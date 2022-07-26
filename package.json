@@ -246,6 +246,7 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "@emotion/react": "^11.9.3",
     "@jellyfin/client-axios": "^10.7.8",
     "@mantine/core": "^5.0.0",
     "@mantine/form": "^5.0.0",
