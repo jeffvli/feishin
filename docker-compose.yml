@@ -1,0 +1,25 @@
+version: '3'
+services:
+  db:
+    container_name: sonixd_db
+    image: postgres:13
+    ports:
+      - '5432:5432'
+    volumes:
+      - ${DB_PERSIST_PATH}:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+  server:
+    container_name: sonixd
+    image: sonixd:latest
+    depends_on:
+      - db
+    environment:
+      - APP_BASE_URL=${APP_BASE_URL}
+      - DATABASE_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@db/${DB_NAME}?schema=public&connection_limit=14&pool_timeout=20
+      - DATABASE_SECRET=${DB_SECRET}
+    ports:
+      - '9321:9321'
+    restart: always

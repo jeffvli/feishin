@@ -1,0 +1,19 @@
+.container {
+  min-width: 400px;
+  max-width: 50%;
+  margin: auto;
+  padding: 3rem;
+  background: rgba(50, 50, 50, 0.4);
+  border-radius: 5px;
+}
+
+.button {
+  background: var(--primary-color);
+
+  &:hover,
+  &:active,
+  &:focus {
+    background: var(--primary-color);
+    filter: brightness(1.1);
+  }
+}

@@ -1,0 +1,370 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model RefreshToken {
+  id    Int    @id @default(autoincrement())
+  token String @unique
+
+  User   User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  enabled   Boolean  @default(false)
+  isAdmin   Boolean  @default(false)
+  deviceId  String   @unique
+
+  favorites               Favorite[]
+  histories               History[]
+  serverFolderPermissions ServerFolderPermission[]
+  albumArtistRatings      AlbumArtistRating[]
+  artistRatings           ArtistRating[]
+  albumRatings            AlbumRating[]
+  songRatings             SongRating[]
+  refreshTokens           RefreshToken[]
+}
+
+model History {
+  id Int @id @default(autoincrement())
+
+  songs Song[]
+
+  User   User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Folder {
+  id        Int      @id @default(autoincrement())
+  name      String
+  path      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  songs         Song[]
+  serverFolders ServerFolder[]
+
+  parentId Int?
+  parent   Folder?  @relation("FolderChildren", fields: [parentId], references: [id])
+  children Folder[] @relation("FolderChildren")
+
+  Server   Server @relation(fields: [serverId], references: [id])
+  serverId Int
+
+  @@unique(fields: [serverId, path], name: "uniqueFolderId")
+}
+
+model Server {
+  id           Int      @id @default(autoincrement())
+  name         String
+  url          String   @unique
+  username     String
+  remoteUserId String
+  token        String
+  serverType   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  albumArtists  AlbumArtist[]
+  artists       Artist[]
+  albums        Album[]
+  songs         Song[]
+  serverFolders ServerFolder[]
+  serverUrls    ServerUrl[]
+  folders       Folder[]
+}
+
+model ServerUrl {
+  id        Int      @id @default(autoincrement())
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Server   Server @relation(fields: [serverId], references: [id])
+  serverId Int
+
+  @@unique(fields: [serverId, url], name: "uniqueServerUrlId")
+}
+
+model ServerFolder {
+  id        Int      @id @default(autoincrement())
+  name      String
+  remoteId  String   @unique
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isPublic  Boolean  @default(true)
+  deleted   Boolean  @default(false)
+
+  albumArtists            AlbumArtist[]
+  artists                 Artist[]
+  albums                  Album[]
+  songs                   Song[]
+  folders                 Folder[]
+  tasks                   Task[]
+  serverFolderPermissions ServerFolderPermission[]
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId Int
+
+  @@unique(fields: [serverId, remoteId], name: "uniqueServerFolderId")
+}
+
+model ServerFolderPermission {
+  id Int @id @default(autoincrement())
+
+  ServerFolder   ServerFolder @relation(fields: [serverFolderId], references: [id])
+  serverFolderId Int
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  @@unique(fields: [serverFolderId, userId], name: "uniqueServerFolderPermissionId")
+}
+
+model Genre {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  albumArtists AlbumArtist[]
+  artists      Artist[]
+  albums       Album[]
+  songs        Song[]
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  albumArtists AlbumArtist[]
+  artists      Artist[]
+  albums       Album[]
+  songs        Song[]
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model AlbumArtistRating {
+  id        Int      @id @default(autoincrement())
+  value     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  albumArtist   AlbumArtist? @relation(fields: [albumArtistId], references: [id])
+  albumArtistId Int?
+}
+
+model ArtistRating {
+  id        Int      @id @default(autoincrement())
+  value     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  artist   Artist? @relation(fields: [artistId], references: [id])
+  artistId Int?
+}
+
+model AlbumRating {
+  id        Int      @id @default(autoincrement())
+  value     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  album   Album? @relation(fields: [albumId], references: [id])
+  albumId Int?
+}
+
+model SongRating {
+  id        Int      @id @default(autoincrement())
+  value     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  song   Song? @relation(fields: [songId], references: [id])
+  songId Int?
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  name      String
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  albumArtists AlbumArtist[]
+  artists      Artist[]
+  albums       Album[]
+  songs        Song[]
+
+  @@unique(fields: [name, url], name: "uniqueImageId")
+}
+
+model External {
+  id        Int      @id @default(autoincrement())
+  name      String
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  albumArtists AlbumArtist[]
+  artists      Artist[]
+  albums       Album[]
+  songs        Song[]
+
+  @@unique(fields: [name, url], name: "uniqueExternalId")
+}
+
+model AlbumArtist {
+  id              Int       @id @default(autoincrement())
+  name            String
+  biography       String?
+  remoteId        String
+  remoteCreatedAt DateTime?
+  deleted         Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  albums        Album[]
+  genres        Genre[]
+  favorites     Favorite[]
+  images        Image[]
+  externals     External[]
+  serverFolders ServerFolder[]
+  ratings       AlbumArtistRating[]
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId Int
+
+  @@unique(fields: [serverId, remoteId], name: "uniqueAlbumArtistId")
+}
+
+model Album {
+  id              Int       @id @default(autoincrement())
+  name            String
+  date            DateTime?
+  year            Int?
+  remoteId        String
+  remoteCreatedAt DateTime?
+  deleted         Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  songs         Song[]
+  genres        Genre[]
+  favorites     Favorite[]
+  artists       Artist[]
+  images        Image[]
+  externals     External[]
+  serverFolders ServerFolder[]
+  ratings       AlbumRating[]
+
+  albumArtist   AlbumArtist? @relation(fields: [albumArtistId], references: [id])
+  albumArtistId Int?
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId Int
+
+  @@unique(fields: [serverId, remoteId], name: "uniqueAlbumId")
+}
+
+model Artist {
+  id              Int       @id @default(autoincrement())
+  name            String
+  biography       String?
+  remoteId        String
+  remoteCreatedAt DateTime?
+  deleted         Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  genres        Genre[]
+  favorites     Favorite[]
+  albums        Album[]
+  songs         Song[]
+  images        Image[]
+  externals     External[]
+  serverFolders ServerFolder[]
+  ratings       ArtistRating[]
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId Int
+
+  @@unique(fields: [serverId, remoteId], name: "uniqueArtistId")
+}
+
+model Song {
+  id              Int       @id @default(autoincrement())
+  name            String
+  date            DateTime?
+  year            Int?
+  duration        Float
+  bitRate         Int
+  container       String
+  disc            Int       @default(1)
+  track           Int?
+  artistName      String?
+  remoteId        String
+  remoteCreatedAt DateTime?
+  deleted         Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  genres        Genre[]
+  favorites     Favorite[]
+  artists       Artist[]
+  images        Image[]
+  externals     External[]
+  folders       Folder[]
+  serverFolders ServerFolder[]
+  histories     History[]
+  ratings       SongRating[]
+
+  album   Album? @relation(fields: [albumId], references: [id])
+  albumId Int?
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId Int
+
+  @@unique(fields: [serverId, remoteId], name: "uniqueSongId")
+}
+
+model Task {
+  id         Int      @id @default(autoincrement())
+  name       String
+  inProgress Boolean  @default(false)
+  completed  Boolean  @default(false)
+  isError    Boolean? @default(false)
+  progress   String?
+  message    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  serverFolder   ServerFolder @relation(fields: [serverFolderId], references: [id])
+  serverFolderId Int
+}

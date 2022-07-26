@@ -1,0 +1,9 @@
+{
+  "player": {
+    "next": "player.next",
+    "play": "player.play",
+    "prev": "player.prev",
+    "seekBack": "player.seekBack",
+    "seekForward": "player.seekForward"
+  }
+}

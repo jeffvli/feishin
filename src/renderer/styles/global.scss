@@ -1,0 +1,175 @@
+@use '../themes/default.scss';
+@use '../themes/dark.scss';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body,
+html {
+  position: absolute;
+  display: block;
+  width: 100%;
+  min-width: 640px;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  color: var(--content-text-color);
+  background: var(--content-bg);
+  font-size: 12px;
+}
+
+@media only screen and (max-width: 639px) {
+  body,
+  html {
+    overflow-x: auto;
+  }
+}
+
+#root {
+  height: inherit;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-text-size-adjust: none;
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-bg);
+}
+
+a {
+  text-decoration: none;
+}
+
+@font-face {
+  font-family: 'AnekTamil';
+  src: url('../fonts/AnekTamil-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('../fonts/Archivo-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Cormorant';
+  src: url('../fonts/Cormorant-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Circular STD';
+  src: url('../fonts/CircularSTD-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Didact Gothic';
+  src: url('../fonts/DidactGothic-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('../fonts/DMSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Encode Sans';
+  src: url('../fonts/EncodeSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Epilogue';
+  src: url('../fonts/Epilogue-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Gotham';
+  src: url('../fonts/Gotham-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Hahmlet';
+  src: url('../fonts/Hahmlet-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inconsolata';
+  src: url('../fonts/Inconsolata-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/Inter-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'JetBrainsMono';
+  src: url('../fonts/JetBrainsMono-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Manrope';
+  src: url('../fonts/Manrope-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../fonts/Montserrat-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('../fonts/Oswald-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Oxygen';
+  src: url('../fonts/Oxygen-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('../fonts/Poppins-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Raleway';
+  src: url('../fonts/Raleway-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Sora';
+  src: url('../fonts/Sora-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Spectral';
+  src: url('../fonts/Spectral-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Work Sans';
+  src: url('../fonts/WorkSans-Regular.ttf') format('truetype');
+}
