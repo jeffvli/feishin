@@ -1,4 +1,8 @@
-import { ReactNode } from 'react';
+import {
+  ComponentPropsWithoutRef,
+  ComponentPropsWithRef,
+  ReactNode,
+} from 'react';
 import {
   Text as MantineText,
   TextProps as MantineTextProps,
@@ -8,7 +12,10 @@ import styled from 'styled-components';
 import { Font } from 'renderer/styles';
 import { textEllipsis } from 'renderer/styles/mixins';
 
-interface TextProps extends MantineTextProps<'div'> {
+type MantineTextDivProps = MantineTextProps & ComponentPropsWithoutRef<'div'>;
+type MantineTextLinkProps = MantineTextProps & ComponentPropsWithRef<'link'>;
+
+interface TextProps extends MantineTextDivProps {
   children: ReactNode;
   font?: Font;
   link?: boolean;
@@ -19,7 +26,7 @@ interface TextProps extends MantineTextProps<'div'> {
   weight?: number;
 }
 
-interface LinkTextProps extends MantineTextProps<'Link'> {
+interface LinkTextProps extends MantineTextLinkProps {
   children: ReactNode;
   font?: Font;
   link?: boolean;

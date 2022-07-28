@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ComponentPropsWithoutRef, ReactNode } from 'react';
 import {
   TooltipProps,
   UnstyledButton,
@@ -8,7 +8,9 @@ import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
 import { Tooltip } from 'renderer/components';
 
-interface PlayerButtonProps extends UnstyledButtonProps<'button'> {
+type MantineButtonProps = UnstyledButtonProps &
+  ComponentPropsWithoutRef<'button'>;
+interface PlayerButtonProps extends MantineButtonProps {
   icon: ReactNode;
   tooltip?: Omit<TooltipProps, 'children'>;
   variant: 'main' | 'secondary';
@@ -107,13 +109,13 @@ export const PlayerButton = ({
 }: PlayerButtonProps) => {
   if (tooltip) {
     return (
-      <Tooltip {...tooltip}>
-        <MotionWrapper variant={variant}>
+      <MotionWrapper variant={variant}>
+        <Tooltip {...tooltip}>
           <StyledPlayerButton variant={variant} {...rest}>
             {icon}
           </StyledPlayerButton>
-        </MotionWrapper>
-      </Tooltip>
+        </Tooltip>
+      </MotionWrapper>
     );
   }
 

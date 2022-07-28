@@ -1,9 +1,9 @@
-import React, { ReactNode } from 'react';
+import { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { ActionIcon, ActionIconProps, TooltipProps } from '@mantine/core';
 import { Tooltip } from '../tooltip/Tooltip';
 
 type MantineIconButtonProps = ActionIconProps &
-  React.ComponentPropsWithoutRef<'button'>;
+  ComponentPropsWithoutRef<'button'>;
 
 interface IconButtonProps extends MantineIconButtonProps {
   active?: boolean;
