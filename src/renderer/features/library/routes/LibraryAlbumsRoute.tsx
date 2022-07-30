@@ -46,8 +46,8 @@ export const LibraryAlbumsRoute = () => {
   });
 
   const { data: albums } = useAlbums({
-    limit: 0,
-    page: 0,
+    skip: 0,
+    take: 0,
     ...filters,
   });
 

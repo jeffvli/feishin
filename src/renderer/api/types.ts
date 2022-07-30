@@ -19,8 +19,8 @@ export interface BasePaginatedResponse<T> {
 }
 
 export interface BasePaginationRequest {
-  limit: number;
-  page: number;
+  skip: number;
+  take: number;
 }
 
 export type ServerResponse = {

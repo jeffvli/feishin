@@ -59,8 +59,8 @@ export const VirtualInfiniteGrid = ({
     const end = stopIndex * columnCount + columnCount;
 
     const t = await query({
-      limit: end - start,
       skip: start,
+      take: end - start,
       ...queryParams,
     });
 
