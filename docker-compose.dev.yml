@@ -27,6 +27,8 @@ services:
       - DATABASE_URL=postgresql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@db/${DATABASE_NAME}?schema=public&connection_limit=14&pool_timeout=20
       - DATABASE_PORT=${DATABASE_PORT}
       - TOKEN_SECRET=${TOKEN_SECRET}
+      - TOKEN_EXPIRATION=${TOKEN_EXPIRATION}
+      - TOKEN_REFRESH_EXPIRATION=${TOKEN_REFRESH_EXPIRATION}
     ports:
       - '9321:9321'
     restart: unless-stopped
