@@ -1,4 +1,4 @@
-import { Card } from '@mantine/core';
+import { Card, Skeleton } from '@mantine/core';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
 import { CardRow } from 'renderer/types';
@@ -10,7 +10,6 @@ const CardWrapper = styled(motion.div)<{
   itemHeight: number;
   itemWidth: number;
 }>`
-  display: flex;
   flex: ${({ itemWidth }) => `0 0 ${itemWidth}px`};
   width: ${({ itemWidth }) => `${itemWidth}px`};
   height: ${({ itemHeight }) => `${itemHeight}px`};
@@ -46,9 +45,17 @@ const ImageSection = styled.div`
   height: 100%;
 `;
 
-const Image = styled(motion.div)<{ height: number; src: string }>`
+interface ImageProps {
+  height: number;
+  src: string;
+}
+
+const Image = styled(motion.div).attrs((props: ImageProps) => ({
+  style: {
+    background: `url(${props.src})`,
+  },
+}))<ImageProps>`
   height: ${({ height }) => `${height}px`};
-  background: ${({ src }) => `url(${src})`};
   background-position: center;
   background-size: cover;
   border: 0;
@@ -82,9 +89,9 @@ export const GridCard = ({ data, index, style, isScrolling }: any) => {
     itemGap,
     itemCount,
     cardControls,
+    handlePlayQueueAdd,
     cardRows,
     itemData,
-    handlePlayQueueAdd,
   } = data;
 
   const startIndex = index * columnCount;
@@ -98,45 +105,33 @@ export const GridCard = ({ data, index, style, isScrolling }: any) => {
         itemGap={itemGap}
         itemHeight={itemHeight}
         itemWidth={itemWidth}
-        tabIndex={0}
       >
-        <StyledCard>
-          <ImageSection>
-            <Image
-              animate={{
-                opacity: 1,
-              }}
-              height={itemWidth}
-              initial={{
-                opacity: 0,
-              }}
-              src={itemData[i]?.image}
-              transition={{
-                duration: 0.5,
-                ease: 'anticipate',
-              }}
-            >
-              {!isScrolling && (
+        <Skeleton visible={!itemData[i]}>
+          <StyledCard>
+            <ImageSection>
+              <Image height={itemWidth} src={itemData[i]?.image}>
                 <ControlsContainer>
-                  <GridCardControls
-                    cardControls={cardControls}
-                    handlePlayQueueAdd={handlePlayQueueAdd}
-                    itemData={itemData[i]}
-                  />
+                  {!isScrolling && (
+                    <GridCardControls
+                      cardControls={cardControls}
+                      handlePlayQueueAdd={handlePlayQueueAdd}
+                      itemData={itemData[i]}
+                    />
+                  )}
                 </ControlsContainer>
-              )}
-            </Image>
-          </ImageSection>
-          <DetailSection>
-            {cardRows.map((row: CardRow) => (
-              <Row key={`row-${row.prop}`}>
-                <Text overflow="hidden" weight={500}>
-                  {itemData[i] && itemData[i][row.prop]}
-                </Text>
-              </Row>
-            ))}
-          </DetailSection>
-        </StyledCard>
+              </Image>
+            </ImageSection>
+            <DetailSection>
+              {cardRows.map((row: CardRow) => (
+                <Row key={`row-${row.prop}`}>
+                  <Text overflow="hidden" weight={500}>
+                    {itemData[i] && itemData[i][row.prop]}
+                  </Text>
+                </Row>
+              ))}
+            </DetailSection>
+          </StyledCard>
+        </Skeleton>
       </CardWrapper>
     );
   }

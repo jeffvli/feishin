@@ -14,11 +14,13 @@ export const VirtualGridWrapper = ({
   itemCount,
   columnCount,
   rowCount,
+  itemData,
   ...rest
 }: Omit<FixedSizeListProps, 'ref' | 'itemSize' | 'children'> & {
   cardControls: any;
   cardRows: CardRow[];
   columnCount: number;
+  itemData: any[];
   itemGap: number;
   itemHeight: number;
   itemWidth: number;
@@ -27,39 +29,37 @@ export const VirtualGridWrapper = ({
 }) => {
   const { handlePlayQueueAdd } = usePlayQueueHandler();
 
-  const itemData = useMemo(
+  const memo = useMemo(
     () => ({
       cardControls,
       cardRows,
       columnCount,
       handlePlayQueueAdd,
       itemCount,
-      itemData: rest.itemData,
+      itemData,
       itemGap,
       itemHeight,
       itemWidth,
     }),
     [
-      cardRows,
       cardControls,
+      cardRows,
       columnCount,
+      handlePlayQueueAdd,
       itemCount,
-      rest.itemData,
+      itemData,
       itemGap,
       itemHeight,
       itemWidth,
-      handlePlayQueueAdd,
     ]
   );
 
   return (
     <FixedSizeList
-      style={{ scrollBehavior: 'smooth' }}
-      {...rest}
       ref={refInstance}
-      initialScrollOffset={0}
+      {...rest}
       itemCount={rowCount}
-      itemData={itemData}
+      itemData={memo}
       itemSize={itemHeight + itemGap}
       overscanCount={10}
     >
