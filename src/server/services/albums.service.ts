@@ -55,10 +55,10 @@ const findMany = async (
 ) => {
   const {
     user,
-    limit,
-    page,
+    take,
     serverFolderIds: rServerFolderIds,
     serverUrls,
+    skip,
     sortBy,
     orderBy,
   } = options;
@@ -75,7 +75,6 @@ const findMany = async (
     serverFolderIds!
   );
 
-  const startIndex = limit * page;
   let totalEntries = 0;
   let albums: Album[];
 
@@ -94,8 +93,8 @@ const findMany = async (
           },
         },
         orderBy: { value: orderBy },
-        skip: startIndex,
-        take: limit,
+        skip,
+        take,
         where: {
           album: { OR: serverFoldersFilter },
           user: { id: user.id },
@@ -113,8 +112,8 @@ const findMany = async (
       prisma.album.findMany({
         include: { ...albumHelpers.include({ serverUrls, songs: false }) },
         orderBy: [{ ...albumHelpers.sort(sortBy, orderBy) }],
-        skip: startIndex,
-        take: limit,
+        skip,
+        take,
         where: { OR: serverFoldersFilter },
       }),
     ]);
@@ -126,9 +125,8 @@ const findMany = async (
   return ApiSuccess.ok({
     data: toRes.albums(albums, user),
     paginationItems: {
-      limit,
-      page,
-      startIndex,
+      skip,
+      take,
       totalEntries,
       url: req.originalUrl,
     },

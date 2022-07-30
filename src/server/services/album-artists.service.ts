@@ -39,7 +39,7 @@ const findMany = async (
   req: Request,
   options: { serverFolderIds: string; user: User } & OffsetPagination
 ) => {
-  const { user, limit, page, serverFolderIds: rServerFolderIds } = options;
+  const { user, take, serverFolderIds: rServerFolderIds, skip } = options;
   const serverFolderIds = splitNumberString(rServerFolderIds);
 
   if (!(await folderPermissions(serverFolderIds!, user))) {
@@ -52,23 +52,21 @@ const findMany = async (
     };
   });
 
-  const startIndex = limit * page;
   const totalEntries = await prisma.albumArtist.count({
     where: { OR: serverFoldersFilter },
   });
   const albumArtists = await prisma.albumArtist.findMany({
     include: { genres: true },
-    skip: startIndex,
-    take: limit,
+    skip,
+    take,
     where: { OR: serverFoldersFilter },
   });
 
   return ApiSuccess.ok({
     data: albumArtists,
     paginationItems: {
-      limit,
-      page,
-      startIndex,
+      skip,
+      take,
       totalEntries,
       url: req.originalUrl,
     },

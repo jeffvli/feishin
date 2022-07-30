@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { prisma } from '../lib';
-import { OffsetPagination, User } from '../types/types';
+import { User } from '../types/types';
 import {
   ApiError,
   ApiSuccess,
@@ -52,8 +52,8 @@ const findMany = async (
     artistIds: rawArtistIds,
     songIds: rawSongIds,
     user,
-    limit,
-    page,
+    skip,
+    take,
     serverFolderIds: rServerFolderIds,
   } = options;
   const serverFolderIds = splitNumberString(rServerFolderIds);
@@ -75,8 +75,6 @@ const findMany = async (
     serverFolders: { some: { id: { in: serverFolderIds } } },
   };
 
-  const startIndex = limit * page;
-
   const [totalEntries, songs] = await prisma.$transaction([
     prisma.song.count({
       where: {
@@ -96,8 +94,8 @@ const findMany = async (
         images: true,
         serverFolders: { include: { server: true } },
       },
-      skip: startIndex,
-      take: limit,
+      skip,
+      take,
       where: { OR: serverFoldersFilter },
     }),
   ]);
@@ -105,9 +103,8 @@ const findMany = async (
   return ApiSuccess.ok({
     data: songs,
     paginationItems: {
-      limit,
-      page,
-      startIndex,
+      skip,
+      take,
       totalEntries,
       url: req.originalUrl,
     },

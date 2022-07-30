@@ -14,7 +14,11 @@ export const errorHandler = (
   });
 
   if (err.message) {
-    message = isJsonString(err.message) ? JSON.parse(err.message) : err.message;
+    message = isJsonString(err.message)
+      ? Array.isArray(JSON.parse(err.message))
+        ? JSON.parse(err.message)[0].message // Handles errors sent from zod preprocess
+        : JSON.parse(err.message)
+      : err.message;
   }
 
   res.status(err.statusCode || 500).json({

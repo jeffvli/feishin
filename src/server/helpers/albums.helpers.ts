@@ -6,7 +6,6 @@ import { songHelpers } from './songs.helpers';
 export enum AlbumSort {
   DATE_ADDED = 'date_added',
   DATE_ADDED_REMOTE = 'date_added_remote',
-  DATE_PLAYED = 'date_played',
   DATE_RELEASED = 'date_released',
   RANDOM = 'random',
   RATING = 'rating',

@@ -113,8 +113,8 @@ export type Task = {
 };
 
 export type OffsetPagination = {
-  limit: number;
-  page: number;
+  skip: number;
+  take: number;
 };
 
 export type PaginationResponse = {
@@ -131,9 +131,8 @@ export type SuccessResponse = {
 };
 
 export type PaginationItems = {
-  limit: number;
-  page: number;
-  startIndex: number;
+  skip: number;
+  take: number;
   totalEntries: number;
   url: string;
 };

@@ -18,12 +18,12 @@ const getSongs = async (req: Request, res: Response) => {
     }),
   });
 
-  const { limit, page, serverFolderIds } = req.query;
+  const { take, skip, serverFolderIds } = req.query;
 
   const data = await songsService.findMany(req, {
-    limit: Number(limit),
-    page: Number(page),
     serverFolderIds: String(serverFolderIds),
+    skip: Number(skip),
+    take: Number(take),
     user: req.auth,
   });
 

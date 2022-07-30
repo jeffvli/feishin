@@ -1,17 +1,16 @@
 import { PaginationItems } from '../types/types';
 
-const getPaginationUrl = (url: string, action: 'next' | 'prev') => {
-  const currentPageRegex = url.match(/page=(\d+)/gm);
-
-  if (currentPageRegex) {
-    const currentPage = Number(currentPageRegex[0].split('=')[1]);
-    const newPage = action === 'next' ? currentPage + 1 : currentPage - 1;
-    const normalizedUrl = process.env.APP_BASE_URL?.replace(/\/$/, '');
-
-    return `${normalizedUrl}${url.replace(/page=\d+/gm, `page=${newPage}`)}`;
+const getPaginationUrl = (
+  url: string,
+  skip: number,
+  take: number,
+  action: 'next' | 'prev'
+) => {
+  if (action === 'next') {
+    return url.replace(/skip=(\d+)/gm, `skip=${skip + take}`);
   }
 
-  return null;
+  return url.replace(/skip=(\d+)/gm, `skip=${skip - take}`);
 };
 
 export const getSuccessResponse = (options: {
@@ -24,15 +23,15 @@ export const getSuccessResponse = (options: {
   let pagination;
 
   if (paginationItems) {
-    const { startIndex, totalEntries, limit, url, page } = paginationItems;
-    const hasPrevPage = startIndex - limit >= 0;
-    const hasNextPage = startIndex + limit <= totalEntries;
+    const { skip, totalEntries, take, url } = paginationItems;
+
+    const hasPrevPage = skip - take >= 0;
+    const hasNextPage = skip + take <= totalEntries;
 
     pagination = {
-      currentPage: page,
-      nextPage: hasNextPage ? getPaginationUrl(url, 'next') : null,
-      prevPage: hasPrevPage ? getPaginationUrl(url, 'prev') : null,
-      startIndex,
+      nextPage: hasNextPage ? getPaginationUrl(url, skip, take, 'next') : null,
+      prevPage: hasPrevPage ? getPaginationUrl(url, skip, take, 'prev') : null,
+      skip,
       totalEntries,
     };
   }

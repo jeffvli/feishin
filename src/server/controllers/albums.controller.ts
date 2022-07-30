@@ -38,15 +38,16 @@ const getAlbums = async (req: Request, res: Response) => {
     }),
   });
 
-  const { limit, page, serverFolderIds, serverUrls, sortBy, orderBy } =
+  const { take, serverFolderIds, serverUrls, sortBy, orderBy, skip } =
     req.query;
+
   const data = await albumsService.findMany(req, {
-    limit: Number(limit),
     orderBy: orderBy as SortOrder,
-    page: Number(page),
     serverFolderIds: serverFolderIds && String(serverFolderIds),
     serverUrls: serverUrls && String(serverUrls),
+    skip: Number(skip),
     sortBy: sortBy as AlbumSort,
+    take: Number(take),
     user: req.auth,
   });
 
