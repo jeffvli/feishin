@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 import { Group } from '@mantine/core';
+import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { ChevronLeft, ChevronRight } from 'tabler-icons-react';
 import { IconButton } from 'renderer/components';
 import { WindowControls } from 'renderer/features/window-controls';
 
@@ -47,12 +47,12 @@ export const Titlebar = ({ children }: TitlebarProps) => {
         <Left>
           <Group spacing="xs">
             <IconButton
-              icon={<ChevronLeft size={25} strokeWidth={1.5} />}
+              icon={<RiArrowLeftSLine size={25} />}
               size={25}
               onClick={() => navigate(-1)}
             />
             <IconButton
-              icon={<ChevronRight size={25} strokeWidth={1.5} />}
+              icon={<RiArrowRightSLine size={25} />}
               size={25}
               onClick={() => navigate(1)}
             />

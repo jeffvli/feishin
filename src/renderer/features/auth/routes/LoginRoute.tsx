@@ -10,11 +10,10 @@ import {
 } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
+import { RiCheckboxCircleFill } from 'react-icons/ri';
 import { useSearchParams } from 'react-router-dom';
-import { AlertCircle, CircleCheck } from 'tabler-icons-react';
 import { normalizeServerUrl } from 'renderer/utils';
-import { useLogin } from '../queries/useLogin';
-import { usePingServer } from '../queries/usePingServer';
+import { useLogin, usePingServer } from '../queries/login';
 import styles from './LoginRoute.module.scss';
 
 export const LoginRoute = () => {
@@ -66,7 +65,7 @@ export const LoginRoute = () => {
               isCheckingServer ? (
                 <Loader size="xs" />
               ) : isValidServer ? (
-                <CircleCheck />
+                <RiCheckboxCircleFill size={20} />
               ) : null
             }
             value={server}
@@ -105,7 +104,7 @@ export const LoginRoute = () => {
             Login
           </Button>
           {isError && (
-            <Alert color="red" icon={<AlertCircle />} variant="outline">
+            <Alert color="red" variant="outline">
               {t('Invalid username or password.')}
             </Alert>
           )}

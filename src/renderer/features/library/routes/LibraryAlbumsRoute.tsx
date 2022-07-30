@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Button, Group, Menu } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { CaretDown } from 'tabler-icons-react';
 import i18n from 'i18n/i18n';
 import { albumsApi } from 'renderer/api/albumsApi';
 import { VirtualInfiniteGrid } from 'renderer/components/virtual-grid/VirtualInfiniteGrid';
@@ -66,37 +65,29 @@ export const LibraryAlbumsRoute = () => {
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Item
-                rightSection={<CaretDown size={12} />}
                 onClick={() => setFilters({ sortBy: AlbumSort.TITLE })}
               >
                 Title
               </Menu.Item>
-              <Menu.Item
-                rightSection={<CaretDown size={12} />}
-                onClick={() => setFilters({ sortBy: AlbumSort.YEAR })}
-              >
+              <Menu.Item onClick={() => setFilters({ sortBy: AlbumSort.YEAR })}>
                 Year
               </Menu.Item>
               <Menu.Item
-                rightSection={<CaretDown size={12} />}
                 onClick={() => setFilters({ sortBy: AlbumSort.RATING })}
               >
                 Rating
               </Menu.Item>
               <Menu.Item
-                rightSection={<CaretDown size={12} />}
                 onClick={() => setFilters({ sortBy: AlbumSort.DATE_RELEASED })}
               >
                 Date Released
               </Menu.Item>
               <Menu.Item
-                rightSection={<CaretDown size={12} />}
                 onClick={() => setFilters({ sortBy: AlbumSort.DATE_ADDED })}
               >
                 Date Added
               </Menu.Item>
               <Menu.Item
-                rightSection={<CaretDown size={12} />}
                 onClick={() =>
                   setFilters({ sortBy: AlbumSort.DATE_ADDED_REMOTE })
                 }

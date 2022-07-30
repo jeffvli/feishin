@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import format from 'format-duration';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import {
-  PlayerPause,
-  PlayerPlay,
-  PlayerSkipBack,
-  PlayerSkipForward,
-  PlayerTrackNext,
-  PlayerTrackPrev,
-} from 'tabler-icons-react';
+  RiPlayFill,
+  RiSkipForwardFill,
+  RiSkipBackFill,
+  RiSpeedFill,
+  RiRewindFill,
+  RiPauseFill,
+} from 'react-icons/ri';
+import styled from 'styled-components';
 import { Text } from 'renderer/components';
 import { usePlayerStore } from 'renderer/store';
 import { Font } from 'renderer/styles';
@@ -106,13 +106,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
       <ControlsContainer onScroll={(e) => console.log(e)}>
         <ButtonsContainer>
           <PlayerButton
-            icon={<PlayerSkipBack size={15} />}
+            icon={<RiSkipBackFill size={15} />}
             tooltip={{ label: `${t('player.prev')}` }}
             variant="secondary"
             onClick={handlePrevTrack}
           />
           <PlayerButton
-            icon={<PlayerTrackPrev size={15} />}
+            icon={<RiRewindFill size={15} />}
             tooltip={{ label: `${t('player.skipBack')}` }}
             variant="secondary"
             onClick={handleSkipBackward}
@@ -120,9 +120,9 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
           <PlayerButton
             icon={
               status === PlayerStatus.Paused ? (
-                <PlayerPlay size={20} />
+                <RiPlayFill size={20} />
               ) : (
-                <PlayerPause size={20} />
+                <RiPauseFill size={20} />
               )
             }
             tooltip={{
@@ -135,13 +135,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             onClick={handlePlayPause}
           />
           <PlayerButton
-            icon={<PlayerTrackNext size={15} />}
+            icon={<RiSpeedFill size={15} />}
             tooltip={{ label: `${t('player.skipForward')}` }}
             variant="secondary"
             onClick={handleSkipForward}
           />
           <PlayerButton
-            icon={<PlayerSkipForward size={15} />}
+            icon={<RiSkipForwardFill size={15} />}
             tooltip={{ label: `${t('player.next')}` }}
             variant="secondary"
             onClick={handleNextTrack}

@@ -1,7 +1,7 @@
 import { Button, Menu } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { RiLogoutBoxLine, RiServerFill, RiSettings3Fill } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
-import { Logout, Server, Settings } from 'tabler-icons-react';
 import { AddServerModal } from 'renderer/features/servers';
 import { useAuthStore } from 'renderer/store';
 
@@ -18,25 +18,24 @@ export const UserMenu = () => {
 
   return (
     <>
-      <Menu
-        control={
+      <Menu position="bottom">
+        <Menu.Target>
           <Button radius="lg" size="xs" variant="default">
             User
           </Button>
-        }
-        position="bottom"
-        size="md"
-      >
-        <Menu.Item
-          icon={<Server size={20} />}
-          onClick={() => addServerHandlers.open()}
-        >
-          Servers
-        </Menu.Item>
-        <Menu.Item icon={<Settings size={20} />}>Settings</Menu.Item>
-        <Menu.Item icon={<Logout size={20} />} onClick={handleLogout}>
-          Logout
-        </Menu.Item>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item
+            icon={<RiServerFill />}
+            onClick={() => addServerHandlers.open()}
+          >
+            Servers
+          </Menu.Item>
+          <Menu.Item icon={<RiSettings3Fill />}>Settings</Menu.Item>
+          <Menu.Item icon={<RiLogoutBoxLine />} onClick={handleLogout}>
+            Logout
+          </Menu.Item>
+        </Menu.Dropdown>
       </Menu>
       <AddServerModal
         opened={addServerModal}

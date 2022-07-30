@@ -1,5 +1,5 @@
+import { RiVolumeUpFill, RiVolumeMuteFill } from 'react-icons/ri';
 import styled from 'styled-components';
-import { Volume2, Volume3 } from 'tabler-icons-react';
 import { IconButton } from 'renderer/components';
 import { usePlayerStore } from 'renderer/store';
 import { useRightControls } from '../hooks/useRightControls';
@@ -42,9 +42,9 @@ export const RightControls = () => {
           <IconButton
             icon={
               muted ? (
-                <Volume3 size={20} strokeWidth={1.5} />
+                <RiVolumeMuteFill size={20} />
               ) : (
-                <Volume2 size={20} strokeWidth={1.5} />
+                <RiVolumeUpFill size={20} />
               )
             }
             size={20}

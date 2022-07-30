@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { EditCircle } from 'tabler-icons-react';
 import { ServerResponse } from 'renderer/api/types';
 import { IconButton } from 'renderer/components';
 import { useServers } from '../queries/useServers';
@@ -61,10 +60,7 @@ export const ServerList = () => {
                 {server.name}
                 <Text>Hello</Text>
               </div>
-              <IconButton
-                icon={<EditCircle />}
-                onClick={() => editServerHandlers.toggle()}
-              >
+              <IconButton onClick={() => editServerHandlers.toggle()}>
                 Edit
               </IconButton>
             </div>

@@ -1,7 +1,8 @@
 import md5 from 'md5';
 import { nanoid } from 'nanoid';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { authApi } from 'renderer/api/authApi';
+import { queryKeys } from 'renderer/api/queryKeys';
 import { useAuthStore } from 'renderer/store';
 
 export const useLogin = (
@@ -34,5 +35,14 @@ export const useLogin = (
         })
       );
     },
+  });
+};
+
+export const usePingServer = (server: string) => {
+  return useQuery({
+    enabled: !!server,
+    queryFn: () => authApi.ping(server),
+    queryKey: queryKeys.ping(server),
+    retry: false,
   });
 };

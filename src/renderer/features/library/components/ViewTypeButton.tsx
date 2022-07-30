@@ -1,6 +1,6 @@
 import { Dispatch } from 'react';
 import { ActionIcon, Menu, MenuProps } from '@mantine/core';
-import { LayoutGrid, LayoutList, Table } from 'tabler-icons-react';
+import { RiLayoutGridFill, RiLayoutTopFill } from 'react-icons/ri';
 
 export enum ViewType {
   Detail = 'detail',
@@ -23,30 +23,18 @@ export const ViewTypeButton = ({
     <Menu {...menuProps}>
       <Menu.Target>
         <ActionIcon variant="transparent">
-          {type === ViewType.Grid ? (
-            <LayoutGrid />
-          ) : type === ViewType.Detail ? (
-            <LayoutList />
-          ) : (
-            <Table />
-          )}
+          {type === ViewType.Grid ? <RiLayoutGridFill /> : <RiLayoutTopFill />}
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Item
-          icon={<LayoutGrid size={14} />}
+          icon={<RiLayoutGridFill />}
           onClick={() => handler(ViewType.Grid)}
         >
           Grid
         </Menu.Item>
         <Menu.Item
-          icon={<LayoutList size={14} />}
-          onClick={() => handler(ViewType.Detail)}
-        >
-          Detail
-        </Menu.Item>
-        <Menu.Item
-          icon={<Table size={14} />}
+          icon={<RiLayoutTopFill />}
           onClick={() => handler(ViewType.Table)}
         >
           Table
