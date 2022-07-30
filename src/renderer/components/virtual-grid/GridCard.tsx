@@ -81,7 +81,7 @@ const Row = styled.div`
   padding: 0 0.2rem;
 `;
 
-export const GridCard = ({ data, index, style, isScrolling }: any) => {
+export const GridCard = ({ data, index, style }: any) => {
   const {
     itemHeight,
     itemWidth,
@@ -111,13 +111,11 @@ export const GridCard = ({ data, index, style, isScrolling }: any) => {
             <ImageSection>
               <Image height={itemWidth} src={itemData[i]?.image}>
                 <ControlsContainer>
-                  {!isScrolling && (
-                    <GridCardControls
-                      cardControls={cardControls}
-                      handlePlayQueueAdd={handlePlayQueueAdd}
-                      itemData={itemData[i]}
-                    />
-                  )}
+                  <GridCardControls
+                    cardControls={cardControls}
+                    handlePlayQueueAdd={handlePlayQueueAdd}
+                    itemData={itemData[i]}
+                  />
                 </ControlsContainer>
               </Image>
             </ImageSection>
