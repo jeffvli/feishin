@@ -1,5 +1,5 @@
 import md5 from 'md5';
-import { ServerFolderAuth } from 'types';
+import { ServerFolderAuth } from '../../types';
 
 export const getServerFolderAuth = (
   serverUrl: string,

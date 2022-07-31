@@ -1,8 +1,8 @@
 import React from 'react';
 import { UnstyledButton, UnstyledButtonProps } from '@mantine/core';
 import { motion } from 'framer-motion';
+import { RiPlayFill } from 'react-icons/ri';
 import styled from 'styled-components';
-import { PlayerPlay } from 'tabler-icons-react';
 
 type PlayButtonType = UnstyledButtonProps &
   React.ComponentPropsWithoutRef<'button'>;
@@ -81,7 +81,7 @@ export const GridCardControls = ({
             });
           }}
         >
-          <PlayerPlay />
+          <RiPlayFill size={25} />
         </PlayButton>
       </CenterControls>
       <BottomControls />

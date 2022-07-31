@@ -2,8 +2,8 @@ import { Button, Menu } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { RiLogoutBoxLine, RiServerFill, RiSettings3Fill } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
-import { AddServerModal } from 'renderer/features/servers';
-import { useAuthStore } from 'renderer/store';
+import { useAuthStore } from '../../../store';
+import { AddServerModal } from '../../servers';
 
 export const UserMenu = () => {
   const navigate = useNavigate();

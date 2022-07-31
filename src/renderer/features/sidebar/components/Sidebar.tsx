@@ -4,7 +4,7 @@ import {
   RiSearch2Fill,
 } from 'react-icons/ri';
 import styled from 'styled-components';
-import { AppRoute } from 'renderer/router/utils/routes';
+import { AppRoute } from '../../../router/utils/routes';
 import { ListItem } from './ListItem';
 
 const StyledSidebar = styled.div``;

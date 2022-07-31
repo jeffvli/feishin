@@ -1,11 +1,11 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Routes, Route } from 'react-router-dom';
-import { LoginRoute } from 'renderer/features/auth';
-import { DashboardRoute } from 'renderer/features/dashboard';
-import { LibraryAlbumsRoute } from 'renderer/features/library/routes/LibraryAlbumsRoute';
-import { LibraryArtistsRoute } from 'renderer/features/library/routes/LibraryArtistsRoute';
-import { LibraryRoute } from 'renderer/features/library/routes/LibraryRoute';
-import { ServersRoute } from 'renderer/features/servers';
+import { LoginRoute } from '../features/auth';
+import { DashboardRoute } from '../features/dashboard';
+import { LibraryAlbumsRoute } from '../features/library/routes/LibraryAlbumsRoute';
+import { LibraryArtistsRoute } from '../features/library/routes/LibraryArtistsRoute';
+import { LibraryRoute } from '../features/library/routes/LibraryRoute';
+import { ServersRoute } from '../features/servers';
 import { AuthLayout, DefaultLayout } from '../layouts';
 import { AuthOutlet } from './outlets/AuthOutlet';
 import { PrivateOutlet } from './outlets/PrivateOutlet';

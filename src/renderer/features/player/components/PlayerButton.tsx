@@ -6,7 +6,7 @@ import {
 } from '@mantine/core';
 import { motion } from 'framer-motion';
 import styled, { css } from 'styled-components';
-import { Tooltip } from 'renderer/components';
+import { Tooltip } from '../../../components';
 
 type MantineButtonProps = UnstyledButtonProps &
   ComponentPropsWithoutRef<'button'>;

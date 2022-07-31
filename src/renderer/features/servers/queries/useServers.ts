@@ -1,9 +1,9 @@
 import md5 from 'md5';
 import { useQuery } from 'react-query';
-import { queryKeys } from 'renderer/api/queryKeys';
-import { serversApi } from 'renderer/api/serversApi';
-import { ServerFolderResponse } from 'renderer/api/types';
-import { ServerFolderAuth } from 'types';
+import { ServerFolderAuth } from '../../../../types';
+import { queryKeys } from '../../../api/queryKeys';
+import { serversApi } from '../../../api/serversApi';
+import { ServerFolderResponse } from '../../../api/types';
 
 export const useServers = () => {
   return useQuery({

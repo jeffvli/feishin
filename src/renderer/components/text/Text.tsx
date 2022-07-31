@@ -9,8 +9,8 @@ import {
 } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Font } from 'renderer/styles';
-import { textEllipsis } from 'renderer/styles/mixins';
+import { Font } from '../../styles';
+import { textEllipsis } from '../../styles/mixins';
 
 type MantineTextDivProps = MantineTextProps & ComponentPropsWithoutRef<'div'>;
 type MantineTextLinkProps = MantineTextProps & ComponentPropsWithRef<'link'>;

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { usePlayerStore } from 'renderer/store';
 import { PlaybackType, PlayerStatus } from '../../../../types';
+import { usePlayerStore } from '../../../store';
 import { mpvPlayer } from '../utils/mpvPlayer';
 
 export const useCenterControls = (args: { playersRef: any }) => {

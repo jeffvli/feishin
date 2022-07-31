@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import debounce from 'lodash/debounce';
 import { FixedSizeListProps } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
-import { CardRow } from 'renderer/types';
+import { CardRow } from '../../types';
 import { VirtualGridWrapper } from './VirtualGridWrapper';
 
 interface VirtualGridProps

@@ -12,7 +12,7 @@ import { useDebouncedValue } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { RiCheckboxCircleFill } from 'react-icons/ri';
 import { useSearchParams } from 'react-router-dom';
-import { normalizeServerUrl } from 'renderer/utils';
+import { normalizeServerUrl } from '../../../utils';
 import { useLogin, usePingServer } from '../queries/login';
 import styles from './LoginRoute.module.scss';
 

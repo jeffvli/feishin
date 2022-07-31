@@ -1,4 +1,4 @@
-import { api } from 'renderer/lib';
+import { api } from '../lib';
 import { AlbumsResponse, BasePaginationRequest } from './types';
 
 export interface AlbumsRequest extends BasePaginationRequest {

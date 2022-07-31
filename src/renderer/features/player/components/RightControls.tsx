@@ -1,7 +1,7 @@
 import { RiVolumeUpFill, RiVolumeMuteFill } from 'react-icons/ri';
 import styled from 'styled-components';
-import { IconButton } from 'renderer/components';
-import { usePlayerStore } from 'renderer/store';
+import { IconButton } from '../../../components';
+import { usePlayerStore } from '../../../store';
 import { useRightControls } from '../hooks/useRightControls';
 import { Slider } from './Slider';
 

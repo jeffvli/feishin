@@ -1,4 +1,4 @@
-import { api } from 'renderer/lib';
+import { api } from '../lib';
 
 const getServers = async () => {
   const { data } = await api.get<any[]>('/servers');

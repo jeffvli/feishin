@@ -1,5 +1,4 @@
-import { Song } from 'renderer/api/types';
-// import { ServerFolderAuth } from 'renderer/features/servers';
+import { Song } from '../api/types';
 
 export const getJellyfinStreamUrl = (
   auth: any,

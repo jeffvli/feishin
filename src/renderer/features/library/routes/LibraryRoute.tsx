@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import { AnimatedPage } from 'renderer/features/shared/components/AnimatedPage';
-import { AppRoute } from 'renderer/router/utils/routes';
+import { AppRoute } from '../../../router/utils/routes';
+import { AnimatedPage } from '../../shared/components/AnimatedPage';
 import LibraryTab from '../components/LibraryTab';
 
 const TabContainer = styled.div`

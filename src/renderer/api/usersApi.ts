@@ -1,4 +1,4 @@
-import { api } from 'renderer/lib';
+import { api } from '../lib';
 import { UserResponse } from './types';
 
 const getUsers = async () => {

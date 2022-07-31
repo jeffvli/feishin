@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuthStore } from 'renderer/store';
+import { useAuthStore } from '../../store';
 
 interface AuthOutletProps {
   redirectTo: string;

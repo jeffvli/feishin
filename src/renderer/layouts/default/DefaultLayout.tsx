@@ -2,9 +2,9 @@ import { AnimatePresence } from 'framer-motion';
 import { Outlet, useLocation } from 'react-router-dom';
 import * as Space from 'react-spaces';
 import styled from 'styled-components';
-import { Playerbar } from 'renderer/features/player';
-import { Sidebar } from 'renderer/features/sidebar';
-import { Titlebar } from 'renderer/features/titlebar';
+import { Playerbar } from '../../features/player';
+import { Sidebar } from '../../features/sidebar';
+import { Titlebar } from '../../features/titlebar';
 
 const LayoutContainer = styled(Space.ViewPort)``;
 
@@ -22,9 +22,7 @@ const TitlebarContainer = styled(Space.Top)`
   border-bottom: var(--playerbar-border-top);
 `;
 
-const ContentContainer = styled(Space.Fill)`
-  padding: 1rem;
-`;
+const ContentContainer = styled(Space.Fill)``;
 
 const PlayerbarContainer = styled(Space.Bottom)``;
 
@@ -54,7 +52,7 @@ export const DefaultLayout = () => {
   return (
     <>
       <LayoutContainer>
-        <TitlebarContainer size={40}>
+        <TitlebarContainer size={30}>
           <Titlebar />
         </TitlebarContainer>
         <Space.Fill>
@@ -75,7 +73,7 @@ export const DefaultLayout = () => {
             maximumSize={400}
             size={300}
           />
-          <Space.Fill>
+          <Space.Fill scrollable>
             <AnimatePresence exitBeforeEnter>
               <ContentContainer key={location.pathname}>
                 <Outlet />

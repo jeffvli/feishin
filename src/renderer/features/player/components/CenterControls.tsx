@@ -2,18 +2,18 @@ import { useEffect, useMemo, useState } from 'react';
 import format from 'format-duration';
 import { useTranslation } from 'react-i18next';
 import {
-  RiPlayFill,
-  RiSkipForwardFill,
-  RiSkipBackFill,
-  RiSpeedFill,
-  RiRewindFill,
   RiPauseFill,
+  RiPlayFill,
+  RiRewindFill,
+  RiSkipBackFill,
+  RiSkipForwardFill,
+  RiSpeedFill,
 } from 'react-icons/ri';
 import styled from 'styled-components';
-import { Text } from 'renderer/components';
-import { usePlayerStore } from 'renderer/store';
-import { Font } from 'renderer/styles';
-import { PlaybackType, PlayerStatus } from 'types';
+import { PlaybackType, PlayerStatus } from '../../../../types';
+import { Text } from '../../../components';
+import { usePlayerStore } from '../../../store';
+import { Font } from '../../../styles';
 import { useCenterControls } from '../hooks/useCenterControls';
 import { PlayerButton } from './PlayerButton';
 import { Slider } from './Slider';

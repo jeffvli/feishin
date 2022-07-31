@@ -1,11 +1,11 @@
 import isElectron from 'is-electron';
-import { PlayerState } from 'renderer/store';
 import {
   CrossfadeStyle,
   PlaybackStyle,
   PlaybackType,
   PlayerRepeat,
-} from 'types';
+} from '../../../../types';
+import { PlayerState } from '../../../store';
 
 export interface WebSettings {
   player: PlayerSettings;

@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Link, LinkProps } from 'react-router-dom';
 import styled from 'styled-components';
-import { fontGotham } from 'renderer/styles';
+import { fontGotham } from '../../../styles';
 
 interface LibraryTabProps extends LinkProps {
   children: ReactNode;

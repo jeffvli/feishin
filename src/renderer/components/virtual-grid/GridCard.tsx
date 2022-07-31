@@ -1,7 +1,7 @@
 import { Card, Skeleton } from '@mantine/core';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
-import { CardRow } from 'renderer/types';
+import { CardRow } from '../../types';
 import { Text } from '../text/Text';
 import { GridCardControls } from './GridCardControls';
 

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { usePlayerStore } from 'renderer/store';
+import { usePlayerStore } from '../../../store';
 import { mpvPlayer } from '../utils/mpvPlayer';
 
 export const useRightControls = () => {

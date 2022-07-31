@@ -1,9 +1,9 @@
 import md5 from 'md5';
 import { nanoid } from 'nanoid';
 import { useMutation, useQuery } from 'react-query';
-import { authApi } from 'renderer/api/authApi';
-import { queryKeys } from 'renderer/api/queryKeys';
-import { useAuthStore } from 'renderer/store';
+import { authApi } from '../../../api/authApi';
+import { queryKeys } from '../../../api/queryKeys';
+import { useAuthStore } from '../../../store';
 
 export const useLogin = (
   serverUrl: string,

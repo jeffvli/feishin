@@ -1,8 +1,8 @@
 import axios from 'axios';
 import md5 from 'md5';
 import { useMutation } from 'react-query';
-import { serversApi } from 'renderer/api/serversApi';
-import { randomString } from 'renderer/utils';
+import { serversApi } from '../../../api/serversApi';
+import { randomString } from '../../../utils';
 
 export const validateServer = async (options: {
   legacyAuth: boolean;

@@ -3,8 +3,8 @@ import { Group } from '@mantine/core';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { IconButton } from 'renderer/components';
-import { WindowControls } from 'renderer/features/window-controls';
+import { IconButton } from '../../../components';
+import { WindowControls } from '../../window-controls';
 
 interface TitlebarProps {
   children?: ReactNode;

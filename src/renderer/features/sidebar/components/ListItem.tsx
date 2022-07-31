@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Link, LinkProps } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { fontInter } from 'renderer/styles';
+import { fontInter } from '../../../styles';
 
 interface ListItemProps {
   children: ReactNode;

@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { Button, Group, Menu } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import i18n from 'i18n/i18n';
-import { albumsApi } from 'renderer/api/albumsApi';
-import { VirtualInfiniteGrid } from 'renderer/components/virtual-grid/VirtualInfiniteGrid';
-import { AnimatedPage } from 'renderer/features/shared/components/AnimatedPage';
-import { AppRoute } from 'renderer/router/utils/routes';
-import { Item } from 'types';
+import i18n from '../../../../i18n/i18n';
+import { Item } from '../../../../types';
+import { albumsApi } from '../../../api/albumsApi';
+import { VirtualInfiniteGrid } from '../../../components/virtual-grid/VirtualInfiniteGrid';
+import { AppRoute } from '../../../router/utils/routes';
+import { AnimatedPage } from '../../shared/components/AnimatedPage';
 import { ViewType, ViewTypeButton } from '../components/ViewTypeButton';
 import { useAlbums } from '../queries/getAlbums';
 

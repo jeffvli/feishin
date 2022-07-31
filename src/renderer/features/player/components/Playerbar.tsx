@@ -1,8 +1,8 @@
 import { useRef } from 'react';
 import styled from 'styled-components';
-import { AudioPlayer } from 'renderer/components';
-import { usePlayerStore } from 'renderer/store';
-import { PlaybackType } from 'types';
+import { PlaybackType } from '../../../../types';
+import { AudioPlayer } from '../../../components';
+import { usePlayerStore } from '../../../store';
 import { CenterControls } from './CenterControls';
 import { LeftControls } from './LeftControls';
 import { RightControls } from './RightControls';

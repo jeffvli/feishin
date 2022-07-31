@@ -35,7 +35,7 @@ export const AddServerModal = ({ ...rest }: ModalProps) => {
           const res = await validateServer(values);
 
           if (res?.token) {
-            createServerMutation.mutateAsync({
+            createServerMutation.mutate({
               ...values,
               remoteUserId: res.userId,
               token: res.token,

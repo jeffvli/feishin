@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import Axios from 'axios';
-import { authApi } from 'renderer/api/authApi';
+import { authApi } from '../api/authApi';
 
 export const api = Axios.create({
   headers: {

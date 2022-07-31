@@ -1,11 +1,11 @@
 import { useQueryClient } from 'react-query';
-import { usePlayerStore } from 'renderer/store';
+import { Item, Play } from '../../../../types';
+import { usePlayerStore } from '../../../store';
 import {
   getJellyfinStreamUrl,
   getServerFolderAuth,
   getSubsonicStreamUrl,
-} from 'renderer/utils';
-import { Item, Play } from 'types';
+} from '../../../utils';
 import { mpvPlayer } from '../utils/mpvPlayer';
 
 const getEndpoint = (item: Item) => {

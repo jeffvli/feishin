@@ -18,10 +18,10 @@ interface AudioPlayerProps extends ReactPlayerProps {
   crossfadeDuration: number;
   crossfadeStyle: CrossfadeStyle;
   currentPlayer: 1 | 2;
+  playbackStyle: PlaybackStyle;
   player1: Song;
   player2: Song;
   status: PlayerStatus;
-  style: PlaybackStyle;
   volume: number;
 }
 
@@ -40,7 +40,7 @@ export const AudioPlayer = forwardRef(
   (
     {
       status,
-      style,
+      playbackStyle,
       crossfadeStyle,
       crossfadeDuration,
       currentPlayer,
@@ -161,7 +161,9 @@ export const AudioPlayer = forwardRef(
           width={0}
           onEnded={handleOnEnded}
           onProgress={
-            style === PlaybackStyle.Gapless ? handleGapless1 : handleCrossfade1
+            playbackStyle === PlaybackStyle.Gapless
+              ? handleGapless1
+              : handleCrossfade1
           }
         />
         <ReactPlayer
@@ -175,7 +177,9 @@ export const AudioPlayer = forwardRef(
           width={0}
           onEnded={handleOnEnded}
           onProgress={
-            style === PlaybackStyle.Gapless ? handleGapless2 : handleCrossfade2
+            playbackStyle === PlaybackStyle.Gapless
+              ? handleGapless2
+              : handleCrossfade2
           }
         />
       </>

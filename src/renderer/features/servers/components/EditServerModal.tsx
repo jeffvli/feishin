@@ -9,7 +9,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
-import { ServerResponse } from 'renderer/api/types';
+import { ServerResponse } from '../../../api/types';
 
 interface EditServerModalProps extends ModalProps {
   server: ServerResponse | undefined;

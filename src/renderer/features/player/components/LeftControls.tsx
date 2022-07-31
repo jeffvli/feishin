@@ -1,8 +1,8 @@
 import { LazyLoadImage as Image } from 'react-lazy-load-image-component';
 import styled from 'styled-components';
-import { Text } from 'renderer/components';
-import { usePlayerStore } from 'renderer/store';
-import { Font } from 'renderer/styles';
+import { Text } from '../../../components';
+import { usePlayerStore } from '../../../store';
+import { Font } from '../../../styles';
 
 const LeftControlsContainer = styled.div`
   display: flex;

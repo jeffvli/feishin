@@ -2,7 +2,6 @@
 import produce from 'immer';
 import create from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { setLocalStorageSettings } from 'renderer/utils';
 import {
   CrossfadeStyle,
   PlaybackStyle,
@@ -10,7 +9,8 @@ import {
   PlayerRepeat,
   PlayerStatus,
   Song,
-} from 'types';
+} from '../../types';
+import { setLocalStorageSettings } from '../utils';
 
 export interface PlayerState {
   current: {

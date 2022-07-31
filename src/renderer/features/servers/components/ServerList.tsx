@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Text } from '@mantine/core';
+import { Button, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { ServerResponse } from 'renderer/api/types';
-import { IconButton } from 'renderer/components';
+import { ServerResponse } from '../../../api/types';
 import { useServers } from '../queries/useServers';
 import { EditServerModal } from './EditServerModal';
 import styles from './ServerList.module.scss';
@@ -60,9 +59,7 @@ export const ServerList = () => {
                 {server.name}
                 <Text>Hello</Text>
               </div>
-              <IconButton onClick={() => editServerHandlers.toggle()}>
-                Edit
-              </IconButton>
+              <Button onClick={() => editServerHandlers.toggle()}>Edit</Button>
             </div>
             {selectedServer && (
               <EditServerModal
