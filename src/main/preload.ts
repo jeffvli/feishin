@@ -3,6 +3,9 @@ import { PlayerData } from '../renderer/store';
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
+    PLAYER_AUTO_NEXT(data: PlayerData) {
+      ipcRenderer.send('player-auto-next', data);
+    },
     PLAYER_CURRENT_TIME() {
       ipcRenderer.send('player-current-time');
     },
@@ -39,6 +42,11 @@ contextBridge.exposeInMainWorld('electron', {
     PLAYER_VOLUME(value: number) {
       ipcRenderer.send('player-volume', value);
     },
+    RENDERER_PLAYER_AUTO_NEXT(
+      cb: (event: IpcRendererEvent, data: any) => void
+    ) {
+      ipcRenderer.on('renderer-player-auto-next', cb);
+    },
     RENDERER_PLAYER_CURRENT_TIME(
       cb: (event: IpcRendererEvent, data: any) => void
     ) {
@@ -49,11 +57,6 @@ contextBridge.exposeInMainWorld('electron', {
     },
     RENDERER_PLAYER_PLAY(cb: (event: IpcRendererEvent, data: any) => void) {
       ipcRenderer.on('renderer-player-play', cb);
-    },
-    RENDERER_PLAYER_SET_QUEUE_NEXT(
-      cb: (event: IpcRendererEvent, data: any) => void
-    ) {
-      ipcRenderer.on('renderer-player-set-queue-next', cb);
     },
     RENDERER_PLAYER_STOP(cb: (event: IpcRendererEvent, data: any) => void) {
       ipcRenderer.on('renderer-player-stop', cb);

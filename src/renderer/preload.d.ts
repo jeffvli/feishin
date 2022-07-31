@@ -5,6 +5,7 @@ declare global {
   interface Window {
     electron: {
       ipcRenderer: {
+        PLAYER_AUTO_NEXT(data: PlayerData): void;
         PLAYER_CURRENT_TIME(): void;
         PLAYER_MUTE(): void;
         PLAYER_NEXT(): void;
@@ -17,6 +18,9 @@ declare global {
         PLAYER_SET_QUEUE_NEXT(data: PlayerData): void;
         PLAYER_STOP(): void;
         PLAYER_VOLUME(value: number): void;
+        RENDERER_PLAYER_AUTO_NEXT(
+          cb: (event: IpcRendererEvent, data: any) => void
+        ): void;
         RENDERER_PLAYER_CURRENT_TIME(
           cb: (event: IpcRendererEvent, data: any) => void
         ): void;
@@ -24,9 +28,6 @@ declare global {
           cb: (event: IpcRendererEvent, data: any) => void
         ): void;
         RENDERER_PLAYER_PLAY(
-          cb: (event: IpcRendererEvent, data: any) => void
-        ): void;
-        RENDERER_PLAYER_SET_QUEUE_NEXT(
           cb: (event: IpcRendererEvent, data: any) => void
         ): void;
         RENDERER_PLAYER_STOP(

@@ -11,12 +11,12 @@ export enum ServerType {
 }
 
 export enum Item {
-  Album = 'album',
-  Artist = 'artist',
-  Folder = 'folder',
-  Genre = 'genre',
-  Music = 'music',
-  Playlist = 'playlist',
+  ALBUM = 'album',
+  ARTIST = 'artist',
+  FOLDER = 'folder',
+  GENRE = 'genre',
+  PLAYLIST = 'playlist',
+  SONG = 'song',
 }
 
 export enum PlayerStatus {
@@ -31,9 +31,9 @@ export enum PlayerRepeat {
 }
 
 export enum Play {
-  Later = 'later',
-  Next = 'next',
-  Now = 'play',
+  LAST = 'last',
+  NEXT = 'next',
+  NOW = 'now',
 }
 
 export enum CrossfadeStyle {
@@ -54,8 +54,6 @@ export enum PlaybackType {
   Local = 'local',
   Web = 'web',
 }
-
-// export type ServerType = Server.Subsonic | Server.Jellyfin;
 
 export type APIEndpoints =
   | 'getPlaylist'
@@ -126,7 +124,7 @@ export interface Album {
   songCount: number;
   starred?: string;
   title: string;
-  type: Item.Album;
+  type: Item.ALBUM;
   uniqueId: string;
   userRating?: number;
   year?: number;
@@ -142,7 +140,7 @@ export interface Artist {
   info?: ArtistInfo;
   starred?: string;
   title: string;
-  type?: Item.Artist;
+  type?: Item.ARTIST;
   uniqueId?: string;
   userRating?: number;
 }
@@ -160,7 +158,7 @@ export interface Folder {
   image: string;
   isDir?: boolean;
   title: string;
-  type: Item.Folder;
+  type: Item.FOLDER;
   uniqueId: string;
 }
 
@@ -169,7 +167,7 @@ export interface Genre {
   id: string;
   songCount?: number;
   title: string;
-  type?: Item.Genre;
+  type?: Item.GENRE;
   uniqueId?: string;
 }
 
@@ -186,7 +184,7 @@ export interface Playlist {
   song?: Song[];
   songCount?: number;
   title: string;
-  type: Item.Playlist;
+  type: Item.PLAYLIST;
   uniqueId: string;
 }
 
@@ -216,7 +214,7 @@ export interface Song {
   suffix?: string;
   title: string;
   track?: number;
-  type?: Item.Music;
+  type?: Item.SONG;
   uniqueId?: string;
   userRating?: number;
   year?: number;

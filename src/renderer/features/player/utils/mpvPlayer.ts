@@ -1,5 +1,10 @@
+// Other files:
+// main/features/core/player/index.ts
+// main/preload.ts
+// renderer/preload.d.ts
+
 import isElectron from 'is-electron';
-import { PlayerData, usePlayerStore } from 'renderer/store';
+import { PlayerData, usePlayerStore } from '../../../store';
 
 const ipc = isElectron() ? window.electron.ipcRenderer : null;
 
@@ -18,6 +23,8 @@ const previous = () => ipc?.PLAYER_PREVIOUS();
 const setQueue = (data: PlayerData) => ipc?.PLAYER_SET_QUEUE(data);
 
 const setQueueNext = (data: PlayerData) => ipc?.PLAYER_SET_QUEUE_NEXT(data);
+
+const playerAutoNext = (data: PlayerData) => ipc?.PLAYER_AUTO_NEXT(data);
 
 const seek = (seconds: number) => ipc?.PLAYER_SEEK(seconds);
 
@@ -42,10 +49,10 @@ ipc?.RENDERER_PLAYER_STOP(() => setPause());
 
 ipc?.RENDERER_PLAYER_CURRENT_TIME((_event, time) => setCurrentTime(time));
 
-ipc?.RENDERER_PLAYER_SET_QUEUE_NEXT(() => {
+ipc?.RENDERER_PLAYER_AUTO_NEXT(() => {
   const playerData = autoNext();
   if (playerData.queue.next) {
-    setQueueNext(playerData);
+    playerAutoNext(playerData);
   }
 });
 
@@ -55,6 +62,7 @@ export const mpvPlayer = {
   next,
   pause,
   play,
+  playerAutoNext,
   previous,
   seek,
   seekTo,

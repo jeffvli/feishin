@@ -111,7 +111,7 @@ export const LibraryAlbumsRoute = () => {
                   cardControls={{
                     endpoint: albumsApi.getAlbum,
                     idProperty: 'id',
-                    type: Item.Album,
+                    type: Item.ALBUM,
                   }}
                   cardRows={[
                     {

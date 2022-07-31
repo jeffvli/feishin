@@ -27,7 +27,7 @@ export const VirtualGridWrapper = ({
   refInstance: Ref<any>;
   rowCount: number;
 }) => {
-  const { handlePlayQueueAdd } = usePlayQueueHandler();
+  const handlePlayQueueAdd = usePlayQueueHandler();
 
   const memo = useMemo(
     () => ({

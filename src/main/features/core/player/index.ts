@@ -20,7 +20,7 @@ mpv.start().catch((error: any) => {
 mpv.on('status', (status: any) => {
   if (status.property === 'playlist-pos') {
     if (status.value !== 0) {
-      getMainWindow()?.webContents.send('renderer-player-set-queue-next');
+      getMainWindow()?.webContents.send('renderer-player-auto-next');
     }
   }
 });
@@ -88,7 +88,7 @@ ipcMain.on('player-seek-to', async (_event, time: number) => {
   await mpv.goToPosition(time);
 });
 
-// Sets the queue to the given data. Used when manually starting a song or using the next/prev buttons
+// Sets the queue in position 0 and 1 to the given data. Used when manually starting a song or using the next/prev buttons
 ipcMain.on('player-set-queue', async (_event, data: PlayerData) => {
   if (data.queue.current) {
     await mpv.load(data.queue.current.streamUrl, 'replace');
@@ -99,8 +99,26 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData) => {
   }
 });
 
-// Sets the next song in the queue when reaching the end of the queue
+// Replaces the queue in position 1 to the given data
 ipcMain.on('player-set-queue-next', async (_event, data: PlayerData) => {
+  const size = await mpv.getPlaylistSize();
+
+  if (size > 1) {
+    await mpv.playlistRemove(1);
+  }
+
+  if (data.queue.next) {
+    await mpv.load(data.queue.next.streamUrl, 'append');
+  }
+});
+
+// Sets the next song in the queue when reaching the end of the queue
+ipcMain.on('player-auto-next', async (_event, data: PlayerData) => {
+  // Always keep the current song as position 0 in the mpv queue
+  // This allows us to easily set update the next song in the queue without
+  // disturbing the currently playing song
+  await mpv.playlistRemove(0);
+
   if (data.queue.next) {
     await mpv.load(data.queue.next.streamUrl, 'append');
   }

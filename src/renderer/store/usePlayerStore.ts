@@ -1,8 +1,10 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import produce from 'immer';
 import create from 'zustand';
 import { devtools } from 'zustand/middleware';
 import {
+  Play,
   CrossfadeStyle,
   PlaybackStyle,
   PlaybackType,
@@ -55,7 +57,7 @@ export interface PlayerData {
 }
 
 export interface PlayerSlice extends PlayerState {
-  add: (songs: Song[]) => PlayerData;
+  addToQueue: (songs: Song[], type: Play) => PlayerData;
   autoNext: () => PlayerData;
   getPlayerData: () => PlayerData;
   next: () => PlayerData;
@@ -70,15 +72,37 @@ export interface PlayerSlice extends PlayerState {
 
 export const usePlayerStore = create<PlayerSlice>()(
   devtools((set, get) => ({
-    add: (songs) => {
-      set(
-        produce((state) => {
-          state.queue.default = songs;
-          state.current.time = 0;
-          state.current.player = 1;
-          state.current.song = state.queue.default[state.current.index];
-        })
-      );
+    addToQueue: (songs, type) => {
+      if (type === Play.NOW) {
+        set(
+          produce((state) => {
+            state.queue.default = songs;
+            state.current.time = 0;
+            state.current.player = 1;
+            state.current.index = 0;
+            state.current.song = songs[0];
+          })
+        );
+      } else if (type === Play.LAST) {
+        set(
+          produce((state) => {
+            state.queue.default = [...get().queue.default, ...songs];
+          })
+        );
+      } else if (type === Play.NEXT) {
+        const queue = get().queue.default;
+        const currentIndex = get().current.index;
+
+        set(
+          produce((state) => {
+            state.queue.default = [
+              ...queue.slice(0, currentIndex + 1),
+              ...songs,
+              ...queue.slice(currentIndex + 1),
+            ];
+          })
+        );
+      }
 
       return get().getPlayerData();
     },

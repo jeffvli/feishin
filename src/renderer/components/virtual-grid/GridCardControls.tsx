@@ -1,8 +1,9 @@
 import React from 'react';
-import { UnstyledButton, UnstyledButtonProps } from '@mantine/core';
+import { Button, UnstyledButton, UnstyledButtonProps } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { RiPlayFill } from 'react-icons/ri';
 import styled from 'styled-components';
+import { Play } from '../../../types';
 
 type PlayButtonType = UnstyledButtonProps &
   React.ComponentPropsWithoutRef<'button'>;
@@ -13,7 +14,7 @@ const PlayButton = styled(UnstyledButton)<PlayButtonType>`
   justify-content: center;
   width: 50px;
   height: 50px;
-  background-color: var(--primary-color);
+  border: 1px solid var(--primary-color);
   border-radius: 50%;
   cursor: default;
   opacity: 0.8;
@@ -78,13 +79,43 @@ export const GridCardControls = ({
                 id: itemData[cardControls.idProperty],
                 type: cardControls.type,
               },
+              play: Play.NOW,
             });
           }}
         >
           <RiPlayFill size={25} />
         </PlayButton>
       </CenterControls>
-      <BottomControls />
+      <BottomControls>
+        <Button
+          onClick={() => {
+            handlePlayQueueAdd({
+              byItemType: {
+                endpoint: cardControls.endpoint,
+                id: itemData[cardControls.idProperty],
+                type: cardControls.type,
+              },
+              play: Play.NEXT,
+            });
+          }}
+        >
+          NEXT
+        </Button>
+        <Button
+          onClick={() => {
+            handlePlayQueueAdd({
+              byItemType: {
+                endpoint: cardControls.endpoint,
+                id: itemData[cardControls.idProperty],
+                type: cardControls.type,
+              },
+              play: Play.LAST,
+            });
+          }}
+        >
+          LATER
+        </Button>
+      </BottomControls>
     </GridCardControlsContainer>
   );
 };

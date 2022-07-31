@@ -1,5 +1,5 @@
-import { useQueryClient } from 'react-query';
 import { Item, Play } from '../../../../types';
+import { albumsApi } from '../../../api/albumsApi';
 import { usePlayerStore } from '../../../store';
 import {
   getJellyfinStreamUrl,
@@ -8,54 +8,23 @@ import {
 } from '../../../utils';
 import { mpvPlayer } from '../utils/mpvPlayer';
 
-const getEndpoint = (item: Item) => {
+const getEndpointByItemType = (item: Item) => {
   switch (item) {
-    case Item.Album:
-      return 'getAlbum';
-    case Item.Artist:
-      return 'getArtistSongs';
-    case Item.Playlist:
-      return 'getPlaylist';
+    case Item.ALBUM:
+      return albumsApi.getAlbum;
     default:
-      return 'getAlbum';
+      return albumsApi.getAlbum;
   }
 };
 
 export const usePlayQueueHandler = () => {
-  const queryClient = useQueryClient();
-  const addQueue = usePlayerStore((state) => state.add);
-
-  // const dispatchSongsToQueue = useCallback(
-  //   (entries: Song[], play: Play) => {
-  //     const filteredSongs = filterPlayQueue(config.playback.filters, entries);
-
-  //     if (play === Play.Play) {
-  //       if (filteredSongs.entries.length > 0) {
-  //       } else {
-  //       }
-  //     }
-
-  //     if (play === Play.Next || play === Play.Later) {
-  //       if (filteredSongs.entries.length > 0) {
-  //       }
-  //     }
-
-  //     notifyToast(
-  //       'info',
-  //       getPlayedSongsNotification({
-  //         ...filteredSongs.count,
-  //         type: play === Play.Play ? 'play' : 'add',
-  //       })
-  //     );
-  //   },
-  //   [config.playback.filters, dispatch]
-  // );
+  const addToQueue = usePlayerStore((state) => state.addToQueue);
 
   const handlePlayQueueAdd = async (options: {
     byData?: any[];
     byItemType?: {
       endpoint: (params: Record<string, any>) => any;
-      id: string;
+      id: number;
       type: Item;
     };
     play: Play;
@@ -71,11 +40,13 @@ export const usePlayQueueHandler = () => {
       );
 
       if (deviceId) {
-        const data = await options.byItemType.endpoint({
+        const endpoint = getEndpointByItemType(options.byItemType.type);
+
+        const { data } = await endpoint({
           id: options.byItemType.id,
         });
 
-        const songs = data.data.songs.map((song) => {
+        const songs = data.songs.map((song) => {
           const auth = getServerFolderAuth(serverUrl, song.serverFolderId);
 
           if (auth) {
@@ -106,30 +77,16 @@ export const usePlayQueueHandler = () => {
           };
         });
 
-        const pData = addQueue(songs);
-        mpvPlayer.setQueue(pData);
-      }
+        const playerData = addToQueue(songs, options.play);
 
-      // const data = await apiController({
-      //   args: { id: options.byItemType.id, musicFolder: options.musicFolder },
-      //   endpoint:
-      //     options.byItemType.endpoint || getEndpoint(options.byItemType.item),
-      //   serverType: config.serverType,
-      // });
-      // if (options.byItemType.item === Item.Album) {
-      //   queryClient.setQueryData(['album', options.byItemType.id], data);
-      // } else if (options.byItemType.item === Item.Artist) {
-      //   queryClient.setQueryData(['artistSongs', options.byItemType.id], data);
-      // } else if (options.byItemType.item === Item.Playlist) {
-      //   queryClient.setQueryData(['playlist', options.byItemType.id], data);
-      // }
-      // if (data?.song) {
-      //   dispatchSongsToQueue(data.song, options.play);
-      // } else {
-      //   dispatchSongsToQueue(data, options.play);
-      // }
+        if (options.play === Play.NEXT || options.play === Play.LAST) {
+          mpvPlayer.setQueueNext(playerData);
+        } else {
+          mpvPlayer.setQueue(playerData);
+        }
+      }
     }
   };
 
-  return { handlePlayQueueAdd };
+  return handlePlayQueueAdd;
 };
