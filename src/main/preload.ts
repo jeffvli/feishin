@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { PlayerData } from 'renderer/store';
+import { PlayerData } from '../renderer/store';
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {

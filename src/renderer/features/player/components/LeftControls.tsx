@@ -1,4 +1,3 @@
-import { LazyLoadImage as Image } from 'react-lazy-load-image-component';
 import styled from 'styled-components';
 import { Text } from '../../../components';
 import { usePlayerStore } from '../../../store';
@@ -35,7 +34,7 @@ export const LeftControls = () => {
   return (
     <LeftControlsContainer>
       <ImageWrapper>
-        <Image height={60} src={song?.image} width={60} />
+        <img alt="img" height={60} src={song?.image} width={60} />
       </ImageWrapper>
       <MetadataStack>
         <Text

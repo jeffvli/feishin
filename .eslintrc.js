@@ -1,5 +1,6 @@
 module.exports = {
   extends: ['erb', 'plugin:typescript-sort-keys/recommended'],
+  ignorePatterns: ['.erb/*'],
   parserOptions: {
     createDefaultProgram: true,
     ecmaVersion: 2020,
