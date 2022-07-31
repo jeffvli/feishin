@@ -1,4 +1,11 @@
 import { ReactNode, useEffect } from 'react';
+import {
+  DndContext,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
 import { MantineProvider } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import isElectron from 'is-electron';
@@ -27,6 +34,21 @@ export const App = () => {
     document.body.setAttribute('data-theme', theme);
   }, [theme]);
 
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 100,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 500,
+        tolerance: 10,
+      },
+    })
+  );
+
   return (
     <MantineProvider
       theme={{
@@ -40,15 +62,22 @@ export const App = () => {
           xl: 18,
           xs: 10,
         },
+
         other: {},
         spacing: {
           xs: 2,
         },
       }}
     >
-      <SelectRouter>
-        <AppRouter />
-      </SelectRouter>
+      <DndContext
+        sensors={sensors}
+        onDragEnd={() => console.log('drag end')}
+        onDragStart={() => console.log('drag start')}
+      >
+        <SelectRouter>
+          <AppRouter />
+        </SelectRouter>
+      </DndContext>
     </MantineProvider>
   );
 };

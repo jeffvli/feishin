@@ -1,7 +1,12 @@
+import React, { useState } from 'react';
+import { DragOverlay, useDndMonitor } from '@dnd-kit/core';
+import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { Card, Skeleton } from '@mantine/core';
 import { motion } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import { CardRow } from '../../types';
+import { Draggable } from '../drag-drop/Draggable';
 import { Text } from '../text/Text';
 import { GridCardControls } from './GridCardControls';
 
@@ -98,39 +103,56 @@ export const GridCard = ({ data, index, style }: any) => {
   const stopIndex = Math.min(itemCount - 1, startIndex + columnCount - 1);
   const cards = [];
 
+  const [isDragging, setIsDragging] = useState(false);
+
+  useDndMonitor({
+    onDragCancel: () => setIsDragging(false),
+    onDragEnd: () => setIsDragging(false),
+    onDragStart: () => setIsDragging(true),
+  });
+
   for (let i = startIndex; i <= stopIndex; i += 1) {
     cards.push(
-      <CardWrapper
-        key={`card-${i}-${index}`}
-        itemGap={itemGap}
-        itemHeight={itemHeight}
-        itemWidth={itemWidth}
-      >
-        <Skeleton visible={!itemData[i]}>
-          <StyledCard>
-            <ImageSection>
-              <Image height={itemWidth} src={itemData[i]?.image}>
-                <ControlsContainer>
-                  <GridCardControls
-                    cardControls={cardControls}
-                    handlePlayQueueAdd={handlePlayQueueAdd}
-                    itemData={itemData[i]}
-                  />
-                </ControlsContainer>
-              </Image>
-            </ImageSection>
-            <DetailSection>
-              {cardRows.map((row: CardRow) => (
-                <Row key={`row-${row.prop}`}>
-                  <Text overflow="hidden" weight={500}>
-                    {itemData[i] && itemData[i][row.prop]}
-                  </Text>
-                </Row>
-              ))}
-            </DetailSection>
-          </StyledCard>
-        </Skeleton>
-      </CardWrapper>
+      <React.Fragment key={`card-${i}-${index}`}>
+        <Draggable id={`${i}-${index}`}>
+          <CardWrapper
+            itemGap={itemGap}
+            itemHeight={itemHeight}
+            itemWidth={itemWidth}
+          >
+            <Skeleton visible={!itemData[i]}>
+              <StyledCard>
+                <ImageSection>
+                  <Image height={itemWidth} src={itemData[i]?.image}>
+                    <ControlsContainer>
+                      <GridCardControls
+                        cardControls={cardControls}
+                        handlePlayQueueAdd={handlePlayQueueAdd}
+                        itemData={itemData[i]}
+                      />
+                    </ControlsContainer>
+                  </Image>
+                </ImageSection>
+                <DetailSection>
+                  {cardRows.map((row: CardRow) => (
+                    <Row key={`row-${row.prop}`}>
+                      <Text overflow="hidden" weight={500}>
+                        {itemData[i] && itemData[i][row.prop]}
+                      </Text>
+                    </Row>
+                  ))}
+                </DetailSection>
+              </StyledCard>
+            </Skeleton>
+          </CardWrapper>
+        </Draggable>
+        {createPortal(
+          <DragOverlay dropAnimation={null} modifiers={[snapCenterToCursor]}>
+            {isDragging ? <div>OVERLAY</div> : null}
+          </DragOverlay>,
+          document.body
+        )}
+      </React.Fragment>
     );
   }
 
