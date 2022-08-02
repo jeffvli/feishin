@@ -10,14 +10,12 @@ export const useRightControls = () => {
   // Ensure that the mpv player volume is set on startup
   useEffect(() => {
     mpvPlayer.volume(volume);
-  }, [volume]);
 
-  // Ensure that the mpv player mute status is set on startup
-  useEffect(() => {
     if (muted) {
       mpvPlayer.mute();
     }
-  }, [muted]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleVolumeSlider = (e: number) => {
     mpvPlayer.volume(e);
