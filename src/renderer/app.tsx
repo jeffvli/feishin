@@ -13,6 +13,8 @@ import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { useDefaultSettings } from './features/settings';
 import { AppRouter } from './router/AppRouter';
 import './styles/global.scss';
+import 'ag-grid-community/styles/ag-grid.css';
+import './styles/ag-grid.scss';
 
 const SelectRouter = ({ children }: { children: ReactNode }) => {
   if (isElectron()) {

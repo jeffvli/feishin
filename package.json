@@ -252,6 +252,8 @@
     "@mantine/core": "^5.0.0",
     "@mantine/form": "^5.0.0",
     "@mantine/hooks": "^5.0.0",
+    "ag-grid-community": "^28.0.2",
+    "ag-grid-react": "^28.0.0",
     "axios": "^0.26.1",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.6",
