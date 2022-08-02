@@ -27,14 +27,14 @@ const MetadataStack = styled.div`
 
 export const LeftControls = () => {
   const song = usePlayerStore((state) => state.current.song);
-  const title = song?.title;
-  const artists = song?.artist?.map((artist) => artist?.title).join(', ');
+  const title = song?.name;
+  const artists = song?.artists?.map((artist) => artist?.name).join(', ');
   const album = song?.album;
 
   return (
     <LeftControlsContainer>
       <ImageWrapper>
-        <img alt="img" height={60} src={song?.image} width={60} />
+        <img alt="img" height={60} src={song?.imageUrl} width={60} />
       </ImageWrapper>
       <MetadataStack>
         <Text

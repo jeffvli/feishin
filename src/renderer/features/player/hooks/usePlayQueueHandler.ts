@@ -56,25 +56,12 @@ export const usePlayQueueHandler = () => {
                 : getSubsonicStreamUrl(auth, song, deviceId);
 
             return {
-              albumId: song.albumId,
-              artistName: song.artistName,
-              duration: song.duration,
-              id: song.id,
+              ...song,
               streamUrl,
-              title: song.name,
-              year: song.year,
             };
           }
 
-          return {
-            albumId: song.albumId,
-            artistName: song.artistName,
-            duration: song.duration,
-            id: song.id,
-            streamUrl: song.streamUrl,
-            title: song.name,
-            year: song.year,
-          };
+          return song;
         });
 
         const playerData = addToQueue(songs, options.play);

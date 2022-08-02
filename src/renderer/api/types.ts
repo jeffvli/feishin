@@ -1,3 +1,5 @@
+import { Album } from '../../types';
+
 export interface BaseResponse<T> {
   data: T;
   error?: string | any;
@@ -111,45 +113,6 @@ export type UserResponse = BaseResponse<User>;
 export type AlbumResponse = BaseResponse<Album>;
 
 export type AlbumsResponse = BasePaginatedResponse<Album[]>;
-
-export interface Album {
-  _count: Count;
-  albumArtistId: number;
-  createdAt: string;
-  date: string;
-  genres: GenreResponse[];
-  id: number;
-  name: string;
-  remoteCreatedAt: string;
-  remoteId: string;
-  serverFolderId: number;
-  songs: Song[];
-  updatedAt: string;
-  year: number;
-}
-
-export interface Song {
-  album?: Partial<Album>;
-  albumId: number;
-  artistName: null;
-  artists?: ArtistResponse[];
-  bitRate: number;
-  container: string;
-  createdAt: string;
-  date: string;
-  disc: number;
-  duration: number;
-  externals?: ExternalResponse[];
-  id: number;
-  images?: ImageResponse[];
-  name: string;
-  remoteCreatedAt: string;
-  remoteId: string;
-  serverFolderId: number;
-  track: number;
-  updatedAt: string;
-  year: number;
-}
 
 export type Count = {
   artists?: number;

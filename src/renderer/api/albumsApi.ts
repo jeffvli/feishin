@@ -1,5 +1,5 @@
 import { api } from '../lib';
-import { AlbumsResponse, BasePaginationRequest } from './types';
+import { AlbumResponse, AlbumsResponse, BasePaginationRequest } from './types';
 
 export interface AlbumsRequest extends BasePaginationRequest {
   orderBy: string;
@@ -8,7 +8,7 @@ export interface AlbumsRequest extends BasePaginationRequest {
 }
 
 const getAlbum = async (params: { id: number }, signal?: AbortSignal) => {
-  const { data } = await api.get<AlbumsResponse>(`/albums/${params.id}`, {
+  const { data } = await api.get<AlbumResponse>(`/albums/${params.id}`, {
     signal,
   });
   return data;

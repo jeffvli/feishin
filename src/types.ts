@@ -103,46 +103,55 @@ export interface GenericItem {
 }
 
 export interface APIResult {
-  data: Album[] | Artist[] | Genre[] | Playlist[] | Song[];
+  data: Album[] | Artist[] | Genre[] | Song[];
   totalRecordCount?: number;
 }
 
 export interface Album {
-  albumArtist?: string;
+  albumArtist: Partial<AlbumArtist>;
   albumArtistId: string;
-  albumGenre?: string;
-  albumId: string;
-  artist?: Artist[];
-  created: string;
-  duration: number;
-  genre?: Genre[];
-  id: string;
-  image: string;
-  isDir?: boolean;
-  playCount?: number;
-  song?: Song[];
+  averageRating: number;
+  container: string;
+  createdAt: string;
+  date: string;
+  deleted: boolean;
+  genres: Genre[];
+  id: number;
+  imageUrl: string;
+  name: string;
+  rating: number;
+  remoteCreatedAt: string;
+  remoteId: string;
+  serverFolderId: number;
+  serverType: ServerType | string;
   songCount: number;
-  starred?: string;
-  title: string;
-  type: Item.ALBUM;
-  uniqueId: string;
-  userRating?: number;
-  year?: number;
+  songs: Song[];
+  updatedAt: string;
+  year: number;
+}
+
+export interface AlbumArtist {
+  biography?: string;
+  createdAt: string;
+  deleted: boolean;
+  id: number;
+  name: string;
+  remoteCreatedAt: string;
+  remoteId: string;
+  serverId: number;
+  updatedAt: string;
 }
 
 export interface Artist {
-  album?: Album[];
-  albumCount?: number;
-  duration?: number;
-  genre?: Genre[];
-  id?: string;
-  image?: string;
-  info?: ArtistInfo;
-  starred?: string;
-  title: string;
-  type?: Item.ARTIST;
-  uniqueId?: string;
-  userRating?: number;
+  biography?: string;
+  createdAt: string;
+  deleted: boolean;
+  id: number;
+  name: string;
+  remoteCreatedAt: string;
+  remoteId: string;
+  serverId: number;
+  updatedAt: string;
 }
 
 export interface ArtistInfo {
@@ -152,72 +161,39 @@ export interface ArtistInfo {
   similarArtist?: Artist[];
 }
 
-export interface Folder {
-  created: string;
-  id: string;
-  image: string;
-  isDir?: boolean;
-  title: string;
-  type: Item.FOLDER;
-  uniqueId: string;
-}
-
 export interface Genre {
   albumCount?: number;
   id: string;
+  name: string;
   songCount?: number;
-  title: string;
   type?: Item.GENRE;
   uniqueId?: string;
 }
 
-export interface Playlist {
-  changed?: string;
-  comment?: string;
-  created?: string;
-  duration: number;
-  genre?: Genre[];
-  id: string;
-  image: string;
-  owner?: string;
-  public?: boolean;
-  song?: Song[];
-  songCount?: number;
-  title: string;
-  type: Item.PLAYLIST;
-  uniqueId: string;
-}
-
 export interface Song {
-  album?: string;
-  albumArtist?: string;
-  albumArtistId?: number;
-  albumGenre?: string;
-  albumId?: number;
-  artist?: Artist[];
-  artistName?: string | null;
-  bitRate?: number;
-  contentType?: string;
-  created?: string;
-  discNumber?: number;
-  duration?: number;
-  genre?: Genre[];
+  album: string;
+  albumId: number;
+  artistName: null;
+  artists: Partial<Artist>[];
+  bitRate: number;
+  container: string;
+  createdAt: string;
+  date: string;
+  deleted: boolean;
+  disc: number;
+  duration: number;
+  genres: Partial<Genre>[];
   id: number;
-  image?: string;
-  isDir?: boolean;
-  parent?: string;
-  path?: string;
-  playCount?: number;
-  size?: number;
-  starred?: string;
+  imageUrl: string;
+  name: string;
+  remoteCreatedAt: string;
+  remoteId: string;
+  serverFolderId: number;
+  serverId: number;
   streamUrl: string;
-  suffix?: string;
-  title: string;
-  track?: number;
-  type?: Item.SONG;
-  uniqueId?: string;
-  userRating?: number;
-  year?: number;
+  track: number;
+  updatedAt: string;
+  year: number;
 }
 
 export interface ScanStatus {
@@ -246,4 +222,8 @@ export interface ServerFolderAuth {
   url: string;
   userId: string;
   username: string;
+}
+
+export interface UniqueId {
+  uniqueId: string;
 }

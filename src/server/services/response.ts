@@ -111,6 +111,8 @@ const songs = (
   items: any[],
   options: {
     deviceId: string;
+    imageUrl?: string;
+    serverFolderId?: number;
     serverType?: string;
     token: string;
     url?: string;
@@ -126,6 +128,7 @@ const songs = (
       const url = options.url ? options.url : item.server.serverUrls[0];
 
       return {
+        album: item.album.name,
         albumId: item.albumId,
         artistName: item.artistName,
         artists: relatedArtists(item.artists),
@@ -138,10 +141,13 @@ const songs = (
         duration: item.duration,
         genres: relatedGenres(item.genres),
         id: item.id,
-        image: primaryImage(item.images, serverType, url, item.remoteId),
+        imageUrl:
+          primaryImage(item.images, serverType, url, item.remoteId) ||
+          options.imageUrl,
         name: item.name,
         remoteCreatedAt: item.remoteCreatedAt,
         remoteId: item.remoteId,
+        serverFolderId: item.serverFolderId,
         serverId: item.serverId,
         streamUrl: streamUrl(serverType, {
           deviceId: options.deviceId,
@@ -167,16 +173,23 @@ const albums = (items: any[], user: User) => {
         (r: Rating) => r.userId === user.id
       )?.value;
       const averageRating = meanBy(item.ratings, 'value');
+      const imageUrl = primaryImage(
+        item.images,
+        serverType,
+        url,
+        item.remoteId
+      );
 
       return {
+        albumArtist: item.albumArtist,
         albumArtistId: item.albumArtistId,
         averageRating,
         createdAt: item.createdAt,
-        dateCreated: item.date,
+        date: item.date,
         deleted: item.deleted,
         genres: relatedGenres(item.genres),
         id: item.id,
-        image: primaryImage(item.images, serverType, url, item.remoteId),
+        imageUrl,
         name: item.name,
         rating,
         remoteCreatedAt: item.remoteCreatedAt,
@@ -186,6 +199,8 @@ const albums = (items: any[], user: User) => {
         songCount: item._count.songs,
         songs: songs(item.songs, {
           deviceId: user.deviceId,
+          imageUrl,
+          serverFolderId: item.serverFolderId,
           serverType,
           token,
           url,
