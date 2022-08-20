@@ -3,6 +3,16 @@ export enum SortOrder {
   DESC = 'desc',
 }
 
+export enum Item {
+  ALBUM = 'album',
+  ALBUM_ARTIST = 'albumArtist',
+  ARTIST = 'artist',
+  FOLDER = 'folder',
+  GENRE = 'genre',
+  PLAYLIST = 'playlist',
+  SONG = 'song',
+}
+
 export enum AlbumFilter {
   FAVORITED,
   NOT_FAVORITED,

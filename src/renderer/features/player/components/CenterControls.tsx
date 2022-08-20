@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import format from 'format-duration';
 import { useTranslation } from 'react-i18next';
 import {
-  RiPauseFill,
+  RiPauseLine,
   RiPlayFill,
   RiRewindFill,
   RiSkipBackFill,
@@ -88,8 +88,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
   useEffect(() => {
     let interval: any;
 
-    if (status === PlayerStatus.Playing && !isSeeking) {
-      if (settings.type === PlaybackType.Web) {
+    if (status === PlayerStatus.PLAYING && !isSeeking) {
+      if (settings.type === PlaybackType.WEB) {
         interval = setInterval(() => {
           setCurrentTime(currentPlayerRef.getCurrentTime());
         }, 1000);
@@ -119,15 +119,15 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
           />
           <PlayerButton
             icon={
-              status === PlayerStatus.Paused ? (
+              status === PlayerStatus.PAUSED ? (
                 <RiPlayFill size={20} />
               ) : (
-                <RiPauseFill size={20} />
+                <RiPauseLine size={20} stroke="20px" />
               )
             }
             tooltip={{
               label:
-                status === PlayerStatus.Paused
+                status === PlayerStatus.PAUSED
                   ? `${t('player.play')}`
                   : `${t('player.pause')}`,
             }}

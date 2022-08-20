@@ -65,7 +65,7 @@ export const Playerbar = () => {
           <RightControls />
         </RightGridItem>
       </PlayerbarControlsGrid>
-      {settings.type === PlaybackType.Web && (
+      {settings.type === PlaybackType.WEB && (
         <AudioPlayer
           ref={playersRef}
           autoNext={autoNext}

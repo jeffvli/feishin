@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import meanBy from 'lodash/meanBy';
-import { Rating, User } from '../types/types';
+import { Item, Rating, User } from '../types/types';
 import { getImageUrl } from '../utils';
 
 const getSubsonicStreamUrl = (
@@ -71,12 +71,23 @@ const streamUrl = (
   return '';
 };
 
+const relatedAlbum = (item: any) => {
+  return {
+    deleted: item.deleted,
+    id: item.id,
+    itemType: Item.ALBUM,
+    name: item.name,
+    remoteId: item.remoteId,
+  };
+};
+
 const relatedArtists = (items: any[]) => {
   return (
     items?.map((item: any) => {
       return {
         deleted: item.deleted,
         id: item.id,
+        itemType: Item.ARTIST,
         name: item.name,
         remoteId: item.remoteId,
       };
@@ -84,11 +95,21 @@ const relatedArtists = (items: any[]) => {
   );
 };
 
+const relatedAlbumArtist = (item: any) => {
+  return {
+    deleted: item.deleted,
+    id: item.id,
+    itemType: item.ALBUMARTIST,
+    name: item.name,
+    remoteId: item.remoteId,
+  };
+};
 const relatedGenres = (genres: any[]) => {
   return (
     genres?.map((genre) => {
       return {
         id: genre.id,
+        itemType: Item.GENRE,
         name: genre.name,
       };
     }) || []
@@ -128,8 +149,7 @@ const songs = (
       const url = options.url ? options.url : item.server.serverUrls[0];
 
       return {
-        album: item.album.name,
-        albumId: item.albumId,
+        album: item.album && relatedAlbum(item.album),
         artistName: item.artistName,
         artists: relatedArtists(item.artists),
         bitRate: item.bitRate,
@@ -144,6 +164,7 @@ const songs = (
         imageUrl:
           primaryImage(item.images, serverType, url, item.remoteId) ||
           options.imageUrl,
+        itemType: Item.SONG,
         name: item.name,
         remoteCreatedAt: item.remoteCreatedAt,
         remoteId: item.remoteId,
@@ -181,8 +202,7 @@ const albums = (items: any[], user: User) => {
       );
 
       return {
-        albumArtist: item.albumArtist,
-        albumArtistId: item.albumArtistId,
+        albumArtist: item.albumArtist && relatedAlbumArtist(item.albumArtist),
         averageRating,
         createdAt: item.createdAt,
         date: item.date,
@@ -190,6 +210,7 @@ const albums = (items: any[], user: User) => {
         genres: relatedGenres(item.genres),
         id: item.id,
         imageUrl,
+        itemType: Item.ALBUM,
         name: item.name,
         rating,
         remoteCreatedAt: item.remoteCreatedAt,

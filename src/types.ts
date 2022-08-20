@@ -1,17 +1,18 @@
 export enum Platform {
-  Linux = 'linux',
-  MacOS = 'macos',
-  Web = 'web',
-  Windows = 'windows',
+  LINUX = 'linux',
+  MACOS = 'macos',
+  WEB = 'web',
+  WINDOWS = 'windows',
 }
 
 export enum ServerType {
-  Jellyfin = 'jellyfin',
-  Subsonic = 'subsonic',
+  JELLYFIN = 'jellyfin',
+  SUBSONIC = 'subsonic',
 }
 
 export enum Item {
   ALBUM = 'album',
+  ALBUM_ARTIST = 'albumArtist',
   ARTIST = 'artist',
   FOLDER = 'folder',
   GENRE = 'genre',
@@ -20,14 +21,14 @@ export enum Item {
 }
 
 export enum PlayerStatus {
-  Paused = 'paused',
-  Playing = 'playing',
+  PAUSED = 'paused',
+  PLAYING = 'playing',
 }
 
 export enum PlayerRepeat {
-  All = 'all',
-  None = 'none',
-  One = 'one',
+  ALL = 'all',
+  NONE = 'none',
+  ONE = 'one',
 }
 
 export enum Play {
@@ -37,22 +38,22 @@ export enum Play {
 }
 
 export enum CrossfadeStyle {
-  ConstantPower = 'constantPower',
-  ConstantPowerSlowCut = 'constantPowerSlowCut',
-  ConstantPowerSlowFade = 'constantPowerSlowFade',
-  Dipped = 'dipped',
-  EqualPower = 'equalPower',
-  Linear = 'linear',
+  CONSTANT_POWER = 'constantPower',
+  CONSTANT_POWER_SLOW_CUT = 'constantPowerSlowCut',
+  CONSTANT_POWER_SLOW_FADE = 'constantPowerSlowFade',
+  DIPPED = 'dipped',
+  EQUALPOWER = 'equalPower',
+  LINEAR = 'linear',
 }
 
 export enum PlaybackStyle {
-  Crossfade = 'crossfade',
-  Gapless = 'gapless',
+  CROSSFADE = 'crossfade',
+  GAPLESS = 'gapless',
 }
 
 export enum PlaybackType {
-  Local = 'local',
-  Web = 'web',
+  LOCAL = 'local',
+  WEB = 'web',
 }
 
 export type APIEndpoints =
@@ -97,25 +98,26 @@ export type APIEndpoints =
   | 'getSongsByGenre'
   | 'getLyrics';
 
-export interface GenericItem {
-  id: string;
-  title: string;
-}
-
 export interface APIResult {
   data: Album[] | Artist[] | Genre[] | Song[];
   totalRecordCount?: number;
 }
 
+interface RelatedItem {
+  deleted?: boolean;
+  id: string;
+  name: string;
+  remoteId?: string;
+}
+
 export interface Album {
-  albumArtist: Partial<AlbumArtist>;
-  albumArtistId: string;
+  albumArtist: AlbumArtist;
   averageRating: number;
   container: string;
   createdAt: string;
   date: string;
   deleted: boolean;
-  genres: Genre[];
+  genres: RelatedItem[];
   id: number;
   imageUrl: string;
   name: string;
@@ -154,27 +156,15 @@ export interface Artist {
   updatedAt: string;
 }
 
-export interface ArtistInfo {
-  biography?: string;
-  externalUrl: GenericItem[];
-  imageUrl?: string;
-  similarArtist?: Artist[];
-}
-
 export interface Genre {
-  albumCount?: number;
   id: string;
   name: string;
-  songCount?: number;
-  type?: Item.GENRE;
-  uniqueId?: string;
 }
 
 export interface Song {
-  album: string;
-  albumId: number;
+  album: RelatedItem;
   artistName: null;
-  artists: Partial<Artist>[];
+  artists: RelatedItem[];
   bitRate: number;
   container: string;
   createdAt: string;
@@ -182,7 +172,7 @@ export interface Song {
   deleted: boolean;
   disc: number;
   duration: number;
-  genres: Partial<Genre>[];
+  genres: RelatedItem[];
   id: number;
   imageUrl: string;
   name: string;
@@ -194,23 +184,6 @@ export interface Song {
   track: number;
   updatedAt: string;
   year: number;
-}
-
-export interface ScanStatus {
-  count: number | 'N/a';
-  scanning: boolean;
-}
-
-export interface Sort {
-  column?: string;
-  type: 'asc' | 'desc';
-}
-
-export interface Pagination {
-  activePage?: number;
-  pages?: number;
-  recordsPerPage: number;
-  serverSide?: boolean;
 }
 
 export interface ServerFolderAuth {

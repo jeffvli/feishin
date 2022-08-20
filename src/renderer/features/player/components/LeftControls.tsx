@@ -67,7 +67,7 @@ export const LeftControls = () => {
           to="/nowplaying"
           weight={500}
         >
-          {album || '—'}
+          {album?.name || '—'}
         </Text>
       </MetadataStack>
     </LeftControlsContainer>

@@ -122,7 +122,7 @@ export const usePlayerStore = create<PlayerSlice>()(
       index: 0,
       player: 1,
       song: {} as Song,
-      status: PlayerStatus.Paused,
+      status: PlayerStatus.PAUSED,
       time: 0,
     },
     getPlayerData: () => {
@@ -171,14 +171,14 @@ export const usePlayerStore = create<PlayerSlice>()(
     pause: () => {
       set(
         produce((state) => {
-          state.current.status = PlayerStatus.Paused;
+          state.current.status = PlayerStatus.PAUSED;
         })
       );
     },
     play: () => {
       set(
         produce((state) => {
-          state.current.status = PlayerStatus.Playing;
+          state.current.status = PlayerStatus.PLAYING;
         })
       );
     },
@@ -228,12 +228,12 @@ export const usePlayerStore = create<PlayerSlice>()(
     },
     settings: {
       crossfadeDuration: 5,
-      crossfadeStyle: CrossfadeStyle.EqualPower,
+      crossfadeStyle: CrossfadeStyle.EQUALPOWER,
       muted: false,
-      repeat: PlayerRepeat.None,
+      repeat: PlayerRepeat.NONE,
       shuffle: false,
-      style: PlaybackStyle.Gapless,
-      type: PlaybackType.Local,
+      style: PlaybackStyle.GAPLESS,
+      type: PlaybackType.LOCAL,
       volume: 50,
     },
   }))

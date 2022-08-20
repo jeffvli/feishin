@@ -16,12 +16,12 @@ export type PlayerSettings = PlayerState['settings'];
 const DEFAULT_SETTINGS: WebSettings = {
   player: {
     crossfadeDuration: 5,
-    crossfadeStyle: CrossfadeStyle.EqualPower,
+    crossfadeStyle: CrossfadeStyle.EQUALPOWER,
     muted: false,
-    repeat: PlayerRepeat.All,
+    repeat: PlayerRepeat.ALL,
     shuffle: false,
-    style: PlaybackStyle.Gapless,
-    type: isElectron() ? PlaybackType.Local : PlaybackType.Web,
+    style: PlaybackStyle.GAPLESS,
+    type: isElectron() ? PlaybackType.LOCAL : PlaybackType.WEB,
     volume: 0.5,
   },
 };
