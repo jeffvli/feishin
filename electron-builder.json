@@ -1,0 +1,59 @@
+{
+  "appId": "TEST",
+  "productName": "TEST",
+  "copyright": "Copyright © 2022 ${author}",
+  "directories": {
+    "app": "release/app",
+    "output": "release/build",
+    "buildResources": "electron/resources"
+  },
+  "extends": null,
+  "asar": true,
+  "asarUnpack": ["**\\*.{node,dll}", "prisma"],
+  "files": [
+    "dist",
+    "node_modules",
+    "package.json",
+    "prisma/**/*",
+    "resources/**/*",
+    "!**/node_modules/@prisma/engines/introspection-engine*",
+    "!**/node_modules/@prisma/engines/migration-engine*",
+    "!**/node_modules/@prisma/engines/prisma-fmt*",
+    "!**/node_modules/@prisma/engines/query_engine-*",
+    "!**/node_modules/@prisma/engines/libquery_engine*",
+    "!**/node_modules/prisma/query_engine*",
+    "!**/node_modules/prisma/libquery_engine*",
+    "!**/node_modules/prisma/**/*.mjs"
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "deleteAppDataOnUninstall": false
+  },
+  "mac": {
+    "target": ["dmg"],
+    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+  },
+  "linux": {
+    "icon": "electron/resources/iconset",
+    "target": ["AppImage", "deb"],
+    "artifactName": "${productName}-Linux-${version}.${ext}"
+  },
+  "extraResources": [
+    "./assets/**",
+    "prisma/**/*",
+    "node_modules/@prisma/engines/migration-engine*",
+    "node_modules/@prisma/engines/query*",
+    "node_modules/@prisma/engines/libquery*"
+  ]
+}
