@@ -1,0 +1,19 @@
+{
+  "name": "electron-react-boilerplate",
+  "version": "4.5.0",
+  "description": "A foundation for scalable desktop apps",
+  "main": "./dist/main/main.js",
+  "author": {
+    "name": "Electron React Boilerplate Maintainers",
+    "email": "electronreactboilerplate@gmail.com",
+    "url": "https://github.com/electron-react-boilerplate"
+  },
+  "scripts": {},
+  "dependencies": {
+    "@prisma/client": "4.4.0"
+  },
+  "devDependencies": {
+    "prisma": "4.4.0"
+  },
+  "license": "MIT"
+}

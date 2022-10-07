@@ -6,12 +6,13 @@
   "description": "",
   "author": "jeffvli",
   "license": "GPL-3.0",
-  "main": "dist-electron/main/index.js",
+  "main": "release/app/dist/main/index.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
     "postinstall": "node post-install.js && electron-builder install-app-deps",
     "prisma:init": "npx prisma migrate dev",
+    "prisma:dev": "npx prisma db push",
     "prisma:migrate": ""
   },
   "engines": {

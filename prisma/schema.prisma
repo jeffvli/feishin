@@ -1,0 +1,272 @@
+generator client {
+  provider      = "prisma-client-js"
+  engineType    = "library"
+  binaryTargets = ["native", "windows"]
+  // output   = "../release/app/node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../release/app/prisma/dev.db"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  favorites          Favorite[]
+  albumArtistRatings AlbumArtistRating[]
+  artistRatings      ArtistRating[]
+  albumRatings       AlbumRating[]
+  songRatings        SongRating[]
+}
+
+model Server {
+  id             Int      @id @default(autoincrement())
+  nickname       String   @unique
+  url            String   @unique
+  remoteId       String   @map("remote_id")
+  authUsername   String   @map("auth_username")
+  authCredential String   @map("auth_credential")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  serverType   ServerType @relation(fields: [serverTypeId], references: [id])
+  serverTypeId Int
+
+  serverFolders ServerFolder[]
+  songs         Song[]
+  albums        Album[]
+  artists       Artist[]
+  albumArtists  AlbumArtist[]
+
+  // @@map("server")
+}
+
+model ServerType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  Server    Server[]
+
+  // @@map("server_type")
+}
+
+model ServerFolder {
+  id        Int      @id @default(autoincrement())
+  name      String
+  remoteId  String   @map("remote_id")
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId Int
+
+  // @@map("server_folder")
+}
+
+model Genre {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  artists      Artist[]
+  albumArtists AlbumArtist[]
+  albums       Album[]
+  songs        Song[]
+
+  // @@map("genre")
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  albumArtists AlbumArtist[]
+  artists      Artist[]
+  albums       Album[]
+  songs        Song[]
+
+  User   User? @relation(fields: [userId], references: [id])
+  userId Int?
+
+  // @@map("favorite")
+}
+
+model AlbumArtistRating {
+  id        Int      @id @default(autoincrement())
+  value     Float
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  albumArtist   AlbumArtist? @relation(fields: [albumArtistId], references: [id])
+  albumArtistId Int
+  // @@map("album_artist_rating")
+
+  @@unique(fields: [albumArtistId, userId], name: "uniqueAlbumArtistRating", map: "unique_album_artist_rating")
+}
+
+model ArtistRating {
+  id        Int      @id @default(autoincrement())
+  value     Float
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  artist   Artist? @relation(fields: [artistId], references: [id])
+  artistId Int
+  // @@map("artist_rating")
+
+  @@unique(fields: [artistId, userId], name: "uniqueArtistRating", map: "unique_artist_rating")
+}
+
+model AlbumRating {
+  id        Int      @id @default(autoincrement())
+  value     Float
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  album   Album? @relation(fields: [albumId], references: [id])
+  albumId Int
+  // @@map("album_rating")
+
+  @@unique(fields: [albumId, userId], name: "uniqueAlbumRating", map: "unique_album_rating")
+}
+
+model SongRating {
+  id        Int      @id @default(autoincrement())
+  value     Float
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  song   Song? @relation(fields: [songId], references: [id])
+  songId Int
+  // @@map("song_rating")
+
+  @@unique(fields: [songId, userId], name: "uniqueSongRating", map: "unique_song_rating")
+}
+
+model AlbumArtist {
+  id              Int       @id @default(autoincrement())
+  name            String
+  image           String?
+  image_remote    String?   @map("image_remote")
+  sortName        String    @map("sort_name")
+  biography       String?
+  remoteId        String    @map("remote_id")
+  remoteCreatedAt DateTime? @map("remote_created_at")
+  deleted         Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  genres    Genre[]
+  albums    Album[]
+  songs     Song[]
+  favorites Favorite[]
+  ratings   AlbumArtistRating[]
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId Int
+  // @@map("album_artist")
+
+  @@unique(fields: [serverId, remoteId], name: "uniqueAlbumArtistId", map: "unique_album_artist_id")
+}
+
+model Artist {
+  id              Int       @id @default(autoincrement())
+  name            String
+  image           String?
+  image_remote    String?   @map("image_remote")
+  biography       String?
+  remoteId        String    @map("remote_id")
+  remoteCreatedAt DateTime? @map("remote_created_at")
+  deleted         Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  genres    Genre[]
+  favorites Favorite[]
+  ratings   ArtistRating[]
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId Int
+  // @@map("artist")
+
+  @@unique(fields: [serverId, remoteId], name: "uniqueArtistId", map: "unique_artist_id")
+}
+
+model Album {
+  id              Int       @id @default(autoincrement())
+  name            String
+  image           String?
+  image_remote    String?   @map("image_remote")
+  releaseDate     DateTime? @map("release_date")
+  releaseYear     Int?      @map("release_year")
+  remoteId        String
+  remoteCreatedAt DateTime?
+  deleted         Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  genres       Genre[]
+  albumArtists AlbumArtist[]
+  favorites    Favorite[]
+  ratings      AlbumRating[]
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId Int    @map("server_id")
+  // @@map("album")
+
+  @@unique(fields: [serverId, remoteId], name: "uniqueAlbumId", map: "unique_album_id")
+}
+
+model Song {
+  id              Int       @id @default(autoincrement())
+  name            String
+  image           String?
+  remote_image    String?   @map("remote_image")
+  releaseDate     DateTime? @map("release_date")
+  releaseYear     Int?      @map("release_year")
+  duration        Float?
+  lyric           String?
+  bitRate         Int       @map("bit_rate")
+  container       String
+  size            String?
+  channels        Int?
+  discIndex       Int       @default(1) @map("disc_index")
+  trackIndex      Int?      @map("track_index")
+  artistName      String?   @map("artist_name")
+  remoteId        String    @map("remote_id")
+  remoteCreatedAt DateTime? @map("remote_created_at")
+  deleted         Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  genres       Genre[]
+  albumArtists AlbumArtist[]
+  favorites    Favorite[]
+  ratings      SongRating[]
+
+  server   Server @relation(fields: [serverId], references: [id])
+  serverId Int    @map("server_id")
+  // @@map("song")
+
+  @@unique(fields: [serverId, remoteId], name: "uniqueSongId", map: "unique_song_id")
+}

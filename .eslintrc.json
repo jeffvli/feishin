@@ -1,0 +1,82 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "ignorePatterns": [
+    "node_modules/*",
+    "dist/*",
+    "electron/preload/*",
+    "vite.config.ts",
+    "post-install.js"
+  ],
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:typescript-sort-keys/recommended",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "@typescript-eslint",
+    "import",
+    "sort-keys-fix",
+    "promise"
+  ],
+  "rules": {
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      { "enableDangerousAutofixThisMayCauseInfiniteLoops": true }
+    ],
+    "react/jsx-sort-props": [
+      "error",
+      {
+        "callbacksLast": true,
+        "ignoreCase": false,
+        "noSortAlphabetically": false,
+        "reservedFirst": true,
+        "shorthandFirst": true,
+        "shorthandLast": false
+      }
+    ],
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal", ["parent", "sibling"]],
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "external",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["react"],
+        "newlines-between": "never",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ],
+    "sort-keys-fix/sort-keys-fix": "warn",
+    "@typescript-eslint/no-explicit-any": "off",
+    "consistent-return": "off",
+    "object-curly-newline": "off",
+    "indent": "off",
+    "no-tabs": "off",
+    "react/jsx-indent": "off",
+    "react/jsx-indent-props": "off",
+    "react/react-in-jsx-scope": "off"
+  }
+}
