@@ -1,9 +1,8 @@
 import express, { Router } from 'express';
-import { usersController } from '../controllers';
-import { authenticateLocal } from '../middleware';
+import { controller } from '../controllers';
 
-export const usersRouter: Router = express.Router();
+export const router: Router = express.Router({ mergeParams: true });
 
-usersRouter.get('/', authenticateLocal, usersController.getUsers);
+router.get('/', controller.users.getUsers);
 
-usersRouter.get('/:id', authenticateLocal, usersController.getUser);
+router.get('/:id', controller.users.getUser);

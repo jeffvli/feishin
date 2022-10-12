@@ -1,7 +1,6 @@
 import express, { Router } from 'express';
-import { songsController } from '../controllers/songs.controller';
-import { authenticateLocal } from '../middleware';
+import { controller } from '../controllers';
 
-export const songsRouter: Router = express.Router();
+export const router: Router = express.Router({ mergeParams: true });
 
-songsRouter.get('/', authenticateLocal, songsController.getSongs);
+router.get('/', controller.songs.getSongs);

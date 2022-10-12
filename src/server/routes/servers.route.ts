@@ -1,29 +1,17 @@
 import express, { Router } from 'express';
-import { serversController } from '../controllers';
-import { authenticateAdmin, authenticateLocal } from '../middleware';
+import { controller } from '../controllers';
+import { authenticateAdmin } from '../middleware';
 
-export const serversRouter: Router = express.Router();
+export const router: Router = express.Router({ mergeParams: true });
 
-serversRouter.get('/', authenticateLocal, serversController.getServers);
+router.get('/', controller.servers.getServerList);
 
-serversRouter.get('/:id', authenticateLocal, serversController.getServerById);
+router.post('/', authenticateAdmin, controller.servers.createServer);
 
-serversRouter.get(
-  '/:id/refresh',
-  authenticateAdmin,
-  serversController.refreshServer
-);
+router.get('/:id', controller.servers.getServerDetail);
 
-serversRouter.get(
-  '/:id/folder',
-  authenticateAdmin,
-  serversController.getFolder
-);
+router.get('/:id/refresh', authenticateAdmin, controller.servers.refreshServer);
 
-serversRouter.post('/', authenticateAdmin, serversController.createServer);
+router.get('/:id/folder', authenticateAdmin, controller.servers.getFolder);
 
-serversRouter.post(
-  '/:id/scan',
-  authenticateAdmin,
-  serversController.scanServer
-);
+router.post('/:id/scan', authenticateAdmin, controller.servers.scanServer);

@@ -1,16 +1,16 @@
 import express, { Router } from 'express';
 import passport from 'passport';
-import { authController } from '../controllers';
-import { authenticateLocal } from '../middleware';
+import { controller } from '../controllers';
+import { authenticate } from '../middleware';
 
-export const authRouter: Router = express.Router();
+export const router: Router = express.Router({ mergeParams: true });
 
-authRouter.post('/login', passport.authenticate('local'), authController.login);
+router.post('/login', passport.authenticate('local'), controller.auth.login);
 
-authRouter.post('/register', authController.register);
+router.post('/register', controller.auth.register);
 
-authRouter.post('/logout', authenticateLocal, authController.logout);
+router.post('/logout', authenticate, controller.auth.logout);
 
-authRouter.post('/refresh', authController.refresh);
+router.post('/refresh', controller.auth.refresh);
 
-authRouter.get('/ping', authController.ping);
+router.get('/ping', controller.auth.ping);

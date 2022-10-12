@@ -1,9 +1,8 @@
 import express, { Router } from 'express';
-import { artistsController } from '../controllers';
-import { authenticateLocal } from '../middleware';
+import { controller } from '../controllers';
 
-export const artistsRouter: Router = express.Router();
+export const router: Router = express.Router({ mergeParams: true });
 
-artistsRouter.get('/', authenticateLocal, artistsController.getArtists);
+router.get('/', controller.artists.getArtists);
 
-artistsRouter.get('/:id', authenticateLocal, artistsController.getArtistById);
+router.get('/:id', controller.artists.getArtistById);
