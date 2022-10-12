@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "orderByNulls", "filteredRelationCount", "fieldReference"]
 }
 
 datasource db {
@@ -7,45 +8,109 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ServerType {
+  SUBSONIC
+  JELLYFIN
+  NAVIDROME
+}
+
+enum ServerPermissionType {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum ExternalSource {
+  MUSICBRAINZ
+  LASTFM
+  THEAUDIODB
+  SPOTIFY
+}
+
+enum ExternalType {
+  ID
+  LINK
+}
+
+enum ImageType {
+  PRIMARY
+  BACKDROP
+  LOGO
+  SCREENSHOT
+}
+
+enum TaskType {
+  FULL_SCAN
+  QUICK_SCAN
+  REFRESH
+  SPOTIFY
+  MUSICBRAINZ
+  LASTFM
+}
+
 model RefreshToken {
-  id    Int    @id @default(autoincrement())
+  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   token String @unique
 
-  User   User @relation(fields: [userId], references: [id])
-  userId Int
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   username  String   @unique
   password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   enabled   Boolean  @default(false)
   isAdmin   Boolean  @default(false)
   deviceId  String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  favorites               Favorite[]
-  histories               History[]
-  serverFolderPermissions ServerFolderPermission[]
-  albumArtistRatings      AlbumArtistRating[]
-  artistRatings           ArtistRating[]
-  albumRatings            AlbumRating[]
-  songRatings             SongRating[]
-  refreshTokens           RefreshToken[]
+  favorites          Favorite[]
+  histories          History[]
+  albumArtistRatings AlbumArtistRating[]
+  artistRatings      ArtistRating[]
+  albumRatings       AlbumRating[]
+  songRatings        SongRating[]
+  refreshTokens      RefreshToken[]
+
+  serverFolderPermissions ServerFolderPermissions[]
+  serverPermissions       ServerPermissions[]
 }
 
 model History {
-  id Int @id @default(autoincrement())
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   songs Song[]
 
-  User   User @relation(fields: [userId], references: [id])
-  userId Int
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+}
+
+model Server {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String
+  url          String     @unique
+  remoteUserId String
+  username     String
+  token        String
+  type         ServerType
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  albumArtists      AlbumArtist[]
+  artists           Artist[]
+  albums            Album[]
+  songs             Song[]
+  serverFolders     ServerFolder[]
+  serverUrls        ServerUrl[]
+  folders           Folder[]
+  serverPermissions ServerPermissions[]
+  tasks             Task[]
 }
 
 model Folder {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
   path      String   @unique
   createdAt DateTime @default(now())
@@ -54,56 +119,50 @@ model Folder {
   songs         Song[]
   serverFolders ServerFolder[]
 
-  parentId Int?
+  parentId String?  @db.Uuid
   parent   Folder?  @relation("FolderChildren", fields: [parentId], references: [id])
   children Folder[] @relation("FolderChildren")
 
-  Server   Server @relation(fields: [serverId], references: [id])
-  serverId Int
+  Server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
 
   @@unique(fields: [serverId, path], name: "uniqueFolderId")
 }
 
-model Server {
-  id           Int      @id @default(autoincrement())
-  name         String
-  url          String   @unique
-  username     String
-  remoteUserId String
-  token        String
-  serverType   String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+model ServerPermissions {
+  id        String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type      ServerPermissionType
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
 
-  albumArtists  AlbumArtist[]
-  artists       Artist[]
-  albums        Album[]
-  songs         Song[]
-  serverFolders ServerFolder[]
-  serverUrls    ServerUrl[]
-  folders       Folder[]
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
+
+  @@unique(fields: [userId, serverId], name: "uniqueServerPermissionsId")
 }
 
 model ServerUrl {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   url       String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Server   Server @relation(fields: [serverId], references: [id])
-  serverId Int
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
 
   @@unique(fields: [serverId, url], name: "uniqueServerUrlId")
 }
 
 model ServerFolder {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
   remoteId  String   @unique
   enabled   Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  isPublic  Boolean  @default(true)
   deleted   Boolean  @default(false)
 
   albumArtists            AlbumArtist[]
@@ -111,29 +170,30 @@ model ServerFolder {
   albums                  Album[]
   songs                   Song[]
   folders                 Folder[]
-  tasks                   Task[]
-  serverFolderPermissions ServerFolderPermission[]
+  serverFolderPermissions ServerFolderPermissions[]
 
-  server   Server @relation(fields: [serverId], references: [id])
-  serverId Int
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
 
   @@unique(fields: [serverId, remoteId], name: "uniqueServerFolderId")
 }
 
-model ServerFolderPermission {
-  id Int @id @default(autoincrement())
+model ServerFolderPermissions {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  ServerFolder   ServerFolder @relation(fields: [serverFolderId], references: [id])
-  serverFolderId Int
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  serverFolder   ServerFolder @relation(fields: [serverFolderId], references: [id], onDelete: Cascade)
+  serverFolderId String       @db.Uuid
 
-  @@unique(fields: [serverFolderId, userId], name: "uniqueServerFolderPermissionId")
+  @@unique(fields: [userId, serverFolderId], name: "uniqueServerFolderPermissionsId")
 }
 
 model Genre {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -145,7 +205,7 @@ model Genre {
 }
 
 model Favorite {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -154,95 +214,98 @@ model Favorite {
   albums       Album[]
   songs        Song[]
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
 }
 
 model AlbumArtistRating {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   value     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
 
-  albumArtist   AlbumArtist? @relation(fields: [albumArtistId], references: [id])
-  albumArtistId Int?
+  albumArtist   AlbumArtist @relation(fields: [albumArtistId], references: [id])
+  albumArtistId String      @db.Uuid
 }
 
 model ArtistRating {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   value     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
 
-  artist   Artist? @relation(fields: [artistId], references: [id])
-  artistId Int?
+  artist   Artist @relation(fields: [artistId], references: [id])
+  artistId String @db.Uuid
 }
 
 model AlbumRating {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   value     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
 
-  album   Album? @relation(fields: [albumId], references: [id])
-  albumId Int?
+  album   Album  @relation(fields: [albumId], references: [id])
+  albumId String @db.Uuid
 }
 
 model SongRating {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   value     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
 
-  song   Song? @relation(fields: [songId], references: [id])
-  songId Int?
+  song   Song?   @relation(fields: [songId], references: [id])
+  songId String? @db.Uuid
 }
 
 model Image {
-  id        Int      @id @default(autoincrement())
-  name      String
-  url       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  url       String?
+  remoteUrl String
+  type      ImageType
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   albumArtists AlbumArtist[]
   artists      Artist[]
   albums       Album[]
   songs        Song[]
 
-  @@unique(fields: [name, url], name: "uniqueImageId")
+  @@unique(fields: [remoteUrl, type], name: "uniqueImageId")
 }
 
 model External {
-  id        Int      @id @default(autoincrement())
-  name      String
-  url       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  value     String
+  type      ExternalType
+  source    ExternalSource
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
   albumArtists AlbumArtist[]
   artists      Artist[]
   albums       Album[]
   songs        Song[]
 
-  @@unique(fields: [name, url], name: "uniqueExternalId")
+  @@unique(fields: [value, source], name: "uniqueExternalId")
 }
 
 model AlbumArtist {
-  id              Int       @id @default(autoincrement())
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name            String
+  sortName        String
   biography       String?
   remoteId        String
   remoteCreatedAt DateTime?
@@ -252,23 +315,24 @@ model AlbumArtist {
 
   albums        Album[]
   genres        Genre[]
-  favorites     Favorite[]
-  images        Image[]
   externals     External[]
   serverFolders ServerFolder[]
   ratings       AlbumArtistRating[]
+  images        Image[]
+  favorites     Favorite[]
 
-  server   Server @relation(fields: [serverId], references: [id])
-  serverId Int
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
 
   @@unique(fields: [serverId, remoteId], name: "uniqueAlbumArtistId")
 }
 
 model Album {
-  id              Int       @id @default(autoincrement())
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name            String
-  date            DateTime?
-  year            Int?
+  sortName        String
+  releaseDate     DateTime?
+  releaseYear     Int?
   remoteId        String
   remoteCreatedAt DateTime?
   deleted         Boolean   @default(false)
@@ -277,25 +341,26 @@ model Album {
 
   songs         Song[]
   genres        Genre[]
-  favorites     Favorite[]
   artists       Artist[]
-  images        Image[]
   externals     External[]
   serverFolders ServerFolder[]
   ratings       AlbumRating[]
+  images        Image[]
+  favorites     Favorite[]
 
   albumArtist   AlbumArtist? @relation(fields: [albumArtistId], references: [id])
-  albumArtistId Int?
+  albumArtistId String?      @db.Uuid
 
-  server   Server @relation(fields: [serverId], references: [id])
-  serverId Int
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
 
   @@unique(fields: [serverId, remoteId], name: "uniqueAlbumId")
 }
 
 model Artist {
-  id              Int       @id @default(autoincrement())
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name            String
+  sortName        String
   biography       String?
   remoteId        String
   remoteCreatedAt DateTime?
@@ -304,30 +369,33 @@ model Artist {
   updatedAt       DateTime  @updatedAt
 
   genres        Genre[]
-  favorites     Favorite[]
   albums        Album[]
   songs         Song[]
-  images        Image[]
   externals     External[]
   serverFolders ServerFolder[]
   ratings       ArtistRating[]
+  images        Image[]
+  favorites     Favorite[]
 
-  server   Server @relation(fields: [serverId], references: [id])
-  serverId Int
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
 
   @@unique(fields: [serverId, remoteId], name: "uniqueArtistId")
 }
 
 model Song {
-  id              Int       @id @default(autoincrement())
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name            String
-  date            DateTime?
-  year            Int?
+  sortName        String
+  releaseDate     DateTime?
+  releaseYear     Int?
   duration        Float
+  size            String?
+  lyrics          String?
   bitRate         Int
   container       String
-  disc            Int       @default(1)
-  track           Int?
+  discNumber      Int       @default(1)
+  trackNumber     Int?
   artistName      String?
   remoteId        String
   remoteCreatedAt DateTime?
@@ -336,35 +404,35 @@ model Song {
   updatedAt       DateTime  @updatedAt
 
   genres        Genre[]
-  favorites     Favorite[]
   artists       Artist[]
-  images        Image[]
   externals     External[]
   folders       Folder[]
   serverFolders ServerFolder[]
   histories     History[]
   ratings       SongRating[]
+  images        Image[]
+  favorites     Favorite[]
 
-  album   Album? @relation(fields: [albumId], references: [id])
-  albumId Int?
+  album   Album?  @relation(fields: [albumId], references: [id])
+  albumId String? @db.Uuid
 
-  server   Server @relation(fields: [serverId], references: [id])
-  serverId Int
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
 
   @@unique(fields: [serverId, remoteId], name: "uniqueSongId")
 }
 
 model Task {
-  id         Int      @id @default(autoincrement())
-  name       String
-  inProgress Boolean  @default(false)
-  completed  Boolean  @default(false)
-  isError    Boolean? @default(false)
-  progress   String?
-  message    String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  type      TaskType
+  message   String?
+  progress  String?
+  completed Boolean  @default(false)
+  isError   Boolean? @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  serverFolder   ServerFolder @relation(fields: [serverFolderId], references: [id])
-  serverFolderId Int
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
 }
