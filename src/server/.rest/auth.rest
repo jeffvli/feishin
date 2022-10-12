@@ -1,0 +1,52 @@
+
+###
+
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{authUsername}}",
+  "password": "{{authPassword}}"
+}
+
+###
+
+POST {{host}}/api/auth/logout
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "username": "{{authUsername}}",
+  "password": "{{authPassword}}"
+}
+
+
+###
+
+POST {{host}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###
+
+# @prompt username Login username
+# @prompt password Login password
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+###
+
+GET {{host}}/api/auth/ping
+Content-Type: application/json
+
+
+@contentType = application/json
+@serverId =

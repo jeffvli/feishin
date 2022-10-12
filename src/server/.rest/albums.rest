@@ -1,0 +1,22 @@
+@serverId =
+@albumId =
+
+###
+# skip: The number of rows to skip before returning rows. Must be a non-negative integer.
+# take: The number of rows to return. Must be a non-negative integer.
+# orderBy: asc | desc
+# sortBy: date_added | date_added_remote | date_released | random | rating | title | year
+GET {{host}}/api/servers/{{serverId}}/albums
+  ?skip=0
+  &take=100
+  &sortBy=title
+  &orderBy=desc
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+###
+
+GET {{host}}/api/servers/{{serverId}}/albums/{{albumId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
