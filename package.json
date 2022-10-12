@@ -21,7 +21,9 @@
     "i18next": "i18next -c src/renderer/i18n/i18next-parser.config.js",
     "docker:up": "docker compose --file docker-compose.dev.yml --env-file .env.dev up --detach && docker compose --file docker-compose.dev.yml --env-file .env.dev logs -f",
     "docker:down": "docker compose --file docker-compose.dev.yml --env-file .env.dev down && docker image rm sonixd_prisma",
-    "docker:migrate": "cd src/server && npx prisma generate && docker exec -ti sonixd_server sh -c \"npx prisma generate && npx prisma db push\"",
+    "docker:dbpush": "cd src/server && npx prisma generate && docker exec -ti sonixd_server sh -c \"npx prisma generate && npx prisma db push\"",
+    "docker:migrate": "cd src/server && npx prisma generate && docker exec -ti sonixd_server sh -c \"npx prisma migrate dev\"",
+    "docker:createmigrate": "cd src/server && npx prisma generate && docker exec -ti sonixd_server sh -c \"npx prisma migrate dev --create-only\"",
     "docker:reset": "docker exec -ti sonixd_server sh -c \"npx prisma migrate reset && npx prisma db push && npx ts-node prisma/seed.ts\""
   },
   "lint-staged": {
