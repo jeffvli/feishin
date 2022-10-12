@@ -1,7 +1,19 @@
+import {
+  ServerFolderPermissions,
+  ServerPermissions,
+  User,
+} from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import passport from 'passport';
 
-export const authenticateLocal = (
+export type AuthUser = User & {
+  flatServerFolderPermissions: string[];
+  flatServerPermissions: string[];
+  serverFolderPermissions: ServerFolderPermissions[];
+  serverPermissions: ServerPermissions[];
+};
+
+export const authenticate = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -33,14 +45,28 @@ export const authenticateLocal = (
       });
     }
 
-    req.auth = {
+    const flatServerFolderPermissions = user.serverFolderPermissions.map(
+      (permission: ServerFolderPermissions) => permission.serverFolderId
+    );
+
+    const flatServerPermissions = user.serverPermissions.map(
+      (permission: ServerPermissions) => permission.serverId
+    );
+
+    const auth = {
       createdAt: user?.createdAt,
       enabled: user?.enabled,
+      flatServerFolderPermissions,
+      flatServerPermissions,
       id: user?.id,
       isAdmin: user?.isAdmin,
+      serverFolderPermissions: user?.serverFolderPermissions,
+      serverPermissions: user?.serverPermissions,
       updatedAt: user?.updatedAt,
       username: user?.username,
     };
+
+    req.auth = auth;
 
     return next();
   })(req, res, next);

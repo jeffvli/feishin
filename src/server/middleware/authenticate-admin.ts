@@ -1,59 +1,20 @@
 import { NextFunction, Request, Response } from 'express';
-import passport from 'passport';
 
 export const authenticateAdmin = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  passport.authenticate('jwt', { session: false }, (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
+  if (!req.auth.isAdmin) {
+    return res.status(403).json({
+      error: {
+        message: 'This action requires an administrator account.',
+        path: req.path,
+      },
+      response: 'Error',
+      statusCode: 403,
+    });
+  }
 
-    if (!user) {
-      return res.status(401).json({
-        error: {
-          message: info?.message || 'Invalid authorization.',
-          path: req.path,
-        },
-        response: 'Error',
-        statusCode: 401,
-      });
-    }
-
-    if (!user.enabled) {
-      return res.status(401).json({
-        error: {
-          message: 'Your account is not enabled.',
-          path: req.path,
-        },
-        response: 'Error',
-        statusCode: 401,
-      });
-    }
-
-    if (!user.isAdmin) {
-      return res.status(403).json({
-        error: {
-          message:
-            info?.message || 'This action requires an administrator account.',
-          path: req.path,
-        },
-        response: 'Error',
-        statusCode: 403,
-      });
-    }
-
-    req.auth = {
-      createdAt: user.createdAt,
-      enabled: user.enabled,
-      id: user.id,
-      isAdmin: user.isAdmin,
-      updatedAt: user.updatedAt,
-      username: user.username,
-    };
-
-    return next();
-  })(req, res, next);
+  return next();
 };

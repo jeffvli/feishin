@@ -9,13 +9,13 @@ import {
 import { Strategy as LocalStrategy } from 'passport-local';
 import { prisma } from './prisma';
 
-export const generateToken = (userId: number) => {
+export const generateToken = (userId: string) => {
   return jwt.sign({ id: userId }, String(process.env.TOKEN_SECRET), {
     expiresIn: String(process.env.TOKEN_EXPIRATION || '15m'),
   });
 };
 
-export const generateRefreshToken = (userId: number) => {
+export const generateRefreshToken = (userId: string) => {
   return jwt.sign({ id: userId }, String(process.env.TOKEN_SECRET), {
     expiresIn: String(process.env.TOKEN_REFRESH_EXPIRATION || '90d'),
   });
@@ -54,9 +54,11 @@ passport.use(
   new JwtStrategy(jwtOptions, async (jwt_payload: any, done: any) => {
     await prisma.user
       .findUnique({
-        where: {
-          id: jwt_payload.id,
+        include: {
+          serverFolderPermissions: true,
+          serverPermissions: true,
         },
+        where: { id: jwt_payload.id },
       })
       .then((user) => {
         // eslint-disable-next-line promise/no-callback-in-promise
@@ -72,7 +74,7 @@ passport.serializeUser((user: any, done) => {
   return done(null, user.id);
 });
 
-passport.deserializeUser(async (id: number, done) => {
+passport.deserializeUser(async (id: string, done) => {
   return done(
     null,
     await prisma.user.findUnique({
