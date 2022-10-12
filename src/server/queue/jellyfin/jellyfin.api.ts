@@ -1,16 +1,42 @@
+import { Server } from '@prisma/client';
 import axios from 'axios';
-import { Server } from '../../types/types';
 import {
   JFAlbumArtistsResponse,
   JFAlbumsResponse,
   JFArtistsResponse,
+  JFAuthenticate,
+  JFCollectionType,
   JFGenreResponse,
+  JFItemType,
   JFMusicFoldersResponse,
   JFRequestParams,
   JFSongsResponse,
-} from './jellyfin-types';
+} from './jellyfin.types';
 
 export const api = axios.create({});
+
+export const authenticate = async (options: {
+  password: string;
+  url: string;
+  username: string;
+}) => {
+  const { password, url, username } = options;
+  const cleanServerUrl = url.replace(/\/$/, '');
+
+  console.log('cleanServerUrl', cleanServerUrl);
+
+  const { data } = await api.post<JFAuthenticate>(
+    `${cleanServerUrl}/users/authenticatebyname`,
+    { pw: password, username },
+    {
+      headers: {
+        'X-Emby-Authorization': `MediaBrowser Client="Sonixd", Device="PC", DeviceId="Sonixd", Version="1.0.0-alpha1"`,
+      },
+    }
+  );
+
+  return data;
+};
 
 export const getMusicFolders = async (server: Partial<Server>) => {
   const { data } = await api.get<JFMusicFoldersResponse>(
@@ -19,7 +45,7 @@ export const getMusicFolders = async (server: Partial<Server>) => {
   );
 
   const musicFolders = data.Items.filter(
-    (folder) => folder.CollectionType === 'music'
+    (folder) => folder.CollectionType === JFCollectionType.MUSIC
   );
 
   return musicFolders;
@@ -63,7 +89,7 @@ export const getAlbums = async (server: Server, params: JFRequestParams) => {
     `${server.url}/users/${server.remoteUserId}/items`,
     {
       headers: { 'X-MediaBrowser-Token': server.token },
-      params: { includeItemTypes: 'MusicAlbum', ...params },
+      params: { includeItemTypes: JFItemType.MUSICALBUM, ...params },
     }
   );
 
@@ -75,7 +101,7 @@ export const getSongs = async (server: Server, params: JFRequestParams) => {
     `${server.url}/users/${server.remoteUserId}/items`,
     {
       headers: { 'X-MediaBrowser-Token': server.token },
-      params: { includeItemTypes: 'Audio', ...params },
+      params: { includeItemTypes: JFItemType.AUDIO, ...params },
     }
   );
 
@@ -83,6 +109,7 @@ export const getSongs = async (server: Server, params: JFRequestParams) => {
 };
 
 export const jellyfinApi = {
+  authenticate,
   getAlbumArtists,
   getAlbums,
   getArtists,

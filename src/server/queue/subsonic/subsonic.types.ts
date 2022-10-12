@@ -127,7 +127,7 @@ export interface SSSong {
 export interface SSAlbumsParams {
   fromYear?: number;
   genre?: string;
-  musicFolderId?: number;
+  musicFolderId?: string;
   offset?: number;
   size?: number;
   toYear?: number;

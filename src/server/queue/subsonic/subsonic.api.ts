@@ -1,5 +1,7 @@
+import { Server } from '@prisma/client';
 import axios from 'axios';
-import { Server } from '../../types/types';
+import md5 from 'md5';
+import { randomString } from '../../utils';
 import {
   SSAlbumListEntry,
   SSAlbumListResponse,
@@ -10,7 +12,7 @@ import {
   SSArtistsResponse,
   SSGenresResponse,
   SSMusicFoldersResponse,
-} from './subsonic-types';
+} from './subsonic.types';
 
 const api = axios.create({
   validateStatus: (status) => status >= 200,
@@ -25,6 +27,31 @@ api.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+
+const authenticate = async (options: {
+  legacy?: boolean;
+  password: string;
+  url: string;
+  username: string;
+}) => {
+  let token;
+
+  const cleanServerUrl = options.url.replace(/\/$/, '');
+
+  if (options.legacy) {
+    token = `u=${options.username}&p=${options.password}`;
+  } else {
+    const salt = randomString(12);
+    const hash = md5(options.password + salt);
+    token = `u=${options.username}&s=${salt}&t=${hash}`;
+  }
+
+  const { data } = await api.get(
+    `${cleanServerUrl}/rest/ping.view?v=1.13.0&c=sonixd&f=json&${token}`
+  );
+
+  return { token, ...data };
+};
 
 const getMusicFolders = async (server: Partial<Server>) => {
   const { data } = await api.get<SSMusicFoldersResponse>(
@@ -120,6 +147,7 @@ const getArtistInfo = async (server: Server, id: string) => {
 };
 
 export const subsonicApi = {
+  authenticate,
   getAlbum,
   getAlbums,
   getArtistInfo,
