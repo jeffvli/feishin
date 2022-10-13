@@ -1,26 +1,27 @@
 /* eslint-disable no-await-in-loop */
-import { Server, ServerFolder, Task } from '@prisma/client';
+import { ImageType, Server, ServerFolder, Task } from '@prisma/client';
 import { prisma, throttle } from '../../lib';
-import { groupByProperty, uniqueArray } from '../../utils';
+import { uniqueArray } from '../../utils';
+import { queue } from '../queues';
 import { subsonicApi } from './subsonic.api';
-import { SSAlbumListEntry } from './subsonic.types';
+import { subsonicUtils } from './subsonic.utils';
 
-export const scanGenres = async (
-  server: Server,
-  serverFolder: ServerFolder
-) => {
+export const scanGenres = async (server: Server, task: Task) => {
+  await prisma.task.update({
+    data: { message: 'Scanning genres' },
+    where: { id: task.id },
+  });
+
   const res = await subsonicApi.getGenres(server);
 
   const genres = res.genres.genre.map((genre) => {
     return { name: genre.value };
   });
 
-  const createdGenres = await prisma.genre.createMany({
+  await prisma.genre.createMany({
     data: genres,
     skipDuplicates: true,
   });
-
-  const message = `Imported ${createdGenres.count} new genres.`;
 };
 
 export const scanAlbumArtists = async (
@@ -35,11 +36,13 @@ export const scanAlbumArtists = async (
         name: artist.name,
         remoteId: artist.id,
         serverId: server.id,
+        sortName: artist.name,
       },
       update: {
         name: artist.name,
         remoteId: artist.id,
         serverId: server.id,
+        sortName: artist.name,
       },
       where: {
         uniqueAlbumArtistId: {
@@ -54,11 +57,13 @@ export const scanAlbumArtists = async (
         name: artist.name,
         remoteId: artist.id,
         serverId: server.id,
+        sortName: artist.name,
       },
       update: {
         name: artist.name,
         remoteId: artist.id,
         serverId: server.id,
+        sortName: artist.name,
       },
       where: {
         uniqueArtistId: {
@@ -68,15 +73,12 @@ export const scanAlbumArtists = async (
       },
     });
   }
-
-  const message = `Scanned ${artists.length} album artists.`;
 };
 
 export const scanAlbums = async (
   server: Server,
   serverFolder: ServerFolder
 ) => {
-  const promises: any[] = [];
   const albums = await subsonicApi.getAlbums(server, {
     musicFolderId: serverFolder.id,
     offset: 0,
@@ -84,92 +86,87 @@ export const scanAlbums = async (
     type: 'newest',
   });
 
-  const albumArtistGroups = groupByProperty(albums, 'artistId');
+  await subsonicUtils.insertImages(albums);
 
-  const addAlbums = async (
-    a: SSAlbumListEntry[],
-    albumArtistRemoteId: string
-  ) => {
-    const albumArtist = await prisma.albumArtist.findUnique({
+  for (const album of albums) {
+    const imagesConnect = album.coverArt
+      ? {
+          uniqueImageId: {
+            remoteUrl: album.coverArt,
+            type: ImageType.PRIMARY,
+          },
+        }
+      : undefined;
+
+    const albumArtist = album.artistId
+      ? await prisma.albumArtist.findUnique({
+          where: {
+            uniqueAlbumArtistId: {
+              remoteId: album.artistId,
+              serverId: server.id,
+            },
+          },
+        })
+      : undefined;
+
+    await prisma.album.upsert({
+      create: {
+        albumArtistId: albumArtist?.id,
+        genres: { connect: album.genre ? { name: album.genre } : undefined },
+        images: { connect: imagesConnect },
+        name: album.title,
+        releaseDate: album?.year
+          ? new Date(album.year, 0).toISOString()
+          : undefined,
+        releaseYear: album.year,
+        remoteCreatedAt: album.created,
+        remoteId: album.id,
+        serverFolders: { connect: { id: serverFolder.id } },
+        serverId: server.id,
+        sortName: album.title,
+      },
+      update: {
+        albumArtistId: albumArtist?.id,
+        genres: { connect: album.genre ? { name: album.genre } : undefined },
+        images: { connect: imagesConnect },
+        name: album.title,
+        releaseDate: album?.year
+          ? new Date(album.year, 0).toISOString()
+          : undefined,
+        releaseYear: album.year,
+        remoteCreatedAt: album.created,
+        remoteId: album.id,
+        serverFolders: { connect: { id: serverFolder.id } },
+        serverId: server.id,
+        sortName: album.title,
+      },
       where: {
-        uniqueAlbumArtistId: {
-          remoteId: albumArtistRemoteId,
+        uniqueAlbumId: {
+          remoteId: album.id,
           serverId: server.id,
         },
       },
     });
-
-    if (albumArtist) {
-      a.forEach(async (album) => {
-        const imagesConnectOrCreate = album.coverArt
-          ? {
-              create: { name: 'Primary', url: album.coverArt },
-              where: {
-                uniqueImageId: { name: 'Primary', url: album.coverArt },
-              },
-            }
-          : [];
-
-        await prisma.album.upsert({
-          create: {
-            albumArtistId: albumArtist.id,
-            images: { connectOrCreate: imagesConnectOrCreate },
-            name: album.title,
-            remoteCreatedAt: album.created,
-            remoteId: album.id,
-            serverId: server.id,
-            year: album.year,
-          },
-          update: {
-            albumArtistId: albumArtist.id,
-            images: { connectOrCreate: imagesConnectOrCreate },
-            name: album.title,
-            remoteCreatedAt: album.created,
-            remoteId: album.id,
-            serverId: server.id,
-            year: album.year,
-          },
-          where: {
-            uniqueAlbumId: {
-              remoteId: album.id,
-              serverId: server.id,
-            },
-          },
-        });
-      });
-    }
-  };
-
-  Object.keys(albumArtistGroups).forEach((key) => {
-    promises.push(addAlbums(albumArtistGroups[key], key));
-  });
-
-  await Promise.all(promises);
-
-  const message = `Scanned ${albums.length} albums.`;
+  }
 };
 
 const throttledAlbumFetch = throttle(
-  async (server: Server, serverFolder: ServerFolder, album: any, i: number) => {
+  async (server: Server, serverFolder: ServerFolder, album: any) => {
     const albumRes = await subsonicApi.getAlbum(server, album.remoteId);
 
-    console.log('fetch', i);
-
     if (albumRes) {
+      await subsonicUtils.insertSongImages(albumRes);
       const songsUpsert = albumRes.album.song.map((song) => {
-        const genresConnectOrCreate = song.genre
-          ? {
-              create: { name: song.genre },
-              where: { name: song.genre },
-            }
-          : [];
+        const genresConnect = song.genre ? { name: song.genre } : undefined;
 
-        const imagesConnectOrCreate = song.coverArt
+        const imagesConnect = song.coverArt
           ? {
-              create: { name: 'Primary', url: song.coverArt },
-              where: { uniqueImageId: { name: 'Primary', url: song.coverArt } },
+              uniqueImageId: {
+                remoteUrl: song.coverArt,
+                type: ImageType.PRIMARY,
+              },
             }
-          : [];
+          : undefined;
 
         const artistsConnect = song.artistId
           ? {
@@ -178,7 +175,7 @@ const throttledAlbumFetch = throttle(
                 serverId: server.id,
               },
             }
-          : [];
+          : undefined;
 
         return {
           create: {
@@ -186,31 +183,44 @@ const throttledAlbumFetch = throttle(
             artists: { connect: artistsConnect },
             bitRate: song.bitRate,
             container: song.suffix,
-            disc: song.discNumber,
+            discNumber: song.discNumber,
             duration: song.duration,
-            genres: { connectOrCreate: genresConnectOrCreate },
-            images: { connectOrCreate: imagesConnectOrCreate },
+            genres: { connect: genresConnect },
+            images: { connect: imagesConnect },
             name: song.title,
+            releaseDate: song?.year
+              ? new Date(song.year, 0).toISOString()
+              : undefined,
+            releaseYear: song.year,
             remoteCreatedAt: song.created,
             remoteId: song.id,
+            serverFolders: { connect: { id: serverFolder.id } },
             serverId: server.id,
-            track: song.track,
-            year: song.year,
+            size: song.size,
+            sortName: song.title,
+            trackNumber: song.track,
           },
           update: {
             artistName: !song.artistId ? song.artist : undefined,
             artists: { connect: artistsConnect },
             bitRate: song.bitRate,
             container: song.suffix,
-            disc: song.discNumber,
+            discNumber: song.discNumber,
             duration: song.duration,
-            genres: { connectOrCreate: genresConnectOrCreate },
-            images: { connectOrCreate: imagesConnectOrCreate },
+            genres: { connect: genresConnect },
+            images: { connect: imagesConnect },
             name: song.title,
+            releaseDate: song?.year
+              ? new Date(song.year, 0).toISOString()
+              : undefined,
+            releaseYear: song.year,
             remoteCreatedAt: song.created,
             remoteId: song.id,
-            track: song.track,
-            year: song.year,
+            serverFolders: { connect: { id: serverFolder.id } },
+            serverId: server.id,
+            size: song.size,
+            sortName: song.title,
+            trackNumber: song.track,
           },
           where: {
             uniqueSongId: {
@@ -234,22 +244,18 @@ const throttledAlbumFetch = throttle(
         };
       });
 
-      try {
-        await prisma.album.update({
-          data: {
-            artists: { connect: artistsConnect },
-            songs: { upsert: songsUpsert },
+      await prisma.album.update({
+        data: {
+          artists: { connect: artistsConnect },
+          songs: { upsert: songsUpsert },
+        },
+        where: {
+          uniqueAlbumId: {
+            remoteId: albumRes.album.id,
+            serverId: server.id,
           },
-          where: {
-            uniqueAlbumId: {
-              remoteId: albumRes.album.id,
-              serverId: server.id,
-            },
-          },
-        });
-      } catch (err) {
-        console.log(err);
-      }
+        },
+      });
     }
   }
 );
@@ -258,8 +264,6 @@ export const scanAlbumDetail = async (
   server: Server,
   serverFolder: ServerFolder
 ) => {
-  const taskId = `[${server.name} (${serverFolder.name})] albums detail`;
-
   const promises = [];
   const dbAlbums = await prisma.album.findMany({
     where: {
@@ -268,104 +272,113 @@ export const scanAlbumDetail = async (
   });
 
   for (let i = 0; i < dbAlbums.length; i += 1) {
-    promises.push(throttledAlbumFetch(server, serverFolder, dbAlbums[i], i));
+    promises.push(throttledAlbumFetch(server, serverFolder, dbAlbums[i]));
   }
 
   await Promise.all(promises);
-  const message = `Scanned ${dbAlbums.length} albums.`;
 };
 
-const throttledArtistDetailFetch = throttle(
-  async (
-    server: Server,
-    artistId: number,
-    artistRemoteId: string,
-    i: number
-  ) => {
-    console.log('artisdetail', i);
+// const throttledArtistDetailFetch = throttle(
+//   async (
+//     server: Server,
+//     artistId: string,
+//     artistRemoteId: string,
+//     i: number
+//   ) => {
+//     console.log('artisdetail', i);
 
-    const artistInfo = await subsonicApi.getArtistInfo(server, artistRemoteId);
+//     const artistInfo = await subsonicApi.getArtistInfo(server, artistRemoteId);
 
-    const externalsConnectOrCreate = [];
-    if (artistInfo.artistInfo2.lastFmUrl) {
-      externalsConnectOrCreate.push({
-        create: {
-          name: 'Last.fm',
-          url: artistInfo.artistInfo2.lastFmUrl,
-        },
-        where: {
-          uniqueExternalId: {
-            name: 'Last.fm',
-            url: artistInfo.artistInfo2.lastFmUrl,
-          },
-        },
-      });
-    }
+//     const externalsConnectOrCreate = [];
+//     if (artistInfo.artistInfo2.lastFmUrl) {
+//       externalsConnectOrCreate.push({
+//         create: {
+//           name: 'Last.fm',
+//           url: artistInfo.artistInfo2.lastFmUrl,
+//         },
+//         where: {
+//           uniqueExternalId: {
+//             name: 'Last.fm',
+//             url: artistInfo.artistInfo2.lastFmUrl,
+//           },
+//         },
+//       });
+//     }
 
-    if (artistInfo.artistInfo2.musicBrainzId) {
-      externalsConnectOrCreate.push({
-        create: {
-          name: 'MusicBrainz',
-          url: `https://musicbrainz.org/artist/${artistInfo.artistInfo2.musicBrainzId}`,
-        },
-        where: {
-          uniqueExternalId: {
-            name: 'MusicBrainz',
-            url: `https://musicbrainz.org/artist/${artistInfo.artistInfo2.musicBrainzId}`,
-          },
-        },
-      });
-    }
+//     if (artistInfo.artistInfo2.musicBrainzId) {
+//       externalsConnectOrCreate.push({
+//         create: {
+//           name: 'MusicBrainz',
+//           url: `https://musicbrainz.org/artist/${artistInfo.artistInfo2.musicBrainzId}`,
+//         },
+//         where: {
+//           uniqueExternalId: {
+//             name: 'MusicBrainz',
+//             url: `https://musicbrainz.org/artist/${artistInfo.artistInfo2.musicBrainzId}`,
+//           },
+//         },
+//       });
+//     }
 
-    try {
-      await prisma.albumArtist.update({
-        data: {
-          biography: artistInfo.artistInfo2.biography,
-          externals: { connectOrCreate: externalsConnectOrCreate },
-        },
-        where: { id: artistId },
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-);
+//     try {
+//       await prisma.albumArtist.update({
+//         data: {
+//           biography: artistInfo.artistInfo2.biography,
+//           // externals: { connectOrCreate: externalsConnectOrCreate },
+//         },
+//         where: { id: artistId },
+//       });
+//     } catch (err) {
+//       console.log(err);
+//     }
+//   }
+// );
 
-export const scanAlbumArtistDetail = async (
-  server: Server,
-  serverFolder: ServerFolder
-) => {
-  const taskId = `[${server.name} (${serverFolder.name})] artists detail`;
+// export const scanAlbumArtistDetail = async (
+//   server: Server,
+//   serverFolder: ServerFolder
+// ) => {
+//   const promises = [];
+//   const dbArtists = await prisma.albumArtist.findMany({
+//     where: { serverId: server.id },
+//   });
 
-  const promises = [];
-  const dbArtists = await prisma.albumArtist.findMany({
-    where: {
-      serverId: server.id,
-    },
-  });
-
-  for (let i = 0; i < dbArtists.length; i += 1) {
-    promises.push(
-      throttledArtistDetailFetch(
-        server,
-        dbArtists[i].id,
-        dbArtists[i].remoteId,
-        i
-      )
-    );
-  }
-};
+//   for (let i = 0; i < dbArtists.length; i += 1) {
+//     promises.push(
+//       throttledArtistDetailFetch(
+//         server,
+//         dbArtists[i].id,
+//         dbArtists[i].remoteId,
+//         i
+//       )
+//     );
+//   }
+// };
 
 const scanAll = async (
   server: Server,
-  serverFolder: ServerFolder,
+  serverFolders: ServerFolder[],
   task: Task
 ) => {
-  await scanGenres(server, serverFolder);
-  await scanAlbumArtists(server, serverFolder);
-  await scanAlbumArtistDetail(server, serverFolder);
-  await scanAlbums(server, serverFolder);
-  await scanAlbumDetail(server, serverFolder);
+  queue.scanner.push({
+    fn: async () => {
+      await prisma.task.update({
+        data: { message: 'Beginning scan...' },
+        where: { id: task.id },
+      });
+
+      for (const serverFolder of serverFolders) {
+        await scanGenres(server, task);
+        await scanAlbumArtists(server, serverFolder);
+        // await scanAlbumArtistDetail(server, serverFolder);
+        await scanAlbums(server, serverFolder);
+        await scanAlbumDetail(server, serverFolder);
+      }
+
+      return { task };
+    },
+    id: task.id,
+  });
 };
 
 export const subsonicScanner = {

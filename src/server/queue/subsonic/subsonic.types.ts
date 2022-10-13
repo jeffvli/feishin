@@ -54,8 +54,8 @@ export interface SSMusicFolder {
 }
 
 export interface SSGenre {
-  albumCount: number;
-  songCount: number;
+  albumCount?: number;
+  songCount?: number;
   value: string;
 }
 
