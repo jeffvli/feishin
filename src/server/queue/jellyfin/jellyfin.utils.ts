@@ -162,6 +162,7 @@ const insertSongGroup = async (
           artists: { connect: artistsConnect },
           bitRate: Math.floor(song.MediaSources[0].Bitrate / 1e3),
           container: song.MediaSources[0].Container,
+          deleted: false,
           discNumber: song.ParentIndexNumber,
           duration: Math.floor(song.MediaSources[0].RunTimeTicks / 1e7),
           externals: { connect: externalsConnect },
@@ -179,7 +180,7 @@ const insertSongGroup = async (
           remoteId: song.Id,
           serverFolders: { connect: { id: serverFolder.id } },
           serverId: server.id,
-          size: String(song.MediaSources[0].Size),
+          size: song.MediaSources[0].Size,
           sortName: song.Name,
           trackNumber: song.IndexNumber,
         },
@@ -187,6 +188,7 @@ const insertSongGroup = async (
           artists: { connect: artistsConnect },
           bitRate: Math.floor(song.MediaSources[0].Bitrate / 1e3),
           container: song.MediaSources[0].Container,
+          deleted: false,
           discNumber: song.ParentIndexNumber,
           duration: Math.floor(song.MediaSources[0].RunTimeTicks / 1e7),
           externals: { connect: externalsConnect },
@@ -204,6 +206,7 @@ const insertSongGroup = async (
           remoteId: song.Id,
           serverFolders: { connect: { id: serverFolder.id } },
           serverId: server.id,
+          size: song.MediaSources[0].Size,
           sortName: song.Name,
           trackNumber: song.IndexNumber,
         },
@@ -215,33 +218,6 @@ const insertSongGroup = async (
         },
       };
     });
-
-  // const artists = uniqBy(
-  //   songs.flatMap((song) => {
-  //     return song.ArtistItems.map((artist) => ({
-  //       deleted: false,
-  //       name: artist.Name,
-  //       remoteId: artist.Id,
-  //       serverFolders: { connect: { id: serverFolder.id } },
-  //       serverId: server.id,
-  //       sortName: '',
-  //     }));
-  //   }),
-  //   'remoteId'
-  // );
-
-  // for (const artist of artists) {
-  //   await prisma.artist.upsert({
-  //     create: artist,
-  //     update: artist,
-  //     where: {
-  //       uniqueArtistId: {
-  //         remoteId: artist.remoteId,
-  //         serverId: server.id,
-  //       },
-  //     },
-  //   });
-  // }
 
   const uniqueArtistIds = songs
     .flatMap((song) => song.ArtistItems.flatMap((artist) => artist.Id))

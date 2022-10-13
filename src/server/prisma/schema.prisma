@@ -390,7 +390,7 @@ model Song {
   releaseDate     DateTime?
   releaseYear     Int?
   duration        Float
-  size            String?
+  size            Int?
   lyrics          String?
   bitRate         Int
   container       String
