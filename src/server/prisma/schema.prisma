@@ -320,6 +320,7 @@ model AlbumArtist {
   ratings       AlbumArtistRating[]
   images        Image[]
   favorites     Favorite[]
+  songs         Song[]
 
   server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
   serverId String @db.Uuid
@@ -342,14 +343,12 @@ model Album {
   songs         Song[]
   genres        Genre[]
   artists       Artist[]
+  albumArtists  AlbumArtist[]
   externals     External[]
   serverFolders ServerFolder[]
   ratings       AlbumRating[]
   images        Image[]
   favorites     Favorite[]
-
-  albumArtist   AlbumArtist? @relation(fields: [albumArtistId], references: [id])
-  albumArtistId String?      @db.Uuid
 
   server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
   serverId String @db.Uuid
@@ -412,6 +411,9 @@ model Song {
   ratings       SongRating[]
   images        Image[]
   favorites     Favorite[]
+
+  albumArtist   AlbumArtist? @relation(fields: [albumArtistId], references: [id])
+  albumArtistId String?      @db.Uuid
 
   album   Album?  @relation(fields: [albumId], references: [id])
   albumId String? @db.Uuid
