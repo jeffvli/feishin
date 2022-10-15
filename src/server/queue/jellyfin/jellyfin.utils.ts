@@ -6,6 +6,7 @@ import {
   Server,
   ServerFolder,
 } from '@prisma/client';
+import uniqBy from 'lodash/uniqBy';
 import { prisma } from '../../lib';
 import { uniqueArray } from '../../utils';
 import {
@@ -32,13 +33,16 @@ const insertArtists = async (
   serverFolder: ServerFolder,
   items: JFSong[] | JFAlbum[]
 ) => {
-  const artistItems = items.flatMap((item) => item.ArtistItems);
+  const artistItems = uniqBy(
+    items.flatMap((item) => item.ArtistItems),
+    'Id'
+  );
 
   const createMany = artistItems.map((artist) => ({
     name: artist.Name,
     remoteId: artist.Id,
     serverId: server.id,
-    sortName: '',
+    sortName: artist.Name,
   }));
 
   await prisma.artist.createMany({
@@ -60,7 +64,10 @@ const insertArtists = async (
 };
 
 const insertImages = async (items: JFSong[] | JFAlbum[] | JFAlbumArtist[]) => {
-  const imageItems = items.flatMap((item) => item.ImageTags);
+  const imageItems = uniqBy(
+    items.flatMap((item) => item.ImageTags),
+    'Id'
+  );
 
   const createMany: Prisma.ImageCreateManyInput[] = [];
 
@@ -88,7 +95,10 @@ const insertImages = async (items: JFSong[] | JFAlbum[] | JFAlbumArtist[]) => {
 const insertExternals = async (
   items: JFSong[] | JFAlbum[] | JFAlbumArtist[]
 ) => {
-  const externalItems = items.flatMap((item) => item.ExternalUrls);
+  const externalItems = uniqBy(
+    items.flatMap((item) => item.ExternalUrls),
+    'Url'
+  );
   const createMany: Prisma.ExternalCreateManyInput[] = [];
 
   for (const external of externalItems) {
@@ -119,6 +129,32 @@ const insertSongGroup = async (
   songs: JFSong[],
   remoteAlbumId: string
 ) => {
+  const remoteAlbumArtist =
+    songs[0].AlbumArtists.length > 0 ? songs[0].AlbumArtists[0] : undefined;
+
+  let albumArtist = remoteAlbumArtist?.Id
+    ? await prisma.albumArtist.findUnique({
+        where: {
+          uniqueAlbumArtistId: {
+            remoteId: remoteAlbumArtist.Id,
+            serverId: server.id,
+          },
+        },
+      })
+    : undefined;
+
+  // If Jellyfin returns an invalid album artist, we'll just use the first matching one
+  if (remoteAlbumArtist && !albumArtist) {
+    albumArtist = await prisma.albumArtist.findFirst({
+      where: {
+        name: remoteAlbumArtist?.Name,
+        serverId: server.id,
+      },
+    });
+  }
+
+  const albumArtistId = albumArtist ? albumArtist.id : undefined;
+
   const songsUpsert: Prisma.SongUpsertWithWhereUniqueWithoutAlbumInput[] =
     songs.map((song) => {
       const genresConnect = song.Genres.map((genre) => ({ name: genre }));
@@ -140,16 +176,28 @@ const insertSongGroup = async (
         },
       }));
 
-      const imagesConnect = [];
+      const imagesConnectOrCreate = [];
       for (const [key, value] of Object.entries(song.ImageTags)) {
         if (key === JFImageType.PRIMARY) {
-          imagesConnect.push({
-            uniqueImageId: { remoteUrl: value, type: ImageType.PRIMARY },
+          imagesConnectOrCreate.push({
+            create: {
+              remoteUrl: value,
+              type: ImageType.PRIMARY,
+            },
+            where: {
+              uniqueImageId: { remoteUrl: value, type: ImageType.PRIMARY },
+            },
           });
         }
         if (key === JFImageType.LOGO) {
-          imagesConnect.push({
-            uniqueImageId: { remoteUrl: value, type: ImageType.LOGO },
+          imagesConnectOrCreate.push({
+            create: {
+              remoteUrl: value,
+              type: ImageType.LOGO,
+            },
+            where: {
+              uniqueImageId: { remoteUrl: value, type: ImageType.LOGO },
+            },
           });
         }
       }
@@ -159,6 +207,7 @@ const insertSongGroup = async (
 
       return {
         create: {
+          albumArtistId,
           artists: { connect: artistsConnect },
           bitRate: Math.floor(song.MediaSources[0].Bitrate / 1e3),
           container: song.MediaSources[0].Container,
@@ -172,7 +221,7 @@ const insertSongGroup = async (
             },
           },
           genres: { connect: genresConnect },
-          images: { connect: imagesConnect },
+          images: { connectOrCreate: imagesConnectOrCreate },
           name: song.Name,
           releaseDate: song.PremiereDate,
           releaseYear: song.ProductionYear,
@@ -185,6 +234,7 @@ const insertSongGroup = async (
           trackNumber: song.IndexNumber,
         },
         update: {
+          albumArtistId,
           artists: { connect: artistsConnect },
           bitRate: Math.floor(song.MediaSources[0].Bitrate / 1e3),
           container: song.MediaSources[0].Container,
@@ -198,7 +248,7 @@ const insertSongGroup = async (
             },
           },
           genres: { connect: genresConnect },
-          images: { connect: imagesConnect },
+          images: { connectOrCreate: imagesConnectOrCreate },
           name: song.Name,
           releaseDate: song.PremiereDate,
           releaseYear: song.ProductionYear,

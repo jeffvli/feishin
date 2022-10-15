@@ -48,6 +48,7 @@ const scanAlbumArtists = async (
     where: { id: task.id },
   });
 
+  // TODO: Possibly need to scan without the parentId to get all artists, since Jellyfin may link an album to an artist of a different folder
   const albumArtists = await jellyfinApi.getAlbumArtists(server, {
     fields: 'Genres,DateCreated,ExternalUrls,Overview',
     parentId: serverFolder.remoteId,
@@ -70,16 +71,21 @@ const scanAlbumArtists = async (
       });
     }
 
-    const imagesConnect = [];
     for (const [key, value] of Object.entries(albumArtist.ImageTags)) {
       if (key === JFImageType.PRIMARY) {
-        imagesConnect.push({
-          uniqueImageId: { remoteUrl: value, type: ImageType.PRIMARY },
+        imagesConnectOrCreate.push({
+          create: { remoteUrl: value, type: ImageType.PRIMARY },
+          where: {
+            uniqueImageId: { remoteUrl: value, type: ImageType.PRIMARY },
+          },
         });
       }
       if (key === JFImageType.LOGO) {
-        imagesConnect.push({
-          uniqueImageId: { remoteUrl: value, type: ImageType.LOGO },
+        imagesConnectOrCreate.push({
+          create: { remoteUrl: value, type: ImageType.LOGO },
+          where: {
+            uniqueImageId: { remoteUrl: value, type: ImageType.LOGO },
+          },
         });
       }
     }
@@ -100,7 +106,6 @@ const scanAlbumArtists = async (
         externals: { connect: externalsConnect },
         genres: { connect: genresConnect },
         images: {
-          connect: imagesConnect,
           connectOrCreate: imagesConnectOrCreate,
         },
         name: albumArtist.Name,
@@ -115,7 +120,9 @@ const scanAlbumArtists = async (
         deleted: false,
         externals: { connect: externalsConnect },
         genres: { connect: genresConnect },
-        images: { connectOrCreate: imagesConnectOrCreate },
+        images: {
+          connectOrCreate: imagesConnectOrCreate,
+        },
         name: albumArtist.Name,
         remoteCreatedAt: albumArtist.DateCreated,
         remoteId: albumArtist.Id,
@@ -174,16 +181,22 @@ const scanAlbums = async (
     for (const album of albums.Items) {
       const genresConnect = album.Genres.map((genre) => ({ name: genre }));
 
-      const imagesConnect = [];
+      const imagesConnectOrCreate = [];
       for (const [key, value] of Object.entries(album.ImageTags)) {
         if (key === JFImageType.PRIMARY) {
-          imagesConnect.push({
-            uniqueImageId: { remoteUrl: value, type: ImageType.PRIMARY },
+          imagesConnectOrCreate.push({
+            create: { remoteUrl: value, type: ImageType.PRIMARY },
+            where: {
+              uniqueImageId: { remoteUrl: value, type: ImageType.PRIMARY },
+            },
           });
         }
         if (key === JFImageType.LOGO) {
-          imagesConnect.push({
-            uniqueImageId: { remoteUrl: value, type: ImageType.LOGO },
+          imagesConnectOrCreate.push({
+            create: { remoteUrl: value, type: ImageType.LOGO },
+            where: {
+              uniqueImageId: { remoteUrl: value, type: ImageType.LOGO },
+            },
           });
         }
       }
@@ -198,24 +211,53 @@ const scanAlbums = async (
         },
       }));
 
-      const albumArtist =
-        album.AlbumArtists.length > 0
-          ? await prisma.albumArtist.findUnique({
-              where: {
-                uniqueAlbumArtistId: {
-                  remoteId: album.AlbumArtists && album.AlbumArtists[0].Id,
-                  serverId: server.id,
-                },
+      const remoteAlbumArtists = album.AlbumArtists;
+
+      const albumArtists = await prisma.albumArtist.findMany({
+        where: {
+          remoteId: { in: remoteAlbumArtists.map((artist) => artist.Id) },
+        },
+      });
+
+      const albumArtistsConnect = [];
+      for (const albumArtist of remoteAlbumArtists) {
+        const invalid = !albumArtists.find(
+          (artist) => artist.remoteId === albumArtist.Id
+        );
+
+        if (invalid) {
+          // If Jellyfin returns an invalid album artist, we'll just use the first matching one
+          const foundAlternate = await prisma.albumArtist.findFirst({
+            where: {
+              name: albumArtist.Name,
+              serverId: server.id,
+            },
+          });
+
+          if (foundAlternate) {
+            albumArtistsConnect.push({
+              uniqueAlbumArtistId: {
+                remoteId: foundAlternate.remoteId,
+                serverId: server.id,
               },
-            })
-          : undefined;
+            });
+          }
+        } else {
+          albumArtistsConnect.push({
+            uniqueAlbumArtistId: {
+              remoteId: albumArtist.Id,
+              serverId: server.id,
+            },
+          });
+        }
+      }
 
       await prisma.album.upsert({
         create: {
-          albumArtistId: albumArtist?.id,
+          albumArtists: { connect: albumArtistsConnect },
           externals: { connect: externalsConnect },
           genres: { connect: genresConnect },
-          images: { connect: imagesConnect },
+          images: { connectOrCreate: imagesConnectOrCreate },
           name: album.Name,
           releaseDate: album.PremiereDate,
           releaseYear: album.ProductionYear,
@@ -226,11 +268,11 @@ const scanAlbums = async (
           sortName: album.Name,
         },
         update: {
-          albumArtistId: albumArtist?.id,
+          albumArtists: { connect: albumArtistsConnect },
           deleted: false,
           externals: { connect: externalsConnect },
           genres: { connect: genresConnect },
-          images: { connect: imagesConnect },
+          images: { connectOrCreate: imagesConnectOrCreate },
           name: album.Name,
           releaseDate: album.PremiereDate,
           releaseYear: album.ProductionYear,

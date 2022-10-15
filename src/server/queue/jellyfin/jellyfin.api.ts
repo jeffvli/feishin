@@ -23,8 +23,6 @@ export const authenticate = async (options: {
   const { password, url, username } = options;
   const cleanServerUrl = url.replace(/\/$/, '');
 
-  console.log('cleanServerUrl', cleanServerUrl);
-
   const { data } = await api.post<JFAuthenticate>(
     `${cleanServerUrl}/users/authenticatebyname`,
     { pw: password, username },

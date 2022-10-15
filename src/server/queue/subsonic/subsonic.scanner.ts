@@ -35,38 +35,19 @@ export const scanAlbumArtists = async (
       create: {
         name: artist.name,
         remoteId: artist.id,
+        serverFolders: { connect: { id: serverFolder.id } },
         serverId: server.id,
         sortName: artist.name,
       },
       update: {
         name: artist.name,
         remoteId: artist.id,
+        serverFolders: { connect: { id: serverFolder.id } },
         serverId: server.id,
         sortName: artist.name,
       },
       where: {
         uniqueAlbumArtistId: {
-          remoteId: artist.id,
-          serverId: server.id,
-        },
-      },
-    });
-
-    await prisma.artist.upsert({
-      create: {
-        name: artist.name,
-        remoteId: artist.id,
-        serverId: server.id,
-        sortName: artist.name,
-      },
-      update: {
-        name: artist.name,
-        remoteId: artist.id,
-        serverId: server.id,
-        sortName: artist.name,
-      },
-      where: {
-        uniqueArtistId: {
           remoteId: artist.id,
           serverId: server.id,
         },
@@ -98,20 +79,18 @@ export const scanAlbums = async (
         }
       : undefined;
 
-    const albumArtist = album.artistId
-      ? await prisma.albumArtist.findUnique({
-          where: {
-            uniqueAlbumArtistId: {
-              remoteId: album.artistId,
-              serverId: server.id,
-            },
+    const albumArtistConnect = album.artistId
+      ? {
+          uniqueAlbumArtistId: {
+            remoteId: album.artistId,
+            serverId: server.id,
           },
-        })
+        }
       : undefined;
 
     await prisma.album.upsert({
       create: {
-        albumArtistId: albumArtist?.id,
+        albumArtists: { connect: albumArtistConnect },
         genres: { connect: album.genre ? { name: album.genre } : undefined },
         images: { connect: imagesConnect },
         name: album.title,
@@ -126,7 +105,7 @@ export const scanAlbums = async (
         sortName: album.title,
       },
       update: {
-        albumArtistId: albumArtist?.id,
+        albumArtists: { connect: albumArtistConnect },
         genres: { connect: album.genre ? { name: album.genre } : undefined },
         images: { connect: imagesConnect },
         name: album.title,
@@ -168,9 +147,9 @@ const throttledAlbumFetch = throttle(
             }
           : undefined;
 
-        const artistsConnect = song.artistId
+        const albumArtistsConnect = song.artistId
           ? {
-              uniqueArtistId: {
+              uniqueAlbumArtistId: {
                 remoteId: song.artistId,
                 serverId: server.id,
               },
@@ -179,8 +158,8 @@ const throttledAlbumFetch = throttle(
 
         return {
           create: {
+            albumArtists: { connect: albumArtistsConnect },
             artistName: !song.artistId ? song.artist : undefined,
-            artists: { connect: artistsConnect },
             bitRate: song.bitRate,
             container: song.suffix,
             discNumber: song.discNumber,
@@ -201,8 +180,8 @@ const throttledAlbumFetch = throttle(
             trackNumber: song.track,
           },
           update: {
+            albumArtists: { connect: albumArtistsConnect },
             artistName: !song.artistId ? song.artist : undefined,
-            artists: { connect: artistsConnect },
             bitRate: song.bitRate,
             container: song.suffix,
             discNumber: song.discNumber,
@@ -278,83 +257,6 @@ export const scanAlbumDetail = async (
   await Promise.all(promises);
 };
 
-// const throttledArtistDetailFetch = throttle(
-//   async (
-//     server: Server,
-//     artistId: string,
-//     artistRemoteId: string,
-//     i: number
-//   ) => {
-//     console.log('artisdetail', i);
-
-//     const artistInfo = await subsonicApi.getArtistInfo(server, artistRemoteId);
-
-//     const externalsConnectOrCreate = [];
-//     if (artistInfo.artistInfo2.lastFmUrl) {
-//       externalsConnectOrCreate.push({
-//         create: {
-//           name: 'Last.fm',
-//           url: artistInfo.artistInfo2.lastFmUrl,
-//         },
-//         where: {
-//           uniqueExternalId: {
-//             name: 'Last.fm',
-//             url: artistInfo.artistInfo2.lastFmUrl,
-//           },
-//         },
-//       });
-//     }
-
-//     if (artistInfo.artistInfo2.musicBrainzId) {
-//       externalsConnectOrCreate.push({
-//         create: {
-//           name: 'MusicBrainz',
-//           url: `https://musicbrainz.org/artist/${artistInfo.artistInfo2.musicBrainzId}`,
-//         },
-//         where: {
-//           uniqueExternalId: {
-//             name: 'MusicBrainz',
-//             url: `https://musicbrainz.org/artist/${artistInfo.artistInfo2.musicBrainzId}`,
-//           },
-//         },
-//       });
-//     }
-
-//     try {
-//       await prisma.albumArtist.update({
-//         data: {
-//           biography: artistInfo.artistInfo2.biography,
-//           // externals: { connectOrCreate: externalsConnectOrCreate },
-//         },
-//         where: { id: artistId },
-//       });
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   }
-// );
-
-// export const scanAlbumArtistDetail = async (
-//   server: Server,
-//   serverFolder: ServerFolder
-// ) => {
-//   const promises = [];
-//   const dbArtists = await prisma.albumArtist.findMany({
-//     where: { serverId: server.id },
-//   });
-
-//   for (let i = 0; i < dbArtists.length; i += 1) {
-//     promises.push(
-//       throttledArtistDetailFetch(
-//         server,
-//         dbArtists[i].id,
-//         dbArtists[i].remoteId,
-//         i
-//       )
-//     );
-//   }
-// };
-
 const scanAll = async (
   server: Server,
   serverFolders: ServerFolder[],
@@ -370,7 +272,6 @@ const scanAll = async (
       for (const serverFolder of serverFolders) {
         await scanGenres(server, task);
         await scanAlbumArtists(server, serverFolder);
-        // await scanAlbumArtistDetail(server, serverFolder);
         await scanAlbums(server, serverFolder);
         await scanAlbumDetail(server, serverFolder);
       }
