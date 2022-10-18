@@ -7,7 +7,7 @@ import {
 
 const list = {
   body: z.object({}),
-  params: z.object(idValidation),
+  params: z.object({ ...idValidation('serverId') }),
   query: z.object({
     ...paginationValidation,
     ...serverFolderIdValidation,

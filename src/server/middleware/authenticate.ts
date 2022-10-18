@@ -1,6 +1,7 @@
 import {
-  ServerFolderPermissions,
-  ServerPermissions,
+  ServerCredential,
+  ServerFolderPermission,
+  ServerPermission,
   User,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
@@ -9,8 +10,9 @@ import passport from 'passport';
 export type AuthUser = User & {
   flatServerFolderPermissions: string[];
   flatServerPermissions: string[];
-  serverFolderPermissions: ServerFolderPermissions[];
-  serverPermissions: ServerPermissions[];
+  serverFolderPermissions: ServerFolderPermission[];
+  serverId?: string;
+  serverPermissions: ServerPermission[];
 };
 
 export const authenticate = (
@@ -46,27 +48,36 @@ export const authenticate = (
     }
 
     const flatServerFolderPermissions = user.serverFolderPermissions.map(
-      (permission: ServerFolderPermissions) => permission.serverFolderId
+      (permission: ServerFolderPermission) => permission.serverFolderId
     );
 
     const flatServerPermissions = user.serverPermissions.map(
-      (permission: ServerPermissions) => permission.serverId
+      (permission: ServerPermission) => permission.serverId
     );
 
-    const auth = {
+    const serverCredentials = user.serverCredentials.map(
+      (credential: ServerCredential) => ({
+        id: credential.id,
+        serverId: credential.serverId,
+      })
+    );
+
+    const props = {
       createdAt: user?.createdAt,
       enabled: user?.enabled,
       flatServerFolderPermissions,
       flatServerPermissions,
       id: user?.id,
       isAdmin: user?.isAdmin,
+      server: req.params.serverId,
+      serverCredentials,
       serverFolderPermissions: user?.serverFolderPermissions,
       serverPermissions: user?.serverPermissions,
       updatedAt: user?.updatedAt,
       username: user?.username,
     };
 
-    req.auth = auth;
+    req.authUser = props;
 
     return next();
   })(req, res, next);

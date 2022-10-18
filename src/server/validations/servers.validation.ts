@@ -4,7 +4,7 @@ import { idValidation } from './shared.validation';
 
 const detail = {
   body: z.object({}),
-  params: z.object(idValidation),
+  params: z.object({ ...idValidation('id') }),
   query: z.object({}),
 };
 
@@ -27,18 +27,25 @@ const create = {
 
 const scan = {
   body: z.object({ serverFolderId: z.string().array().optional() }),
-  params: z.object(idValidation),
+  params: z.object({ ...idValidation('id') }),
   query: z.object({}),
 };
 
 const refresh = {
   body: z.object({}),
-  params: z.object(idValidation),
+  params: z.object({ ...idValidation('id') }),
+  query: z.object({}),
+};
+
+const createCredential = {
+  body: z.object({ credential: z.string() }),
+  params: z.object({ ...idValidation('id') }),
   query: z.object({}),
 };
 
 export const serversValidation = {
   create,
+  createCredential,
   detail,
   refresh,
   scan,

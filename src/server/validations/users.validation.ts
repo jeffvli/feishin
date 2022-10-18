@@ -3,7 +3,7 @@ import { idValidation } from './shared.validation';
 
 const detail = {
   body: z.object({}),
-  params: z.object(idValidation),
+  params: z.object({ ...idValidation('id') }),
   query: z.object({}),
 };
 

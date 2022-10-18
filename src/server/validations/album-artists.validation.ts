@@ -3,7 +3,7 @@ import { paginationValidation, idValidation } from './shared.validation';
 
 export const list = {
   body: z.object({}),
-  params: z.object({}),
+  params: z.object({ ...idValidation('serverId') }),
   query: z.object({
     ...paginationValidation,
     serverFolderIds: z.string().min(1),
@@ -12,7 +12,7 @@ export const list = {
 
 export const detail = {
   body: z.object({}),
-  params: z.object({ ...idValidation }),
+  params: z.object({ ...idValidation('id') }),
   query: z.object({}),
 };
 

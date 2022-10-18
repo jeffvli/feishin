@@ -5,7 +5,7 @@ export const authenticateAdmin = (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.auth.isAdmin) {
+  if (!req.authUser.isAdmin) {
     return res.status(403).json({
       error: {
         message: 'This action requires an administrator account.',

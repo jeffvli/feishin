@@ -27,6 +27,16 @@ type RequestValidation<TParams, TQuery, TBody> = {
 type ErrorListItem = {
   errors: ZodError<any>;
   type: ValidationType;
+  value: string;
+};
+
+const getErrorValue = (object: any, error: ZodError<any>) => {
+  const e = error.errors[0];
+  if (e.code === z.ZodIssueCode.invalid_type) {
+    return e.expected;
+  }
+
+  return object[e.path[0]][e.path[1]];
 };
 
 export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
@@ -38,29 +48,45 @@ export const validateRequest: <TParams = any, TQuery = any, TBody = any>(
     if (params) {
       const parsed = params.safeParse(req.params);
       if (!parsed.success) {
-        errors.push({ errors: parsed.error, type: ValidationType.PARAMS });
+        errors.push({
+          errors: parsed.error,
+          type: ValidationType.PARAMS,
+          value: getErrorValue(req.params, parsed.error),
+        });
       }
     }
     if (query) {
       const parsed = query.safeParse(req.query);
       if (!parsed.success) {
-        errors.push({ errors: parsed.error, type: ValidationType.QUERY });
+        const value = getErrorValue(req.query, parsed.error);
+        errors.push({
+          errors: parsed.error,
+          type: ValidationType.QUERY,
+          value,
+        });
       }
     }
     if (body) {
       const parsed = body.safeParse(req.body);
       if (!parsed.success) {
-        errors.push({ errors: parsed.error, type: ValidationType.BODY });
+        errors.push({
+          errors: parsed.error,
+          type: ValidationType.BODY,
+          value: getErrorValue(req.body, parsed.error),
+        });
       }
     }
 
     if (errors.length > 0) {
       const message = JSON.stringify(
         [
-          `(${errors[0].type})`,
-          `[${errors[0].errors.issues[0].path[0]}]`,
+          // `(${errors[0].type})`,
+          `(${errors[0].type}: ${errors[0].errors.issues[0].path[0]})`,
+          errors[0].value && `[${errors[0].value}]`,
           errors[0].errors.issues[0].message,
-        ].join(' ')
+        ]
+          .filter((x) => x)
+          .join(' ')
       );
 
       throw ApiError.badRequest(message);
@@ -87,8 +113,12 @@ export const paginationValidation = {
   }),
 };
 
-export const idValidation = {
-  id: z.string().uuid(),
+export const serverUrlIdValidation = {
+  serverUrlId: z.optional(z.string().uuid()),
+};
+
+export const idValidation = (property: string) => {
+  return { [property]: z.string().uuid() };
 };
 
 export const serverFolderIdValidation = {
