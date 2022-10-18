@@ -55,6 +55,7 @@ passport.use(
     await prisma.user
       .findUnique({
         include: {
+          serverCredentials: true,
           serverFolderPermissions: true,
           serverPermissions: true,
         },
