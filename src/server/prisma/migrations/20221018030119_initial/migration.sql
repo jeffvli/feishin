@@ -65,6 +65,18 @@ CREATE TABLE "Server" (
 );
 
 -- CreateTable
+CREATE TABLE "ServerCredential" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "credential" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "serverId" UUID NOT NULL,
+    "userId" UUID NOT NULL,
+
+    CONSTRAINT "ServerCredential_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Folder" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "name" TEXT NOT NULL,
@@ -78,7 +90,7 @@ CREATE TABLE "Folder" (
 );
 
 -- CreateTable
-CREATE TABLE "ServerPermissions" (
+CREATE TABLE "ServerPermission" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "type" "ServerPermissionType" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -86,7 +98,7 @@ CREATE TABLE "ServerPermissions" (
     "userId" UUID NOT NULL,
     "serverId" UUID NOT NULL,
 
-    CONSTRAINT "ServerPermissions_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ServerPermission_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -115,14 +127,14 @@ CREATE TABLE "ServerFolder" (
 );
 
 -- CreateTable
-CREATE TABLE "ServerFolderPermissions" (
+CREATE TABLE "ServerFolderPermission" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" UUID NOT NULL,
     "serverFolderId" UUID NOT NULL,
 
-    CONSTRAINT "ServerFolderPermissions_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ServerFolderPermission_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -136,13 +148,43 @@ CREATE TABLE "Genre" (
 );
 
 -- CreateTable
-CREATE TABLE "Favorite" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+CREATE TABLE "AlbumArtistFavorite" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "albumArtistId" UUID NOT NULL,
     "userId" UUID NOT NULL,
 
-    CONSTRAINT "Favorite_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "AlbumArtistFavorite_pkey" PRIMARY KEY ("userId","albumArtistId")
+);
+
+-- CreateTable
+CREATE TABLE "ArtistFavorite" (
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "artistId" UUID NOT NULL,
+    "userId" UUID NOT NULL,
+
+    CONSTRAINT "ArtistFavorite_pkey" PRIMARY KEY ("userId","artistId")
+);
+
+-- CreateTable
+CREATE TABLE "AlbumFavorite" (
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "albumId" UUID NOT NULL,
+    "userId" UUID NOT NULL,
+
+    CONSTRAINT "AlbumFavorite_pkey" PRIMARY KEY ("userId","albumId")
+);
+
+-- CreateTable
+CREATE TABLE "SongFavorite" (
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "songId" UUID NOT NULL,
+    "userId" UUID NOT NULL,
+
+    CONSTRAINT "SongFavorite_pkey" PRIMARY KEY ("userId","songId")
 );
 
 -- CreateTable
@@ -188,7 +230,7 @@ CREATE TABLE "SongRating" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" UUID NOT NULL,
-    "songId" UUID,
+    "songId" UUID NOT NULL,
 
     CONSTRAINT "SongRating_pkey" PRIMARY KEY ("id")
 );
@@ -245,7 +287,6 @@ CREATE TABLE "Album" (
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "albumArtistId" UUID,
     "serverId" UUID NOT NULL,
 
     CONSTRAINT "Album_pkey" PRIMARY KEY ("id")
@@ -275,7 +316,7 @@ CREATE TABLE "Song" (
     "releaseDate" TIMESTAMP(3),
     "releaseYear" INTEGER,
     "duration" DOUBLE PRECISION NOT NULL,
-    "size" TEXT,
+    "size" INTEGER,
     "lyrics" TEXT,
     "bitRate" INTEGER NOT NULL,
     "container" TEXT NOT NULL,
@@ -287,6 +328,7 @@ CREATE TABLE "Song" (
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "albumArtistId" UUID,
     "albumId" UUID,
     "serverId" UUID NOT NULL,
 
@@ -340,12 +382,6 @@ CREATE TABLE "_GenreToSong" (
 );
 
 -- CreateTable
-CREATE TABLE "_FavoriteToSong" (
-    "A" UUID NOT NULL,
-    "B" UUID NOT NULL
-);
-
--- CreateTable
 CREATE TABLE "_ImageToSong" (
     "A" UUID NOT NULL,
     "B" UUID NOT NULL
@@ -382,12 +418,6 @@ CREATE TABLE "_AlbumArtistToImage" (
 );
 
 -- CreateTable
-CREATE TABLE "_AlbumArtistToFavorite" (
-    "A" UUID NOT NULL,
-    "B" UUID NOT NULL
-);
-
--- CreateTable
 CREATE TABLE "_AlbumToGenre" (
     "A" UUID NOT NULL,
     "B" UUID NOT NULL
@@ -395,6 +425,12 @@ CREATE TABLE "_AlbumToGenre" (
 
 -- CreateTable
 CREATE TABLE "_AlbumToArtist" (
+    "A" UUID NOT NULL,
+    "B" UUID NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "_AlbumToAlbumArtist" (
     "A" UUID NOT NULL,
     "B" UUID NOT NULL
 );
@@ -413,12 +449,6 @@ CREATE TABLE "_AlbumToServerFolder" (
 
 -- CreateTable
 CREATE TABLE "_AlbumToImage" (
-    "A" UUID NOT NULL,
-    "B" UUID NOT NULL
-);
-
--- CreateTable
-CREATE TABLE "_AlbumToFavorite" (
     "A" UUID NOT NULL,
     "B" UUID NOT NULL
 );
@@ -453,12 +483,6 @@ CREATE TABLE "_ArtistToImage" (
     "B" UUID NOT NULL
 );
 
--- CreateTable
-CREATE TABLE "_ArtistToFavorite" (
-    "A" UUID NOT NULL,
-    "B" UUID NOT NULL
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "RefreshToken_token_key" ON "RefreshToken"("token");
 
@@ -478,7 +502,7 @@ CREATE UNIQUE INDEX "Folder_path_key" ON "Folder"("path");
 CREATE UNIQUE INDEX "Folder_serverId_path_key" ON "Folder"("serverId", "path");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ServerPermissions_userId_serverId_key" ON "ServerPermissions"("userId", "serverId");
+CREATE UNIQUE INDEX "ServerPermission_userId_serverId_key" ON "ServerPermission"("userId", "serverId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ServerUrl_serverId_url_key" ON "ServerUrl"("serverId", "url");
@@ -490,10 +514,34 @@ CREATE UNIQUE INDEX "ServerFolder_remoteId_key" ON "ServerFolder"("remoteId");
 CREATE UNIQUE INDEX "ServerFolder_serverId_remoteId_key" ON "ServerFolder"("serverId", "remoteId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ServerFolderPermissions_userId_serverFolderId_key" ON "ServerFolderPermissions"("userId", "serverFolderId");
+CREATE UNIQUE INDEX "ServerFolderPermission_userId_serverFolderId_key" ON "ServerFolderPermission"("userId", "serverFolderId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Genre_name_key" ON "Genre"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AlbumArtistFavorite_userId_albumArtistId_key" ON "AlbumArtistFavorite"("userId", "albumArtistId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ArtistFavorite_userId_artistId_key" ON "ArtistFavorite"("userId", "artistId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AlbumFavorite_userId_albumId_key" ON "AlbumFavorite"("userId", "albumId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SongFavorite_userId_songId_key" ON "SongFavorite"("userId", "songId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AlbumArtistRating_userId_albumArtistId_key" ON "AlbumArtistRating"("userId", "albumArtistId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ArtistRating_userId_artistId_key" ON "ArtistRating"("userId", "artistId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AlbumRating_userId_albumId_key" ON "AlbumRating"("userId", "albumId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SongRating_userId_songId_key" ON "SongRating"("userId", "songId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Image_remoteUrl_type_key" ON "Image"("remoteUrl", "type");
@@ -544,12 +592,6 @@ CREATE UNIQUE INDEX "_GenreToSong_AB_unique" ON "_GenreToSong"("A", "B");
 CREATE INDEX "_GenreToSong_B_index" ON "_GenreToSong"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_FavoriteToSong_AB_unique" ON "_FavoriteToSong"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_FavoriteToSong_B_index" ON "_FavoriteToSong"("B");
-
--- CreateIndex
 CREATE UNIQUE INDEX "_ImageToSong_AB_unique" ON "_ImageToSong"("A", "B");
 
 -- CreateIndex
@@ -586,12 +628,6 @@ CREATE UNIQUE INDEX "_AlbumArtistToImage_AB_unique" ON "_AlbumArtistToImage"("A"
 CREATE INDEX "_AlbumArtistToImage_B_index" ON "_AlbumArtistToImage"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_AlbumArtistToFavorite_AB_unique" ON "_AlbumArtistToFavorite"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_AlbumArtistToFavorite_B_index" ON "_AlbumArtistToFavorite"("B");
-
--- CreateIndex
 CREATE UNIQUE INDEX "_AlbumToGenre_AB_unique" ON "_AlbumToGenre"("A", "B");
 
 -- CreateIndex
@@ -602,6 +638,12 @@ CREATE UNIQUE INDEX "_AlbumToArtist_AB_unique" ON "_AlbumToArtist"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_AlbumToArtist_B_index" ON "_AlbumToArtist"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_AlbumToAlbumArtist_AB_unique" ON "_AlbumToAlbumArtist"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_AlbumToAlbumArtist_B_index" ON "_AlbumToAlbumArtist"("B");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_AlbumToExternal_AB_unique" ON "_AlbumToExternal"("A", "B");
@@ -620,12 +662,6 @@ CREATE UNIQUE INDEX "_AlbumToImage_AB_unique" ON "_AlbumToImage"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_AlbumToImage_B_index" ON "_AlbumToImage"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_AlbumToFavorite_AB_unique" ON "_AlbumToFavorite"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_AlbumToFavorite_B_index" ON "_AlbumToFavorite"("B");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_ArtistToGenre_AB_unique" ON "_ArtistToGenre"("A", "B");
@@ -657,17 +693,17 @@ CREATE UNIQUE INDEX "_ArtistToImage_AB_unique" ON "_ArtistToImage"("A", "B");
 -- CreateIndex
 CREATE INDEX "_ArtistToImage_B_index" ON "_ArtistToImage"("B");
 
--- CreateIndex
-CREATE UNIQUE INDEX "_ArtistToFavorite_AB_unique" ON "_ArtistToFavorite"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_ArtistToFavorite_B_index" ON "_ArtistToFavorite"("B");
-
 -- AddForeignKey
 ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "History" ADD CONSTRAINT "History_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ServerCredential" ADD CONSTRAINT "ServerCredential_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ServerCredential" ADD CONSTRAINT "ServerCredential_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Folder" ADD CONSTRAINT "Folder_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Folder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -676,10 +712,10 @@ ALTER TABLE "Folder" ADD CONSTRAINT "Folder_parentId_fkey" FOREIGN KEY ("parentI
 ALTER TABLE "Folder" ADD CONSTRAINT "Folder_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ServerPermissions" ADD CONSTRAINT "ServerPermissions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ServerPermission" ADD CONSTRAINT "ServerPermission_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ServerPermissions" ADD CONSTRAINT "ServerPermissions_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ServerPermission" ADD CONSTRAINT "ServerPermission_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ServerUrl" ADD CONSTRAINT "ServerUrl_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -688,13 +724,34 @@ ALTER TABLE "ServerUrl" ADD CONSTRAINT "ServerUrl_serverId_fkey" FOREIGN KEY ("s
 ALTER TABLE "ServerFolder" ADD CONSTRAINT "ServerFolder_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ServerFolderPermissions" ADD CONSTRAINT "ServerFolderPermissions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ServerFolderPermission" ADD CONSTRAINT "ServerFolderPermission_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ServerFolderPermissions" ADD CONSTRAINT "ServerFolderPermissions_serverFolderId_fkey" FOREIGN KEY ("serverFolderId") REFERENCES "ServerFolder"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ServerFolderPermission" ADD CONSTRAINT "ServerFolderPermission_serverFolderId_fkey" FOREIGN KEY ("serverFolderId") REFERENCES "ServerFolder"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Favorite" ADD CONSTRAINT "Favorite_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "AlbumArtistFavorite" ADD CONSTRAINT "AlbumArtistFavorite_albumArtistId_fkey" FOREIGN KEY ("albumArtistId") REFERENCES "AlbumArtist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AlbumArtistFavorite" ADD CONSTRAINT "AlbumArtistFavorite_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ArtistFavorite" ADD CONSTRAINT "ArtistFavorite_artistId_fkey" FOREIGN KEY ("artistId") REFERENCES "Artist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ArtistFavorite" ADD CONSTRAINT "ArtistFavorite_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AlbumFavorite" ADD CONSTRAINT "AlbumFavorite_albumId_fkey" FOREIGN KEY ("albumId") REFERENCES "Album"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AlbumFavorite" ADD CONSTRAINT "AlbumFavorite_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SongFavorite" ADD CONSTRAINT "SongFavorite_songId_fkey" FOREIGN KEY ("songId") REFERENCES "Song"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SongFavorite" ADD CONSTRAINT "SongFavorite_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AlbumArtistRating" ADD CONSTRAINT "AlbumArtistRating_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -718,19 +775,19 @@ ALTER TABLE "AlbumRating" ADD CONSTRAINT "AlbumRating_albumId_fkey" FOREIGN KEY 
 ALTER TABLE "SongRating" ADD CONSTRAINT "SongRating_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SongRating" ADD CONSTRAINT "SongRating_songId_fkey" FOREIGN KEY ("songId") REFERENCES "Song"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "SongRating" ADD CONSTRAINT "SongRating_songId_fkey" FOREIGN KEY ("songId") REFERENCES "Song"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AlbumArtist" ADD CONSTRAINT "AlbumArtist_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Album" ADD CONSTRAINT "Album_albumArtistId_fkey" FOREIGN KEY ("albumArtistId") REFERENCES "AlbumArtist"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Album" ADD CONSTRAINT "Album_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Artist" ADD CONSTRAINT "Artist_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Song" ADD CONSTRAINT "Song_albumArtistId_fkey" FOREIGN KEY ("albumArtistId") REFERENCES "AlbumArtist"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Song" ADD CONSTRAINT "Song_albumId_fkey" FOREIGN KEY ("albumId") REFERENCES "Album"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -772,12 +829,6 @@ ALTER TABLE "_GenreToSong" ADD CONSTRAINT "_GenreToSong_A_fkey" FOREIGN KEY ("A"
 ALTER TABLE "_GenreToSong" ADD CONSTRAINT "_GenreToSong_B_fkey" FOREIGN KEY ("B") REFERENCES "Song"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_FavoriteToSong" ADD CONSTRAINT "_FavoriteToSong_A_fkey" FOREIGN KEY ("A") REFERENCES "Favorite"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_FavoriteToSong" ADD CONSTRAINT "_FavoriteToSong_B_fkey" FOREIGN KEY ("B") REFERENCES "Song"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "_ImageToSong" ADD CONSTRAINT "_ImageToSong_A_fkey" FOREIGN KEY ("A") REFERENCES "Image"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -814,12 +865,6 @@ ALTER TABLE "_AlbumArtistToImage" ADD CONSTRAINT "_AlbumArtistToImage_A_fkey" FO
 ALTER TABLE "_AlbumArtistToImage" ADD CONSTRAINT "_AlbumArtistToImage_B_fkey" FOREIGN KEY ("B") REFERENCES "Image"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_AlbumArtistToFavorite" ADD CONSTRAINT "_AlbumArtistToFavorite_A_fkey" FOREIGN KEY ("A") REFERENCES "AlbumArtist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_AlbumArtistToFavorite" ADD CONSTRAINT "_AlbumArtistToFavorite_B_fkey" FOREIGN KEY ("B") REFERENCES "Favorite"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "_AlbumToGenre" ADD CONSTRAINT "_AlbumToGenre_A_fkey" FOREIGN KEY ("A") REFERENCES "Album"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -830,6 +875,12 @@ ALTER TABLE "_AlbumToArtist" ADD CONSTRAINT "_AlbumToArtist_A_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "_AlbumToArtist" ADD CONSTRAINT "_AlbumToArtist_B_fkey" FOREIGN KEY ("B") REFERENCES "Artist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_AlbumToAlbumArtist" ADD CONSTRAINT "_AlbumToAlbumArtist_A_fkey" FOREIGN KEY ("A") REFERENCES "Album"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_AlbumToAlbumArtist" ADD CONSTRAINT "_AlbumToAlbumArtist_B_fkey" FOREIGN KEY ("B") REFERENCES "AlbumArtist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_AlbumToExternal" ADD CONSTRAINT "_AlbumToExternal_A_fkey" FOREIGN KEY ("A") REFERENCES "Album"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -848,12 +899,6 @@ ALTER TABLE "_AlbumToImage" ADD CONSTRAINT "_AlbumToImage_A_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "_AlbumToImage" ADD CONSTRAINT "_AlbumToImage_B_fkey" FOREIGN KEY ("B") REFERENCES "Image"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_AlbumToFavorite" ADD CONSTRAINT "_AlbumToFavorite_A_fkey" FOREIGN KEY ("A") REFERENCES "Album"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_AlbumToFavorite" ADD CONSTRAINT "_AlbumToFavorite_B_fkey" FOREIGN KEY ("B") REFERENCES "Favorite"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_ArtistToGenre" ADD CONSTRAINT "_ArtistToGenre_A_fkey" FOREIGN KEY ("A") REFERENCES "Artist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -884,9 +929,3 @@ ALTER TABLE "_ArtistToImage" ADD CONSTRAINT "_ArtistToImage_A_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "_ArtistToImage" ADD CONSTRAINT "_ArtistToImage_B_fkey" FOREIGN KEY ("B") REFERENCES "Image"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_ArtistToFavorite" ADD CONSTRAINT "_ArtistToFavorite_A_fkey" FOREIGN KEY ("A") REFERENCES "Artist"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_ArtistToFavorite" ADD CONSTRAINT "_ArtistToFavorite_B_fkey" FOREIGN KEY ("B") REFERENCES "Favorite"("id") ON DELETE CASCADE ON UPDATE CASCADE;

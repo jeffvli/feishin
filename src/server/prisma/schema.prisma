@@ -66,7 +66,6 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  favorites          Favorite[]
   histories          History[]
   albumArtistRatings AlbumArtistRating[]
   artistRatings      ArtistRating[]
@@ -74,8 +73,13 @@ model User {
   songRatings        SongRating[]
   refreshTokens      RefreshToken[]
 
-  serverFolderPermissions ServerFolderPermissions[]
-  serverPermissions       ServerPermissions[]
+  serverFolderPermissions ServerFolderPermission[]
+  serverPermissions       ServerPermission[]
+  serverCredentials       ServerCredential[]
+  albumArtistFavorites    AlbumArtistFavorite[]
+  ArtistFavorite          ArtistFavorite[]
+  AlbumFavorite           AlbumFavorite[]
+  SongFavorite            SongFavorite[]
 }
 
 model History {
@@ -105,8 +109,22 @@ model Server {
   serverFolders     ServerFolder[]
   serverUrls        ServerUrl[]
   folders           Folder[]
-  serverPermissions ServerPermissions[]
+  serverPermissions ServerPermission[]
+  serverCredentials ServerCredential[]
   tasks             Task[]
+}
+
+model ServerCredential {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  credential String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
 }
 
 model Folder {
@@ -129,7 +147,7 @@ model Folder {
   @@unique(fields: [serverId, path], name: "uniqueFolderId")
 }
 
-model ServerPermissions {
+model ServerPermission {
   id        String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   type      ServerPermissionType
   createdAt DateTime             @default(now())
@@ -170,7 +188,7 @@ model ServerFolder {
   albums                  Album[]
   songs                   Song[]
   folders                 Folder[]
-  serverFolderPermissions ServerFolderPermissions[]
+  serverFolderPermissions ServerFolderPermission[]
 
   server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
   serverId String @db.Uuid
@@ -178,7 +196,7 @@ model ServerFolder {
   @@unique(fields: [serverId, remoteId], name: "uniqueServerFolderId")
 }
 
-model ServerFolderPermissions {
+model ServerFolderPermission {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -204,18 +222,60 @@ model Genre {
   songs        Song[]
 }
 
-model Favorite {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+model AlbumArtistFavorite {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  albumArtists AlbumArtist[]
-  artists      Artist[]
-  albums       Album[]
-  songs        Song[]
+  albumArtist   AlbumArtist @relation(fields: [albumArtistId], references: [id], onDelete: Cascade)
+  albumArtistId String      @db.Uuid
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
+
+  @@id([userId, albumArtistId])
+  @@unique(fields: [userId, albumArtistId], name: "uniqueAlbumArtistFavoriteId")
+}
+
+model ArtistFavorite {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artistId String @db.Uuid
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+
+  @@id([userId, artistId])
+  @@unique(fields: [userId, artistId], name: "uniqueArtistFavoriteId")
+}
+
+model AlbumFavorite {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  albumId String @db.Uuid
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+
+  @@id([userId, albumId])
+  @@unique(fields: [userId, albumId], name: "uniqueAlbumFavoriteId")
+}
+
+model SongFavorite {
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  song   Song   @relation(fields: [songId], references: [id], onDelete: Cascade)
+  songId String @db.Uuid
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+
+  @@id([userId, songId])
+  @@unique(fields: [userId, songId], name: "uniqueSongFavoriteId")
 }
 
 model AlbumArtistRating {
@@ -229,6 +289,8 @@ model AlbumArtistRating {
 
   albumArtist   AlbumArtist @relation(fields: [albumArtistId], references: [id])
   albumArtistId String      @db.Uuid
+
+  @@unique(fields: [userId, albumArtistId], name: "uniqueAlbumArtistRatingId")
 }
 
 model ArtistRating {
@@ -242,6 +304,8 @@ model ArtistRating {
 
   artist   Artist @relation(fields: [artistId], references: [id])
   artistId String @db.Uuid
+
+  @@unique(fields: [userId, artistId], name: "uniqueArtistRatingId")
 }
 
 model AlbumRating {
@@ -255,6 +319,8 @@ model AlbumRating {
 
   album   Album  @relation(fields: [albumId], references: [id])
   albumId String @db.Uuid
+
+  @@unique(fields: [userId, albumId], name: "uniqueAlbumRatingId")
 }
 
 model SongRating {
@@ -266,8 +332,10 @@ model SongRating {
   user   User   @relation(fields: [userId], references: [id])
   userId String @db.Uuid
 
-  song   Song?   @relation(fields: [songId], references: [id])
-  songId String? @db.Uuid
+  song   Song   @relation(fields: [songId], references: [id])
+  songId String @db.Uuid
+
+  @@unique(fields: [userId, songId], name: "uniqueSongRatingId")
 }
 
 model Image {
@@ -313,14 +381,14 @@ model AlbumArtist {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  albums        Album[]
-  genres        Genre[]
-  externals     External[]
-  serverFolders ServerFolder[]
-  ratings       AlbumArtistRating[]
-  images        Image[]
-  favorites     Favorite[]
-  songs         Song[]
+  albums               Album[]
+  genres               Genre[]
+  externals            External[]
+  serverFolders        ServerFolder[]
+  ratings              AlbumArtistRating[]
+  images               Image[]
+  songs                Song[]
+  albumArtistFavorites AlbumArtistFavorite[]
 
   server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
   serverId String @db.Uuid
@@ -348,7 +416,7 @@ model Album {
   serverFolders ServerFolder[]
   ratings       AlbumRating[]
   images        Image[]
-  favorites     Favorite[]
+  favorites     AlbumFavorite[]
 
   server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
   serverId String @db.Uuid
@@ -374,7 +442,7 @@ model Artist {
   serverFolders ServerFolder[]
   ratings       ArtistRating[]
   images        Image[]
-  favorites     Favorite[]
+  favorites     ArtistFavorite[]
 
   server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
   serverId String @db.Uuid
@@ -410,7 +478,7 @@ model Song {
   histories     History[]
   ratings       SongRating[]
   images        Image[]
-  favorites     Favorite[]
+  favorites     SongFavorite[]
 
   albumArtist   AlbumArtist? @relation(fields: [albumArtistId], references: [id])
   albumArtistId String?      @db.Uuid
