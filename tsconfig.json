@@ -3,6 +3,10 @@
     "target": "es2021",
     "module": "commonjs",
     "lib": ["dom", "es2021"],
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    },
     "declaration": true,
     "declarationMap": true,
     "jsx": "react-jsx",

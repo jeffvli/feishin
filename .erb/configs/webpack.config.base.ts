@@ -5,6 +5,7 @@
 import webpack from 'webpack';
 import { dependencies as externals } from '../../release/app/package.json';
 import webpackPaths from './webpack.paths';
+import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin';
 
 const configuration: webpack.Configuration = {
   externals: [...Object.keys(externals || {})],
@@ -48,6 +49,7 @@ const configuration: webpack.Configuration = {
     fallback: {
       child_process: false,
     },
+    plugins: [new TsconfigPathsPlugin({ baseUrl: webpackPaths.srcPath })],
     modules: [webpackPaths.srcPath, 'node_modules'],
   },
 
