@@ -1,6 +1,6 @@
 module.exports = {
   extends: ['erb', 'plugin:typescript-sort-keys/recommended'],
-  ignorePatterns: ['.erb/*'],
+  ignorePatterns: ['.erb/*', 'server/*'],
   parserOptions: {
     createDefaultProgram: true,
     ecmaVersion: 2020,
@@ -9,6 +9,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   plugins: ['import', 'sort-keys-fix'],
+  root: true,
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
@@ -68,6 +69,7 @@ module.exports = {
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
+      project: './tsconfig.json',
       typescript: {},
       webpack: {
         config: require.resolve('./.erb/configs/webpack.config.eslint.ts'),

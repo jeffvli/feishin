@@ -16,27 +16,27 @@ RUN npm run build
 FROM node:16.5-alpine
 WORKDIR /root
 RUN mkdir appdata
-RUN mkdir sonixd-server
-RUN mkdir sonixd-client
+RUN mkdir feishin-server
+RUN mkdir feishin-client
 
 # Install server modules
-COPY src/server/package.json ./sonixd-server
-RUN cd ./sonixd-server && npm install --production
+COPY src/server/package.json ./feishin-server
+RUN cd ./feishin-server && npm install --production
 
 # Add server build files
-COPY --from=server-builder /app/dist ./sonixd-server
-COPY --from=server-builder /app/prisma ./sonixd-server/prisma
+COPY --from=server-builder /app/dist ./feishin-server
+COPY --from=server-builder /app/prisma ./feishin-server/prisma
 
 # Add client build files
-COPY --from=ui-builder /app/release/app/dist/renderer ./sonixd-client
+COPY --from=ui-builder /app/release/app/dist/renderer ./feishin-client
 
-COPY docker-entrypoint.sh ./sonixd-server/docker-entrypoint.sh
-RUN chmod +x ./sonixd-server/docker-entrypoint.sh
+COPY docker-entrypoint.sh ./feishin-server/docker-entrypoint.sh
+RUN chmod +x ./feishin-server/docker-entrypoint.sh
 
-RUN cd ./sonixd-server && npx prisma generate
+RUN cd ./feishin-server && npx prisma generate
 RUN npm install pm2 -g
 
-WORKDIR /root/sonixd-server
+WORKDIR /root/feishin-server
 
 EXPOSE 9321
 CMD ["sh", "docker-entrypoint.sh"]

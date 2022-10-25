@@ -1,7 +1,7 @@
 {
-  "name": "sonixd",
-  "productName": "Sonixd",
-  "description": "A full-featured Subsonic/Jellyfin compatible music player",
+  "name": "feishin",
+  "productName": "Feishin",
+  "description": "",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
@@ -20,11 +20,11 @@
     "prepare": "husky install",
     "i18next": "i18next -c src/renderer/i18n/i18next-parser.config.js",
     "docker:up": "docker compose --file docker-compose.dev.yml --env-file .env.dev up --detach && docker compose --file docker-compose.dev.yml --env-file .env.dev logs -f",
-    "docker:down": "docker compose --file docker-compose.dev.yml --env-file .env.dev down && docker image rm sonixd_prisma",
-    "docker:dbpush": "cd src/server && npx prisma generate && docker exec -ti sonixd_server sh -c \"npx prisma generate && npx prisma db push\"",
-    "docker:migrate": "cd src/server && npx prisma generate && docker exec -ti sonixd_server sh -c \"npx prisma migrate dev\"",
-    "docker:createmigrate": "cd src/server && npx prisma generate && docker exec -ti sonixd_server sh -c \"npx prisma migrate dev --create-only\"",
-    "docker:reset": "docker exec -ti sonixd_server sh -c \"npx prisma migrate reset && npx prisma db push && npx ts-node prisma/seed.ts\""
+    "docker:down": "docker compose --file docker-compose.dev.yml --env-file .env.dev down && docker image rm feishin_prisma",
+    "docker:dbpush": "cd src/server && npx prisma generate && docker exec -ti feishin_server sh -c \"npx prisma generate && npx prisma db push\"",
+    "docker:migrate": "cd src/server && npx prisma generate && docker exec -ti feishin_server sh -c \"npx prisma migrate dev\"",
+    "docker:createmigrate": "cd src/server && npx prisma generate && docker exec -ti feishin_server sh -c \"npx prisma migrate dev --create-only\"",
+    "docker:reset": "docker exec -ti feishin_server sh -c \"npx prisma migrate reset && npx prisma db push && npx ts-node prisma/seed.ts\""
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -41,8 +41,8 @@
     ]
   },
   "build": {
-    "productName": "Sonixd",
-    "appId": "org.erb.sonixd",
+    "productName": "Feishin",
+    "appId": "org.erb.feishin",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
@@ -105,12 +105,12 @@
     "publish": {
       "provider": "github",
       "owner": "jeffvli",
-      "repo": "sonixd"
+      "repo": "feishin"
     }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jeffvli/sonixd.git"
+    "url": "git+https://github.com/jeffvli/feishin.git"
   },
   "author": {
     "name": "jeffvli",
@@ -119,7 +119,7 @@
   "contributors": [],
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/jeffvli/sonixd/issues"
+    "url": "https://github.com/jeffvli/feishin/issues"
   },
   "keywords": [
     "subsonic",
@@ -129,7 +129,7 @@
     "react",
     "electron"
   ],
-  "homepage": "https://github.com/jeffvli/sonixd",
+  "homepage": "https://github.com/jeffvli/feishin",
   "jest": {
     "testURL": "http://localhost/",
     "testEnvironment": "jsdom",
@@ -188,7 +188,7 @@
     "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^3.4.1",
     "detect-port": "^1.3.0",
-    "electron": "^18.0.1",
+    "electron": "^21.2.0",
     "electron-builder": "^23.0.3",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.2.1",

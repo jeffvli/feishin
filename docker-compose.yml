@@ -1,7 +1,7 @@
 version: '3'
 services:
   db:
-    container_name: sonixd_db
+    container_name: feishin_db
     image: postgres:13
     ports:
       - '5432:5432'
@@ -13,8 +13,8 @@ services:
       - POSTGRES_DB=${DATABASE_NAME}
     restart: always
   server:
-    container_name: sonixd
-    image: sonixd:latest
+    container_name: feishin
+    image: feishin:latest
     depends_on:
       - db
     environment:
