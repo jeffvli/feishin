@@ -1,8 +1,8 @@
 import express, { Router } from 'express';
-import { controller } from '../controllers';
+import { controller } from '@controllers/index';
 
 export const router: Router = express.Router({ mergeParams: true });
 
-router.get('/', controller.artists.getArtists);
+router.get('/', controller.artists.getList);
 
-router.get('/:id', controller.artists.getArtistById);
+router.get(':serverId', controller.artists.getDetail);

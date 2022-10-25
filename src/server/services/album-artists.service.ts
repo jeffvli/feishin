@@ -1,14 +1,11 @@
+import { User } from '@prisma/client';
 import { Request } from 'express';
-import { prisma } from '../lib';
-import { OffsetPagination, User } from '../types/types';
-import {
-  ApiError,
-  ApiSuccess,
-  folderPermissions,
-  splitNumberString,
-} from '../utils';
+import { OffsetPagination } from '@/types/types';
+import { ApiError } from '@/utils';
+import { prisma } from '@lib/prisma';
+import { folderPermissions } from '@utils/folder-permissions';
 
-const findById = async (options: { id: number; user: User }) => {
+const findById = async (options: { id: string; user: User }) => {
   const { id, user } = options;
   const albumArtist = await prisma.albumArtist.findUnique({
     include: {
@@ -32,7 +29,7 @@ const findById = async (options: { id: number; user: User }) => {
     throw ApiError.forbidden('');
   }
 
-  return ApiSuccess.ok({ data: albumArtist });
+  return albumArtist;
 };
 
 const findMany = async (
@@ -40,37 +37,29 @@ const findMany = async (
   options: { serverFolderIds: string; user: User } & OffsetPagination
 ) => {
   const { user, take, serverFolderIds: rServerFolderIds, skip } = options;
-  const serverFolderIds = splitNumberString(rServerFolderIds);
+  const serverFolderIds = rServerFolderIds.split(',');
 
   if (!(await folderPermissions(serverFolderIds!, user))) {
     throw ApiError.forbidden('');
   }
 
-  const serverFoldersFilter = serverFolderIds!.map((serverFolderId: number) => {
-    return {
-      serverFolders: { some: { id: { equals: Number(serverFolderId) } } },
-    };
-  });
+  const serverFoldersFilter = serverFolderIds!.map((serverFolderId) => ({
+    serverFolders: { some: { id: { equals: serverFolderId } } },
+  }));
 
-  const totalEntries = await prisma.albumArtist.count({
-    where: { OR: serverFoldersFilter },
-  });
-  const albumArtists = await prisma.albumArtist.findMany({
-    include: { genres: true },
-    skip,
-    take,
-    where: { OR: serverFoldersFilter },
-  });
-
-  return ApiSuccess.ok({
-    data: albumArtists,
-    paginationItems: {
+  const [totalEntries, albumArtists] = await prisma.$transaction([
+    prisma.albumArtist.count({
+      where: { OR: serverFoldersFilter },
+    }),
+    prisma.albumArtist.findMany({
+      include: { genres: true },
       skip,
       take,
-      totalEntries,
-      url: req.originalUrl,
-    },
-  });
+      where: { OR: serverFoldersFilter },
+    }),
+  ]);
+
+  return { data: albumArtists, totalEntries };
 };
 
 export const albumArtistsService = {

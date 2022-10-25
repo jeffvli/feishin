@@ -1,41 +1,50 @@
-import { Request, Response } from 'express';
-import { z } from 'zod';
-import { artistsService } from '../services';
-import {
-  getSuccessResponse,
-  idValidation,
-  paginationValidation,
-  validateRequest,
-} from '../utils';
+import { Response } from 'express';
+import { ApiSuccess, getSuccessResponse } from '@/utils';
+import { service } from '@services/index';
+import { validation, TypedRequest } from '@validations/index';
 
-const getArtistById = async (req: Request, res: Response) => {
-  validateRequest(req, { params: z.object({ ...idValidation }) });
-
+const getDetail = async (
+  req: TypedRequest<typeof validation.artists.detail>,
+  res: Response
+) => {
   const { id } = req.params;
-  const data = await artistsService.findById({
-    id: Number(id),
-    user: req.auth,
+
+  const artist = await service.artists.findById({
+    id,
+    user: req.authUser,
   });
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+
+  const success = ApiSuccess.ok({ data: artist });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-const getArtists = async (req: Request, res: Response) => {
-  validateRequest(req, {
-    query: z.object({
-      ...paginationValidation,
-      serverFolderIds: z.string().min(1),
-    }),
-  });
+const getList = async (
+  req: TypedRequest<typeof validation.artists.list>,
+  res: Response
+) => {
+  const { take, skip, serverFolderId } = req.query;
 
-  const { take, skip, serverFolderIds } = req.query;
-  const data = await artistsService.findMany(req, {
-    serverFolderIds: String(serverFolderIds),
-    skip: Number(skip),
-    take: Number(take),
-    user: req.auth,
-  });
+  // const artists = await service.artists.findMany(req, {
+  //   serverFolderIds: String(serverFolderIds),
+  //   skip: Number(skip),
+  //   take: Number(take),
+  //   user: req.authUser,
+  // });
 
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+  // const success = ApiSuccess.ok({
+  //   data: artists,
+  //   paginationItems: {
+  //     skip: Number(skip),
+  //     take: Number(take),
+  //     totalEntries,
+  //     url: req.originalUrl,
+  //   },
+  // });
+
+  // return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-export const artistsController = { getArtistById, getArtists };
+export const artistsController = {
+  getDetail,
+  getList,
+};

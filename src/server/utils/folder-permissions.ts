@@ -1,5 +1,5 @@
+import { User } from '@prisma/client';
 import { prisma } from '../lib';
-import { User } from '../types/types';
 
 export enum Roles {
   NONE = 0,
@@ -25,11 +25,7 @@ export const folderPermissions = async (serverFolderIds: any[], user: User) => {
     where: {
       OR: [
         {
-          isPublic: true,
-        },
-        {
           AND: [
-            { isPublic: false },
             {
               serverFolderPermissions: {
                 some: { userId: { equals: user.id } },
@@ -67,11 +63,7 @@ export const getFolderPermissions = async (user: User) => {
     where: {
       OR: [
         {
-          isPublic: true,
-        },
-        {
           AND: [
-            { isPublic: false },
             {
               serverFolderPermissions: {
                 some: { userId: { equals: user.id } },

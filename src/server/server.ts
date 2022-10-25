@@ -4,8 +4,8 @@ import cors from 'cors';
 import express from 'express';
 import passport from 'passport';
 import 'express-async-errors';
-import { errorHandler } from './middleware';
-import { routes } from './routes';
+import { errorHandler } from '@/middleware';
+import { routes } from '@routes/index';
 
 require('./lib/passport');
 

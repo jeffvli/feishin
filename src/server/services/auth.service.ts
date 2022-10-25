@@ -8,22 +8,32 @@ import { ApiError } from '../utils/api-error';
 
 const login = async (options: { username: string }) => {
   const { username } = options;
-  const user = await prisma.user.findUnique({ where: { username } });
+  const user = await prisma.user.findUnique({
+    include: { serverFolderPermissions: true, serverPermissions: true },
+    where: { username },
+  });
 
-  if (user) {
-    const accessToken = generateToken(user.id);
-    const refreshToken = generateRefreshToken(user.id);
-
-    await prisma.refreshToken.create({
-      data: { token: refreshToken, userId: user.id },
-    });
-
-    const res = { ...user, accessToken, refreshToken };
-
-    return ApiSuccess.ok({ data: res });
+  if (!user) {
+    throw ApiError.notFound('The user does not exist.');
   }
 
-  throw ApiError.notFound('The user does not exist.');
+  const serverPermissions = user.serverPermissions.map((p) => p.id);
+
+  const otherProperties = {
+    isAdmin: user.isAdmin,
+    serverFolderPermissions: user.serverFolderPermissions.map((p) => p.id),
+    serverPermissions,
+    username: user.username,
+  };
+
+  const accessToken = generateToken(user.id, otherProperties);
+  const refreshToken = generateRefreshToken(user.id, otherProperties);
+
+  await prisma.refreshToken.create({
+    data: { token: refreshToken, userId: user.id },
+  });
+
+  return { ...user, accessToken, refreshToken };
 };
 
 const register = async (options: { password: string; username: string }) => {
@@ -44,7 +54,7 @@ const register = async (options: { password: string; username: string }) => {
     },
   });
 
-  return ApiSuccess.ok({ data: user });
+  return user;
 };
 
 const logout = async (options: { user: User }) => {
@@ -59,19 +69,16 @@ const logout = async (options: { user: User }) => {
 const refresh = async (options: { refreshToken: string }) => {
   const { refreshToken } = options;
   const user = jwt.verify(refreshToken, String(process.env.TOKEN_SECRET));
-  const { id } = user as { exp: number; iat: number; id: number };
+  const { id } = user as { exp: number; iat: number; id: string };
 
   const token = await prisma.refreshToken.findUnique({
     where: { token: refreshToken },
   });
 
-  if (!token) {
-    throw ApiError.unauthorized('Invalid refresh token.');
-  }
+  if (!token) throw ApiError.unauthorized('Invalid refresh token.');
 
   const newToken = generateToken(id);
-
-  return ApiSuccess.ok({ data: { accessToken: newToken } });
+  return { accessToken: newToken };
 };
 
 export const authService = {

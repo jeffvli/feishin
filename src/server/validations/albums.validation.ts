@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AlbumSort } from '../helpers/albums.helpers';
+import { AlbumSort } from '@helpers/albums.helpers';
 import {
   idValidation,
   orderByValidation,
@@ -22,13 +22,32 @@ const list = {
 
 const detail = {
   body: z.object({}),
-  params: z.object({ ...idValidation('id') }),
+  params: z.object({
+    ...idValidation('albumId'),
+    ...idValidation('serverId'),
+  }),
   query: z.object({
     ...serverUrlIdValidation,
   }),
 };
 
+const detailSongList = {
+  body: z.object({}),
+  params: z.object({
+    ...idValidation('albumId'),
+    ...idValidation('serverId'),
+  }),
+  query: z.object({
+    ...paginationValidation,
+    ...serverFolderIdValidation,
+    ...orderByValidation,
+    ...serverUrlIdValidation,
+    sortBy: z.nativeEnum(AlbumSort),
+  }),
+};
+
 export const albumsValidation = {
   detail,
+  detailSongList,
   list,
 };

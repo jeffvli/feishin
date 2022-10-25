@@ -1,35 +1,33 @@
 import { Request, Response } from 'express';
-import { z } from 'zod';
-import { songsService } from '../services/songs.service';
-import {
-  getSuccessResponse,
-  paginationValidation,
-  validateRequest,
-} from '../utils';
 
-const getSongs = async (req: Request, res: Response) => {
-  validateRequest(req, {
-    query: z.object({
-      ...paginationValidation,
-      albumIds: z.optional(z.string()),
-      artistIds: z.optional(z.string()),
-      serverFolderIds: z.optional(z.string().min(1)),
-      songIds: z.optional(z.string()),
-    }),
-  });
+const getSongList = async (req: Request, res: Response) => {
+  const { serverId } = req.params;
+  const { take, skip, serverFolderId } = req.query;
 
-  const { take, skip, serverFolderIds } = req.query;
+  // const songs = await songsService.findMany(req, {
+  //   serverFolderIds: String(serverFolderId),
+  //   serverId,
+  //   skip: Number(skip),
+  //   take: Number(take),
+  //   user: req.authUser,
+  // });
 
-  const data = await songsService.findMany(req, {
-    serverFolderIds: String(serverFolderIds),
-    skip: Number(skip),
-    take: Number(take),
-    user: req.auth,
-  });
+  // const success = ApiSuccess.ok({
+  //   // data: toRes.songs(songs.data, req.authUser),
+  //   data: songs.data,
+  //   paginationItems: {
+  //     skip: Number(skip),
+  //     take: Number(take),
+  //     totalEntries: songs.totalEntries,
+  //     url: req.originalUrl,
+  //   },
+  // });
 
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+  return {};
+
+  // return res.status(data.statusCode).json(getSuccessResponse(data));
 };
 
 export const songsController = {
-  getSongs,
+  getSongList,
 };

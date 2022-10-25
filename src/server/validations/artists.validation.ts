@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AlbumSort } from '../helpers/albums.helpers';
+import { AlbumSort } from '@helpers/albums.helpers';
 import {
   idValidation,
   orderByValidation,

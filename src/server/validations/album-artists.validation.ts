@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { paginationValidation, idValidation } from './shared.validation';
+import { idValidation, paginationValidation } from './shared.validation';
 
 export const list = {
   body: z.object({}),

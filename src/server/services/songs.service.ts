@@ -1,22 +1,18 @@
+import { User } from '@prisma/client';
 import { Request } from 'express';
 import { prisma } from '../lib';
-import { User } from '../types/types';
-import {
-  ApiError,
-  ApiSuccess,
-  folderPermissions,
-  splitNumberString,
-} from '../utils';
-import { toRes } from './response';
+import { SortOrder } from '../types/types';
+import { ApiError, ApiSuccess, folderPermissions } from '../utils';
+// import { toRes } from './response';
 import { SongRequestParams } from './types';
 
-const findById = async (options: { id: number; user: User }) => {
-  const { id, user } = options;
+const findById = async (options: { id: string; user: User }) => {
+  const { id } = options;
 
   const album = await prisma.album.findUnique({
     include: {
       _count: true,
-      albumArtist: true,
+      albumArtists: true,
       genres: true,
       songs: {
         include: {
@@ -26,15 +22,16 @@ const findById = async (options: { id: number; user: User }) => {
           genres: true,
           images: true,
         },
-        orderBy: [{ disc: 'asc' }, { track: 'asc' }],
+        orderBy: [
+          { discNumber: SortOrder.ASC },
+          { trackNumber: SortOrder.ASC },
+        ],
       },
     },
     where: { id },
   });
 
-  if (!album) {
-    throw ApiError.notFound('');
-  }
+  if (!album) throw ApiError.notFound('');
 
   // if (!(await folderPermissions([album?.serverFolderId], user))) {
   //   throw ApiError.forbidden('');
@@ -49,37 +46,37 @@ const findMany = async (
 ) => {
   const {
     albumIds: rawAlbumIds,
-    artistIds: rawArtistIds,
+    // artistIds: rawArtistIds,
+    serverId,
     songIds: rawSongIds,
     user,
     skip,
     take,
     serverFolderIds: rServerFolderIds,
   } = options;
-  const serverFolderIds = splitNumberString(rServerFolderIds);
-  const albumIds = splitNumberString(rawAlbumIds);
-  const artistIds = splitNumberString(rawArtistIds);
-  const songIds = splitNumberString(rawSongIds);
+  const serverFolderIds = rServerFolderIds.split(',');
+  const albumIds = rawAlbumIds && rawAlbumIds.split(',');
+  // const artistIds = rawArtistIds && rawArtistIds.split(',');
+  const songIds = rawSongIds && rawSongIds.split(',');
 
   if (serverFolderIds) {
-    if (!(await folderPermissions(serverFolderIds, user))) {
+    if (!(await folderPermissions(serverFolderIds, user)))
       throw ApiError.forbidden('');
-    }
   }
 
   // const serverFoldersFilter = serverFolderIds!.map((serverFolderId: number) => {
   //   return { serverFolders: { id: { equals: serverFolderId } } };
   // });
 
-  const serverFoldersFilter = {
-    serverFolders: { some: { id: { in: serverFolderIds } } },
-  };
+  // const serverFoldersFilter = {
+  //   serverFolders: { some: { id: { in: serverFolderIds } } },
+  // };
 
   const [totalEntries, songs] = await prisma.$transaction([
     prisma.song.count({
       where: {
         OR: [
-          serverFoldersFilter,
+          // serverFoldersFilter,
           {
             albumId: { in: albumIds },
             id: { in: songIds },
@@ -96,19 +93,16 @@ const findMany = async (
       },
       skip,
       take,
-      where: { OR: serverFoldersFilter },
+      where: {
+        AND: {
+          // OR: serverFoldersFilter,
+          serverId,
+        },
+      },
     }),
   ]);
 
-  return ApiSuccess.ok({
-    data: songs,
-    paginationItems: {
-      skip,
-      take,
-      totalEntries,
-      url: req.originalUrl,
-    },
-  });
+  return { data: songs, totalEntries };
 };
 
 export const songsService = {

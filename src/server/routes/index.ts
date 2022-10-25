@@ -23,7 +23,21 @@ routes.use('/api/users', usersRouter);
 routes.use('/api/servers', serversRouter);
 
 routes.param('serverId', (req, _res, next, serverId) => {
-  helpers.shared.checkServerPermissions(req.auth, { serverId });
+  const { serverFolderId } = req.query as {
+    serverFolderId?: string[] | string;
+  };
+
+  req.authUser.serverId = serverId;
+
+  helpers.shared.checkServerPermissions(req.authUser, { serverId });
+  helpers.shared.checkServerFolderPermissions(req.authUser, {
+    serverFolderId,
+  });
+
+  if (typeof req.query.serverFolderId === 'string') {
+    req.query.serverFolderId = [req.query.serverFolderId];
+  }
+
   next();
 });
 

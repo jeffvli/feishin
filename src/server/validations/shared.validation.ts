@@ -1,8 +1,8 @@
-// Modified from zod-express-middleware: https://github.com/Aquila169/zod-express-middleware
 import { Request, RequestHandler } from 'express';
 import { z, ZodError, ZodSchema } from 'zod';
-import { SortOrder } from '../types/types';
-import { ApiError } from '../utils';
+import { SortOrder } from '@/types/types';
+import { ApiError } from '@/utils';
+// Modified from zod-express-middleware: https://github.com/Aquila169/zod-express-middleware
 
 export type TypedRequest<
   S extends {

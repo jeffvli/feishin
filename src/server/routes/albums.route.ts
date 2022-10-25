@@ -1,8 +1,23 @@
 import express, { Router } from 'express';
-import { controller } from '../controllers';
+import { controller } from '@controllers/index';
+import { validateRequest, validation } from '@validations/index';
 
 export const router: Router = express.Router({ mergeParams: true });
 
-router.get('/', controller.albums.getAlbumList);
+router.get(
+  '/',
+  validateRequest(validation.albums.list),
+  controller.albums.getList
+);
 
-router.get('/:id', controller.albums.getAlbumDetail);
+router.get(
+  '/:albumId',
+  validateRequest(validation.albums.detail),
+  controller.albums.getDetail
+);
+
+router.get(
+  '/:albumId/songs',
+  validateRequest(validation.albums.detail),
+  controller.albums.getDetailSongList
+);

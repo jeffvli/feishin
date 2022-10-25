@@ -1,38 +1,42 @@
 import { Request, Response } from 'express';
-import { z } from 'zod';
+import { ApiSuccess, getSuccessResponse } from '@/utils';
+import { toApiModel } from '@helpers/api-model';
+import { service } from '@services/index';
+import { validation, TypedRequest } from '@validations/index';
 import packageJson from '../package.json';
-import { authService } from '../services';
-import { getSuccessResponse, validateRequest } from '../utils';
 
-const login = async (req: Request, res: Response) => {
-  validateRequest(req, { body: z.object({ username: z.string() }) });
-
+const login = async (
+  req: TypedRequest<typeof validation.auth.login>,
+  res: Response
+) => {
   const { username } = req.body;
-  const { statusCode, data } = await authService.login({ username });
+  const user = await service.auth.login({ username });
 
-  return res.status(statusCode).json(getSuccessResponse({ data, statusCode }));
+  const success = ApiSuccess.ok({ data: toApiModel.users([user])[0] });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-const register = async (req: Request, res: Response) => {
-  validateRequest(req, {
-    body: z.object({
-      password: z.string().min(6).max(255),
-      username: z.string().min(4).max(26),
-    }),
-  });
-
+const register = async (
+  req: TypedRequest<typeof validation.auth.register>,
+  res: Response
+) => {
   const { username, password } = req.body;
-  const { statusCode, data } = await authService.register({
+  const user = await service.auth.register({
     password,
     username,
   });
 
-  return res.status(statusCode).json(getSuccessResponse({ data, statusCode }));
+  const success = ApiSuccess.ok({ data: toApiModel.users([user])[0] });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
 const logout = async (req: Request, res: Response) => {
-  const { statusCode, data } = await authService.logout({ user: req.auth });
-  return res.status(statusCode).json(getSuccessResponse({ data, statusCode }));
+  await service.auth.logout({
+    user: req.authUser,
+  });
+
+  const success = ApiSuccess.noContent({ data: {} });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
 const ping = async (_req: Request, res: Response) => {
@@ -48,18 +52,16 @@ const ping = async (_req: Request, res: Response) => {
   );
 };
 
-const refresh = async (req: Request, res: Response) => {
-  validateRequest(req, {
-    body: z.object({
-      refreshToken: z.string(),
-    }),
-  });
-
-  const { data, statusCode } = await authService.refresh({
+const refresh = async (
+  req: TypedRequest<typeof validation.auth.refresh>,
+  res: Response
+) => {
+  const refresh = await service.auth.refresh({
     refreshToken: req.body.refreshToken,
   });
 
-  return res.status(statusCode).json(getSuccessResponse({ data, statusCode }));
+  const success = ApiSuccess.ok({ data: refresh });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
 export const authController = { login, logout, ping, refresh, register };

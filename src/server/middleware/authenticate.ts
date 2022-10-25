@@ -1,9 +1,4 @@
-import {
-  ServerCredential,
-  ServerFolderPermission,
-  ServerPermission,
-  User,
-} from '@prisma/client';
+import { ServerFolderPermission, ServerPermission, User } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import passport from 'passport';
 
@@ -55,13 +50,6 @@ export const authenticate = (
       (permission: ServerPermission) => permission.serverId
     );
 
-    const serverCredentials = user.serverCredentials.map(
-      (credential: ServerCredential) => ({
-        id: credential.id,
-        serverId: credential.serverId,
-      })
-    );
-
     const props = {
       createdAt: user?.createdAt,
       enabled: user?.enabled,
@@ -70,7 +58,6 @@ export const authenticate = (
       id: user?.id,
       isAdmin: user?.isAdmin,
       server: req.params.serverId,
-      serverCredentials,
       serverFolderPermissions: user?.serverFolderPermissions,
       serverPermissions: user?.serverPermissions,
       updatedAt: user?.updatedAt,

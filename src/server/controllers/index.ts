@@ -1,6 +1,17 @@
-export * from './album-artists.controller';
-export * from './auth.controller';
-export * from './servers.controller';
-export * from './users.controller';
-export * from './artists.controller';
-export * from './albums.controller';
+import { albumArtistsController } from './album-artists.controller';
+import { albumsController } from './albums.controller';
+import { artistsController } from './artists.controller';
+import { authController } from './auth.controller';
+import { serversController } from './servers.controller';
+import { songsController } from './songs.controller';
+import { usersController } from './users.controller';
+
+export const controller = {
+  albumArtists: albumArtistsController,
+  albums: albumsController,
+  artists: artistsController,
+  auth: authController,
+  servers: serversController,
+  songs: songsController,
+  users: usersController,
+};

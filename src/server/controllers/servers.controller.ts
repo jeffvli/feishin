@@ -1,72 +1,177 @@
-import { Request, Response } from 'express';
-import { z } from 'zod';
-import { prisma } from '../lib';
-import { serversService } from '../services';
-import { getSuccessResponse, idValidation, validateRequest } from '../utils';
+import { Response } from 'express';
+import { ApiSuccess, getSuccessResponse } from '@/utils';
+import { toApiModel } from '@helpers/api-model';
+import { service } from '@services/index';
+import { TypedRequest, validation } from '@validations/index';
 
-const getServerById = async (req: Request, res: Response) => {
-  validateRequest(req, { params: z.object({ ...idValidation }) });
+const getServerDetail = async (
+  req: TypedRequest<typeof validation.servers.detail>,
+  res: Response
+) => {
+  const { serverId } = req.params;
+  const data = await service.servers.findById(req.authUser, { id: serverId });
+  const success = ApiSuccess.ok({ data: toApiModel.servers([data]) });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
 
-  const { id } = req.params;
-  const data = await serversService.findById(req.auth, {
-    id: Number(id),
+const getServerList = async (
+  req: TypedRequest<typeof validation.servers.list>,
+  res: Response
+) => {
+  const data = await service.servers.findMany(req.authUser);
+  const success = ApiSuccess.ok({ data: toApiModel.servers(data) });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const deleteServer = async (
+  req: TypedRequest<typeof validation.servers.deleteServer>,
+  res: Response
+) => {
+  const { serverId } = req.params;
+  await service.servers.deleteById({ id: serverId });
+  const success = ApiSuccess.noContent({ data: null });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const createServer = async (
+  req: TypedRequest<typeof validation.servers.create>,
+  res: Response
+) => {
+  const remoteServerLoginRes = await service.servers.remoteServerLogin(
+    req.body
+  );
+
+  const data = await service.servers.create({
+    name: req.body.name,
+    ...remoteServerLoginRes,
   });
 
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+  const success = ApiSuccess.ok({ data: toApiModel.servers([data])[0] });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-const getServers = async (req: Request, res: Response) => {
-  const data = await serversService.findMany(req.auth);
+const updateServer = async (
+  req: TypedRequest<typeof validation.servers.update>,
+  res: Response
+) => {
+  const { serverId } = req.params;
+  const { username, password, name, legacy, type, url } = req.body;
 
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+  if (type && username && password && url) {
+    const remoteServerLoginRes = await service.servers.remoteServerLogin({
+      legacy,
+      password,
+      type,
+      url,
+      username,
+    });
+
+    const data = await service.servers.update(
+      { id: serverId },
+      { name, ...remoteServerLoginRes }
+    );
+
+    const success = ApiSuccess.ok({ data: toApiModel.servers([data])[0] });
+    return res.status(success.statusCode).json(getSuccessResponse(success));
+  }
+
+  const data = await service.servers.update({ id: serverId }, { name, url });
+  const success = ApiSuccess.ok({ data: toApiModel.servers([data])[0] });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-const createServer = async (req: Request, res: Response) => {
-  const data = await serversService.create(req.body);
+const refreshServer = async (
+  req: TypedRequest<typeof validation.servers.refresh>,
+  res: Response
+) => {
+  const { serverId } = req.params;
+  const data = await service.servers.refresh({ id: serverId });
 
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+  const success = ApiSuccess.ok({ data: toApiModel.servers([data])[0] });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-const refreshServer = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const data = await serversService.refresh({ id: Number(id) });
+const scanServer = async (
+  req: TypedRequest<typeof validation.servers.scan>,
+  res: Response
+) => {
+  const { serverId } = req.params;
+  const { serverFolderId } = req.body;
 
-  return res.status(data.statusCode).json(getSuccessResponse(data));
-};
-
-const scanServer = async (req: Request, res: Response) => {
-  validateRequest(req, {
-    query: z.object({ serverFolderIds: z.string().optional() }),
+  const data = await service.servers.fullScan({
+    id: serverId,
+    serverFolderId,
   });
 
-  const { id } = req.params;
-  const { serverFolderIds } = req.query;
-
-  const data = await serversService.fullScan({
-    id: Number(id),
-    serverFolderIds: serverFolderIds && String(serverFolderIds),
-    userId: Number(req.auth.id),
-  });
-
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+  const success = ApiSuccess.ok({ data });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-const getFolder = async (req: Request, res: Response) => {
-  const data = await prisma.folder.findUnique({
-    include: {
-      children: true,
-    },
-    where: { id: Number(req.params.id) },
+const createServerUrl = async (
+  req: TypedRequest<typeof validation.servers.createUrl>,
+  res: Response
+) => {
+  const { serverId } = req.params;
+  const { url } = req.body;
+
+  const data = await service.servers.createUrl({
+    serverId,
+    url,
   });
 
-  return res.status(200).json(getSuccessResponse({ data, statusCode: 200 }));
+  const success = ApiSuccess.ok({ data });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const deleteServerUrl = async (
+  req: TypedRequest<typeof validation.servers.deleteUrl>,
+  res: Response
+) => {
+  const { urlId } = req.params;
+
+  await service.servers.deleteUrlById({
+    id: urlId,
+  });
+
+  const success = ApiSuccess.noContent({ data: null });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const enableServerUrl = async (
+  req: TypedRequest<typeof validation.servers.enableUrl>,
+  res: Response
+) => {
+  const { serverId, urlId } = req.params;
+
+  await service.servers.enableUrlById(req.authUser, {
+    id: urlId,
+    serverId,
+  });
+
+  const success = ApiSuccess.noContent({ data: null });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const disableServerUrl = async (
+  req: TypedRequest<typeof validation.servers.disableUrl>,
+  res: Response
+) => {
+  await service.servers.disableUrlById(req.authUser);
+
+  const success = ApiSuccess.noContent({ data: null });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
 export const serversController = {
   createServer,
-  getFolder,
-  getServerById,
-  getServers,
+  createServerUrl,
+  deleteServer,
+  deleteServerUrl,
+  disableServerUrl,
+  enableServerUrl,
+  getServerDetail,
+  getServerList,
   refreshServer,
   scanServer,
+  updateServer,
 };

@@ -1,30 +1,15 @@
-import { Album } from '@prisma/client';
-import { Request } from 'express';
-import { albumHelpers, AlbumSort } from '../helpers/albums.helpers';
-import { sharedHelpers } from '../helpers/shared.helpers';
-import { prisma } from '../lib';
-import { OffsetPagination, SortOrder, User } from '../types/types';
-import {
-  ApiError,
-  ApiSuccess,
-  folderPermissions,
-  getFolderPermissions,
-  splitNumberString,
-} from '../utils';
-import { toRes } from './response';
+import { AuthUser } from '@/middleware';
+import { OffsetPagination, SortOrder } from '@/types/types';
+import { ApiError } from '@/utils';
+import { AlbumSort } from '@helpers/albums.helpers';
+import { helpers } from '@helpers/index';
+import { prisma } from '@lib/prisma';
 
-const findById = async (options: {
-  id: number;
-  serverUrls?: string;
-  user: User;
-}) => {
-  const { id, user, serverUrls } = options;
+const findById = async (user: AuthUser, options: { id: string }) => {
+  const { id } = options;
 
   const album = await prisma.album.findUnique({
-    include: {
-      ...albumHelpers.include({ serverUrls, songs: true }),
-      serverFolders: true,
-    },
+    include: helpers.albums.include({ songs: true }),
     where: { id },
   });
 
@@ -32,105 +17,94 @@ const findById = async (options: {
     throw ApiError.notFound('');
   }
 
-  const serverFolderIds = album.serverFolders.map(
-    (serverFolder) => serverFolder.id
-  );
+  const serverFolderId = album.serverFolders.map((s) => s.id);
+  helpers.shared.checkServerFolderPermissions(user, { serverFolderId });
 
-  if (!(await folderPermissions(serverFolderIds, user))) {
-    throw ApiError.forbidden('');
-  }
-
-  return ApiSuccess.ok({ data: toRes.albums([album], user)[0] });
+  return album;
 };
 
-const findMany = async (
-  req: Request,
-  options: {
-    orderBy: SortOrder;
-    serverFolderIds?: string;
-    serverUrls?: string;
-    sortBy: AlbumSort;
-    user: User;
-  } & OffsetPagination
-) => {
-  const {
-    user,
-    take,
-    serverFolderIds: rServerFolderIds,
-    serverUrls,
-    skip,
-    sortBy,
-    orderBy,
-  } = options;
+export type AlbumFindManyOptions = {
+  orderBy: SortOrder;
+  serverFolderId?: string[];
+  serverId: string;
+  sortBy: AlbumSort;
+  user: AuthUser;
+} & OffsetPagination;
 
-  const serverFolderIds = rServerFolderIds
-    ? splitNumberString(rServerFolderIds)
-    : await getFolderPermissions(user);
+const findMany = async (options: AlbumFindManyOptions) => {
+  const { take, serverFolderId, skip, sortBy, orderBy, user, serverId } =
+    options;
 
-  if (!(await folderPermissions(serverFolderIds!, user))) {
-    throw ApiError.forbidden('');
-  }
-
-  const serverFoldersFilter = sharedHelpers.serverFolderFilter(
-    serverFolderIds!
-  );
+  const serverFolderIds =
+    serverFolderId ||
+    (await helpers.shared.getAvailableServerFolderIds(user, { serverId }));
 
   let totalEntries = 0;
-  let albums: Album[];
+  let albums;
 
   if (sortBy === AlbumSort.RATING) {
     const [count, result] = await prisma.$transaction([
       prisma.albumRating.count({
         where: {
-          album: { OR: serverFoldersFilter },
+          album: { OR: helpers.shared.serverFolderFilter(serverFolderIds) },
           user: { id: user.id },
         },
       }),
       prisma.albumRating.findMany({
         include: {
           album: {
-            include: { ...albumHelpers.include({ serverUrls, songs: false }) },
+            include: helpers.albums.include({ songs: false, user }),
           },
         },
         orderBy: { value: orderBy },
         skip,
         take,
         where: {
-          album: { OR: serverFoldersFilter },
+          album: { OR: helpers.shared.serverFolderFilter(serverFolderIds) },
           user: { id: user.id },
         },
       }),
     ]);
-
-    albums = result.map((rating) => rating.album) as Album[];
+    albums = result.map((rating) => rating.album);
     totalEntries = count;
-  } else {
-    const [count, result] = await prisma.$transaction([
+  } else if (sortBy === AlbumSort.FAVORITE) {
+    [totalEntries, albums] = await prisma.$transaction([
       prisma.album.count({
-        where: { OR: serverFoldersFilter },
+        where: {
+          AND: [
+            helpers.shared.serverFolderFilter(serverFolderIds),
+            { favorites: { some: { userId: user.id } } },
+          ],
+        },
       }),
       prisma.album.findMany({
-        include: { ...albumHelpers.include({ serverUrls, songs: false }) },
-        orderBy: [{ ...albumHelpers.sort(sortBy, orderBy) }],
+        include: helpers.albums.include({ songs: false, user }),
         skip,
         take,
-        where: { OR: serverFoldersFilter },
+        where: {
+          AND: [
+            helpers.shared.serverFolderFilter(serverFolderIds),
+            { favorites: { some: { userId: user.id } } },
+          ],
+        },
       }),
     ]);
-
-    albums = result;
-    totalEntries = count;
+  } else {
+    [totalEntries, albums] = await prisma.$transaction([
+      prisma.album.count({
+        where: { OR: helpers.shared.serverFolderFilter(serverFolderIds) },
+      }),
+      prisma.album.findMany({
+        include: helpers.albums.include({ songs: false, user }),
+        orderBy: [helpers.albums.sort(sortBy, orderBy)],
+        skip,
+        take,
+        where: { OR: helpers.shared.serverFolderFilter(serverFolderIds) },
+      }),
+    ]);
   }
 
-  return ApiSuccess.ok({
-    data: toRes.albums(albums, user),
-    paginationItems: {
-      skip,
-      take,
-      totalEntries,
-      url: req.originalUrl,
-    },
-  });
+  return { data: albums, totalEntries };
 };
 
 export const albumsService = {

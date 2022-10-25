@@ -1,41 +1,45 @@
 import { Request, Response } from 'express';
-import { z } from 'zod';
-import { albumArtistsService } from '../services';
-import {
-  getSuccessResponse,
-  idValidation,
-  paginationValidation,
-  validateRequest,
-} from '../utils';
+import { ApiSuccess, getSuccessResponse } from '@/utils';
+import { service } from '@services/index';
+import { validation, TypedRequest } from '@validations/index';
 
-const getAlbumArtists = async (req: Request, res: Response) => {
-  validateRequest(req, {
-    query: z.object({
-      ...paginationValidation,
-      serverFolderIds: z.string().min(1),
-    }),
-  });
-
+const getList = async (req: Request, res: Response) => {
   const { take, skip, serverFolderIds } = req.query;
-  const data = await albumArtistsService.findMany(req, {
+  const albumArtists = await service.albumArtists.findMany(req, {
     serverFolderIds: String(serverFolderIds),
     skip: Number(skip),
     take: Number(take),
-    user: req.auth,
+    user: req.authUser,
   });
 
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+  const success = ApiSuccess.ok({
+    data: albumArtists.data,
+    paginationItems: {
+      skip: Number(skip),
+      take: Number(take),
+      totalEntries: albumArtists.totalEntries,
+      url: req.originalUrl,
+    },
+  });
+
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-const getAlbumArtistById = async (req: Request, res: Response) => {
-  validateRequest(req, { params: z.object({ ...idValidation }) });
-
+const getDetail = async (
+  req: TypedRequest<typeof validation.albumArtists.detail>,
+  res: Response
+) => {
   const { id } = req.params;
-  const data = await albumArtistsService.findById({
-    id: Number(id),
-    user: req.auth,
+  const albumArtist = await service.albumArtists.findById({
+    id,
+    user: req.authUser,
   });
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+
+  const success = ApiSuccess.ok({ data: albumArtist });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-export const albumArtistsController = { getAlbumArtistById, getAlbumArtists };
+export const albumArtistsController = {
+  getDetail,
+  getList,
+};

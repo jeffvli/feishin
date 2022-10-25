@@ -1,21 +1,22 @@
 import { Request, Response } from 'express';
-import { z } from 'zod';
-import { usersService } from '../services';
-import { getSuccessResponse, idValidation, validateRequest } from '../utils';
+import { ApiSuccess, getSuccessResponse } from '@/utils';
+import { toApiModel } from '@helpers/api-model';
+import { service } from '@services/index';
 
-const getUser = async (req: Request, res: Response) => {
-  validateRequest(req, { params: z.object({ ...idValidation }) });
+const getUserDetail = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const data = await usersService.getOne({ id: Number(id) });
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+  const user = await service.users.findById(req.authUser, { id });
+  const success = ApiSuccess.ok({ data: toApiModel.users([user])[0] });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-const getUsers = async (_req: Request, res: Response) => {
-  const data = await usersService.getMany();
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+const getUserList = async (_req: Request, res: Response) => {
+  const users = await service.users.findMany();
+  const success = ApiSuccess.ok({ data: toApiModel.users(users) });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
 export const usersController = {
-  getUser,
-  getUsers,
+  getUserDetail,
+  getUserList,
 };

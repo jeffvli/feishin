@@ -1,60 +1,102 @@
-import { Request, Response } from 'express';
-import { z } from 'zod';
-import { AlbumSort } from '../helpers/albums.helpers';
-import { albumsService } from '../services';
-import { SortOrder } from '../types/types';
-import {
-  getSuccessResponse,
-  idValidation,
-  paginationValidation,
-  validateRequest,
-} from '../utils';
+import { Response } from 'express';
+import { ApiSuccess, getSuccessResponse } from '@/utils';
+import { toApiModel } from '@helpers/api-model';
+import { service } from '@services/index';
+import { TypedRequest, validation } from '@validations/index';
 
-const getAlbumById = async (req: Request, res: Response) => {
-  validateRequest(req, {
-    params: z.object({ ...idValidation }),
-    query: z.object({ serverUrls: z.optional(z.string().min(1)) }),
+const getDetail = async (
+  req: TypedRequest<typeof validation.albums.detail>,
+  res: Response
+) => {
+  const { albumId } = req.params;
+
+  const album = await service.albums.findById(req.authUser, { id: albumId });
+
+  const success = ApiSuccess.ok({
+    data: toApiModel.albums({ items: [album], user: req.authUser })[0],
   });
 
-  const { id } = req.params;
-  const { serverUrls } = req.query;
-  const data = await albumsService.findById({
-    id: Number(id),
-    serverUrls: serverUrls && String(serverUrls),
-    user: req.auth,
-  });
-
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-const getAlbums = async (req: Request, res: Response) => {
-  validateRequest(req, {
-    query: z.object({
-      ...paginationValidation,
-      orderBy: z.nativeEnum(SortOrder),
-      serverFolderIds: z.optional(z.string().min(1)),
-      serverUrls: z.optional(z.string().min(1)),
-      sortBy: z.nativeEnum(AlbumSort),
-    }),
-  });
+const getList = async (
+  req: TypedRequest<typeof validation.albums.list>,
+  res: Response
+) => {
+  const { serverId } = req.params;
+  const { take, skip, serverUrlId } = req.query;
 
-  const { take, serverFolderIds, serverUrls, sortBy, orderBy, skip } =
-    req.query;
-
-  const data = await albumsService.findMany(req, {
-    orderBy: orderBy as SortOrder,
-    serverFolderIds: serverFolderIds && String(serverFolderIds),
-    serverUrls: serverUrls && String(serverUrls),
+  const albums = await service.albums.findMany({
+    ...req.query,
+    serverId,
     skip: Number(skip),
-    sortBy: sortBy as AlbumSort,
     take: Number(take),
-    user: req.auth,
+    user: req.authUser,
   });
 
-  return res.status(data.statusCode).json(getSuccessResponse(data));
+  const serverUrl = serverUrlId
+    ? await service.servers.findServerUrlById({
+        id: serverUrlId,
+      })
+    : undefined;
+
+  const success = ApiSuccess.ok({
+    data: toApiModel.albums({
+      items: albums.data,
+      serverUrl: serverUrl?.url,
+      user: req.authUser,
+    }),
+    paginationItems: {
+      skip: Number(skip),
+      take: Number(take),
+      totalEntries: albums.totalEntries,
+      url: req.originalUrl,
+    },
+  });
+
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const getDetailSongList = async (
+  req: TypedRequest<typeof validation.albums.list>,
+  res: Response
+) => {
+  const { serverId } = req.params;
+  const { take, skip, serverUrlId } = req.query;
+
+  const albums = await service.albums.findMany({
+    ...req.query,
+    serverId,
+    skip: Number(skip),
+    take: Number(take),
+    user: req.authUser,
+  });
+
+  const serverUrl = serverUrlId
+    ? await service.servers.findServerUrlById({
+        id: serverUrlId,
+      })
+    : undefined;
+
+  const success = ApiSuccess.ok({
+    data: toApiModel.albums({
+      items: albums.data,
+      serverUrl: serverUrl?.url,
+      user: req.authUser,
+    }),
+    paginationItems: {
+      skip: Number(skip),
+      take: Number(take),
+      totalEntries: albums.totalEntries,
+      url: req.originalUrl,
+    },
+  });
+
+  return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
 export const albumsController = {
-  getAlbumById,
-  getAlbums,
+  getDetail,
+  getDetailSongList,
+  getList,
 };

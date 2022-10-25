@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { isJsonString } from '../utils';
+import { isJsonString } from '@utils/is-json-string';
 
 export const errorHandler = (
   err: any,
@@ -9,7 +9,7 @@ export const errorHandler = (
 ) => {
   let message = '';
 
-  const trace = err.stack.match(/at .* \(.*\)/g).map((e: string) => {
+  const trace = err.stack?.match(/at .* \(.*\)/g).map((e: string) => {
     return e.replace(/\(|\)/g, '');
   });
 
