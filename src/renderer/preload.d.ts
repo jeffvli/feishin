@@ -33,6 +33,8 @@ declare global {
         RENDERER_PLAYER_STOP(
           cb: (event: IpcRendererEvent, data: any) => void
         ): void;
+        SETTINGS_GET(data: { property: string }): any;
+        SETTINGS_SET(data: { property: string; value: any }): void;
         windowClose(): void;
         windowMaximize(): void;
         windowMinimize(): void;

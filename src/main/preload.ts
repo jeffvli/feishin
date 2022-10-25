@@ -61,6 +61,12 @@ contextBridge.exposeInMainWorld('electron', {
     RENDERER_PLAYER_STOP(cb: (event: IpcRendererEvent, data: any) => void) {
       ipcRenderer.on('renderer-player-stop', cb);
     },
+    SETTINGS_GET(data: { property: string }) {
+      ipcRenderer.send('settings-get', data);
+    },
+    SETTINGS_SET(data: { property: string; value: any }) {
+      ipcRenderer.send('settings-set', data);
+    },
     windowClose() {
       ipcRenderer.send('window-close');
     },

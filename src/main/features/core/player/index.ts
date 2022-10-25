@@ -3,11 +3,24 @@ import MpvAPI from 'node-mpv';
 import { PlayerData } from '../../../../renderer/store';
 import { getMainWindow } from '../../../main';
 
+declare module 'node-mpv';
+
+// const BINARY_PATH = getMainWindow()
+//   ?.webContents.executeJavaScript('localStorage.getItem("mpv_binary");', true)
+//   .then((result) => {
+//     return result;
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
 const mpv = new MpvAPI(
   {
     audio_only: true,
     auto_restart: true,
     binary: 'C:/ProgramData/chocolatey/lib/mpv.install/tools/mpv.exe',
+    // binary: BINARY_PATH,
+
     time_update: 1,
   },
   ['--gapless-audio=yes', '--prefetch-playlist']
@@ -68,14 +81,14 @@ ipcMain.on('player-stop', async () => {
   await mpv.stop();
 });
 
-// Stops the player
+// Goes to the next track in the playlist
 ipcMain.on('player-next', async () => {
   await mpv.next();
 });
 
-// Stops the player
+// Goes to the previous track in the playlist
 ipcMain.on('player-previous', async () => {
-  await mpv.previous();
+  await mpv.prev();
 });
 
 // Seeks forward or backward by the given amount of seconds
