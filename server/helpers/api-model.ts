@@ -33,7 +33,7 @@ const getSubsonicStreamUrl = (
     `?id=${remoteId}` +
     `&${token}` +
     `&v=1.13.0` +
-    `&c=sonixd_${deviceId}`
+    `&c=Feishin_${deviceId}`
   );
 };
 
@@ -52,7 +52,7 @@ const getJellyfinStreamUrl = (
     `&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg` +
     `&transcodingContainer=ts` +
     `&transcodingProtocol=hls` +
-    `&deviceId=sonixd_${deviceId}` +
+    `&deviceId=Feishin_${deviceId}` +
     `&playSessionId=${deviceId}` +
     `&api_key=${token}`
   );
@@ -108,7 +108,7 @@ const imageUrl = (
       `?id=${imageId}` +
       `&size=250` +
       `&v=1.13.0` +
-      `&c=sonixd` +
+      `&c=Feishin` +
       `&${token}`
     );
   }

@@ -1,7 +1,7 @@
 import { Server } from '@prisma/client';
+import { randomString } from '@utils/index';
 import axios from 'axios';
 import md5 from 'md5';
-import { randomString } from '@utils/index';
 import {
   SSAlbumListEntry,
   SSAlbumListResponse,
@@ -47,7 +47,7 @@ const authenticate = async (options: {
   }
 
   const { data } = await api.get(
-    `${cleanServerUrl}/rest/ping.view?v=1.13.0&c=sonixd&f=json&${token}`
+    `${cleanServerUrl}/rest/ping.view?v=1.13.0&c=Feishin&f=json&${token}`
   );
 
   return { token, ...data };
@@ -55,7 +55,7 @@ const authenticate = async (options: {
 
 const getMusicFolders = async (server: Partial<Server>) => {
   const { data } = await api.get<SSMusicFoldersResponse>(
-    `${server.url}/rest/getMusicFolders.view?v=1.13.0&c=sonixd&f=json&${server.token}`
+    `${server.url}/rest/getMusicFolders.view?v=1.13.0&c=Feishin&f=json&${server.token}`
   );
 
   return data.musicFolders.musicFolder;
@@ -63,7 +63,7 @@ const getMusicFolders = async (server: Partial<Server>) => {
 
 const getArtists = async (server: Server, musicFolderId: string) => {
   const { data } = await api.get<SSArtistsResponse>(
-    `${server.url}/rest/getArtists.view?v=1.13.0&c=sonixd&f=json&${server.token}`,
+    `${server.url}/rest/getArtists.view?v=1.13.0&c=Feishin&f=json&${server.token}`,
     { params: { musicFolderId } }
   );
 
@@ -76,7 +76,7 @@ const getArtists = async (server: Server, musicFolderId: string) => {
 
 const getGenres = async (server: Server) => {
   const { data: genres } = await api.get<SSGenresResponse>(
-    `${server.url}/rest/getGenres.view?v=1.13.0&c=sonixd&f=json&${server.token}`
+    `${server.url}/rest/getGenres.view?v=1.13.0&c=Feishin&f=json&${server.token}`
   );
 
   return genres;
@@ -84,7 +84,7 @@ const getGenres = async (server: Server) => {
 
 const getAlbum = async (server: Server, id: string) => {
   const { data: album } = await api.get<SSAlbumResponse>(
-    `${server.url}/rest/getAlbum.view?v=1.13.0&c=sonixd&f=json&${server.token}`,
+    `${server.url}/rest/getAlbum.view?v=1.13.0&c=Feishin&f=json&${server.token}`,
     { params: { id } }
   );
 
@@ -98,7 +98,7 @@ const getAlbums = async (
 ) => {
   const albums: any = api
     .get<SSAlbumListResponse>(
-      `${server.url}/rest/getAlbumList2.view?v=1.13.0&c=sonixd&f=json&${server.token}`,
+      `${server.url}/rest/getAlbumList2.view?v=1.13.0&c=Feishin&f=json&${server.token}`,
       { params }
     )
     .then((res) => {
@@ -131,7 +131,7 @@ const getAlbums = async (
 
 const getArtistInfo = async (server: Server, id: string) => {
   const { data: artistInfo } = await api.get<SSArtistInfoResponse>(
-    `${server.url}/rest/getArtistInfo2.view?v=1.13.0&c=sonixd&f=json&${server.token}`,
+    `${server.url}/rest/getArtistInfo2.view?v=1.13.0&c=Feishin&f=json&${server.token}`,
     { params: { id } }
   );
 

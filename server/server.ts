@@ -12,7 +12,7 @@ require('./lib/passport');
 const PORT = 9321;
 
 const app = express();
-const staticPath = path.join(__dirname, '../sonixd-client/');
+const staticPath = path.join(__dirname, '../feishin-client/');
 
 app.use(express.static(staticPath));
 app.use(

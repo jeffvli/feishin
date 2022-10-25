@@ -1,3 +1,4 @@
+import { prisma } from '@lib/prisma';
 import {
   ExternalSource,
   ExternalType,
@@ -7,7 +8,6 @@ import {
   ServerFolder,
 } from '@prisma/client';
 import uniqBy from 'lodash/uniqBy';
-import { prisma } from '@lib/prisma';
 import { uniqueArray } from '../../utils/unique-array';
 import {
   JFAlbum,
