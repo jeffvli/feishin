@@ -3,14 +3,13 @@ import {
   ComponentPropsWithRef,
   ReactNode,
 } from 'react';
+import styled from '@emotion/styled';
 import {
   Text as MantineText,
   TextProps as MantineTextProps,
 } from '@mantine/core';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
-import { Font } from '../../styles';
-import { textEllipsis } from '../../styles/mixins';
+import { Font, textEllipsis } from '@/renderer/styles';
 
 type MantineTextDivProps = MantineTextProps & ComponentPropsWithoutRef<'div'>;
 type MantineTextLinkProps = MantineTextProps & ComponentPropsWithRef<'link'>;
@@ -42,7 +41,7 @@ const BaseText = styled(MantineText)<any>`
       ? 'var(--playerbar-text-secondary-color)'
       : 'var(--playerbar-text-primary-color)'};
   font-family: ${(props) => props.font || Font.GOTHAM};
-  cursor: ${(props) => (props.link ? 'cursor' : 'default')};
+  /* cursor: ${(props) => (props.link ? 'cursor' : 'default')}; */
   user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
   ${(props) => props.overflow === 'hidden' && textEllipsis}
 `;
@@ -63,7 +62,7 @@ export const Text = ({
 }: TextProps) => {
   if (link) {
     return (
-      <StyledLinkText<typeof Link>
+      <StyledLinkText
         $noSelect={noSelect}
         $secondary={secondary}
         component={Link}

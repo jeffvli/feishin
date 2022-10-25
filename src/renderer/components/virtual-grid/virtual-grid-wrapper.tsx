@@ -1,8 +1,8 @@
 import { Ref, useMemo } from 'react';
 import { FixedSizeList, FixedSizeListProps } from 'react-window';
-import { usePlayQueueHandler } from '../../features/player/hooks/usePlayQueueHandler';
-import { CardRow } from '../../types';
-import { GridCard } from './GridCard';
+import { GridCard } from '@/renderer/components/virtual-grid/grid-card';
+import { usePlayQueueHandler } from '@/renderer/features/player/hooks/usePlayQueueHandler';
+import { CardRow } from '@/renderer/types';
 
 export const VirtualGridWrapper = ({
   refInstance,

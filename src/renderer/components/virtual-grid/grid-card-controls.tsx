@@ -1,8 +1,8 @@
 import React from 'react';
+import styled from '@emotion/styled';
 import { Button, UnstyledButton, UnstyledButtonProps } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { RiPlayFill } from 'react-icons/ri';
-import styled from 'styled-components';
 import { Play } from '../../../types';
 
 type PlayButtonType = UnstyledButtonProps &

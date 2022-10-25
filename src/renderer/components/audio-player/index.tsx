@@ -7,12 +7,10 @@ import {
 } from 'react';
 import ReactPlayer, { ReactPlayerProps } from 'react-player';
 import {
-  CrossfadeStyle,
-  PlaybackStyle,
-  PlayerStatus,
-  Song,
-} from '../../../types';
-import { crossfadeHandler, gaplessHandler } from './utils/listenHandlers';
+  crossfadeHandler,
+  gaplessHandler,
+} from '@/renderer/components/audio-player/utils/list-handlers';
+import { CrossfadeStyle, PlaybackStyle, PlayerStatus, Song } from '@/types';
 
 interface AudioPlayerProps extends ReactPlayerProps {
   crossfadeDuration: number;
@@ -125,13 +123,13 @@ export const AudioPlayer = forwardRef(
         return gaplessHandler({
           currentTime: e.playedSeconds,
           duration: getDuration(player1Ref),
-          isFlac: player1?.suffix === 'flac',
+          isFlac: player1?.container === 'flac',
           isTransitioning,
           nextPlayerRef: player2Ref,
           setIsTransitioning,
         });
       },
-      [isTransitioning, player1?.suffix]
+      [isTransitioning, player1?.container]
     );
 
     const handleGapless2 = useCallback(
@@ -139,13 +137,13 @@ export const AudioPlayer = forwardRef(
         return gaplessHandler({
           currentTime: e.playedSeconds,
           duration: getDuration(player2Ref),
-          isFlac: player2?.suffix === 'flac',
+          isFlac: player2?.container === 'flac',
           isTransitioning,
           nextPlayerRef: player1Ref,
           setIsTransitioning,
         });
       },
-      [isTransitioning, player2?.suffix]
+      [isTransitioning, player2?.container]
     );
 
     return (
