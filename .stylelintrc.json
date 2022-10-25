@@ -17,6 +17,9 @@
         "empty-line-between-groups": false
       }
     ],
+    "string-quotes": "single",
+    "declaration-block-no-redundant-longhand-properties": null,
+    "selector-class-pattern": null,
     "selector-type-case": ["lower", { "ignoreTypes": ["/^\\$\\w+/"] }],
     "selector-type-no-unknown": [
       true,
