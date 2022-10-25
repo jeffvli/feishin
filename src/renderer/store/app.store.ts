@@ -1,6 +1,6 @@
 import create from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { Platform } from '../../types';
+import { Platform } from '@/types';
 
 export interface AppState {
   currentPage: {

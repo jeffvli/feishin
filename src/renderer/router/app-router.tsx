@@ -1,15 +1,14 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Routes, Route } from 'react-router-dom';
+import { LibraryAlbumsRoute } from '@/renderer/features/library/routes/LibraryAlbumsRoute';
+import { LibraryArtistsRoute } from '@/renderer/features/library/routes/LibraryArtistsRoute';
+import { LibraryRoute } from '@/renderer/features/library/routes/LibraryRoute';
+import { AuthOutlet } from '@/renderer/router/auth-outlet';
+import { PrivateOutlet } from '@/renderer/router/private-outlet';
 import { LoginRoute } from '../features/auth';
 import { DashboardRoute } from '../features/dashboard';
-import { LibraryAlbumsRoute } from '../features/library/routes/LibraryAlbumsRoute';
-import { LibraryArtistsRoute } from '../features/library/routes/LibraryArtistsRoute';
-import { LibraryRoute } from '../features/library/routes/LibraryRoute';
-import { ServersRoute } from '../features/servers';
 import { AuthLayout, DefaultLayout } from '../layouts';
-import { AuthOutlet } from './outlets/AuthOutlet';
-import { PrivateOutlet } from './outlets/PrivateOutlet';
-import { AppRoute } from './utils/routes';
+import { AppRoute } from './routes';
 
 export const AppRouter = () => {
   return (
@@ -25,7 +24,6 @@ export const AppRouter = () => {
       >
         <Route element={<DefaultLayout />}>
           <Route element={<DashboardRoute />} path={AppRoute.HOME} />
-          <Route element={<ServersRoute />} path={AppRoute.SERVERS} />
           <Route element={<></>} path={AppRoute.SEARCH} />
 
           <Route element={<LibraryRoute />} path={AppRoute.LIBRARY} />

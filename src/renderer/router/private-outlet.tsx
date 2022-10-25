@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../../store';
+import { useAuthStore } from '@/renderer/store';
 
 interface PrivateOutletProps {
   redirectTo: string;
@@ -7,7 +7,7 @@ interface PrivateOutletProps {
 
 export const PrivateOutlet = ({ redirectTo }: PrivateOutletProps) => {
   const location = useLocation();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthenticated = useAuthStore((state) => !!state.accessToken);
 
   if (isAuthenticated) {
     return <Outlet />;
