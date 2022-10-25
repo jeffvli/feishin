@@ -9,16 +9,30 @@ import {
 import { Strategy as LocalStrategy } from 'passport-local';
 import { prisma } from './prisma';
 
-export const generateToken = (userId: string) => {
-  return jwt.sign({ id: userId }, String(process.env.TOKEN_SECRET), {
-    expiresIn: String(process.env.TOKEN_EXPIRATION || '15m'),
-  });
+export const generateToken = (
+  id: string,
+  otherProperties?: { [key: string]: any }
+) => {
+  return jwt.sign(
+    { id, ...otherProperties },
+    String(process.env.TOKEN_SECRET),
+    {
+      expiresIn: String(process.env.TOKEN_EXPIRATION || '15m'),
+    }
+  );
 };
 
-export const generateRefreshToken = (userId: string) => {
-  return jwt.sign({ id: userId }, String(process.env.TOKEN_SECRET), {
-    expiresIn: String(process.env.TOKEN_REFRESH_EXPIRATION || '90d'),
-  });
+export const generateRefreshToken = (
+  id: string,
+  otherProperties?: { [key: string]: any }
+) => {
+  return jwt.sign(
+    { id, ...otherProperties },
+    String(process.env.TOKEN_SECRET),
+    {
+      expiresIn: String(process.env.TOKEN_REFRESH_EXPIRATION || '90d'),
+    }
+  );
 };
 
 const authenticateUser = async (
@@ -55,7 +69,6 @@ passport.use(
     await prisma.user
       .findUnique({
         include: {
-          serverCredentials: true,
           serverFolderPermissions: true,
           serverPermissions: true,
         },

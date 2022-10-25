@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 export const prisma = new PrismaClient({ errorFormat: 'minimal' });
 export const exclude = <T, Key extends keyof T>(
@@ -17,7 +17,7 @@ function sleep(ms: number) {
 }
 
 prisma.$use(async (params, next) => {
-  const maxRetries = 5;
+  const maxRetries = 3;
   let retries = 0;
 
   do {
@@ -25,8 +25,29 @@ prisma.$use(async (params, next) => {
       const result = await next(params);
       return result;
     } catch (err) {
+      console.log('err', err);
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2002') {
+          retries = 3; // Don't retry on unique constraint violation
+          return null;
+        }
+      }
       retries += 1;
-      return sleep(500);
+      return sleep(100);
     }
   } while (retries < maxRetries);
 });
+
+// prisma.$use(async (params, next) => {
+//   const before = Date.now();
+
+//   const result = await next(params);
+
+//   const after = Date.now();
+
+//   console.log(
+//     `Query ${params.model}.${params.action} took ${after - before}ms`
+//   );
+
+//   return result;
+// });
