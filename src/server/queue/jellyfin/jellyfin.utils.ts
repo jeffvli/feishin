@@ -7,8 +7,8 @@ import {
   ServerFolder,
 } from '@prisma/client';
 import uniqBy from 'lodash/uniqBy';
-import { prisma } from '../../lib';
-import { uniqueArray } from '../../utils';
+import { prisma } from '@lib/prisma';
+import { uniqueArray } from '../../utils/unique-array';
 import {
   JFAlbum,
   JFAlbumArtist,

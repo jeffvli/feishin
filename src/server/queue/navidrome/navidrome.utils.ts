@@ -1,5 +1,5 @@
 import { ExternalSource, Server, ServerFolder } from '@prisma/client';
-import { prisma } from '../../lib';
+import { prisma } from '@lib/prisma';
 import { NDSong } from './navidrome.types';
 
 const insertSongGroup = async (

@@ -1,7 +1,7 @@
 import { Server } from '@prisma/client';
 import axios from 'axios';
 import md5 from 'md5';
-import { randomString } from '../../utils';
+import { randomString } from '@utils/index';
 import {
   SSAlbumListEntry,
   SSAlbumListResponse,

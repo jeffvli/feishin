@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import { ImageType, Server, ServerFolder, Task } from '@prisma/client';
-import { prisma, throttle } from '../../lib';
-import { uniqueArray } from '../../utils';
+import { prisma, throttle } from '@lib/index';
+import { uniqueArray } from '@utils/index';
 import { queue } from '../queues';
 import { subsonicApi } from './subsonic.api';
 import { subsonicUtils } from './subsonic.utils';

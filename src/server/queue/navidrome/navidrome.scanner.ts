@@ -9,9 +9,9 @@ import {
   Task,
 } from '@prisma/client';
 import uniqBy from 'lodash/uniqBy';
-import { prisma } from '../../lib';
-import { groupByProperty } from '../../utils';
-import { queue } from '../queues';
+import { prisma } from '@lib/prisma';
+import { groupByProperty } from '@utils/group-by-property';
+import { queue } from '../queues/index';
 import { navidromeApi } from './navidrome.api';
 import { navidromeUtils } from './navidrome.utils';
 
