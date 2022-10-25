@@ -4,10 +4,10 @@
   "description": "A full-featured Subsonic/Jellyfin compatible music player",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon --legacy-watch server.ts",
-    "prod": "ts-node server.ts",
+    "dev": "nodemon --legacy-watch -e ts,js --exec ts-node -r tsconfig-paths/register server.ts",
+    "prod": "ts-node -r tsconfig-paths/register server.ts",
     "dev:debug": "nodemon --config nodemon.json --inspect-brk server.ts",
-    "build": "tsc -p ."
+    "build": "tsc --project . && tsconfig-replace-paths --project tsconfig.json"
   },
   "keywords": [
     "subsonic",
@@ -39,12 +39,14 @@
     "@typescript-eslint/parser": "^5.40.0",
     "eslint-plugin-import": "^2.26.0",
     "nodemon": "^2.0.20",
-    "prisma": "^4.4.0",
+    "prisma": "^4.5.0",
     "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.0",
+    "tsconfig-replace-paths": "^0.0.11",
     "typescript": "^4.8.4"
   },
   "dependencies": {
-    "@prisma/client": "^4.4.0",
+    "@prisma/client": "^4.5.0",
     "@types/better-queue": "^3.8.3",
     "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
