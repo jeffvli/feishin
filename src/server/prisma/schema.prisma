@@ -75,11 +75,12 @@ model User {
 
   serverFolderPermissions ServerFolderPermission[]
   serverPermissions       ServerPermission[]
-  serverCredentials       ServerCredential[]
+  // serverCredentials       ServerCredential[]
   albumArtistFavorites    AlbumArtistFavorite[]
-  ArtistFavorite          ArtistFavorite[]
-  AlbumFavorite           AlbumFavorite[]
-  SongFavorite            SongFavorite[]
+  artistFavorites         ArtistFavorite[]
+  albumFavorites          AlbumFavorite[]
+  songFavorites           SongFavorite[]
+  userServerUrls          UserServerUrl[]
 }
 
 model History {
@@ -110,22 +111,25 @@ model Server {
   serverUrls        ServerUrl[]
   folders           Folder[]
   serverPermissions ServerPermission[]
-  serverCredentials ServerCredential[]
+  // serverCredentials ServerCredential[]
   tasks             Task[]
+  userServerUrls    UserServerUrl[]
 }
 
-model ServerCredential {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  credential String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+// model ServerCredential {
+//   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//   username   String
+//   enabled    Boolean  @default(false)
+//   credential String
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
 
-  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
-  serverId String @db.Uuid
+//   server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+//   serverId String @db.Uuid
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @db.Uuid
-}
+//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   userId String @db.Uuid
+// }
 
 model Folder {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -168,20 +172,39 @@ model ServerUrl {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
-  serverId String @db.Uuid
+  server         Server          @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId       String          @db.Uuid
+  userServerUrls UserServerUrl[]
 
   @@unique(fields: [serverId, url], name: "uniqueServerUrlId")
 }
 
-model ServerFolder {
+model UserServerUrl {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String
-  remoteId  String   @unique
-  enabled   Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  deleted   Boolean  @default(false)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.Uuid
+
+  serverUrl   ServerUrl @relation(fields: [serverUrlId], references: [id], onDelete: Cascade)
+  serverUrlId String    @db.Uuid
+
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId String @db.Uuid
+
+  @@unique(fields: [userId, serverId], name: "uniqueUserServerUrlId")
+}
+
+model ServerFolder {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  remoteId      String    @unique
+  enabled       Boolean   @default(true)
+  lastScannedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deleted       Boolean   @default(false)
 
   albumArtists            AlbumArtist[]
   artists                 Artist[]

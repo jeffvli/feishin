@@ -65,18 +65,6 @@ CREATE TABLE "Server" (
 );
 
 -- CreateTable
-CREATE TABLE "ServerCredential" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "credential" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "serverId" UUID NOT NULL,
-    "userId" UUID NOT NULL,
-
-    CONSTRAINT "ServerCredential_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Folder" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "name" TEXT NOT NULL,
@@ -113,11 +101,24 @@ CREATE TABLE "ServerUrl" (
 );
 
 -- CreateTable
+CREATE TABLE "UserServerUrl" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" UUID NOT NULL,
+    "serverUrlId" UUID NOT NULL,
+    "serverId" UUID NOT NULL,
+
+    CONSTRAINT "UserServerUrl_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "ServerFolder" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "name" TEXT NOT NULL,
     "remoteId" TEXT NOT NULL,
     "enabled" BOOLEAN NOT NULL DEFAULT true,
+    "lastScannedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
@@ -508,6 +509,9 @@ CREATE UNIQUE INDEX "ServerPermission_userId_serverId_key" ON "ServerPermission"
 CREATE UNIQUE INDEX "ServerUrl_serverId_url_key" ON "ServerUrl"("serverId", "url");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "UserServerUrl_userId_serverId_key" ON "UserServerUrl"("userId", "serverId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "ServerFolder_remoteId_key" ON "ServerFolder"("remoteId");
 
 -- CreateIndex
@@ -700,12 +704,6 @@ ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY
 ALTER TABLE "History" ADD CONSTRAINT "History_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ServerCredential" ADD CONSTRAINT "ServerCredential_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ServerCredential" ADD CONSTRAINT "ServerCredential_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Folder" ADD CONSTRAINT "Folder_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Folder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -719,6 +717,15 @@ ALTER TABLE "ServerPermission" ADD CONSTRAINT "ServerPermission_serverId_fkey" F
 
 -- AddForeignKey
 ALTER TABLE "ServerUrl" ADD CONSTRAINT "ServerUrl_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserServerUrl" ADD CONSTRAINT "UserServerUrl_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserServerUrl" ADD CONSTRAINT "UserServerUrl_serverUrlId_fkey" FOREIGN KEY ("serverUrlId") REFERENCES "ServerUrl"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserServerUrl" ADD CONSTRAINT "UserServerUrl_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ServerFolder" ADD CONSTRAINT "ServerFolder_serverId_fkey" FOREIGN KEY ("serverId") REFERENCES "Server"("id") ON DELETE CASCADE ON UPDATE CASCADE;
