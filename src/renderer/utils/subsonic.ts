@@ -1,4 +1,4 @@
-import { Song } from '../api/types';
+import { Song } from '@/renderer/api/types';
 
 export const getSubsonicStreamUrl = (
   auth: any,
