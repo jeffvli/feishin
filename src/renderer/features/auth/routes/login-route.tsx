@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styled from '@emotion/styled';
 import {
   TextInput,
   PasswordInput,
@@ -7,14 +8,24 @@ import {
   Title,
   Loader,
   Alert,
+  Box,
 } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { RiCheckboxCircleFill } from 'react-icons/ri';
 import { useSearchParams } from 'react-router-dom';
-import { normalizeServerUrl } from '../../../utils';
-import { useLogin, usePingServer } from '../queries/login';
-import styles from './LoginRoute.module.scss';
+import { useLogin } from '@/renderer/features/auth/queries/use-login';
+import { usePingServer } from '@/renderer/features/auth/queries/use-ping-server';
+import { normalizeServerUrl } from '@/renderer/utils';
+
+const Container = styled(Box)`
+  min-width: 400px;
+  max-width: 50%;
+  margin: auto;
+  padding: 3rem;
+  background: rgba(50, 50, 50, 40%);
+  border-radius: 5px;
+`;
 
 export const LoginRoute = () => {
   const { t } = useTranslation();
@@ -23,7 +34,7 @@ export const LoginRoute = () => {
   const [username, setUsername] = useState(searchParams.get('username') || '');
   const [password, setPassword] = useState(searchParams.get('password') || '');
   const [server, setServer] = useState(
-    searchParams.get('server') || 'http://localhost:9321'
+    searchParams.get('server') || 'http://localhost:8843'
   );
   const [debouncedServer] = useDebouncedValue(server, 500);
 
@@ -43,7 +54,7 @@ export const LoginRoute = () => {
   } = usePingServer(normalizeServerUrl(debouncedServer));
 
   return (
-    <div className={styles.container}>
+    <Container>
       <Title>{t('auth.login')}</Title>
       <form
         onSubmit={(e) => {
@@ -59,8 +70,8 @@ export const LoginRoute = () => {
             required
             disabled={isLoading}
             error={!isValidServer && isFetched}
-            label={`${t('auth.server.label')}`}
-            placeholder={`${t('auth.server.placeholder')}`}
+            label={t('auth.server.label')}
+            placeholder={t('auth.server.placeholder')}
             rightSection={
               isCheckingServer ? (
                 <Loader size="xs" />
@@ -96,11 +107,7 @@ export const LoginRoute = () => {
               setPassword(e.currentTarget.value)
             }
           />
-          <Button
-            className={styles.button}
-            disabled={!isValidServer}
-            type="submit"
-          >
+          <Button disabled={!isValidServer} type="submit">
             Login
           </Button>
           {isError && (
@@ -110,6 +117,6 @@ export const LoginRoute = () => {
           )}
         </Stack>
       </form>
-    </div>
+    </Container>
   );
 };
