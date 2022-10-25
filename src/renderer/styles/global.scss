@@ -1,5 +1,6 @@
 @use '../themes/default.scss';
 @use '../themes/dark.scss';
+@use '../themes/light.scss';
 
 * {
   box-sizing: border-box;
@@ -45,6 +46,10 @@ html {
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track-bg);
 }
 
 ::-webkit-scrollbar-track {
@@ -172,4 +177,18 @@ a {
 @font-face {
   font-family: 'Work Sans';
   src: url('../fonts/WorkSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'DroidSerif';
+  src: url('https://rawgit.com/google/fonts/master/ufl/ubuntumono/UbuntuMono-Italic.ttf')
+    format('truetype');
+  unicode-range: U+000-5FF; /* Latin glyphs */
+}
+
+@font-face {
+  font-family: 'DroidSerif';
+  src: url('https://fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff2')
+    format('truetype');
+  unicode-range: U+3000-9FFF, U+ff??; /* Japanese glyphs */
 }

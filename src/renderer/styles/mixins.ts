@@ -1,4 +1,4 @@
-import { css } from 'styled-components';
+import { css } from '@emotion/react';
 
 export const textEllipsis = css`
   overflow: hidden;

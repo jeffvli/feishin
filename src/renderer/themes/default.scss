@@ -1,15 +1,24 @@
+@use 'sass:color' as color;
+
 :root {
-  --icon-color: #ffffff;
+  --label-font-family: Poppins, sans-serif;
 
-  --primary-color: #3a81ed;
-  --secondary-color: #c7648d;
+  --icon-color: rgb(255, 255, 255);
 
-  --content-bg: #181819;
-  --content-text-color: #c1c2bb;
+  --primary-color: rgb(58, 129, 237);
+  --secondary-color: rgb(199, 100, 141);
+  --success-color: green;
+  --warning-color: orange;
+  --danger-color: red;
+  --generic-border-color: rgba(50, 50, 50, 0.7);
 
-  --titlebar-bg: #1d1d1d;
+  --main-bg: rgb(24, 24, 25);
+  --main-fg: rgb(193, 194, 187);
 
-  --sidebar-bg: #101010;
+  --titlebar-fg: rgb(255, 255, 255);
+  --titlebar-bg: rgb(29, 29, 29);
+
+  --sidebar-bg: rgb(16, 16, 16);
   --sidebar-btn-color: #b3b3b3;
   --sidebar-btn-color-hover: #dddddd;
   --sidebar-handle-bg: #4d4d4d;
@@ -23,9 +32,51 @@
   --playerbar-slider-track-bg: #3c3f43;
   --playerbar-slider-track-progress-bg: #cccccc;
 
+  --grid-card-bg: rgb(24, 24, 24);
+
   --tooltip-bg: #ffffff;
   --tooltip-text-color: #000000;
 
   --scrollbar-track-bg: #181818;
   --scrollbar-thumb-bg: #5a5a5a;
+
+  --btn-primary-bg: var(--primary-color);
+  --btn-primary-bg-hover: rgb(47, 122, 237);
+  --btn-primary-fg: #ffffff;
+  --btn-primary-fg-hover: #ffffff;
+
+  --btn-default-bg: rgb(41, 41, 41);
+  --btn-default-bg-hover: color.scale(var(--btn-default-bg), $lightness: 15%);
+  --btn-default-fg: rgb(193, 193, 193);
+  --btn-default-fg-hover: rgb(193, 193, 193);
+
+  --btn-subtle-bg: transparent;
+  --btn-subtle-bg-hover: rgba(100, 100, 100, 0.5);
+  --btn-subtle-fg: rgb(119, 126, 139);
+  --btn-subtle-fg-hover: rgb(200, 200, 200);
+
+  --dropdown-menu-bg: rgb(24, 24, 24);
+  --dropdown-menu-fg: rgb(193, 194, 197);
+
+  --toast-title-fg: rgb(255, 255, 255);
+  --toast-description-fg: rgb(193, 194, 197);
+  --toast-bg: rgb(16, 16, 16);
+
+  .ag-theme-alpine-dark {
+    --ag-borders: none;
+    --ag-background-color: #101010;
+    --ag-odd-row-background-color: #101010;
+    --ag-font-size: 12px;
+    --ag-foreground-color: #ffffff;
+    --ag-font-family: Poppins;
+  }
+
+  .ag-header-cell-label {
+    font-family: Montserrat;
+    text-transform: uppercase;
+  }
+
+  .current-song {
+    background: rgba(0, 50, 150, 0.2) !important;
+  }
 }
