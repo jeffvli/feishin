@@ -1,17 +1,15 @@
 import { useState } from 'react';
+import styled from '@emotion/styled';
 import isElectron from 'is-electron';
-import styled from 'styled-components';
-import windowsClose from '../assets/close-w-10.png';
-import windowsMax from '../assets/max-w-10.png';
-import windowsMin from '../assets/min-w-10.png';
+import {
+  RiCheckboxBlankLine,
+  RiCloseLine,
+  RiSubtractLine,
+} from 'react-icons/ri';
 
 interface WindowControlsProps {
   style?: 'macos' | 'windows' | 'linux';
 }
-
-const WindowControlsContainer = styled.div`
-  height: 100%;
-`;
 
 const WindowsButtonGroup = styled.div`
   display: flex;
@@ -20,14 +18,23 @@ const WindowsButtonGroup = styled.div`
   -webkit-app-region: no-drag;
 `;
 
-const WindowsButton = styled.div`
-  flex-grow: 1;
-  height: 100%;
-  text-align: center;
+export const WindowsButton = styled.div<{ $exit?: boolean }>`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
   -webkit-app-region: no-drag;
+  width: 50px;
+  height: 30px;
+
+  img {
+    width: 35%;
+    height: 50%;
+  }
 
   &:hover {
-    background: rgba(125, 125, 125, 30%);
+    background: ${({ $exit }) =>
+      $exit ? 'rgba(200, 50, 0, 30%)' : `rgba(125, 125, 125, 30%)`};
   }
 `;
 
@@ -56,27 +63,25 @@ export const WindowControls = ({ style }: WindowControlsProps) => {
   const handleClose = () => close();
 
   return (
-    <WindowControlsContainer>
+    <>
       {isElectron() && (
         <>
           {style === 'windows' && (
-            <>
-              <WindowsButtonGroup>
-                <WindowsButton role="button" onClick={handleMinimize}>
-                  <img alt="minimize" src={windowsMin} />
-                </WindowsButton>
-                <WindowsButton role="button" onClick={handleMaximize}>
-                  <img alt="maximize" src={windowsMax} />
-                </WindowsButton>
-                <WindowsButton role="button" onClick={handleClose}>
-                  <img alt="exit" src={windowsClose} />
-                </WindowsButton>
-              </WindowsButtonGroup>
-            </>
+            <WindowsButtonGroup>
+              <WindowsButton role="button" onClick={handleMinimize}>
+                <RiSubtractLine size={20} />
+              </WindowsButton>
+              <WindowsButton role="button" onClick={handleMaximize}>
+                <RiCheckboxBlankLine size={15} />
+              </WindowsButton>
+              <WindowsButton $exit role="button" onClick={handleClose}>
+                <RiCloseLine size={20} />
+              </WindowsButton>
+            </WindowsButtonGroup>
           )}
         </>
       )}
-    </WindowControlsContainer>
+    </>
   );
 };
 

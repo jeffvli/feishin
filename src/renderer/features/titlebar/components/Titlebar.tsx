@@ -1,9 +1,12 @@
 import { ReactNode } from 'react';
+import styled from '@emotion/styled';
 import { Group } from '@mantine/core';
+import { FiActivity } from 'react-icons/fi';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { IconButton } from '../../../components';
+import { AppMenu } from '@/renderer/features/titlebar/components/app-menu';
+import { useAuthStore } from '@/renderer/store';
+import { Button } from '../../../components';
 import { WindowControls } from '../../window-controls';
 
 interface TitlebarProps {
@@ -18,11 +21,6 @@ const TitlebarContainer = styled.div`
   justify-content: space-between;
   width: 100%;
   height: 100%;
-  -webkit-app-region: drag;
-`;
-
-const Left = styled.div`
-  height: 100%;
 
   button {
     -webkit-app-region: no-drag;
@@ -33,35 +31,74 @@ const Left = styled.div`
   }
 `;
 
-const Right = styled.div`
+const Left = styled.div`
+  flex: 1/3;
   height: 100%;
-  -webkit-app-region: no-drag;
+`;
+
+const Center = styled.div`
+  flex: 1/3;
+  height: 100%;
+`;
+
+const Right = styled.div`
+  flex: 1/3;
+  height: 100%;
 `;
 
 export const Titlebar = ({ children }: TitlebarProps) => {
   const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((state) => !!state.accessToken);
 
   return (
     <>
       <TitlebarContainer>
         <Left>
           <Group spacing="xs">
-            <IconButton
-              icon={<RiArrowLeftSLine size={25} />}
-              size={25}
-              onClick={() => navigate(-1)}
-            />
-            <IconButton
-              icon={<RiArrowRightSLine size={25} />}
-              size={25}
-              onClick={() => navigate(1)}
-            />
+            {isAuthenticated && (
+              <>
+                <Button
+                  px={5}
+                  size="xs"
+                  sx={{ color: 'var(--titlebar-fg)' }}
+                  variant="subtle"
+                  onClick={() => navigate(-1)}
+                >
+                  <RiArrowLeftSLine size={20} />
+                </Button>
+                <Button
+                  px={5}
+                  size="xs"
+                  sx={{ color: 'var(--titlebar-fg)' }}
+                  variant="subtle"
+                  onClick={() => navigate(1)}
+                >
+                  <RiArrowRightSLine size={20} />
+                </Button>
+              </>
+            )}
           </Group>
         </Left>
+        <Center />
         <Right>
           {children}
 
-          <WindowControls />
+          <Group spacing="xs">
+            {isAuthenticated && (
+              <>
+                <Button
+                  px={5}
+                  size="xs"
+                  sx={{ color: 'var(--titlebar-fg)' }}
+                  variant="subtle"
+                >
+                  <FiActivity size={15} />
+                </Button>
+                <AppMenu />
+              </>
+            )}
+            <WindowControls />
+          </Group>
         </Right>
       </TitlebarContainer>
     </>
@@ -69,5 +106,5 @@ export const Titlebar = ({ children }: TitlebarProps) => {
 };
 
 Titlebar.defaultProps = {
-  children: <></>,
+  children: undefined,
 };

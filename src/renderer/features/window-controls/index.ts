@@ -1,1 +1,1 @@
-export * from './components/WindowControls';
+export * from './components/window-controls';

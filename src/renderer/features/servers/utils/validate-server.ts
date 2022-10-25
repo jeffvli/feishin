@@ -1,21 +1,20 @@
 import axios from 'axios';
 import md5 from 'md5';
-import { useMutation } from 'react-query';
-import { serversApi } from '../../../api/serversApi';
-import { randomString } from '../../../utils';
+import { ServerType } from '@/renderer/api/types';
+import { randomString } from '@/renderer/utils';
 
-export const validateServer = async (options: {
+export const validateServerCredential = async (options: {
   legacyAuth: boolean;
   password: string;
-  serverType: string;
+  type: ServerType;
   url: string;
   username: string;
 }) => {
-  const { serverType, url, username, password, legacyAuth } = options;
+  const { type, url, username, password, legacyAuth } = options;
   const cleanServerUrl = url.replace(/\/$/, '');
 
   try {
-    if (serverType === 'subsonic') {
+    if (type === ServerType.SUBSONIC) {
       let testConnection;
       let token;
       if (legacyAuth) {
@@ -59,12 +58,4 @@ export const validateServer = async (options: {
   }
 
   return null;
-};
-
-export const useCreateServer = () => {
-  return useMutation({
-    mutationFn: serversApi.createServer,
-    onError: (e) => console.log(e),
-    onSuccess: (e) => console.log(e),
-  });
 };

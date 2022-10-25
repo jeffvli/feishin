@@ -3,7 +3,6 @@ import { useDisclosure } from '@mantine/hooks';
 import { RiLogoutBoxLine, RiServerFill, RiSettings3Fill } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { useAuthStore } from '../../../store';
-import { AddServerModal } from '../../servers';
 
 export const UserMenu = () => {
   const navigate = useNavigate();
@@ -37,10 +36,6 @@ export const UserMenu = () => {
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
-      <AddServerModal
-        opened={addServerModal}
-        onClose={() => addServerHandlers.close()}
-      />
     </>
   );
 };

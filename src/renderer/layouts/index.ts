@@ -1,2 +1,2 @@
-export * from './auth/AuthLayout';
-export * from './default/DefaultLayout';
+export * from './auth-layout';
+export * from './default-layout';

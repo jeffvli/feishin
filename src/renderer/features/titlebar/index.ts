@@ -1,1 +1,2 @@
-export * from './components/Titlebar';
+export * from './components/titlebar';
+export * from './components/user-menu';
