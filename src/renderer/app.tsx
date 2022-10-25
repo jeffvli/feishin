@@ -1,20 +1,14 @@
 import { ReactNode, useEffect } from 'react';
-import {
-  DndContext,
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
 import { MantineProvider } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
+import { ModalsProvider } from '@mantine/modals';
+import { NotificationsProvider } from '@mantine/notifications';
 import isElectron from 'is-electron';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { useDefaultSettings } from './features/settings';
-import { AppRouter } from './router/AppRouter';
+import { AppRouter } from './router/app-router';
 import './styles/global.scss';
 import 'ag-grid-community/styles/ag-grid.css';
-import './styles/ag-grid.scss';
 
 const SelectRouter = ({ children }: { children: ReactNode }) => {
   if (isElectron()) {
@@ -36,27 +30,16 @@ export const App = () => {
     document.body.setAttribute('data-theme', theme);
   }, [theme]);
 
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        delay: 200,
-        tolerance: 100,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 500,
-        tolerance: 10,
-      },
-    })
-  );
-
   return (
     <MantineProvider
+      withGlobalStyles
+      withNormalizeCSS
       theme={{
         colorScheme: 'dark',
         defaultRadius: 'xs',
-        focusRing: 'auto',
+        dir: 'ltr',
+        focusRing: 'never',
+        fontFamily: 'Poppins, sans-serif',
         fontSizes: {
           lg: 16,
           md: 14,
@@ -64,22 +47,33 @@ export const App = () => {
           xl: 18,
           xs: 10,
         },
-
         other: {},
         spacing: {
+          lg: 12,
+          md: 8,
+          sm: 4,
+          xl: 16,
           xs: 2,
         },
       }}
     >
-      <DndContext
-        sensors={sensors}
-        onDragEnd={() => console.log('drag end')}
-        onDragStart={() => console.log('drag start')}
+      <NotificationsProvider
+        autoClose={1500}
+        position="bottom-right"
+        style={{
+          marginBottom: '90px',
+          opacity: '.8',
+          userSelect: 'none',
+          width: '250px',
+        }}
+        transitionDuration={200}
       >
-        <SelectRouter>
-          <AppRouter />
-        </SelectRouter>
-      </DndContext>
+        <ModalsProvider>
+          <SelectRouter>
+            <AppRouter />
+          </SelectRouter>
+        </ModalsProvider>
+      </NotificationsProvider>
     </MantineProvider>
   );
 };

@@ -1,4 +1,4 @@
-import { AppRoute } from './router/utils/routes';
+import { AppRoute } from './router/routes';
 
 export interface CardRow {
   align?: 'left' | 'center' | 'right';

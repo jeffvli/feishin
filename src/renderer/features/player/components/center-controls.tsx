@@ -1,22 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
+import styled from '@emotion/styled';
 import format from 'format-duration';
 import { useTranslation } from 'react-i18next';
 import {
   RiPauseLine,
   RiPlayFill,
-  RiRewindFill,
+  RiRepeat2Fill,
+  RiShuffleFill,
   RiSkipBackFill,
   RiSkipForwardFill,
-  RiSpeedFill,
 } from 'react-icons/ri';
-import styled from 'styled-components';
 import { PlaybackType, PlayerStatus } from '../../../../types';
 import { Text } from '../../../components';
 import { usePlayerStore } from '../../../store';
 import { Font } from '../../../styles';
-import { useCenterControls } from '../hooks/useCenterControls';
-import { PlayerButton } from './PlayerButton';
-import { Slider } from './Slider';
+import { useCenterControls } from '../hooks/use-center-controls';
+import { PlayerButton } from './player-button';
+import { Slider } from './slider';
 
 interface CenterControlsProps {
   playersRef: any;
@@ -67,8 +67,6 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     handlePlayPause,
     handlePrevTrack,
     handleSeekSlider,
-    handleSkipBackward,
-    handleSkipForward,
   } = useCenterControls({ playersRef });
 
   const currentTime = usePlayerStore((state) => state.current.time);
@@ -106,16 +104,16 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
       <ControlsContainer onScroll={(e) => console.log(e)}>
         <ButtonsContainer>
           <PlayerButton
-            icon={<RiSkipBackFill size={15} />}
-            tooltip={{ label: `${t('player.prev')}` }}
+            icon={<RiShuffleFill size={15} />}
+            tooltip={{ label: `${t('player.shuffle')}` }}
             variant="secondary"
             onClick={handlePrevTrack}
           />
           <PlayerButton
-            icon={<RiRewindFill size={15} />}
-            tooltip={{ label: `${t('player.skipBack')}` }}
+            icon={<RiSkipBackFill size={15} />}
+            tooltip={{ label: `${t('player.previous')}` }}
             variant="secondary"
-            onClick={handleSkipBackward}
+            onClick={handlePrevTrack}
           />
           <PlayerButton
             icon={
@@ -135,14 +133,14 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             onClick={handlePlayPause}
           />
           <PlayerButton
-            icon={<RiSpeedFill size={15} />}
-            tooltip={{ label: `${t('player.skipForward')}` }}
-            variant="secondary"
-            onClick={handleSkipForward}
-          />
-          <PlayerButton
             icon={<RiSkipForwardFill size={15} />}
             tooltip={{ label: `${t('player.next')}` }}
+            variant="secondary"
+            onClick={handleNextTrack}
+          />
+          <PlayerButton
+            icon={<RiRepeat2Fill size={15} />}
+            tooltip={{ label: `${t('player.repeat')}` }}
             variant="secondary"
             onClick={handleNextTrack}
           />

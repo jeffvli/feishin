@@ -42,7 +42,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
   };
 
   const handlePlay = useCallback(() => {
-    if (settings.type === PlaybackType.Local) {
+    if (settings.type === PlaybackType.LOCAL) {
       mpvPlayer.play();
     } else {
       currentPlayerRef.getInternalPlayer().play();
@@ -52,7 +52,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
   }, [currentPlayerRef, play, settings]);
 
   const handlePause = useCallback(() => {
-    if (settings.type === PlaybackType.Local) {
+    if (settings.type === PlaybackType.LOCAL) {
       mpvPlayer.pause();
     }
 
@@ -60,7 +60,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
   }, [pause, settings]);
 
   const handleStop = () => {
-    if (settings.type === PlaybackType.Local) {
+    if (settings.type === PlaybackType.LOCAL) {
       mpvPlayer.stop();
     } else {
       stopPlayback();
@@ -73,7 +73,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
   const handleNextTrack = useCallback(() => {
     const playerData = next();
 
-    if (settings.type === PlaybackType.Local) {
+    if (settings.type === PlaybackType.LOCAL) {
       mpvPlayer.setQueue(playerData);
       mpvPlayer.next();
     } else {
@@ -86,7 +86,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
   const handlePrevTrack = useCallback(() => {
     const playerData = prev();
 
-    if (settings.type === PlaybackType.Local) {
+    if (settings.type === PlaybackType.LOCAL) {
       mpvPlayer.setQueue(playerData);
       mpvPlayer.previous();
     } else {
@@ -98,7 +98,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
   const handlePlayPause = useCallback(() => {
     if (queue) {
-      if (playerStatus === PlayerStatus.Paused) {
+      if (playerStatus === PlayerStatus.PAUSED) {
         return handlePlay();
       }
 
@@ -111,7 +111,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
   const handleSkipBackward = () => {
     const skipBackwardSec = 5;
 
-    if (settings.type === PlaybackType.Local) {
+    if (settings.type === PlaybackType.LOCAL) {
       const newTime = currentTime - skipBackwardSec;
       mpvPlayer.seek(-skipBackwardSec);
       setCurrentTime(newTime < 0 ? 0 : newTime);
@@ -126,7 +126,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
   const handleSkipForward = () => {
     const skipForwardSec = 5;
 
-    if (settings.type === PlaybackType.Local) {
+    if (settings.type === PlaybackType.LOCAL) {
       const newTime = currentTime + skipForwardSec;
       mpvPlayer.seek(skipForwardSec);
       setCurrentTime(newTime);
@@ -147,7 +147,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     (e: number | any) => {
       setCurrentTime(e);
 
-      if (settings.type === PlaybackType.Local) {
+      if (settings.type === PlaybackType.LOCAL) {
         mpvPlayer.seekTo(e);
       } else {
         currentPlayerRef.seekTo(e);

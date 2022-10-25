@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { Text } from '../../../components';
 import { usePlayerStore } from '../../../store';
 import { Font } from '../../../styles';
@@ -34,7 +34,9 @@ export const LeftControls = () => {
   return (
     <LeftControlsContainer>
       <ImageWrapper>
-        <img alt="img" height={60} src={song?.imageUrl} width={60} />
+        {song?.imageUrl && (
+          <img alt="img" height={60} src={song?.imageUrl} width={60} />
+        )}
       </ImageWrapper>
       <MetadataStack>
         <Text

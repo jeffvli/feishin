@@ -1,11 +1,11 @@
 import { useRef } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import { PlaybackType } from '../../../../types';
 import { AudioPlayer } from '../../../components';
 import { usePlayerStore } from '../../../store';
-import { CenterControls } from './CenterControls';
-import { LeftControls } from './LeftControls';
-import { RightControls } from './RightControls';
+import { CenterControls } from './center-controls';
+import { LeftControls } from './left-controls';
+import { RightControls } from './right-controls';
 
 const PlayerbarContainer = styled.div`
   width: 100%;

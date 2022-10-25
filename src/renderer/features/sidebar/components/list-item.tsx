@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { Link, LinkProps } from 'react-router-dom';
-import styled, { css } from 'styled-components';
 import { fontInter } from '../../../styles';
 
 interface ListItemProps {

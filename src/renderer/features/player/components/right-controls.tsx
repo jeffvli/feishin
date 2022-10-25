@@ -1,9 +1,9 @@
+import styled from '@emotion/styled';
 import { RiVolumeUpFill, RiVolumeMuteFill } from 'react-icons/ri';
-import styled from 'styled-components';
-import { IconButton } from '../../../components';
 import { usePlayerStore } from '../../../store';
-import { useRightControls } from '../hooks/useRightControls';
-import { Slider } from './Slider';
+import { useRightControls } from '../hooks/use-right-controls';
+import { PlayerButton } from './player-button';
+import { Slider } from './slider';
 
 const RightControlsContainer = styled.div`
   display: flex;
@@ -39,23 +39,21 @@ export const RightControls = () => {
     <RightControlsContainer>
       <MetadataStack>
         <VolumeSliderWrapper>
-          <IconButton
+          <PlayerButton
             icon={
               muted ? (
-                <RiVolumeMuteFill size={20} />
+                <RiVolumeMuteFill size={15} />
               ) : (
-                <RiVolumeUpFill size={20} />
+                <RiVolumeUpFill size={15} />
               )
             }
-            size={20}
             tooltip={{ label: muted ? 'Muted' : volume }}
-            variant="transparent"
+            variant="secondary"
             onClick={handleMute}
           />
-
           <Slider
             hasTooltip
-            height="100%"
+            height="60%"
             max={100}
             min={0}
             value={volume}

@@ -1,11 +1,12 @@
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import {
   TooltipProps,
   UnstyledButton,
   UnstyledButtonProps,
 } from '@mantine/core';
 import { motion } from 'framer-motion';
-import styled, { css } from 'styled-components';
 import { Tooltip } from '../../../components';
 
 type MantineButtonProps = UnstyledButtonProps &
@@ -32,17 +33,11 @@ const MotionWrapper = styled(motion.div)<MotionWrapperProps>`
 
 const ButtonMainVariant = css`
   padding: 0.5rem;
-  background: var(--playerbar-btn-color);
+  border: 2px solid var(--playerbar-btn-color);
   border-radius: 50%;
 
   svg {
     display: flex;
-    fill: black;
-    stroke: black;
-  }
-
-  &:hover {
-    background: var(--playerbar-btn-color-hover);
   }
 
   &:focus-visible {
@@ -109,13 +104,17 @@ export const PlayerButton = ({
 }: PlayerButtonProps) => {
   if (tooltip) {
     return (
-      <MotionWrapper variant={variant}>
-        <Tooltip {...tooltip}>
+      <Tooltip {...tooltip}>
+        <MotionWrapper
+          variant={variant}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <StyledPlayerButton variant={variant} {...rest}>
             {icon}
           </StyledPlayerButton>
-        </Tooltip>
-      </MotionWrapper>
+        </MotionWrapper>
+      </Tooltip>
     );
   }
 
