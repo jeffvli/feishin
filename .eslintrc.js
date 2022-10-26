@@ -1,6 +1,7 @@
 module.exports = {
   extends: ['erb', 'plugin:typescript-sort-keys/recommended'],
-  ignorePatterns: ['.erb/*', 'server/*'],
+  ignorePatterns: ['.erb/*', 'server'],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     createDefaultProgram: true,
     ecmaVersion: 2020,
@@ -8,12 +9,14 @@ module.exports = {
     sourceType: 'module',
     tsconfigRootDir: __dirname,
   },
-  plugins: ['import', 'sort-keys-fix'],
+  plugins: ['@typescript-eslint', 'import', 'sort-keys-fix'],
   root: true,
   rules: {
+    '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-shadow': ['off'],
+    'import/extensions': 'off',
     // A temporary hack related to IDE not resolving correct package.json
     'import/no-extraneous-dependencies': 'off',
     'import/no-unresolved': 'error',
@@ -44,6 +47,7 @@ module.exports = {
     'no-console': 'off',
     'no-nested-ternary': 'off',
     'no-restricted-syntax': 'off',
+    'no-underscore-dangle': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/jsx-sort-props': [
       'error',
@@ -69,7 +73,6 @@ module.exports = {
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
-      project: './tsconfig.json',
       typescript: {},
       webpack: {
         config: require.resolve('./.erb/configs/webpack.config.eslint.ts'),

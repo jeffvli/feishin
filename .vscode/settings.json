@@ -4,6 +4,11 @@
     ".prettierrc": "jsonc",
     ".eslintignore": "ignore"
   },
+  "eslint.validate": ["typescript"],
+  "eslint.workingDirectories": [
+    { "directory": "./", "changeProcessCWD": true },
+    { "directory": "./server", "changeProcessCWD": true }
+  ],
   "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "editor.tabSize": 2,
   "editor.codeActionsOnSave": {
