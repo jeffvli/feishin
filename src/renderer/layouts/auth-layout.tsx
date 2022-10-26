@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Outlet } from 'react-router-dom';
-import { Titlebar } from '../features/titlebar';
+import { Titlebar } from '@/renderer/features/titlebar/components/titlebar';
 
 const WindowsTitlebarContainer = styled.div`
   position: absolute;

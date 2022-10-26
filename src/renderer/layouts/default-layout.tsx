@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { Menu, Button } from '@mantine/core';
 import { Outlet } from 'react-router';
-import { Titlebar } from '@/renderer/features/titlebar';
+import { Titlebar } from '@/renderer/features/titlebar/components/titlebar';
+import { useAppStore } from '@/renderer/store';
 import { constrainSidebarWidth } from '@/renderer/utils';
 import { Playerbar } from '../features/player';
-import { Sidebar } from '../features/sidebar';
+import { Sidebar } from '../features/sidebar/components/sidebar';
 
 const Layout = styled.div`
   display: grid;
@@ -72,7 +73,8 @@ const ResizeHandle = styled.div<{
 `;
 
 export const DefaultLayout = () => {
-  const [leftSidebarWidth, setLeftSidebarWidth] = useState('170px');
+  const sidebar = useAppStore((state) => state.sidebar);
+  const setSidebar = useAppStore((state) => state.setSidebar);
 
   const sidebarRef = useRef(null);
   const [isResizing, setIsResizing] = useState(false);
@@ -88,12 +90,11 @@ export const DefaultLayout = () => {
   const resize = useCallback(
     (mouseMoveEvent) => {
       if (isResizing) {
-        setLeftSidebarWidth(
-          `${constrainSidebarWidth(mouseMoveEvent.clientX)}px`
-        );
+        const width = `${constrainSidebarWidth(mouseMoveEvent.clientX)}px`;
+        setSidebar({ leftWidth: width });
       }
     },
-    [isResizing]
+    [isResizing, setSidebar]
   );
 
   useEffect(() => {
@@ -107,47 +108,10 @@ export const DefaultLayout = () => {
 
   return (
     <>
-      {/* <LayoutContainer>
-        <TitlebarContainer size={30}>
-          <Titlebar />
-        </TitlebarContainer>
-        <Space.Fill>
-          <LeftSidebar
-            handleRender={(props) => (
-              <ResizeHandle placement="right" {...props} />
-            )}
-            maximumSize={400}
-            minimumSize={175}
-            size={175}
-          >
-            <Sidebar />
-          </LeftSidebar>
-          <RightSidebar
-            scrollable
-            handleRender={(props) => (
-              <ResizeHandle placement="left" {...props} />
-            )}
-            maximumSize={800}
-            size={300}
-          >
-            <QueueTable />
-          </RightSidebar>
-          <Space.Fill scrollable>
-            <AnimatePresence exitBeforeEnter>
-              <ContentContainer key={location.pathname}>
-                <Outlet />
-              </ContentContainer>
-            </AnimatePresence>
-          </Space.Fill>
-        </Space.Fill>
-        <PlayerbarContainer size={90}>
-          <Playerbar />
-        </PlayerbarContainer>
-      </LayoutContainer> */}
       <Layout>
         <TitlebarContainer>
           <Titlebar />
-          <Menu withinPortal zIndex="999999">
+          <Menu withinPortal>
             <Menu.Target>
               <Button />
             </Menu.Target>
@@ -157,7 +121,7 @@ export const DefaultLayout = () => {
             </Menu.Dropdown>
           </Menu>
         </TitlebarContainer>
-        <MainContainer leftSidebarWidth={leftSidebarWidth}>
+        <MainContainer leftSidebarWidth={sidebar.leftWidth}>
           <SidebarContainer>
             <ResizeHandle
               ref={sidebarRef}
