@@ -10,6 +10,6 @@ export const getSubsonicStreamUrl = (
     `?id=${song.remoteId}` +
     `&${auth.token}` +
     `&v=1.13.0` +
-    `&c=sonixd_${deviceId}`
+    `&c=Feishin_${deviceId}`
   );
 };

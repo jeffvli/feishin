@@ -23,7 +23,7 @@ export const getJellyfinStreamUrl = (
     `${auth.url}/audio` +
     `/${song.remoteId}/universal` +
     `?userId=${auth.userId}` +
-    `&deviceId=sonixd_${deviceId}` +
+    `&deviceId=Feishin_${deviceId}` +
     `&audioCodec=aac` +
     `&api_key=${auth.token}` +
     `&playSessionId=${deviceId}` +
