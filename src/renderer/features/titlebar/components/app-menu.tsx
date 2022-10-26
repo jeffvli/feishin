@@ -1,5 +1,4 @@
 import { openModal, closeAllModals } from '@mantine/modals';
-import { useTranslation } from 'react-i18next';
 import { RiArrowLeftLine, RiLogoutBoxLine, RiMenu3Fill } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { Button, DropdownMenu } from '@/renderer/components';
@@ -8,23 +7,22 @@ import {
   ServerList,
   useServerList,
 } from '@/renderer/features/servers';
+import { usePermissions } from '@/renderer/features/shared';
 import { useAuthStore } from '@/renderer/store';
 
 export const AppMenu = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const logout = useAuthStore((state) => state.logout);
   const currentServer = useAuthStore((state) => state.currentServer);
   const setCurrentServer = useAuthStore((state) => state.setCurrentServer);
+  const permissions = usePermissions();
   const { data: servers } = useServerList();
 
   const serverList =
-    servers?.data?.map((s) => ({ id: s.id, label: `${s.name} - ${s.url}` })) ??
-    [];
+    servers?.data?.map((s) => ({ id: s.id, label: `${s.name}` })) ?? [];
 
   const handleLogout = () => {
     logout();
-    localStorage.removeItem('authentication');
     navigate('/login');
   };
 
@@ -32,7 +30,7 @@ export const AppMenu = () => {
     openModal({
       centered: true,
       children: <AddServerForm onCancel={closeAllModals} />,
-      title: t('modal.add_server.title'),
+      title: 'Add server',
     });
   };
 
@@ -40,7 +38,7 @@ export const AppMenu = () => {
     openModal({
       centered: true,
       children: <ServerList />,
-      title: t('modal.manage_servers.title'),
+      title: 'Manage servers',
     });
   };
 
@@ -51,7 +49,7 @@ export const AppMenu = () => {
   };
 
   return (
-    <DropdownMenu withinPortal position="bottom-start">
+    <DropdownMenu withinPortal position="bottom" width={200}>
       <DropdownMenu.Target>
         <Button
           px={5}
@@ -80,26 +78,24 @@ export const AppMenu = () => {
           </DropdownMenu.Item>
         ))}
         <DropdownMenu.Divider />
-        <DropdownMenu.Item>{t('global.menu.search_label')}</DropdownMenu.Item>
-        <DropdownMenu.Item>
-          {t('global.menu.configure_label')}
-        </DropdownMenu.Item>
+        <DropdownMenu.Item disabled>Search</DropdownMenu.Item>
+        <DropdownMenu.Item>Configure</DropdownMenu.Item>
         <DropdownMenu.Divider />
-        <DropdownMenu.Item onClick={handleAddServerModal}>
-          {t('global.menu.label_add_server_label')}
-        </DropdownMenu.Item>
+        {permissions.createServer && (
+          <DropdownMenu.Item onClick={handleAddServerModal}>
+            Add server
+          </DropdownMenu.Item>
+        )}
         <DropdownMenu.Item onClick={handleManageServersModal}>
-          {t('global.menu.label_manage_servers_label')}
+          Manage servers
         </DropdownMenu.Item>
-        <DropdownMenu.Item disabled>
-          {t('global.menu.label_manage_users_label')}
-        </DropdownMenu.Item>
+        <DropdownMenu.Item disabled>Manage users</DropdownMenu.Item>
         <DropdownMenu.Divider />
         <DropdownMenu.Item
           rightSection={<RiLogoutBoxLine />}
           onClick={handleLogout}
         >
-          {t('global.menu.log_out_label')}
+          Log out
         </DropdownMenu.Item>
       </DropdownMenu.Dropdown>
     </DropdownMenu>
