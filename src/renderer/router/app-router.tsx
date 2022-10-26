@@ -1,8 +1,6 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Routes, Route } from 'react-router-dom';
-import { LibraryAlbumsRoute } from '@/renderer/features/library/routes/LibraryAlbumsRoute';
-import { LibraryArtistsRoute } from '@/renderer/features/library/routes/LibraryArtistsRoute';
-import { LibraryRoute } from '@/renderer/features/library/routes/LibraryRoute';
+import { AlbumListRoute } from '@/renderer/features/albums/routes/album-list-route';
 import { AuthOutlet } from '@/renderer/router/auth-outlet';
 import { PrivateOutlet } from '@/renderer/router/private-outlet';
 import { LoginRoute } from '../features/auth';
@@ -24,25 +22,7 @@ export const AppRouter = () => {
       >
         <Route element={<DefaultLayout />}>
           <Route element={<DashboardRoute />} path={AppRoute.HOME} />
-          <Route element={<></>} path={AppRoute.SEARCH} />
-
-          <Route element={<LibraryRoute />} path={AppRoute.LIBRARY} />
-          <Route
-            element={<DashboardRoute />}
-            path={AppRoute.LIBRARY_ALBUMARTISTS}
-          />
-          <Route
-            element={<LibraryAlbumsRoute />}
-            path={AppRoute.LIBRARY_ALBUMS}
-          />
-          <Route
-            element={<LibraryAlbumsRoute />}
-            path={AppRoute.LIBRARY_ALBUMS}
-          />
-          <Route
-            element={<LibraryArtistsRoute />}
-            path={AppRoute.LIBRARY_ARTISTS}
-          />
+          <Route element={<AlbumListRoute />} path={AppRoute.LIBRARY_ALBUMS} />
           <Route element={<></>} path={AppRoute.LIBRARY_ARTISTS} />
         </Route>
         <Route element={<></>} path={AppRoute.PLAYING} />

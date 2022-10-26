@@ -1,14 +1,16 @@
 // Referenced from: https://betterprogramming.pub/the-best-way-to-manage-routes-in-a-react-project-with-typescript-c4e8d4422d64
 
 export enum AppRoute {
+  EXPLORE = '/explore',
   HOME = '/',
-  LIBRARY = '/library',
   LIBRARY_ALBUMARTISTS = '/library/album-artists',
   LIBRARY_ALBUMARTISTS_DETAIL = '/library/album-artists/:albumArtistId',
   LIBRARY_ALBUMS = '/library/albums',
   LIBRARY_ALBUMS_DETAIL = '/library/albums/:albumId',
   LIBRARY_ARTISTS = '/library/artists',
   LIBRARY_ARTISTS_DETAIL = '/library/artists/:artistId',
+  LIBRARY_FOLDERS = '/library/folders',
+  LIBRARY_SONGS = '/library/songs',
   LOGIN = '/login',
   PLAYING = '/playing',
   PLAYLISTS = '/playlists',
@@ -19,6 +21,7 @@ export enum AppRoute {
 
 type TArgs =
   | { path: AppRoute.HOME }
+  | { path: AppRoute.EXPLORE }
   | { path: AppRoute.LOGIN }
   | { path: AppRoute.PLAYING }
   | { path: AppRoute.SERVERS }
@@ -27,9 +30,9 @@ type TArgs =
   | { path: AppRoute.LIBRARY_ARTISTS_DETAIL }
   | { path: AppRoute.LIBRARY_ALBUMARTISTS }
   | { path: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL }
-  | { path: AppRoute.LIBRARY }
-  | { path: AppRoute.LIBRARY }
   | { path: AppRoute.LIBRARY_ALBUMS }
+  | { path: AppRoute.LIBRARY_FOLDERS }
+  | { path: AppRoute.LIBRARY_SONGS }
   | {
       params: { albumId: string };
       path: AppRoute.LIBRARY_ALBUMS_DETAIL;
