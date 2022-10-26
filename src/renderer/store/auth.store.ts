@@ -8,6 +8,7 @@ export interface AuthState {
   currentServer?: Server;
   permissions: {
     isAdmin: boolean;
+    username: string;
   };
   refreshToken: string;
   serverCredentials: {
@@ -36,10 +37,6 @@ export interface AuthSlice extends AuthState {
   logout: () => void;
   setCurrentServer: (server: Server) => void;
 }
-
-const persistedState = JSON.parse(
-  localStorage.getItem('authentication') || '{}'
-);
 
 export const useAuthStore = create<AuthSlice>()(
   persist(
@@ -92,12 +89,13 @@ export const useAuthStore = create<AuthSlice>()(
         logout: () => {
           return set({
             accessToken: undefined,
-            permissions: { isAdmin: false },
+            permissions: { isAdmin: false, username: '' },
             refreshToken: undefined,
           });
         },
         permissions: {
           isAdmin: false,
+          username: '',
         },
         refreshToken: '',
         serverCredentials: [],
@@ -105,20 +103,11 @@ export const useAuthStore = create<AuthSlice>()(
         serverPermissions: '',
         serverUrl: '',
         setCurrentServer: (server: Server) => {
-          const prev = JSON.parse(
-            localStorage.getItem('authentication') || '{}'
-          );
-          localStorage.setItem(
-            'authentication',
-            JSON.stringify({
-              ...prev,
-              state: { ...prev.state, currentServer: server },
-            })
-          );
           return set({ currentServer: server });
         },
-      }))
+      })),
+      { name: 'authentication' }
     ),
-    { name: 'authentication' }
+    { name: 'store_authentication' }
   )
 );

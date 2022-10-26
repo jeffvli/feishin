@@ -12,7 +12,7 @@ export const ax = Axios.create({
 ax.interceptors.request.use(
   (config) => {
     const { state } = JSON.parse(
-      localStorage.getItem('authentication') || '{}'
+      localStorage.getItem('store_authentication') || '{}'
     );
 
     config.baseURL = `${state.serverUrl}/api`;
@@ -34,7 +34,9 @@ ax.interceptors.response.use(
   async (err) => {
     if (err.response && err.response.status === 401) {
       const { config } = err;
-      const auth = JSON.parse(localStorage.getItem('authentication') || '{}');
+      const auth = JSON.parse(
+        localStorage.getItem('store_authentication') || '{}'
+      );
 
       if (err.response.data.error.message === 'jwt expired' && !config.sent) {
         config.sent = true;
@@ -46,7 +48,7 @@ ax.interceptors.response.use(
         ).data;
 
         localStorage.setItem(
-          'authentication',
+          'store_authentication',
           JSON.stringify({ ...auth, state: { ...auth.state, accessToken } })
         );
 
@@ -59,7 +61,7 @@ ax.interceptors.response.use(
       }
 
       localStorage.setItem(
-        'authentication',
+        'store_authentication',
         JSON.stringify({
           ...auth,
           state: { ...auth.state, accessToken: '', refreshToken: '' },
@@ -68,7 +70,7 @@ ax.interceptors.response.use(
 
       if (err.response.data.error.message === 'No auth token') {
         localStorage.setItem(
-          'authentication',
+          'store_authentication',
           JSON.stringify({
             ...auth,
             state: { ...auth.state, accessToken: '', refreshToken: '' },
