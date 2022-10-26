@@ -1,7 +1,7 @@
 {
-  "name": "sonixd",
+  "name": "feishin",
   "version": "1.0.0-alpha1",
-  "description": "A full-featured Subsonic/Jellyfin compatible desktop client",
+  "description": "",
   "main": "./dist/main/main.js",
   "author": {
     "name": "jeffvli",
