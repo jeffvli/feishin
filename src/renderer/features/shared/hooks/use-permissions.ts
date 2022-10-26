@@ -11,8 +11,10 @@ export const usePermissions = () => {
       createServerUrl: permissions.isAdmin,
       deleteServer: permissions.isAdmin,
       deleteServerCredential: true,
+      deleteServerFolder: permissions.isAdmin,
       deleteServerUrl: permissions.isAdmin,
       editServer: permissions.isAdmin,
+      editServerFolder: permissions.isAdmin,
     };
 
     return set;
