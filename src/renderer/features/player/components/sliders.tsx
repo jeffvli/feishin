@@ -25,7 +25,7 @@ const StyledSlider = styled(ReactSlider)<SliderProps | any>`
       display: ${(props) =>
         props.$isDragging && props.$hasToolTip ? 'block' : 'none'};
       padding: 2px 6px;
-      color: var(--tooltip-text-color);
+      color: var(--tooltip-fg);
       white-space: nowrap;
       background: var(--tooltip-bg);
       border-radius: 4px;

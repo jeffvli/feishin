@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import styled from '@emotion/styled';
-import { PlaybackType } from '../../../../types';
+import { PlaybackType } from '@/renderer/types';
 import { AudioPlayer } from '../../../components';
 import { usePlayerStore } from '../../../store';
 import { CenterControls } from './center-controls';
