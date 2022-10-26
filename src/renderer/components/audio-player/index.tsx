@@ -6,11 +6,12 @@ import {
   useCallback,
 } from 'react';
 import ReactPlayer, { ReactPlayerProps } from 'react-player';
+import { Song } from '@/renderer/api/types';
 import {
   crossfadeHandler,
   gaplessHandler,
 } from '@/renderer/components/audio-player/utils/list-handlers';
-import { CrossfadeStyle, PlaybackStyle, PlayerStatus, Song } from '@/types';
+import { CrossfadeStyle, PlaybackStyle, PlayerStatus } from '@/renderer/types';
 
 interface AudioPlayerProps extends ReactPlayerProps {
   crossfadeDuration: number;
