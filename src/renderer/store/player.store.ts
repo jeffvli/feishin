@@ -14,7 +14,7 @@ import {
   PlayerRepeat,
   PlayerStatus,
   UniqueId,
-} from '../../types';
+} from '@/renderer/types';
 
 type QueueSong = Song & UniqueId;
 

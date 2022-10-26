@@ -10,10 +10,10 @@ import {
   RiSkipBackFill,
   RiSkipForwardFill,
 } from 'react-icons/ri';
-import { PlaybackType, PlayerStatus } from '../../../../types';
-import { Text } from '../../../components';
-import { usePlayerStore } from '../../../store';
-import { Font } from '../../../styles';
+import { Text } from '@/renderer/components';
+import { usePlayerStore } from '@/renderer/store';
+import { Font } from '@/renderer/styles';
+import { PlaybackType, PlayerStatus } from '@/renderer/types';
 import { useCenterControls } from '../hooks/use-center-controls';
 import { PlayerButton } from './player-button';
 import { Slider } from './slider';

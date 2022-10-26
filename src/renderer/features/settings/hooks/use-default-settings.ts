@@ -4,7 +4,7 @@ import {
   PlaybackStyle,
   PlaybackType,
   PlayerRepeat,
-} from '../../../../types';
+} from '@/renderer/types';
 import { PlayerState } from '../../../store';
 
 export interface WebSettings {

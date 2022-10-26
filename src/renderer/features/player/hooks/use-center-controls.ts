@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { PlaybackType, PlayerStatus } from '../../../../types';
+import { PlaybackType, PlayerStatus } from '@/renderer/types';
 import { usePlayerStore } from '../../../store';
 import { mpvPlayer } from '../utils/mpvPlayer';
 
