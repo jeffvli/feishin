@@ -8,7 +8,9 @@ import { AddServerUrlForm } from '@/renderer/features/servers/components/add-ser
 import { EditServerForm } from '@/renderer/features/servers/components/edit-server-form';
 import { ServerSection } from '@/renderer/features/servers/components/server-section';
 import { useDeleteServerUrl } from '@/renderer/features/servers/mutations/use-delete-server-url';
+import { useDisableServerFolder } from '@/renderer/features/servers/mutations/use-disable-server-folder';
 import { useDisableServerUrl } from '@/renderer/features/servers/mutations/use-disable-server-url';
+import { useEnableServerFolder } from '@/renderer/features/servers/mutations/use-enable-server-folder';
 import { useEnableServerUrl } from '@/renderer/features/servers/mutations/use-enable-server-url';
 import { usePermissions } from '@/renderer/features/shared';
 import { useAuthStore } from '@/renderer/store';
@@ -26,6 +28,8 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
   const enableServerUrl = useEnableServerUrl();
   const disableServerUrl = useDisableServerUrl();
   const deleteServerUrl = useDeleteServerUrl();
+  const enableServerFolder = useEnableServerFolder();
+  const disableServerFolder = useDisableServerFolder();
   const serverCredentials = useAuthStore((state) => state.serverCredentials);
 
   const enableServerCredential = useAuthStore(
@@ -69,6 +73,18 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
     });
   };
 
+  const handleToggleFolder = (folderId: string, enabled: boolean) => {
+    if (enabled) {
+      return disableServerFolder.mutate({
+        query: { folderId, serverId: server.id },
+      });
+    }
+
+    return enableServerFolder.mutate({
+      query: { folderId, serverId: server.id },
+    });
+  };
+
   return (
     <>
       <Stack spacing="xl">
@@ -104,7 +120,35 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
             </Group>
           )}
         </ServerSection>
-        <ServerSection title="Server URLs">
+        <ServerSection title="Music Folders">
+          <Stack>
+            {server.serverFolders?.map((folder) => (
+              <Group position="apart">
+                <Group>
+                  <Text>{folder.name}</Text>
+                </Group>
+                <Group>
+                  <Button
+                    compact
+                    radius="lg"
+                    variant={folder.enabled ? 'filled' : 'subtle'}
+                    onClick={() =>
+                      handleToggleFolder(folder.id, folder.enabled)
+                    }
+                  >
+                    {folder.enabled ? 'Enabled' : 'Disabled'}
+                  </Button>
+                  {permissions.deleteServerFolder && (
+                    <Button compact disabled radius="xl" variant="subtle">
+                      <RiDeleteBin2Fill />
+                    </Button>
+                  )}
+                </Group>
+              </Group>
+            ))}
+          </Stack>
+        </ServerSection>
+        <ServerSection title="URLs">
           {addUrl ? (
             <AddServerUrlForm
               serverId={server.id}
@@ -119,14 +163,13 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                     <Group>
                       <Button
                         compact
-                        px={10}
                         radius="lg"
                         variant={serverUrl.enabled ? 'filled' : 'subtle'}
                         onClick={() =>
                           handleToggleUrl(serverUrl.id, serverUrl.enabled)
                         }
                       >
-                        {serverUrl.enabled ? 'Disable' : 'Enable'}
+                        {serverUrl.enabled ? 'Enabled' : 'Disabled'}
                       </Button>
                       {permissions.deleteServerUrl && (
                         <Button
@@ -155,7 +198,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
             </>
           )}
         </ServerSection>
-        <ServerSection title="Server Credentials">
+        <ServerSection title="Credentials">
           {addCredential ? (
             <AddServerCredentialForm
               server={server}
@@ -170,7 +213,6 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                     <Group>
                       <Button
                         compact
-                        px={10}
                         radius="lg"
                         variant={credential.enabled ? 'filled' : 'subtle'}
                         onClick={() =>

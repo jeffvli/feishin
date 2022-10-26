@@ -18,9 +18,12 @@ const Section = styled.div`
 export const ServerSection = ({ title, children }: ServerSectionProps) => {
   return (
     <Container>
-      <Text font={Font.EPILOGUE} size="sm">
-        {title}
-      </Text>
+      {React.isValidElement(title) ? (
+        title
+      ) : (
+        <Text font={Font.EPILOGUE}>{title}</Text>
+      )}
+
       <Section>{children}</Section>
     </Container>
   );
