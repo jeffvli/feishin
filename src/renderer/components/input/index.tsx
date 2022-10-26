@@ -8,11 +8,11 @@ import {
 } from '@mantine/core';
 
 interface TextInputProps extends MantineTextInputProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 interface PasswordInputProps extends MantinePasswordInputProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const StyledTextInput = styled(MantineTextInput)<TextInputProps>`
@@ -30,6 +30,17 @@ const StyledTextInput = styled(MantineTextInput)<TextInputProps>`
     &:focus-within {
       border-color: var(--primary-color);
     }
+
+    color: var(--input-fg);
+    background: var(--input-bg);
+
+    &::placeholder {
+      color: var(--input-placeholder-fg);
+    }
+  }
+
+  & .mantine-Input-icon {
+    color: var(--input-placeholder-fg);
   }
 
   & .mantine-TextInput-required {
@@ -77,3 +88,11 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
     );
   }
 );
+
+TextInput.defaultProps = {
+  children: null,
+};
+
+PasswordInput.defaultProps = {
+  children: null,
+};

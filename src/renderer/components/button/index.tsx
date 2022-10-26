@@ -44,6 +44,11 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     }
   }};
 
+  &:disabled {
+    background-color: transparent;
+    opacity: 0.8;
+  }
+
   &:hover {
     color: ${(props) => {
       switch (props.variant) {
@@ -84,7 +89,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
   }
 `;
 
-const pButton = forwardRef<HTMLButtonElement, ButtonProps>(
+export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, tooltip, ...props }: ButtonProps, ref) => {
     if (tooltip) {
       return (
@@ -105,10 +110,10 @@ const pButton = forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 export const Button = createPolymorphicComponent<'button', ButtonProps>(
-  pButton
+  _Button
 );
 
-pButton.defaultProps = {
+_Button.defaultProps = {
   onClick: undefined,
   tooltip: undefined,
 };

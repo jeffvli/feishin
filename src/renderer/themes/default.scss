@@ -35,7 +35,7 @@
   --grid-card-bg: rgb(24, 24, 24);
 
   --tooltip-bg: #ffffff;
-  --tooltip-text-color: #000000;
+  --tooltip-fg: #000000;
 
   --scrollbar-track-bg: #181818;
   --scrollbar-thumb-bg: #5a5a5a;
@@ -54,6 +54,10 @@
   --btn-subtle-bg-hover: rgba(100, 100, 100, 0.5);
   --btn-subtle-fg: rgb(119, 126, 139);
   --btn-subtle-fg-hover: rgb(200, 200, 200);
+
+  --input-bg: rgb(37, 38, 43);
+  --input-fg: rgb(193, 193, 193);
+  --input-placeholder-fg: rgb(119, 126, 139);
 
   --dropdown-menu-bg: rgb(24, 24, 24);
   --dropdown-menu-fg: rgb(193, 194, 197);
