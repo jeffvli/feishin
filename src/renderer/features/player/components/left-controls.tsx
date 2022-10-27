@@ -1,7 +1,10 @@
 import styled from '@emotion/styled';
-import { Text } from '../../../components';
-import { usePlayerStore } from '../../../store';
-import { Font } from '../../../styles';
+import { Group } from '@mantine/core';
+import { motion, AnimatePresence } from 'framer-motion';
+import { RiArrowUpSLine } from 'react-icons/ri';
+import { Button, Text } from '@/renderer/components';
+import { useAppStore, usePlayerStore } from '@/renderer/store';
+import { Font } from '@/renderer/styles';
 
 const LeftControlsContainer = styled.div`
   display: flex;
@@ -25,7 +28,25 @@ const MetadataStack = styled.div`
   overflow: hidden;
 `;
 
+const Image = styled(motion.div)<{ url: string }>`
+  width: 70px;
+  height: 70px;
+  background-image: url(${(props) => props.url});
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  button {
+    display: none;
+  }
+
+  &:hover button {
+    display: block;
+  }
+`;
+
 export const LeftControls = () => {
+  const hideImage = useAppStore((state) => state.sidebar.image);
+  const setSidebar = useAppStore((state) => state.setSidebar);
   const song = usePlayerStore((state) => state.current.song);
   const title = song?.name;
   const artists = song?.artists?.map((artist) => artist?.name).join(', ');
@@ -34,9 +55,31 @@ export const LeftControls = () => {
   return (
     <LeftControlsContainer>
       <ImageWrapper>
-        {song?.imageUrl && (
-          <img alt="img" height={60} src={song?.imageUrl} width={60} />
-        )}
+        <AnimatePresence>
+          {!hideImage && (
+            <Image
+              key="playerbar-image"
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              url={song?.imageUrl}
+            >
+              <Group position="right">
+                <Button
+                  compact
+                  variant="subtle"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSidebar({ image: true });
+                  }}
+                >
+                  <RiArrowUpSLine color="white" size={20} />
+                </Button>
+              </Group>
+            </Image>
+          )}
+        </AnimatePresence>
       </ImageWrapper>
       <MetadataStack>
         <Text

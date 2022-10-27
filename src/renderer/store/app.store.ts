@@ -5,14 +5,19 @@ import { Platform } from '@/renderer/types';
 
 type SidebarProps = {
   expanded: string[];
+  image: boolean;
   leftWidth: string;
+  rightExpanded: boolean;
   rightWidth: string;
 };
+
 export interface AppState {
   platform: Platform;
   sidebar: {
     expanded: string[];
+    image: boolean;
     leftWidth: string;
+    rightExpanded: boolean;
     rightWidth: string;
   };
 }
@@ -37,7 +42,9 @@ export const useAppStore = create<AppSlice>()(
         },
         sidebar: {
           expanded: [],
+          image: false,
           leftWidth: '230px',
+          rightExpanded: false,
           rightWidth: '230px',
         },
       })),

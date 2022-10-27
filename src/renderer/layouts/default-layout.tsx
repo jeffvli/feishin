@@ -2,9 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { Menu, Button } from '@mantine/core';
 import { Outlet } from 'react-router';
+import { SideQueue } from '@/renderer/features/side-queue/components/SideQueue';
 import { Titlebar } from '@/renderer/features/titlebar/components/titlebar';
 import { useAppStore } from '@/renderer/store';
-import { constrainSidebarWidth } from '@/renderer/utils';
+import {
+  constrainRightSidebarWidth,
+  constrainSidebarWidth,
+} from '@/renderer/utils';
 import { Playerbar } from '../features/player';
 import { Sidebar } from '../features/sidebar/components/sidebar';
 
@@ -26,12 +30,17 @@ const TitlebarContainer = styled.header`
   -webkit-app-region: drag;
 `;
 
-const MainContainer = styled.main<{ leftSidebarWidth: string }>`
+const MainContainer = styled.main<{
+  leftSidebarWidth: string;
+  rightExpanded?: boolean;
+  rightSidebarWidth?: string;
+}>`
   display: grid;
   grid-area: main;
-  grid-template-areas: 'sidebar .';
+  grid-template-areas: 'sidebar . right-sidebar';
   grid-template-rows: 1fr;
-  grid-template-columns: ${(props) => props.leftSidebarWidth} 1fr;
+  grid-template-columns: ${(props) => props.leftSidebarWidth} 1fr ${(props) =>
+      props.rightExpanded && props.rightSidebarWidth};
   gap: 0;
   background: var(--main-bg);
 `;
@@ -42,7 +51,14 @@ const SidebarContainer = styled.div`
   background: var(--sidebar-bg);
 `;
 
+const RightSidebarContainer = styled.div`
+  position: relative;
+  grid-area: right-sidebar;
+  background: var(--sidebar-bg);
+`;
+
 const PlayerbarContainer = styled.footer`
+  z-index: 50;
   grid-area: player;
   background: var(--playerbar-bg);
 `;
@@ -52,20 +68,16 @@ const ResizeHandle = styled.div<{
   placement: 'top' | 'left' | 'bottom' | 'right';
 }>`
   position: absolute;
+  top: ${(props) => props.placement === 'top' && 0};
+  right: ${(props) => props.placement === 'right' && 0};
+  bottom: ${(props) => props.placement === 'bottom' && 0};
+  left: ${(props) => props.placement === 'left' && 0};
+  z-index: 100;
   width: 3px;
   height: 100%;
-  right: 0;
   background-color: var(--sidebar-handle-bg);
-  /* border-top: ${({ placement }) =>
-    placement === 'top' && '1px var(--sidebar-handle-bg) solid'};
-  border-right: ${({ placement }) =>
-    placement === 'right' && '1px var(--sidebar-handle-bg) solid'};
-  border-bottom: ${({ placement }) =>
-    placement === 'bottom' && '1px var(--sidebar-handle-bg) solid'};
-  border-left: ${({ placement }) =>
-    placement === 'left' && '1px var(--sidebar-handle-bg) solid'}; */
-  opacity: ${(props) => (props.isResizing ? 1 : 0)};
   cursor: ew-resize;
+  opacity: ${(props) => (props.isResizing ? 1 : 0)};
 
   &:hover {
     opacity: 1;
@@ -76,15 +88,19 @@ export const DefaultLayout = () => {
   const sidebar = useAppStore((state) => state.sidebar);
   const setSidebar = useAppStore((state) => state.setSidebar);
 
-  const sidebarRef = useRef(null);
+  const sidebarRef = useRef<HTMLDivElement | null>(null);
+  const rightSidebarRef = useRef<HTMLDivElement | null>(null);
   const [isResizing, setIsResizing] = useState(false);
+  const [isResizingRight, setIsResizingRight] = useState(false);
 
-  const startResizing = useCallback(() => {
-    setIsResizing(true);
+  const startResizing = useCallback((position: 'left' | 'right') => {
+    if (position === 'left') return setIsResizing(true);
+    return setIsResizingRight(true);
   }, []);
 
   const stopResizing = useCallback(() => {
     setIsResizing(false);
+    setIsResizingRight(false);
   }, []);
 
   const resize = useCallback(
@@ -93,8 +109,16 @@ export const DefaultLayout = () => {
         const width = `${constrainSidebarWidth(mouseMoveEvent.clientX)}px`;
         setSidebar({ leftWidth: width });
       }
+      if (isResizingRight) {
+        const start = Number(sidebar.rightWidth.split('px')[0]);
+        const { left } = rightSidebarRef!.current!.getBoundingClientRect();
+        const width = `${constrainRightSidebarWidth(
+          start + left - mouseMoveEvent.clientX
+        )}px`;
+        setSidebar({ rightWidth: width });
+      }
     },
-    [isResizing, setSidebar]
+    [isResizing, isResizingRight, setSidebar, sidebar.rightWidth]
   );
 
   useEffect(() => {
@@ -121,19 +145,35 @@ export const DefaultLayout = () => {
             </Menu.Dropdown>
           </Menu>
         </TitlebarContainer>
-        <MainContainer leftSidebarWidth={sidebar.leftWidth}>
+        <MainContainer
+          leftSidebarWidth={sidebar.leftWidth}
+          rightExpanded={sidebar.rightExpanded}
+          rightSidebarWidth={sidebar.rightWidth}
+        >
           <SidebarContainer>
             <ResizeHandle
               ref={sidebarRef}
               isResizing={isResizing}
-              placement="left"
+              placement="right"
               onMouseDown={(e) => {
                 e.preventDefault();
-                startResizing();
+                startResizing('left');
               }}
             />
             <Sidebar />
           </SidebarContainer>
+          <RightSidebarContainer>
+            <ResizeHandle
+              ref={rightSidebarRef}
+              isResizing={isResizingRight}
+              placement="left"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                startResizing('right');
+              }}
+            />
+            {sidebar.rightExpanded && <SideQueue />}
+          </RightSidebarContainer>
           <Outlet />
         </MainContainer>
         <PlayerbarContainer>
