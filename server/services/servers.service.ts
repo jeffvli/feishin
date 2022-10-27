@@ -370,8 +370,10 @@ const refresh = async (options: { id: string }) => {
 
 const fullScan = async (options: { id: string; serverFolderId?: string[] }) => {
   const { id, serverFolderId } = options;
+
+  // Only allow scan of enabled folders
   const server = await prisma.server.findUnique({
-    include: { serverFolders: true },
+    include: { serverFolders: { where: { enabled: true } } },
     where: { id },
   });
 
@@ -544,14 +546,52 @@ const disableUrlById = async (user: AuthUser) => {
   return null;
 };
 
+const findFolderById = async (options: { id: string }) => {
+  const url = await prisma.serverFolder.findUnique({
+    where: { id: options.id },
+  });
+
+  if (!url) {
+    throw ApiError.notFound('Folder not found.');
+  }
+
+  return url;
+};
+
+const deleteFolderById = async (options: { id: string }) => {
+  return null;
+};
+
+const enableFolderById = async (options: { id: string }) => {
+  await prisma.serverFolder.update({
+    data: { enabled: true },
+    where: { id: options.id },
+  });
+
+  return null;
+};
+
+const disableFolderById = async (options: { id: string }) => {
+  await prisma.serverFolder.update({
+    data: { enabled: false },
+    where: { id: options.id },
+  });
+
+  return null;
+};
+
 export const serversService = {
   create,
   createUrl,
   deleteById,
+  deleteFolderById,
   deleteUrlById,
+  disableFolderById,
   disableUrlById,
+  enableFolderById,
   enableUrlById,
   findById,
+  findFolderById,
   findMany,
   findServerUrlById,
   findUrlById,

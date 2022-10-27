@@ -162,12 +162,51 @@ const disableServerUrl = async (
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
+const deleteServerFolder = async (
+  req: TypedRequest<typeof validation.servers.deleteFolder>,
+  res: Response
+) => {
+  const { folderId } = req.params;
+
+  await service.servers.deleteFolderById({ id: folderId });
+
+  const success = ApiSuccess.noContent({ data: null });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const enableServerFolder = async (
+  req: TypedRequest<typeof validation.servers.enableFolder>,
+  res: Response
+) => {
+  const { folderId } = req.params;
+
+  await service.servers.enableFolderById({ id: folderId });
+
+  const success = ApiSuccess.noContent({ data: null });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const disableServerFolder = async (
+  req: TypedRequest<typeof validation.servers.disableFolder>,
+  res: Response
+) => {
+  const { folderId } = req.params;
+
+  await service.servers.disableFolderById({ id: folderId });
+
+  const success = ApiSuccess.noContent({ data: null });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
 export const serversController = {
   createServer,
   createServerUrl,
   deleteServer,
+  deleteServerFolder,
   deleteServerUrl,
+  disableServerFolder,
   disableServerUrl,
+  enableServerFolder,
   enableServerUrl,
   getServerDetail,
   getServerList,

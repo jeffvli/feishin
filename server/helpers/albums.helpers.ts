@@ -13,7 +13,7 @@ export enum AlbumSort {
   RATING = 'rating',
 }
 
-const include = (options: { songs?: boolean; user?: AuthUser }) => {
+const include = (user: AuthUser, options: { songs?: boolean }) => {
   // Prisma.AlbumInclude
   const props = {
     _count: {
@@ -24,17 +24,17 @@ const include = (options: { songs?: boolean; user?: AuthUser }) => {
     },
     albumArtists: true,
     artists: true,
-    favorites: { where: { userId: options.user?.id } },
+    favorites: { where: { userId: user?.id } },
     genres: true,
     images: true,
     ratings: {
       where: {
-        userId: options.user?.id,
+        userId: user?.id,
       },
     },
     server: true,
     serverFolders: true,
-    songs: options?.songs && songHelpers.findMany(),
+    songs: options?.songs && songHelpers.findMany(user),
   };
 
   return props;

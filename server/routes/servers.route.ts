@@ -85,3 +85,30 @@ router
     validateRequest(validation.servers.disableUrl),
     controller.servers.disableServerUrl
   );
+
+router.param('folderId', async (_req, _res, next, folderId) => {
+  await service.servers.findFolderById({ id: folderId });
+  next();
+});
+
+router
+  .route('/:serverId/folder/:folderId')
+  .delete(
+    authenticateAdmin,
+    validateRequest(validation.servers.deleteFolder),
+    controller.servers.deleteServerFolder
+  );
+
+router
+  .route('/:serverId/folder/:folderId/enable')
+  .post(
+    validateRequest(validation.servers.enableFolder),
+    controller.servers.enableServerFolder
+  );
+
+router
+  .route('/:serverId/folder/:folderId/disable')
+  .post(
+    validateRequest(validation.servers.disableFolder),
+    controller.servers.disableServerFolder
+  );

@@ -176,6 +176,7 @@ const relatedServerFolders = (items: ServerFolder[]) => {
       /* eslint-disable sort-keys-fix/sort-keys-fix */
       id: item.id,
       name: item.name,
+      enabled: item.enabled,
       remoteId: item.remoteId,
       lastScannedAt: item.lastScannedAt,
       /* eslint-enable sort-keys-fix/sort-keys-fix */
@@ -266,13 +267,14 @@ const songs = (
 ) => {
   return (
     items?.map((item) => {
-      const url = options.url ? options.url : item.server.serverUrls[0].url;
+      const customUrl = item.server.serverUrls[0].url;
+      const baseUrl = customUrl ? customUrl : options.url;
 
       const stream = streamUrl(options.type, {
         deviceId: options.deviceId,
         remoteId: item.remoteId,
         token: options.token,
-        url: options.url,
+        url: baseUrl,
         userId: options.userId,
       });
 
@@ -294,7 +296,7 @@ const songs = (
           item.images,
           options.type,
           ImageType.PRIMARY,
-          url,
+          baseUrl,
           item.remoteId
         ),
         releaseDate: item.releaseDate,

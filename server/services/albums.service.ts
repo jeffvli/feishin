@@ -9,7 +9,7 @@ const findById = async (user: AuthUser, options: { id: string }) => {
   const { id } = options;
 
   const album = await prisma.album.findUnique({
-    include: helpers.albums.include({ songs: true }),
+    include: helpers.albums.include(user, { songs: true }),
     where: { id },
   });
 
@@ -53,7 +53,7 @@ const findMany = async (options: AlbumFindManyOptions) => {
       prisma.albumRating.findMany({
         include: {
           album: {
-            include: helpers.albums.include({ songs: false, user }),
+            include: helpers.albums.include(user, { songs: false }),
           },
         },
         orderBy: { value: orderBy },
@@ -78,7 +78,7 @@ const findMany = async (options: AlbumFindManyOptions) => {
         },
       }),
       prisma.album.findMany({
-        include: helpers.albums.include({ songs: false, user }),
+        include: helpers.albums.include(user, { songs: false }),
         skip,
         take,
         where: {
@@ -95,7 +95,7 @@ const findMany = async (options: AlbumFindManyOptions) => {
         where: { OR: helpers.shared.serverFolderFilter(serverFolderIds) },
       }),
       prisma.album.findMany({
-        include: helpers.albums.include({ songs: false, user }),
+        include: helpers.albums.include(user, { songs: false }),
         orderBy: [helpers.albums.sort(sortBy, orderBy)],
         skip,
         take,

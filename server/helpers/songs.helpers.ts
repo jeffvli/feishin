@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import { AuthUser } from '@middleware/authenticate';
 
 const include = () => {
   const props: Prisma.SongInclude = {
@@ -16,7 +17,7 @@ const include = () => {
   return props;
 };
 
-const findMany = () => {
+const findMany = (user: AuthUser) => {
   const props: Prisma.SongFindManyArgs = {
     include: {
       album: true,
@@ -26,7 +27,11 @@ const findMany = () => {
       images: true,
       ratings: true,
       server: {
-        include: { serverUrls: true },
+        include: {
+          serverUrls: {
+            where: { userServerUrls: { some: { userId: user.id } } },
+          },
+        },
       },
     },
     orderBy: [

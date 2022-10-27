@@ -134,17 +134,47 @@ const disableUrl = {
   query: z.object({}),
 };
 
+const deleteFolder = {
+  body: z.object({}),
+  params: z.object({
+    ...idValidation('serverId'),
+    ...idValidation('folderId'),
+  }),
+  query: z.object({}),
+};
+
+const enableFolder = {
+  body: z.object({}),
+  params: z.object({
+    ...idValidation('serverId'),
+    ...idValidation('folderId'),
+  }),
+  query: z.object({}),
+};
+
+const disableFolder = {
+  body: z.object({}),
+  params: z.object({
+    ...idValidation('serverId'),
+    ...idValidation('folderId'),
+  }),
+  query: z.object({}),
+};
+
 export const serversValidation = {
   create,
   createCredential,
   createUrl,
   deleteCredential,
+  deleteFolder,
   deleteServer,
   deleteUrl,
   detail,
   disableCredential,
+  disableFolder,
   disableUrl,
   enableCredential,
+  enableFolder,
   enableUrl,
   getCredentialDetail,
   list,
