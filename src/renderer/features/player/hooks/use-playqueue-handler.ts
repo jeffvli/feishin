@@ -1,16 +1,21 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { api } from '@/renderer/api';
+import { queryKeys } from '@/renderer/api/query-keys';
+import { useServerCredential } from '@/renderer/features/shared';
+import { useAuthStore, usePlayerStore } from '@/renderer/store';
 import { LibraryItem, Play } from '@/renderer/types';
-import { useAuthStore, usePlayerStore } from '../../../store';
 import { mpvPlayer } from '../utils/mpvPlayer';
 
 export const usePlayQueueHandler = () => {
+  const queryClient = useQueryClient();
   const serverId = useAuthStore((state) => state.currentServer?.id) || '';
+  const { serverToken, isImageTokenRequired } = useServerCredential();
   const addToQueue = usePlayerStore((state) => state.addToQueue);
 
   const handlePlayQueueAdd = async (options: {
     byData?: any[];
     byItemType?: {
-      id: number;
+      id: string;
       type: LibraryItem;
     };
     play: Play;
@@ -21,51 +26,37 @@ export const usePlayQueueHandler = () => {
 
     if (options.byItemType) {
       const deviceId = localStorage.getItem('device_id');
-      // const { state } = JSON.parse(
-      //   localStorage.getItem('authentication') || '{}'
-      // );
 
-      if (!deviceId) return;
+      if (!deviceId || !options.byItemType.id) return;
 
       let songs = null;
       if (options.byItemType.type === LibraryItem.ALBUM) {
-        const { data } = await api.albums.getAlbumDetail({
-          albumId: options.byItemType.id,
-          serverId,
-        });
+        const albumDetail = await queryClient.fetchQuery(
+          queryKeys.albums.detail(options.byItemType.id),
+          async () =>
+            api.albums.getAlbumDetail({
+              albumId: options.byItemType!.id,
+              serverId,
+            })
+        );
 
-        songs = data.songs;
+        songs = albumDetail.data.songs;
       }
 
-      // const endpoint = getEndpointByItemType(options.byItemType.type);
-
-      // const { data } = await endpoint({
-      //   albumId: options.byItemType.id,
-      //   serverId,
-      // });
-
-      // const songs = data.songs?.map((song) => {
-      // const auth = getServerFolderAuth(
-      //   state.serverUrl,
-      //   song.serverFolderId
-      // );
-
-      // if (auth) {
-      //   const streamUrl =
-      //     auth.type === 'jellyfin'
-      //       ? getJellyfinStreamUrl(auth, song, deviceId)
-      //       : getSubsonicStreamUrl(auth, song, deviceId);
-
-      //   return {
-      //     ...song,
-      //     streamUrl,
-      //   };
-      // }
-
-      // return song;
-      // });
-
       if (!songs) return;
+
+      // * Adds server token
+      if (serverToken) {
+        songs = songs.map((song) => {
+          return {
+            ...song,
+            imageUrl: isImageTokenRequired
+              ? `${song.imageUrl}${serverToken}`
+              : song.imageUrl,
+            streamUrl: `${song.streamUrl}${serverToken}`,
+          };
+        });
+      }
 
       const playerData = addToQueue(songs, options.play);
 
