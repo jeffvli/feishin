@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { Menu, Button } from '@mantine/core';
+import { motion } from 'framer-motion';
 import { Outlet } from 'react-router';
-import { SideQueue } from '@/renderer/features/side-queue/components/SideQueue';
+import { SideQueue } from '@/renderer/features/side-queue/components/side-queue';
 import { Titlebar } from '@/renderer/features/titlebar/components/titlebar';
 import { useAppStore } from '@/renderer/store';
 import {
@@ -51,7 +52,7 @@ const SidebarContainer = styled.div`
   background: var(--sidebar-bg);
 `;
 
-const RightSidebarContainer = styled.div`
+const RightSidebarContainer = styled(motion.div)`
   position: relative;
   grid-area: right-sidebar;
   background: var(--sidebar-bg);
@@ -162,18 +163,25 @@ export const DefaultLayout = () => {
             />
             <Sidebar />
           </SidebarContainer>
-          <RightSidebarContainer>
-            <ResizeHandle
-              ref={rightSidebarRef}
-              isResizing={isResizingRight}
-              placement="left"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                startResizing('right');
-              }}
-            />
-            {sidebar.rightExpanded && <SideQueue />}
-          </RightSidebarContainer>
+          {sidebar.rightExpanded && (
+            <RightSidebarContainer
+              key="sb"
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              initial={{ opacity: 0, x: 500 }}
+              transition={{ duration: 0.3, ease: 'circOut' }}
+            >
+              <ResizeHandle
+                ref={rightSidebarRef}
+                isResizing={isResizingRight}
+                placement="left"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  startResizing('right');
+                }}
+              />
+              <SideQueue />
+            </RightSidebarContainer>
+          )}
           <Outlet />
         </MainContainer>
         <PlayerbarContainer>

@@ -9,3 +9,15 @@ export const constrainSidebarWidth = (num: number) => {
 
   return num;
 };
+
+export const constrainRightSidebarWidth = (num: number) => {
+  if (num < 250) {
+    return 250;
+  }
+
+  if (num > 960) {
+    return 960;
+  }
+
+  return num;
+};
