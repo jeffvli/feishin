@@ -22,28 +22,30 @@ import {
   UserServerUrl,
 } from '@prisma/client';
 
-const getSubsonicStreamUrl = (
-  remoteId: string,
-  url: string,
-  token: string,
-  deviceId: string
-) => {
+const getSubsonicStreamUrl = (options: {
+  deviceId: string;
+  remoteId: string;
+  token?: string;
+  url: string;
+}) => {
+  const { deviceId, remoteId, token, url } = options;
   return (
     `${url}/rest/stream.view` +
     `?id=${remoteId}` +
-    `&${token}` +
     `&v=1.13.0` +
-    `&c=Feishin_${deviceId}`
+    `&c=Feishin_${deviceId}` +
+    `&${token ? `${token}` : ''}`
   );
 };
 
-const getJellyfinStreamUrl = (
-  remoteId: string,
-  url: string,
-  token: string,
-  userId: string,
-  deviceId: string
-) => {
+const getJellyfinStreamUrl = (options: {
+  deviceId: string;
+  remoteId: string;
+  token?: string;
+  url: string;
+  userId: string;
+}) => {
+  const { deviceId, remoteId, token, url, userId } = options;
   return (
     `${url}/audio` +
     `/${remoteId}/universal` +
@@ -54,14 +56,15 @@ const getJellyfinStreamUrl = (
     `&transcodingProtocol=hls` +
     `&deviceId=Feishin_${deviceId}` +
     `&playSessionId=${deviceId}` +
-    `&api_key=${token}`
+    `&api_key=${token ? `${token}` : ''}`
   );
 };
 
-const streamUrl = (
+const buildStreamUrl = (
   type: ServerType,
-  args: {
+  options: {
     deviceId: string;
+    noCredential: boolean;
     remoteId: string;
     token: string;
     url: string;
@@ -69,33 +72,69 @@ const streamUrl = (
   }
 ) => {
   if (type === ServerType.JELLYFIN) {
-    return getJellyfinStreamUrl(
-      args.remoteId,
-      args.url,
-      args.token,
-      args.userId || '',
-      args.deviceId
-    );
+    return getJellyfinStreamUrl({
+      deviceId: options.deviceId,
+      remoteId: options.remoteId,
+      token: options.noCredential ? undefined : options.token,
+      url: options.url,
+      userId: options.userId || '',
+    });
   }
-  return getSubsonicStreamUrl(
-    args.remoteId,
-    args.url,
-    args.token,
-    args.deviceId
-  );
+
+  if (type === ServerType.SUBSONIC) {
+    return getSubsonicStreamUrl({
+      deviceId: options.deviceId,
+      remoteId: options.remoteId,
+      token: options.noCredential ? undefined : options.token,
+      url: options.url,
+    });
+  }
+
+  if (type === ServerType.NAVIDROME) {
+    const [_ndToken, ssToken] = options.token.split('||');
+
+    if (options.noCredential) {
+      return getSubsonicStreamUrl({
+        deviceId: options.deviceId,
+        remoteId: options.remoteId,
+        url: options.url,
+      });
+    }
+
+    return getSubsonicStreamUrl({
+      deviceId: options.deviceId,
+      remoteId: options.remoteId,
+      token: ssToken,
+      url: options.url,
+    });
+  }
+
+  return null;
 };
 
 const imageUrl = (
   type: ServerType,
+  imageType: ImageType,
   baseUrl: string,
   imageId: string,
   token?: string
 ) => {
   if (type === ServerType.JELLYFIN) {
+    if (imageType === ImageType.PRIMARY) {
+      return (
+        `${baseUrl}/Items` +
+        `/${imageId}` +
+        `/Images/Primary` +
+        '?fillHeight=250' +
+        `&fillWidth=250` +
+        '&quality=90'
+      );
+    }
+
     return (
       `${baseUrl}/Items` +
       `/${imageId}` +
-      `/Images/Primary` +
+      `/Images/Backdrop` +
       '?fillHeight=250' +
       `&fillWidth=250` +
       '&quality=90'
@@ -109,7 +148,7 @@ const imageUrl = (
       `&size=250` +
       `&v=1.13.0` +
       `&c=Feishin` +
-      `&${token}`
+      `&${token ? `${token}` : ''}`
     );
   }
 
@@ -219,23 +258,42 @@ const rating = (
   return null;
 };
 
-const image = (
-  images: Image[],
-  type: ServerType,
-  imageType: ImageType,
-  url: string,
-  remoteId: string,
-  token?: string
-) => {
-  const imageRemoteUrl = images.find((i) => i.type === imageType)?.remoteUrl;
+const buildImageUrl = (options: {
+  imageType: ImageType;
+  images: Image[];
+  noCredential?: boolean;
+  remoteId: string;
+  token?: string;
+  type: ServerType;
+  url: string;
+}) => {
+  const { imageType, images, remoteId, token, type, url, noCredential } =
+    options;
 
-  if (!imageRemoteUrl) return null;
+  const image = images.find((i) => i.type === imageType);
+
+  if (!image) return null;
+
   if (type === ServerType.JELLYFIN) {
-    return imageUrl(type, url, remoteId);
+    return imageUrl(type, imageType, url, remoteId);
   }
 
-  if (type === ServerType.SUBSONIC || type === ServerType.NAVIDROME) {
-    return imageUrl(type, url, imageRemoteUrl, token);
+  if (type === ServerType.SUBSONIC) {
+    if (noCredential) {
+      return imageUrl(type, imageType, url, image.remoteUrl);
+    }
+
+    return imageUrl(type, imageType, url, image.remoteUrl, token);
+  }
+
+  if (type === ServerType.NAVIDROME) {
+    const [_ndToken, ssToken] = token!.split('||');
+
+    if (noCredential) {
+      return imageUrl(type, imageType, url, image.remoteUrl);
+    }
+
+    return imageUrl(type, imageType, url, image.remoteUrl, ssToken);
   }
 
   return null;
@@ -244,7 +302,7 @@ const image = (
 type DbSong = Song & DbSongInclude;
 
 type DbSongInclude = {
-  album: Album;
+  album: Album & { images: Image[] };
   artists: Artist[];
   externals: External[];
   genres: Genre[];
@@ -263,20 +321,44 @@ const songs = (
     type: ServerType;
     url: string;
     userId: string;
-  }
+  },
+  noCredential: boolean
 ) => {
   return (
     items?.map((item) => {
-      const customUrl = item.server.serverUrls[0].url;
+      const customUrl = item.server.serverUrls[0]?.url;
       const baseUrl = customUrl ? customUrl : options.url;
 
-      const stream = streamUrl(options.type, {
+      const streamUrl = buildStreamUrl(options.type, {
         deviceId: options.deviceId,
+        noCredential,
         remoteId: item.remoteId,
         token: options.token,
         url: baseUrl,
         userId: options.userId,
       });
+
+      let imageUrl = buildImageUrl({
+        imageType: ImageType.PRIMARY,
+        images: item.images,
+        noCredential,
+        remoteId: item.remoteId,
+        token: options.token,
+        type: options.type,
+        url: baseUrl,
+      });
+
+      if (!imageUrl) {
+        imageUrl = buildImageUrl({
+          imageType: ImageType.PRIMARY,
+          images: item.album.images,
+          noCredential,
+          remoteId: item.remoteId,
+          token: options.token,
+          type: options.type,
+          url: baseUrl,
+        });
+      }
 
       return {
         /* eslint-disable sort-keys-fix/sort-keys-fix */
@@ -292,20 +374,14 @@ const songs = (
         discNumber: item.discNumber,
         duration: item.duration,
         genres: relatedGenres(item.genres),
-        imageUrl: image(
-          item.images,
-          options.type,
-          ImageType.PRIMARY,
-          baseUrl,
-          item.remoteId
-        ),
+        imageUrl,
         releaseDate: item.releaseDate,
         releaseYear: item.releaseYear,
         remoteCreatedAt: item.remoteCreatedAt,
         remoteId: item.remoteId,
         // serverFolderId: item.serverFolderId,
         serverId: item.serverId,
-        streamUrl: stream,
+        streamUrl,
         trackNumber: item.trackNumber,
         updatedAt: item.updatedAt,
         /* eslint-enable sort-keys-fix/sort-keys-fix */
@@ -338,8 +414,32 @@ const albums = (options: {
   const { items, serverUrl, user } = options;
   return (
     items?.map((item) => {
-      const { type, token, remoteUserId } = item.server;
+      const { type, token, remoteUserId, noCredential } = item.server;
       const url = serverUrl || item.server.url;
+
+      // Jellyfin does not require credentials for image url
+      const shouldBuildImage = type === ServerType.JELLYFIN || !noCredential;
+      const tokenForImage = shouldBuildImage ? token : undefined;
+
+      const imageUrl = buildImageUrl({
+        imageType: ImageType.PRIMARY,
+        images: item.images,
+        noCredential,
+        remoteId: item.remoteId,
+        token,
+        type,
+        url,
+      });
+
+      const backdropImageUrl = buildImageUrl({
+        imageType: ImageType.BACKDROP,
+        images: item.images,
+        noCredential,
+        remoteId: item.remoteId,
+        token,
+        type,
+        url,
+      });
 
       return {
         /* eslint-disable sort-keys-fix/sort-keys-fix */
@@ -352,20 +452,8 @@ const albums = (options: {
         rating: rating(item.ratings),
         songCount: item._count.songs,
         type,
-        imageUrl: image(
-          item.images,
-          type,
-          ImageType.PRIMARY,
-          url,
-          item.remoteId
-        ),
-        backdropImageUrl: image(
-          item.images,
-          type,
-          ImageType.BACKDROP,
-          url,
-          item.remoteId
-        ),
+        imageUrl,
+        backdropImageUrl: backdropImageUrl,
         deleted: item.deleted,
         remoteId: item.remoteId,
         remoteCreatedAt: item.remoteCreatedAt,
@@ -379,13 +467,20 @@ const albums = (options: {
         serverFolders: relatedServerFolders(item.serverFolders),
         songs:
           item.songs &&
-          songs(item.songs, {
-            deviceId: user.deviceId,
-            token,
-            type,
-            url,
-            userId: remoteUserId,
-          }),
+          songs(
+            item?.songs?.map((s: any) => ({
+              ...s,
+              album: { images: item?.images },
+            })),
+            {
+              deviceId: user.deviceId,
+              token,
+              type,
+              url,
+              userId: remoteUserId,
+            },
+            noCredential
+          ),
         /* eslint-enable sort-keys-fix/sort-keys-fix */
       };
     }) || []
@@ -440,6 +535,7 @@ const servers = (
         name: item.name,
         url: item.url,
         type: item.type,
+        noCredential: item.noCredential,
         username: item.username,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,

@@ -99,6 +99,7 @@ model Server {
   remoteUserId String
   username     String
   token        String
+  noCredential Boolean    @default(true)
   type         ServerType
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt

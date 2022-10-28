@@ -49,7 +49,7 @@ const getAvailableServerFolderIds = async (
 
   if (user.isAdmin) {
     const serverFoldersWithAccess = await prisma.serverFolder.findMany({
-      where: { serverId },
+      where: { enabled: true, serverId },
     });
 
     const serverFoldersWithAccessIds = serverFoldersWithAccess.map(
@@ -65,6 +65,7 @@ const getAvailableServerFolderIds = async (
         {
           AND: [
             {
+              enabled: true,
               serverFolderPermissions: {
                 some: { userId: { equals: user.id } },
               },

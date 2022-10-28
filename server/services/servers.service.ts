@@ -104,12 +104,13 @@ const findById = async (user: AuthUser, options: { id: string }) => {
   return server;
 };
 
-const findMany = async (user: AuthUser) => {
+const findMany = async (user: AuthUser, options?: { enabled?: boolean }) => {
   if (user.isAdmin) {
     return prisma.server.findMany({
       include: {
         serverFolders: {
           orderBy: { name: SortOrder.ASC },
+          where: { enabled: options?.enabled ? true : undefined },
         },
         serverPermissions: {
           orderBy: { createdAt: SortOrder.ASC },
@@ -131,7 +132,12 @@ const findMany = async (user: AuthUser) => {
     include: {
       serverFolders: {
         orderBy: { name: SortOrder.ASC },
-        where: { id: { in: user.flatServerFolderPermissions } },
+        where: {
+          AND: [
+            { id: { in: user.flatServerFolderPermissions } },
+            { enabled: options?.enabled ? true : undefined },
+          ],
+        },
       },
       serverPermissions: {
         orderBy: { createdAt: SortOrder.ASC },
@@ -178,6 +184,7 @@ const create = async (options: {
     if (!serverFoldersRes) {
       throw ApiError.badRequest('Server is inaccessible.');
     }
+
     const serverFoldersCreate = serverFoldersRes.map((folder) => {
       return {
         name: folder.name,
@@ -193,19 +200,6 @@ const create = async (options: {
       },
     });
 
-    // for (const serverFolder of serverFolders) {
-    //   await prisma.serverFolder.upsert({
-    //     create: serverFolder,
-    //     update: { name: serverFolder.name },
-    //     where: {
-    //       uniqueServerFolderId: {
-    //         remoteId: serverFolder.remoteId,
-    //         serverId: serverFolder.serverId,
-    //       },
-    //     },
-    //   });
-    // }
-
     return server;
   }
 
@@ -218,6 +212,8 @@ const create = async (options: {
     if (!serverFoldersRes) {
       throw ApiError.badRequest('Server is inaccessible.');
     }
+
+    const navidromeToken = options.token + '||' + options?.altToken;
 
     const serverFoldersCreate = serverFoldersRes.map((folder) => {
       return {
@@ -232,7 +228,7 @@ const create = async (options: {
         remoteUserId: options.remoteUserId,
         serverFolders: { create: serverFoldersCreate },
         serverUrls: { create: { url: options.url } },
-        token: options.token,
+        token: navidromeToken,
         type: options.type,
         url: options.url,
         username: options.username,
@@ -295,8 +291,8 @@ const create = async (options: {
 const update = async (
   options: { id: string },
   data: {
-    altToken?: string; // Used for Navidrome only
     name?: string;
+    noCredential?: boolean;
     remoteUserId?: string;
     token?: string;
     type?: ServerType;

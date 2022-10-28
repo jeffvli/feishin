@@ -11,7 +11,7 @@ const detail = {
 const list = {
   body: z.object({}),
   params: z.object({}),
-  query: z.object({}),
+  query: z.object({ enabled: z.string().optional() }),
 };
 
 const deleteServer = {
@@ -24,6 +24,7 @@ const update = {
   body: z.object({
     legacy: z.boolean().optional(),
     name: z.string().optional(),
+    noCredential: z.boolean().optional(),
     password: z.string().optional(),
     type: z.nativeEnum(ServerType),
     url: z.string().optional(),
@@ -37,6 +38,7 @@ const create = {
   body: z.object({
     legacy: z.boolean().optional(),
     name: z.string(),
+    noCredential: z.boolean().optional(),
     password: z.string(),
     type: z.enum([
       ServerType.JELLYFIN,

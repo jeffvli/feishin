@@ -33,7 +33,7 @@ const include = (user: AuthUser, options: { songs?: boolean }) => {
       },
     },
     server: true,
-    serverFolders: true,
+    serverFolders: { where: { enabled: true } },
     songs: options?.songs && songHelpers.findMany(user),
   };
 

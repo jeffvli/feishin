@@ -1,3 +1,4 @@
+import { ServerType } from '@prisma/client';
 import { Response } from 'express';
 import { ApiSuccess, getSuccessResponse } from '@/utils';
 import { toApiModel } from '@helpers/api-model';
@@ -18,7 +19,10 @@ const getServerList = async (
   req: TypedRequest<typeof validation.servers.list>,
   res: Response
 ) => {
-  const data = await service.servers.findMany(req.authUser);
+  const { enabled } = req.query;
+  const data = await service.servers.findMany(req.authUser, {
+    enabled: Boolean(enabled),
+  });
   const success = ApiSuccess.ok({ data: toApiModel.servers(data) });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
@@ -55,7 +59,8 @@ const updateServer = async (
   res: Response
 ) => {
   const { serverId } = req.params;
-  const { username, password, name, legacy, type, url } = req.body;
+  const { username, password, name, legacy, type, url, noCredential } =
+    req.body;
 
   if (type && username && password && url) {
     const remoteServerLoginRes = await service.servers.remoteServerLogin({
@@ -68,14 +73,27 @@ const updateServer = async (
 
     const data = await service.servers.update(
       { id: serverId },
-      { name, ...remoteServerLoginRes }
+      {
+        name,
+        remoteUserId: remoteServerLoginRes.remoteUserId,
+        token:
+          type === ServerType.NAVIDROME
+            ? `${remoteServerLoginRes.token}||${remoteServerLoginRes?.altToken}`
+            : remoteServerLoginRes.token,
+        type,
+        url: remoteServerLoginRes.url,
+        username: remoteServerLoginRes.username,
+      }
     );
 
     const success = ApiSuccess.ok({ data: toApiModel.servers([data])[0] });
     return res.status(success.statusCode).json(getSuccessResponse(success));
   }
 
-  const data = await service.servers.update({ id: serverId }, { name, url });
+  const data = await service.servers.update(
+    { id: serverId },
+    { name, noCredential, url }
+  );
   const success = ApiSuccess.ok({ data: toApiModel.servers([data])[0] });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
@@ -97,6 +115,8 @@ const scanServer = async (
 ) => {
   const { serverId } = req.params;
   const { serverFolderId } = req.body;
+
+  // TODO: Check that server is accessible first with the saved token, otherwise throw error
 
   const data = await service.servers.fullScan({
     id: serverId,
