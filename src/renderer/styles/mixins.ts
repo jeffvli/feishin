@@ -28,3 +28,17 @@ export const coverBackground = css`
   background-position: center;
   background-size: cover;
 `;
+
+export const fadeIn = css`
+  animation: fadein 0.3s;
+
+  @keyframes fadein {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+`;
