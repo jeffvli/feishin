@@ -8,3 +8,4 @@ export * from './input';
 export * from './segmented-control';
 export * from './dropdown-menu';
 export * from './toast';
+export * from './switch';
