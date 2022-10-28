@@ -12,6 +12,7 @@ export enum AppRoute {
   LIBRARY_FOLDERS = '/library/folders',
   LIBRARY_SONGS = '/library/songs',
   LOGIN = '/login',
+  NOW_PLAYING = '/now-playing',
   PLAYING = '/playing',
   PLAYLISTS = '/playlists',
   PLAYLISTS_DETAIL = '/playlists/:playlistId',
@@ -21,6 +22,7 @@ export enum AppRoute {
 
 type TArgs =
   | { path: AppRoute.HOME }
+  | { path: AppRoute.NOW_PLAYING }
   | { path: AppRoute.EXPLORE }
   | { path: AppRoute.LOGIN }
   | { path: AppRoute.PLAYING }

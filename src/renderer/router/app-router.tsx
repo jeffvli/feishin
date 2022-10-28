@@ -1,11 +1,12 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Routes, Route } from 'react-router-dom';
-import { AlbumListRoute } from '@/renderer/features/albums/routes/album-list-route';
+import { AlbumListRoute } from '@/renderer/features/albums';
+import { LoginRoute } from '@/renderer/features/auth';
+import { DashboardRoute } from '@/renderer/features/dashboard';
+import { NowPlayingRoute } from '@/renderer/features/now-playing';
+import { AuthLayout, DefaultLayout } from '@/renderer/layouts';
 import { AuthOutlet } from '@/renderer/router/auth-outlet';
 import { PrivateOutlet } from '@/renderer/router/private-outlet';
-import { LoginRoute } from '../features/auth';
-import { DashboardRoute } from '../features/dashboard';
-import { AuthLayout, DefaultLayout } from '../layouts';
 import { AppRoute } from './routes';
 
 export const AppRouter = () => {
@@ -22,6 +23,7 @@ export const AppRouter = () => {
       >
         <Route element={<DefaultLayout />}>
           <Route element={<DashboardRoute />} path={AppRoute.HOME} />
+          <Route element={<NowPlayingRoute />} path={AppRoute.NOW_PLAYING} />
           <Route element={<AlbumListRoute />} path={AppRoute.LIBRARY_ALBUMS} />
           <Route element={<></>} path={AppRoute.LIBRARY_ARTISTS} />
         </Route>
