@@ -25,8 +25,9 @@ export enum Platform {
 }
 
 export enum ServerType {
-  JELLYFIN = 'jellyfin',
-  SUBSONIC = 'subsonic',
+  JELLYFIN = 'JELLYFIN',
+  NAVIDROME = 'NAVIDROME',
+  SUBSONIC = 'SUBSONIC',
 }
 
 export enum PlayerStatus {
