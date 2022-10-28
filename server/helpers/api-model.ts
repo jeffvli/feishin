@@ -470,7 +470,7 @@ const albums = (options: {
           songs(
             item?.songs?.map((s: any) => ({
               ...s,
-              album: { images: item?.images },
+              album: { images: item?.images, ...relatedAlbum(item) },
             })),
             {
               deviceId: user.deviceId,
@@ -486,38 +486,6 @@ const albums = (options: {
     }) || []
   );
 };
-
-// const relatedServerCredentials = (items: ServerCredential[]) => {
-//   return (
-//     items.map((item) => {
-//       return {
-//         /* eslint-disable sort-keys-fix/sort-keys-fix */
-//         id: item.id,
-//         enabled: item.enabled,
-//         username: item.username,
-//         credential: item.credential,
-//         /* eslint-enable sort-keys-fix/sort-keys-fix */
-//       };
-//     }) || []
-//   );
-// };
-
-// const serverCredentials = (items: ServerCredential[]) => {
-//   return (
-//     items.map((item) => {
-//       return {
-//         /* eslint-disable sort-keys-fix/sort-keys-fix */
-//         id: item.id,
-//         username: item.username,
-//         enabled: item.enabled,
-//         credential: item.credential,
-//         createdAt: item.createdAt,
-//         updatedAt: item.updatedAt,
-//         /* eslint-enable sort-keys-fix/sort-keys-fix */
-//       };
-//     }) || []
-//   );
-// };
 
 const servers = (
   items: (Server & {
