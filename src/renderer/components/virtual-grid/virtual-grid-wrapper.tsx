@@ -1,14 +1,15 @@
 import { Ref, useMemo } from 'react';
+import styled from '@emotion/styled';
 import { FixedSizeList, FixedSizeListProps } from 'react-window';
 import { GridCard } from '@/renderer/components/virtual-grid/grid-card';
 import { usePlayQueueHandler } from '@/renderer/features/player/hooks/use-playqueue-handler';
-import { CardRow } from '@/renderer/types';
+import { CardRow, LibraryItem } from '@/renderer/types';
 
 export const VirtualGridWrapper = ({
   refInstance,
-  cardControls,
   cardRows,
   itemGap,
+  itemType,
   itemWidth,
   itemHeight,
   itemCount,
@@ -17,12 +18,12 @@ export const VirtualGridWrapper = ({
   itemData,
   ...rest
 }: Omit<FixedSizeListProps, 'ref' | 'itemSize' | 'children'> & {
-  cardControls: any;
   cardRows: CardRow[];
   columnCount: number;
   itemData: any[];
   itemGap: number;
   itemHeight: number;
+  itemType: LibraryItem;
   itemWidth: number;
   refInstance: Ref<any>;
   rowCount: number;
@@ -31,7 +32,6 @@ export const VirtualGridWrapper = ({
 
   const memo = useMemo(
     () => ({
-      cardControls,
       cardRows,
       columnCount,
       handlePlayQueueAdd,
@@ -39,11 +39,12 @@ export const VirtualGridWrapper = ({
       itemData,
       itemGap,
       itemHeight,
+      itemType,
       itemWidth,
     }),
     [
-      cardControls,
       cardRows,
+      itemType,
       columnCount,
       handlePlayQueueAdd,
       itemCount,
@@ -67,3 +68,13 @@ export const VirtualGridWrapper = ({
     </FixedSizeList>
   );
 };
+
+export const VirtualGridContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+
+export const VirtualGridAutoSizerContainer = styled.div`
+  flex: 1;
+`;

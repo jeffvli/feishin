@@ -3,31 +3,31 @@ import debounce from 'lodash/debounce';
 import { FixedSizeListProps } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { VirtualGridWrapper } from '@/renderer/components/virtual-grid/virtual-grid-wrapper';
-import { CardRow } from '@/renderer/types';
+import { CardRow, LibraryItem } from '@/renderer/types';
 
 interface VirtualGridProps
   extends Omit<FixedSizeListProps, 'children' | 'itemSize'> {
-  cardControls: any;
   cardRows: CardRow[];
-  itemGap?: number;
+  fetchFn: (options: {
+    columnCount: number;
+    skip: number;
+    take: number;
+  }) => Promise<any>;
+  itemGap: number;
   itemSize: number;
+  itemType: LibraryItem;
   minimumBatchSize?: number;
-  query: ({ serverId }: { serverId: string }, props: any) => Promise<any>;
-  queryParams?: Record<string, any>;
-  serverId: string;
 }
 
 export const VirtualInfiniteGrid = ({
   itemCount,
   itemGap,
   itemSize,
-  cardControls,
+  itemType,
   cardRows,
   minimumBatchSize,
-  query,
-  queryParams,
+  fetchFn,
   height,
-  serverId,
   width,
 }: VirtualGridProps) => {
   const [itemData, setItemData] = useState<any[]>([]);
@@ -36,7 +36,7 @@ export const VirtualInfiniteGrid = ({
 
   const { itemHeight, rowCount, columnCount } = useMemo(() => {
     const itemsPerRow = Math.floor(
-      (Number(width) - itemGap! + 3) / (itemSize! + itemGap! + 2)
+      (Number(width) - itemGap + 3) / (itemSize! + itemGap + 2)
     );
 
     return {
@@ -60,20 +60,17 @@ export const VirtualInfiniteGrid = ({
     const start = startIndex * columnCount;
     const end = stopIndex * columnCount + columnCount;
 
-    const t = await query(
-      { serverId },
-      {
-        skip: start,
-        take: end - start,
-        ...queryParams,
-      }
-    );
+    const items = await fetchFn({
+      columnCount,
+      skip: start,
+      take: end - start,
+    });
 
     const newData: any[] = [...itemData];
 
     let itemIndex = 0;
     for (let rowIndex = start; rowIndex < end; rowIndex += 1) {
-      newData[rowIndex] = t.data[itemIndex];
+      newData[rowIndex] = items.data[itemIndex];
       itemIndex += 1;
     }
 
@@ -85,36 +82,34 @@ export const VirtualInfiniteGrid = ({
   useEffect(() => {
     if (loader.current) {
       listRef.current.scrollTo(0);
-      loader.current.resetloadMoreItemsCache(true);
+      loader.current.resetloadMoreItemsCache(false);
       setItemData(() => []);
 
       loadMoreItems(0, minimumBatchSize! * 2);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [minimumBatchSize, queryParams, setItemData]);
+  }, [minimumBatchSize, fetchFn]);
 
   return (
     <InfiniteLoader
       ref={loader}
       isItemLoaded={(index) => isItemLoaded(index)}
       itemCount={itemCount || 0}
-      loadMoreItems={(startIndex, stopIndex) =>
-        debouncedLoadMoreItems(startIndex, stopIndex)
-      }
+      loadMoreItems={debouncedLoadMoreItems}
       minimumBatchSize={minimumBatchSize}
       threshold={30}
     >
       {({ onItemsRendered, ref: infiniteLoaderRef }) => (
         <VirtualGridWrapper
           useIsScrolling
-          cardControls={cardControls}
           cardRows={cardRows}
           columnCount={columnCount}
           height={height}
           itemCount={itemCount || 0}
           itemData={itemData}
-          itemGap={itemGap!}
-          itemHeight={itemHeight! + itemGap! / 2}
+          itemGap={itemGap}
+          itemHeight={itemHeight + itemGap / 2}
+          itemType={itemType}
           itemWidth={itemSize}
           refInstance={(list) => {
             infiniteLoaderRef(list);
@@ -130,7 +125,5 @@ export const VirtualInfiniteGrid = ({
 };
 
 VirtualInfiniteGrid.defaultProps = {
-  itemGap: 10,
   minimumBatchSize: 20,
-  queryParams: {},
 };
