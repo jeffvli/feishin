@@ -1,10 +1,11 @@
-import { albumArtistsController } from './album-artists.controller';
-import { albumsController } from './albums.controller';
-import { artistsController } from './artists.controller';
-import { authController } from './auth.controller';
-import { serversController } from './servers.controller';
-import { songsController } from './songs.controller';
-import { usersController } from './users.controller';
+import { albumArtistsController } from '@controllers/album-artists.controller';
+import { albumsController } from '@controllers/albums.controller';
+import { artistsController } from '@controllers/artists.controller';
+import { authController } from '@controllers/auth.controller';
+import { serversController } from '@controllers/servers.controller';
+import { songsController } from '@controllers/songs.controller';
+import { tasksController } from '@controllers/tasks.controller';
+import { usersController } from '@controllers/users.controller';
 
 export const controller = {
   albumArtists: albumArtistsController,
@@ -13,5 +14,6 @@ export const controller = {
   auth: authController,
   servers: serversController,
   songs: songsController,
+  tasks: tasksController,
   users: usersController,
 };

@@ -30,10 +30,11 @@ const authenticate = async (options: {
 };
 
 const getGenres = async (server: Server, params?: NDGenreListParams) => {
+  const [ndToken] = server.token.split('||');
   const { data } = await api.get<NDGenreListResponse>(
     `${server.url}/api/genre`,
     {
-      headers: { 'x-nd-authorization': `Bearer ${server.token}` },
+      headers: { 'x-nd-authorization': `Bearer ${ndToken}` },
       params,
     }
   );
@@ -42,10 +43,11 @@ const getGenres = async (server: Server, params?: NDGenreListParams) => {
 };
 
 const getArtists = async (server: Server, params?: NDGenreListParams) => {
+  const [ndToken] = server.token.split('||');
   const { data } = await api.get<NDArtistListResponse>(
     `${server.url}/api/artist`,
     {
-      headers: { 'x-nd-authorization': `Bearer ${server.token}` },
+      headers: { 'x-nd-authorization': `Bearer ${ndToken}` },
       params,
     }
   );
@@ -54,10 +56,11 @@ const getArtists = async (server: Server, params?: NDGenreListParams) => {
 };
 
 const getAlbums = async (server: Server, params?: NDAlbumListParams) => {
+  const [ndToken] = server.token.split('||');
   const { data } = await api.get<NDAlbumListResponse>(
     `${server.url}/api/album`,
     {
-      headers: { 'x-nd-authorization': `Bearer ${server.token}` },
+      headers: { 'x-nd-authorization': `Bearer ${ndToken}` },
       params,
     }
   );
@@ -66,8 +69,9 @@ const getAlbums = async (server: Server, params?: NDAlbumListParams) => {
 };
 
 const getSongs = async (server: Server, params?: NDSongListParams) => {
+  const [ndToken] = server.token.split('||');
   const { data } = await api.get<NDSongListResponse>(`${server.url}/api/song`, {
-    headers: { 'x-nd-authorization': `Bearer ${server.token}` },
+    headers: { 'x-nd-authorization': `Bearer ${ndToken}` },
     params,
   });
 

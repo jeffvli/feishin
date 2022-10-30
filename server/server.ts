@@ -1,3 +1,4 @@
+/* eslint-disable import/order */
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -6,6 +7,9 @@ import passport from 'passport';
 import 'express-async-errors';
 import { errorHandler } from '@/middleware';
 import { routes } from '@routes/index';
+import { sockets } from '@sockets/index';
+import * as http from 'http';
+import * as socketio from 'socket.io';
 
 require('./lib/passport');
 
@@ -37,4 +41,16 @@ app.get('/', (_req, res) => {
 app.use(routes);
 app.use(errorHandler);
 
-app.listen(9321, () => console.log(`Listening on port ${PORT}`));
+const server = http.createServer(app);
+const io = new socketio.Server(server, {
+  cors: {
+    credentials: false,
+    methods: ['GET', 'POST'],
+    origin: [`http://localhost:4343`, `${process.env.APP_BASE_URL}`],
+  },
+});
+
+app.set('socketio', io);
+io.on('connection', (socket) => sockets(socket));
+
+server.listen(9321, () => console.log(`Listening on port ${PORT}`));

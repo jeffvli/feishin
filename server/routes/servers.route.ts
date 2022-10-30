@@ -48,7 +48,15 @@ router
   .post(
     validateRequest(validation.servers.scan),
     authenticateAdmin,
-    controller.servers.scanServer
+    controller.servers.quickScanServer
+  );
+
+router
+  .route('/:serverId/full-scan')
+  .post(
+    validateRequest(validation.servers.scan),
+    authenticateAdmin,
+    controller.servers.fullScanServer
   );
 
 router

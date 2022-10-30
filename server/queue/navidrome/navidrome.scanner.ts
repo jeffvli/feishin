@@ -37,8 +37,14 @@ export const scanGenres = async (server: Server, task: Task) => {
 
 export const scanAlbumArtists = async (
   server: Server,
-  serverFolder: ServerFolder
+  serverFolder: ServerFolder,
+  task: Task
 ) => {
+  await prisma.task.update({
+    data: { message: 'Scanning artists' },
+    where: { id: task.id },
+  });
+
   const artists = await navidromeApi.getArtists(server);
 
   const externalsCreateMany = artists
@@ -101,8 +107,14 @@ export const scanAlbumArtists = async (
 
 export const scanAlbums = async (
   server: Server,
-  serverFolder: ServerFolder
+  serverFolder: ServerFolder,
+  task: Task
 ) => {
+  await prisma.task.update({
+    data: { message: 'Scanning artists' },
+    where: { id: task.id },
+  });
+
   let start = 0;
   let count = 5000;
   do {
@@ -153,26 +165,38 @@ export const scanAlbums = async (
         }
       }
 
-      const artistsConnect = validArtistIds.map((id) => ({
-        uniqueArtistId: {
-          remoteId: id,
-          serverId: server.id,
-        },
-      }));
+      // const artistsConnect = validArtistIds.map((id) => ({
+      //   uniqueArtistId: {
+      //     remoteId: id,
+      //     serverId: server.id,
+      //   },
+      // }));
 
-      const albumArtistConnect = album.artistId
+      const aaConnect = [];
+      const albumArtistConnect = album.albumArtistId
         ? {
             uniqueAlbumArtistId: {
-              remoteId: album.artistId,
+              remoteId: album.albumArtistId,
               serverId: server.id,
             },
           }
         : undefined;
 
+      aaConnect.push(
+        ...validArtistIds.map((id) => ({
+          uniqueAlbumArtistId: {
+            remoteId: id,
+            serverId: server.id,
+          },
+        }))
+      );
+
+      albumArtistConnect && aaConnect.push(albumArtistConnect);
+
       await prisma.album.upsert({
         create: {
-          albumArtists: { connect: albumArtistConnect },
-          artists: { connect: artistsConnect },
+          albumArtists: { connect: aaConnect },
+          // artists: { connect: artistsConnect },
           deleted: false,
           genres: { connect: genresConnect },
           images: { connect: imagesConnect },
@@ -188,8 +212,8 @@ export const scanAlbums = async (
           sortName: album.name,
         },
         update: {
-          albumArtists: { connect: albumArtistConnect },
-          artists: { connect: artistsConnect },
+          albumArtists: { connect: aaConnect },
+          // artists: { connect: artistsConnect },
           deleted: false,
           genres: { connect: genresConnect },
           images: { connect: imagesConnect },
@@ -218,7 +242,16 @@ export const scanAlbums = async (
   } while (count === CHUNK_SIZE);
 };
 
-const scanSongs = async (server: Server, serverFolder: ServerFolder) => {
+const scanSongs = async (
+  server: Server,
+  serverFolder: ServerFolder,
+  task: Task
+) => {
+  await prisma.task.update({
+    data: { message: 'Scanning artists' },
+    where: { id: task.id },
+  });
+
   let start = 0;
   let count = 5000;
   do {
@@ -313,7 +346,7 @@ const scanSongs = async (server: Server, serverFolder: ServerFolder) => {
     }
 
     for (const folder of createdFolders) {
-      if (folder.parentId) break;
+      if (folder?.parentId || !folder) break;
 
       const pathSplit = folder.path.split('/');
       const parentPath = pathSplit.slice(0, pathSplit.length - 1).join('/');
@@ -359,9 +392,14 @@ const scanAll = async (
 
       for (const serverFolder of serverFolders) {
         await scanGenres(server, task);
-        await scanAlbumArtists(server, serverFolder);
-        await scanAlbums(server, serverFolder);
-        await scanSongs(server, serverFolder);
+        await scanAlbumArtists(server, serverFolder, task);
+        await scanAlbums(server, serverFolder, task);
+        await scanSongs(server, serverFolder, task);
+
+        await prisma.serverFolder.update({
+          data: { lastScannedAt: new Date() },
+          where: { id: serverFolder.id },
+        });
       }
 
       return { task };

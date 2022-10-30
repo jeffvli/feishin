@@ -26,8 +26,14 @@ export const scanGenres = async (server: Server, task: Task) => {
 
 export const scanAlbumArtists = async (
   server: Server,
-  serverFolder: ServerFolder
+  serverFolder: ServerFolder,
+  task: Task
 ) => {
+  await prisma.task.update({
+    data: { message: 'Scanning artists' },
+    where: { id: task.id },
+  });
+
   const artists = await subsonicApi.getArtists(server, serverFolder.remoteId);
 
   for (const artist of artists) {
@@ -58,8 +64,14 @@ export const scanAlbumArtists = async (
 
 export const scanAlbums = async (
   server: Server,
-  serverFolder: ServerFolder
+  serverFolder: ServerFolder,
+  task: Task
 ) => {
+  await prisma.task.update({
+    data: { message: 'Scanning albums' },
+    where: { id: task.id },
+  });
+
   const albums = await subsonicApi.getAlbums(server, {
     musicFolderId: serverFolder.id,
     offset: 0,
@@ -241,8 +253,14 @@ const throttledAlbumFetch = throttle(
 
 export const scanAlbumDetail = async (
   server: Server,
-  serverFolder: ServerFolder
+  serverFolder: ServerFolder,
+  task: Task
 ) => {
+  await prisma.task.update({
+    data: { message: 'Scanning songs' },
+    where: { id: task.id },
+  });
+
   const promises = [];
   const dbAlbums = await prisma.album.findMany({
     where: {
@@ -271,9 +289,14 @@ const scanAll = async (
 
       for (const serverFolder of serverFolders) {
         await scanGenres(server, task);
-        await scanAlbumArtists(server, serverFolder);
-        await scanAlbums(server, serverFolder);
-        await scanAlbumDetail(server, serverFolder);
+        await scanAlbumArtists(server, serverFolder, task);
+        await scanAlbums(server, serverFolder, task);
+        await scanAlbumDetail(server, serverFolder, task);
+
+        await prisma.serverFolder.update({
+          data: { lastScannedAt: new Date() },
+          where: { id: serverFolder.id },
+        });
       }
 
       return { task };

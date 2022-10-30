@@ -1,12 +1,13 @@
-import { albumArtistsValidation } from './album-artists.validation';
-import { albumsValidation } from './albums.validation';
-import { artistsValidation } from './artists.validation';
-import { authValidation } from './auth.validation';
-import { serversValidation } from './servers.validation';
-import { songsValidation } from './songs.validation';
-import { usersValidation } from './users.validation';
+import { albumArtistsValidation } from '@validations/album-artists.validation';
+import { albumsValidation } from '@validations/albums.validation';
+import { artistsValidation } from '@validations/artists.validation';
+import { authValidation } from '@validations/auth.validation';
+import { serversValidation } from '@validations/servers.validation';
+import { songsValidation } from '@validations/songs.validation';
+import { tasksValidation } from '@validations/tasks.validation';
+import { usersValidation } from '@validations/users.validation';
 
-export { validateRequest, TypedRequest } from './shared.validation';
+export { validateRequest, TypedRequest } from '@validations/shared.validation';
 
 export const validation = {
   albumArtists: albumArtistsValidation,
@@ -15,5 +16,6 @@ export const validation = {
   auth: authValidation,
   servers: serversValidation,
   songs: songsValidation,
+  tasks: tasksValidation,
   users: usersValidation,
 };

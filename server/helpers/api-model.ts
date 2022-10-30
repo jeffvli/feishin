@@ -18,6 +18,7 @@ import {
   ServerUrl,
   Song,
   SongRating,
+  Task,
   User,
   UserServerUrl,
 } from '@prisma/client';
@@ -516,6 +517,17 @@ const servers = (
   );
 };
 
+const relatedServers = (items: Server[]) => {
+  const result = items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    type: item.type,
+    url: item.url,
+  }));
+
+  return result || [];
+};
+
 const relatedServerFolderPermissions = (items: ServerFolderPermission[]) => {
   return items.map((item) => {
     return {
@@ -578,9 +590,46 @@ const users = (
   );
 };
 
+const relatedUsers = (items: User[]) => {
+  const result = items.map((item) => ({
+    enabled: item.enabled,
+    id: item.id,
+    isAdmin: item.isAdmin,
+    username: item.username,
+  }));
+
+  return result || [];
+};
+
+type DbTask = Task & DbTaskInclude;
+
+type DbTaskInclude = {
+  server: Server;
+  user: User;
+};
+
+const tasks = (options: { items: DbTask[] | any[] }) => {
+  const { items } = options;
+
+  const result = items.map((item) => ({
+    createdAt: item.createdAt,
+    id: item.id,
+    isCompleted: item.completed,
+    isError: item.isError,
+    message: item.message,
+    server: item.server ? relatedServers([item.server])[0] : null,
+    type: item.type,
+    updatedAt: item.updatedAt,
+    user: item.user ? relatedUsers([item.user])[0] : null,
+  }));
+
+  return result;
+};
+
 export const toApiModel = {
   albums,
   servers,
   songs,
+  tasks,
   users,
 };

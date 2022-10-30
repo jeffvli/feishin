@@ -75,12 +75,12 @@ model User {
 
   serverFolderPermissions ServerFolderPermission[]
   serverPermissions       ServerPermission[]
-  // serverCredentials       ServerCredential[]
   albumArtistFavorites    AlbumArtistFavorite[]
   artistFavorites         ArtistFavorite[]
   albumFavorites          AlbumFavorite[]
   songFavorites           SongFavorite[]
   userServerUrls          UserServerUrl[]
+  tasks                   Task[]
 }
 
 model History {
@@ -112,25 +112,9 @@ model Server {
   serverUrls        ServerUrl[]
   folders           Folder[]
   serverPermissions ServerPermission[]
-  // serverCredentials ServerCredential[]
   tasks             Task[]
   userServerUrls    UserServerUrl[]
 }
-
-// model ServerCredential {
-//   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-//   username   String
-//   enabled    Boolean  @default(false)
-//   credential String
-//   createdAt  DateTime @default(now())
-//   updatedAt  DateTime @updatedAt
-
-//   server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
-//   serverId String @db.Uuid
-
-//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   userId String @db.Uuid
-// }
 
 model Folder {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -518,15 +502,16 @@ model Song {
 
 model Task {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String
   type      TaskType
   message   String?
-  progress  String?
   completed Boolean  @default(false)
-  isError   Boolean? @default(false)
+  isError   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
   serverId String @db.Uuid
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String? @db.Uuid
 }

@@ -364,7 +364,22 @@ const refresh = async (options: { id: string }) => {
   return server;
 };
 
-const fullScan = async (options: { id: string; serverFolderId?: string[] }) => {
+const findScanInProgress = async (options: { serverId: string }) => {
+  const tasks = await prisma.task.findMany({
+    where: {
+      OR: [{ type: TaskType.FULL_SCAN }, { type: TaskType.QUICK_SCAN }],
+      completed: false,
+      serverId: options.serverId,
+    },
+  });
+
+  return tasks;
+};
+
+const fullScan = async (
+  user: AuthUser,
+  options: { id: string; serverFolderId?: string[] }
+) => {
   const { id, serverFolderId } = options;
 
   // Only allow scan of enabled folders
@@ -392,10 +407,9 @@ const fullScan = async (options: { id: string; serverFolderId?: string[] }) => {
 
   const task = await prisma.task.create({
     data: {
-      completed: false,
-      name: 'Full scan',
       server: { connect: { id: server.id } },
       type: TaskType.FULL_SCAN,
+      user: { connect: { id: user.id } },
     },
   });
 
@@ -411,7 +425,7 @@ const fullScan = async (options: { id: string; serverFolderId?: string[] }) => {
     await navidrome.scanner.scanAll(server, serverFolders, task);
   }
 
-  return {};
+  return task;
 };
 
 const findServerUrlById = async (options: { id: string }) => {
@@ -421,69 +435,6 @@ const findServerUrlById = async (options: { id: string }) => {
 
   return serverUrl;
 };
-
-// const findCredentialById = async (options: { id: string }) => {
-//   const credential = await prisma.serverCredential.findUnique({
-//     where: { id: options.id },
-//   });
-
-//   if (!credential) {
-//     throw ApiError.notFound('Credential not found.');
-//   }
-
-//   return credential;
-// };
-
-// const createCredential = async (options: {
-//   credential: string;
-//   serverId: string;
-//   userId: string;
-//   username: string;
-// }) => {
-//   const { credential, serverId, userId, username } = options;
-
-//   const serverCredential = await prisma.serverCredential.create({
-//     data: {
-//       credential,
-//       serverId,
-//       userId,
-//       username,
-//     },
-//   });
-
-//   return serverCredential;
-// };
-
-// const deleteCredentialById = async (options: { id: string }) => {
-//   await prisma.serverCredential.delete({
-//     where: { id: options.id },
-//   });
-// };
-
-// const enableCredentialById = async (options: { id: string }) => {
-//   const serverCredential = await prisma.serverCredential.update({
-//     data: { enabled: true },
-//     where: { id: options.id },
-//   });
-
-//   const { id, userId, serverId } = serverCredential;
-
-//   await prisma.serverCredential.updateMany({
-//     data: { enabled: false },
-//     where: { AND: [{ serverId, userId }, { NOT: { id } }] },
-//   });
-
-//   return serverCredential;
-// };
-
-// const disableCredentialById = async (options: { id: string }) => {
-//   const serverCredential = await prisma.serverCredential.update({
-//     data: { enabled: false },
-//     where: { id: options.id },
-//   });
-
-//   return serverCredential;
-// };
 
 const createUrl = async (options: { serverId: string; url: string }) => {
   const { serverId, url } = options;
@@ -589,6 +540,7 @@ export const serversService = {
   findById,
   findFolderById,
   findMany,
+  findScanInProgress,
   findServerUrlById,
   findUrlById,
   fullScan,

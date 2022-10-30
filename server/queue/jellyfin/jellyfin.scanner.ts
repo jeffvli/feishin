@@ -478,6 +478,11 @@ const scanAll = async (
         await scanAlbums(server, serverFolder, task);
         await scanSongs(server, serverFolder, task);
         await checkDeleted(server, serverFolder, task);
+
+        await prisma.serverFolder.update({
+          data: { lastScannedAt: new Date() },
+          where: { id: serverFolder.id },
+        });
       }
 
       return { task };

@@ -1,6 +1,6 @@
 import { ServerType } from '@prisma/client';
 import { Response } from 'express';
-import { ApiSuccess, getSuccessResponse } from '@/utils';
+import { ApiError, ApiSuccess, getSuccessResponse } from '@/utils';
 import { toApiModel } from '@helpers/api-model';
 import { service } from '@services/index';
 import { TypedRequest, validation } from '@validations/index';
@@ -109,7 +109,7 @@ const refreshServer = async (
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
-const scanServer = async (
+const fullScanServer = async (
   req: TypedRequest<typeof validation.servers.scan>,
   res: Response
 ) => {
@@ -118,12 +118,53 @@ const scanServer = async (
 
   // TODO: Check that server is accessible first with the saved token, otherwise throw error
 
-  const data = await service.servers.fullScan({
+  const scansInProgress = await service.servers.findScanInProgress({
+    serverId,
+  });
+
+  if (scansInProgress.length > 0) {
+    throw ApiError.badRequest('Scan already in progress');
+  }
+
+  const io = req.app.get('socketio');
+  await io.emit('task:started');
+
+  const data = await service.servers.fullScan(req.authUser, {
     id: serverId,
     serverFolderId,
   });
 
+  // return res.status(200).json({ data: null });
   const success = ApiSuccess.ok({ data });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const quickScanServer = async (
+  req: TypedRequest<typeof validation.servers.scan>,
+  res: Response
+) => {
+  const { serverId } = req.params;
+  const { serverFolderId } = req.body;
+
+  // TODO: Check that server is accessible first with the saved token, otherwise throw error
+
+  const scansInProgress = await service.servers.findScanInProgress({
+    serverId,
+  });
+
+  if (scansInProgress.length > 0) {
+    throw ApiError.badRequest('Scan already in progress');
+  }
+
+  const io = req.app.get('socketio');
+  await io.emit('task:started');
+
+  // await service.servers.fullScan({
+  //   id: serverId,
+  //   serverFolderId,
+  // });
+
+  const success = ApiSuccess.ok({ data: null });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
@@ -228,9 +269,10 @@ export const serversController = {
   disableServerUrl,
   enableServerFolder,
   enableServerUrl,
+  fullScanServer,
   getServerDetail,
   getServerList,
+  quickScanServer,
   refreshServer,
-  scanServer,
   updateServer,
 };

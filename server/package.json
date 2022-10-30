@@ -73,6 +73,7 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
+    "socket.io": "^4.5.3",
     "zod": "^3.19.1"
   }
 }
