@@ -1,6 +1,7 @@
 // Referenced from: https://betterprogramming.pub/the-best-way-to-manage-routes-in-a-react-project-with-typescript-c4e8d4422d64
 
 export enum AppRoute {
+  ACTION_REQUIRED = '/action-required',
   EXPLORE = '/explore',
   HOME = '/',
   LIBRARY_ALBUMARTISTS = '/library/album-artists',
@@ -22,6 +23,7 @@ export enum AppRoute {
 
 type TArgs =
   | { path: AppRoute.HOME }
+  | { path: AppRoute.ACTION_REQUIRED }
   | { path: AppRoute.NOW_PLAYING }
   | { path: AppRoute.EXPLORE }
   | { path: AppRoute.LOGIN }

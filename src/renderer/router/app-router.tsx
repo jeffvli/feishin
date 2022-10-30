@@ -1,5 +1,6 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 import { Routes, Route, Link } from 'react-router-dom';
+import { ActionRequiredRoute } from '@/renderer/features/action-required';
 import { AlbumListRoute } from '@/renderer/features/albums';
 import { LoginRoute } from '@/renderer/features/auth';
 import { DashboardRoute } from '@/renderer/features/dashboard';
@@ -27,6 +28,12 @@ export const AppRouter = () => {
           <Route element={<Link to={AppRoute.HOME}>Go home</Link>} path="*" />
         </Route>
         <Route element={<></>} path={AppRoute.PLAYING} />
+      </Route>
+      <Route element={<DefaultLayout shell />}>
+        <Route
+          element={<ActionRequiredRoute />}
+          path={AppRoute.ACTION_REQUIRED}
+        />
       </Route>
     </Routes>
   );
