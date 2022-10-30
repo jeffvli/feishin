@@ -67,7 +67,7 @@ export const ActionRequiredRoute = () => {
               <>
                 <Group noWrap position="center">
                   <RiCheckFill color="var(--success-color)" size={30} />
-                  <Text size="xl">No issues found.</Text>
+                  <Text size="xl">No issues found</Text>
                 </Group>
                 <Button
                   component={Link}
@@ -75,7 +75,7 @@ export const ActionRequiredRoute = () => {
                   to={AppRoute.HOME}
                   variant="filled"
                 >
-                  Return home
+                  Go back
                 </Button>
               </>
             )}
