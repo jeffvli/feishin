@@ -84,6 +84,7 @@ export type Server = {
   createdAt: string;
   id: string;
   name: string;
+  noCredential: boolean;
   remoteUserId: string;
   serverFolders?: RelatedServerFolder[];
   serverPermissions?: RelatedServerPermission[];
@@ -96,6 +97,7 @@ export type Server = {
 };
 
 export type RelatedServerFolder = {
+  enabled: boolean;
   id: string;
   lastScannedAt: string | null;
   name: string;
@@ -280,6 +282,32 @@ export type RelatedArtist = {
   id: string;
   name: string;
   remoteId: string;
+};
+
+export type RelatedServer = {
+  id: string;
+  name: string;
+  type: ServerType;
+  url: string;
+};
+
+export type RelatedUser = {
+  enabled: boolean;
+  id: string;
+  isAdmin: boolean;
+  username: string;
+};
+
+export type Task = {
+  createdAt: string;
+  id: string;
+  isCompleted: boolean;
+  isError: boolean;
+  message: string;
+  server: RelatedServer | null;
+  type: TaskType;
+  updatedAt: string;
+  user: RelatedUser | null;
 };
 
 export type PingResponse = BaseResponse<Ping>;

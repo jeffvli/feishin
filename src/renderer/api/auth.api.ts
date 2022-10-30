@@ -1,4 +1,3 @@
-// import axios from 'axios';
 import axios from 'axios';
 import { LoginResponse, PingResponse } from './types';
 

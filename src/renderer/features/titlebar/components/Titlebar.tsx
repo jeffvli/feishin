@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 import styled from '@emotion/styled';
 import { Group } from '@mantine/core';
-import { FiActivity } from 'react-icons/fi';
-import { Button, Text } from '@/renderer/components';
+import { Text } from '@/renderer/components';
+import { ActivityMenu } from '@/renderer/features/titlebar/components/activity-menu';
 import { AppMenu } from '@/renderer/features/titlebar/components/app-menu';
 import { useAuthStore } from '@/renderer/store';
 import { Font } from '@/renderer/styles';
@@ -69,14 +69,7 @@ export const Titlebar = ({ children }: TitlebarProps) => {
           <Group spacing="xs">
             {isAuthenticated && (
               <>
-                <Button
-                  px={5}
-                  size="xs"
-                  sx={{ color: 'var(--titlebar-fg)' }}
-                  variant="subtle"
-                >
-                  <FiActivity size={15} />
-                </Button>
+                <ActivityMenu />
                 <AppMenu />
               </>
             )}

@@ -1,5 +1,11 @@
+import { Group } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
-import { RiArrowLeftLine, RiLogoutBoxLine, RiMenu3Fill } from 'react-icons/ri';
+import {
+  RiArrowLeftLine,
+  RiLock2Line,
+  RiLogoutBoxLine,
+  RiMenu3Fill,
+} from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { Button, DropdownMenu } from '@/renderer/components';
 import {
@@ -15,11 +21,16 @@ export const AppMenu = () => {
   const logout = useAuthStore((state) => state.logout);
   const currentServer = useAuthStore((state) => state.currentServer);
   const setCurrentServer = useAuthStore((state) => state.setCurrentServer);
+  const serverCredentials = useAuthStore((state) => state.serverCredentials);
   const permissions = usePermissions();
   const { data: servers } = useServerList();
 
   const serverList =
-    servers?.data?.map((s) => ({ id: s.id, label: `${s.name}` })) ?? [];
+    servers?.data?.map((s) => ({
+      id: s.id,
+      label: `${s.name}`,
+      noCredential: s.noCredential,
+    })) ?? [];
 
   const handleLogout = () => {
     logout();
@@ -49,7 +60,7 @@ export const AppMenu = () => {
   };
 
   return (
-    <DropdownMenu withinPortal position="bottom" width={200}>
+    <DropdownMenu withArrow withinPortal position="bottom" width={200}>
       <DropdownMenu.Target>
         <Button
           px={5}
@@ -62,24 +73,38 @@ export const AppMenu = () => {
       </DropdownMenu.Target>
       <DropdownMenu.Dropdown>
         <DropdownMenu.Label>Server switcher</DropdownMenu.Label>
-        {serverList.map((s) => (
-          <DropdownMenu.Item
-            key={`server-${s.id}`}
-            rightSection={
-              s.id === currentServer?.id ? <RiArrowLeftLine /> : undefined
-            }
-            sx={{
-              color:
-                s.id === currentServer?.id ? 'var(--primary-color)' : undefined,
-            }}
-            onClick={() => handleSetCurrentServer(s.id)}
-          >
-            {s.label}
-          </DropdownMenu.Item>
-        ))}
+        {serverList.map((s) => {
+          const requiresCredential = !serverCredentials.some(
+            (c) => c.serverId === s.id && c.enabled
+          );
+
+          return (
+            <DropdownMenu.Item
+              key={`server-${s.id}`}
+              disabled={requiresCredential}
+              rightSection={
+                s.id === currentServer?.id ? <RiArrowLeftLine /> : undefined
+              }
+              sx={{
+                color:
+                  s.id === currentServer?.id
+                    ? 'var(--primary-color)'
+                    : undefined,
+              }}
+              onClick={() => handleSetCurrentServer(s.id)}
+            >
+              <Group>
+                {requiresCredential && (
+                  <RiLock2Line color="var(--danger-color)" />
+                )}
+                {s.label}
+              </Group>
+            </DropdownMenu.Item>
+          );
+        })}
         <DropdownMenu.Divider />
         <DropdownMenu.Item disabled>Search</DropdownMenu.Item>
-        <DropdownMenu.Item>Configure</DropdownMenu.Item>
+        <DropdownMenu.Item>Settings</DropdownMenu.Item>
         <DropdownMenu.Divider />
         {permissions.createServer && (
           <DropdownMenu.Item onClick={handleAddServerModal}>

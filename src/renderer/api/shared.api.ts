@@ -23,7 +23,7 @@ export const jfAuthenticate = async (options: {
     { pw: password, username },
     {
       headers: {
-        'X-Emby-Authorization': `MediaBrowser Client="Sonixd", Device="PC", DeviceId="Sonixd", Version="1.0.0-alpha1"`,
+        'X-Emby-Authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="1.0.0-alpha1"`,
       },
     }
   );
@@ -76,7 +76,7 @@ const ssAuthenticate = async (options: {
   }
 
   const { data } = await axios.get(
-    `${cleanServerUrl}/rest/ping.view?v=1.13.0&c=sonixd&f=json&${token}`
+    `${cleanServerUrl}/rest/ping.view?v=1.13.0&c=Feishin&f=json&${token}`
   );
 
   return { token, ...data };

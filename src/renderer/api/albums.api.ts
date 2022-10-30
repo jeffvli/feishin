@@ -1,5 +1,5 @@
 import { ax } from '@/renderer/lib/axios';
-import { SortOrder } from '@/types';
+import { SortOrder } from '@/renderer/types';
 import {
   AlbumDetailResponse,
   AlbumListResponse,
@@ -25,13 +25,19 @@ export type AlbumListParams = PaginationParams & {
 };
 
 const getAlbumDetail = async (
-  query: { albumId: number; serverId: string },
+  query: { albumId: string; serverId: string },
   signal?: AbortSignal
 ) => {
   const { data } = await ax.get<AlbumDetailResponse>(
     `/servers/${query.serverId}/albums/${query.albumId}`,
     { signal }
   );
+
+  // const songs = data.data.songs?.map((s) => ({
+  //   ...s,
+  //   streamUrl:
+  // }));
+
   return data;
 };
 
