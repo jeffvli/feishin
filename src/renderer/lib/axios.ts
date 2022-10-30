@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import Axios from 'axios';
+import { useAuthStore } from '@/renderer/store';
 import { authApi } from '../api/auth.api';
 
 export const ax = Axios.create({
@@ -60,24 +61,12 @@ ax.interceptors.response.use(
         return Axios(config);
       }
 
-      localStorage.setItem(
-        'store_authentication',
-        JSON.stringify({
-          ...auth,
-          state: { ...auth.state, accessToken: '', refreshToken: '' },
-        })
-      );
-
+      const { logout } = useAuthStore.getState();
       if (err.response.data.error.message === 'No auth token') {
-        localStorage.setItem(
-          'store_authentication',
-          JSON.stringify({
-            ...auth,
-            state: { ...auth.state, accessToken: '', refreshToken: '' },
-          })
-        );
-        // window.location.reload();
+        logout();
       }
+
+      logout();
     }
     return Promise.reject(err);
   }
