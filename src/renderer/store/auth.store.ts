@@ -5,7 +5,7 @@ import { Server } from '@/renderer/api/types';
 
 export interface AuthState {
   accessToken: string;
-  currentServer?: Server;
+  currentServer: Server | null;
   permissions: {
     isAdmin: boolean;
     username: string;
@@ -35,7 +35,7 @@ export interface AuthSlice extends AuthState {
   enableServerCredential: (options: { id: string }) => void;
   login: (auth: Partial<AuthState>) => void;
   logout: () => void;
-  setCurrentServer: (server: Server) => void;
+  setCurrentServer: (server: Server | null) => void;
 }
 
 export const useAuthStore = create<AuthSlice>()(
@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthSlice>()(
             state.serverCredentials.push(options);
           });
         },
-        currentServer: undefined,
+        currentServer: null,
         deleteServerCredential: (options) => {
           set((state) => {
             state.serverCredentials = state.serverCredentials.filter(
@@ -102,7 +102,7 @@ export const useAuthStore = create<AuthSlice>()(
         serverKey: '',
         serverPermissions: '',
         serverUrl: '',
-        setCurrentServer: (server: Server) => {
+        setCurrentServer: (server: Server | null) => {
           return set({ currentServer: server });
         },
       })),
