@@ -5,13 +5,15 @@ interface PrivateOutletProps {
   redirectTo: string;
 }
 
-export const PrivateOutlet = ({ redirectTo }: PrivateOutletProps) => {
+export const AppOutlet = ({ redirectTo }: PrivateOutletProps) => {
   const location = useLocation();
   const isAuthenticated = useAuthStore((state) => !!state.accessToken);
+  const logout = useAuthStore((state) => state.logout);
 
   if (isAuthenticated) {
     return <Outlet />;
   }
 
+  logout();
   return <Navigate replace state={{ from: location }} to={redirectTo} />;
 };
