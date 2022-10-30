@@ -100,6 +100,11 @@ const createWindow = async () => {
     mainWindow?.close();
   });
 
+  ipcMain.on('app-restart', () => {
+    app.relaunch();
+    app.exit(0);
+  });
+
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {

@@ -1,1 +1,2 @@
 import './player';
+import './settings';

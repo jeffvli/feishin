@@ -2,25 +2,17 @@ import { ipcMain } from 'electron';
 import MpvAPI from 'node-mpv';
 import { PlayerData } from '../../../../renderer/store';
 import { getMainWindow } from '../../../main';
+import { store } from '../settings/index';
 
 declare module 'node-mpv';
 
-// const BINARY_PATH = getMainWindow()
-//   ?.webContents.executeJavaScript('localStorage.getItem("mpv_binary");', true)
-//   .then((result) => {
-//     return result;
-//   })
-//   .catch((err) => {
-//     console.log(err);
-//   });
+const BINARY_PATH = store.get('mpv_path') as string;
 
 const mpv = new MpvAPI(
   {
     audio_only: true,
     auto_restart: true,
-    binary: 'C:/ProgramData/chocolatey/lib/mpv.install/tools/mpv.exe',
-    // binary: BINARY_PATH,
-
+    binary: BINARY_PATH || '',
     time_update: 1,
   },
   ['--gapless-audio=yes', '--prefetch-playlist']

@@ -3,6 +3,9 @@ import { PlayerData } from '../renderer/store';
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
+    APP_RESTART() {
+      ipcRenderer.send('app-restart');
+    },
     PLAYER_AUTO_NEXT(data: PlayerData) {
       ipcRenderer.send('player-auto-next', data);
     },
@@ -62,7 +65,7 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.on('renderer-player-stop', cb);
     },
     SETTINGS_GET(data: { property: string }) {
-      ipcRenderer.send('settings-get', data);
+      return ipcRenderer.invoke('settings-get', data);
     },
     SETTINGS_SET(data: { property: string; value: any }) {
       ipcRenderer.send('settings-set', data);
