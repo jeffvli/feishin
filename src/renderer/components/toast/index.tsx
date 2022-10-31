@@ -61,7 +61,12 @@ const showToast = ({ type, ...props }: NotificationProps) => {
 export const toast = {
   clean: cleanNotifications,
   cleanQueue: cleanNotificationsQueue,
+  error: (props: NotificationProps) => showToast({ type: 'success', ...props }),
   hide: hideNotification,
+  info: (props: NotificationProps) => showToast({ type: 'success', ...props }),
   show: showToast,
+  success: (props: NotificationProps) =>
+    showToast({ type: 'success', ...props }),
   update: updateNotification,
+  warn: (props: NotificationProps) => showToast({ type: 'success', ...props }),
 };
