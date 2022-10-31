@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
-import { Group } from '@mantine/core';
+import { Box, Group } from '@mantine/core';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { RiArrowUpSLine } from 'react-icons/ri';
-import { Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router-dom';
 import { Button, Text } from '@/renderer/components';
 import { AppRoute } from '@/renderer/router/routes';
 import { useAppStore, usePlayerStore } from '@/renderer/store';
-import { fadeIn, Font } from '@/renderer/styles';
+import { fadeIn } from '@/renderer/styles';
 
 const LeftControlsContainer = styled.div`
   display: flex;
@@ -33,11 +33,12 @@ const MetadataStack = styled(motion.div)`
 
 const Image = styled(motion(Link))<{ url: string }>`
   ${fadeIn};
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   background-image: url(${(props) => props.url});
   background-repeat: no-repeat;
   background-size: cover;
+  filter: drop-shadow(0 0 5px rgb(0, 0, 0, 100%));
 
   button {
     display: none;
@@ -48,12 +49,26 @@ const Image = styled(motion(Link))<{ url: string }>`
   }
 `;
 
+const LineItem = styled(Box)<{ secondary?: boolean }>`
+  display: inline-block;
+  width: 95%;
+  max-width: 30vw;
+  overflow: hidden;
+  color: ${(props) => props.secondary && 'var(--main-fg-secondary)'};
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  a {
+    color: ${(props) => props.secondary && 'var(--text-secondary)'};
+  }
+`;
+
 export const LeftControls = () => {
   const hideImage = useAppStore((state) => state.sidebar.image);
   const setSidebar = useAppStore((state) => state.setSidebar);
   const song = usePlayerStore((state) => state.current.song);
   const title = song?.name;
-  const artists = song?.artists?.map((artist) => artist?.name).join(', ');
+  const artists = song?.artists;
   const album = song?.album;
 
   return (
@@ -88,38 +103,66 @@ export const LeftControls = () => {
           )}
         </AnimatePresence>
         <MetadataStack layout>
-          <Text
-            font={Font.POPPINS}
-            link={!!title}
-            overflow="hidden"
-            size="sm"
-            to="/nowplaying"
-            weight={500}
-          >
-            {title || '—'}
-          </Text>
-          <Text
-            secondary
-            font={Font.POPPINS}
-            link={!!artists}
-            overflow="hidden"
-            size="sm"
-            to="/nowplaying"
-            weight={500}
-          >
-            {artists || '—'}
-          </Text>
-          <Text
-            secondary
-            font={Font.POPPINS}
-            link={!!album}
-            overflow="hidden"
-            size="sm"
-            to="/nowplaying"
-            weight={500}
-          >
-            {album?.name || '—'}
-          </Text>
+          <LineItem>
+            <Text
+              component={Link}
+              overflow="hidden"
+              size="sm"
+              sx={{ '&:hover': { textDecoration: 'underline' } }}
+              to={AppRoute.NOW_PLAYING}
+              weight={500}
+            >
+              {title || '—'}
+            </Text>
+          </LineItem>
+          <LineItem secondary>
+            {artists?.map((artist, index) => (
+              <>
+                {index > 0 && (
+                  <Text secondary style={{ display: 'inline-block' }}>
+                    ,
+                  </Text>
+                )}{' '}
+                <Text
+                  component={Link}
+                  overflow="hidden"
+                  size="sm"
+                  sx={{
+                    '&:hover': { textDecoration: 'underline' },
+                    width: 'inherit',
+                  }}
+                  to={
+                    artist.id
+                      ? generatePath(AppRoute.LIBRARY_ARTISTS_DETAIL, {
+                          artistId: artist.id,
+                        })
+                      : ''
+                  }
+                  weight={500}
+                >
+                  {artist.name || '—'}
+                </Text>
+              </>
+            ))}
+          </LineItem>
+          <LineItem secondary>
+            <Text
+              component={Link}
+              overflow="hidden"
+              size="sm"
+              sx={{ '&:hover': { textDecoration: 'underline' } }}
+              to={
+                album?.id
+                  ? generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                      albumId: album?.id,
+                    })
+                  : ''
+              }
+              weight={500}
+            >
+              {album?.name || '—'}
+            </Text>
+          </LineItem>
         </MetadataStack>
       </LayoutGroup>
     </LeftControlsContainer>
