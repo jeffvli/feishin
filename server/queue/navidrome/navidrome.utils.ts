@@ -40,6 +40,8 @@ const insertSongGroup = async (
     const pathSplit = song.path.split('/');
     const parentPath = pathSplit.slice(0, pathSplit.length - 1).join('/');
 
+    const year = song.year === 0 ? null : song.year;
+
     return {
       create: {
         albumArtistId: albumArtist?.id,
@@ -57,10 +59,8 @@ const insertSongGroup = async (
         },
         genres: { connect: genresConnect },
         name: song.title,
-        releaseDate: song?.year
-          ? new Date(song.year, 0).toISOString()
-          : undefined,
-        releaseYear: song?.year,
+        releaseDate: year ? new Date(year, 0).toISOString() : undefined,
+        releaseYear: year,
         remoteCreatedAt: song.createdAt,
         remoteId: song.id,
         serverFolders: { connect: { id: serverFolder.id } },
@@ -85,10 +85,8 @@ const insertSongGroup = async (
         },
         genres: { connect: genresConnect },
         name: song.title,
-        releaseDate: song?.year
-          ? new Date(song.year, 0).toISOString()
-          : undefined,
-        releaseYear: song?.year,
+        releaseDate: year ? new Date(song.year, 0).toISOString() : undefined,
+        releaseYear: year,
         remoteCreatedAt: song.createdAt,
         remoteId: song.id,
         serverFolders: { connect: { id: serverFolder.id } },

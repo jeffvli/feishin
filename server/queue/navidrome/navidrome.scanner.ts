@@ -111,7 +111,7 @@ export const scanAlbums = async (
   task: Task
 ) => {
   await prisma.task.update({
-    data: { message: 'Scanning artists' },
+    data: { message: 'Scanning albums' },
     where: { id: task.id },
   });
 
@@ -193,6 +193,8 @@ export const scanAlbums = async (
 
       albumArtistConnect && aaConnect.push(albumArtistConnect);
 
+      const year = album.minYear === 0 ? null : album.minYear;
+
       await prisma.album.upsert({
         create: {
           albumArtists: { connect: aaConnect },
@@ -201,10 +203,8 @@ export const scanAlbums = async (
           genres: { connect: genresConnect },
           images: { connect: imagesConnect },
           name: album.name,
-          releaseDate: album?.minYear
-            ? new Date(album.minYear, 0).toISOString()
-            : undefined,
-          releaseYear: album.minYear,
+          releaseDate: year ? new Date(year, 0).toISOString() : undefined,
+          releaseYear: year,
           remoteCreatedAt: album.createdAt,
           remoteId: album.id,
           serverFolders: { connect: { id: serverFolder.id } },
@@ -218,10 +218,8 @@ export const scanAlbums = async (
           genres: { connect: genresConnect },
           images: { connect: imagesConnect },
           name: album.name,
-          releaseDate: album?.minYear
-            ? new Date(album.minYear, 0).toISOString()
-            : undefined,
-          releaseYear: album.minYear,
+          releaseDate: year ? new Date(year, 0).toISOString() : null,
+          releaseYear: year,
           remoteCreatedAt: album.createdAt,
           remoteId: album.id,
           serverFolders: { connect: { id: serverFolder.id } },
@@ -248,7 +246,7 @@ const scanSongs = async (
   task: Task
 ) => {
   await prisma.task.update({
-    data: { message: 'Scanning artists' },
+    data: { message: 'Scanning songs' },
     where: { id: task.id },
   });
 
@@ -391,10 +389,10 @@ const scanAll = async (
       });
 
       for (const serverFolder of serverFolders) {
-        await scanGenres(server, task);
-        await scanAlbumArtists(server, serverFolder, task);
+        // await scanGenres(server, task);
+        // await scanAlbumArtists(server, serverFolder, task);
         await scanAlbums(server, serverFolder, task);
-        await scanSongs(server, serverFolder, task);
+        // await scanSongs(server, serverFolder, task);
 
         await prisma.serverFolder.update({
           data: { lastScannedAt: new Date() },
