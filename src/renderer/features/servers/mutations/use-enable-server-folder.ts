@@ -47,7 +47,7 @@ export const useEnableServerFolder = () => {
       return { previous };
     },
     onSettled: () => {
-      queryClient.invalidateQueries(queryKeys.servers.list());
+      queryClient.invalidateQueries(queryKeys.servers.root);
     },
   });
 

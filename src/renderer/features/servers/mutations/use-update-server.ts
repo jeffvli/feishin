@@ -39,10 +39,16 @@ export const useUpdateServer = () => {
       if (!previous) return undefined;
       const data = previous.data.map((server) => {
         if (server.id === variables.query.serverId) {
+          if (variables.body.name || variables.body.username) {
+            return {
+              ...server,
+              name: variables.body.name,
+              username: variables.body?.username,
+            };
+          }
           return {
             ...server,
-            name: variables.body.name,
-            username: variables.body.username,
+            noCredential: variables.body.noCredential,
           };
         }
 
@@ -54,13 +60,6 @@ export const useUpdateServer = () => {
       return { previous };
     },
     onSettled: () => {
-      queryClient.invalidateQueries(queryKeys.servers.list());
-    },
-    onSuccess: (data) => {
-      toast.show({
-        message: `Server "${data.data.name}" updated`,
-        type: 'success',
-      });
       queryClient.invalidateQueries(queryKeys.servers.list());
     },
   });

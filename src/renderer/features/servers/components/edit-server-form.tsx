@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
 import { RiInformationLine } from 'react-icons/ri';
 import { Server, ServerType } from '@/renderer/api/types';
-import { Button, PasswordInput, TextInput } from '@/renderer/components';
+import { Button, PasswordInput, TextInput, toast } from '@/renderer/components';
 import { useUpdateServer } from '@/renderer/features/servers/mutations/use-update-server';
 
 interface EditServerFormProps {
@@ -40,7 +40,15 @@ export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
         },
         query: { serverId: server.id },
       },
-      { onSuccess: onCancel }
+      {
+        onSuccess: (data) => {
+          toast.show({
+            message: `Server "${data.data.name}" updated`,
+            type: 'success',
+          });
+          onCancel();
+        },
+      }
     );
   });
 
