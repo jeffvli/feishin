@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
-import { Menu, Button } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { Outlet } from 'react-router';
 import { SideQueue } from '@/renderer/features/side-queue/components/side-queue';
@@ -74,18 +73,22 @@ const ResizeHandle = styled.div<{
   bottom: ${(props) => props.placement === 'bottom' && 0};
   left: ${(props) => props.placement === 'left' && 0};
   z-index: 100;
-  width: 3px;
+  width: 2px;
   height: 100%;
   background-color: var(--sidebar-handle-bg);
   cursor: ew-resize;
   opacity: ${(props) => (props.isResizing ? 1 : 0)};
 
   &:hover {
-    opacity: 1;
+    opacity: 0.5;
   }
 `;
 
-export const DefaultLayout = () => {
+interface DefaultLayoutProps {
+  shell?: boolean;
+}
+
+export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const sidebar = useAppStore((state) => state.sidebar);
   const setSidebar = useAppStore((state) => state.setSidebar);
 
@@ -136,52 +139,48 @@ export const DefaultLayout = () => {
       <Layout>
         <TitlebarContainer>
           <Titlebar />
-          <Menu withinPortal>
-            <Menu.Target>
-              <Button />
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item>Hello</Menu.Item>
-              <Menu.Item>Hello</Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
         </TitlebarContainer>
         <MainContainer
           leftSidebarWidth={sidebar.leftWidth}
           rightExpanded={sidebar.rightExpanded}
           rightSidebarWidth={sidebar.rightWidth}
         >
-          <SidebarContainer>
-            <ResizeHandle
-              ref={sidebarRef}
-              isResizing={isResizing}
-              placement="right"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                startResizing('left');
-              }}
-            />
-            <Sidebar />
-          </SidebarContainer>
-          {sidebar.rightExpanded && (
-            <RightSidebarContainer
-              key="sb"
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              initial={{ opacity: 0, x: 500 }}
-              transition={{ duration: 0.3, ease: 'circOut' }}
-            >
-              <ResizeHandle
-                ref={rightSidebarRef}
-                isResizing={isResizingRight}
-                placement="left"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  startResizing('right');
-                }}
-              />
-              <SideQueue />
-            </RightSidebarContainer>
+          {!shell && (
+            <>
+              <SidebarContainer>
+                <ResizeHandle
+                  ref={sidebarRef}
+                  isResizing={isResizing}
+                  placement="right"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    startResizing('left');
+                  }}
+                />
+                <Sidebar />
+              </SidebarContainer>
+              {sidebar.rightExpanded && (
+                <RightSidebarContainer
+                  key="sb"
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  initial={{ opacity: 0, x: 500 }}
+                  transition={{ duration: 0.3, ease: 'circOut' }}
+                >
+                  <ResizeHandle
+                    ref={rightSidebarRef}
+                    isResizing={isResizingRight}
+                    placement="left"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      startResizing('right');
+                    }}
+                  />
+                  <SideQueue />
+                </RightSidebarContainer>
+              )}
+            </>
           )}
+
           <Outlet />
         </MainContainer>
         <PlayerbarContainer>
@@ -190,4 +189,8 @@ export const DefaultLayout = () => {
       </Layout>
     </>
   );
+};
+
+DefaultLayout.defaultProps = {
+  shell: false,
 };
