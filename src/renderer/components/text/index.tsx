@@ -1,18 +1,13 @@
-import {
-  ComponentPropsWithoutRef,
-  ComponentPropsWithRef,
-  ReactNode,
-} from 'react';
+import { ComponentPropsWithoutRef, ReactNode } from 'react';
 import styled from '@emotion/styled';
 import {
+  createPolymorphicComponent,
   Text as MantineText,
   TextProps as MantineTextProps,
 } from '@mantine/core';
-import { Link } from 'react-router-dom';
 import { Font, textEllipsis } from '@/renderer/styles';
 
 type MantineTextDivProps = MantineTextProps & ComponentPropsWithoutRef<'div'>;
-type MantineTextLinkProps = MantineTextProps & ComponentPropsWithRef<'link'>;
 
 interface TextProps extends MantineTextDivProps {
   children: ReactNode;
@@ -25,64 +20,31 @@ interface TextProps extends MantineTextDivProps {
   weight?: number;
 }
 
-interface LinkTextProps extends MantineTextLinkProps {
-  children: ReactNode;
-  font?: Font;
-  link?: boolean;
-  overflow?: 'hidden' | 'visible';
-  secondary?: boolean;
-  to: string;
-  weight?: number;
-}
-
 const BaseText = styled(MantineText)<any>`
   color: ${(props) =>
-    props.$secondary
-      ? 'var(--playerbar-text-secondary-color)'
-      : 'var(--playerbar-text-primary-color)'};
-  font-family: ${(props) => props.font || Font.GOTHAM};
+    props.secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)'};
+  font-family: ${(props) => props.font};
   /* cursor: ${(props) => (props.link ? 'cursor' : 'default')}; */
-  user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
+  user-select: ${(props) => (props.noSelect ? 'none' : 'auto')};
   ${(props) => props.overflow === 'hidden' && textEllipsis}
 `;
 
 const StyledText = styled(BaseText)<TextProps>``;
 
-const StyledLinkText = styled(BaseText)<LinkTextProps>``;
-
-export const Text = ({
+export const _Text = ({
   children,
-  link,
   secondary,
   overflow,
   font,
-  to,
   noSelect,
   ...rest
 }: TextProps) => {
-  if (link) {
-    return (
-      <StyledLinkText
-        $noSelect={noSelect}
-        $secondary={secondary}
-        component={Link}
-        font={font}
-        link="true"
-        overflow={overflow}
-        to={to || ''}
-        {...rest}
-      >
-        {children}
-      </StyledLinkText>
-    );
-  }
-
   return (
     <StyledText
-      $noSelect={noSelect}
-      $secondary={secondary}
       font={font}
+      noSelect={noSelect && noSelect}
       overflow={overflow}
+      secondary={secondary && secondary}
       {...rest}
     >
       {children}
@@ -90,8 +52,10 @@ export const Text = ({
   );
 };
 
-Text.defaultProps = {
-  font: Font.GOTHAM,
+export const Text = createPolymorphicComponent<'div', TextProps>(_Text);
+
+_Text.defaultProps = {
+  font: undefined,
   link: false,
   noSelect: false,
   overflow: 'visible',
