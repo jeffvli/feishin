@@ -9,7 +9,7 @@ import { MpvRequired } from '@/renderer/features/action-required/components/mpv-
 import { ServerCredentialRequired } from '@/renderer/features/action-required/components/server-credential-required';
 import { ServerRequired } from '@/renderer/features/action-required/components/server-required';
 import { settings } from '@/renderer/features/settings';
-import { useServerCredential } from '@/renderer/features/shared';
+import { AnimatedPage, useServerCredential } from '@/renderer/features/shared';
 import { AppRoute } from '@/renderer/router/routes';
 import { useAuthStore } from '@/renderer/store';
 
@@ -52,8 +52,8 @@ export const ActionRequiredRoute = () => {
   const displayedCheck = checks.find((c) => !c.valid);
 
   return (
-    <>
-      <Center sx={{ width: '100vw' }}>
+    <AnimatedPage>
+      <Center sx={{ height: '100%', width: '100vw' }}>
         <Stack spacing="xl" sx={{ maxWidth: '50%' }}>
           <Group noWrap>
             {displayedCheck && (
@@ -82,6 +82,6 @@ export const ActionRequiredRoute = () => {
           </Stack>
         </Stack>
       </Center>
-    </>
+    </AnimatedPage>
   );
 };
