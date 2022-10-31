@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import styled from '@emotion/styled';
+import isElectron from 'is-electron';
 import { PlaybackType } from '@/renderer/types';
 import { AudioPlayer } from '../../../components';
 import { usePlayerStore } from '../../../store';
@@ -65,7 +66,7 @@ export const Playerbar = () => {
           <RightControls />
         </RightGridItem>
       </PlayerbarControlsGrid>
-      {settings.type === PlaybackType.WEB && (
+      {(!isElectron() || settings.type === PlaybackType.WEB) && (
         <AudioPlayer
           ref={playersRef}
           autoNext={autoNext}
@@ -77,7 +78,7 @@ export const Playerbar = () => {
           player2={player2}
           status={status}
           style={settings.style}
-          volume={volume}
+          volume={volume / 100}
         />
       )}
     </PlayerbarContainer>

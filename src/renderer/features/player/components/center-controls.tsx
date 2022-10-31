@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import format from 'format-duration';
+import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import {
   RiPauseLine,
@@ -70,24 +71,15 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
   } = useCenterControls({ playersRef });
 
   const currentTime = usePlayerStore((state) => state.current.time);
-
   const currentPlayerRef = player === 1 ? player1 : player2;
-
-  const duration = useMemo(
-    () => format((playerData.queue.current?.duration || 0) * 1000),
-    [playerData.queue]
-  );
-
-  const formattedTime = useMemo(
-    () => format(currentTime * 1000 || 0),
-    [currentTime]
-  );
+  const duration = format((playerData.queue.current?.duration || 0) * 1000);
+  const formattedTime = format(currentTime * 1000 || 0);
 
   useEffect(() => {
     let interval: any;
 
     if (status === PlayerStatus.PLAYING && !isSeeking) {
-      if (settings.type === PlaybackType.WEB) {
+      if (!isElectron() || settings.type === PlaybackType.WEB) {
         interval = setInterval(() => {
           setCurrentTime(currentPlayerRef.getCurrentTime());
         }, 1000);
