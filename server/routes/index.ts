@@ -5,6 +5,7 @@ import { router as albumArtistsRouter } from './album-artists.route';
 import { router as albumsRouter } from './albums.route';
 import { router as artistsRouter } from './artists.route';
 import { router as authRouter } from './auth.route';
+import { router as genresRouter } from './genres.route';
 import { router as serversRouter } from './servers.route';
 import { router as songsRouter } from './songs.route';
 import { router as tasksRouter } from './tasks.route';
@@ -44,4 +45,5 @@ routes.param('serverId', (req, _res, next, serverId) => {
 routes.use('/api/servers/:serverId/album-artists', albumArtistsRouter);
 routes.use('/api/servers/:serverId/artists', artistsRouter);
 routes.use('/api/servers/:serverId/albums', albumsRouter);
+routes.use('/api/servers/:serverId/genres', genresRouter);
 routes.use('/api/servers/:serverId/songs', songsRouter);

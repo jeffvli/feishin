@@ -210,6 +210,28 @@ const relatedGenres = (items: Genre[]) => {
   );
 };
 
+const genres = (items: (Genre & { _count?: any })[]) => {
+  return (
+    items?.map((item) => {
+      const totalCount = Object.keys(item._count)
+        .map((key) => item._count[key])
+        .reduce((a, b) => a + b, 0);
+
+      return {
+        /* eslint-disable sort-keys-fix/sort-keys-fix */
+        id: item.id,
+        name: item.name,
+        songCount: item._count?.songs,
+        albumCount: item._count?.albums,
+        artistCount: item._count?.artists,
+        albumArtistCount: item._count?.albumArtists,
+        totalCount,
+        /* eslint-enable sort-keys-fix/sort-keys-fix */
+      };
+    }) || []
+  );
+};
+
 const relatedServerFolders = (items: ServerFolder[]) => {
   const serverFolders = items?.map((item) => {
     return {

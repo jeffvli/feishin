@@ -2,6 +2,7 @@ import { albumArtistsValidation } from '@validations/album-artists.validation';
 import { albumsValidation } from '@validations/albums.validation';
 import { artistsValidation } from '@validations/artists.validation';
 import { authValidation } from '@validations/auth.validation';
+import { genresValidation } from '@validations/genres.validation';
 import { serversValidation } from '@validations/servers.validation';
 import { songsValidation } from '@validations/songs.validation';
 import { tasksValidation } from '@validations/tasks.validation';
@@ -14,6 +15,7 @@ export const validation = {
   albums: albumsValidation,
   artists: artistsValidation,
   auth: authValidation,
+  genres: genresValidation,
   servers: serversValidation,
   songs: songsValidation,
   tasks: tasksValidation,
