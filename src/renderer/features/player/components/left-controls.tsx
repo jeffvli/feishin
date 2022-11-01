@@ -31,13 +31,10 @@ const MetadataStack = styled(motion.div)`
   overflow: hidden;
 `;
 
-const Image = styled(motion(Link))<{ url: string }>`
+const Image = styled(motion(Link))`
   ${fadeIn};
   width: 70px;
   height: 70px;
-  background-image: url(${(props) => props.url});
-  background-repeat: no-repeat;
-  background-size: cover;
   filter: drop-shadow(0 0 5px rgb(0, 0, 0, 100%));
 
   button {
@@ -47,6 +44,14 @@ const Image = styled(motion(Link))<{ url: string }>`
   &:hover button {
     display: block;
   }
+`;
+
+const PlayerbarImage = styled.img`
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-size: cover;
 `;
 
 const LineItem = styled(Box)<{ secondary?: boolean }>`
@@ -84,9 +89,12 @@ export const LeftControls = () => {
                 initial={{ opacity: 0, x: -50 }}
                 to={AppRoute.NOW_PLAYING}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                url={song?.imageUrl}
               >
-                <Group position="right">
+                <PlayerbarImage src={song?.imageUrl} />
+                <Group
+                  position="right"
+                  sx={{ position: 'absolute', right: 0, top: 0 }}
+                >
                   <Button
                     compact
                     variant="subtle"

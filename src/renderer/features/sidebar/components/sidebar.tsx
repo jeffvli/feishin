@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { Stack, Group, Grid, Accordion } from '@mantine/core';
 import { SpotlightProvider, openSpotlight } from '@mantine/spotlight';
@@ -17,10 +16,11 @@ import {
   RiSearchLine,
   RiUserVoiceLine,
 } from 'react-icons/ri';
-import { useNavigate } from 'react-router';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button, TextInput } from '@/renderer/components';
 import { AppRoute } from '@/renderer/router/routes';
 import { useAppStore, usePlayerStore } from '@/renderer/store';
+import { fadeIn } from '@/renderer/styles';
 import { SidebarItem } from './sidebar-item';
 
 const SidebarContainer = styled.div`
@@ -28,12 +28,10 @@ const SidebarContainer = styled.div`
   max-height: calc(100vh - 120px); // Account for titlebar and playerbar
 `;
 
-const Image = styled(motion.div)<{ height: string; url: string }>`
+const ImageContainer = styled(motion(Link))<{ height: string }>`
+  ${fadeIn};
+  position: relative;
   height: ${(props) => props.height};
-  background-image: ${(props) => `url(${props.url})`};
-  background-repeat: no-repeat;
-  background-size: cover;
-  transition: background-image 0.5s linear 0.2s;
 
   button {
     display: none;
@@ -44,17 +42,23 @@ const Image = styled(motion.div)<{ height: string; url: string }>`
   }
 `;
 
+const SidebarImage = styled.img`
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-size: cover;
+`;
+
 export const Sidebar = () => {
   const navigate = useNavigate();
-  const playerData = usePlayerStore((state) => state.getPlayerData());
   const sidebar = useAppStore((state) => state.sidebar);
   const setSidebar = useAppStore((state) => state.setSidebar);
+  const backgroundImage = usePlayerStore(
+    (state) => state.current?.song?.imageUrl
+  );
 
   const showImage = sidebar.image;
-
-  const backgroundImage = useMemo(() => {
-    return playerData.current.song.imageUrl;
-  }, [playerData]);
 
   return (
     <SidebarContainer>
@@ -112,7 +116,12 @@ export const Sidebar = () => {
                 </Group>
               </SidebarItem.Link>
             </SidebarItem>
-            <Accordion disableChevronRotation multiple>
+            <Accordion
+              disableChevronRotation
+              multiple
+              value={sidebar.expanded}
+              onChange={(e) => setSidebar({ expanded: e })}
+            >
               <Accordion.Item value="library">
                 <Accordion.Control p="1rem">
                   <Group>
@@ -168,30 +177,34 @@ export const Sidebar = () => {
             </Accordion>
           </Stack>
         </Stack>
-        <AnimatePresence>
+        <AnimatePresence exitBeforeEnter initial={false}>
           {showImage && (
-            <Image
+            <ImageContainer
               key="sidebar-image"
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               height={sidebar.leftWidth}
               initial={{ opacity: 0, y: 200 }}
+              to={AppRoute.NOW_PLAYING}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              url={backgroundImage}
             >
-              <Group position="right">
+              <SidebarImage src={backgroundImage} />
+              <Group
+                position="right"
+                sx={{ position: 'absolute', right: 0, top: 0 }}
+              >
                 <Button
                   compact
                   variant="subtle"
                   onClick={(e) => {
-                    e.stopPropagation();
+                    e.preventDefault();
                     setSidebar({ image: false });
                   }}
                 >
                   <RiArrowDownSLine color="white" size={20} />
                 </Button>
               </Group>
-            </Image>
+            </ImageContainer>
           )}
         </AnimatePresence>
       </Stack>
