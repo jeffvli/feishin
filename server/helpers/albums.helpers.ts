@@ -57,7 +57,7 @@ const sort = (sortBy: AlbumSort, orderBy: SortOrder) => {
       break;
 
     case AlbumSort.DATE_RELEASED:
-      order = { releaseDate: orderBy, year: orderBy };
+      order = { releaseDate: orderBy };
       break;
 
     case AlbumSort.DATE_RELEASED_YEAR:
@@ -80,7 +80,204 @@ const sort = (sortBy: AlbumSort, orderBy: SortOrder) => {
   return order;
 };
 
+export enum FilterGroupType {
+  AND = 'AND',
+  OR = 'OR',
+}
+
+export type AdvancedFilterRule = {
+  field: string | null;
+  operator: string | null;
+  uniqueId: string;
+  value: string | number | Date | undefined | null | any;
+};
+
+export type AdvancedFilterGroup = {
+  group: AdvancedFilterGroup[];
+  rules: AdvancedFilterRule[];
+  type: FilterGroupType;
+  uniqueId: string;
+};
+
+const advancedFilterGroup = (
+  groups: AdvancedFilterGroup[],
+  user: AuthUser,
+  data: any[]
+) => {
+  if (groups.length === 0) {
+    return data;
+  }
+
+  const filterGroups: any[] = [];
+
+  for (const group of groups) {
+    const rootType = group.type.toUpperCase();
+    const query: any = {
+      [rootType]: [],
+    };
+
+    for (const rule of group.rules) {
+      if (rule.field && rule.operator) {
+        const [table, field, relationField] = rule.field.split('.');
+
+        if (field === 'ratings') {
+          if (table === 'albums') {
+            query[rootType].push({
+              [field]: {
+                some: {
+                  [relationField]: {
+                    [rule.operator]: rule.value,
+                  },
+                  userId: user.id,
+                },
+              },
+            });
+          } else {
+            query[rootType].push({
+              [table]: {
+                some: {
+                  [field]: {
+                    some: {
+                      [relationField]: {
+                        [rule.operator]: rule.value,
+                      },
+                      userId: user.id,
+                    },
+                  },
+                },
+              },
+            });
+          }
+        } else if (table === 'albums') {
+          const obj = {
+            [field]: {
+              [rule.operator]: rule.value,
+              mode: 'insensitive',
+            },
+          };
+
+          query[rootType].push(obj);
+        } else {
+          const obj = {
+            [table]: {
+              some: {
+                [field]: {
+                  [rule.operator]: rule.value,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          };
+
+          query[rootType].push(obj);
+        }
+      }
+    }
+
+    if (group.group.length > 0) {
+      const b = advancedFilterGroup(group.group, user, data);
+      b.forEach((c) => query[rootType].push(c));
+    }
+
+    data.push(query);
+    filterGroups.push(query);
+  }
+
+  return filterGroups;
+};
+
+const advancedFilter = (filter: AdvancedFilterGroup, user: AuthUser) => {
+  const rootQueryType = filter.type.toUpperCase();
+  const rootQuery = {
+    [rootQueryType]: [] as any[],
+  };
+
+  const operatorMap = {
+    '!=': 'not',
+    '!~': 'contains',
+    $: 'endsWith',
+    '<': 'lt',
+    '<=': 'lte',
+    '=': 'equals',
+    '>': 'gt',
+    '>=': 'gte',
+    '^': 'startsWith',
+    '~': 'contains',
+  };
+
+  for (const rule of filter.rules) {
+    if (rule.field && rule.operator) {
+      let [table, field, relationField] = rule.field.split('.');
+      const condition = rule.operator === '!~' ? 'none' : 'some';
+      const op = operatorMap[rule.operator as keyof typeof operatorMap];
+
+      switch (table) {
+        case 'albums':
+          if (field === 'ratings') {
+            rootQuery[rootQueryType].push({
+              [field]: {
+                [condition]: {
+                  [relationField]: {
+                    [op]: rule.value,
+                  },
+                  userId: user.id,
+                },
+              },
+            });
+            break;
+          }
+          rootQuery[rootQueryType].push({
+            [field]: {
+              mode: 'insensitive',
+              [op]: rule.value,
+            },
+          });
+          break;
+
+        default:
+          if (field === 'ratings') {
+            rootQuery[rootQueryType].push({
+              [table]: {
+                some: {
+                  [field]: {
+                    some: {
+                      [relationField]: {
+                        [op]: rule.value,
+                      },
+                      userId: user.id,
+                    },
+                  },
+                },
+              },
+            });
+            break;
+          }
+
+          rootQuery[rootQueryType].push({
+            [table]: {
+              [condition]: {
+                [field]: {
+                  mode: 'insensitive',
+                  [op]: rule.value,
+                },
+              },
+            },
+          });
+          break;
+      }
+    }
+  }
+
+  const groups = advancedFilterGroup(filter.group, user, []);
+  for (const group of groups) {
+    rootQuery[rootQueryType].push(group);
+  }
+
+  return rootQuery;
+};
+
 export const albumHelpers = {
+  advancedFilter,
   include,
   sort,
 };

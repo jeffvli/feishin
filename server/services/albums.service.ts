@@ -1,7 +1,8 @@
+import { Prisma } from '@prisma/client';
 import { AuthUser } from '@/middleware';
 import { OffsetPagination, SortOrder } from '@/types/types';
 import { ApiError } from '@/utils';
-import { AlbumSort } from '@helpers/albums.helpers';
+import { AdvancedFilterGroup, AlbumSort } from '@helpers/albums.helpers';
 import { helpers } from '@helpers/index';
 import { prisma } from '@lib/prisma';
 
@@ -24,6 +25,7 @@ const findById = async (user: AuthUser, options: { id: string }) => {
 };
 
 export type AlbumFindManyOptions = {
+  advancedFilters?: AdvancedFilterGroup;
   orderBy: SortOrder;
   serverFolderId?: string[];
   serverId: string;
@@ -32,8 +34,16 @@ export type AlbumFindManyOptions = {
 } & OffsetPagination;
 
 const findMany = async (options: AlbumFindManyOptions) => {
-  const { take, serverFolderId, skip, sortBy, orderBy, user, serverId } =
-    options;
+  const {
+    take,
+    serverFolderId,
+    skip,
+    sortBy,
+    orderBy,
+    user,
+    serverId,
+    advancedFilters,
+  } = options;
 
   const serverFolderIds =
     serverFolderId ||
@@ -41,6 +51,9 @@ const findMany = async (options: AlbumFindManyOptions) => {
 
   let totalEntries = 0;
   let albums;
+
+  const advancedFiltersQuery =
+    advancedFilters && helpers.albums.advancedFilter(advancedFilters, user);
 
   if (sortBy === AlbumSort.RATING) {
     const [count, result] = await prisma.$transaction([
@@ -92,14 +105,24 @@ const findMany = async (options: AlbumFindManyOptions) => {
   } else {
     [totalEntries, albums] = await prisma.$transaction([
       prisma.album.count({
-        where: { OR: helpers.shared.serverFolderFilter(serverFolderIds) },
+        where: {
+          AND: [
+            helpers.shared.serverFolderFilter(serverFolderIds),
+            advancedFiltersQuery as Prisma.AlbumWhereInput,
+          ],
+        },
       }),
       prisma.album.findMany({
         include: helpers.albums.include(user, { songs: false }),
         orderBy: [helpers.albums.sort(sortBy, orderBy)],
         skip,
         take,
-        where: { OR: helpers.shared.serverFolderFilter(serverFolderIds) },
+        where: {
+          AND: [
+            helpers.shared.serverFolderFilter(serverFolderIds),
+            advancedFiltersQuery as Prisma.AlbumWhereInput,
+          ],
+        },
       }),
     ]);
   }

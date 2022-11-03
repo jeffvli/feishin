@@ -18,6 +18,7 @@ export enum AlbumSort {
 }
 
 export type AlbumListParams = PaginationParams & {
+  advancedFilters?: string;
   orderBy: SortOrder;
   serverFolderId?: string[];
   serverUrlId?: string;

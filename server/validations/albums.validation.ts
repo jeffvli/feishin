@@ -16,6 +16,7 @@ const list = {
     ...serverFolderIdValidation,
     ...orderByValidation,
     ...serverUrlIdValidation,
+    advancedFilters: z.optional(z.string()),
     sortBy: z.nativeEnum(AlbumSort),
   }),
 };

@@ -1,8 +1,9 @@
 /* eslint-disable no-plusplus */
 import { useState, useCallback, useMemo } from 'react';
 import { Group, Checkbox } from '@mantine/core';
-import { useSetState } from '@mantine/hooks';
+import { useDebouncedValue, useSetState } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
+import { nanoid } from 'nanoid';
 import { RiArrowDownSLine } from 'react-icons/ri';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { api } from '@/renderer/api';
@@ -17,6 +18,11 @@ import {
   VirtualGridContainer,
   VirtualInfiniteGrid,
 } from '@/renderer/components';
+import {
+  AdvancedFilterGroup,
+  AdvancedFilters,
+  FilterGroupType,
+} from '@/renderer/features/albums/components/advanced-filters';
 import { useAlbumList } from '@/renderer/features/albums/queries/use-album-list';
 import { useServerList } from '@/renderer/features/servers';
 import { AnimatedPage, useServerCredential } from '@/renderer/features/shared';
@@ -60,12 +66,23 @@ export const AlbumListRoute = () => {
     sortBy: AlbumSort.NAME,
   });
 
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterGroup>({
+    group: [],
+    rules: [{ field: null, operator: null, uniqueId: nanoid(), value: null }],
+    type: FilterGroupType.AND,
+    uniqueId: nanoid(),
+  });
+
+  const [debouncedFilters] = useDebouncedValue(advancedFilters, 300);
+  const encoded = encodeURI(JSON.stringify(debouncedFilters));
+
   const serverFolders = useMemo(() => {
     const server = servers?.data.find((server) => server.id === serverId);
     return server?.serverFolders;
   }, [serverId, servers]);
 
   const { data: albums } = useAlbumList({
+    advancedFilters: encoded,
     orderBy: filters.orderBy,
     serverFolderId: filters.serverFolderId,
     skip: 0,
@@ -76,9 +93,17 @@ export const AlbumListRoute = () => {
   const fetch = useCallback(
     async ({ skip, take }) => {
       const albums = await queryClient.fetchQuery(
-        queryKeys.albums.list(serverId, { skip, take, ...filters }),
+        queryKeys.albums.list(serverId, {
+          skip,
+          take,
+          ...filters,
+          advancedFilters: encoded,
+        }),
         async () =>
-          api.albums.getAlbumList({ serverId }, { skip, take, ...filters })
+          api.albums.getAlbumList(
+            { serverId },
+            { skip, take, ...filters, advancedFilters: encoded }
+          )
       );
 
       // * Adds server token
@@ -95,7 +120,7 @@ export const AlbumListRoute = () => {
 
       return albums;
     },
-    [filters, isImageTokenRequired, queryClient, serverId, serverToken]
+    [encoded, filters, isImageTokenRequired, queryClient, serverId, serverToken]
   );
 
   return (
@@ -171,12 +196,18 @@ export const AlbumListRoute = () => {
               </DropdownMenu.Dropdown>
             </DropdownMenu>
           </Group>
-          <ViewTypeButton
-            handler={setViewType}
-            menuProps={{ position: 'bottom-end' }}
-            type={viewType}
-          />
+          <Group position="right">
+            <ViewTypeButton
+              handler={setViewType}
+              menuProps={{ position: 'bottom-end' }}
+              type={viewType}
+            />
+          </Group>
         </Group>
+        <AdvancedFilters
+          filters={advancedFilters}
+          setFilters={setAdvancedFilters}
+        />
         <VirtualGridAutoSizerContainer>
           <AutoSizer>
             {({ height, width }) => (
@@ -201,7 +232,7 @@ export const AlbumListRoute = () => {
                 itemGap={20}
                 itemSize={200}
                 itemType={LibraryItem.ALBUM}
-                minimumBatchSize={100}
+                minimumBatchSize={40}
                 width={width}
               />
             )}

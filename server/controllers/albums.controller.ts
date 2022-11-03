@@ -24,10 +24,15 @@ const getList = async (
   res: Response
 ) => {
   const { serverId } = req.params;
-  const { take, skip, serverUrlId } = req.query;
+  const { take, skip, serverUrlId, advancedFilters } = req.query;
+
+  const decodedAdvancedFilters = advancedFilters && decodeURI(advancedFilters);
+  const jsonAdvancedFilters =
+    decodedAdvancedFilters && JSON.parse(decodedAdvancedFilters);
 
   const albums = await service.albums.findMany({
     ...req.query,
+    advancedFilters: jsonAdvancedFilters,
     serverId,
     skip: Number(skip),
     take: Number(take),
@@ -66,6 +71,7 @@ const getDetailSongList = async (
 
   const albums = await service.albums.findMany({
     ...req.query,
+    advancedFilters: undefined,
     serverId,
     skip: Number(skip),
     take: Number(take),
