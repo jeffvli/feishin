@@ -134,8 +134,11 @@ const advancedFilterGroup = (
     for (const rule of group.rules) {
       if (rule.field && rule.operator) {
         const [table, field, relationField] = rule.field.split('.');
-        const condition = rule.operator === '!~' ? 'none' : 'some';
+        const condition =
+          rule.operator === '!~' || rule.operator === '!=' ? 'none' : 'some';
         const op = operatorMap[rule.operator as keyof typeof operatorMap];
+        const value =
+          field !== 'releaseDate' ? rule.value : new Date(rule.value);
 
         switch (table) {
           case 'albums':
@@ -144,7 +147,7 @@ const advancedFilterGroup = (
                 [field]: {
                   [condition]: {
                     [relationField]: {
-                      [op]: rule.value,
+                      [op]: value,
                     },
                     userId: user.id,
                   },
@@ -152,13 +155,24 @@ const advancedFilterGroup = (
               });
               break;
             }
-
+            if (field === 'genres') {
+              query[rootType].push({
+                [field]: {
+                  [condition]: {
+                    [relationField]: {
+                      equals: value,
+                    },
+                  },
+                },
+              });
+              break;
+            }
             query[rootType].push({
               [field]: {
                 mode: insensitiveFields.includes(field)
                   ? 'insensitive'
                   : undefined,
-                [op]: rule.value,
+                [op]: value,
               },
             });
             break;
@@ -171,9 +185,25 @@ const advancedFilterGroup = (
                     [field]: {
                       some: {
                         [relationField]: {
-                          [op]: rule.value,
+                          [op]: value,
                         },
                         userId: user.id,
+                      },
+                    },
+                  },
+                },
+              });
+              break;
+            }
+            if (field === 'genres') {
+              query[rootType].push({
+                [table]: {
+                  some: {
+                    [field]: {
+                      [condition]: {
+                        [relationField]: {
+                          equals: value,
+                        },
                       },
                     },
                   },
@@ -187,7 +217,7 @@ const advancedFilterGroup = (
                 [condition]: {
                   [field]: {
                     mode: 'insensitive',
-                    [op]: rule.value,
+                    [op]: value,
                   },
                 },
               },
@@ -218,8 +248,10 @@ const advancedFilter = (filter: AdvancedFilterGroup, user: AuthUser) => {
   for (const rule of filter.rules) {
     if (rule.field && rule.operator) {
       let [table, field, relationField] = rule.field.split('.');
-      const condition = rule.operator === '!~' ? 'none' : 'some';
+      const condition =
+        rule.operator === '!~' || rule.operator === '!=' ? 'none' : 'some';
       const op = operatorMap[rule.operator as keyof typeof operatorMap];
+      const value = field !== 'releaseDate' ? rule.value : new Date(rule.value);
 
       switch (table) {
         case 'albums':
@@ -228,7 +260,7 @@ const advancedFilter = (filter: AdvancedFilterGroup, user: AuthUser) => {
               [field]: {
                 [condition]: {
                   [relationField]: {
-                    [op]: rule.value,
+                    [op]: value,
                   },
                   userId: user.id,
                 },
@@ -236,13 +268,24 @@ const advancedFilter = (filter: AdvancedFilterGroup, user: AuthUser) => {
             });
             break;
           }
-
+          if (field === 'genres') {
+            rootQuery[rootQueryType].push({
+              [field]: {
+                [condition]: {
+                  [relationField]: {
+                    equals: value,
+                  },
+                },
+              },
+            });
+            break;
+          }
           rootQuery[rootQueryType].push({
             [field]: {
               mode: insensitiveFields.includes(field)
                 ? 'insensitive'
                 : undefined,
-              [op]: rule.value,
+              [op]: value,
             },
           });
           break;
@@ -255,9 +298,25 @@ const advancedFilter = (filter: AdvancedFilterGroup, user: AuthUser) => {
                   [field]: {
                     some: {
                       [relationField]: {
-                        [op]: rule.value,
+                        [op]: value,
                       },
                       userId: user.id,
+                    },
+                  },
+                },
+              },
+            });
+            break;
+          }
+          if (field === 'genres') {
+            rootQuery[rootQueryType].push({
+              [table]: {
+                some: {
+                  [field]: {
+                    [condition]: {
+                      [relationField]: {
+                        equals: value,
+                      },
                     },
                   },
                 },
@@ -271,7 +330,7 @@ const advancedFilter = (filter: AdvancedFilterGroup, user: AuthUser) => {
               [condition]: {
                 [field]: {
                   mode: 'insensitive',
-                  [op]: rule.value,
+                  [op]: value,
                 },
               },
             },

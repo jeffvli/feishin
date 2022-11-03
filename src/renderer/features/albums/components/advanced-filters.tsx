@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { Stack, Group } from '@mantine/core';
 import dayjs from 'dayjs';
+import { AnimatePresence, motion } from 'framer-motion';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import { nanoid } from 'nanoid/non-secure';
@@ -12,6 +14,7 @@ import {
   Select,
   TextInput,
 } from '@/renderer/components';
+import { useGenreList } from '@/renderer/features/genres';
 
 export enum FilterGroupType {
   AND = 'AND',
@@ -19,10 +22,10 @@ export enum FilterGroupType {
 }
 
 export type AdvancedFilterRule = {
-  field: string | null;
-  operator: string | null;
+  field?: string | null;
+  operator?: string | null;
   uniqueId: string;
-  value: string | number | Date | undefined | null | any;
+  value?: string | number | Date | undefined | null | any;
 };
 
 export type AdvancedFilterGroup = {
@@ -58,8 +61,8 @@ const NUMBER_FILTER_OPTIONS_DATA = [
 ];
 
 const ID_FILTER_OPTIONS_DATA = [
-  { label: 'is', value: 'equals' },
-  { label: 'is not', value: 'not' },
+  { label: 'is', value: '=' },
+  { label: 'is not', value: '!=' },
 ];
 
 const FILTER_GROUP_OPTIONS_DATA = [
@@ -75,73 +78,96 @@ const FILTER_GROUP_OPTIONS_DATA = [
 
 const FILTER_OPTIONS_DATA = [
   {
+    default: '~',
     label: 'Artist Title',
     value: 'artists.name',
   },
   {
+    default: '=',
     label: 'Artist Rating',
     value: 'artists.ratings.value',
   },
   {
+    default: '=',
     label: 'Artist Genre',
-    value: 'artists.genre',
+    value: 'artists.genres.id',
   },
   {
+    default: '~',
     label: 'Album Artist Title',
     value: 'albumArtists.name',
   },
   {
+    default: '=',
     label: 'Album Artist Rating',
     value: 'albumArtists.ratings.value',
   },
   {
+    default: '=',
     label: 'Album Artist Genre',
-    value: 'albumArtists.genre',
+    value: 'albumArtists.genres.id',
   },
   {
+    default: '~',
     label: 'Album Title',
     value: 'albums.name',
   },
   {
-    label: 'Album Genre',
-    value: 'albums.genre',
-  },
-  {
+    default: '=',
     label: 'Album Rating',
     value: 'albums.ratings.value',
   },
   {
+    default: '=',
+    label: 'Album Genre',
+    value: 'albums.genres.id',
+  },
+  {
+    default: '=',
     label: 'Album Year',
     value: 'albums.releaseYear',
   },
   {
+    default: '<',
     label: 'Album Release Date',
     value: 'albums.releaseDate',
   },
   {
-    label: 'Album Plays',
+    default: '=',
+    disabled: true,
+    label: 'Album Play Count',
     value: 'albums.playCount',
   },
   {
+    default: '<',
     label: 'Album Date Added',
     value: 'albums.dateAdded',
   },
   {
+    default: '~',
     label: 'Track Title',
     value: 'songs.name',
   },
   {
-    label: 'Track Plays',
-    value: 'songs.playCount',
-  },
-  {
+    default: '=',
     label: 'Track Rating',
     value: 'songs.ratings.value',
+  },
+  {
+    default: '=',
+    label: 'Track Genre',
+    value: 'songs.genres.id',
+  },
+  {
+    default: '=',
+    disabled: true,
+    label: 'Track Play Count',
+    value: 'songs.playCount',
   },
 ];
 
 const OPTIONS_MAP = {
-  'albumArtists.genre': {
+  'albumArtists.genres.id': {
     type: 'id',
   },
   'albumArtists.name': {
@@ -156,7 +182,7 @@ const OPTIONS_MAP = {
   'albums.favorite': {
     type: 'boolean',
   },
-  'albums.genre': {
+  'albums.genres.id': {
     type: 'id',
   },
   'albums.name': {
@@ -174,7 +200,7 @@ const OPTIONS_MAP = {
   'albums.releaseYear': {
     type: 'number',
   },
-  'artists.genre': {
+  'artists.genres.id': {
     type: 'id',
   },
   'artists.name': {
@@ -182,6 +208,9 @@ const OPTIONS_MAP = {
   },
   'artists.ratings.value': {
     type: 'number',
+  },
+  'songs.genres.id': {
+    type: 'id',
   },
   'songs.name': {
     type: 'string',
@@ -218,7 +247,7 @@ export const formatAdvancedFiltersGroups = (groups: AdvancedFilterGroup[]) => {
 };
 
 // Prevent query key from constantly changing due to empty rules or groups
-export const formatAdvancedFiltersQuery = (filter: AdvancedFilterGroup) => {
+export const encodeAdvancedFiltersQuery = (filter: AdvancedFilterGroup) => {
   const updatedFilter = {
     ...filter,
     group: formatAdvancedFiltersGroups(filter.group),
@@ -227,7 +256,7 @@ export const formatAdvancedFiltersQuery = (filter: AdvancedFilterGroup) => {
       .map((rule) => ({ ...rule, uniqueId: undefined })),
   };
 
-  return updatedFilter;
+  return encodeURI(JSON.stringify(updatedFilter));
 };
 
 interface FilterOptionProps {
@@ -252,6 +281,48 @@ const FilterOption = ({
   onChangeValue,
 }: FilterOptionProps) => {
   const { field, operator, uniqueId, value } = data;
+  const { data: genres } = useGenreList();
+
+  const genresData = useMemo(() => {
+    if (!genres?.data) return null;
+
+    const album = [];
+    const song = [];
+    const albumArtist = [];
+    const artist = [];
+
+    for (const genre of genres.data) {
+      if (genre.albumCount > 0) {
+        album.push({
+          label: `${genre.name} (${genre.albumCount})`,
+          value: genre.id,
+        });
+      }
+
+      if (genre.songCount > 0) {
+        song.push({
+          label: `${genre.name} (${genre.songCount})`,
+          value: genre.id,
+        });
+      }
+
+      if (genre.albumArtistCount > 0) {
+        albumArtist.push({
+          label: `${genre.name} (${genre.albumArtistCount})`,
+          value: genre.id,
+        });
+      }
+
+      if (genre.artistCount > 0) {
+        artist.push({
+          label: `${genre.name} (${genre.artistCount})`,
+          value: genre.id,
+        });
+      }
+    }
+
+    return { album, albumArtist, artist, song };
+  }, [genres]);
 
   const handleDeleteRule = () => {
     onDeleteRule({ groupIndex, level, uniqueId });
@@ -278,6 +349,17 @@ const FilterOption = ({
         level,
         uniqueId,
         value: e,
+      });
+    }
+
+    const isDate = e instanceof Date;
+
+    if (isDate) {
+      return onChangeValue({
+        groupIndex,
+        level,
+        uniqueId,
+        value: dayjs(e).format('YYYY-MM-DD'),
       });
     }
 
@@ -337,10 +419,10 @@ const FilterOption = ({
   };
 
   const filterInputValueMap = {
-    'albumArtists.genre': (
+    'albumArtists.genres.id': (
       <Select
         searchable
-        data={[]}
+        data={genresData?.albumArtist || []}
         maxWidth={175}
         size="xs"
         value={value}
@@ -380,10 +462,10 @@ const FilterOption = ({
         onChange={handleChangeValue}
       />
     ),
-    'albums.genre': (
+    'albums.genres.id': (
       <Select
         searchable
-        data={[]}
+        data={genresData?.album || []}
         maxWidth={175}
         size="xs"
         value={value}
@@ -443,10 +525,10 @@ const FilterOption = ({
         onChange={handleChangeValue}
       />
     ),
-    'artists.genre': (
+    'artists.genres.id': (
       <Select
         searchable
-        data={[]}
+        data={genresData?.artist || []}
         maxWidth={175}
         size="xs"
         value={value}
@@ -468,6 +550,17 @@ const FilterOption = ({
         max={5}
         maxWidth={175}
         min={0}
+        size="xs"
+        value={value}
+        width="20%"
+        onChange={handleChangeValue}
+      />
+    ),
+    'songs.genres.id': (
+      <Select
+        searchable
+        data={genresData?.song || []}
+        maxWidth={175}
         size="xs"
         value={value}
         width="20%"
@@ -640,39 +733,55 @@ const FilterGroup = ({
           </DropdownMenu.Dropdown>
         </DropdownMenu>
       </Group>
-      {data.rules.map((rule: AdvancedFilterRule) => (
-        <FilterOption
-          key={rule.uniqueId}
-          data={rule}
-          groupIndex={groupIndex || []}
-          level={level}
-          noRemove={data.rules.length === 1}
-          onChangeField={onChangeField}
-          onChangeOperator={onChangeOperator}
-          onChangeValue={onChangeValue}
-          onDeleteRule={onDeleteRule}
-        />
-      ))}
-      {data.group && (
-        <>
-          {data.group.map((group: AdvancedFilterGroup, index: number) => (
-            <FilterGroup
-              key={group.uniqueId}
-              data={group}
-              groupIndex={[...(groupIndex || []), index]}
-              level={level + 1}
-              uniqueId={group.uniqueId}
-              onAddRule={onAddRule}
-              onAddRuleGroup={onAddRuleGroup}
+      <AnimatePresence key="advanced-filter-option" initial={false}>
+        {data.rules.map((rule: AdvancedFilterRule) => (
+          <motion.div
+            key={rule.uniqueId}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -25 }}
+            initial={{ opacity: 0, x: -25 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+          >
+            <FilterOption
+              data={rule}
+              groupIndex={groupIndex || []}
+              level={level}
+              noRemove={data.rules.length === 1}
               onChangeField={onChangeField}
               onChangeOperator={onChangeOperator}
-              onChangeType={onChangeType}
               onChangeValue={onChangeValue}
               onDeleteRule={onDeleteRule}
-              onDeleteRuleGroup={onDeleteRuleGroup}
             />
+          </motion.div>
+        ))}
+      </AnimatePresence>
+      {data.group && (
+        <AnimatePresence key="advanced-filter-group" initial={false}>
+          {data.group.map((group: AdvancedFilterGroup, index: number) => (
+            <motion.div
+              key={group.uniqueId}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -25 }}
+              initial={{ opacity: 0, x: -25 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+            >
+              <FilterGroup
+                data={group}
+                groupIndex={[...(groupIndex || []), index]}
+                level={level + 1}
+                uniqueId={group.uniqueId}
+                onAddRule={onAddRule}
+                onAddRuleGroup={onAddRuleGroup}
+                onChangeField={onChangeField}
+                onChangeOperator={onChangeOperator}
+                onChangeType={onChangeType}
+                onChangeValue={onChangeValue}
+                onDeleteRule={onDeleteRule}
+                onDeleteRuleGroup={onDeleteRuleGroup}
+              />
+            </motion.div>
           ))}
-        </>
+        </AnimatePresence>
       )}
     </Stack>
   );
@@ -701,10 +810,10 @@ export const AdvancedFilters = ({ filters, setFilters }: any) => {
         group: [],
         rules: [
           {
-            field: undefined,
-            operator: undefined,
+            field: '',
+            operator: '',
             uniqueId: nanoid(),
-            value: undefined,
+            value: '',
           },
         ],
         type: FilterGroupType.AND,
@@ -800,11 +909,15 @@ export const AdvancedFilters = ({ filters, setFilters }: any) => {
       path,
       get(filtersCopy, path).map((rule: AdvancedFilterRule) => {
         if (rule.uniqueId !== uniqueId) return rule;
+        const defaultOperator = FILTER_OPTIONS_DATA.find(
+          (option) => option.value === value
+        )?.default;
+
         return {
           ...rule,
           field: value,
-          operator: null,
-          value: null,
+          operator: defaultOperator || '',
+          value: '',
         };
       })
     );
