@@ -260,14 +260,14 @@
     "@mantine/notifications": "^5.6.0",
     "@mantine/spotlight": "^5.6.0",
     "@tanstack/react-query": "^4.12.0",
+    "@tanstack/react-query-devtools": "^4.13.7",
     "ag-grid-community": "^28.0.2",
     "ag-grid-react": "^28.0.0",
     "axios": "^0.26.1",
     "dayjs": "^1.11.5",
-    "electron-browser-storage": "^1.0.7",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.6",
-    "electron-settings": "^4.0.2",
+    "electron-store": "^8.1.0",
     "electron-updater": "^4.6.5",
     "format-duration": "^2.0.0",
     "framer-motion": "^6.4.2",
@@ -292,6 +292,7 @@
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.7",
     "react-window-infinite-loader": "^1.0.8",
+    "socket.io-client": "^4.5.3",
     "zod": "^3.19.1",
     "zustand": "^4.0.0-rc.1"
   },
@@ -316,5 +317,11 @@
       }
     ],
     "singleQuote": true
+  },
+  "electronmon": {
+    "patterns": [
+      "!server",
+      "!src/renderer"
+    ]
   }
 }
