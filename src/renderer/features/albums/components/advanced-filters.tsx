@@ -1,4 +1,4 @@
-import { Box, Stack, Group } from '@mantine/core';
+import { Stack, Group } from '@mantine/core';
 import dayjs from 'dayjs';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -75,7 +75,7 @@ const FILTER_GROUP_OPTIONS_DATA = [
 
 const FILTER_OPTIONS_DATA = [
   {
-    label: 'Artist Name',
+    label: 'Artist Title',
     value: 'artists.name',
   },
   {
@@ -87,7 +87,7 @@ const FILTER_OPTIONS_DATA = [
     value: 'artists.genre',
   },
   {
-    label: 'Album Artist Name',
+    label: 'Album Artist Title',
     value: 'albumArtists.name',
   },
   {
@@ -99,7 +99,7 @@ const FILTER_OPTIONS_DATA = [
     value: 'albumArtists.genre',
   },
   {
-    label: 'Album Name',
+    label: 'Album Title',
     value: 'albums.name',
   },
   {
@@ -112,7 +112,7 @@ const FILTER_OPTIONS_DATA = [
   },
   {
     label: 'Album Year',
-    value: 'albums.year',
+    value: 'albums.releaseYear',
   },
   {
     label: 'Album Release Date',
@@ -127,7 +127,7 @@ const FILTER_OPTIONS_DATA = [
     value: 'albums.dateAdded',
   },
   {
-    label: 'Track Name',
+    label: 'Track Title',
     value: 'songs.name',
   },
   {
@@ -171,7 +171,7 @@ const OPTIONS_MAP = {
   'albums.releaseDate': {
     type: 'date',
   },
-  'albums.year': {
+  'albums.releaseYear': {
     type: 'number',
   },
   'artists.genre': {
@@ -194,10 +194,47 @@ const OPTIONS_MAP = {
   },
 };
 
+export const formatAdvancedFiltersGroups = (groups: AdvancedFilterGroup[]) => {
+  const filterGroups: any[] = [];
+
+  for (const group of groups) {
+    const rules = group.rules
+      .filter((rule) => rule.field && rule.operator && rule.value)
+      .map((rule) => ({ ...rule, uniqueId: undefined }));
+
+    const updatedGroup = { ...group, rules, uniqueId: undefined };
+
+    if (group.group.length > 0) {
+      const nestedRuleGroup = formatAdvancedFiltersGroups(group.group);
+      nestedRuleGroup.forEach((group) => groups.push(group));
+    }
+
+    if (updatedGroup.rules.length > 0) {
+      filterGroups.push(updatedGroup);
+    }
+  }
+
+  return filterGroups;
+};
+
+// Prevent query key from constantly changing due to empty rules or groups
+export const formatAdvancedFiltersQuery = (filter: AdvancedFilterGroup) => {
+  const updatedFilter = {
+    ...filter,
+    group: formatAdvancedFiltersGroups(filter.group),
+    rules: filter.rules
+      .filter((rule) => rule.field && rule.operator && rule.value)
+      .map((rule) => ({ ...rule, uniqueId: undefined })),
+  };
+
+  return updatedFilter;
+};
+
 interface FilterOptionProps {
   data: AdvancedFilterRule;
   groupIndex: number[];
   level: number;
+  noRemove: boolean;
   onChangeField: (args: any) => void;
   onChangeOperator: (args: any) => void;
   onChangeValue: (args: any) => void;
@@ -209,6 +246,7 @@ const FilterOption = ({
   level,
   onDeleteRule,
   groupIndex,
+  noRemove,
   onChangeField,
   onChangeOperator,
   onChangeValue,
@@ -254,37 +292,45 @@ const FilterOption = ({
   const filterOperatorMap = {
     date: (
       <Select
+        searchable
         data={DATE_FILTER_OPTIONS_DATA}
+        maxWidth={175}
         size="xs"
         value={operator}
-        width={150}
+        width="20%"
         onChange={handleChangeOperator}
       />
     ),
     id: (
       <Select
+        searchable
         data={ID_FILTER_OPTIONS_DATA}
+        maxWidth={175}
         size="xs"
         value={operator}
-        width={150}
+        width="20%"
         onChange={handleChangeOperator}
       />
     ),
     number: (
       <Select
+        searchable
         data={NUMBER_FILTER_OPTIONS_DATA}
+        maxWidth={175}
         size="xs"
         value={operator}
-        width={150}
+        width="20%"
         onChange={handleChangeOperator}
       />
     ),
     string: (
       <Select
+        searchable
         data={STRING_FILTER_OPTIONS_DATA}
+        maxWidth={175}
         size="xs"
         value={operator}
-        width={150}
+        width="20%"
         onChange={handleChangeOperator}
       />
     ),
@@ -295,27 +341,30 @@ const FilterOption = ({
       <Select
         searchable
         data={[]}
+        maxWidth={175}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
     'albumArtists.name': (
       <TextInput
+        maxWidth={175}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
     'albumArtists.ratings.value': (
       <NumberInput
         max={5}
+        maxWidth={175}
         min={0}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
@@ -323,10 +372,11 @@ const FilterOption = ({
       <DatePicker
         initialLevel="year"
         maxDate={dayjs(new Date()).year(3000).toDate()}
+        maxWidth={175}
         minDate={dayjs(new Date()).year(1950).toDate()}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
@@ -334,36 +384,40 @@ const FilterOption = ({
       <Select
         searchable
         data={[]}
+        maxWidth={175}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
     'albums.name': (
       <TextInput
+        maxWidth={175}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
     'albums.playCount': (
       <NumberInput
+        maxWidth={175}
         min={0}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={(e) => handleChangeValue(e)}
       />
     ),
     'albums.ratings.value': (
       <NumberInput
         max={5}
+        maxWidth={175}
         min={0}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
@@ -371,19 +425,21 @@ const FilterOption = ({
       <DatePicker
         initialLevel="year"
         maxDate={dayjs(new Date()).year(3000).toDate()}
+        maxWidth={175}
         minDate={dayjs(new Date()).year(1950).toDate()}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
-    'albums.year': (
+    'albums.releaseYear': (
       <NumberInput
+        maxWidth={175}
         min={0}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
@@ -391,60 +447,75 @@ const FilterOption = ({
       <Select
         searchable
         data={[]}
+        maxWidth={175}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
     'artists.name': (
       <TextInput
+        maxWidth={175}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
     'artists.ratings.value': (
       <NumberInput
         max={5}
+        maxWidth={175}
         min={0}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
     'songs.name': (
-      <TextInput size="xs" width={150} onChange={handleChangeValue} />
+      <TextInput
+        maxWidth={175}
+        size="xs"
+        width="20%"
+        onChange={handleChangeValue}
+      />
     ),
     'songs.playCount': (
       <NumberInput
+        maxWidth={175}
         min={0}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
     'songs.ratings.value': (
       <NumberInput
         max={5}
+        maxWidth={175}
         min={0}
         size="xs"
         value={value}
-        width={150}
+        width="20%"
         onChange={handleChangeValue}
       />
     ),
   };
 
+  const ml = (level + 1) * 10 - level * 5;
+
   return (
-    <Group ml={`${(level + 1) * 10}px`}>
+    <Group ml={ml}>
       <Select
+        searchable
         data={FILTER_OPTIONS_DATA}
+        maxWidth={175}
         size="xs"
         value={field}
+        width="20%"
         onChange={handleChangeField}
       />
       {field ? (
@@ -453,14 +524,15 @@ const FilterOption = ({
             .type as keyof typeof filterOperatorMap
         ]
       ) : (
-        <TextInput disabled size="xs" width={150} />
+        <TextInput disabled maxWidth={175} size="xs" width="20%" />
       )}
       {field ? (
         filterInputValueMap[field as keyof typeof filterInputValueMap]
       ) : (
-        <TextInput disabled size="xs" width={150} />
+        <TextInput disabled maxWidth={175} size="xs" width="20%" />
       )}
       <Button
+        disabled={noRemove}
         px={5}
         size="xs"
         tooltip={{ label: 'Remove rule' }}
@@ -533,9 +605,12 @@ const FilterGroup = ({
     <Stack ml={`${level * 10}px`}>
       <Group>
         <Select
+          searchable
           data={FILTER_GROUP_OPTIONS_DATA}
+          maxWidth={175}
           size="xs"
           value={data.type}
+          width="20%"
           onChange={handleChangeType}
         />
         <Button
@@ -571,6 +646,7 @@ const FilterGroup = ({
           data={rule}
           groupIndex={groupIndex || []}
           level={level}
+          noRemove={data.rules.length === 1}
           onChangeField={onChangeField}
           onChangeOperator={onChangeOperator}
           onChangeValue={onChangeValue}
@@ -804,7 +880,7 @@ export const AdvancedFilters = ({ filters, setFilters }: any) => {
   };
 
   return (
-    <Box m={10}>
+    <>
       <FilterGroup
         data={filters}
         groupIndex={[]}
@@ -819,6 +895,6 @@ export const AdvancedFilters = ({ filters, setFilters }: any) => {
         onDeleteRule={handleDeleteRule}
         onDeleteRuleGroup={handleDeleteRuleGroup}
       />
-    </Box>
+    </>
   );
 };

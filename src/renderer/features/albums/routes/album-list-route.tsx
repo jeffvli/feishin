@@ -1,10 +1,10 @@
 /* eslint-disable no-plusplus */
 import { useState, useCallback, useMemo } from 'react';
 import { Group, Checkbox } from '@mantine/core';
-import { useDebouncedValue, useSetState } from '@mantine/hooks';
+import { useDebouncedValue, useSetState, useToggle } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { nanoid } from 'nanoid';
-import { RiArrowDownSLine } from 'react-icons/ri';
+import { RiArrowDownSLine, RiArrowLeftLine } from 'react-icons/ri';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { api } from '@/renderer/api';
 import { AlbumSort } from '@/renderer/api/albums.api';
@@ -13,6 +13,9 @@ import { SortOrder } from '@/renderer/api/types';
 import {
   Button,
   DropdownMenu,
+  NumberInput,
+  ScrollArea,
+  Paper,
   Text,
   VirtualGridAutoSizerContainer,
   VirtualGridContainer,
@@ -22,13 +25,13 @@ import {
   AdvancedFilterGroup,
   AdvancedFilters,
   FilterGroupType,
+  formatAdvancedFiltersQuery,
 } from '@/renderer/features/albums/components/advanced-filters';
 import { useAlbumList } from '@/renderer/features/albums/queries/use-album-list';
 import { useServerList } from '@/renderer/features/servers';
 import { AnimatedPage, useServerCredential } from '@/renderer/features/shared';
 import { AppRoute } from '@/renderer/router/routes';
 import { useAuthStore } from '@/renderer/store';
-import { Font } from '@/renderer/styles';
 import { LibraryItem } from '@/renderer/types';
 import {
   ViewType,
@@ -36,20 +39,20 @@ import {
 } from '../../library/components/ViewTypeButton';
 
 const FILTERS = [
+  { name: 'Title', value: AlbumSort.NAME },
   { name: 'Date added', value: AlbumSort.DATE_ADDED },
   {
-    name: 'Date added (remote)',
+    name: 'Date Added (remote)',
     value: AlbumSort.DATE_ADDED_REMOTE,
   },
-  { name: 'Date released', value: AlbumSort.DATE_RELEASED },
-  { name: 'Favorites', value: AlbumSort.FAVORITE },
-  { name: 'Random', value: AlbumSort.RANDOM },
-  { name: 'Rating', value: AlbumSort.RATING },
-  { name: 'Title', value: AlbumSort.NAME },
+  { name: 'Release Date', value: AlbumSort.DATE_RELEASED },
   { name: 'Year', value: AlbumSort.DATE_RELEASED_YEAR },
+  { name: 'Random', value: AlbumSort.RANDOM },
+  { name: 'Favorites', value: AlbumSort.FAVORITE },
+  { name: 'Rating', value: AlbumSort.RATING },
 ];
 
-const SORT = [
+const ORDER = [
   { name: 'Ascending', value: SortOrder.ASC },
   { name: 'Descending', value: SortOrder.DESC },
 ];
@@ -66,15 +69,20 @@ export const AlbumListRoute = () => {
     sortBy: AlbumSort.NAME,
   });
 
-  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterGroup>({
+  const [isAdvFilter, toggleAdvFilter] = useToggle();
+  const [rawAdvFilters, setRawAdvFilters] = useState<AdvancedFilterGroup>({
     group: [],
     rules: [{ field: null, operator: null, uniqueId: nanoid(), value: null }],
     type: FilterGroupType.AND,
     uniqueId: nanoid(),
   });
 
-  const [debouncedFilters] = useDebouncedValue(advancedFilters, 300);
-  const encoded = encodeURI(JSON.stringify(debouncedFilters));
+  const [debouncedAdvFilters] = useDebouncedValue(rawAdvFilters, 300);
+
+  const advancedFilters = useMemo(() => {
+    const value = formatAdvancedFiltersQuery(debouncedAdvFilters);
+    return encodeURI(JSON.stringify(value));
+  }, [debouncedAdvFilters]);
 
   const serverFolders = useMemo(() => {
     const server = servers?.data.find((server) => server.id === serverId);
@@ -82,7 +90,7 @@ export const AlbumListRoute = () => {
   }, [serverId, servers]);
 
   const { data: albums } = useAlbumList({
-    advancedFilters: encoded,
+    advancedFilters,
     orderBy: filters.orderBy,
     serverFolderId: filters.serverFolderId,
     skip: 0,
@@ -97,12 +105,12 @@ export const AlbumListRoute = () => {
           skip,
           take,
           ...filters,
-          advancedFilters: encoded,
+          advancedFilters,
         }),
         async () =>
           api.albums.getAlbumList(
             { serverId },
-            { skip, take, ...filters, advancedFilters: encoded }
+            { skip, take, ...filters, advancedFilters }
           )
       );
 
@@ -120,7 +128,14 @@ export const AlbumListRoute = () => {
 
       return albums;
     },
-    [encoded, filters, isImageTokenRequired, queryClient, serverId, serverToken]
+    [
+      advancedFilters,
+      filters,
+      isImageTokenRequired,
+      queryClient,
+      serverId,
+      serverToken,
+    ]
   );
 
   return (
@@ -128,7 +143,7 @@ export const AlbumListRoute = () => {
       <VirtualGridContainer>
         <Group m={10} position="apart">
           <Group>
-            <Text font={Font.POPPINS} size="lg">
+            <Text noSelect size="lg">
               Albums
             </Text>
             <DropdownMenu position="bottom-start">
@@ -144,26 +159,54 @@ export const AlbumListRoute = () => {
                 {FILTERS.map((filter) => (
                   <DropdownMenu.Item
                     key={`filter-${filter.value}`}
+                    color={
+                      filter.value === filters.sortBy
+                        ? 'var(--primary-color)'
+                        : undefined
+                    }
+                    rightSection={
+                      filter.value === filters.sortBy ? (
+                        <RiArrowLeftLine />
+                      ) : undefined
+                    }
                     onClick={() => setFilters({ sortBy: filter.value })}
                   >
                     {filter.name}
                   </DropdownMenu.Item>
                 ))}
+                <DropdownMenu.Divider />
+                <DropdownMenu.Item
+                  color={isAdvFilter ? 'var(--primary-color)' : undefined}
+                  rightSection={isAdvFilter ? <RiArrowLeftLine /> : undefined}
+                  onClick={() => toggleAdvFilter()}
+                >
+                  Advanced Filters
+                </DropdownMenu.Item>
               </DropdownMenu.Dropdown>
             </DropdownMenu>
             <DropdownMenu position="bottom-start">
               <DropdownMenu.Target>
                 <Button compact variant="subtle">
                   <Group>
-                    {SORT.find((s) => s.value === filters.orderBy)?.name}{' '}
+                    {ORDER.find((s) => s.value === filters.orderBy)?.name}{' '}
                     <RiArrowDownSLine size={15} />
                   </Group>
                 </Button>
               </DropdownMenu.Target>
               <DropdownMenu.Dropdown>
-                {SORT.map((sort) => (
+                {ORDER.map((sort) => (
                   <DropdownMenu.Item
                     key={`sort-${sort.value}`}
+                    color={
+                      sort.value === filters.orderBy
+                        ? 'var(--primary-color)'
+                        : undefined
+                    }
+                    rightSection={
+                      sort.value === filters.orderBy ? (
+                        <RiArrowLeftLine />
+                      ) : undefined
+                    }
                     onClick={() => setFilters({ orderBy: sort.value })}
                   >
                     {sort.name}
@@ -204,10 +247,37 @@ export const AlbumListRoute = () => {
             />
           </Group>
         </Group>
-        <AdvancedFilters
-          filters={advancedFilters}
-          setFilters={setAdvancedFilters}
-        />
+        {isAdvFilter && (
+          <>
+            <Paper sx={{ maxHeight: '20vh' }}>
+              <ScrollArea
+                my={10}
+                px={10}
+                sx={{ height: '100%', width: '100%' }}
+              >
+                <Group noWrap my={10} position="apart">
+                  <Group>
+                    <Text>Advanced Filters</Text>
+                    <NumberInput
+                      disabled
+                      min={1}
+                      placeholder="Limit"
+                      size="xs"
+                      width={75}
+                    />
+                  </Group>
+                  <Button disabled uppercase>
+                    Save as...
+                  </Button>
+                </Group>
+                <AdvancedFilters
+                  filters={rawAdvFilters}
+                  setFilters={setRawAdvFilters}
+                />
+              </ScrollArea>
+            </Paper>
+          </>
+        )}
         <VirtualGridAutoSizerContainer>
           <AutoSizer>
             {({ height, width }) => (

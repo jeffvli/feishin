@@ -99,6 +99,21 @@ export type AdvancedFilterGroup = {
   uniqueId: string;
 };
 
+const operatorMap = {
+  '!=': 'not',
+  '!~': 'contains',
+  $: 'endsWith',
+  '<': 'lt',
+  '<=': 'lte',
+  '=': 'equals',
+  '>': 'gt',
+  '>=': 'gte',
+  '^': 'startsWith',
+  '~': 'contains',
+};
+
+const insensitiveFields = ['name'];
+
 const advancedFilterGroup = (
   groups: AdvancedFilterGroup[],
   user: AuthUser,
@@ -119,57 +134,65 @@ const advancedFilterGroup = (
     for (const rule of group.rules) {
       if (rule.field && rule.operator) {
         const [table, field, relationField] = rule.field.split('.');
+        const condition = rule.operator === '!~' ? 'none' : 'some';
+        const op = operatorMap[rule.operator as keyof typeof operatorMap];
 
-        if (field === 'ratings') {
-          if (table === 'albums') {
+        switch (table) {
+          case 'albums':
+            if (field === 'ratings') {
+              query[rootType].push({
+                [field]: {
+                  [condition]: {
+                    [relationField]: {
+                      [op]: rule.value,
+                    },
+                    userId: user.id,
+                  },
+                },
+              });
+              break;
+            }
+
             query[rootType].push({
               [field]: {
-                some: {
-                  [relationField]: {
-                    [rule.operator]: rule.value,
-                  },
-                  userId: user.id,
-                },
+                mode: insensitiveFields.includes(field)
+                  ? 'insensitive'
+                  : undefined,
+                [op]: rule.value,
               },
             });
-          } else {
-            query[rootType].push({
-              [table]: {
-                some: {
-                  [field]: {
-                    some: {
-                      [relationField]: {
-                        [rule.operator]: rule.value,
+            break;
+
+          default:
+            if (field === 'ratings') {
+              query[rootType].push({
+                [table]: {
+                  some: {
+                    [field]: {
+                      some: {
+                        [relationField]: {
+                          [op]: rule.value,
+                        },
+                        userId: user.id,
                       },
-                      userId: user.id,
                     },
                   },
                 },
-              },
-            });
-          }
-        } else if (table === 'albums') {
-          const obj = {
-            [field]: {
-              [rule.operator]: rule.value,
-              mode: 'insensitive',
-            },
-          };
+              });
+              break;
+            }
 
-          query[rootType].push(obj);
-        } else {
-          const obj = {
-            [table]: {
-              some: {
-                [field]: {
-                  [rule.operator]: rule.value,
-                  mode: 'insensitive',
+            query[rootType].push({
+              [table]: {
+                [condition]: {
+                  [field]: {
+                    mode: 'insensitive',
+                    [op]: rule.value,
+                  },
                 },
               },
-            },
-          };
-
-          query[rootType].push(obj);
+            });
+            break;
         }
       }
     }
@@ -190,19 +213,6 @@ const advancedFilter = (filter: AdvancedFilterGroup, user: AuthUser) => {
   const rootQueryType = filter.type.toUpperCase();
   const rootQuery = {
     [rootQueryType]: [] as any[],
-  };
-
-  const operatorMap = {
-    '!=': 'not',
-    '!~': 'contains',
-    $: 'endsWith',
-    '<': 'lt',
-    '<=': 'lte',
-    '=': 'equals',
-    '>': 'gt',
-    '>=': 'gte',
-    '^': 'startsWith',
-    '~': 'contains',
   };
 
   for (const rule of filter.rules) {
@@ -226,9 +236,12 @@ const advancedFilter = (filter: AdvancedFilterGroup, user: AuthUser) => {
             });
             break;
           }
+
           rootQuery[rootQueryType].push({
             [field]: {
-              mode: 'insensitive',
+              mode: insensitiveFields.includes(field)
+                ? 'insensitive'
+                : undefined,
               [op]: rule.value,
             },
           });
