@@ -45,8 +45,32 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
   }};
 
   &:disabled {
-    background-color: transparent;
-    opacity: 0.8;
+    color: ${(props) => {
+      switch (props.variant) {
+        case 'default':
+          return 'var(--btn-default-fg)';
+        case 'filled':
+          return 'var(--btn-primary-fg)';
+        case 'subtle':
+          return 'var(--btn-subtle-fg)';
+        default:
+          return '';
+      }
+    }};
+    background-color: ${(props) => {
+      switch (props.variant) {
+        case 'default':
+          return 'var(--btn-default-bg)';
+        case 'filled':
+          return 'var(--btn-primary-bg)';
+        case 'subtle':
+          return 'var(--btn-subtle-bg)';
+        default:
+          return '';
+      }
+    }};
+
+    opacity: 0.4;
   }
 
   &:hover {
@@ -93,7 +117,7 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, tooltip, ...props }: ButtonProps, ref) => {
     if (tooltip) {
       return (
-        <Tooltip {...tooltip}>
+        <Tooltip withinPortal {...tooltip}>
           <StyledButton ref={ref} {...props}>
             {children}
           </StyledButton>

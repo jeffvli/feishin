@@ -30,6 +30,10 @@ const StyledMenuItem = styled(MantineMenu.Item)`
   & .mantine-Menu-itemIcon {
     margin-right: 0.5rem;
   }
+
+  & .mantine-Menu-itemRightSection {
+    margin-left: 2rem !important;
+  }
 `;
 
 const StyledMenuDropdown = styled(MantineMenu.Dropdown)`

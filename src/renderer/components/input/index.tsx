@@ -13,21 +13,25 @@ import {
 
 interface TextInputProps extends MantineTextInputProps {
   children?: React.ReactNode;
+  maxWidth?: number | string;
   width?: number | string;
 }
 
 interface NumberInputProps extends MantineNumberInputProps {
   children?: React.ReactNode;
+  maxWidth?: number | string;
   width?: number | string;
 }
 
 interface PasswordInputProps extends MantinePasswordInputProps {
   children?: React.ReactNode;
+  maxWidth?: number | string;
   width?: number | string;
 }
 
 interface FileInputProps extends MantineFileInputProps {
   children?: React.ReactNode;
+  maxWidth?: number | string;
   width?: number | string;
 }
 
@@ -140,9 +144,14 @@ const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
 `;
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ children, width, ...props }: TextInputProps, ref) => {
+  ({ children, width, maxWidth, ...props }: TextInputProps, ref) => {
     return (
-      <StyledTextInput ref={ref} spellCheck={false} {...props} sx={{ width }}>
+      <StyledTextInput
+        ref={ref}
+        spellCheck={false}
+        {...props}
+        sx={{ maxWidth, width }}
+      >
         {children}
       </StyledTextInput>
     );
@@ -150,9 +159,14 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
 );
 
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
-  ({ children, width, ...props }: NumberInputProps, ref) => {
+  ({ children, width, maxWidth, ...props }: NumberInputProps, ref) => {
     return (
-      <StyledNumberInput ref={ref} spellCheck={false} {...props} sx={{ width }}>
+      <StyledNumberInput
+        ref={ref}
+        spellCheck={false}
+        {...props}
+        sx={{ maxWidth, width }}
+      >
         {children}
       </StyledNumberInput>
     );
@@ -160,13 +174,13 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 );
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-  ({ children, width, ...props }: PasswordInputProps, ref) => {
+  ({ children, width, maxWidth, ...props }: PasswordInputProps, ref) => {
     return (
       <StyledPasswordInput
         ref={ref}
         spellCheck={false}
         {...props}
-        sx={{ width }}
+        sx={{ maxWidth, width }}
       >
         {children}
       </StyledPasswordInput>
@@ -175,9 +189,14 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 );
 
 export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
-  ({ children, width, ...props }: FileInputProps, ref) => {
+  ({ children, width, maxWidth, ...props }: FileInputProps, ref) => {
     return (
-      <StyledFileInput ref={ref} spellCheck={false} {...props} sx={{ width }}>
+      <StyledFileInput
+        ref={ref}
+        spellCheck={false}
+        {...props}
+        sx={{ maxWidth, width }}
+      >
         {children}
       </StyledFileInput>
     );
@@ -186,20 +205,24 @@ export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
 
 TextInput.defaultProps = {
   children: undefined,
+  maxWidth: undefined,
   width: undefined,
 };
 
 NumberInput.defaultProps = {
   children: undefined,
+  maxWidth: undefined,
   width: undefined,
 };
 
 PasswordInput.defaultProps = {
   children: undefined,
+  maxWidth: undefined,
   width: undefined,
 };
 
 FileInput.defaultProps = {
   children: undefined,
+  maxWidth: undefined,
   width: undefined,
 };

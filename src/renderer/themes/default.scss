@@ -14,12 +14,13 @@
 
   --main-bg: rgb(24, 24, 25);
   --main-fg: rgb(193, 194, 187);
+  --main-fg-secondary: rgb(150, 150, 150);
 
   --titlebar-fg: rgb(255, 255, 255);
   --titlebar-bg: rgb(29, 29, 29);
 
   --sidebar-bg: rgb(16, 16, 16);
-  --sidebar-btn-color: #b3b3b3;
+  --sidebar-btn-color: rgb(179, 179, 179);
   --sidebar-btn-color-hover: #dddddd;
   --sidebar-handle-bg: #4d4d4d;
 
@@ -52,7 +53,7 @@
 
   --btn-subtle-bg: transparent;
   --btn-subtle-bg-hover: rgba(100, 100, 100, 0.5);
-  --btn-subtle-fg: rgb(119, 126, 139);
+  --btn-subtle-fg: rgb(150, 150, 150);
   --btn-subtle-fg-hover: rgb(200, 200, 200);
 
   --input-bg: rgb(37, 38, 43);
@@ -62,6 +63,10 @@
   --dropdown-menu-bg: rgb(24, 24, 24);
   --dropdown-menu-fg: rgb(193, 194, 197);
 
+  --switch-track-bg: rgb(50, 50, 50);
+  --switch-track-enabled-bg: var(--primary-color);
+  --switch-thumb-bg: rgb(255, 255, 255);
+
   --toast-title-fg: rgb(255, 255, 255);
   --toast-description-fg: rgb(193, 194, 197);
   --toast-bg: rgb(16, 16, 16);
@@ -69,12 +74,21 @@
   --paper-bg: rgb(29, 29, 29);
 
   .ag-theme-alpine-dark {
-    --ag-borders: none;
-    --ag-background-color: #101010;
-    --ag-odd-row-background-color: #101010;
+    --ag-font-family: poppins;
     --ag-font-size: 12px;
-    --ag-foreground-color: #ffffff;
-    --ag-font-family: Poppins;
+
+    --ag-borders: none;
+    --ag-border-color: rgb(50, 50, 50);
+
+    --ag-header-background-color: rgb(16, 16, 16);
+    --ag-header-foreground-color: rgb(179, 179, 179);
+
+    --ag-foreground-color: rgb(179, 179, 179);
+
+    --ag-background-color: rgb(24, 24, 25);
+    --ag-odd-row-background-color: rgb(24, 24, 25);
+    --ag-row-hover-color: rgba(100, 100, 100, 0.2);
+    --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
   }
 
   .ag-header-cell-label {

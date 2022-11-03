@@ -13,3 +13,4 @@ export * from './popover';
 export * from './select';
 export * from './date-picker';
 export * from './scroll-area';
+export * from './paper';
