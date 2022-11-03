@@ -12,3 +12,4 @@ export * from './switch';
 export * from './popover';
 export * from './select';
 export * from './date-picker';
+export * from './scroll-area';
