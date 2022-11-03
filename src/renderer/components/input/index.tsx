@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 import {
   TextInput as MantineTextInput,
   TextInputProps as MantineTextInputProps,
+  NumberInput as MantineNumberInput,
+  NumberInputProps as MantineNumberInputProps,
   PasswordInput as MantinePasswordInput,
   PasswordInputProps as MantinePasswordInputProps,
   FileInput as MantineFileInput,
@@ -11,14 +13,22 @@ import {
 
 interface TextInputProps extends MantineTextInputProps {
   children?: React.ReactNode;
+  width?: number | string;
+}
+
+interface NumberInputProps extends MantineNumberInputProps {
+  children?: React.ReactNode;
+  width?: number | string;
 }
 
 interface PasswordInputProps extends MantinePasswordInputProps {
   children?: React.ReactNode;
+  width?: number | string;
 }
 
 interface FileInputProps extends MantineFileInputProps {
   children?: React.ReactNode;
+  width?: number | string;
 }
 
 const StyledTextInput = styled(MantineTextInput)<TextInputProps>`
@@ -58,6 +68,43 @@ const StyledTextInput = styled(MantineTextInput)<TextInputProps>`
   }
 `;
 
+const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
+  &:focus,
+  &:focus-within {
+    border-color: var(--primary-color);
+  }
+
+  & .mantine-NumberInput-wrapper {
+    border-color: var(--primary-color);
+  }
+
+  & .mantine-NumberInput-input {
+    &:focus,
+    &:focus-within {
+      border-color: var(--primary-color);
+    }
+
+    color: var(--input-fg);
+    background: var(--input-bg);
+
+    &::placeholder {
+      color: var(--input-placeholder-fg);
+    }
+  }
+
+  & .mantine-Input-icon {
+    color: var(--input-placeholder-fg);
+  }
+
+  & .mantine-NumberInput-required {
+    color: var(--secondary-color);
+  }
+
+  & .mantine-NumberInput-label {
+    font-family: var(--label-font-faimly);
+  }
+`;
+
 const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
   & .mantine-PasswordInput-input {
     &:focus,
@@ -93,19 +140,34 @@ const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
 `;
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ children, ...props }: TextInputProps, ref) => {
+  ({ children, width, ...props }: TextInputProps, ref) => {
     return (
-      <StyledTextInput ref={ref} spellCheck={false} {...props}>
+      <StyledTextInput ref={ref} spellCheck={false} {...props} sx={{ width }}>
         {children}
       </StyledTextInput>
     );
   }
 );
 
-export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-  ({ children, ...props }: PasswordInputProps, ref) => {
+export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
+  ({ children, width, ...props }: NumberInputProps, ref) => {
     return (
-      <StyledPasswordInput ref={ref} spellCheck={false} {...props}>
+      <StyledNumberInput ref={ref} spellCheck={false} {...props} sx={{ width }}>
+        {children}
+      </StyledNumberInput>
+    );
+  }
+);
+
+export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
+  ({ children, width, ...props }: PasswordInputProps, ref) => {
+    return (
+      <StyledPasswordInput
+        ref={ref}
+        spellCheck={false}
+        {...props}
+        sx={{ width }}
+      >
         {children}
       </StyledPasswordInput>
     );
@@ -113,9 +175,9 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 );
 
 export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
-  ({ children, ...props }: FileInputProps, ref) => {
+  ({ children, width, ...props }: FileInputProps, ref) => {
     return (
-      <StyledFileInput ref={ref} spellCheck={false} {...props}>
+      <StyledFileInput ref={ref} spellCheck={false} {...props} sx={{ width }}>
         {children}
       </StyledFileInput>
     );
@@ -123,13 +185,21 @@ export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
 );
 
 TextInput.defaultProps = {
-  children: null,
+  children: undefined,
+  width: undefined,
+};
+
+NumberInput.defaultProps = {
+  children: undefined,
+  width: undefined,
 };
 
 PasswordInput.defaultProps = {
-  children: null,
+  children: undefined,
+  width: undefined,
 };
 
 FileInput.defaultProps = {
-  children: null,
+  children: undefined,
+  width: undefined,
 };

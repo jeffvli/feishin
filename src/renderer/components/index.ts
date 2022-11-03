@@ -9,3 +9,6 @@ export * from './segmented-control';
 export * from './dropdown-menu';
 export * from './toast';
 export * from './switch';
+export * from './popover';
+export * from './select';
+export * from './date-picker';
