@@ -4,11 +4,18 @@ export const queryKeys = {
   albums: {
     detail: (albumId: string) => ['albums', albumId] as const,
     list: (serverId: string, params: AlbumListParams) =>
-      ['albums', 'list', serverId, params] as const,
+      [serverId, 'albums', 'list', params] as const,
     root: ['albums'],
     songList: (albumId: string) => ['albums', albumId, 'songs'] as const,
   },
+  genres: {
+    list: (serverId: string) => [serverId, 'genres', 'list'] as const,
+    root: (serverId: string) => [serverId, 'genres'] as const,
+  },
   ping: (url: string) => ['ping', url] as const,
+  server: {
+    root: (serverId: string) => [serverId] as const,
+  },
   servers: {
     list: (params?: any) => ['servers', 'list', params] as const,
     root: ['servers'],

@@ -174,10 +174,13 @@ export type Ping = {
 };
 
 export type Genre = {
-  createdAt: string;
+  albumArtistCount: number;
+  albumCount: number;
+  artistCount: number;
   id: string;
   name: string;
-  updatedAt: string;
+  songCount: number;
+  totalCount: number;
 };
 
 export type RelatedGenre = {
