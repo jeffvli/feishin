@@ -45,7 +45,11 @@ const StyledMenuDivider = styled(MantineMenu.Divider)`
 `;
 
 export const DropdownMenu = ({ children, ...props }: MenuProps) => {
-  return <StyledMenu {...props}>{children}</StyledMenu>;
+  return (
+    <StyledMenu withinPortal {...props}>
+      {children}
+    </StyledMenu>
+  );
 };
 
 const MenuLabel = ({ children, ...props }: MenuLabelProps) => {

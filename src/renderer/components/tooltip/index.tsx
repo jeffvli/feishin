@@ -10,6 +10,7 @@ const StyledTooltip = styled(MantineTooltip)`
 export const Tooltip = ({ children, ...rest }: TooltipProps) => {
   return (
     <StyledTooltip
+      withinPortal
       pl={10}
       pr={10}
       py={5}

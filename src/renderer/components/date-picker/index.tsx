@@ -12,7 +12,7 @@ interface DatePickerProps extends MantineDatePickerProps {
 const StyledDatePicker = styled(MantineDatePicker)<DatePickerProps>``;
 
 export const DatePicker = ({ width, maxWidth, ...props }: DatePickerProps) => {
-  return <StyledDatePicker {...props} sx={{ maxWidth, width }} />;
+  return <StyledDatePicker withinPortal {...props} sx={{ maxWidth, width }} />;
 };
 
 DatePicker.defaultProps = {
