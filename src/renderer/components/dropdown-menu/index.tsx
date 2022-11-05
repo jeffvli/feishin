@@ -17,18 +17,23 @@ type MenuDropdownProps = MantineMenuDropdownProps;
 
 const StyledMenu = styled(MantineMenu)<MenuProps>``;
 
-const StyledMenuLabel = styled(MantineMenu.Label)`
+const StyledMenuLabel = styled(MantineMenu.Label)<MenuLabelProps>`
   font-family: var(--label-font-family);
 `;
 
-const StyledMenuItem = styled(MantineMenu.Item)`
-  padding: 0.5rem;
+const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
+  padding: 0.8rem;
   font-size: 0.9em;
   font-family: var(--label-font-family);
   background-color: var(--dropdown-menu-bg);
 
   & .mantine-Menu-itemIcon {
     margin-right: 0.5rem;
+  }
+
+  & .mantine-Menu-itemLabel {
+    font-weight: 500;
+    font-size: 1em;
   }
 
   & .mantine-Menu-itemRightSection {
@@ -46,7 +51,7 @@ const StyledMenuDivider = styled(MantineMenu.Divider)`
 
 export const DropdownMenu = ({ children, ...props }: MenuProps) => {
   return (
-    <StyledMenu withinPortal {...props}>
+    <StyledMenu withinPortal radius="sm" transition="scale" {...props}>
       {children}
     </StyledMenu>
   );
