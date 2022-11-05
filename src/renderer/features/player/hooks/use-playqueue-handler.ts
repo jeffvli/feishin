@@ -50,9 +50,10 @@ export const usePlayQueueHandler = () => {
         songs = songs.map((song) => {
           return {
             ...song,
-            imageUrl: isImageTokenRequired
-              ? `${song.imageUrl}${serverToken}`
-              : song.imageUrl,
+            imageUrl:
+              song.imageUrl && isImageTokenRequired
+                ? `${song.imageUrl}${serverToken}`
+                : song.imageUrl,
             streamUrl: `${song.streamUrl}${serverToken}`,
           };
         });

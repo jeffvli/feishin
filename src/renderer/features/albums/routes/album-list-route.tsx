@@ -116,14 +116,14 @@ export const AlbumListRoute = () => {
 
       // * Adds server token
       if (isImageTokenRequired) {
-        const t = albums.data.map((album) => {
+        const data = albums.data.map((album) => {
           return {
             ...album,
-            imageUrl: album?.imageUrl + serverToken!,
+            imageUrl: album.imageUrl && album.imageUrl + serverToken!,
           };
         });
 
-        return { ...albums, data: t };
+        return { ...albums, data };
       }
 
       return albums;
