@@ -24,9 +24,12 @@ const BaseText = styled(MantineText)<any>`
   color: ${(props) =>
     props.secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)'};
   font-family: ${(props) => props.font};
-  /* cursor: ${(props) => (props.link ? 'cursor' : 'default')}; */
   user-select: ${(props) => (props.noSelect ? 'none' : 'auto')};
   ${(props) => props.overflow === 'hidden' && textEllipsis}
+
+  &:hover {
+    text-decoration: ${(props) => (props.link ? 'underline' : 'none')};
+  }
 `;
 
 const StyledText = styled(BaseText)<TextProps>``;
