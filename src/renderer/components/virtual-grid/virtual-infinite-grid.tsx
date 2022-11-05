@@ -3,11 +3,17 @@ import debounce from 'lodash/debounce';
 import { FixedSizeListProps } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { VirtualGridWrapper } from '@/renderer/components/virtual-grid/virtual-grid-wrapper';
-import { CardRow, LibraryItem } from '@/renderer/types';
+import {
+  CardDisplayType,
+  CardRoute,
+  CardRow,
+  LibraryItem,
+} from '@/renderer/types';
 
 interface VirtualGridProps
   extends Omit<FixedSizeListProps, 'children' | 'itemSize'> {
   cardRows: CardRow[];
+  display?: CardDisplayType;
   fetchFn: (options: {
     columnCount: number;
     skip: number;
@@ -17,6 +23,8 @@ interface VirtualGridProps
   itemSize: number;
   itemType: LibraryItem;
   minimumBatchSize?: number;
+  refresh?: any; // Pass in any value to refresh the grid when changed
+  route?: CardRoute;
 }
 
 export const VirtualInfiniteGrid = ({
@@ -25,10 +33,13 @@ export const VirtualInfiniteGrid = ({
   itemSize,
   itemType,
   cardRows,
+  route,
+  display,
   minimumBatchSize,
   fetchFn,
   height,
   width,
+  refresh,
 }: VirtualGridProps) => {
   const [itemData, setItemData] = useState<any[]>([]);
   const listRef = useRef<any>(null);
@@ -88,7 +99,7 @@ export const VirtualInfiniteGrid = ({
       loadMoreItems(0, minimumBatchSize! * 2);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [minimumBatchSize, fetchFn]);
+  }, [minimumBatchSize, fetchFn, refresh]);
 
   return (
     <InfiniteLoader
@@ -104,6 +115,7 @@ export const VirtualInfiniteGrid = ({
           useIsScrolling
           cardRows={cardRows}
           columnCount={columnCount}
+          display={display || CardDisplayType.CARD}
           height={height}
           itemCount={itemCount || 0}
           itemData={itemData}
@@ -115,6 +127,7 @@ export const VirtualInfiniteGrid = ({
             infiniteLoaderRef(list);
             listRef.current = list;
           }}
+          route={route}
           rowCount={rowCount}
           width={width}
           onItemsRendered={onItemsRendered}
@@ -125,5 +138,8 @@ export const VirtualInfiniteGrid = ({
 };
 
 VirtualInfiniteGrid.defaultProps = {
+  display: CardDisplayType.CARD,
   minimumBatchSize: 20,
+  refresh: undefined,
+  route: undefined,
 };

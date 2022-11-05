@@ -3,8 +3,8 @@ import { api } from '@/renderer/api';
 import { queryKeys } from '@/renderer/api/query-keys';
 import { useServerCredential } from '@/renderer/features/shared';
 import { useAuthStore, usePlayerStore } from '@/renderer/store';
-import { LibraryItem, Play } from '@/renderer/types';
-import { mpvPlayer } from '../utils/mpvPlayer';
+import { LibraryItem, Play, PlayQueueAddOptions } from '@/renderer/types';
+import { mpvPlayer } from '../utils/mpv-player';
 
 export const usePlayQueueHandler = () => {
   const queryClient = useQueryClient();
@@ -12,14 +12,7 @@ export const usePlayQueueHandler = () => {
   const { serverToken, isImageTokenRequired } = useServerCredential();
   const addToQueue = usePlayerStore((state) => state.addToQueue);
 
-  const handlePlayQueueAdd = async (options: {
-    byData?: any[];
-    byItemType?: {
-      id: string;
-      type: LibraryItem;
-    };
-    play: Play;
-  }) => {
+  const handlePlayQueueAdd = async (options: PlayQueueAddOptions) => {
     if (options.byData) {
       // dispatchSongsToQueue(options.byData, options.play);
     }
@@ -65,6 +58,7 @@ export const usePlayQueueHandler = () => {
         mpvPlayer.setQueueNext(playerData);
       } else {
         mpvPlayer.setQueue(playerData);
+        mpvPlayer.play();
       }
     }
   };

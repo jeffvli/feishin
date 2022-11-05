@@ -1,12 +1,24 @@
 import { AppRoute } from './router/routes';
 
-export interface CardRow {
-  align?: 'left' | 'center' | 'right';
-  prop: string;
-  route?: {
-    prop: string;
-    route: AppRoute | string;
-  };
+export type RouteSlug = {
+  idProperty: string;
+  slugProperty: string;
+};
+
+export type CardRoute = {
+  route: AppRoute | string;
+  slugs?: RouteSlug[];
+};
+
+export type CardRow = {
+  arrayProperty?: string;
+  property: string;
+  route?: CardRoute;
+};
+
+export enum CardDisplayType {
+  CARD = 'card',
+  POSTER = 'poster',
 }
 
 export enum LibraryItem {
@@ -74,3 +86,27 @@ export enum SortOrder {
   ASC = 'asc',
   DESC = 'desc',
 }
+
+export type PlayQueueAddOptions = {
+  byData?: any[];
+  byItemType?: {
+    id: string;
+    type: LibraryItem;
+  };
+  play: Play;
+};
+
+export type GridCardData = {
+  cardControls: any;
+  cardRows: CardRow[];
+  columnCount: number;
+  display: CardDisplayType;
+  handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
+  itemCount: number;
+  itemData: any[];
+  itemGap: number;
+  itemHeight: number;
+  itemType: LibraryItem;
+  itemWidth: number;
+  route?: CardRoute;
+};

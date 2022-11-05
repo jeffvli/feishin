@@ -3,7 +3,12 @@ import styled from '@emotion/styled';
 import { FixedSizeList, FixedSizeListProps } from 'react-window';
 import { GridCard } from '@/renderer/components/virtual-grid/grid-card';
 import { usePlayQueueHandler } from '@/renderer/features/player/hooks/use-playqueue-handler';
-import { CardRow, LibraryItem } from '@/renderer/types';
+import {
+  CardRow,
+  LibraryItem,
+  CardDisplayType,
+  CardRoute,
+} from '@/renderer/types';
 
 export const VirtualGridWrapper = ({
   refInstance,
@@ -16,16 +21,19 @@ export const VirtualGridWrapper = ({
   columnCount,
   rowCount,
   itemData,
+  route,
   ...rest
 }: Omit<FixedSizeListProps, 'ref' | 'itemSize' | 'children'> & {
   cardRows: CardRow[];
   columnCount: number;
+  display: CardDisplayType;
   itemData: any[];
   itemGap: number;
   itemHeight: number;
   itemType: LibraryItem;
   itemWidth: number;
   refInstance: Ref<any>;
+  route?: CardRoute;
   rowCount: number;
 }) => {
   const handlePlayQueueAdd = usePlayQueueHandler();
@@ -41,6 +49,7 @@ export const VirtualGridWrapper = ({
       itemHeight,
       itemType,
       itemWidth,
+      route,
     }),
     [
       cardRows,
@@ -51,6 +60,7 @@ export const VirtualGridWrapper = ({
       itemData,
       itemGap,
       itemHeight,
+      route,
       itemWidth,
     ]
   );
@@ -59,14 +69,19 @@ export const VirtualGridWrapper = ({
     <FixedSizeList
       ref={refInstance}
       {...rest}
+      useIsScrolling
       itemCount={rowCount}
       itemData={memo}
       itemSize={itemHeight + itemGap}
-      overscanCount={10}
+      overscanCount={5}
     >
       {GridCard}
     </FixedSizeList>
   );
+};
+
+VirtualGridWrapper.defaultProps = {
+  route: undefined,
 };
 
 export const VirtualGridContainer = styled.div`

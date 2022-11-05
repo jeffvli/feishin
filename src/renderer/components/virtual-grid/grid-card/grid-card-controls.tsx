@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import styled from '@emotion/styled';
-import { Box, UnstyledButton, Group, UnstyledButtonProps } from '@mantine/core';
+import { Group, UnstyledButtonProps } from '@mantine/core';
 import { motion } from 'framer-motion';
 import {
   RiPlayFill,
@@ -15,22 +15,17 @@ import { Play } from '@/renderer/types';
 type PlayButtonType = UnstyledButtonProps &
   React.ComponentPropsWithoutRef<'button'>;
 
-const PlayButton = styled(UnstyledButton)<PlayButtonType>`
+const PlayButton = styled(motion.button)<PlayButtonType>`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 50px;
   height: 50px;
   background-color: rgb(255, 255, 255);
+  border: none;
   border-radius: 50%;
-  opacity: 0.8;
   transition: opacity 0.2s ease-in-out;
   transition: scale 0.2s ease-in;
-
-  &:hover {
-    opacity: 1;
-    scale: 1.1;
-  }
 
   svg {
     fill: rgb(0, 0, 0);
@@ -38,7 +33,7 @@ const PlayButton = styled(UnstyledButton)<PlayButtonType>`
   }
 `;
 
-const GridCardControlsContainer = styled(Box)`
+const GridCardControlsContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -90,7 +85,11 @@ export const GridCardControls = ({
       <CenterControls animate={{ opacity: 1 }} initial={{ opacity: 0 }} />
       <BottomControls>
         <PlayButton
-          onClick={() => {
+          animate={{ opacity: 0.6 }}
+          whileHover={{ opacity: 1, scale: 1.1 }}
+          whileTap={{ scale: 1 }}
+          onClick={(e) => {
+            e.preventDefault();
             handlePlayQueueAdd({
               byItemType: {
                 id: itemData.id,
@@ -114,13 +113,43 @@ export const GridCardControls = ({
           </Button>
           <DropdownMenu withinPortal position="bottom-start">
             <DropdownMenu.Target>
-              <Button p={5} variant="subtle">
+              <Button
+                p={5}
+                variant="subtle"
+                onClick={(e) => e.preventDefault()}
+              >
                 <RiMore2Fill color="white" size={20} />
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-              <DropdownMenu.Item>Play next</DropdownMenu.Item>
-              <DropdownMenu.Item>Play later</DropdownMenu.Item>
+              <DropdownMenu.Item
+                onClick={(e: MouseEvent) => {
+                  e.preventDefault();
+                  handlePlayQueueAdd({
+                    byItemType: {
+                      id: itemData.id,
+                      type: itemType,
+                    },
+                    play: Play.LAST,
+                  });
+                }}
+              >
+                Play later
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                onClick={(e: MouseEvent) => {
+                  e.preventDefault();
+                  handlePlayQueueAdd({
+                    byItemType: {
+                      id: itemData.id,
+                      type: itemType,
+                    },
+                    play: Play.NEXT,
+                  });
+                }}
+              >
+                Play next
+              </DropdownMenu.Item>
               <DropdownMenu.Divider />
               <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
               <DropdownMenu.Divider />
