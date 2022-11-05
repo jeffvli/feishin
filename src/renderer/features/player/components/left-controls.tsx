@@ -127,6 +127,7 @@ export const LeftControls = () => {
         <MetadataStack layout>
           <LineItem>
             <Text
+              link
               component={Link}
               overflow="hidden"
               size="sm"
@@ -146,13 +147,10 @@ export const LeftControls = () => {
                   </Text>
                 )}{' '}
                 <Text
+                  link
                   component={Link}
                   overflow="hidden"
                   size="sm"
-                  sx={{
-                    '&:hover': { textDecoration: 'underline' },
-                    width: 'inherit',
-                  }}
                   to={
                     artist.id
                       ? generatePath(AppRoute.LIBRARY_ARTISTS_DETAIL, {
@@ -169,6 +167,7 @@ export const LeftControls = () => {
           </LineItem>
           <LineItem secondary>
             <Text
+              link
               component={Link}
               overflow="hidden"
               size="sm"
