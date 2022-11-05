@@ -34,7 +34,11 @@ export const AppOutlet = ({ redirectTo }: PrivateOutletProps) => {
   const actions = [isServerRequired, isCredentialRequired, isMpvRequired];
   const actionRequired = actions.some((c) => c);
 
-  if (actionRequired) {
+  if (isAuthenticated) {
+    return <Outlet />;
+  }
+
+  if (isAuthenticated && actionRequired) {
     return (
       <Navigate
         replace
@@ -42,10 +46,6 @@ export const AppOutlet = ({ redirectTo }: PrivateOutletProps) => {
         to={AppRoute.ACTION_REQUIRED}
       />
     );
-  }
-
-  if (isAuthenticated) {
-    return <Outlet />;
   }
 
   logout();
