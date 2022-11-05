@@ -1,3 +1,4 @@
+import { SortOrder } from '@/types/types';
 import { prisma } from '@lib/prisma';
 import { ApiError } from '@utils/api-error';
 
@@ -14,6 +15,9 @@ const findManyByServer = async (options: { serverId: string }) => {
           songs: { where: { serverId } },
         },
       },
+    },
+    orderBy: {
+      name: SortOrder.ASC,
     },
     where: {
       OR: [
