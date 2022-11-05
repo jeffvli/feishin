@@ -95,9 +95,12 @@ export const LeftControls = () => {
                 ) : (
                   <>
                     <Center
-                      sx={{ background: 'rgb(53, 53, 53)', height: '100%' }}
+                      sx={{
+                        background: 'var(--placeholder-bg)',
+                        height: '100%',
+                      }}
                     >
-                      <RiDiscLine color="rgb(126, 126, 126)" size={50} />
+                      <RiDiscLine color="var(--placeholder-fg)" size={50} />
                     </Center>
                   </>
                 )}

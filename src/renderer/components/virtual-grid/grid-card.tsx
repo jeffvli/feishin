@@ -1,9 +1,12 @@
 import styled from '@emotion/styled';
-import { Skeleton } from '@mantine/core';
+import { Center, Skeleton } from '@mantine/core';
+import { RiAlbumFill } from 'react-icons/ri';
+import { Link, generatePath } from 'react-router-dom';
+import { Text } from '@/renderer/components/text';
 import { GridCardControls } from '@/renderer/components/virtual-grid/grid-card-controls';
+import { AppRoute } from '@/renderer/router/routes';
 import { fadeIn } from '@/renderer/styles';
-import { CardRow } from '../../types';
-import { Text } from '../text';
+import { CardRow } from '@/renderer/types';
 
 const CardWrapper = styled.div<{
   itemGap: number;
@@ -40,7 +43,6 @@ const StyledCard = styled.div`
   width: 100%;
   height: 100%;
   padding: 0;
-  background: var(--grid-card-bg);
   border-radius: 3px;
 `;
 
@@ -62,7 +64,6 @@ const Image = styled.div<ImageProps>`
   background-size: cover;
   border: 0;
   border-radius: 5px;
-  transition: background-image 0.5s ease-in-out;
 
   &::before {
     position: absolute;
@@ -130,21 +131,41 @@ export const GridCard = ({ data, index, style }: any) => {
           itemWidth={itemWidth}
         >
           <StyledCard>
-            <ImageSection style={{ height: `${itemWidth}px` }}>
-              <Image height={itemWidth} src={itemData[i]?.imageUrl} />
-              <ControlsContainer>
-                <GridCardControls
-                  cardControls={cardControls}
-                  handlePlayQueueAdd={handlePlayQueueAdd}
-                  itemData={itemData[i]}
-                  itemType={itemType}
-                />
-              </ControlsContainer>
-            </ImageSection>
+            <Link
+              tabIndex={0}
+              to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                albumId: itemData[i]?.id,
+              })}
+            >
+              <ImageSection style={{ height: `${itemWidth}px` }}>
+                {itemData[i]?.imageUrl ? (
+                  <Image height={itemWidth} src={itemData[i]?.imageUrl} />
+                ) : (
+                  <Center
+                    sx={{
+                      background: 'var(--placeholder-bg)',
+                      borderRadius: '5px',
+                      height: '100%',
+                    }}
+                  >
+                    <RiAlbumFill color="var(--placeholder-fg)" size={35} />
+                  </Center>
+                )}
+
+                <ControlsContainer>
+                  <GridCardControls
+                    cardControls={cardControls}
+                    handlePlayQueueAdd={handlePlayQueueAdd}
+                    itemData={itemData[i]}
+                    itemType={itemType}
+                  />
+                </ControlsContainer>
+              </ImageSection>
+            </Link>
             <DetailSection>
               {cardRows.map((row: CardRow) => (
-                <Row>
-                  <Text overflow="hidden" to={row.route?.route} weight={500}>
+                <Row key={row.prop}>
+                  <Text overflow="hidden">
                     {itemData[i] && itemData[i][row.prop]}
                   </Text>
                 </Row>

@@ -189,8 +189,10 @@ export const Sidebar = () => {
               {imageUrl ? (
                 <SidebarImage src={imageUrl} />
               ) : (
-                <Center sx={{ background: 'rgb(53, 53, 53)', height: '100%' }}>
-                  <RiDiscLine color="rgb(126, 126, 126)" size={50} />
+                <Center
+                  sx={{ background: 'var(--placeholder-bg)', height: '100%' }}
+                >
+                  <RiDiscLine color="var(--placeholder-fg)" size={50} />
                 </Center>
               )}
               <Group

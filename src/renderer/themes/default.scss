@@ -9,22 +9,26 @@
   --secondary-color: rgb(199, 100, 141);
   --success-color: green;
   --warning-color: orange;
-  --danger-color: red;
+  --danger-color: rgb(204, 30, 54);
   --generic-border-color: rgba(50, 50, 50, 0.7);
 
-  --main-bg: rgb(24, 24, 25);
+  --main-bg: rgb(22, 22, 22);
   --main-fg: rgb(193, 194, 187);
   --main-fg-secondary: rgb(150, 150, 150);
 
   --titlebar-fg: rgb(255, 255, 255);
-  --titlebar-bg: rgb(29, 29, 29);
+  --titlebar-bg: rgb(15, 15, 15);
 
-  --sidebar-bg: rgb(16, 16, 16);
+  --sidebar-bg: rgb(15, 15, 15);
   --sidebar-btn-color: rgb(179, 179, 179);
   --sidebar-btn-color-hover: #dddddd;
   --sidebar-handle-bg: #4d4d4d;
 
-  --playerbar-bg: #181818;
+  --playerbar-bg: linear-gradient(
+    rgb(20, 20, 20) 0%,
+    rgb(30, 30, 30) 50%,
+    rgb(20, 20, 20) 100%
+  );
   --playerbar-text-primary-color: #e7e7e7;
   --playerbar-text-secondary-color: #a8a8a8;
   --playerbar-btn-color: #c5c5c5;
@@ -71,7 +75,10 @@
   --toast-description-fg: rgb(193, 194, 197);
   --toast-bg: rgb(16, 16, 16);
 
-  --paper-bg: rgb(29, 29, 29);
+  --paper-bg: rgb(30, 30, 30);
+
+  --placeholder-bg: rgba(53, 53, 53, 0.5);
+  --placeholder-fg: rgba(126, 126, 126);
 
   .ag-theme-alpine-dark {
     --ag-font-family: poppins;
