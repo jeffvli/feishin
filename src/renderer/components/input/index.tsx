@@ -70,6 +70,10 @@ const StyledTextInput = styled(MantineTextInput)<TextInputProps>`
   & .mantine-TextInput-label {
     font-family: var(--label-font-faimly);
   }
+
+  & .mantine-TextInput-disabled {
+    cursor: default;
+  }
 `;
 
 const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
@@ -107,6 +111,10 @@ const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
   & .mantine-NumberInput-label {
     font-family: var(--label-font-faimly);
   }
+
+  & .mantine-NumberInput-disabled {
+    cursor: default;
+  }
 `;
 
 const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
@@ -124,6 +132,10 @@ const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
   & .mantine-PasswordInput-label {
     font-family: var(--label-font-faimly);
   }
+
+  & .mantine-PasswordInput-disabled {
+    cursor: default;
+  }
 `;
 
 const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
@@ -140,6 +152,10 @@ const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
 
   & .mantine-FileInput-label {
     font-family: var(--label-font-faimly);
+  }
+
+  & .mantine-PasswordInput-disabled {
+    cursor: default;
   }
 `;
 
