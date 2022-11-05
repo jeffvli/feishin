@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { Stack, Group, Grid, Accordion } from '@mantine/core';
-import { SpotlightProvider, openSpotlight } from '@mantine/spotlight';
+import { Stack, Group, Grid, Accordion, Center } from '@mantine/core';
+import { SpotlightProvider } from '@mantine/spotlight';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   RiAlbumLine,
@@ -8,6 +8,7 @@ import {
   RiArrowLeftSLine,
   RiArrowRightSLine,
   RiDatabaseLine,
+  RiDiscLine,
   RiEyeLine,
   RiFolder3Line,
   RiHome5Line,
@@ -45,18 +46,14 @@ const ImageContainer = styled(motion(Link))<{ height: string }>`
 const SidebarImage = styled.img`
   width: 100%;
   height: 100%;
-  background-repeat: no-repeat;
-  background-position: 50%;
-  background-size: cover;
+  object-fit: contain;
 `;
 
 export const Sidebar = () => {
   const navigate = useNavigate();
   const sidebar = useAppStore((state) => state.sidebar);
   const setSidebar = useAppStore((state) => state.setSidebar);
-  const backgroundImage = usePlayerStore(
-    (state) => state.current?.song?.imageUrl
-  );
+  const imageUrl = usePlayerStore((state) => state.current?.song?.imageUrl);
 
   const showImage = sidebar.image;
 
@@ -72,11 +69,12 @@ export const Sidebar = () => {
             <Grid.Col span={8}>
               <SpotlightProvider actions={[]}>
                 <TextInput
+                  disabled
                   readOnly
                   icon={<RiSearchLine />}
                   placeholder="Search"
                   rightSectionWidth={90}
-                  onClick={() => openSpotlight()}
+                  // onClick={() => openSpotlight()}
                 />
               </SpotlightProvider>
             </Grid.Col>
@@ -188,7 +186,13 @@ export const Sidebar = () => {
               to={AppRoute.NOW_PLAYING}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-              <SidebarImage src={backgroundImage} />
+              {imageUrl ? (
+                <SidebarImage src={imageUrl} />
+              ) : (
+                <Center sx={{ background: 'rgb(53, 53, 53)', height: '100%' }}>
+                  <RiDiscLine color="rgb(126, 126, 126)" size={50} />
+                </Center>
+              )}
               <Group
                 position="right"
                 sx={{ position: 'absolute', right: 0, top: 0 }}

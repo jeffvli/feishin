@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
-import { Box, Group } from '@mantine/core';
+import { Center, Group } from '@mantine/core';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { RiArrowUpSLine } from 'react-icons/ri';
+import { RiArrowUpSLine, RiDiscLine } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
 import { Button, Text } from '@/renderer/components';
 import { AppRoute } from '@/renderer/router/routes';
@@ -54,7 +54,7 @@ const PlayerbarImage = styled.img`
   background-size: cover;
 `;
 
-const LineItem = styled(Box)<{ secondary?: boolean }>`
+const LineItem = styled.div<{ secondary?: boolean }>`
   display: inline-block;
   width: 95%;
   max-width: 30vw;
@@ -90,7 +90,18 @@ export const LeftControls = () => {
                 to={AppRoute.NOW_PLAYING}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
               >
-                <PlayerbarImage src={song?.imageUrl} />
+                {song?.imageUrl ? (
+                  <PlayerbarImage src={song?.imageUrl} />
+                ) : (
+                  <>
+                    <Center
+                      sx={{ background: 'rgb(53, 53, 53)', height: '100%' }}
+                    >
+                      <RiDiscLine color="rgb(126, 126, 126)" size={50} />
+                    </Center>
+                  </>
+                )}
+
                 <Group
                   position="right"
                   sx={{ position: 'absolute', right: 0, top: 0 }}
