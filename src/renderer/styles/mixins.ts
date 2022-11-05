@@ -30,8 +30,6 @@ export const coverBackground = css`
 `;
 
 export const fadeIn = css`
-  animation: fadein 0.3s;
-
   @keyframes fadein {
     from {
       opacity: 0;
@@ -39,6 +37,18 @@ export const fadeIn = css`
 
     to {
       opacity: 1;
+    }
+  }
+`;
+
+export const rotating = css`
+  @keyframes rotating {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
     }
   }
 `;

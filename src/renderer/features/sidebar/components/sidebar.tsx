@@ -30,9 +30,11 @@ const SidebarContainer = styled.div`
 `;
 
 const ImageContainer = styled(motion(Link))<{ height: string }>`
-  ${fadeIn};
   position: relative;
   height: ${(props) => props.height};
+
+  ${fadeIn};
+  animation: fadein 0.2s ease-in-out;
 
   button {
     display: none;
@@ -188,7 +190,7 @@ export const Sidebar = () => {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
               {imageUrl ? (
-                <SidebarImage src={imageUrl} />
+                <SidebarImage loading="eager" src={imageUrl} />
               ) : (
                 <Center
                   sx={{ background: 'var(--placeholder-bg)', height: '100%' }}

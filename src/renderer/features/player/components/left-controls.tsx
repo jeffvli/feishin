@@ -32,10 +32,12 @@ const MetadataStack = styled(motion.div)`
 `;
 
 const Image = styled(motion(Link))`
-  ${fadeIn};
   width: 70px;
   height: 70px;
   filter: drop-shadow(0 0 5px rgb(0, 0, 0, 100%));
+
+  ${fadeIn};
+  animation: fadein 0.2s ease-in-out;
 
   button {
     display: none;
@@ -91,7 +93,7 @@ export const LeftControls = () => {
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
               >
                 {song?.imageUrl ? (
-                  <PlayerbarImage src={song?.imageUrl} />
+                  <PlayerbarImage loading="eager" src={song?.imageUrl} />
                 ) : (
                   <>
                     <Center

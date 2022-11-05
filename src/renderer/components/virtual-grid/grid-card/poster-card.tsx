@@ -82,12 +82,14 @@ interface ImageProps {
 }
 
 const Image = styled.img<ImageProps>`
-  ${fadeIn};
   width: ${({ height }) => `${height}px`};
   height: ${({ height }) => `${height}px`};
   object-fit: cover;
   border: 0;
   border-radius: 2px;
+
+  ${fadeIn}
+  animation: fadein 0.3s ease-in-out;
 `;
 
 const ControlsContainer = styled.div`
