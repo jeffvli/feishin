@@ -1,6 +1,6 @@
 /* eslint-disable no-plusplus */
 import { useState, useCallback, useMemo } from 'react';
-import { Group, Checkbox, Box, Slider } from '@mantine/core';
+import { Group, Box, Slider } from '@mantine/core';
 import { useDebouncedValue, useSetState, useToggle } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -234,19 +234,31 @@ export const AlbumListRoute = () => {
                 </Button>
               </DropdownMenu.Target>
               <DropdownMenu.Dropdown>
-                <Checkbox.Group
-                  orientation="vertical"
-                  value={filters.serverFolderId}
-                  onChange={(e) => setFilters({ serverFolderId: e })}
-                >
-                  {serverFolders?.map((folder) => (
-                    <Checkbox
-                      key={folder.id}
-                      label={folder.name}
-                      value={folder.id}
-                    />
-                  ))}
-                </Checkbox.Group>
+                {serverFolders?.map((folder) => (
+                  <DropdownMenu.Item
+                    key={folder.id}
+                    closeMenuOnClick={false}
+                    isActive={filters.serverFolderId.includes(folder.id)}
+                    onClick={() => {
+                      if (filters.serverFolderId.includes(folder.id)) {
+                        setFilters({
+                          serverFolderId: filters.serverFolderId.filter(
+                            (id) => id !== folder.id
+                          ),
+                        });
+                      } else {
+                        setFilters({
+                          serverFolderId: [
+                            ...filters.serverFolderId,
+                            folder.id,
+                          ],
+                        });
+                      }
+                    }}
+                  >
+                    {folder.name}
+                  </DropdownMenu.Item>
+                ))}
               </DropdownMenu.Dropdown>
             </DropdownMenu>
           </Group>
