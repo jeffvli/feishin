@@ -439,7 +439,7 @@ export const DefaultCard = ({
               my={2}
               radius="md"
               visible={!data}
-              width={!data ? `${90 - index * 20}%` : '100%'}
+              width={!data ? (index > 0 ? '50%' : '90%') : '100%'}
             >
               <Row />
             </Skeleton>
