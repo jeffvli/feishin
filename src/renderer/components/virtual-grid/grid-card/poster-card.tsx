@@ -49,7 +49,12 @@ const StyledCard = styled.div`
   width: 100%;
   height: 100%;
   padding: 0;
+  background: var(--card-poster-bg);
   border-radius: var(--card-poster-radius);
+
+  &:hover {
+    background: var(--card-poster-bg-hover);
+  }
 `;
 
 const ImageSection = styled.div`

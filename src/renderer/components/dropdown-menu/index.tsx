@@ -75,7 +75,7 @@ const pMenuItem = ({ isActive, children, ...props }: MenuItemProps) => {
     <StyledMenuItem
       isActive={isActive && isActive}
       rightSection={
-        isActive && <RiArrowLeftLine color="var(--primary-color)" size="1em" />
+        isActive && <RiArrowLeftLine color="var(--primary-color)" />
       }
       {...props}
     >
