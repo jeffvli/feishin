@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
 import {
   DatePicker as MantineDatePicker,
   DatePickerProps as MantineDatePickerProps,
 } from '@mantine/dates';
+import styled from 'styled-components';
 
 interface DatePickerProps extends MantineDatePickerProps {
   maxWidth?: number | string;

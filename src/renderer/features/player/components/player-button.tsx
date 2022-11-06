@@ -1,13 +1,12 @@
 /* stylelint-disable no-descending-specificity */
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
 import {
   TooltipProps,
   UnstyledButton,
   UnstyledButtonProps,
 } from '@mantine/core';
 import { motion } from 'framer-motion';
+import styled, { css } from 'styled-components';
 import { Tooltip } from '@/renderer/components';
 
 type MantineButtonProps = UnstyledButtonProps &

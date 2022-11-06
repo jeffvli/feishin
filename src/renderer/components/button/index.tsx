@@ -1,11 +1,11 @@
 import React, { forwardRef, Ref } from 'react';
-import styled from '@emotion/styled';
 import {
   Button as MantineButton,
   ButtonProps as MantineButtonProps,
   createPolymorphicComponent,
   TooltipProps,
 } from '@mantine/core';
+import styled from 'styled-components';
 import { Tooltip } from '@/renderer/components/tooltip';
 
 interface ButtonProps extends MantineButtonProps {

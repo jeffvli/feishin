@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from 'styled-components';
 
 export enum Font {
   EPILOGUE = 'Epilogue',

@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
 import { Center, Group } from '@mantine/core';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { RiArrowUpSLine, RiDiscLine } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
+import styled from 'styled-components';
 import { Button, Text } from '@/renderer/components';
 import { AppRoute } from '@/renderer/router/routes';
 import { useAppStore, usePlayerStore } from '@/renderer/store';
@@ -56,17 +56,17 @@ const PlayerbarImage = styled.img`
   background-size: cover;
 `;
 
-const LineItem = styled.div<{ secondary?: boolean }>`
+const LineItem = styled.div<{ $secondary?: boolean }>`
   display: inline-block;
   width: 95%;
   max-width: 30vw;
   overflow: hidden;
-  color: ${(props) => props.secondary && 'var(--main-fg-secondary)'};
+  color: ${(props) => props.$secondary && 'var(--main-fg-secondary)'};
   white-space: nowrap;
   text-overflow: ellipsis;
 
   a {
-    color: ${(props) => props.secondary && 'var(--text-secondary)'};
+    color: ${(props) => props.$secondary && 'var(--text-secondary)'};
   }
 `;
 
@@ -129,7 +129,7 @@ export const LeftControls = () => {
         <MetadataStack layout>
           <LineItem>
             <Text
-              link
+              $link
               component={Link}
               overflow="hidden"
               size="sm"
@@ -140,16 +140,16 @@ export const LeftControls = () => {
               {title || '—'}
             </Text>
           </LineItem>
-          <LineItem secondary>
+          <LineItem $secondary>
             {artists?.map((artist, index) => (
               <>
                 {index > 0 && (
-                  <Text secondary style={{ display: 'inline-block' }}>
+                  <Text $secondary style={{ display: 'inline-block' }}>
                     ,
                   </Text>
                 )}{' '}
                 <Text
-                  link
+                  $link
                   component={Link}
                   overflow="hidden"
                   size="sm"
@@ -167,9 +167,9 @@ export const LeftControls = () => {
               </>
             ))}
           </LineItem>
-          <LineItem secondary>
+          <LineItem $secondary>
             <Text
-              link
+              $link
               component={Link}
               overflow="hidden"
               size="sm"

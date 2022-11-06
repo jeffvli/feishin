@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
-import styled from '@emotion/styled';
 import format from 'format-duration';
 import ReactSlider, { ReactSliderProps } from 'react-slider';
+import styled from 'styled-components';
 
 interface SliderProps extends ReactSliderProps {
   hasTooltip?: boolean;

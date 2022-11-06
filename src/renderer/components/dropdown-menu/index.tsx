@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import {
   Menu as MantineMenu,
   MenuProps as MantineMenuProps,
@@ -9,12 +8,13 @@ import {
   createPolymorphicComponent,
 } from '@mantine/core';
 import { RiArrowLeftLine } from 'react-icons/ri';
+import styled from 'styled-components';
 
 type MenuProps = MantineMenuProps;
 type MenuLabelProps = MantineMenuLabelProps;
 interface MenuItemProps extends MantineMenuItemProps {
+  $isActive?: boolean;
   children: React.ReactNode;
-  isActive?: boolean;
 }
 type MenuDividerProps = MantineMenuDividerProps;
 type MenuDropdownProps = MantineMenuDropdownProps;
@@ -40,7 +40,7 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   }
 
   & .mantine-Menu-itemLabel {
-    color: ${({ isActive }) => isActive && 'var(--primary-color)'};
+    color: ${({ $isActive }) => $isActive && 'var(--primary-color)'};
     font-weight: 500;
     font-size: 1em;
   }
@@ -70,12 +70,12 @@ const MenuLabel = ({ children, ...props }: MenuLabelProps) => {
   return <StyledMenuLabel {...props}>{children}</StyledMenuLabel>;
 };
 
-const pMenuItem = ({ isActive, children, ...props }: MenuItemProps) => {
+const pMenuItem = ({ $isActive, children, ...props }: MenuItemProps) => {
   return (
     <StyledMenuItem
-      isActive={isActive && isActive}
+      $isActive={$isActive}
       rightSection={
-        isActive && <RiArrowLeftLine color="var(--primary-color)" />
+        $isActive && <RiArrowLeftLine color="var(--primary-color)" />
       }
       {...props}
     >

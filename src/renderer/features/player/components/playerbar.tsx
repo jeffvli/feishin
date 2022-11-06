@@ -1,6 +1,6 @@
 import { useRef } from 'react';
-import styled from '@emotion/styled';
 import isElectron from 'is-electron';
+import styled from 'styled-components';
 import { PlaybackType } from '@/renderer/types';
 import { AudioPlayer } from '../../../components';
 import { usePlayerStore } from '../../../store';

@@ -1,5 +1,5 @@
-import styled from '@emotion/styled';
 import { Tooltip as MantineTooltip, TooltipProps } from '@mantine/core';
+import styled from 'styled-components';
 
 const StyledTooltip = styled(MantineTooltip)`
   & .mantine-Tooltip-tooltip {

@@ -173,7 +173,7 @@ export const AlbumListRoute = () => {
       <VirtualGridContainer>
         <Group m={10} position="apart">
           <Group>
-            <Text noSelect size="lg">
+            <Text $noSelect size="lg">
               Albums
             </Text>
             <DropdownMenu position="bottom-start">
@@ -189,7 +189,7 @@ export const AlbumListRoute = () => {
                 {FILTERS.map((filter) => (
                   <DropdownMenu.Item
                     key={`filter-${filter.value}`}
-                    isActive={filter.value === filters.sortBy}
+                    $isActive={filter.value === filters.sortBy}
                     onClick={() => setFilters({ sortBy: filter.value })}
                   >
                     {filter.name}
@@ -197,7 +197,7 @@ export const AlbumListRoute = () => {
                 ))}
                 <DropdownMenu.Divider />
                 <DropdownMenu.Item
-                  isActive={isAdvFilter}
+                  $isActive={isAdvFilter}
                   onClick={() => toggleAdvFilter()}
                 >
                   Advanced Filters
@@ -217,7 +217,7 @@ export const AlbumListRoute = () => {
                 {ORDER.map((sort) => (
                   <DropdownMenu.Item
                     key={`sort-${sort.value}`}
-                    isActive={sort.value === filters.orderBy}
+                    $isActive={sort.value === filters.orderBy}
                     onClick={() => setFilters({ orderBy: sort.value })}
                   >
                     {sort.name}
@@ -237,8 +237,8 @@ export const AlbumListRoute = () => {
                 {serverFolders?.map((folder) => (
                   <DropdownMenu.Item
                     key={folder.id}
+                    $isActive={filters.serverFolderId.includes(folder.id)}
                     closeMenuOnClick={false}
-                    isActive={filters.serverFolderId.includes(folder.id)}
                     onClick={() => {
                       if (filters.serverFolderId.includes(folder.id)) {
                         setFilters({
@@ -279,7 +279,7 @@ export const AlbumListRoute = () => {
                 </DropdownMenu.Item>
                 <DropdownMenu.Divider />
                 <DropdownMenu.Item
-                  isActive={
+                  $isActive={
                     page.list.type === 'grid' &&
                     page.list.display === CardDisplayType.CARD
                   }
@@ -297,7 +297,7 @@ export const AlbumListRoute = () => {
                   Card
                 </DropdownMenu.Item>
                 <DropdownMenu.Item
-                  isActive={
+                  $isActive={
                     page.list.type === 'grid' &&
                     page.list.display === CardDisplayType.POSTER
                   }
@@ -316,7 +316,7 @@ export const AlbumListRoute = () => {
                 </DropdownMenu.Item>
                 <DropdownMenu.Item
                   disabled
-                  isActive={page.list.type === 'list'}
+                  $isActive={page.list.type === 'list'}
                   onClick={() =>
                     setPage('albums', {
                       ...page,
@@ -366,7 +366,7 @@ export const AlbumListRoute = () => {
                     }}
                   >
                     <Group>
-                      <Text noSelect>Advanced Filters</Text>
+                      <Text $noSelect>Advanced Filters</Text>
                       <NumberInput
                         disabled
                         min={1}

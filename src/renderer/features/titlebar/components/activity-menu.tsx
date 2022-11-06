@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import styled from '@emotion/styled';
 import { Group } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { FiActivity } from 'react-icons/fi';
 import { RiRefreshLine } from 'react-icons/ri';
+import styled from 'styled-components';
 import { socket } from '@/renderer/api';
 import { queryKeys } from '@/renderer/api/query-keys';
 import { Button, Popover, Text } from '@/renderer/components';

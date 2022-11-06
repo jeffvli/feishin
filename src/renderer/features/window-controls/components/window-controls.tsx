@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import styled from '@emotion/styled';
 import isElectron from 'is-electron';
 import {
   RiCheckboxBlankLine,
   RiCloseLine,
   RiSubtractLine,
 } from 'react-icons/ri';
+import styled from 'styled-components';
 
 interface WindowControlsProps {
   style?: 'macos' | 'windows' | 'linux';

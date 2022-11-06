@@ -1,9 +1,9 @@
-import styled from '@emotion/styled';
 import {
   Popover as MantinePopover,
   PopoverProps as MantinePopoverProps,
   PopoverDropdownProps as MantinePopoverDropdownProps,
 } from '@mantine/core';
+import styled from 'styled-components';
 
 type PopoverProps = MantinePopoverProps;
 type PopoverDropdownProps = MantinePopoverDropdownProps;

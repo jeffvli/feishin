@@ -1,9 +1,9 @@
 import { forwardRef } from 'react';
-import styled from '@emotion/styled';
 import {
   SegmentedControl as MantineSegmentedControl,
   SegmentedControlProps as MantineSegmentedControlProps,
 } from '@mantine/core';
+import styled from 'styled-components';
 
 type SegmentedControlProps = MantineSegmentedControlProps;
 

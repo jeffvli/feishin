@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
 import {
   ScrollArea as MantineScrollArea,
   ScrollAreaProps as MantineScrollAreaProps,
 } from '@mantine/core';
+import styled from 'styled-components';
 
 interface ScrollAreaProps extends MantineScrollAreaProps {
   children: React.ReactNode;

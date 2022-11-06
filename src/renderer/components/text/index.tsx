@@ -1,34 +1,34 @@
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
-import styled from '@emotion/styled';
 import {
   createPolymorphicComponent,
   Text as MantineText,
   TextProps as MantineTextProps,
 } from '@mantine/core';
+import styled from 'styled-components';
 import { Font, textEllipsis } from '@/renderer/styles';
 
 type MantineTextDivProps = MantineTextProps & ComponentPropsWithoutRef<'div'>;
 
 interface TextProps extends MantineTextDivProps {
+  $link?: boolean;
+  $noSelect?: boolean;
+  $secondary?: boolean;
   children: ReactNode;
   font?: Font;
-  link?: boolean;
-  noSelect?: boolean;
   overflow?: 'hidden' | 'visible';
-  secondary?: boolean;
   to?: string;
   weight?: number;
 }
 
-const BaseText = styled(MantineText)<any>`
+const BaseText = styled(MantineText)<TextProps>`
   color: ${(props) =>
-    props.secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)'};
+    props.$secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)'};
   font-family: ${(props) => props.font};
-  user-select: ${(props) => (props.noSelect ? 'none' : 'auto')};
+  user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
   ${(props) => props.overflow === 'hidden' && textEllipsis}
 
   &:hover {
-    text-decoration: ${(props) => (props.link ? 'underline' : 'none')};
+    text-decoration: ${(props) => (props.$link ? 'underline' : 'none')};
   }
 `;
 
@@ -36,18 +36,18 @@ const StyledText = styled(BaseText)<TextProps>``;
 
 export const _Text = ({
   children,
-  secondary,
+  $secondary,
   overflow,
   font,
-  noSelect,
+  $noSelect,
   ...rest
 }: TextProps) => {
   return (
     <StyledText
+      $noSelect={$noSelect}
+      $secondary={$secondary}
       font={font}
-      noSelect={noSelect && noSelect}
       overflow={overflow}
-      secondary={secondary && secondary}
       {...rest}
     >
       {children}
@@ -58,11 +58,11 @@ export const _Text = ({
 export const Text = createPolymorphicComponent<'div', TextProps>(_Text);
 
 _Text.defaultProps = {
+  $link: false,
+  $noSelect: false,
+  $secondary: false,
   font: undefined,
-  link: false,
-  noSelect: false,
   overflow: 'visible',
-  secondary: false,
   to: '',
   weight: 500,
 };

@@ -1,5 +1,4 @@
 import React, { MouseEvent } from 'react';
-import styled from '@emotion/styled';
 import { Group, UnstyledButtonProps } from '@mantine/core';
 import { motion } from 'framer-motion';
 import {
@@ -8,6 +7,7 @@ import {
   RiHeartFill,
   RiHeartLine,
 } from 'react-icons/ri';
+import styled from 'styled-components';
 import { Button } from '@/renderer/components/button';
 import { DropdownMenu } from '@/renderer/components/dropdown-menu';
 import { Play } from '@/renderer/types';

@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
 import {
   Paper as MantinePaper,
   PaperProps as MantinePaperProps,
 } from '@mantine/core';
+import styled from 'styled-components';
 
 export interface PaperProps extends MantinePaperProps {
   children: React.ReactNode;

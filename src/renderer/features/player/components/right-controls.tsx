@@ -1,10 +1,10 @@
-import styled from '@emotion/styled';
 import { Group } from '@mantine/core';
 import {
   RiVolumeUpFill,
   RiVolumeMuteFill,
   RiPlayListFill,
 } from 'react-icons/ri';
+import styled from 'styled-components';
 import { usePlayerStore, useAppStore } from '@/renderer/store';
 import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';

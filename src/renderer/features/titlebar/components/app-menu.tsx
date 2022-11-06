@@ -10,6 +10,7 @@ import {
   ServerList,
   useServerList,
 } from '@/renderer/features/servers';
+import { Settings } from '@/renderer/features/settings';
 import { usePermissions } from '@/renderer/features/shared';
 import { useAuthStore } from '@/renderer/store';
 
@@ -51,6 +52,15 @@ export const AppMenu = () => {
     });
   };
 
+  const handleSettingsModal = () => {
+    openModal({
+      centered: true,
+      children: <Settings />,
+      size: 'xl',
+      title: 'Settings',
+    });
+  };
+
   const handleSetCurrentServer = (serverId: string) => {
     const server = servers?.data.find((s) => s.id === serverId);
     if (!server) return;
@@ -80,8 +90,8 @@ export const AppMenu = () => {
           return (
             <DropdownMenu.Item
               key={`server-${s.id}`}
+              $isActive={s.id === currentServer?.id}
               disabled={requiresCredential}
-              isActive={s.id === currentServer?.id}
               onClick={() => handleSetCurrentServer(s.id)}
             >
               <Group>
@@ -95,7 +105,9 @@ export const AppMenu = () => {
         })}
         <DropdownMenu.Divider />
         <DropdownMenu.Item disabled>Search</DropdownMenu.Item>
-        <DropdownMenu.Item>Settings</DropdownMenu.Item>
+        <DropdownMenu.Item onClick={handleSettingsModal}>
+          Settings
+        </DropdownMenu.Item>
         <DropdownMenu.Divider />
         {permissions.createServer && (
           <DropdownMenu.Item onClick={handleAddServerModal}>

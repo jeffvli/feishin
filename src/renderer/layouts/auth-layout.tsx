@@ -1,5 +1,5 @@
-import styled from '@emotion/styled';
 import { Outlet } from 'react-router-dom';
+import styled from 'styled-components';
 import { Titlebar } from '@/renderer/features/titlebar/components/titlebar';
 
 const WindowsTitlebarContainer = styled.div`

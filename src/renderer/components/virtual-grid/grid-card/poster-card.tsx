@@ -112,14 +112,14 @@ const DetailSection = styled.div`
   flex-direction: column;
 `;
 
-const Row = styled.div<{ secondary?: boolean }>`
+const Row = styled.div<{ $secondary?: boolean }>`
   width: 100%;
   max-width: 100%;
   height: 25px;
   padding: 0 0.2rem;
   overflow: hidden;
-  color: ${({ secondary }) =>
-    secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)'};
+  color: ${({ $secondary }) =>
+    $secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)'};
   white-space: nowrap;
   text-overflow: ellipsis;
 `;
@@ -235,7 +235,7 @@ export const PosterCard = ({
                 return (
                   <Row
                     key={`row-${row.property}-${columnIndex}`}
-                    secondary={index > 0}
+                    $secondary={index > 0}
                   >
                     {data[row.property].map((item: any, itemIndex: number) => (
                       <React.Fragment key={`${data.id}-${item.id}`}>

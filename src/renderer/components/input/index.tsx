@@ -1,5 +1,4 @@
 import React, { forwardRef } from 'react';
-import styled from '@emotion/styled';
 import {
   TextInput as MantineTextInput,
   TextInputProps as MantineTextInputProps,
@@ -10,6 +9,7 @@ import {
   FileInput as MantineFileInput,
   FileInputProps as MantineFileInputProps,
 } from '@mantine/core';
+import styled from 'styled-components';
 
 interface TextInputProps extends MantineTextInputProps {
   children?: React.ReactNode;

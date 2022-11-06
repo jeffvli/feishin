@@ -1,4 +1,3 @@
-import styled from '@emotion/styled';
 import { Stack, Group, Grid, Accordion, Center } from '@mantine/core';
 import { SpotlightProvider } from '@mantine/spotlight';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -18,6 +17,7 @@ import {
   RiUserVoiceLine,
 } from 'react-icons/ri';
 import { useNavigate, Link } from 'react-router-dom';
+import styled from 'styled-components';
 import { Button, TextInput } from '@/renderer/components';
 import { AppRoute } from '@/renderer/router/routes';
 import { useAppStore, usePlayerStore } from '@/renderer/store';

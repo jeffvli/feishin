@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
 import {
   Switch as MantineSwitch,
   SwitchProps as MantineSwitchProps,
 } from '@mantine/core';
+import styled from 'styled-components';
 
 type SwitchProps = MantineSwitchProps;
 

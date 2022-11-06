@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 import { Outlet } from 'react-router';
+import styled from 'styled-components';
 import { SideQueue } from '@/renderer/features/side-queue/components/side-queue';
 import { Titlebar } from '@/renderer/features/titlebar/components/titlebar';
 import { useAppStore } from '@/renderer/store';

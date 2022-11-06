@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
-import styled from '@emotion/styled';
 import { Group } from '@mantine/core';
+import styled from 'styled-components';
 import { Text } from '@/renderer/components';
 import { ActivityMenu } from '@/renderer/features/titlebar/components/activity-menu';
 import { AppMenu } from '@/renderer/features/titlebar/components/app-menu';

@@ -1,6 +1,6 @@
 import { Ref, useMemo } from 'react';
-import styled from '@emotion/styled';
 import { FixedSizeList, FixedSizeListProps } from 'react-window';
+import styled from 'styled-components';
 import { GridCard } from '@/renderer/components/virtual-grid/grid-card';
 import { usePlayQueueHandler } from '@/renderer/features/player/hooks/use-playqueue-handler';
 import {

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import styled from '@emotion/styled';
 import format from 'format-duration';
 import isElectron from 'is-electron';
 import { IoIosPause } from 'react-icons/io';
@@ -10,6 +9,7 @@ import {
   RiSkipBackFill,
   RiSkipForwardFill,
 } from 'react-icons/ri';
+import styled from 'styled-components';
 import { Text } from '@/renderer/components';
 import { usePlayerStore } from '@/renderer/store';
 import { Font } from '@/renderer/styles';
@@ -137,7 +137,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
       </ControlsContainer>
       <SliderContainer>
         <SliderValueWrapper position="left">
-          <Text noSelect secondary font={Font.POPPINS} size="xs" weight={600}>
+          <Text $noSelect $secondary font={Font.POPPINS} size="xs" weight={600}>
             {formattedTime}
           </Text>
         </SliderValueWrapper>
@@ -155,7 +155,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
           />
         </SliderWrapper>
         <SliderValueWrapper position="right">
-          <Text noSelect secondary font={Font.POPPINS} size="xs" weight={600}>
+          <Text $noSelect $secondary font={Font.POPPINS} size="xs" weight={600}>
             {duration}
           </Text>
         </SliderValueWrapper>

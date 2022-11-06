@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import styled from '@emotion/styled';
 import {
   TextInput,
   PasswordInput,
@@ -14,6 +13,7 @@ import { useDebouncedValue } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { RiCheckboxCircleFill } from 'react-icons/ri';
 import { useSearchParams } from 'react-router-dom';
+import styled from 'styled-components';
 import { useLogin } from '@/renderer/features/auth/queries/use-login';
 import { usePingServer } from '@/renderer/features/auth/queries/use-ping-server';
 import { normalizeServerUrl } from '@/renderer/utils';

@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
 import {
   Select as MantineSelect,
   SelectProps as MantineSelectProps,
 } from '@mantine/core';
+import styled from 'styled-components';
 
 interface SelectProps extends MantineSelectProps {
   maxWidth?: number | string;
