@@ -1,6 +1,7 @@
 import { ListChildComponentProps } from 'react-window';
+import { DefaultCard } from '@/renderer/components/virtual-grid/grid-card/default-card';
 import { PosterCard } from '@/renderer/components/virtual-grid/grid-card/poster-card';
-import { GridCardData } from '@/renderer/types';
+import { CardDisplayType, GridCardData } from '@/renderer/types';
 
 export const GridCard = ({
   data,
@@ -27,9 +28,11 @@ export const GridCard = ({
   const stopIndex = Math.min(itemCount - 1, startIndex + columnCount - 1);
   const cards = [];
 
+  const View = display === CardDisplayType.CARD ? DefaultCard : PosterCard;
+
   for (let i = startIndex; i <= stopIndex; i += 1) {
     cards.push(
-      <PosterCard
+      <View
         key={`card-${i}-${index}`}
         columnIndex={i}
         controls={{

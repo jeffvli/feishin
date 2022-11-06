@@ -1,10 +1,16 @@
 /* eslint-disable no-plusplus */
 import { useState, useCallback, useMemo } from 'react';
-import { Group, Checkbox } from '@mantine/core';
+import { Group, Checkbox, Box, Slider } from '@mantine/core';
 import { useDebouncedValue, useSetState, useToggle } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
+import { AnimatePresence, motion } from 'framer-motion';
+import throttle from 'lodash/throttle';
 import { nanoid } from 'nanoid';
-import { RiArrowDownSLine, RiArrowLeftLine } from 'react-icons/ri';
+import {
+  RiArrowDownSLine,
+  RiDeleteBack2Fill,
+  RiSettings2Fill,
+} from 'react-icons/ri';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { api } from '@/renderer/api';
 import { AlbumSort } from '@/renderer/api/albums.api';
@@ -25,18 +31,14 @@ import {
   AdvancedFilterGroup,
   AdvancedFilters,
   FilterGroupType,
-  formatAdvancedFiltersQuery,
+  encodeAdvancedFiltersQuery,
 } from '@/renderer/features/albums/components/advanced-filters';
 import { useAlbumList } from '@/renderer/features/albums/queries/use-album-list';
 import { useServerList } from '@/renderer/features/servers';
 import { AnimatedPage, useServerCredential } from '@/renderer/features/shared';
 import { AppRoute } from '@/renderer/router/routes';
-import { useAuthStore } from '@/renderer/store';
-import { LibraryItem } from '@/renderer/types';
-import {
-  ViewType,
-  ViewTypeButton,
-} from '../../library/components/ViewTypeButton';
+import { useAppStore, useAuthStore } from '@/renderer/store';
+import { LibraryItem, CardDisplayType } from '@/renderer/types';
 
 const FILTERS = [
   { name: 'Title', value: AlbumSort.NAME },
@@ -57,12 +59,27 @@ const ORDER = [
   { name: 'Descending', value: SortOrder.DESC },
 ];
 
+const DEFAULT_ADVANCED_FILTERS = {
+  group: [],
+  rules: [
+    {
+      field: '',
+      operator: '',
+      uniqueId: nanoid(),
+      value: '',
+    },
+  ],
+  type: FilterGroupType.AND,
+  uniqueId: nanoid(),
+};
+
 export const AlbumListRoute = () => {
   const queryClient = useQueryClient();
   const { serverToken, isImageTokenRequired } = useServerCredential();
+  const page = useAppStore((state) => state.albums);
+  const setPage = useAppStore((state) => state.setPage);
   const serverId = useAuthStore((state) => state.currentServer?.id) || '';
   const { data: servers } = useServerList({ enabled: true });
-  const [viewType, setViewType] = useState(ViewType.Grid);
   const [filters, setFilters] = useSetState({
     orderBy: SortOrder.ASC,
     serverFolderId: [] as string[],
@@ -70,19 +87,23 @@ export const AlbumListRoute = () => {
   });
 
   const [isAdvFilter, toggleAdvFilter] = useToggle();
-  const [rawAdvFilters, setRawAdvFilters] = useState<AdvancedFilterGroup>({
-    group: [],
-    rules: [{ field: null, operator: null, uniqueId: nanoid(), value: null }],
-    type: FilterGroupType.AND,
-    uniqueId: nanoid(),
-  });
+  const [rawAdvFilters, setRawAdvFilters] = useState<AdvancedFilterGroup>(
+    DEFAULT_ADVANCED_FILTERS
+  );
 
-  const [debouncedAdvFilters] = useDebouncedValue(rawAdvFilters, 300);
+  const [debouncedAdvFilters] = useDebouncedValue(rawAdvFilters, 500);
 
   const advancedFilters = useMemo(() => {
-    const value = formatAdvancedFiltersQuery(debouncedAdvFilters);
-    return encodeURI(JSON.stringify(value));
-  }, [debouncedAdvFilters]);
+    if (!isAdvFilter) {
+      return encodeAdvancedFiltersQuery(DEFAULT_ADVANCED_FILTERS);
+    }
+
+    return encodeAdvancedFiltersQuery(debouncedAdvFilters);
+  }, [debouncedAdvFilters, isAdvFilter]);
+
+  const handleResetAdvancedFilters = () => {
+    setRawAdvFilters(DEFAULT_ADVANCED_FILTERS);
+  };
 
   const serverFolders = useMemo(() => {
     const server = servers?.data.find((server) => server.id === serverId);
@@ -99,7 +120,7 @@ export const AlbumListRoute = () => {
   });
 
   const fetch = useCallback(
-    async ({ skip, take }) => {
+    async ({ skip, take }: { skip: number; take: number }) => {
       const albums = await queryClient.fetchQuery(
         queryKeys.albums.list(serverId, {
           skip,
@@ -138,6 +159,15 @@ export const AlbumListRoute = () => {
     ]
   );
 
+  const setSize = throttle(
+    (e: number) =>
+      setPage('albums', {
+        ...page,
+        list: { ...page.list, size: e },
+      }),
+    200
+  );
+
   return (
     <AnimatedPage>
       <VirtualGridContainer>
@@ -159,16 +189,7 @@ export const AlbumListRoute = () => {
                 {FILTERS.map((filter) => (
                   <DropdownMenu.Item
                     key={`filter-${filter.value}`}
-                    color={
-                      filter.value === filters.sortBy
-                        ? 'var(--primary-color)'
-                        : undefined
-                    }
-                    rightSection={
-                      filter.value === filters.sortBy ? (
-                        <RiArrowLeftLine />
-                      ) : undefined
-                    }
+                    isActive={filter.value === filters.sortBy}
                     onClick={() => setFilters({ sortBy: filter.value })}
                   >
                     {filter.name}
@@ -176,8 +197,7 @@ export const AlbumListRoute = () => {
                 ))}
                 <DropdownMenu.Divider />
                 <DropdownMenu.Item
-                  color={isAdvFilter ? 'var(--primary-color)' : undefined}
-                  rightSection={isAdvFilter ? <RiArrowLeftLine /> : undefined}
+                  isActive={isAdvFilter}
                   onClick={() => toggleAdvFilter()}
                 >
                   Advanced Filters
@@ -197,16 +217,7 @@ export const AlbumListRoute = () => {
                 {ORDER.map((sort) => (
                   <DropdownMenu.Item
                     key={`sort-${sort.value}`}
-                    color={
-                      sort.value === filters.orderBy
-                        ? 'var(--primary-color)'
-                        : undefined
-                    }
-                    rightSection={
-                      sort.value === filters.orderBy ? (
-                        <RiArrowLeftLine />
-                      ) : undefined
-                    }
+                    isActive={sort.value === filters.orderBy}
                     onClick={() => setFilters({ orderBy: sort.value })}
                   >
                     {sort.name}
@@ -240,69 +251,181 @@ export const AlbumListRoute = () => {
             </DropdownMenu>
           </Group>
           <Group position="right">
-            <ViewTypeButton
-              handler={setViewType}
-              menuProps={{ position: 'bottom-end' }}
-              type={viewType}
-            />
+            <DropdownMenu position="bottom-end" width={100}>
+              <DropdownMenu.Target>
+                <Button compact variant="subtle">
+                  <RiSettings2Fill size={15} />
+                </Button>
+              </DropdownMenu.Target>
+              <DropdownMenu.Dropdown>
+                <DropdownMenu.Item>
+                  <Slider
+                    defaultValue={page.list?.size || 0}
+                    label={null}
+                    onChange={setSize}
+                  />
+                </DropdownMenu.Item>
+                <DropdownMenu.Divider />
+                <DropdownMenu.Item
+                  isActive={
+                    page.list.type === 'grid' &&
+                    page.list.display === CardDisplayType.CARD
+                  }
+                  onClick={() =>
+                    setPage('albums', {
+                      ...page,
+                      list: {
+                        ...page.list,
+                        display: CardDisplayType.CARD,
+                        type: 'grid',
+                      },
+                    })
+                  }
+                >
+                  Card
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  isActive={
+                    page.list.type === 'grid' &&
+                    page.list.display === CardDisplayType.POSTER
+                  }
+                  onClick={() =>
+                    setPage('albums', {
+                      ...page,
+                      list: {
+                        ...page.list,
+                        display: CardDisplayType.POSTER,
+                        type: 'grid',
+                      },
+                    })
+                  }
+                >
+                  Poster
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  disabled
+                  isActive={page.list.type === 'list'}
+                  onClick={() =>
+                    setPage('albums', {
+                      ...page,
+                      list: {
+                        ...page.list,
+                        type: 'list',
+                      },
+                    })
+                  }
+                >
+                  List
+                </DropdownMenu.Item>
+              </DropdownMenu.Dropdown>
+            </DropdownMenu>
           </Group>
         </Group>
-        {isAdvFilter && (
-          <>
-            <Paper sx={{ maxHeight: '20vh' }}>
-              <ScrollArea
-                my={10}
-                px={10}
-                sx={{ height: '100%', width: '100%' }}
+        <AnimatePresence
+          key="album-list-advanced-filter"
+          exitBeforeEnter
+          initial={false}
+        >
+          {isAdvFilter && (
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -25 }}
+              initial={{ opacity: 0, y: -25 }}
+              style={{ maxHeight: '20vh', zIndex: 100 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+            >
+              <Paper
+                sx={{
+                  boxShadow: ' 0 10px 5px -2px rgb(0, 0, 0, .2)',
+                  height: '100%',
+                  position: 'relative',
+                }}
               >
-                <Group noWrap my={10} position="apart">
-                  <Group>
-                    <Text>Advanced Filters</Text>
-                    <NumberInput
-                      disabled
-                      min={1}
-                      placeholder="Limit"
-                      size="xs"
-                      width={75}
-                    />
+                <ScrollArea sx={{ height: '100%', width: '100%' }}>
+                  <Group
+                    noWrap
+                    p={10}
+                    position="apart"
+                    sx={{
+                      background: 'var(--paper-bg)',
+                      position: 'sticky',
+                      top: 0,
+                      zIndex: 50,
+                    }}
+                  >
+                    <Group>
+                      <Text noSelect>Advanced Filters</Text>
+                      <NumberInput
+                        disabled
+                        min={1}
+                        placeholder="Limit"
+                        size="xs"
+                        width={75}
+                      />
+                      <Button
+                        px={10}
+                        size="xs"
+                        tooltip={{ label: 'Reset' }}
+                        variant="default"
+                        onClick={handleResetAdvancedFilters}
+                      >
+                        <RiDeleteBack2Fill size={15} />
+                      </Button>
+                    </Group>
+                    <Button disabled uppercase variant="default">
+                      Save as...
+                    </Button>
                   </Group>
-                  <Button disabled uppercase>
-                    Save as...
-                  </Button>
-                </Group>
-                <AdvancedFilters
-                  filters={rawAdvFilters}
-                  setFilters={setRawAdvFilters}
-                />
-              </ScrollArea>
-            </Paper>
-          </>
-        )}
+                  <Box p={10}>
+                    <AdvancedFilters
+                      filters={rawAdvFilters}
+                      setFilters={setRawAdvFilters}
+                    />
+                  </Box>
+                </ScrollArea>
+              </Paper>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <VirtualGridAutoSizerContainer>
           <AutoSizer>
             {({ height, width }) => (
               <VirtualInfiniteGrid
                 cardRows={[
                   {
-                    align: 'center',
-                    prop: 'name',
+                    property: 'name',
                     route: {
-                      prop: 'id',
                       route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                      slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
                     },
                   },
                   {
-                    align: 'center',
-                    prop: 'releaseYear',
+                    arrayProperty: 'name',
+                    property: 'albumArtists',
+                    route: {
+                      route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+                      slugs: [
+                        { idProperty: 'id', slugProperty: 'albumArtistId' },
+                      ],
+                    },
+                  },
+                  {
+                    property: 'releaseYear',
                   },
                 ]}
+                display={page.list?.display || CardDisplayType.CARD}
                 fetchFn={fetch}
                 height={height}
                 itemCount={albums?.pagination.totalEntries || 0}
                 itemGap={20}
-                itemSize={200}
+                itemSize={150 + page.list?.size}
                 itemType={LibraryItem.ALBUM}
                 minimumBatchSize={40}
+                refresh={advancedFilters}
+                route={{
+                  route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                  slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
+                }}
                 width={width}
               />
             )}

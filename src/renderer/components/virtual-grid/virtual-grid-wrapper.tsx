@@ -16,6 +16,7 @@ export const VirtualGridWrapper = ({
   itemGap,
   itemType,
   itemWidth,
+  display,
   itemHeight,
   itemCount,
   columnCount,
@@ -42,6 +43,7 @@ export const VirtualGridWrapper = ({
     () => ({
       cardRows,
       columnCount,
+      display,
       handlePlayQueueAdd,
       itemCount,
       itemData,
@@ -58,6 +60,7 @@ export const VirtualGridWrapper = ({
       handlePlayQueueAdd,
       itemCount,
       itemData,
+      display,
       itemGap,
       itemHeight,
       route,
@@ -72,7 +75,7 @@ export const VirtualGridWrapper = ({
       useIsScrolling
       itemCount={rowCount}
       itemData={memo}
-      itemSize={itemHeight + itemGap}
+      itemSize={itemHeight}
       overscanCount={5}
     >
       {GridCard}

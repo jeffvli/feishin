@@ -90,6 +90,7 @@ export const GridCardControls = ({
           whileTap={{ scale: 1 }}
           onClick={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             handlePlayQueueAdd({
               byItemType: {
                 id: itemData.id,
@@ -116,7 +117,10 @@ export const GridCardControls = ({
               <Button
                 p={5}
                 variant="subtle"
-                onClick={(e) => e.preventDefault()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
               >
                 <RiMore2Fill color="white" size={20} />
               </Button>
@@ -125,6 +129,7 @@ export const GridCardControls = ({
               <DropdownMenu.Item
                 onClick={(e: MouseEvent) => {
                   e.preventDefault();
+                  e.stopPropagation();
                   handlePlayQueueAdd({
                     byItemType: {
                       id: itemData.id,
@@ -139,6 +144,7 @@ export const GridCardControls = ({
               <DropdownMenu.Item
                 onClick={(e: MouseEvent) => {
                   e.preventDefault();
+                  e.stopPropagation();
                   handlePlayQueueAdd({
                     byItemType: {
                       id: itemData.id,

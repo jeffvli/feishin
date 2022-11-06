@@ -79,7 +79,7 @@ const FILTER_GROUP_OPTIONS_DATA = [
 const FILTER_OPTIONS_DATA = [
   {
     default: '~',
-    label: 'Artist Title',
+    label: 'Artist Name',
     value: 'artists.name',
   },
   {
@@ -94,7 +94,7 @@ const FILTER_OPTIONS_DATA = [
   },
   {
     default: '~',
-    label: 'Album Artist Title',
+    label: 'Album Artist Name',
     value: 'albumArtists.name',
   },
   {
@@ -109,7 +109,7 @@ const FILTER_OPTIONS_DATA = [
   },
   {
     default: '~',
-    label: 'Album Title',
+    label: 'Album Name',
     value: 'albums.name',
   },
   {
@@ -145,7 +145,7 @@ const FILTER_OPTIONS_DATA = [
   },
   {
     default: '~',
-    label: 'Track Title',
+    label: 'Track Name',
     value: 'songs.name',
   },
   {
