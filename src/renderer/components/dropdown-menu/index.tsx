@@ -8,10 +8,14 @@ import {
   MenuDropdownProps as MantineMenuDropdownProps,
   createPolymorphicComponent,
 } from '@mantine/core';
+import { RiArrowLeftLine } from 'react-icons/ri';
 
 type MenuProps = MantineMenuProps;
 type MenuLabelProps = MantineMenuLabelProps;
-type MenuItemProps = MantineMenuItemProps;
+interface MenuItemProps extends MantineMenuItemProps {
+  children: React.ReactNode;
+  isActive?: boolean;
+}
 type MenuDividerProps = MantineMenuDividerProps;
 type MenuDropdownProps = MantineMenuDropdownProps;
 
@@ -27,11 +31,16 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   font-family: var(--label-font-family);
   background-color: var(--dropdown-menu-bg);
 
+  &:hover {
+    background-color: var(--dropdown-menu-bg-hover);
+  }
+
   & .mantine-Menu-itemIcon {
     margin-right: 0.5rem;
   }
 
   & .mantine-Menu-itemLabel {
+    color: ${({ isActive }) => isActive && 'var(--primary-color)'};
     font-weight: 500;
     font-size: 1em;
   }
@@ -61,8 +70,18 @@ const MenuLabel = ({ children, ...props }: MenuLabelProps) => {
   return <StyledMenuLabel {...props}>{children}</StyledMenuLabel>;
 };
 
-const pMenuItem = ({ children, ...props }: MenuItemProps) => {
-  return <StyledMenuItem {...props}>{children}</StyledMenuItem>;
+const pMenuItem = ({ isActive, children, ...props }: MenuItemProps) => {
+  return (
+    <StyledMenuItem
+      isActive={isActive && isActive}
+      rightSection={
+        isActive && <RiArrowLeftLine color="var(--primary-color)" size="1em" />
+      }
+      {...props}
+    >
+      {children}
+    </StyledMenuItem>
+  );
 };
 
 const MenuDropdown = ({ children, ...props }: MenuDropdownProps) => {
