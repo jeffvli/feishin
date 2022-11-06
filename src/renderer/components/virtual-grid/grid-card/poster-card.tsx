@@ -1,9 +1,10 @@
-import styled from '@emotion/styled';
+import React from 'react';
 import { Center, Skeleton } from '@mantine/core';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import { ListChildComponentProps } from 'react-window';
+import styled from 'styled-components';
 import { Text } from '@/renderer/components/text';
 import { GridCardControls } from '@/renderer/components/virtual-grid/grid-card/grid-card-controls';
 import { fadeIn } from '@/renderer/styles';
@@ -230,51 +231,56 @@ export const PosterCard = ({
           )}
           <DetailSection>
             {cardRows.map((row: CardRow, index: number) => {
-              if (row.arrayProperty) {
-                if (row.route) {
-                  return (
-                    <Row secondary={index > 0}>
-                      {data[row.property].map(
-                        (item: any, itemIndex: number) => (
-                          <>
-                            {itemIndex > 0 && (
-                              <Text
-                                sx={{
-                                  display: 'inline-block',
-                                  padding: '0 2px 0 1px',
-                                }}
-                              >
-                                ,
-                              </Text>
-                            )}{' '}
-                            <Text
-                              link
-                              component={Link}
-                              overflow="hidden"
-                              secondary={index > 0}
-                              to={generatePath(
-                                row.route!.route,
-                                row.route!.slugs?.reduce((acc, slug) => {
-                                  return {
-                                    ...acc,
-                                    [slug.slugProperty]: data[slug.idProperty],
-                                  };
-                                }, {})
-                              )}
-                            >
-                              {row.arrayProperty && item[row.arrayProperty]}
-                            </Text>
-                          </>
-                        )
-                      )}
-                    </Row>
-                  );
-                }
-
+              if (row.arrayProperty && row.route) {
                 return (
-                  <Row>
+                  <Row
+                    key={`row-${row.property}-${columnIndex}`}
+                    secondary={index > 0}
+                  >
+                    {data[row.property].map((item: any, itemIndex: number) => (
+                      <React.Fragment key={`${data.id}-${item.id}`}>
+                        {itemIndex > 0 && (
+                          <Text
+                            sx={{
+                              display: 'inline-block',
+                              padding: '0 2px 0 1px',
+                            }}
+                          >
+                            ,
+                          </Text>
+                        )}{' '}
+                        <Text
+                          $link
+                          $secondary={index > 0}
+                          component={Link}
+                          overflow="hidden"
+                          to={generatePath(
+                            row.route!.route,
+                            row.route!.slugs?.reduce((acc, slug) => {
+                              return {
+                                ...acc,
+                                [slug.slugProperty]: data[slug.idProperty],
+                              };
+                            }, {})
+                          )}
+                        >
+                          {row.arrayProperty && item[row.arrayProperty]}
+                        </Text>
+                      </React.Fragment>
+                    ))}
+                  </Row>
+                );
+              }
+
+              if (row.arrayProperty) {
+                return (
+                  <Row key={`row-${row.property}-${columnIndex}`}>
                     {data[row.property].map((item: any) => (
-                      <Text overflow="hidden" secondary={index > 0}>
+                      <Text
+                        key={`${data.id}-${item.id}`}
+                        $secondary={index > 0}
+                        overflow="hidden"
+                      >
                         {row.arrayProperty && item[row.arrayProperty]}
                       </Text>
                     ))}
@@ -283,10 +289,10 @@ export const PosterCard = ({
               }
 
               return (
-                <Row key={row.property}>
+                <Row key={`row-${row.property}-${columnIndex}`}>
                   {row.route ? (
                     <Text
-                      link
+                      $link
                       component={Link}
                       overflow="hidden"
                       to={generatePath(
@@ -302,7 +308,7 @@ export const PosterCard = ({
                       {data && data[row.property]}
                     </Text>
                   ) : (
-                    <Text overflow="hidden" secondary={index > 0}>
+                    <Text $secondary={index > 0} overflow="hidden">
                       {data && data[row.property]}
                     </Text>
                   )}
@@ -329,7 +335,7 @@ export const PosterCard = ({
         <DetailSection>
           {cardRows.map((row: CardRow, index: number) => (
             <Skeleton
-              key={`row-${row.property}`}
+              key={`row-${row.property}-${columnIndex}`}
               my={2}
               radius="md"
               visible={!data}
