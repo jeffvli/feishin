@@ -61,6 +61,7 @@ const PlayerbarContainer = styled.footer`
   z-index: 50;
   grid-area: player;
   background: var(--playerbar-bg);
+  filter: drop-shadow(0 -3px 4mm rgba(0, 0, 0, 50%));
 `;
 
 const ResizeHandle = styled.div<{
@@ -108,7 +109,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   }, []);
 
   const resize = useCallback(
-    (mouseMoveEvent) => {
+    (mouseMoveEvent: any) => {
       if (isResizing) {
         const width = `${constrainSidebarWidth(mouseMoveEvent.clientX)}px`;
         setSidebar({ leftWidth: width });

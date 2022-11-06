@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { Group } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import { FiActivity } from 'react-icons/fi';
 import { RiRefreshLine } from 'react-icons/ri';
 import { socket } from '@/renderer/api';
+import { queryKeys } from '@/renderer/api/query-keys';
 import { Button, Popover, Text } from '@/renderer/components';
 import { useTaskList } from '@/renderer/features/tasks';
+import { useAuthStore } from '@/renderer/store';
 import { rotating } from '@/renderer/styles';
 
 const StyledActivitySvg = styled(RiRefreshLine)`
@@ -14,10 +17,13 @@ const StyledActivitySvg = styled(RiRefreshLine)`
 `;
 
 export const ActivityMenu = () => {
+  const queryClient = useQueryClient();
+  const serverId = useAuthStore((state) => state.currentServer?.id) || '';
   const [isTaskRunning, setIsTaskRunning] = useState(false);
   const { data: tasks, refetch } = useTaskList({
     onSuccess: (data) => {
       if (data.data.length === 0) {
+        queryClient.invalidateQueries(queryKeys.server.root(serverId));
         return setIsTaskRunning(false);
       }
 
@@ -63,14 +69,9 @@ export const ActivityMenu = () => {
     <>
       <Popover withArrow withinPortal>
         <Popover.Target>
-          <Button
-            px={5}
-            size="xs"
-            sx={{ color: 'var(--titlebar-fg)' }}
-            variant="subtle"
-          >
+          <Button px={5} size="xs" variant="subtle">
             {isTaskRunning ? (
-              <StyledActivitySvg size={15} />
+              <StyledActivitySvg color="var(--primary-color)" size={15} />
             ) : (
               <FiActivity size={15} />
             )}

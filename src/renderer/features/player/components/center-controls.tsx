@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import format from 'format-duration';
 import isElectron from 'is-electron';
-import { useTranslation } from 'react-i18next';
+import { IoIosPause } from 'react-icons/io';
 import {
-  RiPauseLine,
   RiPlayFill,
   RiRepeat2Fill,
   RiShuffleFill,
@@ -55,7 +54,6 @@ const SliderWrapper = styled.div`
 `;
 
 export const CenterControls = ({ playersRef }: CenterControlsProps) => {
-  const { t } = useTranslation();
   const [isSeeking, setIsSeeking] = useState(false);
   const playerData = usePlayerStore((state) => state.getPlayerData());
   const player1 = playersRef?.current?.player1?.player;
@@ -94,17 +92,17 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
 
   return (
     <>
-      <ControlsContainer onScroll={(e) => console.log(e)}>
+      <ControlsContainer>
         <ButtonsContainer>
           <PlayerButton
             icon={<RiShuffleFill size={15} />}
-            tooltip={{ label: `${t('player.shuffle')}` }}
+            tooltip={{ label: `Shuffle`, openDelay: 500 }}
             variant="secondary"
             onClick={handlePrevTrack}
           />
           <PlayerButton
             icon={<RiSkipBackFill size={15} />}
-            tooltip={{ label: `${t('player.previous')}` }}
+            tooltip={{ label: `Previous track`, openDelay: 500 }}
             variant="secondary"
             onClick={handlePrevTrack}
           />
@@ -113,27 +111,25 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
               status === PlayerStatus.PAUSED ? (
                 <RiPlayFill size={20} />
               ) : (
-                <RiPauseLine size={20} stroke="20px" />
+                <IoIosPause size={20} />
               )
             }
             tooltip={{
-              label:
-                status === PlayerStatus.PAUSED
-                  ? `${t('player.play')}`
-                  : `${t('player.pause')}`,
+              label: status === PlayerStatus.PAUSED ? 'Play' : 'Pause',
+              openDelay: 500,
             }}
             variant="main"
             onClick={handlePlayPause}
           />
           <PlayerButton
             icon={<RiSkipForwardFill size={15} />}
-            tooltip={{ label: `${t('player.next')}` }}
+            tooltip={{ label: 'Next track', openDelay: 500 }}
             variant="secondary"
             onClick={handleNextTrack}
           />
           <PlayerButton
             icon={<RiRepeat2Fill size={15} />}
-            tooltip={{ label: `${t('player.repeat')}` }}
+            tooltip={{ label: 'Repeat', openDelay: 500 }}
             variant="secondary"
             onClick={handleNextTrack}
           />

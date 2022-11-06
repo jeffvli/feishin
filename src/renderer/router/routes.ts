@@ -33,7 +33,10 @@ type TArgs =
   | { path: AppRoute.LIBRARY_ARTISTS }
   | { path: AppRoute.LIBRARY_ARTISTS_DETAIL }
   | { path: AppRoute.LIBRARY_ALBUMARTISTS }
-  | { path: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL }
+  | {
+      params: { albumArtistId: string };
+      path: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL;
+    }
   | { path: AppRoute.LIBRARY_ALBUMS }
   | { path: AppRoute.LIBRARY_FOLDERS }
   | { path: AppRoute.LIBRARY_SONGS }

@@ -48,7 +48,7 @@ export const RightControls = () => {
       <Group>
         <PlayerButton
           icon={<RiPlayListFill size={15} />}
-          tooltip={{ label: 'View queue' }}
+          tooltip={{ label: 'View queue', openDelay: 500 }}
           variant="secondary"
           onClick={() => setSidebar({ rightExpanded: !isQueueExpanded })}
         />
@@ -63,7 +63,7 @@ export const RightControls = () => {
                 <RiVolumeUpFill size={15} />
               )
             }
-            tooltip={{ label: muted ? 'Muted' : volume }}
+            tooltip={{ label: muted ? 'Muted' : volume, openDelay: 500 }}
             variant="secondary"
             onClick={handleMute}
           />

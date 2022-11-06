@@ -1,4 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRoot } from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
 import { queryClient } from '@/renderer/lib/react-query';
@@ -12,6 +13,7 @@ root.render(
   <I18nextProvider i18n={i18n}>
     <QueryClientProvider client={queryClient}>
       <App />
+      <ReactQueryDevtools position="bottom-left" />
     </QueryClientProvider>
   </I18nextProvider>
 );

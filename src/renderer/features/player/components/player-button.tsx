@@ -1,3 +1,4 @@
+/* stylelint-disable no-descending-specificity */
 import { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -7,7 +8,7 @@ import {
   UnstyledButtonProps,
 } from '@mantine/core';
 import { motion } from 'framer-motion';
-import { Tooltip } from '../../../components';
+import { Tooltip } from '@/renderer/components';
 
 type MantineButtonProps = UnstyledButtonProps &
   ComponentPropsWithoutRef<'button'>;
@@ -33,15 +34,24 @@ const MotionWrapper = styled(motion.div)<MotionWrapperProps>`
 
 const ButtonMainVariant = css`
   padding: 0.5rem;
-  border: 2px solid var(--playerbar-btn-color);
+  background-color: var(--playerbar-btn-bg);
   border-radius: 50%;
 
   svg {
     display: flex;
+    fill: var(--playerbar-btn-fg);
   }
 
   &:focus-visible {
-    background: var(--playerbar-btn-color-hover);
+    background: var(--playerbar-btn-bg-hover);
+  }
+
+  &:hover {
+    background: var(--playerbar-btn-bg-hover);
+
+    svg {
+      fill: var(--playerbar-btn-fg-hover);
+    }
   }
 `;
 
@@ -50,21 +60,21 @@ const ButtonSecondaryVariant = css`
 
   svg {
     display: flex;
-    fill: var(--playerbar-btn-color);
-    stroke: var(--playerbar-btn-color);
+    fill: var(--playerbar-btn-bg);
+    stroke: var(--playerbar-btn-bg);
   }
 
   &:hover {
     svg {
-      fill: var(--playerbar-btn-color-hover);
-      stroke: var(--playerbar-btn-color-hover);
+      fill: var(--playerbar-btn-bg-hover);
+      stroke: var(--playerbar-btn-bg-hover);
     }
   }
 
   &:focus-visible {
     svg {
-      fill: var(--playerbar-btn-color-hover);
-      stroke: var(--playerbar-btn-color-hover);
+      fill: var(--playerbar-btn-bg-hover);
+      stroke: var(--playerbar-btn-bg-hover);
     }
   }
 `;

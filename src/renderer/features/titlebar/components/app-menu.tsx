@@ -1,12 +1,9 @@
 import { Group } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
-import {
-  RiArrowLeftLine,
-  RiLock2Line,
-  RiLogoutBoxLine,
-  RiMenu3Fill,
-} from 'react-icons/ri';
+import { useQueryClient } from '@tanstack/react-query';
+import { RiLock2Line, RiLogoutBoxLine, RiMenu3Fill } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
+import { queryKeys } from '@/renderer/api/query-keys';
 import { Button, DropdownMenu } from '@/renderer/components';
 import {
   AddServerForm,
@@ -17,6 +14,7 @@ import { usePermissions } from '@/renderer/features/shared';
 import { useAuthStore } from '@/renderer/store';
 
 export const AppMenu = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
   const currentServer = useAuthStore((state) => state.currentServer);
@@ -57,6 +55,7 @@ export const AppMenu = () => {
     const server = servers?.data.find((s) => s.id === serverId);
     if (!server) return;
     setCurrentServer(server);
+    queryClient.invalidateQueries(queryKeys.server.root(serverId));
   };
 
   return (
@@ -82,15 +81,7 @@ export const AppMenu = () => {
             <DropdownMenu.Item
               key={`server-${s.id}`}
               disabled={requiresCredential}
-              rightSection={
-                s.id === currentServer?.id ? <RiArrowLeftLine /> : undefined
-              }
-              sx={{
-                color:
-                  s.id === currentServer?.id
-                    ? 'var(--primary-color)'
-                    : undefined,
-              }}
+              isActive={s.id === currentServer?.id}
               onClick={() => handleSetCurrentServer(s.id)}
             >
               <Group>

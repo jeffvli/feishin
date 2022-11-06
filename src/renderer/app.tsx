@@ -39,13 +39,13 @@ export const App = () => {
         defaultRadius: 'xs',
         dir: 'ltr',
         focusRing: 'never',
-        fontFamily: 'Poppins, sans-serif',
+        fontFamily: 'Sora, sans-serif',
         fontSizes: {
           lg: 16,
           md: 14,
-          sm: 12,
+          sm: 13,
           xl: 18,
-          xs: 10,
+          xs: 12,
         },
         other: {},
         spacing: {
