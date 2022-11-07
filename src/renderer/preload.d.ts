@@ -5,8 +5,11 @@ declare global {
   interface Window {
     electron: {
       ipcRenderer: {
+        APP_RESTART(): void;
         PLAYER_AUTO_NEXT(data: PlayerData): void;
         PLAYER_CURRENT_TIME(): void;
+        PLAYER_MEDIA_KEYS_DISABLE(): void;
+        PLAYER_MEDIA_KEYS_ENABLE(): void;
         PLAYER_MUTE(): void;
         PLAYER_NEXT(): void;
         PLAYER_PAUSE(): void;
@@ -24,10 +27,19 @@ declare global {
         RENDERER_PLAYER_CURRENT_TIME(
           cb: (event: IpcRendererEvent, data: any) => void
         ): void;
+        RENDERER_PLAYER_NEXT(
+          cb: (event: IpcRendererEvent, data: any) => void
+        ): void;
         RENDERER_PLAYER_PAUSE(
           cb: (event: IpcRendererEvent, data: any) => void
         ): void;
         RENDERER_PLAYER_PLAY(
+          cb: (event: IpcRendererEvent, data: any) => void
+        ): void;
+        RENDERER_PLAYER_PLAY_PAUSE(
+          cb: (event: IpcRendererEvent, data: any) => void
+        ): void;
+        RENDERER_PLAYER_PREVIOUS(
           cb: (event: IpcRendererEvent, data: any) => void
         ): void;
         RENDERER_PLAYER_STOP(

@@ -12,6 +12,12 @@ contextBridge.exposeInMainWorld('electron', {
     PLAYER_CURRENT_TIME() {
       ipcRenderer.send('player-current-time');
     },
+    PLAYER_MEDIA_KEYS_DISABLE() {
+      ipcRenderer.send('global-media-keys-disable');
+    },
+    PLAYER_MEDIA_KEYS_ENABLE() {
+      ipcRenderer.send('global-media-keys-enable');
+    },
     PLAYER_MUTE() {
       ipcRenderer.send('player-mute');
     },
@@ -55,11 +61,22 @@ contextBridge.exposeInMainWorld('electron', {
     ) {
       ipcRenderer.on('renderer-player-current-time', cb);
     },
+    RENDERER_PLAYER_NEXT(cb: (event: IpcRendererEvent, data: any) => void) {
+      ipcRenderer.on('renderer-player-next', cb);
+    },
     RENDERER_PLAYER_PAUSE(cb: (event: IpcRendererEvent, data: any) => void) {
       ipcRenderer.on('renderer-player-pause', cb);
     },
     RENDERER_PLAYER_PLAY(cb: (event: IpcRendererEvent, data: any) => void) {
       ipcRenderer.on('renderer-player-play', cb);
+    },
+    RENDERER_PLAYER_PLAY_PAUSE(
+      cb: (event: IpcRendererEvent, data: any) => void
+    ) {
+      ipcRenderer.on('renderer-player-play-pause', cb);
+    },
+    RENDERER_PLAYER_PREVIOUS(cb: (event: IpcRendererEvent, data: any) => void) {
+      ipcRenderer.on('renderer-player-previous', cb);
     },
     RENDERER_PLAYER_STOP(cb: (event: IpcRendererEvent, data: any) => void) {
       ipcRenderer.on('renderer-player-stop', cb);

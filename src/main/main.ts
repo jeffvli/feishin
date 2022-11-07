@@ -9,9 +9,14 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, globalShortcut } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
+import {
+  disableMediaKeys,
+  enableMediaKeys,
+} from './features/core/player/media-keys';
+import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './utils';
 import './features';
@@ -105,6 +110,20 @@ const createWindow = async () => {
     app.exit(0);
   });
 
+  ipcMain.on('global-media-keys-enable', () => {
+    enableMediaKeys(mainWindow);
+  });
+
+  ipcMain.on('global-media-keys-disable', () => {
+    disableMediaKeys();
+  });
+
+  const globalMediaKeysEnabled = store.get('global_media_hotkeys') as boolean;
+
+  if (globalMediaKeysEnabled) {
+    enableMediaKeys(mainWindow);
+  }
+
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
@@ -152,6 +171,7 @@ export const getMainWindow = () => {
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
+  globalShortcut.unregisterAll();
   if (process.platform !== 'darwin') {
     app.quit();
   }

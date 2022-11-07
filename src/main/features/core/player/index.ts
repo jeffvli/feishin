@@ -3,6 +3,7 @@ import MpvAPI from 'node-mpv';
 import { PlayerData } from '../../../../renderer/store';
 import { getMainWindow } from '../../../main';
 import { store } from '../settings/index';
+import './media-keys';
 
 declare module 'node-mpv';
 
