@@ -142,7 +142,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             <PlayerButton
               icon={<RiSpeedFill size={15} />}
               tooltip={{
-                label: `Skip forwards ${skip?.skipBackwardSeconds} seconds`,
+                label: `Skip forwards ${skip?.skipForwardSeconds} seconds`,
                 openDelay: 500,
               }}
               variant="secondary"
