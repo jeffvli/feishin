@@ -1,6 +1,6 @@
 /* eslint-disable no-plusplus */
-import { useState, useCallback, useMemo } from 'react';
-import { Group, Box, Slider } from '@mantine/core';
+import { useState, useCallback, useMemo, MouseEvent } from 'react';
+import { Group, Box } from '@mantine/core';
 import { useDebouncedValue, useSetState, useToggle } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -21,6 +21,7 @@ import {
   DropdownMenu,
   NumberInput,
   ScrollArea,
+  Slider,
   Paper,
   Text,
   VirtualGridAutoSizerContainer,
@@ -168,6 +169,66 @@ export const AlbumListRoute = () => {
     200
   );
 
+  const handleSetFilter = (e: MouseEvent<HTMLButtonElement>) => {
+    if (!e.currentTarget?.value) return;
+    setFilters({ sortBy: e.currentTarget.value as AlbumSort });
+  };
+
+  const handleSetOrder = (e: MouseEvent<HTMLButtonElement>) => {
+    if (!e.currentTarget?.value) return;
+    setFilters({ orderBy: e.currentTarget.value as SortOrder });
+  };
+
+  const handleSetServerFolder = (e: MouseEvent<HTMLButtonElement>) => {
+    if (!e.currentTarget?.value) return;
+    const value = e.currentTarget.value as string;
+    if (filters.serverFolderId.includes(value)) {
+      setFilters({
+        serverFolderId: filters.serverFolderId.filter((id) => id !== value),
+      });
+    } else {
+      setFilters({
+        serverFolderId: [...filters.serverFolderId, value],
+      });
+    }
+  };
+
+  const handleToggleAdvancedFilters = () => {
+    toggleAdvFilter();
+  };
+
+  const handleSetViewType = (e: MouseEvent<HTMLButtonElement>) => {
+    if (!e.currentTarget?.value) return;
+    const type = e.currentTarget.value;
+    if (type === CardDisplayType.CARD) {
+      setPage('albums', {
+        ...page,
+        list: {
+          ...page.list,
+          display: CardDisplayType.CARD,
+          type: 'grid',
+        },
+      });
+    } else if (type === CardDisplayType.POSTER) {
+      setPage('albums', {
+        ...page,
+        list: {
+          ...page.list,
+          display: CardDisplayType.POSTER,
+          type: 'grid',
+        },
+      });
+    } else {
+      setPage('albums', {
+        ...page,
+        list: {
+          ...page.list,
+          type: 'list',
+        },
+      });
+    }
+  };
+
   return (
     <AnimatedPage>
       <VirtualGridContainer>
@@ -190,7 +251,8 @@ export const AlbumListRoute = () => {
                   <DropdownMenu.Item
                     key={`filter-${filter.value}`}
                     $isActive={filter.value === filters.sortBy}
-                    onClick={() => setFilters({ sortBy: filter.value })}
+                    value={filter.value}
+                    onClick={handleSetFilter}
                   >
                     {filter.name}
                   </DropdownMenu.Item>
@@ -198,7 +260,7 @@ export const AlbumListRoute = () => {
                 <DropdownMenu.Divider />
                 <DropdownMenu.Item
                   $isActive={isAdvFilter}
-                  onClick={() => toggleAdvFilter()}
+                  onClick={handleToggleAdvancedFilters}
                 >
                   Advanced Filters
                 </DropdownMenu.Item>
@@ -218,7 +280,8 @@ export const AlbumListRoute = () => {
                   <DropdownMenu.Item
                     key={`sort-${sort.value}`}
                     $isActive={sort.value === filters.orderBy}
-                    onClick={() => setFilters({ orderBy: sort.value })}
+                    value={sort.value}
+                    onClick={handleSetOrder}
                   >
                     {sort.name}
                   </DropdownMenu.Item>
@@ -239,22 +302,8 @@ export const AlbumListRoute = () => {
                     key={folder.id}
                     $isActive={filters.serverFolderId.includes(folder.id)}
                     closeMenuOnClick={false}
-                    onClick={() => {
-                      if (filters.serverFolderId.includes(folder.id)) {
-                        setFilters({
-                          serverFolderId: filters.serverFolderId.filter(
-                            (id) => id !== folder.id
-                          ),
-                        });
-                      } else {
-                        setFilters({
-                          serverFolderId: [
-                            ...filters.serverFolderId,
-                            folder.id,
-                          ],
-                        });
-                      }
-                    }}
+                    value={folder.id}
+                    onClick={handleSetServerFolder}
                   >
                     {folder.name}
                   </DropdownMenu.Item>
@@ -283,16 +332,8 @@ export const AlbumListRoute = () => {
                     page.list.type === 'grid' &&
                     page.list.display === CardDisplayType.CARD
                   }
-                  onClick={() =>
-                    setPage('albums', {
-                      ...page,
-                      list: {
-                        ...page.list,
-                        display: CardDisplayType.CARD,
-                        type: 'grid',
-                      },
-                    })
-                  }
+                  value={CardDisplayType.CARD}
+                  onClick={handleSetViewType}
                 >
                   Card
                 </DropdownMenu.Item>
@@ -301,31 +342,16 @@ export const AlbumListRoute = () => {
                     page.list.type === 'grid' &&
                     page.list.display === CardDisplayType.POSTER
                   }
-                  onClick={() =>
-                    setPage('albums', {
-                      ...page,
-                      list: {
-                        ...page.list,
-                        display: CardDisplayType.POSTER,
-                        type: 'grid',
-                      },
-                    })
-                  }
+                  value={CardDisplayType.POSTER}
+                  onClick={handleSetViewType}
                 >
                   Poster
                 </DropdownMenu.Item>
                 <DropdownMenu.Item
                   disabled
                   $isActive={page.list.type === 'list'}
-                  onClick={() =>
-                    setPage('albums', {
-                      ...page,
-                      list: {
-                        ...page.list,
-                        type: 'list',
-                      },
-                    })
-                  }
+                  value="list"
+                  onClick={handleSetViewType}
                 >
                   List
                 </DropdownMenu.Item>
