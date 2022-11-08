@@ -1,6 +1,5 @@
 import { Checkbox, Stack, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useTranslation } from 'react-i18next';
 import { RiInformationLine } from 'react-icons/ri';
 import { Server, ServerType } from '@/renderer/api/types';
 import { Button, PasswordInput, TextInput, toast } from '@/renderer/components';
@@ -12,7 +11,6 @@ interface EditServerFormProps {
 }
 
 export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
-  const { t } = useTranslation();
   const updateServer = useUpdateServer();
 
   const serverDetailsForm = useForm({
@@ -57,7 +55,7 @@ export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
       <Stack>
         <TextInput
           required
-          label={t('generic.name')}
+          label="Name"
           rightSection={
             serverDetailsForm.isDirty('name') && (
               <RiInformationLine color="red" />
@@ -67,7 +65,7 @@ export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
         />
         <TextInput
           required
-          label={t('generic.url')}
+          label="Url"
           rightSection={
             serverDetailsForm.isDirty('url') && (
               <RiInformationLine color="red" />
@@ -76,7 +74,7 @@ export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
           {...serverDetailsForm.getInputProps('url')}
         />
         <TextInput
-          label={t('generic.username')}
+          label="Username"
           rightSection={
             serverDetailsForm.isDirty('username') && (
               <RiInformationLine color="red" />
@@ -85,12 +83,12 @@ export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
           {...serverDetailsForm.getInputProps('username')}
         />
         <PasswordInput
-          label={t('generic.password')}
+          label="Password"
           {...serverDetailsForm.getInputProps('password')}
         />
         {isSubsonic && (
           <Checkbox
-            label={t('generic.legacyauth')}
+            label="Enable legacy authentication"
             {...serverDetailsForm.getInputProps('legacyAuth', {
               type: 'checkbox',
             })}

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Stack, Group, Divider } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
-import { RiDeleteBin2Fill, RiEdit2Fill } from 'react-icons/ri';
+import { RiDeleteBin2Line, RiEdit2Fill } from 'react-icons/ri';
 import { queryKeys } from '@/renderer/api/query-keys';
 import { Server, TaskType } from '@/renderer/api/types';
 import { Button, Switch, Text, toast } from '@/renderer/components';
@@ -160,7 +160,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                 <Button
                   compact
                   disabled={true || isRunningTask}
-                  variant="filled"
+                  variant="subtle"
                   onClick={handleQuickScan}
                 >
                   Quick scan
@@ -182,20 +182,19 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                   <Text>Username</Text>
                 </Stack>
                 <Stack>
-                  <Text>{server.url}</Text>
-                  <Text>{server.username}</Text>
+                  <Text size="sm">{server.url}</Text>
+                  <Text size="sm">{server.username}</Text>
                 </Stack>
               </Group>
               <Group>
-                {permissions.editServer && (
-                  <Button
-                    tooltip={{ label: 'Edit server details' }}
-                    variant="default"
-                    onClick={() => editHandlers.toggle()}
-                  >
-                    <RiEdit2Fill color="white" />
-                  </Button>
-                )}
+                <Button
+                  disabled={!permissions.editServer}
+                  tooltip={{ label: 'Edit server details' }}
+                  variant="default"
+                  onClick={() => editHandlers.toggle()}
+                >
+                  <RiEdit2Fill color="white" />
+                </Button>
               </Group>
             </Group>
           )}
@@ -204,20 +203,22 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
           <Stack>
             {server.serverFolders?.map((folder) => (
               <Group key={folder.id} position="apart">
-                <Text>{folder.name}</Text>
                 <Group>
-                  {permissions.deleteServerFolder && (
-                    <Button compact disabled radius="xl" variant="subtle">
-                      <RiDeleteBin2Fill />
-                    </Button>
-                  )}
-                  <Switch
-                    checked={folder.enabled}
-                    onChange={(e) =>
-                      handleToggleFolder(folder.id, !e.currentTarget.checked)
-                    }
-                  />
+                  <Button
+                    compact
+                    disabled={true || !permissions.deleteServerFolder}
+                    variant="subtle"
+                  >
+                    <RiDeleteBin2Line color="var(--danger-color)" />
+                  </Button>
+                  <Text size="sm">{folder.name}</Text>
                 </Group>
+                <Switch
+                  checked={folder.enabled}
+                  onChange={(e) =>
+                    handleToggleFolder(folder.id, !e.currentTarget.checked)
+                  }
+                />
               </Group>
             ))}
           </Stack>
@@ -233,41 +234,38 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
               <Stack>
                 {serverCredentials?.map((credential) => (
                   <Group key={credential.id} position="apart">
-                    <Text>{credential.username}</Text>
                     <Group>
-                      {permissions.deleteServerCredential && (
-                        <Button
-                          compact
-                          radius="xl"
-                          variant="subtle"
-                          onClick={() => handleDeleteCredential(credential.id)}
-                        >
-                          <RiDeleteBin2Fill />
-                        </Button>
-                      )}
-                      <Switch
-                        checked={credential.enabled}
-                        onChange={(e) =>
-                          handleToggleCredential(
-                            credential.id,
-                            !e.currentTarget.checked
-                          )
-                        }
-                      />
+                      <Button
+                        compact
+                        disabled={!permissions.deleteServerCredential}
+                        variant="subtle"
+                        onClick={() => handleDeleteCredential(credential.id)}
+                      >
+                        <RiDeleteBin2Line color="var(--danger-color)" />
+                      </Button>
+                      <Text size="sm">{credential.username}</Text>
                     </Group>
+                    <Switch
+                      checked={credential.enabled}
+                      onChange={(e) =>
+                        handleToggleCredential(
+                          credential.id,
+                          !e.currentTarget.checked
+                        )
+                      }
+                    />
                   </Group>
                 ))}
               </Stack>
-              {permissions.createServerCredential && (
-                <Button
-                  compact
-                  mt={10}
-                  variant="default"
-                  onClick={() => addCredentialHandlers.open()}
-                >
-                  Add credential
-                </Button>
-              )}
+              <Button
+                compact
+                disabled={!permissions.createServerCredential}
+                mt={10}
+                variant="subtle"
+                onClick={() => addCredentialHandlers.open()}
+              >
+                Add credential
+              </Button>
             </>
           )}
         </ServerSection>
@@ -282,61 +280,59 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
               <Stack>
                 {server.serverUrls?.map((serverUrl) => (
                   <Group key={serverUrl.id} position="apart">
-                    <Text>{serverUrl.url}</Text>
                     <Group>
-                      {permissions.deleteServerUrl && (
-                        <Button
-                          compact
-                          radius="xl"
-                          variant="subtle"
-                          onClick={() => handleDeleteUrl(serverUrl.id)}
-                        >
-                          <RiDeleteBin2Fill />
-                        </Button>
-                      )}
-                      <Switch
-                        checked={serverUrl.enabled}
-                        onChange={(e) =>
-                          handleToggleUrl(
-                            serverUrl.id,
-                            !e.currentTarget.checked
-                          )
-                        }
-                      />
+                      <Button
+                        compact
+                        disabled={!permissions.deleteServerUrl}
+                        variant="subtle"
+                        onClick={() => handleDeleteUrl(serverUrl.id)}
+                      >
+                        <RiDeleteBin2Line color="var(--danger-color)" />
+                      </Button>
+                      <Text size="sm">{serverUrl.url}</Text>
                     </Group>
+                    <Switch
+                      checked={serverUrl.enabled}
+                      onChange={(e) =>
+                        handleToggleUrl(serverUrl.id, !e.currentTarget.checked)
+                      }
+                    />
                   </Group>
                 ))}
               </Stack>
-              {permissions.createServerUrl && (
-                <Button
-                  compact
-                  mt={10}
-                  variant="default"
-                  onClick={() => addUrlHandlers.open()}
-                >
-                  Add URL
-                </Button>
-              )}
+              <Button
+                compact
+                disabled={!permissions.createServerUrl}
+                mt={10}
+                variant="subtle"
+                onClick={() => addUrlHandlers.open()}
+              >
+                Add url
+              </Button>
             </>
           )}
         </ServerSection>
 
         <ServerSection title="Danger zone">
           <Group position="apart">
-            <Text>Require user credentials</Text>
+            <Text size="sm">Require user credentials</Text>
             <Switch
               checked={server.noCredential}
+              disabled={!permissions.isAdmin}
               onChange={(e) =>
                 toggleRequiredCredential(e.currentTarget.checked)
               }
             />
           </Group>
           <Divider my="xl" />
-          {permissions.deleteServer && (
-            <Button compact color="red" leftIcon={<RiDeleteBin2Fill />}>
-              Delete server
-            </Button>
-          )}
+          <Button
+            compact
+            disabled={!permissions.deleteServer}
+            leftIcon={<RiDeleteBin2Line color="var(--danger-color)" />}
+            variant="default"
+          >
+            Delete server
+          </Button>
         </ServerSection>
       </Stack>
     </>

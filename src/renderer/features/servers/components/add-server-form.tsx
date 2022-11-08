@@ -2,7 +2,6 @@ import { Checkbox, Stack, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
-import { useTranslation } from 'react-i18next';
 import { ServerType } from '@/renderer/api/types';
 import {
   Button,
@@ -23,7 +22,6 @@ interface AddServerFormProps {
 }
 
 export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
-  const { t } = useTranslation();
   const focusTrapRef = useFocusTrap(true);
 
   const form = useForm({
@@ -53,27 +51,23 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         <TextInput
           data-autofocus
           required
-          label={t('modal.add_server.name_label')}
+          label="Name"
           {...form.getInputProps('name')}
         />
+        <TextInput required label="Url" {...form.getInputProps('url')} />
         <TextInput
           required
-          label={t('modal.add_server.url_label')}
-          {...form.getInputProps('url')}
-        />
-        <TextInput
-          required
-          label={t('modal.add_server.username_label')}
+          label="Username"
           {...form.getInputProps('username')}
         />
         <PasswordInput
           required
-          label={t('modal.add_server.password_label')}
+          label="Password"
           {...form.getInputProps('password')}
         />
         {form.values.type === ServerType.SUBSONIC && (
           <Checkbox
-            label={t('modal.add_server.legacy_label')}
+            label="Enable legacy authentication"
             {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
           />
         )}
@@ -86,7 +80,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             type="submit"
             variant="filled"
           >
-            {t('modal.add_server.submit_label')}
+            Submit
           </Button>
         </Group>
       </Stack>
