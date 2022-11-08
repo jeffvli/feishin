@@ -1,5 +1,5 @@
 import { Group } from '@mantine/core';
-import { openModal, closeAllModals } from '@mantine/modals';
+import { openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   RiLock2Line,
@@ -10,18 +10,12 @@ import {
   RiSettings2Line,
   RiEdit2Line,
   RiUserAddLine,
-  RiAddLine,
 } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { queryKeys } from '@/renderer/api/query-keys';
 import { Button, DropdownMenu, Text } from '@/renderer/components';
-import {
-  AddServerForm,
-  ServerList,
-  useServerList,
-} from '@/renderer/features/servers';
+import { ServerList, useServerList } from '@/renderer/features/servers';
 import { Settings } from '@/renderer/features/settings';
-import { usePermissions } from '@/renderer/features/shared';
 import { useAuthStore } from '@/renderer/store';
 
 export const AppMenu = () => {
@@ -31,7 +25,6 @@ export const AppMenu = () => {
   const currentServer = useAuthStore((state) => state.currentServer);
   const setCurrentServer = useAuthStore((state) => state.setCurrentServer);
   const serverCredentials = useAuthStore((state) => state.serverCredentials);
-  const permissions = usePermissions();
   const { data: servers } = useServerList();
 
   const serverList =
@@ -44,17 +37,6 @@ export const AppMenu = () => {
   const handleLogout = () => {
     logout();
     navigate('/login');
-  };
-
-  const handleAddServerModal = () => {
-    openModal({
-      centered: true,
-      children: <AddServerForm onCancel={closeAllModals} />,
-      exitTransitionDuration: 300,
-      overflow: 'inside',
-      title: 'Add server',
-      transition: 'slide-down',
-    });
   };
 
   const handleManageServersModal = () => {
@@ -138,22 +120,14 @@ export const AppMenu = () => {
           Settings
         </DropdownMenu.Item>
         <DropdownMenu.Divider />
-        {permissions.createServer && (
-          <DropdownMenu.Item
-            rightSection={<RiAddLine />}
-            onClick={handleAddServerModal}
-          >
-            Add server
-          </DropdownMenu.Item>
-        )}
+        <DropdownMenu.Item disabled rightSection={<RiUserAddLine />}>
+          Manage users
+        </DropdownMenu.Item>
         <DropdownMenu.Item
           rightSection={<RiEdit2Line />}
           onClick={handleManageServersModal}
         >
           Manage servers
-        </DropdownMenu.Item>
-        <DropdownMenu.Item disabled rightSection={<RiUserAddLine />}>
-          Manage users
         </DropdownMenu.Item>
         <DropdownMenu.Divider />
         <DropdownMenu.Item
