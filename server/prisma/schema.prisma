@@ -57,14 +57,15 @@ model RefreshToken {
 }
 
 model User {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username  String   @unique
-  password  String
-  enabled   Boolean  @default(false)
-  isAdmin   Boolean  @default(false)
-  deviceId  String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  displayName String?  @unique
+  username    String   @unique
+  password    String
+  enabled     Boolean  @default(false)
+  isAdmin     Boolean  @default(false)
+  deviceId    String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   histories          History[]
   albumArtistRatings AlbumArtistRating[]
@@ -474,6 +475,7 @@ model Song {
   artistName      String?
   remoteId        String
   remoteCreatedAt DateTime?
+  skip            Boolean   @default(false)
   deleted         Boolean   @default(false)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
