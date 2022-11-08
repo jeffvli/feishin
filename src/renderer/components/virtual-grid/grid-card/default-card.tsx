@@ -3,6 +3,7 @@ import { Center, Skeleton } from '@mantine/core';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import { SimpleImg, initSimpleImg } from 'react-simple-img';
 import { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Text } from '@/renderer/components/text';
@@ -14,6 +15,8 @@ import {
   CardRow,
   CardRoute,
 } from '@/renderer/types';
+
+initSimpleImg({ threshold: 0.5 }, true);
 
 const CardWrapper = styled.div<{
   itemGap: number;
@@ -87,14 +90,7 @@ const ImageSection = styled.div<{ size?: number }>`
   }
 `;
 
-interface ImageProps {
-  height: number;
-  isLoading?: boolean;
-}
-
-const Image = styled.img<ImageProps>`
-  width: ${({ height }) => `${height - 24}px`};
-  height: ${({ height }) => `${height - 24}px`};
+const Image = styled(SimpleImg)`
   object-fit: cover;
   border: 0;
   border-radius: var(--card-default-radius);
@@ -127,6 +123,7 @@ const Row = styled.div<{ $secondary?: boolean }>`
     $secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)'};
   white-space: nowrap;
   text-overflow: ellipsis;
+  user-select: none;
 `;
 
 interface BaseGridCardProps {
@@ -136,7 +133,7 @@ interface BaseGridCardProps {
     cardRows: CardRow[];
     handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
     itemType: LibraryItem;
-    route?: CardRoute;
+    route: CardRoute;
   };
   data: any;
   listChildProps: Omit<ListChildComponentProps, 'data' | 'style'>;
@@ -161,161 +158,37 @@ export const DefaultCard = ({
     controls;
 
   if (data) {
-    if (route) {
-      return (
-        <CardWrapper
-          key={`card-${columnIndex}-${index}`}
-          link
-          itemGap={itemGap}
-          itemHeight={itemHeight}
-          itemWidth={itemWidth}
-          onClick={() =>
-            navigate(
-              generatePath(
-                route.route,
-                route.slugs?.reduce((acc, slug) => {
-                  return {
-                    ...acc,
-                    [slug.slugProperty]: data[slug.idProperty],
-                  };
-                }, {})
-              )
-            )
-          }
-        >
-          <StyledCard>
-            <ImageSection size={itemWidth}>
-              {data?.imageUrl ? (
-                <Image height={itemWidth} src={data?.imageUrl} />
-              ) : (
-                <Center
-                  sx={{
-                    background: 'var(--placeholder-bg)',
-                    borderRadius: 'var(--card-default-radius)',
-                    height: '100%',
-                    width: '100%',
-                  }}
-                >
-                  <RiAlbumFill color="var(--placeholder-fg)" size={35} />
-                </Center>
-              )}
-              <ControlsContainer>
-                {!isScrolling && (
-                  <GridCardControls
-                    cardControls={cardControls}
-                    handlePlayQueueAdd={handlePlayQueueAdd}
-                    itemData={data}
-                    itemType={itemType}
-                  />
-                )}
-              </ControlsContainer>
-            </ImageSection>
-            <DetailSection>
-              {cardRows.map((row: CardRow, index: number) => {
-                if (row.arrayProperty && row.route) {
-                  return (
-                    <Row
-                      key={`row-${row.property}-${columnIndex}`}
-                      $secondary={index > 0}
-                    >
-                      {data[row.property].map(
-                        (item: any, itemIndex: number) => (
-                          <React.Fragment key={`${data.id}-${item.id}`}>
-                            {itemIndex > 0 && (
-                              <Text
-                                sx={{
-                                  display: 'inline-block',
-                                  padding: '0 2px 0 1px',
-                                }}
-                              >
-                                ,
-                              </Text>
-                            )}{' '}
-                            <Text
-                              $link
-                              $secondary={index > 0}
-                              component={Link}
-                              overflow="hidden"
-                              to={generatePath(
-                                row.route!.route,
-                                row.route!.slugs?.reduce((acc, slug) => {
-                                  return {
-                                    ...acc,
-                                    [slug.slugProperty]: data[slug.idProperty],
-                                  };
-                                }, {})
-                              )}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {row.arrayProperty && item[row.arrayProperty]}
-                            </Text>
-                          </React.Fragment>
-                        )
-                      )}
-                    </Row>
-                  );
-                }
-
-                if (row.arrayProperty) {
-                  return (
-                    <Row key={`row-${row.property}-${columnIndex}`}>
-                      {data[row.property].map((item: any) => (
-                        <Text
-                          key={`${data.id}-${item.id}`}
-                          $secondary={index > 0}
-                          overflow="hidden"
-                        >
-                          {row.arrayProperty && item[row.arrayProperty]}
-                        </Text>
-                      ))}
-                    </Row>
-                  );
-                }
-
-                return (
-                  <Row key={`row-${row.property}-${columnIndex}`}>
-                    {row.route ? (
-                      <Text
-                        $link
-                        component={Link}
-                        overflow="hidden"
-                        to={generatePath(
-                          row.route.route,
-                          row.route.slugs?.reduce((acc, slug) => {
-                            return {
-                              ...acc,
-                              [slug.slugProperty]: data[slug.idProperty],
-                            };
-                          }, {})
-                        )}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {data && data[row.property]}
-                      </Text>
-                    ) : (
-                      <Text $secondary={index > 0} overflow="hidden">
-                        {data && data[row.property]}
-                      </Text>
-                    )}
-                  </Row>
-                );
-              })}
-            </DetailSection>
-          </StyledCard>
-        </CardWrapper>
-      );
-    }
     return (
       <CardWrapper
         key={`card-${columnIndex}-${index}`}
+        link
         itemGap={itemGap}
         itemHeight={itemHeight}
         itemWidth={itemWidth}
+        onClick={() =>
+          navigate(
+            generatePath(
+              route.route,
+              route.slugs?.reduce((acc, slug) => {
+                return {
+                  ...acc,
+                  [slug.slugProperty]: data[slug.idProperty],
+                };
+              }, {})
+            )
+          )
+        }
       >
         <StyledCard>
           <ImageSection size={itemWidth}>
             {data?.imageUrl ? (
-              <Image height={itemWidth} src={data?.imageUrl} />
+              <Image
+                animationDuration={0.5}
+                height={itemWidth - 24}
+                placeholder="var(--card-default-bg)"
+                src={data?.imageUrl}
+                width={itemWidth - 24}
+              />
             ) : (
               <Center
                 sx={{

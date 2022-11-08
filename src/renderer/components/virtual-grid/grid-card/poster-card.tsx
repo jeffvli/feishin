@@ -3,17 +3,19 @@ import { Center, Skeleton } from '@mantine/core';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
+import { SimpleImg, initSimpleImg } from 'react-simple-img';
 import { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Text } from '@/renderer/components/text';
 import { GridCardControls } from '@/renderer/components/virtual-grid/grid-card/grid-card-controls';
-import { fadeIn } from '@/renderer/styles';
 import {
   PlayQueueAddOptions,
   LibraryItem,
   CardRow,
   CardRoute,
 } from '@/renderer/types';
+
+initSimpleImg({ threshold: 0.5 }, true);
 
 const CardWrapper = styled.div<{
   itemGap: number;
@@ -87,15 +89,10 @@ interface ImageProps {
   isLoading?: boolean;
 }
 
-const Image = styled.img<ImageProps>`
-  width: ${({ height }) => `${height}px`};
-  height: ${({ height }) => `${height}px`};
+const Image = styled(SimpleImg)<ImageProps>`
   object-fit: cover;
   border: 0;
   border-radius: var(--card-poster-radius);
-
-  ${fadeIn}
-  animation: fadein 0.3s ease-in-out;
 `;
 
 const ControlsContainer = styled.div`
@@ -122,6 +119,7 @@ const Row = styled.div<{ $secondary?: boolean }>`
     $secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)'};
   white-space: nowrap;
   text-overflow: ellipsis;
+  user-select: none;
 `;
 
 interface BaseGridCardProps {
@@ -131,7 +129,7 @@ interface BaseGridCardProps {
     cardRows: CardRow[];
     handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
     itemType: LibraryItem;
-    route?: CardRoute;
+    route: CardRoute;
   };
   data: any;
   listChildProps: Omit<ListChildComponentProps, 'data' | 'style'>;
@@ -163,49 +161,27 @@ export const PosterCard = ({
         itemWidth={itemWidth}
       >
         <StyledCard>
-          {route ? (
-            <Link
-              tabIndex={0}
-              to={generatePath(
-                route.route,
-                route.slugs?.reduce((acc, slug) => {
-                  return {
-                    ...acc,
-                    [slug.slugProperty]: data[slug.idProperty],
-                  };
-                }, {})
-              )}
-            >
-              <ImageSection style={{ height: `${itemWidth}px` }}>
-                {data?.imageUrl ? (
-                  <Image height={itemWidth} src={data?.imageUrl} />
-                ) : (
-                  <Center
-                    sx={{
-                      background: 'var(--placeholder-bg)',
-                      borderRadius: 'var(--card-poster-radius)',
-                      height: '100%',
-                    }}
-                  >
-                    <RiAlbumFill color="var(--placeholder-fg)" size={35} />
-                  </Center>
-                )}
-                <ControlsContainer>
-                  {!isScrolling && (
-                    <GridCardControls
-                      cardControls={cardControls}
-                      handlePlayQueueAdd={handlePlayQueueAdd}
-                      itemData={data}
-                      itemType={itemType}
-                    />
-                  )}
-                </ControlsContainer>
-              </ImageSection>
-            </Link>
-          ) : (
+          <Link
+            tabIndex={0}
+            to={generatePath(
+              route.route,
+              route.slugs?.reduce((acc, slug) => {
+                return {
+                  ...acc,
+                  [slug.slugProperty]: data[slug.idProperty],
+                };
+              }, {})
+            )}
+          >
             <ImageSection style={{ height: `${itemWidth}px` }}>
               {data?.imageUrl ? (
-                <Image height={itemWidth} src={data?.imageUrl} />
+                <Image
+                  animationDuration={0.5}
+                  height={itemWidth}
+                  placeholder="var(--card-default-bg)"
+                  src={data?.imageUrl}
+                  width={itemWidth}
+                />
               ) : (
                 <Center
                   sx={{
@@ -228,7 +204,7 @@ export const PosterCard = ({
                 )}
               </ControlsContainer>
             </ImageSection>
-          )}
+          </Link>
           <DetailSection>
             {cardRows.map((row: CardRow, index: number) => {
               if (row.arrayProperty && row.route) {

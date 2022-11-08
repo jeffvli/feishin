@@ -285,6 +285,7 @@
     "react-player": "^2.10.0",
     "react-router": "^6.3.0",
     "react-router-dom": "^6.3.0",
+    "react-simple-img": "^3.0.0",
     "react-slider": "^2.0.0",
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.7",
