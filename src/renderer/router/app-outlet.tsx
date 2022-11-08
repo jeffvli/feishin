@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import isElectron from 'is-electron';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { settings } from '@/renderer/features/settings';
+import { localSettings } from '@/renderer/features/settings';
 import { useServerCredential } from '@/renderer/features/shared';
 import { AppRoute } from '@/renderer/router/routes';
 import { useAuthStore } from '@/renderer/store';
@@ -24,7 +24,7 @@ export const AppOutlet = ({ redirectTo }: PrivateOutletProps) => {
   useEffect(() => {
     const getMpvPath = async () => {
       if (!isElectron()) return setIsMpvRequired(false);
-      const mpvPath = await settings.get('mpv_path');
+      const mpvPath = await localSettings.get('mpv_path');
       return setIsMpvRequired(!mpvPath);
     };
 
@@ -34,10 +34,6 @@ export const AppOutlet = ({ redirectTo }: PrivateOutletProps) => {
   const actions = [isServerRequired, isCredentialRequired, isMpvRequired];
   const actionRequired = actions.some((c) => c);
 
-  if (isAuthenticated) {
-    return <Outlet />;
-  }
-
   if (isAuthenticated && actionRequired) {
     return (
       <Navigate
@@ -46,6 +42,10 @@ export const AppOutlet = ({ redirectTo }: PrivateOutletProps) => {
         to={AppRoute.ACTION_REQUIRED}
       />
     );
+  }
+
+  if (isAuthenticated) {
+    return <Outlet />;
   }
 
   logout();

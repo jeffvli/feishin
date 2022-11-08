@@ -8,7 +8,7 @@ import { ActionRequiredContainer } from '@/renderer/features/action-required/com
 import { MpvRequired } from '@/renderer/features/action-required/components/mpv-required';
 import { ServerCredentialRequired } from '@/renderer/features/action-required/components/server-credential-required';
 import { ServerRequired } from '@/renderer/features/action-required/components/server-required';
-import { settings } from '@/renderer/features/settings';
+import { localSettings } from '@/renderer/features/settings';
 import { AnimatedPage, useServerCredential } from '@/renderer/features/shared';
 import { AppRoute } from '@/renderer/router/routes';
 import { useAuthStore } from '@/renderer/store';
@@ -23,7 +23,7 @@ export const ActionRequiredRoute = () => {
   useEffect(() => {
     const getMpvPath = async () => {
       if (!isElectron()) return setIsMpvRequired(false);
-      const mpvPath = await settings.get('mpv_path');
+      const mpvPath = await localSettings.get('mpv_path');
       return setIsMpvRequired(!mpvPath);
     };
 
