@@ -4,13 +4,16 @@ import {
   useRef,
   useState,
   useCallback,
+  useEffect,
 } from 'react';
+import isElectron from 'is-electron';
 import ReactPlayer, { ReactPlayerProps } from 'react-player';
 import { Song } from '@/renderer/api/types';
 import {
   crossfadeHandler,
   gaplessHandler,
 } from '@/renderer/components/audio-player/utils/list-handlers';
+import { useSettingsStore } from '@/renderer/store/settings.store';
 import { CrossfadeStyle, PlaybackStyle, PlayerStatus } from '@/renderer/types';
 
 interface AudioPlayerProps extends ReactPlayerProps {
@@ -54,6 +57,9 @@ export const AudioPlayer = forwardRef(
     const player1Ref = useRef<any>(null);
     const player2Ref = useRef<any>(null);
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const audioDeviceId = useSettingsStore(
+      (state) => state.player.audioDeviceId
+    );
 
     useImperativeHandle(ref, () => ({
       get player1() {
@@ -146,6 +152,18 @@ export const AudioPlayer = forwardRef(
       },
       [isTransitioning, player2?.container]
     );
+
+    useEffect(() => {
+      if (isElectron()) {
+        if (audioDeviceId) {
+          player1Ref.current?.getInternalPlayer()?.setSinkId(audioDeviceId);
+          player2Ref.current?.getInternalPlayer()?.setSinkId(audioDeviceId);
+        } else {
+          player1Ref.current?.getInternalPlayer()?.setSinkId('');
+          player2Ref.current?.getInternalPlayer()?.setSinkId('');
+        }
+      }
+    }, [audioDeviceId]);
 
     return (
       <>
