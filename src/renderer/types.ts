@@ -108,5 +108,6 @@ export type GridCardData = {
   itemHeight: number;
   itemType: LibraryItem;
   itemWidth: number;
-  route?: CardRoute;
+  playButtonBehavior: Play;
+  route: CardRoute;
 };
