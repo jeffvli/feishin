@@ -12,7 +12,7 @@ const login = {
 const register = {
   body: z.object({
     password: z.string().min(6).max(255),
-    username: z.string().min(4).max(26),
+    username: z.string().min(2).max(255),
   }),
   params: z.object({}),
   query: z.object({}),

@@ -598,6 +598,7 @@ const users = (
         /* eslint-disable sort-keys-fix/sort-keys-fix */
         id: item.id,
         username: item.username,
+        displayName: item.displayName,
         accessToken: item.accessToken,
         refreshToken: item.refreshToken,
         enabled: item.enabled,
