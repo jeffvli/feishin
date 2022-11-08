@@ -77,7 +77,7 @@ export const useSettingsStore = create<SettingsSlice>()(
     ),
     {
       merge: (persistedState, currentState) => {
-        return merge(persistedState, currentState);
+        return merge(currentState, persistedState);
       },
       name: 'store_settings',
       version: 1,

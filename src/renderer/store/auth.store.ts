@@ -1,3 +1,4 @@
+import merge from 'lodash/merge';
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -106,8 +107,14 @@ export const useAuthStore = create<AuthSlice>()(
           return set({ currentServer: server });
         },
       })),
-      { name: 'authentication' }
+      { name: 'store_authentication' }
     ),
-    { name: 'store_authentication' }
+    {
+      merge: (persistedState, currentState) => {
+        return merge(currentState, persistedState);
+      },
+      name: 'store_authentication',
+      version: 1,
+    }
   )
 );

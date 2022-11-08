@@ -1,3 +1,4 @@
+import merge from 'lodash/merge';
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -47,7 +48,7 @@ export const useAppStore = create<AppSlice>()(
           list: {
             display: CardDisplayType.CARD,
             size: 50,
-            type: 'list',
+            type: 'grid',
           },
         },
         platform: Platform.WINDOWS,
@@ -72,8 +73,14 @@ export const useAppStore = create<AppSlice>()(
           rightWidth: '230px',
         },
       })),
-      { name: 'app' }
+      { name: 'store_app' }
     ),
-    { name: 'store_app' }
+    {
+      merge: (persistedState, currentState) => {
+        return merge(currentState, persistedState);
+      },
+      name: 'store_app',
+      version: 1,
+    }
   )
 );
