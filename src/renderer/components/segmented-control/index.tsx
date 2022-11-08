@@ -19,6 +19,10 @@ const StyledSegmentedControl = styled(
   & .mantine-SegmentedControl-label {
     font-family: var(--label-font-family);
   }
+
+  &:disabled {
+    cursor: default;
+  }
 `;
 
 export const SegmentedControl = forwardRef<

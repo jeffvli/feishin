@@ -7,6 +7,8 @@ import styled from 'styled-components';
 type SwitchProps = MantineSwitchProps;
 
 const StyledSwitch = styled(MantineSwitch)`
+  display: flex;
+
   & .mantine-Switch-track {
     background-color: var(--switch-track-bg);
   }
