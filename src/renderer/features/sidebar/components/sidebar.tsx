@@ -27,6 +27,7 @@ import { SidebarItem } from './sidebar-item';
 const SidebarContainer = styled.div`
   height: 100%;
   max-height: calc(100vh - 120px); // Account for titlebar and playerbar
+  user-select: none;
 `;
 
 const ImageContainer = styled(motion(Link))<{ height: string }>`
