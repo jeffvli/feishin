@@ -32,7 +32,7 @@ mpv.on('status', (status: any) => {
 });
 
 // Automatically updates the play button when the player is playing
-mpv.on('started', () => {
+mpv.on('resumed', () => {
   getMainWindow()?.webContents.send('renderer-player-play');
 });
 

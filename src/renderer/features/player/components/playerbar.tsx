@@ -1,6 +1,6 @@
 import { useRef } from 'react';
-import isElectron from 'is-electron';
 import styled from 'styled-components';
+import { useSettingsStore } from '@/renderer/store/settings.store';
 import { PlaybackType } from '@/renderer/types';
 import { AudioPlayer } from '../../../components';
 import { usePlayerStore } from '../../../store';
@@ -45,8 +45,8 @@ const CenterGridItem = styled.div`
 
 export const Playerbar = () => {
   const playersRef = useRef<any>();
-  const settings = usePlayerStore((state) => state.settings);
-  const volume = usePlayerStore((state) => state.settings.volume);
+  const settings = useSettingsStore((state) => state.player);
+  const volume = usePlayerStore((state) => state.volume);
   const player1 = usePlayerStore((state) => state.player1());
   const player2 = usePlayerStore((state) => state.player2());
   const status = usePlayerStore((state) => state.current.status);
@@ -66,7 +66,7 @@ export const Playerbar = () => {
           <RightControls />
         </RightGridItem>
       </PlayerbarControlsGrid>
-      {(!isElectron() || settings.type === PlaybackType.WEB) && (
+      {settings.type === PlaybackType.WEB && (
         <AudioPlayer
           ref={playersRef}
           autoNext={autoNext}
@@ -74,6 +74,7 @@ export const Playerbar = () => {
           crossfadeStyle={settings.crossfadeStyle}
           currentPlayer={player}
           muted={settings.muted}
+          playbackStyle={settings.style}
           player1={player1}
           player2={player2}
           status={status}

@@ -1,12 +1,16 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+import isElectron from 'is-electron';
 import { PlaybackType, PlayerStatus } from '@/renderer/types';
 import { usePlayerStore } from '../../../store';
-import { mpvPlayer } from '../utils/mpvPlayer';
+import { useSettingsStore } from '../../../store/settings.store';
+import { mpvPlayer } from '../utils/mpv-player';
+
+const ipc = isElectron() ? window.electron.ipcRenderer : null;
 
 export const useCenterControls = (args: { playersRef: any }) => {
   const { playersRef } = args;
 
-  const settings = usePlayerStore((state) => state.settings);
+  const settings = useSettingsStore((state) => state.player);
   const play = usePlayerStore((state) => state.play);
   const pause = usePlayerStore((state) => state.pause);
   const prev = usePlayerStore((state) => state.prev);
@@ -41,26 +45,28 @@ export const useCenterControls = (args: { playersRef: any }) => {
     resetPlayers();
   };
 
+  const isMpvPlayer = isElectron() && settings.type === PlaybackType.LOCAL;
+
   const handlePlay = useCallback(() => {
-    if (settings.type === PlaybackType.LOCAL) {
+    if (isMpvPlayer) {
       mpvPlayer.play();
     } else {
       currentPlayerRef.getInternalPlayer().play();
     }
 
     play();
-  }, [currentPlayerRef, play, settings]);
+  }, [currentPlayerRef, isMpvPlayer, play]);
 
   const handlePause = useCallback(() => {
-    if (settings.type === PlaybackType.LOCAL) {
+    if (isMpvPlayer) {
       mpvPlayer.pause();
     }
 
     pause();
-  }, [pause, settings]);
+  }, [isMpvPlayer, pause]);
 
   const handleStop = () => {
-    if (settings.type === PlaybackType.LOCAL) {
+    if (isMpvPlayer) {
       mpvPlayer.stop();
     } else {
       stopPlayback();
@@ -73,7 +79,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
   const handleNextTrack = useCallback(() => {
     const playerData = next();
 
-    if (settings.type === PlaybackType.LOCAL) {
+    if (isMpvPlayer) {
       mpvPlayer.setQueue(playerData);
       mpvPlayer.next();
     } else {
@@ -81,12 +87,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
     }
 
     setCurrentTime(0);
-  }, [next, resetPlayers, setCurrentTime, settings]);
+  }, [isMpvPlayer, next, resetPlayers, setCurrentTime]);
 
   const handlePrevTrack = useCallback(() => {
     const playerData = prev();
 
-    if (settings.type === PlaybackType.LOCAL) {
+    if (isMpvPlayer) {
       mpvPlayer.setQueue(playerData);
       mpvPlayer.previous();
     } else {
@@ -94,7 +100,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     }
 
     setCurrentTime(0);
-  }, [prev, resetPlayers, setCurrentTime, settings]);
+  }, [isMpvPlayer, prev, resetPlayers, setCurrentTime]);
 
   const handlePlayPause = useCallback(() => {
     if (queue) {
@@ -108,30 +114,26 @@ export const useCenterControls = (args: { playersRef: any }) => {
     return null;
   }, [handlePause, handlePlay, playerStatus, queue]);
 
-  const handleSkipBackward = () => {
-    const skipBackwardSec = 5;
-
-    if (settings.type === PlaybackType.LOCAL) {
-      const newTime = currentTime - skipBackwardSec;
-      mpvPlayer.seek(-skipBackwardSec);
+  const handleSkipBackward = (seconds: number) => {
+    if (isMpvPlayer) {
+      const newTime = currentTime - seconds;
+      mpvPlayer.seek(-seconds);
       setCurrentTime(newTime < 0 ? 0 : newTime);
     } else {
-      const newTime = currentPlayerRef.getCurrentTime() - skipBackwardSec;
+      const newTime = currentPlayerRef?.getCurrentTime() - seconds;
       resetNextPlayer();
       setCurrentTime(newTime);
       currentPlayerRef.seekTo(newTime);
     }
   };
 
-  const handleSkipForward = () => {
-    const skipForwardSec = 5;
-
-    if (settings.type === PlaybackType.LOCAL) {
-      const newTime = currentTime + skipForwardSec;
-      mpvPlayer.seek(skipForwardSec);
+  const handleSkipForward = (seconds: number) => {
+    if (isMpvPlayer) {
+      const newTime = currentTime + seconds;
+      mpvPlayer.seek(seconds);
       setCurrentTime(newTime);
     } else {
-      const checkNewTime = currentPlayerRef.getCurrentTime() + skipForwardSec;
+      const checkNewTime = currentPlayerRef?.getCurrentTime() + seconds;
       const songDuration = currentPlayerRef.player.player.duration;
 
       const newTime =
@@ -147,26 +149,67 @@ export const useCenterControls = (args: { playersRef: any }) => {
     (e: number | any) => {
       setCurrentTime(e);
 
-      if (settings.type === PlaybackType.LOCAL) {
+      if (isMpvPlayer) {
         mpvPlayer.seekTo(e);
       } else {
         currentPlayerRef.seekTo(e);
       }
     },
-    [currentPlayerRef, setCurrentTime, settings]
+    [currentPlayerRef, isMpvPlayer, setCurrentTime]
   );
 
-  // const handleVolumeSlider = useCallback(
-  //   (e: number | any) => {
-  //     // dispatch(setVolume(e));
-  //     if (settings.type === PlaybackType.Local) {
-  //       // playerApi.volume(currentTime, e);
-  //     }
+  useEffect(() => {
+    ipc?.RENDERER_PLAYER_PLAY_PAUSE(() => {
+      const { status } = usePlayerStore.getState().current;
+      if (status === PlayerStatus.PAUSED) {
+        play();
 
-  //     setSettings({ volume: (e / 100) ** 2 });
-  //   },
-  //   [currentTime, setSettings, settings]
-  // );
+        if (isMpvPlayer) {
+          mpvPlayer.play();
+        }
+      } else {
+        pause();
+        if (isMpvPlayer) {
+          mpvPlayer.pause();
+        }
+      }
+    });
+
+    ipc?.RENDERER_PLAYER_NEXT(() => {
+      const playerData = next();
+
+      if (isMpvPlayer) {
+        mpvPlayer.setQueue(playerData);
+        mpvPlayer.next();
+      }
+    });
+
+    ipc?.RENDERER_PLAYER_PREVIOUS(() => {
+      const playerData = prev();
+      if (isMpvPlayer) {
+        mpvPlayer.setQueue(playerData);
+        mpvPlayer.previous();
+      }
+    });
+
+    ipc?.RENDERER_PLAYER_PLAY(() => play());
+
+    ipc?.RENDERER_PLAYER_PAUSE(() => pause());
+
+    ipc?.RENDERER_PLAYER_STOP(() => pause());
+
+    ipc?.RENDERER_PLAYER_CURRENT_TIME((_event, time) => setCurrentTime(time));
+
+    return () => {
+      ipc?.removeAllListeners('renderer-player-play-pause');
+      ipc?.removeAllListeners('renderer-player-next');
+      ipc?.removeAllListeners('renderer-player-previous');
+      ipc?.removeAllListeners('renderer-player-play');
+      ipc?.removeAllListeners('renderer-player-pause');
+      ipc?.removeAllListeners('renderer-player-stop');
+      ipc?.removeAllListeners('renderer-player-current-time');
+    };
+  }, [isMpvPlayer, next, pause, play, prev, setCurrentTime]);
 
   return {
     handleNextTrack,

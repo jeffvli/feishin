@@ -3,14 +3,22 @@ import { api } from '@/renderer/api';
 import { queryKeys } from '@/renderer/api/query-keys';
 import { useServerCredential } from '@/renderer/features/shared';
 import { useAuthStore, usePlayerStore } from '@/renderer/store';
-import { LibraryItem, Play, PlayQueueAddOptions } from '@/renderer/types';
+import { useSettingsStore } from '@/renderer/store/settings.store';
+import {
+  LibraryItem,
+  Play,
+  PlaybackType,
+  PlayQueueAddOptions,
+} from '@/renderer/types';
 import { mpvPlayer } from '../utils/mpv-player';
 
 export const usePlayQueueHandler = () => {
   const queryClient = useQueryClient();
   const serverId = useAuthStore((state) => state.currentServer?.id) || '';
   const { serverToken, isImageTokenRequired } = useServerCredential();
+  const play = usePlayerStore((state) => state.play);
   const addToQueue = usePlayerStore((state) => state.addToQueue);
+  const playerType = useSettingsStore((state) => state.player.type);
 
   const handlePlayQueueAdd = async (options: PlayQueueAddOptions) => {
     if (options.byData) {
@@ -55,10 +63,18 @@ export const usePlayQueueHandler = () => {
       const playerData = addToQueue(songs, options.play);
 
       if (options.play === Play.NEXT || options.play === Play.LAST) {
-        mpvPlayer.setQueueNext(playerData);
-      } else {
-        mpvPlayer.setQueue(playerData);
-        mpvPlayer.play();
+        if (playerType === PlaybackType.LOCAL) {
+          mpvPlayer.setQueueNext(playerData);
+        }
+      }
+
+      if (options.play === Play.NOW) {
+        if (playerType === PlaybackType.LOCAL) {
+          mpvPlayer.setQueue(playerData);
+          mpvPlayer.play();
+        }
+
+        play();
       }
     }
   };

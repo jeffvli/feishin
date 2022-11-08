@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import { usePlayerStore } from '../../../store';
-import { mpvPlayer } from '../utils/mpvPlayer';
+import { mpvPlayer } from '../utils/mpv-player';
 
 export const useRightControls = () => {
-  const setSettings = usePlayerStore((state) => state.setSettings);
-  const volume = usePlayerStore((state) => state.settings.volume);
-  const muted = usePlayerStore((state) => state.settings.muted);
+  const setVolume = usePlayerStore((state) => state.setVolume);
+  const volume = usePlayerStore((state) => state.volume);
+  const muted = usePlayerStore((state) => state.muted);
+  const setMuted = usePlayerStore((state) => state.setMuted);
 
   // Ensure that the mpv player volume is set on startup
   useEffect(() => {
@@ -19,14 +20,15 @@ export const useRightControls = () => {
 
   const handleVolumeSlider = (e: number) => {
     mpvPlayer.volume(e);
+    setVolume(e);
   };
 
   const handleVolumeSliderState = (e: number) => {
-    setSettings({ volume: e });
+    setVolume(e);
   };
 
   const handleMute = () => {
-    setSettings({ muted: !muted });
+    setMuted(!muted);
     mpvPlayer.mute();
   };
 

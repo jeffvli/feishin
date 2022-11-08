@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import { Dispatch } from 'react';
-import { CrossfadeStyle } from '../../../../types';
+import { CrossfadeStyle } from '@/renderer/types';
 
 export const gaplessHandler = (args: {
   currentTime: number;

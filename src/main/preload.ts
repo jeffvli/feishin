@@ -87,6 +87,9 @@ contextBridge.exposeInMainWorld('electron', {
     SETTINGS_SET(data: { property: string; value: any }) {
       ipcRenderer.send('settings-set', data);
     },
+    removeAllListeners(value: string) {
+      ipcRenderer.removeAllListeners(value);
+    },
     windowClose() {
       ipcRenderer.send('window-close');
     },

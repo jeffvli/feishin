@@ -34,20 +34,7 @@ const volume = (value: number) => ipc?.PLAYER_VOLUME(value);
 
 const mute = () => ipc?.PLAYER_MUTE();
 
-const {
-  setCurrentTime,
-  play: setPlay,
-  pause: setPause,
-  autoNext,
-} = usePlayerStore.getState();
-
-ipc?.RENDERER_PLAYER_PLAY(() => setPlay());
-
-ipc?.RENDERER_PLAYER_PAUSE(() => setPause());
-
-ipc?.RENDERER_PLAYER_STOP(() => setPause());
-
-ipc?.RENDERER_PLAYER_CURRENT_TIME((_event, time) => setCurrentTime(time));
+const { autoNext } = usePlayerStore.getState();
 
 ipc?.RENDERER_PLAYER_AUTO_NEXT(() => {
   const playerData = autoNext();

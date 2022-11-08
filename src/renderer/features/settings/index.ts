@@ -1,5 +1,6 @@
 import isElectron from 'is-electron';
 
+export * from './components/settings';
 export * from './hooks/use-default-settings';
 
 const ipc = isElectron() ? window.electron.ipcRenderer : null;
@@ -14,7 +15,7 @@ const restart = () => {
   ipc?.APP_RESTART();
 };
 
-export const settings = {
+export const localSettings = {
   get,
   restart,
   set,

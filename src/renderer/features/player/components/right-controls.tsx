@@ -36,8 +36,8 @@ const MetadataStack = styled.div`
 `;
 
 export const RightControls = () => {
-  const volume = usePlayerStore((state) => state.settings.volume);
-  const muted = usePlayerStore((state) => state.settings.muted);
+  const volume = usePlayerStore((state) => state.volume);
+  const muted = usePlayerStore((state) => state.muted);
   const setSidebar = useAppStore((state) => state.setSidebar);
   const isQueueExpanded = useAppStore((state) => state.sidebar.rightExpanded);
   const { handleVolumeSlider, handleVolumeSliderState, handleMute } =

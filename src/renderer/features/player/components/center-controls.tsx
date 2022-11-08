@@ -5,13 +5,16 @@ import { IoIosPause } from 'react-icons/io';
 import {
   RiPlayFill,
   RiRepeat2Fill,
+  RiRewindFill,
   RiShuffleFill,
   RiSkipBackFill,
   RiSkipForwardFill,
+  RiSpeedFill,
 } from 'react-icons/ri';
 import styled from 'styled-components';
 import { Text } from '@/renderer/components';
 import { usePlayerStore } from '@/renderer/store';
+import { useSettingsStore } from '@/renderer/store/settings.store';
 import { Font } from '@/renderer/styles';
 import { PlaybackType, PlayerStatus } from '@/renderer/types';
 import { useCenterControls } from '../hooks/use-center-controls';
@@ -56,10 +59,11 @@ const SliderWrapper = styled.div`
 export const CenterControls = ({ playersRef }: CenterControlsProps) => {
   const [isSeeking, setIsSeeking] = useState(false);
   const playerData = usePlayerStore((state) => state.getPlayerData());
+  const skip = useSettingsStore((state) => state.player.skipButtons);
+  const playerType = useSettingsStore((state) => state.player.type);
   const player1 = playersRef?.current?.player1?.player;
   const player2 = playersRef?.current?.player2?.player;
   const { status, player } = usePlayerStore((state) => state.current);
-  const settings = usePlayerStore((state) => state.settings);
   const setCurrentTime = usePlayerStore((state) => state.setCurrentTime);
 
   const {
@@ -67,6 +71,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     handlePlayPause,
     handlePrevTrack,
     handleSeekSlider,
+    handleSkipBackward,
+    handleSkipForward,
   } = useCenterControls({ playersRef });
 
   const currentTime = usePlayerStore((state) => state.current.time);
@@ -78,7 +84,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     let interval: any;
 
     if (status === PlayerStatus.PLAYING && !isSeeking) {
-      if (!isElectron() || settings.type === PlaybackType.WEB) {
+      if (!isElectron() || playerType === PlaybackType.WEB) {
         interval = setInterval(() => {
           setCurrentTime(currentPlayerRef.getCurrentTime());
         }, 1000);
@@ -88,7 +94,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     }
 
     return () => clearInterval(interval);
-  }, [currentPlayerRef, isSeeking, setCurrentTime, settings.type, status]);
+  }, [currentPlayerRef, isSeeking, setCurrentTime, playerType, status]);
 
   return (
     <>
@@ -106,6 +112,17 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             variant="secondary"
             onClick={handlePrevTrack}
           />
+          {skip?.enabled && (
+            <PlayerButton
+              icon={<RiRewindFill size={15} />}
+              tooltip={{
+                label: `Skip backwards ${skip?.skipBackwardSeconds} seconds`,
+                openDelay: 500,
+              }}
+              variant="secondary"
+              onClick={() => handleSkipBackward(skip?.skipBackwardSeconds)}
+            />
+          )}
           <PlayerButton
             icon={
               status === PlayerStatus.PAUSED ? (
@@ -121,6 +138,17 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             variant="main"
             onClick={handlePlayPause}
           />
+          {skip?.enabled && (
+            <PlayerButton
+              icon={<RiSpeedFill size={15} />}
+              tooltip={{
+                label: `Skip forwards ${skip?.skipBackwardSeconds} seconds`,
+                openDelay: 500,
+              }}
+              variant="secondary"
+              onClick={() => handleSkipForward(skip?.skipForwardSeconds)}
+            />
+          )}
           <PlayerButton
             icon={<RiSkipForwardFill size={15} />}
             tooltip={{ label: 'Next track', openDelay: 500 }}
