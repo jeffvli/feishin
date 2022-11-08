@@ -3,6 +3,7 @@ import {
   Modal as MantineModal,
   ModalProps as MantineModalProps,
 } from '@mantine/core';
+import { ContextModalProps } from '@mantine/modals';
 
 export interface ModalProps extends Omit<MantineModalProps, 'onClose'> {
   children?: React.ReactNode;
@@ -25,6 +26,19 @@ export const Modal = ({ children, handlers, ...rest }: ModalProps) => {
     </MantineModal>
   );
 };
+
+export type ContextModalVars = {
+  context: ContextModalProps['context'];
+  id: ContextModalProps['id'];
+};
+
+export const BaseContextModal = ({
+  context,
+  id,
+  innerProps,
+}: ContextModalProps<{
+  modalBody: (vars: ContextModalVars) => React.ReactNode;
+}>) => <>{innerProps.modalBody({ context, id })}</>;
 
 Modal.defaultProps = {
   children: undefined,

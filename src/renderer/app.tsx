@@ -5,6 +5,7 @@ import { ModalsProvider } from '@mantine/modals';
 import { NotificationsProvider } from '@mantine/notifications';
 import isElectron from 'is-electron';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
+import { BaseContextModal } from '@/renderer/components';
 import { useDefaultSettings } from './features/settings';
 import { AppRouter } from './router/app-router';
 import './styles/global.scss';
@@ -68,7 +69,7 @@ export const App = () => {
         }}
         transitionDuration={200}
       >
-        <ModalsProvider>
+        <ModalsProvider modals={{ base: BaseContextModal }}>
           <SelectRouter>
             <AppRouter />
           </SelectRouter>
