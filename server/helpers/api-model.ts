@@ -156,12 +156,19 @@ const imageUrl = (
   return null;
 };
 
-const relatedAlbum = (item: Album) => {
+const relatedAlbum = (
+  item: Album & {
+    albumArtists: AlbumArtist[];
+  }
+) => {
   return {
     /* eslint-disable sort-keys-fix/sort-keys-fix */
     id: item.id,
     name: item.name,
     remoteId: item.remoteId,
+    albumArtists: item.albumArtists
+      ? relatedAlbumArtists(item.albumArtists)
+      : [],
     deleted: item.deleted,
     /* eslint-enable sort-keys-fix/sort-keys-fix */
   };
@@ -325,7 +332,7 @@ const buildImageUrl = (options: {
 type DbSong = Song & DbSongInclude;
 
 type DbSongInclude = {
-  album: Album & { images: Image[] };
+  album: Album & { albumArtists: AlbumArtist[]; images: Image[] };
   artists: Artist[];
   externals: External[];
   genres: Genre[];
@@ -650,6 +657,7 @@ const tasks = (options: { items: DbTask[] | any[] }) => {
 
 export const toApiModel = {
   albums,
+  genres,
   servers,
   songs,
   tasks,
