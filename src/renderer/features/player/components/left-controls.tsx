@@ -1,3 +1,4 @@
+import React from 'react';
 import { Center, Group } from '@mantine/core';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { RiArrowUpSLine, RiDiscLine } from 'react-icons/ri';
@@ -5,8 +6,9 @@ import { generatePath, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button, Text } from '@/renderer/components';
 import { AppRoute } from '@/renderer/router/routes';
-import { useAppStore, usePlayerStore } from '@/renderer/store';
+import { useAppStore, useAuthStore, usePlayerStore } from '@/renderer/store';
 import { fadeIn } from '@/renderer/styles';
+import { ServerType } from '@/renderer/types';
 
 const LeftControlsContainer = styled.div`
   display: flex;
@@ -73,9 +75,16 @@ const LineItem = styled.div<{ $secondary?: boolean }>`
 export const LeftControls = () => {
   const hideImage = useAppStore((state) => state.sidebar.image);
   const setSidebar = useAppStore((state) => state.setSidebar);
+  const serverType = useAuthStore((state) => state.currentServer?.type);
   const song = usePlayerStore((state) => state.current.song);
+
   const title = song?.name;
-  const artists = song?.artists;
+
+  const artists =
+    serverType === ServerType.JELLYFIN
+      ? song?.artists
+      : song?.album?.albumArtists;
+
   const album = song?.album;
 
   return (
@@ -142,7 +151,7 @@ export const LeftControls = () => {
           </LineItem>
           <LineItem $secondary>
             {artists?.map((artist, index) => (
-              <>
+              <React.Fragment key={`bar-${artist.id}`}>
                 {index > 0 && (
                   <Text $secondary style={{ display: 'inline-block' }}>
                     ,
@@ -164,7 +173,7 @@ export const LeftControls = () => {
                 >
                   {artist.name || '—'}
                 </Text>
-              </>
+              </React.Fragment>
             ))}
           </LineItem>
           <LineItem $secondary>
