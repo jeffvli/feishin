@@ -1,10 +1,20 @@
 import { Group } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
-import { RiLock2Line, RiLogoutBoxLine, RiMenu3Fill } from 'react-icons/ri';
+import {
+  RiLock2Line,
+  RiLogoutBoxLine,
+  RiMenu3Fill,
+  RiSearch2Line,
+  RiSettings2Fill,
+  RiSettings2Line,
+  RiEdit2Line,
+  RiUserAddLine,
+  RiAddLine,
+} from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { queryKeys } from '@/renderer/api/query-keys';
-import { Button, DropdownMenu } from '@/renderer/components';
+import { Button, DropdownMenu, Text } from '@/renderer/components';
 import {
   AddServerForm,
   ServerList,
@@ -40,7 +50,10 @@ export const AppMenu = () => {
     openModal({
       centered: true,
       children: <AddServerForm onCancel={closeAllModals} />,
+      exitTransitionDuration: 300,
+      overflow: 'inside',
       title: 'Add server',
+      transition: 'slide-down',
     });
   };
 
@@ -48,7 +61,10 @@ export const AppMenu = () => {
     openModal({
       centered: true,
       children: <ServerList />,
+      exitTransitionDuration: 300,
+      overflow: 'inside',
       title: 'Manage servers',
+      transition: 'slide-down',
     });
   };
 
@@ -56,8 +72,16 @@ export const AppMenu = () => {
     openModal({
       centered: true,
       children: <Settings />,
+      exitTransitionDuration: 300,
+      overflow: 'inside',
       size: 'xl',
-      title: 'Settings',
+      title: (
+        <Group position="center">
+          <RiSettings2Fill size={20} />
+          <Text>Settings</Text>
+        </Group>
+      ),
+      transition: 'slide-down',
     });
   };
 
@@ -104,20 +128,33 @@ export const AppMenu = () => {
           );
         })}
         <DropdownMenu.Divider />
-        <DropdownMenu.Item disabled>Search</DropdownMenu.Item>
-        <DropdownMenu.Item onClick={handleSettingsModal}>
+        <DropdownMenu.Item disabled rightSection={<RiSearch2Line />}>
+          Search
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          rightSection={<RiSettings2Line />}
+          onClick={handleSettingsModal}
+        >
           Settings
         </DropdownMenu.Item>
         <DropdownMenu.Divider />
         {permissions.createServer && (
-          <DropdownMenu.Item onClick={handleAddServerModal}>
+          <DropdownMenu.Item
+            rightSection={<RiAddLine />}
+            onClick={handleAddServerModal}
+          >
             Add server
           </DropdownMenu.Item>
         )}
-        <DropdownMenu.Item onClick={handleManageServersModal}>
+        <DropdownMenu.Item
+          rightSection={<RiEdit2Line />}
+          onClick={handleManageServersModal}
+        >
           Manage servers
         </DropdownMenu.Item>
-        <DropdownMenu.Item disabled>Manage users</DropdownMenu.Item>
+        <DropdownMenu.Item disabled rightSection={<RiUserAddLine />}>
+          Manage users
+        </DropdownMenu.Item>
         <DropdownMenu.Divider />
         <DropdownMenu.Item
           rightSection={<RiLogoutBoxLine />}
