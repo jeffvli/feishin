@@ -3,6 +3,7 @@ import { FixedSizeList, FixedSizeListProps } from 'react-window';
 import styled from 'styled-components';
 import { GridCard } from '@/renderer/components/virtual-grid/grid-card';
 import { usePlayQueueHandler } from '@/renderer/features/player/hooks/use-playqueue-handler';
+import { useSettingsStore } from '@/renderer/store/settings.store';
 import {
   CardRow,
   LibraryItem,
@@ -38,26 +39,27 @@ export const VirtualGridWrapper = ({
   rowCount: number;
 }) => {
   const handlePlayQueueAdd = usePlayQueueHandler();
+  const { playButtonBehavior } = useSettingsStore((state) => state.player);
 
   const memo = useMemo(
     () => ({
       cardRows,
       columnCount,
       display,
-      handlePlayQueueAdd,
       itemCount,
       itemData,
       itemGap,
       itemHeight,
       itemType,
       itemWidth,
+      playButtonBehavior,
       route,
     }),
     [
       cardRows,
       itemType,
       columnCount,
-      handlePlayQueueAdd,
+      playButtonBehavior,
       itemCount,
       itemData,
       display,
@@ -74,7 +76,7 @@ export const VirtualGridWrapper = ({
       {...rest}
       useIsScrolling
       itemCount={rowCount}
-      itemData={memo}
+      itemData={{ ...memo, handlePlayQueueAdd }}
       itemSize={itemHeight}
       overscanCount={5}
     >

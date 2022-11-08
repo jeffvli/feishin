@@ -14,6 +14,7 @@ import {
   LibraryItem,
   CardRow,
   CardRoute,
+  Play,
 } from '@/renderer/types';
 
 initSimpleImg({ threshold: 0.5 }, true);
@@ -133,6 +134,7 @@ interface BaseGridCardProps {
     cardRows: CardRow[];
     handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
     itemType: LibraryItem;
+    playButtonBehavior: Play;
     route: CardRoute;
   };
   data: any;
@@ -154,7 +156,7 @@ export const DefaultCard = ({
   const navigate = useNavigate();
   const { isScrolling, index } = listChildProps;
   const { itemGap, itemHeight, itemWidth } = sizes;
-  const { cardControls, handlePlayQueueAdd, itemType, cardRows, route } =
+  const { handlePlayQueueAdd, itemType, cardRows, route, playButtonBehavior } =
     controls;
 
   if (data) {
@@ -204,10 +206,10 @@ export const DefaultCard = ({
             <ControlsContainer>
               {!isScrolling && (
                 <GridCardControls
-                  cardControls={cardControls}
                   handlePlayQueueAdd={handlePlayQueueAdd}
                   itemData={data}
                   itemType={itemType}
+                  playButtonBehavior={playButtonBehavior}
                 />
               )}
             </ControlsContainer>
@@ -224,6 +226,7 @@ export const DefaultCard = ({
                       <React.Fragment key={`${data.id}-${item.id}`}>
                         {itemIndex > 0 && (
                           <Text
+                            $noSelect
                             sx={{
                               display: 'inline-block',
                               padding: '0 2px 0 1px',
@@ -234,6 +237,7 @@ export const DefaultCard = ({
                         )}{' '}
                         <Text
                           $link
+                          $noSelect
                           $secondary={index > 0}
                           component={Link}
                           overflow="hidden"
@@ -262,6 +266,7 @@ export const DefaultCard = ({
                     {data[row.property].map((item: any) => (
                       <Text
                         key={`${data.id}-${item.id}`}
+                        $noSelect
                         $secondary={index > 0}
                         overflow="hidden"
                       >
@@ -277,6 +282,7 @@ export const DefaultCard = ({
                   {row.route ? (
                     <Text
                       $link
+                      $noSelect
                       component={Link}
                       overflow="hidden"
                       to={generatePath(
@@ -293,7 +299,7 @@ export const DefaultCard = ({
                       {data && data[row.property]}
                     </Text>
                   ) : (
-                    <Text $secondary={index > 0} overflow="hidden">
+                    <Text $noSelect $secondary={index > 0} overflow="hidden">
                       {data && data[row.property]}
                     </Text>
                   )}

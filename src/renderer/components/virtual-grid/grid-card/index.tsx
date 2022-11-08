@@ -20,6 +20,7 @@ export const GridCard = ({
     cardRows,
     itemData,
     itemType,
+    playButtonBehavior,
     route,
     display,
   } = data as GridCardData;
@@ -40,6 +41,7 @@ export const GridCard = ({
           cardRows,
           handlePlayQueueAdd,
           itemType,
+          playButtonBehavior,
           route,
         }}
         data={itemData[i]}

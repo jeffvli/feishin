@@ -10,7 +10,7 @@ import {
 import styled from 'styled-components';
 import { Button } from '@/renderer/components/button';
 import { DropdownMenu } from '@/renderer/components/dropdown-menu';
-import { Play } from '@/renderer/types';
+import { LibraryItem, Play, PlayQueueAddOptions } from '@/renderer/types';
 
 type PlayButtonType = UnstyledButtonProps &
   React.ComponentPropsWithoutRef<'button'>;
@@ -74,11 +74,32 @@ const FavoriteWrapper = styled.span<{ isFavorite: boolean }>`
   }
 `;
 
+const PLAY_TYPES = [
+  {
+    label: 'Play',
+    play: Play.NOW,
+  },
+  {
+    label: 'Play last',
+    play: Play.LAST,
+  },
+  {
+    label: 'Play next',
+    play: Play.NEXT,
+  },
+];
+
 export const GridCardControls = ({
   itemData,
   itemType,
   handlePlayQueueAdd,
-}: any) => {
+  playButtonBehavior,
+}: {
+  handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
+  itemData: any;
+  itemType: LibraryItem;
+  playButtonBehavior: Play;
+}) => {
   return (
     <GridCardControlsContainer>
       <TopControls />
@@ -96,7 +117,7 @@ export const GridCardControls = ({
                 id: itemData.id,
                 type: itemType,
               },
-              play: Play.NOW,
+              play: playButtonBehavior,
             });
           }}
         >
@@ -126,36 +147,26 @@ export const GridCardControls = ({
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-              <DropdownMenu.Item
-                onClick={(e: MouseEvent) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handlePlayQueueAdd({
-                    byItemType: {
-                      id: itemData.id,
-                      type: itemType,
-                    },
-                    play: Play.LAST,
-                  });
-                }}
-              >
-                Play later
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                onClick={(e: MouseEvent) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handlePlayQueueAdd({
-                    byItemType: {
-                      id: itemData.id,
-                      type: itemType,
-                    },
-                    play: Play.NEXT,
-                  });
-                }}
-              >
-                Play next
-              </DropdownMenu.Item>
+              {PLAY_TYPES.filter(
+                (type) => type.play !== playButtonBehavior
+              ).map((type) => (
+                <DropdownMenu.Item
+                  key={`playtype-${type.play}`}
+                  onClick={(e: MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handlePlayQueueAdd({
+                      byItemType: {
+                        id: itemData.id,
+                        type: itemType,
+                      },
+                      play: type.play,
+                    });
+                  }}
+                >
+                  {type.label}
+                </DropdownMenu.Item>
+              ))}
               <DropdownMenu.Divider />
               <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
               <DropdownMenu.Divider />
