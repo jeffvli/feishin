@@ -5,24 +5,28 @@ export const GeneralTab = () => {
   const options = [
     {
       control: <Select disabled data={[]} />,
-      description: 'Primary application language ',
+      description: 'Sets the application language',
+      isHidden: false,
       title: 'Language',
     },
     {
       control: <Select disabled data={[]} />,
-      description: 'Theme for the application',
+      description: 'Sets the default theme',
+      isHidden: false,
       title: 'Theme',
     },
     {
       control: <Select disabled data={[]} />,
-      description: 'Font for the application',
+      description: 'Sets the default font',
+      isHidden: false,
       title: 'Font',
     },
     {
       control: (
         <Select disabled data={['Windows', 'macOS']} defaultValue="Windows" />
       ),
-      description: 'Font for the application',
+      description: 'Adjust the style of the titlebar',
+      isHidden: false,
       title: 'Titlebar style',
     },
   ];

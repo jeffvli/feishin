@@ -8,7 +8,7 @@ export const Settings = () => {
   const currentTab = useSettingsStore((state) => state.tab);
   const update = useSettingsStore((state) => state.setSettings);
   return (
-    <Box px="1rem" sx={{ height: '800px', maxHeight: '50vh' }}>
+    <Box pr={15} sx={{ height: '800px', maxHeight: '50vh' }}>
       <Tabs
         orientation="horizontal"
         styles={{

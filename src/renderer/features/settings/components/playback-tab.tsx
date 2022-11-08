@@ -226,6 +226,7 @@ export const PlaybackTab = () => {
           <Tooltip label="Backward">
             <NumberInput
               defaultValue={settings.skipButtons.skipBackwardSeconds}
+              min={0}
               width={75}
               onBlur={(e) =>
                 update({
@@ -243,6 +244,7 @@ export const PlaybackTab = () => {
           <Tooltip label="Forward">
             <NumberInput
               defaultValue={settings.skipButtons.skipForwardSeconds}
+              min={0}
               width={75}
               onBlur={(e) =>
                 update({
