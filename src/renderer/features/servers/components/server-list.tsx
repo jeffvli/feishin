@@ -13,8 +13,34 @@ export const ServerList = () => {
   const { data: servers } = useServerList();
   const permissions = usePermissions();
 
+  const handleAddServerModal = () => {
+    openContextModal({
+      centered: true,
+      exitTransitionDuration: 300,
+      innerProps: {
+        modalBody: (vars: ContextModalVars) => (
+          <AddServerForm onCancel={() => vars.context.closeModal(vars.id)} />
+        ),
+      },
+      modal: 'base',
+      overflow: 'inside',
+      title: 'Add server',
+      transition: 'slide-down',
+    });
+  };
+
   return (
     <>
+      <Group mb={10} position="right">
+        <Button
+          compact
+          disabled={!permissions.createServer}
+          variant="subtle"
+          onClick={handleAddServerModal}
+        >
+          Add server
+        </Button>
+      </Group>
       <Accordion variant="separated">
         {servers?.data?.map((s) => (
           <Accordion.Item key={s.id} value={s.name}>
@@ -31,31 +57,6 @@ export const ServerList = () => {
           </Accordion.Item>
         ))}
       </Accordion>
-      <Group mt={10} position="right">
-        <Button
-          compact
-          disabled={!permissions.createServer}
-          onClick={() =>
-            openContextModal({
-              centered: true,
-              exitTransitionDuration: 300,
-              innerProps: {
-                modalBody: (vars: ContextModalVars) => (
-                  <AddServerForm
-                    onCancel={() => vars.context.closeModal(vars.id)}
-                  />
-                ),
-              },
-              modal: 'base',
-              overflow: 'inside',
-              title: 'Add server',
-              transition: 'slide-down',
-            })
-          }
-        >
-          Add server
-        </Button>
-      </Group>
     </>
   );
 };

@@ -51,7 +51,10 @@ export const AddUserForm = ({ onCancel }: AddUserFormProps) => {
         onError: (err) =>
           toast.error({ message: err.response?.data?.error?.message }),
         onSuccess: () => {
-          toast.success({ message: 'User created' });
+          toast.success({
+            message: `${values.username} was successfully created.`,
+            title: 'User created',
+          });
           onCancel();
         },
       }

@@ -59,7 +59,10 @@ export const EditUserForm = ({ user, onCancel }: AddUserFormProps) => {
         onError: (err) =>
           toast.error({ message: err.response?.data?.error?.message }),
         onSuccess: () => {
-          toast.success({ message: 'User updated' });
+          toast.success({
+            message: `${values.username} was successfully updated.`,
+            title: 'User updated',
+          });
           onCancel();
         },
       }

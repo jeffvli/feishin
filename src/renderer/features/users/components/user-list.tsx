@@ -5,6 +5,7 @@ import { User } from '@/renderer/api/types';
 import {
   Button,
   ContextModalVars,
+  Popover,
   Text,
   toast,
   Tooltip,
@@ -112,14 +113,34 @@ export const UserList = () => {
             >
               Edit
             </Button>
-            <Button
-              compact
-              disabled={!permissions.isAdmin}
-              variant="subtle"
-              onClick={() => handleDeleteUser(u)}
-            >
-              <RiDeleteBin2Line color="var(--danger-color)" size={15} />
-            </Button>
+            <Popover position="bottom-start">
+              <Popover.Target>
+                <Button
+                  compact
+                  disabled={!permissions.isAdmin}
+                  variant="subtle"
+                >
+                  <RiDeleteBin2Line color="var(--danger-color)" size={15} />
+                </Button>
+              </Popover.Target>
+              <Popover.Dropdown>
+                <Group>
+                  <Button
+                    compact
+                    uppercase
+                    sx={{
+                      '&:hover': {
+                        background: 'var(--danger-color)',
+                      },
+                      background: 'var(--danger-color)',
+                    }}
+                    onClick={() => handleDeleteUser(u)}
+                  >
+                    Delete
+                  </Button>
+                </Group>
+              </Popover.Dropdown>
+            </Popover>
           </Group>
         </Group>
       ))}
