@@ -18,7 +18,11 @@ export const useLogin = (
     onSuccess: (res) => {
       const props = {
         accessToken: res.data.accessToken,
-        permissions: { isAdmin: res.data.isAdmin, username: res.data.username },
+        permissions: {
+          isAdmin: res.data.isAdmin,
+          isSuperAdmin: res.data.isSuperAdmin,
+          username: res.data.username,
+        },
         refreshToken: res.data.refreshToken,
         serverKey: md5(serverUrl),
         serverUrl,
