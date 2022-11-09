@@ -25,7 +25,7 @@ const createUser = async (
   req: TypedRequest<typeof validation.users.createUser>,
   res: Response
 ) => {
-  const user = await service.users.createUser(req.body);
+  const user = await service.users.createUser(req.authUser, req.body);
   const success = ApiSuccess.ok({ data: toApiModel.users([user])[0] });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };

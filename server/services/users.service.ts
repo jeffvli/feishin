@@ -27,21 +27,30 @@ const findMany = async () => {
   return users;
 };
 
-const createUser = async (options: {
-  displayName?: string;
-  password: string;
-  username: string;
-}) => {
-  const { password, username, displayName } = options;
+const createUser = async (
+  user: AuthUser,
+  options: {
+    displayName?: string;
+    isAdmin?: boolean;
+    password: string;
+    username: string;
+  }
+) => {
+  const { password, username, displayName, isAdmin } = options;
 
-  const [userExists, displayNameExists] = await prisma.$transaction([
-    prisma.user.findUnique({ where: { username } }),
-    prisma.user.findUnique({ where: { displayName } }),
-  ]);
+  if (isAdmin && !user.isSuperAdmin) {
+    throw ApiError.badRequest('You are not authorized to create an admin.');
+  }
+
+  const userExists = await prisma.user.findUnique({ where: { username } });
 
   if (userExists) {
     throw ApiError.conflict('The user already exists.');
   }
+
+  const displayNameExists = await prisma.user.findUnique({
+    where: { displayName },
+  });
 
   if (displayNameExists) {
     throw ApiError.conflict('The display name already exists.');
@@ -49,39 +58,51 @@ const createUser = async (options: {
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  const user = await prisma.user.create({
+  const createdUser = await prisma.user.create({
     data: {
       deviceId: `${username}_${randomString(10)}`,
       enabled: false,
+      isAdmin,
       password: hashedPassword,
       username,
     },
   });
 
-  return user;
+  return createdUser;
 };
 
 const deleteUser = async (options: { userId: string }) => {
   const { userId } = options;
 
-  const user = await prisma.user.delete({ where: { id: userId } });
-  return user;
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (!user) {
+    throw ApiError.notFound('The user does not exist.');
+  }
+
+  if (user?.isSuperAdmin) {
+    throw ApiError.badRequest('You cannot delete a superadmin.');
+  }
+
+  await prisma.user.delete({ where: { id: userId } });
 };
 
 const updateUser = async (
   options: { userId: string },
   data: {
+    displayName?: string;
+    isAdmin?: boolean;
     password?: string;
     username?: string;
   }
 ) => {
   const { userId } = options;
-  const { username, password } = data;
+  const { username, password, isAdmin, displayName } = data;
 
   const hashedPassword = password && (await bcrypt.hash(password, 12));
 
   const user = await prisma.user.update({
-    data: { password: hashedPassword, username },
+    data: { displayName, isAdmin, password: hashedPassword, username },
     where: { id: userId },
   });
 

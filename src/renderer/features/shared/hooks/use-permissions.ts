@@ -16,6 +16,8 @@ export const usePermissions = () => {
       editServer: permissions.isAdmin,
       editServerFolder: permissions.isAdmin,
       isAdmin: permissions.isAdmin,
+      isSuperAdmin: permissions.isSuperAdmin,
+      manageUsers: permissions.isAdmin,
     };
 
     return set;

@@ -10,12 +10,15 @@ import {
   RiSettings2Line,
   RiEdit2Line,
   RiUserAddLine,
+  RiProfileLine,
 } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { queryKeys } from '@/renderer/api/query-keys';
 import { Button, DropdownMenu, Text } from '@/renderer/components';
 import { ServerList, useServerList } from '@/renderer/features/servers';
 import { Settings } from '@/renderer/features/settings';
+import { usePermissions } from '@/renderer/features/shared';
+import { UserList } from '@/renderer/features/users';
 import { useAuthStore } from '@/renderer/store';
 
 export const AppMenu = () => {
@@ -25,6 +28,7 @@ export const AppMenu = () => {
   const currentServer = useAuthStore((state) => state.currentServer);
   const setCurrentServer = useAuthStore((state) => state.setCurrentServer);
   const serverCredentials = useAuthStore((state) => state.serverCredentials);
+  const permissions = usePermissions();
   const { data: servers } = useServerList();
 
   const serverList =
@@ -45,7 +49,18 @@ export const AppMenu = () => {
       children: <ServerList />,
       exitTransitionDuration: 300,
       overflow: 'inside',
-      title: 'Manage servers',
+      title: 'Manage Servers',
+      transition: 'slide-down',
+    });
+  };
+
+  const handleManageUsersModal = () => {
+    openModal({
+      centered: true,
+      children: <UserList />,
+      exitTransitionDuration: 300,
+      overflow: 'inside',
+      title: 'Manage Users',
       transition: 'slide-down',
     });
   };
@@ -120,9 +135,17 @@ export const AppMenu = () => {
           Settings
         </DropdownMenu.Item>
         <DropdownMenu.Divider />
-        <DropdownMenu.Item disabled rightSection={<RiUserAddLine />}>
-          Manage users
+        <DropdownMenu.Item rightSection={<RiProfileLine />}>
+          Edit profile
         </DropdownMenu.Item>
+        {permissions.manageUsers && (
+          <DropdownMenu.Item
+            rightSection={<RiUserAddLine />}
+            onClick={handleManageUsersModal}
+          >
+            Manage users
+          </DropdownMenu.Item>
+        )}
         <DropdownMenu.Item
           rightSection={<RiEdit2Line />}
           onClick={handleManageServersModal}

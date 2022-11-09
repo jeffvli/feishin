@@ -136,10 +136,12 @@ export type RelatedServerPermission = {
 
 export type User = {
   createdAt: string;
+  displayName?: string;
   enabled: boolean;
   flatServerPermissions: string[];
   id: string;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   password?: string;
   serverFolderPermissions: ServerFolderPermission[];
   serverPermissions: ServerPermission[];

@@ -26,7 +26,7 @@ export const queryKeys = {
   },
   users: {
     detail: (userId: string) => ['users', userId] as const,
-    list: (params: any) => ['users', 'list', params] as const,
+    list: (params?: any) => ['users', 'list', params] as const,
     root: ['users'],
   },
 };
