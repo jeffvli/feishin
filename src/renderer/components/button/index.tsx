@@ -118,7 +118,7 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
     if (tooltip) {
       return (
         <Tooltip withinPortal {...tooltip}>
-          <StyledButton ref={ref} {...props}>
+          <StyledButton ref={ref} loaderPosition="center" {...props}>
             {children}
           </StyledButton>
         </Tooltip>
@@ -126,7 +126,7 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     return (
-      <StyledButton ref={ref} {...props}>
+      <StyledButton ref={ref} loaderPosition="center" {...props}>
         {children}
       </StyledButton>
     );
