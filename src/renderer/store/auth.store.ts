@@ -8,6 +8,7 @@ export interface AuthState {
   accessToken: string;
   currentServer: Server | null;
   permissions: {
+    id: string;
     isAdmin: boolean;
     isSuperAdmin: boolean;
     username: string;
@@ -91,11 +92,17 @@ export const useAuthStore = create<AuthSlice>()(
         logout: () => {
           return set({
             accessToken: undefined,
-            permissions: { isAdmin: false, isSuperAdmin: false, username: '' },
+            permissions: {
+              id: '',
+              isAdmin: false,
+              isSuperAdmin: false,
+              username: '',
+            },
             refreshToken: undefined,
           });
         },
         permissions: {
+          id: '',
           isAdmin: false,
           isSuperAdmin: false,
           username: '',

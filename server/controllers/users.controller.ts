@@ -9,8 +9,8 @@ const getUserDetail = async (
   req: TypedRequest<typeof validation.users.detail>,
   res: Response
 ) => {
-  const { id } = req.params;
-  const user = await service.users.findById(req.authUser, { id });
+  const { userId } = req.params;
+  const user = await service.users.findById(req.authUser, { id: userId });
   const success = ApiSuccess.ok({ data: toApiModel.users([user])[0] });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };

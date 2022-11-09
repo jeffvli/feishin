@@ -11,7 +11,7 @@ const findById = async (user: AuthUser, options: { id: string }) => {
   }
 
   const uniqueUser = await prisma.user.findUnique({
-    include: { serverFolderPermissions: true },
+    include: { serverFolderPermissions: true, serverPermissions: true },
     where: { id },
   });
 
@@ -61,7 +61,7 @@ const createUser = async (
   const createdUser = await prisma.user.create({
     data: {
       deviceId: `${username}_${randomString(10)}`,
-      enabled: false,
+      enabled: true,
       isAdmin,
       password: hashedPassword,
       username,

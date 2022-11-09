@@ -1,6 +1,9 @@
 import express, { Router } from 'express';
 import { controller } from '@controllers/index';
 import { authenticateAdmin } from '@middleware/authenticate-admin';
+import { authenticateServerAdmin } from '@middleware/authenticate-server-admin';
+import { authenticateServerEditor } from '@middleware/authenticate-server-editor';
+import { authenticateServerViewer } from '@middleware/authenticate-server-viewer';
 import { service } from '@services/index';
 import { validateRequest, validation } from '@validations/index';
 
@@ -25,7 +28,7 @@ router
     controller.servers.getServerDetail
   )
   .patch(
-    authenticateAdmin,
+    authenticateServerAdmin,
     validateRequest(validation.servers.update),
     controller.servers.updateServer
   )
@@ -38,7 +41,7 @@ router
 router
   .route('/:serverId/refresh')
   .get(
-    authenticateAdmin,
+    authenticateServerEditor,
     validateRequest(validation.servers.refresh),
     controller.servers.refreshServer
   );
@@ -46,23 +49,23 @@ router
 router
   .route('/:serverId/scan')
   .post(
+    authenticateServerAdmin,
     validateRequest(validation.servers.scan),
-    authenticateAdmin,
     controller.servers.quickScanServer
   );
 
 router
   .route('/:serverId/full-scan')
   .post(
+    authenticateServerAdmin,
     validateRequest(validation.servers.scan),
-    authenticateAdmin,
     controller.servers.fullScanServer
   );
 
 router
   .route('/:serverId/url')
   .post(
-    authenticateAdmin,
+    authenticateServerEditor,
     validateRequest(validation.servers.createUrl),
     controller.servers.createServerUrl
   );
@@ -75,7 +78,7 @@ router.param('urlId', async (_req, _res, next, urlId) => {
 router
   .route('/:serverId/url/:urlId')
   .delete(
-    authenticateAdmin,
+    authenticateServerEditor,
     validateRequest(validation.servers.deleteUrl),
     controller.servers.deleteServerUrl
   );
@@ -83,6 +86,7 @@ router
 router
   .route('/:serverId/url/:urlId/enable')
   .post(
+    authenticateServerViewer,
     validateRequest(validation.servers.enableUrl),
     controller.servers.enableServerUrl
   );
@@ -90,6 +94,7 @@ router
 router
   .route('/:serverId/url/:urlId/disable')
   .post(
+    authenticateServerViewer,
     validateRequest(validation.servers.disableUrl),
     controller.servers.disableServerUrl
   );
@@ -102,7 +107,7 @@ router.param('folderId', async (_req, _res, next, folderId) => {
 router
   .route('/:serverId/folder/:folderId')
   .delete(
-    authenticateAdmin,
+    authenticateServerAdmin,
     validateRequest(validation.servers.deleteFolder),
     controller.servers.deleteServerFolder
   );
@@ -110,6 +115,7 @@ router
 router
   .route('/:serverId/folder/:folderId/enable')
   .post(
+    authenticateServerAdmin,
     validateRequest(validation.servers.enableFolder),
     controller.servers.enableServerFolder
   );
@@ -117,6 +123,7 @@ router
 router
   .route('/:serverId/folder/:folderId/disable')
   .post(
+    authenticateServerAdmin,
     validateRequest(validation.servers.disableFolder),
     controller.servers.disableServerFolder
   );

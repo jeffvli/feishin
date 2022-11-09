@@ -19,6 +19,7 @@ export const useLogin = (
       const props = {
         accessToken: res.data.accessToken,
         permissions: {
+          id: res.data.id,
           isAdmin: res.data.isAdmin,
           isSuperAdmin: res.data.isSuperAdmin,
           username: res.data.username,
