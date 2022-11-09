@@ -57,6 +57,7 @@ export const authenticate = (
       flatServerPermissions,
       id: user?.id,
       isAdmin: user?.isAdmin,
+      isSuperAdmin: user?.isSuperAdmin,
       server: req.params.serverId,
       serverFolderPermissions: user?.serverFolderPermissions,
       serverPermissions: user?.serverPermissions,

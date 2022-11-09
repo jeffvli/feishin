@@ -57,15 +57,16 @@ model RefreshToken {
 }
 
 model User {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  displayName String?  @unique
-  username    String   @unique
-  password    String
-  enabled     Boolean  @default(false)
-  isAdmin     Boolean  @default(false)
-  deviceId    String   @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  displayName  String?  @unique
+  username     String   @unique
+  password     String
+  enabled      Boolean  @default(false)
+  isAdmin      Boolean  @default(false)
+  isSuperAdmin Boolean  @default(false)
+  deviceId     String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   histories          History[]
   albumArtistRatings AlbumArtistRating[]

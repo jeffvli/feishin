@@ -15,6 +15,7 @@ async function main() {
           deviceId: `admin_${randomString(10)}`,
           enabled: true,
           isAdmin: true,
+          isSuperAdmin: true,
           password: hashedPassword,
           username: 'admin',
         },

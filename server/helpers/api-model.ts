@@ -603,6 +603,7 @@ const users = (
         refreshToken: item.refreshToken,
         enabled: item.enabled,
         isAdmin: item.isAdmin,
+        isSuperAdmin: item.isSuperAdmin,
         deviceId: item.deviceId,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
