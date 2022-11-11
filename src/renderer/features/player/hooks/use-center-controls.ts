@@ -1,6 +1,11 @@
 import { useCallback, useEffect } from 'react';
 import isElectron from 'is-electron';
-import { PlaybackType, PlayerStatus } from '@/renderer/types';
+import {
+  PlaybackType,
+  PlayerRepeat,
+  PlayerShuffle,
+  PlayerStatus,
+} from '@/renderer/types';
 import { usePlayerStore } from '../../../store';
 import { useSettingsStore } from '../../../store/settings.store';
 import { mpvPlayer } from '../utils/mpv-player';
@@ -11,14 +16,21 @@ export const useCenterControls = (args: { playersRef: any }) => {
   const { playersRef } = args;
 
   const settings = useSettingsStore((state) => state.player);
+  const setShuffle = usePlayerStore((state) => state.setShuffle);
+  const setRepeat = usePlayerStore((state) => state.setRepeat);
   const play = usePlayerStore((state) => state.play);
   const pause = usePlayerStore((state) => state.pause);
   const prev = usePlayerStore((state) => state.prev);
   const next = usePlayerStore((state) => state.next);
+  const setCurrentIndex = usePlayerStore((state) => state.setCurrentIndex);
+  const autoNext = usePlayerStore((state) => state.autoNext);
   const queue = usePlayerStore((state) => state.queue.default);
   const playerStatus = usePlayerStore((state) => state.current.status);
   const currentPlayer = usePlayerStore((state) => state.current.player);
-  const currentTime = usePlayerStore((state) => state.current.time);
+  const repeat = usePlayerStore((state) => state.repeat);
+  const shuffle = usePlayerStore((state) => state.shuffle);
+  const playerType = useSettingsStore((state) => state.player.type);
+
   const setCurrentTime = usePlayerStore((state) => state.setCurrentTime);
 
   const player1Ref = playersRef?.current?.player1;
@@ -39,11 +51,11 @@ export const useCenterControls = (args: { playersRef: any }) => {
     nextPlayerRef.getInternalPlayer().pause();
   }, [currentPlayerRef, nextPlayerRef]);
 
-  const stopPlayback = () => {
+  const stopPlayback = useCallback(() => {
     player1Ref.getInternalPlayer().pause();
     player2Ref.getInternalPlayer().pause();
     resetPlayers();
-  };
+  }, [player1Ref, player2Ref, resetPlayers]);
 
   const isMpvPlayer = isElectron() && settings.type === PlaybackType.LOCAL;
 
@@ -65,7 +77,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     pause();
   }, [isMpvPlayer, pause]);
 
-  const handleStop = () => {
+  const handleStop = useCallback(() => {
     if (isMpvPlayer) {
       mpvPlayer.stop();
     } else {
@@ -74,33 +86,335 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
     setCurrentTime(0);
     pause();
-  };
+  }, [isMpvPlayer, pause, setCurrentTime, stopPlayback]);
+
+  const handleToggleShuffle = useCallback(() => {
+    if (shuffle === PlayerShuffle.NONE) {
+      const playerData = setShuffle(PlayerShuffle.TRACK);
+      return mpvPlayer.setQueueNext(playerData);
+    }
+
+    const playerData = setShuffle(PlayerShuffle.NONE);
+    return mpvPlayer.setQueueNext(playerData);
+  }, [setShuffle, shuffle]);
+
+  const handleToggleRepeat = useCallback(() => {
+    if (repeat === PlayerRepeat.NONE) {
+      const playerData = setRepeat(PlayerRepeat.ALL);
+      return mpvPlayer.setQueueNext(playerData);
+    }
+
+    if (repeat === PlayerRepeat.ALL) {
+      const playerData = setRepeat(PlayerRepeat.ONE);
+      return mpvPlayer.setQueueNext(playerData);
+    }
+
+    return setRepeat(PlayerRepeat.NONE);
+  }, [repeat, setRepeat]);
+
+  const checkIsLastTrack = useCallback(() => {
+    const currentIndex =
+      shuffle === PlayerShuffle.NONE
+        ? usePlayerStore.getState().current.index
+        : usePlayerStore.getState().current.shuffledIndex;
+
+    const queueLength = queue.length;
+
+    return currentIndex >= queueLength - 1;
+  }, [queue.length, shuffle]);
+
+  const checkIsFirstTrack = useCallback(() => {
+    const currentIndex =
+      shuffle === PlayerShuffle.NONE
+        ? usePlayerStore.getState().current.index
+        : usePlayerStore.getState().current.shuffledIndex;
+
+    return currentIndex === 0;
+  }, [shuffle]);
+
+  const handleAutoNext = useCallback(() => {
+    const isLastTrack = checkIsLastTrack();
+
+    const handleRepeatAll = {
+      local: () => {
+        const playerData = autoNext();
+        mpvPlayer.playerAutoNext(playerData);
+        play();
+      },
+      web: () => {
+        autoNext();
+      },
+    };
+
+    const handleRepeatNone = {
+      local: () => {
+        if (isLastTrack) {
+          const playerData = setCurrentIndex(0);
+          mpvPlayer.setQueue(playerData);
+          mpvPlayer.pause();
+          pause();
+        } else {
+          const playerData = autoNext();
+          mpvPlayer.playerAutoNext(playerData);
+          play();
+        }
+      },
+      web: () => {
+        if (isLastTrack) {
+          resetPlayers();
+        } else {
+          next();
+          resetPlayers();
+        }
+      },
+    };
+
+    const handleRepeatOne = {
+      local: () => {
+        const playerData = autoNext();
+        mpvPlayer.playerAutoNext(playerData);
+        play();
+      },
+      web: () => {
+        if (isLastTrack) {
+          resetPlayers();
+        } else {
+          next();
+          resetPlayers();
+        }
+      },
+    };
+
+    switch (repeat) {
+      case PlayerRepeat.NONE:
+        handleRepeatNone[playerType]();
+        break;
+      case PlayerRepeat.ALL:
+        handleRepeatAll[playerType]();
+        break;
+      case PlayerRepeat.ONE:
+        handleRepeatOne[playerType]();
+        break;
+
+      default:
+        break;
+    }
+  }, [
+    autoNext,
+    checkIsLastTrack,
+    next,
+    pause,
+    play,
+    playerType,
+    repeat,
+    resetPlayers,
+    setCurrentIndex,
+  ]);
 
   const handleNextTrack = useCallback(() => {
-    const playerData = next();
+    const isLastTrack = checkIsLastTrack();
 
-    if (isMpvPlayer) {
-      mpvPlayer.setQueue(playerData);
-      mpvPlayer.next();
-    } else {
-      resetPlayers();
+    const handleRepeatAll = {
+      local: () => {
+        const playerData = next();
+        mpvPlayer.setQueue(playerData);
+        mpvPlayer.next();
+      },
+      web: () => {
+        next();
+      },
+    };
+
+    const handleRepeatNone = {
+      local: () => {
+        if (isLastTrack) {
+          const playerData = setCurrentIndex(0);
+          mpvPlayer.setQueue(playerData);
+          mpvPlayer.pause();
+          pause();
+        } else {
+          const playerData = next();
+          mpvPlayer.setQueue(playerData);
+          mpvPlayer.next();
+        }
+      },
+      web: () => {
+        if (isLastTrack) {
+          setCurrentIndex(0);
+          resetPlayers();
+          pause();
+        } else {
+          next();
+          resetPlayers();
+        }
+      },
+    };
+
+    const handleRepeatOne = {
+      local: () => {
+        const playerData = next();
+        mpvPlayer.setQueue(playerData);
+        mpvPlayer.next();
+      },
+      web: () => {
+        if (!isLastTrack) {
+          resetPlayers();
+        } else {
+          next();
+          resetPlayers();
+        }
+      },
+    };
+
+    switch (repeat) {
+      case PlayerRepeat.NONE:
+        handleRepeatNone[playerType]();
+        break;
+      case PlayerRepeat.ALL:
+        handleRepeatAll[playerType]();
+        break;
+      case PlayerRepeat.ONE:
+        handleRepeatOne[playerType]();
+        break;
+
+      default:
+        break;
     }
 
     setCurrentTime(0);
-  }, [isMpvPlayer, next, resetPlayers, setCurrentTime]);
+  }, [
+    checkIsLastTrack,
+    next,
+    pause,
+    playerType,
+    repeat,
+    resetPlayers,
+    setCurrentIndex,
+    setCurrentTime,
+  ]);
 
   const handlePrevTrack = useCallback(() => {
-    const playerData = prev();
+    const currentTime = isMpvPlayer
+      ? usePlayerStore.getState().current.time
+      : currentPlayerRef.getCurrentTime();
 
-    if (isMpvPlayer) {
-      mpvPlayer.setQueue(playerData);
-      mpvPlayer.previous();
-    } else {
-      resetPlayers();
+    // Reset the current track more than 10 seconds have elapsed
+    if (currentTime >= 10) {
+      if (isMpvPlayer) {
+        return mpvPlayer.seekTo(0);
+      }
+      return currentPlayerRef.seekTo(0);
     }
 
-    setCurrentTime(0);
-  }, [isMpvPlayer, prev, resetPlayers, setCurrentTime]);
+    const isFirstTrack = checkIsFirstTrack();
+
+    const handleRepeatAll = {
+      local: () => {
+        if (!isFirstTrack) {
+          const playerData = prev();
+          mpvPlayer.setQueue(playerData);
+          mpvPlayer.previous();
+        } else {
+          const playerData = setCurrentIndex(queue.length - 1);
+          mpvPlayer.setQueue(playerData);
+          mpvPlayer.previous();
+        }
+      },
+      web: () => {
+        if (!isFirstTrack) {
+          prev();
+          resetPlayers();
+        } else {
+          setCurrentIndex(queue.length - 1);
+          resetPlayers();
+        }
+      },
+    };
+
+    const handleRepeatNone = {
+      local: () => {
+        const playerData = prev();
+        mpvPlayer.setQueue(playerData);
+        mpvPlayer.previous();
+      },
+      web: () => {
+        if (!isFirstTrack) {
+          prev();
+          resetPlayers();
+        } else {
+          resetPlayers();
+          pause();
+        }
+      },
+    };
+
+    const handleRepeatOne = {
+      local: () => {
+        if (!isFirstTrack) {
+          const playerData = prev();
+          mpvPlayer.setQueue(playerData);
+          mpvPlayer.previous();
+        } else {
+          mpvPlayer.stop();
+        }
+      },
+      web: () => {
+        if (!isFirstTrack) {
+          prev();
+          resetPlayers();
+        } else {
+          resetPlayers();
+          pause();
+        }
+      },
+    };
+
+    switch (repeat) {
+      case PlayerRepeat.NONE:
+        handleRepeatNone[playerType]();
+        break;
+      case PlayerRepeat.ALL:
+        handleRepeatAll[playerType]();
+        break;
+      case PlayerRepeat.ONE:
+        handleRepeatOne[playerType]();
+        break;
+
+      default:
+        break;
+    }
+
+    // if (isMpvPlayer) {
+    //   if (shuffle === PlayerShuffle.TRACK) {
+    //     // const playerData = setCurrentIndex(shuffleTrackPrevious());
+    //     // mpvPlayer.setQueue(playerData);
+    //     mpvPlayer.previous();
+    //   } else if (shuffle === PlayerShuffle.ALBUM) {
+    //   } else {
+    //     const playerData = prev();
+    //     mpvPlayer.setQueue(playerData);
+    //     mpvPlayer.previous();
+    //   }
+    // }
+
+    // if (!isMpvPlayer) {
+    //   resetPlayers();
+    // }
+
+    return setCurrentTime(0);
+  }, [
+    checkIsFirstTrack,
+    currentPlayerRef,
+    isMpvPlayer,
+    pause,
+    playerType,
+    prev,
+    queue.length,
+    repeat,
+    resetPlayers,
+    setCurrentIndex,
+    setCurrentTime,
+  ]);
 
   const handlePlayPause = useCallback(() => {
     if (queue) {
@@ -115,12 +429,16 @@ export const useCenterControls = (args: { playersRef: any }) => {
   }, [handlePause, handlePlay, playerStatus, queue]);
 
   const handleSkipBackward = (seconds: number) => {
+    const currentTime = isMpvPlayer
+      ? usePlayerStore.getState().current.time
+      : currentPlayerRef.getCurrentTime();
+
     if (isMpvPlayer) {
       const newTime = currentTime - seconds;
       mpvPlayer.seek(-seconds);
       setCurrentTime(newTime < 0 ? 0 : newTime);
     } else {
-      const newTime = currentPlayerRef?.getCurrentTime() - seconds;
+      const newTime = currentTime - seconds;
       resetNextPlayer();
       setCurrentTime(newTime);
       currentPlayerRef.seekTo(newTime);
@@ -128,12 +446,16 @@ export const useCenterControls = (args: { playersRef: any }) => {
   };
 
   const handleSkipForward = (seconds: number) => {
+    const currentTime = isMpvPlayer
+      ? usePlayerStore.getState().current.time
+      : currentPlayerRef.getCurrentTime();
+
     if (isMpvPlayer) {
       const newTime = currentTime + seconds;
       mpvPlayer.seek(seconds);
       setCurrentTime(newTime);
     } else {
-      const checkNewTime = currentPlayerRef?.getCurrentTime() + seconds;
+      const checkNewTime = currentTime + seconds;
       const songDuration = currentPlayerRef.player.player.duration;
 
       const newTime =
@@ -160,45 +482,60 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
   useEffect(() => {
     ipc?.RENDERER_PLAYER_PLAY_PAUSE(() => {
-      const { status } = usePlayerStore.getState().current;
-      if (status === PlayerStatus.PAUSED) {
-        play();
+      handlePlayPause();
 
-        if (isMpvPlayer) {
-          mpvPlayer.play();
-        }
-      } else {
-        pause();
-        if (isMpvPlayer) {
-          mpvPlayer.pause();
-        }
-      }
+      // const { status } = usePlayerStore.getState().current;
+      // if (status === PlayerStatus.PAUSED) {
+      //   play();
+
+      //   if (isMpvPlayer) {
+      //     mpvPlayer.play();
+      //   }
+      // } else {
+      //   pause();
+      //   if (isMpvPlayer) {
+      //     mpvPlayer.pause();
+      //   }
+      // }
     });
 
     ipc?.RENDERER_PLAYER_NEXT(() => {
-      const playerData = next();
+      handleNextTrack();
+      // const playerData = next();
 
-      if (isMpvPlayer) {
-        mpvPlayer.setQueue(playerData);
-        mpvPlayer.next();
-      }
+      // if (isMpvPlayer) {
+      //   mpvPlayer.setQueue(playerData);
+      //   mpvPlayer.next();
+      // }
     });
 
     ipc?.RENDERER_PLAYER_PREVIOUS(() => {
-      const playerData = prev();
-      if (isMpvPlayer) {
-        mpvPlayer.setQueue(playerData);
-        mpvPlayer.previous();
-      }
+      handlePrevTrack();
+
+      // const playerData = prev();
+      // if (isMpvPlayer) {
+      //   mpvPlayer.setQueue(playerData);
+      //   mpvPlayer.previous();
+      // }
     });
 
-    ipc?.RENDERER_PLAYER_PLAY(() => play());
+    ipc?.RENDERER_PLAYER_PLAY(() => handlePlay());
 
-    ipc?.RENDERER_PLAYER_PAUSE(() => pause());
+    ipc?.RENDERER_PLAYER_PAUSE(() => handlePause());
 
-    ipc?.RENDERER_PLAYER_STOP(() => pause());
+    ipc?.RENDERER_PLAYER_STOP(() => handleStop());
 
     ipc?.RENDERER_PLAYER_CURRENT_TIME((_event, time) => setCurrentTime(time));
+
+    ipc?.RENDERER_PLAYER_AUTO_NEXT(() => {
+      handleAutoNext();
+      // const playerData = autoNext();
+      // console.log('playerData', playerData);
+      // if (playerData.queue.next) {
+      //   mpvPlayer.playerAutoNext(playerData);
+      //   play();
+      // }
+    });
 
     return () => {
       ipc?.removeAllListeners('renderer-player-play-pause');
@@ -208,8 +545,24 @@ export const useCenterControls = (args: { playersRef: any }) => {
       ipc?.removeAllListeners('renderer-player-pause');
       ipc?.removeAllListeners('renderer-player-stop');
       ipc?.removeAllListeners('renderer-player-current-time');
+      ipc?.removeAllListeners('renderer-player-auto-next');
     };
-  }, [isMpvPlayer, next, pause, play, prev, setCurrentTime]);
+  }, [
+    autoNext,
+    handleAutoNext,
+    handleNextTrack,
+    handlePause,
+    handlePlay,
+    handlePlayPause,
+    handlePrevTrack,
+    handleStop,
+    isMpvPlayer,
+    next,
+    pause,
+    play,
+    prev,
+    setCurrentTime,
+  ]);
 
   return {
     handleNextTrack,
@@ -219,5 +572,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     handleSkipBackward,
     handleSkipForward,
     handleStop,
+    handleToggleRepeat,
+    handleToggleShuffle,
   };
 };

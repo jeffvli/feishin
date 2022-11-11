@@ -53,6 +53,12 @@ export enum PlayerRepeat {
   ONE = 'one',
 }
 
+export enum PlayerShuffle {
+  ALBUM = 'album',
+  NONE = 'none',
+  TRACK = 'track',
+}
+
 export enum Play {
   LAST = 'last',
   NEXT = 'next',

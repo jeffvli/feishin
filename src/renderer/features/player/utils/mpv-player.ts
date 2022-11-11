@@ -4,7 +4,7 @@
 // renderer/preload.d.ts
 
 import isElectron from 'is-electron';
-import { PlayerData, usePlayerStore } from '../../../store';
+import { PlayerData } from '../../../store';
 
 const ipc = isElectron() ? window.electron.ipcRenderer : null;
 
@@ -33,15 +33,6 @@ const seekTo = (seconds: number) => ipc?.PLAYER_SEEK_TO(seconds);
 const volume = (value: number) => ipc?.PLAYER_VOLUME(value);
 
 const mute = () => ipc?.PLAYER_MUTE();
-
-const { autoNext } = usePlayerStore.getState();
-
-ipc?.RENDERER_PLAYER_AUTO_NEXT(() => {
-  const playerData = autoNext();
-  if (playerData.queue.next) {
-    playerAutoNext(playerData);
-  }
-});
 
 export const mpvPlayer = {
   currentTime,

@@ -9,7 +9,6 @@ import {
   Play,
   PlaybackStyle,
   PlaybackType,
-  PlayerRepeat,
 } from '@/renderer/types';
 
 export interface SettingsState {
@@ -20,12 +19,10 @@ export interface SettingsState {
     globalMediaHotkeys: boolean;
     muted: boolean;
     playButtonBehavior: Play;
-    repeat: PlayerRepeat;
     scrobble: {
       enabled: boolean;
       scrobbleAtPercentage: number;
     };
-    shuffle: boolean;
     skipButtons: {
       enabled: boolean;
       skipBackwardSeconds: number;
@@ -33,7 +30,6 @@ export interface SettingsState {
     };
     style: PlaybackStyle;
     type: PlaybackType;
-    volume: number;
   };
   tab: 'general' | 'playback' | 'view' | string;
 }
@@ -53,12 +49,10 @@ export const useSettingsStore = create<SettingsSlice>()(
           globalMediaHotkeys: true,
           muted: false,
           playButtonBehavior: Play.NOW,
-          repeat: PlayerRepeat.NONE,
           scrobble: {
             enabled: false,
             scrobbleAtPercentage: 75,
           },
-          shuffle: false,
           skipButtons: {
             enabled: true,
             skipBackwardSeconds: 10,
@@ -66,7 +60,6 @@ export const useSettingsStore = create<SettingsSlice>()(
           },
           style: PlaybackStyle.GAPLESS,
           type: PlaybackType.LOCAL,
-          volume: 50,
         },
         setSettings: (data) => {
           set({ ...get(), ...data });
