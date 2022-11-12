@@ -4,7 +4,8 @@ import isElectron from 'is-electron';
 import { IoIosPause } from 'react-icons/io';
 import {
   RiPlayFill,
-  RiRepeat2Fill,
+  RiRepeat2Line,
+  RiRepeatOneLine,
   RiRewindFill,
   RiShuffleFill,
   RiSkipBackFill,
@@ -16,7 +17,12 @@ import { Text } from '@/renderer/components';
 import { usePlayerStore } from '@/renderer/store';
 import { useSettingsStore } from '@/renderer/store/settings.store';
 import { Font } from '@/renderer/styles';
-import { PlaybackType, PlayerStatus } from '@/renderer/types';
+import {
+  PlaybackType,
+  PlayerRepeat,
+  PlayerShuffle,
+  PlayerStatus,
+} from '@/renderer/types';
 import { useCenterControls } from '../hooks/use-center-controls';
 import { PlayerButton } from './player-button';
 import { Slider } from './slider';
@@ -58,13 +64,15 @@ const SliderWrapper = styled.div`
 
 export const CenterControls = ({ playersRef }: CenterControlsProps) => {
   const [isSeeking, setIsSeeking] = useState(false);
-  const playerData = usePlayerStore((state) => state.getPlayerData());
+  const songDuration = usePlayerStore((state) => state.current.song?.duration);
   const skip = useSettingsStore((state) => state.player.skipButtons);
   const playerType = useSettingsStore((state) => state.player.type);
-  const player1 = playersRef?.current?.player1?.player;
-  const player2 = playersRef?.current?.player2?.player;
+  const player1 = playersRef?.current?.player1;
+  const player2 = playersRef?.current?.player2;
   const { status, player } = usePlayerStore((state) => state.current);
   const setCurrentTime = usePlayerStore((state) => state.setCurrentTime);
+  const repeat = usePlayerStore((state) => state.repeat);
+  const shuffle = usePlayerStore((state) => state.shuffle);
 
   const {
     handleNextTrack,
@@ -73,11 +81,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     handleSeekSlider,
     handleSkipBackward,
     handleSkipForward,
+    handleToggleRepeat,
+    handleToggleShuffle,
   } = useCenterControls({ playersRef });
 
   const currentTime = usePlayerStore((state) => state.current.time);
   const currentPlayerRef = player === 1 ? player1 : player2;
-  const duration = format((playerData.queue.current?.duration || 0) * 1000);
+  const duration = format((songDuration || 0) * 1000);
   const formattedTime = format(currentTime * 1000 || 0);
 
   useEffect(() => {
@@ -101,10 +111,19 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
       <ControlsContainer>
         <ButtonsContainer>
           <PlayerButton
+            $isActive={shuffle !== PlayerShuffle.NONE}
             icon={<RiShuffleFill size={15} />}
-            tooltip={{ label: `Shuffle`, openDelay: 500 }}
-            variant="secondary"
-            onClick={handlePrevTrack}
+            tooltip={{
+              label:
+                shuffle === PlayerShuffle.NONE
+                  ? 'Shuffle disabled'
+                  : shuffle === PlayerShuffle.TRACK
+                  ? 'Shuffle tracks'
+                  : 'Shuffle albums',
+              openDelay: 500,
+            }}
+            variant="tertiary"
+            onClick={handleToggleShuffle}
           />
           <PlayerButton
             icon={<RiSkipBackFill size={15} />}
@@ -156,10 +175,26 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             onClick={handleNextTrack}
           />
           <PlayerButton
-            icon={<RiRepeat2Fill size={15} />}
-            tooltip={{ label: 'Repeat', openDelay: 500 }}
-            variant="secondary"
-            onClick={handleNextTrack}
+            $isActive={repeat !== PlayerRepeat.NONE}
+            icon={
+              repeat === PlayerRepeat.ONE ? (
+                <RiRepeatOneLine size={15} />
+              ) : (
+                <RiRepeat2Line size={15} />
+              )
+            }
+            tooltip={{
+              label: `${
+                repeat === PlayerRepeat.NONE
+                  ? 'Repeat disabled'
+                  : repeat === PlayerRepeat.ALL
+                  ? 'Repeat all'
+                  : 'Repeat one'
+              }`,
+              openDelay: 500,
+            }}
+            variant="tertiary"
+            onClick={handleToggleRepeat}
           />
         </ButtonsContainer>
       </ControlsContainer>
@@ -172,7 +207,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
         <SliderWrapper>
           <Slider
             height="100%"
-            max={playerData.queue.current?.duration}
+            max={songDuration}
             min={0}
             tooltipType="time"
             value={currentTime}

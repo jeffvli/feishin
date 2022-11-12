@@ -12,9 +12,10 @@ import { Tooltip } from '@/renderer/components';
 type MantineButtonProps = UnstyledButtonProps &
   ComponentPropsWithoutRef<'button'>;
 interface PlayerButtonProps extends MantineButtonProps {
+  $isActive?: boolean;
   icon: ReactNode;
   tooltip?: Omit<TooltipProps, 'children'>;
-  variant: 'main' | 'secondary';
+  variant: 'main' | 'secondary' | 'tertiary';
 }
 
 const WrapperMainVariant = css`
@@ -63,11 +64,19 @@ const ButtonSecondaryVariant = css`
     stroke: var(--playerbar-btn-bg);
   }
 
-  &:hover {
+  &:focus-visible {
     svg {
       fill: var(--playerbar-btn-bg-hover);
       stroke: var(--playerbar-btn-bg-hover);
     }
+  }
+`;
+
+const ButtonTertiaryVariant = css`
+  padding: 0.5rem;
+
+  svg {
+    display: flex;
   }
 
   &:focus-visible {
@@ -101,8 +110,22 @@ const StyledPlayerButton = styled(UnstyledButton)<StyledPlayerButtonProps>`
     opacity: 0.5;
   }
 
+  svg {
+    fill: ${({ $isActive }) => $isActive && 'var(--primary-color)'};
+  }
+
+  &:hover {
+    svg {
+      fill: ${({ $isActive }) => !$isActive && 'var(--playerbar-btn-bg-hover)'};
+    }
+  }
+
   ${({ variant }) =>
-    variant === 'main' ? ButtonMainVariant : ButtonSecondaryVariant}
+    variant === 'main'
+      ? ButtonMainVariant
+      : variant === 'secondary'
+      ? ButtonSecondaryVariant
+      : ButtonTertiaryVariant};
 `;
 
 export const PlayerButton = ({
@@ -116,8 +139,8 @@ export const PlayerButton = ({
       <Tooltip {...tooltip}>
         <MotionWrapper
           variant={variant}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 1 }}
         >
           <StyledPlayerButton variant={variant} {...rest}>
             {icon}
@@ -137,5 +160,6 @@ export const PlayerButton = ({
 };
 
 PlayerButton.defaultProps = {
+  $isActive: false,
   tooltip: undefined,
 };

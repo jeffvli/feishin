@@ -61,7 +61,7 @@ const PlayerbarImage = styled.img`
 const LineItem = styled.div<{ $secondary?: boolean }>`
   display: inline-block;
   width: 95%;
-  max-width: 30vw;
+  max-width: 20vw;
   overflow: hidden;
   color: ${(props) => props.$secondary && 'var(--main-fg-secondary)'};
   white-space: nowrap;
@@ -142,7 +142,6 @@ export const LeftControls = () => {
               component={Link}
               overflow="hidden"
               size="sm"
-              sx={{ '&:hover': { textDecoration: 'underline' } }}
               to={AppRoute.NOW_PLAYING}
               weight={500}
             >
