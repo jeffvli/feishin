@@ -75,7 +75,6 @@ passport.use(
         where: { id: jwt_payload.id },
       })
       .then((user) => {
-        // eslint-disable-next-line promise/no-callback-in-promise
         return done(null, user);
       })
       .catch((err) => {
