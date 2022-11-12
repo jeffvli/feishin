@@ -5,11 +5,14 @@ import { ModalsProvider } from '@mantine/modals';
 import { NotificationsProvider } from '@mantine/notifications';
 import isElectron from 'is-electron';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
+import { initSimpleImg } from 'react-simple-img';
 import { BaseContextModal } from '@/renderer/components';
 import { useDefaultSettings } from './features/settings';
 import { AppRouter } from './router/app-router';
 import './styles/global.scss';
 import 'ag-grid-community/styles/ag-grid.css';
+
+initSimpleImg({ threshold: 0.05 }, true);
 
 const SelectRouter = ({ children }: { children: ReactNode }) => {
   if (isElectron()) {
