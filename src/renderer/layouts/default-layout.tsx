@@ -4,7 +4,8 @@ import { Outlet } from 'react-router';
 import styled from 'styled-components';
 import { SideQueue } from '@/renderer/features/side-queue/components/side-queue';
 import { Titlebar } from '@/renderer/features/titlebar/components/titlebar';
-import { useAppStore } from '@/renderer/store';
+import { useUserDetail } from '@/renderer/features/users';
+import { useAppStore, useAuthStore } from '@/renderer/store';
 import {
   constrainRightSidebarWidth,
   constrainSidebarWidth,
@@ -97,6 +98,27 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const rightSidebarRef = useRef<HTMLDivElement | null>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [isResizingRight, setIsResizingRight] = useState(false);
+  const userId = useAuthStore((state) => state.permissions.id);
+  const login = useAuthStore((state) => state.login);
+
+  // Fetch and cache user profile
+  useUserDetail(
+    { userId },
+    {
+      onSuccess: (res) => {
+        const props = {
+          permissions: {
+            id: res.data.id,
+            isAdmin: res.data.isAdmin,
+            isSuperAdmin: res.data.isSuperAdmin,
+            username: res.data.username,
+          },
+        };
+
+        login(props);
+      },
+    }
+  );
 
   const startResizing = useCallback((position: 'left' | 'right') => {
     if (position === 'left') return setIsResizing(true);
