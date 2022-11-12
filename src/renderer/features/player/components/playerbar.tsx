@@ -79,7 +79,7 @@ export const Playerbar = () => {
           player2={player2}
           status={status}
           style={settings.style}
-          volume={volume / 100}
+          volume={(volume / 100) ** 2}
         />
       )}
     </PlayerbarContainer>
