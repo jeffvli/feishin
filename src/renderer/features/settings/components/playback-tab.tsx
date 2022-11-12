@@ -19,6 +19,7 @@ import {
   PlaybackStyle,
   PlaybackType,
   PlayerStatus,
+  CrossfadeStyle,
 } from '@/renderer/types';
 
 const getAudioDevice = async () => {
@@ -144,6 +145,44 @@ export const PlaybackTab = () => {
       note:
         status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
       title: 'Crossfade Duration',
+    },
+    {
+      control: (
+        <Select
+          data={[
+            { label: 'Linear', value: CrossfadeStyle.LINEAR },
+            { label: 'Constant Power', value: CrossfadeStyle.CONSTANT_POWER },
+            {
+              label: 'Constant Power (Slow cut)',
+              value: CrossfadeStyle.CONSTANT_POWER_SLOW_CUT,
+            },
+            {
+              label: 'Constant Power (Slow fade)',
+              value: CrossfadeStyle.CONSTANT_POWER_SLOW_FADE,
+            },
+            { label: 'Dipped', value: CrossfadeStyle.DIPPED },
+            { label: 'Equal Power', value: CrossfadeStyle.EQUALPOWER },
+          ]}
+          defaultValue={settings.crossfadeStyle}
+          disabled={
+            settings.type !== PlaybackType.WEB ||
+            settings.style !== PlaybackStyle.CROSSFADE ||
+            status === PlayerStatus.PLAYING
+          }
+          width={200}
+          onChange={(e) => {
+            if (!e) return;
+            update({
+              player: { ...settings, crossfadeStyle: e as CrossfadeStyle },
+            });
+          }}
+        />
+      ),
+      description: 'Change the crossfade algorithm (web player only)',
+      isHidden: false,
+      note:
+        status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
+      title: 'Crossfade Style',
     },
     {
       control: (
