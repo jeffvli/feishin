@@ -249,45 +249,6 @@ export const usePlayerStore = create<PlayerSlice>()(
           status: PlayerStatus.PAUSED,
           time: 0,
         },
-        // getNextTrack: () => {
-        //   const shuffle = get().shuffle;
-        //   const queue = get().queue.default;
-        //   const shuffledQueue = get().queue.shuffled;
-
-        //   if (shuffle === PlayerShuffle.TRACK) {
-
-        //   }
-
-        //   const currentIndex =
-        //     shuffle === PlayerShuffle.TRACK
-        //       ? get().current.shuffledIndex
-        //       : get().current.index;
-
-        //   const current = queue.find(
-        //     (song) => song.uniqueId === queue[currentIndex]
-        //   ) as QueueSong;
-
-        //   let nextSongIndex: number | undefined;
-        //   if (repeat === PlayerRepeat.ALL) {
-        //     if (isLastTrack) nextSongIndex = 0;
-        //     else nextSongIndex = currentIndex + 1;
-        //   }
-
-        //   if (repeat === PlayerRepeat.ONE) {
-        //     nextSongIndex = currentIndex;
-        //   }
-
-        //   if (repeat === PlayerRepeat.NONE) {
-        //     if (isLastTrack) nextSongIndex = undefined;
-        //     else nextSongIndex = currentIndex + 1;
-        //   }
-
-        //   const next = nextSongIndex
-        //     ? (queue.find(
-        //         (song) => song.uniqueId === queue[nextSongIndex as number]
-        //       ) as QueueSong)
-        //     : undefined;
-        // },
         getPlayerData: () => {
           const queue = get().queue.default;
           const currentPlayer = get().current.player;

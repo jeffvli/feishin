@@ -75,6 +75,19 @@ export const AudioPlayer = forwardRef(
       setIsTransitioning(false);
     };
 
+    useEffect(() => {
+      if (status === PlayerStatus.PLAYING) {
+        if (currentPlayer === 1) {
+          player1Ref.current.getInternalPlayer().play();
+        } else {
+          player2Ref.current.getInternalPlayer().play();
+        }
+      } else {
+        player1Ref.current.getInternalPlayer().pause();
+        player2Ref.current.getInternalPlayer().pause();
+      }
+    }, [currentPlayer, status]);
+
     const handleCrossfade1 = useCallback(
       (e: AudioPlayerProgress) => {
         return crossfadeHandler({

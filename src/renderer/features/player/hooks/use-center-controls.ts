@@ -163,7 +163,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
         if (isLastTrack) {
           resetPlayers();
         } else {
-          next();
+          autoNext();
           resetPlayers();
         }
       },
@@ -179,7 +179,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
         if (isLastTrack) {
           resetPlayers();
         } else {
-          next();
+          autoNext();
           resetPlayers();
         }
       },
@@ -202,7 +202,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
   }, [
     autoNext,
     checkIsLastTrack,
-    next,
     pause,
     play,
     playerType,
@@ -258,10 +257,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
       },
       web: () => {
         if (!isLastTrack) {
-          resetPlayers();
-        } else {
           next();
-          resetPlayers();
         }
       },
     };
@@ -321,11 +317,11 @@ export const useCenterControls = (args: { playersRef: any }) => {
         }
       },
       web: () => {
-        if (!isFirstTrack) {
-          prev();
+        if (isFirstTrack) {
+          setCurrentIndex(queue.length - 1);
           resetPlayers();
         } else {
-          setCurrentIndex(queue.length - 1);
+          prev();
           resetPlayers();
         }
       },
@@ -338,12 +334,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
         mpvPlayer.previous();
       },
       web: () => {
-        if (!isFirstTrack) {
-          prev();
-          resetPlayers();
-        } else {
+        if (isFirstTrack) {
           resetPlayers();
           pause();
+        } else {
+          prev();
+          resetPlayers();
         }
       },
     };
@@ -359,13 +355,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
         }
       },
       web: () => {
-        if (!isFirstTrack) {
-          prev();
-          resetPlayers();
-        } else {
-          resetPlayers();
-          pause();
-        }
+        prev();
+        resetPlayers();
       },
     };
 
@@ -383,23 +374,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
       default:
         break;
     }
-
-    // if (isMpvPlayer) {
-    //   if (shuffle === PlayerShuffle.TRACK) {
-    //     // const playerData = setCurrentIndex(shuffleTrackPrevious());
-    //     // mpvPlayer.setQueue(playerData);
-    //     mpvPlayer.previous();
-    //   } else if (shuffle === PlayerShuffle.ALBUM) {
-    //   } else {
-    //     const playerData = prev();
-    //     mpvPlayer.setQueue(playerData);
-    //     mpvPlayer.previous();
-    //   }
-    // }
-
-    // if (!isMpvPlayer) {
-    //   resetPlayers();
-    // }
 
     return setCurrentTime(0);
   }, [
@@ -483,40 +457,14 @@ export const useCenterControls = (args: { playersRef: any }) => {
   useEffect(() => {
     ipc?.RENDERER_PLAYER_PLAY_PAUSE(() => {
       handlePlayPause();
-
-      // const { status } = usePlayerStore.getState().current;
-      // if (status === PlayerStatus.PAUSED) {
-      //   play();
-
-      //   if (isMpvPlayer) {
-      //     mpvPlayer.play();
-      //   }
-      // } else {
-      //   pause();
-      //   if (isMpvPlayer) {
-      //     mpvPlayer.pause();
-      //   }
-      // }
     });
 
     ipc?.RENDERER_PLAYER_NEXT(() => {
       handleNextTrack();
-      // const playerData = next();
-
-      // if (isMpvPlayer) {
-      //   mpvPlayer.setQueue(playerData);
-      //   mpvPlayer.next();
-      // }
     });
 
     ipc?.RENDERER_PLAYER_PREVIOUS(() => {
       handlePrevTrack();
-
-      // const playerData = prev();
-      // if (isMpvPlayer) {
-      //   mpvPlayer.setQueue(playerData);
-      //   mpvPlayer.previous();
-      // }
     });
 
     ipc?.RENDERER_PLAYER_PLAY(() => handlePlay());
@@ -529,12 +477,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
     ipc?.RENDERER_PLAYER_AUTO_NEXT(() => {
       handleAutoNext();
-      // const playerData = autoNext();
-      // console.log('playerData', playerData);
-      // if (playerData.queue.next) {
-      //   mpvPlayer.playerAutoNext(playerData);
-      //   play();
-      // }
     });
 
     return () => {
