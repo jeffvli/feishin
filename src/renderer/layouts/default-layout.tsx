@@ -50,19 +50,21 @@ const SidebarContainer = styled.div`
   position: relative;
   grid-area: sidebar;
   background: var(--sidebar-bg);
+  border-right: var(--sidebar-border);
 `;
 
 const RightSidebarContainer = styled(motion.div)`
   position: relative;
   grid-area: right-sidebar;
   background: var(--sidebar-bg);
+  border-left: var(--sidebar-border);
 `;
 
 const PlayerbarContainer = styled.footer`
   z-index: 50;
   grid-area: player;
   background: var(--playerbar-bg);
-  filter: drop-shadow(0 -3px 4mm rgba(0, 0, 0, 50%));
+  filter: drop-shadow(0 -3px 1px rgba(0, 0, 0, 10%));
 `;
 
 const ResizeHandle = styled.div<{

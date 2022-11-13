@@ -36,21 +36,11 @@ interface FileInputProps extends MantineFileInputProps {
 }
 
 const StyledTextInput = styled(MantineTextInput)<TextInputProps>`
-  &:focus,
-  &:focus-within {
-    border-color: var(--primary-color);
-  }
-
   & .mantine-TextInput-wrapper {
     border-color: var(--primary-color);
   }
 
   & .mantine-TextInput-input {
-    &:focus,
-    &:focus-within {
-      border-color: var(--primary-color);
-    }
-
     color: var(--input-fg);
     background: var(--input-bg);
 
@@ -72,26 +62,16 @@ const StyledTextInput = styled(MantineTextInput)<TextInputProps>`
   }
 
   & .mantine-TextInput-disabled {
-    cursor: default;
+    opacity: 0.6;
   }
 `;
 
 const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
-  &:focus,
-  &:focus-within {
-    border-color: var(--primary-color);
-  }
-
   & .mantine-NumberInput-wrapper {
     border-color: var(--primary-color);
   }
 
   & .mantine-NumberInput-input {
-    &:focus,
-    &:focus-within {
-      border-color: var(--primary-color);
-    }
-
     color: var(--input-fg);
     background: var(--input-bg);
 
@@ -113,18 +93,11 @@ const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
   }
 
   & .mantine-NumberInput-disabled {
-    cursor: default;
+    opacity: 0.6;
   }
 `;
 
 const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
-  & .mantine-PasswordInput-input {
-    &:focus,
-    &:focus-within {
-      border-color: var(--primary-color);
-    }
-  }
-
   & .mantine-PasswordInput-required {
     color: var(--secondary-color);
   }
@@ -134,18 +107,11 @@ const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
   }
 
   & .mantine-PasswordInput-disabled {
-    cursor: default;
+    opacity: 0.6;
   }
 `;
 
 const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
-  & .mantine-FileInput-input {
-    &:focus,
-    &:focus-within {
-      border-color: var(--primary-color);
-    }
-  }
-
   & .mantine-FileInput-required {
     color: var(--secondary-color);
   }
@@ -155,7 +121,7 @@ const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
   }
 
   & .mantine-PasswordInput-disabled {
-    cursor: default;
+    opacity: 0.6;
   }
 `;
 

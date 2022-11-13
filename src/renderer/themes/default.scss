@@ -6,38 +6,45 @@
   --icon-color: rgb(255, 255, 255);
 
   --primary-color: rgb(58, 129, 237);
-  --secondary-color: rgb(199, 100, 141);
+  --secondary-color: rgb(255, 120, 120);
   --success-color: green;
   --warning-color: orange;
-  --danger-color: rgb(204, 30, 54);
+  --danger-color: rgb(204, 50, 50);
   --generic-border-color: rgba(50, 50, 50, 0.7);
 
-  --main-bg: rgb(22, 22, 22);
-  --main-fg: rgb(193, 194, 187);
+  --main-bg: rgb(18, 18, 18);
+  --main-fg: rgb(240, 240, 240);
   --main-fg-secondary: rgb(150, 150, 150);
 
   --titlebar-fg: rgb(255, 255, 255);
-  --titlebar-bg: rgb(15, 15, 15);
+  --titlebar-bg: rgb(13, 14, 17);
 
-  --sidebar-bg: rgb(15, 15, 15);
+  --sidebar-bg: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 1) 38%,
+    rgba(0, 0, 0, 0) 100%
+  );
   --sidebar-btn-color: rgb(179, 179, 179);
   --sidebar-btn-color-hover: #dddddd;
   --sidebar-handle-bg: #4d4d4d;
+  --sidebar-border: 1px rgba(150, 150, 150, 0.1) solid;
 
   --playerbar-bg: linear-gradient(
     rgb(20, 20, 20) 0%,
     rgb(30, 30, 30) 50%,
     rgb(20, 20, 20) 100%
   );
-  --playerbar-text-primary-color: #e7e7e7;
-  --playerbar-text-secondary-color: #a8a8a8;
-  --playerbar-btn-color: #c5c5c5;
-  --playerbar-btn-color-hover: #ffffff;
+  --playerbar-btn-main-fg: rgb(0, 0, 0);
+  --playerbar-btn-main-fg-hover: rgb(0, 0, 0);
+  --playerbar-btn-main-bg: rgb(230, 230, 230);
+  --playerbar-btn-main-bg-hover: rgb(255, 255, 255);
+  --playerbar-btn-fg: rgba(200, 200, 200, 0.8);
+  --playerbar-btn-fg-hover: rgba(255, 255, 255, 1);
+  --playerbar-btn-bg: #c5c5c5;
+  --playerbar-btn-bg-hover: transparent;
   --playerbar-border-top: 1px rgba(50, 50, 50, 0.7) solid;
   --playerbar-slider-track-bg: #3c3f43;
   --playerbar-slider-track-progress-bg: #cccccc;
-
-  --grid-card-bg: rgb(24, 24, 24);
 
   --tooltip-bg: #ffffff;
   --tooltip-fg: #000000;
@@ -51,7 +58,7 @@
   --btn-primary-fg-hover: #ffffff;
 
   --btn-default-bg: rgb(41, 41, 41);
-  --btn-default-bg-hover: color.scale(var(--btn-default-bg), $lightness: 15%);
+  --btn-default-bg-hover: rgb(51, 51, 51);
   --btn-default-fg: rgb(193, 193, 193);
   --btn-default-fg-hover: rgb(193, 193, 193);
 
@@ -63,22 +70,39 @@
   --input-bg: rgb(37, 38, 43);
   --input-fg: rgb(193, 193, 193);
   --input-placeholder-fg: rgb(119, 126, 139);
+  --input-active-fg: rgb(193, 193, 193);
+  --input-active-bg: rgba(255, 255, 255, 0.1);
 
   --dropdown-menu-bg: rgb(24, 24, 24);
   --dropdown-menu-fg: rgb(193, 194, 197);
+  --dropdown-menu-bg-hover: rgb(37, 38, 43);
+  --dropdown-menu-border: 1px rgba(50, 50, 50, 0.7) solid;
+  --dropdown-menu-border-radius: 4px;
 
   --switch-track-bg: rgb(50, 50, 50);
   --switch-track-enabled-bg: var(--primary-color);
   --switch-thumb-bg: rgb(255, 255, 255);
 
+  --slider-track-bg: rgb(50, 50, 50);
+  --slider-thumb-bg: rgb(50, 50, 50);
+
   --toast-title-fg: rgb(255, 255, 255);
   --toast-description-fg: rgb(193, 194, 197);
   --toast-bg: rgb(16, 16, 16);
+
+  --modal-bg: rgb(24, 24, 24);
 
   --paper-bg: rgb(30, 30, 30);
 
   --placeholder-bg: rgba(53, 53, 53, 0.5);
   --placeholder-fg: rgba(126, 126, 126);
+
+  --card-default-bg: rgb(24, 24, 24);
+  --card-default-bg-hover: rgb(40, 40, 40);
+  --card-default-radius: 10px;
+  --card-poster-bg: transparent;
+  --card-poster-bg-hover: transparent;
+  --card-poster-radius: 5px;
 
   .ag-theme-alpine-dark {
     --ag-font-family: poppins;
@@ -92,8 +116,8 @@
 
     --ag-foreground-color: rgb(179, 179, 179);
 
-    --ag-background-color: rgb(24, 24, 25);
-    --ag-odd-row-background-color: rgb(24, 24, 25);
+    --ag-background-color: var(--main-bg);
+    --ag-odd-row-background-color: rgb(25, 25, 25);
     --ag-row-hover-color: rgba(100, 100, 100, 0.2);
     --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
   }
@@ -105,5 +129,9 @@
 
   .current-song {
     background: rgba(0, 50, 150, 0.2) !important;
+  }
+
+  .mantine-Modal-modal {
+    background: var(--modal-bg);
   }
 }

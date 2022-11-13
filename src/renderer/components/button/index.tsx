@@ -31,7 +31,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
         return '';
     }
   }};
-  background-color: ${(props) => {
+  background: ${(props) => {
     switch (props.variant) {
       case 'default':
         return 'var(--btn-default-bg)';
@@ -43,6 +43,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
         return '';
     }
   }};
+  border: none;
 
   &:disabled {
     color: ${(props) => {
@@ -57,7 +58,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
           return '';
       }
     }};
-    background-color: ${(props) => {
+    background: ${(props) => {
       switch (props.variant) {
         case 'default':
           return 'var(--btn-default-bg)';
@@ -70,7 +71,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
       }
     }};
 
-    opacity: 0.4;
+    opacity: 0.6;
   }
 
   &:hover {
@@ -86,7 +87,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
           return '';
       }
     }};
-    background-color: ${(props) => {
+    background: ${(props) => {
       switch (props.variant) {
         case 'default':
           return 'var(--btn-default-bg-hover)';
@@ -102,14 +103,6 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
 
   &:active {
     transform: scale(0.98);
-  }
-
-  &:focus-visible {
-    border: 1px var(--primary-color) solid;
-  }
-
-  &.mantine-Button-root &:focus-visible {
-    outline: --var-primary;
   }
 `;
 

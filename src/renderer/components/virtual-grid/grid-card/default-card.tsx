@@ -3,7 +3,7 @@ import { Center, Skeleton } from '@mantine/core';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
-import { SimpleImg, initSimpleImg } from 'react-simple-img';
+import { SimpleImg } from 'react-simple-img';
 import { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Text } from '@/renderer/components/text';
@@ -16,8 +16,6 @@ import {
   CardRoute,
   Play,
 } from '@/renderer/types';
-
-initSimpleImg({ threshold: 0.5 }, true);
 
 const CardWrapper = styled.div<{
   itemGap: number;

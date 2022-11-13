@@ -15,6 +15,8 @@ const StyledSlider = styled(MantineSlider)`
   & .mantine-Slider-thumb {
     width: 1rem;
     height: 1rem;
+    background: var(--slider-thumb-bg);
+    border: none;
   }
 
   & .mantine-Slider-label {

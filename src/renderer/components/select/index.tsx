@@ -11,7 +11,12 @@ interface SelectProps extends MantineSelectProps {
 
 const StyledSelect = styled(MantineSelect)`
   & [data-selected='true'] {
-    background: black;
+    background: var(--input-select-bg);
+  }
+
+  & .mantine-Select-disabled {
+    background: var(--input-select-bg);
+    opacity: 0.6;
   }
 
   & .mantine-Select-itemsWrapper {
@@ -29,8 +34,15 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
         dropdown: {
           background: 'var(--dropdown-menu-bg)',
         },
+        input: {
+          background: 'var(--input-bg)',
+          color: 'var(--input-fg)',
+        },
         item: {
           '&:hover': {
+            background: 'var(--dropdown-menu-bg-hover)',
+          },
+          '&[data-hovered]': {
             background: 'var(--dropdown-menu-bg-hover)',
           },
           '&[data-selected="true"]': {
@@ -40,6 +52,7 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
             background: 'none',
             color: 'var(--primary-color)',
           },
+          color: 'var(--dropdown-menu-fg)',
           padding: '.3rem',
         },
         itemsWrapper: {

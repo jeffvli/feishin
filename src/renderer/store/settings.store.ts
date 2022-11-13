@@ -4,6 +4,7 @@ import merge from 'lodash/merge';
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { AppTheme } from '@/renderer/themes/types';
 import {
   CrossfadeStyle,
   Play,
@@ -12,6 +13,12 @@ import {
 } from '@/renderer/types';
 
 export interface SettingsState {
+  general: {
+    followSystemTheme: boolean;
+    theme: AppTheme;
+    themeDark: AppTheme;
+    themeLight: AppTheme;
+  };
   player: {
     audioDeviceId?: string | null;
     crossfadeDuration: number;
@@ -42,6 +49,12 @@ export const useSettingsStore = create<SettingsSlice>()(
   persist(
     devtools(
       immer((set, get) => ({
+        general: {
+          followSystemTheme: false,
+          theme: AppTheme.DEFAULT_DARK,
+          themeDark: AppTheme.DEFAULT_DARK,
+          themeLight: AppTheme.DEFAULT_LIGHT,
+        },
         player: {
           audioDeviceId: undefined,
           crossfadeDuration: 5,

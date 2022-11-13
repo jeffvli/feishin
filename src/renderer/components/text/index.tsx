@@ -64,5 +64,5 @@ _Text.defaultProps = {
   font: undefined,
   overflow: 'visible',
   to: '',
-  weight: 500,
+  weight: 400,
 };

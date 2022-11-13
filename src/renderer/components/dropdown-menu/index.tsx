@@ -31,6 +31,10 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   font-family: var(--label-font-family);
   background-color: var(--dropdown-menu-bg);
 
+  &:disabled {
+    opacity: 0.6;
+  }
+
   &:hover {
     background-color: var(--dropdown-menu-bg-hover);
   }
@@ -40,18 +44,23 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   }
 
   & .mantine-Menu-itemLabel {
-    color: ${({ $isActive }) => $isActive && 'var(--primary-color)'};
+    color: ${({ $isActive }) =>
+      $isActive ? 'var(--primary-color)' : 'var(--dropdown-menu-fg)'};
     font-weight: 500;
     font-size: 1em;
   }
 
   & .mantine-Menu-itemRightSection {
     margin-left: 2rem !important;
+    color: ${({ $isActive }) =>
+      $isActive ? 'var(--primary-color)' : 'var(--dropdown-menu-fg)'};
   }
 `;
 
 const StyledMenuDropdown = styled(MantineMenu.Dropdown)`
   background: var(--dropdown-menu-bg);
+  border: var(--dropdown-menu-border);
+  border-radius: var(--dropdown-menu-border-radius);
 `;
 
 const StyledMenuDivider = styled(MantineMenu.Divider)`
@@ -74,9 +83,7 @@ const pMenuItem = ({ $isActive, children, ...props }: MenuItemProps) => {
   return (
     <StyledMenuItem
       $isActive={$isActive}
-      rightSection={
-        $isActive && <RiArrowLeftLine color="var(--primary-color)" />
-      }
+      rightSection={$isActive && <RiArrowLeftLine />}
       {...props}
     >
       {children}

@@ -1,12 +1,12 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 import { MantineProvider } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
 import { ModalsProvider } from '@mantine/modals';
 import { NotificationsProvider } from '@mantine/notifications';
 import isElectron from 'is-electron';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { initSimpleImg } from 'react-simple-img';
 import { BaseContextModal } from '@/renderer/components';
+import { useTheme } from '@/renderer/hooks';
 import { useDefaultSettings } from './features/settings';
 import { AppRouter } from './router/app-router';
 import './styles/global.scss';
@@ -23,27 +23,29 @@ const SelectRouter = ({ children }: { children: ReactNode }) => {
 };
 
 export const App = () => {
-  const [theme] = useLocalStorage({
-    defaultValue: 'dark',
-    key: 'theme',
-  });
-
   useDefaultSettings();
-
-  useEffect(() => {
-    document.body.setAttribute('data-theme', theme);
-  }, [theme]);
+  const theme = useTheme();
 
   return (
     <MantineProvider
       withGlobalStyles
       withNormalizeCSS
       theme={{
-        colorScheme: 'dark',
+        colorScheme: theme,
         defaultRadius: 'xs',
         dir: 'ltr',
-        focusRing: 'never',
-        fontFamily: 'Sora, sans-serif',
+        focusRing: 'auto',
+        focusRingStyles: {
+          inputStyles: () => ({
+            border: `1px solid var(--primary-color)`,
+          }),
+          resetStyles: () => ({ outline: 'none' }),
+          styles: () => ({
+            outline: `1px solid var(--primary-color)`,
+            outlineOffset: '-1px',
+          }),
+        },
+        fontFamily: 'Inter, sans-serif',
         fontSizes: {
           lg: 16,
           md: 14,
