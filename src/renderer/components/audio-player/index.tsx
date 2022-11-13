@@ -78,13 +78,13 @@ export const AudioPlayer = forwardRef(
     useEffect(() => {
       if (status === PlayerStatus.PLAYING) {
         if (currentPlayer === 1) {
-          player1Ref.current.getInternalPlayer().play();
+          player1Ref.current?.getInternalPlayer()?.play();
         } else {
-          player2Ref.current.getInternalPlayer().play();
+          player2Ref.current?.getInternalPlayer()?.play();
         }
       } else {
-        player1Ref.current.getInternalPlayer().pause();
-        player2Ref.current.getInternalPlayer().pause();
+        player1Ref.current?.getInternalPlayer()?.pause();
+        player2Ref.current?.getInternalPlayer()?.pause();
       }
     }, [currentPlayer, status]);
 

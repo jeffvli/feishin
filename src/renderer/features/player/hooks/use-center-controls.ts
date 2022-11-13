@@ -113,24 +113,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
   }, [repeat, setRepeat]);
 
   const checkIsLastTrack = useCallback(() => {
-    const currentIndex =
-      shuffle === PlayerShuffle.NONE
-        ? usePlayerStore.getState().current.index
-        : usePlayerStore.getState().current.shuffledIndex;
-
-    const queueLength = queue.length;
-
-    return currentIndex >= queueLength - 1;
-  }, [queue.length, shuffle]);
+    return usePlayerStore.getState().checkIsLastTrack();
+  }, []);
 
   const checkIsFirstTrack = useCallback(() => {
-    const currentIndex =
-      shuffle === PlayerShuffle.NONE
-        ? usePlayerStore.getState().current.index
-        : usePlayerStore.getState().current.shuffledIndex;
-
-    return currentIndex === 0;
-  }, [shuffle]);
+    return usePlayerStore.getState().checkIsFirstTrack();
+  }, []);
 
   const handleAutoNext = useCallback(() => {
     const isLastTrack = checkIsLastTrack();
@@ -162,6 +150,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
       web: () => {
         if (isLastTrack) {
           resetPlayers();
+          pause();
         } else {
           autoNext();
           resetPlayers();
