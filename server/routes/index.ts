@@ -1,3 +1,4 @@
+import { ServerPermissionType } from '@prisma/client';
 import { Router } from 'express';
 import { helpers } from '../helpers';
 import { authenticate } from '../middleware';
@@ -31,9 +32,16 @@ routes.param('serverId', (req, _res, next, serverId) => {
   req.authUser.serverId = serverId;
 
   helpers.shared.checkServerPermissions(req.authUser, { serverId });
-  helpers.shared.checkServerFolderPermissions(req.authUser, {
-    serverFolderId,
-  });
+
+  const isNotServerAdmin =
+    req.authUser.serverPermissions.find((s) => s.serverId === serverId)
+      ?.type !== ServerPermissionType.ADMIN;
+
+  if (isNotServerAdmin) {
+    helpers.shared.checkServerFolderPermissions(req.authUser, {
+      serverFolderId,
+    });
+  }
 
   if (typeof req.query.serverFolderId === 'string') {
     req.query.serverFolderId = [req.query.serverFolderId];

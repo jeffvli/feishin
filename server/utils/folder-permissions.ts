@@ -1,4 +1,5 @@
 import { User } from '@prisma/client';
+import { AuthUser } from '@middleware/authenticate';
 import { prisma } from '../lib';
 
 export enum Roles {
@@ -16,7 +17,10 @@ export enum FolderRoles {
   ADMIN = 4,
 }
 
-export const folderPermissions = async (serverFolderIds: any[], user: User) => {
+export const folderPermissions = async (
+  serverFolderIds: any[],
+  user: AuthUser
+) => {
   if (user.isAdmin) {
     return true;
   }

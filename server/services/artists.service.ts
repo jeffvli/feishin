@@ -1,10 +1,10 @@
-import { User } from '@prisma/client';
 import { Request } from 'express';
+import { AuthUser } from '@middleware/authenticate';
 import { prisma } from '../lib';
 import { OffsetPagination } from '../types/types';
 import { ApiError, folderPermissions } from '../utils';
 
-const findById = async (options: { id: string; user: User }) => {
+const findById = async (options: { id: string; user: AuthUser }) => {
   const { id, user } = options;
 
   const artist = await prisma.artist.findUnique({
@@ -26,7 +26,7 @@ const findById = async (options: { id: string; user: User }) => {
 
 const findMany = async (
   req: Request,
-  options: { serverFolderIds: string; user: User } & OffsetPagination
+  options: { serverFolderIds: string; user: AuthUser } & OffsetPagination
 ) => {
   const { user, skip, take, serverFolderIds: rServerFolderIds } = options;
   const serverFolderIds = rServerFolderIds.split(',');

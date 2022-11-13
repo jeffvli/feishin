@@ -1,3 +1,4 @@
+import { ServerPermissionType } from '@prisma/client';
 import { AuthUser } from '@/middleware';
 import { ApiError } from '@/utils';
 import { prisma } from '@lib/prisma';
@@ -62,6 +63,13 @@ const getAvailableServerFolderIds = async (
   const serverFoldersWithAccess = await prisma.serverFolder.findMany({
     where: {
       OR: [
+        {
+          server: {
+            serverPermissions: {
+              some: { type: ServerPermissionType.ADMIN, userId: user.id },
+            },
+          },
+        },
         {
           AND: [
             {

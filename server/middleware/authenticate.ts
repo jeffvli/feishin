@@ -2,13 +2,7 @@ import { ServerFolderPermission, ServerPermission, User } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import passport from 'passport';
 
-export type AuthUser = User & {
-  flatServerFolderPermissions: string[];
-  flatServerPermissions: string[];
-  serverFolderPermissions: ServerFolderPermission[];
-  serverId?: string;
-  serverPermissions: ServerPermission[];
-};
+export type AuthUser = Request['authUser'];
 
 export const authenticate = (
   req: Request,
@@ -52,14 +46,15 @@ export const authenticate = (
 
     const props = {
       createdAt: user?.createdAt,
+      deviceId: user?.deviceId,
       enabled: user?.enabled,
       flatServerFolderPermissions,
       flatServerPermissions,
       id: user?.id,
       isAdmin: user?.isAdmin,
       isSuperAdmin: user?.isSuperAdmin,
-      server: req.params.serverId,
       serverFolderPermissions: user?.serverFolderPermissions,
+      serverId: req.params.serverId,
       serverPermissions: user?.serverPermissions,
       updatedAt: user?.updatedAt,
       username: user?.username,

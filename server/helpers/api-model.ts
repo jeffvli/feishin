@@ -22,6 +22,7 @@ import {
   User,
   UserServerUrl,
 } from '@prisma/client';
+import { AuthUser } from '@middleware/authenticate';
 
 const getSubsonicStreamUrl = (options: {
   deviceId: string;
@@ -439,7 +440,7 @@ type DbAlbumInclude = {
 const albums = (options: {
   items: DbAlbum[] | any[];
   serverUrl?: string;
-  user: User;
+  user: AuthUser;
 }) => {
   const { items, serverUrl, user } = options;
   return (

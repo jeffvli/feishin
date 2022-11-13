@@ -1,6 +1,6 @@
-import { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { AuthUser } from '@middleware/authenticate';
 import { prisma } from '../lib';
 import { generateRefreshToken, generateToken } from '../lib/passport';
 import { ApiSuccess, randomString } from '../utils';
@@ -57,7 +57,7 @@ const register = async (options: { password: string; username: string }) => {
   return user;
 };
 
-const logout = async (options: { user: User }) => {
+const logout = async (options: { user: AuthUser }) => {
   const { user } = options;
   await prisma.refreshToken.deleteMany({
     where: { userId: user.id },
