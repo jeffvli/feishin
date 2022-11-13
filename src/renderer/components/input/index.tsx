@@ -98,6 +98,19 @@ const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
 `;
 
 const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
+  & .mantine-PasswordInput-input {
+    color: var(--input-fg);
+    background: var(--input-bg);
+
+    &::placeholder {
+      color: var(--input-placeholder-fg);
+    }
+  }
+
+  & .mantine-PasswordInput-icon {
+    color: var(--input-placeholder-fg);
+  }
+
   & .mantine-PasswordInput-required {
     color: var(--secondary-color);
   }
