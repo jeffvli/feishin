@@ -22,8 +22,13 @@ export const MpvRequired = () => {
   return (
     <>
       <Text size="lg">
-        MPV is required for local playback. Set your MPV executable location
-        below.
+        Set your MPV executable location below and restart the application.
+      </Text>
+      <Text>
+        MPV is available at the following:{' '}
+        <a href="https://mpv.io/installation/" rel="noreferrer" target="_blank">
+          https://mpv.io/
+        </a>
       </Text>
       <FileInput placeholder={mpvPath} onChange={handleSetMpvPath} />
       <Button onClick={() => localSettings.restart()}>Restart</Button>
