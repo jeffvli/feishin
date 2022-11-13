@@ -220,10 +220,10 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                 <Group>
                   <Button
                     tooltip={{ label: 'Edit server details' }}
-                    variant="default"
+                    variant="subtle"
                     onClick={() => editHandlers.toggle()}
                   >
-                    <RiEdit2Fill color="white" />
+                    <RiEdit2Fill />
                   </Button>
                 </Group>
               )}

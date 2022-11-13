@@ -1,7 +1,12 @@
-import { Accordion, Group } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { openContextModal } from '@mantine/modals';
 import { RiServerFill } from 'react-icons/ri';
-import { Text, Button, ContextModalVars } from '@/renderer/components';
+import {
+  Text,
+  Button,
+  ContextModalVars,
+  Accordion,
+} from '@/renderer/components';
 import { ServerListItem } from '@/renderer/features/servers/components/server-list-item';
 import { useServerList } from '@/renderer/features/servers/queries/use-server-list';
 import { usePermissions } from '@/renderer/features/shared';
