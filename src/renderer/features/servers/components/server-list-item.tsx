@@ -2,7 +2,12 @@ import { useMemo } from 'react';
 import { Stack, Group, Divider } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
-import { RiDeleteBin2Line, RiEdit2Fill, RiMore2Fill } from 'react-icons/ri';
+import {
+  RiDeleteBin2Line,
+  RiEdit2Fill,
+  RiMore2Fill,
+  RiInformationLine,
+} from 'react-icons/ri';
 import { queryKeys } from '@/renderer/api/query-keys';
 import { Server, TaskType } from '@/renderer/api/types';
 import {
@@ -11,6 +16,7 @@ import {
   Switch,
   Text,
   toast,
+  Tooltip,
 } from '@/renderer/components';
 import { AddServerCredentialForm } from '@/renderer/features/servers/components/add-server-credential-form';
 import { AddServerUrlForm } from '@/renderer/features/servers/components/add-server-url-form';
@@ -231,7 +237,18 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
           )}
         </ServerSection>
 
-        <ServerSection title="Music Folders">
+        <ServerSection
+          title={
+            <Group>
+              <Text>Music Folders</Text>
+              <Tooltip label="Select which music folders you want to enable. Enabled music folders are included in the scan queue and are available to browse.">
+                <Group>
+                  <RiInformationLine />
+                </Group>
+              </Tooltip>
+            </Group>
+          }
+        >
           <Stack>
             {server.serverFolders?.map((folder) => (
               <Group key={folder.id} position="apart">
@@ -271,7 +288,18 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
           </Stack>
         </ServerSection>
 
-        <ServerSection title="Credentials">
+        <ServerSection
+          title={
+            <Group>
+              <Text>Credentials</Text>
+              <Tooltip label="If the server admin has required user credentials for this server, you will need to add your own login details here. Any credentials entered here are stored LOCALLY in the browser.">
+                <Group>
+                  <RiInformationLine />
+                </Group>
+              </Tooltip>
+            </Group>
+          }
+        >
           {addCredential ? (
             <AddServerCredentialForm
               server={server}
@@ -328,7 +356,18 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
           )}
         </ServerSection>
 
-        <ServerSection title="URLs">
+        <ServerSection
+          title={
+            <Group>
+              <Text>URLs</Text>
+              <Tooltip label="Enabling a URL will use it to generate image and audio endpoints instead of the server-defined URL. This is useful if you need to be able to access a URL from a local and remote network (e.g. http://localhost:4533 or https://music.domain.net)">
+                <Group>
+                  <RiInformationLine />
+                </Group>
+              </Tooltip>
+            </Group>
+          }
+        >
           {addUrl ? (
             <AddServerUrlForm
               serverId={server.id}
@@ -390,7 +429,14 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
         {serverPermission >= ServerPermission.ADMIN && (
           <ServerSection title="Danger zone">
             <Group position="apart">
-              <Text size="sm">Require user credentials</Text>
+              <Group>
+                <Text size="sm">Require user credentials</Text>
+                <Tooltip label="WARNING: Disabling this option will expose your server login credentials to all users. If enabled, all users will be required to enter their own credentials to access this server.">
+                  <Group>
+                    <RiInformationLine />
+                  </Group>
+                </Tooltip>
+              </Group>
               <Switch
                 checked={server.noCredential}
                 onChange={(e) =>

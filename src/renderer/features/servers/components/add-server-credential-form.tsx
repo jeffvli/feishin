@@ -77,12 +77,12 @@ export const AddServerCredentialForm = ({
         <TextInput
           data-autofocus
           required
-          label="username"
+          label="Username"
           {...form.getInputProps('username')}
         />
         <PasswordInput
           required
-          label="password"
+          label="Password"
           {...form.getInputProps('password')}
         />
         {server.type === ServerType.SUBSONIC && (
