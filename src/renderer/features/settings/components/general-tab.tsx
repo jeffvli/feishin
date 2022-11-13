@@ -1,13 +1,9 @@
 import { Divider, Stack } from '@mantine/core';
 import { Switch, Select } from '@/renderer/components';
 import { SettingsOptions } from '@/renderer/features/settings/components/settings-option';
+import { THEME_DATA } from '@/renderer/hooks';
 import { useSettingsStore } from '@/renderer/store/settings.store';
 import { AppTheme } from '@/renderer/themes/types';
-
-const THEME_OPTIONS = [
-  { label: 'Default Dark', value: AppTheme.DEFAULT_DARK },
-  { label: 'Default Light', value: AppTheme.DEFAULT_LIGHT },
-];
 
 export const GeneralTab = () => {
   const settings = useSettingsStore((state) => state.general);
@@ -59,7 +55,7 @@ export const GeneralTab = () => {
     {
       control: (
         <Select
-          data={THEME_OPTIONS}
+          data={THEME_DATA}
           defaultValue={settings.theme}
           onChange={(e) => {
             update({
@@ -78,7 +74,7 @@ export const GeneralTab = () => {
     {
       control: (
         <Select
-          data={THEME_OPTIONS}
+          data={THEME_DATA}
           defaultValue={settings.themeDark}
           onChange={(e) => {
             update({
@@ -97,7 +93,7 @@ export const GeneralTab = () => {
     {
       control: (
         <Select
-          data={THEME_OPTIONS}
+          data={THEME_DATA}
           defaultValue={settings.themeLight}
           onChange={(e) => {
             update({

@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useSettingsStore } from '@/renderer/store/settings.store';
+import { AppTheme } from '@/renderer/themes/types';
+
+export const THEME_DATA = [
+  { label: 'Default dark', type: 'dark', value: AppTheme.DEFAULT_DARK },
+  { label: 'Default light', type: 'light', value: AppTheme.DEFAULT_LIGHT },
+];
 
 export const useTheme = () => {
   const getCurrentTheme = () =>
@@ -33,5 +39,5 @@ export const useTheme = () => {
     document.body.setAttribute('data-theme', appTheme);
   }, [appTheme]);
 
-  return isDarkTheme ? 'dark' : 'light';
+  return THEME_DATA.find((t) => t.value === appTheme)?.type || 'dark';
 };

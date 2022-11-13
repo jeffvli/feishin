@@ -31,7 +31,7 @@ export const App = () => {
       withGlobalStyles
       withNormalizeCSS
       theme={{
-        colorScheme: theme,
+        colorScheme: theme as 'light' | 'dark',
         defaultRadius: 'xs',
         dir: 'ltr',
         focusRing: 'auto',
