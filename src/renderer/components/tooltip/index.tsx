@@ -18,6 +18,7 @@ export const Tooltip = ({ children, ...rest }: TooltipProps) => {
       styles={{
         tooltip: {
           background: 'var(--tooltip-bg)',
+          boxShadow: '4px 4px 10px 0px rgba(0,0,0,0.2)',
           color: 'var(--tooltip-fg)',
         },
       }}
