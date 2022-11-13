@@ -1,4 +1,4 @@
-import { ServerType, TaskType } from '@prisma/client';
+import { ServerPermissionType, ServerType, TaskType } from '@prisma/client';
 import { SortOrder } from '@/types/types';
 import { helpers } from '../helpers';
 import { prisma } from '../lib';
@@ -116,13 +116,7 @@ const findMany = async (user: AuthUser, options?: { enabled?: boolean }) => {
           orderBy: { createdAt: SortOrder.ASC },
           where: { userId: user.id },
         },
-        serverUrls: {
-          include: {
-            userServerUrls: {
-              where: { userId: user.id },
-            },
-          },
-        },
+        serverUrls: true,
       },
       orderBy: { createdAt: SortOrder.ASC },
     });
@@ -133,8 +127,17 @@ const findMany = async (user: AuthUser, options?: { enabled?: boolean }) => {
       serverFolders: {
         orderBy: { name: SortOrder.ASC },
         where: {
-          AND: [
-            { id: { in: user.flatServerFolderPermissions } },
+          OR: [
+            // Show all folders if user has server admin permissions
+            {
+              server: {
+                serverPermissions: {
+                  some: { type: ServerPermissionType.ADMIN, userId: user.id },
+                },
+              },
+            },
+            // If not admin, only show folders the user has permissions for
+            { serverFolderPermissions: { some: { userId: user.id } } },
             { enabled: options?.enabled ? true : undefined },
           ],
         },
@@ -146,7 +149,7 @@ const findMany = async (user: AuthUser, options?: { enabled?: boolean }) => {
       serverUrls: true,
     },
     orderBy: { createdAt: SortOrder.ASC },
-    where: { id: { in: user.flatServerPermissions } },
+    where: { serverPermissions: { some: { userId: user.id } } },
   });
 
   return servers;
