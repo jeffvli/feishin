@@ -36,8 +36,11 @@ export const useUpdateUser = () => {
 
       return { previous };
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries(queryKeys.users.list());
+      queryClient.invalidateQueries(
+        queryKeys.users.detail(variables.query.userId)
+      );
     },
   });
 

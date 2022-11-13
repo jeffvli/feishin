@@ -1,5 +1,5 @@
 import { Group } from '@mantine/core';
-import { openModal } from '@mantine/modals';
+import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   RiLock2Line,
@@ -14,11 +14,13 @@ import {
 } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { queryKeys } from '@/renderer/api/query-keys';
+import { UserDetailResponse } from '@/renderer/api/users.api';
 import { Button, DropdownMenu, Text } from '@/renderer/components';
 import { ServerList, useServerList } from '@/renderer/features/servers';
 import { Settings } from '@/renderer/features/settings';
 import { usePermissions } from '@/renderer/features/shared';
 import { UserList } from '@/renderer/features/users';
+import { EditUserForm } from '@/renderer/features/users/components/edit-user-form';
 import { useAuthStore } from '@/renderer/store';
 
 export const AppMenu = () => {
@@ -30,6 +32,10 @@ export const AppMenu = () => {
   const serverCredentials = useAuthStore((state) => state.serverCredentials);
   const permissions = usePermissions();
   const { data: servers } = useServerList();
+  const userId = useAuthStore((state) => state.permissions.id);
+  const user = queryClient.getQueryData<UserDetailResponse>(
+    queryKeys.users.detail(userId)
+  );
 
   const serverList =
     servers?.data?.map((s) => ({
@@ -50,6 +56,23 @@ export const AppMenu = () => {
       exitTransitionDuration: 300,
       overflow: 'inside',
       title: 'Manage Servers',
+      transition: 'slide-down',
+    });
+  };
+
+  const handleEditProfileModal = () => {
+    openModal({
+      centered: true,
+      children: (
+        <EditUserForm
+          repeatPassword
+          user={user?.data}
+          onCancel={closeAllModals}
+        />
+      ),
+      exitTransitionDuration: 300,
+      overflow: 'inside',
+      title: 'Edit Profile',
       transition: 'slide-down',
     });
   };
@@ -130,7 +153,10 @@ export const AppMenu = () => {
           Settings
         </DropdownMenu.Item>
         <DropdownMenu.Divider />
-        <DropdownMenu.Item rightSection={<RiProfileLine />}>
+        <DropdownMenu.Item
+          rightSection={<RiProfileLine />}
+          onClick={handleEditProfileModal}
+        >
           Edit profile
         </DropdownMenu.Item>
         {permissions.isAdmin && (

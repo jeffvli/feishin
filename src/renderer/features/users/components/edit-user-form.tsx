@@ -13,12 +13,17 @@ import { usePermissions } from '@/renderer/features/shared';
 import { useUpdateUser } from '@/renderer/features/users/mutations/update-user';
 import { randomString } from '@/renderer/utils';
 
-interface AddUserFormProps {
+interface EditUserFormProps {
   onCancel: () => void;
+  repeatPassword?: boolean;
   user?: User;
 }
 
-export const EditUserForm = ({ user, onCancel }: AddUserFormProps) => {
+export const EditUserForm = ({
+  user,
+  onCancel,
+  repeatPassword,
+}: EditUserFormProps) => {
   const permissions = usePermissions();
   const focusTrapRef = useFocusTrap(true);
   const clipboard = useClipboard({ timeout: 1000 });
@@ -28,6 +33,7 @@ export const EditUserForm = ({ user, onCancel }: AddUserFormProps) => {
       displayName: user?.displayName || '',
       isAdmin: user?.isAdmin || false,
       password: '',
+      repeatPassword: '',
       username: user?.username || '',
     },
   });
@@ -39,6 +45,11 @@ export const EditUserForm = ({ user, onCancel }: AddUserFormProps) => {
     toast.info({ message: 'Password copied to clipboard' });
   };
 
+  const isSubmitValid = () => {
+    if (!repeatPassword) return true;
+    return form.values.password === form.values.repeatPassword;
+  };
+
   const updateUserMutation = useUpdateUser();
 
   const handleUpdateUser = form.onSubmit((values) => {
@@ -48,6 +59,7 @@ export const EditUserForm = ({ user, onCancel }: AddUserFormProps) => {
       ...values,
       displayName: values.displayName || undefined,
       password: values.password || undefined,
+      repeatPassword: values.repeatPassword || undefined,
     };
 
     updateUserMutation.mutate(
@@ -82,6 +94,13 @@ export const EditUserForm = ({ user, onCancel }: AddUserFormProps) => {
           {...form.getInputProps('displayName')}
         />
         <PasswordInput label="Password" {...form.getInputProps('password')} />
+        {repeatPassword && (
+          <PasswordInput
+            label="Repeat password"
+            {...form.getInputProps('repeatPassword')}
+          />
+        )}
+
         <Group position="apart">
           {permissions.isAdmin && !user?.isSuperAdmin ? (
             <Group>
@@ -93,14 +112,16 @@ export const EditUserForm = ({ user, onCancel }: AddUserFormProps) => {
           ) : (
             <Group />
           )}
-          <Button
-            compact
-            sx={{ height: '1.5rem' }}
-            variant="subtle"
-            onClick={handleGeneratePassword}
-          >
-            Generate password
-          </Button>
+          {!repeatPassword && (
+            <Button
+              compact
+              sx={{ height: '1.5rem' }}
+              variant="subtle"
+              onClick={handleGeneratePassword}
+            >
+              Generate password
+            </Button>
+          )}
         </Group>
 
         <Group mt={10} position="right">
@@ -108,6 +129,7 @@ export const EditUserForm = ({ user, onCancel }: AddUserFormProps) => {
             Cancel
           </Button>
           <Button
+            disabled={!isSubmitValid()}
             loading={updateUserMutation.isLoading}
             type="submit"
             variant="filled"
@@ -121,5 +143,6 @@ export const EditUserForm = ({ user, onCancel }: AddUserFormProps) => {
 };
 
 EditUserForm.defaultProps = {
+  repeatPassword: false,
   user: undefined,
 };
