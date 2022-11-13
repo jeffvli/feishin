@@ -10,6 +10,7 @@ const StyledTooltip = styled(MantineTooltip)`
 export const Tooltip = ({ children, ...rest }: TooltipProps) => {
   return (
     <StyledTooltip
+      multiline
       withinPortal
       pl={10}
       pr={10}
@@ -20,6 +21,7 @@ export const Tooltip = ({ children, ...rest }: TooltipProps) => {
           background: 'var(--tooltip-bg)',
           boxShadow: '4px 4px 10px 0px rgba(0,0,0,0.2)',
           color: 'var(--tooltip-fg)',
+          maxWidth: '250px',
         },
       }}
       {...rest}
