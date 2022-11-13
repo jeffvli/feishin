@@ -246,7 +246,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                       }
                     />
                     {serverPermission >= ServerPermission.ADMIN && (
-                      <DropdownMenu position="right-start">
+                      <DropdownMenu position="bottom-start">
                         <DropdownMenu.Target>
                           <Button compact variant="subtle">
                             <RiMore2Fill size={15} />
@@ -293,7 +293,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                           )
                         }
                       />
-                      <DropdownMenu position="right-start">
+                      <DropdownMenu position="bottom-start">
                         <DropdownMenu.Target>
                           <Button compact variant="subtle">
                             <RiMore2Fill size={15} />
@@ -319,7 +319,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
               <Button
                 compact
                 mt={10}
-                variant="default"
+                variant="subtle"
                 onClick={() => addCredentialHandlers.open()}
               >
                 Add credential
@@ -351,7 +351,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                         }
                       />
                       {serverPermission >= ServerPermission.EDITOR && (
-                        <DropdownMenu position="right-start">
+                        <DropdownMenu position="bottom-start">
                           <DropdownMenu.Target>
                             <Button compact variant="subtle">
                               <RiMore2Fill size={15} />
@@ -377,10 +377,10 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                 <Button
                   compact
                   mt={10}
-                  variant="default"
+                  variant="subtle"
                   onClick={() => addUrlHandlers.open()}
                 >
-                  Add url
+                  Add URL
                 </Button>
               )}
             </>

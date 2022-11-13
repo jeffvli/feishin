@@ -137,7 +137,7 @@ export const UserList = () => {
               >
                 Edit
               </Button>
-              <DropdownMenu position="right-start">
+              <DropdownMenu position="bottom-start">
                 <DropdownMenu.Target>
                   <Button
                     compact
