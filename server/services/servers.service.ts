@@ -530,11 +530,87 @@ const disableFolderById = async (options: { id: string }) => {
   return null;
 };
 
+const addPermission = async (options: {
+  serverId: string;
+  type: ServerPermissionType;
+  userId: string;
+}) => {
+  const { serverId, userId, type } = options;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw ApiError.notFound('User not found.');
+  }
+
+  const permission = await prisma.serverPermission.create({
+    data: {
+      serverId,
+      type,
+      userId,
+    },
+  });
+
+  return permission;
+};
+
+const deletePermission = async (options: { id: string }) => {
+  await prisma.serverPermission.delete({
+    where: { id: options.id },
+  });
+
+  return null;
+};
+
+const updateServerPermission = async (options: {
+  id: string;
+  type: ServerPermissionType;
+}) => {
+  const { type, id } = options;
+
+  const permission = await prisma.serverPermission.update({
+    data: { type },
+    where: { id },
+  });
+
+  return permission;
+};
+
+const addFolderPermission = async (options: {
+  serverFolderId: string;
+  userId: string;
+}) => {
+  const { serverFolderId, userId } = options;
+
+  const permission = await prisma.serverFolderPermission.create({
+    data: {
+      serverFolderId,
+      userId,
+    },
+  });
+
+  return permission;
+};
+
+const deleteFolderPermission = async (options: { id: string }) => {
+  await prisma.serverFolderPermission.delete({
+    where: { id: options.id },
+  });
+
+  return null;
+};
+
 export const serversService = {
+  addFolderPermission,
+  addPermission,
   create,
   createUrl,
   deleteById,
   deleteFolderById,
+  deleteFolderPermission,
+  deletePermission,
   deleteUrlById,
   disableFolderById,
   disableUrlById,
@@ -550,4 +626,5 @@ export const serversService = {
   refresh,
   remoteServerLogin,
   update,
+  updateServerPermission,
 };

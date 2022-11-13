@@ -1,4 +1,4 @@
-import { ServerType } from '@prisma/client';
+import { ServerPermissionType, ServerType } from '@prisma/client';
 import { z } from 'zod';
 import { idValidation } from './shared.validation';
 
@@ -163,13 +163,76 @@ const disableFolder = {
   query: z.object({}),
 };
 
+const addServerPermission = {
+  body: z.object({
+    type: z.enum([
+      ServerPermissionType.ADMIN,
+      ServerPermissionType.VIEWER,
+      ServerPermissionType.EDITOR,
+    ]),
+    userId: z.string().uuid(),
+  }),
+  params: z.object({
+    ...idValidation('serverId'),
+  }),
+  query: z.object({}),
+};
+
+const updateServerPermission = {
+  body: z.object({
+    type: z.enum([
+      ServerPermissionType.ADMIN,
+      ServerPermissionType.VIEWER,
+      ServerPermissionType.EDITOR,
+    ]),
+  }),
+  params: z.object({
+    ...idValidation('serverId'),
+    ...idValidation('permissionId'),
+  }),
+  query: z.object({}),
+};
+
+const deleteServerPermission = {
+  body: z.object({}),
+  params: z.object({
+    ...idValidation('serverId'),
+  }),
+  query: z.object({}),
+};
+
+const addServerFolderPermission = {
+  body: z.object({
+    userId: z.string().uuid(),
+  }),
+  params: z.object({
+    ...idValidation('serverId'),
+    ...idValidation('folderId'),
+  }),
+  query: z.object({}),
+};
+
+const deleteServerFolderPermission = {
+  body: z.object({}),
+  params: z.object({
+    ...idValidation('serverId'),
+    ...idValidation('folderId'),
+    ...idValidation('folderPermissionId'),
+  }),
+  query: z.object({}),
+};
+
 export const serversValidation = {
+  addServerFolderPermission,
+  addServerPermission,
   create,
   createCredential,
   createUrl,
   deleteCredential,
   deleteFolder,
   deleteServer,
+  deleteServerFolderPermission,
+  deleteServerPermission,
   deleteUrl,
   detail,
   disableCredential,
@@ -183,4 +246,5 @@ export const serversValidation = {
   refresh,
   scan,
   update,
+  updateServerPermission,
 };

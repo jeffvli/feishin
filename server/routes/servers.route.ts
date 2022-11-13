@@ -99,6 +99,25 @@ router
     controller.servers.disableServerUrl
   );
 
+router
+  .route('/:serverId/permissions')
+  .post(
+    authenticateServerAdmin,
+    validateRequest(validation.servers.addServerPermission),
+    controller.servers.addServerPermission
+  );
+
+router
+  .route('/:serverId/permissions/:permissionId')
+  .patch(
+    authenticateServerAdmin,
+    validateRequest(validation.servers.updateServerPermission)
+  )
+  .delete(
+    authenticateServerAdmin,
+    validateRequest(validation.servers.deleteServerPermission)
+  );
+
 router.param('folderId', async (_req, _res, next, folderId) => {
   await service.servers.findFolderById({ id: folderId });
   next();
@@ -127,3 +146,12 @@ router
     validateRequest(validation.servers.disableFolder),
     controller.servers.disableServerFolder
   );
+
+router
+  .route('/:serverId/folder/:folderId/permissions')
+  .post(authenticateServerAdmin);
+
+router
+  .route('/:serverId/folder/:folderId/permissions/:folderPermissionId')
+  .patch(authenticateServerAdmin)
+  .delete(authenticateServerAdmin);

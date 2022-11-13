@@ -259,11 +259,90 @@ const disableServerFolder = async (
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
+const addServerPermission = async (
+  req: TypedRequest<typeof validation.servers.addServerPermission>,
+  res: Response
+) => {
+  const { serverId } = req.params;
+  const { userId, type } = req.body;
+
+  const data = await service.servers.addPermission({
+    serverId,
+    type,
+    userId,
+  });
+
+  const success = ApiSuccess.ok({ data });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const deleteServerPermission = async (
+  req: TypedRequest<typeof validation.servers.deleteServerPermission>,
+  res: Response
+) => {
+  const { permissionId } = req.params;
+
+  await service.servers.deletePermission({
+    id: permissionId,
+  });
+
+  const success = ApiSuccess.noContent({ data: null });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const updateServerPermission = async (
+  req: TypedRequest<typeof validation.servers.updateServerPermission>,
+  res: Response
+) => {
+  const { permissionId } = req.params;
+  const { type } = req.body;
+
+  await service.servers.updateServerPermission({
+    id: permissionId,
+    type,
+  });
+
+  const success = ApiSuccess.noContent({ data: null });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const addServerFolderPermission = async (
+  req: TypedRequest<typeof validation.servers.addServerFolderPermission>,
+  res: Response
+) => {
+  const { folderId } = req.params;
+  const { userId } = req.body;
+
+  const data = await service.servers.addFolderPermission({
+    serverFolderId: folderId,
+    userId,
+  });
+
+  const success = ApiSuccess.ok({ data });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
+const deleteServerFolderPermission = async (
+  req: TypedRequest<typeof validation.servers.deleteServerFolderPermission>,
+  res: Response
+) => {
+  const { permissionId } = req.params;
+
+  await service.servers.deleteFolderPermission({ id: permissionId });
+
+  const success = ApiSuccess.noContent({ data: null });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
+
 export const serversController = {
+  addServerFolderPermission,
+  addServerPermission,
   createServer,
   createServerUrl,
   deleteServer,
   deleteServerFolder,
+  deleteServerFolderPermission,
+  deleteServerPermission,
   deleteServerUrl,
   disableServerFolder,
   disableServerUrl,
@@ -275,4 +354,5 @@ export const serversController = {
   quickScanServer,
   refreshServer,
   updateServer,
+  updateServerPermission,
 };
