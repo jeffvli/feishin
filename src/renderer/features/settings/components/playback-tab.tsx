@@ -187,6 +187,7 @@ export const PlaybackTab = () => {
     {
       control: (
         <Switch
+          aria-label="Toggle global media hotkeys"
           defaultChecked={settings.globalMediaHotkeys}
           disabled={!isElectron()}
           onChange={(e) => {
@@ -241,6 +242,7 @@ export const PlaybackTab = () => {
     {
       control: (
         <Switch
+          aria-label="Toggle skip buttons"
           defaultChecked={settings.skipButtons?.enabled}
           onChange={(e) =>
             update({

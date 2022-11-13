@@ -92,13 +92,8 @@ export const AppMenu = () => {
   return (
     <DropdownMenu withArrow withinPortal position="bottom" width={200}>
       <DropdownMenu.Target>
-        <Button
-          px={5}
-          size="xs"
-          sx={{ color: 'var(--titlebar-fg)' }}
-          variant="subtle"
-        >
-          <RiMenu3Fill size={15} />
+        <Button px={5} size="xs" variant="subtle">
+          <RiMenu3Fill color="var(--titlebar-fg)" size={15} />
         </Button>
       </DropdownMenu.Target>
       <DropdownMenu.Dropdown>
@@ -138,7 +133,7 @@ export const AppMenu = () => {
         <DropdownMenu.Item rightSection={<RiProfileLine />}>
           Edit profile
         </DropdownMenu.Item>
-        {permissions.manageUsers && (
+        {permissions.isAdmin && (
           <DropdownMenu.Item
             rightSection={<RiUserAddLine />}
             onClick={handleManageUsersModal}

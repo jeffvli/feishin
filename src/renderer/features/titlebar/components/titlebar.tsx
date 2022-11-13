@@ -1,11 +1,9 @@
 import { ReactNode } from 'react';
 import { Group } from '@mantine/core';
 import styled from 'styled-components';
-import { Text } from '@/renderer/components';
 import { ActivityMenu } from '@/renderer/features/titlebar/components/activity-menu';
 import { AppMenu } from '@/renderer/features/titlebar/components/app-menu';
 import { useAuthStore } from '@/renderer/store';
-import { Font } from '@/renderer/styles';
 import { WindowControls } from '../../window-controls';
 
 interface TitlebarProps {
@@ -20,6 +18,7 @@ const TitlebarContainer = styled.div`
   justify-content: space-between;
   width: 100%;
   height: 100%;
+  color: var(--titlebar-fg);
 
   button {
     -webkit-app-region: no-drag;
@@ -59,9 +58,7 @@ export const Titlebar = ({ children }: TitlebarProps) => {
     <>
       <TitlebarContainer>
         <Left>
-          <Group>
-            <Text font={Font.POPPINS}>Feishin</Text>
-          </Group>
+          <Group>Feishin</Group>
         </Left>
         <Center />
         <Right>

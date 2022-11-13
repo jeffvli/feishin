@@ -1,11 +1,17 @@
+import React from 'react';
 import { Avatar, Group, Stack } from '@mantine/core';
 import { openContextModal } from '@mantine/modals';
-import { RiAdminLine, RiDeleteBin2Line, RiEdit2Line } from 'react-icons/ri';
+import {
+  RiAdminLine,
+  RiDeleteBin2Line,
+  RiEdit2Line,
+  RiMore2Fill,
+} from 'react-icons/ri';
 import { User } from '@/renderer/api/types';
 import {
   Button,
   ContextModalVars,
-  Popover,
+  DropdownMenu,
   Text,
   toast,
   Tooltip,
@@ -74,75 +80,87 @@ export const UserList = () => {
 
   return (
     <Stack>
-      <Group mb={10} position="right">
-        <Button compact variant="default" onClick={handleAddUserModal}>
+      <Group
+        mb={10}
+        position="right"
+        sx={{
+          position: 'absolute',
+          right: 45,
+          transform: 'translateY(-35px)',
+        }}
+      >
+        <Button
+          autoFocus
+          compact
+          variant="default"
+          onClick={handleAddUserModal}
+        >
           Add user
         </Button>
       </Group>
       {users?.data?.map((u) => (
-        <Group
-          key={u.id}
-          noWrap
-          position="apart"
-          sx={{
-            '&:hover': {
-              background: 'rgba(125, 125, 125, 0.1)',
-            },
-          }}
-        >
-          <Group>
-            <Avatar radius="xl" />
-            <Text overflow="hidden">
-              {u.displayName ? u.displayName : u.username}{' '}
-              {u.isAdmin && (
-                <Tooltip label="Admin">
-                  <span>
-                    <RiAdminLine />
-                  </span>
-                </Tooltip>
-              )}
-            </Text>
-          </Group>
-          <Group>
-            <Button
-              compact
-              disabled={!permissions.isAdmin}
-              leftIcon={<RiEdit2Line />}
-              variant="subtle"
-              onClick={() => handleEditUserModal(u)}
-            >
-              Edit
-            </Button>
-            <Popover position="bottom-start">
-              <Popover.Target>
-                <Button
-                  compact
-                  disabled={!permissions.isAdmin}
-                  variant="subtle"
-                >
-                  <RiDeleteBin2Line color="var(--danger-color)" size={15} />
-                </Button>
-              </Popover.Target>
-              <Popover.Dropdown>
-                <Group>
+        <React.Fragment key={u.id}>
+          <Group
+            noWrap
+            position="apart"
+            sx={{
+              '&:hover': {
+                background: 'rgba(125, 125, 125, 0.1)',
+              },
+            }}
+          >
+            <Group>
+              <Avatar radius="xl" />
+              <Stack spacing="xs">
+                <Text overflow="hidden">
+                  {u.username}
+                  {(u.isSuperAdmin || u.isAdmin) && (
+                    <Tooltip label={u.isSuperAdmin ? 'Super Admin' : 'Admin'}>
+                      <span>
+                        <RiAdminLine />
+                      </span>
+                    </Tooltip>
+                  )}
+                </Text>
+                <Text $secondary size="xs">
+                  {u.displayName}
+                </Text>
+              </Stack>
+            </Group>
+            <Group>
+              <Button
+                compact
+                disabled={!permissions.isAdmin}
+                leftIcon={<RiEdit2Line />}
+                variant="subtle"
+                onClick={() => handleEditUserModal(u)}
+              >
+                Edit
+              </Button>
+              <DropdownMenu position="right-start">
+                <DropdownMenu.Target>
                   <Button
                     compact
-                    uppercase
-                    sx={{
-                      '&:hover': {
-                        background: 'var(--danger-color)',
-                      },
-                      background: 'var(--danger-color)',
-                    }}
+                    disabled={!permissions.isAdmin}
+                    variant="subtle"
+                  >
+                    <RiMore2Fill size={15} />
+                  </Button>
+                </DropdownMenu.Target>
+                <DropdownMenu.Dropdown>
+                  <DropdownMenu.Item
+                    rightSection={
+                      <RiDeleteBin2Line color="var(--danger-color)" />
+                    }
                     onClick={() => handleDeleteUser(u)}
                   >
                     Delete
-                  </Button>
-                </Group>
-              </Popover.Dropdown>
-            </Popover>
+                  </DropdownMenu.Item>
+                </DropdownMenu.Dropdown>
+              </DropdownMenu>
+            </Group>
           </Group>
-        </Group>
+        </React.Fragment>
       ))}
     </Stack>
   );

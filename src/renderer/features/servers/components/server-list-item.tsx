@@ -2,10 +2,16 @@ import { useMemo } from 'react';
 import { Stack, Group, Divider } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
-import { RiDeleteBin2Line, RiEdit2Fill } from 'react-icons/ri';
+import { RiDeleteBin2Line, RiEdit2Fill, RiMore2Fill } from 'react-icons/ri';
 import { queryKeys } from '@/renderer/api/query-keys';
 import { Server, TaskType } from '@/renderer/api/types';
-import { Button, Switch, Text, toast } from '@/renderer/components';
+import {
+  Button,
+  DropdownMenu,
+  Switch,
+  Text,
+  toast,
+} from '@/renderer/components';
 import { AddServerCredentialForm } from '@/renderer/features/servers/components/add-server-credential-form';
 import { AddServerUrlForm } from '@/renderer/features/servers/components/add-server-url-form';
 import { EditServerForm } from '@/renderer/features/servers/components/edit-server-form';
@@ -134,14 +140,26 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
 
   const handleToggleFolder = (folderId: string, enabled: boolean) => {
     if (enabled) {
-      return disableServerFolder.mutate({
-        query: { folderId, serverId: server.id },
-      });
+      return disableServerFolder.mutate(
+        {
+          query: { folderId, serverId: server.id },
+        },
+        {
+          onError: (err) =>
+            toast.error({ message: err?.response?.data?.error.message }),
+        }
+      );
     }
 
-    return enableServerFolder.mutate({
-      query: { folderId, serverId: server.id },
-    });
+    return enableServerFolder.mutate(
+      {
+        query: { folderId, serverId: server.id },
+      },
+      {
+        onError: (err) =>
+          toast.error({ message: err?.response?.data?.error.message }),
+      }
+    );
   };
 
   return (
@@ -228,9 +246,23 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                       }
                     />
                     {serverPermission >= ServerPermission.ADMIN && (
-                      <Button compact variant="subtle">
-                        <RiDeleteBin2Line color="var(--danger-color)" />
-                      </Button>
+                      <DropdownMenu position="right-start">
+                        <DropdownMenu.Target>
+                          <Button compact variant="subtle">
+                            <RiMore2Fill size={15} />
+                          </Button>
+                        </DropdownMenu.Target>
+                        <DropdownMenu.Dropdown>
+                          <DropdownMenu.Item
+                            disabled
+                            rightSection={
+                              <RiDeleteBin2Line color="var(--danger-color)" />
+                            }
+                          >
+                            Delete
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Dropdown>
+                      </DropdownMenu>
                     )}
                   </>
                 </Group>
@@ -261,13 +293,25 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                           )
                         }
                       />
-                      <Button
-                        compact
-                        variant="subtle"
-                        onClick={() => handleDeleteCredential(credential.id)}
-                      >
-                        <RiDeleteBin2Line color="var(--danger-color)" />
-                      </Button>
+                      <DropdownMenu position="right-start">
+                        <DropdownMenu.Target>
+                          <Button compact variant="subtle">
+                            <RiMore2Fill size={15} />
+                          </Button>
+                        </DropdownMenu.Target>
+                        <DropdownMenu.Dropdown>
+                          <DropdownMenu.Item
+                            rightSection={
+                              <RiDeleteBin2Line color="var(--danger-color)" />
+                            }
+                            onClick={() =>
+                              handleDeleteCredential(credential.id)
+                            }
+                          >
+                            Delete
+                          </DropdownMenu.Item>
+                        </DropdownMenu.Dropdown>
+                      </DropdownMenu>
                     </Group>
                   </Group>
                 ))}
@@ -275,7 +319,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
               <Button
                 compact
                 mt={10}
-                variant="subtle"
+                variant="default"
                 onClick={() => addCredentialHandlers.open()}
               >
                 Add credential
@@ -307,13 +351,23 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                         }
                       />
                       {serverPermission >= ServerPermission.EDITOR && (
-                        <Button
-                          compact
-                          variant="subtle"
-                          onClick={() => handleDeleteUrl(serverUrl.id)}
-                        >
-                          <RiDeleteBin2Line color="var(--danger-color)" />
-                        </Button>
+                        <DropdownMenu position="right-start">
+                          <DropdownMenu.Target>
+                            <Button compact variant="subtle">
+                              <RiMore2Fill size={15} />
+                            </Button>
+                          </DropdownMenu.Target>
+                          <DropdownMenu.Dropdown>
+                            <DropdownMenu.Item
+                              rightSection={
+                                <RiDeleteBin2Line color="var(--danger-color)" />
+                              }
+                              onClick={() => handleDeleteUrl(serverUrl.id)}
+                            >
+                              Delete
+                            </DropdownMenu.Item>
+                          </DropdownMenu.Dropdown>
+                        </DropdownMenu>
                       )}
                     </Group>
                   </Group>
@@ -323,7 +377,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                 <Button
                   compact
                   mt={10}
-                  variant="subtle"
+                  variant="default"
                   onClick={() => addUrlHandlers.open()}
                 >
                   Add url
@@ -349,6 +403,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                 <Divider my="xl" />
                 <Button
                   compact
+                  disabled
                   leftIcon={<RiDeleteBin2Line />}
                   size="xs"
                   sx={{

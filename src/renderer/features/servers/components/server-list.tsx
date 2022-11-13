@@ -31,15 +31,25 @@ export const ServerList = () => {
 
   return (
     <>
-      <Group mb={10} position="right">
-        <Button
-          compact
-          disabled={!permissions.createServer}
-          variant="subtle"
-          onClick={handleAddServerModal}
-        >
-          Add server
-        </Button>
+      <Group
+        mb={10}
+        position="right"
+        sx={{
+          position: 'absolute',
+          right: 45,
+          transform: 'translateY(-35px)',
+        }}
+      >
+        {permissions.isAdmin && (
+          <Button
+            autoFocus
+            compact
+            variant="default"
+            onClick={handleAddServerModal}
+          >
+            Add server
+          </Button>
+        )}
       </Group>
       <Accordion variant="separated">
         {servers?.data?.map((s) => (
