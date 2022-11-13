@@ -20,11 +20,19 @@ const checkServerPermissions = (
 
 const checkServerFolderPermissions = (
   user: AuthUser,
-  options: { serverFolderId?: string[] | string }
+  options: { serverFolderId?: string[] | string; serverId: string }
 ) => {
-  const { serverFolderId } = options;
+  const { serverFolderId, serverId } = options;
 
   if (user.isAdmin || !serverFolderId) {
+    return;
+  }
+
+  const isServerAdmin =
+    user.serverPermissions.find((s) => s.serverId === serverId)?.type ===
+    ServerPermissionType.ADMIN;
+
+  if (isServerAdmin) {
     return;
   }
 

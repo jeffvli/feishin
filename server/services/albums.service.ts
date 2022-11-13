@@ -6,8 +6,11 @@ import { AdvancedFilterGroup, AlbumSort } from '@helpers/albums.helpers';
 import { helpers } from '@helpers/index';
 import { prisma } from '@lib/prisma';
 
-const findById = async (user: AuthUser, options: { id: string }) => {
-  const { id } = options;
+const findById = async (
+  user: AuthUser,
+  options: { id: string; serverId: string }
+) => {
+  const { id, serverId } = options;
 
   const album = await prisma.album.findUnique({
     include: helpers.albums.include(user, { songs: true }),
@@ -19,7 +22,10 @@ const findById = async (user: AuthUser, options: { id: string }) => {
   }
 
   const serverFolderId = album.serverFolders.map((s) => s.id);
-  helpers.shared.checkServerFolderPermissions(user, { serverFolderId });
+  helpers.shared.checkServerFolderPermissions(user, {
+    serverFolderId,
+    serverId,
+  });
 
   return album;
 };

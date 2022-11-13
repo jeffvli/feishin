@@ -8,9 +8,12 @@ const getDetail = async (
   req: TypedRequest<typeof validation.albums.detail>,
   res: Response
 ) => {
-  const { albumId } = req.params;
+  const { albumId, serverId } = req.params;
 
-  const album = await service.albums.findById(req.authUser, { id: albumId });
+  const album = await service.albums.findById(req.authUser, {
+    id: albumId,
+    serverId,
+  });
 
   const success = ApiSuccess.ok({
     data: toApiModel.albums({ items: [album], user: req.authUser })[0],
