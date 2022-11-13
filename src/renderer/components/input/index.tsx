@@ -112,6 +112,19 @@ const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
 `;
 
 const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
+  & .mantine-FileInput-input {
+    color: var(--input-fg);
+    background: var(--input-bg);
+
+    &::placeholder {
+      color: var(--input-placeholder-fg);
+    }
+  }
+
+  & .mantine-FileInput-icon {
+    color: var(--input-placeholder-fg);
+  }
+
   & .mantine-FileInput-required {
     color: var(--secondary-color);
   }
