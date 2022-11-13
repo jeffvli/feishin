@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Divider, Group, SelectItem, Stack } from '@mantine/core';
 import isElectron from 'is-electron';
 import {
+  FileInput,
   NumberInput,
   SegmentedControl,
   Select,
@@ -12,6 +13,10 @@ import {
 } from '@/renderer/components';
 import { mpvPlayer } from '@/renderer/features/player/utils/mpv-player';
 import { SettingsOptions } from '@/renderer/features/settings/components/settings-option';
+import {
+  getLocalSetting,
+  setLocalSetting,
+} from '@/renderer/features/settings/utils/local-settings';
 import { usePlayerStore } from '@/renderer/store';
 import { useSettingsStore } from '@/renderer/store/settings.store';
 import {
@@ -40,6 +45,21 @@ export const PlaybackTab = () => {
   const update = useSettingsStore((state) => state.setSettings);
   const status = usePlayerStore((state) => state.current.status);
   const [audioDevices, setAudioDevices] = useState<SelectItem[]>([]);
+  const [mpvPath, setMpvPath] = useState('');
+
+  const handleSetMpvPath = (e: File) => {
+    setLocalSetting('mpv_path', e.path);
+  };
+
+  useEffect(() => {
+    const getMpvPath = async () => {
+      if (!isElectron()) return setMpvPath('');
+      const mpvPath = await getLocalSetting('mpv_path');
+      return setMpvPath(mpvPath);
+    };
+
+    getMpvPath();
+  }, []);
 
   useEffect(() => {
     const getAudioDevices = () => {
@@ -86,6 +106,19 @@ export const PlaybackTab = () => {
     },
     {
       control: (
+        <FileInput
+          placeholder={mpvPath}
+          width={225}
+          onChange={handleSetMpvPath}
+        />
+      ),
+      description: 'The location of your MPV executable',
+      isHidden: settings.type !== PlaybackType.LOCAL,
+      note: 'Restart required',
+      title: 'MPV executable path',
+    },
+    {
+      control: (
         <Select
           clearable
           data={audioDevices}
@@ -97,7 +130,7 @@ export const PlaybackTab = () => {
         />
       ),
       description: 'The audio device to use for playback (web player only)',
-      isHidden: !isElectron(),
+      isHidden: !isElectron() || settings.type !== PlaybackType.WEB,
       title: 'Audio device',
     },
     {
@@ -118,7 +151,7 @@ export const PlaybackTab = () => {
         />
       ),
       description: 'Adjust the playback style (web player only)',
-      isHidden: false,
+      isHidden: settings.type !== PlaybackType.WEB,
       note:
         status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
       title: 'Playback style',
@@ -141,7 +174,7 @@ export const PlaybackTab = () => {
         />
       ),
       description: 'Adjust the crossfade duration (web player only)',
-      isHidden: false,
+      isHidden: settings.type !== PlaybackType.WEB,
       note:
         status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
       title: 'Crossfade Duration',
@@ -179,7 +212,7 @@ export const PlaybackTab = () => {
         />
       ),
       description: 'Change the crossfade algorithm (web player only)',
-      isHidden: false,
+      isHidden: settings.type !== PlaybackType.WEB,
       note:
         status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
       title: 'Crossfade Style',
