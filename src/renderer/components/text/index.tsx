@@ -4,6 +4,7 @@ import {
   Text as MantineText,
   TextProps as MantineTextProps,
 } from '@mantine/core';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Font, textEllipsis } from '@/renderer/styles';
 
@@ -24,7 +25,7 @@ const BaseText = styled(MantineText)<TextProps>`
   color: ${(props) =>
     props.$secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)'};
   font-family: ${(props) => props.font};
-  cursor: default;
+  cursor: ${(props) => (props.$link ? 'cursor' : 'default')};
   user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
   ${(props) => props.overflow === 'hidden' && textEllipsis}
 
@@ -45,6 +46,7 @@ export const _Text = ({
 }: TextProps) => {
   return (
     <StyledText
+      $link={rest.component === Link}
       $noSelect={$noSelect}
       $secondary={$secondary}
       font={font}
