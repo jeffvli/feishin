@@ -11,7 +11,7 @@ export const ErrorFallback = ({ error, resetErrorBoundary }: any) => {
   return (
     <Container>
       <Center sx={{ height: '100vh' }}>
-        <Stack>
+        <Stack sx={{ maxWidth: '50%' }}>
           <Group spacing="xs">
             <RiErrorWarningLine color="var(--danger-color)" size={30} />
             <Text size="lg">Something went wrong</Text>
