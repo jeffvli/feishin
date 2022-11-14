@@ -138,7 +138,10 @@ const findMany = async (user: AuthUser, options?: { enabled?: boolean }) => {
             },
             // If not admin, only show folders the user has permissions for
             { serverFolderPermissions: { some: { userId: user.id } } },
-            { enabled: options?.enabled ? true : undefined },
+            {
+              enabled: options?.enabled ? true : undefined,
+              serverFolderPermissions: { some: { userId: user.id } },
+            },
           ],
         },
       },

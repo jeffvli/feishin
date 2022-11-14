@@ -111,11 +111,13 @@ router
   .route('/:serverId/permissions/:permissionId')
   .patch(
     authenticateServerAdmin,
-    validateRequest(validation.servers.updateServerPermission)
+    validateRequest(validation.servers.updateServerPermission),
+    controller.servers.updateServerPermission
   )
   .delete(
     authenticateServerAdmin,
-    validateRequest(validation.servers.deleteServerPermission)
+    validateRequest(validation.servers.deleteServerPermission),
+    controller.servers.deleteServerPermission
   );
 
 router.param('folderId', async (_req, _res, next, folderId) => {
@@ -149,9 +151,11 @@ router
 
 router
   .route('/:serverId/folder/:folderId/permissions')
-  .post(authenticateServerAdmin);
+  .post(authenticateServerAdmin, controller.servers.addServerFolderPermission);
 
 router
   .route('/:serverId/folder/:folderId/permissions/:folderPermissionId')
-  .patch(authenticateServerAdmin)
-  .delete(authenticateServerAdmin);
+  .delete(
+    authenticateServerAdmin,
+    controller.servers.deleteServerFolderPermission
+  );

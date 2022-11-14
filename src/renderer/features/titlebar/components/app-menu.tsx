@@ -72,6 +72,7 @@ export const AppMenu = () => {
       ),
       exitTransitionDuration: 300,
       overflow: 'inside',
+      size: 'lg',
       title: 'Edit Profile',
       transition: 'slide-down',
     });
@@ -159,7 +160,7 @@ export const AppMenu = () => {
         >
           Edit profile
         </DropdownMenu.Item>
-        {permissions.isAdmin && (
+        {(permissions.isAdmin || permissions.isMusicServerAdmin) && (
           <DropdownMenu.Item
             rightSection={<RiUserAddLine />}
             onClick={handleManageUsersModal}

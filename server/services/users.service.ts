@@ -11,9 +11,10 @@ import { SortOrder } from '../types/types';
 const findById = async (user: AuthUser, options: { id: string }) => {
   const { id } = options;
 
-  if (!user.isAdmin && user.id !== id) {
-    throw ApiError.forbidden();
-  }
+  // Possibly restrict detail later if additional sensitive user data is added
+  // if (!user.isAdmin && user.id !== id) {
+  //   throw ApiError.forbidden();
+  // }
 
   const uniqueUser = await prisma.user.findUnique({
     include: {
@@ -33,9 +34,14 @@ const findById = async (user: AuthUser, options: { id: string }) => {
 
 const findMany = async () => {
   const users = await prisma.user.findMany({
-    include: { files: true },
+    include: {
+      files: true,
+      serverFolderPermissions: true,
+      serverPermissions: true,
+    },
     orderBy: [{ isAdmin: SortOrder.DESC }, { username: SortOrder.ASC }],
   });
+
   return users;
 };
 

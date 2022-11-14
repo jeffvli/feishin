@@ -194,7 +194,7 @@ const deleteServerUrl = async (
     id: urlId,
   });
 
-  const success = ApiSuccess.noContent({ data: null });
+  const success = ApiSuccess.ok({ data: null });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
@@ -209,7 +209,7 @@ const enableServerUrl = async (
     serverId,
   });
 
-  const success = ApiSuccess.noContent({ data: null });
+  const success = ApiSuccess.ok({ data: null });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
@@ -219,7 +219,7 @@ const disableServerUrl = async (
 ) => {
   await service.servers.disableUrlById(req.authUser);
 
-  const success = ApiSuccess.noContent({ data: null });
+  const success = ApiSuccess.ok({ data: null });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
@@ -231,7 +231,7 @@ const deleteServerFolder = async (
 
   await service.servers.deleteFolderById({ id: folderId });
 
-  const success = ApiSuccess.noContent({ data: null });
+  const success = ApiSuccess.ok({ data: null });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
@@ -243,7 +243,7 @@ const enableServerFolder = async (
 
   await service.servers.enableFolderById({ id: folderId });
 
-  const success = ApiSuccess.noContent({ data: null });
+  const success = ApiSuccess.ok({ data: null });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
@@ -255,7 +255,7 @@ const disableServerFolder = async (
 
   await service.servers.disableFolderById({ id: folderId });
 
-  const success = ApiSuccess.noContent({ data: null });
+  const success = ApiSuccess.ok({ data: null });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
@@ -286,7 +286,7 @@ const deleteServerPermission = async (
     id: permissionId,
   });
 
-  const success = ApiSuccess.noContent({ data: null });
+  const success = ApiSuccess.ok({ data: null });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
@@ -302,7 +302,7 @@ const updateServerPermission = async (
     type,
   });
 
-  const success = ApiSuccess.noContent({ data: null });
+  const success = ApiSuccess.ok({ data: null });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 
@@ -326,11 +326,11 @@ const deleteServerFolderPermission = async (
   req: TypedRequest<typeof validation.servers.deleteServerFolderPermission>,
   res: Response
 ) => {
-  const { permissionId } = req.params;
+  const { folderPermissionId } = req.params;
 
-  await service.servers.deleteFolderPermission({ id: permissionId });
+  await service.servers.deleteFolderPermission({ id: folderPermissionId });
 
-  const success = ApiSuccess.noContent({ data: null });
+  const success = ApiSuccess.ok({ data: null });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };
 

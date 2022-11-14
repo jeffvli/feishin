@@ -47,9 +47,15 @@ export const usePermissions = () => {
           : -1;
     });
 
+    const isMusicServerAdmin = Object.keys(serverPermissions).some((key) => {
+      return serverPermissions[key] === ServerPermission.ADMIN;
+    });
+
     return {
       isAdmin: permissions.isAdmin || permissions.isSuperAdmin,
+      isMusicServerAdmin,
       isSuperAdmin: permissions.isSuperAdmin,
+      userId,
       ...serverPermissions,
     };
   }, [
@@ -57,6 +63,7 @@ export const usePermissions = () => {
     permissions.isSuperAdmin,
     servers?.data,
     user?.data?.serverPermissions,
+    userId,
   ]);
 
   return permissionSet;

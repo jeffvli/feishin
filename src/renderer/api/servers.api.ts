@@ -2,6 +2,7 @@ import {
   BaseResponse,
   NullResponse,
   Server,
+  ServerPermissionType,
   ServerType,
   ServerUrl,
 } from '@/renderer/api/types';
@@ -145,10 +146,91 @@ const fullScan = async (options: {
   return data;
 };
 
+export type CreateServerPermissionBody = {
+  type: ServerPermissionType;
+  userId: string;
+};
+
+const createServerPermission = async (
+  query: { serverId: string },
+  body: CreateServerPermissionBody
+) => {
+  const { data } = await ax.post<NullResponse>(
+    `/servers/${query.serverId}/permissions`,
+    body
+  );
+  return data;
+};
+
+const deleteServerPermission = async (query: {
+  permissionId: string;
+  serverId: string;
+}) => {
+  const { data } = await ax.delete<NullResponse>(
+    `/servers/${query.serverId}/permissions/${query.permissionId}`
+  );
+
+  return data;
+};
+
+export type UpdateServerPermissionBody = {
+  type: ServerPermissionType;
+};
+
+const updateServerPermission = async (
+  query: {
+    permissionId: string;
+    serverId: string;
+  },
+  body: UpdateServerPermissionBody
+) => {
+  const { data } = await ax.patch<NullResponse>(
+    `/servers/${query.serverId}/permissions/${query.permissionId}`,
+    body
+  );
+
+  return data;
+};
+
+export type CreateServerFolderPermissionBody = {
+  userId: string;
+};
+
+const createServerFolderPermission = async (
+  query: {
+    folderId: string;
+    serverId: string;
+  },
+  body: CreateServerFolderPermissionBody
+) => {
+  const { data } = await ax.post<NullResponse>(
+    `/servers/${query.serverId}/folder/${query.folderId}/permissions`,
+    body
+  );
+
+  return data;
+};
+
+const deleteServerFolderPermission = async (query: {
+  folderId: string;
+  folderPermissionId: string;
+  serverId: string;
+}) => {
+  const { data } = await ax.delete<NullResponse>(
+    `/servers/${query.serverId}/folder/${query.folderId}/permissions/${query.folderPermissionId}`
+  );
+
+  return data;
+};
+
 export const serversApi = {
   createServer,
+  createServerFolderPermission,
+  createServerPermission,
   createUrl,
   deleteServer,
+  deleteServerFolderPermission,
+  deleteServerPermission,
   deleteUrl,
   disableFolder,
   disableUrl,
@@ -158,4 +240,5 @@ export const serversApi = {
   getServerList,
   quickScan,
   updateServer,
+  updateServerPermission,
 };

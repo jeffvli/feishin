@@ -13,11 +13,7 @@ export const router: Router = express.Router({ mergeParams: true });
 
 router
   .route('/')
-  .get(
-    authenticateAdmin,
-    validateRequest(validation.users.list),
-    controller.users.getUserList
-  )
+  .get(validateRequest(validation.users.list), controller.users.getUserList)
   .post(
     authenticateAdmin,
     validateRequest(validation.users.createUser),

@@ -19,6 +19,7 @@ import {
 import { usePermissions } from '@/renderer/features/shared';
 import { AddUserForm } from '@/renderer/features/users/components/add-user-form';
 import { EditUserForm } from '@/renderer/features/users/components/edit-user-form';
+import { EditUserPermissionsForm } from '@/renderer/features/users/components/edit-user-permissions-form';
 import { useDeleteUser } from '../mutations/delete-user';
 import { useUserList } from '../queries/get-user-list';
 
@@ -57,7 +58,7 @@ export const UserList = () => {
       modal: 'base',
       overflow: 'inside',
       size: 'lg',
-      title: `Edit User`,
+      title: `Edit User (${user.username})`,
       transition: 'slide-down',
     });
   };
@@ -77,6 +78,25 @@ export const UserList = () => {
           }),
       }
     );
+  };
+
+  const handleEdituserPermissionsModal = (user: User) => {
+    openContextModal({
+      centered: true,
+      exitTransitionDuration: 300,
+      innerProps: {
+        modalBody: (vars: ContextModalVars) => (
+          <EditUserPermissionsForm
+            userId={user.id}
+            onCancel={() => vars.context.closeModal(vars.id)}
+          />
+        ),
+      },
+      modal: 'base',
+      overflow: 'inside',
+      title: `Edit Permissions (${user.username})`,
+      transition: 'slide-down',
+    });
   };
 
   return (
@@ -103,41 +123,50 @@ export const UserList = () => {
         <React.Fragment key={u.id}>
           <Group
             noWrap
+            p={5}
             position="apart"
             sx={{
               '&:hover': {
                 background: 'rgba(125, 125, 125, 0.1)',
               },
+              transition: 'background 0.2s ease',
             }}
           >
-            <Group>
+            <Group noWrap>
               <Avatar radius="xl" src={u.avatarUrl} />
               <Stack spacing="xs">
-                <Text overflow="hidden">
-                  {u.username}
+                <Text overflow="hidden" sx={{ maxWidth: '15rem' }}>
                   {(u.isSuperAdmin || u.isAdmin) && (
                     <Tooltip label={u.isSuperAdmin ? 'Super Admin' : 'Admin'}>
-                      <span>
+                      <span style={{ marginRight: '.5rem' }}>
                         <RiAdminLine />
                       </span>
                     </Tooltip>
                   )}
+                  {u.username}
                 </Text>
-                <Text $secondary size="xs">
+                <Text
+                  $secondary
+                  overflow="hidden"
+                  size="xs"
+                  sx={{ maxWidth: '15rem' }}
+                >
                   {u.displayName}
                 </Text>
               </Stack>
             </Group>
-            <Group>
-              <Button
-                compact
-                disabled={!permissions.isAdmin}
-                leftIcon={<RiEdit2Line />}
-                variant="subtle"
-                onClick={() => handleEditUserModal(u)}
-              >
-                Edit
-              </Button>
+            <Group noWrap>
+              {!u.isAdmin && (
+                <Button
+                  compact
+                  disabled={u.isAdmin}
+                  leftIcon={<RiEdit2Line />}
+                  variant="subtle"
+                  onClick={() => handleEdituserPermissionsModal(u)}
+                >
+                  Permissions
+                </Button>
+              )}
               <DropdownMenu position="bottom-start">
                 <DropdownMenu.Target>
                   <Button
@@ -149,6 +178,12 @@ export const UserList = () => {
                   </Button>
                 </DropdownMenu.Target>
                 <DropdownMenu.Dropdown>
+                  <DropdownMenu.Item
+                    rightSection={<RiEdit2Line />}
+                    onClick={() => handleEditUserModal(u)}
+                  >
+                    Edit profile
+                  </DropdownMenu.Item>
                   <DropdownMenu.Item
                     rightSection={
                       <RiDeleteBin2Line color="var(--danger-color)" />
