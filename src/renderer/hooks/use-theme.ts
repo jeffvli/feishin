@@ -3,8 +3,8 @@ import { useSettingsStore } from '@/renderer/store/settings.store';
 import { AppTheme } from '@/renderer/themes/types';
 
 export const THEME_DATA = [
-  { label: 'Default dark', type: 'dark', value: AppTheme.DEFAULT_DARK },
-  { label: 'Default light', type: 'light', value: AppTheme.DEFAULT_LIGHT },
+  { label: 'Default Dark', type: 'dark', value: AppTheme.DEFAULT_DARK },
+  { label: 'Default Light', type: 'light', value: AppTheme.DEFAULT_LIGHT },
 ];
 
 export const useTheme = () => {

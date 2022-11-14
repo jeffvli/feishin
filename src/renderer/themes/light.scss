@@ -27,7 +27,7 @@ body[data-theme='defaultLight'] {
   --playerbar-btn-fg-hover: #000;
   --playerbar-btn-bg: transparent;
   --playerbar-btn-bg-hover: transparent;
-  --playerbar-border-top: 1px rgba(50, 50, 50, 0.7) solid;
+  --playerbar-border-top: 1px rgba(200, 200, 200, 0.7) solid;
   --playerbar-slider-track-bg: rgba(50, 50, 50, 0.2);
   --playerbar-slider-track-progress-bg: rgb(50, 50, 50);
 
@@ -35,22 +35,22 @@ body[data-theme='defaultLight'] {
   --tooltip-fg: rgb(0, 0, 0);
 
   --scrollbar-track-bg: rgba(0, 0, 0, 0.2);
-  --scrollbar-thumb-bg: #5a5a5a;
+  --scrollbar-thumb-bg: rgb(150, 150, 150);
 
   --btn-primary-bg: var(--primary-color);
   --btn-primary-bg-hover: rgb(47, 122, 237);
   --btn-primary-fg: #ffffff;
   --btn-primary-fg-hover: #ffffff;
 
-  --btn-default-bg: rgb(180, 180, 180);
-  --btn-default-bg-hover: rgb(150, 150, 150);
-  --btn-default-fg: rgb(80, 80, 80);
-  --btn-default-fg-hover: rgb(0, 0, 0);
+  --btn-default-bg: rgb(220, 220, 220);
+  --btn-default-bg-hover: rgb(210, 210, 210);
+  --btn-default-fg: rgb(50, 50, 50);
+  --btn-default-fg-hover: rgb(50, 50, 50);
 
   --btn-subtle-bg: transparent;
   --btn-subtle-bg-hover: rgba(100, 100, 100, 0.1);
   --btn-subtle-fg: rgb(60, 60, 60);
-  --btn-subtle-fg-hover: rgb(50, 50, 50);
+  --btn-subtle-fg-hover: rgb(30, 30, 30);
 
   --input-bg: rgb(235, 237, 239);
   --input-fg: rgb(0, 0, 0);
