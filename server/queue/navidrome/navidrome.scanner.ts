@@ -389,10 +389,10 @@ const scanAll = async (
       });
 
       for (const serverFolder of serverFolders) {
-        // await scanGenres(server, task);
-        // await scanAlbumArtists(server, serverFolder, task);
+        await scanGenres(server, task);
+        await scanAlbumArtists(server, serverFolder, task);
         await scanAlbums(server, serverFolder, task);
-        // await scanSongs(server, serverFolder, task);
+        await scanSongs(server, serverFolder, task);
 
         await prisma.serverFolder.update({
           data: { lastScannedAt: new Date() },
