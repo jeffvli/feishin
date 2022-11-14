@@ -56,6 +56,7 @@ export const UserList = () => {
       },
       modal: 'base',
       overflow: 'inside',
+      size: 'lg',
       title: `Edit User`,
       transition: 'slide-down',
     });
@@ -110,7 +111,7 @@ export const UserList = () => {
             }}
           >
             <Group>
-              <Avatar radius="xl" />
+              <Avatar radius="xl" src={u.avatarUrl} />
               <Stack spacing="xs">
                 <Text overflow="hidden">
                   {u.username}

@@ -17,8 +17,10 @@ const PORT = 9321;
 
 const app = express();
 const staticPath = path.join(__dirname, '../feishin-client/');
+const filesPath = path.join(__dirname, './files/');
 
 app.use(express.static(staticPath));
+app.use('/files', express.static(filesPath));
 app.use(
   cors({
     credentials: false,

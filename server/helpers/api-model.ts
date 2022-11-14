@@ -7,6 +7,8 @@ import {
   Artist,
   ArtistRating,
   External,
+  File,
+  FileType,
   Genre,
   Image,
   ImageType,
@@ -585,9 +587,21 @@ const relatedServerPermissions = (items: ServerPermission[]) => {
   });
 };
 
+const relatedFile = (item: File) => {
+  return {
+    /* eslint-disable sort-keys-fix/sort-keys-fix */
+    id: item.id,
+    name: item.fileName,
+    path: item.path,
+    type: item.type,
+    /* eslint-enable sort-keys-fix/sort-keys-fix */
+  };
+};
+
 const users = (
   items: (User & {
     accessToken?: string;
+    files?: File[];
     refreshToken?: string;
     serverFolderPermissions?: ServerFolderPermission[];
     serverPermissions?: ServerPermission[];
@@ -595,11 +609,14 @@ const users = (
 ) => {
   return (
     items.map((item) => {
+      const avatar = item.files?.find((f) => f.type === FileType.USER);
+
       return {
         /* eslint-disable sort-keys-fix/sort-keys-fix */
         id: item.id,
         username: item.username,
         displayName: item.displayName,
+        avatar: avatar ? relatedFile(avatar) : null,
         accessToken: item.accessToken,
         refreshToken: item.refreshToken,
         enabled: item.enabled,

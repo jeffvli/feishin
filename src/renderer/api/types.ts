@@ -134,7 +134,16 @@ export type RelatedServerPermission = {
   type: ServerPermissionType;
 };
 
+export type ServerFile = {
+  id: string;
+  mimetype: string;
+  name: string;
+  path: string;
+  type: string;
+};
+
 export type User = {
+  avatar: ServerFile | null;
   createdAt: string;
   displayName?: string;
   enabled: boolean;

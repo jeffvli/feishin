@@ -35,7 +35,11 @@ const updateUser = async (
   res: Response
 ) => {
   const { userId } = req.params;
-  const user = await service.users.updateUser({ userId }, req.body);
+
+  const user = await service.users.updateUser(
+    { userId },
+    { ...req.body, image: req.file }
+  );
   const success = ApiSuccess.ok({ data: toApiModel.users([user])[0] });
   return res.status(success.statusCode).json(getSuccessResponse(success));
 };

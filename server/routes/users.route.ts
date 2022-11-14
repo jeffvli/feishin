@@ -1,10 +1,13 @@
 import express, { Router } from 'express';
+import multer from 'multer';
 import { controller } from '@controllers/index';
 import { service } from '@services/index';
 import { ApiError } from '@utils/index';
 import { validation } from '@validations/index';
 import { validateRequest } from '@validations/shared.validation';
 import { authenticateAdmin } from '../middleware/authenticate-admin';
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 export const router: Router = express.Router({ mergeParams: true });
 
@@ -41,6 +44,7 @@ router
   .get(validateRequest(validation.users.detail), controller.users.getUserDetail)
   .patch(
     validateRequest(validation.users.updateUser),
+    upload.single('image'),
     controller.users.updateUser
   )
   .delete(

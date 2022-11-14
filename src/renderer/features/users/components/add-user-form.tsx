@@ -63,7 +63,7 @@ export const AddUserForm = ({ onCancel }: AddUserFormProps) => {
 
   return (
     <form onSubmit={handleAddUser}>
-      <Stack ref={focusTrapRef}>
+      <Stack ref={focusTrapRef} m={5}>
         <TextInput
           data-autofocus
           required

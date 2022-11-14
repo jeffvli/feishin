@@ -48,6 +48,13 @@ enum TaskType {
   LASTFM
 }
 
+enum FileType {
+  ALBUM
+  SONG
+  AUDIO
+  USER
+}
+
 model RefreshToken {
   id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   token String @unique
@@ -74,6 +81,7 @@ model User {
   albumRatings       AlbumRating[]
   songRatings        SongRating[]
   refreshTokens      RefreshToken[]
+  files              File[]
 
   serverFolderPermissions ServerFolderPermission[]
   serverPermissions       ServerPermission[]
@@ -83,6 +91,22 @@ model User {
   songFavorites           SongFavorite[]
   userServerUrls          UserServerUrl[]
   tasks                   Task[]
+}
+
+model File {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  path         String   @unique
+  originalName String
+  fileName     String   @unique
+  size         Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  type         FileType
+
+  User   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @db.Uuid
+
+  @@unique(fields: [userId, type], name: "uniqueFileId")
 }
 
 model History {
