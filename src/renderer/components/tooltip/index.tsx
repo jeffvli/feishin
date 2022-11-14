@@ -21,6 +21,8 @@ export const Tooltip = ({ children, ...rest }: TooltipProps) => {
           background: 'var(--tooltip-bg)',
           boxShadow: '4px 4px 10px 0px rgba(0,0,0,0.2)',
           color: 'var(--tooltip-fg)',
+          fontSize: '1.1rem',
+          fontWeight: 550,
           maxWidth: '250px',
         },
       }}

@@ -17,3 +17,4 @@ export * from './paper';
 export * from './tabs';
 export * from './slider';
 export * from './accordion';
+export * from './dropzone';

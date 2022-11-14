@@ -101,6 +101,33 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     }};
   }
 
+  &:focus-visible {
+    color: ${(props) => {
+      switch (props.variant) {
+        case 'default':
+          return 'var(--btn-default-fg-hover)';
+        case 'filled':
+          return 'var(--btn-primary-fg-hover)';
+        case 'subtle':
+          return 'var(--btn-subtle-fg-hover)';
+        default:
+          return '';
+      }
+    }};
+    background: ${(props) => {
+      switch (props.variant) {
+        case 'default':
+          return 'var(--btn-default-bg-hover)';
+        case 'filled':
+          return 'var(--btn-primary-bg-hover)';
+        case 'subtle':
+          return 'var(--btn-subtle-bg-hover)';
+        default:
+          return '';
+      }
+    }};
+  }
+
   &:active {
     transform: scale(0.98);
   }
