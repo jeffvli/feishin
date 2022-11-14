@@ -175,7 +175,7 @@ export const PosterCard = ({
             <ImageSection style={{ height: `${itemWidth}px` }}>
               {data?.imageUrl ? (
                 <Image
-                  animationDuration={0.5}
+                  animationDuration={0.2}
                   height={itemWidth}
                   placeholder="var(--card-default-bg)"
                   src={data?.imageUrl}
