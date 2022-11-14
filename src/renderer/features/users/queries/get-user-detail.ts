@@ -9,10 +9,8 @@ export const useUserDetail = (
   options?: QueryOptions<UserDetailResponse>
 ) => {
   const query = useQuery({
-    cacheTime: Infinity,
     queryFn: () => api.users.getUserDetail({ userId: q.userId }),
     queryKey: queryKeys.users.detail(q.userId),
-    staleTime: 1000 * 60 * 60 * 24,
     ...options,
   });
 

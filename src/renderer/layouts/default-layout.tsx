@@ -107,6 +107,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   useUserDetail(
     { userId },
     {
+      cacheTime: Infinity,
       onSuccess: (res) => {
         const props = {
           permissions: {
@@ -119,6 +120,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
 
         login(props);
       },
+      staleTime: 1000 * 60 * 60 * 8,
     }
   );
 
