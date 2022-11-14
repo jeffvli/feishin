@@ -46,7 +46,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         );
       })}
     >
-      <Stack ref={focusTrapRef}>
+      <Stack ref={focusTrapRef} m={5}>
         <SegmentedControl data={SERVER_TYPES} {...form.getInputProps('type')} />
         <TextInput
           data-autofocus
