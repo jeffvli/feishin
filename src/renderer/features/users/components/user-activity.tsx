@@ -15,7 +15,6 @@ import { useAuthStore, usePlayerStore } from '@/renderer/store';
 import { PlayerStatus } from '@/renderer/types';
 
 const UserActivityContainer = styled(motion.div)`
-  min-height: 10rem;
   overflow-x: hidden;
 `;
 
@@ -28,6 +27,7 @@ type UserConnectionEvent = {
 
 type SongChangeEvent = {
   song: Activity['song'];
+  status: Activity['status'];
   user: UserConnectionEvent;
 };
 
@@ -155,7 +155,7 @@ export const UserActivity = () => {
             ...user.activity,
             socketId: data.user.socketId,
             song: data.song,
-            status: shouldUpdateStatus ? 'playing' : user?.activity?.status,
+            status: shouldUpdateStatus ? data.status : user?.activity?.status,
           },
         },
       ]);
@@ -163,12 +163,9 @@ export const UserActivity = () => {
   }, []);
 
   const handleUserStatusChange = useCallback((data: PlayStatusChangeEvent) => {
-    console.log('data', data);
     setActivityList((prev) => {
       const user = prev.find((user) => user.id === data.user.userId);
       if (!user) return prev;
-
-      console.log('data.status', data.status);
 
       return sortByName([
         ...prev.filter((user) => user.id !== data.user.userId),
@@ -200,6 +197,7 @@ export const UserActivity = () => {
 
       socket.emit('user:send:change_song', {
         song: currentSongDetails,
+        status: playStatus,
         user: userDetails,
       });
     }
