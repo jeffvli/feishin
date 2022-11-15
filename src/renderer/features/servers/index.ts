@@ -2,6 +2,7 @@ export * from './mutations/use-create-server';
 export * from './components/add-server-form';
 export * from './components/server-list';
 export * from './queries/use-server-list';
+export * from './queries/get-server-map';
 export * from './mutations/create-server-folder-permission';
 export * from './mutations/delete-server-folder-permission';
 export * from './mutations/update-server-permission';
