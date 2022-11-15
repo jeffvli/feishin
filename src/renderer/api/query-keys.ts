@@ -18,6 +18,7 @@ export const queryKeys = {
   },
   servers: {
     list: (params?: any) => ['servers', 'list', params] as const,
+    map: () => ['servers', 'map'] as const,
     root: ['servers'],
   },
   tasks: {

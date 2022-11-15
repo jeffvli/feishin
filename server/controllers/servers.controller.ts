@@ -1,9 +1,15 @@
 import { ServerType } from '@prisma/client';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ApiError, ApiSuccess, getSuccessResponse } from '@/utils';
 import { toApiModel } from '@helpers/api-model';
 import { service } from '@services/index';
 import { TypedRequest, validation } from '@validations/index';
+
+const getServerListMap = async (req: Request, res: Response) => {
+  const data = await service.servers.getServerListMap();
+  const success = ApiSuccess.ok({ data });
+  return res.status(success.statusCode).json(getSuccessResponse(success));
+};
 
 const getServerDetail = async (
   req: TypedRequest<typeof validation.servers.detail>,
@@ -351,6 +357,7 @@ export const serversController = {
   fullScanServer,
   getServerDetail,
   getServerList,
+  getServerListMap,
   quickScanServer,
   refreshServer,
   updateServer,

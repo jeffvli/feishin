@@ -76,6 +76,18 @@ const remoteServerLogin = async (options: {
   throw ApiError.badRequest('Server type invalid.');
 };
 
+const getServerListMap = async () => {
+  const servers = await prisma.server.findMany({});
+
+  return servers.reduce((acc, server) => {
+    acc[server.id] = {
+      name: server.name,
+      type: server.type,
+    };
+    return acc;
+  }, {} as Record<string, { name: string; type: string }>);
+};
+
 const findById = async (user: AuthUser, options: { id: string }) => {
   const { id } = options;
 
@@ -626,6 +638,7 @@ export const serversService = {
   findServerUrlById,
   findUrlById,
   fullScan,
+  getServerListMap,
   refresh,
   remoteServerLogin,
   update,

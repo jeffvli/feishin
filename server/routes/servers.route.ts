@@ -21,6 +21,8 @@ router
     controller.servers.createServer
   );
 
+router.route('/map').get(controller.servers.getServerListMap);
+
 router
   .route('/:serverId')
   .get(

@@ -4,6 +4,13 @@ export enum ServerType {
   SUBSONIC = 'SUBSONIC',
 }
 
+export type ServerMap = {
+  [key: string]: {
+    name: string;
+    type: ServerType;
+  };
+};
+
 export enum ServerPermissionType {
   ADMIN = 'ADMIN',
   EDITOR = 'EDITOR',

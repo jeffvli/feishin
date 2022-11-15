@@ -2,11 +2,21 @@ import {
   BaseResponse,
   NullResponse,
   Server,
+  ServerMap,
   ServerPermissionType,
   ServerType,
   ServerUrl,
 } from '@/renderer/api/types';
 import { ax } from '@/renderer/lib/axios';
+
+export type ServerMapResponse = BaseResponse<ServerMap>;
+
+const getServerMap = async (signal?: AbortSignal) => {
+  const { data } = await ax.get<ServerMapResponse>('/servers/map', {
+    signal,
+  });
+  return data;
+};
 
 export type ServerListResponse = BaseResponse<Server[]>;
 
@@ -238,6 +248,7 @@ export const serversApi = {
   enableUrl,
   fullScan,
   getServerList,
+  getServerMap,
   quickScan,
   updateServer,
   updateServerPermission,

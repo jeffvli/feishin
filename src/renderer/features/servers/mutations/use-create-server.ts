@@ -24,13 +24,7 @@ export const useCreateServer = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries(queryKeys.servers.list());
-    },
-    onSuccess: (data) => {
-      toast.show({
-        message: `${data.data.name} was added successfully`,
-        title: 'Server added',
-        type: 'success',
-      });
+      queryClient.invalidateQueries(queryKeys.servers.map());
     },
   });
 };
