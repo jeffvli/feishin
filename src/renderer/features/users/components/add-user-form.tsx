@@ -109,7 +109,7 @@ export const AddUserForm = ({ onCancel }: AddUserFormProps) => {
             type="submit"
             variant="filled"
           >
-            Submit
+            Add
           </Button>
         </Group>
       </Stack>

@@ -73,7 +73,7 @@ export const ActivityMenu = () => {
             {isTaskRunning ? (
               <StyledActivitySvg color="var(--primary-color)" size={15} />
             ) : (
-              <FiActivity color="var(--titlebar-fg)" size={15} />
+              <FiActivity size={15} />
             )}
           </Button>
         </Popover.Target>

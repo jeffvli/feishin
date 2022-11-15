@@ -1,11 +1,12 @@
 @use 'sass:color' as color;
 
 :root {
-  --label-font-family: Poppins, sans-serif;
+  --content-font-family: Sora, sans-serif;
+  --header-font-family: Poppins, sans-serif;
 
   --icon-color: rgb(255, 255, 255);
 
-  --primary-color: rgb(58, 129, 237);
+  --primary-color: rgb(52, 109, 219);
   --secondary-color: rgb(255, 120, 120);
   --success-color: green;
   --warning-color: orange;
@@ -13,7 +14,7 @@
   --generic-border-color: rgba(50, 50, 50, 0.7);
 
   --main-bg: rgb(18, 18, 18);
-  --main-fg: rgb(240, 240, 240);
+  --main-fg: rgb(245, 245, 245);
   --main-fg-secondary: rgb(150, 150, 150);
 
   --titlebar-fg: rgb(255, 255, 255);
@@ -53,19 +54,19 @@
   --scrollbar-thumb-bg: #5a5a5a;
 
   --btn-primary-bg: var(--primary-color);
-  --btn-primary-bg-hover: rgb(47, 122, 237);
+  --btn-primary-bg-hover: rgb(41, 100, 216);
   --btn-primary-fg: #ffffff;
   --btn-primary-fg-hover: #ffffff;
 
-  --btn-default-bg: rgb(41, 41, 41);
-  --btn-default-bg-hover: rgb(51, 51, 51);
+  --btn-default-bg: rgb(39, 39, 39);
+  --btn-default-bg-hover: rgb(63, 63, 63);
   --btn-default-fg: rgb(193, 193, 193);
   --btn-default-fg-hover: rgb(193, 193, 193);
 
   --btn-subtle-bg: transparent;
-  --btn-subtle-bg-hover: rgba(100, 100, 100, 0.5);
+  --btn-subtle-bg-hover: transparent;
   --btn-subtle-fg: rgb(150, 150, 150);
-  --btn-subtle-fg-hover: rgb(200, 200, 200);
+  --btn-subtle-fg-hover: rgb(240, 240, 240);
 
   --input-bg: rgb(56, 56, 56);
   --input-fg: rgb(193, 193, 193);
@@ -74,7 +75,7 @@
   --input-active-bg: rgba(255, 255, 255, 0.1);
 
   --dropdown-menu-bg: rgb(24, 24, 24);
-  --dropdown-menu-fg: rgb(193, 194, 197);
+  --dropdown-menu-fg: rgb(220, 220, 220);
   --dropdown-menu-bg-hover: rgb(37, 38, 43);
   --dropdown-menu-border: 1px rgba(50, 50, 50, 0.7) solid;
   --dropdown-menu-border-radius: 4px;
@@ -133,5 +134,14 @@
 
   .mantine-Modal-modal {
     background: var(--modal-bg);
+    border-radius: 10px;
+  }
+
+  .mantine-Modal-header {
+    font-weight: bold;
+    font-size: medium;
+    padding-bottom: 1rem;
+    margin-right: 0.5rem;
+    border-bottom: 1px solid var(--generic-border-color);
   }
 }

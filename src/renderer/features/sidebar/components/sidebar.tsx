@@ -205,7 +205,8 @@ export const Sidebar = () => {
               >
                 <Button
                   compact
-                  variant="subtle"
+                  size="xs"
+                  variant="default"
                   onClick={(e) => {
                     e.preventDefault();
                     setSidebar({ image: false });

@@ -51,18 +51,13 @@ export const AppMenu = () => {
 
   const handleManageServersModal = () => {
     openModal({
-      centered: true,
       children: <ServerList />,
-      exitTransitionDuration: 300,
-      overflow: 'inside',
       title: 'Manage Servers',
-      transition: 'slide-down',
     });
   };
 
   const handleEditProfileModal = () => {
     openModal({
-      centered: true,
       children: (
         <EditUserForm
           repeatPassword
@@ -70,31 +65,21 @@ export const AppMenu = () => {
           onCancel={closeAllModals}
         />
       ),
-      exitTransitionDuration: 300,
-      overflow: 'inside',
       size: 'lg',
       title: 'Edit Profile',
-      transition: 'slide-down',
     });
   };
 
   const handleManageUsersModal = () => {
     openModal({
-      centered: true,
       children: <UserList />,
-      exitTransitionDuration: 300,
-      overflow: 'inside',
       title: 'Manage Users',
-      transition: 'slide-down',
     });
   };
 
   const handleSettingsModal = () => {
     openModal({
-      centered: true,
       children: <Settings />,
-      exitTransitionDuration: 300,
-      overflow: 'inside',
       size: 'xl',
       title: (
         <Group position="center">
@@ -102,7 +87,6 @@ export const AppMenu = () => {
           <Text>Settings</Text>
         </Group>
       ),
-      transition: 'slide-down',
     });
   };
 

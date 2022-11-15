@@ -8,7 +8,6 @@ import { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Text } from '@/renderer/components/text';
 import { GridCardControls } from '@/renderer/components/virtual-grid/grid-card/grid-card-controls';
-import { fadeIn } from '@/renderer/styles';
 import {
   PlayQueueAddOptions,
   LibraryItem,
@@ -90,12 +89,7 @@ const ImageSection = styled.div<{ size?: number }>`
 `;
 
 const Image = styled(SimpleImg)`
-  object-fit: cover;
-  border: 0;
   border-radius: var(--card-default-radius);
-
-  ${fadeIn}
-  animation: fadein 0.3s ease-in-out;
 `;
 
 const ControlsContainer = styled.div`
@@ -157,6 +151,8 @@ export const DefaultCard = ({
   const { handlePlayQueueAdd, itemType, cardRows, route, playButtonBehavior } =
     controls;
 
+  const cardSize = itemWidth - 24;
+
   if (data) {
     return (
       <CardWrapper
@@ -184,10 +180,11 @@ export const DefaultCard = ({
             {data?.imageUrl ? (
               <Image
                 animationDuration={0.2}
-                height={itemWidth - 24}
+                height={cardSize}
+                imgStyle={{ objectFit: 'cover' }}
                 placeholder="var(--card-default-bg)"
                 src={data?.imageUrl}
-                width={itemWidth - 24}
+                width={cardSize}
               />
             ) : (
               <Center

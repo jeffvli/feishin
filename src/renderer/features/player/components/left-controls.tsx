@@ -122,7 +122,9 @@ export const LeftControls = () => {
                 >
                   <Button
                     compact
-                    variant="subtle"
+                    radius={0}
+                    size="xs"
+                    variant="default"
                     onClick={(e) => {
                       e.preventDefault();
                       setSidebar({ image: true });
@@ -152,7 +154,12 @@ export const LeftControls = () => {
             {artists?.map((artist, index) => (
               <React.Fragment key={`bar-${artist.id}`}>
                 {index > 0 && (
-                  <Text $secondary style={{ display: 'inline-block' }}>
+                  <Text
+                    $link
+                    $secondary
+                    size="xs"
+                    style={{ display: 'inline-block' }}
+                  >
                     ,
                   </Text>
                 )}{' '}
@@ -160,7 +167,7 @@ export const LeftControls = () => {
                   $link
                   component={Link}
                   overflow="hidden"
-                  size="sm"
+                  size="xs"
                   to={
                     artist.id
                       ? generatePath(AppRoute.LIBRARY_ARTISTS_DETAIL, {
@@ -180,8 +187,7 @@ export const LeftControls = () => {
               $link
               component={Link}
               overflow="hidden"
-              size="sm"
-              sx={{ '&:hover': { textDecoration: 'underline' } }}
+              size="xs"
               to={
                 album?.id
                   ? generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {

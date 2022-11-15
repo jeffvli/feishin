@@ -1,4 +1,5 @@
 import { Box } from '@mantine/core';
+import { Variants, motion } from 'framer-motion';
 import { Tabs } from '@/renderer/components';
 import { GeneralTab } from '@/renderer/features/settings/components/general-tab';
 import { PlaybackTab } from '@/renderer/features/settings/components/playback-tab';
@@ -7,10 +8,26 @@ import { useSettingsStore } from '@/renderer/store/settings.store';
 export const Settings = () => {
   const currentTab = useSettingsStore((state) => state.tab);
   const update = useSettingsStore((state) => state.setSettings);
+
+  const tabVariants: Variants = {
+    in: {
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+      },
+      x: 0,
+    },
+    out: {
+      opacity: 0,
+      x: 50,
+    },
+  };
+
   return (
-    <Box pr={15} sx={{ height: '800px', maxHeight: '50vh' }}>
+    <Box m={5} sx={{ height: '800px', maxHeight: '50vh', overflowX: 'hidden' }}>
       <Tabs
-        orientation="horizontal"
+        keepMounted={false}
+        orientation="vertical"
         styles={{
           tab: {
             fontSize: '1.1rem',
@@ -18,8 +35,7 @@ export const Settings = () => {
           },
         }}
         value={currentTab}
-        variant="default"
-        onChange={(e) => console.log(e)}
+        variant="pills"
         onTabChange={(e) => e && update({ tab: e })}
       >
         <Tabs.List>
@@ -27,10 +43,14 @@ export const Settings = () => {
           <Tabs.Tab value="playback">Playback</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="general">
-          <GeneralTab />
+          <motion.div animate="in" initial="out" variants={tabVariants}>
+            <GeneralTab />
+          </motion.div>
         </Tabs.Panel>
         <Tabs.Panel value="playback">
-          <PlaybackTab />
+          <motion.div animate="in" initial="out" variants={tabVariants}>
+            <PlaybackTab />
+          </motion.div>
         </Tabs.Panel>
       </Tabs>
     </Box>

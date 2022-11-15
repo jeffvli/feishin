@@ -12,7 +12,7 @@ const Container = styled.div``;
 
 const Section = styled.div`
   padding: 1rem;
-  border: 1px solid var(--generic-border-color);
+  border: 1px dashed var(--generic-border-color);
 `;
 
 export const ServerSection = ({ title, children }: ServerSectionProps) => {

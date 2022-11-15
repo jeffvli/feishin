@@ -112,7 +112,7 @@ export const GeneralTab = () => {
   ];
 
   return (
-    <Stack mt="1rem" spacing="xl">
+    <Stack spacing="xl">
       {options.map((option) => (
         <SettingsOptions key={`general-${option.title}`} {...option} />
       ))}

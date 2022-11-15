@@ -13,7 +13,7 @@ const StyledPopover = styled(MantinePopover)``;
 const StyledDropdown = styled(MantinePopover.Dropdown)<PopoverDropdownProps>`
   padding: 0.5rem;
   font-size: 0.9em;
-  font-family: var(--label-font-family);
+  font-family: var(--content-font-family);
   background-color: var(--dropdown-menu-bg);
 
   & .mantine-Menu-itemIcon {

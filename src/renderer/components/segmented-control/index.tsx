@@ -12,7 +12,7 @@ const StyledSegmentedControl = styled(
 )<MantineSegmentedControlProps>`
   & .mantine-SegmentedControl-label {
     color: var(--input-fg);
-    font-family: var(--label-font-family);
+    font-family: var(--content-font-family);
   }
 
   background-color: var(--input-bg);

@@ -146,9 +146,7 @@ export const EditUserPermissionsForm = ({
             <Accordion.Item key={`server-permission-${s.id}`} value={s.name}>
               <Accordion.Control icon={<RiServerFill />}>
                 <Group>
-                  <Text>
-                    {s.name} ({titleCase(s.type)})
-                  </Text>
+                  {s.name} ({titleCase(s.type)})
                 </Group>
               </Accordion.Control>
               <Accordion.Panel>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar, Group, Stack } from '@mantine/core';
 import { openContextModal } from '@mantine/modals';
 import {
+  RiAddFill,
   RiAdminLine,
   RiDeleteBin2Line,
   RiEdit2Line,
@@ -29,24 +30,18 @@ export const UserList = () => {
 
   const handleAddUserModal = () => {
     openContextModal({
-      centered: true,
-      exitTransitionDuration: 300,
       innerProps: {
         modalBody: (vars: ContextModalVars) => (
           <AddUserForm onCancel={() => vars.context.closeModal(vars.id)} />
         ),
       },
       modal: 'base',
-      overflow: 'inside',
       title: 'Add User',
-      transition: 'slide-down',
     });
   };
 
   const handleEditUserModal = (user: User) => {
     openContextModal({
-      centered: true,
-      exitTransitionDuration: 300,
       innerProps: {
         modalBody: (vars: ContextModalVars) => (
           <EditUserForm
@@ -56,10 +51,8 @@ export const UserList = () => {
         ),
       },
       modal: 'base',
-      overflow: 'inside',
       size: 'lg',
       title: `Edit User (${user.username})`,
-      transition: 'slide-down',
     });
   };
 
@@ -82,8 +75,6 @@ export const UserList = () => {
 
   const handleEdituserPermissionsModal = (user: User) => {
     openContextModal({
-      centered: true,
-      exitTransitionDuration: 300,
       innerProps: {
         modalBody: (vars: ContextModalVars) => (
           <EditUserPermissionsForm
@@ -93,9 +84,7 @@ export const UserList = () => {
         ),
       },
       modal: 'base',
-      overflow: 'inside',
       title: `Edit Permissions (${user.username})`,
-      transition: 'slide-down',
     });
   };
 
@@ -106,14 +95,16 @@ export const UserList = () => {
         position="right"
         sx={{
           position: 'absolute',
-          right: 45,
-          transform: 'translateY(-35px)',
+          right: 55,
+          transform: 'translateY(-4rem)',
         }}
       >
         <Button
           autoFocus
           compact
-          variant="default"
+          leftIcon={<RiAddFill size={15} />}
+          size="sm"
+          variant="filled"
           onClick={handleAddUserModal}
         >
           Add user

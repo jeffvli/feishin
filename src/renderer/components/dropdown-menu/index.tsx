@@ -22,13 +22,13 @@ type MenuDropdownProps = MantineMenuDropdownProps;
 const StyledMenu = styled(MantineMenu)<MenuProps>``;
 
 const StyledMenuLabel = styled(MantineMenu.Label)<MenuLabelProps>`
-  font-family: var(--label-font-family);
+  font-family: var(--content-font-family);
 `;
 
 const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   padding: 0.8rem;
   font-size: 0.9em;
-  font-family: var(--label-font-family);
+  font-family: var(--content-font-family);
   background-color: var(--dropdown-menu-bg);
 
   &:disabled {

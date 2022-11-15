@@ -45,7 +45,7 @@ export const App = () => {
             outlineOffset: '-1px',
           }),
         },
-        fontFamily: 'Inter, sans-serif',
+        fontFamily: 'var(--content-font-family)',
         fontSizes: {
           lg: 16,
           md: 14,
@@ -74,7 +74,18 @@ export const App = () => {
         }}
         transitionDuration={200}
       >
-        <ModalsProvider modals={{ base: BaseContextModal }}>
+        <ModalsProvider
+          modalProps={{
+            centered: true,
+            exitTransitionDuration: 300,
+            overflow: 'inside',
+            overlayBlur: 5,
+            overlayOpacity: 0.9,
+            transition: 'slide-down',
+            transitionDuration: 300,
+          }}
+          modals={{ base: BaseContextModal }}
+        >
           <SelectRouter>
             <AppRouter />
           </SelectRouter>

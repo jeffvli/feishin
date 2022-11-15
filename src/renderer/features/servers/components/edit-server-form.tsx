@@ -99,7 +99,7 @@ export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
             Cancel
           </Button>
           <Button type="submit" variant="filled">
-            Update
+            Save
           </Button>
         </Group>
       </Stack>

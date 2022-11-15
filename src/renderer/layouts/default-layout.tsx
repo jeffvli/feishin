@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import throttle from 'lodash/throttle';
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
 import { SideQueue } from '@/renderer/features/side-queue/components/side-queue';
@@ -152,14 +153,16 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
     [isResizing, isResizingRight, setSidebar, sidebar.rightWidth]
   );
 
+  const throttledResize = useMemo(() => throttle(resize, 50), [resize]);
+
   useEffect(() => {
-    window.addEventListener('mousemove', resize);
+    window.addEventListener('mousemove', throttledResize);
     window.addEventListener('mouseup', stopResizing);
     return () => {
-      window.removeEventListener('mousemove', resize);
+      window.removeEventListener('mousemove', throttledResize);
       window.removeEventListener('mouseup', stopResizing);
     };
-  }, [resize, stopResizing]);
+  }, [throttledResize, stopResizing]);
 
   return (
     <>

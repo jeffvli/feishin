@@ -89,7 +89,6 @@ interface ImageProps {
 }
 
 const Image = styled(SimpleImg)<ImageProps>`
-  object-fit: cover;
   border: 0;
   border-radius: var(--card-poster-radius);
 `;
@@ -177,6 +176,7 @@ export const PosterCard = ({
                 <Image
                   animationDuration={0.2}
                   height={itemWidth}
+                  imgStyle={{ objectFit: 'cover' }}
                   placeholder="var(--card-default-bg)"
                   src={data?.imageUrl}
                   width={itemWidth}

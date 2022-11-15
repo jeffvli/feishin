@@ -11,6 +11,7 @@ interface ListItemProps {
 const StyledItem = styled.div`
   display: flex;
   width: 100%;
+  font-family: var(--content-font-family);
 
   &:focus-visible {
     border: 1px solid var(--primary-color);
@@ -22,6 +23,7 @@ const ItemStyle = css`
   width: 100%;
   padding: 0.5rem 1rem;
   color: var(--sidebar-btn-color);
+  font-family: var(--content-font-family);
   border: 1px transparent solid;
   transition: color 0.2s ease-in-out;
 

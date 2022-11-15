@@ -1,16 +1,10 @@
 import { Group } from '@mantine/core';
 import { openContextModal } from '@mantine/modals';
-import { RiServerFill } from 'react-icons/ri';
-import {
-  Text,
-  Button,
-  ContextModalVars,
-  Accordion,
-} from '@/renderer/components';
+import { RiAddFill, RiServerFill } from 'react-icons/ri';
+import { Button, ContextModalVars, Accordion } from '@/renderer/components';
 import { ServerListItem } from '@/renderer/features/servers/components/server-list-item';
 import { useServerList } from '@/renderer/features/servers/queries/use-server-list';
 import { usePermissions } from '@/renderer/features/shared';
-import { Font } from '@/renderer/styles';
 import { titleCase } from '@/renderer/utils';
 import { AddServerForm } from './add-server-form';
 
@@ -20,17 +14,13 @@ export const ServerList = () => {
 
   const handleAddServerModal = () => {
     openContextModal({
-      centered: true,
-      exitTransitionDuration: 300,
       innerProps: {
         modalBody: (vars: ContextModalVars) => (
           <AddServerForm onCancel={() => vars.context.closeModal(vars.id)} />
         ),
       },
       modal: 'base',
-      overflow: 'inside',
       title: 'Add server',
-      transition: 'slide-down',
     });
   };
 
@@ -41,15 +31,17 @@ export const ServerList = () => {
         position="right"
         sx={{
           position: 'absolute',
-          right: 45,
-          transform: 'translateY(-35px)',
+          right: 55,
+          transform: 'translateY(-4rem)',
         }}
       >
         {permissions.isAdmin && (
           <Button
             autoFocus
             compact
-            variant="default"
+            leftIcon={<RiAddFill size={15} />}
+            size="sm"
+            variant="filled"
             onClick={handleAddServerModal}
           >
             Add server
@@ -61,9 +53,7 @@ export const ServerList = () => {
           <Accordion.Item key={s.id} value={s.name}>
             <Accordion.Control icon={<RiServerFill size={15} />}>
               <Group position="apart">
-                <Text font={Font.GOTHAM}>
-                  {titleCase(s.type)} - {s.name}
-                </Text>
+                {titleCase(s.type)} - {s.name}
               </Group>
             </Accordion.Control>
             <Accordion.Panel>

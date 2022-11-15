@@ -201,7 +201,7 @@ export const EditUserForm = ({
                   type="submit"
                   variant="filled"
                 >
-                  Submit
+                  Save
                 </Button>
               </Group>
             </Stack>

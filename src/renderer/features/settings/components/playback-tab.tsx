@@ -343,7 +343,7 @@ export const PlaybackTab = () => {
   ];
 
   return (
-    <Stack my={10} spacing="xl">
+    <Stack spacing="xl">
       {playerOptions
         .filter((o) => !o.isHidden)
         .map((option) => (

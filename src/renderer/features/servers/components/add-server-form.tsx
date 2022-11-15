@@ -80,7 +80,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             type="submit"
             variant="filled"
           >
-            Submit
+            Add
           </Button>
         </Group>
       </Stack>
