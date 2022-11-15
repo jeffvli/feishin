@@ -124,6 +124,10 @@ export const Sidebar = () => {
               multiple
               styles={{
                 item: { borderBottom: 'none' },
+                panel: {
+                  borderLeft: '1px solid rgba(100,100,100,.5)',
+                  marginLeft: '1.5rem',
+                },
               }}
               value={sidebar.expanded}
               onChange={(e) => setSidebar({ expanded: e })}
