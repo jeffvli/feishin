@@ -315,6 +315,7 @@ export const PosterCard = ({
           {cardRows.map((row: CardRow, index: number) => (
             <Skeleton
               key={`row-${row.property}-${columnIndex}`}
+              height={20}
               my={2}
               radius="md"
               visible={!data}
