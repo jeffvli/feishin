@@ -22,7 +22,11 @@ const StyledDropdown = styled(MantinePopover.Dropdown)<PopoverDropdownProps>`
 `;
 
 export const Popover = ({ children, ...props }: PopoverProps) => {
-  return <StyledPopover {...props}>{children}</StyledPopover>;
+  return (
+    <StyledPopover withArrow withinPortal {...props}>
+      {children}
+    </StyledPopover>
+  );
 };
 
 Popover.Target = MantinePopover.Target;
