@@ -14,11 +14,13 @@ import {
   RiMusicLine,
   RiPlayListLine,
   RiSearchLine,
+  RiUser3Line,
   RiUserVoiceLine,
 } from 'react-icons/ri';
 import { useNavigate, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button, TextInput } from '@/renderer/components';
+import { UserActivity } from '@/renderer/features/users';
 import { AppRoute } from '@/renderer/router/routes';
 import { useAppStore, usePlayerStore } from '@/renderer/store';
 import { fadeIn } from '@/renderer/styles';
@@ -119,8 +121,10 @@ export const Sidebar = () => {
               </SidebarItem.Link>
             </SidebarItem>
             <Accordion
-              disableChevronRotation
               multiple
+              styles={{
+                item: { borderBottom: 'none' },
+              }}
               value={sidebar.expanded}
               onChange={(e) => setSidebar({ expanded: e })}
             >
@@ -161,7 +165,7 @@ export const Sidebar = () => {
               <Accordion.Item value="collections">
                 <Accordion.Control disabled p="1rem">
                   <Group>
-                    <RiPlayListLine size={20} />
+                    <RiPlayListLine size={15} />
                     Collections
                   </Group>
                 </Accordion.Control>
@@ -170,11 +174,24 @@ export const Sidebar = () => {
               <Accordion.Item value="playlists">
                 <Accordion.Control disabled p="1rem">
                   <Group>
-                    <RiPlayListLine size={20} />
+                    <RiPlayListLine size={15} />
                     Playlists
                   </Group>
                 </Accordion.Control>
                 <Accordion.Panel />
+              </Accordion.Item>
+              <Accordion.Item value="activity">
+                <Accordion.Control p="1rem">
+                  <Group>
+                    <RiUser3Line size={15} />
+                    User Activity
+                  </Group>
+                </Accordion.Control>
+                <Accordion.Panel>
+                  <div>
+                    <UserActivity />
+                  </div>
+                </Accordion.Panel>
               </Accordion.Item>
             </Accordion>
           </Stack>

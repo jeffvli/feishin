@@ -53,6 +53,6 @@ const io = new socketio.Server(server, {
 });
 
 app.set('socketio', io);
-io.on('connection', (socket) => sockets(socket));
+io.on('connection', (socket) => sockets(socket, io));
 
 server.listen(9321, () => console.log(`Listening on port ${PORT}`));
