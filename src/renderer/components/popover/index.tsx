@@ -15,15 +15,20 @@ const StyledDropdown = styled(MantinePopover.Dropdown)<PopoverDropdownProps>`
   font-size: 0.9em;
   font-family: var(--content-font-family);
   background-color: var(--dropdown-menu-bg);
-
-  & .mantine-Menu-itemIcon {
-    margin-right: 0.5rem;
-  }
 `;
 
 export const Popover = ({ children, ...props }: PopoverProps) => {
   return (
-    <StyledPopover withArrow withinPortal {...props}>
+    <StyledPopover
+      withArrow
+      withinPortal
+      styles={{
+        dropdown: {
+          filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))',
+        },
+      }}
+      {...props}
+    >
       {children}
     </StyledPopover>
   );

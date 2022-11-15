@@ -1,6 +1,6 @@
 import React, { MouseEvent } from 'react';
 import { Group, UnstyledButtonProps } from '@mantine/core';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import {
   RiPlayFill,
   RiMore2Fill,
@@ -8,7 +8,7 @@ import {
   RiHeartLine,
 } from 'react-icons/ri';
 import styled from 'styled-components';
-import { Button } from '@/renderer/components/button';
+import { _Button } from '@/renderer/components/button';
 import { DropdownMenu } from '@/renderer/components/dropdown-menu';
 import { LibraryItem, Play, PlayQueueAddOptions } from '@/renderer/types';
 
@@ -30,6 +30,13 @@ const PlayButton = styled(motion.button)<PlayButtonType>`
   svg {
     fill: rgb(0, 0, 0);
     stroke: rgb(0, 0, 0);
+  }
+`;
+
+const SecondaryButton = styled(motion(_Button))`
+  fill: white !important;
+  svg: {
+    fill: white !important;
   }
 `;
 
@@ -100,15 +107,30 @@ export const GridCardControls = ({
   itemType: LibraryItem;
   playButtonBehavior: Play;
 }) => {
+  const buttonVariants: Variants = {
+    hover: {
+      opacity: 1,
+      scale: 1.1,
+    },
+    initial: {
+      opacity: 0.6,
+      scale: 1,
+    },
+    pressed: {
+      scale: 1,
+    },
+  };
+
   return (
     <GridCardControlsContainer>
       <TopControls />
       <CenterControls animate={{ opacity: 1 }} initial={{ opacity: 0 }} />
       <BottomControls>
         <PlayButton
-          animate={{ opacity: 0.6 }}
-          whileHover={{ opacity: 1, scale: 1.1 }}
-          whileTap={{ scale: 1 }}
+          initial="initial"
+          variants={buttonVariants}
+          whileHover="hover"
+          whileTap="pressed"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -124,7 +146,15 @@ export const GridCardControls = ({
           <RiPlayFill size={25} />
         </PlayButton>
         <Group spacing="xs">
-          <Button disabled p={5} variant="subtle">
+          <SecondaryButton
+            disabled
+            p={5}
+            sx={{ svg: { fill: 'white !important' } }}
+            variant="subtle"
+            variants={buttonVariants}
+            whileHover="hover"
+            whileTap="pressed"
+          >
             <FavoriteWrapper isFavorite={itemData?.isFavorite}>
               {itemData?.isFavorite ? (
                 <RiHeartFill size={20} />
@@ -132,19 +162,24 @@ export const GridCardControls = ({
                 <RiHeartLine color="white" size={20} />
               )}
             </FavoriteWrapper>
-          </Button>
+          </SecondaryButton>
           <DropdownMenu withinPortal position="bottom-start">
             <DropdownMenu.Target>
-              <Button
+              <SecondaryButton
+                initial="initial"
                 p={5}
+                sx={{ svg: { fill: 'white !important' } }}
                 variant="subtle"
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="pressed"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                 }}
               >
                 <RiMore2Fill color="white" size={20} />
-              </Button>
+              </SecondaryButton>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
               {PLAY_TYPES.filter(

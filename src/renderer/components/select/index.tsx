@@ -33,6 +33,7 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
       styles={{
         dropdown: {
           background: 'var(--dropdown-menu-bg)',
+          filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 20%))',
         },
         input: {
           background: 'var(--input-bg)',

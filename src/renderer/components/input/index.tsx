@@ -80,6 +80,18 @@ const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
     }
   }
 
+  /* & .mantine-NumberInput-rightSection {
+    color: var(--input-placeholder-fg);
+    background: var(--input-bg);
+  } */
+
+  & .mantine-NumberInput-controlUp {
+    svg {
+      color: white;
+      fill: white;
+    }
+  }
+
   & .mantine-Input-icon {
     color: var(--input-placeholder-fg);
   }
@@ -146,7 +158,7 @@ const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
     font-family: var(--label-font-faimly);
   }
 
-  & .mantine-PasswordInput-disabled {
+  & .mantine-FileInput-disabled {
     opacity: 0.6;
   }
 `;
@@ -171,6 +183,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     return (
       <StyledNumberInput
         ref={ref}
+        hideControls
         spellCheck={false}
         {...props}
         sx={{ maxWidth, width }}
@@ -184,12 +197,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ children, width, maxWidth, ...props }: PasswordInputProps, ref) => {
     return (
-      <StyledPasswordInput
-        ref={ref}
-        spellCheck={false}
-        {...props}
-        sx={{ maxWidth, width }}
-      >
+      <StyledPasswordInput ref={ref} {...props} sx={{ maxWidth, width }}>
         {children}
       </StyledPasswordInput>
     );
@@ -199,12 +207,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
   ({ children, width, maxWidth, ...props }: FileInputProps, ref) => {
     return (
-      <StyledFileInput
-        ref={ref}
-        spellCheck={false}
-        {...props}
-        sx={{ maxWidth, width }}
-      >
+      <StyledFileInput ref={ref} {...props} sx={{ maxWidth, width }}>
         {children}
       </StyledFileInput>
     );

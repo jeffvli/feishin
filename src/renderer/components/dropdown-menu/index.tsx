@@ -61,6 +61,7 @@ const StyledMenuDropdown = styled(MantineMenu.Dropdown)`
   background: var(--dropdown-menu-bg);
   border: var(--dropdown-menu-border);
   border-radius: var(--dropdown-menu-border-radius);
+  filter: drop-shadow(0 0 5px rgb(0, 0, 0, 50%));
 `;
 
 const StyledMenuDivider = styled(MantineMenu.Divider)`
@@ -69,7 +70,15 @@ const StyledMenuDivider = styled(MantineMenu.Divider)`
 
 export const DropdownMenu = ({ children, ...props }: MenuProps) => {
   return (
-    <StyledMenu withinPortal radius="sm" transition="scale" {...props}>
+    <StyledMenu
+      withinPortal
+      radius="sm"
+      styles={{
+        dropdown: { filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))' },
+      }}
+      transition="scale"
+      {...props}
+    >
       {children}
     </StyledMenu>
   );
