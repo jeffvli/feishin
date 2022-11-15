@@ -1,7 +1,7 @@
 import React from 'react';
 import { Avatar, Group, Indicator, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { IoIosPause } from 'react-icons/io';
 import { RiPlayFill, RiServerLine, RiUserLine } from 'react-icons/ri';
 import { generatePath } from 'react-router';
@@ -57,6 +57,8 @@ const ItemInfoContainer = styled.div`
   grid-area: info;
 `;
 
+const MotionStack = motion(Stack);
+
 export const UserActivityItem = ({ user }: UserActivityItemProps) => {
   const { data: serverMap } = useServerMap();
   const [opened, { close, open }] = useDisclosure(false);
@@ -72,9 +74,27 @@ export const UserActivityItem = ({ user }: UserActivityItemProps) => {
   const status = user?.activity?.status;
   const albumArtists = user?.activity?.song?.albumArtists;
 
-  console.log('serverMap', serverMap);
-
-  console.log('serverId', serverId);
+  const infoVariants: Variants = {
+    animate: {
+      opacity: 1,
+      transition: {
+        duration: 0.2,
+      },
+      x: 0,
+    },
+    exit: {
+      opacity: 0,
+      transition: {
+        duration: 0.2,
+        ease: 'easeInOut',
+      },
+      x: 10,
+    },
+    initial: {
+      opacity: 0,
+      x: -10,
+    },
+  };
 
   return (
     <ActivityContainer>
@@ -113,56 +133,69 @@ export const UserActivityItem = ({ user }: UserActivityItemProps) => {
         </ItemImageContainer>
         <ItemInfoContainer>
           <Group noWrap position="apart">
-            <Stack spacing={0} sx={{ lineHeight: 1, maxWidth: '80%' }}>
-              <Text overflow="hidden" size="sm">
-                {songId ? songName : 'Idle...'}
-              </Text>
-              <Text $secondary overflow="hidden" size="xs">
-                {albumArtists?.length ? (
-                  albumArtists.map((artist, index) => (
-                    <React.Fragment
-                      key={`activity-${user.id}-artist-${artist.id}`}
-                    >
-                      {index > 0 ? ', ' : null}
-                      <Text
-                        $link
-                        $secondary
-                        component={Link}
-                        overflow="hidden"
-                        size="xs"
-                        sx={{ width: 'fit-content' }}
-                        to={generatePath(AppRoute.LIBRARY_ALBUMARTISTS_DETAIL, {
-                          albumArtistId: artist.id,
-                        })}
-                      >
-                        {artist.name}
-                      </Text>
-                    </React.Fragment>
-                  ))
-                ) : (
-                  <Text $secondary>—</Text>
-                )}
-              </Text>
-              {albumId ? (
-                <Text
-                  $link
-                  $secondary
-                  component={Link}
-                  overflow="hidden"
-                  size="xs"
-                  sx={{ width: 'fit-content' }}
-                  to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
-                    albumId,
-                  })}
-                >
-                  {albumName}
+            <AnimatePresence exitBeforeEnter initial={false}>
+              <MotionStack
+                key={`activity-user-${user?.id}-${songId}`}
+                animate="animate"
+                exit="exit"
+                initial="initial"
+                spacing={0}
+                sx={{ lineHeight: 1, maxWidth: '80%' }}
+                variants={infoVariants}
+              >
+                <Text $secondary={!songId} overflow="hidden" size="sm">
+                  {songId ? songName : 'Not Playing'}
                 </Text>
-              ) : (
                 <Text $secondary overflow="hidden" size="xs">
-                  —
+                  {albumArtists?.length ? (
+                    albumArtists.map((artist, index) => (
+                      <React.Fragment
+                        key={`activity-${user.id}-artist-${artist.id}`}
+                      >
+                        {index > 0 ? ', ' : null}
+                        <Text
+                          $link
+                          $secondary
+                          component={Link}
+                          overflow="hidden"
+                          size="xs"
+                          sx={{ width: 'fit-content' }}
+                          to={generatePath(
+                            AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+                            {
+                              albumArtistId: artist.id,
+                            }
+                          )}
+                        >
+                          {artist.name}
+                        </Text>
+                      </React.Fragment>
+                    ))
+                  ) : (
+                    <Text $secondary>—</Text>
+                  )}
                 </Text>
-              )}
-            </Stack>
+                {albumId ? (
+                  <Text $secondary overflow="hidden" size="xs">
+                    <Text
+                      $link
+                      $secondary
+                      component={Link}
+                      sx={{ width: 'fit-content' }}
+                      to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                        albumId,
+                      })}
+                    >
+                      {albumName}
+                    </Text>
+                  </Text>
+                ) : (
+                  <Text $secondary overflow="hidden" size="xs">
+                    —
+                  </Text>
+                )}
+              </MotionStack>
+            </AnimatePresence>
             <Group>
               {status === 'playing' ? (
                 <RiPlayFill color="var(--main-fg)" size={15} />
