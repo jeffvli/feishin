@@ -108,6 +108,7 @@ export const PlaybackTab = () => {
       control: (
         <FileInput
           placeholder={mpvPath}
+          size="sm"
           width={225}
           onChange={handleSetMpvPath}
         />
@@ -308,7 +309,9 @@ export const PlaybackTab = () => {
                     ...settings,
                     skipButtons: {
                       ...settings.skipButtons,
-                      skipBackwardSeconds: Number(e.currentTarget.value),
+                      skipBackwardSeconds: e.currentTarget.value
+                        ? Number(e.currentTarget.value)
+                        : 0,
                     },
                   },
                 })
@@ -326,7 +329,9 @@ export const PlaybackTab = () => {
                     ...settings,
                     skipButtons: {
                       ...settings.skipButtons,
-                      skipForwardSeconds: Number(e.currentTarget.value),
+                      skipForwardSeconds: e.currentTarget.value
+                        ? Number(e.currentTarget.value)
+                        : 0,
                     },
                   },
                 })
