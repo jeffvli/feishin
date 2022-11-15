@@ -57,7 +57,7 @@ export type QueryOptions<TResponse> = {
   cacheTime?: UseQueryOptions['cacheTime'];
   enabled?: UseQueryOptions['enabled'];
   onError?: (err: any) => void;
-  onSuccess?: (data: TResponse) => void;
+  onSuccess?: (data: any) => void;
   refetchInterval?: number;
   refetchIntervalInBackground?: UseQueryOptions['refetchIntervalInBackground'];
   refetchOnWindowFocus?: boolean;
