@@ -14,6 +14,7 @@ import { rotating } from '@/renderer/styles';
 const StyledActivitySvg = styled(RiRefreshLine)`
   ${rotating}
   animation: rotating 1s linear infinite;
+  fill: var(--primary-color) !important;
 `;
 
 export const ActivityMenu = () => {
@@ -71,7 +72,7 @@ export const ActivityMenu = () => {
         <Popover.Target>
           <Button px={5} size="xs" variant="subtle">
             {isTaskRunning ? (
-              <StyledActivitySvg color="var(--primary-color)" size={15} />
+              <StyledActivitySvg size={15} />
             ) : (
               <FiActivity size={15} />
             )}
