@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import isElectron from 'is-electron';
 import throttle from 'lodash/throttle';
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
@@ -7,6 +8,8 @@ import { SideQueue } from '@/renderer/features/side-queue/components/side-queue'
 import { Titlebar } from '@/renderer/features/titlebar/components/titlebar';
 import { useUserDetail } from '@/renderer/features/users';
 import { useAppStore, useAuthStore } from '@/renderer/store';
+import { useSettingsStore } from '@/renderer/store/settings.store';
+import { PlaybackType } from '@/renderer/types';
 import {
   constrainRightSidebarWidth,
   constrainSidebarWidth,
@@ -103,6 +106,18 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const [isResizingRight, setIsResizingRight] = useState(false);
   const userId = useAuthStore((state) => state.permissions.id);
   const login = useAuthStore((state) => state.login);
+  const setSettings = useSettingsStore((state) => state.setSettings);
+
+  useEffect(() => {
+    if (!isElectron()) {
+      setSettings({
+        player: {
+          ...useSettingsStore.getState().player,
+          type: PlaybackType.WEB,
+        },
+      });
+    }
+  }, [setSettings]);
 
   // Fetch and cache user profile
   useUserDetail(
