@@ -176,8 +176,8 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
   }
 `;
 
-const ButtonChildWrapper = styled.span<ButtonProps>`
-  color: ${(props) => props.loading && 'transparent !important'};
+const ButtonChildWrapper = styled.span<{ $loading?: boolean }>`
+  color: ${(props) => props.$loading && 'transparent !important'};
 `;
 
 const SpinnerWrapper = styled.div`
@@ -193,7 +193,7 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
       return (
         <Tooltip withinPortal {...tooltip}>
           <StyledButton ref={ref} loaderPosition="center" {...props}>
-            <ButtonChildWrapper loading={props.loading}>
+            <ButtonChildWrapper $loading={props.loading}>
               {children}
             </ButtonChildWrapper>
             {props.loading && (
@@ -208,7 +208,7 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <StyledButton ref={ref} loaderPosition="center" {...props}>
-        <ButtonChildWrapper loading={props.loading}>
+        <ButtonChildWrapper $loading={props.loading}>
           {children}
         </ButtonChildWrapper>
         {props.loading && (
