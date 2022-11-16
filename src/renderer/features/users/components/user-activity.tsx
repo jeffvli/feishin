@@ -5,6 +5,7 @@ import sortBy from 'lodash/sortBy';
 import styled from 'styled-components';
 import { socket } from '@/renderer/api';
 import { UserListResponse } from '@/renderer/api/users.api';
+import { Text } from '@/renderer/components';
 import {
   Activity,
   UserActivityItem,
@@ -167,7 +168,7 @@ export const UserActivity = () => {
       const user = prev.find((user) => user.id === data.user.userId);
       if (!user) return prev;
 
-      return sortByName([
+      return [
         ...prev.filter((user) => user.id !== data.user.userId),
         {
           ...user,
@@ -177,7 +178,7 @@ export const UserActivity = () => {
             status: data.status,
           },
         },
-      ]);
+      ];
     });
   }, []);
 
@@ -252,15 +253,23 @@ export const UserActivity = () => {
     handleUserStatusChange,
   ]);
 
+  const orderedActivityList = sortByName(
+    activityList.filter(
+      (user) => user.activity?.status && user.activity?.status !== 'offline'
+    )
+  );
+
   return (
     <UserActivityContainer>
-      {activityList
-        .filter(
-          (user) => user.activity?.status && user.activity?.status !== 'offline'
-        )
-        .map((user) => (
+      {orderedActivityList.length ? (
+        orderedActivityList.map((user) => (
           <UserActivityItem key={`activity-${user.id}`} user={user} />
-        ))}
+        ))
+      ) : (
+        <Text $secondary overflow="hidden" px="1rem" py=".5rem" size="xs">
+          No users online
+        </Text>
+      )}
     </UserActivityContainer>
   );
 };
