@@ -7,7 +7,6 @@ import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { initSimpleImg } from 'react-simple-img';
 import { BaseContextModal } from '@/renderer/components';
 import { useTheme } from '@/renderer/hooks';
-import { useDefaultSettings } from './features/settings';
 import { AppRouter } from './router/app-router';
 import './styles/global.scss';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -23,7 +22,6 @@ const SelectRouter = ({ children }: { children: ReactNode }) => {
 };
 
 export const App = () => {
-  useDefaultSettings();
   const theme = useTheme();
 
   return (

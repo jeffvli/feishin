@@ -16,7 +16,6 @@ import styled from 'styled-components';
 import { Text } from '@/renderer/components';
 import { usePlayerStore } from '@/renderer/store';
 import { useSettingsStore } from '@/renderer/store/settings.store';
-import { Font } from '@/renderer/styles';
 import {
   PlaybackType,
   PlayerRepeat,
@@ -200,7 +199,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
       </ControlsContainer>
       <SliderContainer>
         <SliderValueWrapper position="left">
-          <Text $noSelect $secondary font={Font.POPPINS} size="xs" weight={600}>
+          <Text $noSelect $secondary size="xs" weight={600}>
             {formattedTime}
           </Text>
         </SliderValueWrapper>
@@ -218,7 +217,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
           />
         </SliderWrapper>
         <SliderValueWrapper position="right">
-          <Text $noSelect $secondary font={Font.POPPINS} size="xs" weight={600}>
+          <Text $noSelect $secondary size="xs" weight={600}>
             {duration}
           </Text>
         </SliderValueWrapper>

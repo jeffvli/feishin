@@ -47,6 +47,7 @@ declare global {
         ): void;
         SETTINGS_GET(data: { property: string }): any;
         SETTINGS_SET(data: { property: string; value: any }): void;
+        removeAllListeners(value: string): void;
         windowClose(): void;
         windowMaximize(): void;
         windowMinimize(): void;

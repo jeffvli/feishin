@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Text } from '@/renderer/components';
-import { Font } from '@/renderer/styles';
 
 interface ServerSectionProps {
   children: React.ReactNode;
@@ -18,12 +17,7 @@ const Section = styled.div`
 export const ServerSection = ({ title, children }: ServerSectionProps) => {
   return (
     <Container>
-      {React.isValidElement(title) ? (
-        title
-      ) : (
-        <Text font={Font.EPILOGUE}>{title}</Text>
-      )}
-
+      {React.isValidElement(title) ? title : <Text>{title}</Text>}
       <Section>{children}</Section>
     </Container>
   );

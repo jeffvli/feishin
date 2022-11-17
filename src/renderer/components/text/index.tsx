@@ -20,22 +20,22 @@ interface TextProps extends MantineTextDivProps {
   weight?: number;
 }
 
-const BaseText = styled(MantineText)<TextProps>`
+const StyledText = styled(MantineText)<TextProps>`
   color: ${(props) =>
     props.$secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)'};
-  font-family: ${(props) => props.font || 'var(--content-font-family)'};
+  font-family: ${(props) => props.font};
   cursor: ${(props) => (props.$link ? 'cursor' : 'default')};
+  transition: color 0.2s ease-in-out;
   user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
   ${(props) => props.overflow === 'hidden' && textEllipsis}
 
   &:hover {
+    color: ${(props) => props.$link && 'var(--main-fg)'};
     text-decoration: ${(props) => (props.$link ? 'underline' : 'none')};
   }
 `;
 
-const StyledText = styled(BaseText)<TextProps>``;
-
-export const _Text = ({
+const _Text = ({
   children,
   $secondary,
   overflow,

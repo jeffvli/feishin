@@ -1,8 +1,9 @@
 import { Group } from '@mantine/core';
+import { HiOutlineQueueList } from 'react-icons/hi2';
 import {
   RiVolumeUpFill,
+  RiVolumeDownFill,
   RiVolumeMuteFill,
-  RiPlayListFill,
 } from 'react-icons/ri';
 import styled from 'styled-components';
 import { usePlayerStore, useAppStore } from '@/renderer/store';
@@ -47,7 +48,7 @@ export const RightControls = () => {
     <RightControlsContainer>
       <Group>
         <PlayerButton
-          icon={<RiPlayListFill size={15} />}
+          icon={<HiOutlineQueueList />}
           tooltip={{ label: 'View queue', openDelay: 500 }}
           variant="secondary"
           onClick={() => setSidebar({ rightExpanded: !isQueueExpanded })}
@@ -59,8 +60,10 @@ export const RightControls = () => {
             icon={
               muted ? (
                 <RiVolumeMuteFill size={15} />
-              ) : (
+              ) : volume > 50 ? (
                 <RiVolumeUpFill size={15} />
+              ) : (
+                <RiVolumeDownFill size={15} />
               )
             }
             tooltip={{ label: muted ? 'Muted' : volume, openDelay: 500 }}

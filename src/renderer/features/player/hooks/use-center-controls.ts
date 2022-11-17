@@ -39,10 +39,15 @@ export const useCenterControls = (args: { playersRef: any }) => {
   const nextPlayerRef = currentPlayer === 1 ? player2Ref : player1Ref;
 
   const resetPlayers = useCallback(() => {
-    player1Ref.getInternalPlayer().currentTime = 0;
-    player2Ref.getInternalPlayer().currentTime = 0;
-    player1Ref.getInternalPlayer().pause();
-    player2Ref.getInternalPlayer().pause();
+    if (player1Ref.getInternalPlayer()) {
+      player1Ref.getInternalPlayer().currentTime = 0;
+      player1Ref.getInternalPlayer().pause();
+    }
+
+    if (player2Ref.getInternalPlayer()) {
+      player2Ref.getInternalPlayer().currentTime = 0;
+      player2Ref.getInternalPlayer().pause();
+    }
   }, [player1Ref, player2Ref]);
 
   const resetNextPlayer = useCallback(() => {

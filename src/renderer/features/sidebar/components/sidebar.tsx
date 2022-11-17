@@ -1,6 +1,7 @@
 import { Stack, Group, Grid, Accordion, Center } from '@mantine/core';
 import { SpotlightProvider } from '@mantine/spotlight';
 import { AnimatePresence, motion } from 'framer-motion';
+import { BsCollection } from 'react-icons/bs';
 import {
   RiAlbumLine,
   RiArrowDownSLine,
@@ -169,7 +170,7 @@ export const Sidebar = () => {
               <Accordion.Item value="collections">
                 <Accordion.Control disabled p="1rem">
                   <Group>
-                    <RiPlayListLine size={15} />
+                    <BsCollection size={15} />
                     Collections
                   </Group>
                 </Accordion.Control>
