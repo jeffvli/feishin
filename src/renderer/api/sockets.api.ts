@@ -1,9 +1,16 @@
 import { io } from 'socket.io-client';
+import { useAuthStore } from '@/renderer/store';
 
-const { username } = JSON.parse(
-  localStorage.getItem('store_authentication') || '{}'
-).state.permissions;
+export const socket = io(useAuthStore.getState().serverUrl, {
+  query: {
+    id: useAuthStore.getState().permissions.id,
+    username: useAuthStore.getState().permissions.username,
+  },
+  reconnection: true,
+  reconnectionAttempts: 10,
+  reconnectionDelay: 500,
+});
 
-export const socket = io('http://localhost:8843', {
-  query: { username },
+socket.emit('join', {
+  id: useAuthStore.getState().permissions.id,
 });
