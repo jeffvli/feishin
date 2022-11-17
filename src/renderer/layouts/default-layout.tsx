@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useDisclosure } from '@mantine/hooks';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import isElectron from 'is-electron';
 import throttle from 'lodash/throttle';
+import { TbArrowBarLeft } from 'react-icons/tb';
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
 import { UserDetailResponse } from '@/renderer/api/users.api';
@@ -66,7 +68,7 @@ const RightSidebarContainer = styled(motion.div)`
 `;
 
 const PlayerbarContainer = styled.footer`
-  z-index: 50;
+  z-index: 100;
   grid-area: player;
   background: var(--playerbar-bg);
   filter: drop-shadow(0 -3px 1px rgba(0, 0, 0, 10%));
@@ -93,6 +95,24 @@ const ResizeHandle = styled.div<{
   }
 `;
 
+const QueueDrawer = styled(motion.div)`
+  background: var(--sidebar-bg);
+  border-left: var(--sidebar-border);
+`;
+
+const QueueDrawerButton = styled(motion.div)`
+  position: absolute;
+  top: 35%;
+  right: 0;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  width: 50px;
+  height: 25vh;
+  opacity: 0.3;
+  user-select: none;
+`;
+
 interface DefaultLayoutProps {
   shell?: boolean;
 }
@@ -100,6 +120,7 @@ interface DefaultLayoutProps {
 export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const sidebar = useAppStore((state) => state.sidebar);
   const setSidebar = useAppStore((state) => state.setSidebar);
+  const [opened, drawerHandler] = useDisclosure(false);
 
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const rightSidebarRef = useRef<HTMLDivElement | null>(null);
@@ -108,6 +129,42 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const userId = useAuthStore((state) => state.permissions.id);
   const login = useAuthStore((state) => state.login);
   const setSettings = useSettingsStore((state) => state.setSettings);
+
+  const queueDrawerVariants: Variants = {
+    closed: {
+      height: 'calc(100% - 120px)',
+      position: 'absolute',
+      right: 0,
+      width: 0,
+    },
+    open: {
+      height: 'calc(100% - 120px)',
+      position: 'absolute',
+      right: 0,
+      transition: {
+        duration: 0.5,
+        ease: 'anticipate',
+      },
+      width: '30vw',
+      zIndex: 75,
+    },
+  };
+
+  const queueSidebarVariants: Variants = {
+    closed: {
+      transition: { duration: 0.5 },
+      x: 1000,
+    },
+    open: {
+      transition: {
+        duration: 0.5,
+        ease: 'anticipate',
+      },
+      width: sidebar.rightWidth,
+      x: 0,
+      zIndex: 75,
+    },
+  };
 
   useEffect(() => {
     if (!isElectron()) {
@@ -205,28 +262,52 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                 />
                 <Sidebar />
               </SidebarContainer>
-              {sidebar.rightExpanded && (
-                <RightSidebarContainer
-                  key="sb"
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  initial={{ opacity: 0, x: 500 }}
-                  transition={{ duration: 0.3, ease: 'circOut' }}
+              {!sidebar.rightExpanded && (
+                <QueueDrawerButton
+                  whileHover={{ opacity: 0, transition: { duration: 0.2 } }}
+                  onMouseEnter={() => drawerHandler.open()}
                 >
-                  <ResizeHandle
-                    ref={rightSidebarRef}
-                    isResizing={isResizingRight}
-                    placement="left"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      startResizing('right');
-                    }}
-                  />
-                  <SideQueue />
-                </RightSidebarContainer>
+                  <TbArrowBarLeft size={20} />
+                </QueueDrawerButton>
               )}
+              <AnimatePresence key="queue-drawer" initial={false}>
+                {opened && (
+                  <QueueDrawer
+                    key="queue-drawer"
+                    animate="open"
+                    exit="closed"
+                    initial="closed"
+                    variants={queueDrawerVariants}
+                    onMouseLeave={() => drawerHandler.close()}
+                  >
+                    <SideQueue />
+                  </QueueDrawer>
+                )}
+              </AnimatePresence>
+              <AnimatePresence key="queue-sidebar" initial={false}>
+                {sidebar.rightExpanded && (
+                  <RightSidebarContainer
+                    key="queue-sidebar"
+                    animate="open"
+                    exit="closed"
+                    initial="oclosed"
+                    variants={queueSidebarVariants}
+                  >
+                    <ResizeHandle
+                      ref={rightSidebarRef}
+                      isResizing={isResizingRight}
+                      placement="left"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        startResizing('right');
+                      }}
+                    />
+                    <SideQueue />
+                  </RightSidebarContainer>
+                )}
+              </AnimatePresence>
             </>
           )}
-
           <Outlet />
         </MainContainer>
         <PlayerbarContainer>
