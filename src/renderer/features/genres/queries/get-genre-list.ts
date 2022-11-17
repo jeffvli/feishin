@@ -1,20 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { api } from '@/renderer/api';
-import { GenreListResponse } from '@/renderer/api/genres.api';
 import { queryKeys } from '@/renderer/api/query-keys';
-import { ApiError } from '@/renderer/api/types';
 import { QueryOptions } from '@/renderer/lib/react-query';
 import { useAuthStore } from '@/renderer/store';
 
-export const useGenreList = (options?: QueryOptions<GenreListResponse>) => {
+export const useGenreList = (options?: QueryOptions) => {
   const serverId = useAuthStore((state) => state.currentServer?.id) || '';
 
-  const query = useQuery<GenreListResponse, AxiosError<ApiError>>({
+  const query = useQuery({
     enabled: !!serverId,
     queryFn: ({ signal }) => api.genres.getGenreList({ serverId }, signal),
     queryKey: queryKeys.genres.list(serverId),
-    staleTime: Infinity,
+    staleTime: 1000 * 60 * 60,
     ...options,
   });
 

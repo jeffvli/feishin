@@ -34,7 +34,7 @@ import {
   FilterGroupType,
   encodeAdvancedFiltersQuery,
 } from '@/renderer/features/albums/components/advanced-filters';
-import { useAlbumList } from '@/renderer/features/albums/queries/use-album-list';
+import { useAlbumList } from '@/renderer/features/albums/queries/get-album-list';
 import { useServerList } from '@/renderer/features/servers';
 import { AnimatedPage, useServerCredential } from '@/renderer/features/shared';
 import { AppRoute } from '@/renderer/router/routes';
@@ -80,7 +80,7 @@ export const AlbumListRoute = () => {
   const page = useAppStore((state) => state.albums);
   const setPage = useAppStore((state) => state.setPage);
   const serverId = useAuthStore((state) => state.currentServer?.id) || '';
-  const { data: servers } = useServerList({ enabled: true });
+  const serverListQuery = useServerList({ enabled: true });
   const [filters, setFilters] = useSetState({
     orderBy: SortOrder.ASC,
     serverFolderId: [] as string[],
@@ -107,11 +107,13 @@ export const AlbumListRoute = () => {
   };
 
   const serverFolders = useMemo(() => {
-    const server = servers?.data.find((server) => server.id === serverId);
+    const server = serverListQuery?.data?.data.find(
+      (server) => server.id === serverId
+    );
     return server?.serverFolders;
-  }, [serverId, servers]);
+  }, [serverId, serverListQuery?.data?.data]);
 
-  const { data: albums } = useAlbumList({
+  const albumListQuery = useAlbumList({
     advancedFilters,
     orderBy: filters.orderBy,
     serverFolderId: filters.serverFolderId,
@@ -454,7 +456,7 @@ export const AlbumListRoute = () => {
                 display={page.list?.display || CardDisplayType.CARD}
                 fetchFn={fetch}
                 height={height}
-                itemCount={albums?.pagination.totalEntries || 0}
+                itemCount={albumListQuery?.data?.pagination.totalEntries || 0}
                 itemGap={20}
                 itemSize={150 + page.list?.size}
                 itemType={LibraryItem.ALBUM}

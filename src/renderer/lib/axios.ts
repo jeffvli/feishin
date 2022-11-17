@@ -4,9 +4,7 @@ import { useAuthStore } from '@/renderer/store';
 import { authApi } from '../api/auth.api';
 
 export const ax = Axios.create({
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
   withCredentials: false,
 });
 
@@ -35,23 +33,19 @@ ax.interceptors.response.use(
   async (err) => {
     if (err.response && err.response.status === 401) {
       const { config } = err;
-      const auth = JSON.parse(
-        localStorage.getItem('store_authentication') || '{}'
-      );
+
+      const auth = useAuthStore.getState();
 
       if (err.response.data.error.message === 'jwt expired' && !config.sent) {
         config.sent = true;
 
         const { accessToken } = (
-          await authApi.refresh(auth.state.serverUrl, {
+          await authApi.refresh(auth.serverUrl, {
             refreshToken: auth.refreshToken,
           })
         ).data;
 
-        localStorage.setItem(
-          'store_authentication',
-          JSON.stringify({ ...auth, state: { ...auth.state, accessToken } })
-        );
+        useAuthStore.setState({ ...auth, accessToken });
 
         config.headers = {
           ...config.headers,
@@ -61,12 +55,11 @@ ax.interceptors.response.use(
         return Axios(config);
       }
 
-      const { logout } = useAuthStore.getState();
-      if (err.response.data.error.message === 'No auth token') {
-        logout();
-      }
+      // if (err.response.data.error.message === 'No auth token') {
+      //   auth.logout();
+      // }
 
-      logout();
+      auth.logout();
     }
     return Promise.reject(err);
   }

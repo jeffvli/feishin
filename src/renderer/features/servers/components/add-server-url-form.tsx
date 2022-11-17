@@ -3,7 +3,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { z } from 'zod';
 import { Button, TextInput } from '@/renderer/components';
-import { useCreateServerUrl } from '@/renderer/features/servers/mutations/use-create-server-url';
+import { useCreateServerUrl } from '@/renderer/features/servers/mutations/create-server-url';
 
 interface AddServerUrlFormProps {
   onCancel: () => void;

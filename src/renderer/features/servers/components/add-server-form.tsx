@@ -9,7 +9,7 @@ import {
   TextInput,
   SegmentedControl,
 } from '@/renderer/components';
-import { useCreateServer } from '@/renderer/features/servers/mutations/use-create-server';
+import { useCreateServer } from '@/renderer/features/servers/mutations/create-server';
 
 const SERVER_TYPES = [
   { label: 'Jellyfin', value: ServerType.JELLYFIN },

@@ -5,7 +5,7 @@ import { queryKeys } from '@/renderer/api/query-keys';
 import { TaskListResponse } from '@/renderer/api/tasks.api';
 import { QueryOptions } from '@/renderer/lib/react-query';
 
-export const useTaskList = (options?: QueryOptions<TaskListResponse>) => {
+export const useTaskList = (options?: QueryOptions) => {
   return useQuery({
     queryFn: ({ signal }) => api.tasks.getActiveTasks(signal),
     queryKey: queryKeys.tasks.list(),

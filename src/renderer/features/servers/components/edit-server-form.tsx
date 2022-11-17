@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form';
 import { RiInformationLine } from 'react-icons/ri';
 import { Server, ServerType } from '@/renderer/api/types';
 import { Button, PasswordInput, TextInput, toast } from '@/renderer/components';
-import { useUpdateServer } from '@/renderer/features/servers/mutations/use-update-server';
+import { useUpdateServer } from '@/renderer/features/servers/mutations/update-server';
 
 interface EditServerFormProps {
   onCancel: () => void;

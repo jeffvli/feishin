@@ -40,8 +40,8 @@ export const EditUserPermissionsForm = ({
   onCancel,
 }: EditUserPermissionsFormProps) => {
   const permissions = usePermissions();
-  const { data: servers } = useServerList();
-  const { data: user } = useUserDetail({ userId });
+  const serverListQuery = useServerList();
+  const userDetailQuery = useUserDetail({ userId });
   const createServerPermissionMutation = useCreateServerPermission();
   const deleteServerPermissionMutation = useDeleteServerPermission();
   const updateServerPermissionMutation = useUpdateServerPermission();
@@ -61,17 +61,20 @@ export const EditUserPermissionsForm = ({
     },
   ];
 
+  const userDetailId = userDetailQuery?.data?.data.id;
+
   return (
     <Stack m={5}>
       <Accordion variant="contained">
-        {servers?.data?.map((s) => {
-          const currentServerPermission = user?.data?.serverPermissions?.find(
-            (p) => p.serverId === s.id
-          );
+        {serverListQuery?.data?.data.map((s) => {
+          const currentServerPermission =
+            userDetailQuery?.data?.data.serverPermissions?.find(
+              (p) => p.serverId === s.id
+            );
 
           const isServerAdminEditingSelf =
             permissions[s.id] >= ServerPermission.ADMIN &&
-            user?.data.id === permissions.userId;
+            userDetailQuery?.data?.data.id === permissions.userId;
 
           const isServerAdminEditingOtherAdmin =
             !permissions.isAdmin &&
@@ -81,7 +84,7 @@ export const EditUserPermissionsForm = ({
             isServerAdminEditingSelf || isServerAdminEditingOtherAdmin;
 
           const handleChangeServerPermission = async (e: string | null) => {
-            if (!e || !user) return;
+            if (!e || !userDetailId) return;
 
             if (e === 'none' && currentServerPermission) {
               deleteServerPermissionMutation.mutate(
@@ -90,7 +93,7 @@ export const EditUserPermissionsForm = ({
                     permissionId: currentServerPermission.id,
                     serverId: s.id,
                   },
-                  userId: user.data.id,
+                  userId: userDetailId,
                 },
                 {
                   onError: (err) =>
@@ -110,7 +113,7 @@ export const EditUserPermissionsForm = ({
                     permissionId: currentServerPermission.id,
                     serverId: s.id,
                   },
-                  userId: user.data.id,
+                  userId: userDetailId,
                 },
                 {
                   onError: (err) =>
@@ -125,7 +128,7 @@ export const EditUserPermissionsForm = ({
                 {
                   body: {
                     type: e as ServerPermissionType,
-                    userId: user.data.id,
+                    userId: userDetailId,
                   },
                   query: {
                     serverId: s.id,
@@ -191,14 +194,14 @@ export const EditUserPermissionsForm = ({
                   </Stack>
                   {s.serverFolders?.map((f) => {
                     const currentFolderPermission =
-                      user?.data.serverFolderPermissions?.find(
+                      userDetailQuery?.data?.data.serverFolderPermissions?.find(
                         (p) => p.serverFolderId === f.id
                       );
 
                     const handleToggleMusicFolderPermission = async (
                       e: ChangeEvent<HTMLInputElement>
                     ) => {
-                      if (!user) return;
+                      if (!userDetailId) return;
                       const { checked } = e.target;
                       const serverId = s.id;
 
@@ -206,7 +209,7 @@ export const EditUserPermissionsForm = ({
                         createServerFolderPermissionMutation.mutate(
                           {
                             body: {
-                              userId: user.data.id,
+                              userId: userDetailId,
                             },
                             query: {
                               folderId: f.id,
@@ -229,7 +232,7 @@ export const EditUserPermissionsForm = ({
                               folderPermissionId: currentFolderPermission.id,
                               serverId,
                             },
-                            userId: user.data.id,
+                            userId: userDetailId,
                           },
                           {
                             onError: (err) =>
@@ -245,7 +248,7 @@ export const EditUserPermissionsForm = ({
                     return (
                       <Switch
                         key={`server-folder-permission-${f.id}`}
-                        defaultChecked={user?.data.serverFolderPermissions.some(
+                        defaultChecked={userDetailQuery?.data?.data.serverFolderPermissions.some(
                           (p) => p.serverFolderId === f.id
                         )}
                         disabled={isServerAdminEditingOtherAdmin}

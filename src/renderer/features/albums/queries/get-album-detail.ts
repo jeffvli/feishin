@@ -3,11 +3,10 @@ import { api } from '@/renderer/api';
 import { queryKeys } from '@/renderer/api/query-keys';
 import { QueryOptions } from '@/renderer/lib/react-query';
 import { useAuthStore } from '@/renderer/store';
-import { AlbumDetailResponse } from 'renderer/api/types';
 
 export const useAlbumDetail = (
   query: { albumId: string },
-  options: QueryOptions<AlbumDetailResponse>
+  options: QueryOptions
 ) => {
   const serverId = useAuthStore((state) => state.currentServer?.id) || '';
 

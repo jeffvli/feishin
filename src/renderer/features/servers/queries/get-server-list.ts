@@ -7,14 +7,14 @@ import { useAuthStore } from '@/renderer/store';
 
 export const useServerList = (
   params?: { enabled?: boolean },
-  options?: QueryOptions<ServerListResponse>
+  options?: QueryOptions
 ) => {
   const currentServer = useAuthStore((state) => state.currentServer);
   const setCurrentServer = useAuthStore((state) => state.setCurrentServer);
 
   return useQuery({
-    onSuccess: (data) => {
-      const currentServerFromList = data.data.find(
+    onSettled: (data: ServerListResponse) => {
+      const currentServerFromList = data?.data.find(
         (server) => server.id === currentServer?.id
       );
 

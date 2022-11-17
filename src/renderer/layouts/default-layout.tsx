@@ -4,6 +4,7 @@ import isElectron from 'is-electron';
 import throttle from 'lodash/throttle';
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
+import { UserDetailResponse } from '@/renderer/api/users.api';
 import { SideQueue } from '@/renderer/features/side-queue/components/side-queue';
 import { Titlebar } from '@/renderer/features/titlebar/components/titlebar';
 import { useUserDetail } from '@/renderer/features/users';
@@ -124,7 +125,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
     { userId },
     {
       cacheTime: Infinity,
-      onSuccess: (res) => {
+      onSuccess: (res: UserDetailResponse) => {
         const props = {
           permissions: {
             id: res.data.id,

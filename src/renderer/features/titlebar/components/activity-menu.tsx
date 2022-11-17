@@ -21,9 +21,9 @@ export const ActivityMenu = () => {
   const queryClient = useQueryClient();
   const serverId = useAuthStore((state) => state.currentServer?.id) || '';
   const [isTaskRunning, setIsTaskRunning] = useState(false);
-  const { data: tasks, refetch } = useTaskList({
-    onSuccess: (data) => {
-      if (data.data.length === 0) {
+  const taskListQuery = useTaskList({
+    onSuccess: (data: ReturnType<typeof useTaskList>['data']) => {
+      if (data?.data.length === 0) {
         queryClient.invalidateQueries(queryKeys.server.root(serverId));
         return setIsTaskRunning(false);
       }
@@ -57,14 +57,14 @@ export const ActivityMenu = () => {
 
   useEffect(() => {
     socket.on('task:started', () => {
-      setTimeout(() => refetch(), 1000);
+      setTimeout(() => taskListQuery.refetch(), 1000);
       setIsTaskRunning(true);
     });
 
     return () => {
       socket.off('task:started');
     };
-  }, [refetch]);
+  }, [taskListQuery]);
 
   return (
     <>
@@ -80,7 +80,7 @@ export const ActivityMenu = () => {
         </Popover.Target>
         <Popover.Dropdown>
           {isTaskRunning ? (
-            tasks?.data?.map((task) => (
+            taskListQuery.data?.data?.map((task) => (
               <Group key={task.id} position="apart">
                 <Text>{task.note}</Text>
               </Group>

@@ -1,1 +1,1 @@
-export * from './queries/genre-list';
+export * from './queries/get-genre-list';

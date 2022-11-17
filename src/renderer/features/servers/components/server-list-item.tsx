@@ -22,18 +22,17 @@ import { AddServerCredentialForm } from '@/renderer/features/servers/components/
 import { AddServerUrlForm } from '@/renderer/features/servers/components/add-server-url-form';
 import { EditServerForm } from '@/renderer/features/servers/components/edit-server-form';
 import { ServerSection } from '@/renderer/features/servers/components/server-section';
-import { useDeleteServerUrl } from '@/renderer/features/servers/mutations/use-delete-server-url';
-import { useDisableServerFolder } from '@/renderer/features/servers/mutations/use-disable-server-folder';
-import { useDisableServerUrl } from '@/renderer/features/servers/mutations/use-disable-server-url';
-import { useEnableServerFolder } from '@/renderer/features/servers/mutations/use-enable-server-folder';
-import { useEnableServerUrl } from '@/renderer/features/servers/mutations/use-enable-server-url';
-import { useFullScan } from '@/renderer/features/servers/mutations/use-full-scan';
-import { useQuickScan } from '@/renderer/features/servers/mutations/use-quick-scan';
-import { useUpdateServer } from '@/renderer/features/servers/mutations/use-update-server';
+import { useDeleteServerUrl } from '@/renderer/features/servers/mutations/delete-server-url';
+import { useDisableServerFolder } from '@/renderer/features/servers/mutations/disable-server-folder';
+import { useDisableServerUrl } from '@/renderer/features/servers/mutations/disable-server-url';
+import { useEnableServerFolder } from '@/renderer/features/servers/mutations/enable-server-folder';
+import { useEnableServerUrl } from '@/renderer/features/servers/mutations/enable-server-url';
+import { useFullScan } from '@/renderer/features/servers/mutations/start-full-scan';
+import { useQuickScan } from '@/renderer/features/servers/mutations/start-quick-scan';
+import { useUpdateServer } from '@/renderer/features/servers/mutations/update-server';
 import { ServerPermission, usePermissions } from '@/renderer/features/shared';
 import { useTaskList } from '@/renderer/features/tasks';
 import { useAuthStore } from '@/renderer/store';
-import { Font } from '@/renderer/styles';
 
 interface ServerListItemProps {
   server: Server;
@@ -169,100 +168,221 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
   };
 
   return (
-    <>
-      <Stack mt="1rem" spacing="xl">
-        <ServerSection
-          title={
-            <Group position="apart">
-              <Text font={Font.EPILOGUE}>Server details</Text>
-              <Group spacing="md">
-                {serverPermission >= ServerPermission.ADMIN && (
-                  <Button
-                    compact
-                    disabled={isRunningTask}
-                    loading={fullScan.isLoading}
-                    variant="subtle"
-                    onClick={handleFullScan}
-                  >
-                    Full scan
-                  </Button>
-                )}
-                {serverPermission >= ServerPermission.EDITOR && (
-                  <Button
-                    compact
-                    disabled={true || isRunningTask}
-                    variant="subtle"
-                    onClick={handleQuickScan}
-                  >
-                    Quick scan
-                  </Button>
-                )}
-              </Group>
-            </Group>
-          }
-        >
-          {edit ? (
-            <EditServerForm
-              server={server}
-              onCancel={() => editHandlers.toggle()}
-            />
-          ) : (
-            <Group position="apart">
-              <Group>
-                <Stack>
-                  <Text>URL</Text>
-                  {serverPermission >= ServerPermission.EDITOR && (
-                    <Text>Username</Text>
-                  )}
-                </Stack>
-                <Stack>
-                  <Text size="sm">{server.url}</Text>
-                  {serverPermission >= ServerPermission.EDITOR && (
-                    <Text size="sm">{server.username}</Text>
-                  )}
-                </Stack>
-              </Group>
+    <Stack mt="1rem" p="1rem" spacing="xl">
+      <ServerSection
+        title={
+          <Group position="apart">
+            <Text>Server details</Text>
+            <Group spacing="md">
               {serverPermission >= ServerPermission.ADMIN && (
-                <Group>
-                  <Button
-                    tooltip={{ label: 'Edit server details' }}
-                    variant="subtle"
-                    onClick={() => editHandlers.toggle()}
-                  >
-                    <RiEdit2Fill />
-                  </Button>
-                </Group>
+                <Button
+                  compact
+                  disabled={isRunningTask}
+                  loading={fullScan.isLoading}
+                  variant="subtle"
+                  onClick={handleFullScan}
+                >
+                  Full scan
+                </Button>
+              )}
+              {serverPermission >= ServerPermission.EDITOR && (
+                <Button
+                  compact
+                  disabled={true || isRunningTask}
+                  variant="subtle"
+                  onClick={handleQuickScan}
+                >
+                  Quick scan
+                </Button>
               )}
             </Group>
-          )}
-        </ServerSection>
-
-        <ServerSection
-          title={
+          </Group>
+        }
+      >
+        {edit ? (
+          <EditServerForm
+            server={server}
+            onCancel={() => editHandlers.toggle()}
+          />
+        ) : (
+          <Group position="apart">
             <Group>
-              <Text>Music Folders</Text>
-              <Tooltip label="Select which music folders you want to enable. Enabled music folders are included in the scan queue and are available to browse.">
-                <Group>
-                  <RiInformationLine />
-                </Group>
-              </Tooltip>
+              <Stack>
+                <Text>URL</Text>
+                {serverPermission >= ServerPermission.EDITOR && (
+                  <Text>Username</Text>
+                )}
+              </Stack>
+              <Stack>
+                <Text size="sm">{server.url}</Text>
+                {serverPermission >= ServerPermission.EDITOR && (
+                  <Text size="sm">{server.username}</Text>
+                )}
+              </Stack>
             </Group>
-          }
-        >
-          <Stack>
-            {server.serverFolders?.map((folder) => (
-              <Group key={folder.id} position="apart">
-                <Text size="sm">{folder.name}</Text>
-                <Group>
-                  <>
+            {serverPermission >= ServerPermission.ADMIN && (
+              <Group>
+                <Button
+                  tooltip={{ label: 'Edit server details' }}
+                  variant="subtle"
+                  onClick={() => editHandlers.toggle()}
+                >
+                  <RiEdit2Fill />
+                </Button>
+              </Group>
+            )}
+          </Group>
+        )}
+      </ServerSection>
+
+      <ServerSection
+        title={
+          <Group>
+            <Text>Music Folders</Text>
+            <Tooltip label="Select which music folders you want to enable. Enabled music folders are included in the scan queue and are available to browse.">
+              <Group>
+                <RiInformationLine />
+              </Group>
+            </Tooltip>
+          </Group>
+        }
+      >
+        <Stack>
+          {server.serverFolders?.map((folder) => (
+            <Group key={folder.id} position="apart">
+              <Text size="sm">{folder.name}</Text>
+              <Group>
+                <>
+                  <Switch
+                    checked={folder.enabled}
+                    disabled={serverPermission < ServerPermission.ADMIN}
+                    onChange={(e) =>
+                      handleToggleFolder(folder.id, !e.currentTarget.checked)
+                    }
+                  />
+                  {serverPermission >= ServerPermission.ADMIN && (
+                    <DropdownMenu position="bottom-start">
+                      <DropdownMenu.Target>
+                        <Button compact variant="subtle">
+                          <RiMore2Fill size={15} />
+                        </Button>
+                      </DropdownMenu.Target>
+                      <DropdownMenu.Dropdown>
+                        <DropdownMenu.Item
+                          disabled
+                          rightSection={
+                            <RiDeleteBin2Line color="var(--danger-color)" />
+                          }
+                        >
+                          Delete
+                        </DropdownMenu.Item>
+                      </DropdownMenu.Dropdown>
+                    </DropdownMenu>
+                  )}
+                </>
+              </Group>
+            </Group>
+          ))}
+        </Stack>
+      </ServerSection>
+
+      <ServerSection
+        title={
+          <Group>
+            <Text>Credentials</Text>
+            <Tooltip label="If the server admin has required user credentials for this server, you will need to add your own login details here. Any credentials entered here are stored LOCALLY in the browser.">
+              <Group>
+                <RiInformationLine />
+              </Group>
+            </Tooltip>
+          </Group>
+        }
+      >
+        {addCredential ? (
+          <AddServerCredentialForm
+            server={server}
+            onCancel={() => addCredentialHandlers.close()}
+          />
+        ) : (
+          <>
+            <Stack>
+              {serverCredentials?.map((credential) => (
+                <Group key={credential.id} position="apart">
+                  <Text size="sm">{credential.username}</Text>
+                  <Group>
                     <Switch
-                      checked={folder.enabled}
-                      disabled={serverPermission < ServerPermission.ADMIN}
+                      checked={credential.enabled}
                       onChange={(e) =>
-                        handleToggleFolder(folder.id, !e.currentTarget.checked)
+                        handleToggleCredential(
+                          credential.id,
+                          !e.currentTarget.checked
+                        )
                       }
                     />
-                    {serverPermission >= ServerPermission.ADMIN && (
+                    <DropdownMenu position="bottom-start">
+                      <DropdownMenu.Target>
+                        <Button compact variant="subtle">
+                          <RiMore2Fill size={15} />
+                        </Button>
+                      </DropdownMenu.Target>
+                      <DropdownMenu.Dropdown>
+                        <DropdownMenu.Item
+                          rightSection={
+                            <RiDeleteBin2Line color="var(--danger-color)" />
+                          }
+                          onClick={() => handleDeleteCredential(credential.id)}
+                        >
+                          Delete
+                        </DropdownMenu.Item>
+                      </DropdownMenu.Dropdown>
+                    </DropdownMenu>
+                  </Group>
+                </Group>
+              ))}
+            </Stack>
+            <Button
+              compact
+              mt={10}
+              variant="subtle"
+              onClick={() => addCredentialHandlers.open()}
+            >
+              Add credential
+            </Button>
+          </>
+        )}
+      </ServerSection>
+
+      <ServerSection
+        title={
+          <Group>
+            <Text>URLs</Text>
+            <Tooltip label="Enabling a URL will use it to generate image and audio endpoints instead of the server-defined URL. This is useful if you need to be able to access a URL from a local and remote network (e.g. http://localhost:4533 or https://music.domain.net)">
+              <Group>
+                <RiInformationLine />
+              </Group>
+            </Tooltip>
+          </Group>
+        }
+      >
+        {addUrl ? (
+          <AddServerUrlForm
+            serverId={server.id}
+            onCancel={() => addUrlHandlers.close()}
+          />
+        ) : (
+          <>
+            <Stack>
+              {server.serverUrls?.map((serverUrl) => (
+                <Group key={serverUrl.id} position="apart">
+                  <Text size="sm">{serverUrl.url}</Text>
+                  <Group>
+                    <Switch
+                      checked={serverUrl.enabled}
+                      onChange={(e) =>
+                        handleToggleUrl(serverUrl.id, !e.currentTarget.checked)
+                      }
+                    />
+                    {serverPermission >= ServerPermission.EDITOR && (
                       <DropdownMenu position="bottom-start">
                         <DropdownMenu.Target>
                           <Button compact variant="subtle">
@@ -271,201 +391,73 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                         </DropdownMenu.Target>
                         <DropdownMenu.Dropdown>
                           <DropdownMenu.Item
-                            disabled
                             rightSection={
                               <RiDeleteBin2Line color="var(--danger-color)" />
                             }
+                            onClick={() => handleDeleteUrl(serverUrl.id)}
                           >
                             Delete
                           </DropdownMenu.Item>
                         </DropdownMenu.Dropdown>
                       </DropdownMenu>
                     )}
-                  </>
-                </Group>
-              </Group>
-            ))}
-          </Stack>
-        </ServerSection>
-
-        <ServerSection
-          title={
-            <Group>
-              <Text>Credentials</Text>
-              <Tooltip label="If the server admin has required user credentials for this server, you will need to add your own login details here. Any credentials entered here are stored LOCALLY in the browser.">
-                <Group>
-                  <RiInformationLine />
-                </Group>
-              </Tooltip>
-            </Group>
-          }
-        >
-          {addCredential ? (
-            <AddServerCredentialForm
-              server={server}
-              onCancel={() => addCredentialHandlers.close()}
-            />
-          ) : (
-            <>
-              <Stack>
-                {serverCredentials?.map((credential) => (
-                  <Group key={credential.id} position="apart">
-                    <Text size="sm">{credential.username}</Text>
-                    <Group>
-                      <Switch
-                        checked={credential.enabled}
-                        onChange={(e) =>
-                          handleToggleCredential(
-                            credential.id,
-                            !e.currentTarget.checked
-                          )
-                        }
-                      />
-                      <DropdownMenu position="bottom-start">
-                        <DropdownMenu.Target>
-                          <Button compact variant="subtle">
-                            <RiMore2Fill size={15} />
-                          </Button>
-                        </DropdownMenu.Target>
-                        <DropdownMenu.Dropdown>
-                          <DropdownMenu.Item
-                            rightSection={
-                              <RiDeleteBin2Line color="var(--danger-color)" />
-                            }
-                            onClick={() =>
-                              handleDeleteCredential(credential.id)
-                            }
-                          >
-                            Delete
-                          </DropdownMenu.Item>
-                        </DropdownMenu.Dropdown>
-                      </DropdownMenu>
-                    </Group>
                   </Group>
-                ))}
-              </Stack>
+                </Group>
+              ))}
+            </Stack>
+            {serverPermission >= ServerPermission.EDITOR && (
               <Button
                 compact
                 mt={10}
                 variant="subtle"
-                onClick={() => addCredentialHandlers.open()}
+                onClick={() => addUrlHandlers.open()}
               >
-                Add credential
+                Add URL
               </Button>
-            </>
-          )}
-        </ServerSection>
+            )}
+          </>
+        )}
+      </ServerSection>
 
-        <ServerSection
-          title={
+      {serverPermission >= ServerPermission.ADMIN && (
+        <ServerSection title="Danger zone">
+          <Group position="apart">
             <Group>
-              <Text>URLs</Text>
-              <Tooltip label="Enabling a URL will use it to generate image and audio endpoints instead of the server-defined URL. This is useful if you need to be able to access a URL from a local and remote network (e.g. http://localhost:4533 or https://music.domain.net)">
+              <Text size="sm">Require user credentials</Text>
+              <Tooltip label="WARNING: Disabling this option will expose your server login credentials to all users. If enabled, all users will be required to enter their own credentials to access this server.">
                 <Group>
                   <RiInformationLine />
                 </Group>
               </Tooltip>
             </Group>
-          }
-        >
-          {addUrl ? (
-            <AddServerUrlForm
-              serverId={server.id}
-              onCancel={() => addUrlHandlers.close()}
+            <Switch
+              checked={server.noCredential}
+              onChange={(e) =>
+                toggleRequiredCredential(e.currentTarget.checked)
+              }
             />
-          ) : (
+          </Group>
+          {permissions.isSuperAdmin && (
             <>
-              <Stack>
-                {server.serverUrls?.map((serverUrl) => (
-                  <Group key={serverUrl.id} position="apart">
-                    <Text size="sm">{serverUrl.url}</Text>
-                    <Group>
-                      <Switch
-                        checked={serverUrl.enabled}
-                        onChange={(e) =>
-                          handleToggleUrl(
-                            serverUrl.id,
-                            !e.currentTarget.checked
-                          )
-                        }
-                      />
-                      {serverPermission >= ServerPermission.EDITOR && (
-                        <DropdownMenu position="bottom-start">
-                          <DropdownMenu.Target>
-                            <Button compact variant="subtle">
-                              <RiMore2Fill size={15} />
-                            </Button>
-                          </DropdownMenu.Target>
-                          <DropdownMenu.Dropdown>
-                            <DropdownMenu.Item
-                              rightSection={
-                                <RiDeleteBin2Line color="var(--danger-color)" />
-                              }
-                              onClick={() => handleDeleteUrl(serverUrl.id)}
-                            >
-                              Delete
-                            </DropdownMenu.Item>
-                          </DropdownMenu.Dropdown>
-                        </DropdownMenu>
-                      )}
-                    </Group>
-                  </Group>
-                ))}
-              </Stack>
-              {serverPermission >= ServerPermission.EDITOR && (
-                <Button
-                  compact
-                  mt={10}
-                  variant="subtle"
-                  onClick={() => addUrlHandlers.open()}
-                >
-                  Add URL
-                </Button>
-              )}
+              <Divider my="xl" />
+              <Button
+                compact
+                disabled
+                leftIcon={<RiDeleteBin2Line />}
+                size="xs"
+                sx={{
+                  '&:hover': {
+                    background: 'var(--danger-color)',
+                  },
+                  background: 'var(--danger-color)',
+                }}
+              >
+                Delete server
+              </Button>
             </>
           )}
         </ServerSection>
-
-        {serverPermission >= ServerPermission.ADMIN && (
-          <ServerSection title="Danger zone">
-            <Group position="apart">
-              <Group>
-                <Text size="sm">Require user credentials</Text>
-                <Tooltip label="WARNING: Disabling this option will expose your server login credentials to all users. If enabled, all users will be required to enter their own credentials to access this server.">
-                  <Group>
-                    <RiInformationLine />
-                  </Group>
-                </Tooltip>
-              </Group>
-              <Switch
-                checked={server.noCredential}
-                onChange={(e) =>
-                  toggleRequiredCredential(e.currentTarget.checked)
-                }
-              />
-            </Group>
-            {permissions.isSuperAdmin && (
-              <>
-                <Divider my="xl" />
-                <Button
-                  compact
-                  disabled
-                  leftIcon={<RiDeleteBin2Line />}
-                  size="xs"
-                  sx={{
-                    '&:hover': {
-                      background: 'var(--danger-color)',
-                    },
-                    background: 'var(--danger-color)',
-                  }}
-                >
-                  Delete server
-                </Button>
-              </>
-            )}
-          </ServerSection>
-        )}
-      </Stack>
-    </>
+      )}
+    </Stack>
   );
 };
