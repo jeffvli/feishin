@@ -8,6 +8,10 @@ import {
   PasswordInputProps as MantinePasswordInputProps,
   FileInput as MantineFileInput,
   FileInputProps as MantineFileInputProps,
+  JsonInput as MantineJsonInput,
+  JsonInputProps as MantineJsonInputProps,
+  Textarea as MantineTextarea,
+  TextareaProps as MantineTextareaProps,
 } from '@mantine/core';
 import styled from 'styled-components';
 
@@ -30,6 +34,18 @@ interface PasswordInputProps extends MantinePasswordInputProps {
 }
 
 interface FileInputProps extends MantineFileInputProps {
+  children?: React.ReactNode;
+  maxWidth?: number | string;
+  width?: number | string;
+}
+
+interface JsonInputProps extends MantineJsonInputProps {
+  children?: React.ReactNode;
+  maxWidth?: number | string;
+  width?: number | string;
+}
+
+interface TextareaProps extends MantineTextareaProps {
   children?: React.ReactNode;
   maxWidth?: number | string;
   width?: number | string;
@@ -163,6 +179,60 @@ const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
   }
 `;
 
+const StyledJsonInput = styled(MantineJsonInput)<JsonInputProps>`
+  & .mantine-JsonInput-input {
+    color: var(--input-fg);
+    background: var(--input-bg);
+
+    &::placeholder {
+      color: var(--input-placeholder-fg);
+    }
+  }
+
+  & .mantine-JsonInput-icon {
+    color: var(--input-placeholder-fg);
+  }
+
+  & .mantine-JsonInput-required {
+    color: var(--secondary-color);
+  }
+
+  & .mantine-JsonInput-label {
+    font-family: var(--label-font-faimly);
+  }
+
+  & .mantine-JsonInput-disabled {
+    opacity: 0.6;
+  }
+`;
+
+const StyledTextarea = styled(MantineTextarea)<TextareaProps>`
+  & .mantine-Textarea-input {
+    color: var(--input-fg);
+    background: var(--input-bg);
+
+    &::placeholder {
+      color: var(--input-placeholder-fg);
+    }
+  }
+
+  & .mantine-Textarea-icon {
+    color: var(--input-placeholder-fg);
+  }
+
+  & .mantine-Textarea-required {
+    color: var(--secondary-color);
+  }
+
+  & .mantine-Textarea-label {
+    font-family: var(--label-font-faimly);
+  }
+
+  & .mantine-Textarea-disabled {
+    opacity: 0.6;
+  }
+`;
+
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   ({ children, width, maxWidth, ...props }: TextInputProps, ref) => {
     return (
@@ -207,9 +277,38 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
   ({ children, width, maxWidth, ...props }: FileInputProps, ref) => {
     return (
-      <StyledFileInput ref={ref} {...props} sx={{ maxWidth, width }}>
+      <StyledFileInput
+        ref={ref}
+        {...props}
+        styles={{
+          placeholder: {
+            color: 'var(--input-placeholder-fg)',
+          },
+        }}
+        sx={{ maxWidth, width }}
+      >
         {children}
       </StyledFileInput>
+    );
+  }
+);
+
+export const JsonInput = forwardRef<HTMLTextAreaElement, JsonInputProps>(
+  ({ children, width, maxWidth, ...props }: JsonInputProps, ref) => {
+    return (
+      <StyledJsonInput ref={ref} {...props} sx={{ maxWidth, width }}>
+        {children}
+      </StyledJsonInput>
+    );
+  }
+);
+
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ children, width, maxWidth, ...props }: TextareaProps, ref) => {
+    return (
+      <StyledTextarea ref={ref} {...props} sx={{ maxWidth, width }}>
+        {children}
+      </StyledTextarea>
     );
   }
 );
@@ -233,6 +332,18 @@ PasswordInput.defaultProps = {
 };
 
 FileInput.defaultProps = {
+  children: undefined,
+  maxWidth: undefined,
+  width: undefined,
+};
+
+JsonInput.defaultProps = {
+  children: undefined,
+  maxWidth: undefined,
+  width: undefined,
+};
+
+Textarea.defaultProps = {
   children: undefined,
   maxWidth: undefined,
   width: undefined,
