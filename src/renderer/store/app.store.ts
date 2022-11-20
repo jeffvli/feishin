@@ -136,7 +136,7 @@ export const useAppStore = create<AppSlice>()(
           image: false,
           leftWidth: '230px',
           rightExpanded: false,
-          rightWidth: '230px',
+          rightWidth: '400px',
         },
       })),
       { name: 'store_app' }
