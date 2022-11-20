@@ -91,10 +91,40 @@ export interface UniqueId {
   uniqueId: string;
 }
 
+export enum AlbumSort {
+  DATE_ADDED = 'added',
+  DATE_ADDED_REMOTE = 'addedRemote',
+  DATE_RELEASED = 'released',
+  DATE_RELEASED_YEAR = 'year',
+  FAVORITE = 'favorite',
+  NAME = 'name',
+  RANDOM = 'random',
+  RATING = 'rating',
+}
+
 export enum SortOrder {
   ASC = 'asc',
   DESC = 'desc',
 }
+
+export enum FilterGroupType {
+  AND = 'AND',
+  OR = 'OR',
+}
+
+export type AdvancedFilterRule = {
+  field?: string | null;
+  operator?: string | null;
+  uniqueId: string;
+  value?: string | number | Date | undefined | null | any;
+};
+
+export type AdvancedFilterGroup = {
+  group: AdvancedFilterGroup[];
+  rules: AdvancedFilterRule[];
+  type: FilterGroupType;
+  uniqueId: string;
+};
 
 export enum TableColumn {
   ALBUM = 'album',

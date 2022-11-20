@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { forwardRef, Ref, useImperativeHandle, useMemo, useState } from 'react';
 import { Stack, Group } from '@mantine/core';
 import dayjs from 'dayjs';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -15,25 +15,11 @@ import {
   TextInput,
 } from '@/renderer/components';
 import { useGenreList } from '@/renderer/features/genres';
-
-export enum FilterGroupType {
-  AND = 'AND',
-  OR = 'OR',
-}
-
-export type AdvancedFilterRule = {
-  field?: string | null;
-  operator?: string | null;
-  uniqueId: string;
-  value?: string | number | Date | undefined | null | any;
-};
-
-export type AdvancedFilterGroup = {
-  group: AdvancedFilterGroup[];
-  rules: AdvancedFilterRule[];
-  type: FilterGroupType;
-  uniqueId: string;
-};
+import {
+  AdvancedFilterGroup,
+  AdvancedFilterRule,
+  FilterGroupType,
+} from '@/renderer/types';
 
 const DATE_FILTER_OPTIONS_DATA = [
   { label: 'is before', value: '<' },
@@ -787,227 +773,274 @@ const FilterGroup = ({
   );
 };
 
-export const AdvancedFilters = ({ filters, setFilters }: any) => {
-  const handleAddRuleGroup = (args: AddArgs) => {
-    const { level, groupIndex } = args;
-    const filtersCopy = { ...filters };
+const DEFAULT_ADVANCED_FILTERS = {
+  group: [],
+  rules: [
+    {
+      field: '',
+      operator: '',
+      uniqueId: nanoid(),
+      value: '',
+    },
+  ],
+  type: FilterGroupType.AND,
+  uniqueId: nanoid(),
+};
 
-    const getPath = (level: number) => {
-      if (level === 0) return 'group';
+interface AdvancedFiltersProps {
+  defaultFilters?: AdvancedFilterGroup;
+  onChange: (filters: AdvancedFilterGroup) => void;
+}
+
+export interface AdvancedFiltersRef {
+  reset: () => void;
+}
+
+export const AdvancedFilters = forwardRef(
+  (
+    { defaultFilters, onChange }: AdvancedFiltersProps,
+    ref: Ref<AdvancedFiltersRef>
+  ) => {
+    const [filters, setFilters] = useState<AdvancedFilterGroup>(
+      defaultFilters || DEFAULT_ADVANCED_FILTERS
+    );
+
+    useImperativeHandle(ref, () => ({
+      reset() {
+        setFilters(DEFAULT_ADVANCED_FILTERS);
+      },
+    }));
+
+    const setFilterHandler = (newFilters: AdvancedFilterGroup) => {
+      setFilters(newFilters);
+      onChange(newFilters);
+    };
+
+    const handleAddRuleGroup = (args: AddArgs) => {
+      const { level, groupIndex } = args;
+      const filtersCopy = { ...filters };
+
+      const getPath = (level: number) => {
+        if (level === 0) return 'group';
+
+        const str = [];
+        for (const index of groupIndex) {
+          str.push(`group[${index}]`);
+        }
+
+        return `${str.join('.')}.group`;
+      };
+
+      const path = getPath(level);
+      const updatedFilters = set(filtersCopy, path, [
+        ...get(filtersCopy, path),
+        {
+          group: [],
+          rules: [
+            {
+              field: '',
+              operator: '',
+              uniqueId: nanoid(),
+              value: '',
+            },
+          ],
+          type: FilterGroupType.AND,
+          uniqueId: nanoid(),
+        },
+      ]);
+
+      setFilterHandler(updatedFilters);
+    };
+
+    const handleDeleteRuleGroup = (args: DeleteArgs) => {
+      const { uniqueId, level, groupIndex } = args;
+      const filtersCopy = { ...filters };
+
+      const getPath = (level: number) => {
+        if (level === 0) return 'group';
+
+        const str = [];
+        for (let i = 0; i < groupIndex.length; i += 1) {
+          if (i !== groupIndex.length - 1) {
+            str.push(`group[${groupIndex[i]}]`);
+          } else {
+            str.push(`group`);
+          }
+        }
+
+        return `${str.join('.')}`;
+      };
+
+      const path = getPath(level);
+
+      const updatedFilters = set(filtersCopy, path, [
+        ...get(filtersCopy, path).filter(
+          (group: AdvancedFilterGroup) => group.uniqueId !== uniqueId
+        ),
+      ]);
+
+      setFilterHandler(updatedFilters);
+    };
+
+    const getRulePath = (level: number, groupIndex: number[]) => {
+      if (level === 0) return 'rules';
 
       const str = [];
       for (const index of groupIndex) {
         str.push(`group[${index}]`);
       }
 
-      return `${str.join('.')}.group`;
+      return `${str.join('.')}.rules`;
     };
 
-    const path = getPath(level);
-    const updatedFilters = set(filtersCopy, path, [
-      ...get(filtersCopy, path),
-      {
-        group: [],
-        rules: [
-          {
-            field: '',
-            operator: '',
-            uniqueId: nanoid(),
+    const handleAddRule = (args: AddArgs) => {
+      const { level, groupIndex } = args;
+      const filtersCopy = { ...filters };
+
+      const path = getRulePath(level, groupIndex);
+      const updatedFilters = set(filtersCopy, path, [
+        ...get(filtersCopy, path),
+        {
+          field: null,
+          operator: null,
+          uniqueId: nanoid(),
+          value: null,
+        },
+      ]);
+
+      setFilterHandler(updatedFilters);
+    };
+
+    const handleDeleteRule = (args: DeleteArgs) => {
+      const { uniqueId, level, groupIndex } = args;
+      const filtersCopy = { ...filters };
+
+      const path = getRulePath(level, groupIndex);
+      const updatedFilters = set(
+        filtersCopy,
+        path,
+        get(filtersCopy, path).filter(
+          (rule: AdvancedFilterRule) => rule.uniqueId !== uniqueId
+        )
+      );
+
+      setFilterHandler(updatedFilters);
+    };
+
+    const handleChangeField = (args: any) => {
+      const { uniqueId, level, groupIndex, value } = args;
+      const filtersCopy = { ...filters };
+
+      const path = getRulePath(level, groupIndex);
+      const updatedFilters = set(
+        filtersCopy,
+        path,
+        get(filtersCopy, path).map((rule: AdvancedFilterRule) => {
+          if (rule.uniqueId !== uniqueId) return rule;
+          const defaultOperator = FILTER_OPTIONS_DATA.find(
+            (option) => option.value === value
+          )?.default;
+
+          return {
+            ...rule,
+            field: value,
+            operator: defaultOperator || '',
             value: '',
-          },
-        ],
-        type: FilterGroupType.AND,
-        uniqueId: nanoid(),
-      },
-    ]);
+          };
+        })
+      );
 
-    setFilters(updatedFilters);
-  };
+      setFilterHandler(updatedFilters);
+    };
 
-  const handleDeleteRuleGroup = (args: DeleteArgs) => {
-    const { uniqueId, level, groupIndex } = args;
-    const filtersCopy = { ...filters };
+    const handleChangeType = (args: any) => {
+      const { level, groupIndex, value } = args;
 
-    const getPath = (level: number) => {
-      if (level === 0) return 'group';
+      const filtersCopy = { ...filters };
 
-      const str = [];
-      for (let i = 0; i < groupIndex.length; i += 1) {
-        if (i !== groupIndex.length - 1) {
+      if (level === 0) {
+        return setFilterHandler({ ...filtersCopy, type: value });
+      }
+
+      const getTypePath = () => {
+        const str = [];
+        for (let i = 0; i < groupIndex.length; i += 1) {
           str.push(`group[${groupIndex[i]}]`);
-        } else {
-          str.push(`group`);
         }
-      }
 
-      return `${str.join('.')}`;
+        return `${str.join('.')}`;
+      };
+
+      const path = getTypePath();
+      const updatedFilters = set(filtersCopy, path, {
+        ...get(filtersCopy, path),
+        type: value,
+      });
+
+      return setFilterHandler(updatedFilters);
     };
 
-    const path = getPath(level);
+    const handleChangeOperator = (args: any) => {
+      const { uniqueId, level, groupIndex, value } = args;
+      const filtersCopy = { ...filters };
 
-    const updatedFilters = set(filtersCopy, path, [
-      ...get(filtersCopy, path).filter(
-        (group: AdvancedFilterGroup) => group.uniqueId !== uniqueId
-      ),
-    ]);
+      const path = getRulePath(level, groupIndex);
+      const updatedFilters = set(
+        filtersCopy,
+        path,
+        get(filtersCopy, path).map((rule: AdvancedFilterRule) => {
+          if (rule.uniqueId !== uniqueId) return rule;
+          return {
+            ...rule,
+            operator: value,
+          };
+        })
+      );
 
-    setFilters(updatedFilters);
-  };
-
-  const getRulePath = (level: number, groupIndex: number[]) => {
-    if (level === 0) return 'rules';
-
-    const str = [];
-    for (const index of groupIndex) {
-      str.push(`group[${index}]`);
-    }
-
-    return `${str.join('.')}.rules`;
-  };
-
-  const handleAddRule = (args: AddArgs) => {
-    const { level, groupIndex } = args;
-    const filtersCopy = { ...filters };
-
-    const path = getRulePath(level, groupIndex);
-    const updatedFilters = set(filtersCopy, path, [
-      ...get(filtersCopy, path),
-      {
-        field: null,
-        operator: null,
-        uniqueId: nanoid(),
-        value: null,
-      },
-    ]);
-
-    setFilters(updatedFilters);
-  };
-
-  const handleDeleteRule = (args: DeleteArgs) => {
-    const { uniqueId, level, groupIndex } = args;
-    const filtersCopy = { ...filters };
-
-    const path = getRulePath(level, groupIndex);
-    const updatedFilters = set(
-      filtersCopy,
-      path,
-      get(filtersCopy, path).filter(
-        (rule: AdvancedFilterRule) => rule.uniqueId !== uniqueId
-      )
-    );
-
-    setFilters(updatedFilters);
-  };
-
-  const handleChangeField = (args: any) => {
-    const { uniqueId, level, groupIndex, value } = args;
-    const filtersCopy = { ...filters };
-
-    const path = getRulePath(level, groupIndex);
-    const updatedFilters = set(
-      filtersCopy,
-      path,
-      get(filtersCopy, path).map((rule: AdvancedFilterRule) => {
-        if (rule.uniqueId !== uniqueId) return rule;
-        const defaultOperator = FILTER_OPTIONS_DATA.find(
-          (option) => option.value === value
-        )?.default;
-
-        return {
-          ...rule,
-          field: value,
-          operator: defaultOperator || '',
-          value: '',
-        };
-      })
-    );
-
-    setFilters(updatedFilters);
-  };
-
-  const handleChangeType = (args: any) => {
-    const { level, groupIndex, value } = args;
-
-    const filtersCopy = { ...filters };
-
-    if (level === 0) {
-      return setFilters({ ...filtersCopy, type: value });
-    }
-
-    const getTypePath = () => {
-      const str = [];
-      for (let i = 0; i < groupIndex.length; i += 1) {
-        str.push(`group[${groupIndex[i]}]`);
-      }
-
-      return `${str.join('.')}`;
+      setFilterHandler(updatedFilters);
     };
 
-    const path = getTypePath();
-    const updatedFilters = set(filtersCopy, path, {
-      ...get(filtersCopy, path),
-      type: value,
-    });
+    const handleChangeValue = (args: any) => {
+      const { uniqueId, level, groupIndex, value } = args;
+      const filtersCopy = { ...filters };
 
-    return setFilters(updatedFilters);
-  };
+      const path = getRulePath(level, groupIndex);
+      const updatedFilters = set(
+        filtersCopy,
+        path,
+        get(filtersCopy, path).map((rule: AdvancedFilterRule) => {
+          if (rule.uniqueId !== uniqueId) return rule;
+          return {
+            ...rule,
+            value,
+          };
+        })
+      );
 
-  const handleChangeOperator = (args: any) => {
-    const { uniqueId, level, groupIndex, value } = args;
-    const filtersCopy = { ...filters };
+      setFilterHandler(updatedFilters);
+    };
 
-    const path = getRulePath(level, groupIndex);
-    const updatedFilters = set(
-      filtersCopy,
-      path,
-      get(filtersCopy, path).map((rule: AdvancedFilterRule) => {
-        if (rule.uniqueId !== uniqueId) return rule;
-        return {
-          ...rule,
-          operator: value,
-        };
-      })
+    return (
+      <>
+        <FilterGroup
+          data={filters}
+          groupIndex={[]}
+          level={0}
+          uniqueId={filters.uniqueId}
+          onAddRule={handleAddRule}
+          onAddRuleGroup={handleAddRuleGroup}
+          onChangeField={handleChangeField}
+          onChangeOperator={handleChangeOperator}
+          onChangeType={handleChangeType}
+          onChangeValue={handleChangeValue}
+          onDeleteRule={handleDeleteRule}
+          onDeleteRuleGroup={handleDeleteRuleGroup}
+        />
+      </>
     );
+  }
+);
 
-    setFilters(updatedFilters);
-  };
-
-  const handleChangeValue = (args: any) => {
-    const { uniqueId, level, groupIndex, value } = args;
-    const filtersCopy = { ...filters };
-
-    const path = getRulePath(level, groupIndex);
-    const updatedFilters = set(
-      filtersCopy,
-      path,
-      get(filtersCopy, path).map((rule: AdvancedFilterRule) => {
-        if (rule.uniqueId !== uniqueId) return rule;
-        return {
-          ...rule,
-          value,
-        };
-      })
-    );
-
-    setFilters(updatedFilters);
-  };
-
-  return (
-    <>
-      <FilterGroup
-        data={filters}
-        groupIndex={[]}
-        level={0}
-        uniqueId={filters.uniqueId}
-        onAddRule={handleAddRule}
-        onAddRuleGroup={handleAddRuleGroup}
-        onChangeField={handleChangeField}
-        onChangeOperator={handleChangeOperator}
-        onChangeType={handleChangeType}
-        onChangeValue={handleChangeValue}
-        onDeleteRule={handleDeleteRule}
-        onDeleteRuleGroup={handleDeleteRuleGroup}
-      />
-    </>
-  );
+AdvancedFilters.defaultProps = {
+  defaultFilters: undefined,
 };

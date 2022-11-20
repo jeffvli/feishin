@@ -1,9 +1,10 @@
 /* eslint-disable no-plusplus */
-import { useState, useCallback, useMemo, MouseEvent } from 'react';
+import { useCallback, useMemo, MouseEvent, useRef } from 'react';
 import { Group, Box } from '@mantine/core';
-import { useDebouncedValue, useSetState, useToggle } from '@mantine/hooks';
+import { useDebouncedValue } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
+import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { nanoid } from 'nanoid';
 import {
@@ -12,8 +13,8 @@ import {
   RiSettings2Fill,
 } from 'react-icons/ri';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { ListOnScrollProps } from 'react-window';
 import { api } from '@/renderer/api';
-import { AlbumSort } from '@/renderer/api/albums.api';
 import { queryKeys } from '@/renderer/api/query-keys';
 import { SortOrder } from '@/renderer/api/types';
 import {
@@ -29,17 +30,22 @@ import {
   VirtualInfiniteGrid,
 } from '@/renderer/components';
 import {
-  AdvancedFilterGroup,
   AdvancedFilters,
-  FilterGroupType,
   encodeAdvancedFiltersQuery,
+  AdvancedFiltersRef,
 } from '@/renderer/features/albums/components/advanced-filters';
 import { useAlbumList } from '@/renderer/features/albums/queries/get-album-list';
 import { useServerList } from '@/renderer/features/servers';
 import { AnimatedPage, useServerCredential } from '@/renderer/features/shared';
 import { AppRoute } from '@/renderer/router/routes';
 import { useAppStore, useAuthStore } from '@/renderer/store';
-import { LibraryItem, CardDisplayType } from '@/renderer/types';
+import {
+  LibraryItem,
+  CardDisplayType,
+  AlbumSort,
+  FilterGroupType,
+  AdvancedFilterGroup,
+} from '@/renderer/types';
 
 const FILTERS = [
   { name: 'Title', value: AlbumSort.NAME },
@@ -81,18 +87,15 @@ export const AlbumListRoute = () => {
   const setPage = useAppStore((state) => state.setPage);
   const serverId = useAuthStore((state) => state.currentServer?.id) || '';
   const serverListQuery = useServerList({ enabled: true });
-  const [filters, setFilters] = useSetState({
-    orderBy: SortOrder.ASC,
-    serverFolderId: [] as string[],
-    sortBy: AlbumSort.NAME,
-  });
+  const filters = page.list.filter;
+  const advancedFiltersRef = useRef<AdvancedFiltersRef>(null);
 
-  const [isAdvFilter, toggleAdvFilter] = useToggle();
-  const [rawAdvFilters, setRawAdvFilters] = useState<AdvancedFilterGroup>(
-    DEFAULT_ADVANCED_FILTERS
+  const isAdvFilter = page.list.advancedFilter.enabled;
+
+  const [debouncedAdvFilters] = useDebouncedValue(
+    page.list.advancedFilter.filter,
+    500
   );
-
-  const [debouncedAdvFilters] = useDebouncedValue(rawAdvFilters, 500);
 
   const advancedFilters = useMemo(() => {
     if (!isAdvFilter) {
@@ -103,7 +106,17 @@ export const AlbumListRoute = () => {
   }, [debouncedAdvFilters, isAdvFilter]);
 
   const handleResetAdvancedFilters = () => {
-    setRawAdvFilters(DEFAULT_ADVANCED_FILTERS);
+    setPage('albums', {
+      ...page,
+      list: {
+        ...page.list,
+        advancedFilter: {
+          ...page.list.advancedFilter,
+          filter: DEFAULT_ADVANCED_FILTERS,
+        },
+      },
+    });
+    advancedFiltersRef.current?.reset();
   };
 
   const serverFolders = useMemo(() => {
@@ -173,31 +186,83 @@ export const AlbumListRoute = () => {
 
   const handleSetFilter = (e: MouseEvent<HTMLButtonElement>) => {
     if (!e.currentTarget?.value) return;
-    setFilters({ sortBy: e.currentTarget.value as AlbumSort });
+    setPage('albums', {
+      list: {
+        ...page.list,
+        filter: {
+          ...page.list.filter,
+          sortBy: e.currentTarget.value as AlbumSort,
+        },
+      },
+    });
   };
 
   const handleSetOrder = (e: MouseEvent<HTMLButtonElement>) => {
     if (!e.currentTarget?.value) return;
-    setFilters({ orderBy: e.currentTarget.value as SortOrder });
+    setPage('albums', {
+      list: {
+        ...page.list,
+        filter: {
+          ...page.list.filter,
+          orderBy: e.currentTarget.value as SortOrder,
+        },
+      },
+    });
   };
 
   const handleSetServerFolder = (e: MouseEvent<HTMLButtonElement>) => {
     if (!e.currentTarget?.value) return;
     const value = e.currentTarget.value as string;
     if (filters.serverFolderId.includes(value)) {
-      setFilters({
-        serverFolderId: filters.serverFolderId.filter((id) => id !== value),
+      setPage('albums', {
+        list: {
+          ...page.list,
+          filter: {
+            ...page.list.filter,
+            serverFolderId: filters.serverFolderId.filter((id) => id !== value),
+          },
+        },
       });
     } else {
-      setFilters({
-        serverFolderId: [...filters.serverFolderId, value],
+      setPage('albums', {
+        list: {
+          ...page.list,
+          filter: {
+            ...page.list.filter,
+            serverFolderId: [...filters.serverFolderId, value],
+          },
+        },
       });
     }
   };
 
   const handleToggleAdvancedFilters = () => {
-    toggleAdvFilter();
+    const enabled = !page.list.advancedFilter.enabled;
+    setPage('albums', {
+      ...page,
+      list: {
+        ...page.list,
+        advancedFilter: {
+          ...page.list.advancedFilter,
+          enabled,
+          ...(!enabled && { filter: DEFAULT_ADVANCED_FILTERS }),
+        },
+      },
+    });
   };
+
+  const handleUpdateAdvancedFilters = debounce((e: AdvancedFilterGroup) => {
+    setPage('albums', {
+      ...page,
+      list: {
+        ...page.list,
+        advancedFilter: {
+          ...page.list.advancedFilter,
+          filter: e,
+        },
+      },
+    });
+  }, 150);
 
   const handleSetViewType = (e: MouseEvent<HTMLButtonElement>) => {
     if (!e.currentTarget?.value) return;
@@ -230,6 +295,16 @@ export const AlbumListRoute = () => {
       });
     }
   };
+
+  const handleGridScroll = debounce((e: ListOnScrollProps) => {
+    setPage('albums', {
+      ...page,
+      list: {
+        ...page.list,
+        gridScrollOffset: e.scrollOffset,
+      },
+    });
+  }, 50);
 
   return (
     <AnimatedPage>
@@ -418,8 +493,9 @@ export const AlbumListRoute = () => {
                   </Group>
                   <Box p={10}>
                     <AdvancedFilters
-                      filters={rawAdvFilters}
-                      setFilters={setRawAdvFilters}
+                      ref={advancedFiltersRef}
+                      defaultFilters={page.list.advancedFilter.filter}
+                      onChange={handleUpdateAdvancedFilters}
                     />
                   </Box>
                 </ScrollArea>
@@ -456,6 +532,7 @@ export const AlbumListRoute = () => {
                 display={page.list?.display || CardDisplayType.CARD}
                 fetchFn={fetch}
                 height={height}
+                initialScrollOffset={page.list?.gridScrollOffset || 0}
                 itemCount={albumListQuery?.data?.pagination.totalEntries || 0}
                 itemGap={20}
                 itemSize={150 + page.list?.size}
@@ -467,6 +544,7 @@ export const AlbumListRoute = () => {
                   slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
                 }}
                 width={width}
+                onScroll={handleGridScroll}
               />
             )}
           </AutoSizer>

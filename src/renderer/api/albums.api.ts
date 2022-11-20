@@ -1,29 +1,10 @@
 import { ax } from '@/renderer/lib/axios';
-import { SortOrder } from '@/renderer/types';
+import { AlbumSort, SortOrder } from '@/renderer/types';
 import {
   AlbumDetailResponse,
   AlbumListResponse,
   PaginationParams,
 } from './types';
-
-export enum AlbumSort {
-  DATE_ADDED = 'added',
-  DATE_ADDED_REMOTE = 'addedRemote',
-  DATE_RELEASED = 'released',
-  DATE_RELEASED_YEAR = 'year',
-  FAVORITE = 'favorite',
-  NAME = 'name',
-  RANDOM = 'random',
-  RATING = 'rating',
-}
-
-export type AlbumListParams = PaginationParams & {
-  advancedFilters?: string;
-  orderBy: SortOrder;
-  serverFolderId?: string[];
-  serverUrlId?: string;
-  sortBy: AlbumSort;
-};
 
 const getAlbumDetail = async (
   query: { albumId: string; serverId: string },
@@ -40,6 +21,14 @@ const getAlbumDetail = async (
   // }));
 
   return data;
+};
+
+export type AlbumListParams = PaginationParams & {
+  advancedFilters?: string;
+  orderBy: SortOrder;
+  serverFolderId?: string[];
+  serverUrlId?: string;
+  sortBy: AlbumSort;
 };
 
 const getAlbumList = async (
