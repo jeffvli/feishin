@@ -139,15 +139,6 @@ export const PlaybackTab = () => {
             placeholder={`--gapless-playback=yes\n--prefetch-playlist=yes`}
             width={225}
             onBlur={(e) => {
-              update({
-                player: {
-                  ...settings,
-                  mpv: {
-                    ...settings.mpv,
-                    parameters: e.currentTarget.value,
-                  },
-                },
-              });
               if (isElectron()) {
                 setLocalSetting(
                   'mpv_parameters',
