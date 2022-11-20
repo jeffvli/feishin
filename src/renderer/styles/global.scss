@@ -20,7 +20,7 @@ html {
   color: var(--content-text-color);
   background: var(--content-bg);
   font-family: var(--content-font-family);
-  font-size: 12px;
+  font-size: var(--root-font-size);
 }
 
 @media only screen and (max-width: 639px) {

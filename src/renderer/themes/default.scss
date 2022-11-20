@@ -1,12 +1,10 @@
 @use 'sass:color' as color;
 
 :root {
-  --content-font-family: Sora, sans-serif;
-  --header-font-family: Gotham, sans-serif;
-
+  --root-font-size: 12px;
   --icon-color: rgb(255, 255, 255);
 
-  --primary-color: rgb(66, 116, 214);
+  --primary-color: rgb(49, 107, 224);
   --secondary-color: rgb(255, 120, 120);
   --success-color: green;
   --warning-color: orange;
@@ -50,7 +48,7 @@
   --scrollbar-thumb-bg: rgba(90, 90, 90, 0.5);
 
   --btn-primary-bg: var(--primary-color);
-  --btn-primary-bg-hover: rgb(71, 122, 224);
+  --btn-primary-bg-hover: rgb(31, 93, 216);
   --btn-primary-fg: #ffffff;
   --btn-primary-fg-hover: #ffffff;
 

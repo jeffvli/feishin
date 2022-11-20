@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { NotificationsProvider } from '@mantine/notifications';
@@ -7,6 +7,7 @@ import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { initSimpleImg } from 'react-simple-img';
 import { BaseContextModal } from '@/renderer/components';
 import { useTheme } from '@/renderer/hooks';
+import { useSettingsStore } from '@/renderer/store/settings.store';
 import { AppRouter } from './router/app-router';
 import './styles/global.scss';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -23,6 +24,14 @@ const SelectRouter = ({ children }: { children: ReactNode }) => {
 
 export const App = () => {
   const theme = useTheme();
+  const contentFont = useSettingsStore((state) => state.general.fontContent);
+  const headerFont = useSettingsStore((state) => state.general.fontHeader);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--content-font-family', contentFont);
+    root.style.setProperty('--header-font-family', headerFont);
+  }, [contentFont, headerFont]);
 
   return (
     <MantineProvider

@@ -28,6 +28,8 @@ export type DataTableProps = {
 export interface SettingsState {
   general: {
     followSystemTheme: boolean;
+    fontContent: string;
+    fontHeader: string;
     theme: AppTheme;
     themeDark: AppTheme;
     themeLight: AppTheme;
@@ -69,6 +71,8 @@ export const useSettingsStore = create<SettingsSlice>()(
       immer((set, get) => ({
         general: {
           followSystemTheme: false,
+          fontContent: 'Circular STD',
+          fontHeader: 'Gotham',
           theme: AppTheme.DEFAULT_DARK,
           themeDark: AppTheme.DEFAULT_DARK,
           themeLight: AppTheme.DEFAULT_LIGHT,
