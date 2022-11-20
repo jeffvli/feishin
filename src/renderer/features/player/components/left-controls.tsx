@@ -6,7 +6,7 @@ import { generatePath, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button, Text } from '@/renderer/components';
 import { AppRoute } from '@/renderer/router/routes';
-import { useAppStore, useAuthStore, usePlayerStore } from '@/renderer/store';
+import { useAppStore, usePlayerStore } from '@/renderer/store';
 import { fadeIn } from '@/renderer/styles';
 import { ServerType } from '@/renderer/types';
 
@@ -53,9 +53,7 @@ const Image = styled(motion(Link))`
 const PlayerbarImage = styled.img`
   width: 100%;
   height: 100%;
-  background-repeat: no-repeat;
-  background-position: 50%;
-  background-size: cover;
+  object-fit: cover;
 `;
 
 const LineItem = styled.div<{ $secondary?: boolean }>`
@@ -75,13 +73,12 @@ const LineItem = styled.div<{ $secondary?: boolean }>`
 export const LeftControls = () => {
   const hideImage = useAppStore((state) => state.sidebar.image);
   const setSidebar = useAppStore((state) => state.setSidebar);
-  const serverType = useAuthStore((state) => state.currentServer?.type);
   const song = usePlayerStore((state) => state.current.song);
 
   const title = song?.name;
 
   const artists =
-    serverType === ServerType.JELLYFIN
+    song?.type === ServerType.JELLYFIN
       ? song?.artists
       : song?.album?.albumArtists;
 
