@@ -77,12 +77,10 @@ export const PlayQueue = ({ type }: QueueProps) => {
   };
 
   const handleGridReady = () => {
-    if (tableConfig.followCurrentSong) {
-      const { api } = gridRef?.current;
+    const { api } = gridRef?.current;
 
-      const currentNode = api.getRowNode(current?.uniqueId);
-      api.ensureNodeVisible(currentNode, 'middle');
-    }
+    const currentNode = api.getRowNode(current?.uniqueId);
+    api.ensureNodeVisible(currentNode, 'middle');
   };
 
   const handleColumnChange = () => {
