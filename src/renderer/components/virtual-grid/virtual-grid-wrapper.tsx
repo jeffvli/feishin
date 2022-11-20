@@ -22,8 +22,10 @@ export const VirtualGridWrapper = ({
   itemCount,
   columnCount,
   rowCount,
+  initialScrollOffset,
   itemData,
   route,
+  onScroll,
   ...rest
 }: Omit<FixedSizeListProps, 'ref' | 'itemSize' | 'children'> & {
   cardRows: CardRow[];
@@ -75,10 +77,12 @@ export const VirtualGridWrapper = ({
       ref={refInstance}
       {...rest}
       useIsScrolling
+      initialScrollOffset={initialScrollOffset}
       itemCount={rowCount}
       itemData={{ ...memo, handlePlayQueueAdd }}
       itemSize={itemHeight}
       overscanCount={5}
+      onScroll={onScroll}
     >
       {GridCard}
     </FixedSizeList>

@@ -34,9 +34,11 @@ export const VirtualInfiniteGrid = ({
   itemType,
   cardRows,
   route,
+  onScroll,
   display,
   minimumBatchSize,
   fetchFn,
+  initialScrollOffset,
   height,
   width,
   refresh,
@@ -118,6 +120,7 @@ export const VirtualInfiniteGrid = ({
           columnCount={columnCount}
           display={display || CardDisplayType.CARD}
           height={height}
+          initialScrollOffset={initialScrollOffset}
           itemCount={itemCount || 0}
           itemData={itemData}
           itemGap={itemGap}
@@ -132,6 +135,7 @@ export const VirtualInfiniteGrid = ({
           rowCount={rowCount}
           width={width}
           onItemsRendered={onItemsRendered}
+          onScroll={onScroll}
         />
       )}
     </InfiniteLoader>
