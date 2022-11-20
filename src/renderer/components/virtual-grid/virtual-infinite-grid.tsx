@@ -52,7 +52,7 @@ export const VirtualInfiniteGrid = ({
 
     return {
       columnCount: itemsPerRow,
-      itemHeight: itemSize! + cardRows.length * 25 + itemGap,
+      itemHeight: itemSize! + cardRows.length * 22 + itemGap,
       itemWidth: itemSize! + itemGap,
       rowCount: Math.ceil(itemCount / itemsPerRow),
     };

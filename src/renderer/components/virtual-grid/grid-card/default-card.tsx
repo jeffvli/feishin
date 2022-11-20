@@ -109,7 +109,7 @@ const DetailSection = styled.div`
 const Row = styled.div<{ $secondary?: boolean }>`
   width: 100%;
   max-width: 100%;
-  height: 25px;
+  height: 22px;
   padding: 0 0.2rem;
   overflow: hidden;
   color: ${({ $secondary }) =>
@@ -236,6 +236,7 @@ export const DefaultCard = ({
                           $secondary={index > 0}
                           component={Link}
                           overflow="hidden"
+                          size={index > 0 ? 'xs' : 'md'}
                           to={generatePath(
                             row.route!.route,
                             row.route!.slugs?.reduce((acc, slug) => {
@@ -264,6 +265,7 @@ export const DefaultCard = ({
                         $noSelect
                         $secondary={index > 0}
                         overflow="hidden"
+                        size={index > 0 ? 'xs' : 'md'}
                       >
                         {row.arrayProperty && item[row.arrayProperty]}
                       </Text>
@@ -294,7 +296,12 @@ export const DefaultCard = ({
                       {data && data[row.property]}
                     </Text>
                   ) : (
-                    <Text $noSelect $secondary={index > 0} overflow="hidden">
+                    <Text
+                      $noSelect
+                      $secondary={index > 0}
+                      overflow="hidden"
+                      size={index > 0 ? 'xs' : 'md'}
+                    >
                       {data && data[row.property]}
                     </Text>
                   )}

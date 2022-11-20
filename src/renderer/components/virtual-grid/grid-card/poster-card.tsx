@@ -110,7 +110,7 @@ const DetailSection = styled.div`
 const Row = styled.div<{ $secondary?: boolean }>`
   width: 100%;
   max-width: 100%;
-  height: 25px;
+  height: 22px;
   padding: 0 0.2rem;
   overflow: hidden;
   color: ${({ $secondary }) =>
@@ -217,6 +217,7 @@ export const PosterCard = ({
                         {itemIndex > 0 && (
                           <Text
                             $noSelect
+                            size={index > 0 ? 'xs' : 'md'}
                             sx={{
                               display: 'inline-block',
                               padding: '0 2px 0 1px',
@@ -231,6 +232,7 @@ export const PosterCard = ({
                           $secondary={index > 0}
                           component={Link}
                           overflow="hidden"
+                          size={index > 0 ? 'xs' : 'md'}
                           to={generatePath(
                             row.route!.route,
                             row.route!.slugs?.reduce((acc, slug) => {
@@ -258,6 +260,7 @@ export const PosterCard = ({
                         $noSelect
                         $secondary={index > 0}
                         overflow="hidden"
+                        size={index > 0 ? 'xs' : 'md'}
                       >
                         {row.arrayProperty && item[row.arrayProperty]}
                       </Text>
@@ -274,6 +277,7 @@ export const PosterCard = ({
                       $noSelect
                       component={Link}
                       overflow="hidden"
+                      size={index > 0 ? 'xs' : 'md'}
                       to={generatePath(
                         row.route.route,
                         row.route.slugs?.reduce((acc, slug) => {
@@ -287,7 +291,12 @@ export const PosterCard = ({
                       {data && data[row.property]}
                     </Text>
                   ) : (
-                    <Text $noSelect $secondary={index > 0} overflow="hidden">
+                    <Text
+                      $noSelect
+                      $secondary={index > 0}
+                      overflow="hidden"
+                      size={index > 0 ? 'xs' : 'md'}
+                    >
                       {data && data[row.property]}
                     </Text>
                   )}
