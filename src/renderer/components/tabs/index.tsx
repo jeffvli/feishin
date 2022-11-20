@@ -11,7 +11,6 @@ const StyledTabs = styled(MantineTabs)`
 
   & .mantine-Tabs-tabsList {
     padding-right: 1rem;
-    border-right: 1px solid var(--generic-border-color);
   }
 
   &.mantine-Tabs-tab {
