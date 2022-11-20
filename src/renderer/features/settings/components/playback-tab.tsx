@@ -290,7 +290,7 @@ export const PlaybackTab = () => {
       ),
       description:
         'Enable or disable the usage of your system media hotkeys to control the audio player (desktop only)',
-      isHidden: false,
+      isHidden: !isElectron(),
       title: 'Global media hotkeys',
     },
   ];

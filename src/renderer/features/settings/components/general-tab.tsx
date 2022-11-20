@@ -1,4 +1,5 @@
 import { Divider, Stack } from '@mantine/core';
+import isElectron from 'is-electron';
 import { Switch, Select } from '@/renderer/components';
 import { SettingsOptions } from '@/renderer/features/settings/components/settings-option';
 import { THEME_DATA } from '@/renderer/hooks';
@@ -41,7 +42,7 @@ export const GeneralTab = () => {
         <Select disabled data={['Windows', 'macOS']} defaultValue="Windows" />
       ),
       description: 'Adjust the style of the titlebar',
-      isHidden: false,
+      isHidden: !isElectron(),
       title: 'Titlebar style',
     },
     {
@@ -172,9 +173,11 @@ export const GeneralTab = () => {
 
   return (
     <Stack spacing="xl">
-      {options.map((option) => (
-        <SettingsOptions key={`general-${option.title}`} {...option} />
-      ))}
+      {options
+        .filter((o) => !o.isHidden)
+        .map((option) => (
+          <SettingsOptions key={`general-${option.title}`} {...option} />
+        ))}
       <Divider />
       {themeOptions
         .filter((o) => !o.isHidden)
