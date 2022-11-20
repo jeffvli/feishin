@@ -18,8 +18,15 @@ export const SettingsOptions = ({
 }: SettingsOptionProps) => {
   return (
     <>
-      <Group noWrap position="apart">
-        <Stack spacing="xs" sx={{ maxWidth: '50%' }}>
+      <Group noWrap position="apart" sx={{ alignItems: 'center' }}>
+        <Stack
+          spacing="xs"
+          sx={{
+            alignSelf: 'flex-start',
+            display: 'flex',
+            maxWidth: '50%',
+          }}
+        >
           <Group>
             <Text $noSelect size="sm">
               {title}
