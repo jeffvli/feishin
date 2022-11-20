@@ -15,10 +15,12 @@ import {
   TextInput,
 } from '@/renderer/components';
 import { useGenreList } from '@/renderer/features/genres';
+import { useAuthStore } from '@/renderer/store';
 import {
   AdvancedFilterGroup,
   AdvancedFilterRule,
   FilterGroupType,
+  ServerType,
 } from '@/renderer/types';
 
 const DATE_FILTER_OPTIONS_DATA = [
@@ -65,16 +67,22 @@ const FILTER_GROUP_OPTIONS_DATA = [
 const FILTER_OPTIONS_DATA = [
   {
     default: '~',
+    disabled:
+      useAuthStore.getState().currentServer?.type !== ServerType.JELLYFIN,
     label: 'Artist Name',
     value: 'artists.name',
   },
   {
     default: '=',
+    disabled:
+      useAuthStore.getState().currentServer?.type !== ServerType.JELLYFIN,
     label: 'Artist Rating',
     value: 'artists.ratings.value',
   },
   {
     default: '=',
+    disabled:
+      useAuthStore.getState().currentServer?.type !== ServerType.JELLYFIN,
     label: 'Artist Genre',
     value: 'artists.genres.id',
   },
