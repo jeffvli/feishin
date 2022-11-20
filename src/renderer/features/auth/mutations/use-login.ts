@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import md5 from 'md5';
 import { nanoid } from 'nanoid';
 import { api } from '@/renderer/api';
+import { QueryOptions } from '@/renderer/lib/react-query';
 import { useAuthStore } from '@/renderer/store';
 
 export const useLogin = (
@@ -9,7 +10,8 @@ export const useLogin = (
   body: {
     password: string;
     username: string;
-  }
+  },
+  options?: QueryOptions
 ) => {
   const login = useAuthStore((state) => state.login);
 
@@ -35,5 +37,6 @@ export const useLogin = (
         localStorage.setItem('device_id', nanoid());
       }
     },
+    ...options,
   });
 };

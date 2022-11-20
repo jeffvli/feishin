@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button, PasswordInput, Text, TextInput } from '@/renderer/components';
 import { ErrorFallback } from '@/renderer/features/action-required';
-import { useLogin } from '@/renderer/features/auth/queries/use-login';
+import { useLogin } from '@/renderer/features/auth/mutations/use-login';
 import { normalizeServerUrl } from '@/renderer/utils';
 
 const Container = styled(Box)`
