@@ -10,7 +10,20 @@ import {
   Play,
   PlaybackStyle,
   PlaybackType,
+  TableColumn,
 } from '@/renderer/types';
+
+export type PersistedTableColumn = {
+  column: TableColumn;
+  width: number;
+};
+
+export type DataTableProps = {
+  autoFit: boolean;
+  columns: PersistedTableColumn[];
+  followCurrentSong: boolean;
+  rowHeight: number;
+};
 
 export interface SettingsState {
   general: {
@@ -39,6 +52,11 @@ export interface SettingsState {
     type: PlaybackType;
   };
   tab: 'general' | 'playback' | 'view' | string;
+  tables: {
+    nowPlaying: DataTableProps;
+    sideDrawerQueue: DataTableProps;
+    sideQueue: DataTableProps;
+  };
 }
 
 export interface SettingsSlice extends SettingsState {
@@ -78,6 +96,77 @@ export const useSettingsStore = create<SettingsSlice>()(
           set({ ...get(), ...data });
         },
         tab: 'general',
+        tables: {
+          nowPlaying: {
+            autoFit: true,
+            columns: [
+              {
+                column: TableColumn.ROW_INDEX,
+                width: 50,
+              },
+              {
+                column: TableColumn.TITLE,
+                width: 500,
+              },
+              {
+                column: TableColumn.DURATION,
+                width: 100,
+              },
+              {
+                column: TableColumn.ALBUM,
+                width: 100,
+              },
+              {
+                column: TableColumn.ALBUM_ARTIST,
+                width: 100,
+              },
+              {
+                column: TableColumn.GENRE,
+                width: 100,
+              },
+              {
+                column: TableColumn.YEAR,
+                width: 100,
+              },
+            ],
+            followCurrentSong: true,
+            rowHeight: 30,
+          },
+          sideDrawerQueue: {
+            autoFit: true,
+            columns: [
+              {
+                column: TableColumn.TITLE_COMBINED,
+                width: 500,
+              },
+              {
+                column: TableColumn.DURATION,
+                width: 100,
+              },
+            ],
+            followCurrentSong: true,
+            rowHeight: 60,
+          },
+          sideQueue: {
+            autoFit: true,
+            columns: [
+              {
+                column: TableColumn.ROW_INDEX,
+                width: 50,
+              },
+              {
+                column: TableColumn.TITLE_COMBINED,
+                width: 500,
+              },
+              {
+                column: TableColumn.DURATION,
+                width: 100,
+              },
+            ],
+            followCurrentSong: true,
+            rowHeight: 60,
+          },
+        },
       })),
       { name: 'store_settings' }
     ),

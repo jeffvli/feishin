@@ -12,10 +12,8 @@ import {
   PlayerRepeat,
   PlayerShuffle,
   PlayerStatus,
-  UniqueId,
+  QueueSong,
 } from '@/renderer/types';
-
-type QueueSong = Song & UniqueId;
 
 export interface PlayerState {
   current: {
@@ -76,8 +74,10 @@ export interface PlayerSlice extends PlayerState {
   player1: () => QueueSong | undefined;
   player2: () => QueueSong | undefined;
   prev: () => PlayerData;
+  reorderQueue: (rowUniqueIds: string[], afterUniqueId?: string) => PlayerData;
   setCurrentIndex: (index: number) => PlayerData;
   setCurrentTime: (time: number) => void;
+  setCurrentTrack: (uniqueId: string) => PlayerData;
   setMuted: (muted: boolean) => void;
   setRepeat: (type: PlayerRepeat) => PlayerData;
   setShuffle: (type: PlayerShuffle) => PlayerData;
@@ -505,6 +505,45 @@ export const usePlayerStore = create<PlayerSlice>()(
           shuffled: [],
           sorted: [],
         },
+        reorderQueue: (rowUniqueIds: string[], afterUniqueId?: string) => {
+          // Don't move if dropping on top of a selected row
+          if (afterUniqueId && rowUniqueIds.includes(afterUniqueId)) {
+            return get().getPlayerData();
+          }
+
+          const queue = get().queue.default;
+          const currentSongUniqueId = get().current.song?.uniqueId;
+          const queueWithoutSelectedRows = queue.filter(
+            (song) => !rowUniqueIds.includes(song.uniqueId)
+          );
+
+          const moveBeforeIndex = queueWithoutSelectedRows.findIndex(
+            (song) => song.uniqueId === afterUniqueId
+          );
+
+          // AG-Grid does not provide node data when a row is moved to the bottom of the list
+          const reorderedQueue = afterUniqueId
+            ? [
+                ...queueWithoutSelectedRows.slice(0, moveBeforeIndex),
+                ...queue.filter((song) => rowUniqueIds.includes(song.uniqueId)),
+                ...queueWithoutSelectedRows.slice(moveBeforeIndex),
+              ]
+            : [
+                ...queueWithoutSelectedRows,
+                ...queue.filter((song) => rowUniqueIds.includes(song.uniqueId)),
+              ];
+
+          const currentSongIndex = reorderedQueue.findIndex(
+            (song) => song.uniqueId === currentSongUniqueId
+          );
+
+          set({
+            current: { ...get().current, index: currentSongIndex },
+            queue: { ...get().queue, default: reorderedQueue },
+          });
+
+          return get().getPlayerData();
+        },
         repeat: PlayerRepeat.NONE,
         setCurrentIndex: (index) => {
           if (get().shuffle === PlayerShuffle.TRACK) {
@@ -538,6 +577,40 @@ export const usePlayerStore = create<PlayerSlice>()(
           set((state) => {
             state.current.time = time;
           });
+        },
+        setCurrentTrack: (uniqueId) => {
+          if (get().shuffle === PlayerShuffle.TRACK) {
+            const defaultIndex = get().queue.default.findIndex(
+              (song) => song.uniqueId === uniqueId
+            );
+
+            const shuffledIndex = get().queue.shuffled.findIndex(
+              (id) => id === uniqueId
+            );
+
+            set((state) => {
+              state.current.time = 0;
+              state.current.index = defaultIndex;
+              state.current.shuffledIndex = shuffledIndex;
+              state.current.player = 1;
+              state.current.song = state.queue.default[defaultIndex];
+              state.queue.previousNode = get().current.song;
+            });
+          } else {
+            const defaultIndex = get().queue.default.findIndex(
+              (song) => song.uniqueId === uniqueId
+            );
+
+            set((state) => {
+              state.current.time = 0;
+              state.current.index = defaultIndex;
+              state.current.player = 1;
+              state.current.song = state.queue.default[defaultIndex];
+              state.queue.previousNode = get().current.song;
+            });
+          }
+
+          return get().getPlayerData();
         },
         setMuted: (muted: boolean) => {
           set((state) => {

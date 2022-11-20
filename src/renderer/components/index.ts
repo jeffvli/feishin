@@ -19,3 +19,4 @@ export * from './slider';
 export * from './accordion';
 export * from './dropzone';
 export * from './spinner';
+export * from './virtual-table';

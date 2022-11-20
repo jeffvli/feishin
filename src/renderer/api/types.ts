@@ -268,6 +268,7 @@ export type Song = {
   serverId: string;
   streamUrl: string;
   trackNumber: number;
+  type: ServerType;
   updatedAt: string;
 };
 

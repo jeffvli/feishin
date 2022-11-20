@@ -4,12 +4,13 @@ import { AnimatePresence, motion, Variants } from 'framer-motion';
 import isElectron from 'is-electron';
 import throttle from 'lodash/throttle';
 import { TbArrowBarLeft } from 'react-icons/tb';
-import { Outlet } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import styled from 'styled-components';
 import { UserDetailResponse } from '@/renderer/api/users.api';
-import { SideQueue } from '@/renderer/features/side-queue/components/side-queue';
+import { PlayQueue } from '@/renderer/features/now-playing/';
 import { Titlebar } from '@/renderer/features/titlebar/components/titlebar';
 import { useUserDetail } from '@/renderer/features/users';
+import { AppRoute } from '@/renderer/router/routes';
 import { useAppStore, useAuthStore } from '@/renderer/store';
 import { useSettingsStore } from '@/renderer/store/settings.store';
 import { PlaybackType } from '@/renderer/types';
@@ -103,14 +104,27 @@ const QueueDrawer = styled(motion.div)`
 const QueueDrawerButton = styled(motion.div)`
   position: absolute;
   top: 35%;
-  right: 0;
-  z-index: 55;
+  right: 25px;
+  z-index: 100;
   display: flex;
   align-items: center;
-  width: 50px;
+  width: 20px;
   height: 25vh;
-  opacity: 0.3;
   user-select: none;
+`;
+
+const SideQueueContainer = styled.div`
+  width: 100%;
+  height: 100%;
+
+  .ag-root ::-webkit-scrollbar-track-piece {
+    background: var(--main-bg);
+  }
+
+  .ag-theme-alpine-dark {
+    --ag-background-color: var(--sidebar-bg) !important;
+    --ag-odd-row-background-color: var(--sidebar-bg) !important;
+  }
 `;
 
 interface DefaultLayoutProps {
@@ -120,7 +134,8 @@ interface DefaultLayoutProps {
 export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const sidebar = useAppStore((state) => state.sidebar);
   const setSidebar = useAppStore((state) => state.setSidebar);
-  const [opened, drawerHandler] = useDisclosure(false);
+  const [drawer, drawerHandler] = useDisclosure(false);
+  const location = useLocation();
 
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const rightSidebarRef = useRef<HTMLDivElement | null>(null);
@@ -130,30 +145,64 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const login = useAuthStore((state) => state.login);
   const setSettings = useSettingsStore((state) => state.setSettings);
 
+  const showQueueDrawerButton =
+    !sidebar.rightExpanded &&
+    !drawer &&
+    location.pathname !== AppRoute.NOW_PLAYING;
+
+  const showSideQueue =
+    sidebar.rightExpanded && location.pathname !== AppRoute.NOW_PLAYING;
+
+  const queueDrawerButtonVariants: Variants = {
+    hidden: {
+      opacity: 0,
+      transition: { duration: 0.2 },
+      x: 100,
+    },
+    visible: {
+      opacity: 0.5,
+      transition: { duration: 0.2, ease: 'anticipate' },
+      x: 0,
+    },
+  };
+
   const queueDrawerVariants: Variants = {
     closed: {
       height: 'calc(100% - 120px)',
-      position: 'absolute',
-      right: 0,
-      width: 0,
-    },
-    open: {
-      height: 'calc(100% - 120px)',
+      minWidth: '400px',
       position: 'absolute',
       right: 0,
       transition: {
-        duration: 0.5,
+        duration: 0.3,
         ease: 'anticipate',
       },
       width: '30vw',
-      zIndex: 75,
+      x: '30vw',
+    },
+    open: {
+      height: 'calc(100% - 120px)',
+      minWidth: '400px',
+      position: 'absolute',
+      right: 0,
+      transition: {
+        damping: 10,
+        delay: 0,
+        duration: 0.3,
+        ease: 'anticipate',
+        mass: 0.5,
+      },
+      width: '30vw',
+      x: 0,
+      zIndex: 120,
     },
   };
 
   const queueSidebarVariants: Variants = {
     closed: {
       transition: { duration: 0.5 },
+      width: sidebar.rightWidth,
       x: 1000,
+      zIndex: 120,
     },
     open: {
       transition: {
@@ -162,7 +211,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
       },
       width: sidebar.rightWidth,
       x: 0,
-      zIndex: 75,
+      zIndex: 120,
     },
   };
 
@@ -245,7 +294,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
         </TitlebarContainer>
         <MainContainer
           leftSidebarWidth={sidebar.leftWidth}
-          rightExpanded={sidebar.rightExpanded}
+          rightExpanded={showSideQueue}
           rightSidebarWidth={sidebar.rightWidth}
         >
           {!shell && (
@@ -262,35 +311,53 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                 />
                 <Sidebar />
               </SidebarContainer>
-              {!sidebar.rightExpanded && (
-                <QueueDrawerButton
-                  whileHover={{ opacity: 0, transition: { duration: 0.2 } }}
-                  onMouseEnter={() => drawerHandler.open()}
-                >
-                  <TbArrowBarLeft size={20} />
-                </QueueDrawerButton>
-              )}
-              <AnimatePresence key="queue-drawer" initial={false}>
-                {opened && (
+              <AnimatePresence exitBeforeEnter initial={false}>
+                {showQueueDrawerButton && (
+                  <QueueDrawerButton
+                    key="queue-drawer-button"
+                    animate="visible"
+                    exit="hidden"
+                    initial="hidden"
+                    variants={queueDrawerButtonVariants}
+                    onMouseEnter={() => drawerHandler.open()}
+                  >
+                    <TbArrowBarLeft size={12} />
+                  </QueueDrawerButton>
+                )}
+
+                {drawer && (
                   <QueueDrawer
                     key="queue-drawer"
                     animate="open"
                     exit="closed"
                     initial="closed"
                     variants={queueDrawerVariants}
-                    onMouseLeave={() => drawerHandler.close()}
+                    onMouseLeave={() => {
+                      // The drawer will close due to the delay when setting isReorderingQueue
+                      setTimeout(() => {
+                        if (useAppStore.getState().isReorderingQueue) return;
+                        drawerHandler.close();
+                      }, 50);
+                    }}
                   >
-                    <SideQueue />
+                    <SideQueueContainer>
+                      <PlayQueue type="sideDrawerQueue" />
+                    </SideQueueContainer>
                   </QueueDrawer>
                 )}
               </AnimatePresence>
-              <AnimatePresence key="queue-sidebar" initial={false}>
-                {sidebar.rightExpanded && (
+              <AnimatePresence
+                key="queue-sidebar"
+                exitBeforeEnter
+                presenceAffectsLayout
+                initial={false}
+              >
+                {showSideQueue && (
                   <RightSidebarContainer
                     key="queue-sidebar"
                     animate="open"
                     exit="closed"
-                    initial="oclosed"
+                    initial="closed"
                     variants={queueSidebarVariants}
                   >
                     <ResizeHandle
@@ -302,7 +369,9 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                         startResizing('right');
                       }}
                     />
-                    <SideQueue />
+                    <SideQueueContainer>
+                      <PlayQueue type="sideQueue" />
+                    </SideQueueContainer>
                   </RightSidebarContainer>
                 )}
               </AnimatePresence>

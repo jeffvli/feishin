@@ -24,6 +24,7 @@ type ListProps = {
 
 export interface AppState {
   albums: LibraryPageProps;
+  isReorderingQueue: boolean;
   platform: Platform;
   sidebar: {
     expanded: string[];
@@ -51,6 +52,7 @@ export const useAppStore = create<AppSlice>()(
             type: 'grid',
           },
         },
+        isReorderingQueue: false,
         platform: Platform.WINDOWS,
         setAppStore: (data) => {
           set({ ...get(), ...data });

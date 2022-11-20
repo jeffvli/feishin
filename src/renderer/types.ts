@@ -1,3 +1,4 @@
+import { Song } from '@/renderer/api/types';
 import { AppRoute } from './router/routes';
 
 export type RouteSlug = {
@@ -9,6 +10,8 @@ export type CardRoute = {
   route: AppRoute | string;
   slugs?: RouteSlug[];
 };
+
+export type TableType = 'nowPlaying' | 'sideQueue' | 'sideDrawerQueue';
 
 export type CardRow = {
   arrayProperty?: string;
@@ -92,6 +95,31 @@ export enum SortOrder {
   ASC = 'asc',
   DESC = 'desc',
 }
+
+export enum TableColumn {
+  ALBUM = 'album',
+  ALBUM_ARTIST = 'albumArtist',
+  ARTIST = 'artist',
+  BIT_RATE = 'bitRate',
+  DATE_ADDED = 'dateAdded',
+  DISC_NUMBER = 'discNumber',
+  DURATION = 'duration',
+  // FAVORITE = 'favorite',
+  GENRE = 'genre',
+  // PATH = 'path',
+  // PLAY_COUNT = 'playCount',
+  // RATING = 'rating',
+  RELEASE_DATE = 'releaseDate',
+  ROW_INDEX = 'rowIndex',
+  // SKIP = 'skip',
+  // SIZE = 'size',
+  TITLE = 'title',
+  TITLE_COMBINED = 'titleCombined',
+  TRACK_NUMBER = 'trackNumber',
+  YEAR = 'releaseYear',
+}
+
+export type QueueSong = Song & UniqueId;
 
 export type PlayQueueAddOptions = {
   byData?: any[];
