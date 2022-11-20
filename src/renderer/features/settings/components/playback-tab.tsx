@@ -8,6 +8,8 @@ import {
   Select,
   Slider,
   Switch,
+  Text,
+  Textarea,
   toast,
   Tooltip,
 } from '@/renderer/components';
@@ -46,6 +48,7 @@ export const PlaybackTab = () => {
   const status = usePlayerStore((state) => state.current.status);
   const [audioDevices, setAudioDevices] = useState<SelectItem[]>([]);
   const [mpvPath, setMpvPath] = useState('');
+  const [mpvParameters, setMpvParameters] = useState('');
 
   const handleSetMpvPath = (e: File) => {
     setLocalSetting('mpv_path', e.path);
@@ -58,7 +61,15 @@ export const PlaybackTab = () => {
       return setMpvPath(mpvPath);
     };
 
+    const getMpvParameters = async () => {
+      if (!isElectron()) return setMpvPath('');
+      const mpvParametersFromSettings = await getLocalSetting('mpv_parameters');
+      const mpvParameters = mpvParametersFromSettings?.join('\n');
+      return setMpvParameters(mpvParameters);
+    };
+
     getMpvPath();
+    getMpvParameters();
   }, []);
 
   useEffect(() => {
@@ -82,7 +93,7 @@ export const PlaybackTab = () => {
           data={[
             {
               disabled: !isElectron(),
-              label: 'MPV',
+              label: 'Mpv',
               value: PlaybackType.LOCAL,
             },
             { label: 'Web', value: PlaybackType.WEB },
@@ -98,7 +109,7 @@ export const PlaybackTab = () => {
           }}
         />
       ),
-      description: 'The audio player to use for playback (desktop only)',
+      description: 'The audio player to use for playback',
       isHidden: !isElectron(),
       note:
         status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
@@ -113,10 +124,55 @@ export const PlaybackTab = () => {
           onChange={handleSetMpvPath}
         />
       ),
-      description: 'The location of your MPV executable',
+      description: 'The location of your mpv executable',
       isHidden: settings.type !== PlaybackType.LOCAL,
       note: 'Restart required',
-      title: 'MPV executable path',
+      title: 'Mpv executable path',
+    },
+    {
+      control: (
+        <Stack spacing="xs">
+          <Textarea
+            autosize
+            defaultValue={mpvParameters}
+            minRows={4}
+            placeholder={`--gapless-playback=yes\n--prefetch-playlist=yes`}
+            width={225}
+            onBlur={(e) => {
+              update({
+                player: {
+                  ...settings,
+                  mpv: {
+                    ...settings.mpv,
+                    parameters: e.currentTarget.value,
+                  },
+                },
+              });
+              if (isElectron()) {
+                setLocalSetting(
+                  'mpv_parameters',
+                  e.currentTarget.value.split('\n')
+                );
+              }
+            }}
+          />
+        </Stack>
+      ),
+      description: (
+        <Text $noSelect $secondary size="sm">
+          Options to pass to the player{' '}
+          <a
+            href="https://mpv.io/manual/stable/#audio"
+            rel="noreferrer"
+            target="_blank"
+          >
+            https://mpv.io/manual/stable/#audio
+          </a>
+        </Text>
+      ),
+      isHidden: settings.type !== PlaybackType.LOCAL,
+      note: 'Restart required',
+      title: 'Mpv parameters',
     },
     {
       control: (

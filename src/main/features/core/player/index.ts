@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import uniq from 'lodash/uniq';
 import MpvAPI from 'node-mpv';
 import { PlayerData } from '../../../../renderer/store';
 import { getMainWindow } from '../../../main';
@@ -7,7 +8,29 @@ import './media-keys';
 
 declare module 'node-mpv';
 
-const BINARY_PATH = store.get('mpv_path') as string;
+const BINARY_PATH = store.get('mpv_path') as string | undefined;
+const MPV_PARAMETERS = store.get('mpv_parameters') as Array<string> | undefined;
+const DEFAULT_MPV_PARAMETERS = () => {
+  const parameters = [];
+  if (
+    !MPV_PARAMETERS?.includes('--gapless-audio=weak') ||
+    !MPV_PARAMETERS?.includes('--gapless-audio=no') ||
+    !MPV_PARAMETERS?.includes('--gapless-audio=yes') ||
+    !MPV_PARAMETERS?.includes('--gapless-audio')
+  ) {
+    parameters.push('--gapless-audio=yes');
+  }
+
+  if (
+    !MPV_PARAMETERS?.includes('--prefetch-playlist=no') ||
+    !MPV_PARAMETERS?.includes('--prefetch-playlist=yes') ||
+    !MPV_PARAMETERS?.includes('--prefetch-playlist')
+  ) {
+    parameters.push('--prefetch-playlist=yes');
+  }
+
+  return parameters;
+};
 
 const mpv = new MpvAPI(
   {
@@ -16,7 +39,9 @@ const mpv = new MpvAPI(
     binary: BINARY_PATH || '',
     time_update: 1,
   },
-  ['--gapless-audio=yes', '--prefetch-playlist']
+  MPV_PARAMETERS
+    ? uniq([...DEFAULT_MPV_PARAMETERS(), ...MPV_PARAMETERS])
+    : DEFAULT_MPV_PARAMETERS()
 );
 
 mpv.start().catch((error: any) => {
