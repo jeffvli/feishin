@@ -9,7 +9,7 @@ body[data-theme='defaultLight'] {
   --titlebar-fg: rgb(25, 25, 25);
   --titlebar-bg: rgb(227, 229, 232);
 
-  --sidebar-bg: radial-gradient(255, 255, 255);
+  --sidebar-bg: rgb(255, 255, 255);
   --sidebar-btn-color: rgb(0, 0, 0);
   --sidebar-btn-color-hover: rgb(0, 0, 0);
   --sidebar-handle-bg: #4d4d4d;
@@ -105,5 +105,9 @@ body[data-theme='defaultLight'] {
     --ag-odd-row-background-color: rgb(230, 230, 230);
     --ag-row-hover-color: rgba(100, 100, 100, 0.2);
     --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
+  }
+
+  .ag-cell-focus {
+    border: 1px rgba(60, 60, 60, 0.3) solid !important;
   }
 }

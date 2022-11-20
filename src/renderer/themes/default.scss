@@ -2,11 +2,11 @@
 
 :root {
   --content-font-family: Sora, sans-serif;
-  --header-font-family: Poppins, sans-serif;
+  --header-font-family: Gotham, sans-serif;
 
   --icon-color: rgb(255, 255, 255);
 
-  --primary-color: rgb(52, 109, 219);
+  --primary-color: rgb(66, 116, 214);
   --secondary-color: rgb(255, 120, 120);
   --success-color: green;
   --warning-color: orange;
@@ -20,11 +20,7 @@
   --titlebar-fg: rgb(255, 255, 255);
   --titlebar-bg: rgb(13, 14, 17);
 
-  --sidebar-bg: radial-gradient(
-    circle,
-    rgba(0, 0, 0, 1) 38%,
-    rgba(0, 0, 0, 0) 100%
-  );
+  --sidebar-bg: rgb(10, 12, 15);
   --sidebar-btn-color: rgb(179, 179, 179);
   --sidebar-btn-color-hover: #dddddd;
   --sidebar-handle-bg: #4d4d4d;
@@ -51,10 +47,10 @@
   --tooltip-fg: #000000;
 
   --scrollbar-track-bg: #181818;
-  --scrollbar-thumb-bg: #5a5a5a;
+  --scrollbar-thumb-bg: rgba(90, 90, 90, 0.5);
 
   --btn-primary-bg: var(--primary-color);
-  --btn-primary-bg-hover: rgb(41, 100, 216);
+  --btn-primary-bg-hover: rgb(71, 122, 224);
   --btn-primary-fg: #ffffff;
   --btn-primary-fg-hover: #ffffff;
 
@@ -103,11 +99,10 @@
   --card-default-radius: 10px;
   --card-poster-bg: transparent;
   --card-poster-bg-hover: transparent;
-  --card-poster-radius: 5px;
+  --card-poster-radius: 3px;
 
   .ag-theme-alpine-dark {
-    --ag-font-family: poppins;
-    --ag-font-size: 12px;
+    --ag-font-family: var(--content-font-family);
 
     --ag-borders: none;
     --ag-border-color: rgb(50, 50, 50);
@@ -118,18 +113,23 @@
     --ag-foreground-color: rgb(179, 179, 179);
 
     --ag-background-color: var(--main-bg);
-    --ag-odd-row-background-color: rgb(25, 25, 25);
+    // --ag-odd-row-background-color: rgb(25, 25, 25);
     --ag-row-hover-color: rgba(100, 100, 100, 0.2);
     --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
   }
 
   .ag-header-cell-label {
-    font-family: Montserrat;
+    font-family: var(--header-font-family);
+    font-weight: 600;
     text-transform: uppercase;
   }
 
+  .ag-cell-focus {
+    border: 1px rgba(155, 155, 155, 0.3) solid !important;
+  }
+
   .current-song {
-    background: rgba(0, 50, 150, 0.2) !important;
+    background: rgba(96, 144, 240, 0.3) !important;
   }
 
   .mantine-Modal-modal {
