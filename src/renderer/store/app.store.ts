@@ -74,6 +74,7 @@ const DEFAULT_ADVANCED_FILTERS = {
 };
 
 export interface AppSlice extends AppState {
+  resetServerDefaults: () => void;
   setAppStore: (data: Partial<AppSlice>) => void;
   setPage: (page: 'albums', options: Partial<LibraryPageProps>) => void;
   setSidebar: (options: Partial<SidebarProps>) => void;
@@ -104,6 +105,19 @@ export const useAppStore = create<AppSlice>()(
         },
         isReorderingQueue: false,
         platform: Platform.WINDOWS,
+        resetServerDefaults: () => {
+          set((state) => {
+            state.albums.list = {
+              ...state.albums.list,
+              filter: {
+                ...state.albums.list.filter,
+                serverFolderId: [],
+              },
+              gridScrollOffset: 0,
+              listScrollOffset: 0,
+            };
+          });
+        },
         setAppStore: (data) => {
           set({ ...get(), ...data });
         },

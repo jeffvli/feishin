@@ -21,7 +21,7 @@ import { Settings } from '@/renderer/features/settings';
 import { usePermissions } from '@/renderer/features/shared';
 import { UserList } from '@/renderer/features/users';
 import { EditUserForm } from '@/renderer/features/users/components/edit-user-form';
-import { useAuthStore } from '@/renderer/store';
+import { useAppStore, useAuthStore } from '@/renderer/store';
 
 export const AppMenu = () => {
   const queryClient = useQueryClient();
@@ -30,6 +30,7 @@ export const AppMenu = () => {
   const currentServer = useAuthStore((state) => state.currentServer);
   const setCurrentServer = useAuthStore((state) => state.setCurrentServer);
   const serverCredentials = useAuthStore((state) => state.serverCredentials);
+  const resetServerDefaults = useAppStore((state) => state.resetServerDefaults);
   const permissions = usePermissions();
   const { data: servers } = useServerList();
   const userId = useAuthStore((state) => state.permissions.id);
@@ -94,6 +95,7 @@ export const AppMenu = () => {
     const server = servers?.data.find((s) => s.id === serverId);
     if (!server) return;
     setCurrentServer(server);
+    resetServerDefaults();
     queryClient.invalidateQueries(queryKeys.server.root(serverId));
   };
 
