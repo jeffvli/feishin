@@ -1,4 +1,5 @@
 import { Box, Center, Group, Stack } from '@mantine/core';
+import { FallbackProps } from 'react-error-boundary';
 import { RiErrorWarningLine } from 'react-icons/ri';
 import styled from 'styled-components';
 import { Button, Text } from '@/renderer/components';
@@ -7,7 +8,7 @@ const Container = styled(Box)`
   background: var(--main-bg);
 `;
 
-export const ErrorFallback = ({ error, resetErrorBoundary }: any) => {
+export const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
   return (
     <Container>
       <Center sx={{ height: '100vh' }}>
