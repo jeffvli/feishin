@@ -14,6 +14,7 @@
       "@queues/*": ["queues/*"],
       "@lib/*": ["lib/*"],
       "@utils/*": ["utils/*"],
+      "@sockets/*": ["sockets/*"],
       "@/*": ["*"]
     },
     "declaration": true,
