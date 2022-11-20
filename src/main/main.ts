@@ -10,6 +10,7 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain, globalShortcut } from 'electron';
+import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import {
@@ -71,7 +72,7 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     frame: false,
-    height: 728,
+    height: 900,
     icon: getAssetPath('icon.png'),
     minHeight: 600,
     minWidth: 640,
@@ -86,7 +87,11 @@ const createWindow = async () => {
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
-    width: 1024,
+    width: 1440,
+  });
+
+  electronLocalShortcut.register(mainWindow, 'Ctrl+Shift+I', () => {
+    mainWindow?.webContents.openDevTools();
   });
 
   ipcMain.on('window-maximize', () => {
