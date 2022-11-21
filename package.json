@@ -2,6 +2,7 @@
   "name": "feishin",
   "productName": "Feishin",
   "description": "Feishin music server",
+  "version": "0.0.1-alpha1",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
@@ -19,6 +20,8 @@
     "test": "jest",
     "prepare": "husky install",
     "i18next": "i18next -c src/renderer/i18n/i18next-parser.config.js",
+    "prod:buildserver": "pwsh -c \"./scripts/server-build.ps1\"",
+    "prod:publishserver": "pwsh -c \"./scripts/server-publish.ps1\"",
     "docker:up": "docker compose --file docker-compose.dev.yml --env-file .env.dev up --detach && docker compose --file docker-compose.dev.yml --env-file .env.dev logs -f",
     "docker:down": "docker compose --file docker-compose.dev.yml --env-file .env.dev down && docker image rm feishin_prisma",
     "docker:dbpush": "cd server && npx prisma generate && docker exec -ti feishin_server sh -c \"npx prisma generate && npx prisma db push\"",
