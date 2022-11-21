@@ -90,7 +90,7 @@ If the server is specified to "require user credentials", you will need to add a
 
 ### What music servers does Feishin support?
 
-Feishin supports any music server that implements a [http://www.subsonic.org/pages/api.jsp](Subsonic), [Navidrome](https://www.navidrome.org/), or [Jellyfin](https://jellyfin.org/) API.
+Feishin supports any music server that implements a [Subsonic](http://www.subsonic.org/pages/api.jsp), [Navidrome](https://www.navidrome.org/), or [Jellyfin](https://jellyfin.org/) API.
 
 - [Jellyfin](https://github.com/jellyfin/jellyfin)
 - [Navidrome](https://github.com/navidrome/navidrome)
@@ -106,7 +106,7 @@ Feishin was an idea I had after I ran into usage limitations while building out 
 
 ### Can I use (insert database) instead of Postgresql?
 
-Due to the how [Prisma limitations](https://www.prisma.io/docs/concepts/components/prisma-migrate/prisma-migrate-limitations-issues#you-cannot-automatically-switch-database-providers), there is no easy way to switch to a different database provider at this time.
+Due to [Prisma limitations](https://www.prisma.io/docs/concepts/components/prisma-migrate/prisma-migrate-limitations-issues#you-cannot-automatically-switch-database-providers), there is no easy way to switch to a different database provider at this time.
 
 ## Development
 
