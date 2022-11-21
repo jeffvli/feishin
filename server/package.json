@@ -1,6 +1,6 @@
 {
   "name": "feishin-server",
-  "version": "1.0.0-alpha1",
+  "version": "0.0.1-alpha1",
   "description": "A full-featured Subsonic/Jellyfin compatible music player",
   "main": "server.js",
   "scripts": {

@@ -45,7 +45,7 @@ export const validateServerCredential = async (options: {
       { pw: password, username },
       {
         headers: {
-          'X-Emby-Authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="1.0.0-alpha1"`,
+          'X-Emby-Authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="0.0.1-alpha1"`,
         },
       }
     );
