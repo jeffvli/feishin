@@ -44,6 +44,8 @@ Download the [latest desktop client](https://github.com/jeffvli/feishin/releases
 
 ### Docker Compose
 
+**Warning:** Check the environment variable configuration before running the commands below.
+
 1. Copy and rename [example.env](https://github.com/jeffvli/feishin/blob/dev/example.env) to `.env` and make any changes necessary
 2. Run the compose file: `docker compose --file docker-compose.yml --env-file .env up`
 
@@ -51,8 +53,26 @@ Download the [latest desktop client](https://github.com/jeffvli/feishin/releases
 
 **Warning:** Check the environment variable configuration before running the commands below.
 
-1. Run a postgres container: `docker run postgres:13 -p 5432:5432 -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=feishin`
-2. Run the server image: `docker run jeffvictorli/feishin:latest -p 8643:9321 -e APP_BASE_URL=http://192.168.0.1:8643 -e DATABASE_PORT=5432 -e DATABASE_URL=postgresql://admin:admin@localhost:5432/feishin?schema=public -e TOKEN_SECRET=secret -e TOKEN_EXPIRATION=5m -e TOKEN_REFRESH_EXPIRATION=90d`
+**Run a postgres database container:**
+
+```
+docker run postgres:13 \
+  -p 5432:5432 \
+  -e POSTGRES_USER=admin \
+  -e POSTGRES_PASSWORD=admin \
+  -e POSTGRES_DB=feishin
+```
+
+**Run the Feishin server container:**
+
+```
+docker run jeffvictorli/feishin:latest \
+  -p 8643:9321 \
+  -e APP_BASE_URL=http://192.168.0.1:8643 \
+  -e DATABASE_PORT=5432 \
+  -e DATABASE_URL=postgresql://admin:admin@localhost:5432/feishin?schema=public \
+  -e TOKEN_SECRET=secret
+```
 
 **Docker Environment Variables**
 
