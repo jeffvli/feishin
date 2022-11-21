@@ -31,6 +31,10 @@ ax.interceptors.response.use(
     return res;
   },
   async (err) => {
+    if (!err.response) {
+      return Promise.reject(err);
+    }
+
     if (err.response && err.response.status === 401) {
       const { config } = err;
 
@@ -54,10 +58,6 @@ ax.interceptors.response.use(
 
         return Axios(config);
       }
-
-      // if (err.response.data.error.message === 'No auth token') {
-      //   auth.logout();
-      // }
 
       auth.logout();
     }
