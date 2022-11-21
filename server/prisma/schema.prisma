@@ -210,7 +210,7 @@ model UserServerUrl {
 model ServerFolder {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String
-  remoteId      String    @unique
+  remoteId      String
   enabled       Boolean   @default(true)
   lastScannedAt DateTime?
   createdAt     DateTime  @default(now())
@@ -490,17 +490,16 @@ model Song {
   sortName        String
   releaseDate     DateTime?
   releaseYear     Int?
-  duration        Float
+  duration        Float?
   size            Int?
   lyrics          String?
-  bitRate         Int
+  bitRate         Int?
   container       String
-  discNumber      Int       @default(1)
+  discNumber      Int?      @default(1)
   trackNumber     Int?
   artistName      String?
   remoteId        String
   remoteCreatedAt DateTime?
-  skip            Boolean   @default(false)
   deleted         Boolean   @default(false)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
