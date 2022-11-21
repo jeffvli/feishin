@@ -48,5 +48,7 @@
       "authUsername": "admin",
       "authPassword": "admin"
     }
-  }
+  },
+  "i18n-ally.localesPaths": ["src/i18n", "src/i18n/locales"],
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }
