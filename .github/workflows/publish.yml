@@ -1,9 +1,6 @@
-name: Publish
+name: Publish (Manual)
 
-on:
-  push:
-    branches:
-      - main
+on: workflow_dispatch
 
 jobs:
   publish:
