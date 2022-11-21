@@ -29,15 +29,15 @@ jobs:
 
       - name: Publish releases
         env:
-          # These values are used for auto updates signing
-          # APPLE_ID: ${{ secrets.APPLE_ID }}
-          # APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
-          # CSC_LINK: ${{ secrets.CSC_LINK }}
-          # CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          # This is used for uploading release assets to github
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: nick-invision/retry@v2.4.0
-        run: |
-          npm run postinstall
-          npm run build
-          npm exec electron-builder -- --publish always --win --mac --linux
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: error
+          command: |
+            npm run postinstall
+            npm run build
+            npm exec electron-builder -- --publish always --win --mac --linux
+          on_retry_command: npm cache clean --force
+          shell: cmd
