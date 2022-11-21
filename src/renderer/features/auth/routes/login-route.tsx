@@ -20,7 +20,7 @@ export const LoginRoute = () => {
   const [username, setUsername] = useState(searchParams.get('username') || '');
   const [password, setPassword] = useState(searchParams.get('password') || '');
   const [server, setServer] = useState(
-    searchParams.get('server') || 'http://localhost:8843'
+    searchParams.get('server') || 'http://localhost:8643'
   );
 
   const {
@@ -88,7 +88,7 @@ export const LoginRoute = () => {
                   <TextInput
                     disabled={isLoading}
                     label="Server URL"
-                    placeholder="http://localhost:8843"
+                    placeholder="http://localhost:8643"
                     value={server}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setServer(e.currentTarget.value)
