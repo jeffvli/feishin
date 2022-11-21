@@ -64,7 +64,7 @@ const remoteServerLogin = async (options: {
     });
 
     return {
-      altToken: `u=${res.name}&s=${res.subsonicSalt}&t=${res.subsonicToken}`,
+      altToken: `u=${res.username}&s=${res.subsonicSalt}&t=${res.subsonicToken}`,
       remoteUserId: res.id,
       token: res.token,
       type: ServerType.NAVIDROME,
