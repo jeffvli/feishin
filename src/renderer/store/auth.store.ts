@@ -48,9 +48,6 @@ export const useAuthStore = create<AuthSlice>()(
         accessToken: '',
         addServerCredential: (options) => {
           set((state) => {
-            state.serverCredentials = state.serverCredentials.filter(
-              (c) => c.username !== options.username
-            );
             state.serverCredentials.push(options);
           });
         },
