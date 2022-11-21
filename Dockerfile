@@ -40,6 +40,9 @@ COPY --from=ui-builder /app/release/app/dist/renderer ./feishin-client
 COPY docker-entrypoint.sh ./feishin-server/docker-entrypoint.sh
 RUN chmod +x ./feishin-server/docker-entrypoint.sh
 
+COPY ./server/wait-for-it.sh ./feishin-server/wait-for-it.sh
+RUN chmod +x ./feishin-server/wait-for-it.sh
+
 RUN npm install pm2 -g
 
 WORKDIR /root/feishin-server
