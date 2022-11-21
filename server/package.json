@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon --legacy-watch -e ts,js --exec ts-node -r tsconfig-paths/register server.ts",
-    "prod": "ts-node -r tsconfig-paths/register server.ts",
+    "prod": "ts-node --transpileOnly -r tsconfig-paths/register server.ts",
     "dev:debug": "nodemon --config nodemon.json --inspect-brk server.ts",
     "build": "tsc --project . && tsconfig-replace-paths --project tsconfig.json"
   },

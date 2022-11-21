@@ -1,4 +1,4 @@
 node_modules
 release/app/node_modules
 release/app/dist
-src/server/node_modules
+server/node_modules

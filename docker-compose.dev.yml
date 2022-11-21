@@ -30,7 +30,7 @@ services:
       - TOKEN_EXPIRATION=${TOKEN_EXPIRATION}
       - TOKEN_REFRESH_EXPIRATION=${TOKEN_REFRESH_EXPIRATION}
     ports:
-      - '9321:9321'
+      - '8843:9321'
     restart: unless-stopped
   prisma:
     container_name: feishin_prisma_studio
