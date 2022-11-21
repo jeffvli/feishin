@@ -14,7 +14,10 @@ services:
     restart: unless-stopped
   server:
     container_name: feishin
-    image: jeffvictorli/feishin:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: feishin
     depends_on:
       - db
     environment:
