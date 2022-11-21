@@ -107,11 +107,11 @@ export const AppMenu = () => {
         </Button>
       </DropdownMenu.Target>
       <DropdownMenu.Dropdown>
-        <DropdownMenu.Label>Server switcher</DropdownMenu.Label>
+        <DropdownMenu.Label>Select a server</DropdownMenu.Label>
         {serverList.map((s) => {
-          const requiresCredential = !serverCredentials.some(
-            (c) => c.serverId === s.id && c.enabled
-          );
+          const requiresCredential =
+            s.noCredential &&
+            !serverCredentials.some((c) => c.serverId === s.id && c.enabled);
 
           return (
             <DropdownMenu.Item
