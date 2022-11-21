@@ -1,7 +1,7 @@
 import { Server } from '@prisma/client';
-import { randomString } from '@utils/index';
 import axios from 'axios';
 import md5 from 'md5';
+import { randomString } from '../../utils/random-string';
 import {
   SSAlbumListEntry,
   SSAlbumListResponse,
@@ -103,8 +103,8 @@ const getAlbums = async (
     )
     .then((res) => {
       if (
-        !res.data.albumList2.album ||
-        res.data.albumList2.album.length === 0
+        !res.data.albumList2?.album ||
+        res.data.albumList2?.album?.length === 0
       ) {
         // Flatten and return once there are no more albums left
         return recursiveData.flatMap((album) => album);

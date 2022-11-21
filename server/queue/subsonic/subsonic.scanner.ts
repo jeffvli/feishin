@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 import { ImageType, Server, ServerFolder, Task } from '@prisma/client';
-import { prisma, throttle } from '@lib/index';
-import { uniqueArray } from '@utils/index';
+import { prisma, throttle } from '../../lib/index';
+import { uniqueArray } from '../../utils/index';
 import { queue } from '../queues';
 import { subsonicApi } from './subsonic.api';
 import { subsonicUtils } from './subsonic.utils';
@@ -73,7 +73,7 @@ export const scanAlbums = async (
   });
 
   const albums = await subsonicApi.getAlbums(server, {
-    musicFolderId: serverFolder.id,
+    musicFolderId: serverFolder.remoteId,
     offset: 0,
     size: 500,
     type: 'newest',
@@ -103,33 +103,35 @@ export const scanAlbums = async (
     await prisma.album.upsert({
       create: {
         albumArtists: { connect: albumArtistConnect },
+        deleted: false,
         genres: { connect: album.genre ? { name: album.genre } : undefined },
         images: { connect: imagesConnect },
-        name: album.title,
+        name: album.name,
         releaseDate: album?.year
-          ? new Date(album.year, 0).toISOString()
+          ? new Date(Number(String(album.year).slice(4)), 0).toISOString()
           : undefined,
         releaseYear: album.year,
         remoteCreatedAt: album.created,
         remoteId: album.id,
         serverFolders: { connect: { id: serverFolder.id } },
         serverId: server.id,
-        sortName: album.title,
+        sortName: album.name,
       },
       update: {
         albumArtists: { connect: albumArtistConnect },
+        deleted: false,
         genres: { connect: album.genre ? { name: album.genre } : undefined },
         images: { connect: imagesConnect },
-        name: album.title,
+        name: album.name,
         releaseDate: album?.year
-          ? new Date(album.year, 0).toISOString()
+          ? new Date(Number(String(album.year).slice(4)), 0).toISOString()
           : undefined,
         releaseYear: album.year,
         remoteCreatedAt: album.created,
         remoteId: album.id,
         serverFolders: { connect: { id: serverFolder.id } },
         serverId: server.id,
-        sortName: album.title,
+        sortName: album.name,
       },
       where: {
         uniqueAlbumId: {
@@ -170,45 +172,53 @@ const throttledAlbumFetch = throttle(
 
         return {
           create: {
-            albumArtists: { connect: albumArtistsConnect },
+            // albumArtistId: song.artistId ? song.artistId : undefined,
+            albumArtist: { connect: albumArtistsConnect },
             artistName: !song.artistId ? song.artist : undefined,
-            bitRate: song.bitRate,
+            bitRate: song.bitRate ? song.bitRate : undefined,
             container: song.suffix,
+            deleted: false,
             discNumber: song.discNumber,
             duration: song.duration,
             genres: { connect: genresConnect },
             images: { connect: imagesConnect },
             name: song.title,
             releaseDate: song?.year
-              ? new Date(song.year, 0).toISOString()
+              ? new Date(Number(String(song.year).slice(4)), 0).toISOString()
               : undefined,
             releaseYear: song.year,
             remoteCreatedAt: song.created,
             remoteId: song.id,
+            server: { connect: { id: server.id } },
             serverFolders: { connect: { id: serverFolder.id } },
-            serverId: server.id,
+            // serverId: server.id,
             size: song.size,
             sortName: song.title,
             trackNumber: song.track,
           },
           update: {
-            albumArtists: { connect: albumArtistsConnect },
+            albumArtist: { connect: albumArtistsConnect },
+            // albumArtistId: song.artistId ? song.artistId : undefined,
             artistName: !song.artistId ? song.artist : undefined,
-            bitRate: song.bitRate,
+
+            bitRate: song.bitRate ? song.bitRate : undefined,
             container: song.suffix,
+            deleted: false,
             discNumber: song.discNumber,
             duration: song.duration,
             genres: { connect: genresConnect },
             images: { connect: imagesConnect },
             name: song.title,
             releaseDate: song?.year
-              ? new Date(song.year, 0).toISOString()
+              ? new Date(Number(String(song.year).slice(4)), 0).toISOString()
               : undefined,
             releaseYear: song.year,
             remoteCreatedAt: song.created,
             remoteId: song.id,
+            server: { connect: { id: server.id } },
             serverFolders: { connect: { id: serverFolder.id } },
-            serverId: server.id,
+
+            // serverId: server.id,
             size: song.size,
             sortName: song.title,
             trackNumber: song.track,
@@ -228,7 +238,7 @@ const throttledAlbumFetch = throttle(
 
       const artistsConnect = uniqueArtistIds.map((artistId) => {
         return {
-          uniqueArtistId: {
+          uniqueAlbumArtistId: {
             remoteId: artistId!,
             serverId: server.id,
           },
@@ -237,12 +247,12 @@ const throttledAlbumFetch = throttle(
 
       await prisma.album.update({
         data: {
-          artists: { connect: artistsConnect },
+          // albumArtists: { connect: artistsConnect },
           songs: { upsert: songsUpsert },
         },
         where: {
           uniqueAlbumId: {
-            remoteId: albumRes.album.id,
+            remoteId: album.remoteId,
             serverId: server.id,
           },
         },
@@ -269,10 +279,8 @@ export const scanAlbumDetail = async (
   });
 
   for (let i = 0; i < dbAlbums.length; i += 1) {
-    promises.push(throttledAlbumFetch(server, serverFolder, dbAlbums[i]));
+    await throttledAlbumFetch(server, serverFolder, dbAlbums[i]);
   }
-
-  await Promise.all(promises);
 };
 
 const scanAll = async (
