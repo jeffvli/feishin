@@ -42,7 +42,7 @@
   },
   "build": {
     "productName": "Feishin",
-    "appId": "org.erb.feishin",
+    "appId": "org.jeffvli.feishin",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
