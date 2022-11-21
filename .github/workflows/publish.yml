@@ -27,7 +27,7 @@ jobs:
       - name: Publish releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: nick-invision/retry@v2.4.0
+        uses: nick-invision/retry@v2.8.2
         with:
           timeout_minutes: 30
           max_attempts: 3
@@ -37,4 +37,3 @@ jobs:
             npm run build
             npm exec electron-builder -- --publish always --win --mac --linux
           on_retry_command: npm cache clean --force
-          shell: cmd
