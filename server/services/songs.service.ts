@@ -59,10 +59,10 @@ const findMany = async (
   // const artistIds = rawArtistIds && rawArtistIds.split(',');
   const songIds = rawSongIds && rawSongIds.split(',');
 
-  if (serverFolderIds) {
-    if (!(await folderPermissions(serverFolderIds, user)))
-      throw ApiError.forbidden('');
-  }
+  // if (serverFolderIds) {
+  //   if (!(await folderPermissions(serverFolderIds, user)))
+  //     throw ApiError.forbidden('');
+  // }
 
   // const serverFoldersFilter = serverFolderIds!.map((serverFolderId: number) => {
   //   return { serverFolders: { id: { equals: serverFolderId } } };
