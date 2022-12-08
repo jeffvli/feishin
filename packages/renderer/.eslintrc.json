@@ -1,0 +1,80 @@
+{
+  "env": {
+    "browser": true,
+    "node": false
+  },
+  "extends": ["plugin:react-hooks/recommended", "plugin:typescript-sort-keys/recommended"],
+  "plugins": ["react", "@typescript-eslint", "import", "sort-keys-fix"],
+  "root": false,
+  "parserOptions": {
+    "createDefaultProgram": true,
+    "parser": "@typescript-eslint/parser",
+    "ecmaVersion": 12,
+    "sourceType": "module",
+    "project": "./packages/renderer/tsconfig.json",
+    "tsconfigRootDir": "./"
+  },
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      // See https://github.com/benmosher/eslint-plugin-import/issues/1396#issuecomment-575727774 for line below
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": "./packages/renderer/tsconfig.json"
+      }
+    }
+  },
+  "rules": {
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-shadow": ["off"],
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": "off",
+    "import/no-unresolved": "error",
+    "import/order": [
+      "error",
+      {
+        "alphabetize": {
+          "caseInsensitive": true,
+          "order": "asc"
+        },
+        "groups": ["builtin", "external", "internal", ["parent", "sibling"]],
+        "newlines-between": "never",
+        "pathGroups": [
+          {
+            "group": "external",
+            "pattern": "react",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["react"]
+      }
+    ],
+    "import/prefer-default-export": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/interactive-supports-focus": "off",
+    "jsx-a11y/media-has-caption": "off",
+    "no-await-in-loop": "off",
+    "no-console": "off",
+    "no-nested-ternary": "off",
+    "no-restricted-syntax": "off",
+    "no-underscore-dangle": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-sort-props": [
+      "error",
+      {
+        "callbacksLast": true,
+        "ignoreCase": false,
+        "noSortAlphabetically": false,
+        "reservedFirst": true,
+        "shorthandFirst": true,
+        "shorthandLast": false
+      }
+    ],
+    "react/react-in-jsx-scope": "off",
+    "sort-keys-fix/sort-keys-fix": "warn"
+  }
+}

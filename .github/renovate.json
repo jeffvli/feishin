@@ -1,0 +1,18 @@
+{
+  "extends": [
+    "config:base",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(deps)",
+    ":semanticCommitScopeDisabled",
+    ":automergeAll",
+    ":automergeBranch",
+    ":disableDependencyDashboard",
+    ":pinVersions",
+    ":onlyNpm",
+    ":label(dependencies)"
+  ],
+  "gitNoVerify": [
+    "commit",
+    "push"
+  ]
+}
