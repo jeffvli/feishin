@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useTimeout } from '@mantine/hooks';
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
 import isElectron from 'is-electron';
@@ -107,15 +107,15 @@ const QueueDrawer = styled(motion.div)`
   border-left: var(--sidebar-border);
 `;
 
-const QueueDrawerButton = styled(motion.div)`
+const QueueDrawerArea = styled(motion.div)`
   position: absolute;
-  top: 35%;
+  top: 50%;
   right: 25px;
   z-index: 100;
   display: flex;
   align-items: center;
   width: 20px;
-  height: 25vh;
+  height: 30px;
   user-select: none;
 `;
 
@@ -148,6 +148,16 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const [isResizing, setIsResizing] = useState(false);
   const [isResizingRight, setIsResizingRight] = useState(false);
 
+  const drawerTimeout = useTimeout(() => drawerHandler.open(), 500);
+
+  const handleEnterDrawerButton = useCallback(() => {
+    drawerTimeout.start();
+  }, [drawerTimeout]);
+
+  const handleLeaveDrawerButton = useCallback(() => {
+    drawerTimeout.clear();
+  }, [drawerTimeout]);
+
   const showQueueDrawerButton =
     !sidebar.rightExpanded && !drawer && location.pathname !== AppRoute.NOW_PLAYING;
 
@@ -161,7 +171,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
     },
     visible: {
       opacity: 0.5,
-      transition: { duration: 0.2, ease: 'anticipate' },
+      transition: { duration: 0.1, ease: 'anticipate' },
       x: 0,
     },
   };
@@ -177,7 +187,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
         ease: 'anticipate',
       },
       width: '30vw',
-      x: '30vw',
+      x: '50vw',
     },
     open: {
       height: 'calc(100% - 120px)',
@@ -282,16 +292,18 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                 mode="wait"
               >
                 {showQueueDrawerButton && (
-                  <QueueDrawerButton
+                  <QueueDrawerArea
                     key="queue-drawer-button"
                     animate="visible"
                     exit="hidden"
                     initial="hidden"
                     variants={queueDrawerButtonVariants}
-                    onMouseEnter={() => drawerHandler.open()}
+                    whileHover={{ opacity: 1, scale: 2, transition: { duration: 0.5 } }}
+                    onMouseEnter={handleEnterDrawerButton}
+                    onMouseLeave={handleLeaveDrawerButton}
                   >
                     <TbArrowBarLeft size={12} />
-                  </QueueDrawerButton>
+                  </QueueDrawerArea>
                 )}
 
                 {drawer && (
