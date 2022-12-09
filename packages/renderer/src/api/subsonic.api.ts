@@ -200,7 +200,8 @@ const getAlbumDetail = async (args: AlbumDetailArgs): Promise<SSAlbumDetail> => 
     })
     .json<SSAlbumDetailResponse>();
 
-  return data.album;
+  const { song: songs, ...dataWithoutSong } = data.album;
+  return { ...dataWithoutSong, songs };
 };
 
 const getAlbumList = async (args: AlbumListArgs): Promise<SSAlbumList> => {

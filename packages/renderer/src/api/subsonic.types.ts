@@ -55,7 +55,7 @@ export type SSAlbumListResponse = {
   };
 };
 
-export type SSAlbumDetail = SSAlbum;
+export type SSAlbumDetail = Omit<SSAlbum, 'song'> & { songs: SSSong[] };
 
 export type SSAlbumDetailResponse = {
   album: SSAlbum;
