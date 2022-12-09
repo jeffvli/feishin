@@ -8,7 +8,7 @@ import type { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Skeleton } from '/@/components/skeleton';
 import { Text } from '/@/components/text';
-import type { PlayQueueAddOptions, LibraryItem, CardRow, CardRoute, Play } from '/@/types';
+import type { LibraryItem, CardRow, CardRoute, Play } from '/@/types';
 import GridCardControls from './grid-card-controls';
 
 const CardWrapper = styled.div<{
@@ -117,7 +117,6 @@ interface BaseGridCardProps {
   columnIndex: number;
   controls: {
     cardRows: CardRow[];
-    handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
     itemType: LibraryItem;
     playButtonBehavior: Play;
     route: CardRoute;
@@ -166,7 +165,6 @@ export const PosterCard = ({
                   height={sizes.itemWidth}
                   importance="auto"
                   placeholder={'var(--card-default-bg)'}
-                  // placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
                   src={data?.imageUrl}
                   width={sizes.itemWidth}
                 />
@@ -184,14 +182,12 @@ export const PosterCard = ({
                   />
                 </Center>
               )}
-              {!listChildProps.isScrolling && (
-                <ControlsContainer>
-                  <GridCardControls
-                    itemData={data}
-                    itemType={controls.itemType}
-                  />
-                </ControlsContainer>
-              )}
+              <ControlsContainer>
+                <GridCardControls
+                  itemData={data}
+                  itemType={controls.itemType}
+                />
+              </ControlsContainer>
             </ImageSection>
           </Link>
           <DetailSection>

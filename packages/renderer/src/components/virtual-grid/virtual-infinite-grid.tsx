@@ -86,7 +86,7 @@ export const VirtualInfiniteGrid = ({
     [columnCount, fetchFn, itemData],
   );
 
-  const debouncedLoadMoreItems = debounce(loadMoreItems, 400);
+  const debouncedLoadMoreItems = debounce(loadMoreItems, 500);
 
   useEffect(() => {
     if (loader.current) {
@@ -110,7 +110,6 @@ export const VirtualInfiniteGrid = ({
     >
       {({ onItemsRendered, ref: infiniteLoaderRef }) => (
         <VirtualGridWrapper
-          useIsScrolling
           cardRows={cardRows}
           columnCount={columnCount}
           display={display || CardDisplayType.CARD}

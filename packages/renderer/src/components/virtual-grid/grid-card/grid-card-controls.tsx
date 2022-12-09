@@ -42,9 +42,18 @@ const PlayButton = styled.button<PlayButtonType>`
 `;
 
 const SecondaryButton = styled(_Button)`
-  fill: white !important;
-  svg: {
-    fill: white !important;
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+  transition: scale 0.2s linear;
+
+  &:hover {
+    opacity: 1;
+    scale: 1.1;
+  }
+
+  &:active {
+    opacity: 1;
+    scale: 1;
   }
 `;
 
@@ -132,13 +141,7 @@ export const GridCardControls = ({
       {/* <TopControls /> */}
       {/* <CenterControls /> */}
       <BottomControls>
-        <PlayButton
-          // initial="initial"
-          // variants={buttonVariants}
-          // whileHover="hover"
-          // whileTap="pressed"
-          onClick={handlePlay}
-        >
+        <PlayButton onClick={handlePlay}>
           <RiPlayFill size={25} />
         </PlayButton>
         <Group spacing="xs">
@@ -166,6 +169,7 @@ export const GridCardControls = ({
             <DropdownMenu.Target>
               <SecondaryButton
                 p={5}
+                sx={{ svg: { fill: 'white !important' } }}
                 variant="subtle"
                 onClick={(e) => {
                   e.preventDefault();

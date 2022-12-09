@@ -7,7 +7,7 @@ import { SimpleImg } from 'react-simple-img';
 import type { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Text } from '/@/components/text';
-import type { PlayQueueAddOptions, LibraryItem, CardRow, CardRoute, Play } from '/@/types';
+import type { LibraryItem, CardRow, CardRoute, Play } from '/@/types';
 import GridCardControls from './grid-card-controls';
 
 const CardWrapper = styled.div<{
@@ -113,7 +113,6 @@ interface BaseGridCardProps {
   controls: {
     cardControls: any[];
     cardRows: CardRow[];
-    handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
     itemType: LibraryItem;
     playButtonBehavior: Play;
     route: CardRoute;
@@ -135,7 +134,7 @@ export const DefaultCard = ({
   sizes,
 }: BaseGridCardProps) => {
   const navigate = useNavigate();
-  const { index, isScrolling } = listChildProps;
+  const { index } = listChildProps;
   const { itemGap, itemHeight, itemWidth } = sizes;
   const { itemType, cardRows, route } = controls;
 
@@ -190,12 +189,10 @@ export const DefaultCard = ({
               </Center>
             )}
             <ControlsContainer>
-              {!isScrolling && (
-                <GridCardControls
-                  itemData={data}
-                  itemType={itemType}
-                />
-              )}
+              <GridCardControls
+                itemData={data}
+                itemType={itemType}
+              />
             </ControlsContainer>
           </ImageSection>
           <DetailSection>
