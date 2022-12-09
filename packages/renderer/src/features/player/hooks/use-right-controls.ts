@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import isElectron from 'is-electron';
 import { mpvPlayer } from '#preload';
 import { usePlayerStore } from '../../../store';
 
@@ -10,11 +11,14 @@ export const useRightControls = () => {
 
   // Ensure that the mpv player volume is set on startup
   useEffect(() => {
-    mpvPlayer.volume(volume);
+    if (isElectron()) {
+      mpvPlayer.volume(volume);
 
-    if (muted) {
-      mpvPlayer.mute();
+      if (muted) {
+        mpvPlayer.mute();
+      }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -432,47 +432,49 @@ export const useCenterControls = (args: { playersRef: any }) => {
   );
 
   useEffect(() => {
-    mpvPlayerListener.rendererPlayPause(() => {
-      handlePlayPause();
-    });
+    if (isElectron()) {
+      mpvPlayerListener.rendererPlayPause(() => {
+        handlePlayPause();
+      });
 
-    mpvPlayerListener.rendererNext(() => {
-      handleNextTrack();
-    });
+      mpvPlayerListener.rendererNext(() => {
+        handleNextTrack();
+      });
 
-    mpvPlayerListener.rendererPrevious(() => {
-      handlePrevTrack();
-    });
+      mpvPlayerListener.rendererPrevious(() => {
+        handlePrevTrack();
+      });
 
-    mpvPlayerListener.rendererPlay(() => {
-      handlePlay();
-    });
+      mpvPlayerListener.rendererPlay(() => {
+        handlePlay();
+      });
 
-    mpvPlayerListener.rendererPause(() => {
-      handlePause();
-    });
+      mpvPlayerListener.rendererPause(() => {
+        handlePause();
+      });
 
-    mpvPlayerListener.rendererStop(() => {
-      handleStop();
-    });
+      mpvPlayerListener.rendererStop(() => {
+        handleStop();
+      });
 
-    mpvPlayerListener.rendererCurrentTime((_event, time: number) => {
-      setCurrentTime(time);
-    });
+      mpvPlayerListener.rendererCurrentTime((_event, time: number) => {
+        setCurrentTime(time);
+      });
 
-    mpvPlayerListener.rendererAutoNext(() => {
-      handleAutoNext();
-    });
+      mpvPlayerListener.rendererAutoNext(() => {
+        handleAutoNext();
+      });
+    }
 
     return () => {
-      ipc.removeAllListeners('renderer-player-play-pause');
-      ipc.removeAllListeners('renderer-player-next');
-      ipc.removeAllListeners('renderer-player-previous');
-      ipc.removeAllListeners('renderer-player-play');
-      ipc.removeAllListeners('renderer-player-pause');
-      ipc.removeAllListeners('renderer-player-stop');
-      ipc.removeAllListeners('renderer-player-current-time');
-      ipc.removeAllListeners('renderer-player-auto-next');
+      ipc?.removeAllListeners('renderer-player-play-pause');
+      ipc?.removeAllListeners('renderer-player-next');
+      ipc?.removeAllListeners('renderer-player-previous');
+      ipc?.removeAllListeners('renderer-player-play');
+      ipc?.removeAllListeners('renderer-player-pause');
+      ipc?.removeAllListeners('renderer-player-stop');
+      ipc?.removeAllListeners('renderer-player-current-time');
+      ipc?.removeAllListeners('renderer-player-auto-next');
     };
   }, [
     autoNext,
