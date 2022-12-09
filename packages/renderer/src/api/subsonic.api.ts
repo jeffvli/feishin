@@ -1,17 +1,40 @@
-import axios from 'axios';
+import ky from 'ky';
 import md5 from 'md5';
-import { randomString } from '../utils/random-string';
+import { randomString } from '/@/utils';
 import type {
-  SSAlbumListEntry,
   SSAlbumListResponse,
-  SSAlbumResponse,
-  SSAlbumsParams,
+  SSAlbumDetailResponse,
   SSArtistIndex,
-  SSArtistInfoResponse,
-  SSArtistsResponse,
-  SSGenresResponse,
-  SSMusicFoldersResponse,
-} from './subsonic.types';
+  SSAlbumArtistList,
+  SSAlbumArtistListResponse,
+  SSGenreListResponse,
+  SSMusicFolderList,
+  SSMusicFolderListResponse,
+  SSGenreList,
+  SSAlbumDetail,
+  SSAlbumList,
+  SSAlbumArtistDetail,
+  SSAlbumArtistDetailResponse,
+  SSFavoriteParams,
+  SSFavorite,
+  SSFavoriteResponse,
+  SSRatingParams,
+  SSRatingResponse,
+  SSAlbumArtistDetailParams,
+  SSAlbumArtistListParams,
+} from '/@/api/subsonic.types';
+import type {
+  AlbumArtistDetailArgs,
+  AlbumArtistListArgs,
+  AlbumDetailArgs,
+  AlbumListArgs,
+  AuthenticationResponse,
+  FavoriteArgs,
+  GenreListArgs,
+  RatingArgs,
+} from '/@/api/types';
+import { useAuthStore } from '/@/store';
+import { toast } from '/@/components';
 
 const getCoverArtUrl = (args: {
   baseUrl: string;
@@ -35,136 +58,235 @@ const getCoverArtUrl = (args: {
   );
 };
 
-const api = axios.create({
-  validateStatus: (status) => status >= 200,
+const api = ky.create({
+  hooks: {
+    afterResponse: [
+      async (_request, _options, response) => {
+        const data = await response.json();
+        if (data['subsonic-response'].status !== 'ok') {
+          toast.warn({ message: 'Issue from Subsonic API' });
+        }
+
+        return new Response(JSON.stringify(data['subsonic-response']), { status: 200 });
+      },
+    ],
+    beforeRequest: [
+      (request) => {
+        const server = useAuthStore.getState().currentServer;
+
+        const searchParams = new URLSearchParams();
+
+        if (server) {
+          const authParams = server.credential.split(/&?\w=/gm);
+
+          searchParams.set('u', server.username);
+          searchParams.set('v', '1.13.0');
+          searchParams.set('c', 'Feishin');
+          searchParams.set('f', 'json');
+
+          if (authParams?.length === 4) {
+            searchParams.set('s', authParams[2]);
+            searchParams.set('t', authParams[3]);
+          } else if (authParams?.length === 3) {
+            searchParams.set('p', authParams[2]);
+          }
+        }
+
+        return ky(request, { searchParams });
+      },
+    ],
+  },
 });
 
-api.interceptors.response.use(
-  (res: any) => {
-    res.data = res.data['subsonic-response'];
-    return res;
+const authenticate = async (
+  url: string,
+  body: {
+    legacy?: boolean;
+    password: string;
+    username: string;
   },
-  (err: any) => {
-    return Promise.reject(err);
-  },
-);
+): Promise<AuthenticationResponse> => {
+  let credential;
+  const cleanServerUrl = url.replace(/\/$/, '');
 
-const authenticate = async (options: {
-  legacy?: boolean;
-  password: string;
-  url: string;
-  username: string;
-}) => {
-  let token;
-
-  const cleanServerUrl = options.url.replace(/\/$/, '');
-
-  if (options.legacy) {
-    token = `u=${options.username}&p=${options.password}`;
+  if (body.legacy) {
+    credential = `u=${body.username}&p=${body.password}`;
   } else {
     const salt = randomString(12);
-    const hash = md5(options.password + salt);
-    token = `u=${options.username}&s=${salt}&t=${hash}`;
+    const hash = md5(body.password + salt);
+    credential = `u=${body.username}&s=${salt}&t=${hash}`;
   }
 
-  const { data } = await api.get(
-    `${cleanServerUrl}/rest/ping.view?v=1.13.0&c=Feishin&f=json&${token}`,
-  );
+  await ky.get(`${cleanServerUrl}/rest/ping.view?v=1.13.0&c=Feishin&f=json&${credential}`);
 
-  return { token, ...data };
+  return {
+    credential,
+    userId: null,
+    username: body.username,
+  };
 };
 
-const getMusicFolders = async (server: Partial<Server>) => {
-  const { data } = await api.get<SSMusicFoldersResponse>(
-    `${server.url}/rest/getMusicFolders.view?v=1.13.0&c=Feishin&f=json&${server.token}`,
-  );
+const getMusicFolderList = async (
+  server: any,
+  signal?: AbortSignal,
+): Promise<SSMusicFolderList> => {
+  const data = await api
+    .get('rest/getMusicFolders.view', {
+      prefixUrl: server.url,
+      signal,
+    })
+    .json<SSMusicFolderListResponse>();
 
   return data.musicFolders.musicFolder;
 };
 
-const getArtists = async (server: Server, musicFolderId: string) => {
-  const { data } = await api.get<SSArtistsResponse>(
-    `${server.url}/rest/getArtists.view?v=1.13.0&c=Feishin&f=json&${server.token}`,
-    { params: { musicFolderId } },
-  );
+export const getAlbumArtistDetail = async (
+  args: AlbumArtistDetailArgs,
+): Promise<SSAlbumArtistDetail> => {
+  const { signal, query } = args;
+
+  const searchParams: SSAlbumArtistDetailParams = {
+    id: query.id,
+  };
+
+  const data = await api
+    .get('/getArtist.view', {
+      searchParams,
+      signal,
+    })
+    .json<SSAlbumArtistDetailResponse>();
+
+  return data.artist;
+};
+
+const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<SSAlbumArtistList> => {
+  const { signal, query } = args;
+
+  const searchParams: SSAlbumArtistListParams = {
+    musicFolderId: query.musicFolderId,
+  };
+
+  const data = await api
+    .get('/rest/getArtists.view', {
+      searchParams,
+      signal,
+    })
+    .json<SSAlbumArtistListResponse>();
 
   const artists = (data.artists?.index || []).flatMap((index: SSArtistIndex) => index.artist);
 
   return artists;
 };
 
-const getGenres = async (server: Server) => {
-  const { data: genres } = await api.get<SSGenresResponse>(
-    `${server.url}/rest/getGenres.view?v=1.13.0&c=Feishin&f=json&${server.token}`,
-  );
+const getGenreList = async (args: GenreListArgs): Promise<SSGenreList> => {
+  const { signal } = args;
 
-  return genres;
-};
-
-const getAlbum = async (server: Server, id: string) => {
-  const { data: album } = await api.get<SSAlbumResponse>(
-    `${server.url}/rest/getAlbum.view?v=1.13.0&c=Feishin&f=json&${server.token}`,
-    { params: { id } },
-  );
-
-  return album;
-};
-
-const getAlbums = async (server: Server, params: SSAlbumsParams, recursiveData: any[] = []) => {
-  const albums: any = api
-    .get<SSAlbumListResponse>(
-      `${server.url}/rest/getAlbumList2.view?v=1.13.0&c=Feishin&f=json&${server.token}`,
-      { params },
-    )
-    .then((res) => {
-      if (!res.data.albumList2?.album || res.data.albumList2?.album?.length === 0) {
-        // Flatten and return once there are no more albums left
-        return recursiveData.flatMap((album) => album);
-      }
-
-      // On every iteration, push the existing combined album array and increase the offset
-      recursiveData.push(res.data.albumList2.album);
-      return getAlbums(
-        server,
-        {
-          musicFolderId: params.musicFolderId,
-          offset: (params.offset || 0) + (params.size || 0),
-          size: params.size,
-          type: 'newest',
-        },
-
-        recursiveData,
-      );
+  const data = await api
+    .get('/rest/getGenres.view', {
+      signal,
     })
-    .catch((err) => console.log(err));
+    .json<SSGenreListResponse>();
 
-  return albums as SSAlbumListEntry[];
+  return data.genres.genre;
 };
 
-const getArtistInfo = async (server: Server, id: string) => {
-  const { data: artistInfo } = await api.get<SSArtistInfoResponse>(
-    `${server.url}/rest/getArtistInfo2.view?v=1.13.0&c=Feishin&f=json&${server.token}`,
-    { params: { id } },
-  );
+const getAlbumDetail = async (args: AlbumDetailArgs): Promise<SSAlbumDetail> => {
+  const { query, signal } = args;
+
+  const data = await api
+    .get('/rest/getAlbum.view', {
+      searchParams: { id: query.id },
+      signal,
+    })
+    .json<SSAlbumDetailResponse>();
+
+  return data.album;
+};
+
+const getAlbumList = async (args: AlbumListArgs): Promise<SSAlbumList> => {
+  const { query, signal } = args;
+
+  const normalizedParams = {};
+  const data = await api
+    .get('/rest/getAlbumList2.view', {
+      searchParams: normalizedParams,
+      signal,
+    })
+    .json<SSAlbumListResponse>();
 
   return {
-    ...artistInfo,
-    artistInfo2: {
-      ...artistInfo.artistInfo2,
-      biography: artistInfo.artistInfo2.biography
-        .replaceAll(/<a target.*<\/a>/gm, '')
-        .replace('Biography not available', ''),
-    },
+    items: data.albumList2.album,
+    startIndex: query.startIndex,
+    totalRecordCount: null,
   };
+};
+
+const createFavorite = async (args: FavoriteArgs): Promise<SSFavorite> => {
+  const { query, signal } = args;
+
+  const searchParams: SSFavoriteParams = {
+    albumId: query.type === 'album' ? query.id : undefined,
+    artistId: query.type === 'albumArtist' ? query.id : undefined,
+    id: query.type === 'song' ? query.id : undefined,
+  };
+
+  const data = await api
+    .get('/rest/star.view', {
+      searchParams,
+      signal,
+    })
+    .json<SSFavoriteResponse>();
+
+  return data;
+};
+
+const deleteFavorite = async (args: FavoriteArgs) => {
+  const { query, signal } = args;
+
+  const searchParams: SSFavoriteParams = {
+    albumId: query.type === 'album' ? query.id : undefined,
+    artistId: query.type === 'albumArtist' ? query.id : undefined,
+    id: query.type === 'song' ? query.id : undefined,
+  };
+
+  const data = await api
+    .get('/rest/unstar.view', {
+      searchParams,
+      signal,
+    })
+    .json<SSFavoriteResponse>();
+
+  return data;
+};
+
+const updateRating = async (args: RatingArgs) => {
+  const { query, signal } = args;
+
+  const searchParams: SSRatingParams = {
+    id: query.id,
+    rating: query.rating,
+  };
+
+  const data = await api
+    .get('/rest/setRating.view', {
+      searchParams,
+      signal,
+    })
+    .json<SSRatingResponse>();
+
+  return data;
 };
 
 export const subsonicApi = {
   authenticate,
-  getAlbum,
-  getAlbums,
-  getArtistInfo,
-  getArtists,
+  createFavorite,
+  deleteFavorite,
+  getAlbumArtistDetail,
+  getAlbumArtistList,
+  getAlbumDetail,
+  getAlbumList,
   getCoverArtUrl,
-  getGenres,
-  getMusicFolders,
+  getGenreList,
+  getMusicFolderList,
+  updateRating,
 };

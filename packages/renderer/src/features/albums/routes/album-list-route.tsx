@@ -29,7 +29,7 @@ import { useAlbumList } from '../queries/album-list-query';
 import { JFAlbumListSort } from '/@/api/jellyfin.types';
 import type { NDAlbum } from '/@/api/navidrome.types';
 import { NDAlbumListSort } from '/@/api/navidrome.types';
-import { apiController } from '/@/api/controller';
+import { controller } from '/@/api/controller';
 import { ndNormalize } from '/@/api/navidrome.api';
 
 const FILTERS = {
@@ -70,28 +70,30 @@ export const AlbumListRoute = () => {
   const filters = page.list.filter;
 
   const albumListQuery = useAlbumList({
-    _skip: 0,
-    _take: 1,
-    musicFolderId: null,
+    limit: 1,
     sortBy: filters.sortBy,
     sortOrder: filters.sortOrder,
+    startIndex: 0,
   });
 
   const fetch = useCallback(
     async ({ skip, take }: { skip: number; take: number }) => {
       const queryKey = queryKeys.albums.list(server?.id || '', {
-        _skip: skip,
-        _take: take,
+        limit: take,
+        startIndex: skip,
         ...filters,
       });
 
-      const albums = await queryClient.fetchQuery(queryKey, async () =>
-        apiController.getAlbumList({
-          _skip: skip,
-          _take: take,
-          musicFolderId: null,
-          sortBy: filters.sortBy,
-          sortOrder: filters.sortOrder,
+      const albums = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+        controller.getAlbumList({
+          query: {
+            limit: take,
+            sortBy: filters.sortBy,
+            sortOrder: filters.sortOrder,
+            startIndex: skip,
+          },
+          server,
+          signal,
         }),
       );
 
@@ -110,10 +112,8 @@ export const AlbumListRoute = () => {
 
       return {
         items,
-        pagination: {
-          startIndex: skip,
-          totalEntries: albums?.pagination?.totalEntries || 0,
-        },
+        startIndex: skip,
+        totalRecordCount: albums?.totalRecordCount || 0,
       } as AlbumListResponse;
     },
     [filters, queryClient, server],
@@ -445,7 +445,7 @@ export const AlbumListRoute = () => {
                 fetchFn={fetch}
                 height={height}
                 initialScrollOffset={page.list?.gridScrollOffset || 0}
-                itemCount={albumListQuery?.data?.pagination?.totalEntries || 0}
+                itemCount={albumListQuery?.data?.totalRecordCount || 0}
                 itemGap={20}
                 itemSize={150 + page.list?.size}
                 itemType={LibraryItem.ALBUM}

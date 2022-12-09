@@ -92,7 +92,7 @@ export type NDSong = {
   year: number;
 };
 
-export type NDArtist = {
+export type NDAlbumArtist = {
   albumCount: number;
   biography: string;
   externalInfoUpdatedAt: string;
@@ -115,15 +115,43 @@ export type NDArtist = {
   starredAt: string;
 };
 
+export type NDAuthenticationResponse = NDAuthenticate;
+
+export type NDAlbumArtistList = NDAlbumArtist[];
+
+export type NDAlbumArtistDetail = NDAlbumArtist & { albums: NDAlbumListResponse };
+
+export type NDAlbumArtistDetailResponse = NDAlbumArtist;
+
+export type NDGenreList = NDGenre[];
+
 export type NDGenreListResponse = NDGenre[];
 
 export type NDAlbumDetailResponse = NDAlbum;
 
+export type NDAlbumDetail = NDAlbum & { songs: NDSongListResponse };
+
 export type NDAlbumListResponse = NDAlbum[];
+
+export type NDAlbumList = {
+  items: NDAlbum[];
+  startIndex: number;
+  totalRecordCount: number;
+};
+
+export type NDSongDetail = NDSong;
+
+export type NDSongDetailResponse = NDSong;
 
 export type NDSongListResponse = NDSong[];
 
-export type NDArtistListResponse = NDArtist[];
+export type NDSongList = {
+  items: NDSong[];
+  startIndex: number;
+  totalRecordCount: number;
+};
+
+export type NDArtistListResponse = NDAlbumArtist[];
 
 export type NDPagination = {
   _end?: number;
@@ -177,8 +205,107 @@ export type NDAlbumListParams = {
 } & NDPagination &
   NDOrder;
 
+export enum NDSongListSort {
+  ALBUM = 'album',
+  ALBUM_ARTIST = 'albumArtist',
+  ARTIST = 'artist',
+  BPM = 'bpm',
+  CHANNELS = 'channels',
+  COMMENT = 'comment',
+  DURATION = 'duration',
+  GENRE = 'genre',
+  NAME = 'name',
+  PLAY_COUNT = 'playCount',
+  PLAY_DATE = 'playDate',
+  RATING = 'rating',
+  TRACK = 'track',
+  YEAR = 'year',
+}
+
 export type NDSongListParams = {
+  _sort?: NDSongListSort;
   genre_id?: string;
   starred?: boolean;
+} & NDPagination &
+  NDOrder;
+
+export enum NDAlbumArtistListSort {
+  ALBUM_COUNT = 'albumCount',
+  NAME = 'name',
+  PLAY_COUNT = 'playCount',
+  RATING = 'rating',
+  SONG_COUNT = 'songCount',
+  STARRED = 'starred ASC, starredAt ASC',
+}
+
+export type NDAlbumArtistListParams = {
+  _sort?: NDAlbumArtistListSort;
+  genre_id?: string;
+  starred?: boolean;
+} & NDPagination &
+  NDOrder;
+
+export type NDCreatePlaylistParams = {
+  comment?: string;
+  name: string;
+  public: boolean;
+};
+
+export type NDCreatePlaylistResponse = {
+  id: string;
+};
+
+export type NDCreatePlaylist = NDCreatePlaylistResponse;
+
+export type NDDeletePlaylistParams = {
+  id: string;
+};
+
+export type NDDeletePlaylistResponse = null;
+
+export type NDDeletePlaylist = NDDeletePlaylistResponse;
+
+export type NDPlaylist = {
+  comment: string;
+  createdAt: string;
+  duration: number;
+  evaluatedAt: string;
+  id: string;
+  name: string;
+  ownerId: string;
+  ownerName: string;
+  path: string;
+  public: boolean;
+  rules: null;
+  size: number;
+  songCount: number;
+  sync: boolean;
+  updatedAt: string;
+};
+
+export type NDPlaylistDetail = NDPlaylist;
+
+export type NDPlaylistDetailResponse = NDPlaylist;
+
+export type NDPlaylistList = {
+  items: NDPlaylist[];
+  startIndex: number;
+  totalRecordCount: number;
+};
+
+export type NDPlaylistListResponse = NDPlaylist[];
+
+export enum NDPlaylistListSort {
+  DURATION = 'duration',
+  NAME = 'name',
+  OWNER = 'owner',
+  PUBLIC = 'public',
+  SONG_COUNT = 'songCount',
+  UPDATED_AT = 'updatedAt',
+}
+
+export type NDPlaylistListParams = {
+  _sort?: NDPlaylistListSort;
+  owner_id?: string;
 } & NDPagination &
   NDOrder;

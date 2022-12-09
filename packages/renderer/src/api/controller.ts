@@ -1,63 +1,173 @@
-import { useAuthStore } from '../store/auth.store';
-import { navidromeApi } from './navidrome.api';
+import { useAuthStore } from '/@/store';
+import { navidromeApi } from '/@/api/navidrome.api';
+import { toast } from '/@/components';
 import type {
-  AlbumDetailQuery,
-  AlbumDetailResponse,
-  AlbumListParams,
-  AlbumListResponse,
-} from './types';
+  AlbumDetailArgs,
+  RawAlbumDetailResponse,
+  RawAlbumListResponse,
+  AlbumListArgs,
+  SongListArgs,
+  RawSongListResponse,
+  SongDetailArgs,
+  RawSongDetailResponse,
+  AlbumArtistDetailArgs,
+  RawAlbumArtistDetailResponse,
+  AlbumArtistListArgs,
+  RawAlbumArtistListResponse,
+  RatingArgs,
+  RawRatingResponse,
+  FavoriteArgs,
+  RawFavoriteResponse,
+  GenreListArgs,
+  RawGenreListResponse,
+  CreatePlaylistArgs,
+  RawCreatePlaylistResponse,
+  DeletePlaylistArgs,
+  RawDeletePlaylistResponse,
+  PlaylistDetailArgs,
+  RawPlaylistDetailResponse,
+  PlaylistListArgs,
+  RawPlaylistListResponse,
+} from '/@/api/types';
+import { subsonicApi } from '/@/api/subsonic.api';
 
-export const getServerType = () => {
-  const server = useAuthStore.getState().currentServer;
+export type ControllerEndpoint = Partial<{
+  clearPlaylist: () => void;
+  createFavorite: (args: FavoriteArgs) => Promise<RawFavoriteResponse>;
+  createPlaylist: (args: CreatePlaylistArgs) => Promise<RawCreatePlaylistResponse>;
+  deleteFavorite: (args: FavoriteArgs) => Promise<RawFavoriteResponse>;
+  deletePlaylist: (args: DeletePlaylistArgs) => Promise<RawDeletePlaylistResponse>;
+  getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<RawAlbumArtistDetailResponse>;
+  getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<RawAlbumArtistListResponse>;
+  getAlbumDetail: (args: AlbumDetailArgs) => Promise<RawAlbumDetailResponse>;
+  getAlbumList: (args: AlbumListArgs) => Promise<RawAlbumListResponse>;
+  getArtistDetail: () => void;
+  getArtistList: () => void;
+  getFavoritesList: () => void;
+  getFolderItemList: () => void;
+  getFolderList: () => void;
+  getFolderSongs: () => void;
+  getGenreList: (args: GenreListArgs) => Promise<RawGenreListResponse>;
+  getMusicFolderList: () => void;
+  getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<RawPlaylistDetailResponse>;
+  getPlaylistList: (args: PlaylistListArgs) => Promise<RawPlaylistListResponse>;
+  getSongDetail: (args: SongDetailArgs) => Promise<RawSongDetailResponse>;
+  getSongList: (args: SongListArgs) => Promise<RawSongListResponse>;
+  updatePlaylist: () => void;
+  updateRating: (args: RatingArgs) => Promise<RawRatingResponse>;
+}>;
 
-  if (!server) {
-    return null;
-  }
-
-  return server.type;
+type ApiController = {
+  jellyfin: ControllerEndpoint;
+  navidrome: ControllerEndpoint;
+  subsonic: ControllerEndpoint;
 };
 
-const getAlbumDetail = async (
-  query: AlbumDetailQuery,
-  signal?: AbortSignal,
-): Promise<AlbumDetailResponse> => {
-  const serverType = getServerType();
-  if (!serverType) return null;
-
-  const functions = {
-    jellyfin: null,
-    navidrome: navidromeApi.getAlbumDetail,
-    subsonic: null,
-  };
-
-  if (functions[serverType] === null) {
-    return null;
-  }
-
-  return functions[serverType]?.(query, signal);
+const endpoints: ApiController = {
+  jellyfin: {
+    clearPlaylist: undefined,
+    createFavorite: undefined,
+    createPlaylist: undefined,
+    deleteFavorite: undefined,
+    deletePlaylist: undefined,
+    getAlbumArtistDetail: undefined,
+    getAlbumArtistList: undefined,
+    getAlbumDetail: undefined,
+    getAlbumList: undefined,
+    getArtistDetail: undefined,
+    getArtistList: undefined,
+    getFavoritesList: undefined,
+    getFolderItemList: undefined,
+    getFolderList: undefined,
+    getFolderSongs: undefined,
+    getGenreList: undefined,
+    getMusicFolderList: undefined,
+    getPlaylistDetail: undefined,
+    getPlaylistList: undefined,
+    getSongList: undefined,
+    updatePlaylist: undefined,
+    updateRating: undefined,
+  },
+  navidrome: {
+    clearPlaylist: undefined,
+    createFavorite: subsonicApi.createFavorite,
+    createPlaylist: navidromeApi.createPlaylist,
+    deleteFavorite: subsonicApi.deleteFavorite,
+    deletePlaylist: navidromeApi.deletePlaylist,
+    getAlbumArtistDetail: navidromeApi.getAlbumArtistDetail,
+    getAlbumArtistList: navidromeApi.getAlbumArtistList,
+    getAlbumDetail: navidromeApi.getAlbumDetail,
+    getAlbumList: navidromeApi.getAlbumList,
+    getArtistDetail: undefined,
+    getArtistList: undefined,
+    getFavoritesList: undefined,
+    getFolderItemList: undefined,
+    getFolderList: undefined,
+    getFolderSongs: undefined,
+    getGenreList: navidromeApi.getGenreList,
+    getMusicFolderList: undefined,
+    getPlaylistDetail: navidromeApi.getPlaylistDetail,
+    getPlaylistList: navidromeApi.getPlaylistList,
+    getSongList: navidromeApi.getSongList,
+    updatePlaylist: undefined,
+    updateRating: subsonicApi.updateRating,
+  },
+  subsonic: {
+    clearPlaylist: undefined,
+    createFavorite: subsonicApi.createFavorite,
+    createPlaylist: undefined,
+    deleteFavorite: subsonicApi.deleteFavorite,
+    deletePlaylist: undefined,
+    getAlbumArtistDetail: subsonicApi.getAlbumArtistDetail,
+    getAlbumArtistList: subsonicApi.getAlbumArtistList,
+    getAlbumDetail: subsonicApi.getAlbumDetail,
+    getAlbumList: subsonicApi.getAlbumList,
+    getArtistDetail: undefined,
+    getArtistList: undefined,
+    getFavoritesList: undefined,
+    getFolderItemList: undefined,
+    getFolderList: undefined,
+    getFolderSongs: undefined,
+    getGenreList: undefined,
+    getMusicFolderList: undefined,
+    getPlaylistDetail: undefined,
+    getPlaylistList: undefined,
+    getSongList: undefined,
+    updatePlaylist: undefined,
+    updateRating: undefined,
+  },
 };
 
-const getAlbumList = async (
-  params: AlbumListParams,
-  signal?: AbortSignal,
-): Promise<AlbumListResponse> => {
-  const serverType = getServerType();
-  if (!serverType) return null;
+const apiController = (endpoint: keyof ControllerEndpoint) => {
+  const serverType = useAuthStore.getState().currentServer?.type;
 
-  const functions = {
-    jellyfin: null,
-    navidrome: navidromeApi.getAlbumList,
-    subsonic: null,
-  };
-
-  if (functions[serverType] === null) {
-    return null;
+  if (!serverType) {
+    toast.error({ message: 'No server selected', title: 'Unable to route request' });
+    return () => undefined;
   }
 
-  return functions[serverType]?.(params, signal);
+  const controllerFn = endpoints[serverType][endpoint];
+
+  if (typeof controllerFn !== 'function') {
+    toast.error({
+      message: `Endpoint ${endpoint} is not implemented for ${serverType}`,
+      title: 'Unable to route request',
+    });
+    return () => undefined;
+  }
+
+  return endpoints[serverType][endpoint];
 };
 
-export const apiController = {
+const getAlbumList = async (args: AlbumListArgs) => {
+  return (apiController('getAlbumList') as ControllerEndpoint['getAlbumList'])?.(args);
+};
+
+const getAlbumDetail = async (args: AlbumDetailArgs) => {
+  return (apiController('getAlbumDetail') as ControllerEndpoint['getAlbumDetail'])?.(args);
+};
+
+export const controller = {
   getAlbumDetail,
   getAlbumList,
 };

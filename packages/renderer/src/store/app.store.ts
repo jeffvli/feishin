@@ -22,7 +22,7 @@ type LibraryPageProps = {
 };
 
 type ListFilter = {
-  musicFolderId: string | null;
+  musicFolderId?: string;
   sortBy: AlbumListSort;
   sortOrder: SortOrder;
 };
@@ -89,7 +89,7 @@ export const useAppStore = create<AppSlice>()(
                 ...state.albums.list,
                 filter: {
                   ...state.albums.list.filter,
-                  musicFolderId: null,
+                  musicFolderId: undefined,
                 },
                 gridScrollOffset: 0,
                 listScrollOffset: 0,
@@ -118,7 +118,7 @@ export const useAppStore = create<AppSlice>()(
             },
             display: CardDisplayType.CARD,
             filter: {
-              musicFolderId: null,
+              musicFolderId: undefined,
               sortBy: JFAlbumListSort.NAME,
               sortOrder: SortOrder.DESC,
             },

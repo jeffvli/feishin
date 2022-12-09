@@ -1,10 +1,10 @@
-import type { AlbumListParams } from './types';
+import type { AlbumListQuery } from './types';
 import type { AlbumDetailQuery } from './types';
 
 export const queryKeys = {
   albums: {
     detail: (serverId: string, query: AlbumDetailQuery) => ['albums', serverId, query] as const,
-    list: (serverId: string, params: AlbumListParams) =>
+    list: (serverId: string, params: AlbumListQuery) =>
       [serverId, 'albums', 'list', serverId, params] as const,
     root: ['albums'],
   },

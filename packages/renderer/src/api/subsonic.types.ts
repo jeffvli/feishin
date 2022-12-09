@@ -1,78 +1,104 @@
-export interface SSBaseResponse {
+export type SSBaseResponse = {
   serverVersion?: 'string';
   status: 'string';
   type?: 'string';
   version: 'string';
-}
+};
 
-export interface SSMusicFoldersResponse extends SSBaseResponse {
+export type SSMusicFolderList = SSMusicFolder[];
+
+export type SSMusicFolderListResponse = {
   musicFolders: {
     musicFolder: SSMusicFolder[];
   };
-}
+};
 
-export interface SSGenresResponse extends SSBaseResponse {
+export type SSGenreList = SSGenre[];
+
+export type SSGenreListResponse = {
   genres: {
     genre: SSGenre[];
   };
-}
+};
 
-export interface SSArtistsResponse extends SSBaseResponse {
+export type SSAlbumArtistDetailParams = {
+  id: string;
+};
+
+export type SSAlbumArtistDetail = SSAlbumArtistListEntry & { album: SSAlbumListEntry[] };
+
+export type SSAlbumArtistDetailResponse = {
+  artist: SSAlbumArtistListEntry & {
+    album: SSAlbumListEntry[];
+  };
+};
+
+export type SSAlbumArtistList = SSAlbumArtistListEntry[];
+
+export type SSAlbumArtistListResponse = {
   artists: {
     ignoredArticles: string;
     index: SSArtistIndex[];
     lastModified: number;
   };
-}
+};
 
-export interface SSAlbumListResponse extends SSBaseResponse {
+export type SSAlbumList = {
+  items: SSAlbumListEntry[];
+  startIndex: number;
+  totalRecordCount: number | null;
+};
+
+export type SSAlbumListResponse = {
   albumList2: {
     album: SSAlbumListEntry[];
   };
-}
+};
 
-export interface SSAlbumResponse extends SSBaseResponse {
+export type SSAlbumDetail = SSAlbum;
+
+export type SSAlbumDetailResponse = {
   album: SSAlbum;
-}
+};
 
-export interface SSArtistInfoResponse extends SSBaseResponse {
+export type SSArtistInfoResponse = {
   artistInfo2: SSArtistInfo;
-}
+};
 
-export interface SSArtistInfo {
+export type SSArtistInfo = {
   biography: string;
   largeImageUrl?: string;
   lastFmUrl?: string;
   mediumImageUrl?: string;
   musicBrainzId?: string;
   smallImageUrl?: string;
-}
+};
 
-export interface SSMusicFolder {
+export type SSMusicFolder = {
   id: number;
   name: string;
-}
+};
 
-export interface SSGenre {
+export type SSGenre = {
   albumCount?: number;
   songCount?: number;
   value: string;
-}
+};
 
-export interface SSArtistIndex {
-  artist: SSArtistListEntry[];
+export type SSArtistIndex = {
+  artist: SSAlbumArtistListEntry[];
   name: string;
-}
+};
 
-export interface SSArtistListEntry {
+export type SSAlbumArtistListEntry = {
   albumCount: string;
   artistImageUrl?: string;
   coverArt?: string;
   id: string;
   name: string;
-}
+};
 
-export interface SSAlbumListEntry {
+export type SSAlbumListEntry = {
   album: string;
   artist: string;
   artistId: string;
@@ -90,13 +116,13 @@ export interface SSAlbumListEntry {
   title: string;
   userRating?: number;
   year: number;
-}
+};
 
-export interface SSAlbum extends SSAlbumListEntry {
+export type SSAlbum = {
   song: SSSong[];
-}
+} & SSAlbumListEntry;
 
-export interface SSSong {
+export type SSSong = {
   album: string;
   albumId: string;
   artist: string;
@@ -122,9 +148,9 @@ export interface SSSong {
   type: string;
   userRating?: number;
   year: number;
-}
+};
 
-export interface SSAlbumsParams {
+export type SSAlbumListParams = {
   fromYear?: number;
   genre?: string;
   musicFolderId?: string;
@@ -132,8 +158,27 @@ export interface SSAlbumsParams {
   size?: number;
   toYear?: number;
   type: string;
-}
+};
 
-export interface SSArtistsParams {
-  musicFolderId?: number;
-}
+export type SSAlbumArtistListParams = {
+  musicFolderId?: string;
+};
+
+export type SSFavoriteParams = {
+  albumId?: string;
+  artistId?: string;
+  id?: string;
+};
+
+export type SSFavorite = null;
+
+export type SSFavoriteResponse = null;
+
+export type SSRatingParams = {
+  id: string;
+  rating: number;
+};
+
+export type SSRating = null;
+
+export type SSRatingResponse = null;

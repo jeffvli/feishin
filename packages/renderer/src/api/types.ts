@@ -1,7 +1,30 @@
-import type { ServerListItem } from '../store';
-import type { ServerType } from '../types';
-import type { JFAlbum, JFAlbumListSort, JFSortOrder } from './jellyfin.types';
-import type { NDAlbum, NDAlbumListSort, NDOrder } from './navidrome.types';
+import type { ServerListItem } from '/@/store';
+import type { ServerType } from '/@//types';
+import type { JFAlbumListSort, JFSortOrder } from '/@/api/jellyfin.types';
+import type {
+  NDAlbumArtistDetail,
+  NDAlbumArtistList,
+  NDAlbumArtistListSort,
+  NDAlbumDetail,
+  NDAlbumList,
+  NDAlbumListSort,
+  NDCreatePlaylist,
+  NDDeletePlaylist,
+  NDGenreList,
+  NDOrder,
+  NDPlaylistDetail,
+  NDPlaylistList,
+  NDPlaylistListSort,
+  NDSongDetail,
+  NDSongList,
+  NDSongListSort,
+} from '/@/api/navidrome.types';
+import type {
+  SSAlbumArtistDetail,
+  SSAlbumArtistList,
+  SSAlbumDetail,
+  SSAlbumList,
+} from '/@/api/subsonic.types';
 
 export enum SortOrder {
   ASC = 'ASC',
@@ -27,33 +50,15 @@ export enum ImageType {
   SCREENSHOT = 'SCREENSHOT',
 }
 
-export enum TaskType {
-  FULL_SCAN = 'FULL_SCAN',
-  LASTFM = 'LASTFM',
-  MUSICBRAINZ = 'MUSICBRAINZ',
-  QUICK_SCAN = 'QUICK_SCAN',
-  REFRESH = 'REFRESH',
-  SPOTIFY = 'SPOTIFY',
-}
-
 export type EndpointDetails = {
   server: ServerListItem;
 };
 
-// export interface BaseResponse<T> {
-//   error?: string | any;
-//   items: T;
-//   response: 'Success' | 'Error';
-//   statusCode: number;
-// }
-
 export interface BasePaginatedResponse<T> {
   error?: string | any;
   items: T;
-  pagination?: {
-    startIndex: number;
-    totalEntries: number;
-  };
+  startIndex: number;
+  totalRecordCount: number;
 }
 
 export type ApiError = {
@@ -66,47 +71,14 @@ export type ApiError = {
   statusCode: number;
 };
 
-export type AuthResponse = {
+export type AuthenticationResponse = {
   credential: string;
   ndCredential?: string;
+  userId: string | null;
   username: string;
 };
 
-// export type NullResponse = BaseResponse<null>;
-
-export type PaginationParams = {
-  skip: number;
-  take: number;
-};
-
-export type RelatedServerFolder = {
-  enabled: boolean;
-  id: string;
-  lastScannedAt: string | null;
-  name: string;
-};
-
-export type ServerFolder = {
-  createdAt: string;
-  enabled: boolean;
-  id: string;
-  lastScannedAt: string | null;
-  name: string;
-  serverId: string;
-  updatedAt: string;
-};
-
 export type Genre = {
-  albumArtistCount: number;
-  albumCount: number;
-  artistCount: number;
-  id: string;
-  name: string;
-  songCount: number;
-  totalCount: number;
-};
-
-export type RelatedGenre = {
   id: string;
   name: string;
 };
@@ -116,7 +88,7 @@ export type Album = {
   artists: RelatedArtist[];
   backdropImageUrl: string | null;
   createdAt: string;
-  genres: RelatedGenre[];
+  genres: Genre[];
   id: string;
   imagePlaceholderUrl: string | null;
   imageUrl: string | null;
@@ -147,7 +119,7 @@ export type Song = {
   createdAt: string;
   discNumber: number;
   duration: number;
-  genres: RelatedGenre[];
+  genres: Genre[];
   id: string;
   imageUrl: string;
   isFavorite: boolean;
@@ -193,69 +165,207 @@ export type RelatedArtist = {
   name: string;
 };
 
-export type RelatedServer = {
+export type MusicFolder = {
   id: string;
   name: string;
-  type: ServerType;
-  url: string;
 };
 
-export type RelatedUser = {
-  enabled: boolean;
+export type Playlist = {
+  duration?: number;
   id: string;
-  isAdmin: boolean;
+  name: string;
+  public?: boolean;
+  size?: number;
+  songCount?: number;
+  userId: string;
   username: string;
 };
 
-export type Task = {
-  createdAt: string;
-  id: string;
-  isCompleted: boolean;
-  isError: boolean;
-  message: string;
-  server: RelatedServer | null;
-  type: TaskType;
-  updatedAt: string;
-  user: RelatedUser | null;
-};
+export type GenresResponse = Genre[];
 
-export type AlbumListSort = NDAlbumListSort | JFAlbumListSort;
+export type MusicFoldersResponse = MusicFolder[];
 
 export type ListSortOrder = NDOrder | JFSortOrder;
 
-export type AlbumListParams = {
-  _skip: number;
-  _take?: number;
-  musicFolderId: string | null;
-  nd?: {
+type BaseEndpointArgs = {
+  server: ServerListItem | null;
+  signal?: AbortSignal;
+};
+
+// Genre List ---------------------------------------------------------------------------
+export type RawGenreListResponse = NDGenreList | undefined;
+
+export type GenreListResponse = BasePaginatedResponse<Genre[]> | null | undefined;
+
+export type GenreListArgs = { query: GenreListQuery } & BaseEndpointArgs;
+
+export type GenreListQuery = null;
+
+// Album List ---------------------------------------------------------------------------
+export type RawAlbumListResponse = NDAlbumList | SSAlbumList | undefined;
+
+export type AlbumListResponse = BasePaginatedResponse<Album[]> | null | undefined;
+
+export type AlbumListSort = NDAlbumListSort | JFAlbumListSort;
+
+export type AlbumListQuery = {
+  limit?: number;
+  musicFolderId?: string;
+  ndParams?: {
+    artist_id?: string;
+    compilation?: boolean;
+    genre_id?: string;
+    has_rating?: boolean;
+    name?: string;
+    starred?: boolean;
+    year?: number;
+  };
+  sortBy: AlbumListSort;
+  sortOrder: SortOrder;
+  startIndex: number;
+};
+
+export type AlbumListArgs = { query: AlbumListQuery } & BaseEndpointArgs;
+
+// Album Detail -------------------------------------------------------------------------
+export type RawAlbumDetailResponse = NDAlbumDetail | SSAlbumDetail | undefined;
+
+export type AlbumDetailResponse = Album | null | undefined;
+
+export type AlbumDetailQuery = { id: string };
+
+export type AlbumDetailArgs = { query: AlbumDetailQuery } & BaseEndpointArgs;
+
+// Song List ----------------------------------------------------------------------------
+export type RawSongListResponse = NDSongList | undefined;
+
+export type SongListResponse = BasePaginatedResponse<Song[]>;
+
+export type SongListSort = NDSongListSort;
+
+export type SongListQuery = {
+  limit?: number;
+  musicFolderId?: string;
+  ndParams?: {
     artist_id?: string;
     compilation?: boolean;
     genre_id?: string;
     has_rating?: boolean;
     starred?: boolean;
+    title?: string;
     year?: number;
   };
-  sortBy: NDAlbumListSort | JFAlbumListSort;
+  sortBy: SongListSort;
   sortOrder: SortOrder;
+  startIndex: number;
 };
 
-export type AlbumListResponse =
-  | BasePaginatedResponse<Album[] | NDAlbum[] | JFAlbum[]>
-  | null
-  | undefined;
+export type SongListArgs = { query: SongListQuery } & BaseEndpointArgs;
 
-export type AlbumDetailQuery = {
+// Song Detail  -------------------------------------------------------------------------
+export type RawSongDetailResponse = NDSongDetail | undefined;
+
+export type SongDetailResponse = Song | null | undefined;
+
+export type SongDetailQuery = { id: string };
+
+export type SongDetailArgs = { query: SongDetailQuery } & BaseEndpointArgs;
+
+// Album Artist List  -------------------------------------------------------------------
+export type RawAlbumArtistListResponse = NDAlbumArtistList | SSAlbumArtistList | undefined;
+
+export type AlbumArtistListResponse = BasePaginatedResponse<AlbumArtist[]>;
+
+export type AlbumArtistListSort = NDAlbumArtistListSort;
+
+export type AlbumArtistListQuery = {
+  limit?: number;
+  musicFolderId?: string;
+  ndParams?: {
+    genre_id?: string;
+    name?: string;
+    starred?: boolean;
+  };
+  sortBy: AlbumArtistListSort;
+  sortOrder: SortOrder;
+  startIndex: number;
+};
+
+export type AlbumArtistListArgs = { query: AlbumArtistListQuery } & BaseEndpointArgs;
+
+// Album Artist Detail  -----------------------------------------------------------------
+export type RawAlbumArtistDetailResponse = NDAlbumArtistDetail | SSAlbumArtistDetail | undefined;
+
+export type AlbumArtistDetailResponse = BasePaginatedResponse<AlbumArtist[]>;
+
+export type AlbumArtistDetailQuery = { id: string };
+
+export type AlbumArtistDetailArgs = { query: AlbumArtistDetailQuery } & BaseEndpointArgs;
+
+// Artist List  -------------------------------------------------------------------------
+
+// Artist Detail  -----------------------------------------------------------------------
+
+// Favorite  ----------------------------------------------------------------------------
+export type RawFavoriteResponse = null | undefined;
+
+export type FavoriteResponse = null;
+
+export type FavoriteQuery = { id: string; type?: 'song' | 'album' | 'albumArtist' };
+
+export type FavoriteArgs = { query: FavoriteQuery } & BaseEndpointArgs;
+
+// Rating  -------------------------------------------------------------------------------
+export type RawRatingResponse = null | undefined;
+
+export type RatingResponse = null;
+
+export type RatingQuery = { id: string; rating: number };
+
+export type RatingArgs = { query: RatingQuery } & BaseEndpointArgs;
+
+// Create Playlist -----------------------------------------------------------------------
+export type RawCreatePlaylistResponse = NDCreatePlaylist | undefined;
+
+export type CreatePlaylistResponse = null;
+
+export type CreatePlaylistQuery = { comment?: string; name: string; public?: boolean };
+
+export type CreatePlaylistArgs = { query: CreatePlaylistQuery } & BaseEndpointArgs;
+
+// Delete Playlist -----------------------------------------------------------------------
+export type RawDeletePlaylistResponse = NDDeletePlaylist | undefined;
+
+export type DeletePlaylistResponse = null;
+
+export type DeletePlaylistQuery = { id: string };
+
+export type DeletePlaylistArgs = { query: DeletePlaylistQuery } & BaseEndpointArgs;
+
+// Playlist List -------------------------------------------------------------------------
+export type RawPlaylistListResponse = NDPlaylistList | undefined;
+
+export type PlaylistListResponse = BasePaginatedResponse<Playlist[]>;
+
+export type PlaylistListSort = NDPlaylistListSort;
+
+export type PlaylistListQuery = {
+  limit?: number;
+  musicFolderId?: string;
+  sortBy: PlaylistListSort;
+  sortOrder: SortOrder;
+  startIndex: number;
+};
+
+export type PlaylistListArgs = { query: PlaylistListQuery } & BaseEndpointArgs;
+
+// Playlist Detail -----------------------------------------------------------------------
+export type RawPlaylistDetailResponse = NDPlaylistDetail | undefined;
+
+export type PlaylistDetailResponse = BasePaginatedResponse<Playlist[]>;
+
+export type PlaylistDetailQuery = {
   id: string;
 };
 
-export type AlbumDetailResponse = Album | NDAlbum | JFAlbum | null | undefined;
-
-export type Count = {
-  artists?: number;
-  externals?: number;
-  favorites?: number;
-  genres?: number;
-  images?: number;
-  ratings?: number;
-  songs?: number;
-};
+export type PlaylistDetailArgs = { query: PlaylistDetailQuery } & BaseEndpointArgs;
