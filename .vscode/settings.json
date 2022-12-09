@@ -1,0 +1,8 @@
+{
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "stylelint.validate": ["css", "less", "postcss", "typescript", "typescriptreact", "scss"],
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true
+}
