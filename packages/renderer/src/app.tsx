@@ -32,6 +32,7 @@ export const App = () => {
         withNormalizeCSS
         theme={{
           colorScheme: theme as 'light' | 'dark',
+          components: { Modal: { styles: { body: { padding: '.5rem' } } } },
           defaultRadius: 'xs',
           dir: 'ltr',
           focusRing: 'auto',
