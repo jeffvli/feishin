@@ -5,7 +5,7 @@ import { useFocusTrap } from '@mantine/hooks';
 import { jellyfinApi } from '/@/api/jellyfin.api';
 import { navidromeApi } from '/@/api/navidrome.api';
 import { subsonicApi } from '/@/api/subsonic.api';
-import type { AuthResponse } from '/@/api/types';
+import type { AuthenticationResponse } from '/@/api/types';
 import { ServerType } from '/@/types';
 import { Button, PasswordInput, TextInput, SegmentedControl, toast } from '/@/components';
 import { useAuthStoreActions } from '/@/store';
@@ -56,10 +56,9 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
     try {
       setIsLoading(true);
-      const data: AuthResponse = await authFunction({
+      const data: AuthenticationResponse = await authFunction(values.url, {
         legacy: values.legacyAuth,
         password: values.password,
-        url: values.url,
         username: values.username,
       });
 
@@ -70,6 +69,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         ndCredential: data.ndCredential,
         type: values.type,
         url: values.url,
+        userId: data.userId,
         username: data.username,
       });
 

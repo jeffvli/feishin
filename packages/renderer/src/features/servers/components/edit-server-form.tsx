@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Checkbox, Stack, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { closeAllModals } from '@mantine/modals';
 import { nanoid } from 'nanoid/non-secure';
 import { RiInformationLine } from 'react-icons/ri';
 import { ServerType } from '/@/types';
@@ -10,9 +11,10 @@ import { useAuthStoreActions } from '/@/store';
 import { jellyfinApi } from '/@/api/jellyfin.api';
 import { navidromeApi } from '/@/api/navidrome.api';
 import { subsonicApi } from '/@/api/subsonic.api';
-import type { AuthResponse } from '/@/api/types';
+import type { AuthenticationResponse } from '/@/api/types';
 
 interface EditServerFormProps {
+  isUpdate?: boolean;
   onCancel: () => void;
   server: ServerListItem;
 }
@@ -23,8 +25,8 @@ const AUTH_FUNCTIONS = {
   [ServerType.SUBSONIC]: subsonicApi.authenticate,
 };
 
-export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
-  const { updateServer } = useAuthStoreActions();
+export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormProps) => {
+  const { updateServer, setCurrentServer } = useAuthStoreActions();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm({
@@ -52,14 +54,13 @@ export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
 
     try {
       setIsLoading(true);
-      const data: AuthResponse = await authFunction({
+      const data: AuthenticationResponse = await authFunction(values.url, {
         legacy: values.legacyAuth,
         password: values.password,
-        url: values.url,
         username: values.username,
       });
 
-      updateServer(server.id, {
+      const serverItem = {
         credential: data.credential,
         id: nanoid(),
         name: values.name,
@@ -67,7 +68,10 @@ export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
         type: values.type,
         url: values.url,
         username: data.username,
-      });
+      };
+
+      updateServer(server.id, serverItem);
+      setCurrentServer(serverItem);
 
       toast.success({ message: 'Server updated' });
     } catch (err: any) {
@@ -76,6 +80,7 @@ export const EditServerForm = ({ server, onCancel }: EditServerFormProps) => {
     }
 
     setIsLoading(false);
+    if (isUpdate) closeAllModals();
   });
 
   return (
