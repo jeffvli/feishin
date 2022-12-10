@@ -6,7 +6,7 @@ import { generatePath, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button, Text } from '/@/components';
 import { AppRoute } from '/@/router/routes';
-import { useAppStore, useAppStoreActions, usePlayerStore } from '/@/store';
+import { useAppStore, useAppStoreActions, useCurrentSong } from '/@/store';
 import { fadeIn } from '/@/styles';
 
 const LeftControlsContainer = styled.div`
@@ -72,9 +72,9 @@ const LineItem = styled.div<{ $secondary?: boolean }>`
 export const LeftControls = () => {
   const { setSidebar } = useAppStoreActions();
   const hideImage = useAppStore((state) => state.sidebar.image);
-  const song = usePlayerStore((state) => state.current.song);
-  const title = song?.name;
-  const artists = song?.artists;
+  const currentSong = useCurrentSong();
+  const title = currentSong?.name;
+  const artists = currentSong?.artists;
 
   return (
     <LeftControlsContainer>
@@ -93,10 +93,10 @@ export const LeftControls = () => {
                 to={AppRoute.NOW_PLAYING}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
               >
-                {song?.imageUrl ? (
+                {currentSong?.imageUrl ? (
                   <PlayerbarImage
                     loading="eager"
-                    src={song?.imageUrl}
+                    src={currentSong?.imageUrl}
                   />
                 ) : (
                   <>
@@ -190,15 +190,15 @@ export const LeftControls = () => {
               overflow="hidden"
               size="xs"
               to={
-                song?.albumId
+                currentSong?.albumId
                   ? generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
-                      albumId: song.albumId,
+                      albumId: currentSong.albumId,
                     })
                   : ''
               }
               weight={500}
             >
-              {song?.album || '—'}
+              {currentSong?.album || '—'}
             </Text>
           </LineItem>
         </MetadataStack>

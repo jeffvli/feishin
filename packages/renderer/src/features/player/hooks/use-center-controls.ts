@@ -2,30 +2,31 @@ import { useCallback, useEffect } from 'react';
 import isElectron from 'is-electron';
 import { PlaybackType, PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/types';
 import { mpvPlayer, mpvPlayerListener, ipc } from '#preload';
-import { usePlayerStore } from '../../../store';
-import { useSettingsStore } from '../../../store/settings.store';
+import {
+  useCurrentPlayer,
+  useCurrentStatus,
+  useDefaultQueue,
+  usePlayerControls,
+  usePlayerStore,
+  useRepeatStatus,
+  useSetCurrentTime,
+  useShuffleStatus,
+} from '/@/store';
+import { useSettingsStore } from '/@/store/settings.store';
 
 export const useCenterControls = (args: { playersRef: any }) => {
   const { playersRef } = args;
 
   const settings = useSettingsStore((state) => state.player);
-  const setShuffle = usePlayerStore((state) => state.setShuffle);
-  const setRepeat = usePlayerStore((state) => state.setRepeat);
-  const play = usePlayerStore((state) => state.play);
-  const pause = usePlayerStore((state) => state.pause);
-  const prev = usePlayerStore((state) => state.prev);
-  const next = usePlayerStore((state) => state.next);
-  const setCurrentIndex = usePlayerStore((state) => state.setCurrentIndex);
-  const autoNext = usePlayerStore((state) => state.autoNext);
-  const queue = usePlayerStore((state) => state.queue.default);
-  const playerStatus = usePlayerStore((state) => state.current.status);
-  const currentPlayer = usePlayerStore((state) => state.current.player);
-  const repeat = usePlayerStore((state) => state.repeat);
-  const shuffle = usePlayerStore((state) => state.shuffle);
+  const currentPlayer = useCurrentPlayer();
+  const { setShuffle, setRepeat, play, pause, previous, next, setCurrentIndex, autoNext } =
+    usePlayerControls();
+  const setCurrentTime = useSetCurrentTime();
+  const queue = useDefaultQueue();
+  const playerStatus = useCurrentStatus();
+  const repeatStatus = useRepeatStatus();
+  const shuffleStatus = useShuffleStatus();
   const playerType = useSettingsStore((state) => state.player.type);
-
-  const setCurrentTime = usePlayerStore((state) => state.setCurrentTime);
-
   const player1Ref = playersRef?.current?.player1;
   const player2Ref = playersRef?.current?.player2;
   const currentPlayerRef = currentPlayer === 1 ? player1Ref : player2Ref;
@@ -87,35 +88,35 @@ export const useCenterControls = (args: { playersRef: any }) => {
   }, [isMpvPlayer, pause, setCurrentTime, stopPlayback]);
 
   const handleToggleShuffle = useCallback(() => {
-    if (shuffle === PlayerShuffle.NONE) {
+    if (shuffleStatus === PlayerShuffle.NONE) {
       const playerData = setShuffle(PlayerShuffle.TRACK);
       return mpvPlayer.setQueueNext(playerData);
     }
 
     const playerData = setShuffle(PlayerShuffle.NONE);
     return mpvPlayer.setQueueNext(playerData);
-  }, [setShuffle, shuffle]);
+  }, [setShuffle, shuffleStatus]);
 
   const handleToggleRepeat = useCallback(() => {
-    if (repeat === PlayerRepeat.NONE) {
+    if (repeatStatus === PlayerRepeat.NONE) {
       const playerData = setRepeat(PlayerRepeat.ALL);
       return mpvPlayer.setQueueNext(playerData);
     }
 
-    if (repeat === PlayerRepeat.ALL) {
+    if (repeatStatus === PlayerRepeat.ALL) {
       const playerData = setRepeat(PlayerRepeat.ONE);
       return mpvPlayer.setQueueNext(playerData);
     }
 
     return setRepeat(PlayerRepeat.NONE);
-  }, [repeat, setRepeat]);
+  }, [repeatStatus, setRepeat]);
 
   const checkIsLastTrack = useCallback(() => {
-    return usePlayerStore.getState().checkIsLastTrack();
+    return usePlayerStore.getState().actions.checkIsLastTrack();
   }, []);
 
   const checkIsFirstTrack = useCallback(() => {
-    return usePlayerStore.getState().checkIsFirstTrack();
+    return usePlayerStore.getState().actions.checkIsFirstTrack();
   }, []);
 
   const handleAutoNext = useCallback(() => {
@@ -172,7 +173,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
       },
     };
 
-    switch (repeat) {
+    switch (repeatStatus) {
       case PlayerRepeat.NONE:
         handleRepeatNone[playerType]();
         break;
@@ -186,7 +187,16 @@ export const useCenterControls = (args: { playersRef: any }) => {
       default:
         break;
     }
-  }, [autoNext, checkIsLastTrack, pause, play, playerType, repeat, resetPlayers, setCurrentIndex]);
+  }, [
+    autoNext,
+    checkIsLastTrack,
+    pause,
+    play,
+    playerType,
+    repeatStatus,
+    resetPlayers,
+    setCurrentIndex,
+  ]);
 
   const handleNextTrack = useCallback(() => {
     const isLastTrack = checkIsLastTrack();
@@ -240,7 +250,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
       },
     };
 
-    switch (repeat) {
+    switch (repeatStatus) {
       case PlayerRepeat.NONE:
         handleRepeatNone[playerType]();
         break;
@@ -261,7 +271,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     next,
     pause,
     playerType,
-    repeat,
+    repeatStatus,
     resetPlayers,
     setCurrentIndex,
     setCurrentTime,
@@ -285,7 +295,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     const handleRepeatAll = {
       local: () => {
         if (!isFirstTrack) {
-          const playerData = prev();
+          const playerData = previous();
           mpvPlayer.setQueue(playerData);
           mpvPlayer.previous();
         } else {
@@ -299,7 +309,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
           setCurrentIndex(queue.length - 1);
           resetPlayers();
         } else {
-          prev();
+          previous();
           resetPlayers();
         }
       },
@@ -307,7 +317,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
     const handleRepeatNone = {
       local: () => {
-        const playerData = prev();
+        const playerData = previous();
         mpvPlayer.setQueue(playerData);
         mpvPlayer.previous();
       },
@@ -316,7 +326,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
           resetPlayers();
           pause();
         } else {
-          prev();
+          previous();
           resetPlayers();
         }
       },
@@ -325,7 +335,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     const handleRepeatOne = {
       local: () => {
         if (!isFirstTrack) {
-          const playerData = prev();
+          const playerData = previous();
           mpvPlayer.setQueue(playerData);
           mpvPlayer.previous();
         } else {
@@ -333,12 +343,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
         }
       },
       web: () => {
-        prev();
+        previous();
         resetPlayers();
       },
     };
 
-    switch (repeat) {
+    switch (repeatStatus) {
       case PlayerRepeat.NONE:
         handleRepeatNone[playerType]();
         break;
@@ -360,9 +370,9 @@ export const useCenterControls = (args: { playersRef: any }) => {
     isMpvPlayer,
     pause,
     playerType,
-    prev,
+    previous,
     queue.length,
-    repeat,
+    repeatStatus,
     resetPlayers,
     setCurrentIndex,
     setCurrentTime,
@@ -489,7 +499,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     next,
     pause,
     play,
-    prev,
+    previous,
     setCurrentTime,
   ]);
 

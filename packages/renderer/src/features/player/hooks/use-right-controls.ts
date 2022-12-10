@@ -1,13 +1,12 @@
 import { useEffect } from 'react';
 import isElectron from 'is-electron';
 import { mpvPlayer } from '#preload';
-import { usePlayerStore } from '../../../store';
+import { useMuted, usePlayerControls, useVolume } from '/@/store';
 
 export const useRightControls = () => {
-  const setVolume = usePlayerStore((state) => state.setVolume);
-  const volume = usePlayerStore((state) => state.volume);
-  const muted = usePlayerStore((state) => state.muted);
-  const setMuted = usePlayerStore((state) => state.setMuted);
+  const { setVolume, setMuted } = usePlayerControls();
+  const volume = useVolume();
+  const muted = useMuted();
 
   // Ensure that the mpv player volume is set on startup
   useEffect(() => {

@@ -9,7 +9,7 @@ body[data-theme="defaultLight"] {
   --titlebar-fg: rgb(25, 25, 25);
   --titlebar-bg: rgb(227, 229, 232);
 
-  --sidebar-bg: rgb(255, 255, 255);
+  --sidebar-bg: rgb(240, 241, 242);
   --sidebar-btn-color: rgb(0, 0, 0);
   --sidebar-btn-color-hover: rgb(0, 0, 0);
   --sidebar-handle-bg: #4d4d4d;
@@ -34,8 +34,8 @@ body[data-theme="defaultLight"] {
   --tooltip-bg: rgb(255, 255, 255);
   --tooltip-fg: rgb(0, 0, 0);
 
-  --scrollbar-track-bg: rgba(0, 0, 0, 0.2);
-  --scrollbar-thumb-bg: rgb(150, 150, 150);
+  --scrollbar-track-bg: transparent;
+  --scrollbar-thumb-bg: rgb(140, 140, 140);
 
   --btn-primary-bg: var(--primary-color);
   --btn-primary-bg-hover: rgb(47, 122, 237);
@@ -107,6 +107,17 @@ body[data-theme="defaultLight"] {
     --ag-odd-row-background-color: rgb(230, 230, 230);
     --ag-row-hover-color: rgba(100, 100, 100, 0.2);
     --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
+  }
+
+  .ag-root ::-webkit-scrollbar-corner {
+    background: var(--scrollbar-track-bg);
+  }
+  .ag-root ::-webkit-scrollbar-track-piece {
+    background: var(--scrollbar-track-bg);
+  }
+  .ag-root ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-bg);
+    // background: black;
   }
 
   .ag-cell-focus {

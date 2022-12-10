@@ -2,8 +2,15 @@ import { useRef } from 'react';
 import styled from 'styled-components';
 import { useSettingsStore } from '/@/store/settings.store';
 import { PlaybackType } from '/@/types';
-import { AudioPlayer } from '../../../components';
-import { usePlayerStore } from '../../../store';
+import { AudioPlayer } from '/@/components';
+import {
+  useCurrentPlayer,
+  useCurrentStatus,
+  usePlayer1Data,
+  usePlayer2Data,
+  usePlayerControls,
+  useVolume,
+} from '/@/store';
 import { CenterControls } from './center-controls';
 import { LeftControls } from './left-controls';
 import { RightControls } from './right-controls';
@@ -46,12 +53,12 @@ const CenterGridItem = styled.div`
 export const Playerbar = () => {
   const playersRef = useRef<any>();
   const settings = useSettingsStore((state) => state.player);
-  const volume = usePlayerStore((state) => state.volume);
-  const player1 = usePlayerStore((state) => state.player1());
-  const player2 = usePlayerStore((state) => state.player2());
-  const status = usePlayerStore((state) => state.current.status);
-  const player = usePlayerStore((state) => state.current.player);
-  const autoNext = usePlayerStore((state) => state.autoNext);
+  const volume = useVolume();
+  const player1 = usePlayer1Data();
+  const player2 = usePlayer2Data();
+  const status = useCurrentStatus();
+  const player = useCurrentPlayer();
+  const { autoNext } = usePlayerControls();
 
   return (
     <PlayerbarContainer>

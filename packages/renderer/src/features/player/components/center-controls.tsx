@@ -14,7 +14,15 @@ import {
 } from 'react-icons/ri';
 import styled from 'styled-components';
 import { Text } from '/@/components';
-import { usePlayerStore } from '/@/store';
+import {
+  useCurrentPlayer,
+  useCurrentSong,
+  useCurrentStatus,
+  useCurrentTime,
+  useRepeatStatus,
+  useSetCurrentTime,
+  useShuffleStatus,
+} from '/@/store';
 import { useSettingsStore } from '/@/store/settings.store';
 import { PlaybackType, PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/types';
 import { useCenterControls } from '../hooks/use-center-controls';
@@ -58,15 +66,17 @@ const SliderWrapper = styled.div`
 
 export const CenterControls = ({ playersRef }: CenterControlsProps) => {
   const [isSeeking, setIsSeeking] = useState(false);
-  const songDuration = usePlayerStore((state) => state.current.song?.duration);
+  const currentSong = useCurrentSong();
+  const songDuration = currentSong?.duration;
   const skip = useSettingsStore((state) => state.player.skipButtons);
   const playerType = useSettingsStore((state) => state.player.type);
   const player1 = playersRef?.current?.player1;
   const player2 = playersRef?.current?.player2;
-  const { status, player } = usePlayerStore((state) => state.current);
-  const setCurrentTime = usePlayerStore((state) => state.setCurrentTime);
-  const repeat = usePlayerStore((state) => state.repeat);
-  const shuffle = usePlayerStore((state) => state.shuffle);
+  const status = useCurrentStatus();
+  const player = useCurrentPlayer();
+  const setCurrentTime = useSetCurrentTime();
+  const repeat = useRepeatStatus();
+  const shuffle = useShuffleStatus();
 
   const {
     handleNextTrack,
@@ -79,7 +89,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     handleToggleShuffle,
   } = useCenterControls({ playersRef });
 
-  const currentTime = usePlayerStore((state) => state.current.time);
+  const currentTime = useCurrentTime();
   const currentPlayerRef = player === 1 ? player1 : player2;
   const duration = format((songDuration || 0) * 1000);
   const formattedTime = format(currentTime * 1000 || 0);

@@ -16,7 +16,7 @@ import {
 } from '/@/components';
 import { mpvPlayer } from '#preload';
 import { SettingsOptions } from '/@/features/settings/components/settings-option';
-import { usePlayerStore } from '/@/store';
+import { useCurrentStatus, usePlayerStore } from '/@/store';
 import { useSettingsStore } from '/@/store/settings.store';
 import { Play, PlaybackStyle, PlaybackType, PlayerStatus, CrossfadeStyle } from '/@/types';
 import { localSettings } from '#preload';
@@ -29,7 +29,7 @@ const getAudioDevice = async () => {
 export const PlaybackTab = () => {
   const settings = useSettingsStore((state) => state.player);
   const update = useSettingsStore((state) => state.setSettings);
-  const status = usePlayerStore((state) => state.current.status);
+  const status = useCurrentStatus();
   const [audioDevices, setAudioDevices] = useState<SelectItem[]>([]);
   const [mpvPath, setMpvPath] = useState('');
   const [mpvParameters, setMpvParameters] = useState('');
@@ -83,7 +83,7 @@ export const PlaybackTab = () => {
           onChange={(e) => {
             update({ player: { ...settings, type: e as PlaybackType } });
             if (isElectron() && e === PlaybackType.LOCAL) {
-              const queueData = usePlayerStore.getState().getPlayerData();
+              const queueData = usePlayerStore.getState().actions.getPlayerData();
               mpvPlayer.setQueue(queueData);
             }
           }}

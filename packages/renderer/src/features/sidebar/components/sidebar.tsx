@@ -21,7 +21,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button, TextInput } from '/@/components';
 import { AppRoute } from '/@/router/routes';
-import { useAppStoreActions, usePlayerStore, useSidebarStore } from '/@/store';
+import { useAppStoreActions, useCurrentSong, useSidebarStore } from '/@/store';
 import { fadeIn } from '/@/styles';
 import { SidebarItem } from './sidebar-item';
 
@@ -62,7 +62,7 @@ export const Sidebar = () => {
   const navigate = useNavigate();
   const sidebar = useSidebarStore();
   const { setSidebar } = useAppStoreActions();
-  const imageUrl = usePlayerStore((state) => state.current?.song?.imageUrl);
+  const imageUrl = useCurrentSong()?.imageUrl;
 
   const showImage = sidebar.image;
 

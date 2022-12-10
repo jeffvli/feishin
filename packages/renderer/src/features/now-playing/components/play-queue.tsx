@@ -6,19 +6,20 @@ import type {
   RowDragEvent,
 } from '@ag-grid-community/core';
 import '@ag-grid-community/styles/ag-theme-alpine.css';
+import { VirtualGridAutoSizerContainer, VirtualGridContainer, getColumnDefs } from '/@/components';
 import {
-  VirtualGridAutoSizerContainer,
-  VirtualGridContainer,
-  getColumnDefs,
-  TableConfigDropdown,
-} from '/@/components';
-import { useAppStoreActions, usePlayerStore } from '/@/store';
+  useAppStoreActions,
+  useCurrentSong,
+  useDefaultQueue,
+  usePreviousSong,
+  useQueueControls,
+} from '/@/store';
 import { useSettingsStore } from '/@/store/settings.store';
 import type { QueueSong, TableType } from '/@/types';
 import { ErrorBoundary } from 'react-error-boundary';
 import { mpvPlayer } from '#preload';
-import { VirtualTable } from '../../../components/virtual-table';
-import { ErrorFallback } from '../../action-required';
+import { VirtualTable } from '/@/components/virtual-table';
+import { ErrorFallback } from '/@/features/action-required';
 
 type QueueProps = {
   type: TableType;
@@ -26,11 +27,10 @@ type QueueProps = {
 
 export const PlayQueue = ({ type }: QueueProps) => {
   const gridRef = useRef<any>(null);
-  const queue = usePlayerStore((state) => state.queue.default);
-  const reorderQueue = usePlayerStore((state) => state.reorderQueue);
-  const current = usePlayerStore((state) => state.getQueueData().current);
-  const previous = usePlayerStore((state) => state.queue.previousNode);
-  const setCurrentTrack = usePlayerStore((state) => state.setCurrentTrack);
+  const queue = useDefaultQueue();
+  const { reorderQueue, setCurrentTrack } = useQueueControls();
+  const currentSong = useCurrentSong();
+  const previousSong = usePreviousSong();
   const setSettings = useSettingsStore((state) => state.setSettings);
   const { setAppStore } = useAppStoreActions();
   const tableConfig = useSettingsStore((state) => state.tables[type]);
@@ -77,7 +77,7 @@ export const PlayQueue = ({ type }: QueueProps) => {
   const handleGridReady = () => {
     const { api } = gridRef?.current || {};
 
-    const currentNode = api.getRowNode(current?.uniqueId);
+    const currentNode = api.getRowNode(currentSong?.uniqueId);
     api.ensureNodeVisible(currentNode, 'middle');
   };
 
@@ -121,10 +121,10 @@ export const PlayQueue = ({ type }: QueueProps) => {
   const rowClassRules = useMemo<RowClassRules>(() => {
     return {
       'current-song': (params) => {
-        return params.data.uniqueId === current?.uniqueId;
+        return params.data.uniqueId === currentSong?.uniqueId;
       },
     };
-  }, [current?.uniqueId]);
+  }, [currentSong?.uniqueId]);
 
   // Redraw the current song row when the previous song changes
   useEffect(() => {
@@ -134,8 +134,8 @@ export const PlayQueue = ({ type }: QueueProps) => {
         return;
       }
 
-      const currentNode = api.getRowNode(current?.uniqueId);
-      const previousNode = api.getRowNode(previous?.uniqueId);
+      const currentNode = api.getRowNode(currentSong?.uniqueId);
+      const previousNode = api.getRowNode(previousSong?.uniqueId);
 
       const rowNodes = [currentNode, previousNode];
 
@@ -146,7 +146,7 @@ export const PlayQueue = ({ type }: QueueProps) => {
         }
       }
     }
-  }, [current, previous, tableConfig.followCurrentSong]);
+  }, [currentSong, previousSong, tableConfig.followCurrentSong]);
 
   // Auto resize the columns when the column config changes
   useEffect(() => {
@@ -198,7 +198,7 @@ export const PlayQueue = ({ type }: QueueProps) => {
           />
         </VirtualGridAutoSizerContainer>
       </VirtualGridContainer>
-      <TableConfigDropdown type={type} />
+      {/* <TableConfigDropdown type={type} /> */}
     </ErrorBoundary>
   );
 };

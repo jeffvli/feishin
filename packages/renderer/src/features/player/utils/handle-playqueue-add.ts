@@ -46,7 +46,7 @@ export const handlePlayQueueAdd = async (options: PlayQueueAddOptions) => {
 
     if (!songs) return;
 
-    const playerData = usePlayerStore.getState().addToQueue(songs, options.play);
+    const playerData = usePlayerStore.getState().actions.addToQueue(songs, options.play);
 
     if (options.play === Play.NEXT || options.play === Play.LAST) {
       if (playerType === PlaybackType.LOCAL) {
@@ -60,7 +60,7 @@ export const handlePlayQueueAdd = async (options: PlayQueueAddOptions) => {
         mpvPlayer.play();
       }
 
-      usePlayerStore.getState().play();
+      usePlayerStore.getState().actions.play();
     }
   }
 };

@@ -2,7 +2,7 @@ import { Group } from '@mantine/core';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import { RiVolumeUpFill, RiVolumeDownFill, RiVolumeMuteFill } from 'react-icons/ri';
 import styled from 'styled-components';
-import { usePlayerStore, useAppStoreActions, useSidebarStore } from '/@/store';
+import { useAppStoreActions, useMuted, useSidebarStore, useVolume } from '/@/store';
 import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';
 import { Slider } from './slider';
@@ -33,8 +33,8 @@ const MetadataStack = styled.div`
 `;
 
 export const RightControls = () => {
-  const volume = usePlayerStore((state) => state.volume);
-  const muted = usePlayerStore((state) => state.muted);
+  const volume = useVolume();
+  const muted = useMuted();
   const { setSidebar } = useAppStoreActions();
   const { rightExpanded: isQueueExpanded } = useSidebarStore();
   const { handleVolumeSlider, handleVolumeSliderState, handleMute } = useRightControls();
