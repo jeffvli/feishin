@@ -67,6 +67,7 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
         ndCredential: data.ndCredential,
         type: values.type,
         url: values.url,
+        userId: data.userId,
         username: data.username,
       };
 
