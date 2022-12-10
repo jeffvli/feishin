@@ -130,7 +130,6 @@ export const useAppStore = create<AppSlice>()(
         },
         isReorderingQueue: false,
         platform: Platform.WINDOWS,
-
         sidebar: {
           expanded: [],
           image: false,
@@ -156,3 +155,5 @@ export const useAppStoreActions = () => useAppStore((state) => state.actions);
 export const useAlbumRouteStore = () => useAppStore((state) => state.albums);
 
 export const useSidebarStore = () => useAppStore((state) => state.sidebar);
+
+export const useSidebarRightExpanded = () => useAppStore((state) => state.sidebar.rightExpanded);

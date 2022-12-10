@@ -1,6 +1,7 @@
 import type { MouseEvent } from 'react';
 import { useCallback } from 'react';
 import { Group, Slider } from '@mantine/core';
+import { motion } from 'framer-motion';
 import throttle from 'lodash/throttle';
 import { RiArrowDownSLine } from 'react-icons/ri';
 import { JFAlbumListSort } from '/@/api/jellyfin.types';
@@ -8,7 +9,12 @@ import { NDAlbumListSort } from '/@/api/navidrome.types';
 import type { AlbumListSort } from '/@/api/types';
 import { SortOrder } from '/@/api/types';
 import { Button, DropdownMenu } from '/@/components';
-import { useCurrentServer, useAppStoreActions, useAlbumRouteStore } from '/@/store';
+import {
+  useCurrentServer,
+  useAppStoreActions,
+  useAlbumRouteStore,
+  useSidebarRightExpanded,
+} from '/@/store';
 import { CardDisplayType } from '/@/types';
 import styled from 'styled-components';
 
@@ -42,8 +48,10 @@ const ORDER = [
   { name: 'Descending', value: SortOrder.DESC },
 ];
 
-const AlbumListHeaderContainer = styled.div`
-  padding: 1rem 170px 1rem 1rem;
+const AlbumListHeaderContainer = styled(motion.div)<{ $padRight?: boolean }>`
+  padding: 0.8rem 1rem;
+
+  padding: ${(props) => (props.$padRight ? '0.8rem 1rem' : '0.8rem 170px 0.8rem 1rem')};
 
   button {
     -webkit-app-region: no-drag;
@@ -60,6 +68,8 @@ export const AlbumListHeader = () => {
         (f) => f.value === filters.sortBy,
       )?.name
     : 'Unknown';
+
+  const isRightSidebarExpanded = useSidebarRightExpanded();
 
   const sortOrderLabel = ORDER.find((s) => s.value === filters.sortOrder)?.name;
 
@@ -140,7 +150,7 @@ export const AlbumListHeader = () => {
   );
 
   return (
-    <AlbumListHeaderContainer>
+    <AlbumListHeaderContainer $padRight={isRightSidebarExpanded}>
       <Group>
         <DropdownMenu
           position="bottom-end"
@@ -150,7 +160,7 @@ export const AlbumListHeader = () => {
             <Button
               compact
               rightIcon={<RiArrowDownSLine size={15} />}
-              size="lg"
+              size="xl"
               sx={{ paddingLeft: 0, paddingRight: 0 }}
               variant="subtle"
             >
@@ -194,8 +204,8 @@ export const AlbumListHeader = () => {
           <DropdownMenu.Target>
             <Button
               compact
-              rightIcon={<RiArrowDownSLine size={15} />}
-              variant="default"
+              fw="normal"
+              variant="subtle"
             >
               {sortByLabel}
             </Button>
@@ -217,8 +227,8 @@ export const AlbumListHeader = () => {
           <DropdownMenu.Target>
             <Button
               compact
-              rightIcon={<RiArrowDownSLine size={15} />}
-              variant="default"
+              fw="normal"
+              variant="subtle"
             >
               {sortOrderLabel}
             </Button>
@@ -240,10 +250,10 @@ export const AlbumListHeader = () => {
           <DropdownMenu.Target>
             <Button
               compact
-              rightIcon={<RiArrowDownSLine size={15} />}
-              variant="default"
+              fw="normal"
+              variant="subtle"
             >
-              Folders
+              Folder
             </Button>
           </DropdownMenu.Target>
           {/* <DropdownMenu.Dropdown>
