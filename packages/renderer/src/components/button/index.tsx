@@ -34,7 +34,6 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
         return '';
     }
   }};
-  font-weight: normal;
   background: ${(props) => {
     switch (props.variant) {
       case 'default':
