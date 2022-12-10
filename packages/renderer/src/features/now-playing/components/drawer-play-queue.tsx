@@ -15,8 +15,7 @@ export const DrawerPlayQueue = () => {
     >
       <PlayQueue type="sideQueue" />
       <PlayQueueListControls
-        gridApi={queueRef.current?.grid.api}
-        gridColumnApi={queueRef.current?.grid?.columnApi}
+        tableRef={queueRef}
         type="sideQueue"
       />
     </Stack>

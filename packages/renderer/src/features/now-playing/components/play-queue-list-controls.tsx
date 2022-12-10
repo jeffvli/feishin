@@ -1,3 +1,4 @@
+import type { MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Group } from '@mantine/core';
 import {
@@ -15,17 +16,16 @@ import type { TableType } from '/@/types';
 import { mpvPlayer } from '#preload';
 
 interface PlayQueueListOptionsProps {
-  gridApi?: AgGridReactType<Song>['api'];
-  gridColumnApi?: AgGridReactType<Song>['columnApi'];
+  tableRef: MutableRefObject<{ grid: AgGridReactType<Song> } | null>;
   type: TableType;
 }
 
-export const PlayQueueListControls = ({ type, gridApi }: PlayQueueListOptionsProps) => {
+export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsProps) => {
   const { clearQueue, moveToBottomOfQueue, moveToTopOfQueue, shuffleQueue, removeFromQueue } =
     useQueueControls();
 
   const handleMoveToBottom = () => {
-    const selectedRows = gridApi?.getSelectedRows();
+    const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
     const uniqueIds = selectedRows?.map((row) => row.uniqueId);
     if (!uniqueIds?.length) return;
 
@@ -34,7 +34,7 @@ export const PlayQueueListControls = ({ type, gridApi }: PlayQueueListOptionsPro
   };
 
   const handleMoveToTop = () => {
-    const selectedRows = gridApi?.getSelectedRows();
+    const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
     const uniqueIds = selectedRows?.map((row) => row.uniqueId);
     if (!uniqueIds?.length) return;
 
@@ -43,7 +43,7 @@ export const PlayQueueListControls = ({ type, gridApi }: PlayQueueListOptionsPro
   };
 
   const handleRemoveSelected = () => {
-    const selectedRows = gridApi?.getSelectedRows();
+    const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
     const uniqueIds = selectedRows?.map((row) => row.uniqueId);
     if (!uniqueIds?.length) return;
 
