@@ -16,7 +16,6 @@ import {
 } from '/@/components';
 import { mpvPlayer } from '#preload';
 import { SettingsOptions } from '/@/features/settings/components/settings-option';
-import { getLocalSetting, setLocalSetting } from '/@/features/settings/utils/local-settings';
 import { usePlayerStore } from '/@/store';
 import { useSettingsStore } from '/@/store/settings.store';
 import { Play, PlaybackStyle, PlaybackType, PlayerStatus, CrossfadeStyle } from '/@/types';
@@ -36,19 +35,19 @@ export const PlaybackTab = () => {
   const [mpvParameters, setMpvParameters] = useState('');
 
   const handleSetMpvPath = (e: File) => {
-    setLocalSetting('mpv_path', e.path);
+    localSettings.set('mpv_path', e.path);
   };
 
   useEffect(() => {
     const getMpvPath = async () => {
       if (!isElectron()) return setMpvPath('');
-      const mpvPath = await getLocalSetting('mpv_path');
+      const mpvPath = (await localSettings.get('mpv_path')) as string;
       return setMpvPath(mpvPath);
     };
 
     const getMpvParameters = async () => {
       if (!isElectron()) return setMpvPath('');
-      const mpvParametersFromSettings = await getLocalSetting('mpv_parameters');
+      const mpvParametersFromSettings = (await localSettings.get('mpv_parameters')) as string[];
       const mpvParameters = mpvParametersFromSettings?.join('\n');
       return setMpvParameters(mpvParameters);
     };
@@ -120,7 +119,7 @@ export const PlaybackTab = () => {
             width={225}
             onBlur={(e) => {
               if (isElectron()) {
-                setLocalSetting('mpv_parameters', e.currentTarget.value.split('\n'));
+                localSettings.set('mpv_parameters', e.currentTarget.value.split('\n'));
               }
             }}
           />
