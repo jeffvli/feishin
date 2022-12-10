@@ -3,7 +3,7 @@ import { app, ipcRenderer } from 'electron';
 
 const store = new Store();
 
-const set = (property: string, value: string | Record<string, unknown> | boolean) => {
+const set = (property: string, value: string | Record<string, unknown> | boolean | string[]) => {
   store.set(`${property}`, value);
 };
 
