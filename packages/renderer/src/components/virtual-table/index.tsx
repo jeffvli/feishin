@@ -7,10 +7,10 @@ import type {
   IHeaderParams,
   ValueFormatterParams,
   ColDef,
-} from 'ag-grid-community';
-import type { AgGridReactProps } from 'ag-grid-react';
-import { AgGridReact } from 'ag-grid-react';
-import type { AgGridReact as AgGridReactType } from 'ag-grid-react/lib/agGridReact';
+} from '@ag-grid-community/core';
+import type { AgGridReactProps } from '@ag-grid-community/react';
+import { AgGridReact } from '@ag-grid-community/react';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import formatDuration from 'format-duration';
 import { generatePath } from 'react-router';
 import styled from 'styled-components';

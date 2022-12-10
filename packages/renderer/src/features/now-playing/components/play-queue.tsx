@@ -4,8 +4,8 @@ import type {
   ColDef,
   RowClassRules,
   RowDragEvent,
-} from 'ag-grid-community';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
+} from '@ag-grid-community/core';
+import '@ag-grid-community/styles/ag-theme-alpine.css';
 import {
   VirtualGridAutoSizerContainer,
   VirtualGridContainer,

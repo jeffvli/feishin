@@ -1,4 +1,4 @@
-import type { ICellRendererParams } from 'ag-grid-community';
+import type { ICellRendererParams } from '@ag-grid-community/core';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Text } from '/@/components/text';

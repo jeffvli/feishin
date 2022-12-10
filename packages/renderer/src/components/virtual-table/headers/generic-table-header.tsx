@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { IHeaderParams } from 'ag-grid-community';
+import type { IHeaderParams } from '@ag-grid-community/core';
 import { AiOutlineNumber } from 'react-icons/ai';
 import { FiClock } from 'react-icons/fi';
 import styled from 'styled-components';

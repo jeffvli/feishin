@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ICellRendererParams } from 'ag-grid-community';
+import type { ICellRendererParams } from '@ag-grid-community/core';
 import { Link } from 'react-router-dom';
 import type { AlbumArtist, Artist } from '/@/api/types';
 import { Text } from '/@/components/text';

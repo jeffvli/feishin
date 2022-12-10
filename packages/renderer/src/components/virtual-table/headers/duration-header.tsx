@@ -1,4 +1,4 @@
-import type { IHeaderParams } from 'ag-grid-community';
+import type { IHeaderParams } from '@ag-grid-community/core';
 import { FiClock } from 'react-icons/fi';
 
 export interface ICustomHeaderParams extends IHeaderParams {

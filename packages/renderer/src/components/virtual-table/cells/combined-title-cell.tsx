@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import type { ICellRendererParams } from 'ag-grid-community';
+import type { ICellRendererParams } from '@ag-grid-community/core';
 import { motion } from 'framer-motion';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';

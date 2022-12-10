@@ -1,4 +1,6 @@
 import { useEffect } from 'react';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { ModuleRegistry } from '@ag-grid-community/core';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { NotificationsProvider } from '@mantine/notifications';
@@ -10,7 +12,9 @@ import { queryClient } from './lib/react-query';
 import { AppRouter } from './router/app-router';
 import { useSettingsStore } from './store/settings.store';
 import './styles/global.scss';
-import 'ag-grid-community/styles/ag-grid.css';
+import '@ag-grid-community/styles/ag-grid.css';
+
+ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 initSimpleImg({ threshold: 0.05 }, true);
 
