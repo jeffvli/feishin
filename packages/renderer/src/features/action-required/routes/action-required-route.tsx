@@ -13,7 +13,7 @@ import { AppRoute } from '/@/router/routes';
 import { useCurrentServer } from '/@/store';
 import { localSettings } from '#preload';
 
-export const ActionRequiredRoute = () => {
+const ActionRequiredRoute = () => {
   const currentServer = useCurrentServer();
   const [isMpvRequired, setIsMpvRequired] = useState(false);
   const isServerRequired = !currentServer;
@@ -94,3 +94,5 @@ export const ActionRequiredRoute = () => {
     </AnimatedPage>
   );
 };
+
+export default ActionRequiredRoute;

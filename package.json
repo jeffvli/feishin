@@ -30,7 +30,6 @@
   },
   "devDependencies": {
     "@types/electron-localshortcut": "^3.1.0",
-    "@types/loadable__component": "^5.13.4",
     "@types/lodash": "^4.14.191",
     "@types/md5": "^2.3.2",
     "@types/node": "18.11.10",
@@ -78,7 +77,6 @@
     "vitest": "0.25.3"
   },
   "dependencies": {
-    "@loadable/component": "^5.15.2",
     "@mantine/core": "^5.9.2",
     "@mantine/dates": "^5.9.2",
     "@mantine/dropzone": "^5.9.2",
@@ -103,6 +101,7 @@
     "ky-universal": "^0.11.0",
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
+    "memoize-one": "^6.0.0",
     "nanoid": "^4.0.0",
     "node-mpv": "^2.0.0-beta.2",
     "react": "^18.2.0",

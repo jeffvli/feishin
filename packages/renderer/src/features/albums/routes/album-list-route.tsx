@@ -32,37 +32,7 @@ import { NDAlbumListSort } from '/@/api/navidrome.types';
 import { controller } from '/@/api/controller';
 import { ndNormalize } from '/@/api/navidrome.api';
 
-const FILTERS = {
-  jellyfin: [
-    { name: 'Album Artist', value: JFAlbumListSort.NAME },
-    { name: 'Community Rating', value: JFAlbumListSort.RATING },
-    { name: 'Critic Rating', value: JFAlbumListSort.CRITIC_RATING },
-    { name: 'Name', value: JFAlbumListSort.NAME },
-    { name: 'Random', value: JFAlbumListSort.RANDOM },
-    { name: 'Recently Added', value: JFAlbumListSort.RECENTLY_ADDED },
-    { name: 'Release Date', value: JFAlbumListSort.RELEASE_DATE },
-  ],
-  navidrome: [
-    { name: 'Album Artist', value: NDAlbumListSort.ALBUM_ARTIST },
-    { name: 'Artist', value: NDAlbumListSort.ARTIST },
-    { name: 'Duration', value: NDAlbumListSort.DURATION },
-    { name: 'Name', value: NDAlbumListSort.NAME },
-    { name: 'Play Count', value: NDAlbumListSort.PLAY_COUNT },
-    { name: 'Random', value: NDAlbumListSort.RANDOM },
-    { name: 'Rating', value: NDAlbumListSort.RATING },
-    { name: 'Recently Added', value: NDAlbumListSort.RECENTLY_ADDED },
-    { name: 'Song Count', value: NDAlbumListSort.SONG_COUNT },
-    { name: 'Starred', value: NDAlbumListSort.STARRED },
-    { name: 'Year', value: NDAlbumListSort.YEAR },
-  ],
-};
-
-const ORDER = [
-  { name: 'Ascending', value: SortOrder.ASC },
-  { name: 'Descending', value: SortOrder.DESC },
-];
-
-export const AlbumListRoute = () => {
+const AlbumListRoute = () => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
   const { setPage } = useAppStoreActions();
@@ -465,3 +435,5 @@ export const AlbumListRoute = () => {
     </AnimatedPage>
   );
 };
+
+export default AlbumListRoute;

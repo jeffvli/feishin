@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Text } from '/@/components';
 import { AnimatedPage } from '/@/features/shared';
 
-export const InvalidRoute = () => {
+const InvalidRoute = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -34,3 +34,5 @@ export const InvalidRoute = () => {
     </AnimatedPage>
   );
 };
+
+export default InvalidRoute;

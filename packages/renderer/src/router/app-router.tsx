@@ -1,79 +1,80 @@
-import loadable from '@loadable/component';
+import { lazy, Suspense } from 'react';
 import {
   Route,
-  createBrowserRouter,
   createRoutesFromElements,
   RouterProvider,
+  createHashRouter,
 } from 'react-router-dom';
 import { DefaultLayout } from '/@/layouts';
 import { AppOutlet } from '/@/router/app-outlet';
 import { AppRoute } from './routes';
 import { RouteErrorBoundary } from '/@/features/action-required';
+import { TitlebarOutlet } from '/@/router/titlebar-outlet';
 
-const DashboardRoute = loadable(() => import('/@/features/dashboard'), {
-  resolveComponent: (components) => components.DashboardRoute,
-});
+const DashboardRoute = lazy(() => import('/@/features/dashboard/routes/DashboardRoute'));
 
-const NowPlayingRoute = loadable(() => import('/@/features/now-playing'), {
-  resolveComponent: (components) => components.NowPlayingRoute,
-});
+const NowPlayingRoute = lazy(() => import('/@/features/now-playing/routes/now-playing-route'));
 
-const AlbumListRoute = loadable(() => import('/@/features/albums'), {
-  resolveComponent: (components) => components.AlbumListRoute,
-});
+const AlbumListRoute = lazy(() => import('/@/features/albums/routes/album-list-route'));
 
-const ActionRequiredRoute = loadable(() => import('/@/features/action-required'), {
-  resolveComponent: (components) => components.ActionRequiredRoute,
-});
+const ActionRequiredRoute = lazy(
+  () => import('/@/features/action-required/routes/action-required-route'),
+);
 
-const InvalidRoute = loadable(() => import('/@/features/action-required'), {
-  resolveComponent: (components) => components.InvalidRoute,
-});
+const InvalidRoute = lazy(() => import('/@/features/action-required/routes/invalid-route'));
 
 export const AppRouter = () => {
-  const router = createBrowserRouter(
+  const router = createHashRouter(
     createRoutesFromElements(
       <>
-        <Route
-          element={<AppOutlet />}
-          errorElement={<RouteErrorBoundary />}
-        >
-          <Route element={<DefaultLayout />}>
-            <Route
-              index
-              element={<DashboardRoute />}
-            />
-            <Route
-              element={<DashboardRoute />}
-              path={AppRoute.HOME}
-            />
-            <Route
-              element={<NowPlayingRoute />}
-              path={AppRoute.NOW_PLAYING}
-            />
-            <Route
-              element={<AlbumListRoute />}
-              path={AppRoute.LIBRARY_ALBUMS}
-            />
-            <Route
-              element={<></>}
-              path={AppRoute.LIBRARY_ARTISTS}
-            />
-            <Route
-              element={<InvalidRoute />}
-              path="*"
-            />
+        <Route element={<TitlebarOutlet />}>
+          <Route
+            element={<AppOutlet />}
+            errorElement={<RouteErrorBoundary />}
+          >
+            <Route element={<DefaultLayout />}>
+              <Route
+                index
+                element={<DashboardRoute />}
+              />
+              <Route
+                element={<DashboardRoute />}
+                path={AppRoute.HOME}
+              />
+              <Route
+                element={<NowPlayingRoute />}
+                path={AppRoute.NOW_PLAYING}
+              />
+              <Route
+                element={<AlbumListRoute />}
+                path={AppRoute.LIBRARY_ALBUMS}
+              />
+              <Route
+                element={<></>}
+                path={AppRoute.LIBRARY_ARTISTS}
+              />
+              <Route
+                element={<InvalidRoute />}
+                path="*"
+              />
+            </Route>
           </Route>
         </Route>
-        <Route element={<DefaultLayout shell />}>
-          <Route
-            element={<ActionRequiredRoute />}
-            path={AppRoute.ACTION_REQUIRED}
-          />
+        <Route element={<TitlebarOutlet />}>
+          <Route element={<DefaultLayout shell />}>
+            <Route
+              element={<ActionRequiredRoute />}
+              path={AppRoute.ACTION_REQUIRED}
+            />
+          </Route>
         </Route>
       </>,
     ),
   );
 
-  return <RouterProvider router={router} />;
+  return (
+    <Suspense fallback={<></>}>
+      <RouterProvider router={router} />
+    </Suspense>
+  );
 };

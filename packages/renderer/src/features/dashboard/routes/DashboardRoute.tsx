@@ -1,3 +1,5 @@
-export const DashboardRoute = () => {
+const DashboardRoute = () => {
   return <></>;
 };
+
+export default DashboardRoute;
