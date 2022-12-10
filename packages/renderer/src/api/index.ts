@@ -1,7 +1,5 @@
-import { apiController } from './controller';
-import { navidromeApi } from './navidrome.api';
+import { controller } from '/@/api/controller';
 
 export const api = {
-  controller: apiController,
-  navidrome: navidromeApi,
+  controller: controller,
 };
