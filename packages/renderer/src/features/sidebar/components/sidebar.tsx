@@ -27,7 +27,7 @@ import { SidebarItem } from './sidebar-item';
 
 const SidebarContainer = styled.div`
   height: 100%;
-  max-height: calc(100vh - 120px); // Account for titlebar and playerbar
+  max-height: calc(100vh - 90px); // Account for and playerbar
   user-select: none;
 `;
 
@@ -54,6 +54,10 @@ const SidebarImage = styled.img`
   background: var(--placeholder-bg);
 `;
 
+const ActionsContainer = styled(Grid)`
+  -webkit-app-region: drag;
+`;
+
 export const Sidebar = () => {
   const navigate = useNavigate();
   const sidebar = useSidebarStore();
@@ -74,7 +78,7 @@ export const Sidebar = () => {
             maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%',
           }}
         >
-          <Grid p={10}>
+          <ActionsContainer p={10}>
             <Grid.Col span={8}>
               <SpotlightProvider actions={[]}>
                 <TextInput
@@ -110,7 +114,7 @@ export const Sidebar = () => {
                 </Button>
               </Group>
             </Grid.Col>
-          </Grid>
+          </ActionsContainer>
           <Stack
             spacing={0}
             sx={{ overflowY: 'auto' }}

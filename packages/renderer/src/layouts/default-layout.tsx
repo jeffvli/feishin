@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDisclosure, useTimeout } from '@mantine/hooks';
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -7,16 +7,15 @@ import throttle from 'lodash/throttle';
 import { TbArrowBarLeft } from 'react-icons/tb';
 import { Outlet, useLocation } from 'react-router';
 import styled from 'styled-components';
-import { PlayQueue } from '/@/features/now-playing/';
-import { Titlebar } from '/@/features/titlebar/components/titlebar';
 import { AppRoute } from '/@/router/routes';
 import { useAppStore } from '/@/store';
 import { useSettingsStore } from '/@/store/settings.store';
 import { PlaybackType } from '/@/types';
 import { constrainRightSidebarWidth, constrainSidebarWidth } from '/@/utils';
-import { Playerbar } from '../features/player';
-import { Sidebar } from '../features/sidebar/components/sidebar';
-import { useAppStoreActions } from '../store/app.store';
+import { Playerbar } from '/@/features/player';
+import { Sidebar } from '/@/features/sidebar/components/sidebar';
+import { useAppStoreActions } from '/@/store/app.store';
+import { PlayQueue } from '/@/features/now-playing';
 
 if (!isElectron()) {
   useSettingsStore.getState().setSettings({
@@ -30,19 +29,12 @@ if (!isElectron()) {
 const Layout = styled.div`
   display: grid;
   grid-template-areas:
-    'header'
     'main'
     'player';
-  grid-template-rows: 30px 1fr 90px;
+  grid-template-rows: 1fr 90px;
   grid-template-columns: 1fr;
   gap: 0;
   height: 100%;
-`;
-
-const TitlebarContainer = styled.header`
-  grid-area: header;
-  background: var(--titlebar-bg);
-  -webkit-app-region: drag;
 `;
 
 const MainContainer = styled.main<{
@@ -178,10 +170,11 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
 
   const queueDrawerVariants: Variants = {
     closed: {
-      height: 'calc(100% - 120px)',
+      height: 'calc(100vh - 150px)',
       minWidth: '400px',
       position: 'absolute',
       right: 0,
+      top: '50px',
       transition: {
         duration: 0.3,
         ease: 'anticipate',
@@ -190,10 +183,14 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
       x: '50vw',
     },
     open: {
-      height: 'calc(100% - 120px)',
+      boxShadow: '4px 4px 10px 0px rgba(0,0,0,.75)',
+      height: 'calc(100vh - 150px)',
       minWidth: '400px',
+      opacity: 0.98,
       position: 'absolute',
-      right: 0,
+      right: '20px',
+      top: '50px',
+
       transition: {
         damping: 10,
         delay: 0,
@@ -265,9 +262,6 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   return (
     <>
       <Layout>
-        <TitlebarContainer>
-          <Titlebar />
-        </TitlebarContainer>
         <MainContainer
           leftSidebarWidth={sidebar.leftWidth}
           rightExpanded={showSideQueue}
@@ -358,7 +352,9 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
               </AnimatePresence>
             </>
           )}
-          <Outlet />
+          <Suspense fallback={<></>}>
+            <Outlet />
+          </Suspense>
         </MainContainer>
         <PlayerbarContainer>
           <Playerbar />

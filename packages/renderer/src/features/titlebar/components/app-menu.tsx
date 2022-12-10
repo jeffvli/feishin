@@ -1,12 +1,12 @@
 import { Group } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
 import {
-  RiMenu3Fill,
   RiSearch2Line,
   RiSettings2Fill,
   RiSettings2Line,
   RiEdit2Line,
   RiLockLine,
+  RiMenuFill,
 } from 'react-icons/ri';
 import { Button, DropdownMenu, Text } from '/@/components';
 import { ServerList } from '/@/features/servers';
@@ -72,7 +72,7 @@ export const AppMenu = () => {
           size="xs"
           variant="subtle"
         >
-          <RiMenu3Fill
+          <RiMenuFill
             color="var(--titlebar-fg)"
             size={15}
           />

@@ -11,36 +11,31 @@ interface TitlebarProps {
 const TitlebarContainer = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 1rem;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  height: 100%;
   color: var(--titlebar-fg);
 
   button {
     -webkit-app-region: no-drag;
-
-    svg {
-      transform: scaleX(1);
-    }
   }
 `;
 
-const Left = styled.div`
-  display: flex;
-  flex: 1/3;
-  justify-content: center;
-  height: 100%;
-  padding-left: 1rem;
-`;
+// const Left = styled.div`
+//   display: flex;
+//   flex: 1/3;
+//   justify-content: center;
+//   height: 100%;
+//   padding-left: 1rem;
+//   opacity: 0;
+// `;
 
-const Center = styled.div`
-  display: flex;
-  flex: 1/3;
-  justify-content: center;
-  height: 100%;
-`;
+// const Center = styled.div`
+//   display: flex;
+//   flex: 1/3;
+//   justify-content: center;
+//   height: 100%;
+//   opacity: 0;
+// `;
 
 const Right = styled.div`
   display: flex;
@@ -53,10 +48,6 @@ export const Titlebar = ({ children }: TitlebarProps) => {
   return (
     <>
       <TitlebarContainer>
-        <Left>
-          <Group>Feishin</Group>
-        </Left>
-        <Center />
         <Right>
           {children}
           <Group spacing="xs">
