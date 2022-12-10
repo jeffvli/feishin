@@ -173,7 +173,13 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
   }
 
   & .mantine-Button-leftIcon {
+    display: flex;
     margin-right: 0.5rem;
+  }
+
+  .mantine-Button-rightIcon {
+    display: flex;
+    margin-left: 0.5rem;
   }
 `;
 

@@ -49,6 +49,7 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   }
 
   & .mantine-Menu-itemRightSection {
+    display: flex;
     margin-left: 2rem !important;
     color: ${({ $isActive }) => ($isActive ? 'var(--primary-color)' : 'var(--dropdown-menu-fg)')};
   }
