@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import type {
   CellDoubleClickedEvent,
   ColDef,
   RowClassRules,
   RowDragEvent,
+  RowNode,
 } from '@ag-grid-community/core';
 import '@ag-grid-community/styles/ag-theme-alpine.css';
 import { VirtualGridAutoSizerContainer, VirtualGridContainer, getColumnDefs } from '/@/components';
@@ -16,17 +17,19 @@ import {
 } from '/@/store';
 import { useSettingsStore } from '/@/store/settings.store';
 import type { QueueSong, TableType } from '/@/types';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { ErrorBoundary } from 'react-error-boundary';
 import { mpvPlayer } from '#preload';
 import { VirtualTable } from '/@/components/virtual-table';
 import { ErrorFallback } from '/@/features/action-required';
+import type { Song } from '/@/api/types';
 
 type QueueProps = {
   type: TableType;
 };
 
-export const PlayQueue = ({ type }: QueueProps) => {
-  const gridRef = useRef<any>(null);
+export const PlayQueue = forwardRef(({ type }: QueueProps, ref: any) => {
+  const gridRef = useRef<AgGridReactType<Song> | null | any>(null);
   const queue = useDefaultQueue();
   const { reorderQueue, setCurrentTrack } = useQueueControls();
   const currentSong = useCurrentSong();
@@ -34,6 +37,12 @@ export const PlayQueue = ({ type }: QueueProps) => {
   const setSettings = useSettingsStore((state) => state.setSettings);
   const { setAppStore } = useAppStoreActions();
   const tableConfig = useSettingsStore((state) => state.tables[type]);
+
+  useImperativeHandle(ref, () => ({
+    get grid() {
+      return gridRef?.current;
+    },
+  }));
 
   const columnDefs = useMemo(() => getColumnDefs(tableConfig.columns), [tableConfig.columns]);
   const defaultColumnDefs: ColDef = useMemo(() => {
@@ -71,19 +80,22 @@ export const PlayQueue = ({ type }: QueueProps) => {
 
     const { api } = gridRef?.current || {};
     clearTimeout(timeout);
-    timeout = setTimeout(() => api.redrawRows(), 250);
+    timeout = setTimeout(() => api?.redrawRows(), 250);
   };
 
   const handleGridReady = () => {
     const { api } = gridRef?.current || {};
 
-    const currentNode = api.getRowNode(currentSong?.uniqueId);
-    api.ensureNodeVisible(currentNode, 'middle');
+    if (currentSong?.uniqueId) {
+      const currentNode = api?.getRowNode(currentSong?.uniqueId);
+      api?.ensureNodeVisible(currentNode, 'middle');
+    }
   };
 
   const handleColumnChange = () => {
     const { columnApi } = gridRef?.current || {};
-    const columnsOrder = columnApi.getAllGridColumns();
+    const columnsOrder = columnApi?.getAllGridColumns();
+    if (!columnsOrder) return;
 
     const columnsInSettings = useSettingsStore.getState().tables[type].columns;
 
@@ -114,7 +126,7 @@ export const PlayQueue = ({ type }: QueueProps) => {
 
   const handleGridSizeChange = () => {
     if (tableConfig.autoFit) {
-      gridRef?.current.api.sizeColumnsToFit();
+      gridRef?.current?.api.sizeColumnsToFit();
     }
   };
 
@@ -134,10 +146,12 @@ export const PlayQueue = ({ type }: QueueProps) => {
         return;
       }
 
-      const currentNode = api.getRowNode(currentSong?.uniqueId);
-      const previousNode = api.getRowNode(previousSong?.uniqueId);
+      const currentNode = currentSong?.uniqueId ? api.getRowNode(currentSong.uniqueId) : undefined;
+      const previousNode = previousSong?.uniqueId
+        ? api.getRowNode(previousSong?.uniqueId)
+        : undefined;
 
-      const rowNodes = [currentNode, previousNode];
+      const rowNodes = [currentNode, previousNode].filter((e) => e !== undefined) as RowNode<any>[];
 
       if (rowNodes) {
         api.redrawRows({ rowNodes });
@@ -186,8 +200,6 @@ export const PlayQueue = ({ type }: QueueProps) => {
             rowData={queue}
             rowHeight={tableConfig.rowHeight || 40}
             rowSelection="multiple"
-            // onCellClicked={(e) => console.log('clicked', e)}
-            // onCellContextMenu={(e) => console.log(e)}
             onCellDoubleClicked={handlePlayByRowClick}
             onColumnMoved={handleColumnChange}
             onColumnResized={handleColumnChange}
@@ -198,7 +210,6 @@ export const PlayQueue = ({ type }: QueueProps) => {
           />
         </VirtualGridAutoSizerContainer>
       </VirtualGridContainer>
-      {/* <TableConfigDropdown type={type} /> */}
     </ErrorBoundary>
   );
-};
+});

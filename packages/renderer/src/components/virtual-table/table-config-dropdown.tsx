@@ -1,19 +1,12 @@
 import type { ChangeEvent } from 'react';
 import { Stack } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import type { Variants } from 'framer-motion';
-import { motion } from 'framer-motion';
-import { RiListSettingsLine } from 'react-icons/ri';
-import styled from 'styled-components';
-import { Button } from '/@/components/button';
-import { Popover } from '/@/components/popover';
-import { MultiSelect } from '/@/components/select';
 import { Slider } from '/@/components/slider';
 import { Switch } from '/@/components/switch';
 import { Text } from '/@/components/text';
 import { useSettingsStore } from '/@/store/settings.store';
 import type { TableType } from '/@/types';
 import { TableColumn } from '/@/types';
+import { MultiSelect } from '/@/components/select';
 
 export const tableColumns = [
   { label: 'Row Index', value: TableColumn.ROW_INDEX },
@@ -38,13 +31,6 @@ export const tableColumns = [
   { label: 'Date Added', value: TableColumn.DATE_ADDED },
 ];
 
-const Container = styled(motion.div)`
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  z-index: 500;
-`;
-
 interface TableConfigDropdownProps {
   type: TableType;
 }
@@ -52,15 +38,6 @@ interface TableConfigDropdownProps {
 export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
   const setSettings = useSettingsStore((state) => state.setSettings);
   const tableConfig = useSettingsStore((state) => state.tables);
-  const [opened, handlers] = useDisclosure(false);
-  const containerVariants: Variants = {
-    animate: {
-      opacity: 0.2,
-    },
-    initial: {
-      opacity: 0,
-    },
-  };
 
   const handleAddOrRemoveColumns = (values: TableColumn[]) => {
     const existingColumns = tableConfig[type].columns;
@@ -146,69 +123,45 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
   };
 
   return (
-    <Container
-      animate="animate"
-      initial="initial"
-      variants={containerVariants}
-      whileHover={{ opacity: 1 }}
+    <Stack
+      p="1rem"
+      spacing="xl"
     >
-      <Popover
-        opened={opened}
-        position="top-start"
-        withArrow={false}
-      >
-        <Popover.Target>
-          <Button
-            compact
-            variant="subtle"
-            onClick={() => handlers.toggle()}
-          >
-            <RiListSettingsLine size={20} />
-          </Button>
-        </Popover.Target>
-        <Popover.Dropdown>
-          <Stack
-            p="1rem"
-            spacing="xl"
-          >
-            <Stack spacing="xs">
-              <Text>Table Columns</Text>
-              <MultiSelect
-                clearable
-                data={tableColumns}
-                defaultValue={tableConfig[type]?.columns.map((column) => column.column)}
-                dropdownPosition="top"
-                width={300}
-                onChange={handleAddOrRemoveColumns}
-              />
-            </Stack>
-            <Stack spacing="xs">
-              <Text>Row Height</Text>
-              <Slider
-                defaultValue={tableConfig[type]?.rowHeight}
-                max={100}
-                min={25}
-                sx={{ width: 150 }}
-                onChangeEnd={handleUpdateRowHeight}
-              />
-            </Stack>
-            <Stack spacing="xs">
-              <Text>Auto Fit Columns</Text>
-              <Switch
-                defaultChecked={tableConfig[type]?.autoFit}
-                onChange={handleUpdateAutoFit}
-              />
-            </Stack>
-            <Stack spacing="xs">
-              <Text>Follow Current Song</Text>
-              <Switch
-                defaultChecked={tableConfig[type]?.followCurrentSong}
-                onChange={handleUpdateFollow}
-              />
-            </Stack>
-          </Stack>
-        </Popover.Dropdown>
-      </Popover>
-    </Container>
+      <Stack spacing="xs">
+        <Text>Table Columns</Text>
+        <MultiSelect
+          clearable
+          data={tableColumns}
+          defaultValue={tableConfig[type]?.columns.map((column) => column.column)}
+          dropdownPosition="top"
+          width={300}
+          onChange={handleAddOrRemoveColumns}
+        />
+      </Stack>
+      <Stack spacing="xs">
+        <Text>Row Height</Text>
+        <Slider
+          defaultValue={tableConfig[type]?.rowHeight}
+          max={100}
+          min={25}
+          sx={{ width: 150 }}
+          onChangeEnd={handleUpdateRowHeight}
+        />
+      </Stack>
+      <Stack spacing="xs">
+        <Text>Auto Fit Columns</Text>
+        <Switch
+          defaultChecked={tableConfig[type]?.autoFit}
+          onChange={handleUpdateAutoFit}
+        />
+      </Stack>
+      <Stack spacing="xs">
+        <Text>Follow Current Song</Text>
+        <Switch
+          defaultChecked={tableConfig[type]?.followCurrentSong}
+          onChange={handleUpdateFollow}
+        />
+      </Stack>
+    </Stack>
   );
 };

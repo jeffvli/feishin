@@ -1,4 +1,5 @@
 import map from 'lodash/map';
+import merge from 'lodash/merge';
 import shuffle from 'lodash/shuffle';
 import { nanoid } from 'nanoid/non-secure';
 import create from 'zustand';
@@ -59,16 +60,18 @@ export interface PlayerSlice extends PlayerState {
     autoNext: () => PlayerData;
     checkIsFirstTrack: () => boolean;
     checkIsLastTrack: () => boolean;
-    // getNextTrack: () => QueueSong;
-    // getPreviousTrack: () => QueueSong;
+    clearQueue: () => PlayerData;
     getPlayerData: () => PlayerData;
     getQueueData: () => QueueData;
+    moveToBottomOfQueue: (uniqueIds: string[]) => PlayerData;
+    moveToTopOfQueue: (uniqueIds: string[]) => PlayerData;
     next: () => PlayerData;
     pause: () => void;
     play: () => void;
     player1: () => QueueSong | undefined;
     player2: () => QueueSong | undefined;
     previous: () => PlayerData;
+    removeFromQueue: (uniqueIds: string[]) => PlayerData;
     reorderQueue: (rowUniqueIds: string[], afterUniqueId?: string) => PlayerData;
     setCurrentIndex: (index: number) => PlayerData;
     setCurrentTime: (time: number) => void;
@@ -79,6 +82,7 @@ export interface PlayerSlice extends PlayerState {
     setShuffledIndex: (index: number) => PlayerData;
     setStore: (data: Partial<PlayerState>) => void;
     setVolume: (volume: number) => void;
+    shuffleQueue: () => PlayerData;
   };
 }
 
@@ -232,6 +236,19 @@ export const usePlayerStore = create<PlayerSlice>()(
 
             return currentIndex === get().queue.default.length - 1;
           },
+          clearQueue: () => {
+            set((state) => {
+              state.queue.default = [];
+              state.queue.shuffled = [];
+              state.queue.sorted = [];
+              state.current.index = 0;
+              state.current.shuffledIndex = 0;
+              state.current.player = 1;
+              state.current.song = undefined;
+            });
+
+            return get().actions.getPlayerData();
+          },
           getPlayerData: () => {
             const queue = get().queue.default;
             const currentPlayer = get().current.player;
@@ -370,6 +387,46 @@ export const usePlayerStore = create<PlayerSlice>()(
               previous: queue[get().current.index - 1],
             };
           },
+          moveToBottomOfQueue: (uniqueIds) => {
+            const queue = get().queue.default;
+
+            const songsToMove = queue.filter((song) => uniqueIds.includes(song.uniqueId));
+            const songsToStay = queue.filter((song) => !uniqueIds.includes(song.uniqueId));
+
+            const reorderedQueue = [...songsToStay, ...songsToMove];
+
+            const currentSongUniqueId = get().current.song?.uniqueId;
+            const newCurrentSongIndex = reorderedQueue.findIndex(
+              (song) => song.uniqueId === currentSongUniqueId,
+            );
+
+            set((state) => {
+              state.current.index = newCurrentSongIndex;
+              state.queue.default = reorderedQueue;
+            });
+
+            return get().actions.getPlayerData();
+          },
+          moveToTopOfQueue: (uniqueIds) => {
+            const queue = get().queue.default;
+
+            const songsToMove = queue.filter((song) => uniqueIds.includes(song.uniqueId));
+            const songsToStay = queue.filter((song) => !uniqueIds.includes(song.uniqueId));
+
+            const reorderedQueue = [...songsToMove, ...songsToStay];
+
+            const currentSongUniqueId = get().current.song?.uniqueId;
+            const newCurrentSongIndex = reorderedQueue.findIndex(
+              (song) => song.uniqueId === currentSongUniqueId,
+            );
+
+            set((state) => {
+              state.current.index = newCurrentSongIndex;
+              state.queue.default = reorderedQueue;
+            });
+
+            return get().actions.getPlayerData();
+          },
           next: () => {
             const isLastTrack = get().actions.checkIsLastTrack();
             const repeat = get().repeat;
@@ -469,6 +526,17 @@ export const usePlayerStore = create<PlayerSlice>()(
                 state.queue.previousNode = get().current.song;
               });
             }
+
+            return get().actions.getPlayerData();
+          },
+          removeFromQueue: (uniqueIds) => {
+            const queue = get().queue.default;
+
+            const newQueue = queue.filter((song) => !uniqueIds.includes(song.uniqueId));
+
+            set((state) => {
+              state.queue.default = newQueue;
+            });
 
             return get().actions.getPlayerData();
           },
@@ -633,6 +701,22 @@ export const usePlayerStore = create<PlayerSlice>()(
               state.volume = volume;
             });
           },
+          shuffleQueue: () => {
+            const queue = get().queue.default;
+            const shuffledQueue = shuffle(queue);
+
+            const currentSongUniqueId = get().current.song?.uniqueId;
+            const newCurrentSongIndex = shuffledQueue.findIndex(
+              (song) => song.uniqueId === currentSongUniqueId,
+            );
+
+            set((state) => {
+              state.current.index = newCurrentSongIndex;
+              state.queue.default = shuffledQueue;
+            });
+
+            return get().actions.getPlayerData();
+          },
         },
         current: {
           index: 0,
@@ -658,7 +742,13 @@ export const usePlayerStore = create<PlayerSlice>()(
       })),
       { name: 'store_player' },
     ),
-    { name: 'store_player' },
+    {
+      merge: (persistedState, currentState) => {
+        return merge(currentState, persistedState);
+      },
+      name: 'store_player',
+      version: 1,
+    },
   ),
 );
 
@@ -686,10 +776,15 @@ export const useQueueControls = () =>
   usePlayerStore(
     (state) => ({
       addToQueue: state.actions.addToQueue,
+      clearQueue: state.actions.clearQueue,
+      moveToBottomOfQueue: state.actions.moveToBottomOfQueue,
+      moveToTopOfQueue: state.actions.moveToTopOfQueue,
+      removeFromQueue: state.actions.removeFromQueue,
       reorderQueue: state.actions.reorderQueue,
       setCurrentIndex: state.actions.setCurrentIndex,
       setCurrentTrack: state.actions.setCurrentTrack,
       setShuffledIndex: state.actions.setShuffledIndex,
+      shuffleQueue: state.actions.shuffleQueue,
     }),
     shallow,
   );

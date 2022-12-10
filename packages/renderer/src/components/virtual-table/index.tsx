@@ -1,6 +1,6 @@
 import type { Ref } from 'react';
 import { forwardRef, useRef } from 'react';
-import { useClickOutside, useMergedRef } from '@mantine/hooks';
+import { useMergedRef } from '@mantine/hooks';
 import type {
   ICellRendererParams,
   ValueGetterParams,
@@ -175,17 +175,8 @@ export const VirtualTable = forwardRef(
 
     const mergedRef = useMergedRef(ref, tableRef);
 
-    const tableContainerRef = useClickOutside(() => {
-      if (tableRef?.current) {
-        tableRef?.current.api.deselectAll();
-      }
-    });
-
     return (
-      <TableWrapper
-        ref={tableContainerRef}
-        className="ag-theme-alpine-dark"
-      >
+      <TableWrapper className="ag-theme-alpine-dark">
         <AgGridReact
           ref={mergedRef}
           suppressMoveWhenRowDragging

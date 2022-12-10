@@ -15,7 +15,7 @@ import { constrainRightSidebarWidth, constrainSidebarWidth } from '/@/utils';
 import { Playerbar } from '/@/features/player';
 import { Sidebar } from '/@/features/sidebar/components/sidebar';
 import { useAppStoreActions } from '/@/store/app.store';
-import { PlayQueue } from '/@/features/now-playing';
+import { DrawerPlayQueue, SidebarPlayQueue } from '/@/features/now-playing';
 
 if (!isElectron()) {
   useSettingsStore.getState().setSettings({
@@ -111,20 +111,6 @@ const QueueDrawerArea = styled(motion.div)`
   user-select: none;
 `;
 
-const SideQueueContainer = styled.div`
-  width: 100%;
-  height: 100%;
-
-  .ag-root ::-webkit-scrollbar-track-piece {
-    background: var(--main-bg);
-  }
-
-  .ag-theme-alpine-dark {
-    --ag-background-color: var(--sidebar-bg) !important;
-    --ag-odd-row-background-color: var(--sidebar-bg) !important;
-  }
-`;
-
 interface DefaultLayoutProps {
   shell?: boolean;
 }
@@ -183,10 +169,9 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
       x: '50vw',
     },
     open: {
-      boxShadow: '4px 4px 10px 0px rgba(0,0,0,.75)',
+      boxShadow: '2px 2px 10px 10px rgba(0,0,0,.1)',
       height: 'calc(100vh - 150px)',
       minWidth: '400px',
-      opacity: 0.98,
       position: 'absolute',
       right: '20px',
       top: '50px',
@@ -315,9 +300,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                       }, 50);
                     }}
                   >
-                    <SideQueueContainer>
-                      <PlayQueue type="sideDrawerQueue" />
-                    </SideQueueContainer>
+                    <DrawerPlayQueue />
                   </QueueDrawer>
                 )}
               </AnimatePresence>
@@ -344,9 +327,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                         startResizing('right');
                       }}
                     />
-                    <SideQueueContainer>
-                      <PlayQueue type="sideQueue" />
-                    </SideQueueContainer>
+                    <SidebarPlayQueue />
                   </RightSidebarContainer>
                 )}
               </AnimatePresence>
