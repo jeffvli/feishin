@@ -8,7 +8,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import type { Song } from '/@/api/types';
 import type { QueueSong } from '/@/types';
-import { Play, PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/types';
+import { PlayerStatus, PlayerRepeat, PlayerShuffle, Play } from '/@/types';
 
 export interface PlayerState {
   current: {
