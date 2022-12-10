@@ -3,7 +3,7 @@ import { Stack } from '@mantine/core';
 import { Slider } from '/@/components/slider';
 import { Switch } from '/@/components/switch';
 import { Text } from '/@/components/text';
-import { useSettingsStore } from '/@/store/settings.store';
+import { useSettingsStore, useSettingsStoreActions } from '/@/store/settings.store';
 import type { TableType } from '/@/types';
 import { TableColumn } from '/@/types';
 import { MultiSelect } from '/@/components/select';
@@ -36,7 +36,7 @@ interface TableConfigDropdownProps {
 }
 
 export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
-  const setSettings = useSettingsStore((state) => state.setSettings);
+  const { setSettings } = useSettingsStoreActions();
   const tableConfig = useSettingsStore((state) => state.tables);
 
   const handleAddOrRemoveColumns = (values: TableColumn[]) => {

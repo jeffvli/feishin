@@ -17,7 +17,7 @@ import {
 import { mpvPlayer } from '#preload';
 import { SettingsOptions } from '/@/features/settings/components/settings-option';
 import { useCurrentStatus, usePlayerStore } from '/@/store';
-import { useSettingsStore } from '/@/store/settings.store';
+import { useSettingsStore, useSettingsStoreActions } from '/@/store/settings.store';
 import { Play, PlaybackStyle, PlaybackType, PlayerStatus, CrossfadeStyle } from '/@/types';
 import { localSettings } from '#preload';
 
@@ -28,7 +28,7 @@ const getAudioDevice = async () => {
 
 export const PlaybackTab = () => {
   const settings = useSettingsStore((state) => state.player);
-  const update = useSettingsStore((state) => state.setSettings);
+  const { setSettings } = useSettingsStoreActions();
   const status = useCurrentStatus();
   const [audioDevices, setAudioDevices] = useState<SelectItem[]>([]);
   const [mpvPath, setMpvPath] = useState('');
@@ -81,7 +81,7 @@ export const PlaybackTab = () => {
           defaultValue={settings.type}
           disabled={status === PlayerStatus.PLAYING}
           onChange={(e) => {
-            update({ player: { ...settings, type: e as PlaybackType } });
+            setSettings({ player: { ...settings, type: e as PlaybackType } });
             if (isElectron() && e === PlaybackType.LOCAL) {
               const queueData = usePlayerStore.getState().actions.getPlayerData();
               mpvPlayer.setQueue(queueData);
@@ -152,7 +152,7 @@ export const PlaybackTab = () => {
           data={audioDevices}
           defaultValue={settings.audioDeviceId}
           disabled={settings.type !== PlaybackType.WEB}
-          onChange={(e) => update({ player: { ...settings, audioDeviceId: e } })}
+          onChange={(e) => setSettings({ player: { ...settings, audioDeviceId: e } })}
         />
       ),
       description: 'The audio device to use for playback (web player only)',
@@ -168,7 +168,7 @@ export const PlaybackTab = () => {
           ]}
           defaultValue={settings.style}
           disabled={settings.type !== PlaybackType.WEB || status === PlayerStatus.PLAYING}
-          onChange={(e) => update({ player: { ...settings, style: e as PlaybackStyle } })}
+          onChange={(e) => setSettings({ player: { ...settings, style: e as PlaybackStyle } })}
         />
       ),
       description: 'Adjust the playback style (web player only)',
@@ -188,7 +188,7 @@ export const PlaybackTab = () => {
           max={15}
           min={0}
           w={100}
-          onChangeEnd={(e) => update({ player: { ...settings, crossfadeDuration: e } })}
+          onChangeEnd={(e) => setSettings({ player: { ...settings, crossfadeDuration: e } })}
         />
       ),
       description: 'Adjust the crossfade duration (web player only)',
@@ -222,7 +222,7 @@ export const PlaybackTab = () => {
           width={200}
           onChange={(e) => {
             if (!e) return;
-            update({
+            setSettings({
               player: { ...settings, crossfadeStyle: e as CrossfadeStyle },
             });
           }}
@@ -240,7 +240,7 @@ export const PlaybackTab = () => {
           defaultChecked={settings.globalMediaHotkeys}
           disabled={!isElectron()}
           onChange={(e) => {
-            update({
+            setSettings({
               player: {
                 ...settings,
                 globalMediaHotkeys: e.currentTarget.checked,
@@ -274,7 +274,7 @@ export const PlaybackTab = () => {
           ]}
           defaultValue={settings.playButtonBehavior}
           onChange={(e) =>
-            update({
+            setSettings({
               player: {
                 ...settings,
                 playButtonBehavior: e as Play,
@@ -293,7 +293,7 @@ export const PlaybackTab = () => {
           aria-label="Toggle skip buttons"
           defaultChecked={settings.skipButtons?.enabled}
           onChange={(e) =>
-            update({
+            setSettings({
               player: {
                 ...settings,
                 skipButtons: {
@@ -318,7 +318,7 @@ export const PlaybackTab = () => {
               min={0}
               width={75}
               onBlur={(e) =>
-                update({
+                setSettings({
                   player: {
                     ...settings,
                     skipButtons: {
@@ -338,7 +338,7 @@ export const PlaybackTab = () => {
               min={0}
               width={75}
               onBlur={(e) =>
-                update({
+                setSettings({
                   player: {
                     ...settings,
                     skipButtons: {

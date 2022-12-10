@@ -18,7 +18,7 @@ import { useAppStoreActions } from '/@/store/app.store';
 import { DrawerPlayQueue, SidebarPlayQueue } from '/@/features/now-playing';
 
 if (!isElectron()) {
-  useSettingsStore.getState().setSettings({
+  useSettingsStore.getState().actions.setSettings({
     player: {
       ...useSettingsStore.getState().player,
       type: PlaybackType.WEB,

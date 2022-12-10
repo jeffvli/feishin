@@ -5,6 +5,7 @@ import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { AppTheme } from '/@/themes/types';
+import type { TableType } from '/@/types';
 import { CrossfadeStyle, Play, PlaybackStyle, PlaybackType, TableColumn } from '/@/types';
 
 export type PersistedTableColumn = {
@@ -56,13 +57,20 @@ export interface SettingsState {
 }
 
 export interface SettingsSlice extends SettingsState {
-  setSettings: (data: Partial<SettingsState>) => void;
+  actions: {
+    setSettings: (data: Partial<SettingsState>) => void;
+  };
 }
 
 export const useSettingsStore = create<SettingsSlice>()(
   persist(
     devtools(
       immer((set, get) => ({
+        actions: {
+          setSettings: (data) => {
+            set({ ...get(), ...data });
+          },
+        },
         general: {
           followSystemTheme: false,
           fontContent: 'Circular STD',
@@ -90,9 +98,7 @@ export const useSettingsStore = create<SettingsSlice>()(
           style: PlaybackStyle.GAPLESS,
           type: PlaybackType.LOCAL,
         },
-        setSettings: (data) => {
-          set({ ...get(), ...data });
-        },
+
         tab: 'general',
         tables: {
           nowPlaying: {
@@ -177,3 +183,12 @@ export const useSettingsStore = create<SettingsSlice>()(
     },
   ),
 );
+
+export const useSettingsStoreActions = () => useSettingsStore((state) => state.actions);
+
+export const usePlayerSettings = () => useSettingsStore((state) => state.player);
+
+export const useTableSettings = (type: TableType) =>
+  useSettingsStore((state) => state.tables[type]);
+
+export const useGeneralSettings = () => useSettingsStore((state) => state.general);

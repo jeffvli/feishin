@@ -3,7 +3,7 @@ import isElectron from 'is-electron';
 import { Switch, Select } from '/@/components';
 import { SettingsOptions } from '/@/features/settings/components/settings-option';
 import { THEME_DATA } from '/@/hooks';
-import { useSettingsStore } from '/@/store/settings.store';
+import { useGeneralSettings, useSettingsStoreActions } from '/@/store/settings.store';
 import type { AppTheme } from '/@/themes/types';
 
 const FONT_OPTIONS = [
@@ -29,8 +29,8 @@ const FONT_OPTIONS = [
 ];
 
 export const GeneralTab = () => {
-  const settings = useSettingsStore((state) => state.general);
-  const update = useSettingsStore((state) => state.setSettings);
+  const settings = useGeneralSettings();
+  const { setSettings } = useSettingsStoreActions();
 
   const options = [
     {
@@ -63,7 +63,7 @@ export const GeneralTab = () => {
           defaultValue={settings.fontContent}
           onChange={(e) => {
             if (!e) return;
-            update({
+            setSettings({
               general: {
                 ...settings,
                 fontContent: e,
@@ -83,7 +83,7 @@ export const GeneralTab = () => {
           defaultValue={settings.fontHeader}
           onChange={(e) => {
             if (!e) return;
-            update({
+            setSettings({
               general: {
                 ...settings,
                 fontHeader: e,
@@ -104,7 +104,7 @@ export const GeneralTab = () => {
         <Switch
           defaultChecked={settings.followSystemTheme}
           onChange={(e) => {
-            update({
+            setSettings({
               general: {
                 ...settings,
                 followSystemTheme: e.currentTarget.checked,
@@ -123,7 +123,7 @@ export const GeneralTab = () => {
           data={THEME_DATA}
           defaultValue={settings.theme}
           onChange={(e) => {
-            update({
+            setSettings({
               general: {
                 ...settings,
                 theme: e as AppTheme,
@@ -142,7 +142,7 @@ export const GeneralTab = () => {
           data={THEME_DATA}
           defaultValue={settings.themeDark}
           onChange={(e) => {
-            update({
+            setSettings({
               general: {
                 ...settings,
                 themeDark: e as AppTheme,
@@ -161,7 +161,7 @@ export const GeneralTab = () => {
           data={THEME_DATA}
           defaultValue={settings.themeLight}
           onChange={(e) => {
-            update({
+            setSettings({
               general: {
                 ...settings,
                 themeLight: e as AppTheme,

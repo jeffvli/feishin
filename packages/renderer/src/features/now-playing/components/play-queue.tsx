@@ -15,7 +15,11 @@ import {
   usePreviousSong,
   useQueueControls,
 } from '/@/store';
-import { useSettingsStore } from '/@/store/settings.store';
+import {
+  useSettingsStore,
+  useSettingsStoreActions,
+  useTableSettings,
+} from '/@/store/settings.store';
 import type { QueueSong, TableType } from '/@/types';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -34,9 +38,9 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: any) => {
   const { reorderQueue, setCurrentTrack } = useQueueControls();
   const currentSong = useCurrentSong();
   const previousSong = usePreviousSong();
-  const setSettings = useSettingsStore((state) => state.setSettings);
+  const { setSettings } = useSettingsStoreActions();
   const { setAppStore } = useAppStoreActions();
-  const tableConfig = useSettingsStore((state) => state.tables[type]);
+  const tableConfig = useTableSettings(type);
 
   useImperativeHandle(ref, () => ({
     get grid() {

@@ -5,11 +5,11 @@ import { motion } from 'framer-motion';
 import { Tabs } from '/@/components';
 import { GeneralTab } from '/@/features/settings/components/general-tab';
 import { PlaybackTab } from '/@/features/settings/components/playback-tab';
-import { useSettingsStore } from '/@/store/settings.store';
+import { useSettingsStore, useSettingsStoreActions } from '/@/store/settings.store';
 
 export const Settings = () => {
   const currentTab = useSettingsStore((state) => state.tab);
-  const update = useSettingsStore((state) => state.setSettings);
+  const { setSettings } = useSettingsStoreActions();
 
   const tabVariants: Variants = {
     in: {
@@ -42,7 +42,7 @@ export const Settings = () => {
           }}
           value={currentTab}
           variant="pills"
-          onTabChange={(e) => e && update({ tab: e })}
+          onTabChange={(e) => e && setSettings({ tab: e })}
         >
           <Tabs.List>
             <Tabs.Tab value="general">General</Tabs.Tab>
