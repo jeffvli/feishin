@@ -1,5 +1,5 @@
 import React from 'react';
-import { Center, Skeleton } from '@mantine/core';
+import { Center } from '@mantine/core';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { Text } from '/@/components/text';
 import type { LibraryItem, CardRow, CardRoute, Play } from '/@/types';
 import GridCardControls from './grid-card-controls';
+import { Skeleton } from '/@/components/skeleton';
 
 const CardWrapper = styled.div<{
   itemGap: number;
