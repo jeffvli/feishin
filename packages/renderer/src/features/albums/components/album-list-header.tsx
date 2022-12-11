@@ -1,22 +1,15 @@
 import type { MouseEvent } from 'react';
 import { useCallback } from 'react';
 import { Group, Slider } from '@mantine/core';
-import { motion } from 'framer-motion';
 import throttle from 'lodash/throttle';
 import { RiArrowDownSLine } from 'react-icons/ri';
 import { JFAlbumListSort } from '/@/api/jellyfin.types';
 import { NDAlbumListSort } from '/@/api/navidrome.types';
 import type { AlbumListSort } from '/@/api/types';
 import { SortOrder } from '/@/api/types';
-import { Button, DropdownMenu } from '/@/components';
-import {
-  useCurrentServer,
-  useAppStoreActions,
-  useAlbumRouteStore,
-  useSidebarRightExpanded,
-} from '/@/store';
+import { Button, DropdownMenu, PageHeader } from '/@/components';
+import { useCurrentServer, useAppStoreActions, useAlbumRouteStore } from '/@/store';
 import { CardDisplayType } from '/@/types';
-import styled from 'styled-components';
 
 const FILTERS = {
   jellyfin: [
@@ -48,28 +41,17 @@ const ORDER = [
   { name: 'Descending', value: SortOrder.DESC },
 ];
 
-const AlbumListHeaderContainer = styled(motion.div)<{ $padRight?: boolean }>`
-  padding: 0.8rem 1rem;
-
-  padding: ${(props) => (props.$padRight ? '0.8rem 1rem' : '0.8rem 170px 0.8rem 1rem')};
-
-  button {
-    -webkit-app-region: no-drag;
-  }
-`;
-
 export const AlbumListHeader = () => {
   const server = useCurrentServer();
   const { setPage } = useAppStoreActions();
   const page = useAlbumRouteStore();
   const filters = page.list.filter;
+
   const sortByLabel = server?.type
     ? (FILTERS[server.type as keyof typeof FILTERS] as { name: string; value: string }[]).find(
         (f) => f.value === filters.sortBy,
       )?.name
     : 'Unknown';
-
-  const isRightSidebarExpanded = useSidebarRightExpanded();
 
   const sortOrderLabel = ORDER.find((s) => s.value === filters.sortOrder)?.name;
 
@@ -150,7 +132,7 @@ export const AlbumListHeader = () => {
   );
 
   return (
-    <AlbumListHeaderContainer $padRight={isRightSidebarExpanded}>
+    <PageHeader>
       <Group>
         <DropdownMenu
           position="bottom-end"
@@ -271,6 +253,6 @@ export const AlbumListHeader = () => {
         </DropdownMenu.Dropdown> */}
         </DropdownMenu>
       </Group>
-    </AlbumListHeaderContainer>
+    </PageHeader>
   );
 };
