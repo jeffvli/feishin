@@ -13,7 +13,10 @@ export const DrawerPlayQueue = () => {
       pb="1rem"
       sx={{ height: '100%' }}
     >
-      <PlayQueue type="sideQueue" />
+      <PlayQueue
+        ref={queueRef}
+        type="sideQueue"
+      />
       <PlayQueueListControls
         tableRef={queueRef}
         type="sideQueue"

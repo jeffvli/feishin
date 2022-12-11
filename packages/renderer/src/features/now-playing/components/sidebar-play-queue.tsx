@@ -6,7 +6,7 @@ import { PlayQueueListControls } from './play-queue-list-controls';
 import type { Song } from '/@/api/types';
 
 export const SidebarPlayQueue = () => {
-  const tableRef = useRef<{ grid: AgGridReactType<Song> } | null>(null);
+  const queueRef = useRef<{ grid: AgGridReactType<Song> } | null>(null);
 
   return (
     <Stack
@@ -15,11 +15,11 @@ export const SidebarPlayQueue = () => {
       sx={{ height: '100%' }}
     >
       <PlayQueue
-        ref={tableRef}
+        ref={queueRef}
         type="sideQueue"
       />
       <PlayQueueListControls
-        tableRef={tableRef}
+        tableRef={queueRef}
         type="sideQueue"
       />
     </Stack>

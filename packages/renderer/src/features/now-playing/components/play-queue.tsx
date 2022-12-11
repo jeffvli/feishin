@@ -1,3 +1,5 @@
+import type { Ref } from 'react';
+import { useState } from 'react';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import type {
   CellDoubleClickedEvent,
@@ -22,18 +24,19 @@ import {
 } from '/@/store/settings.store';
 import type { QueueSong, TableType } from '/@/types';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { useMergedRef } from '@mantine/hooks';
 import { ErrorBoundary } from 'react-error-boundary';
 import { mpvPlayer } from '#preload';
 import { VirtualTable } from '/@/components/virtual-table';
 import { ErrorFallback } from '/@/features/action-required';
-import type { Song } from '/@/api/types';
 
 type QueueProps = {
   type: TableType;
 };
 
-export const PlayQueue = forwardRef(({ type }: QueueProps, ref: any) => {
-  const gridRef = useRef<AgGridReactType<Song> | null | any>(null);
+export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
+  const tableRef = useRef<AgGridReactType | null>(null);
+  const mergedRef = useMergedRef(ref, tableRef);
   const queue = useDefaultQueue();
   const { reorderQueue, setCurrentTrack } = useQueueControls();
   const currentSong = useCurrentSong();
@@ -41,10 +44,17 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: any) => {
   const { setSettings } = useSettingsStoreActions();
   const { setAppStore } = useAppStoreActions();
   const tableConfig = useTableSettings(type);
+  const [gridApi, setGridApi] = useState<AgGridReactType | undefined>();
+
+  useEffect(() => {
+    if (tableRef.current) {
+      setGridApi(tableRef.current);
+    }
+  }, []);
 
   useImperativeHandle(ref, () => ({
     get grid() {
-      return gridRef?.current;
+      return gridApi;
     },
   }));
 
@@ -82,22 +92,22 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: any) => {
       setAppStore({ isReorderingQueue: false });
     }
 
-    const { api } = gridRef?.current || {};
+    const { api } = tableRef?.current || {};
     clearTimeout(timeout);
     timeout = setTimeout(() => api?.redrawRows(), 250);
   };
 
   const handleGridReady = () => {
-    const { api } = gridRef?.current || {};
+    const { api } = tableRef?.current || {};
 
     if (currentSong?.uniqueId) {
       const currentNode = api?.getRowNode(currentSong?.uniqueId);
-      api?.ensureNodeVisible(currentNode, 'middle');
+      currentNode && api?.ensureNodeVisible(currentNode, 'middle');
     }
   };
 
   const handleColumnChange = () => {
-    const { columnApi } = gridRef?.current || {};
+    const { columnApi } = tableRef?.current || {};
     const columnsOrder = columnApi?.getAllGridColumns();
     if (!columnsOrder) return;
 
@@ -130,7 +140,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: any) => {
 
   const handleGridSizeChange = () => {
     if (tableConfig.autoFit) {
-      gridRef?.current?.api.sizeColumnsToFit();
+      tableRef?.current?.api.sizeColumnsToFit();
     }
   };
 
@@ -144,8 +154,8 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: any) => {
 
   // Redraw the current song row when the previous song changes
   useEffect(() => {
-    if (gridRef?.current) {
-      const { api, columnApi } = gridRef?.current || {};
+    if (tableRef?.current) {
+      const { api, columnApi } = tableRef?.current || {};
       if (api == null || columnApi == null) {
         return;
       }
@@ -160,7 +170,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: any) => {
       if (rowNodes) {
         api.redrawRows({ rowNodes });
         if (tableConfig.followCurrentSong) {
-          api.ensureNodeVisible(currentNode, 'middle');
+          currentNode && api.ensureNodeVisible(currentNode, 'middle');
         }
       }
     }
@@ -169,13 +179,13 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: any) => {
   // Auto resize the columns when the column config changes
   useEffect(() => {
     if (tableConfig.autoFit) {
-      const { api } = gridRef?.current || {};
+      const { api } = tableRef?.current || {};
       api?.sizeColumnsToFit();
     }
   }, [tableConfig.autoFit, tableConfig.columns]);
 
   useEffect(() => {
-    const { api } = gridRef?.current || {};
+    const { api } = tableRef?.current || {};
     api?.resetRowHeights();
     api?.redrawRows();
   }, [tableConfig.rowHeight]);
@@ -185,7 +195,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: any) => {
       <VirtualGridContainer>
         <VirtualGridAutoSizerContainer>
           <VirtualTable
-            ref={gridRef}
+            ref={mergedRef}
             alwaysShowHorizontalScroll
             animateRows
             maintainColumnOrder
