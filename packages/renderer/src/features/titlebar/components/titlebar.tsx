@@ -14,7 +14,6 @@ const TitlebarContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   color: var(--titlebar-fg);
-  opacity: 0.9;
 
   button {
     -webkit-app-region: no-drag;

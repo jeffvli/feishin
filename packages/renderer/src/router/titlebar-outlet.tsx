@@ -10,6 +10,7 @@ const TitlebarContainer = styled.header`
   height: 2.5rem;
   background: var(--titlebar-bg);
   -webkit-app-region: drag;
+  opacity: 0.85;
 `;
 
 export const TitlebarOutlet = () => {
