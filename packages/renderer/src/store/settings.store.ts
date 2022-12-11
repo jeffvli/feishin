@@ -20,7 +20,7 @@ export type DataTableProps = {
   rowHeight: number;
 };
 
-type SideQueue = 'sideQueue' | 'sideDrawerQueue';
+export type SideQueueType = 'sideQueue' | 'sideDrawerQueue';
 
 export interface SettingsState {
   general: {
@@ -28,7 +28,7 @@ export interface SettingsState {
     fontContent: string;
     fontHeader: string;
     showQueueDrawerButton: boolean;
-    sideQueueType: SideQueue;
+    sideQueueType: SideQueueType;
     theme: AppTheme;
     themeDark: AppTheme;
     themeLight: AppTheme;
