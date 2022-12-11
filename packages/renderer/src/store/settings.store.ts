@@ -20,11 +20,15 @@ export type DataTableProps = {
   rowHeight: number;
 };
 
+type SideQueue = 'sideQueue' | 'sideDrawerQueue';
+
 export interface SettingsState {
   general: {
     followSystemTheme: boolean;
     fontContent: string;
     fontHeader: string;
+    showQueueDrawerButton: boolean;
+    sideQueueType: SideQueue;
     theme: AppTheme;
     themeDark: AppTheme;
     themeLight: AppTheme;
@@ -75,6 +79,8 @@ export const useSettingsStore = create<SettingsSlice>()(
           followSystemTheme: false,
           fontContent: 'Circular STD',
           fontHeader: 'Gotham',
+          showQueueDrawerButton: true,
+          sideQueueType: 'sideQueue',
           theme: AppTheme.DEFAULT_DARK,
           themeDark: AppTheme.DEFAULT_DARK,
           themeLight: AppTheme.DEFAULT_LIGHT,

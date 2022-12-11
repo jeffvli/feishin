@@ -3,6 +3,7 @@ import isElectron from 'is-electron';
 import { Switch, Select } from '/@/components';
 import { SettingsOptions } from '/@/features/settings/components/settings-option';
 import { THEME_DATA } from '/@/hooks';
+import type { SideQueueType } from '/@/store/settings.store';
 import { useGeneralSettings, useSettingsStoreActions } from '/@/store/settings.store';
 import type { AppTheme } from '/@/themes/types';
 
@@ -26,6 +27,11 @@ const FONT_OPTIONS = [
   { label: 'Roboto', value: 'Roboto' },
   { label: 'Sora', value: 'Sora' },
   { label: 'Work Sans', value: 'Work Sans' },
+];
+
+const SIDE_QUEUE_OPTIONS = [
+  { label: 'Fixed', value: 'sideQueue' },
+  { label: 'Floating', value: 'sideDrawerQueue' },
 ];
 
 export const GeneralTab = () => {
@@ -176,6 +182,46 @@ export const GeneralTab = () => {
     },
   ];
 
+  const layoutOptions = [
+    {
+      control: (
+        <Select
+          data={SIDE_QUEUE_OPTIONS}
+          defaultValue={settings.sideQueueType}
+          onChange={(e) => {
+            setSettings({
+              general: {
+                ...settings,
+                sideQueueType: e as SideQueueType,
+              },
+            });
+          }}
+        />
+      ),
+      description: 'The style of the sidebar play queue',
+      isHidden: false,
+      title: 'Side play queue style',
+    },
+    {
+      control: (
+        <Switch
+          defaultChecked={settings.showQueueDrawerButton}
+          onChange={(e) => {
+            setSettings({
+              general: {
+                ...settings,
+                showQueueDrawerButton: e.currentTarget.checked,
+              },
+            });
+          }}
+        />
+      ),
+      description: 'Display a hover icon on the right side of the application view the play queue',
+      isHidden: false,
+      title: 'Show floating queue hover area',
+    },
+  ];
+
   return (
     <Stack spacing="xl">
       {options
@@ -188,6 +234,15 @@ export const GeneralTab = () => {
         ))}
       <Divider />
       {themeOptions
+        .filter((o) => !o.isHidden)
+        .map((option) => (
+          <SettingsOptions
+            key={`general-${option.title}`}
+            {...option}
+          />
+        ))}
+      <Divider />
+      {layoutOptions
         .filter((o) => !o.isHidden)
         .map((option) => (
           <SettingsOptions

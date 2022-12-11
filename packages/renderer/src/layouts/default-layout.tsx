@@ -9,7 +9,7 @@ import { Outlet, useLocation } from 'react-router';
 import styled from 'styled-components';
 import { AppRoute } from '/@/router/routes';
 import { useAppStore } from '/@/store';
-import { useSettingsStore } from '/@/store/settings.store';
+import { useGeneralSettings, useSettingsStore } from '/@/store/settings.store';
 import { PlaybackType } from '/@/types';
 import { constrainRightSidebarWidth, constrainSidebarWidth } from '/@/utils';
 import { Playerbar } from '/@/features/player';
@@ -120,6 +120,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const { setSidebar } = useAppStoreActions();
   const [drawer, drawerHandler] = useDisclosure(false);
   const location = useLocation();
+  const { sideQueueType, showQueueDrawerButton } = useGeneralSettings();
 
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const rightSidebarRef = useRef<HTMLDivElement | null>(null);
@@ -136,8 +137,11 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
     drawerTimeout.clear();
   }, [drawerTimeout]);
 
-  const showQueueDrawerButton =
-    !sidebar.rightExpanded && !drawer && location.pathname !== AppRoute.NOW_PLAYING;
+  const isQueueDrawerButtonVisible =
+    showQueueDrawerButton &&
+    !sidebar.rightExpanded &&
+    !drawer &&
+    location.pathname !== AppRoute.NOW_PLAYING;
 
   const showSideQueue = sidebar.rightExpanded && location.pathname !== AppRoute.NOW_PLAYING;
 
@@ -249,7 +253,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
       <Layout>
         <MainContainer
           leftSidebarWidth={sidebar.leftWidth}
-          rightExpanded={showSideQueue}
+          rightExpanded={showSideQueue && sideQueueType === 'sideQueue'}
           rightSidebarWidth={sidebar.rightWidth}
         >
           {!shell && (
@@ -270,7 +274,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                 initial={false}
                 mode="wait"
               >
-                {showQueueDrawerButton && (
+                {isQueueDrawerButtonVisible && (
                   <QueueDrawerArea
                     key="queue-drawer-button"
                     animate="visible"
@@ -311,24 +315,45 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                 mode="wait"
               >
                 {showSideQueue && (
-                  <RightSidebarContainer
-                    key="queue-sidebar"
-                    animate="open"
-                    exit="closed"
-                    initial="closed"
-                    variants={queueSidebarVariants}
-                  >
-                    <ResizeHandle
-                      ref={rightSidebarRef}
-                      isResizing={isResizingRight}
-                      placement="left"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        startResizing('right');
-                      }}
-                    />
-                    <SidebarPlayQueue />
-                  </RightSidebarContainer>
+                  <>
+                    {sideQueueType === 'sideQueue' ? (
+                      <RightSidebarContainer
+                        key="queue-sidebar"
+                        animate="open"
+                        exit="closed"
+                        initial="closed"
+                        variants={queueSidebarVariants}
+                      >
+                        <ResizeHandle
+                          ref={rightSidebarRef}
+                          isResizing={isResizingRight}
+                          placement="left"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            startResizing('right');
+                          }}
+                        />
+                        <SidebarPlayQueue />
+                      </RightSidebarContainer>
+                    ) : (
+                      <QueueDrawer
+                        key="queue-drawer"
+                        animate="open"
+                        exit="closed"
+                        initial="closed"
+                        variants={queueDrawerVariants}
+                        onMouseLeave={() => {
+                          // The drawer will close due to the delay when setting isReorderingQueue
+                          setTimeout(() => {
+                            if (useAppStore.getState().isReorderingQueue) return;
+                            drawerHandler.close();
+                          }, 50);
+                        }}
+                      >
+                        <DrawerPlayQueue />
+                      </QueueDrawer>
+                    )}
+                  </>
                 )}
               </AnimatePresence>
             </>
