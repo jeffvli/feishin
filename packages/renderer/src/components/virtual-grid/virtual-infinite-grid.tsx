@@ -18,6 +18,14 @@ interface VirtualGridProps extends Omit<FixedSizeListProps, 'children' | 'itemSi
   route?: CardRoute;
 }
 
+const constrainWidth = (width: number) => {
+  if (width < 1920) {
+    return width;
+  }
+
+  return 1920;
+};
+
 export const VirtualInfiniteGrid = ({
   itemCount,
   itemGap,
@@ -39,7 +47,9 @@ export const VirtualInfiniteGrid = ({
   const loader = useRef<InfiniteLoader>(null);
 
   const { itemHeight, rowCount, columnCount } = useMemo(() => {
-    const itemsPerRow = Math.floor((Number(width) - itemGap + 3) / (itemSize! + itemGap + 2));
+    const itemsPerRow = Math.floor(
+      (constrainWidth(Number(width)) - itemGap + 3) / (itemSize! + itemGap + 2),
+    );
 
     return {
       columnCount: itemsPerRow,
