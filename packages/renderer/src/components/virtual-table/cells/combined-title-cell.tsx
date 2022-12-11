@@ -68,7 +68,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
         <Text
           $secondary
           overflow="hidden"
-          size="xs"
+          size="sm"
         >
           {artists?.length ? (
             artists.map((artist: Artist | AlbumArtist, index: number) => (
@@ -79,7 +79,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
                   $secondary
                   component={Link}
                   overflow="hidden"
-                  size="xs"
+                  size="sm"
                   sx={{ width: 'fit-content' }}
                   to={generatePath(AppRoute.LIBRARY_ALBUMARTISTS_DETAIL, {
                     albumArtistId: artist.id,

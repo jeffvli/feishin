@@ -40,7 +40,7 @@ export const GenericCell = (
           $secondary={!primary}
           component={Link}
           overflow="hidden"
-          size="xs"
+          size="sm"
           to={displayedValue.link}
         >
           {isLink ? displayedValue.value : displayedValue}
@@ -49,7 +49,7 @@ export const GenericCell = (
         <Text
           $secondary={!primary}
           overflow="hidden"
-          size="xs"
+          size="sm"
         >
           {displayedValue}
         </Text>
