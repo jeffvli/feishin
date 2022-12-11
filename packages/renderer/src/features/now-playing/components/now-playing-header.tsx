@@ -27,7 +27,10 @@ export const NowPlayingHeader = () => {
         })
         .then((color) => {
           const isDark = color.isDark;
-          setHeaderColor({ isDark, value: getHeaderColor(color.rgb, theme === 'dark' ? 0.3 : 1) });
+          setHeaderColor({
+            isDark,
+            value: getHeaderColor(color.rgb, theme === 'dark' ? 0.3 : 0.8),
+          });
         })
         .catch((e) => {
           console.log(e);
