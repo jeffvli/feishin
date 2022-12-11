@@ -5,7 +5,7 @@ import { useShouldPadTitlebar } from '/@/hooks';
 const Container = styled(motion.div)``;
 
 const Header = styled(motion.div)<{ $padRight?: boolean }>`
-  margin-right: 170px;
+  margin-right: ${(props) => props.$padRight && '170px'};
   padding: 1rem;
   -webkit-app-region: drag;
 
@@ -21,6 +21,8 @@ interface PageHeaderProps {
 
 export const PageHeader = ({ backgroundColor, children }: PageHeaderProps) => {
   const padRight = useShouldPadTitlebar();
+
+  console.log('padRight :>> ', padRight);
 
   return (
     <Container
