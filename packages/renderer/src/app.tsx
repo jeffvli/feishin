@@ -54,9 +54,9 @@ export const App = () => {
           fontSizes: {
             lg: 16,
             md: 14,
-            sm: 13,
+            sm: 12,
             xl: 18,
-            xs: 12,
+            xs: 10,
           },
           other: {},
           spacing: {
@@ -72,7 +72,7 @@ export const App = () => {
           autoClose={1500}
           position="bottom-right"
           style={{
-            marginBottom: '90px',
+            marginBottom: '85px',
             opacity: '.8',
             userSelect: 'none',
             width: '250px',

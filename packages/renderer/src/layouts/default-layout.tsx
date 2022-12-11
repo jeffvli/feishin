@@ -31,7 +31,7 @@ const Layout = styled.div`
   grid-template-areas:
     'main'
     'player';
-  grid-template-rows: 1fr 90px;
+  grid-template-rows: 1fr 85px;
   grid-template-columns: 1fr;
   gap: 0;
   height: 100%;

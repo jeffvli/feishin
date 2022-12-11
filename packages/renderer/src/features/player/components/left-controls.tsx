@@ -1,5 +1,5 @@
 import React from 'react';
-import { Center, Group } from '@mantine/core';
+import { Center } from '@mantine/core';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { RiArrowUpSLine, RiDiscLine } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
@@ -26,15 +26,15 @@ const ImageWrapper = styled.div`
 const MetadataStack = styled(motion.div)`
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0;
   justify-content: center;
   width: 100%;
   overflow: hidden;
 `;
 
 const Image = styled(motion(Link))`
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   filter: drop-shadow(0 0 5px rgb(0, 0, 0, 100%));
 
   ${fadeIn};
@@ -61,6 +61,7 @@ const LineItem = styled.div<{ $secondary?: boolean }>`
   max-width: 20vw;
   overflow: hidden;
   color: ${(props) => props.$secondary && 'var(--main-fg-secondary)'};
+  line-height: 1.3;
   white-space: nowrap;
   text-overflow: ellipsis;
 
@@ -114,26 +115,24 @@ export const LeftControls = () => {
                   </>
                 )}
 
-                <Group
-                  position="right"
-                  sx={{ position: 'absolute', right: 0, top: 0 }}
+                <Button
+                  compact
+                  opacity={0.8}
+                  radius={50}
+                  size="xs"
+                  sx={{ position: 'absolute', right: 2, top: 2 }}
+                  tooltip={{ label: 'Expand' }}
+                  variant="default"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSidebar({ image: true });
+                  }}
                 >
-                  <Button
-                    compact
-                    radius={0}
-                    size="xs"
-                    variant="default"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSidebar({ image: true });
-                    }}
-                  >
-                    <RiArrowUpSLine
-                      color="white"
-                      size={20}
-                    />
-                  </Button>
-                </Group>
+                  <RiArrowUpSLine
+                    color="white"
+                    size={20}
+                  />
+                </Button>
               </Image>
             </ImageWrapper>
           )}

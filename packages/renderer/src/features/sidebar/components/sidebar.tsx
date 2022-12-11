@@ -27,7 +27,7 @@ import { SidebarItem } from './sidebar-item';
 
 const SidebarContainer = styled.div`
   height: 100%;
-  max-height: calc(100vh - 90px); // Account for and playerbar
+  max-height: calc(100vh - 85px); // Account for and playerbar
   user-select: none;
 `;
 
@@ -245,25 +245,24 @@ export const Sidebar = () => {
                   />
                 </Center>
               )}
-              <Group
-                position="right"
-                sx={{ position: 'absolute', right: 0, top: 0 }}
+              <Button
+                compact
+                opacity={0.8}
+                radius={100}
+                size="sm"
+                sx={{ position: 'absolute', right: 5, top: 5 }}
+                tooltip={{ label: 'Collapse' }}
+                variant="default"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSidebar({ image: false });
+                }}
               >
-                <Button
-                  compact
-                  size="md"
-                  variant="default"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setSidebar({ image: false });
-                  }}
-                >
-                  <RiArrowDownSLine
-                    color="white"
-                    size={20}
-                  />
-                </Button>
-              </Group>
+                <RiArrowDownSLine
+                  color="white"
+                  size={20}
+                />
+              </Button>
             </ImageContainer>
           )}
         </AnimatePresence>
