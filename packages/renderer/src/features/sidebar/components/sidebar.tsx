@@ -251,7 +251,7 @@ export const Sidebar = () => {
               >
                 <Button
                   compact
-                  size="xs"
+                  size="md"
                   variant="default"
                   onClick={(e) => {
                     e.preventDefault();
