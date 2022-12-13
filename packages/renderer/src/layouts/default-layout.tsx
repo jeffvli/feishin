@@ -42,6 +42,7 @@ const MainContainer = styled.main<{
   rightExpanded?: boolean;
   rightSidebarWidth?: string;
 }>`
+  position: relative;
   display: grid;
   grid-area: main;
   grid-template-areas: 'sidebar . right-sidebar';
@@ -160,30 +161,31 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
 
   const queueDrawerVariants: Variants = {
     closed: {
-      height: 'calc(100vh - 150px)',
+      height: 'calc(100vh - 170px)',
       minWidth: '400px',
       position: 'absolute',
       right: 0,
-      top: '50px',
+      top: '75px',
       transition: {
-        duration: 0.3,
+        duration: 0.5,
         ease: 'anticipate',
       },
       width: '30vw',
       x: '50vw',
     },
     open: {
-      boxShadow: '2px 2px 10px 10px rgba(0,0,0,.1)',
-      height: 'calc(100vh - 150px)',
+      borderRadius: '10px',
+      boxShadow: '1px 1px 10px 5px rgba(0, 0, 0, 0.3)',
+      height: 'calc(100vh - 170px)',
       minWidth: '400px',
       position: 'absolute',
       right: '20px',
-      top: '50px',
+      top: '75px',
 
       transition: {
         damping: 10,
         delay: 0,
-        duration: 0.3,
+        duration: 0.8,
         ease: 'anticipate',
         mass: 0.5,
       },
