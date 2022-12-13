@@ -28,7 +28,6 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   padding: 0.8rem;
   font-size: 0.9em;
   font-family: var(--content-font-family);
-  background-color: var(--dropdown-menu-bg);
 
   &:disabled {
     opacity: 0.6;
@@ -72,7 +71,10 @@ export const DropdownMenu = ({ children, ...props }: MenuProps) => {
       withinPortal
       radius="sm"
       styles={{
-        dropdown: { filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))' },
+        dropdown: {
+          backdropFilter: 'blur(8px)',
+          filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))',
+        },
       }}
       transition="scale"
       {...props}

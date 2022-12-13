@@ -17,11 +17,11 @@ interface MultiSelectProps extends MantineMultiSelectProps {
 
 const StyledSelect = styled(MantineSelect)`
   & [data-selected='true'] {
-    background: var(--input-select-bg);
+    background: var(--input-bg);
   }
 
   & .mantine-Select-disabled {
-    background: var(--input-select-bg);
+    background: var(--input-bg);
     opacity: 0.6;
   }
 
@@ -38,6 +38,7 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
       withinPortal
       styles={{
         dropdown: {
+          backdropFilter: 'blur(8px)',
           background: 'var(--dropdown-menu-bg)',
           filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 20%))',
         },
@@ -61,9 +62,6 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
           },
           color: 'var(--dropdown-menu-fg)',
           padding: '.3rem',
-        },
-        itemsWrapper: {
-          background: 'var(--dropdown-menu-bg)',
         },
       }}
       sx={{ maxWidth, width }}
