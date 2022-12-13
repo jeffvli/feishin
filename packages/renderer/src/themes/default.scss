@@ -2,27 +2,27 @@
   --root-font-size: 12px;
   --icon-color: rgb(255, 255, 255);
 
-  --primary-color: rgb(89, 141, 245);
+  --primary-color: rgb(5, 109, 255);
   --secondary-color: rgb(255, 120, 120);
   --success-color: green;
   --warning-color: orange;
   --danger-color: rgb(204, 50, 50);
   --generic-border-color: rgba(50, 50, 50, 0.7);
 
-  --main-bg: rgb(20, 21, 23);
+  --main-bg: rgb(18, 18, 18);
   --main-fg: rgb(245, 245, 245);
   --main-fg-secondary: rgb(150, 150, 150);
 
   --titlebar-fg: rgb(255, 255, 255);
-  --titlebar-bg: rgb(13, 14, 17);
+  --titlebar-bg: rgb(7, 7, 7);
 
-  --sidebar-bg: rgb(10, 12, 15);
-  --sidebar-btn-color: rgb(179, 179, 179);
+  --sidebar-bg: rgb(0, 0, 0);
+  --sidebar-btn-color: rgb(255, 255, 255);
   --sidebar-btn-color-hover: #dddddd;
   --sidebar-handle-bg: #4d4d4d;
   --sidebar-border: none;
 
-  --playerbar-bg: linear-gradient(rgb(20, 20, 20) 0%, rgb(30, 30, 30) 50%, rgb(20, 20, 20) 100%);
+  --playerbar-bg: rgb(24, 24, 24);
   --playerbar-btn-main-fg: rgb(0, 0, 0);
   --playerbar-btn-main-fg-hover: rgb(0, 0, 0);
   --playerbar-btn-main-bg: rgb(230, 230, 230);
@@ -42,7 +42,7 @@
   --scrollbar-thumb-bg: rgba(90, 90, 90, 0.5);
 
   --btn-primary-bg: var(--primary-color);
-  --btn-primary-bg-hover: rgb(31, 93, 216);
+  --btn-primary-bg-hover: rgb(51, 109, 255);
   --btn-primary-fg: #ffffff;
   --btn-primary-fg-hover: #ffffff;
 
@@ -62,7 +62,7 @@
   --input-active-fg: rgb(193, 193, 193);
   --input-active-bg: rgba(255, 255, 255, 0.1);
 
-  --dropdown-menu-bg: rgb(24, 24, 24);
+  --dropdown-menu-bg: rgba(24, 24, 24, 0.85);
   --dropdown-menu-fg: rgb(220, 220, 220);
   --dropdown-menu-bg-hover: rgb(37, 38, 43);
   --dropdown-menu-border: 1px rgba(50, 50, 50, 0.7) solid;
@@ -81,7 +81,7 @@
   --toast-description-fg: rgb(193, 194, 197);
   --toast-bg: rgb(16, 16, 16);
 
-  --modal-bg: rgb(24, 24, 24);
+  --modal-bg: rgba(24, 24, 24, 0.85);
 
   --paper-bg: rgb(30, 30, 30);
 
@@ -90,7 +90,7 @@
 
   --card-default-bg: rgb(24, 24, 24);
   --card-default-bg-hover: rgb(40, 40, 40);
-  --card-default-radius: 10px;
+  --card-default-radius: 5px;
   --card-poster-bg: transparent;
   --card-poster-bg-hover: transparent;
   --card-poster-radius: 3px;
@@ -128,6 +128,7 @@
   .mantine-Modal-modal {
     background: var(--modal-bg);
     border-radius: 10px;
+    backdrop-filter: blur(8px);
   }
 
   .mantine-Modal-header {

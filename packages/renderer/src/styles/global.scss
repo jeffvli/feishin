@@ -21,6 +21,7 @@ html {
   background: var(--content-bg);
   font-family: var(--content-font-family);
   font-size: var(--root-font-size);
+  user-select: none;
 }
 
 @media only screen and (max-width: 639px) {
@@ -65,6 +66,31 @@ a {
   text-decoration: none;
 }
 
+button {
+  -webkit-app-region: no-drag;
+}
+
+.hide-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+
+  &::-webkit-scrollbar {
+    width: 1px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent;
+  }
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
 @font-face {
   font-family: "AnekTamil";
   src: url("../fonts/AnekTamil-Regular.ttf") format("truetype");
@@ -73,11 +99,6 @@ a {
 @font-face {
   font-family: "Archivo";
   src: url("../fonts/Archivo-Regular.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "Cormorant";
-  src: url("../fonts/Cormorant-Regular.ttf") format("truetype");
 }
 
 @font-face {
@@ -111,11 +132,6 @@ a {
 }
 
 @font-face {
-  font-family: "Hahmlet";
-  src: url("../fonts/Hahmlet-Regular.ttf") format("truetype");
-}
-
-@font-face {
   font-family: "Inconsolata";
   src: url("../fonts/Inconsolata-Regular.ttf") format("truetype");
 }
@@ -141,11 +157,6 @@ a {
 }
 
 @font-face {
-  font-family: "Oswald";
-  src: url("../fonts/Oswald-Regular.ttf") format("truetype");
-}
-
-@font-face {
   font-family: "Oxygen";
   src: url("../fonts/Oxygen-Regular.ttf") format("truetype");
 }
@@ -168,11 +179,6 @@ a {
 @font-face {
   font-family: "Sora";
   src: url("../fonts/Sora-Regular.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "Spectral";
-  src: url("../fonts/Spectral-Regular.ttf") format("truetype");
 }
 
 @font-face {
