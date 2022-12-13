@@ -113,7 +113,6 @@ const Row = styled.div<{ $secondary?: boolean }>`
 interface BaseGridCardProps {
   columnIndex: number;
   controls: {
-    cardControls: any[];
     cardRows: CardRow[];
     itemType: LibraryItem;
     playButtonBehavior: Play;

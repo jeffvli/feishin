@@ -13,7 +13,6 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
     columnCount,
     itemGap,
     itemCount,
-    cardControls,
     cardRows,
     itemData,
     itemType,
@@ -33,7 +32,6 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
         key={`card-${i}-${index}`}
         columnIndex={i}
         controls={{
-          cardControls,
           cardRows,
           itemType,
           playButtonBehavior,
