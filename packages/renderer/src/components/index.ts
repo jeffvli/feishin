@@ -22,3 +22,4 @@ export * from './spinner';
 export * from './virtual-table';
 export * from './skeleton';
 export * from './page-header';
+export * from './text-title';
