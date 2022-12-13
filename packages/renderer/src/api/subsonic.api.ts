@@ -16,7 +16,6 @@ import type {
   SSAlbumArtistDetail,
   SSAlbumArtistDetailResponse,
   SSFavoriteParams,
-  SSFavorite,
   SSFavoriteResponse,
   SSRatingParams,
   SSRatingResponse,
@@ -30,6 +29,7 @@ import type {
   AlbumListArgs,
   AuthenticationResponse,
   FavoriteArgs,
+  FavoriteResponse,
   GenreListArgs,
   RatingArgs,
 } from '/@/api/types';
@@ -222,7 +222,7 @@ const getAlbumList = async (args: AlbumListArgs): Promise<SSAlbumList> => {
   };
 };
 
-const createFavorite = async (args: FavoriteArgs): Promise<SSFavorite> => {
+const createFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
   const { query, signal } = args;
 
   const searchParams: SSFavoriteParams = {
@@ -231,17 +231,19 @@ const createFavorite = async (args: FavoriteArgs): Promise<SSFavorite> => {
     id: query.type === 'song' ? query.id : undefined,
   };
 
-  const data = await api
+  await api
     .get('/rest/star.view', {
       searchParams,
       signal,
     })
     .json<SSFavoriteResponse>();
 
-  return data;
+  return {
+    id: query.id,
+  };
 };
 
-const deleteFavorite = async (args: FavoriteArgs) => {
+const deleteFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
   const { query, signal } = args;
 
   const searchParams: SSFavoriteParams = {
@@ -250,14 +252,16 @@ const deleteFavorite = async (args: FavoriteArgs) => {
     id: query.type === 'song' ? query.id : undefined,
   };
 
-  const data = await api
+  await api
     .get('/rest/unstar.view', {
       searchParams,
       signal,
     })
     .json<SSFavoriteResponse>();
 
-  return data;
+  return {
+    id: query.id,
+  };
 };
 
 const updateRating = async (args: RatingArgs) => {

@@ -4,7 +4,6 @@ import type {
   NDGenreListResponse,
   NDArtistListResponse,
   NDAlbumDetail,
-  NDSongListResponse,
   NDAlbumListParams,
   NDAlbumList,
   NDSongDetailResponse,
@@ -12,18 +11,14 @@ import type {
   NDSong,
   NDAuthenticationResponse,
   NDAlbumDetailResponse,
-  NDSongList,
   NDSongDetail,
   NDGenreList,
   NDAlbumArtistListParams,
-  NDAlbumArtistListSort,
   NDAlbumArtistDetail,
   NDAlbumListResponse,
   NDAlbumArtistDetailResponse,
   NDAlbumArtistList,
   NDSongListParams,
-  NDSongListSort,
-  NDCreatePlaylist,
   NDCreatePlaylistParams,
   NDCreatePlaylistResponse,
   NDDeletePlaylist,
@@ -31,11 +26,13 @@ import type {
   NDPlaylistListParams,
   NDPlaylistDetail,
   NDPlaylistList,
-  NDPlaylistListSort,
   NDPlaylistListResponse,
   NDPlaylistDetailResponse,
+  NDSongList,
+  NDSongListResponse,
 } from '/@/api/navidrome.types';
-import { NDAlbumListSort } from '/@/api/navidrome.types';
+import { NDPlaylistListSort } from '/@/api/navidrome.types';
+import { NDSongListSort } from '/@/api/navidrome.types';
 import { NDSortOrder } from '/@/api/navidrome.types';
 import type {
   Album,
@@ -52,12 +49,18 @@ import type {
   DeletePlaylistArgs,
   PlaylistListArgs,
   PlaylistDetailArgs,
+  CreatePlaylistResponse,
+  PlaylistSongListArgs,
 } from '/@/api/types';
-import { SortOrder } from '/@/api/types';
+import { playlistListSortMap } from '/@/api/types';
+import { albumArtistListSortMap } from '/@/api/types';
+import { songListSortMap } from '/@/api/types';
+import { albumListSortMap, sortOrderMap } from '/@/api/types';
 import { toast } from '/@/components';
 import type { ServerListItem } from '/@/store';
 import { useAuthStore } from '/@/store';
 import { ServerType } from '/@/types';
+import { parseSearchParams } from '/@/utils';
 
 const api = ky.create({
   hooks: {
@@ -94,56 +97,6 @@ const api = ky.create({
     ],
   },
 });
-
-// api.interceptors.request.use(
-//   (config) => {
-//     const server = useAuthStore.getState().currentServer;
-
-//     config.baseURL = server?.url;
-//     config.headers = {
-//       'Content-Type': 'application/json',
-//       'x-nd-authorization': `Bearer ${server?.ndCredential}`,
-//     };
-
-//     return config;
-//   },
-//   (err) => {
-//     return Promise.reject(err);
-//   },
-// );
-
-// api.interceptors.response.use(
-//   (res) => {
-//     const serverId = useAuthStore.getState().currentServer?.id;
-
-//     if (serverId) {
-//       useAuthStore.getState().actions.updateServer(serverId, {
-//         ndCredential: res.headers['x-nd-authorization'] as string,
-//       });
-//     }
-
-//     return res;
-//   },
-//   async (err) => {
-//     if (!err.response) {
-//       return Promise.reject(err);
-//     }
-
-//     if (err.response && err.response.status === 401) {
-//       toast.error({
-//         message: 'Your session has expired.',
-//       });
-
-//       const serverId = useAuthStore.getState().currentServer?.id;
-
-//       if (serverId) {
-//         useAuthStore.getState().actions.setCurrentServer(null);
-//         useAuthStore.getState().actions.updateServer(serverId, { ndCredential: undefined });
-//       }
-//     }
-//     return Promise.reject(err);
-//   },
-// );
 
 const authenticate = async (
   url: string,
@@ -193,22 +146,7 @@ const getAlbumArtistDetail = async (args: AlbumArtistDetailArgs): Promise<NDAlbu
     })
     .json<NDAlbumArtistDetailResponse>();
 
-  const albumsData = await api
-    .get('api/album', {
-      headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
-      prefixUrl: server?.url,
-      searchParams: {
-        _end: 0,
-        _order: NDSortOrder.ASC,
-        _sort: NDAlbumListSort.YEAR,
-        _start: 0,
-        artist_id: query.id,
-      } as NDAlbumListParams,
-      signal,
-    })
-    .json<NDAlbumListResponse>();
-
-  return { ...data, albums: albumsData };
+  return { ...data };
 };
 
 const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<NDAlbumArtistList> => {
@@ -216,8 +154,8 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<NDAlbumArt
 
   const searchParams: NDAlbumArtistListParams = {
     _end: query.startIndex + (query.limit || 0),
-    _order: query.sortOrder === SortOrder.ASC ? NDSortOrder.ASC : NDSortOrder.DESC,
-    _sort: query.sortBy as NDAlbumArtistListSort,
+    _order: sortOrderMap.navidrome[query.sortOrder],
+    _sort: albumArtistListSortMap.navidrome[query.sortBy],
     _start: query.startIndex,
     ...query.ndParams,
   };
@@ -267,8 +205,8 @@ const getAlbumList = async (args: AlbumListArgs): Promise<NDAlbumList> => {
 
   const searchParams: NDAlbumListParams = {
     _end: query.startIndex + (query.limit || 0),
-    _order: query.sortOrder === SortOrder.ASC ? NDSortOrder.ASC : NDSortOrder.DESC,
-    _sort: query.sortBy as NDAlbumListSort,
+    _order: sortOrderMap.navidrome[query.sortOrder],
+    _sort: albumListSortMap.navidrome[query.sortBy],
     _start: query.startIndex,
     ...query.ndParams,
   };
@@ -295,8 +233,8 @@ const getSongList = async (args: SongListArgs): Promise<NDSongList> => {
 
   const searchParams: NDSongListParams = {
     _end: query.startIndex + (query.limit || 0),
-    _order: query.sortOrder === SortOrder.ASC ? NDSortOrder.ASC : NDSortOrder.DESC,
-    _sort: query.sortBy as NDSongListSort,
+    _order: sortOrderMap.navidrome[query.sortOrder],
+    _sort: songListSortMap.navidrome[query.sortBy],
     _start: query.startIndex,
     ...query.ndParams,
   };
@@ -324,6 +262,7 @@ const getSongDetail = async (args: SongDetailArgs): Promise<NDSongDetail> => {
   const data = await api
     .get(`api/song/${query.id}`, {
       headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
+      prefixUrl: server?.url,
       signal,
     })
     .json<NDSongDetailResponse>();
@@ -331,7 +270,7 @@ const getSongDetail = async (args: SongDetailArgs): Promise<NDSongDetail> => {
   return data;
 };
 
-const createPlaylist = async (args: CreatePlaylistArgs): Promise<NDCreatePlaylist> => {
+const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistResponse> => {
   const { query, server, signal } = args;
 
   const json: NDCreatePlaylistParams = {
@@ -344,11 +283,15 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<NDCreatePlaylis
     .post('api/playlist', {
       headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
       json,
+      prefixUrl: server?.url,
       signal,
     })
     .json<NDCreatePlaylistResponse>();
 
-  return data;
+  return {
+    id: data.id,
+    name: query.name,
+  };
 };
 
 const deletePlaylist = async (args: DeletePlaylistArgs): Promise<NDDeletePlaylist> => {
@@ -357,6 +300,7 @@ const deletePlaylist = async (args: DeletePlaylistArgs): Promise<NDDeletePlaylis
   const data = await api
     .delete(`api/playlist/${query.id}`, {
       headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
+      prefixUrl: server?.url,
       signal,
     })
     .json<NDDeletePlaylistResponse>();
@@ -369,12 +313,12 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<NDPlaylistList> 
 
   const searchParams: NDPlaylistListParams = {
     _end: query.startIndex + (query.limit || 0),
-    _order: query.sortOrder === SortOrder.ASC ? NDSortOrder.ASC : NDSortOrder.DESC,
-    _sort: query.sortBy as NDPlaylistListSort,
+    _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : NDSortOrder.ASC,
+    _sort: query.sortBy ? playlistListSortMap.navidrome[query.sortBy] : NDPlaylistListSort.NAME,
     _start: query.startIndex,
   };
 
-  const res = await api.get('api/song', {
+  const res = await api.get('api/playlist', {
     headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
     prefixUrl: server?.url,
     searchParams,
@@ -395,13 +339,41 @@ const getPlaylistDetail = async (args: PlaylistDetailArgs): Promise<NDPlaylistDe
   const { query, server, signal } = args;
 
   const data = await api
-    .get(`api/song/${query.id}`, {
+    .get(`api/playlist/${query.id}`, {
       headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
+      prefixUrl: server?.url,
       signal,
     })
     .json<NDPlaylistDetailResponse>();
 
   return data;
+};
+
+const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<NDSongList> => {
+  const { query, server, signal } = args;
+
+  const searchParams: NDSongListParams & { playlist_id: string } = {
+    _end: query.startIndex + (query.limit || 0),
+    _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : NDSortOrder.ASC,
+    _sort: query.sortBy ? songListSortMap.navidrome[query.sortBy] : NDSongListSort.ID,
+    _start: query.startIndex,
+    playlist_id: query.id,
+  };
+
+  const data = await api
+    .get(`api/playlist/${query.id}/tracks`, {
+      headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
+      prefixUrl: server?.url,
+      searchParams: parseSearchParams(searchParams),
+      signal,
+    })
+    .json<NDSongListResponse>();
+
+  return {
+    items: data,
+    startIndex: query?.startIndex || 0,
+    totalRecordCount: data.length,
+  };
 };
 
 const getCoverArtUrl = (args: {
@@ -426,7 +398,7 @@ const getCoverArtUrl = (args: {
   );
 };
 
-const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: number) => {
+const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: number): Album => {
   const imageUrl = getCoverArtUrl({
     baseUrl: server.url,
     coverArtId: item.coverArtId,
@@ -434,13 +406,14 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
     size: imageSize || 300,
   });
 
-  const imagePlaceholderUrl = imageUrl?.replace(/size=\d+/, 'size=50');
+  const imagePlaceholderUrl = imageUrl?.replace(/size=\d+/, 'size=50') || null;
 
   return {
     albumArtists: [{ id: item.albumArtistId, name: item.albumArtist }],
     artists: [{ id: item.artistId, name: item.artist }],
     backdropImageUrl: null,
     createdAt: item.createdAt,
+    duration: null,
     genres: item.genres,
     id: item.id,
     imagePlaceholderUrl,
@@ -457,7 +430,7 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
     songCount: item.songCount,
     uniqueId: nanoid(),
     updatedAt: item.updatedAt,
-  } as Album;
+  };
 };
 
 const normalizeSong = (
@@ -465,7 +438,7 @@ const normalizeSong = (
   server: ServerListItem,
   deviceId: string,
   imageSize?: number,
-) => {
+): Song => {
   const imageUrl = getCoverArtUrl({
     baseUrl: server.url,
     coverArtId: item.albumId,
@@ -490,6 +463,8 @@ const normalizeSong = (
     imageUrl,
     isFavorite: item.starred,
     name: item.title,
+    path: item.path,
+    playCount: item.playCount,
     releaseDate: new Date(item.year, 0, 1).toISOString(),
     releaseYear: String(item.year),
     serverId: server.id,
@@ -499,7 +474,7 @@ const normalizeSong = (
     type: ServerType.NAVIDROME,
     uniqueId: nanoid(),
     updatedAt: item.updatedAt,
-  } as Song;
+  };
 };
 
 export const navidromeApi = {
@@ -513,6 +488,7 @@ export const navidromeApi = {
   getGenreList,
   getPlaylistDetail,
   getPlaylistList,
+  getPlaylistSongList,
   getSongDetail,
   getSongList,
 };

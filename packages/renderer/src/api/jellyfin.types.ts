@@ -1,31 +1,89 @@
-export type JFBaseResponse = {
+export type JFBasePaginatedResponse = {
   StartIndex: number;
   TotalRecordCount: number;
 };
 
-export interface JFMusicFoldersResponse extends JFBaseResponse {
+export interface JFMusicFolderListResponse extends JFBasePaginatedResponse {
   Items: JFMusicFolder[];
 }
 
-export interface JFGenreResponse extends JFBaseResponse {
+export type JFMusicFolderList = {
+  items: JFMusicFolder[];
+  startIndex: number;
+  totalRecordCount: number;
+};
+
+export interface JFGenreListResponse extends JFBasePaginatedResponse {
   Items: JFGenre[];
 }
 
-export interface JFAlbumArtistsResponse extends JFBaseResponse {
+export type JFGenreList = JFGenreListResponse;
+
+export type JFAlbumArtistDetailResponse = JFAlbumArtist;
+
+export type JFAlbumArtistDetail = JFAlbumArtistDetailResponse;
+
+export interface JFAlbumArtistListResponse extends JFBasePaginatedResponse {
   Items: JFAlbumArtist[];
 }
 
-export interface JFArtistsResponse extends JFBaseResponse {
+export type JFAlbumArtistList = JFAlbumArtistListResponse;
+
+export interface JFArtistListResponse extends JFBasePaginatedResponse {
   Items: JFAlbumArtist[];
 }
 
-export interface JFAlbumsResponse extends JFBaseResponse {
+export type JFArtistList = JFArtistListResponse;
+
+export interface JFAlbumListResponse extends JFBasePaginatedResponse {
   Items: JFAlbum[];
 }
 
-export interface JFSongsResponse extends JFBaseResponse {
+export type JFAlbumList = {
+  items: JFAlbum[];
+  startIndex: number;
+  totalRecordCount: number;
+};
+
+export type JFAlbumDetailResponse = JFAlbum;
+
+export type JFAlbumDetail = JFAlbum & { songs?: JFSong[] };
+
+export interface JFSongListResponse extends JFBasePaginatedResponse {
   Items: JFSong[];
 }
+
+export type JFSongList = JFSongListResponse;
+
+export interface JFPlaylistListResponse extends JFBasePaginatedResponse {
+  Items: JFPlaylist[];
+}
+
+export type JFPlaylistList = JFPlaylistListResponse;
+
+export type JFPlaylistDetailResponse = JFPlaylist;
+
+export type JFPlaylistDetail = JFPlaylist & { songs?: JFSong[] };
+
+export type JFPlaylist = {
+  BackdropImageTags: string[];
+  ChannelId: null;
+  ChildCount?: number;
+  DateCreated: string;
+  GenreItems: GenreItem[];
+  Genres: string[];
+  Id: string;
+  ImageBlurHashes: ImageBlurHashes;
+  ImageTags: ImageTags;
+  IsFolder: boolean;
+  LocationType: string;
+  MediaType: string;
+  Name: string;
+  RunTimeTicks: number;
+  ServerId: string;
+  Type: string;
+  UserData: UserData;
+};
 
 export type JFRequestParams = {
   albumArtistIds?: string;
@@ -114,10 +172,13 @@ export type JFArtist = {
 export type JFAlbum = {
   AlbumArtist: string;
   AlbumArtists: JFGenericItem[];
+  AlbumPrimaryImageTag: string;
   ArtistItems: JFGenericItem[];
   Artists: string[];
   ChannelId: null;
+  ChildCount?: number;
   DateCreated: string;
+  DateLastMediaAdded?: string;
   ExternalUrls: ExternalURL[];
   GenreItems: JFGenericItem[];
   Genres: string[];
@@ -134,6 +195,7 @@ export type JFAlbum = {
   RunTimeTicks: number;
   ServerId: string;
   Type: string;
+  UserData?: UserData;
 } & {
   songs?: JFSong[];
 };
@@ -168,6 +230,7 @@ export type JFSong = {
   ServerId: string;
   SortName: string;
   Type: string;
+  UserData?: UserData;
 };
 
 type ImageBlurHashes = {
@@ -405,6 +468,21 @@ type Policy = {
   SyncPlayAccess: string;
 };
 
+type JFBaseParams = {
+  enableImageTypes?: JFImageType[];
+  fields?: string;
+  imageTypeLimit?: number;
+  parentId?: string;
+  recursive?: boolean;
+};
+
+type JFPaginationParams = {
+  limit?: number;
+  nameStartsWith?: string;
+  sortOrder?: JFSortOrder;
+  startIndex?: number;
+};
+
 export enum JFSortOrder {
   ASC = 'Ascending',
   DESC = 'Descending',
@@ -412,22 +490,81 @@ export enum JFSortOrder {
 
 export enum JFAlbumListSort {
   ALBUM_ARTIST = 'AlbumArtist,SortName',
+  COMMUNITY_RATING = 'CommunityRating,SortName',
   CRITIC_RATING = 'CriticRating,SortName',
   NAME = 'SortName',
   RANDOM = 'Random,SortName',
-  RATING = 'CommunityRating,SortName',
   RECENTLY_ADDED = 'DateCreated,SortName',
   RELEASE_DATE = 'ProductionYear,PremiereDate,SortName',
 }
 
 export type JFAlbumListParams = {
-  enableImageTypes: JFImageType[];
-  imageTypeLimit: number;
+  filters?: string;
+  genres?: string;
   includeItemTypes: 'MusicAlbum';
-  limit?: number;
-  parentId: string;
-  recursive: boolean;
-  sortBy: JFAlbumListSort;
-  sortOrder: JFSortOrder;
-  startIndex: number;
+  sortBy?: JFAlbumListSort;
+  years?: string;
+} & JFBaseParams &
+  JFPaginationParams;
+
+export enum JFSongListSort {
+  ALBUM = 'Album,SortName',
+  ALBUM_ARTIST = 'AlbumArtist,Album,SortName',
+  ARTIST = 'Artist,Album,SortName',
+  DURATION = 'Runtime,AlbumArtist,Album,SortName',
+  NAME = 'Name,SortName',
+  PLAY_COUNT = 'PlayCount,SortName',
+  RANDOM = 'Random,SortName',
+  RECENTLY_ADDED = 'DateCreated,SortName',
+  RECENTLY_PLAYED = 'DatePlayed,SortName',
+  RELEASE_DATE = 'PremiereDate,AlbumArtist,Album,SortName',
+}
+
+export type JFSongListParams = {
+  filters?: string;
+  genres?: string;
+  includeItemTypes: 'Audio';
+  sortBy?: JFSongListSort;
+  years?: string;
+} & JFBaseParams &
+  JFPaginationParams;
+
+export enum JFAlbumArtistListSort {
+  ALBUM = 'Album,SortName',
+  DURATION = 'Runtime,AlbumArtist,Album,SortName',
+  NAME = 'Name,SortName',
+  RANDOM = 'Random,SortName',
+  RECENTLY_ADDED = 'DateCreated,SortName',
+  RELEASE_DATE = 'PremiereDate,AlbumArtist,Album,SortName',
+}
+
+export type JFAlbumArtistListParams = {
+  filters?: string;
+  genres?: string;
+  sortBy?: JFAlbumArtistListSort;
+  years?: string;
+} & JFBaseParams &
+  JFPaginationParams;
+
+export enum JFArtistListSort {
+  ALBUM = 'Album,SortName',
+  DURATION = 'Runtime,AlbumArtist,Album,SortName',
+  NAME = 'Name,SortName',
+  RANDOM = 'Random,SortName',
+  RECENTLY_ADDED = 'DateCreated,SortName',
+  RELEASE_DATE = 'PremiereDate,AlbumArtist,Album,SortName',
+}
+
+export type JFArtistListParams = {
+  filters?: string;
+  genres?: string;
+  sortBy?: JFArtistListSort;
+  years?: string;
+} & JFBaseParams &
+  JFPaginationParams;
+
+export type JFCreatePlaylistResponse = {
+  Id: string;
 };
+
+export type JFCreatePlaylist = JFCreatePlaylistResponse;

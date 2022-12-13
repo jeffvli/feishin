@@ -45,8 +45,6 @@ export type NDAlbum = {
   starred: boolean;
   starredAt: string;
   updatedAt: string;
-} & {
-  songs?: NDSong[];
 };
 
 export type NDSong = {
@@ -119,7 +117,7 @@ export type NDAuthenticationResponse = NDAuthenticate;
 
 export type NDAlbumArtistList = NDAlbumArtist[];
 
-export type NDAlbumArtistDetail = NDAlbumArtist & { albums: NDAlbumListResponse };
+export type NDAlbumArtistDetail = NDAlbumArtist;
 
 export type NDAlbumArtistDetailResponse = NDAlbumArtist;
 
@@ -129,7 +127,7 @@ export type NDGenreListResponse = NDGenre[];
 
 export type NDAlbumDetailResponse = NDAlbum;
 
-export type NDAlbumDetail = NDAlbum & { songs: NDSongListResponse };
+export type NDAlbumDetail = NDAlbum & { songs?: NDSongListResponse };
 
 export type NDAlbumListResponse = NDAlbum[];
 
@@ -183,6 +181,7 @@ export enum NDAlbumListSort {
   DURATION = 'duration',
   NAME = 'name',
   PLAY_COUNT = 'playCount',
+  PLAY_DATE = 'play_date',
   RANDOM = 'random',
   RATING = 'rating',
   RECENTLY_ADDED = 'recently_added',
@@ -193,6 +192,7 @@ export enum NDAlbumListSort {
 
 export type NDAlbumListParams = {
   _sort?: NDAlbumListSort;
+  album_id?: string;
   artist_id?: string;
   compilation?: boolean;
   genre_id?: string;
@@ -213,7 +213,9 @@ export enum NDSongListSort {
   CHANNELS = 'channels',
   COMMENT = 'comment',
   DURATION = 'duration',
+  FAVORITED = 'starred ASC, starredAt ASC',
   GENRE = 'genre',
+  ID = 'id',
   NAME = 'name',
   PLAY_COUNT = 'playCount',
   PLAY_DATE = 'playDate',
@@ -231,11 +233,11 @@ export type NDSongListParams = {
 
 export enum NDAlbumArtistListSort {
   ALBUM_COUNT = 'albumCount',
+  FAVORITED = 'starred ASC, starredAt ASC',
   NAME = 'name',
   PLAY_COUNT = 'playCount',
   RATING = 'rating',
   SONG_COUNT = 'songCount',
-  STARRED = 'starred ASC, starredAt ASC',
 }
 
 export type NDAlbumArtistListParams = {

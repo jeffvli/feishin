@@ -1,35 +1,70 @@
 import type { ServerListItem } from '/@/store';
 import type { ServerType } from '/@//types';
-import type { JFAlbumListSort, JFSortOrder } from '/@/api/jellyfin.types';
+import type {
+  JFAlbumArtistDetail,
+  JFAlbumArtistList,
+  JFAlbumDetail,
+  JFAlbumList,
+  JFArtistList,
+  JFGenreList,
+  JFMusicFolderList,
+  JFPlaylistDetail,
+  JFPlaylistList,
+  JFSongList,
+} from '/@/api/jellyfin.types';
+import { JFAlbumArtistListSort, JFArtistListSort } from '/@/api/jellyfin.types';
+import { JFAlbumListSort, JFSongListSort } from '/@/api/jellyfin.types';
+import { JFSortOrder } from '/@/api/jellyfin.types';
 import type {
   NDAlbumArtistDetail,
   NDAlbumArtistList,
-  NDAlbumArtistListSort,
   NDAlbumDetail,
   NDAlbumList,
-  NDAlbumListSort,
-  NDCreatePlaylist,
   NDDeletePlaylist,
   NDGenreList,
   NDOrder,
   NDPlaylistDetail,
   NDPlaylistList,
-  NDPlaylistListSort,
   NDSongDetail,
   NDSongList,
-  NDSongListSort,
 } from '/@/api/navidrome.types';
+import { NDPlaylistListSort } from '/@/api/navidrome.types';
+import { NDAlbumArtistListSort } from '/@/api/navidrome.types';
+import { NDSongListSort } from '/@/api/navidrome.types';
+import { NDAlbumListSort, NDSortOrder } from '/@/api/navidrome.types';
 import type {
   SSAlbumArtistDetail,
   SSAlbumArtistList,
   SSAlbumDetail,
   SSAlbumList,
+  SSMusicFolderList,
 } from '/@/api/subsonic.types';
 
 export enum SortOrder {
   ASC = 'ASC',
   DESC = 'DESC',
 }
+
+type SortOrderMap = {
+  jellyfin: Record<SortOrder, JFSortOrder>;
+  navidrome: Record<SortOrder, NDSortOrder>;
+  subsonic: Record<SortOrder, undefined>;
+};
+
+export const sortOrderMap: SortOrderMap = {
+  jellyfin: {
+    ASC: JFSortOrder.ASC,
+    DESC: JFSortOrder.DESC,
+  },
+  navidrome: {
+    ASC: NDSortOrder.ASC,
+    DESC: NDSortOrder.DESC,
+  },
+  subsonic: {
+    ASC: undefined,
+    DESC: undefined,
+  },
+};
 
 export enum ExternalSource {
   LASTFM = 'LASTFM',
@@ -88,6 +123,7 @@ export type Album = {
   artists: RelatedArtist[];
   backdropImageUrl: string | null;
   createdAt: string;
+  duration: number | null;
   genres: Genre[];
   id: string;
   imagePlaceholderUrl: string | null;
@@ -115,17 +151,19 @@ export type Song = {
   artists: RelatedArtist[];
   bitRate: number;
   compilation: boolean | null;
-  container: string;
+  container: string | null;
   createdAt: string;
   discNumber: number;
   duration: number;
   genres: Genre[];
   id: string;
-  imageUrl: string;
+  imageUrl: string | null;
   isFavorite: boolean;
   name: string;
-  releaseDate: string;
-  releaseYear: string;
+  path: string | null;
+  playCount: number;
+  releaseDate: string | null;
+  releaseYear: string | null;
   serverId: string;
   size: number;
   streamUrl: string;
@@ -192,8 +230,8 @@ type BaseEndpointArgs = {
   signal?: AbortSignal;
 };
 
-// Genre List ---------------------------------------------------------------------------
-export type RawGenreListResponse = NDGenreList | undefined;
+// Genre List
+export type RawGenreListResponse = NDGenreList | JFGenreList | undefined;
 
 export type GenreListResponse = BasePaginatedResponse<Genre[]> | null | undefined;
 
@@ -201,14 +239,35 @@ export type GenreListArgs = { query: GenreListQuery } & BaseEndpointArgs;
 
 export type GenreListQuery = null;
 
-// Album List ---------------------------------------------------------------------------
-export type RawAlbumListResponse = NDAlbumList | SSAlbumList | undefined;
+// Album List
+export type RawAlbumListResponse = NDAlbumList | SSAlbumList | JFAlbumList | undefined;
 
 export type AlbumListResponse = BasePaginatedResponse<Album[]> | null | undefined;
 
-export type AlbumListSort = NDAlbumListSort | JFAlbumListSort;
+export enum AlbumListSort {
+  ALBUM_ARTIST = 'albumArtist',
+  ARTIST = 'artist',
+  COMMUNITY_RATING = 'communityRating',
+  CRITIC_RATING = 'criticRating',
+  DURATION = 'duration',
+  FAVORITED = 'favorited',
+  NAME = 'name',
+  PLAY_COUNT = 'playCount',
+  RANDOM = 'random',
+  RATING = 'rating',
+  RECENTLY_ADDED = 'recentlyAdded',
+  RECENTLY_PLAYED = 'recentlyPlayed',
+  RELEASE_DATE = 'releaseDate',
+  SONG_COUNT = 'songCount',
+  YEAR = 'year',
+}
 
 export type AlbumListQuery = {
+  jfParams?: {
+    filters?: string;
+    genres?: string;
+    years?: string;
+  };
   limit?: number;
   musicFolderId?: string;
   ndParams?: {
@@ -227,8 +286,68 @@ export type AlbumListQuery = {
 
 export type AlbumListArgs = { query: AlbumListQuery } & BaseEndpointArgs;
 
-// Album Detail -------------------------------------------------------------------------
-export type RawAlbumDetailResponse = NDAlbumDetail | SSAlbumDetail | undefined;
+type AlbumListSortMap = {
+  jellyfin: Record<AlbumListSort, JFAlbumListSort | undefined>;
+  navidrome: Record<AlbumListSort, NDAlbumListSort | undefined>;
+  subsonic: Record<AlbumListSort, undefined>;
+};
+
+export const albumListSortMap: AlbumListSortMap = {
+  jellyfin: {
+    albumArtist: JFAlbumListSort.ALBUM_ARTIST,
+    artist: undefined,
+    communityRating: JFAlbumListSort.COMMUNITY_RATING,
+    criticRating: JFAlbumListSort.CRITIC_RATING,
+    duration: undefined,
+    favorited: undefined,
+    name: JFAlbumListSort.NAME,
+    playCount: undefined,
+    random: JFAlbumListSort.RANDOM,
+    rating: undefined,
+    recentlyAdded: JFAlbumListSort.RECENTLY_ADDED,
+    recentlyPlayed: undefined,
+    releaseDate: JFAlbumListSort.RELEASE_DATE,
+    songCount: undefined,
+    year: undefined,
+  },
+  navidrome: {
+    albumArtist: NDAlbumListSort.ALBUM_ARTIST,
+    artist: NDAlbumListSort.ARTIST,
+    communityRating: undefined,
+    criticRating: undefined,
+    duration: NDAlbumListSort.DURATION,
+    favorited: NDAlbumListSort.STARRED,
+    name: NDAlbumListSort.NAME,
+    playCount: NDAlbumListSort.PLAY_COUNT,
+    random: NDAlbumListSort.RANDOM,
+    rating: NDAlbumListSort.RATING,
+    recentlyAdded: NDAlbumListSort.RECENTLY_ADDED,
+    recentlyPlayed: NDAlbumListSort.PLAY_DATE,
+    releaseDate: undefined,
+    songCount: NDAlbumListSort.SONG_COUNT,
+    year: NDAlbumListSort.YEAR,
+  },
+  subsonic: {
+    albumArtist: undefined,
+    artist: undefined,
+    communityRating: undefined,
+    criticRating: undefined,
+    duration: undefined,
+    favorited: undefined,
+    name: undefined,
+    playCount: undefined,
+    random: undefined,
+    rating: undefined,
+    recentlyAdded: undefined,
+    recentlyPlayed: undefined,
+    releaseDate: undefined,
+    songCount: undefined,
+    year: undefined,
+  },
+};
+
+// Album Detail
+export type RawAlbumDetailResponse = NDAlbumDetail | SSAlbumDetail | JFAlbumDetail | undefined;
 
 export type AlbumDetailResponse = Album | null | undefined;
 
@@ -236,14 +355,38 @@ export type AlbumDetailQuery = { id: string };
 
 export type AlbumDetailArgs = { query: AlbumDetailQuery } & BaseEndpointArgs;
 
-// Song List ----------------------------------------------------------------------------
-export type RawSongListResponse = NDSongList | undefined;
+// Song List
+export type RawSongListResponse = NDSongList | JFSongList | undefined;
 
 export type SongListResponse = BasePaginatedResponse<Song[]>;
 
-export type SongListSort = NDSongListSort;
+export enum SongListSort {
+  ALBUM_ARTIST = 'albumArtist',
+  ARTIST = 'artist',
+  BPM = 'bpm',
+  CHANNELS = 'channels',
+  COMMENT = 'comment',
+  DURATION = 'duration',
+  FAVORITED = 'favorited',
+  GENRE = 'genre',
+  NAME = 'name',
+  PLAY_COUNT = 'playCount',
+  RANDOM = 'random',
+  RATING = 'rating',
+  RECENTLY_ADDED = 'recentlyAdded',
+  RECENTLY_PLAYED = 'recentlyPlayed',
+  RELEASE_DATE = 'releaseDate',
+  YEAR = 'year',
+}
 
 export type SongListQuery = {
+  jfParams?: {
+    filters?: string;
+    genres?: string;
+    includeItemTypes: 'Audio';
+    sortBy?: JFSongListSort;
+    years?: string;
+  };
   limit?: number;
   musicFolderId?: string;
   ndParams?: {
@@ -262,7 +405,70 @@ export type SongListQuery = {
 
 export type SongListArgs = { query: SongListQuery } & BaseEndpointArgs;
 
-// Song Detail  -------------------------------------------------------------------------
+type SongListSortMap = {
+  jellyfin: Record<SongListSort, JFSongListSort | undefined>;
+  navidrome: Record<SongListSort, NDSongListSort | undefined>;
+  subsonic: Record<SongListSort, undefined>;
+};
+
+export const songListSortMap: SongListSortMap = {
+  jellyfin: {
+    albumArtist: JFSongListSort.ALBUM_ARTIST,
+    artist: JFSongListSort.ARTIST,
+    bpm: undefined,
+    channels: undefined,
+    comment: undefined,
+    duration: JFSongListSort.DURATION,
+    favorited: undefined,
+    genre: undefined,
+    name: JFSongListSort.NAME,
+    playCount: JFSongListSort.PLAY_COUNT,
+    random: JFSongListSort.RANDOM,
+    rating: undefined,
+    recentlyAdded: JFSongListSort.RECENTLY_ADDED,
+    recentlyPlayed: JFSongListSort.RECENTLY_PLAYED,
+    releaseDate: JFSongListSort.RELEASE_DATE,
+    year: undefined,
+  },
+  navidrome: {
+    albumArtist: NDSongListSort.ALBUM_ARTIST,
+    artist: NDSongListSort.ARTIST,
+    bpm: NDSongListSort.BPM,
+    channels: NDSongListSort.CHANNELS,
+    comment: NDSongListSort.COMMENT,
+    duration: NDSongListSort.DURATION,
+    favorited: NDSongListSort.FAVORITED,
+    genre: NDSongListSort.GENRE,
+    name: NDSongListSort.NAME,
+    playCount: NDSongListSort.PLAY_COUNT,
+    random: undefined,
+    rating: NDSongListSort.RATING,
+    recentlyAdded: NDSongListSort.PLAY_DATE,
+    recentlyPlayed: NDSongListSort.PLAY_DATE,
+    releaseDate: undefined,
+    year: NDSongListSort.YEAR,
+  },
+  subsonic: {
+    albumArtist: undefined,
+    artist: undefined,
+    bpm: undefined,
+    channels: undefined,
+    comment: undefined,
+    duration: undefined,
+    favorited: undefined,
+    genre: undefined,
+    name: undefined,
+    playCount: undefined,
+    random: undefined,
+    rating: undefined,
+    recentlyAdded: undefined,
+    recentlyPlayed: undefined,
+    releaseDate: undefined,
+    year: undefined,
+  },
+};
+
+// Song Detail
 export type RawSongDetailResponse = NDSongDetail | undefined;
 
 export type SongDetailResponse = Song | null | undefined;
@@ -271,12 +477,28 @@ export type SongDetailQuery = { id: string };
 
 export type SongDetailArgs = { query: SongDetailQuery } & BaseEndpointArgs;
 
-// Album Artist List  -------------------------------------------------------------------
-export type RawAlbumArtistListResponse = NDAlbumArtistList | SSAlbumArtistList | undefined;
+// Album Artist List
+export type RawAlbumArtistListResponse =
+  | NDAlbumArtistList
+  | SSAlbumArtistList
+  | JFAlbumArtistList
+  | undefined;
 
 export type AlbumArtistListResponse = BasePaginatedResponse<AlbumArtist[]>;
 
-export type AlbumArtistListSort = NDAlbumArtistListSort;
+export enum AlbumArtistListSort {
+  ALBUM = 'album',
+  ALBUM_COUNT = 'albumCount',
+  DURATION = 'duration',
+  FAVORITED = 'favorited',
+  NAME = 'name',
+  PLAY_COUNT = 'playCount',
+  RANDOM = 'random',
+  RATING = 'rating',
+  RECENTLY_ADDED = 'recentlyAdded',
+  RELEASE_DATE = 'releaseDate',
+  SONG_COUNT = 'songCount',
+}
 
 export type AlbumArtistListQuery = {
   limit?: number;
@@ -293,8 +515,60 @@ export type AlbumArtistListQuery = {
 
 export type AlbumArtistListArgs = { query: AlbumArtistListQuery } & BaseEndpointArgs;
 
-// Album Artist Detail  -----------------------------------------------------------------
-export type RawAlbumArtistDetailResponse = NDAlbumArtistDetail | SSAlbumArtistDetail | undefined;
+type AlbumArtistListSortMap = {
+  jellyfin: Record<AlbumArtistListSort, JFAlbumArtistListSort | undefined>;
+  navidrome: Record<AlbumArtistListSort, NDAlbumArtistListSort | undefined>;
+  subsonic: Record<AlbumArtistListSort, undefined>;
+};
+
+export const albumArtistListSortMap: AlbumArtistListSortMap = {
+  jellyfin: {
+    album: JFAlbumArtistListSort.ALBUM,
+    albumCount: undefined,
+    duration: JFAlbumArtistListSort.DURATION,
+    favorited: undefined,
+    name: JFAlbumArtistListSort.NAME,
+    playCount: undefined,
+    random: JFAlbumArtistListSort.RANDOM,
+    rating: undefined,
+    recentlyAdded: JFAlbumArtistListSort.RECENTLY_ADDED,
+    releaseDate: undefined,
+    songCount: undefined,
+  },
+  navidrome: {
+    album: undefined,
+    albumCount: NDAlbumArtistListSort.ALBUM_COUNT,
+    duration: undefined,
+    favorited: NDAlbumArtistListSort.FAVORITED,
+    name: NDAlbumArtistListSort.NAME,
+    playCount: NDAlbumArtistListSort.PLAY_COUNT,
+    random: undefined,
+    rating: NDAlbumArtistListSort.RATING,
+    recentlyAdded: undefined,
+    releaseDate: undefined,
+    songCount: NDAlbumArtistListSort.SONG_COUNT,
+  },
+  subsonic: {
+    album: undefined,
+    albumCount: undefined,
+    duration: undefined,
+    favorited: undefined,
+    name: undefined,
+    playCount: undefined,
+    random: undefined,
+    rating: undefined,
+    recentlyAdded: undefined,
+    releaseDate: undefined,
+    songCount: undefined,
+  },
+};
+
+// Album Artist Detail
+export type RawAlbumArtistDetailResponse =
+  | NDAlbumArtistDetail
+  | SSAlbumArtistDetail
+  | JFAlbumArtistDetail
+  | undefined;
 
 export type AlbumArtistDetailResponse = BasePaginatedResponse<AlbumArtist[]>;
 
@@ -302,20 +576,100 @@ export type AlbumArtistDetailQuery = { id: string };
 
 export type AlbumArtistDetailArgs = { query: AlbumArtistDetailQuery } & BaseEndpointArgs;
 
-// Artist List  -------------------------------------------------------------------------
+// Artist List
+export type RawArtistListResponse = JFArtistList | undefined;
 
-// Artist Detail  -----------------------------------------------------------------------
+export type ArtistListResponse = BasePaginatedResponse<Artist[]>;
 
-// Favorite  ----------------------------------------------------------------------------
-export type RawFavoriteResponse = null | undefined;
+export enum ArtistListSort {
+  ALBUM = 'album',
+  ALBUM_COUNT = 'albumCount',
+  DURATION = 'duration',
+  FAVORITED = 'favorited',
+  NAME = 'name',
+  PLAY_COUNT = 'playCount',
+  RANDOM = 'random',
+  RATING = 'rating',
+  RECENTLY_ADDED = 'recentlyAdded',
+  RELEASE_DATE = 'releaseDate',
+  SONG_COUNT = 'songCount',
+}
 
-export type FavoriteResponse = null;
+export type ArtistListQuery = {
+  limit?: number;
+  musicFolderId?: string;
+  ndParams?: {
+    genre_id?: string;
+    name?: string;
+    starred?: boolean;
+  };
+  sortBy: ArtistListSort;
+  sortOrder: SortOrder;
+  startIndex: number;
+};
+
+export type ArtistListArgs = { query: ArtistListQuery } & BaseEndpointArgs;
+
+type ArtistListSortMap = {
+  jellyfin: Record<ArtistListSort, JFArtistListSort | undefined>;
+  navidrome: Record<ArtistListSort, undefined>;
+  subsonic: Record<ArtistListSort, undefined>;
+};
+
+export const artistListSortMap: ArtistListSortMap = {
+  jellyfin: {
+    album: JFArtistListSort.ALBUM,
+    albumCount: undefined,
+    duration: JFArtistListSort.DURATION,
+    favorited: undefined,
+    name: JFArtistListSort.NAME,
+    playCount: undefined,
+    random: JFArtistListSort.RANDOM,
+    rating: undefined,
+    recentlyAdded: JFArtistListSort.RECENTLY_ADDED,
+    releaseDate: undefined,
+    songCount: undefined,
+  },
+  navidrome: {
+    album: undefined,
+    albumCount: undefined,
+    duration: undefined,
+    favorited: undefined,
+    name: undefined,
+    playCount: undefined,
+    random: undefined,
+    rating: undefined,
+    recentlyAdded: undefined,
+    releaseDate: undefined,
+    songCount: undefined,
+  },
+  subsonic: {
+    album: undefined,
+    albumCount: undefined,
+    duration: undefined,
+    favorited: undefined,
+    name: undefined,
+    playCount: undefined,
+    random: undefined,
+    rating: undefined,
+    recentlyAdded: undefined,
+    releaseDate: undefined,
+    songCount: undefined,
+  },
+};
+
+// Artist Detail
+
+// Favorite
+export type RawFavoriteResponse = FavoriteResponse | undefined;
+
+export type FavoriteResponse = { id: string };
 
 export type FavoriteQuery = { id: string; type?: 'song' | 'album' | 'albumArtist' };
 
 export type FavoriteArgs = { query: FavoriteQuery } & BaseEndpointArgs;
 
-// Rating  -------------------------------------------------------------------------------
+// Rating
 export type RawRatingResponse = null | undefined;
 
 export type RatingResponse = null;
@@ -324,16 +678,16 @@ export type RatingQuery = { id: string; rating: number };
 
 export type RatingArgs = { query: RatingQuery } & BaseEndpointArgs;
 
-// Create Playlist -----------------------------------------------------------------------
-export type RawCreatePlaylistResponse = NDCreatePlaylist | undefined;
+// Create Playlist
+export type RawCreatePlaylistResponse = CreatePlaylistResponse | undefined;
 
-export type CreatePlaylistResponse = null;
+export type CreatePlaylistResponse = { id: string; name: string };
 
 export type CreatePlaylistQuery = { comment?: string; name: string; public?: boolean };
 
 export type CreatePlaylistArgs = { query: CreatePlaylistQuery } & BaseEndpointArgs;
 
-// Delete Playlist -----------------------------------------------------------------------
+// Delete Playlist
 export type RawDeletePlaylistResponse = NDDeletePlaylist | undefined;
 
 export type DeletePlaylistResponse = null;
@@ -342,8 +696,8 @@ export type DeletePlaylistQuery = { id: string };
 
 export type DeletePlaylistArgs = { query: DeletePlaylistQuery } & BaseEndpointArgs;
 
-// Playlist List -------------------------------------------------------------------------
-export type RawPlaylistListResponse = NDPlaylistList | undefined;
+// Playlist List
+export type RawPlaylistListResponse = NDPlaylistList | JFPlaylistList | undefined;
 
 export type PlaylistListResponse = BasePaginatedResponse<Playlist[]>;
 
@@ -359,8 +713,41 @@ export type PlaylistListQuery = {
 
 export type PlaylistListArgs = { query: PlaylistListQuery } & BaseEndpointArgs;
 
-// Playlist Detail -----------------------------------------------------------------------
-export type RawPlaylistDetailResponse = NDPlaylistDetail | undefined;
+type PlaylistListSortMap = {
+  jellyfin: Record<PlaylistListSort, undefined>;
+  navidrome: Record<PlaylistListSort, NDPlaylistListSort | undefined>;
+  subsonic: Record<PlaylistListSort, undefined>;
+};
+
+export const playlistListSortMap: PlaylistListSortMap = {
+  jellyfin: {
+    duration: undefined,
+    name: undefined,
+    owner: undefined,
+    public: undefined,
+    songCount: undefined,
+    updatedAt: undefined,
+  },
+  navidrome: {
+    duration: NDPlaylistListSort.DURATION,
+    name: NDPlaylistListSort.NAME,
+    owner: NDPlaylistListSort.OWNER,
+    public: NDPlaylistListSort.PUBLIC,
+    songCount: NDPlaylistListSort.SONG_COUNT,
+    updatedAt: NDPlaylistListSort.UPDATED_AT,
+  },
+  subsonic: {
+    duration: undefined,
+    name: undefined,
+    owner: undefined,
+    public: undefined,
+    songCount: undefined,
+    updatedAt: undefined,
+  },
+};
+
+// Playlist Detail
+export type RawPlaylistDetailResponse = NDPlaylistDetail | JFPlaylistDetail | undefined;
 
 export type PlaylistDetailResponse = BasePaginatedResponse<Playlist[]>;
 
@@ -369,3 +756,38 @@ export type PlaylistDetailQuery = {
 };
 
 export type PlaylistDetailArgs = { query: PlaylistDetailQuery } & BaseEndpointArgs;
+
+// Playlist Songs
+export type RawPlaylistSongListResponse = JFSongList | undefined;
+
+export type PlaylistSongListResponse = BasePaginatedResponse<Song[]>;
+
+export type PlaylistSongListQuery = {
+  id: string;
+  limit?: number;
+  sortBy?: SongListSort;
+  sortOrder?: SortOrder;
+  startIndex: number;
+};
+
+export type PlaylistSongListArgs = { query: PlaylistSongListQuery } & BaseEndpointArgs;
+
+// Music Folder List
+export type RawMusicFolderListResponse = SSMusicFolderList | JFMusicFolderList | undefined;
+
+export type MusicFolderListResponse = BasePaginatedResponse<Playlist[]>;
+
+export type MusicFolderListQuery = {
+  id: string;
+};
+
+export type MusicFolderListArgs = { query: MusicFolderListQuery } & BaseEndpointArgs;
+
+// Create Favorite
+export type RawCreateFavoriteResponse = CreateFavoriteResponse | undefined;
+
+export type CreateFavoriteResponse = { id: string };
+
+export type CreateFavoriteQuery = { comment?: string; name: string; public?: boolean };
+
+export type CreateFavoriteArgs = { query: CreateFavoriteQuery } & BaseEndpointArgs;
