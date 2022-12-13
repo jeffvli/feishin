@@ -3,9 +3,7 @@ import { useCallback } from 'react';
 import { Group, Slider } from '@mantine/core';
 import throttle from 'lodash/throttle';
 import { RiArrowDownSLine } from 'react-icons/ri';
-import { JFAlbumListSort } from '/@/api/jellyfin.types';
-import { NDAlbumListSort } from '/@/api/navidrome.types';
-import type { AlbumListSort } from '/@/api/types';
+import { AlbumListSort } from '/@/api/types';
 import { SortOrder } from '/@/api/types';
 import { Button, DropdownMenu, PageHeader } from '/@/components';
 import { useCurrentServer, useAppStoreActions, useAlbumRouteStore } from '/@/store';
@@ -13,26 +11,26 @@ import { CardDisplayType } from '/@/types';
 
 const FILTERS = {
   jellyfin: [
-    { name: 'Album Artist', value: JFAlbumListSort.NAME },
-    { name: 'Community Rating', value: JFAlbumListSort.RATING },
-    { name: 'Critic Rating', value: JFAlbumListSort.CRITIC_RATING },
-    { name: 'Name', value: JFAlbumListSort.NAME },
-    { name: 'Random', value: JFAlbumListSort.RANDOM },
-    { name: 'Recently Added', value: JFAlbumListSort.RECENTLY_ADDED },
-    { name: 'Release Date', value: JFAlbumListSort.RELEASE_DATE },
+    { name: 'Album Artist', value: AlbumListSort.ALBUM_ARTIST },
+    { name: 'Community Rating', value: AlbumListSort.COMMUNITY_RATING },
+    { name: 'Critic Rating', value: AlbumListSort.CRITIC_RATING },
+    { name: 'Name', value: AlbumListSort.NAME },
+    { name: 'Random', value: AlbumListSort.RANDOM },
+    { name: 'Recently Added', value: AlbumListSort.RECENTLY_ADDED },
+    { name: 'Release Date', value: AlbumListSort.RELEASE_DATE },
   ],
   navidrome: [
-    { name: 'Album Artist', value: NDAlbumListSort.ALBUM_ARTIST },
-    { name: 'Artist', value: NDAlbumListSort.ARTIST },
-    { name: 'Duration', value: NDAlbumListSort.DURATION },
-    { name: 'Name', value: NDAlbumListSort.NAME },
-    { name: 'Play Count', value: NDAlbumListSort.PLAY_COUNT },
-    { name: 'Random', value: NDAlbumListSort.RANDOM },
-    { name: 'Rating', value: NDAlbumListSort.RATING },
-    { name: 'Recently Added', value: NDAlbumListSort.RECENTLY_ADDED },
-    { name: 'Song Count', value: NDAlbumListSort.SONG_COUNT },
-    { name: 'Starred', value: NDAlbumListSort.STARRED },
-    { name: 'Year', value: NDAlbumListSort.YEAR },
+    { name: 'Album Artist', value: AlbumListSort.ALBUM_ARTIST },
+    { name: 'Artist', value: AlbumListSort.ARTIST },
+    { name: 'Duration', value: AlbumListSort.DURATION },
+    { name: 'Name', value: AlbumListSort.NAME },
+    { name: 'Play Count', value: AlbumListSort.PLAY_COUNT },
+    { name: 'Random', value: AlbumListSort.RANDOM },
+    { name: 'Rating', value: AlbumListSort.RATING },
+    { name: 'Recently Added', value: AlbumListSort.RECENTLY_ADDED },
+    { name: 'Song Count', value: AlbumListSort.SONG_COUNT },
+    { name: 'Favorited', value: AlbumListSort.FAVORITED },
+    { name: 'Year', value: AlbumListSort.YEAR },
   ],
 };
 
@@ -47,11 +45,12 @@ export const AlbumListHeader = () => {
   const page = useAlbumRouteStore();
   const filters = page.list.filter;
 
-  const sortByLabel = server?.type
-    ? (FILTERS[server.type as keyof typeof FILTERS] as { name: string; value: string }[]).find(
+  const sortByLabel =
+    (server?.type &&
+      (FILTERS[server.type as keyof typeof FILTERS] as { name: string; value: string }[]).find(
         (f) => f.value === filters.sortBy,
-      )?.name
-    : 'Unknown';
+      )?.name) ||
+    'Unknown';
 
   const sortOrderLabel = ORDER.find((s) => s.value === filters.sortOrder)?.name;
 
@@ -195,7 +194,7 @@ export const AlbumListHeader = () => {
           <DropdownMenu.Dropdown>
             {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
               <DropdownMenu.Item
-                key={`filter-${filter.value}`}
+                key={`filter-${filter.name}`}
                 $isActive={filter.value === filters.sortBy}
                 value={filter.value}
                 onClick={handleSetFilter}
