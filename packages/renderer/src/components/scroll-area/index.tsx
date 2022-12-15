@@ -13,7 +13,7 @@ const StyledScrollArea = styled(MantineScrollArea)`
   }
 
   & .mantine-ScrollArea-scrollbar {
-    width: 8px;
+    width: 12px;
     padding: 0;
     background: var(--scrollbar-track-bg);
   }

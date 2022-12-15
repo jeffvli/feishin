@@ -46,8 +46,8 @@ html {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-corner {
@@ -89,6 +89,32 @@ button {
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.mantine-ScrollArea-thumb[data-state="visible"] {
+  animation: fadeIn 0.3s forwards;
+}
+
+.mantine-ScrollArea-scrollbar[data-state="hidden"] {
+  animation: fadeOut 0.2s forwards;
 }
 
 @font-face {
