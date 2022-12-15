@@ -11,7 +11,7 @@ import { AppRoute } from './routes';
 import { RouteErrorBoundary } from '/@/features/action-required';
 import { TitlebarOutlet } from '/@/router/titlebar-outlet';
 
-const DashboardRoute = lazy(() => import('/@/features/dashboard/routes/DashboardRoute'));
+const HomeRoute = lazy(() => import('/@/features/home/routes/home-route'));
 
 const NowPlayingRoute = lazy(() => import('/@/features/now-playing/routes/now-playing-route'));
 
@@ -35,10 +35,10 @@ export const AppRouter = () => {
             <Route element={<DefaultLayout />}>
               <Route
                 index
-                element={<DashboardRoute />}
+                element={<HomeRoute />}
               />
               <Route
-                element={<DashboardRoute />}
+                element={<HomeRoute />}
                 path={AppRoute.HOME}
               />
               <Route
