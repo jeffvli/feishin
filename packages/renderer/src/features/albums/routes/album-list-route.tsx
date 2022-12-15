@@ -19,6 +19,8 @@ import { controller } from '/@/api/controller';
 import { ndNormalize } from '/@/api/navidrome.api';
 import { AnimatedPage } from '/@/features/shared';
 import { AlbumListHeader } from '/@/features/albums/components/album-list-header';
+import { jfNormalize } from '/@/api/jellyfin.api';
+import type { JFAlbum } from '/@/api/jellyfin.types';
 
 const AlbumListRoute = () => {
   const queryClient = useQueryClient();
@@ -58,6 +60,9 @@ const AlbumListRoute = () => {
       let items: Album[] = [];
       switch (server?.type) {
         case 'jellyfin':
+          items = (albums?.items || []).map((a) => {
+            return jfNormalize.album(a as JFAlbum, server);
+          });
           break;
         case 'navidrome':
           items = (albums?.items || []).map((a) => {

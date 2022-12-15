@@ -11,6 +11,8 @@ import { ndNormalize } from '/@/api/navidrome.api';
 import type { NDSong } from '/@/api/navidrome.types';
 import { toast } from '/@/components';
 import { controller } from '/@/api/controller';
+import { jfNormalize } from '/@/api/jellyfin.api';
+import type { JFSong } from '/@/api/jellyfin.types';
 
 export const handlePlayQueueAdd = async (options: PlayQueueAddOptions) => {
   const playerType = useSettingsStore.getState().player.type;
@@ -33,6 +35,9 @@ export const handlePlayQueueAdd = async (options: PlayQueueAddOptions) => {
 
       switch (server?.type) {
         case 'jellyfin':
+          songs = albumDetail.songs?.map((song) =>
+            jfNormalize.song(song as JFSong, server, deviceId),
+          );
           break;
         case 'navidrome':
           songs = albumDetail.songs?.map((song) =>
