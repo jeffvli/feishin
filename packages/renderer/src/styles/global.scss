@@ -62,6 +62,10 @@ html {
   background: var(--scrollbar-thumb-bg);
 }
 
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(136, 136, 136);
+}
+
 a {
   text-decoration: none;
 }
