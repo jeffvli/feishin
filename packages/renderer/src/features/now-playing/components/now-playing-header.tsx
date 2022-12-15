@@ -7,7 +7,7 @@ import { getHeaderColor } from '/@/utils';
 import { useTheme } from '/@/hooks';
 
 export const NowPlayingHeader = () => {
-  const [headerColor, setHeaderColor] = useState({ isDark: false, value: 'transparent' });
+  const [headerColor, setHeaderColor] = useState({ isDark: false, value: 'rgba(0, 0, 0, 0)' });
   const currentSong = useCurrentSong();
   const theme = useTheme();
 
@@ -29,7 +29,7 @@ export const NowPlayingHeader = () => {
           const isDark = color.isDark;
           setHeaderColor({
             isDark,
-            value: getHeaderColor(color.rgb, theme === 'dark' ? 0.3 : 0.8),
+            value: getHeaderColor(color.rgb, theme === 'dark' ? 0.5 : 0.8),
           });
         })
         .catch((e) => {
