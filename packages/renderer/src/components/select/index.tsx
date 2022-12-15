@@ -38,7 +38,6 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
       withinPortal
       styles={{
         dropdown: {
-          backdropFilter: 'blur(8px)',
           background: 'var(--dropdown-menu-bg)',
           filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 20%))',
         },

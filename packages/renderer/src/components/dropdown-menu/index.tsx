@@ -72,7 +72,6 @@ export const DropdownMenu = ({ children, ...props }: MenuProps) => {
       radius="sm"
       styles={{
         dropdown: {
-          backdropFilter: 'blur(8px)',
           filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))',
         },
       }}
