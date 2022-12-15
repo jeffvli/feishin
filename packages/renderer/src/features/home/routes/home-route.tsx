@@ -3,10 +3,11 @@ import { AlbumListSort, SortOrder } from '/@/api/types';
 import { GridCarousel, PageHeader, ScrollArea, TextTitle } from '/@/components';
 import { useAlbumList } from '/@/features/albums';
 import { useRecentlyPlayed } from '/@/features/home/queries/recently-played-query';
-import { AnimatedPage, useContainerQuery } from '/@/features/shared';
+import { AnimatedPage } from '/@/features/shared';
 import { AppRoute } from '/@/router/routes';
 import { useSetState } from '@mantine/hooks';
 import { throttle } from 'lodash';
+import { useContainerQuery } from '/@/hooks';
 
 const HomeRoute = () => {
   const rootElement = document.querySelector(':root') as HTMLElement;
