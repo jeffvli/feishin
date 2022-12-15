@@ -34,6 +34,8 @@ export const queryClient = new QueryClient({
 export type QueryOptions = {
   cacheTime?: UseQueryOptions['cacheTime'];
   enabled?: UseQueryOptions['enabled'];
+  keepPreviousData?: UseQueryOptions['keepPreviousData'];
+  meta?: UseQueryOptions['meta'];
   onError?: (err: any) => void;
   onSettled?: any;
   onSuccess?: any;
@@ -43,5 +45,6 @@ export type QueryOptions = {
   retry?: UseQueryOptions['retry'];
   retryDelay?: UseQueryOptions['retryDelay'];
   staleTime?: UseQueryOptions['staleTime'];
+  suspense?: UseQueryOptions['suspense'];
   useErrorBoundary?: boolean;
 };
