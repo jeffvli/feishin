@@ -1,0 +1,17 @@
+{
+  "name": "feishin",
+  "version": "0.0.1-alpha1",
+  "description": "",
+  "main": "./dist/main/main.js",
+  "author": {
+    "name": "jeffvli",
+    "url": "https://github.com/jeffvli/"
+  },
+  "scripts": {
+    "electron-rebuild": "node -r ts-node/register ../../.erb/scripts/electron-rebuild.js",
+    "link-modules": "node -r ts-node/register ../../.erb/scripts/link-modules.ts",
+    "postinstall": "npm run electron-rebuild && npm run link-modules"
+  },
+  "dependencies": {},
+  "license": "MIT"
+}

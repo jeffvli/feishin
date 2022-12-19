@@ -1,0 +1,144 @@
+:root {
+  --root-font-size: 12px;
+  --icon-color: rgb(255, 255, 255);
+
+  --primary-color: rgb(5, 109, 255);
+  --secondary-color: rgb(255, 120, 120);
+  --success-color: green;
+  --warning-color: orange;
+  --danger-color: rgb(204, 50, 50);
+  --generic-border-color: rgba(50, 50, 50, 0.7);
+
+  --main-bg: rgb(18, 18, 18);
+  --main-fg: rgb(245, 245, 245);
+  --main-fg-secondary: rgb(150, 150, 150);
+
+  --titlebar-fg: rgb(255, 255, 255);
+  --titlebar-bg: rgb(7, 7, 7);
+
+  --sidebar-bg: rgb(0, 0, 0);
+  --sidebar-btn-color: rgb(255, 255, 255);
+  --sidebar-btn-color-hover: #dddddd;
+  --sidebar-handle-bg: #4d4d4d;
+  --sidebar-border: none;
+
+  --playerbar-bg: rgb(24, 24, 24);
+  --playerbar-btn-main-fg: rgb(0, 0, 0);
+  --playerbar-btn-main-fg-hover: rgb(0, 0, 0);
+  --playerbar-btn-main-bg: rgb(230, 230, 230);
+  --playerbar-btn-main-bg-hover: rgb(255, 255, 255);
+  --playerbar-btn-fg: rgba(200, 200, 200, 0.8);
+  --playerbar-btn-fg-hover: rgba(255, 255, 255, 1);
+  --playerbar-btn-bg: #c5c5c5;
+  --playerbar-btn-bg-hover: transparent;
+  --playerbar-border-top: 1px rgba(50, 50, 50, 0.7) solid;
+  --playerbar-slider-track-bg: #3c3f43;
+  --playerbar-slider-track-progress-bg: #cccccc;
+
+  --tooltip-bg: #ffffff;
+  --tooltip-fg: #000000;
+
+  --scrollbar-track-bg: transparent;
+  --scrollbar-thumb-bg: rgba(90, 90, 90, 0.5);
+
+  --btn-primary-bg: var(--primary-color);
+  --btn-primary-bg-hover: rgb(51, 109, 255);
+  --btn-primary-fg: #ffffff;
+  --btn-primary-fg-hover: #ffffff;
+
+  --btn-default-bg: rgb(31, 31, 32);
+  --btn-default-bg-hover: rgb(63, 63, 63);
+  --btn-default-fg: rgb(193, 193, 193);
+  --btn-default-fg-hover: rgb(193, 193, 193);
+
+  --btn-subtle-bg: transparent;
+  --btn-subtle-bg-hover: transparent;
+  --btn-subtle-fg: rgb(224, 224, 224);
+  --btn-subtle-fg-hover: rgb(240, 240, 240);
+
+  --input-bg: rgb(35, 35, 35);
+  --input-fg: rgb(193, 193, 193);
+  --input-placeholder-fg: rgb(119, 126, 139);
+  --input-active-fg: rgb(193, 193, 193);
+  --input-active-bg: rgba(255, 255, 255, 0.1);
+
+  --dropdown-menu-bg: rgb(24, 24, 24);
+  --dropdown-menu-fg: rgb(220, 220, 220);
+  --dropdown-menu-bg-hover: rgb(37, 38, 43);
+  --dropdown-menu-border: 1px rgba(50, 50, 50, 0.7) solid;
+  --dropdown-menu-border-radius: 4px;
+
+  --switch-track-bg: rgb(50, 50, 50);
+  --switch-track-enabled-bg: var(--primary-color);
+  --switch-thumb-bg: rgb(255, 255, 255);
+
+  --slider-track-bg: rgb(50, 50, 50);
+  --slider-thumb-bg: rgb(255, 255, 255);
+
+  --skeleton-bg: rgba(255, 255, 255, 8%);
+
+  --toast-title-fg: rgb(255, 255, 255);
+  --toast-description-fg: rgb(193, 194, 197);
+  --toast-bg: rgb(16, 16, 16);
+
+  --modal-bg: rgb(24, 24, 24);
+
+  --badge-bg: rgb(0, 0, 0);
+  --badge-fg: rgb(255, 255, 255);
+
+  --paper-bg: rgb(30, 30, 30);
+
+  --placeholder-bg: rgba(53, 53, 53, 0.5);
+  --placeholder-fg: rgba(126, 126, 126);
+
+  --card-default-bg: rgb(24, 24, 24);
+  --card-default-bg-hover: rgb(40, 40, 40);
+  --card-default-radius: 5px;
+  --card-poster-bg: transparent;
+  --card-poster-bg-hover: transparent;
+  --card-poster-radius: 3px;
+
+  .ag-theme-alpine-dark {
+    --ag-font-family: var(--content-font-family);
+
+    --ag-borders: none;
+    --ag-border-color: rgb(50, 50, 50);
+
+    --ag-header-background-color: rgb(16, 16, 16);
+    --ag-header-foreground-color: rgb(179, 179, 179);
+
+    --ag-foreground-color: rgb(179, 179, 179);
+
+    --ag-background-color: var(--main-bg);
+    --ag-row-hover-color: rgba(100, 100, 100, 0.2);
+    --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
+  }
+
+  .ag-header-cell-label {
+    font-family: var(--header-font-family);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .ag-cell-focus {
+    border: 1px rgba(155, 155, 155, 0.3) solid !important;
+  }
+
+  .current-song {
+    background: rgba(96, 144, 240, 0.3) !important;
+  }
+
+  .mantine-Modal-modal {
+    background: var(--modal-bg);
+    border-radius: 10px;
+    backdrop-filter: blur(8px);
+  }
+
+  .mantine-Modal-header {
+    font-weight: bold;
+    font-size: medium;
+    padding-bottom: 1rem;
+    margin-right: 0.5rem;
+    border-bottom: 1px solid var(--generic-border-color);
+  }
+}

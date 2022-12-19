@@ -1,0 +1,60 @@
+// {
+//   "compilerOptions": {
+//     "module": "esnext",
+//     "target": "esnext",
+//     "skipLibCheck": true,
+//     "lib": ["ESNext", "dom", "dom.iterable"],
+//     "baseUrl": "./src",
+//     "paths": {
+//       "/main/*": ["./src/main/*"],
+//       "/@/*": ["*"]
+//     },
+//     "declaration": true,
+//     "declarationMap": true,
+//     "jsx": "preserve",
+//     "jsxImportSource": "@emotion/react",
+//     "strict": true,
+//     "pretty": true,
+//     "sourceMap": true,
+//     "noUnusedLocals": true,
+//     "noUnusedParameters": true,
+//     "noFallthroughCasesInSwitch": true,
+//     "moduleResolution": "Node",
+//     "esModuleInterop": true,
+//     "outDir": "release/app/dist",
+//     "isolatedModules": false,
+//     "types": ["node"]
+//   },
+//   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll", "server"]
+// }
+
+{
+  "compilerOptions": {
+    "target": "es2021",
+    "module": "commonjs",
+    "lib": ["dom", "es2021"],
+    "baseUrl": "./src",
+    "paths": {
+      "/main/*": ["./src/main/*"],
+      "/@/*": ["*"]
+    },
+    "declaration": true,
+    "declarationMap": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "strict": true,
+    "pretty": true,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "outDir": "release/app/dist"
+  },
+  "exclude": ["test", "release/build", "release/app/dist", ".erb/dll", "server"]
+}

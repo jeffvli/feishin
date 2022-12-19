@@ -1,0 +1,249 @@
+@use "../themes/default.scss";
+@use "../themes/dark.scss";
+@use "../themes/light.scss";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body,
+html {
+  position: absolute;
+  display: block;
+  width: 100%;
+  min-width: 640px;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  color: var(--content-text-color);
+  background: var(--content-bg);
+  font-family: var(--content-font-family);
+  font-size: var(--root-font-size);
+  user-select: none;
+}
+
+@media only screen and (max-width: 639px) {
+  body,
+  html {
+    overflow-x: auto;
+  }
+}
+
+#app {
+  height: inherit;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-text-size-adjust: none;
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track-bg);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(136, 136, 136);
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  -webkit-app-region: no-drag;
+}
+
+.hide-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+
+  &::-webkit-scrollbar {
+    width: 1px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent;
+  }
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.mantine-ScrollArea-thumb[data-state="visible"] {
+  animation: fadeIn 0.3s forwards;
+}
+
+.mantine-ScrollArea-scrollbar[data-state="hidden"] {
+  animation: fadeOut 0.2s forwards;
+}
+
+@font-face {
+  font-family: "AnekTamil";
+  src: url("../fonts/AnekTamil-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Archivo";
+  src: url("../fonts/Archivo-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Circular STD";
+  src: url("../fonts/CircularSTD-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Didact Gothic";
+  src: url("../fonts/DidactGothic-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  src: url("../fonts/DMSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Encode Sans";
+  src: url("../fonts/EncodeSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Epilogue";
+  src: url("../fonts/Epilogue-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Gotham";
+  src: url("../fonts/Gotham-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Inconsolata";
+  src: url("../fonts/Inconsolata-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/Inter-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "JetBrainsMono";
+  src: url("../fonts/JetBrainsMono-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Manrope";
+  src: url("../fonts/Manrope-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("../fonts/Montserrat-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Oxygen";
+  src: url("../fonts/Oxygen-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../fonts/Poppins-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../fonts/Poppins-SemiBold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/Poppins-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Raleway";
+  src: url("../fonts/Raleway-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Roboto";
+  src: url("../fonts/Roboto-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Sora";
+  src: url("../fonts/Sora-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Work Sans";
+  src: url("../fonts/WorkSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "DroidSerif";
+  src: url("https://rawgit.com/google/fonts/master/ufl/ubuntumono/UbuntuMono-Italic.ttf")
+    format("truetype");
+  unicode-range: U+000-5FF; /* Latin glyphs */
+}
+
+@font-face {
+  font-family: "DroidSerif";
+  src: url("https://fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff2") format("truetype");
+  unicode-range: U+3000-9FFF, U+ff??; /* Japanese glyphs */
+}

@@ -1,0 +1,29 @@
+version: '3'
+services:
+  db:
+    container_name: feishin_db
+    image: postgres:13
+    volumes:
+      - ${DATABASE_PERSIST_PATH}:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+    ports:
+      - '${DATABASE_PORT}:5432'
+    restart: unless-stopped
+  server:
+    container_name: feishin
+    image: jeffvictorli/feishin:latest
+    depends_on:
+      - db
+    environment:
+      - APP_BASE_URL=${APP_BASE_URL}
+      - DATABASE_URL=postgresql://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@db/${DATABASE_NAME}?schema=public&connection_limit=14&pool_timeout=20
+      - DATABASE_PORT=${DATABASE_PORT}
+      - TOKEN_SECRET=${TOKEN_SECRET}
+      - TOKEN_EXPIRATION=${TOKEN_EXPIRATION}
+      - TOKEN_REFRESH_EXPIRATION=${TOKEN_REFRESH_EXPIRATION}
+    ports:
+      - '8643:9321'
+    restart: unless-stopped

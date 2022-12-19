@@ -1,0 +1,60 @@
+{
+  "files.associations": {
+    ".eslintrc": "jsonc",
+    ".prettierrc": "jsonc",
+    ".eslintignore": "ignore"
+  },
+  "eslint.validate": ["typescript"],
+  "eslint.workingDirectories": [
+    { "directory": "./", "changeProcessCWD": true },
+    { "directory": "./server", "changeProcessCWD": true }
+  ],
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": false
+  },
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "javascript.validate.enable": false,
+  "javascript.format.enable": false,
+  "typescript.format.enable": false,
+  "search.exclude": {
+    ".git": true,
+    ".eslintcache": true,
+    ".erb/dll": true,
+    "release/{build,app/dist}": true,
+    "node_modules": true,
+    "npm-debug.log.*": true,
+    "test/**/__snapshots__": true,
+    "package-lock.json": true,
+    "*.{css,sass,scss}.d.ts": true
+  },
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "host": "http://localhost:9321"
+    },
+    "dev-user": {
+      "token": "",
+      "refreshToken": "",
+      "authUsername": "user",
+      "authPassword": "user"
+    },
+    "dev-admin": {
+      "token": "",
+      "refreshToken": "",
+      "authUsername": "admin",
+      "authPassword": "admin"
+    }
+  },
+  "i18n-ally.localesPaths": ["src/i18n", "src/i18n/locales"],
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "stylelint.validate": ["css", "less", "postcss", "typescript", "typescriptreact", "scss"],
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true
+}

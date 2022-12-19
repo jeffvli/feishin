@@ -1,0 +1,126 @@
+body[data-theme="defaultLight"] {
+  --primary-color: rgb(79, 149, 255);
+  --icon-color: #ffffff;
+
+  --main-bg: rgb(255, 255, 255);
+  --main-fg: rgb(25, 25, 25);
+  --main-fg-secondary: rgb(80, 80, 80);
+
+  --titlebar-fg: rgb(25, 25, 25);
+  --titlebar-bg: rgb(227, 229, 232);
+
+  --sidebar-bg: rgb(240, 241, 242);
+  --sidebar-btn-color: rgb(0, 0, 0);
+  --sidebar-btn-color-hover: rgb(0, 0, 0);
+  --sidebar-handle-bg: #4d4d4d;
+
+  --playerbar-bg: linear-gradient(
+    rgb(220, 220, 220) 0%,
+    rgb(240, 240, 240) 50%,
+    rgb(220, 220, 220) 100%
+  );
+  --playerbar-btn-main-fg: rgb(0, 0, 0);
+  --playerbar-btn-main-fg-hover: rgb(0, 0, 0);
+  --playerbar-btn-main-bg: transparent;
+  --playerbar-btn-main-bg-hover: transparent;
+  --playerbar-btn-fg: #000;
+  --playerbar-btn-fg-hover: #000;
+  --playerbar-btn-bg: transparent;
+  --playerbar-btn-bg-hover: transparent;
+  --playerbar-border-top: 1px rgba(200, 200, 200, 0.7) solid;
+  --playerbar-slider-track-bg: rgba(50, 50, 50, 0.2);
+  --playerbar-slider-track-progress-bg: rgb(50, 50, 50);
+
+  --tooltip-bg: rgb(255, 255, 255);
+  --tooltip-fg: rgb(0, 0, 0);
+
+  --scrollbar-track-bg: transparent;
+  --scrollbar-thumb-bg: rgb(140, 140, 140);
+
+  --btn-primary-bg: var(--primary-color);
+  --btn-primary-bg-hover: rgb(47, 122, 237);
+  --btn-primary-fg: #ffffff;
+  --btn-primary-fg-hover: #ffffff;
+
+  --btn-default-bg: rgb(220, 220, 220);
+  --btn-default-bg-hover: rgb(210, 210, 210);
+  --btn-default-fg: rgb(50, 50, 50);
+  --btn-default-fg-hover: rgb(50, 50, 50);
+
+  --btn-subtle-bg: transparent;
+  --btn-subtle-bg-hover: rgba(100, 100, 100, 0.1);
+  --btn-subtle-fg: rgb(60, 60, 60);
+  --btn-subtle-fg-hover: rgb(30, 30, 30);
+
+  --input-bg: rgb(240, 241, 242);
+  --input-fg: rgb(0, 0, 0);
+  --input-placeholder-fg: rgb(119, 126, 139);
+  --input-active-fg: rgb(193, 193, 193);
+  --input-active-bg: rgba(37, 38, 43, 0.3);
+
+  --dropdown-menu-bg: rgb(255, 255, 255);
+  --dropdown-menu-fg: rgb(0, 0, 0);
+  --dropdown-menu-bg-hover: rgba(0, 0, 0, 0.1);
+  --dropdown-menu-border: 1px rgba(150, 150, 150, 0.7) solid;
+  --dropdown-menu-border-radius: 4px;
+
+  --switch-track-bg: rgb(114, 118, 125);
+  --switch-track-enabled-bg: var(--primary-color);
+  --switch-thumb-bg: rgb(255, 255, 255);
+
+  --slider-track-bg: rgba(50, 50, 50, 0.1);
+  --slider-thumb-bg: rgb(100, 100, 100);
+
+  --skeleton-bg: rgba(50, 50, 50, 8%);
+
+  --toast-title-fg: rgb(255, 255, 255);
+  --toast-description-fg: rgb(193, 194, 197);
+  --toast-bg: rgb(16, 16, 16);
+
+  --modal-bg: rgb(255, 255, 255);
+
+  --paper-bg: rgb(240, 240, 240);
+
+  --placeholder-bg: rgba(204, 204, 204, 0.5);
+  --placeholder-fg: rgb(126, 126, 126);
+
+  --card-default-bg: rgba(235, 235, 235, 0.5);
+  --card-default-bg-hover: rgba(200, 200, 200, 0.8);
+  --card-default-radius: 10px;
+  --card-poster-bg: transparent;
+  --card-poster-bg-hover: transparent;
+  --card-poster-radius: 5px;
+
+  .ag-theme-alpine-dark {
+    --ag-font-family: poppins;
+    --ag-font-size: 12px;
+
+    --ag-borders: none;
+    --ag-border-color: rgb(50, 50, 50);
+
+    --ag-header-background-color: var(--main-bg);
+    --ag-header-foreground-color: var(--main-fg);
+
+    --ag-foreground-color: rgb(0, 0, 0);
+
+    --ag-background-color: var(--main-bg);
+    --ag-odd-row-background-color: rgb(230, 230, 230);
+    --ag-row-hover-color: rgba(100, 100, 100, 0.2);
+    --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
+  }
+
+  .ag-root ::-webkit-scrollbar-corner {
+    background: var(--scrollbar-track-bg);
+  }
+  .ag-root ::-webkit-scrollbar-track-piece {
+    background: var(--scrollbar-track-bg);
+  }
+  .ag-root ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-bg);
+    // background: black;
+  }
+
+  .ag-cell-focus {
+    border: 1px rgba(60, 60, 60, 0.3) solid !important;
+  }
+}
