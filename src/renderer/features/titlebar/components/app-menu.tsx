@@ -1,4 +1,4 @@
-import { Button, Group } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
 import {
   RiSearch2Line,
@@ -8,7 +8,7 @@ import {
   RiLockLine,
   RiMenuFill,
 } from 'react-icons/ri';
-import { DropdownMenu, Text } from '/@/renderer/components';
+import { DropdownMenu, Text, Button } from '/@/renderer/components';
 import { ServerList } from '/@/renderer/features/servers';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { Settings } from '/@/renderer/features/settings';
