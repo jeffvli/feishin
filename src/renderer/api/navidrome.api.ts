@@ -57,7 +57,7 @@ import {
   albumListSortMap,
   sortOrderMap,
 } from '/@/renderer/api/types';
-import { toast } from '/@/renderer/components';
+import { toast } from '/@/renderer/components/toast';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import { parseSearchParams } from '/@/renderer/utils';
