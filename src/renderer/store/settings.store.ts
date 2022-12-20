@@ -32,7 +32,6 @@ export interface SettingsState {
   general: {
     followSystemTheme: boolean;
     fontContent: string;
-    fontHeader: string;
     showQueueDrawerButton: boolean;
     sideQueueType: SideQueueType;
     theme: AppTheme;
@@ -84,10 +83,9 @@ export const useSettingsStore = create<SettingsSlice>()(
         },
         general: {
           followSystemTheme: false,
-          fontContent: 'Circular STD',
-          fontHeader: 'Gotham',
-          showQueueDrawerButton: true,
-          sideQueueType: 'sideQueue',
+          fontContent: 'Poppins',
+          showQueueDrawerButton: false,
+          sideQueueType: 'sideDrawerQueue',
           theme: AppTheme.DEFAULT_DARK,
           themeDark: AppTheme.DEFAULT_DARK,
           themeLight: AppTheme.DEFAULT_LIGHT,
@@ -96,7 +94,7 @@ export const useSettingsStore = create<SettingsSlice>()(
           audioDeviceId: undefined,
           crossfadeDuration: 5,
           crossfadeStyle: CrossfadeStyle.EQUALPOWER,
-          globalMediaHotkeys: true,
+          globalMediaHotkeys: false,
           muted: false,
           playButtonBehavior: Play.NOW,
           scrobble: {
@@ -104,9 +102,9 @@ export const useSettingsStore = create<SettingsSlice>()(
             scrobbleAtPercentage: 75,
           },
           skipButtons: {
-            enabled: true,
-            skipBackwardSeconds: 10,
-            skipForwardSeconds: 30,
+            enabled: false,
+            skipBackwardSeconds: 5,
+            skipForwardSeconds: 10,
           },
           style: PlaybackStyle.GAPLESS,
           type: PlaybackType.LOCAL,
