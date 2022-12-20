@@ -40,9 +40,10 @@ const MainContainer = styled.main<{
   leftSidebarWidth: string;
   rightExpanded?: boolean;
   rightSidebarWidth?: string;
+  shell?: boolean;
 }>`
   position: relative;
-  display: grid;
+  display: ${(props) => (props.shell ? 'flex' : 'grid')};
   grid-area: main;
   grid-template-areas: 'sidebar . right-sidebar';
   grid-template-rows: 1fr;
@@ -256,6 +257,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
           leftSidebarWidth={sidebar.leftWidth}
           rightExpanded={showSideQueue && sideQueueType === 'sideQueue'}
           rightSidebarWidth={sidebar.rightWidth}
+          shell={shell}
         >
           {!shell && (
             <>

@@ -3,7 +3,7 @@ import { Center, Group, Stack } from '@mantine/core';
 import isElectron from 'is-electron';
 import { RiCheckFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { Button, Text } from '/@/renderer/components';
+import { Button, PageHeader, Text } from '/@/renderer/components';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
 import { MpvRequired } from '/@/renderer/features/action-required/components/mpv-required';
 import { ServerCredentialRequired } from '/@/renderer/features/action-required/components/server-credential-required';
@@ -18,7 +18,6 @@ const ActionRequiredRoute = () => {
   const currentServer = useCurrentServer();
   const [isMpvRequired, setIsMpvRequired] = useState(false);
   const isServerRequired = !currentServer;
-  // const isCredentialRequired = currentServer?.noCredential && !serverToken;
   const isCredentialRequired = false;
 
   useEffect(() => {
@@ -54,6 +53,7 @@ const ActionRequiredRoute = () => {
 
   return (
     <AnimatedPage>
+      <PageHeader />
       <Center sx={{ height: '100%', width: '100vw' }}>
         <Stack
           spacing="xl"
