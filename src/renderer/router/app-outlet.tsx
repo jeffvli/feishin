@@ -16,8 +16,8 @@ export const AppOutlet = () => {
   useEffect(() => {
     const getMpvPath = async () => {
       if (!isElectron()) return setIsMpvRequired(false);
-      // const mpvPath = await localSettings.get('mpv_path');
-      // return setIsMpvRequired(!mpvPath);
+      const mpvPath = await localSettings.get('mpv_path');
+      return setIsMpvRequired(!mpvPath);
     };
 
     getMpvPath();
