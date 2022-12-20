@@ -17,9 +17,11 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
     itemData,
     itemType,
     playButtonBehavior,
+    handlePlayQueueAdd,
     route,
     display,
   } = data as GridCardData;
+
   const cards = [];
   const startIndex = index * columnCount;
   const stopIndex = Math.min(itemCount - 1, startIndex + columnCount - 1);
@@ -33,6 +35,7 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
         columnIndex={i}
         controls={{
           cardRows,
+          handlePlayQueueAdd,
           itemType,
           playButtonBehavior,
           route,

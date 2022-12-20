@@ -6,9 +6,9 @@ import { Link } from 'react-router-dom';
 import { SimpleImg } from 'react-simple-img';
 import styled from 'styled-components';
 import { Text } from '/@/renderer/components/text';
-import type { LibraryItem, CardRow, CardRoute, Play } from '/@/renderer/types';
+import type { LibraryItem, CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
 import { Skeleton } from '/@/renderer/components/skeleton';
-import CardControls from '/@/renderer/components/card/card-controls';
+import { CardControls } from '/@/renderer/components/card/card-controls';
 
 const CardWrapper = styled.div<{
   link?: boolean;
@@ -108,11 +108,18 @@ interface BaseGridCardProps {
     route: CardRoute;
   };
   data: any;
+  handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
   loading?: boolean;
   size: number;
 }
 
-export const AlbumCard = ({ loading, size, data, controls }: BaseGridCardProps) => {
+export const AlbumCard = ({
+  loading,
+  size,
+  handlePlayQueueAdd,
+  data,
+  controls,
+}: BaseGridCardProps) => {
   const navigate = useNavigate();
   const { itemType, cardRows, route } = controls;
 
@@ -164,6 +171,7 @@ export const AlbumCard = ({ loading, size, data, controls }: BaseGridCardProps) 
             )}
             <ControlsContainer>
               <CardControls
+                handlePlayQueueAdd={handlePlayQueueAdd}
                 itemData={data}
                 itemType={itemType}
               />
@@ -286,7 +294,7 @@ export const AlbumCard = ({ loading, size, data, controls }: BaseGridCardProps) 
           <ImageSection />
         </Skeleton>
         <DetailSection style={{ width: '100%' }}>
-          {cardRows.map((row: CardRow, index: number) => (
+          {cardRows.map((_row: CardRow, index: number) => (
             <Skeleton
               visible
               height={15}
