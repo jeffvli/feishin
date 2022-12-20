@@ -39,24 +39,28 @@ const tableColumns: { [key: string]: ColDef } = {
       GenericCell(params, { isLink: true, position: 'left' }),
     colId: TableColumn.ALBUM,
     headerName: 'Album',
-    valueGetter: (params: ValueGetterParams) => ({
-      link: generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
-        albumId: params.data?.albumId || '',
-      }),
-      value: params.data?.album,
-    }),
+    valueGetter: (params: ValueGetterParams) =>
+      params.data
+        ? {
+            link: generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+              albumId: params.data?.albumId || '',
+            }),
+            value: params.data?.album,
+          }
+        : undefined,
   },
   albumArtist: {
     cellRenderer: AlbumArtistCell,
     colId: TableColumn.ALBUM_ARTIST,
     headerName: 'Album Artist',
-    valueGetter: (params: ValueGetterParams) => params.data?.albumArtists,
+    valueGetter: (params: ValueGetterParams) =>
+      params.data ? params.data.albumArtists : undefined,
   },
   artist: {
     cellRenderer: ArtistCell,
     colId: TableColumn.ARTIST,
     headerName: 'Artist',
-    valueGetter: (params: ValueGetterParams) => params.data?.artists,
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.artists : undefined),
   },
   bitRate: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
@@ -64,6 +68,7 @@ const tableColumns: { [key: string]: ColDef } = {
     field: 'bitRate',
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'left' }),
     valueFormatter: (params: ValueFormatterParams) => `${params.value} kbps`,
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.bitRate : undefined),
   },
   dateAdded: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
@@ -72,6 +77,7 @@ const tableColumns: { [key: string]: ColDef } = {
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'left' }),
     headerName: 'Date Added',
     valueFormatter: (params: ValueFormatterParams) => params.value?.split('T')[0],
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.createdAt : undefined),
   },
   discNumber: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
@@ -81,6 +87,7 @@ const tableColumns: { [key: string]: ColDef } = {
     headerName: 'Disc',
     initialWidth: 75,
     suppressSizeToFit: true,
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.discNumber : undefined),
   },
   duration: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
@@ -90,12 +97,13 @@ const tableColumns: { [key: string]: ColDef } = {
       GenericTableHeader(params, { position: 'center', preset: 'duration' }),
     initialWidth: 100,
     valueFormatter: (params: ValueFormatterParams) => formatDuration(params.value * 1000),
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.duration : undefined),
   },
   genre: {
     cellRenderer: GenreCell,
     colId: TableColumn.GENRE,
     headerName: 'Genre',
-    valueGetter: (params: ValueGetterParams) => params.data.genres,
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.genres : undefined),
   },
   releaseDate: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
@@ -104,6 +112,7 @@ const tableColumns: { [key: string]: ColDef } = {
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'Release Date',
     valueFormatter: (params: ValueFormatterParams) => params.value?.split('T')[0],
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.releaseDate : undefined),
   },
   releaseYear: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
@@ -111,6 +120,7 @@ const tableColumns: { [key: string]: ColDef } = {
     field: 'releaseYear',
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'Year',
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.releaseYear : undefined),
   },
   rowIndex: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
@@ -129,20 +139,24 @@ const tableColumns: { [key: string]: ColDef } = {
     colId: TableColumn.TITLE,
     field: 'name',
     headerName: 'Title',
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.name : undefined),
   },
   titleCombined: {
     cellRenderer: CombinedTitleCell,
     colId: TableColumn.TITLE_COMBINED,
     headerName: 'Title',
     initialWidth: 500,
-    valueGetter: (params: ValueGetterParams) => ({
-      albumArtists: params.data?.albumArtists,
-      artists: params.data?.artists,
-      imageUrl: params.data?.imageUrl,
-      name: params.data?.name,
-      rowHeight: params.node?.rowHeight,
-      type: params.data?.type,
-    }),
+    valueGetter: (params: ValueGetterParams) =>
+      params.data
+        ? {
+            albumArtists: params.data?.albumArtists,
+            artists: params.data?.artists,
+            imageUrl: params.data?.imageUrl,
+            name: params.data?.name,
+            rowHeight: params.node?.rowHeight,
+            type: params.data?.type,
+          }
+        : undefined,
   },
   trackNumber: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
@@ -152,6 +166,7 @@ const tableColumns: { [key: string]: ColDef } = {
     headerName: 'Track',
     initialWidth: 75,
     suppressSizeToFit: true,
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.trackNumber : undefined),
   },
 };
 

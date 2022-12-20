@@ -44,7 +44,6 @@ const TrackListRoute = () => {
     (params: GridReadyEvent) => {
       const dataSource: IDatasource = {
         getRows: async (params) => {
-          console.log(`asking for ${params.startRow} to ${params.endRow}`);
           const limit = params.endRow - params.startRow;
           const startIndex = params.startRow;
 
@@ -69,7 +68,6 @@ const TrackListRoute = () => {
 
           const songs = api.normalize.songList(songsRes, server);
 
-          console.log('songs :>> ', songs);
           params.successCallback(songs?.items || [], -1);
         },
         rowCount: undefined,
@@ -84,29 +82,31 @@ const TrackListRoute = () => {
       <VirtualGridContainer>
         <SongListHeader />
         <VirtualGridAutoSizerContainer>
-          <VirtualTable
-            alwaysShowHorizontalScroll
-            animateRows
-            maintainColumnOrder
-            suppressCopyRowsToClipboard
-            suppressMoveWhenRowDragging
-            suppressRowDrag
-            suppressScrollOnNewData
-            cacheBlockSize={500}
-            cacheOverflowSize={0}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColumnDefs}
-            enableCellChangeFlash={false}
-            getRowId={(data) => data.data.uniqueId}
-            infiniteInitialRowCount={checkSongList.data?.totalRecordCount}
-            maxConcurrentDatasourceRequests={3}
-            rowBuffer={20}
-            // rowData={queue}
-            rowHeight={tableConfig.rowHeight || 40}
-            rowModelType="infinite"
-            rowSelection="multiple"
-            onGridReady={onGridReady}
-          />
+          {!checkSongList.isLoading && (
+            <VirtualTable
+              alwaysShowHorizontalScroll
+              animateRows
+              maintainColumnOrder
+              suppressCopyRowsToClipboard
+              suppressMoveWhenRowDragging
+              suppressRowDrag
+              suppressScrollOnNewData
+              blockLoadDebounceMillis={200}
+              cacheBlockSize={500}
+              cacheOverflowSize={1}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColumnDefs}
+              enableCellChangeFlash={false}
+              getRowId={(data) => data.data.uniqueId}
+              infiniteInitialRowCount={checkSongList.data?.totalRecordCount}
+              rowBuffer={20}
+              rowHeight={tableConfig.rowHeight || 40}
+              rowModelType="infinite"
+              rowSelection="multiple"
+              onCellContextMenu={(e) => console.log('context', e)}
+              onGridReady={onGridReady}
+            />
+          )}
         </VirtualGridAutoSizerContainer>
       </VirtualGridContainer>
     </AnimatedPage>
