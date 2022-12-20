@@ -1,6 +1,9 @@
 import type { ChangeEvent } from 'react';
 import { Stack } from '@mantine/core';
-import { MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
+import { MultiSelect } from '/@/renderer/components/select';
+import { Slider } from '/@/renderer/components/slider';
+import { Switch } from '/@/renderer/components/switch';
+import { Text } from '/@/renderer/components/text';
 import { useSettingsStoreActions, useSettingsStore } from '/@/renderer/store/settings.store';
 import { TableColumn, TableType } from '/@/renderer/types';
 
