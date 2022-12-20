@@ -64,7 +64,7 @@ module.exports = {
         shorthandLast: false,
       },
     ],
-    // Since React 17 and typescript 4.1 you can safely disable the rule
+    'react/no-array-index-key': 'off',
     'react/react-in-jsx-scope': 'off',
     'react/require-default-props': 'off',
     'sort-keys-fix/sort-keys-fix': 'warn',
