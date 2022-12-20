@@ -22,13 +22,11 @@ initSimpleImg({ threshold: 0.05 }, true);
 export const App = () => {
   const theme = useTheme();
   const contentFont = useSettingsStore((state) => state.general.fontContent);
-  const headerFont = useSettingsStore((state) => state.general.fontHeader);
 
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty('--content-font-family', contentFont);
-    root.style.setProperty('--header-font-family', headerFont);
-  }, [contentFont, headerFont]);
+  }, [contentFont]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -66,7 +64,7 @@ export const App = () => {
             xl: 18,
             xs: 10,
           },
-          headings: { fontFamily: 'var(--header-font-family)' },
+          headings: { fontFamily: 'var(--content-font-family)' },
           other: {},
           spacing: {
             lg: 12,

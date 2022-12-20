@@ -21,7 +21,7 @@ const HeaderWrapper = styled.div<{ position: 'left' | 'center' | 'right' }>`
       ? 'center'
       : 'flex-start'};
   width: 100%;
-  font-family: var(--header-font-family);
+  font-family: var(--content-font-family);
   text-transform: uppercase;
 `;
 

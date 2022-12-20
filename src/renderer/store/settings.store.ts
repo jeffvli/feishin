@@ -83,7 +83,7 @@ export const useSettingsStore = create<SettingsSlice>()(
         },
         general: {
           followSystemTheme: false,
-          fontContent: 'Poppins',
+          fontContent: 'Sora',
           showQueueDrawerButton: false,
           sideQueueType: 'sideDrawerQueue',
           theme: AppTheme.DEFAULT_DARK,

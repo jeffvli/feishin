@@ -11,23 +11,12 @@ import {
 import { AppTheme } from '/@/renderer/themes/types';
 
 const FONT_OPTIONS = [
-  { label: 'AnekTamil', value: 'AnekTamil' },
   { label: 'Archivo', value: 'Archivo' },
-  { label: 'Circular STD', value: 'Circular STD' },
-  { label: 'Didact Gothic', value: 'Didact Gothic' },
-  { label: 'DM Sans', value: 'DM Sans' },
-  { label: 'Encode Sans', value: 'Encode Sans' },
-  { label: 'Epilogue', value: 'Epilogue' },
-  { label: 'Gotham', value: 'Gotham' },
-  { label: 'Inconsolata', value: 'Inconsolata' },
-  { label: 'Inter', value: 'Inter' },
-  { label: 'JetBrains Mono', value: 'JetBrainsMono' },
-  { label: 'Manrope', value: 'Manrope' },
-  { label: 'Montserrat', value: 'Montserrat' },
-  { label: 'Oxygen', value: 'Oxygen' },
+  { label: 'Fredoka', value: 'Fredoka' },
+  { label: 'League Spartan', value: 'League Spartan' },
+  { label: 'Lexend', value: 'Lexend' },
   { label: 'Poppins', value: 'Poppins' },
   { label: 'Raleway', value: 'Raleway' },
-  { label: 'Roboto', value: 'Roboto' },
   { label: 'Sora', value: 'Sora' },
   { label: 'Work Sans', value: 'Work Sans' },
 ];
@@ -68,6 +57,7 @@ export const GeneralTab = () => {
     {
       control: (
         <Select
+          searchable
           data={FONT_OPTIONS}
           defaultValue={settings.fontContent}
           onChange={(e) => {
@@ -84,26 +74,6 @@ export const GeneralTab = () => {
       description: 'Sets the application content font',
       isHidden: false,
       title: 'Font (Content)',
-    },
-    {
-      control: (
-        <Select
-          data={FONT_OPTIONS}
-          defaultValue={settings.fontHeader}
-          onChange={(e) => {
-            if (!e) return;
-            setSettings({
-              general: {
-                ...settings,
-                fontHeader: e,
-              },
-            });
-          }}
-        />
-      ),
-      description: 'Sets the application header font',
-      isHidden: false,
-      title: 'Font (Header)',
     },
   ];
 
