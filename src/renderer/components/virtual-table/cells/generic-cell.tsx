@@ -1,6 +1,7 @@
 import type { ICellRendererParams } from '@ag-grid-community/core';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { Skeleton } from '/@/renderer/components/skeleton';
 import { Text } from '/@/renderer/components/text';
 
 export const CellContainer = styled.div<{
@@ -31,6 +32,17 @@ export const GenericCell = (
   { position, primary, isLink }: Options,
 ) => {
   const displayedValue = valueFormatted || value;
+
+  if (!value) {
+    return (
+      <CellContainer position={position || 'left'}>
+        <Skeleton
+          height="1rem"
+          width="80%"
+        />
+      </CellContainer>
+    );
+  }
 
   return (
     <CellContainer position={position || 'left'}>

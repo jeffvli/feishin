@@ -6,8 +6,20 @@ import type { AlbumArtist, Artist } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components/text';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 import { AppRoute } from '/@/renderer/router/routes';
+import { Skeleton } from '/@/renderer/components/skeleton';
 
 export const AlbumArtistCell = ({ value, data }: ICellRendererParams) => {
+  if (!value) {
+    return (
+      <CellContainer position="left">
+        <Skeleton
+          height="1rem"
+          width="80%"
+        />
+      </CellContainer>
+    );
+  }
+
   return (
     <CellContainer position="left">
       <Text

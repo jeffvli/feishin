@@ -8,6 +8,7 @@ import type { AlbumArtist, Artist } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components/text';
 import { AppRoute } from '/@/renderer/router/routes';
 import { ServerType } from '/@/renderer/types';
+import { Skeleton } from '/@/renderer/components/skeleton';
 
 const CellContainer = styled(motion.div)<{ height: number }>`
   display: grid;
@@ -43,16 +44,37 @@ const StyledImage = styled.img`
 
 export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams) => {
   const artists = useMemo(() => {
-    return value.type === ServerType.JELLYFIN ? value.artists : value.albumArtists;
+    if (!value) return null;
+    return value?.type === ServerType.JELLYFIN ? value.artists : value.albumArtists;
   }, [value]);
+
+  if (!value) {
+    return (
+      <CellContainer height={node.rowHeight || 40}>
+        <Skeleton>
+          <ImageWrapper />
+        </Skeleton>
+        <MetadataWrapper>
+          <Skeleton
+            height="1rem"
+            width="80%"
+          />
+          <Skeleton
+            height="1rem"
+            mt="0.5rem"
+            width="60%"
+          />
+        </MetadataWrapper>
+      </CellContainer>
+    );
+  }
 
   return (
     <CellContainer height={node.rowHeight || 40}>
       <ImageWrapper>
         <StyledImage
-          alt="song-cover"
+          alt="cover"
           height={(node.rowHeight || 40) - 10}
-          loading="lazy"
           src={value.imageUrl}
           style={{}}
           width={(node.rowHeight || 40) - 10}
