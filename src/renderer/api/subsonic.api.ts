@@ -34,7 +34,7 @@ import type {
   RatingArgs,
 } from '/@/renderer/api/types';
 import { useAuthStore } from '/@/renderer/store';
-import { toast } from '/@/renderer/components';
+import { toast } from '/@/renderer/components/toast';
 
 const getCoverArtUrl = (args: {
   baseUrl: string;

@@ -1,6 +1,6 @@
 import { useAuthStore } from '/@/renderer/store';
 import { navidromeApi } from '/@/renderer/api/navidrome.api';
-import { toast } from '/@/renderer/components';
+import { toast } from '/@/renderer/components/toast';
 import type {
   AlbumDetailArgs,
   RawAlbumDetailResponse,
