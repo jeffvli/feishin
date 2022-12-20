@@ -7,9 +7,9 @@ import { SimpleImg } from 'react-simple-img';
 import type { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Text } from '/@/renderer/components/text';
-import type { LibraryItem, CardRow, CardRoute, Play } from '/@/renderer/types';
-import GridCardControls from './grid-card-controls';
+import type { LibraryItem, CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
 import { Skeleton } from '/@/renderer/components/skeleton';
+import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
 
 const CardWrapper = styled.div<{
   itemGap: number;
@@ -114,6 +114,7 @@ interface BaseGridCardProps {
   columnIndex: number;
   controls: {
     cardRows: CardRow[];
+    handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
     itemType: LibraryItem;
     playButtonBehavior: Play;
     route: CardRoute;
@@ -137,7 +138,7 @@ export const DefaultCard = ({
   const navigate = useNavigate();
   const { index } = listChildProps;
   const { itemGap, itemHeight, itemWidth } = sizes;
-  const { itemType, cardRows, route } = controls;
+  const { itemType, cardRows, route, handlePlayQueueAdd } = controls;
 
   const cardSize = itemWidth - 24;
 
@@ -191,6 +192,7 @@ export const DefaultCard = ({
             )}
             <ControlsContainer>
               <GridCardControls
+                handlePlayQueueAdd={handlePlayQueueAdd}
                 itemData={data}
                 itemType={itemType}
               />

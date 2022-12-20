@@ -6,7 +6,7 @@ import { RiPlayFill, RiMore2Fill, RiHeartFill, RiHeartLine } from 'react-icons/r
 import styled from 'styled-components';
 import { _Button } from '/@/renderer/components/button';
 import { DropdownMenu } from '/@/renderer/components/dropdown-menu';
-import type { LibraryItem } from '/@/renderer/types';
+import type { LibraryItem, PlayQueueAddOptions } from '/@/renderer/types';
 import { Play } from '/@/renderer/types';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 
@@ -116,23 +116,24 @@ const PLAY_TYPES = [
 export const GridCardControls = ({
   itemData,
   itemType,
+  handlePlayQueueAdd,
 }: {
+  handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   itemData: any;
   itemType: LibraryItem;
 }) => {
   const playButtonBehavior = useSettingsStore((state) => state.player.playButtonBehavior);
 
-  const handlePlay = (e: MouseEvent<HTMLButtonElement>, playType?: Play) => {
+  const handlePlay = async (e: MouseEvent<HTMLButtonElement>, playType?: Play) => {
     e.preventDefault();
     e.stopPropagation();
-    import('/@/renderer/features/player/utils/handle-playqueue-add').then((fn) => {
-      fn.handlePlayQueueAdd({
-        byItemType: {
-          id: itemData.id,
-          type: itemType,
-        },
-        play: playType || playButtonBehavior,
-      });
+
+    handlePlayQueueAdd?.({
+      byItemType: {
+        id: itemData.id,
+        type: itemType,
+      },
+      play: playType || playButtonBehavior,
     });
   };
 
@@ -200,5 +201,3 @@ export const GridCardControls = ({
     </GridCardControlsContainer>
   );
 };
-
-export default GridCardControls;

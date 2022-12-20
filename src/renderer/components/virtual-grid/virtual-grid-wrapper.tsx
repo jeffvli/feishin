@@ -5,7 +5,13 @@ import type { FixedSizeListProps } from 'react-window';
 import { FixedSizeList } from 'react-window';
 import styled from 'styled-components';
 import { GridCard } from '/@/renderer/components/virtual-grid/grid-card';
-import type { CardRow, LibraryItem, CardDisplayType, CardRoute } from '/@/renderer/types';
+import type {
+  CardRow,
+  LibraryItem,
+  CardDisplayType,
+  CardRoute,
+  PlayQueueAddOptions,
+} from '/@/renderer/types';
 
 const createItemData = memoize(
   (
@@ -19,10 +25,12 @@ const createItemData = memoize(
     itemType,
     itemWidth,
     route,
+    handlePlayQueueAdd,
   ) => ({
     cardRows,
     columnCount,
     display,
+    handlePlayQueueAdd,
     itemCount,
     itemData,
     itemGap,
@@ -47,6 +55,7 @@ export const VirtualGridWrapper = ({
   columnCount,
   rowCount,
   initialScrollOffset,
+  handlePlayQueueAdd,
   itemData,
   route,
   onScroll,
@@ -55,6 +64,7 @@ export const VirtualGridWrapper = ({
   cardRows: CardRow[];
   columnCount: number;
   display: CardDisplayType;
+  handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   itemData: any[];
   itemGap: number;
   itemHeight: number;
@@ -75,6 +85,7 @@ export const VirtualGridWrapper = ({
     itemType,
     itemWidth,
     route,
+    handlePlayQueueAdd,
   );
 
   const memoizedOnScroll = createScrollHandler(onScroll);

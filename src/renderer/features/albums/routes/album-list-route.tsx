@@ -17,6 +17,7 @@ import { controller } from '/@/renderer/api/controller';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AlbumListHeader } from '/@/renderer/features/albums/components/album-list-header';
 import { api } from '/@/renderer/api';
+import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 
 const AlbumListRoute = () => {
   const queryClient = useQueryClient();
@@ -24,6 +25,7 @@ const AlbumListRoute = () => {
   const { setPage } = useAppStoreActions();
   const page = useAlbumRouteStore();
   const filters = page.list.filter;
+  const handlePlayQueueAdd = useHandlePlayQueueAdd();
 
   const albumListQuery = useAlbumList({
     limit: 1,
@@ -101,6 +103,7 @@ const AlbumListRoute = () => {
                 ]}
                 display={page.list?.display || CardDisplayType.CARD}
                 fetchFn={fetch}
+                handlePlayQueueAdd={handlePlayQueueAdd}
                 height={height}
                 initialScrollOffset={page.list?.gridScrollOffset || 0}
                 itemCount={albumListQuery?.data?.totalRecordCount || 0}
@@ -108,7 +111,6 @@ const AlbumListRoute = () => {
                 itemSize={150 + page.list?.size}
                 itemType={LibraryItem.ALBUM}
                 minimumBatchSize={40}
-                // refresh={advancedFilters}
                 route={{
                   route: AppRoute.LIBRARY_ALBUMS_DETAIL,
                   slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],

@@ -3,18 +3,19 @@ import debounce from 'lodash/debounce';
 import type { FixedSizeListProps } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { VirtualGridWrapper } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
-import type { CardRoute, CardRow, LibraryItem } from '/@/renderer/types';
+import type { CardRoute, CardRow, LibraryItem, PlayQueueAddOptions } from '/@/renderer/types';
 import { CardDisplayType } from '/@/renderer/types';
 
 interface VirtualGridProps extends Omit<FixedSizeListProps, 'children' | 'itemSize'> {
   cardRows: CardRow[];
   display?: CardDisplayType;
   fetchFn: (options: { columnCount: number; skip: number; take: number }) => Promise<any>;
+  handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   itemGap: number;
   itemSize: number;
   itemType: LibraryItem;
   minimumBatchSize?: number;
-  refresh?: any; // Pass in any value to refresh the grid when changed
+  refresh?: any;
   route?: CardRoute;
 }
 
@@ -35,6 +36,7 @@ export const VirtualInfiniteGrid = ({
   route,
   onScroll,
   display,
+  handlePlayQueueAdd,
   minimumBatchSize,
   fetchFn,
   initialScrollOffset,
@@ -123,6 +125,7 @@ export const VirtualInfiniteGrid = ({
           cardRows={cardRows}
           columnCount={columnCount}
           display={display || CardDisplayType.CARD}
+          handlePlayQueueAdd={handlePlayQueueAdd}
           height={height}
           initialScrollOffset={initialScrollOffset}
           itemCount={itemCount || 0}

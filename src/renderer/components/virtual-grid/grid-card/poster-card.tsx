@@ -8,8 +8,8 @@ import type { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Skeleton } from '/@/renderer/components/skeleton';
 import { Text } from '/@/renderer/components/text';
-import type { LibraryItem, CardRow, CardRoute, Play } from '/@/renderer/types';
-import GridCardControls from './grid-card-controls';
+import type { LibraryItem, CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
+import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
 
 const CardWrapper = styled.div<{
   itemGap: number;
@@ -117,6 +117,7 @@ interface BaseGridCardProps {
   columnIndex: number;
   controls: {
     cardRows: CardRow[];
+    handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
     itemType: LibraryItem;
     playButtonBehavior: Play;
     route: CardRoute;
@@ -184,6 +185,7 @@ export const PosterCard = ({
               )}
               <ControlsContainer>
                 <GridCardControls
+                  handlePlayQueueAdd={controls.handlePlayQueueAdd}
                   itemData={data}
                   itemType={controls.itemType}
                 />
