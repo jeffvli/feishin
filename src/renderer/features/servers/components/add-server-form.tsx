@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Stack, Group, Checkbox } from '@mantine/core';
-import { Button, PasswordInput, SegmentedControl, TextInput } from '/@/renderer/components';
+import { Button, PasswordInput, SegmentedControl, TextInput, toast } from '/@/renderer/components';
 import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
@@ -9,14 +9,13 @@ import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
 import { navidromeApi } from '/@/renderer/api/navidrome.api';
 import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { AuthenticationResponse } from '/@/renderer/api/types';
-import { toast } from '/@/renderer/components';
 import { useAuthStoreActions } from '/@/renderer/store';
 import { ServerType } from '/@/renderer/types';
 
 const SERVER_TYPES = [
   { label: 'Jellyfin', value: ServerType.JELLYFIN },
   { label: 'Navidrome', value: ServerType.NAVIDROME },
-  { label: 'Subsonic', value: ServerType.SUBSONIC },
+  // { label: 'Subsonic', value: ServerType.SUBSONIC },
 ];
 
 const AUTH_FUNCTIONS = {
