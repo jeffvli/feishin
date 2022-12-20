@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron';
 import uniq from 'lodash/uniq';
 import MpvAPI from 'node-mpv';
-import { store } from '/@/main/features/core/settings';
-import { getMainWindow } from '/@/main/main';
+import { store } from '../settings';
+import { getMainWindow } from '../../../main';
 import { PlayerData } from '/@/renderer/store';
 
 declare module 'node-mpv';
