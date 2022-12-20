@@ -29,11 +29,17 @@ const StyledSkeleton = styled(MantineSkeleton)`
     animation-name: run;
     animation-duration: 1.5s;
     animation-timing-function: linear;
+    animation-iteration-count: infinite;
     content: '';
     inset: 0;
   }
 `;
 
 export const Skeleton = ({ ...props }: MantineSkeletonProps) => {
-  return <StyledSkeleton {...props} />;
+  return (
+    <StyledSkeleton
+      animate={false}
+      {...props}
+    />
+  );
 };
