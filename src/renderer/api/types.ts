@@ -40,12 +40,32 @@ import {
   SSAlbumArtistDetail,
   SSMusicFolderList,
 } from '/@/renderer/api/subsonic.types';
-import { ServerListItem, ServerType } from '/@/renderer/types';
 
 export enum SortOrder {
   ASC = 'ASC',
   DESC = 'DESC',
 }
+
+export type ServerListItem = {
+  credential: string;
+  id: string;
+  name: string;
+  ndCredential?: string;
+  type: ServerType;
+  url: string;
+  userId: string | null;
+  username: string;
+};
+
+export enum ServerType {
+  JELLYFIN = 'jellyfin',
+  NAVIDROME = 'navidrome',
+  SUBSONIC = 'subsonic',
+}
+
+export type QueueSong = Song & {
+  uniqueId: string;
+};
 
 type SortOrderMap = {
   jellyfin: Record<SortOrder, JFSortOrder>;
@@ -281,6 +301,7 @@ export type AlbumListQuery = {
     starred?: boolean;
     year?: number;
   };
+  searchTerm?: string;
   sortBy: AlbumListSort;
   sortOrder: SortOrder;
   startIndex: number;

@@ -252,9 +252,11 @@ const getAlbumList = async (args: AlbumListArgs): Promise<JFAlbumList> => {
     limit: query.limit,
     parentId: query.musicFolderId,
     recursive: true,
+    searchTerm: query.searchTerm,
     sortBy: albumListSortMap.jellyfin[query.sortBy],
     sortOrder: sortOrderMap.jellyfin[query.sortOrder],
     startIndex: query.startIndex,
+    ...query.jfParams,
   };
 
   const data = await api

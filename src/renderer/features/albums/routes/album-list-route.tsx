@@ -10,7 +10,7 @@ import {
   VirtualInfiniteGrid,
 } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useAlbumRouteStore, useAppStoreActions, useCurrentServer } from '/@/renderer/store';
+import { useAlbumListStore, useCurrentServer, useSetAlbumStore } from '/@/renderer/store';
 import { LibraryItem, CardDisplayType } from '/@/renderer/types';
 import { useAlbumList } from '../queries/album-list-query';
 import { controller } from '/@/renderer/api/controller';
@@ -22,17 +22,15 @@ import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-han
 const AlbumListRoute = () => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
-  const { setPage } = useAppStoreActions();
-  const page = useAlbumRouteStore();
-  const filters = page.list.filter;
+  const setPage = useSetAlbumStore();
+
+  const page = useAlbumListStore();
   const handlePlayQueueAdd = useHandlePlayQueueAdd();
 
   const albumListQuery = useAlbumList({
     limit: 1,
-    musicFolderId: filters.musicFolderId,
-    sortBy: filters.sortBy,
-    sortOrder: filters.sortOrder,
     startIndex: 0,
+    ...page.filter,
   });
 
   const fetch = useCallback(
@@ -40,17 +38,15 @@ const AlbumListRoute = () => {
       const queryKey = queryKeys.albums.list(server?.id || '', {
         limit: take,
         startIndex: skip,
-        ...filters,
+        ...page.filter,
       });
 
       const albums = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
         controller.getAlbumList({
           query: {
             limit: take,
-            musicFolderId: filters.musicFolderId,
-            sortBy: filters.sortBy,
-            sortOrder: filters.sortOrder,
             startIndex: skip,
+            ...page.filter,
           },
           server,
           signal,
@@ -59,16 +55,18 @@ const AlbumListRoute = () => {
 
       return api.normalize.albumList(albums, server);
     },
-    [filters, queryClient, server],
+    [page.filter, queryClient, server],
   );
 
   const handleGridScroll = useCallback(
     (e: ListOnScrollProps) => {
-      setPage('albums', {
-        ...page,
+      setPage({
         list: {
-          ...page.list,
-          gridScrollOffset: e.scrollOffset,
+          ...page,
+          grid: {
+            ...page.grid,
+            scrollOffset: e.scrollOffset,
+          },
         },
       });
     },
@@ -103,17 +101,17 @@ const AlbumListRoute = () => {
                     property: 'releaseYear',
                   },
                 ]}
-                display={page.list?.display || CardDisplayType.CARD}
+                display={page.display || CardDisplayType.CARD}
                 fetchFn={fetch}
                 handlePlayQueueAdd={handlePlayQueueAdd}
                 height={height}
-                initialScrollOffset={page.list?.gridScrollOffset || 0}
+                initialScrollOffset={page?.grid.scrollOffset || 0}
                 itemCount={albumListQuery?.data?.totalRecordCount || 0}
                 itemGap={20}
-                itemSize={150 + page.list?.size}
+                itemSize={150 + page.grid?.size}
                 itemType={LibraryItem.ALBUM}
                 minimumBatchSize={40}
-                refresh={filters.musicFolderId}
+                refresh={page.filter}
                 route={{
                   route: AppRoute.LIBRARY_ALBUMS_DETAIL,
                   slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],

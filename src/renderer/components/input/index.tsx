@@ -82,6 +82,8 @@ const StyledTextInput = styled(MantineTextInput)<TextInputProps>`
   & .mantine-TextInput-disabled {
     opacity: 0.6;
   }
+
+  transition: width 0.3s ease-in-out;
 `;
 
 const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
@@ -125,6 +127,8 @@ const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
   & .mantine-NumberInput-disabled {
     opacity: 0.6;
   }
+
+  transition: width 0.3s ease-in-out;
 `;
 
 const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
@@ -152,6 +156,8 @@ const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
   & .mantine-PasswordInput-disabled {
     opacity: 0.6;
   }
+
+  transition: width 0.3s ease-in-out;
 `;
 
 const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
@@ -179,6 +185,8 @@ const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
   & .mantine-FileInput-disabled {
     opacity: 0.6;
   }
+
+  transition: width 0.3s ease-in-out;
 `;
 
 const StyledJsonInput = styled(MantineJsonInput)<JsonInputProps>`
@@ -206,6 +214,8 @@ const StyledJsonInput = styled(MantineJsonInput)<JsonInputProps>`
   & .mantine-JsonInput-disabled {
     opacity: 0.6;
   }
+
+  transition: width 0.3s ease-in-out;
 `;
 
 const StyledTextarea = styled(MantineTextarea)<TextareaProps>`
@@ -233,6 +243,8 @@ const StyledTextarea = styled(MantineTextarea)<TextareaProps>`
   & .mantine-Textarea-disabled {
     opacity: 0.6;
   }
+
+  transition: width 0.3s ease-in-out;
 `;
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(

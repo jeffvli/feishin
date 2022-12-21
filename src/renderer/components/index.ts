@@ -27,3 +27,4 @@ export * from './grid-carousel';
 export * from './card';
 export * from './feature-carousel';
 export * from './badge';
+export * from './search-input';

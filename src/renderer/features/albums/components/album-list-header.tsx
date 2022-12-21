@@ -1,13 +1,20 @@
-import type { MouseEvent } from 'react';
+import type { MouseEvent, ChangeEvent } from 'react';
 import { useCallback } from 'react';
-import { Group, Slider } from '@mantine/core';
+import { Flex, Slider } from '@mantine/core';
+import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { RiArrowDownSLine } from 'react-icons/ri';
 import { AlbumListSort, SortOrder } from '/@/renderer/api/types';
-import { Button, DropdownMenu, PageHeader } from '/@/renderer/components';
-import { useCurrentServer, useAppStoreActions, useAlbumRouteStore } from '/@/renderer/store';
+import { Button, DropdownMenu, PageHeader, SearchInput } from '/@/renderer/components';
+import {
+  useCurrentServer,
+  useAlbumListStore,
+  useSetAlbumFilters,
+  useSetAlbumStore,
+} from '/@/renderer/store';
 import { CardDisplayType } from '/@/renderer/types';
 import { useMusicFolders } from '/@/renderer/features/shared';
+import styled from 'styled-components';
 
 const FILTERS = {
   jellyfin: [
@@ -39,11 +46,18 @@ const ORDER = [
   { name: 'Descending', value: SortOrder.DESC },
 ];
 
+const HeaderItems = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
 export const AlbumListHeader = () => {
   const server = useCurrentServer();
-  const { setPage } = useAppStoreActions();
-  const page = useAlbumRouteStore();
-  const filters = page.list.filter;
+  const setPage = useSetAlbumStore();
+  const setFilter = useSetAlbumFilters();
+  const page = useAlbumListStore();
+  const filters = page.filter;
 
   const musicFoldersQuery = useMusicFolders();
 
@@ -58,59 +72,44 @@ export const AlbumListHeader = () => {
 
   const setSize = throttle(
     (e: number) =>
-      setPage('albums', {
-        ...page,
-        list: { ...page.list, size: e },
+      setPage({
+        list: { ...page, grid: { ...page.grid, size: e } },
       }),
     200,
   );
 
-  const handleSetFilter = useCallback(
+  const handleSetSortBy = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      setPage('albums', {
-        list: {
-          ...page.list,
-          filter: {
-            ...page.list.filter,
-            sortBy: e.currentTarget.value as AlbumListSort,
-          },
-        },
+      setFilter({
+        sortBy: e.currentTarget.value as AlbumListSort,
       });
     },
-    [page.list, setPage],
+    [setFilter],
   );
 
   const handleSetMusicFolder = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      setPage('albums', {
-        list: {
-          ...page.list,
-          filter: {
-            ...page.list.filter,
-            musicFolderId: e.currentTarget.value,
-          },
-        },
+      setFilter({
+        musicFolderId: e.currentTarget.value,
       });
     },
-    [page.list, setPage],
+    [setFilter],
   );
 
   const handleSetOrder = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      setPage('albums', {
-        list: {
-          ...page.list,
-          filter: {
-            ...page.list.filter,
+      debounce(
+        () =>
+          setFilter({
             sortOrder: e.currentTarget.value as SortOrder,
-          },
-        },
-      });
+          }),
+        1000,
+      );
     },
-    [page.list, setPage],
+    [setFilter],
   );
 
   const handleSetViewType = useCallback(
@@ -118,29 +117,24 @@ export const AlbumListHeader = () => {
       if (!e.currentTarget?.value) return;
       const type = e.currentTarget.value;
       if (type === CardDisplayType.CARD) {
-        setPage('albums', {
-          ...page,
+        setPage({
           list: {
-            ...page.list,
+            ...page,
             display: CardDisplayType.CARD,
-            type: 'grid',
           },
         });
       } else if (type === CardDisplayType.POSTER) {
-        setPage('albums', {
-          ...page,
+        setPage({
           list: {
-            ...page.list,
+            ...page,
             display: CardDisplayType.POSTER,
-            type: 'grid',
           },
         });
       } else {
-        setPage('albums', {
-          ...page,
+        setPage({
           list: {
-            ...page.list,
-            type: 'list',
+            ...page,
+            display: CardDisplayType.TABLE,
           },
         });
       }
@@ -148,127 +142,142 @@ export const AlbumListHeader = () => {
     [page, setPage],
   );
 
+  const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
+    setFilter({
+      searchTerm: e.target.value,
+    });
+  }, 500);
+
   return (
     <PageHeader>
-      <Group>
-        <DropdownMenu
-          position="bottom-end"
-          width={100}
+      <HeaderItems>
+        <Flex
+          align="center"
+          gap="sm"
+          justify="center"
         >
-          <DropdownMenu.Target>
-            <Button
-              compact
-              rightIcon={<RiArrowDownSLine size={15} />}
-              size="xl"
-              sx={{ paddingLeft: 0, paddingRight: 0 }}
-              variant="subtle"
-            >
-              Albums
-            </Button>
-          </DropdownMenu.Target>
-          <DropdownMenu.Dropdown>
-            <DropdownMenu.Item>
-              <Slider
-                defaultValue={page.list?.size || 0}
-                label={null}
-                onChange={setSize}
-              />
-            </DropdownMenu.Item>
-            <DropdownMenu.Divider />
-            <DropdownMenu.Item
-              $isActive={page.list.type === 'grid' && page.list.display === CardDisplayType.CARD}
-              value={CardDisplayType.CARD}
-              onClick={handleSetViewType}
-            >
-              Card
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              $isActive={page.list.type === 'grid' && page.list.display === CardDisplayType.POSTER}
-              value={CardDisplayType.POSTER}
-              onClick={handleSetViewType}
-            >
-              Poster
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              disabled
-              $isActive={page.list.type === 'list'}
-              value="list"
-              onClick={handleSetViewType}
-            >
-              List
-            </DropdownMenu.Item>
-          </DropdownMenu.Dropdown>
-        </DropdownMenu>
-        <DropdownMenu position="bottom-start">
-          <DropdownMenu.Target>
-            <Button
-              compact
-              fw="normal"
-              variant="subtle"
-            >
-              {sortByLabel}
-            </Button>
-          </DropdownMenu.Target>
-          <DropdownMenu.Dropdown>
-            {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
-              <DropdownMenu.Item
-                key={`filter-${filter.name}`}
-                $isActive={filter.value === filters.sortBy}
-                value={filter.value}
-                onClick={handleSetFilter}
+          <DropdownMenu position="bottom-end">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                rightIcon={<RiArrowDownSLine size={15} />}
+                size="xl"
+                sx={{ paddingLeft: 0, paddingRight: 0 }}
+                variant="subtle"
               >
-                {filter.name}
+                Albums
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              <DropdownMenu.Item>
+                <Slider
+                  defaultValue={page.grid.size || 0}
+                  label={null}
+                  onChange={setSize}
+                />
               </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Dropdown>
-        </DropdownMenu>
-        <DropdownMenu position="bottom-start">
-          <DropdownMenu.Target>
-            <Button
-              compact
-              fw="normal"
-              variant="subtle"
-            >
-              {sortOrderLabel}
-            </Button>
-          </DropdownMenu.Target>
-          <DropdownMenu.Dropdown>
-            {ORDER.map((sort) => (
+              <DropdownMenu.Divider />
               <DropdownMenu.Item
-                key={`sort-${sort.value}`}
-                $isActive={sort.value === filters.sortOrder}
-                value={sort.value}
-                onClick={handleSetOrder}
+                $isActive={page.display === CardDisplayType.CARD}
+                value={CardDisplayType.CARD}
+                onClick={handleSetViewType}
               >
-                {sort.name}
+                Card
               </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Dropdown>
-        </DropdownMenu>
-        <DropdownMenu position="bottom-start">
-          <DropdownMenu.Target>
-            <Button
-              compact
-              fw="normal"
-              variant="subtle"
-            >
-              Folder
-            </Button>
-          </DropdownMenu.Target>
-          <DropdownMenu.Dropdown>
-            {musicFoldersQuery.data?.map((folder) => (
               <DropdownMenu.Item
-                key={`musicFolder-${folder.id}`}
-                $isActive={filters.musicFolderId === folder.id}
-                value={folder.id}
-                onClick={handleSetMusicFolder}
+                $isActive={page.display === CardDisplayType.POSTER}
+                value={CardDisplayType.POSTER}
+                onClick={handleSetViewType}
               >
-                {folder.name}
+                Poster
               </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Dropdown>
-        </DropdownMenu>
-      </Group>
+              <DropdownMenu.Item
+                disabled
+                $isActive={page.display === CardDisplayType.TABLE}
+                value="list"
+                onClick={handleSetViewType}
+              >
+                List
+              </DropdownMenu.Item>
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
+          <DropdownMenu position="bottom-start">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                fw="normal"
+                variant="subtle"
+              >
+                {sortByLabel}
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
+                <DropdownMenu.Item
+                  key={`filter-${filter.name}`}
+                  $isActive={filter.value === filters.sortBy}
+                  value={filter.value}
+                  onClick={handleSetSortBy}
+                >
+                  {filter.name}
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
+          <DropdownMenu position="bottom-start">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                fw="normal"
+                variant="subtle"
+              >
+                {sortOrderLabel}
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              {ORDER.map((sort) => (
+                <DropdownMenu.Item
+                  key={`sort-${sort.value}`}
+                  $isActive={sort.value === filters.sortOrder}
+                  value={sort.value}
+                  onClick={handleSetOrder}
+                >
+                  {sort.name}
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
+          <DropdownMenu position="bottom-start">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                fw="normal"
+                variant="subtle"
+              >
+                Folder
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              {musicFoldersQuery.data?.map((folder) => (
+                <DropdownMenu.Item
+                  key={`musicFolder-${folder.id}`}
+                  $isActive={filters.musicFolderId === folder.id}
+                  value={folder.id}
+                  onClick={handleSetMusicFolder}
+                >
+                  {folder.name}
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
+        </Flex>
+        <Flex>
+          <SearchInput
+            defaultValue={page.filter.searchTerm}
+            onChange={handleSearch}
+          />
+        </Flex>
+      </HeaderItems>
     </PageHeader>
   );
 };
