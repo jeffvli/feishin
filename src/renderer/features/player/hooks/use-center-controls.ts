@@ -203,6 +203,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
   const handleNextTrack = useCallback(() => {
     const isLastTrack = checkIsLastTrack();
+    setCurrentTime(0);
 
     const handleRepeatAll = {
       local: () => {
@@ -287,6 +288,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
     // Reset the current track more than 10 seconds have elapsed
     if (currentTime >= 10) {
+      setCurrentTime(0);
+
       if (isMpvPlayer) {
         return mpvPlayer.seekTo(0);
       }
