@@ -1,4 +1,3 @@
-import { Song } from '/@/renderer/api/types';
 import { AppRoute } from '/@/renderer/router/routes';
 
 export type RouteSlug = {
@@ -22,6 +21,7 @@ export type CardRow = {
 export enum CardDisplayType {
   CARD = 'card',
   POSTER = 'poster',
+  TABLE = 'table',
 }
 
 export enum ListDisplayType {
@@ -149,8 +149,6 @@ export enum TableColumn {
   TRACK_NUMBER = 'trackNumber',
   YEAR = 'releaseYear',
 }
-
-export type QueueSong = Song & UniqueId;
 
 export type PlayQueueAddOptions = {
   // byData?: any[];

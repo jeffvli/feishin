@@ -6,8 +6,8 @@ import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import shallow from 'zustand/shallow';
-import { Song } from '/@/renderer/api/types';
-import { QueueSong, PlayerStatus, PlayerRepeat, PlayerShuffle, Play } from '/@/renderer/types';
+import { QueueSong, Song } from '/@/renderer/api/types';
+import { PlayerStatus, PlayerRepeat, PlayerShuffle, Play } from '/@/renderer/types';
 
 export interface PlayerState {
   current: {

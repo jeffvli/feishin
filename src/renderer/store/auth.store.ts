@@ -4,7 +4,7 @@ import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { AlbumListSort, SortOrder } from '/@/renderer/api/types';
-import { useAppStore } from '/@/renderer/store/app.store';
+import { useAlbumStore } from '/@/renderer/store/album.store';
 import { ServerListItem } from '/@/renderer/types';
 
 export interface AuthState {
@@ -45,15 +45,10 @@ export const useAuthStore = create<AuthSlice>()(
               state.currentServer = server;
 
               if (server) {
-                useAppStore.getState().actions.setPage('albums', {
-                  list: {
-                    ...useAppStore.getState().albums.list,
-                    filter: {
-                      ...useAppStore.getState().albums.list.filter,
-                      sortBy: AlbumListSort.RECENTLY_ADDED,
-                      sortOrder: SortOrder.ASC,
-                    },
-                  },
+                useAlbumStore.getState().actions.setFilters({
+                  musicFolderId: undefined,
+                  sortBy: AlbumListSort.RECENTLY_ADDED,
+                  sortOrder: SortOrder.ASC,
                 });
               }
             });
