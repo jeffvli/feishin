@@ -7,6 +7,7 @@ import { AlbumListSort, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, PageHeader } from '/@/renderer/components';
 import { useCurrentServer, useAppStoreActions, useAlbumRouteStore } from '/@/renderer/store';
 import { CardDisplayType } from '/@/renderer/types';
+import { useMusicFolders } from '/@/renderer/features/shared';
 
 const FILTERS = {
   jellyfin: [
@@ -44,6 +45,8 @@ export const AlbumListHeader = () => {
   const page = useAlbumRouteStore();
   const filters = page.list.filter;
 
+  const musicFoldersQuery = useMusicFolders();
+
   const sortByLabel =
     (server?.type &&
       (FILTERS[server.type as keyof typeof FILTERS] as { name: string; value: string }[]).find(
@@ -71,6 +74,22 @@ export const AlbumListHeader = () => {
           filter: {
             ...page.list.filter,
             sortBy: e.currentTarget.value as AlbumListSort,
+          },
+        },
+      });
+    },
+    [page.list, setPage],
+  );
+
+  const handleSetMusicFolder = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      if (!e.currentTarget?.value) return;
+      setPage('albums', {
+        list: {
+          ...page.list,
+          filter: {
+            ...page.list.filter,
+            musicFolderId: e.currentTarget.value,
           },
         },
       });
@@ -236,19 +255,18 @@ export const AlbumListHeader = () => {
               Folder
             </Button>
           </DropdownMenu.Target>
-          {/* <DropdownMenu.Dropdown>
-          {serverFolders?.map((folder) => (
-            <DropdownMenu.Item
-              key={folder.id}
-              $isActive={filters.serverFolderId.includes(folder.id)}
-              closeMenuOnClick={false}
-              value={folder.id}
-              onClick={handleSetServerFolder}
-            >
-              {folder.name}
-            </DropdownMenu.Item>
-          ))}
-        </DropdownMenu.Dropdown> */}
+          <DropdownMenu.Dropdown>
+            {musicFoldersQuery.data?.map((folder) => (
+              <DropdownMenu.Item
+                key={`musicFolder-${folder.id}`}
+                $isActive={filters.musicFolderId === folder.id}
+                value={folder.id}
+                onClick={handleSetMusicFolder}
+              >
+                {folder.name}
+              </DropdownMenu.Item>
+            ))}
+          </DropdownMenu.Dropdown>
         </DropdownMenu>
       </Group>
     </PageHeader>

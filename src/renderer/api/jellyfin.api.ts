@@ -95,11 +95,13 @@ const authenticate = async (
 };
 
 const getMusicFolderList = async (args: MusicFolderListArgs): Promise<JFMusicFolderList> => {
-  const { signal } = args;
+  const { server, signal } = args;
   const userId = useAuthStore.getState().currentServer?.userId;
 
   const data = await api
     .get(`users/${userId}/items`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      prefixUrl: server?.url,
       signal,
     })
     .json<JFMusicFolderListResponse>();
@@ -108,11 +110,7 @@ const getMusicFolderList = async (args: MusicFolderListArgs): Promise<JFMusicFol
     (folder) => folder.CollectionType === JFCollectionType.MUSIC,
   );
 
-  return {
-    items: musicFolders,
-    startIndex: data.StartIndex,
-    totalRecordCount: data.TotalRecordCount,
-  };
+  return musicFolders;
 };
 
 const getGenreList = async (args: GenreListArgs): Promise<JFGenreList> => {

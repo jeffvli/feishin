@@ -31,6 +31,7 @@ import type {
   FavoriteArgs,
   FavoriteResponse,
   GenreListArgs,
+  MusicFolderListArgs,
   RatingArgs,
 } from '/@/renderer/api/types';
 import { useAuthStore } from '/@/renderer/store';
@@ -126,13 +127,12 @@ const authenticate = async (
   };
 };
 
-const getMusicFolderList = async (
-  server: any,
-  signal?: AbortSignal,
-): Promise<SSMusicFolderList> => {
+const getMusicFolderList = async (args: MusicFolderListArgs): Promise<SSMusicFolderList> => {
+  const { signal, server } = args;
+
   const data = await api
     .get('rest/getMusicFolders.view', {
-      prefixUrl: server.url,
+      prefixUrl: server?.url,
       signal,
     })
     .json<SSMusicFolderListResponse>();
@@ -143,7 +143,7 @@ const getMusicFolderList = async (
 export const getAlbumArtistDetail = async (
   args: AlbumArtistDetailArgs,
 ): Promise<SSAlbumArtistDetail> => {
-  const { signal, query } = args;
+  const { server, signal, query } = args;
 
   const searchParams: SSAlbumArtistDetailParams = {
     id: query.id,
@@ -151,6 +151,7 @@ export const getAlbumArtistDetail = async (
 
   const data = await api
     .get('/getArtist.view', {
+      prefixUrl: server?.url,
       searchParams,
       signal,
     })
@@ -160,14 +161,15 @@ export const getAlbumArtistDetail = async (
 };
 
 const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<SSAlbumArtistList> => {
-  const { signal, query } = args;
+  const { signal, server, query } = args;
 
   const searchParams: SSAlbumArtistListParams = {
     musicFolderId: query.musicFolderId,
   };
 
   const data = await api
-    .get('/rest/getArtists.view', {
+    .get('rest/getArtists.view', {
+      prefixUrl: server?.url,
       searchParams,
       signal,
     })
@@ -179,10 +181,11 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<SSAlbumArt
 };
 
 const getGenreList = async (args: GenreListArgs): Promise<SSGenreList> => {
-  const { signal } = args;
+  const { server, signal } = args;
 
   const data = await api
-    .get('/rest/getGenres.view', {
+    .get('rest/getGenres.view', {
+      prefixUrl: server?.url,
       signal,
     })
     .json<SSGenreListResponse>();
@@ -191,10 +194,11 @@ const getGenreList = async (args: GenreListArgs): Promise<SSGenreList> => {
 };
 
 const getAlbumDetail = async (args: AlbumDetailArgs): Promise<SSAlbumDetail> => {
-  const { query, signal } = args;
+  const { server, query, signal } = args;
 
   const data = await api
-    .get('/rest/getAlbum.view', {
+    .get('rest/getAlbum.view', {
+      prefixUrl: server?.url,
       searchParams: { id: query.id },
       signal,
     })
@@ -205,11 +209,12 @@ const getAlbumDetail = async (args: AlbumDetailArgs): Promise<SSAlbumDetail> => 
 };
 
 const getAlbumList = async (args: AlbumListArgs): Promise<SSAlbumList> => {
-  const { query, signal } = args;
+  const { server, query, signal } = args;
 
   const normalizedParams = {};
   const data = await api
-    .get('/rest/getAlbumList2.view', {
+    .get('rest/getAlbumList2.view', {
+      prefixUrl: server?.url,
       searchParams: normalizedParams,
       signal,
     })
@@ -223,7 +228,7 @@ const getAlbumList = async (args: AlbumListArgs): Promise<SSAlbumList> => {
 };
 
 const createFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
-  const { query, signal } = args;
+  const { server, query, signal } = args;
 
   const searchParams: SSFavoriteParams = {
     albumId: query.type === 'album' ? query.id : undefined,
@@ -232,7 +237,8 @@ const createFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
   };
 
   await api
-    .get('/rest/star.view', {
+    .get('rest/star.view', {
+      prefixUrl: server?.url,
       searchParams,
       signal,
     })
@@ -244,7 +250,7 @@ const createFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
 };
 
 const deleteFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
-  const { query, signal } = args;
+  const { server, query, signal } = args;
 
   const searchParams: SSFavoriteParams = {
     albumId: query.type === 'album' ? query.id : undefined,
@@ -253,7 +259,8 @@ const deleteFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
   };
 
   await api
-    .get('/rest/unstar.view', {
+    .get('rest/unstar.view', {
+      prefixUrl: server?.url,
       searchParams,
       signal,
     })
@@ -265,7 +272,7 @@ const deleteFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
 };
 
 const updateRating = async (args: RatingArgs) => {
-  const { query, signal } = args;
+  const { server, query, signal } = args;
 
   const searchParams: SSRatingParams = {
     id: query.id,
@@ -273,7 +280,8 @@ const updateRating = async (args: RatingArgs) => {
   };
 
   const data = await api
-    .get('/rest/setRating.view', {
+    .get('rest/setRating.view', {
+      prefixUrl: server?.url,
       searchParams,
       signal,
     })

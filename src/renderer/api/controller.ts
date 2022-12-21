@@ -114,7 +114,7 @@ const endpoints: ApiController = {
     getFolderList: undefined,
     getFolderSongs: undefined,
     getGenreList: navidromeApi.getGenreList,
-    getMusicFolderList: undefined,
+    getMusicFolderList: subsonicApi.getMusicFolderList,
     getPlaylistDetail: navidromeApi.getPlaylistDetail,
     getPlaylistList: navidromeApi.getPlaylistList,
     getPlaylistSongList: navidromeApi.getPlaylistSongList,
@@ -140,7 +140,7 @@ const endpoints: ApiController = {
     getFolderList: undefined,
     getFolderSongs: undefined,
     getGenreList: undefined,
-    getMusicFolderList: undefined,
+    getMusicFolderList: subsonicApi.getMusicFolderList,
     getPlaylistDetail: undefined,
     getPlaylistList: undefined,
     getSongDetail: undefined,
@@ -183,8 +183,13 @@ const getSongList = async (args: SongListArgs) => {
   return (apiController('getSongList') as ControllerEndpoint['getSongList'])?.(args);
 };
 
+const getMusicFolderList = async (args: MusicFolderListArgs) => {
+  return (apiController('getMusicFolderList') as ControllerEndpoint['getMusicFolderList'])?.(args);
+};
+
 export const controller = {
   getAlbumDetail,
   getAlbumList,
+  getMusicFolderList,
   getSongList,
 };

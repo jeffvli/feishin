@@ -7,11 +7,7 @@ export interface JFMusicFolderListResponse extends JFBasePaginatedResponse {
   Items: JFMusicFolder[];
 }
 
-export type JFMusicFolderList = {
-  items: JFMusicFolder[];
-  startIndex: number;
-  totalRecordCount: number;
-};
+export type JFMusicFolderList = JFMusicFolder[];
 
 export interface JFGenreListResponse extends JFBasePaginatedResponse {
   Items: JFGenre[];
@@ -506,6 +502,7 @@ export type JFAlbumListParams = {
   filters?: string;
   genres?: string;
   includeItemTypes: 'MusicAlbum';
+  searchTerm?: string;
   sortBy?: JFAlbumListSort;
   years?: string;
 } & JFBaseParams &
@@ -528,6 +525,7 @@ export type JFSongListParams = {
   filters?: string;
   genres?: string;
   includeItemTypes: 'Audio';
+  searchTerm?: string;
   sortBy?: JFSongListSort;
   years?: string;
 } & JFBaseParams &

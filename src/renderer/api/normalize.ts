@@ -1,8 +1,13 @@
 import { jfNormalize } from '/@/renderer/api/jellyfin.api';
-import type { JFAlbum, JFSong } from '/@/renderer/api/jellyfin.types';
+import type { JFAlbum, JFMusicFolderList, JFSong } from '/@/renderer/api/jellyfin.types';
 import { ndNormalize } from '/@/renderer/api/navidrome.api';
 import type { NDAlbum, NDSong } from '/@/renderer/api/navidrome.types';
-import type { RawAlbumListResponse, RawSongListResponse } from '/@/renderer/api/types';
+import { SSMusicFolderList } from '/@/renderer/api/subsonic.types';
+import type {
+  RawAlbumListResponse,
+  RawMusicFolderListResponse,
+  RawSongListResponse,
+} from '/@/renderer/api/types';
 import { ServerListItem } from '/@/renderer/types';
 
 const albumList = (data: RawAlbumListResponse | undefined, server: ServerListItem | null) => {
@@ -45,7 +50,37 @@ const songList = (data: RawSongListResponse | undefined, server: ServerListItem 
   };
 };
 
+const musicFolderList = (
+  data: RawMusicFolderListResponse | undefined,
+  server: ServerListItem | null,
+) => {
+  let musicFolders;
+  switch (server?.type) {
+    case 'jellyfin':
+      musicFolders = (data as JFMusicFolderList)?.map((item) => ({
+        id: String(item.Id),
+        name: item.Name,
+      }));
+      break;
+    case 'navidrome':
+      musicFolders = (data as SSMusicFolderList)?.map((item) => ({
+        id: String(item.id),
+        name: item.name,
+      }));
+      break;
+    case 'subsonic':
+      musicFolders = (data as SSMusicFolderList)?.map((item) => ({
+        id: String(item.id),
+        name: item.name,
+      }));
+      break;
+  }
+
+  return musicFolders;
+};
+
 export const normalize = {
   albumList,
+  musicFolderList,
   songList,
 };

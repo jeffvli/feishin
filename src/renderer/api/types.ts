@@ -779,11 +779,7 @@ export type RawMusicFolderListResponse = SSMusicFolderList | JFMusicFolderList |
 
 export type MusicFolderListResponse = BasePaginatedResponse<Playlist[]>;
 
-export type MusicFolderListQuery = {
-  id: string;
-};
-
-export type MusicFolderListArgs = { query: MusicFolderListQuery } & BaseEndpointArgs;
+export type MusicFolderListArgs = BaseEndpointArgs;
 
 // Create Favorite
 export type RawCreateFavoriteResponse = CreateFavoriteResponse | undefined;

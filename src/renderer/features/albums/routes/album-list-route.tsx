@@ -29,6 +29,7 @@ const AlbumListRoute = () => {
 
   const albumListQuery = useAlbumList({
     limit: 1,
+    musicFolderId: filters.musicFolderId,
     sortBy: filters.sortBy,
     sortOrder: filters.sortOrder,
     startIndex: 0,
@@ -46,6 +47,7 @@ const AlbumListRoute = () => {
         controller.getAlbumList({
           query: {
             limit: take,
+            musicFolderId: filters.musicFolderId,
             sortBy: filters.sortBy,
             sortOrder: filters.sortOrder,
             startIndex: skip,
@@ -111,6 +113,7 @@ const AlbumListRoute = () => {
                 itemSize={150 + page.list?.size}
                 itemType={LibraryItem.ALBUM}
                 minimumBatchSize={40}
+                refresh={filters.musicFolderId}
                 route={{
                   route: AppRoute.LIBRARY_ALBUMS_DETAIL,
                   slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],

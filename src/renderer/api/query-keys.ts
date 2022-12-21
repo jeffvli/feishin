@@ -1,5 +1,4 @@
-import type { AlbumListQuery, SongListQuery } from './types';
-import type { AlbumDetailQuery } from './types';
+import type { AlbumListQuery, SongListQuery, AlbumDetailQuery } from './types';
 
 export const queryKeys = {
   albums: {
@@ -14,6 +13,9 @@ export const queryKeys = {
   genres: {
     list: (serverId: string) => [serverId, 'genres', 'list'] as const,
     root: (serverId: string) => [serverId, 'genres'] as const,
+  },
+  musicFolders: {
+    list: (serverId: string) => [serverId, 'musicFolders', 'list'] as const,
   },
   server: {
     root: (serverId: string) => [serverId] as const,
