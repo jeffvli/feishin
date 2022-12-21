@@ -153,6 +153,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                   <TitleWrapper>
                     {currentItem?.albumArtists.map((artist) => (
                       <TextTitle
+                        key={`carousel-artist-${artist.id}`}
                         fw="600"
                         order={3}
                       >
