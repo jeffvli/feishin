@@ -27,7 +27,7 @@ interface GridCarouselProps {
   uniqueId: string;
 }
 
-const GridCarouselContext = createContext<any>(null);
+const GridCarouselContext = createContext<any>({});
 
 const GridContainer = styled(motion.div)<{ height: number; itemsPerPage: number }>`
   display: grid;
