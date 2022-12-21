@@ -6,7 +6,7 @@ import { useShouldPadTitlebar } from '/@/renderer/hooks';
 const Container = styled(motion.div)<{ $useOpacity?: boolean; height?: string }>`
   z-index: 100;
   width: 100%;
-  height: ${(props) => props.height || '55px'};
+  height: ${(props) => props.height || '60px'};
   opacity: ${(props) => props.$useOpacity && 'var(--header-opacity)'};
   transition: opacity 0.3s ease-in-out;
 `;
@@ -18,6 +18,10 @@ const Header = styled(motion.div)<{ $padRight?: boolean }>`
   -webkit-app-region: drag;
 
   button {
+    -webkit-app-region: no-drag;
+  }
+
+  input {
     -webkit-app-region: no-drag;
   }
 `;
