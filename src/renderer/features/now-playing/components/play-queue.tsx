@@ -30,7 +30,8 @@ import { useMergedRef } from '@mantine/hooks';
 import { ErrorBoundary } from 'react-error-boundary';
 import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required';
-import { TableType, QueueSong } from '/@/renderer/types';
+import { TableType } from '/@/renderer/types';
+import { QueueSong } from '/@/renderer/api/types';
 
 const mpvPlayer = window.electron.mpvPlayer;
 
