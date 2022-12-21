@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, KeyboardEvent } from 'react';
 import { TextInputProps } from '@mantine/core';
 import { useFocusWithin, useHotkeys, useMergedRef } from '@mantine/hooks';
 import { RiSearchLine } from 'react-icons/ri';
@@ -6,7 +6,6 @@ import { TextInput } from '/@/renderer/components/input';
 
 interface SearchInputProps extends TextInputProps {
   initialWidth?: number;
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
   openedWidth?: number;
   value?: string;
 }
@@ -31,6 +30,14 @@ export const SearchInput = ({
     ],
   ]);
 
+  const handleEscape = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.code === 'Escape') {
+      onChange?.({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
+      ref.current.value = '';
+      ref.current.blur();
+    }
+  };
+
   return (
     <TextInput
       ref={mergedRef}
@@ -45,6 +52,7 @@ export const SearchInput = ({
       }}
       width={isOpened ? openedWidth || 200 : initialWidth || 50}
       onChange={onChange}
+      onKeyDown={handleEscape}
     />
   );
 };
