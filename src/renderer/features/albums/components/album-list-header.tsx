@@ -3,9 +3,22 @@ import { useCallback } from 'react';
 import { Flex, Slider } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
-import { RiArrowDownSLine } from 'react-icons/ri';
-import { AlbumListSort, SortOrder } from '/@/renderer/api/types';
-import { Button, DropdownMenu, PageHeader, SearchInput } from '/@/renderer/components';
+import {
+  RiArrowDownSLine,
+  RiFilter3Line,
+  RiFolder2Line,
+  RiSortAsc,
+  RiSortDesc,
+} from 'react-icons/ri';
+import { AlbumListSort, ServerType, SortOrder } from '/@/renderer/api/types';
+import {
+  Button,
+  DropdownMenu,
+  PageHeader,
+  Popover,
+  SearchInput,
+  TextTitle,
+} from '/@/renderer/components';
 import {
   useCurrentServer,
   useAlbumListStore,
@@ -15,6 +28,8 @@ import {
 import { CardDisplayType } from '/@/renderer/types';
 import { useMusicFolders } from '/@/renderer/features/shared';
 import styled from 'styled-components';
+import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
+import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
 
 const FILTERS = {
   jellyfin: [
@@ -35,6 +50,7 @@ const FILTERS = {
     { name: 'Random', value: AlbumListSort.RANDOM },
     { name: 'Rating', value: AlbumListSort.RATING },
     { name: 'Recently Added', value: AlbumListSort.RECENTLY_ADDED },
+    { name: 'Recently Played', value: AlbumListSort.RECENTLY_PLAYED },
     { name: 'Song Count', value: AlbumListSort.SONG_COUNT },
     { name: 'Favorited', value: AlbumListSort.FAVORITED },
     { name: 'Year', value: AlbumListSort.YEAR },
@@ -68,8 +84,6 @@ export const AlbumListHeader = () => {
       )?.name) ||
     'Unknown';
 
-  const sortOrderLabel = ORDER.find((s) => s.value === filters.sortOrder)?.name;
-
   const setSize = throttle(
     (e: number) =>
       setPage({
@@ -101,13 +115,9 @@ export const AlbumListHeader = () => {
   const handleSetOrder = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      debounce(
-        () =>
-          setFilter({
-            sortOrder: e.currentTarget.value as SortOrder,
-          }),
-        1000,
-      );
+      setFilter({
+        sortOrder: e.currentTarget.value as SortOrder,
+      });
     },
     [setFilter],
   );
@@ -153,19 +163,25 @@ export const AlbumListHeader = () => {
       <HeaderItems>
         <Flex
           align="center"
-          gap="sm"
+          gap="md"
           justify="center"
         >
-          <DropdownMenu position="bottom-end">
+          <DropdownMenu position="bottom">
             <DropdownMenu.Target>
               <Button
                 compact
+                pl={0}
+                pr="0.5rem"
                 rightIcon={<RiArrowDownSLine size={15} />}
                 size="xl"
-                sx={{ paddingLeft: 0, paddingRight: 0 }}
                 variant="subtle"
               >
-                Albums
+                <TextTitle
+                  fw="bold"
+                  order={2}
+                >
+                  Albums
+                </TextTitle>
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
@@ -201,7 +217,7 @@ export const AlbumListHeader = () => {
               </DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
-          <DropdownMenu position="bottom-start">
+          <DropdownMenu position="bottom">
             <DropdownMenu.Target>
               <Button
                 compact
@@ -224,14 +240,18 @@ export const AlbumListHeader = () => {
               ))}
             </DropdownMenu.Dropdown>
           </DropdownMenu>
-          <DropdownMenu position="bottom-start">
+          <DropdownMenu position="bottom">
             <DropdownMenu.Target>
               <Button
                 compact
                 fw="normal"
                 variant="subtle"
               >
-                {sortOrderLabel}
+                {filters.sortOrder === SortOrder.ASC ? (
+                  <RiSortAsc size={15} />
+                ) : (
+                  <RiSortDesc size={15} />
+                )}
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
@@ -247,29 +267,49 @@ export const AlbumListHeader = () => {
               ))}
             </DropdownMenu.Dropdown>
           </DropdownMenu>
-          <DropdownMenu position="bottom-start">
-            <DropdownMenu.Target>
+          {server?.type === ServerType.JELLYFIN && (
+            <DropdownMenu position="bottom">
+              <DropdownMenu.Target>
+                <Button
+                  compact
+                  fw="normal"
+                  variant="subtle"
+                >
+                  <RiFolder2Line size={15} />
+                </Button>
+              </DropdownMenu.Target>
+              <DropdownMenu.Dropdown>
+                {musicFoldersQuery.data?.map((folder) => (
+                  <DropdownMenu.Item
+                    key={`musicFolder-${folder.id}`}
+                    $isActive={filters.musicFolderId === folder.id}
+                    value={folder.id}
+                    onClick={handleSetMusicFolder}
+                  >
+                    {folder.name}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Dropdown>
+            </DropdownMenu>
+          )}
+          <Popover>
+            <Popover.Target>
               <Button
                 compact
                 fw="normal"
                 variant="subtle"
               >
-                Folder
+                <RiFilter3Line size={15} />
               </Button>
-            </DropdownMenu.Target>
-            <DropdownMenu.Dropdown>
-              {musicFoldersQuery.data?.map((folder) => (
-                <DropdownMenu.Item
-                  key={`musicFolder-${folder.id}`}
-                  $isActive={filters.musicFolderId === folder.id}
-                  value={folder.id}
-                  onClick={handleSetMusicFolder}
-                >
-                  {folder.name}
-                </DropdownMenu.Item>
-              ))}
-            </DropdownMenu.Dropdown>
-          </DropdownMenu>
+            </Popover.Target>
+            <Popover.Dropdown>
+              {server?.type === ServerType.NAVIDROME ? (
+                <NavidromeAlbumFilters />
+              ) : (
+                <JellyfinAlbumFilters />
+              )}
+            </Popover.Dropdown>
+          </Popover>
         </Flex>
         <Flex>
           <SearchInput

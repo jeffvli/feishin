@@ -287,9 +287,15 @@ export enum AlbumListSort {
 
 export type AlbumListQuery = {
   jfParams?: {
+    albumArtistIds?: string;
+    artistIds?: string;
     filters?: string;
+    genreIds?: string;
     genres?: string;
-    years?: string;
+    isFavorite?: boolean;
+    maxYear?: number; // Parses to years
+    minYear?: number; // Parses to years
+    tags?: string;
   };
   limit?: number;
   musicFolderId?: string;
@@ -299,6 +305,7 @@ export type AlbumListQuery = {
     genre_id?: string;
     has_rating?: boolean;
     name?: string;
+    recently_played?: boolean;
     starred?: boolean;
     year?: number;
   };

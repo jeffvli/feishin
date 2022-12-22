@@ -499,11 +499,16 @@ export enum JFAlbumListSort {
 }
 
 export type JFAlbumListParams = {
+  albumArtistIds?: string;
+  artistIds?: string;
   filters?: string;
+  genreIds?: string;
   genres?: string;
   includeItemTypes: 'MusicAlbum';
+  isFavorite?: boolean;
   searchTerm?: string;
   sortBy?: JFAlbumListSort;
+  tags?: string;
   years?: string;
 } & JFBaseParams &
   JFPaginationParams;

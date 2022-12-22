@@ -215,7 +215,7 @@ const getAlbumList = async (args: AlbumListArgs): Promise<NDAlbumList> => {
   const res = await api.get('api/album', {
     headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
     prefixUrl: server?.url,
-    searchParams,
+    searchParams: parseSearchParams(searchParams),
     signal,
   });
 

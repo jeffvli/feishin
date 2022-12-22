@@ -247,7 +247,16 @@ const getAlbumDetail = async (args: AlbumDetailArgs): Promise<JFAlbumDetail> => 
 const getAlbumList = async (args: AlbumListArgs): Promise<JFAlbumList> => {
   const { query, server, signal } = args;
 
-  const searchParams: JFAlbumListParams = {
+  const yearsGroup = [];
+  if (query.jfParams?.minYear && query.jfParams?.maxYear) {
+    for (let i = Number(query.jfParams.minYear); i <= Number(query.jfParams.maxYear); i += 1) {
+      yearsGroup.push(String(i));
+    }
+  }
+
+  const yearsFilter = yearsGroup.length ? yearsGroup.join(',') : undefined;
+
+  const searchParams: JFAlbumListParams & { maxYear?: number; minYear?: number } = {
     includeItemTypes: 'MusicAlbum',
     limit: query.limit,
     parentId: query.musicFolderId,
@@ -257,6 +266,9 @@ const getAlbumList = async (args: AlbumListArgs): Promise<JFAlbumList> => {
     sortOrder: sortOrderMap.jellyfin[query.sortOrder],
     startIndex: query.startIndex,
     ...query.jfParams,
+    maxYear: undefined,
+    minYear: undefined,
+    years: yearsFilter,
   };
 
   const data = await api
