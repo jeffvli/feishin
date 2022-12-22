@@ -39,6 +39,7 @@ import {
   SSAlbumArtistList,
   SSAlbumArtistDetail,
   SSMusicFolderList,
+  SSGenreList,
 } from '/@/renderer/api/subsonic.types';
 
 export enum SortOrder {
@@ -253,7 +254,7 @@ type BaseEndpointArgs = {
 };
 
 // Genre List
-export type RawGenreListResponse = NDGenreList | JFGenreList | undefined;
+export type RawGenreListResponse = NDGenreList | JFGenreList | SSGenreList | undefined;
 
 export type GenreListResponse = BasePaginatedResponse<Genre[]> | null | undefined;
 

@@ -1,10 +1,16 @@
 import { jfNormalize } from '/@/renderer/api/jellyfin.api';
-import type { JFAlbum, JFMusicFolderList, JFSong } from '/@/renderer/api/jellyfin.types';
+import type {
+  JFAlbum,
+  JFGenreList,
+  JFMusicFolderList,
+  JFSong,
+} from '/@/renderer/api/jellyfin.types';
 import { ndNormalize } from '/@/renderer/api/navidrome.api';
-import type { NDAlbum, NDSong } from '/@/renderer/api/navidrome.types';
-import { SSMusicFolderList } from '/@/renderer/api/subsonic.types';
+import type { NDAlbum, NDGenreList, NDSong } from '/@/renderer/api/navidrome.types';
+import { SSGenreList, SSMusicFolderList } from '/@/renderer/api/subsonic.types';
 import type {
   RawAlbumListResponse,
+  RawGenreListResponse,
   RawMusicFolderListResponse,
   RawSongListResponse,
 } from '/@/renderer/api/types';
@@ -79,8 +85,35 @@ const musicFolderList = (
   return musicFolders;
 };
 
+const genreList = (data: RawGenreListResponse | undefined, server: ServerListItem | null) => {
+  let genres;
+  switch (server?.type) {
+    case 'jellyfin':
+      genres = (data as JFGenreList)?.Items.map((item) => ({
+        id: String(item.Id),
+        name: item.Name,
+      }));
+      break;
+    case 'navidrome':
+      genres = (data as NDGenreList)?.map((item) => ({
+        id: String(item.id),
+        name: item.name,
+      }));
+      break;
+    case 'subsonic':
+      genres = (data as SSGenreList)?.map((item) => ({
+        id: item.value,
+        name: item.value,
+      }));
+      break;
+  }
+
+  return genres;
+};
+
 export const normalize = {
   albumList,
+  genreList,
   musicFolderList,
   songList,
 };
