@@ -47,10 +47,11 @@ export const SearchInput = ({
         input: {
           backgroundColor: isOpened ? 'inherit' : 'transparent !important',
           border: 'none !important',
+          cursor: isOpened ? 'text' : 'pointer',
           padding: isOpened ? '10px' : 0,
         },
       }}
-      width={isOpened ? openedWidth || 200 : initialWidth || 50}
+      width={isOpened ? openedWidth || 150 : initialWidth || 50}
       onChange={onChange}
       onKeyDown={handleEscape}
     />

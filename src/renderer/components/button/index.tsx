@@ -162,7 +162,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
   }
 
   &:active {
-    transform: scale(0.98);
+    transform: none;
   }
 
   & .mantine-Button-centerLoader {

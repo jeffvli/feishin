@@ -27,6 +27,7 @@ export const Popover = ({ children, ...props }: PopoverProps) => {
           filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))',
         },
       }}
+      transition="scale"
       {...props}
     >
       {children}
