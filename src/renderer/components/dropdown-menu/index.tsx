@@ -28,6 +28,10 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   padding: 0.8rem;
   font-size: 0.9em;
   font-family: var(--content-font-family);
+  background-color: ${({ $isActive }) => {
+    if (!$isActive) return undefined;
+    return 'var(--dropdown-menu-bg-hover)';
+  }};
 
   &:disabled {
     opacity: 0.6;
@@ -50,7 +54,6 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   & .mantine-Menu-itemRightSection {
     display: flex;
     margin-left: 2rem !important;
-    color: ${({ $isActive }) => ($isActive ? 'var(--primary-color)' : 'var(--dropdown-menu-fg)')};
   }
 `;
 
@@ -68,7 +71,6 @@ const StyledMenuDivider = styled(MantineMenu.Divider)`
 export const DropdownMenu = ({ children, ...props }: MenuProps) => {
   return (
     <StyledMenu
-      withArrow
       withinPortal
       radius="sm"
       styles={{
@@ -76,7 +78,7 @@ export const DropdownMenu = ({ children, ...props }: MenuProps) => {
           filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))',
         },
       }}
-      transition="scale"
+      transition="scale-y"
       {...props}
     >
       {children}
