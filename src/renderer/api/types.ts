@@ -153,6 +153,7 @@ export type Album = {
   imageUrl: string | null;
   isCompilation: boolean | null;
   isFavorite: boolean;
+  lastPlayedAt: string | null;
   name: string;
   playCount: number | null;
   rating: number | null;
