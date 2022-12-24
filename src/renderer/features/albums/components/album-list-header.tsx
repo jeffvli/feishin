@@ -33,27 +33,31 @@ import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jel
 
 const FILTERS = {
   jellyfin: [
-    { name: 'Album Artist', value: AlbumListSort.ALBUM_ARTIST },
-    { name: 'Community Rating', value: AlbumListSort.COMMUNITY_RATING },
-    { name: 'Critic Rating', value: AlbumListSort.CRITIC_RATING },
-    { name: 'Name', value: AlbumListSort.NAME },
-    { name: 'Random', value: AlbumListSort.RANDOM },
-    { name: 'Recently Added', value: AlbumListSort.RECENTLY_ADDED },
-    { name: 'Release Date', value: AlbumListSort.RELEASE_DATE },
+    { defaultOrder: SortOrder.ASC, name: 'Album Artist', value: AlbumListSort.ALBUM_ARTIST },
+    {
+      defaultOrder: SortOrder.DESC,
+      name: 'Community Rating',
+      value: AlbumListSort.COMMUNITY_RATING,
+    },
+    { defaultOrder: SortOrder.DESC, name: 'Critic Rating', value: AlbumListSort.CRITIC_RATING },
+    { defaultOrder: SortOrder.ASC, name: 'Name', value: AlbumListSort.NAME },
+    { defaultOrder: SortOrder.ASC, name: 'Random', value: AlbumListSort.RANDOM },
+    { defaultOrder: SortOrder.DESC, name: 'Recently Added', value: AlbumListSort.RECENTLY_ADDED },
+    { defaultOrder: SortOrder.DESC, name: 'Release Date', value: AlbumListSort.RELEASE_DATE },
   ],
   navidrome: [
-    { name: 'Album Artist', value: AlbumListSort.ALBUM_ARTIST },
-    { name: 'Artist', value: AlbumListSort.ARTIST },
-    { name: 'Duration', value: AlbumListSort.DURATION },
-    { name: 'Name', value: AlbumListSort.NAME },
-    { name: 'Play Count', value: AlbumListSort.PLAY_COUNT },
-    { name: 'Random', value: AlbumListSort.RANDOM },
-    { name: 'Rating', value: AlbumListSort.RATING },
-    { name: 'Recently Added', value: AlbumListSort.RECENTLY_ADDED },
-    { name: 'Recently Played', value: AlbumListSort.RECENTLY_PLAYED },
-    { name: 'Song Count', value: AlbumListSort.SONG_COUNT },
-    { name: 'Favorited', value: AlbumListSort.FAVORITED },
-    { name: 'Year', value: AlbumListSort.YEAR },
+    { defaultOrder: SortOrder.ASC, name: 'Album Artist', value: AlbumListSort.ALBUM_ARTIST },
+    { defaultOrder: SortOrder.ASC, name: 'Artist', value: AlbumListSort.ARTIST },
+    { defaultOrder: SortOrder.DESC, name: 'Duration', value: AlbumListSort.DURATION },
+    { defaultOrder: SortOrder.DESC, name: 'Most Played', value: AlbumListSort.PLAY_COUNT },
+    { defaultOrder: SortOrder.ASC, name: 'Name', value: AlbumListSort.NAME },
+    { defaultOrder: SortOrder.ASC, name: 'Random', value: AlbumListSort.RANDOM },
+    { defaultOrder: SortOrder.DESC, name: 'Rating', value: AlbumListSort.RATING },
+    { defaultOrder: SortOrder.DESC, name: 'Recently Added', value: AlbumListSort.RECENTLY_ADDED },
+    { defaultOrder: SortOrder.DESC, name: 'Recently Played', value: AlbumListSort.RECENTLY_PLAYED },
+    { defaultOrder: SortOrder.DESC, name: 'Song Count', value: AlbumListSort.SONG_COUNT },
+    { defaultOrder: SortOrder.ASC, name: 'Favorited', value: AlbumListSort.FAVORITED },
+    { defaultOrder: SortOrder.DESC, name: 'Year', value: AlbumListSort.YEAR },
   ],
 };
 
@@ -79,9 +83,7 @@ export const AlbumListHeader = () => {
 
   const sortByLabel =
     (server?.type &&
-      (FILTERS[server.type as keyof typeof FILTERS] as { name: string; value: string }[]).find(
-        (f) => f.value === filters.sortBy,
-      )?.name) ||
+      FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filters.sortBy)?.name) ||
     'Unknown';
 
   const setSize = throttle(
@@ -94,12 +96,18 @@ export const AlbumListHeader = () => {
 
   const handleSetSortBy = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
-      if (!e.currentTarget?.value) return;
+      if (!e.currentTarget?.value || !server?.type) return;
+
+      const sortOrder = FILTERS[server.type as keyof typeof FILTERS].find(
+        (f) => f.value === e.currentTarget.value,
+      )?.defaultOrder;
+
       setFilter({
         sortBy: e.currentTarget.value as AlbumListSort,
+        sortOrder: sortOrder || SortOrder.ASC,
       });
     },
-    [setFilter],
+    [server?.type, setFilter],
   );
 
   const handleSetMusicFolder = useCallback(
@@ -170,15 +178,14 @@ export const AlbumListHeader = () => {
             <DropdownMenu.Target>
               <Button
                 compact
-                pl={0}
-                pr="0.5rem"
+                px={0}
                 rightIcon={<RiArrowDownSLine size={15} />}
                 size="xl"
                 variant="subtle"
               >
                 <TextTitle
                   fw="bold"
-                  order={2}
+                  order={3}
                 >
                   Albums
                 </TextTitle>
