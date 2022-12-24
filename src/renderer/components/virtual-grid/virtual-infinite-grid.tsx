@@ -7,7 +7,7 @@ import type { CardRoute, CardRow, LibraryItem, PlayQueueAddOptions } from '/@/re
 import { CardDisplayType } from '/@/renderer/types';
 
 interface VirtualGridProps extends Omit<FixedSizeListProps, 'children' | 'itemSize'> {
-  cardRows: CardRow[];
+  cardRows: CardRow<any>[];
   display?: CardDisplayType;
   fetchFn: (options: { columnCount: number; skip: number; take: number }) => Promise<any>;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;

@@ -1,3 +1,4 @@
+import { Album, AlbumArtist, Artist } from '/@/renderer/api/types';
 import { AppRoute } from '/@/renderer/router/routes';
 
 export type RouteSlug = {
@@ -12,9 +13,9 @@ export type CardRoute = {
 
 export type TableType = 'nowPlaying' | 'sideQueue' | 'sideDrawerQueue' | 'songs';
 
-export type CardRow = {
+export type CardRow<T> = {
   arrayProperty?: string;
-  property: string;
+  property: keyof T;
   route?: CardRoute;
 };
 
@@ -161,7 +162,7 @@ export type PlayQueueAddOptions = {
 
 export type GridCardData = {
   cardControls: any;
-  cardRows: CardRow[];
+  cardRows: CardRow<Album | AlbumArtist | Artist>[];
   columnCount: number;
   display: CardDisplayType;
   handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;

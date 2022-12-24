@@ -9,6 +9,7 @@ import { Text } from '/@/renderer/components/text';
 import type { LibraryItem, CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
 import { Skeleton } from '/@/renderer/components/skeleton';
 import { CardControls } from '/@/renderer/components/card/card-controls';
+import { Album } from '/@/renderer/api/types';
 
 const CardWrapper = styled.div<{
   link?: boolean;
@@ -102,7 +103,7 @@ const Row = styled.div<{ $secondary?: boolean }>`
 
 interface BaseGridCardProps {
   controls: {
-    cardRows: CardRow[];
+    cardRows: CardRow<Album>[];
     itemType: LibraryItem;
     playButtonBehavior: Play;
     route: CardRoute;
@@ -178,7 +179,7 @@ export const AlbumCard = ({
             </ControlsContainer>
           </ImageSection>
           <DetailSection>
-            {cardRows.map((row: CardRow, index: number) => {
+            {cardRows.map((row: CardRow<Album>, index: number) => {
               if (row.arrayProperty && row.route) {
                 return (
                   <Row
@@ -294,7 +295,7 @@ export const AlbumCard = ({
           <ImageSection />
         </Skeleton>
         <DetailSection style={{ width: '100%' }}>
-          {cardRows.map((_row: CardRow, index: number) => (
+          {cardRows.map((_row: CardRow<Album>, index: number) => (
             <Skeleton
               visible
               height={15}

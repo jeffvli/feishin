@@ -12,7 +12,7 @@ import { AlbumCard } from '/@/renderer/components/card';
 import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 
 interface GridCarouselProps {
-  cardRows: CardRow[];
+  cardRows: CardRow<any>[];
   children: React.ReactElement;
   containerWidth: number;
   data: any[] | undefined;
