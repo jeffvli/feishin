@@ -12,6 +12,7 @@ import type {
   CardRoute,
   PlayQueueAddOptions,
 } from '/@/renderer/types';
+import { Album, AlbumArtist, Artist } from '/@/renderer/api/types';
 
 const createItemData = memoize(
   (
@@ -61,7 +62,7 @@ export const VirtualGridWrapper = ({
   onScroll,
   ...rest
 }: Omit<FixedSizeListProps, 'ref' | 'itemSize' | 'children'> & {
-  cardRows: CardRow[];
+  cardRows: CardRow<Album | AlbumArtist | Artist>[];
   columnCount: number;
   display: CardDisplayType;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
