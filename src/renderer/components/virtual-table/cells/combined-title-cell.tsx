@@ -48,7 +48,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
     return value?.type === ServerType.JELLYFIN ? value.artists : value.albumArtists;
   }, [value]);
 
-  if (!value) {
+  if (value === undefined) {
     return (
       <CellContainer height={node.rowHeight || 40}>
         <Skeleton>

@@ -33,7 +33,7 @@ export const GenericCell = (
 ) => {
   const displayedValue = valueFormatted || value;
 
-  if (!value) {
+  if (value === undefined) {
     return (
       <CellContainer position={position || 'left'}>
         <Skeleton

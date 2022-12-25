@@ -9,7 +9,7 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { Skeleton } from '/@/renderer/components/skeleton';
 
 export const AlbumArtistCell = ({ value, data }: ICellRendererParams) => {
-  if (!value) {
+  if (value === undefined) {
     return (
       <CellContainer position="left">
         <Skeleton
