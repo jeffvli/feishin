@@ -1,6 +1,7 @@
-import type { MouseEvent, ChangeEvent } from 'react';
+import type { MouseEvent, ChangeEvent, MutableRefObject } from 'react';
 import { useCallback } from 'react';
 import { Flex, Slider } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import {
@@ -18,18 +19,23 @@ import {
   Popover,
   SearchInput,
   TextTitle,
+  VirtualInfiniteGridRef,
 } from '/@/renderer/components';
 import {
   useCurrentServer,
   useAlbumListStore,
   useSetAlbumFilters,
   useSetAlbumStore,
+  AlbumListFilter,
 } from '/@/renderer/store';
 import { CardDisplayType } from '/@/renderer/types';
 import { useMusicFolders } from '/@/renderer/features/shared';
 import styled from 'styled-components';
 import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
 import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
+import { api } from '/@/renderer/api';
+import { controller } from '/@/renderer/api/controller';
+import { queryKeys } from '/@/renderer/api/query-keys';
 
 const FILTERS = {
   jellyfin: [
@@ -72,7 +78,12 @@ const HeaderItems = styled.div`
   justify-content: space-between;
 `;
 
-export const AlbumListHeader = () => {
+interface AlbumListHeaderProps {
+  gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+}
+
+export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
+  const queryClient = useQueryClient();
   const server = useCurrentServer();
   const setPage = useSetAlbumStore();
   const setFilter = useSetAlbumFilters();
@@ -94,6 +105,47 @@ export const AlbumListHeader = () => {
     200,
   );
 
+  const fetch = useCallback(
+    async (skip: number, take: number, filters: AlbumListFilter) => {
+      const queryKey = queryKeys.albums.list(server?.id || '', {
+        limit: take,
+        startIndex: skip,
+        ...filters,
+      });
+
+      const albums = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+        controller.getAlbumList({
+          query: {
+            limit: take,
+            startIndex: skip,
+            ...filters,
+          },
+          server,
+          signal,
+        }),
+      );
+
+      return api.normalize.albumList(albums, server);
+    },
+    [queryClient, server],
+  );
+
+  const handleFilterChange = useCallback(
+    async (filters: any) => {
+      gridRef.current?.scrollTo(0);
+      gridRef.current?.resetLoadMoreItemsCache();
+
+      // Refetching within the virtualized grid may be inconsistent due to it refetching
+      // using an outdated set of filters. To avoid this, we fetch using the updated filters
+      // and then set the grid's data here.
+      const data = await fetch(0, 200, filters);
+
+      if (!data?.items) return;
+      gridRef.current?.setItemData(data.items);
+    },
+    [gridRef, fetch],
+  );
+
   const handleSetSortBy = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value || !server?.type) return;
@@ -102,32 +154,32 @@ export const AlbumListHeader = () => {
         (f) => f.value === e.currentTarget.value,
       )?.defaultOrder;
 
-      setFilter({
+      const updatedFilters = setFilter({
         sortBy: e.currentTarget.value as AlbumListSort,
         sortOrder: sortOrder || SortOrder.ASC,
       });
+
+      handleFilterChange(updatedFilters);
     },
-    [server?.type, setFilter],
+    [handleFilterChange, server?.type, setFilter],
   );
 
   const handleSetMusicFolder = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      setFilter({
-        musicFolderId: e.currentTarget.value,
-      });
+      const updatedFilters = setFilter({ musicFolderId: e.currentTarget.value });
+      handleFilterChange(updatedFilters);
     },
-    [setFilter],
+    [handleFilterChange, setFilter],
   );
 
   const handleSetOrder = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      setFilter({
-        sortOrder: e.currentTarget.value as SortOrder,
-      });
+      const updatedFilters = setFilter({ sortOrder: e.currentTarget.value as SortOrder });
+      handleFilterChange(updatedFilters);
     },
-    [setFilter],
+    [handleFilterChange, setFilter],
   );
 
   const handleSetViewType = useCallback(
@@ -135,26 +187,11 @@ export const AlbumListHeader = () => {
       if (!e.currentTarget?.value) return;
       const type = e.currentTarget.value;
       if (type === CardDisplayType.CARD) {
-        setPage({
-          list: {
-            ...page,
-            display: CardDisplayType.CARD,
-          },
-        });
+        setPage({ list: { ...page, display: CardDisplayType.CARD } });
       } else if (type === CardDisplayType.POSTER) {
-        setPage({
-          list: {
-            ...page,
-            display: CardDisplayType.POSTER,
-          },
-        });
+        setPage({ list: { ...page, display: CardDisplayType.POSTER } });
       } else {
-        setPage({
-          list: {
-            ...page,
-            display: CardDisplayType.TABLE,
-          },
-        });
+        setPage({ list: { ...page, display: CardDisplayType.TABLE } });
       }
     },
     [page, setPage],

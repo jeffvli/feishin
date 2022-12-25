@@ -2,11 +2,12 @@ import {
   ALBUM_CARD_ROWS,
   VirtualGridAutoSizerContainer,
   VirtualInfiniteGrid,
+  VirtualInfiniteGridRef,
 } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { CardDisplayType, CardRow, LibraryItem } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { useCallback, useMemo } from 'react';
+import { MutableRefObject, useCallback, useMemo } from 'react';
 import { ListOnScrollProps } from 'react-window';
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
@@ -17,7 +18,11 @@ import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-han
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentServer, useSetAlbumStore, useAlbumListStore } from '/@/renderer/store';
 
-export const AlbumListContent = () => {
+interface AlbumListContentProps {
+  gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+}
+
+export const AlbumListContent = ({ gridRef }: AlbumListContentProps) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
   const page = useAlbumListStore();
@@ -135,6 +140,7 @@ export const AlbumListContent = () => {
       <AutoSizer>
         {({ height, width }) => (
           <VirtualInfiniteGrid
+            ref={gridRef}
             cardRows={cardRows}
             display={page.display || CardDisplayType.CARD}
             fetchFn={fetch}
@@ -146,7 +152,6 @@ export const AlbumListContent = () => {
             itemSize={150 + page.grid?.size}
             itemType={LibraryItem.ALBUM}
             minimumBatchSize={40}
-            refresh={page.filter}
             route={{
               route: AppRoute.LIBRARY_ALBUMS_DETAIL,
               slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
