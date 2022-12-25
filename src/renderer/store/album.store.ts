@@ -19,7 +19,7 @@ type ListProps<T> = {
   table: TableProps;
 };
 
-type AlbumListFilter = Omit<AlbumListArgs['query'], 'startIndex' | 'limit'>;
+export type AlbumListFilter = Omit<AlbumListArgs['query'], 'startIndex' | 'limit'>;
 
 export interface AlbumState {
   list: ListProps<AlbumListFilter>;
@@ -27,7 +27,7 @@ export interface AlbumState {
 
 export interface AlbumSlice extends AlbumState {
   actions: {
-    setFilters: (data: Partial<AlbumListFilter>) => void;
+    setFilters: (data: Partial<AlbumListFilter>) => AlbumListFilter;
     setStore: (data: Partial<AlbumSlice>) => void;
   };
 }
@@ -41,6 +41,8 @@ export const useAlbumStore = create<AlbumSlice>()(
             set((state) => {
               state.list.filter = { ...state.list.filter, ...data };
             });
+
+            return get().list.filter;
           },
           setStore: (data) => {
             set({ ...get(), ...data });
