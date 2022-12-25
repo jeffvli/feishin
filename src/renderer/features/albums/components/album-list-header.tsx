@@ -56,7 +56,7 @@ const FILTERS = {
     { defaultOrder: SortOrder.DESC, name: 'Recently Added', value: AlbumListSort.RECENTLY_ADDED },
     { defaultOrder: SortOrder.DESC, name: 'Recently Played', value: AlbumListSort.RECENTLY_PLAYED },
     { defaultOrder: SortOrder.DESC, name: 'Song Count', value: AlbumListSort.SONG_COUNT },
-    { defaultOrder: SortOrder.ASC, name: 'Favorited', value: AlbumListSort.FAVORITED },
+    { defaultOrder: SortOrder.DESC, name: 'Favorited', value: AlbumListSort.FAVORITED },
     { defaultOrder: SortOrder.DESC, name: 'Year', value: AlbumListSort.YEAR },
   ],
 };
