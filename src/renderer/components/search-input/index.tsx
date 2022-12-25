@@ -45,6 +45,7 @@ export const SearchInput = ({
       {...props}
       icon={showIcon && <RiSearchLine size={15} />}
       styles={{
+        icon: { svg: { fill: 'var(--btn-default-fg)' } },
         input: {
           backgroundColor: isOpened ? 'inherit' : 'transparent !important',
           border: 'none !important',
