@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Group } from '@mantine/core';
 import { FastAverageColor } from 'fast-average-color';
-import { PageHeader, Text } from '/@/renderer/components';
+import { PageHeader, TextTitle } from '/@/renderer/components';
 import { useCurrentSong } from '/@/renderer/store';
 import { getHeaderColor } from '/@/renderer/utils';
 import { useTheme } from '/@/renderer/hooks';
@@ -27,7 +27,7 @@ export const NowPlayingHeader = () => {
         })
         .then((color) => {
           const isDark = color.isDark;
-          setHeaderColor({
+          return setHeaderColor({
             isDark,
             value: getHeaderColor(color.rgb, theme === 'dark' ? 0.5 : 0.8),
           });
@@ -45,7 +45,12 @@ export const NowPlayingHeader = () => {
   return (
     <PageHeader backgroundColor={headerColor.value}>
       <Group>
-        <Text size="xl">Queue</Text>
+        <TextTitle
+          fw="bold"
+          order={3}
+        >
+          Queue
+        </TextTitle>
       </Group>
     </PageHeader>
   );
