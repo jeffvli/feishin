@@ -21,12 +21,18 @@ const HomeRoute = () => {
     recentlyPlayed: 0,
   });
 
-  const feature = useAlbumList({
-    limit: 20,
-    sortBy: AlbumListSort.RANDOM,
-    sortOrder: SortOrder.DESC,
-    startIndex: 0,
-  });
+  const feature = useAlbumList(
+    {
+      limit: 20,
+      sortBy: AlbumListSort.RANDOM,
+      sortOrder: SortOrder.DESC,
+      startIndex: 0,
+    },
+    {
+      cacheTime: 1000 * 60,
+      staleTime: 1000 * 60,
+    },
+  );
 
   const featureItemsWithImage = useMemo(() => {
     return feature.data?.items?.filter((item) => item.imageUrl) ?? [];
@@ -68,7 +74,7 @@ const HomeRoute = () => {
     },
     {
       keepPreviousData: true,
-      staleTime: 0,
+      staleTime: 1000 * 60,
     },
   );
 
@@ -81,7 +87,7 @@ const HomeRoute = () => {
     },
     {
       keepPreviousData: true,
-      staleTime: 0,
+      staleTime: 1000 * 60 * 60,
     },
   );
 
