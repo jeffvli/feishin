@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import isElectron from 'is-electron';
 import { FileInput, Text, Button } from '/@/renderer/components';
 
-const localSettings = window.electron.localSettings;
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const MpvRequired = () => {
   const [mpvPath, setMpvPath] = useState('');

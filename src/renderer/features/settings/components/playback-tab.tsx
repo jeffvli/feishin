@@ -18,8 +18,8 @@ import { useCurrentStatus, usePlayerStore } from '/@/renderer/store';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { PlaybackType, PlayerStatus, PlaybackStyle, CrossfadeStyle, Play } from '/@/renderer/types';
 
-const localSettings = window.electron.localSettings;
-const mpvPlayer = window.electron.mpvPlayer;
+const localSettings = isElectron() ? window.electron.localSettings : null;
+const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 const getAudioDevice = async () => {
   const devices = await navigator.mediaDevices.enumerateDevices();

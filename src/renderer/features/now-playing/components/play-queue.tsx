@@ -27,13 +27,14 @@ import {
   useTableSettings,
 } from '/@/renderer/store/settings.store';
 import { useMergedRef } from '@mantine/hooks';
+import isElectron from 'is-electron';
 import { ErrorBoundary } from 'react-error-boundary';
 import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import { TableType } from '/@/renderer/types';
 import { QueueSong } from '/@/renderer/api/types';
 
-const mpvPlayer = window.electron.mpvPlayer;
+const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 type QueueProps = {
   type: TableType;

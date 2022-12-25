@@ -4,7 +4,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 
-const localSettings = window.electron.localSettings;
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const AppOutlet = () => {
   const location = useLocation();

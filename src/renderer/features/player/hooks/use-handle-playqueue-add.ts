@@ -9,8 +9,9 @@ import { useAuthStore, usePlayerStore } from '/@/renderer/store';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { PlayQueueAddOptions, LibraryItem, Play, PlaybackType } from '/@/renderer/types';
 import { toast } from '/@/renderer/components/toast';
+import isElectron from 'is-electron';
 
-const mpvPlayer = window.electron.mpvPlayer;
+const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 export const useHandlePlayQueueAdd = () => {
   const queryClient = useQueryClient();

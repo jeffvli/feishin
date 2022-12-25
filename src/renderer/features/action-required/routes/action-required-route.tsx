@@ -12,7 +12,7 @@ import { AnimatedPage } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 
-const localSettings = window.electron.localSettings;
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const ActionRequiredRoute = () => {
   const currentServer = useCurrentServer();

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import isElectron from 'is-electron';
 import { useMuted, usePlayerControls, useVolume } from '/@/renderer/store';
 
-const mpvPlayer = window.electron.mpvPlayer;
+const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 export const useRightControls = () => {
   const { setVolume, setMuted } = usePlayerControls();

@@ -3,7 +3,7 @@ import isElectron from 'is-electron';
 import { RiCheckboxBlankLine, RiCloseLine, RiSubtractLine } from 'react-icons/ri';
 import styled from 'styled-components';
 
-const browser = window.electron.browser;
+const browser = isElectron() ? window.electron.browser : null;
 
 interface WindowControlsProps {
   style?: 'macos' | 'windows' | 'linux';

@@ -2,6 +2,7 @@ import type { MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Group } from '@mantine/core';
 import { Button, Popover, TableConfigDropdown } from '/@/renderer/components';
+import isElectron from 'is-electron';
 import {
   RiArrowDownLine,
   RiArrowUpLine,
@@ -14,7 +15,7 @@ import { Song } from '/@/renderer/api/types';
 import { useQueueControls } from '/@/renderer/store';
 import { TableType } from '/@/renderer/types';
 
-const mpvPlayer = window.electron.mpvPlayer;
+const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 interface PlayQueueListOptionsProps {
   tableRef: MutableRefObject<{ grid: AgGridReactType<Song> } | null>;
