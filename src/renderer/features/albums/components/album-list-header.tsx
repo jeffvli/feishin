@@ -36,6 +36,7 @@ import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jel
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { useContainerQuery } from '/@/renderer/hooks';
 
 const FILTERS = {
   jellyfin: [
@@ -89,6 +90,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
   const setFilter = useSetAlbumFilters();
   const page = useAlbumListStore();
   const filters = page.filter;
+  const cq = useContainerQuery();
 
   const musicFoldersQuery = useMusicFolders();
 
@@ -96,6 +98,8 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
     (server?.type &&
       FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filters.sortBy)?.name) ||
     'Unknown';
+
+  const sortOrderLabel = ORDER.find((o) => o.value === filters.sortOrder)?.name || 'Unknown';
 
   const setSize = throttle(
     (e: number) =>
@@ -204,7 +208,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
 
   return (
     <PageHeader>
-      <HeaderItems>
+      <HeaderItems ref={cq.ref}>
         <Flex
           align="center"
           gap="md"
@@ -290,10 +294,16 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
                 fw="normal"
                 variant="subtle"
               >
-                {filters.sortOrder === SortOrder.ASC ? (
-                  <RiSortAsc size={15} />
+                {cq.isMd ? (
+                  sortOrderLabel
                 ) : (
-                  <RiSortDesc size={15} />
+                  <>
+                    {filters.sortOrder === SortOrder.ASC ? (
+                      <RiSortAsc size={15} />
+                    ) : (
+                      <RiSortDesc size={15} />
+                    )}
+                  </>
                 )}
               </Button>
             </DropdownMenu.Target>
@@ -318,7 +328,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
                   fw="normal"
                   variant="subtle"
                 >
-                  <RiFolder2Line size={15} />
+                  {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}
                 </Button>
               </DropdownMenu.Target>
               <DropdownMenu.Dropdown>
@@ -342,7 +352,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
                 fw="normal"
                 variant="subtle"
               >
-                <RiFilter3Line size={15} />
+                {cq.isMd ? 'Filters' : <RiFilter3Line size={15} />}
               </Button>
             </Popover.Target>
             <Popover.Dropdown>
@@ -357,6 +367,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
         <Flex>
           <SearchInput
             defaultValue={page.filter.searchTerm}
+            openedWidth={cq.isLg ? 300 : cq.isMd ? 250 : cq.isSm ? 150 : 75}
             onChange={handleSearch}
           />
         </Flex>

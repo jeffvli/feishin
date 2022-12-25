@@ -20,6 +20,7 @@ export const SearchInput = ({
   const mergedRef = useMergedRef<HTMLInputElement>(ref);
 
   const isOpened = focused || ref.current?.value;
+  const showIcon = !isOpened || (openedWidth || 150) > 150;
 
   useHotkeys([
     [
@@ -42,7 +43,7 @@ export const SearchInput = ({
     <TextInput
       ref={mergedRef}
       {...props}
-      icon={<RiSearchLine size={15} />}
+      icon={showIcon && <RiSearchLine size={15} />}
       styles={{
         input: {
           backgroundColor: isOpened ? 'inherit' : 'transparent !important',
