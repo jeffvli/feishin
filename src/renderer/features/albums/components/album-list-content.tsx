@@ -130,6 +130,9 @@ export const AlbumListContent = ({ gridRef }: AlbumListContentProps) => {
         rows.push(ALBUM_CARD_ROWS.albumArtists);
         rows.push(ALBUM_CARD_ROWS.releaseYear);
         break;
+      case AlbumListSort.RELEASE_DATE:
+        rows.push(ALBUM_CARD_ROWS.albumArtists);
+        rows.push(ALBUM_CARD_ROWS.releaseDate);
     }
 
     return rows;
