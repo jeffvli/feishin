@@ -91,8 +91,8 @@ export const App = () => {
               centered: true,
               exitTransitionDuration: 300,
               overflow: 'inside',
-              overlayBlur: 5,
-              overlayOpacity: 0.5,
+              overlayBlur: 0,
+              overlayOpacity: 0.8,
               transition: 'slide-down',
               transitionDuration: 300,
             }}
