@@ -50,7 +50,7 @@ const HomeRoute = () => {
     {
       limit: itemsPerPage,
       sortBy: AlbumListSort.RECENTLY_PLAYED,
-      sortOrder: SortOrder.ASC,
+      sortOrder: SortOrder.DESC,
       startIndex: pagination.recentlyPlayed * itemsPerPage,
     },
     {
@@ -63,7 +63,7 @@ const HomeRoute = () => {
     {
       limit: itemsPerPage,
       sortBy: AlbumListSort.RECENTLY_ADDED,
-      sortOrder: SortOrder.ASC,
+      sortOrder: SortOrder.DESC,
       startIndex: pagination.recentlyAdded * itemsPerPage,
     },
     {
