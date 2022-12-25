@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import type { ICellRendererParams } from '@ag-grid-community/core';
+import { Center } from '@mantine/core';
 import { motion } from 'framer-motion';
+import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -72,13 +74,29 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
   return (
     <CellContainer height={node.rowHeight || 40}>
       <ImageWrapper>
-        <StyledImage
-          alt="cover"
-          height={(node.rowHeight || 40) - 10}
-          src={value.imageUrl}
-          style={{}}
-          width={(node.rowHeight || 40) - 10}
-        />
+        {value.imageUrl ? (
+          <StyledImage
+            alt="cover"
+            height={(node.rowHeight || 40) - 10}
+            src={value.imageUrl}
+            style={{}}
+            width={(node.rowHeight || 40) - 10}
+          />
+        ) : (
+          <Center
+            sx={{
+              background: 'var(--placeholder-bg)',
+              borderRadius: 'var(--card-default-radius)',
+              height: `${(node.rowHeight || 40) - 10}px`,
+              width: `${(node.rowHeight || 40) - 10}px`,
+            }}
+          >
+            <RiAlbumFill
+              color="var(--placeholder-fg)"
+              size={35}
+            />
+          </Center>
+        )}
       </ImageWrapper>
       <MetadataWrapper>
         <Text
