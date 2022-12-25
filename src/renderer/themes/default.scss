@@ -9,7 +9,7 @@
   --danger-color: rgb(204, 50, 50);
   --generic-border-color: rgba(50, 50, 50, 0.7);
 
-  --main-bg: rgb(18, 18, 18);
+  --main-bg: rgb(20, 20, 20);
   --main-fg: rgb(245, 245, 245);
   --main-fg-secondary: rgb(150, 150, 150);
 
@@ -53,8 +53,8 @@
 
   --btn-subtle-bg: transparent;
   --btn-subtle-bg-hover: transparent;
-  --btn-subtle-fg: rgb(224, 224, 224);
-  --btn-subtle-fg-hover: rgb(240, 240, 240);
+  --btn-subtle-fg: rgb(200, 200, 200);
+  --btn-subtle-fg-hover: rgb(255, 255, 255);
 
   --input-bg: rgb(35, 35, 35);
   --input-fg: rgb(193, 193, 193);
@@ -65,7 +65,7 @@
   --dropdown-menu-bg: rgb(24, 24, 24);
   --dropdown-menu-fg: rgb(220, 220, 220);
   --dropdown-menu-bg-hover: rgb(37, 38, 43);
-  --dropdown-menu-border: 1px rgba(50, 50, 50, 0.7) solid;
+  --dropdown-menu-border: none;
   --dropdown-menu-border-radius: 4px;
 
   --switch-track-bg: rgb(50, 50, 50);
@@ -81,7 +81,7 @@
   --toast-description-fg: rgb(193, 194, 197);
   --toast-bg: rgb(16, 16, 16);
 
-  --modal-bg: rgb(24, 24, 24);
+  --modal-bg: rgb(22, 22, 22);
 
   --badge-bg: rgb(0, 0, 0);
   --badge-fg: rgb(255, 255, 255);
@@ -91,8 +91,8 @@
   --placeholder-bg: rgba(53, 53, 53, 0.5);
   --placeholder-fg: rgba(126, 126, 126);
 
-  --card-default-bg: rgb(24, 24, 24);
-  --card-default-bg-hover: rgb(40, 40, 40);
+  --card-default-bg: rgb(32, 32, 32);
+  --card-default-bg-hover: rgb(44, 44, 44);
   --card-default-radius: 5px;
   --card-poster-bg: transparent;
   --card-poster-bg-hover: transparent;
