@@ -790,9 +790,9 @@ export const useQueueControls = () =>
 
 export const useQueueData = () => usePlayerStore((state) => state.actions.getQueueData);
 
-export const usePlayer1Data = () => usePlayerStore((state) => state.actions.player1);
+export const usePlayer1Data = () => usePlayerStore((state) => state.actions.player1());
 
-export const usePlayer2Data = () => usePlayerStore((state) => state.actions.player2);
+export const usePlayer2Data = () => usePlayerStore((state) => state.actions.player2());
 
 export const useSetCurrentTime = () => usePlayerStore((state) => state.actions.setCurrentTime);
 
