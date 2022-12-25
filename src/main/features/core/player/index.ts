@@ -44,7 +44,7 @@ const mpv = new MpvAPI(
 );
 
 mpv.start().catch((error) => {
-  console.log('error', error);
+  console.log('error starting mpv', error);
 });
 
 mpv.on('status', (status) => {
@@ -152,10 +152,14 @@ ipcMain.on('player-auto-next', async (_event, data: PlayerData) => {
 
 // Sets the volume to the given value (0-100)
 ipcMain.on('player-volume', async (_event, value: number) => {
-  mpv.volume(value);
+  await mpv.volume(value);
 });
 
 // Toggles the mute status
 ipcMain.on('player-mute', async () => {
-  mpv.mute();
+  await mpv.mute();
+});
+
+ipcMain.on('player-quit', async () => {
+  await mpv.quit();
 });

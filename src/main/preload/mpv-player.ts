@@ -42,6 +42,10 @@ const volume = (value: number) => {
   ipcRenderer.send('player-volume', value);
 };
 
+const quit = () => {
+  ipcRenderer.send('player-quit');
+};
+
 const rendererAutoNext = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
   ipcRenderer.on('renderer-player-auto-next', cb);
 };
@@ -74,6 +78,10 @@ const rendererStop = (cb: (event: IpcRendererEvent, data: PlayerData) => void) =
   ipcRenderer.on('renderer-player-stop', cb);
 };
 
+const rendererQuit = (cb: (event: IpcRendererEvent) => void) => {
+  ipcRenderer.on('renderer-player-quit', cb);
+};
+
 export const mpvPlayer = {
   autoNext,
   currentTime,
@@ -82,6 +90,7 @@ export const mpvPlayer = {
   pause,
   play,
   previous,
+  quit,
   seek,
   seekTo,
   setQueue,
@@ -98,5 +107,6 @@ export const mpvPlayerListener = {
   rendererPlay,
   rendererPlayPause,
   rendererPrevious,
+  rendererQuit,
   rendererStop,
 };

@@ -13,9 +13,9 @@ import {
 } from '/@/renderer/store';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 
-const mpvPlayer = window.electron.mpvPlayer;
-const mpvPlayerListener = window.electron.mpvPlayerListener;
-const ipc = window.electron.ipc;
+const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
+const ipc = isElectron() ? window.electron.ipc : null;
 
 export const useCenterControls = (args: { playersRef: any }) => {
   const { playersRef } = args;
@@ -447,6 +447,10 @@ export const useCenterControls = (args: { playersRef: any }) => {
     [currentPlayerRef, isMpvPlayer, setCurrentTime],
   );
 
+  const handleQuit = useCallback(() => {
+    mpvPlayer.quit();
+  }, []);
+
   useEffect(() => {
     if (isElectron()) {
       mpvPlayerListener.rendererPlayPause(() => {
@@ -480,6 +484,10 @@ export const useCenterControls = (args: { playersRef: any }) => {
       mpvPlayerListener.rendererAutoNext(() => {
         handleAutoNext();
       });
+
+      mpvPlayerListener.rendererQuit(() => {
+        handleQuit();
+      });
     }
 
     return () => {
@@ -491,6 +499,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
       ipc?.removeAllListeners('renderer-player-stop');
       ipc?.removeAllListeners('renderer-player-current-time');
       ipc?.removeAllListeners('renderer-player-auto-next');
+      ipc?.removeAllListeners('renderer-player-quit');
     };
   }, [
     autoNext,
@@ -500,6 +509,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     handlePlay,
     handlePlayPause,
     handlePrevTrack,
+    handleQuit,
     handleStop,
     isMpvPlayer,
     next,
