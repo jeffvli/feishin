@@ -162,30 +162,31 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const queueDrawerVariants: Variants = {
     closed: {
       height: 'calc(100vh - 170px)',
+      maxWidth: '600px',
       minWidth: '400px',
       position: 'absolute',
       right: 0,
       top: '75px',
       transition: {
-        duration: 0.5,
+        duration: 0.4,
         ease: 'anticipate',
       },
       width: '30vw',
       x: '50vw',
     },
     open: {
-      borderRadius: '10px',
       boxShadow: '1px 1px 10px 5px rgba(0, 0, 0, 0.3)',
       height: 'calc(100vh - 170px)',
+      maxWidth: '600px',
       minWidth: '400px',
       position: 'absolute',
       right: '20px',
-      top: '75px',
 
+      top: '75px',
       transition: {
         damping: 10,
         delay: 0,
-        duration: 0.8,
+        duration: 0.4,
         ease: 'anticipate',
         mass: 0.5,
       },
