@@ -20,14 +20,13 @@ const StyledDropdown = styled(MantinePopover.Dropdown)<PopoverDropdownProps>`
 export const Popover = ({ children, ...props }: PopoverProps) => {
   return (
     <StyledPopover
-      withArrow
       withinPortal
       styles={{
         dropdown: {
           filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))',
         },
       }}
-      transition="scale"
+      transition="scale-y"
       {...props}
     >
       {children}
