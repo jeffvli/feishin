@@ -40,9 +40,9 @@ const HomeRoute = () => {
       startIndex: pagination.random * itemsPerPage,
     },
     {
-      cacheTime: 0,
+      cacheTime: 1000 * 60,
       keepPreviousData: true,
-      staleTime: 0,
+      staleTime: 1000 * 60,
     },
   );
 
