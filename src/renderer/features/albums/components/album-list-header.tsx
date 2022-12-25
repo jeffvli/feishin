@@ -198,9 +198,8 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
   );
 
   const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-    setFilter({
-      searchTerm: e.target.value,
-    });
+    const updatedFilters = setFilter({ searchTerm: e.target.value });
+    handleFilterChange(updatedFilters);
   }, 500);
 
   return (
