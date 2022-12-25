@@ -30,7 +30,7 @@ export const AnimatedPage = forwardRef(
         animate="animate"
         exit="exit"
         initial="initial"
-        transition={{ duration: 0.2, type: 'tween' }}
+        transition={{ duration: 0.8, ease: 'anticipate' }}
         variants={variants}
       >
         {children}
