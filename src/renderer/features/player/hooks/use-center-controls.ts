@@ -11,7 +11,7 @@ import {
   useSetCurrentTime,
   useShuffleStatus,
 } from '/@/renderer/store';
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { usePlayerType, useSettingsStore } from '/@/renderer/store/settings.store';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
@@ -29,7 +29,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
   const playerStatus = useCurrentStatus();
   const repeatStatus = useRepeatStatus();
   const shuffleStatus = useShuffleStatus();
-  const playerType = useSettingsStore((state) => state.player.type);
+  const playerType = usePlayerType();
   const player1Ref = playersRef?.current?.player1;
   const player2Ref = playersRef?.current?.player2;
   const currentPlayerRef = currentPlayer === 1 ? player1Ref : player2Ref;

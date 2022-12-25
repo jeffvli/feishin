@@ -233,3 +233,5 @@ export const useTableSettings = (type: TableType) =>
   useSettingsStore((state) => state.tables[type]);
 
 export const useGeneralSettings = () => useSettingsStore((state) => state.general);
+
+export const usePlayerType = () => useSettingsStore((state) => state.player.type);

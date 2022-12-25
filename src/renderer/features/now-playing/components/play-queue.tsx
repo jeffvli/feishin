@@ -22,6 +22,7 @@ import {
   useQueueControls,
 } from '/@/renderer/store';
 import {
+  usePlayerType,
   useSettingsStore,
   useSettingsStoreActions,
   useTableSettings,
@@ -31,7 +32,7 @@ import isElectron from 'is-electron';
 import { ErrorBoundary } from 'react-error-boundary';
 import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required';
-import { TableType } from '/@/renderer/types';
+import { PlaybackType, TableType } from '/@/renderer/types';
 import { QueueSong } from '/@/renderer/api/types';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
@@ -51,6 +52,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
   const { setAppStore } = useAppStoreActions();
   const tableConfig = useTableSettings(type);
   const [gridApi, setGridApi] = useState<AgGridReactType | undefined>();
+  const playerType = usePlayerType();
 
   useEffect(() => {
     if (tableRef.current) {
@@ -73,9 +75,12 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     };
   }, []);
 
-  const handlePlayByRowClick = (e: CellDoubleClickedEvent) => {
+  const handleDoubleClick = (e: CellDoubleClickedEvent) => {
     const playerData = setCurrentTrack(e.data.uniqueId);
-    mpvPlayer.setQueue(playerData);
+
+    if (playerType === PlaybackType.LOCAL) {
+      mpvPlayer.setQueue(playerData);
+    }
   };
 
   const handleDragStart = () => {
@@ -92,7 +97,10 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
       .filter((e) => e !== undefined);
 
     const playerData = reorderQueue(selectedUniqueIds as string[], e.overNode?.data?.uniqueId);
-    mpvPlayer.setQueueNext(playerData);
+
+    if (playerType === PlaybackType.LOCAL) {
+      mpvPlayer.setQueueNext(playerData);
+    }
 
     if (type === 'sideDrawerQueue') {
       setAppStore({ isReorderingQueue: false });
@@ -223,7 +231,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
             rowData={queue}
             rowHeight={tableConfig.rowHeight || 40}
             rowSelection="multiple"
-            onCellDoubleClicked={handlePlayByRowClick}
+            onCellDoubleClicked={handleDoubleClick}
             onColumnMoved={handleColumnChange}
             onColumnResized={handleColumnChange}
             onDragStarted={handleDragStart}

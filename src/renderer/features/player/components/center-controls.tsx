@@ -26,7 +26,7 @@ import {
   useShuffleStatus,
   useCurrentTime,
 } from '/@/renderer/store';
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { usePlayerType, useSettingsStore } from '/@/renderer/store/settings.store';
 import { PlayerStatus, PlaybackType, PlayerShuffle, PlayerRepeat } from '/@/renderer/types';
 
 interface CenterControlsProps {
@@ -69,7 +69,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
   const currentSong = useCurrentSong();
   const songDuration = currentSong?.duration;
   const skip = useSettingsStore((state) => state.player.skipButtons);
-  const playerType = useSettingsStore((state) => state.player.type);
+  const playerType = usePlayerType();
   const player1 = playersRef?.current?.player1;
   const player2 = playersRef?.current?.player2;
   const status = useCurrentStatus();

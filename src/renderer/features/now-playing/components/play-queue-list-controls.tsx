@@ -13,7 +13,8 @@ import {
 } from 'react-icons/ri';
 import { Song } from '/@/renderer/api/types';
 import { useQueueControls } from '/@/renderer/store';
-import { TableType } from '/@/renderer/types';
+import { PlaybackType, TableType } from '/@/renderer/types';
+import { usePlayerType } from '/@/renderer/store/settings.store';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
@@ -26,13 +27,18 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
   const { clearQueue, moveToBottomOfQueue, moveToTopOfQueue, shuffleQueue, removeFromQueue } =
     useQueueControls();
 
+  const playerType = usePlayerType();
+
   const handleMoveToBottom = () => {
     const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
     const uniqueIds = selectedRows?.map((row) => row.uniqueId);
     if (!uniqueIds?.length) return;
 
     const playerData = moveToBottomOfQueue(uniqueIds);
-    mpvPlayer.setQueueNext(playerData);
+
+    if (playerType === PlaybackType.LOCAL) {
+      mpvPlayer.setQueueNext(playerData);
+    }
   };
 
   const handleMoveToTop = () => {
@@ -41,7 +47,10 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
     if (!uniqueIds?.length) return;
 
     const playerData = moveToTopOfQueue(uniqueIds);
-    mpvPlayer.setQueueNext(playerData);
+
+    if (playerType === PlaybackType.LOCAL) {
+      mpvPlayer.setQueueNext(playerData);
+    }
   };
 
   const handleRemoveSelected = () => {
@@ -50,24 +59,34 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
     if (!uniqueIds?.length) return;
 
     const playerData = removeFromQueue(uniqueIds);
-    mpvPlayer.setQueueNext(playerData);
+
+    if (playerType === PlaybackType.LOCAL) {
+      mpvPlayer.setQueueNext(playerData);
+    }
   };
 
   const handleClearQueue = () => {
     const playerData = clearQueue();
-    mpvPlayer.setQueue(playerData);
-    mpvPlayer.stop();
+
+    if (playerType === PlaybackType.LOCAL) {
+      mpvPlayer.setQueue(playerData);
+      mpvPlayer.stop();
+    }
   };
 
   const handleShuffleQueue = () => {
     const playerData = shuffleQueue();
-    mpvPlayer.setQueueNext(playerData);
+
+    if (playerType === PlaybackType.LOCAL) {
+      mpvPlayer.setQueueNext(playerData);
+    }
   };
 
   return (
     <Group
       position="apart"
       px="1rem"
+      py="1rem"
       sx={{ alignItems: 'center' }}
     >
       <Group>

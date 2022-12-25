@@ -6,7 +6,7 @@ import { ndNormalize } from '/@/renderer/api/navidrome.api';
 import { NDSong } from '/@/renderer/api/navidrome.types';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { useAuthStore, usePlayerStore } from '/@/renderer/store';
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { usePlayerType } from '/@/renderer/store/settings.store';
 import { PlayQueueAddOptions, LibraryItem, Play, PlaybackType } from '/@/renderer/types';
 import { toast } from '/@/renderer/components/toast';
 import isElectron from 'is-electron';
@@ -15,7 +15,7 @@ const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 export const useHandlePlayQueueAdd = () => {
   const queryClient = useQueryClient();
-  const playerType = useSettingsStore.getState().player.type;
+  const playerType = usePlayerType();
   const deviceId = useAuthStore.getState().deviceId;
   const server = useAuthStore.getState().currentServer;
 
