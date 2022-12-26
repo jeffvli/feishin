@@ -12,6 +12,7 @@
   "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "editor.tabSize": 2,
   "editor.codeActionsOnSave": {
+    "source.organizeImports": true,
     "source.fixAll.eslint": true,
     "source.fixAll.stylelint": false
   },
@@ -31,23 +32,6 @@
     "test/**/__snapshots__": true,
     "package-lock.json": true,
     "*.{css,sass,scss}.d.ts": true
-  },
-  "rest-client.environmentVariables": {
-    "$shared": {
-      "host": "http://localhost:9321"
-    },
-    "dev-user": {
-      "token": "",
-      "refreshToken": "",
-      "authUsername": "user",
-      "authPassword": "user"
-    },
-    "dev-admin": {
-      "token": "",
-      "refreshToken": "",
-      "authUsername": "admin",
-      "authPassword": "admin"
-    }
   },
   "i18n-ally.localesPaths": ["src/i18n", "src/i18n/locales"],
   "typescript.tsdk": "node_modules\\typescript\\lib",
