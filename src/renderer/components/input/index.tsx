@@ -100,15 +100,17 @@ const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
     }
   }
 
-  /* & .mantine-NumberInput-rightSection {
-    color: var(--input-placeholder-fg);
-    background: var(--input-bg);
-  } */
-
   & .mantine-NumberInput-controlUp {
     svg {
-      color: white;
-      fill: white;
+      color: var(--btn-default-fg);
+      fill: var(--btn-default-fg);
+    }
+  }
+
+  & .mantine-NumberInput-controlDown {
+    svg {
+      color: var(--btn-default-fg);
+      fill: var(--btn-default-fg);
     }
   }
 
