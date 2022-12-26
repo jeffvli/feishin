@@ -25,6 +25,7 @@ import { PersistedTableColumn } from '/@/renderer/store/settings.store';
 import { TableColumn } from '/@/renderer/types';
 
 export * from './table-config-dropdown';
+export * from './table-pagination';
 
 const TableWrapper = styled.div`
   display: flex;
