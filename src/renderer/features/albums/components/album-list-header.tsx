@@ -1,16 +1,21 @@
-import type { MouseEvent, ChangeEvent, MutableRefObject } from 'react';
-import { useCallback } from 'react';
 import { Flex, Slider } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
+import type { ChangeEvent, MouseEvent, MutableRefObject } from 'react';
+import { useCallback } from 'react';
 import {
   RiArrowDownSLine,
   RiFilter3Line,
   RiFolder2Line,
+  RiMoreFill,
   RiSortAsc,
   RiSortDesc,
 } from 'react-icons/ri';
+import styled from 'styled-components';
+import { api } from '/@/renderer/api';
+import { controller } from '/@/renderer/api/controller';
+import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import {
   Button,
@@ -21,22 +26,18 @@ import {
   TextTitle,
   VirtualInfiniteGridRef,
 } from '/@/renderer/components';
+import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
+import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
+import { useMusicFolders } from '/@/renderer/features/shared';
+import { useContainerQuery } from '/@/renderer/hooks';
 import {
-  useCurrentServer,
+  AlbumListFilter,
   useAlbumListStore,
+  useCurrentServer,
   useSetAlbumFilters,
   useSetAlbumStore,
-  AlbumListFilter,
 } from '/@/renderer/store';
 import { CardDisplayType } from '/@/renderer/types';
-import { useMusicFolders } from '/@/renderer/features/shared';
-import styled from 'styled-components';
-import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
-import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
-import { api } from '/@/renderer/api';
-import { controller } from '/@/renderer/api/controller';
-import { queryKeys } from '/@/renderer/api/query-keys';
-import { useContainerQuery } from '/@/renderer/hooks';
 
 const FILTERS = {
   jellyfin: [
@@ -171,10 +172,17 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
   const handleSetMusicFolder = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      const updatedFilters = setFilter({ musicFolderId: e.currentTarget.value });
+
+      let updatedFilters = null;
+      if (e.currentTarget.value === String(page.filter.musicFolderId)) {
+        updatedFilters = setFilter({ musicFolderId: undefined });
+      } else {
+        updatedFilters = setFilter({ musicFolderId: e.currentTarget.value });
+      }
+
       handleFilterChange(updatedFilters);
     },
-    [handleFilterChange, setFilter],
+    [handleFilterChange, page.filter.musicFolderId, setFilter],
   );
 
   const handleSetOrder = useCallback(
@@ -364,12 +372,28 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
             </Popover.Dropdown>
           </Popover>
         </Flex>
-        <Flex>
+        <Flex gap="md">
           <SearchInput
             defaultValue={page.filter.searchTerm}
             openedWidth={cq.isLg ? 300 : cq.isMd ? 250 : cq.isSm ? 150 : 75}
             onChange={handleSearch}
           />
+          <DropdownMenu>
+            <DropdownMenu.Target>
+              <Button
+                px="sm"
+                variant="subtle"
+              >
+                <RiMoreFill size={15} />
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              <DropdownMenu.Item disabled>Play</DropdownMenu.Item>
+              <DropdownMenu.Item disabled>Play last</DropdownMenu.Item>
+              <DropdownMenu.Item disabled>Play next</DropdownMenu.Item>
+              <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
         </Flex>
       </HeaderItems>
     </PageHeader>
