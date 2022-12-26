@@ -13,7 +13,7 @@ export const useContainerQuery = (props?: UseContainerQueryProps) => {
 
   const isXs = width >= 0;
   const isSm = width >= (sm || 600);
-  const isMd = width >= (md || 900);
+  const isMd = width >= (md || 768);
   const isLg = width >= (lg || 1200);
   const isXl = width >= (xl || 1500);
 
