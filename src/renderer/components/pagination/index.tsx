@@ -1,7 +1,10 @@
-import { Pagination as MantinePagination, PaginationProps } from '@mantine/core';
+import {
+  Pagination as MantinePagination,
+  PaginationProps as MantinePaginationProps,
+} from '@mantine/core';
 import styled from 'styled-components';
 
-const StyledPagination = styled(MantinePagination)`
+const StyledPagination = styled(MantinePagination)<PaginationProps>`
   & .mantine-Pagination-item {
     color: var(--btn-default-fg);
     background-color: var(--btn-default-bg);
@@ -24,14 +27,20 @@ const StyledPagination = styled(MantinePagination)`
     }
 
     &[data-dots] {
+      display: ${({ $hideDividers }) => ($hideDividers ? 'none' : 'block')};
       background-color: transparent;
     }
   }
 `;
 
-export const Pagination = ({ ...props }: PaginationProps) => {
+interface PaginationProps extends MantinePaginationProps {
+  $hideDividers?: boolean;
+}
+
+export const Pagination = ({ $hideDividers, ...props }: PaginationProps) => {
   return (
     <StyledPagination
+      $hideDividers={$hideDividers}
       radius="xl"
       size="md"
       {...props}
