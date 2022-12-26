@@ -136,7 +136,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
   );
 
   const handleFilterChange = useCallback(
-    async (filters: any) => {
+    async (filters: AlbumListFilter) => {
       gridRef.current?.scrollTo(0);
       gridRef.current?.resetLoadMoreItemsCache();
 
@@ -185,14 +185,11 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
     [handleFilterChange, page.filter.musicFolderId, setFilter],
   );
 
-  const handleSetOrder = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
-      if (!e.currentTarget?.value) return;
-      const updatedFilters = setFilter({ sortOrder: e.currentTarget.value as SortOrder });
-      handleFilterChange(updatedFilters);
-    },
-    [handleFilterChange, setFilter],
-  );
+  const handleToggleSortOrder = useCallback(() => {
+    const newSortOrder = filters.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
+    const updatedFilters = setFilter({ sortOrder: newSortOrder });
+    handleFilterChange(updatedFilters);
+  }, [filters.sortOrder, handleFilterChange, setFilter]);
 
   const handleSetViewType = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -210,7 +207,9 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
   );
 
   const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-    const updatedFilters = setFilter({ searchTerm: e.target.value });
+    const updatedFilters = setFilter({
+      searchTerm: e.target.value === '' ? undefined : e.target.value,
+    });
     handleFilterChange(updatedFilters);
   }, 500);
 
@@ -222,7 +221,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
           gap="md"
           justify="center"
         >
-          <DropdownMenu position="bottom">
+          <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
               <Button
                 compact
@@ -240,6 +239,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
+              <DropdownMenu.Label>Item size</DropdownMenu.Label>
               <DropdownMenu.Item>
                 <Slider
                   defaultValue={page.grid.size || 0}
@@ -248,16 +248,17 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
                 />
               </DropdownMenu.Item>
               <DropdownMenu.Divider />
+              <DropdownMenu.Label>Display type</DropdownMenu.Label>
               <DropdownMenu.Item
-                $isActive={page.display === CardDisplayType.CARD}
-                value={CardDisplayType.CARD}
+                $isActive={page.display === ListDisplayType.CARD}
+                value={ListDisplayType.CARD}
                 onClick={handleSetViewType}
               >
                 Card
               </DropdownMenu.Item>
               <DropdownMenu.Item
-                $isActive={page.display === CardDisplayType.POSTER}
-                value={CardDisplayType.POSTER}
+                $isActive={page.display === ListDisplayType.POSTER}
+                value={ListDisplayType.POSTER}
                 onClick={handleSetViewType}
               >
                 Poster
@@ -272,7 +273,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
               </DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
-          <DropdownMenu position="bottom">
+          <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
               <Button
                 compact
@@ -295,45 +296,32 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
               ))}
             </DropdownMenu.Dropdown>
           </DropdownMenu>
-          <DropdownMenu position="bottom">
-            <DropdownMenu.Target>
-              <Button
-                compact
-                fw="normal"
-                variant="subtle"
-              >
-                {cq.isMd ? (
-                  sortOrderLabel
+          <Button
+            compact
+            fw="normal"
+            tooltip={!cq.isMd ? { label: sortOrderLabel } : undefined}
+            variant="subtle"
+            onClick={handleToggleSortOrder}
+          >
+            {cq.isMd ? (
+              sortOrderLabel
+            ) : (
+              <>
+                {filters.sortOrder === SortOrder.ASC ? (
+                  <RiSortAsc size={15} />
                 ) : (
-                  <>
-                    {filters.sortOrder === SortOrder.ASC ? (
-                      <RiSortAsc size={15} />
-                    ) : (
-                      <RiSortDesc size={15} />
-                    )}
-                  </>
+                  <RiSortDesc size={15} />
                 )}
-              </Button>
-            </DropdownMenu.Target>
-            <DropdownMenu.Dropdown>
-              {ORDER.map((sort) => (
-                <DropdownMenu.Item
-                  key={`sort-${sort.value}`}
-                  $isActive={sort.value === filters.sortOrder}
-                  value={sort.value}
-                  onClick={handleSetOrder}
-                >
-                  {sort.name}
-                </DropdownMenu.Item>
-              ))}
-            </DropdownMenu.Dropdown>
-          </DropdownMenu>
+              </>
+            )}
+          </Button>
           {server?.type === ServerType.JELLYFIN && (
-            <DropdownMenu position="bottom">
+            <DropdownMenu position="bottom-start">
               <DropdownMenu.Target>
                 <Button
                   compact
                   fw="normal"
+                  tooltip={!cq.isMd ? { label: 'Folder' } : undefined}
                   variant="subtle"
                 >
                   {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}
@@ -353,11 +341,15 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
               </DropdownMenu.Dropdown>
             </DropdownMenu>
           )}
-          <Popover>
+          <Popover
+            closeOnClickOutside={false}
+            position="bottom-start"
+          >
             <Popover.Target>
               <Button
                 compact
                 fw="normal"
+                tooltip={!cq.isMd ? { label: 'Filters' } : undefined}
                 variant="subtle"
               >
                 {cq.isMd ? 'Filters' : <RiFilter3Line size={15} />}
@@ -365,23 +357,17 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
             </Popover.Target>
             <Popover.Dropdown>
               {server?.type === ServerType.NAVIDROME ? (
-                <NavidromeAlbumFilters />
+                <NavidromeAlbumFilters handleFilterChange={handleFilterChange} />
               ) : (
-                <JellyfinAlbumFilters />
+                <JellyfinAlbumFilters handleFilterChange={handleFilterChange} />
               )}
             </Popover.Dropdown>
           </Popover>
-        </Flex>
-        <Flex gap="md">
-          <SearchInput
-            defaultValue={page.filter.searchTerm}
-            openedWidth={cq.isLg ? 300 : cq.isMd ? 250 : cq.isSm ? 150 : 75}
-            onChange={handleSearch}
-          />
-          <DropdownMenu>
+          <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
               <Button
-                px="sm"
+                compact
+                tooltip={{ label: 'More' }}
                 variant="subtle"
               >
                 <RiMoreFill size={15} />
@@ -394,6 +380,13 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
               <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
+        </Flex>
+        <Flex gap="md">
+          <SearchInput
+            defaultValue={page.filter.searchTerm}
+            openedWidth={cq.isLg ? 300 : cq.isMd ? 250 : cq.isSm ? 150 : 75}
+            onChange={handleSearch}
+          />
         </Flex>
       </HeaderItems>
     </PageHeader>
