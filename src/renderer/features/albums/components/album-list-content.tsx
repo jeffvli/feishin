@@ -5,7 +5,7 @@ import {
   VirtualInfiniteGridRef,
 } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
-import { CardDisplayType, CardRow, LibraryItem } from '/@/renderer/types';
+import { ListDisplayType, CardRow, LibraryItem } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { ListOnScrollProps } from 'react-window';
@@ -145,7 +145,7 @@ export const AlbumListContent = ({ gridRef }: AlbumListContentProps) => {
           <VirtualInfiniteGrid
             ref={gridRef}
             cardRows={cardRows}
-            display={page.display || CardDisplayType.CARD}
+            display={page.display || ListDisplayType.CARD}
             fetchFn={fetch}
             handlePlayQueueAdd={handlePlayQueueAdd}
             height={height}

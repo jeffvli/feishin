@@ -3,14 +3,14 @@ import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { AlbumListArgs, AlbumListSort, SortOrder } from '/@/renderer/api/types';
-import { CardDisplayType } from '/@/renderer/types';
+import { ListDisplayType } from '/@/renderer/types';
 
 type TableProps = {
   scrollOffset: number;
 };
 
 type ListProps<T> = {
-  display: CardDisplayType;
+  display: ListDisplayType;
   filter: T;
   grid: {
     scrollOffset: number;
@@ -49,7 +49,7 @@ export const useAlbumStore = create<AlbumSlice>()(
           },
         },
         list: {
-          display: CardDisplayType.CARD,
+          display: ListDisplayType.CARD,
           filter: {
             musicFolderId: undefined,
             sortBy: AlbumListSort.RECENTLY_ADDED,

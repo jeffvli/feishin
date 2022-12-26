@@ -12,7 +12,7 @@ import type { FixedSizeListProps } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { VirtualGridWrapper } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
 import type { CardRoute, CardRow, LibraryItem, PlayQueueAddOptions } from '/@/renderer/types';
-import { CardDisplayType } from '/@/renderer/types';
+import { ListDisplayType } from '/@/renderer/types';
 
 export type VirtualInfiniteGridRef = {
   resetLoadMoreItemsCache: () => void;
@@ -22,7 +22,7 @@ export type VirtualInfiniteGridRef = {
 
 interface VirtualGridProps extends Omit<FixedSizeListProps, 'children' | 'itemSize'> {
   cardRows: CardRow<any>[];
-  display?: CardDisplayType;
+  display?: ListDisplayType;
   fetchFn: (options: { columnCount: number; skip: number; take: number }) => Promise<any>;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   itemGap: number;
@@ -144,7 +144,7 @@ export const VirtualInfiniteGrid = forwardRef(
           <VirtualGridWrapper
             cardRows={cardRows}
             columnCount={columnCount}
-            display={display || CardDisplayType.CARD}
+            display={display || ListDisplayType.CARD}
             handlePlayQueueAdd={handlePlayQueueAdd}
             height={height}
             initialScrollOffset={initialScrollOffset}
@@ -171,7 +171,7 @@ export const VirtualInfiniteGrid = forwardRef(
 );
 
 VirtualInfiniteGrid.defaultProps = {
-  display: CardDisplayType.CARD,
+  display: ListDisplayType.CARD,
   minimumBatchSize: 20,
   route: undefined,
 };

@@ -37,7 +37,7 @@ import {
   useSetAlbumFilters,
   useSetAlbumStore,
 } from '/@/renderer/store';
-import { CardDisplayType } from '/@/renderer/types';
+import { ListDisplayType } from '/@/renderer/types';
 
 const FILTERS = {
   jellyfin: [
@@ -198,12 +198,12 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
       const type = e.currentTarget.value;
-      if (type === CardDisplayType.CARD) {
-        setPage({ list: { ...page, display: CardDisplayType.CARD } });
-      } else if (type === CardDisplayType.POSTER) {
-        setPage({ list: { ...page, display: CardDisplayType.POSTER } });
+      if (type === ListDisplayType.CARD) {
+        setPage({ list: { ...page, display: ListDisplayType.CARD } });
+      } else if (type === ListDisplayType.POSTER) {
+        setPage({ list: { ...page, display: ListDisplayType.POSTER } });
       } else {
-        setPage({ list: { ...page, display: CardDisplayType.TABLE } });
+        setPage({ list: { ...page, display: ListDisplayType.TABLE } });
       }
     },
     [page, setPage],
@@ -264,7 +264,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
               </DropdownMenu.Item>
               <DropdownMenu.Item
                 disabled
-                $isActive={page.display === CardDisplayType.TABLE}
+                $isActive={page.display === ListDisplayType.TABLE}
                 value="list"
                 onClick={handleSetViewType}
               >

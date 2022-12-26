@@ -4,7 +4,7 @@ import { areEqual } from 'react-window';
 import { DefaultCard } from '/@/renderer/components/virtual-grid/grid-card/default-card';
 import { PosterCard } from '/@/renderer/components/virtual-grid/grid-card/poster-card';
 import type { GridCardData } from '/@/renderer/types';
-import { CardDisplayType } from '/@/renderer/types';
+import { ListDisplayType } from '/@/renderer/types';
 
 export const GridCard = memo(({ data, index, style }: ListChildComponentProps) => {
   const {
@@ -26,7 +26,7 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
   const startIndex = index * columnCount;
   const stopIndex = Math.min(itemCount - 1, startIndex + columnCount - 1);
 
-  const View = display === CardDisplayType.CARD ? DefaultCard : PosterCard;
+  const View = display === ListDisplayType.CARD ? DefaultCard : PosterCard;
 
   for (let i = startIndex; i <= stopIndex; i += 1) {
     cards.push(

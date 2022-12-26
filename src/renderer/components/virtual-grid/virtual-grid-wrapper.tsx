@@ -8,7 +8,7 @@ import { GridCard } from '/@/renderer/components/virtual-grid/grid-card';
 import type {
   CardRow,
   LibraryItem,
-  CardDisplayType,
+  ListDisplayType,
   CardRoute,
   PlayQueueAddOptions,
 } from '/@/renderer/types';
@@ -64,7 +64,7 @@ export const VirtualGridWrapper = ({
 }: Omit<FixedSizeListProps, 'ref' | 'itemSize' | 'children'> & {
   cardRows: CardRow<Album | AlbumArtist | Artist>[];
   columnCount: number;
-  display: CardDisplayType;
+  display: ListDisplayType;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   itemData: any[];
   itemGap: number;

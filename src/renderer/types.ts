@@ -19,16 +19,11 @@ export type CardRow<T> = {
   route?: CardRoute;
 };
 
-export enum CardDisplayType {
-  CARD = 'card',
-  POSTER = 'poster',
-  TABLE = 'table',
-}
-
 export enum ListDisplayType {
   CARD = 'card',
   POSTER = 'poster',
   TABLE = 'table',
+  TABLE_PAGINATED = 'paginatedTable',
 }
 
 export enum LibraryItem {
@@ -164,7 +159,7 @@ export type GridCardData = {
   cardControls: any;
   cardRows: CardRow<Album | AlbumArtist | Artist>[];
   columnCount: number;
-  display: CardDisplayType;
+  display: ListDisplayType;
   handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
   itemCount: number;
   itemData: any[];

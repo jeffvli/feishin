@@ -4,14 +4,14 @@ import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { SongListArgs, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { DataTableProps } from '/@/renderer/store/settings.store';
-import { CardDisplayType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, TableColumn } from '/@/renderer/types';
 
 type TableProps = {
   scrollOffset: number;
 } & DataTableProps;
 
 type ListProps<T> = {
-  display: CardDisplayType;
+  display: ListDisplayType;
   filter: T;
   table: TableProps;
 };
@@ -44,7 +44,7 @@ export const useSongStore = create<SongSlice>()(
           },
         },
         list: {
-          display: CardDisplayType.TABLE,
+          display: ListDisplayType.TABLE,
           filter: {
             musicFolderId: undefined,
             sortBy: SongListSort.RECENTLY_ADDED,
