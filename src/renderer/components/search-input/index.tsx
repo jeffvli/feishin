@@ -20,7 +20,7 @@ export const SearchInput = ({
   const mergedRef = useMergedRef<HTMLInputElement>(ref);
 
   const isOpened = focused || ref.current?.value;
-  const showIcon = !isOpened || (openedWidth || 150) > 150;
+  const showIcon = !isOpened || (openedWidth || 100) > 100;
 
   useHotkeys([
     [
