@@ -92,19 +92,23 @@ const genreList = (data: RawGenreListResponse | undefined, server: ServerListIte
       genres = (data as JFGenreList)?.Items.map((item) => ({
         id: String(item.Id),
         name: item.Name,
-      }));
+      })).sort((a, b) => a.name.localeCompare(b.name));
       break;
     case 'navidrome':
-      genres = (data as NDGenreList)?.map((item) => ({
-        id: String(item.id),
-        name: item.name,
-      }));
+      genres = (data as NDGenreList)
+        ?.map((item) => ({
+          id: String(item.id),
+          name: item.name,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
       break;
     case 'subsonic':
-      genres = (data as SSGenreList)?.map((item) => ({
-        id: item.value,
-        name: item.value,
-      }));
+      genres = (data as SSGenreList)
+        ?.map((item) => ({
+          id: item.value,
+          name: item.value,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
       break;
   }
 
