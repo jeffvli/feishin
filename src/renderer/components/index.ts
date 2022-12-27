@@ -29,3 +29,4 @@ export * from './toast';
 export * from './tooltip';
 export * from './virtual-grid';
 export * from './virtual-table';
+export * from './motion';
