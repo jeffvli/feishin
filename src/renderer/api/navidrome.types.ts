@@ -56,7 +56,9 @@ export type NDSong = {
   artistId: string;
   bitRate: number;
   bookmarkPosition: number;
-  channels: number;
+  bpm?: number;
+  channels?: number;
+  comment?: string;
   compilation: boolean;
   createdAt: string;
   discNumber: number;
@@ -66,6 +68,7 @@ export type NDSong = {
   genres: NDGenre[];
   hasCoverArt: boolean;
   id: string;
+  lyrics?: string;
   mbzAlbumArtistId: string;
   mbzAlbumId: string;
   mbzArtistId: string;
@@ -206,7 +209,7 @@ export type NDAlbumListParams = {
   NDOrder;
 
 export enum NDSongListSort {
-  ALBUM = 'album',
+  ALBUM = 'album, order_album_artist_name, disc_number, track_number, title',
   ALBUM_ARTIST = 'albumArtist',
   ARTIST = 'artist',
   BPM = 'bpm',

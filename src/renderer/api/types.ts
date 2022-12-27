@@ -174,6 +174,8 @@ export type Song = {
   artistName: string;
   artists: RelatedArtist[];
   bitRate: number;
+  bpm: number | null;
+  channels: number | null;
   compilation: boolean | null;
   container: string | null;
   createdAt: string;
@@ -183,7 +185,9 @@ export type Song = {
   id: string;
   imageUrl: string | null;
   isFavorite: boolean;
+  lastPlayedAt: string | null;
   name: string;
+  note: string | null;
   path: string | null;
   playCount: number;
   releaseDate: string | null;
@@ -393,6 +397,7 @@ export type RawSongListResponse = NDSongList | JFSongList | undefined;
 export type SongListResponse = BasePaginatedResponse<Song[]>;
 
 export enum SongListSort {
+  ALBUM = 'album',
   ALBUM_ARTIST = 'albumArtist',
   ARTIST = 'artist',
   BPM = 'bpm',
@@ -416,6 +421,8 @@ export type SongListQuery = {
     filters?: string;
     genres?: string;
     includeItemTypes: 'Audio';
+    maxYear?: number;
+    minYear?: number;
     sortBy?: JFSongListSort;
     years?: string;
   };
@@ -430,6 +437,7 @@ export type SongListQuery = {
     title?: string;
     year?: number;
   };
+  searchTerm?: string;
   sortBy: SongListSort;
   sortOrder: SortOrder;
   startIndex: number;
@@ -445,6 +453,7 @@ type SongListSortMap = {
 
 export const songListSortMap: SongListSortMap = {
   jellyfin: {
+    album: JFSongListSort.ALBUM,
     albumArtist: JFSongListSort.ALBUM_ARTIST,
     artist: JFSongListSort.ARTIST,
     bpm: undefined,
@@ -463,6 +472,7 @@ export const songListSortMap: SongListSortMap = {
     year: undefined,
   },
   navidrome: {
+    album: NDSongListSort.ALBUM,
     albumArtist: NDSongListSort.ALBUM_ARTIST,
     artist: NDSongListSort.ARTIST,
     bpm: NDSongListSort.BPM,
@@ -481,6 +491,7 @@ export const songListSortMap: SongListSortMap = {
     year: NDSongListSort.YEAR,
   },
   subsonic: {
+    album: undefined,
     albumArtist: undefined,
     artist: undefined,
     bpm: undefined,
