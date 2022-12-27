@@ -7,7 +7,7 @@ import { Text } from '/@/renderer/components/text';
 import { useSettingsStoreActions, useSettingsStore } from '/@/renderer/store/settings.store';
 import { TableColumn, TableType } from '/@/renderer/types';
 
-export const tableColumns = [
+export const SONG_TABLE_COLUMNS = [
   { label: 'Row Index', value: TableColumn.ROW_INDEX },
   { label: 'Title', value: TableColumn.TITLE },
   { label: 'Title (Combined)', value: TableColumn.TITLE_COMBINED },
@@ -21,13 +21,17 @@ export const tableColumns = [
   { label: 'Disc Number', value: TableColumn.DISC_NUMBER },
   { label: 'Track Number', value: TableColumn.TRACK_NUMBER },
   { label: 'Bitrate', value: TableColumn.BIT_RATE },
-  // { label: 'Size', value: TableColumn.SIZE },
-  // { label: 'Skip', value: TableColumn.SKIP },
-  // { label: 'Path', value: TableColumn.PATH },
-  // { label: 'Play Count', value: TableColumn.PLAY_COUNT },
+  { label: 'Last Played', value: TableColumn.LAST_PLAYED },
+  { label: 'Note', value: TableColumn.COMMENT },
+  { label: 'Channels', value: TableColumn.CHANNELS },
+  { label: 'BPM', value: TableColumn.BPM },
+  { label: 'Date Added', value: TableColumn.DATE_ADDED },
+  { label: 'Path', value: TableColumn.PATH },
+  { label: 'Plays', value: TableColumn.PLAY_COUNT },
   // { label: 'Favorite', value: TableColumn.FAVORITE },
   // { label: 'Rating', value: TableColumn.RATING },
-  { label: 'Date Added', value: TableColumn.DATE_ADDED },
+  // { label: 'Size', value: TableColumn.SIZE },
+  // { label: 'Skip', value: TableColumn.SKIP },
 ];
 
 interface TableConfigDropdownProps {
@@ -130,7 +134,7 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
         <Text>Table Columns</Text>
         <MultiSelect
           clearable
-          data={tableColumns}
+          data={SONG_TABLE_COLUMNS}
           defaultValue={tableConfig[type]?.columns.map((column) => column.column)}
           dropdownPosition="top"
           width={300}

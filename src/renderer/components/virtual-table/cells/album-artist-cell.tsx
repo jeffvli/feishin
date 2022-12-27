@@ -31,7 +31,6 @@ export const AlbumArtistCell = ({ value, data }: ICellRendererParams) => {
           <React.Fragment key={`row-${item.id}-${data.uniqueId}`}>
             {index > 0 && (
               <Text
-                $link
                 $secondary
                 size="sm"
                 style={{ display: 'inline-block' }}

@@ -11,6 +11,7 @@ import { Text } from '/@/renderer/components/text';
 import { AppRoute } from '/@/renderer/router/routes';
 import { ServerType } from '/@/renderer/types';
 import { Skeleton } from '/@/renderer/components/skeleton';
+import { CELL_VARIANTS } from '/@/renderer/components/virtual-table/cells/generic-cell';
 
 const CellContainer = styled(motion.div)<{ height: number }>`
   display: grid;

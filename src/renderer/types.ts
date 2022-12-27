@@ -1,6 +1,13 @@
 import { Album, AlbumArtist, Artist } from '/@/renderer/api/types';
 import { AppRoute } from '/@/renderer/router/routes';
 
+export type TablePagination = {
+  currentPage: number;
+  itemsPerPage: number;
+  totalItems: number;
+  totalPages: number;
+};
+
 export type RouteSlug = {
   idProperty: string;
   slugProperty: string;
@@ -128,18 +135,21 @@ export enum TableColumn {
   ALBUM_ARTIST = 'albumArtist',
   ARTIST = 'artist',
   BIT_RATE = 'bitRate',
+  BPM = 'bpm',
+  CHANNELS = 'channels',
+  COMMENT = 'comment',
   DATE_ADDED = 'dateAdded',
   DISC_NUMBER = 'discNumber',
   DURATION = 'duration',
-  // FAVORITE = 'favorite',
+  FAVORITE = 'favorite',
   GENRE = 'genre',
-  // PATH = 'path',
-  // PLAY_COUNT = 'playCount',
-  // RATING = 'rating',
+  LAST_PLAYED = 'lastPlayedAt',
+  PATH = 'path',
+  PLAY_COUNT = 'playCount',
+  RATING = 'rating',
   RELEASE_DATE = 'releaseDate',
   ROW_INDEX = 'rowIndex',
   // SKIP = 'skip',
-  // SIZE = 'size',
   TITLE = 'title',
   TITLE_COMBINED = 'titleCombined',
   TRACK_NUMBER = 'trackNumber',

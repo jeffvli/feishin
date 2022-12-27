@@ -71,6 +71,26 @@ const tableColumns: { [key: string]: ColDef } = {
     valueFormatter: (params: ValueFormatterParams) => `${params.value} kbps`,
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.bitRate : undefined),
   },
+  bpm: {
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+    colId: TableColumn.BPM,
+    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
+    headerName: 'BPM',
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.bpm : undefined),
+  },
+  channels: {
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+    colId: TableColumn.CHANNELS,
+    field: 'channels',
+    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.channels : undefined),
+  },
+  comment: {
+    cellRenderer: GenericCell,
+    colId: TableColumn.COMMENT,
+    headerName: 'Note',
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.comment : undefined),
+  },
   dateAdded: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
     colId: TableColumn.DATE_ADDED,
@@ -105,6 +125,27 @@ const tableColumns: { [key: string]: ColDef } = {
     colId: TableColumn.GENRE,
     headerName: 'Genre',
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.genres : undefined),
+  },
+  lastPlayedAt: {
+    cellRenderer: GenericCell,
+    colId: TableColumn.LAST_PLAYED,
+    headerName: 'Last Played',
+    valueGetter: (params: ValueGetterParams) =>
+      params.data ? params.data.lastPlayedAt : undefined,
+  },
+  path: {
+    cellRenderer: GenericCell,
+    colId: TableColumn.PATH,
+    headerName: 'Path',
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.path : undefined),
+  },
+  playCount: {
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+    colId: TableColumn.PLAY_COUNT,
+    field: 'playCount',
+    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
+    headerName: 'Plays',
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.playCount : undefined),
   },
   releaseDate: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
