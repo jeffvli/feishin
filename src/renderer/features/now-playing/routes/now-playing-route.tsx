@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Stack } from '@mantine/core';
+import { Flex, Stack } from '@mantine/core';
 import { NowPlayingHeader } from '/@/renderer/features/now-playing/components/now-playing-header';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
@@ -13,20 +13,20 @@ const NowPlayingRoute = () => {
   return (
     <AnimatedPage>
       <Stack
-        pb="1rem"
+        h="100%"
         spacing={0}
-        sx={{ height: '100%' }}
       >
         <NowPlayingHeader />
         <PlayQueue
           ref={queueRef}
           type="nowPlaying"
         />
-
-        <PlayQueueListControls
-          tableRef={queueRef}
-          type="nowPlaying"
-        />
+        <Flex sx={{ borderTop: '1px solid var(--generic-border-color)' }}>
+          <PlayQueueListControls
+            tableRef={queueRef}
+            type="nowPlaying"
+          />
+        </Flex>
       </Stack>
     </AnimatedPage>
   );
