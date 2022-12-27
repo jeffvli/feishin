@@ -237,13 +237,14 @@ const getSongList = async (args: SongListArgs): Promise<NDSongList> => {
     _order: sortOrderMap.navidrome[query.sortOrder],
     _sort: songListSortMap.navidrome[query.sortBy],
     _start: query.startIndex,
+    title: query.searchTerm,
     ...query.ndParams,
   };
 
   const res = await api.get('api/song', {
     headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
     prefixUrl: server?.url,
-    searchParams,
+    searchParams: parseSearchParams(searchParams),
     signal,
   });
 

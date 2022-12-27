@@ -290,16 +290,29 @@ const getAlbumList = async (args: AlbumListArgs): Promise<JFAlbumList> => {
 const getSongList = async (args: SongListArgs): Promise<JFSongList> => {
   const { query, server, signal } = args;
 
-  const searchParams: JFSongListParams = {
+  const yearsGroup = [];
+  if (query.jfParams?.minYear && query.jfParams?.maxYear) {
+    for (let i = Number(query.jfParams.minYear); i <= Number(query.jfParams.maxYear); i += 1) {
+      yearsGroup.push(String(i));
+    }
+  }
+
+  const yearsFilter = yearsGroup.length ? yearsGroup.join(',') : undefined;
+
+  const searchParams: JFSongListParams & { maxYear?: number; minYear?: number } = {
     fields: 'Genres, DateCreated, MediaSources, ParentId',
     includeItemTypes: 'Audio',
     limit: query.limit,
     parentId: query.musicFolderId,
     recursive: true,
+    searchTerm: query.searchTerm,
     sortBy: songListSortMap.jellyfin[query.sortBy],
     sortOrder: sortOrderMap.jellyfin[query.sortOrder],
     startIndex: query.startIndex,
     ...query.jfParams,
+    maxYear: undefined,
+    minYear: undefined,
+    years: yearsFilter,
   };
 
   const data = await api

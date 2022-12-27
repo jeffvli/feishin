@@ -419,10 +419,12 @@ export enum SongListSort {
 export type SongListQuery = {
   jfParams?: {
     filters?: string;
+    genreIds?: string;
     genres?: string;
     includeItemTypes: 'Audio';
-    maxYear?: number;
-    minYear?: number;
+    isFavorite?: boolean;
+    maxYear?: number; // Parses to years
+    minYear?: number; // Parses to years
     sortBy?: JFSongListSort;
     years?: string;
   };
