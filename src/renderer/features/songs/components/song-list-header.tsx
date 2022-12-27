@@ -1,40 +1,76 @@
-import type { MouseEvent } from 'react';
-import { useCallback } from 'react';
-import { Group } from '@mantine/core';
-import { Button, Slider, PageHeader, DropdownMenu } from '/@/renderer/components';
-import throttle from 'lodash/throttle';
-import { RiArrowDownSLine } from 'react-icons/ri';
-import { SongListSort, SortOrder } from '/@/renderer/api/types';
-import { useCurrentServer, useAppStoreActions, useSongRouteStore } from '/@/renderer/store';
-import { CardDisplayType } from '/@/renderer/types';
+import type { IDatasource } from '@ag-grid-community/core';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { Flex, Group } from '@mantine/core';
+import debounce from 'lodash/debounce';
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
+import {
+  RiArrowDownSLine,
+  RiFilter3Line,
+  RiFolder2Line,
+  RiMoreFill,
+  RiSortAsc,
+  RiSortDesc,
+} from 'react-icons/ri';
+import { api } from '/@/renderer/api';
+import { queryKeys } from '/@/renderer/api/query-keys';
+import { ServerType, SongListSort, SortOrder } from '/@/renderer/api/types';
+import {
+  Button,
+  DropdownMenu,
+  PageHeader,
+  SearchInput,
+  Slider,
+  TextTitle,
+  Switch,
+  MultiSelect,
+  Text,
+  SONG_TABLE_COLUMNS,
+} from '/@/renderer/components';
+import { useMusicFolders } from '/@/renderer/features/shared';
+import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jellyfin-song-filters';
+import { NavidromeSongFilters } from '/@/renderer/features/songs/components/navidrome-song-filters';
+import { useContainerQuery } from '/@/renderer/hooks';
+import { queryClient } from '/@/renderer/lib/react-query';
+import {
+  SongListFilter,
+  useCurrentServer,
+  useSetSongFilters,
+  useSetSongStore,
+  useSetSongTable,
+  useSetSongTablePagination,
+  useSongListStore,
+} from '/@/renderer/store';
+import { ListDisplayType, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
   jellyfin: [
-    { name: 'Album Artist', value: SongListSort.ALBUM_ARTIST },
-    { name: 'Artist', value: SongListSort.ARTIST },
-    { name: 'Duration', value: SongListSort.DURATION },
-    { name: 'Name', value: SongListSort.NAME },
-    { name: 'Name', value: SongListSort.PLAY_COUNT },
-    { name: 'Random', value: SongListSort.RANDOM },
-    { name: 'Recently Added', value: SongListSort.RECENTLY_ADDED },
-    { name: 'Recently Played', value: SongListSort.RECENTLY_PLAYED },
-    { name: 'Release Date', value: SongListSort.RELEASE_DATE },
+    { defaultOrder: SortOrder.ASC, name: 'Album', value: SongListSort.ALBUM },
+    { defaultOrder: SortOrder.ASC, name: 'Album Artist', value: SongListSort.ALBUM_ARTIST },
+    { defaultOrder: SortOrder.ASC, name: 'Artist', value: SongListSort.ARTIST },
+    { defaultOrder: SortOrder.ASC, name: 'Duration', value: SongListSort.DURATION },
+    { defaultOrder: SortOrder.ASC, name: 'Most Played', value: SongListSort.PLAY_COUNT },
+    { defaultOrder: SortOrder.ASC, name: 'Name', value: SongListSort.NAME },
+    { defaultOrder: SortOrder.ASC, name: 'Random', value: SongListSort.RANDOM },
+    { defaultOrder: SortOrder.ASC, name: 'Recently Added', value: SongListSort.RECENTLY_ADDED },
+    { defaultOrder: SortOrder.ASC, name: 'Recently Played', value: SongListSort.RECENTLY_PLAYED },
+    { defaultOrder: SortOrder.ASC, name: 'Release Date', value: SongListSort.RELEASE_DATE },
   ],
   navidrome: [
-    { name: 'Album Artist', value: SongListSort.ALBUM_ARTIST },
-    { name: 'Artist', value: SongListSort.ARTIST },
-    { name: 'BPM', value: SongListSort.BPM },
-    { name: 'Channels', value: SongListSort.CHANNELS },
-    { name: 'Comment', value: SongListSort.COMMENT },
-    { name: 'Duration', value: SongListSort.DURATION },
-    { name: 'Favorited', value: SongListSort.FAVORITED },
-    { name: 'Genre', value: SongListSort.GENRE },
-    { name: 'Name', value: SongListSort.NAME },
-    { name: 'Play Count', value: SongListSort.PLAY_COUNT },
-    { name: 'Rating', value: SongListSort.RATING },
-    { name: 'Recently Added', value: SongListSort.RECENTLY_ADDED },
-    { name: 'Recently Played', value: SongListSort.RECENTLY_PLAYED },
-    { name: 'Year', value: SongListSort.YEAR },
+    { defaultOrder: SortOrder.ASC, name: 'Album', value: SongListSort.ALBUM },
+    { defaultOrder: SortOrder.ASC, name: 'Album Artist', value: SongListSort.ALBUM_ARTIST },
+    { defaultOrder: SortOrder.ASC, name: 'Artist', value: SongListSort.ARTIST },
+    { defaultOrder: SortOrder.DESC, name: 'BPM', value: SongListSort.BPM },
+    { defaultOrder: SortOrder.ASC, name: 'Channels', value: SongListSort.CHANNELS },
+    { defaultOrder: SortOrder.ASC, name: 'Comment', value: SongListSort.COMMENT },
+    { defaultOrder: SortOrder.DESC, name: 'Duration', value: SongListSort.DURATION },
+    { defaultOrder: SortOrder.DESC, name: 'Favorited', value: SongListSort.FAVORITED },
+    { defaultOrder: SortOrder.ASC, name: 'Genre', value: SongListSort.GENRE },
+    { defaultOrder: SortOrder.ASC, name: 'Name', value: SongListSort.NAME },
+    { defaultOrder: SortOrder.DESC, name: 'Play Count', value: SongListSort.PLAY_COUNT },
+    { defaultOrder: SortOrder.DESC, name: 'Rating', value: SongListSort.RATING },
+    { defaultOrder: SortOrder.DESC, name: 'Recently Added', value: SongListSort.RECENTLY_ADDED },
+    { defaultOrder: SortOrder.DESC, name: 'Recently Played', value: SongListSort.RECENTLY_PLAYED },
+    { defaultOrder: SortOrder.DESC, name: 'Year', value: SongListSort.YEAR },
   ],
 };
 
@@ -43,219 +79,363 @@ const ORDER = [
   { name: 'Descending', value: SortOrder.DESC },
 ];
 
-export const SongListHeader = () => {
+interface SongListHeaderProps {
+  tableRef: MutableRefObject<AgGridReactType | null>;
+}
+
+export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
   const server = useCurrentServer();
-  const { setPage } = useAppStoreActions();
-  const page = useSongRouteStore();
-  const filters = page.list.filter;
+  const page = useSongListStore();
+  const setPage = useSetSongStore();
+  const setFilter = useSetSongFilters();
+  const setTable = useSetSongTable();
+  const cq = useContainerQuery();
+
+  const musicFoldersQuery = useMusicFolders();
 
   const sortByLabel =
     (server?.type &&
       (FILTERS[server.type as keyof typeof FILTERS] as { name: string; value: string }[]).find(
-        (f) => f.value === filters.sortBy,
+        (f) => f.value === page.filter.sortBy,
       )?.name) ||
     'Unknown';
 
-  const sortOrderLabel = ORDER.find((s) => s.value === filters.sortOrder)?.name;
+  const sortOrderLabel = ORDER.find((s) => s.value === page.filter.sortOrder)?.name;
 
-  const setSize = throttle(
-    (e: number) =>
-      setPage('songs', {
-        ...page,
-        list: { ...page.list, size: e },
-      }),
-    200,
+  const handleFilterChange = useCallback(
+    async (filters?: SongListFilter) => {
+      const dataSource: IDatasource = {
+        getRows: async (params) => {
+          const limit = params.endRow - params.startRow;
+          const startIndex = params.startRow;
+
+          const pageFilters = filters || page.filter;
+
+          const queryKey = queryKeys.songs.list(server?.id || '', {
+            limit,
+            startIndex,
+            ...pageFilters,
+          });
+
+          const songsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+            api.controller.getSongList({
+              query: {
+                limit,
+                startIndex,
+                ...pageFilters,
+              },
+              server,
+              signal,
+            }),
+          );
+
+          const songs = api.normalize.songList(songsRes, server);
+          params.successCallback(songs?.items || [], songsRes?.totalRecordCount);
+        },
+        rowCount: undefined,
+      };
+      tableRef.current?.api.setDatasource(dataSource);
+      tableRef.current?.api.purgeInfiniteCache();
+      tableRef.current?.api.ensureIndexVisible(0, 'top');
+    },
+    [page.filter, server, tableRef],
   );
 
-  const handleSetFilter = useCallback(
+  const handleSetSortBy = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      if (!e.currentTarget?.value || !server?.type) return;
+
+      const sortOrder = FILTERS[server.type as keyof typeof FILTERS].find(
+        (f) => f.value === e.currentTarget.value,
+      )?.defaultOrder;
+
+      const updatedFilters = setFilter({
+        sortBy: e.currentTarget.value as SongListSort,
+        sortOrder: sortOrder || SortOrder.ASC,
+      });
+
+      handleFilterChange(updatedFilters);
+    },
+    [handleFilterChange, server?.type, setFilter],
+  );
+
+  const handleSetMusicFolder = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      setPage('songs', {
-        list: {
-          ...page.list,
-          filter: {
-            ...page.list.filter,
-            sortBy: e.currentTarget.value as SongListSort,
-          },
-        },
-      });
+
+      let updatedFilters = null;
+      if (e.currentTarget.value === String(page.filter.musicFolderId)) {
+        updatedFilters = setFilter({ musicFolderId: undefined });
+      } else {
+        updatedFilters = setFilter({ musicFolderId: e.currentTarget.value });
+      }
+
+      handleFilterChange(updatedFilters);
     },
-    [page.list, setPage],
+    [handleFilterChange, page.filter.musicFolderId, setFilter],
   );
 
-  const handleSetOrder = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
-      if (!e.currentTarget?.value) return;
-      setPage('songs', {
-        list: {
-          ...page.list,
-          filter: {
-            ...page.list.filter,
-            sortOrder: e.currentTarget.value as SortOrder,
-          },
-        },
-      });
-    },
-    [page.list, setPage],
-  );
+  const handleToggleSortOrder = useCallback(() => {
+    const newSortOrder = page.filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
+    const updatedFilters = setFilter({ sortOrder: newSortOrder });
+    handleFilterChange(updatedFilters);
+  }, [page.filter.sortOrder, handleFilterChange, setFilter]);
+
+  const setPagination = useSetSongTablePagination();
 
   const handleSetViewType = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      const type = e.currentTarget.value;
-      if (type === CardDisplayType.CARD) {
-        setPage('songs', {
-          ...page,
-          list: {
-            ...page.list,
-            display: CardDisplayType.CARD,
-            type: 'grid',
-          },
-        });
-      } else if (type === CardDisplayType.POSTER) {
-        setPage('songs', {
-          ...page,
-          list: {
-            ...page.list,
-            display: CardDisplayType.POSTER,
-            type: 'grid',
-          },
-        });
-      } else {
-        setPage('songs', {
-          ...page,
-          list: {
-            ...page.list,
-            type: 'list',
-          },
-        });
+      const display = e.currentTarget.value as ListDisplayType;
+      setPage({ list: { ...page, display: e.currentTarget.value as ListDisplayType } });
+
+      if (display === ListDisplayType.TABLE) {
+        tableRef.current?.api.paginationSetPageSize(tableRef.current.props.infiniteInitialRowCount);
+        setPagination({ currentPage: 0 });
+      } else if (display === ListDisplayType.TABLE_PAGINATED) {
+        setPagination({ currentPage: 0 });
       }
     },
-    [page, setPage],
+    [page, setPage, setPagination, tableRef],
   );
+
+  const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
+    const updatedFilters = setFilter({
+      searchTerm: e.target.value === '' ? undefined : e.target.value,
+    });
+    handleFilterChange(updatedFilters);
+  }, 500);
+
+  const handleTableColumns = (values: TableColumn[]) => {
+    const existingColumns = page.table.columns;
+
+    if (values.length === 0) {
+      return setTable({
+        columns: [],
+      });
+    }
+
+    // If adding a column
+    if (values.length > existingColumns.length) {
+      const newColumn = { column: values[values.length - 1], width: 100 };
+
+      return setTable({ columns: [...existingColumns, newColumn] });
+    }
+
+    // If removing a column
+    const removed = existingColumns.filter((column) => !values.includes(column.column));
+    const newColumns = existingColumns.filter((column) => !removed.includes(column));
+
+    return setTable({ columns: newColumns });
+  };
+
+  const handleAutoFitColumns = (e: ChangeEvent<HTMLInputElement>) => {
+    setTable({ autoFit: e.currentTarget.checked });
+
+    if (e.currentTarget.checked) {
+      tableRef.current?.api.sizeColumnsToFit();
+    }
+  };
+
+  const handleRowHeight = (e: number) => {
+    setTable({ rowHeight: e });
+  };
 
   return (
     <PageHeader>
-      <Group>
-        <DropdownMenu
-          position="bottom-end"
-          width={100}
+      <Flex
+        ref={cq.ref}
+        direction="row"
+        justify="space-between"
+      >
+        <Flex
+          align="center"
+          gap="md"
+          justify="center"
         >
-          <DropdownMenu.Target>
-            <Button
-              compact
-              rightIcon={<RiArrowDownSLine size={15} />}
-              size="xl"
-              sx={{ paddingLeft: 0, paddingRight: 0 }}
-              variant="subtle"
-            >
-              Tracks
-            </Button>
-          </DropdownMenu.Target>
-          <DropdownMenu.Dropdown>
-            <DropdownMenu.Item>
-              <Slider
-                defaultValue={page.list?.size || 0}
-                label={null}
-                onChange={setSize}
-              />
-            </DropdownMenu.Item>
-            <DropdownMenu.Divider />
-            <DropdownMenu.Item
-              $isActive={page.list.type === 'grid' && page.list.display === CardDisplayType.CARD}
-              value={CardDisplayType.CARD}
-              onClick={handleSetViewType}
-            >
-              Card
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              $isActive={page.list.type === 'grid' && page.list.display === CardDisplayType.POSTER}
-              value={CardDisplayType.POSTER}
-              onClick={handleSetViewType}
-            >
-              Poster
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              disabled
-              $isActive={page.list.type === 'list'}
-              value="list"
-              onClick={handleSetViewType}
-            >
-              List
-            </DropdownMenu.Item>
-          </DropdownMenu.Dropdown>
-        </DropdownMenu>
-        <DropdownMenu position="bottom-start">
-          <DropdownMenu.Target>
-            <Button
-              compact
-              fw="normal"
-              variant="subtle"
-            >
-              {sortByLabel}
-            </Button>
-          </DropdownMenu.Target>
-          <DropdownMenu.Dropdown>
-            {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
-              <DropdownMenu.Item
-                key={`filter-${filter.name}`}
-                $isActive={filter.value === filters.sortBy}
-                value={filter.value}
-                onClick={handleSetFilter}
+          <DropdownMenu position="bottom-start">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                rightIcon={<RiArrowDownSLine size={15} />}
+                size="xl"
+                sx={{ paddingLeft: 0, paddingRight: 0 }}
+                variant="subtle"
               >
-                {filter.name}
-              </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Dropdown>
-        </DropdownMenu>
-        <DropdownMenu position="bottom-start">
-          <DropdownMenu.Target>
-            <Button
-              compact
-              fw="normal"
-              variant="subtle"
-            >
-              {sortOrderLabel}
-            </Button>
-          </DropdownMenu.Target>
-          <DropdownMenu.Dropdown>
-            {ORDER.map((sort) => (
+                <TextTitle
+                  fw="bold"
+                  order={3}
+                >
+                  Tracks
+                </TextTitle>
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              <DropdownMenu.Label>Display type</DropdownMenu.Label>
               <DropdownMenu.Item
-                key={`sort-${sort.value}`}
-                $isActive={sort.value === filters.sortOrder}
-                value={sort.value}
-                onClick={handleSetOrder}
+                $isActive={page.display === ListDisplayType.TABLE}
+                value={ListDisplayType.TABLE}
+                onClick={handleSetViewType}
               >
-                {sort.name}
+                Table
               </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Dropdown>
-        </DropdownMenu>
-        <DropdownMenu position="bottom-start">
-          <DropdownMenu.Target>
-            <Button
-              compact
-              fw="normal"
-              variant="subtle"
-            >
-              Folder
-            </Button>
-          </DropdownMenu.Target>
-          {/* <DropdownMenu.Dropdown>
-          {serverFolders?.map((folder) => (
-            <DropdownMenu.Item
-              key={folder.id}
-              $isActive={filters.serverFolderId.includes(folder.id)}
-              closeMenuOnClick={false}
-              value={folder.id}
-              onClick={handleSetServerFolder}
-            >
-              {folder.name}
-            </DropdownMenu.Item>
-          ))}
-        </DropdownMenu.Dropdown> */}
-        </DropdownMenu>
-      </Group>
+              <DropdownMenu.Item
+                $isActive={page.display === ListDisplayType.TABLE_PAGINATED}
+                value={ListDisplayType.TABLE_PAGINATED}
+                onClick={handleSetViewType}
+              >
+                Table (paginated)
+              </DropdownMenu.Item>
+              <DropdownMenu.Divider />
+              <DropdownMenu.Label>Item Size</DropdownMenu.Label>
+              <DropdownMenu.Item closeMenuOnClick={false}>
+                <Slider
+                  defaultValue={page.table.rowHeight || 0}
+                  label={null}
+                  max={100}
+                  min={25}
+                  onChangeEnd={handleRowHeight}
+                />
+              </DropdownMenu.Item>
+              <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
+              <DropdownMenu.Item
+                closeMenuOnClick={false}
+                component="div"
+                sx={{ cursor: 'default' }}
+              >
+                <MultiSelect
+                  clearable
+                  data={SONG_TABLE_COLUMNS}
+                  defaultValue={page.table?.columns.map((column) => column.column)}
+                  width={300}
+                  onChange={handleTableColumns}
+                />
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                closeMenuOnClick={false}
+                component="div"
+                sx={{ cursor: 'default' }}
+              >
+                <Group position="apart">
+                  <Text>Auto Fit Columns</Text>
+                  <Switch
+                    defaultChecked={page.table.autoFit}
+                    onChange={handleAutoFitColumns}
+                  />
+                </Group>
+              </DropdownMenu.Item>
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
+          <DropdownMenu position="bottom-start">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                fw="600"
+                variant="subtle"
+              >
+                {sortByLabel}
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
+                <DropdownMenu.Item
+                  key={`filter-${filter.name}`}
+                  $isActive={filter.value === page.filter.sortBy}
+                  value={filter.value}
+                  onClick={handleSetSortBy}
+                >
+                  {filter.name}
+                </DropdownMenu.Item>
+              ))}
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
+          <Button
+            compact
+            fw="600"
+            variant="subtle"
+            onClick={handleToggleSortOrder}
+          >
+            {cq.isMd ? (
+              sortOrderLabel
+            ) : (
+              <>
+                {page.filter.sortOrder === SortOrder.ASC ? (
+                  <RiSortAsc size={15} />
+                ) : (
+                  <RiSortDesc size={15} />
+                )}
+              </>
+            )}
+          </Button>
+          {server?.type === ServerType.JELLYFIN && (
+            <DropdownMenu position="bottom-start">
+              <DropdownMenu.Target>
+                <Button
+                  compact
+                  fw="600"
+                  variant="subtle"
+                >
+                  {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}
+                </Button>
+              </DropdownMenu.Target>
+              <DropdownMenu.Dropdown>
+                {musicFoldersQuery.data?.map((folder) => (
+                  <DropdownMenu.Item
+                    key={`musicFolder-${folder.id}`}
+                    $isActive={page.filter.musicFolderId === folder.id}
+                    value={folder.id}
+                    onClick={handleSetMusicFolder}
+                  >
+                    {folder.name}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Dropdown>
+            </DropdownMenu>
+          )}
+          <DropdownMenu position="bottom-start">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                fw="600"
+                variant="subtle"
+              >
+                {cq.isMd ? 'Filters' : <RiFilter3Line size={15} />}
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              {server?.type === ServerType.NAVIDROME ? (
+                <NavidromeSongFilters handleFilterChange={handleFilterChange} />
+              ) : (
+                <JellyfinSongFilters handleFilterChange={handleFilterChange} />
+              )}
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
+          <DropdownMenu position="bottom-start">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                fw="600"
+                variant="subtle"
+              >
+                <RiMoreFill size={15} />
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              <DropdownMenu.Item disabled>Play</DropdownMenu.Item>
+              <DropdownMenu.Item disabled>Play last</DropdownMenu.Item>
+              <DropdownMenu.Item disabled>Play next</DropdownMenu.Item>
+              <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
+        </Flex>
+        <Flex gap="md">
+          <SearchInput
+            defaultValue={page.filter.searchTerm}
+            openedWidth={cq.isLg ? 300 : cq.isMd ? 250 : cq.isSm ? 150 : 75}
+            onChange={handleSearch}
+          />
+        </Flex>
+      </Flex>
     </PageHeader>
   );
 };

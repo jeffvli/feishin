@@ -3,8 +3,9 @@ import { nanoid } from 'nanoid/non-secure';
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { AlbumListSort, SortOrder } from '/@/renderer/api/types';
+import { AlbumListSort, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { useAlbumStore } from '/@/renderer/store/album.store';
+import { useSongStore } from '/@/renderer/store/song.store';
 import { ServerListItem } from '/@/renderer/types';
 
 export interface AuthState {
@@ -48,7 +49,12 @@ export const useAuthStore = create<AuthSlice>()(
                 useAlbumStore.getState().actions.setFilters({
                   musicFolderId: undefined,
                   sortBy: AlbumListSort.RECENTLY_ADDED,
-                  sortOrder: SortOrder.ASC,
+                  sortOrder: SortOrder.DESC,
+                });
+                useSongStore.getState().actions.setFilters({
+                  musicFolderId: undefined,
+                  sortBy: SongListSort.RECENTLY_ADDED,
+                  sortOrder: SortOrder.DESC,
                 });
               }
             });

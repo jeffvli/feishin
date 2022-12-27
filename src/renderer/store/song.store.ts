@@ -4,9 +4,10 @@ import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { SongListArgs, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { DataTableProps } from '/@/renderer/store/settings.store';
-import { ListDisplayType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, TableColumn, TablePagination } from '/@/renderer/types';
 
 type TableProps = {
+  pagination: TablePagination;
   scrollOffset: number;
 } & DataTableProps;
 
@@ -16,16 +17,18 @@ type ListProps<T> = {
   table: TableProps;
 };
 
-type AlbumListFilter = Omit<SongListArgs['query'], 'startIndex' | 'limit'>;
+export type SongListFilter = Omit<SongListArgs['query'], 'startIndex' | 'limit'>;
 
 interface SongState {
-  list: ListProps<AlbumListFilter>;
+  list: ListProps<SongListFilter>;
 }
 
 export interface SongSlice extends SongState {
   actions: {
-    setFilters: (data: Partial<AlbumListFilter>) => void;
+    setFilters: (data: Partial<SongListFilter>) => SongListFilter;
     setStore: (data: Partial<SongSlice>) => void;
+    setTable: (data: Partial<TableProps>) => void;
+    setTablePagination: (data: Partial<TableProps['pagination']>) => void;
   };
 }
 
@@ -38,9 +41,21 @@ export const useSongStore = create<SongSlice>()(
             set((state) => {
               state.list.filter = { ...state.list.filter, ...data };
             });
+
+            return get().list.filter;
           },
           setStore: (data) => {
             set({ ...get(), ...data });
+          },
+          setTable: (data) => {
+            set((state) => {
+              state.list.table = { ...state.list.table, ...data };
+            });
+          },
+          setTablePagination: (data) => {
+            set((state) => {
+              state.list.table.pagination = { ...state.list.table.pagination, ...data };
+            });
           },
         },
         list: {
@@ -78,6 +93,12 @@ export const useSongStore = create<SongSlice>()(
                 width: 100,
               },
             ],
+            pagination: {
+              currentPage: 1,
+              itemsPerPage: 100,
+              totalItems: 1,
+              totalPages: 1,
+            },
             rowHeight: 60,
             scrollOffset: 0,
           },
@@ -99,8 +120,17 @@ export const useSongStoreActions = () => useSongStore((state) => state.actions);
 
 export const useSetSongStore = () => useSongStore((state) => state.actions.setStore);
 
+export const useSetSongFilters = () => useSongStore((state) => state.actions.setFilters);
+
 export const useSongFilters = () => {
   return useSongStore((state) => [state.list.filter, state.actions.setFilters]);
 };
 
 export const useSongListStore = () => useSongStore((state) => state.list);
+
+export const useSongTablePagination = () => useSongStore((state) => state.list.table.pagination);
+
+export const useSetSongTablePagination = () =>
+  useSongStore((state) => state.actions.setTablePagination);
+
+export const useSetSongTable = () => useSongStore((state) => state.actions.setTable);
