@@ -200,10 +200,10 @@ export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
   );
 
   const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-    const updatedFilters = setFilter({
-      searchTerm: e.target.value === '' ? undefined : e.target.value,
-    });
-    handleFilterChange(updatedFilters);
+    const previousSearchTerm = page.filter.searchTerm;
+    const searchTerm = e.target.value === '' ? undefined : e.target.value;
+    const updatedFilters = setFilter({ searchTerm });
+    if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
   }, 500);
 
   const handleTableColumns = (values: TableColumn[]) => {
