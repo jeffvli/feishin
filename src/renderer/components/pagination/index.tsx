@@ -11,24 +11,28 @@ const StyledPagination = styled(MantinePagination)<PaginationProps>`
     border: none;
     transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 
-    &:hover {
-      color: var(--btn-default-fg-hover);
-      background-color: var(--btn-default-bg-hover);
-    }
-
     &[data-active] {
       color: var(--btn-primary-fg);
       background-color: var(--btn-primary-bg);
     }
 
-    &:hover &[data-active] {
-      color: var(--btn-primary-fg-hover);
-      background-color: var(--btn-primary-bg-hover);
-    }
-
     &[data-dots] {
       display: ${({ $hideDividers }) => ($hideDividers ? 'none' : 'block')};
       background-color: transparent;
+    }
+
+    &:hover {
+      color: var(--btn-default-fg-hover);
+      background-color: var(--btn-default-bg-hover);
+
+      &[data-active] {
+        color: var(--btn-primary-fg-hover);
+        background-color: var(--btn-primary-bg-hover);
+      }
+
+      &[data-dots] {
+        background-color: transparent;
+      }
     }
   }
 `;
