@@ -223,7 +223,7 @@ export const getColumnDefs = (columns: PersistedTableColumn[]) => {
     if (presetColumn) {
       columnDefs.push({
         ...presetColumn,
-        width: column.width,
+        initialWidth: column.width,
       });
     }
   }
