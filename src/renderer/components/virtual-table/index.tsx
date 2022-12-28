@@ -217,10 +217,15 @@ export const getColumnDef = (column: TableColumn) => {
 };
 
 export const getColumnDefs = (columns: PersistedTableColumn[]) => {
-  const columnDefs: any[] = [];
+  const columnDefs: ColDef[] = [];
   for (const column of columns) {
-    const columnExists = tableColumns[column.column as keyof typeof tableColumns];
-    if (columnExists) columnDefs.push(columnExists);
+    const presetColumn = tableColumns[column.column as keyof typeof tableColumns];
+    if (presetColumn) {
+      columnDefs.push({
+        ...presetColumn,
+        width: column.width,
+      });
+    }
   }
 
   return columnDefs;
