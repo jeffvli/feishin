@@ -1,24 +1,28 @@
-import { Stack, Group, Grid, Accordion, Center } from '@mantine/core';
+import { Stack, Grid, Accordion, Center, Group } from '@mantine/core';
 import { SpotlightProvider } from '@mantine/spotlight';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BsCollection } from 'react-icons/bs';
 import { Button, TextInput } from '/@/renderer/components';
 import {
+  RiAlbumFill,
   RiAlbumLine,
   RiArrowDownSLine,
   RiArrowLeftSLine,
   RiArrowRightSLine,
+  RiDatabaseFill,
   RiDatabaseLine,
   RiDiscLine,
-  RiEyeLine,
+  RiFlag2Line,
   RiFolder3Line,
+  RiHome5Fill,
   RiHome5Line,
+  RiMusicFill,
   RiMusicLine,
   RiPlayListLine,
   RiSearchLine,
   RiUserVoiceLine,
 } from 'react-icons/ri';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -60,6 +64,7 @@ const ActionsContainer = styled(Grid)`
 
 export const Sidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const sidebar = useSidebarStore();
   const { setSidebar } = useAppStoreActions();
   const imageUrl = useCurrentSong()?.imageUrl;
@@ -121,28 +126,26 @@ export const Sidebar = () => {
           >
             <SidebarItem to={AppRoute.HOME}>
               <Group>
-                <RiHome5Line size={15} />
+                {location.pathname === AppRoute.HOME ? (
+                  <RiHome5Fill size={15} />
+                ) : (
+                  <RiHome5Line size={15} />
+                )}
                 Home
               </Group>
-            </SidebarItem>
-            <SidebarItem>
-              <SidebarItem.Link
-                disabled
-                to={AppRoute.EXPLORE}
-              >
-                <Group>
-                  <RiEyeLine />
-                  Explore
-                </Group>
-              </SidebarItem.Link>
             </SidebarItem>
             <Accordion
               multiple
               styles={{
-                item: { borderBottom: 'none' },
+                control: {
+                  '&:hover': { background: 'none', color: 'var(--sidebar-fg-hover)' },
+                  color: 'var(--sidebar-fg)',
+                  transition: 'color 0.2s ease-in-out',
+                },
+                item: { borderBottom: 'none', color: 'var(--sidebar-fg)' },
+                itemTitle: { color: 'var(--sidebar-fg)' },
                 panel: {
-                  borderLeft: '1px solid rgba(100,100,100,.5)',
-                  marginLeft: '1.5rem',
+                  marginLeft: '1rem',
                 },
               }}
               value={sidebar.expanded}
@@ -151,20 +154,32 @@ export const Sidebar = () => {
               <Accordion.Item value="library">
                 <Accordion.Control p="1rem">
                   <Group>
-                    <RiDatabaseLine size={15} />
+                    {location.pathname.includes('/library/') ? (
+                      <RiDatabaseFill size={15} />
+                    ) : (
+                      <RiDatabaseLine size={15} />
+                    )}
                     Library
                   </Group>
                 </Accordion.Control>
                 <Accordion.Panel>
                   <SidebarItem to={AppRoute.LIBRARY_ALBUMS}>
                     <Group>
-                      <RiAlbumLine />
+                      {location.pathname === AppRoute.LIBRARY_ALBUMS ? (
+                        <RiAlbumFill />
+                      ) : (
+                        <RiAlbumLine />
+                      )}
                       Albums
                     </Group>
                   </SidebarItem>
                   <SidebarItem to={AppRoute.LIBRARY_SONGS}>
                     <Group>
-                      <RiMusicLine />
+                      {location.pathname === AppRoute.LIBRARY_SONGS ? (
+                        <RiMusicFill />
+                      ) : (
+                        <RiMusicLine />
+                      )}
                       Tracks
                     </Group>
                   </SidebarItem>
@@ -175,6 +190,15 @@ export const Sidebar = () => {
                     <Group>
                       <RiUserVoiceLine />
                       Artists
+                    </Group>
+                  </SidebarItem>
+                  <SidebarItem
+                    disabled
+                    to={AppRoute.LIBRARY_FOLDERS}
+                  >
+                    <Group>
+                      <RiFlag2Line />
+                      Genres
                     </Group>
                   </SidebarItem>
                   <SidebarItem

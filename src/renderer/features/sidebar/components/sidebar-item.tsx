@@ -23,13 +23,12 @@ const ItemStyle = css`
   display: flex;
   width: 100%;
   padding: 0.5rem 1rem;
-  color: var(--sidebar-btn-color);
-  font-family: var(--content-font-family);
+  color: var(--sidebar-fg);
   border: 1px transparent solid;
   transition: color 0.2s ease-in-out;
 
   &:hover {
-    color: var(--sidebar-btn-color-hover);
+    color: var(--sidebar-fg-hover);
   }
 `;
 
