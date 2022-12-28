@@ -10,6 +10,7 @@ import { usePlayerType } from '/@/renderer/store/settings.store';
 import { PlayQueueAddOptions, LibraryItem, Play, PlaybackType } from '/@/renderer/types';
 import { toast } from '/@/renderer/components/toast';
 import isElectron from 'is-electron';
+import { nanoid } from 'nanoid/non-secure';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
@@ -57,6 +58,29 @@ export const useHandlePlayQueueAdd = () => {
       if (!songs) return toast.warn({ message: 'No songs found' });
 
       const playerData = usePlayerStore.getState().actions.addToQueue(songs, options.play);
+
+      if (options.play === Play.NEXT || options.play === Play.LAST) {
+        if (playerType === PlaybackType.LOCAL) {
+          mpvPlayer.setQueueNext(playerData);
+        }
+      }
+
+      if (options.play === Play.NOW) {
+        if (playerType === PlaybackType.LOCAL) {
+          mpvPlayer.setQueue(playerData);
+          mpvPlayer.play();
+        }
+
+        usePlayerStore.getState().actions.play();
+      }
+    }
+
+    if (options.byData) {
+      const songsWithNewUniqueId = options.byData.map((song) => ({ ...song, uniqueId: nanoid() }));
+
+      const playerData = usePlayerStore
+        .getState()
+        .actions.addToQueue(songsWithNewUniqueId, options.play);
 
       if (options.play === Play.NEXT || options.play === Play.LAST) {
         if (playerType === PlaybackType.LOCAL) {

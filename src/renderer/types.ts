@@ -1,4 +1,4 @@
-import { Album, AlbumArtist, Artist } from '/@/renderer/api/types';
+import { Album, AlbumArtist, Artist, QueueSong } from '/@/renderer/api/types';
 import { AppRoute } from '/@/renderer/router/routes';
 
 export type TablePagination = {
@@ -157,8 +157,8 @@ export enum TableColumn {
 }
 
 export type PlayQueueAddOptions = {
-  // byData?: any[];
-  byItemType: {
+  byData?: QueueSong[];
+  byItemType?: {
     id: string;
     type: LibraryItem;
   };
