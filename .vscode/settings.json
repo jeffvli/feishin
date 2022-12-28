@@ -12,7 +12,6 @@
   "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "editor.tabSize": 2,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true,
     "source.fixAll.eslint": true,
     "source.fixAll.stylelint": false
   },
