@@ -1,6 +1,7 @@
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import type {
   BodyScrollEvent,
+  CellContextMenuEvent,
   ColDef,
   GridReadyEvent,
   IDatasource,
@@ -25,9 +26,11 @@ import {
   useSongListStore,
   useSongTablePagination,
 } from '/@/renderer/store';
-import { ListDisplayType } from '/@/renderer/types';
+import { LibraryItem, ListDisplayType } from '/@/renderer/types';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
+import { openContextMenu } from '/@/renderer/features/context-menu';
+import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 
 interface SongListContentProps {
   tableRef: MutableRefObject<AgGridReactType | null>;
@@ -152,6 +155,28 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
     setTable({ scrollOffset });
   };
 
+  const handleContextMenu = (e: CellContextMenuEvent) => {
+    if (!e.event) return;
+    const clickEvent = e.event as MouseEvent;
+    clickEvent.preventDefault();
+
+    const selectedRows = e.api.getSelectedRows();
+    const selectedUniqueIds = selectedRows.map((row) => row.uniqueId);
+
+    if (!selectedUniqueIds.includes(e.data.uniqueId)) {
+      e.api.deselectAll();
+      e.node.setSelected(true);
+    }
+
+    openContextMenu({
+      data: selectedRows,
+      menuItems: SONG_CONTEXT_MENU_ITEMS,
+      type: LibraryItem.SONG,
+      xPos: clickEvent.clientX,
+      yPos: clickEvent.clientY,
+    });
+  };
+
   return (
     <Stack
       h="100%"
@@ -187,7 +212,7 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
           rowModelType="infinite"
           rowSelection="multiple"
           onBodyScrollEnd={handleScroll}
-          onCellContextMenu={(e) => console.log('context', e)}
+          onCellContextMenu={handleContextMenu}
           onColumnMoved={handleColumnChange}
           onColumnResized={debouncedColumnChange}
           onGridReady={onGridReady}
