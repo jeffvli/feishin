@@ -50,7 +50,10 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
     ...page.filter,
   });
 
-  const columnDefs = useMemo(() => getColumnDefs(page.table.columns), [page.table.columns]);
+  const columnDefs: ColDef[] = useMemo(
+    () => getColumnDefs(page.table.columns),
+    [page.table.columns],
+  );
 
   const defaultColumnDefs: ColDef = useMemo(() => {
     return {
@@ -91,9 +94,8 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
         rowCount: undefined,
       };
       params.api.setDatasource(dataSource);
-      params.api.ensureIndexVisible(page.table.scrollOffset || 0, 'top');
     },
-    [page.filter, page.table.scrollOffset, queryClient, server],
+    [page.filter, queryClient, server],
   );
 
   const onPaginationChanged = useCallback(
@@ -119,7 +121,7 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
     }
   };
 
-  const handleColumnMove = useCallback(() => {
+  const handleColumnChange = useCallback(() => {
     const { columnApi } = tableRef?.current || {};
     const columnsOrder = columnApi?.getAllGridColumns();
 
@@ -134,7 +136,7 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
         updatedColumns.push({
           ...columnInSettings,
           ...(!page.table.autoFit && {
-            width: column.getColDef().width,
+            width: column.getActualWidth(),
           }),
         });
       }
@@ -143,10 +145,12 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
     setTable({ columns: updatedColumns });
   }, [page.table.autoFit, page.table.columns, setTable, tableRef]);
 
-  const handleScroll = debounce((e: BodyScrollEvent) => {
+  const debouncedColumnChange = debounce(handleColumnChange, 200);
+
+  const handleScroll = (e: BodyScrollEvent) => {
     const scrollOffset = Number((e.top / page.table.rowHeight).toFixed(0));
     setTable({ scrollOffset });
-  }, 200);
+  };
 
   return (
     <Stack
@@ -173,18 +177,19 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
           columnDefs={columnDefs}
           defaultColDef={defaultColumnDefs}
           enableCellChangeFlash={false}
-          getRowId={(data) => data.data.uniqueId}
-          infiniteInitialRowCount={checkSongList.data?.totalRecordCount || 10}
+          getRowId={(data) => data.data.id}
+          infiniteInitialRowCount={checkSongList.data?.totalRecordCount || 100}
           pagination={isPaginationEnabled}
           paginationAutoPageSize={isPaginationEnabled}
+          paginationPageSize={page.table.pagination.itemsPerPage || 100}
           rowBuffer={20}
           rowHeight={page.table.rowHeight || 40}
           rowModelType="infinite"
           rowSelection="multiple"
-          // onBodyScroll={handleScroll}
           onBodyScrollEnd={handleScroll}
           onCellContextMenu={(e) => console.log('context', e)}
-          onColumnMoved={handleColumnMove}
+          onColumnMoved={handleColumnChange}
+          onColumnResized={debouncedColumnChange}
           onGridReady={onGridReady}
           onGridSizeChanged={handleGridSizeChange}
           onPaginationChanged={onPaginationChanged}
@@ -192,6 +197,7 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
       </VirtualGridAutoSizerContainer>
       <AnimatePresence
         presenceAffectsLayout
+        initial={false}
         mode="wait"
       >
         {page.display === ListDisplayType.TABLE_PAGINATED && (

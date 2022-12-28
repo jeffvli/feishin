@@ -1,6 +1,6 @@
 import type { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Flex, Group } from '@mantine/core';
+import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import {
@@ -89,6 +89,7 @@ export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
   const setPage = useSetSongStore();
   const setFilter = useSetSongFilters();
   const setTable = useSetSongTable();
+  const setPagination = useSetSongTablePagination();
   const cq = useContainerQuery();
 
   const musicFoldersQuery = useMusicFolders();
@@ -137,8 +138,9 @@ export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
       tableRef.current?.api.setDatasource(dataSource);
       tableRef.current?.api.purgeInfiniteCache();
       tableRef.current?.api.ensureIndexVisible(0, 'top');
+      setPagination({ currentPage: 0 });
     },
-    [page.filter, server, tableRef],
+    [page.filter, server, setPagination, tableRef],
   );
 
   const handleSetSortBy = useCallback(
@@ -180,8 +182,6 @@ export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
     const updatedFilters = setFilter({ sortOrder: newSortOrder });
     handleFilterChange(updatedFilters);
   }, [page.filter.sortOrder, handleFilterChange, setFilter]);
-
-  const setPagination = useSetSongTablePagination();
 
   const handleSetViewType = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -303,26 +303,22 @@ export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
                 component="div"
                 sx={{ cursor: 'default' }}
               >
-                <MultiSelect
-                  clearable
-                  data={SONG_TABLE_COLUMNS}
-                  defaultValue={page.table?.columns.map((column) => column.column)}
-                  width={300}
-                  onChange={handleTableColumns}
-                />
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                closeMenuOnClick={false}
-                component="div"
-                sx={{ cursor: 'default' }}
-              >
-                <Group position="apart">
-                  <Text>Auto Fit Columns</Text>
-                  <Switch
-                    defaultChecked={page.table.autoFit}
-                    onChange={handleAutoFitColumns}
+                <Stack>
+                  <MultiSelect
+                    clearable
+                    data={SONG_TABLE_COLUMNS}
+                    defaultValue={page.table?.columns.map((column) => column.column)}
+                    width={300}
+                    onChange={handleTableColumns}
                   />
-                </Group>
+                  <Group position="apart">
+                    <Text>Auto Fit Columns</Text>
+                    <Switch
+                      defaultChecked={page.table.autoFit}
+                      onChange={handleAutoFitColumns}
+                    />
+                  </Group>
+                </Stack>
               </DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
