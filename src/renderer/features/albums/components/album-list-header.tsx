@@ -1,9 +1,10 @@
-import { Flex, Slider } from '@mantine/core';
-import { useQueryClient } from '@tanstack/react-query';
-import debounce from 'lodash/debounce';
-import throttle from 'lodash/throttle';
 import type { ChangeEvent, MouseEvent, MutableRefObject } from 'react';
 import { useCallback } from 'react';
+import { IDatasource } from '@ag-grid-community/core';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { Flex, Group, Stack } from '@mantine/core';
+import { useQueryClient } from '@tanstack/react-query';
+import debounce from 'lodash/debounce';
 import {
   RiArrowDownSLine,
   RiFilter3Line,
@@ -18,11 +19,16 @@ import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import {
+  ALBUM_TABLE_COLUMNS,
   Button,
   DropdownMenu,
+  MultiSelect,
   PageHeader,
   Popover,
   SearchInput,
+  Slider,
+  Switch,
+  Text,
   TextTitle,
   VirtualInfiniteGridRef,
 } from '/@/renderer/components';
@@ -36,8 +42,10 @@ import {
   useCurrentServer,
   useSetAlbumFilters,
   useSetAlbumStore,
+  useSetAlbumTable,
+  useSetAlbumTablePagination,
 } from '/@/renderer/store';
-import { ListDisplayType } from '/@/renderer/types';
+import { ListDisplayType, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
   jellyfin: [
@@ -82,9 +90,10 @@ const HeaderItems = styled.div`
 
 interface AlbumListHeaderProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+  tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
+export const AlbumListHeader = ({ gridRef, tableRef }: AlbumListHeaderProps) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
   const setPage = useSetAlbumStore();
@@ -95,6 +104,9 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
 
   const musicFoldersQuery = useMusicFolders();
 
+  const setPagination = useSetAlbumTablePagination();
+  const setTable = useSetAlbumTable();
+
   const sortByLabel =
     (server?.type &&
       FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filters.sortBy)?.name) ||
@@ -102,13 +114,16 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
 
   const sortOrderLabel = ORDER.find((o) => o.value === filters.sortOrder)?.name || 'Unknown';
 
-  const setSize = throttle(
-    (e: number) =>
-      setPage({
-        list: { ...page, grid: { ...page.grid, size: e } },
-      }),
-    200,
-  );
+  const handleItemSize = (e: number) => {
+    if (
+      page.display === ListDisplayType.TABLE ||
+      page.display === ListDisplayType.TABLE_PAGINATED
+    ) {
+      setTable({ rowHeight: e });
+    } else {
+      setPage({ list: { ...page, grid: { ...page.grid, size: e } } });
+    }
+  };
 
   const fetch = useCallback(
     async (skip: number, take: number, filters: AlbumListFilter) => {
@@ -137,18 +152,59 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
 
   const handleFilterChange = useCallback(
     async (filters: AlbumListFilter) => {
-      gridRef.current?.scrollTo(0);
-      gridRef.current?.resetLoadMoreItemsCache();
+      if (
+        page.display === ListDisplayType.TABLE ||
+        page.display === ListDisplayType.TABLE_PAGINATED
+      ) {
+        const dataSource: IDatasource = {
+          getRows: async (params) => {
+            const limit = params.endRow - params.startRow;
+            const startIndex = params.startRow;
 
-      // Refetching within the virtualized grid may be inconsistent due to it refetching
-      // using an outdated set of filters. To avoid this, we fetch using the updated filters
-      // and then set the grid's data here.
-      const data = await fetch(0, 200, filters);
+            const queryKey = queryKeys.albums.list(server?.id || '', {
+              limit,
+              startIndex,
+              ...filters,
+            });
 
-      if (!data?.items) return;
-      gridRef.current?.setItemData(data.items);
+            const albumsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+              api.controller.getAlbumList({
+                query: {
+                  limit,
+                  startIndex,
+                  ...filters,
+                },
+                server,
+                signal,
+              }),
+            );
+
+            const albums = api.normalize.albumList(albumsRes, server);
+            params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || undefined);
+          },
+          rowCount: undefined,
+        };
+        tableRef.current?.api.setDatasource(dataSource);
+        tableRef.current?.api.purgeInfiniteCache();
+        tableRef.current?.api.ensureIndexVisible(0, 'top');
+
+        if (page.display === ListDisplayType.TABLE_PAGINATED) {
+          setPagination({ currentPage: 0 });
+        }
+      } else {
+        gridRef.current?.scrollTo(0);
+        gridRef.current?.resetLoadMoreItemsCache();
+
+        // Refetching within the virtualized grid may be inconsistent due to it refetching
+        // using an outdated set of filters. To avoid this, we fetch using the updated filters
+        // and then set the grid's data here.
+        const data = await fetch(0, 200, filters);
+
+        if (!data?.items) return;
+        gridRef.current?.setItemData(data.items);
+      }
     },
-    [gridRef, fetch],
+    [page.display, tableRef, setPagination, server, queryClient, gridRef, fetch],
   );
 
   const handleSetSortBy = useCallback(
@@ -194,14 +250,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
   const handleSetViewType = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      const type = e.currentTarget.value;
-      if (type === ListDisplayType.CARD) {
-        setPage({ list: { ...page, display: ListDisplayType.CARD } });
-      } else if (type === ListDisplayType.POSTER) {
-        setPage({ list: { ...page, display: ListDisplayType.POSTER } });
-      } else {
-        setPage({ list: { ...page, display: ListDisplayType.TABLE } });
-      }
+      setPage({ list: { ...page, display: e.currentTarget.value as ListDisplayType } });
     },
     [page, setPage],
   );
@@ -212,6 +261,39 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
     const updatedFilters = setFilter({ searchTerm });
     if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
   }, 500);
+
+  const handleTableColumns = (values: TableColumn[]) => {
+    const existingColumns = page.table.columns;
+
+    if (values.length === 0) {
+      return setTable({
+        columns: [],
+      });
+    }
+
+    // If adding a column
+    if (values.length > existingColumns.length) {
+      const newColumn = { column: values[values.length - 1], width: 100 };
+
+      setTable({ columns: [...existingColumns, newColumn] });
+    } else {
+      // If removing a column
+      const removed = existingColumns.filter((column) => !values.includes(column.column));
+      const newColumns = existingColumns.filter((column) => !removed.includes(column));
+
+      setTable({ columns: newColumns });
+    }
+
+    return tableRef.current?.api.sizeColumnsToFit();
+  };
+
+  const handleAutoFitColumns = (e: ChangeEvent<HTMLInputElement>) => {
+    setTable({ autoFit: e.currentTarget.checked });
+
+    if (e.currentTarget.checked) {
+      tableRef.current?.api.sizeColumnsToFit();
+    }
+  };
 
   return (
     <PageHeader>
@@ -239,15 +321,6 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-              <DropdownMenu.Label>Item size</DropdownMenu.Label>
-              <DropdownMenu.Item>
-                <Slider
-                  defaultValue={page.grid.size || 0}
-                  label={null}
-                  onChange={setSize}
-                />
-              </DropdownMenu.Item>
-              <DropdownMenu.Divider />
               <DropdownMenu.Label>Display type</DropdownMenu.Label>
               <DropdownMenu.Item
                 $isActive={page.display === ListDisplayType.CARD}
@@ -264,20 +337,69 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
                 Poster
               </DropdownMenu.Item>
               <DropdownMenu.Item
-                disabled
                 $isActive={page.display === ListDisplayType.TABLE}
-                value="list"
+                value={ListDisplayType.TABLE}
                 onClick={handleSetViewType}
               >
-                List
+                Table
               </DropdownMenu.Item>
+              <DropdownMenu.Item
+                $isActive={page.display === ListDisplayType.TABLE_PAGINATED}
+                value={ListDisplayType.TABLE_PAGINATED}
+                onClick={handleSetViewType}
+              >
+                Table (paginated)
+              </DropdownMenu.Item>
+              <DropdownMenu.Divider />
+              <DropdownMenu.Label>Item size</DropdownMenu.Label>
+              <DropdownMenu.Item closeMenuOnClick={false}>
+                <Slider
+                  defaultValue={
+                    page.display === ListDisplayType.CARD || page.display === ListDisplayType.POSTER
+                      ? page.grid.size
+                      : page.table.rowHeight
+                  }
+                  label={null}
+                  max={100}
+                  min={25}
+                  onChangeEnd={handleItemSize}
+                />
+              </DropdownMenu.Item>
+              {(page.display === ListDisplayType.TABLE ||
+                page.display === ListDisplayType.TABLE_PAGINATED) && (
+                <>
+                  <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
+                  <DropdownMenu.Item
+                    closeMenuOnClick={false}
+                    component="div"
+                    sx={{ cursor: 'default' }}
+                  >
+                    <Stack>
+                      <MultiSelect
+                        clearable
+                        data={ALBUM_TABLE_COLUMNS}
+                        defaultValue={page.table?.columns.map((column) => column.column)}
+                        width={300}
+                        onChange={handleTableColumns}
+                      />
+                      <Group position="apart">
+                        <Text>Auto Fit Columns</Text>
+                        <Switch
+                          defaultChecked={page.table.autoFit}
+                          onChange={handleAutoFitColumns}
+                        />
+                      </Group>
+                    </Stack>
+                  </DropdownMenu.Item>
+                </>
+              )}
             </DropdownMenu.Dropdown>
           </DropdownMenu>
           <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
               <Button
                 compact
-                fw="normal"
+                fw="600"
                 variant="subtle"
               >
                 {sortByLabel}
@@ -298,8 +420,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
           </DropdownMenu>
           <Button
             compact
-            fw="normal"
-            tooltip={!cq.isMd ? { label: sortOrderLabel } : undefined}
+            fw="600"
             variant="subtle"
             onClick={handleToggleSortOrder}
           >
@@ -320,8 +441,7 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
               <DropdownMenu.Target>
                 <Button
                   compact
-                  fw="normal"
-                  tooltip={!cq.isMd ? { label: 'Folder' } : undefined}
+                  fw="600"
                   variant="subtle"
                 >
                   {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}
@@ -341,15 +461,11 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
               </DropdownMenu.Dropdown>
             </DropdownMenu>
           )}
-          <Popover
-            closeOnClickOutside={false}
-            position="bottom-start"
-          >
+          <Popover position="bottom-start">
             <Popover.Target>
               <Button
                 compact
-                fw="normal"
-                tooltip={!cq.isMd ? { label: 'Filters' } : undefined}
+                fw="600"
                 variant="subtle"
               >
                 {cq.isMd ? 'Filters' : <RiFilter3Line size={15} />}
@@ -367,7 +483,6 @@ export const AlbumListHeader = ({ gridRef }: AlbumListHeaderProps) => {
             <DropdownMenu.Target>
               <Button
                 compact
-                tooltip={{ label: 'More' }}
                 variant="subtle"
               >
                 <RiMoreFill size={15} />

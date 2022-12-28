@@ -3,11 +3,13 @@ import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { AlbumListArgs, AlbumListSort, SortOrder } from '/@/renderer/api/types';
-import { ListDisplayType } from '/@/renderer/types';
+import { DataTableProps } from '/@/renderer/store/settings.store';
+import { ListDisplayType, TableColumn, TablePagination } from '/@/renderer/types';
 
 type TableProps = {
+  pagination: TablePagination;
   scrollOffset: number;
-};
+} & DataTableProps;
 
 type ListProps<T> = {
   display: ListDisplayType;
@@ -29,6 +31,8 @@ export interface AlbumSlice extends AlbumState {
   actions: {
     setFilters: (data: Partial<AlbumListFilter>) => AlbumListFilter;
     setStore: (data: Partial<AlbumSlice>) => void;
+    setTable: (data: Partial<TableProps>) => void;
+    setTablePagination: (data: Partial<TableProps['pagination']>) => void;
   };
 }
 
@@ -47,6 +51,16 @@ export const useAlbumStore = create<AlbumSlice>()(
           setStore: (data) => {
             set({ ...get(), ...data });
           },
+          setTable: (data) => {
+            set((state) => {
+              state.list.table = { ...state.list.table, ...data };
+            });
+          },
+          setTablePagination: (data) => {
+            set((state) => {
+              state.list.table.pagination = { ...state.list.table.pagination, ...data };
+            });
+          },
         },
         list: {
           display: ListDisplayType.CARD,
@@ -60,6 +74,36 @@ export const useAlbumStore = create<AlbumSlice>()(
             size: 50,
           },
           table: {
+            autoFit: true,
+            columns: [
+              {
+                column: TableColumn.ROW_INDEX,
+                width: 50,
+              },
+              {
+                column: TableColumn.TITLE_COMBINED,
+                width: 500,
+              },
+              {
+                column: TableColumn.DURATION,
+                width: 100,
+              },
+              {
+                column: TableColumn.ALBUM_ARTIST,
+                width: 300,
+              },
+              {
+                column: TableColumn.YEAR,
+                width: 100,
+              },
+            ],
+            pagination: {
+              currentPage: 1,
+              itemsPerPage: 100,
+              totalItems: 1,
+              totalPages: 1,
+            },
+            rowHeight: 60,
             scrollOffset: 0,
           },
         },
@@ -83,3 +127,10 @@ export const useSetAlbumStore = () => useAlbumStore((state) => state.actions.set
 export const useSetAlbumFilters = () => useAlbumStore((state) => state.actions.setFilters);
 
 export const useAlbumListStore = () => useAlbumStore((state) => state.list);
+
+export const useAlbumTablePagination = () => useAlbumStore((state) => state.list.table.pagination);
+
+export const useSetAlbumTablePagination = () =>
+  useAlbumStore((state) => state.actions.setTablePagination);
+
+export const useSetAlbumTable = () => useAlbumStore((state) => state.actions.setTable);

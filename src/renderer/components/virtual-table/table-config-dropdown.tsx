@@ -34,6 +34,21 @@ export const SONG_TABLE_COLUMNS = [
   // { label: 'Skip', value: TableColumn.SKIP },
 ];
 
+export const ALBUM_TABLE_COLUMNS = [
+  { label: 'Row Index', value: TableColumn.ROW_INDEX },
+  { label: 'Title', value: TableColumn.TITLE },
+  { label: 'Title (Combined)', value: TableColumn.TITLE_COMBINED },
+  { label: 'Duration', value: TableColumn.DURATION },
+  { label: 'Album Artist', value: TableColumn.ALBUM_ARTIST },
+  { label: 'Artist', value: TableColumn.ARTIST },
+  { label: 'Genre', value: TableColumn.GENRE },
+  { label: 'Year', value: TableColumn.YEAR },
+  { label: 'Release Date', value: TableColumn.RELEASE_DATE },
+  { label: 'Last Played', value: TableColumn.LAST_PLAYED },
+  { label: 'Date Added', value: TableColumn.DATE_ADDED },
+  { label: 'Plays', value: TableColumn.PLAY_COUNT },
+];
+
 interface TableConfigDropdownProps {
   type: TableType;
 }
