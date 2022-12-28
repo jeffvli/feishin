@@ -129,13 +129,12 @@ export const TablePagination = ({ tableRef, pagination, setPagination }: TablePa
         </Popover>
         <Pagination
           noWrap
-          $hideDividers={!containerQuery.isMd}
+          $hideDividers={!containerQuery.isSm}
           boundaries={1}
           page={pagination.currentPage + 1}
           radius="sm"
-          siblings={1}
+          siblings={containerQuery.isMd ? 2 : containerQuery.isSm ? 1 : 0}
           total={pagination.totalPages - 1}
-          withControls={containerQuery.isSm}
           onChange={handlePagination}
         />
       </Group>
