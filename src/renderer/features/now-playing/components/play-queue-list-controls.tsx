@@ -88,6 +88,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
       px="1rem"
       py="1rem"
       sx={{ alignItems: 'center' }}
+      w="100%"
     >
       <Group>
         <Button
@@ -137,7 +138,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         </Button>
       </Group>
       <Group>
-        <Popover>
+        <Popover transition="fade">
           <Popover.Target>
             <Button
               compact

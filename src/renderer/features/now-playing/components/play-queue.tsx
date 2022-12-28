@@ -29,6 +29,7 @@ import {
 } from '/@/renderer/store/settings.store';
 import { useMergedRef } from '@mantine/hooks';
 import isElectron from 'is-electron';
+import debounce from 'lodash/debounce';
 import { ErrorBoundary } from 'react-error-boundary';
 import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required';
@@ -131,13 +132,13 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
     const updatedColumns = [];
     for (const column of columnsOrder) {
-      const columnInSettings = columnsInSettings.find((c) => c.column === column.colId);
+      const columnInSettings = columnsInSettings.find((c) => c.column === column.getColDef().colId);
 
       if (columnInSettings) {
         updatedColumns.push({
           ...columnInSettings,
           ...(!useSettingsStore.getState().tables[type].autoFit && {
-            width: column.actualWidth,
+            width: column.getActualWidth(),
           }),
         });
       }
@@ -153,6 +154,8 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
       },
     });
   };
+
+  const debouncedColumnChange = debounce(handleColumnChange, 250);
 
   const handleGridSizeChange = () => {
     if (tableConfig.autoFit) {
@@ -233,7 +236,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
             rowSelection="multiple"
             onCellDoubleClicked={handleDoubleClick}
             onColumnMoved={handleColumnChange}
-            onColumnResized={handleColumnChange}
+            onColumnResized={debouncedColumnChange}
             onDragStarted={handleDragStart}
             onGridReady={handleGridReady}
             onGridSizeChanged={handleGridSizeChange}
