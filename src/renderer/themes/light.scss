@@ -1,4 +1,4 @@
-body[data-theme="defaultLight"] {
+body[data-theme='defaultLight'] {
   --primary-color: rgb(79, 149, 255);
   --icon-color: #ffffff;
 
@@ -10,8 +10,8 @@ body[data-theme="defaultLight"] {
   --titlebar-bg: rgb(227, 229, 232);
 
   --sidebar-bg: rgb(240, 241, 242);
-  --sidebar-btn-color: rgb(0, 0, 0);
-  --sidebar-btn-color-hover: rgb(0, 0, 0);
+  --sidebar-fg: rgb(0, 0, 0);
+  --sidebar-fg-hover: rgb(0, 0, 0);
   --sidebar-handle-bg: #4d4d4d;
 
   --playerbar-bg: linear-gradient(
@@ -48,9 +48,9 @@ body[data-theme="defaultLight"] {
   --btn-default-fg-hover: rgb(50, 50, 50);
 
   --btn-subtle-bg: transparent;
-  --btn-subtle-bg-hover: rgba(100, 100, 100, 0.1);
-  --btn-subtle-fg: rgb(60, 60, 60);
-  --btn-subtle-fg-hover: rgb(30, 30, 30);
+  --btn-subtle-bg-hover: transparent;
+  --btn-subtle-fg: rgb(80, 80, 80);
+  --btn-subtle-fg-hover: rgb(0, 0, 0);
 
   --input-bg: rgb(240, 241, 242);
   --input-fg: rgb(0, 0, 0);

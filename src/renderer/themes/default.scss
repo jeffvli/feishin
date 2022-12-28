@@ -2,14 +2,14 @@
   --root-font-size: 12px;
   --icon-color: rgb(255, 255, 255);
 
-  --primary-color: rgb(5, 109, 255);
+  --primary-color: rgb(25, 88, 248);
   --secondary-color: rgb(255, 120, 120);
   --success-color: green;
   --warning-color: orange;
   --danger-color: rgb(204, 50, 50);
-  --generic-border-color: rgba(50, 50, 50, 0.7);
+  --generic-border-color: rgba(50, 50, 50, 0.3);
 
-  --main-bg: rgb(20, 20, 20);
+  --main-bg: rgb(18, 18, 18);
   --main-fg: rgb(245, 245, 245);
   --main-fg-secondary: rgb(150, 150, 150);
 
@@ -17,8 +17,8 @@
   --titlebar-bg: rgb(7, 7, 7);
 
   --sidebar-bg: rgb(0, 0, 0);
-  --sidebar-btn-color: rgb(255, 255, 255);
-  --sidebar-btn-color-hover: #dddddd;
+  --sidebar-fg: rgb(255, 255, 255);
+  --sidebar-fg-hover: #dddddd;
   --sidebar-handle-bg: #4d4d4d;
   --sidebar-border: none;
 
@@ -53,7 +53,7 @@
 
   --btn-subtle-bg: transparent;
   --btn-subtle-bg-hover: transparent;
-  --btn-subtle-fg: rgb(200, 200, 200);
+  --btn-subtle-fg: rgb(220, 220, 220);
   --btn-subtle-fg-hover: rgb(255, 255, 255);
 
   --input-bg: rgb(35, 35, 35);
@@ -62,9 +62,9 @@
   --input-active-fg: rgb(193, 193, 193);
   --input-active-bg: rgba(255, 255, 255, 0.1);
 
-  --dropdown-menu-bg: rgb(24, 24, 24);
+  --dropdown-menu-bg: rgb(36, 36, 36);
   --dropdown-menu-fg: rgb(220, 220, 220);
-  --dropdown-menu-bg-hover: rgb(37, 38, 43);
+  --dropdown-menu-bg-hover: rgb(46, 46, 46);
   --dropdown-menu-border: none;
   --dropdown-menu-border-radius: 4px;
 
@@ -112,6 +112,13 @@
     --ag-background-color: var(--main-bg);
     --ag-row-hover-color: rgba(100, 100, 100, 0.2);
     --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
+  }
+
+  .ag-header-cell-resize {
+    background-color: rgb(70, 70, 70, 0.4);
+    height: 50%;
+    top: 25%;
+    width: 7px;
   }
 
   .ag-header-cell-label {
