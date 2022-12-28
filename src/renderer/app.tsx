@@ -14,6 +14,7 @@ import { AppRouter } from './router/app-router';
 import { useSettingsStore } from './store/settings.store';
 import './styles/global.scss';
 import '@ag-grid-community/styles/ag-grid.css';
+import { ContextMenuProvider } from '/@/renderer/features/context-menu';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -98,7 +99,9 @@ export const App = () => {
             }}
             modals={{ base: BaseContextModal }}
           >
-            <AppRouter />
+            <ContextMenuProvider>
+              <AppRouter />
+            </ContextMenuProvider>
           </ModalsProvider>
         </NotificationsProvider>
       </MantineProvider>
