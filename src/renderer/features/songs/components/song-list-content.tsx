@@ -31,6 +31,7 @@ import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import sortBy from 'lodash/sortBy';
 
 interface SongListContentProps {
   tableRef: MutableRefObject<AgGridReactType | null>;
@@ -160,10 +161,11 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
     const clickEvent = e.event as MouseEvent;
     clickEvent.preventDefault();
 
-    let selectedRows = e.api.getSelectedRows();
-    const selectedUniqueIds = selectedRows.map((row) => row.uniqueId);
+    const selectedNodes = e.api.getSelectedNodes();
+    const selectedIds = selectedNodes.map((node) => node.data.id);
+    let selectedRows = sortBy(selectedNodes, ['rowIndex']).map((node) => node.data);
 
-    if (!selectedUniqueIds.includes(e.data.uniqueId)) {
+    if (!selectedIds.includes(e.data.id)) {
       e.api.deselectAll();
       e.node.setSelected(true);
       selectedRows = [e.data];

@@ -40,6 +40,7 @@ import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import sortBy from 'lodash/sortBy';
 
 interface AlbumListContentProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -276,8 +277,9 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
     const clickEvent = e.event as MouseEvent;
     clickEvent.preventDefault();
 
-    let selectedRows = e.api.getSelectedRows();
-    const selectedIds = selectedRows.map((row) => row.id);
+    const selectedNodes = e.api.getSelectedNodes();
+    const selectedIds = selectedNodes.map((node) => node.data.id);
+    let selectedRows = sortBy(selectedNodes, ['rowIndex']).map((node) => node.data);
 
     if (!selectedIds.includes(e.data.id)) {
       e.api.deselectAll();
