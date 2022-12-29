@@ -30,6 +30,7 @@ import {
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import {
   BodyScrollEvent,
+  CellContextMenuEvent,
   ColDef,
   GridReadyEvent,
   IDatasource,
@@ -37,6 +38,8 @@ import {
 } from '@ag-grid-community/core';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
+import { openContextMenu } from '/@/renderer/features/context-menu';
+import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 
 interface AlbumListContentProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -268,6 +271,29 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
     return rows;
   }, [page.filter.sortBy]);
 
+  const handleContextMenu = (e: CellContextMenuEvent) => {
+    if (!e.event) return;
+    const clickEvent = e.event as MouseEvent;
+    clickEvent.preventDefault();
+
+    let selectedRows = e.api.getSelectedRows();
+    const selectedIds = selectedRows.map((row) => row.id);
+
+    if (!selectedIds.includes(e.data.id)) {
+      e.api.deselectAll();
+      e.node.setSelected(true);
+      selectedRows = [e.data];
+    }
+
+    openContextMenu({
+      data: selectedRows,
+      menuItems: ALBUM_CONTEXT_MENU_ITEMS,
+      type: LibraryItem.ALBUM,
+      xPos: clickEvent.clientX,
+      yPos: clickEvent.clientY,
+    });
+  };
+
   return (
     <>
       <VirtualGridAutoSizerContainer>
@@ -327,7 +353,7 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
             rowModelType="infinite"
             rowSelection="multiple"
             onBodyScrollEnd={handleTableScroll}
-            onCellContextMenu={(e) => console.log('context', e)}
+            onCellContextMenu={handleContextMenu}
             onColumnMoved={handleTableColumnChange}
             onColumnResized={debouncedTableColumnChange}
             onGridReady={onTableReady}

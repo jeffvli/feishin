@@ -1,6 +1,6 @@
 import { Stack } from '@mantine/core';
 import { useClickOutside, useResizeObserver, useSetState, useViewportSize } from '@mantine/hooks';
-import { createContext, useMemo, useState } from 'react';
+import { createContext, useState } from 'react';
 import { ContextMenu, ContextMenuButton } from '/@/renderer/components';
 import {
   OpenContextMenuProps,
@@ -48,7 +48,8 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const handlePlayQueueAdd = useHandlePlayQueueAdd();
 
   const openContextMenu = (args: OpenContextMenuProps) => {
-    const { xPos, yPos, menuItems, data } = args;
+    console.log('args.data', args.data);
+    const { xPos, yPos, menuItems, data, type } = args;
 
     const shouldReverseY = yPos + menuRect.height > viewport.height;
     const shouldReverseX = xPos + menuRect.width > viewport.width;
@@ -56,7 +57,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const calculatedXPos = shouldReverseX ? xPos - menuRect.width : xPos;
     const calculatedYPos = shouldReverseY ? yPos - menuRect.height : yPos;
 
-    setCtx({ data, menuItems, xPos: calculatedXPos, yPos: calculatedYPos });
+    setCtx({ data, menuItems, type, xPos: calculatedXPos, yPos: calculatedYPos });
     setOpened(true);
   };
 
@@ -69,45 +70,65 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     openContextMenu,
   });
 
-  const contextMenuItems = useMemo(() => {
-    return {
-      addToFavorites: { id: 'addToFavorites', label: 'Add to favorites', onClick: () => {} },
-      addToPlaylist: { id: 'addToPlaylist', label: 'Add to playlist', onClick: () => {} },
-      play: {
-        id: 'play',
-        label: 'Play',
-        onClick: () => {
-          if (ctx.type === LibraryItem.SONG) {
-            handlePlayQueueAdd({ byData: ctx.data, play: Play.NOW });
-          }
-        },
-      },
-      playLast: {
-        id: 'playLast',
-        label: 'Play Last',
-        onClick: () => {
-          if (ctx.type === LibraryItem.SONG) {
-            handlePlayQueueAdd({ byData: ctx.data, play: Play.LAST });
-          }
-        },
-      },
-      playNext: {
-        id: 'playNext',
-        label: 'Play Next',
-        onClick: () => {
-          if (ctx.type === LibraryItem.SONG) {
-            handlePlayQueueAdd({ byData: ctx.data, play: Play.NEXT });
-          }
-        },
-      },
-      removeFromFavorites: {
-        id: 'removeFromFavorites',
-        label: 'Remove from favorites',
-        onClick: () => {},
-      },
-      setRating: { id: 'setRating', label: 'Set rating', onClick: () => {} },
-    };
-  }, [ctx.data, ctx.type, handlePlayQueueAdd]);
+  const handlePlay = (play: Play) => {
+    console.log('ctx', ctx);
+
+    switch (ctx.type) {
+      case LibraryItem.ALBUM:
+        handlePlayQueueAdd({
+          byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
+          play,
+        });
+        break;
+      case LibraryItem.ARTIST:
+        handlePlayQueueAdd({
+          byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
+          play,
+        });
+        break;
+      case LibraryItem.ALBUM_ARTIST:
+        handlePlayQueueAdd({
+          byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
+          play,
+        });
+        break;
+      case LibraryItem.SONG:
+        handlePlayQueueAdd({ byData: ctx.data, play });
+        break;
+      case LibraryItem.PLAYLIST:
+        handlePlayQueueAdd({
+          byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
+          play,
+        });
+        break;
+    }
+  };
+
+  const contextMenuItems = {
+    addToFavorites: { id: 'addToFavorites', label: 'Add to favorites', onClick: () => {} },
+    addToPlaylist: { id: 'addToPlaylist', label: 'Add to playlist', onClick: () => {} },
+    play: {
+      id: 'play',
+      label: 'Play',
+      onClick: () => handlePlay(Play.NOW),
+    },
+    playLast: {
+      id: 'playLast',
+      label: 'Play Last',
+      onClick: () => handlePlay(Play.LAST),
+    },
+    playNext: {
+      id: 'playNext',
+      label: 'Play Next',
+      onClick: () => handlePlay(Play.NEXT),
+    },
+    removeFromFavorites: {
+      id: 'removeFromFavorites',
+      label: 'Remove from favorites',
+      onClick: () => {},
+    },
+    setRating: { id: 'setRating', label: 'Set rating', onClick: () => {} },
+  };
 
   return (
     <ContextMenuContext.Provider

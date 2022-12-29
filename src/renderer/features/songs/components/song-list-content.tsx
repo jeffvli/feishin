@@ -160,12 +160,13 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
     const clickEvent = e.event as MouseEvent;
     clickEvent.preventDefault();
 
-    const selectedRows = e.api.getSelectedRows();
+    let selectedRows = e.api.getSelectedRows();
     const selectedUniqueIds = selectedRows.map((row) => row.uniqueId);
 
     if (!selectedUniqueIds.includes(e.data.uniqueId)) {
       e.api.deselectAll();
       e.node.setSelected(true);
+      selectedRows = [e.data];
     }
 
     openContextMenu({
