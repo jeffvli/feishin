@@ -18,7 +18,7 @@ export const SidebarPlayQueue = () => {
         h="50px"
         mr="160px"
         sx={{
-          '-webkit-app-region': 'drag',
+          WebkitAppRegion: 'drag',
           zIndex: -1,
         }}
       />
