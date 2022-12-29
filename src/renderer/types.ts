@@ -159,7 +159,7 @@ export enum TableColumn {
 export type PlayQueueAddOptions = {
   byData?: QueueSong[];
   byItemType?: {
-    id: string;
+    id: string[];
     type: LibraryItem;
   };
   play: Play;
