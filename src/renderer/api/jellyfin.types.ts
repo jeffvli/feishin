@@ -527,9 +527,14 @@ export enum JFSongListSort {
 }
 
 export type JFSongListParams = {
+  albumArtistIds?: string;
+  albumIds?: string;
+  artistIds?: string;
+  contributingArtistIds?: string;
   filters?: string;
   genreIds?: string;
   genres?: string;
+  ids?: string;
   includeItemTypes: 'Audio';
   searchTerm?: string;
   sortBy?: JFSongListSort;

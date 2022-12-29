@@ -417,6 +417,7 @@ export enum SongListSort {
 }
 
 export type SongListQuery = {
+  albumIds?: string[];
   jfParams?: {
     filters?: string;
     genreIds?: string;

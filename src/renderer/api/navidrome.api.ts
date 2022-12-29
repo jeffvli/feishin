@@ -237,6 +237,7 @@ const getSongList = async (args: SongListArgs): Promise<NDSongList> => {
     _order: sortOrderMap.navidrome[query.sortOrder],
     _sort: songListSortMap.navidrome[query.sortBy],
     _start: query.startIndex,
+    album_id: query.albumIds,
     title: query.searchTerm,
     ...query.ndParams,
   };

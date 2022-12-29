@@ -63,6 +63,10 @@ import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import { parseSearchParams } from '/@/renderer/utils';
 
+const getCommaDelimitedString = (value: string[]) => {
+  return value.join(',');
+};
+
 const api = ky.create({});
 
 const authenticate = async (
@@ -297,9 +301,11 @@ const getSongList = async (args: SongListArgs): Promise<JFSongList> => {
     }
   }
 
-  const yearsFilter = yearsGroup.length ? yearsGroup.join(',') : undefined;
+  const yearsFilter = yearsGroup.length ? getCommaDelimitedString(yearsGroup) : undefined;
+  const albumIdsFilter = query.albumIds ? getCommaDelimitedString(query.albumIds) : undefined;
 
   const searchParams: JFSongListParams & { maxYear?: number; minYear?: number } = {
+    albumIds: albumIdsFilter,
     fields: 'Genres, DateCreated, MediaSources, ParentId',
     includeItemTypes: 'Audio',
     limit: query.limit,
