@@ -47,15 +47,23 @@ export const useHandlePlayQueueAdd = () => {
         };
 
         const queryKey = queryKeys.songs.list(server?.id, queryFilter);
-        const songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-          api.controller.getSongList({
-            query: queryFilter,
-            server,
-            signal,
-          }),
-        );
+        let songsList;
+        try {
+          songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+            api.controller.getSongList({
+              query: queryFilter,
+              server,
+              signal,
+            }),
+          );
+        } catch (err: any) {
+          return toast.error({
+            message: err.message,
+            title: 'Play queue add failed',
+          });
+        }
 
-        if (!songsList) return toast.warn({ message: 'Error occurred while fetching' });
+        if (!songsList) return toast.warn({ message: 'No songs found' });
 
         switch (server?.type) {
           case 'jellyfin':
