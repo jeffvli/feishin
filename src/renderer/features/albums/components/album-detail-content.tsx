@@ -69,8 +69,6 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     [page.table.columns],
   );
 
-  console.log('columnDefs :>> ', columnDefs);
-
   const defaultColumnDefs: ColDef = useMemo(() => {
     return {
       lockPinned: true,
