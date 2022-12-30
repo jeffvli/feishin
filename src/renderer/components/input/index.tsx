@@ -224,10 +224,6 @@ const StyledTextarea = styled(MantineTextarea)<TextareaProps>`
   & .mantine-Textarea-input {
     color: var(--input-fg);
     background: var(--input-bg);
-
-    &::placeholder {
-      color: var(--input-placeholder-fg);
-    }
   }
 
   & .mantine-Textarea-icon {
