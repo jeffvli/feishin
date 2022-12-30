@@ -104,11 +104,11 @@ const PLAY_TYPES = [
     play: Play.NOW,
   },
   {
-    label: 'Play last',
+    label: 'Add to queue (last)',
     play: Play.LAST,
   },
   {
-    label: 'Play next',
+    label: 'Add to queue (next)',
     play: Play.NEXT,
   },
 ];

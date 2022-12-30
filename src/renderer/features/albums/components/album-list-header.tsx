@@ -490,8 +490,8 @@ export const AlbumListHeader = ({ gridRef, tableRef }: AlbumListHeaderProps) => 
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
               <DropdownMenu.Item disabled>Play</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Play last</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Play next</DropdownMenu.Item>
+              <DropdownMenu.Item disabled>Add to queue (next)</DropdownMenu.Item>
+              <DropdownMenu.Item disabled>Add to queue (last)</DropdownMenu.Item>
               <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
