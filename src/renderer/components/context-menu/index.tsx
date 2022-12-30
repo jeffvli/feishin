@@ -26,7 +26,9 @@ const ContextMenuContainer = styled(motion.div)<Omit<ContextMenuProps, 'children
 `;
 
 export const ContextMenuButton = styled(_Button)`
+  padding: 0.5rem;
   background: var(--dropdown-menu-bg);
+  cursor: default;
 
   & .mantine-Button-inner {
     justify-content: flex-start;
