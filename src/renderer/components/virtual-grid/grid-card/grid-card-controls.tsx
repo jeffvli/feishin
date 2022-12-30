@@ -130,7 +130,7 @@ export const GridCardControls = ({
 
     handlePlayQueueAdd?.({
       byItemType: {
-        id: itemData.id,
+        id: [itemData.id],
         type: itemType,
       },
       play: playType || playButtonBehavior,
