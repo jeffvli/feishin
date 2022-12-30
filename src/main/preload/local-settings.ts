@@ -1,4 +1,4 @@
-import { app, ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 import Store from 'electron-store';
 
 const store = new Store();
@@ -12,8 +12,7 @@ const get = (property: string) => {
 };
 
 const restart = () => {
-  app.relaunch();
-  app.exit(0);
+  ipcRenderer.send('app-restart');
 };
 
 const enableMediaKeys = () => {
