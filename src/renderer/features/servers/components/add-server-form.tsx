@@ -68,7 +68,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         name: values.name,
         ndCredential: data.ndCredential,
         type: values.type,
-        url: values.url,
+        url: values.url.replace(/\/$/, ''),
         userId: data.userId,
         username: data.username,
       });
