@@ -25,6 +25,7 @@ export type ContextMenuItem =
 
 export type SetContextMenuItems = {
   disabled?: boolean;
+  divider?: boolean;
   id: ContextMenuItem;
   onClick?: () => void;
 }[];

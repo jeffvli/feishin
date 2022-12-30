@@ -1,6 +1,6 @@
-import { Stack } from '@mantine/core';
+import { Divider, Stack } from '@mantine/core';
 import { useClickOutside, useResizeObserver, useSetState, useViewportSize } from '@mantine/hooks';
-import { createContext, useState } from 'react';
+import { createContext, Fragment, useState } from 'react';
 import { ContextMenu, ContextMenuButton } from '/@/renderer/components';
 import {
   OpenContextMenuProps,
@@ -48,7 +48,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const handlePlayQueueAdd = useHandlePlayQueueAdd();
 
   const openContextMenu = (args: OpenContextMenuProps) => {
-    console.log('args.data', args.data);
     const { xPos, yPos, menuItems, data, type } = args;
 
     const shouldReverseY = yPos + menuRect.height > viewport.height;
@@ -114,12 +113,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     },
     playLast: {
       id: 'playLast',
-      label: 'Play Last',
+      label: 'Add to queue (last)',
       onClick: () => handlePlay(Play.LAST),
     },
     playNext: {
       id: 'playNext',
-      label: 'Play Next',
+      label: 'Add to queue (next)',
       onClick: () => handlePlay(Play.NEXT),
     },
     removeFromFavorites: {
@@ -151,14 +150,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
           >
             {ctx.menuItems?.map((item) => {
               return (
-                <ContextMenuButton
-                  key={`context-menu-${item.id}`}
-                  disabled={item.disabled}
-                  variant="default"
-                  onClick={contextMenuItems[item.id].onClick}
-                >
-                  {contextMenuItems[item.id].label}
-                </ContextMenuButton>
+                <Fragment key={`context-menu-${item.id}`}>
+                  <ContextMenuButton
+                    disabled={item.disabled}
+                    variant="default"
+                    onClick={contextMenuItems[item.id as keyof typeof contextMenuItems].onClick}
+                  >
+                    {contextMenuItems[item.id as keyof typeof contextMenuItems].label}
+                  </ContextMenuButton>
+                  {item.divider && <Divider key={`context-menu-divider-${item.id}`} />}
+                </Fragment>
               );
             })}
           </Stack>
