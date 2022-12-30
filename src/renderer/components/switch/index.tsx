@@ -9,6 +9,7 @@ const StyledSwitch = styled(MantineSwitch)`
 
   & .mantine-Switch-track {
     background-color: var(--switch-track-bg);
+    border: none;
   }
 
   & .mantine-Switch-input {
