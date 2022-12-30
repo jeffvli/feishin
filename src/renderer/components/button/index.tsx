@@ -248,7 +248,7 @@ interface HoldButtonProps extends ButtonProps {
 }
 
 export const TimeoutButton = ({ timeoutProps, ...props }: HoldButtonProps) => {
-  const [_timeoutRemaining, setTimeoutRemaining] = useState(timeoutProps.duration);
+  const [, setTimeoutRemaining] = useState(timeoutProps.duration);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef(0);
 
@@ -279,12 +279,12 @@ export const TimeoutButton = ({ timeoutProps, ...props }: HoldButtonProps) => {
   }, [clear, isRunning, start]);
 
   return (
-    <_Button
+    <Button
       sx={{ color: 'var(--danger-color)' }}
       onClick={startTimeout}
       {...props}
     >
       {isRunning ? 'Cancel' : props.children}
-    </_Button>
+    </Button>
   );
 };

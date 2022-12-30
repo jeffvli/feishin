@@ -91,9 +91,9 @@ const StyledTrack = styled.div<any>`
 `;
 
 const Track = (props: any, state: any) => (
-  // eslint-disable-next-line react/destructuring-assignment
   <StyledTrack
     {...props}
+    // eslint-disable-next-line react/destructuring-assignment
     index={state.index}
   />
 );
