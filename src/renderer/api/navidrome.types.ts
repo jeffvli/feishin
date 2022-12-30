@@ -45,7 +45,7 @@ export type NDAlbum = {
   starred: boolean;
   starredAt: string;
   updatedAt: string;
-};
+} & { songs?: NDSong[] };
 
 export type NDSong = {
   album: string;

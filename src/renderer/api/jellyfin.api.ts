@@ -543,41 +543,6 @@ const getSongCoverArtUrl = (args: { baseUrl: string; item: JFSong; size: number 
   );
 };
 
-const normalizeAlbum = (item: JFAlbum, server: ServerListItem, imageSize?: number): Album => {
-  return {
-    albumArtists:
-      item.AlbumArtists?.map((entry) => ({
-        id: entry.Id,
-        name: entry.Name,
-      })) || [],
-    artists: item.ArtistItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
-    backdropImageUrl: null,
-    createdAt: item.DateCreated,
-    duration: item.RunTimeTicks / 10000000,
-    genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
-    id: item.Id,
-    imagePlaceholderUrl: null,
-    imageUrl: getAlbumCoverArtUrl({
-      baseUrl: server.url,
-      item,
-      size: imageSize || 300,
-    }),
-    isCompilation: null,
-    isFavorite: item.UserData?.IsFavorite || false,
-    lastPlayedAt: null,
-    name: item.Name,
-    playCount: item.UserData?.PlayCount || 0,
-    rating: null,
-    releaseDate: item.PremiereDate?.split('T')[0] || null,
-    releaseYear: item.ProductionYear,
-    serverType: ServerType.JELLYFIN,
-    size: null,
-    songCount: item?.ChildCount || null,
-    uniqueId: nanoid(),
-    updatedAt: item?.DateLastMediaAdded || item.DateCreated,
-  };
-};
-
 const normalizeSong = (
   item: JFSong,
   server: ServerListItem,
@@ -624,6 +589,42 @@ const normalizeSong = (
     type: ServerType.JELLYFIN,
     uniqueId: nanoid(),
     updatedAt: item.DateCreated,
+  };
+};
+
+const normalizeAlbum = (item: JFAlbum, server: ServerListItem, imageSize?: number): Album => {
+  return {
+    albumArtists:
+      item.AlbumArtists.map((entry) => ({
+        id: entry.Id,
+        name: entry.Name,
+      })) || [],
+    artists: item.ArtistItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
+    backdropImageUrl: null,
+    createdAt: item.DateCreated,
+    duration: item.RunTimeTicks / 10000000,
+    genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
+    id: item.Id,
+    imagePlaceholderUrl: null,
+    imageUrl: getAlbumCoverArtUrl({
+      baseUrl: server.url,
+      item,
+      size: imageSize || 300,
+    }),
+    isCompilation: null,
+    isFavorite: item.UserData?.IsFavorite || false,
+    lastPlayedAt: null,
+    name: item.Name,
+    playCount: item.UserData?.PlayCount || 0,
+    rating: null,
+    releaseDate: item.PremiereDate?.split('T')[0] || null,
+    releaseYear: item.ProductionYear,
+    serverType: ServerType.JELLYFIN,
+    size: null,
+    songCount: item?.ChildCount || null,
+    songs: item.songs?.map((song) => normalizeSong(song, server, '', imageSize)),
+    uniqueId: nanoid(),
+    updatedAt: item?.DateLastMediaAdded || item.DateCreated,
   };
 };
 

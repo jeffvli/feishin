@@ -165,7 +165,7 @@ export type Album = {
   songs?: Song[];
   uniqueId: string;
   updatedAt: string;
-};
+} & { songs?: Song[] };
 
 export type Song = {
   album: string;

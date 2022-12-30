@@ -9,6 +9,8 @@ import { ndNormalize } from '/@/renderer/api/navidrome.api';
 import type { NDAlbum, NDGenreList, NDSong } from '/@/renderer/api/navidrome.types';
 import { SSGenreList, SSMusicFolderList } from '/@/renderer/api/subsonic.types';
 import type {
+  Album,
+  RawAlbumDetailResponse,
   RawAlbumListResponse,
   RawGenreListResponse,
   RawMusicFolderListResponse,
@@ -34,6 +36,25 @@ const albumList = (data: RawAlbumListResponse | undefined, server: ServerListIte
     startIndex: data?.startIndex,
     totalRecordCount: data?.totalRecordCount,
   };
+};
+
+const albumDetail = (
+  data: RawAlbumDetailResponse | undefined,
+  server: ServerListItem | null,
+): Album | undefined => {
+  let album: Album | undefined;
+  switch (server?.type) {
+    case 'jellyfin':
+      album = jfNormalize.album(data as JFAlbum, server);
+      break;
+    case 'navidrome':
+      album = ndNormalize.album(data as NDAlbum, server);
+      break;
+    case 'subsonic':
+      break;
+  }
+
+  return album;
 };
 
 const songList = (data: RawSongListResponse | undefined, server: ServerListItem | null) => {
@@ -116,6 +137,7 @@ const genreList = (data: RawGenreListResponse | undefined, server: ServerListIte
 };
 
 export const normalize = {
+  albumDetail,
   albumList,
   genreList,
   musicFolderList,

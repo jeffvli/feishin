@@ -401,42 +401,6 @@ const getCoverArtUrl = (args: {
   );
 };
 
-const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: number): Album => {
-  const imageUrl = getCoverArtUrl({
-    baseUrl: server.url,
-    coverArtId: item.coverArtId,
-    credential: server.credential,
-    size: imageSize || 300,
-  });
-
-  const imagePlaceholderUrl = imageUrl?.replace(/size=\d+/, 'size=50') || null;
-
-  return {
-    albumArtists: [{ id: item.albumArtistId, name: item.albumArtist }],
-    artists: [{ id: item.artistId, name: item.artist }],
-    backdropImageUrl: null,
-    createdAt: item.createdAt.split('T')[0],
-    duration: item.duration || null,
-    genres: item.genres,
-    id: item.id,
-    imagePlaceholderUrl,
-    imageUrl,
-    isCompilation: item.compilation,
-    isFavorite: item.starred,
-    lastPlayedAt: item.playDate ? item.playDate.split('T')[0] : null,
-    name: item.name,
-    playCount: item.playCount,
-    rating: item.rating,
-    releaseDate: new Date(item.minYear, 0, 1).toISOString(),
-    releaseYear: item.minYear,
-    serverType: ServerType.NAVIDROME,
-    size: item.size,
-    songCount: item.songCount,
-    uniqueId: nanoid(),
-    updatedAt: item.updatedAt,
-  };
-};
-
 const normalizeSong = (
   item: NDSong,
   server: ServerListItem,
@@ -480,6 +444,44 @@ const normalizeSong = (
     streamUrl: `${server.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=feishin_${deviceId}&${server.credential}`,
     trackNumber: item.trackNumber,
     type: ServerType.NAVIDROME,
+    uniqueId: nanoid(),
+    updatedAt: item.updatedAt,
+  };
+};
+
+const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: number): Album => {
+  const imageUrl = getCoverArtUrl({
+    baseUrl: server.url,
+    coverArtId: item.coverArtId,
+    credential: server.credential,
+    size: imageSize || 300,
+  });
+
+  const imagePlaceholderUrl = imageUrl?.replace(/size=\d+/, 'size=50') || null;
+  const imageBackdropUrl = imageUrl?.replace(/size=\d+/, 'size=1000') || null;
+
+  return {
+    albumArtists: [{ id: item.albumArtistId, name: item.albumArtist }],
+    artists: [{ id: item.artistId, name: item.artist }],
+    backdropImageUrl: imageBackdropUrl,
+    createdAt: item.createdAt.split('T')[0],
+    duration: item.duration || null,
+    genres: item.genres,
+    id: item.id,
+    imagePlaceholderUrl,
+    imageUrl,
+    isCompilation: item.compilation,
+    isFavorite: item.starred,
+    lastPlayedAt: item.playDate ? item.playDate.split('T')[0] : null,
+    name: item.name,
+    playCount: item.playCount,
+    rating: item.rating,
+    releaseDate: new Date(item.minYear, 0, 1).toISOString(),
+    releaseYear: item.minYear,
+    serverType: ServerType.NAVIDROME,
+    size: item.size,
+    songCount: item.songCount,
+    songs: item.songs ? item.songs.map((song) => normalizeSong(song, server, '')) : undefined,
     uniqueId: nanoid(),
     updatedAt: item.updatedAt,
   };
