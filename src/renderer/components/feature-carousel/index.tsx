@@ -14,6 +14,9 @@ import { AppRoute } from '/@/renderer/router/routes';
 
 const Carousel = styled(motion.div)`
   position: relative;
+  height: 30vh;
+  min-height: 250px;
+
   padding: 2rem;
   overflow: hidden;
   background: linear-gradient(180deg, var(--main-bg), rgba(25, 26, 28, 60%));
@@ -24,7 +27,7 @@ const Grid = styled.div`
   grid-auto-columns: 1fr;
   grid-template-areas: 'image info';
   grid-template-rows: 1fr;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 250px 1fr;
   gap: 0.5rem;
   width: 100%;
   max-width: 100%;
@@ -35,13 +38,16 @@ const ImageColumn = styled.div`
   z-index: 15;
   display: flex;
   grid-area: image;
+  align-items: flex-end;
 `;
 
 const InfoColumn = styled.div`
   z-index: 15;
   display: flex;
   grid-area: info;
+  align-items: flex-end;
   width: 100%;
+  padding-left: 1rem;
 `;
 
 const BackgroundImage = styled.img`
@@ -75,8 +81,8 @@ const Wrapper = styled(Link)`
 `;
 
 const TitleWrapper = styled.div`
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
+  display: webkit-box;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
@@ -97,7 +103,6 @@ const variants: Variants = {
 
 interface FeatureCarouselProps {
   data: Album[] | undefined;
-  loading?: boolean;
 }
 
 export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
@@ -137,12 +142,12 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
             <Grid>
               <ImageColumn>
                 <Image
-                  height={150}
+                  height={225}
                   placeholder="var(--card-default-bg)"
                   radius="sm"
                   src={data[itemIndex]?.imageUrl}
                   sx={{ objectFit: 'cover' }}
-                  width={150}
+                  width={225}
                 />
               </ImageColumn>
               <InfoColumn>
