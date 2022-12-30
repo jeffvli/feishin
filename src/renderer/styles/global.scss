@@ -1,6 +1,6 @@
-@use "../themes/default.scss";
-@use "../themes/dark.scss";
-@use "../themes/light.scss";
+@use '../themes/default.scss';
+@use '../themes/dark.scss';
+@use '../themes/light.scss';
 
 * {
   box-sizing: border-box;
@@ -113,95 +113,111 @@ button {
   }
 }
 
-.mantine-ScrollArea-thumb[data-state="visible"] {
+.mantine-ScrollArea-thumb[data-state='visible'] {
   animation: fadeIn 0.3s forwards;
 }
 
-.mantine-ScrollArea-scrollbar[data-state="hidden"] {
+.mantine-ScrollArea-scrollbar[data-state='hidden'] {
   animation: fadeOut 0.2s forwards;
 }
 
 @font-face {
-  font-family: "Archivo";
-  src: url("../fonts/Archivo-VariableFont_wdth,wght.ttf") format("truetype-variations");
+  font-family: 'Archivo';
+  src: url('../fonts/Archivo-VariableFont_wdth,wght.ttf') format('truetype-variations');
   font-weight: 100 1000;
 }
 
 @font-face {
-  font-family: "Raleway";
-  src: url("../fonts/Raleway-VariableFont_wght.ttf") format("truetype-variations");
+  font-family: 'Raleway';
+  src: url('../fonts/Raleway-VariableFont_wght.ttf') format('truetype-variations');
   font-weight: 100 1000;
 }
 
 @font-face {
-  font-family: "Fredoka";
-  src: url("../fonts/Fredoka-VariableFont_wdth,wght.ttf") format("truetype-variations");
+  font-family: 'Fredoka';
+  src: url('../fonts/Fredoka-VariableFont_wdth,wght.ttf') format('truetype-variations');
   font-weight: 100 1000;
 }
 
 @font-face {
-  font-family: "League Spartan";
-  src: url("../fonts/LeagueSpartan-VariableFont_wght.ttf") format("truetype-variations");
+  font-family: 'League Spartan';
+  src: url('../fonts/LeagueSpartan-VariableFont_wght.ttf') format('truetype-variations');
   font-weight: 100 1000;
 }
 
 @font-face {
-  font-family: "Lexend";
-  src: url("../fonts/Lexend-VariableFont_wght.ttf") format("truetype-variations");
+  font-family: 'Lexend';
+  src: url('../fonts/Lexend-VariableFont_wght.ttf') format('truetype-variations');
   font-weight: 100 1000;
 }
 
 @font-face {
-  font-family: "Sora";
-  src: url("../fonts/Sora-VariableFont_wght.ttf") format("truetype-variations");
+  font-family: 'Sora';
+  src: url('../fonts/Sora-VariableFont_wght.ttf') format('truetype-variations');
   font-weight: 100 1000;
 }
 
 @font-face {
-  font-family: "Work Sans";
-  src: url("../fonts/WorkSans-VariableFont_wght.ttf") format("truetype-variations");
+  font-family: 'Work Sans';
+  src: url('../fonts/WorkSans-VariableFont_wght.ttf') format('truetype-variations');
   font-weight: 100 1000;
 }
 
 @font-face {
-  font-family: "Poppins";
+  font-family: 'Poppins';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../fonts/Poppins-Regular.ttf") format("truetype");
+  src: url('../fonts/Poppins-Regular.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "Poppins";
+  font-family: 'Poppins';
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("../fonts/Poppins-SemiBold.ttf") format("truetype");
+  src: url('../fonts/Poppins-SemiBold.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "Poppins";
+  font-family: 'Poppins';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("../fonts/Poppins-Bold.ttf") format("truetype");
+  src: url('../fonts/Poppins-Bold.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "Raleway";
-  src: url("../fonts/Raleway-VariableFont_wght.ttf") format("truetype-variations");
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/Poppins-ExtraBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('../fonts/Poppins-Black.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Raleway';
+  src: url('../fonts/Raleway-VariableFont_wght.ttf') format('truetype-variations');
   font-weight: 100 1000;
 }
 
 @font-face {
-  font-family: "DroidSerif";
-  src: url("https://rawgit.com/google/fonts/master/ufl/ubuntumono/UbuntuMono-Italic.ttf")
-    format("truetype");
+  font-family: 'DroidSerif';
+  src: url('https://rawgit.com/google/fonts/master/ufl/ubuntumono/UbuntuMono-Italic.ttf')
+    format('truetype');
   unicode-range: U+000-5FF; /* Latin glyphs */
 }
 
 @font-face {
-  font-family: "DroidSerif";
-  src: url("https://fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff2") format("truetype");
+  font-family: 'DroidSerif';
+  src: url('https://fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff2') format('truetype');
   unicode-range: U+3000-9FFF, U+ff??; /* Japanese glyphs */
 }
