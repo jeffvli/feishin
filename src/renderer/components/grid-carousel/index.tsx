@@ -90,7 +90,7 @@ const Carousel = ({ data, cardRows }: any) => {
         mode="popLayout"
       >
         <GridContainer
-          key={`carousel-${uniqueId}-${data[0].id}`}
+          key={`carousel-${uniqueId}-${data[0]?.id}`}
           animate="animate"
           custom={{ direction, loading }}
           exit="exit"
