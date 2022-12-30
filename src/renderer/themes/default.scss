@@ -2,7 +2,7 @@
   --root-font-size: 12px;
   --icon-color: rgb(255, 255, 255);
 
-  --primary-color: rgb(25, 88, 248);
+  --primary-color: rgb(34, 104, 255);
   --secondary-color: rgb(255, 120, 120);
   --success-color: green;
   --warning-color: orange;
@@ -42,7 +42,7 @@
   --scrollbar-thumb-bg: rgba(90, 90, 90, 0.5);
 
   --btn-primary-bg: var(--primary-color);
-  --btn-primary-bg-hover: rgb(51, 109, 255);
+  --btn-primary-bg-hover: rgb(0, 71, 252);
   --btn-primary-fg: #ffffff;
   --btn-primary-fg-hover: #ffffff;
 
@@ -132,7 +132,7 @@
   }
 
   .current-song {
-    background: rgba(96, 144, 240, 0.3) !important;
+    background: rgba(170, 70, 70, 0.2) !important;
   }
 
   .mantine-Modal-modal {
