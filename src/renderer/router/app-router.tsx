@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import { AppRoute } from './routes';
 import { RouteErrorBoundary } from '/@/renderer/features/action-required';
+import AlbumDetailRoute from '/@/renderer/features/albums/routes/album-detail-route';
 import HomeRoute from '/@/renderer/features/home/routes/home-route';
 import { DefaultLayout } from '/@/renderer/layouts';
 import { AppOutlet } from '/@/renderer/router/app-outlet';
@@ -53,6 +54,10 @@ export const AppRouter = () => {
               <Route
                 element={<AlbumListRoute />}
                 path={AppRoute.LIBRARY_ALBUMS}
+              />
+              <Route
+                element={<AlbumDetailRoute />}
+                path={AppRoute.LIBRARY_ALBUMS_DETAIL}
               />
               <Route
                 element={<SongListRoute />}
