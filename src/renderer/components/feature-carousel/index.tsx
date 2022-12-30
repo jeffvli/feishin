@@ -27,7 +27,7 @@ const Grid = styled.div`
   grid-auto-columns: 1fr;
   grid-template-areas: 'image info';
   grid-template-rows: 1fr;
-  grid-template-columns: 250px 1fr;
+  grid-template-columns: 225px 1fr;
   gap: 0.5rem;
   width: 100%;
   max-width: 100%;
@@ -81,7 +81,8 @@ const Wrapper = styled(Link)`
 `;
 
 const TitleWrapper = styled.div`
-  display: webkit-box;
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
