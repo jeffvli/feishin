@@ -92,6 +92,14 @@ export const useSongStore = create<SongSlice>()(
                 column: TableColumn.YEAR,
                 width: 100,
               },
+              {
+                column: TableColumn.DATE_ADDED,
+                width: 100,
+              },
+              {
+                column: TableColumn.PLAY_COUNT,
+                width: 100,
+              },
             ],
             pagination: {
               currentPage: 1,
