@@ -1,6 +1,6 @@
 {
   "name": "feishin",
-  "version": "0.0.1-alpha1",
+  "version": "0.0.1-alpha2",
   "description": "",
   "main": "./dist/main/main.js",
   "author": {
@@ -13,5 +13,5 @@
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
   "dependencies": {},
-  "license": "MIT"
+  "license": "GPL-3.0"
 }
