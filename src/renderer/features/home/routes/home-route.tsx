@@ -1,16 +1,18 @@
 import { useCallback, useMemo } from 'react';
 import { Box, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
-import { AlbumListSort, SortOrder } from '/@/renderer/api/types';
+import { AlbumListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import { TextTitle, PageHeader, FeatureCarousel, GridCarousel } from '/@/renderer/components';
 import { useAlbumList } from '/@/renderer/features/albums';
 import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-played-query';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
+import { useCurrentServer } from '/@/renderer/store';
 
 const HomeRoute = () => {
   // const rootElement = document.querySelector(':root') as HTMLElement;
+  const server = useCurrentServer();
   const cq = useContainerQuery();
   const itemsPerPage = cq.isXl ? 9 : cq.isLg ? 7 : cq.isMd ? 5 : cq.isSm ? 4 : 3;
 
@@ -223,39 +225,47 @@ const HomeRoute = () => {
             }}
           >
             <Stack spacing={35}>
-              <FeatureCarousel
-                data={featureItemsWithImage}
-                loading={feature.isLoading || feature.isFetching}
-              />
-              {carousels.map((carousel, index) => (
-                <GridCarousel
-                  key={`carousel-${carousel.uniqueId}-${index}`}
-                  cardRows={[
-                    {
-                      property: 'name',
-                      route: {
-                        route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                        slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
+              <FeatureCarousel data={featureItemsWithImage} />
+              {carousels
+                .filter((carousel) => {
+                  if (
+                    server?.type === ServerType.JELLYFIN &&
+                    carousel.uniqueId === 'recentlyPlayed'
+                  ) {
+                    return null;
+                  }
+
+                  return carousel;
+                })
+                .map((carousel, index) => (
+                  <GridCarousel
+                    key={`carousel-${carousel.uniqueId}-${index}`}
+                    cardRows={[
+                      {
+                        property: 'name',
+                        route: {
+                          route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                          slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
+                        },
                       },
-                    },
-                    {
-                      arrayProperty: 'name',
-                      property: 'albumArtists',
-                      route: {
-                        route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
-                        slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
+                      {
+                        arrayProperty: 'name',
+                        property: 'albumArtists',
+                        route: {
+                          route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+                          slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
+                        },
                       },
-                    },
-                  ]}
-                  containerWidth={cq.width}
-                  data={carousel.data}
-                  loading={carousel.loading}
-                  pagination={carousel.pagination}
-                  uniqueId={carousel.uniqueId}
-                >
-                  <GridCarousel.Title>{carousel.title}</GridCarousel.Title>
-                </GridCarousel>
-              ))}
+                    ]}
+                    containerWidth={cq.width}
+                    data={carousel.data}
+                    loading={carousel.loading}
+                    pagination={carousel.pagination}
+                    uniqueId={carousel.uniqueId}
+                  >
+                    <GridCarousel.Title>{carousel.title}</GridCarousel.Title>
+                  </GridCarousel>
+                ))}
             </Stack>
           </Box>
         </Box>
