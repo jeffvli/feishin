@@ -35,12 +35,14 @@ import {
   GridReadyEvent,
   IDatasource,
   PaginationChangedEvent,
+  RowDoubleClickedEvent,
 } from '@ag-grid-community/core';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import sortBy from 'lodash/sortBy';
+import { generatePath, useNavigate } from 'react-router';
 
 interface AlbumListContentProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -49,6 +51,7 @@ interface AlbumListContentProps {
 
 export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const server = useCurrentServer();
   const page = useAlbumListStore();
   const setPage = useSetAlbumStore();
@@ -296,6 +299,10 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
     });
   };
 
+  const handleRowDoubleClick = (e: RowDoubleClickedEvent) => {
+    navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: e.data.id }));
+  };
+
   return (
     <>
       <VirtualGridAutoSizerContainer>
@@ -361,6 +368,7 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
             onGridReady={onTableReady}
             onGridSizeChanged={handleTableSizeChange}
             onPaginationChanged={onTablePaginationChanged}
+            onRowDoubleClicked={handleRowDoubleClick}
           />
         )}
       </VirtualGridAutoSizerContainer>
