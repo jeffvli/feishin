@@ -5,27 +5,38 @@ import type {
   AlbumArtistListQuery,
   ArtistListQuery,
   PlaylistListQuery,
+  PlaylistDetailQuery,
 } from './types';
 
 export const queryKeys = {
   albumArtists: {
-    list: (serverId: string, query?: AlbumArtistListQuery) =>
-      [serverId, 'albumArtists', 'list', query] as const,
+    detail: (serverId: string, query?: AlbumArtistListQuery) => {
+      if (query) return [serverId, 'albumArtists', 'detail', query] as const;
+      return [serverId, 'albumArtists', 'detail'] as const;
+    },
+    list: (serverId: string, query?: AlbumArtistListQuery) => {
+      if (query) return [serverId, 'albumArtists', 'list', query] as const;
+      return [serverId, 'albumArtists', 'list'] as const;
+    },
     root: (serverId: string) => [serverId, 'albumArtists'] as const,
   },
   albums: {
     detail: (serverId: string, query?: AlbumDetailQuery) =>
       [serverId, 'albums', 'detail', query] as const,
-    list: (serverId: string, query?: AlbumListQuery) =>
-      [serverId, 'albums', 'list', query] as const,
+    list: (serverId: string, query?: AlbumListQuery) => {
+      if (query) return [serverId, 'albums', 'list', query] as const;
+      return [serverId, 'albums', 'list'] as const;
+    },
     root: (serverId: string) => [serverId, 'albums'],
     serverRoot: (serverId: string) => [serverId, 'albums'],
     songs: (serverId: string, query: SongListQuery) =>
       [serverId, 'albums', 'songs', query] as const,
   },
   artists: {
-    list: (serverId: string, query?: ArtistListQuery) =>
-      [serverId, 'artists', 'list', query] as const,
+    list: (serverId: string, query?: ArtistListQuery) => {
+      if (query) return [serverId, 'artists', 'list', query] as const;
+      return [serverId, 'artists', 'list'] as const;
+    },
     root: (serverId: string) => [serverId, 'artists'] as const,
   },
   genres: {
@@ -36,15 +47,25 @@ export const queryKeys = {
     list: (serverId: string) => [serverId, 'musicFolders', 'list'] as const,
   },
   playlists: {
-    list: (serverId: string, query?: PlaylistListQuery) =>
-      [serverId, 'playlists', 'list', query] as const,
+    detail: (serverId: string, id?: string, query?: PlaylistDetailQuery) => {
+      if (query) return [serverId, 'playlists', 'detail', id, query] as const;
+      if (id) return [serverId, 'playlists', 'detail', id] as const;
+      return [serverId, 'playlists', 'detail'] as const;
+    },
+    list: (serverId: string, query?: PlaylistListQuery) => {
+      if (query) return [serverId, 'playlists', 'list', query] as const;
+      return [serverId, 'playlists', 'list'] as const;
+    },
     root: (serverId: string) => [serverId, 'playlists'] as const,
   },
   server: {
     root: (serverId: string) => [serverId] as const,
   },
   songs: {
-    list: (serverId: string, query?: SongListQuery) => [serverId, 'songs', 'list', query] as const,
+    list: (serverId: string, query?: SongListQuery) => {
+      if (query) return [serverId, 'songs', 'list', query] as const;
+      return [serverId, 'songs', 'list'] as const;
+    },
     root: (serverId: string) => [serverId, 'songs'] as const,
   },
 };
