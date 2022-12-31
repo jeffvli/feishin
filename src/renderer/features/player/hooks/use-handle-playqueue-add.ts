@@ -26,63 +26,61 @@ export const useHandlePlayQueueAdd = () => {
     let songs = null;
 
     if (options.byItemType) {
+      let songsList;
+      let queryFilter: any;
+      let queryKey: any;
       if (options.byItemType.type === LibraryItem.ALBUM) {
-        // const albumDetail = await queryClient.fetchQuery(
-        //   queryKeys.albums.detail(server?.id, { id: options.byItemType.id }),
-        //   async ({ signal }) =>
-        //     api.controller.getAlbumDetail({
-        //       query: { id: options.byItemType!.id },
-        //       server,
-        //       signal,
-        //     }),
-        // );
-
-        // if (!albumDetail) return null;
-
-        const queryFilter = {
+        queryFilter = {
           albumIds: options.byItemType?.id || [],
           sortBy: SongListSort.ALBUM,
           sortOrder: SortOrder.ASC,
           startIndex: 0,
         };
 
-        const queryKey = queryKeys.songs.list(server?.id, queryFilter);
-        let songsList;
-        try {
-          songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-            api.controller.getSongList({
-              query: queryFilter,
-              server,
-              signal,
-            }),
-          );
-        } catch (err: any) {
-          return toast.error({
-            message: err.message,
-            title: 'Play queue add failed',
-          });
-        }
+        queryKey = queryKeys.songs.list(server?.id, queryFilter);
+      } else if (options.byItemType.type === LibraryItem.ALBUM_ARTIST) {
+        queryFilter = {
+          artistIds: options.byItemType?.id || [],
+          sortBy: SongListSort.ALBUM,
+          sortOrder: SortOrder.ASC,
+          startIndex: 0,
+        };
 
-        if (!songsList) return toast.warn({ message: 'No songs found' });
-
-        switch (server?.type) {
-          case 'jellyfin':
-            songs = songsList.items?.map((song) =>
-              jfNormalize.song(song as JFSong, server, deviceId),
-            );
-            break;
-          case 'navidrome':
-            songs = songsList.items?.map((song) =>
-              ndNormalize.song(song as NDSong, server, deviceId),
-            );
-            break;
-          case 'subsonic':
-            break;
-        }
+        queryKey = queryKeys.songs.list(server?.id, queryFilter);
       }
-    }
 
-    if (options.byData) {
+      try {
+        songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+          api.controller.getSongList({
+            query: queryFilter,
+            server,
+            signal,
+          }),
+        );
+      } catch (err: any) {
+        return toast.error({
+          message: err.message,
+          title: 'Play queue add failed',
+        });
+      }
+
+      if (!songsList) return toast.warn({ message: 'No songs found' });
+
+      switch (server?.type) {
+        case 'jellyfin':
+          songs = songsList.items?.map((song) =>
+            jfNormalize.song(song as JFSong, server, deviceId),
+          );
+          break;
+        case 'navidrome':
+          songs = songsList.items?.map((song) =>
+            ndNormalize.song(song as NDSong, server, deviceId),
+          );
+          break;
+        case 'subsonic':
+          break;
+      }
+    } else if (options.byData) {
       songs = options.byData.map((song) => ({ ...song, uniqueId: nanoid() }));
     }
 
