@@ -104,8 +104,9 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
         rowCount: undefined,
       };
       params.api.setDatasource(dataSource);
+      params.api.ensureIndexVisible(page.table.scrollOffset, 'top');
     },
-    [page.filter, queryClient, server],
+    [page.filter, page.table.scrollOffset, queryClient, server],
   );
 
   const onPaginationChanged = useCallback(
