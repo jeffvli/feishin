@@ -133,7 +133,9 @@ export type AdvancedFilterGroup = {
 export enum TableColumn {
   ALBUM = 'album',
   ALBUM_ARTIST = 'albumArtist',
+  ALBUM_COUNT = 'albumCount',
   ARTIST = 'artist',
+  BIOGRAPHY = 'biography',
   BIT_RATE = 'bitRate',
   BPM = 'bpm',
   CHANNELS = 'channels',
@@ -149,6 +151,7 @@ export enum TableColumn {
   RATING = 'rating',
   RELEASE_DATE = 'releaseDate',
   ROW_INDEX = 'rowIndex',
+  SONG_COUNT = 'songCount',
   // SKIP = 'skip',
   TITLE = 'title',
   TITLE_COMBINED = 'titleCombined',

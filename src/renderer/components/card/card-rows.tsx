@@ -178,3 +178,34 @@ export const ALBUM_CARD_ROWS: { [key: string]: CardRow<Album> } = {
     property: 'songCount',
   },
 };
+
+export const ALBUMARTIST_CARD_ROWS: { [key: string]: CardRow<AlbumArtist> } = {
+  albumCount: {
+    property: 'albumCount',
+  },
+  duration: {
+    property: 'duration',
+  },
+  genres: {
+    property: 'genres',
+  },
+  lastPlayedAt: {
+    property: 'lastPlayedAt',
+  },
+  name: {
+    property: 'name',
+    route: {
+      route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+      slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
+    },
+  },
+  playCount: {
+    property: 'playCount',
+  },
+  rating: {
+    property: 'rating',
+  },
+  songCount: {
+    property: 'songCount',
+  },
+};

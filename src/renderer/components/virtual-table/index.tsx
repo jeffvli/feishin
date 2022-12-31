@@ -57,11 +57,27 @@ const tableColumns: { [key: string]: ColDef } = {
     valueGetter: (params: ValueGetterParams) =>
       params.data ? params.data.albumArtists : undefined,
   },
+  albumCount: {
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+    colId: TableColumn.ALBUM_COUNT,
+    field: 'albumCount',
+    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
+    headerName: 'Albums',
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.albumCount : undefined),
+  },
   artist: {
     cellRenderer: ArtistCell,
     colId: TableColumn.ARTIST,
     headerName: 'Artist',
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.artists : undefined),
+  },
+  biography: {
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
+    colId: TableColumn.BIOGRAPHY,
+    field: 'biography',
+    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'left' }),
+    headerName: 'Biography',
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.biography : undefined),
   },
   bitRate: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
@@ -174,6 +190,14 @@ const tableColumns: { [key: string]: ColDef } = {
     valueGetter: (params) => {
       return (params.node?.rowIndex || 0) + 1;
     },
+  },
+  songCount: {
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+    colId: TableColumn.SONG_COUNT,
+    field: 'songCount',
+    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
+    headerName: 'Songs',
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.songCount : undefined),
   },
   title: {
     cellRenderer: (params: ICellRendererParams) =>
