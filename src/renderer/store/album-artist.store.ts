@@ -96,13 +96,13 @@ export const useAlbumArtistStore = create<AlbumArtistSlice>()(
           },
         },
       })),
-      { name: 'store_artist' },
+      { name: 'store_album_artist' },
     ),
     {
       merge: (persistedState, currentState) => {
         return merge(currentState, persistedState);
       },
-      name: 'store_artist',
+      name: 'store_album_artist',
       version: 1,
     },
   ),
