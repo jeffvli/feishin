@@ -5,7 +5,7 @@ export const useFastAverageColor = (
   src?: string | null,
   aglorithm?: 'dominant' | 'simple' | 'sqrt',
 ) => {
-  const [color, setColor] = useState('rgba(0, 0, 0, 0)');
+  const [color, setColor] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const fac = new FastAverageColor();
@@ -24,7 +24,8 @@ export const useFastAverageColor = (
           return setColor(color.rgb);
         })
         .catch((e) => {
-          console.log(e);
+          console.log('Error fetching average color', e);
+          return setColor('rgba(0, 0, 0, 0)');
         });
     }
 
