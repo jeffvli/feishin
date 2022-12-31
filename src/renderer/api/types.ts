@@ -14,6 +14,7 @@ import {
   JFPlaylistList,
   JFPlaylistDetail,
   JFMusicFolderList,
+  JFPlaylistListSort,
 } from '/@/renderer/api/jellyfin.types';
 import {
   NDSortOrder,
@@ -243,14 +244,15 @@ export type MusicFolder = {
 };
 
 export type Playlist = {
-  duration?: number;
+  duration: number | null;
   id: string;
   name: string;
-  public?: boolean;
-  size?: number;
-  songCount?: number;
-  userId: string;
-  username: string;
+  public: boolean | null;
+  rules?: Record<string, any> | null;
+  size: number | null;
+  songCount: number | null;
+  userId: string | null;
+  username: string | null;
 };
 
 export type GenresResponse = Genre[];
@@ -756,11 +758,21 @@ export type RawPlaylistListResponse = NDPlaylistList | JFPlaylistList | undefine
 
 export type PlaylistListResponse = BasePaginatedResponse<Playlist[]>;
 
-export type PlaylistListSort = NDPlaylistListSort;
+export enum PlaylistListSort {
+  DURATION = 'duration',
+  NAME = 'name',
+  OWNER = 'owner',
+  PUBLIC = 'public',
+  SONG_COUNT = 'songCount',
+  UPDATED_AT = 'updatedAt',
+}
 
 export type PlaylistListQuery = {
   limit?: number;
-  musicFolderId?: string;
+  ndParams?: {
+    owner_id?: string;
+  };
+  searchTerm?: string;
   sortBy: PlaylistListSort;
   sortOrder: SortOrder;
   startIndex: number;
@@ -769,18 +781,18 @@ export type PlaylistListQuery = {
 export type PlaylistListArgs = { query: PlaylistListQuery } & BaseEndpointArgs;
 
 type PlaylistListSortMap = {
-  jellyfin: Record<PlaylistListSort, undefined>;
+  jellyfin: Record<PlaylistListSort, JFPlaylistListSort | undefined>;
   navidrome: Record<PlaylistListSort, NDPlaylistListSort | undefined>;
   subsonic: Record<PlaylistListSort, undefined>;
 };
 
 export const playlistListSortMap: PlaylistListSortMap = {
   jellyfin: {
-    duration: undefined,
-    name: undefined,
+    duration: JFPlaylistListSort.DURATION,
+    name: JFPlaylistListSort.NAME,
     owner: undefined,
     public: undefined,
-    songCount: undefined,
+    songCount: JFPlaylistListSort.SONG_COUNT,
     updatedAt: undefined,
   },
   navidrome: {

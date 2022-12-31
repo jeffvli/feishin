@@ -22,6 +22,7 @@ import type {
   JFGenreListResponse,
   JFMusicFolderList,
   JFMusicFolderListResponse,
+  JFPlaylist,
   JFPlaylistDetail,
   JFPlaylistDetailResponse,
   JFPlaylistList,
@@ -32,7 +33,7 @@ import type {
   JFSongListResponse,
 } from '/@/renderer/api/jellyfin.types';
 import { JFCollectionType } from '/@/renderer/api/jellyfin.types';
-import type {
+import {
   Album,
   AlbumArtist,
   AlbumArtistDetailArgs,
@@ -48,13 +49,13 @@ import type {
   FavoriteResponse,
   GenreListArgs,
   MusicFolderListArgs,
+  Playlist,
   PlaylistDetailArgs,
   PlaylistListArgs,
+  playlistListSortMap,
   PlaylistSongListArgs,
   Song,
   SongListArgs,
-} from '/@/renderer/api/types';
-import {
   songListSortMap,
   albumListSortMap,
   artistListSortMap,
@@ -396,18 +397,20 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<JFSongLi
 };
 
 const getPlaylistList = async (args: PlaylistListArgs): Promise<JFPlaylistList> => {
-  const { server, signal } = args;
+  const { query, server, signal } = args;
 
   const searchParams = {
     fields: 'ChildCount, Genres, DateCreated, ParentId, Overview',
     includeItemTypes: 'Playlist',
+    limit: query.limit,
     recursive: true,
-    sortBy: 'SortName',
-    sortOrder: 'Ascending',
+    sortBy: playlistListSortMap.jellyfin[query.sortBy],
+    sortOrder: sortOrderMap.jellyfin[query.sortOrder],
+    startIndex: query.startIndex,
   };
 
   const data = await api
-    .get(`/users/${server?.userId}/items`, {
+    .get(`users/${server?.userId}/items`, {
       headers: { 'X-MediaBrowser-Token': server?.credential },
       prefixUrl: server?.url,
       searchParams: parseSearchParams(searchParams),
@@ -415,12 +418,12 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<JFPlaylistList> 
     })
     .json<JFPlaylistListResponse>();
 
-  const playlistData = data.Items.filter((item) => item.MediaType === 'Audio');
+  const playlistItems = data.Items.filter((item) => item.MediaType === 'Audio');
 
   return {
-    Items: playlistData,
-    StartIndex: 0,
-    TotalRecordCount: playlistData.length,
+    items: playlistItems,
+    startIndex: 0,
+    totalRecordCount: playlistItems.length,
   };
 };
 
@@ -690,6 +693,20 @@ const normalizeAlbumArtist = (
   };
 };
 
+const normalizePlaylist = (item: JFPlaylist): Playlist => {
+  return {
+    duration: item.RunTimeTicks / 10000000,
+    id: item.Id,
+    name: item.Name,
+    public: null,
+    rules: null,
+    size: null,
+    songCount: item?.ChildCount || null,
+    userId: null,
+    username: null,
+  };
+};
+
 // const normalizeArtist = (item: any) => {
 //   return {
 //     album: (item.album || []).map((entry: any) => normalizeAlbum(entry)),
@@ -705,24 +722,6 @@ const normalizeAlbumArtist = (
 //       similarArtist: (item.similarArtist || []).map((entry: any) => normalizeArtist(entry)),
 //     },
 //     starred: item.UserData && item.UserData?.IsFavorite ? 'true' : undefined,
-//     title: item.Name,
-//     uniqueId: nanoid(),
-//   };
-// };
-
-// const normalizePlaylist = (item: any) => {
-//   return {
-//     changed: item.DateLastMediaAdded,
-//     comment: item.Overview,
-//     created: item.DateCreated,
-//     duration: item.RunTimeTicks / 10000000,
-//     genre: item.GenreItems && item.GenreItems.map((entry: any) => normalizeItem(entry)),
-//     id: item.Id,
-//     image: getCoverArtUrl(item, 350),
-//     owner: undefined,
-//     public: undefined,
-//     song: [],
-//     songCount: item.ChildCount,
 //     title: item.Name,
 //     uniqueId: nanoid(),
 //   };
@@ -780,5 +779,6 @@ export const jellyfinApi = {
 export const jfNormalize = {
   album: normalizeAlbum,
   albumArtist: normalizeAlbumArtist,
+  playlist: normalizePlaylist,
   song: normalizeSong,
 };

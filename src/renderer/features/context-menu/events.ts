@@ -21,7 +21,8 @@ export type ContextMenuItem =
   | 'addToPlaylist'
   | 'addToFavorites'
   | 'removeFromFavorites'
-  | 'setRating';
+  | 'setRating'
+  | 'deletePlaylist';
 
 export type SetContextMenuItems = {
   disabled?: boolean;

@@ -106,6 +106,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const contextMenuItems = {
     addToFavorites: { id: 'addToFavorites', label: 'Add to favorites', onClick: () => {} },
     addToPlaylist: { id: 'addToPlaylist', label: 'Add to playlist', onClick: () => {} },
+    deletePlaylist: { id: 'deletePlaylist', label: 'Delete playlist', onClick: () => {} },
     play: {
       id: 'play',
       label: 'Play',

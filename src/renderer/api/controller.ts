@@ -199,6 +199,10 @@ const getArtistList = async (args: ArtistListArgs) => {
   return (apiController('getArtistList') as ControllerEndpoint['getArtistList'])?.(args);
 };
 
+const getPlaylistList = async (args: PlaylistListArgs) => {
+  return (apiController('getPlaylistList') as ControllerEndpoint['getPlaylistList'])?.(args);
+};
+
 export const controller = {
   getAlbumArtistList,
   getAlbumDetail,
@@ -206,5 +210,6 @@ export const controller = {
   getArtistList,
   getGenreList,
   getMusicFolderList,
+  getPlaylistList,
   getSongList,
 };

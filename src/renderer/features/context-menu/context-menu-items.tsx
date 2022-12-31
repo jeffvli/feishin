@@ -29,3 +29,10 @@ export const ARTIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { disabled: true, id: 'removeFromFavorites' },
   { disabled: true, id: 'setRating' },
 ];
+
+export const PLAYLIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
+  { id: 'play' },
+  { id: 'playLast' },
+  { divider: true, id: 'playNext' },
+  { disabled: true, id: 'deletePlaylist' },
+];

@@ -4,10 +4,17 @@ import type {
   JFAlbumArtist,
   JFGenreList,
   JFMusicFolderList,
+  JFPlaylist,
   JFSong,
 } from '/@/renderer/api/jellyfin.types';
 import { ndNormalize } from '/@/renderer/api/navidrome.api';
-import type { NDAlbum, NDAlbumArtist, NDGenreList, NDSong } from '/@/renderer/api/navidrome.types';
+import type {
+  NDAlbum,
+  NDAlbumArtist,
+  NDGenreList,
+  NDPlaylist,
+  NDSong,
+} from '/@/renderer/api/navidrome.types';
 import { SSGenreList, SSMusicFolderList } from '/@/renderer/api/subsonic.types';
 import type {
   Album,
@@ -16,6 +23,7 @@ import type {
   RawAlbumListResponse,
   RawGenreListResponse,
   RawMusicFolderListResponse,
+  RawPlaylistListResponse,
   RawSongListResponse,
 } from '/@/renderer/api/types';
 import { ServerListItem } from '/@/renderer/types';
@@ -163,11 +171,32 @@ const albumArtistList = (
   };
 };
 
+const playlistList = (data: RawPlaylistListResponse | undefined, server: ServerListItem | null) => {
+  let playlists;
+  switch (server?.type) {
+    case 'jellyfin':
+      playlists = data?.items.map((item) => jfNormalize.playlist(item as JFPlaylist));
+      break;
+    case 'navidrome':
+      playlists = data?.items.map((item) => ndNormalize.playlist(item as NDPlaylist));
+      break;
+    case 'subsonic':
+      break;
+  }
+
+  return {
+    items: playlists,
+    startIndex: data?.startIndex,
+    totalRecordCount: data?.totalRecordCount,
+  };
+};
+
 export const normalize = {
   albumArtistList,
   albumDetail,
   albumList,
   genreList,
   musicFolderList,
+  playlistList,
   songList,
 };

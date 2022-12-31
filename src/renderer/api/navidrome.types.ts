@@ -287,7 +287,7 @@ export type NDPlaylist = {
   ownerName: string;
   path: string;
   public: boolean;
-  rules: null;
+  rules: Record<string, any> | null;
   size: number;
   songCount: number;
   sync: boolean;
@@ -309,7 +309,7 @@ export type NDPlaylistListResponse = NDPlaylist[];
 export enum NDPlaylistListSort {
   DURATION = 'duration',
   NAME = 'name',
-  OWNER = 'owner',
+  OWNER = 'ownerName',
   PUBLIC = 'public',
   SONG_COUNT = 'songCount',
   UPDATED_AT = 'updatedAt',

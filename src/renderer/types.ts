@@ -146,6 +146,7 @@ export enum TableColumn {
   FAVORITE = 'favorite',
   GENRE = 'genre',
   LAST_PLAYED = 'lastPlayedAt',
+  OWNER = 'username',
   PATH = 'path',
   PLAY_COUNT = 'playCount',
   RATING = 'rating',

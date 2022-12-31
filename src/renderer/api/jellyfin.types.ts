@@ -63,7 +63,19 @@ export interface JFPlaylistListResponse extends JFBasePaginatedResponse {
   Items: JFPlaylist[];
 }
 
-export type JFPlaylistList = JFPlaylistListResponse;
+export type JFPlaylistList = {
+  items: JFPlaylist[];
+  startIndex: number;
+  totalRecordCount: number;
+};
+
+export enum JFPlaylistListSort {
+  ALBUM_ARTIST = 'AlbumArtist,SortName',
+  DURATION = 'Runtime',
+  NAME = 'SortName',
+  RECENTLY_ADDED = 'DateCreated,SortName',
+  SONG_COUNT = 'ChildCount',
+}
 
 export type JFPlaylistDetailResponse = JFPlaylist;
 
@@ -485,6 +497,7 @@ type JFBaseParams = {
   imageTypeLimit?: number;
   parentId?: string;
   recursive?: boolean;
+  searchTerm?: string;
   userId?: string;
 };
 

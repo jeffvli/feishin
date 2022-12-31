@@ -31,6 +31,7 @@ import type {
   NDSongList,
   NDSongListResponse,
   NDAlbumArtist,
+  NDPlaylist,
 } from '/@/renderer/api/navidrome.types';
 import { NDPlaylistListSort, NDSongListSort, NDSortOrder } from '/@/renderer/api/navidrome.types';
 import type {
@@ -51,6 +52,7 @@ import type {
   CreatePlaylistResponse,
   PlaylistSongListArgs,
   AlbumArtist,
+  Playlist,
 } from '/@/renderer/api/types';
 import {
   playlistListSortMap,
@@ -329,12 +331,13 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<NDPlaylistList> 
     _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : NDSortOrder.ASC,
     _sort: query.sortBy ? playlistListSortMap.navidrome[query.sortBy] : NDPlaylistListSort.NAME,
     _start: query.startIndex,
+    ...query.ndParams,
   };
 
   const res = await api.get('api/playlist', {
     headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
     prefixUrl: server?.url,
-    searchParams,
+    searchParams: parseSearchParams(searchParams),
     signal,
   });
 
@@ -521,6 +524,20 @@ const normalizeAlbumArtist = (item: NDAlbumArtist): AlbumArtist => {
   };
 };
 
+const normalizePlaylist = (item: NDPlaylist): Playlist => {
+  return {
+    duration: item.duration,
+    id: item.id,
+    name: item.name,
+    public: item.public,
+    rules: item?.rules || null,
+    size: item.size,
+    songCount: item.songCount,
+    userId: item.ownerId,
+    username: item.ownerName,
+  };
+};
+
 export const navidromeApi = {
   authenticate,
   createPlaylist,
@@ -540,5 +557,6 @@ export const navidromeApi = {
 export const ndNormalize = {
   album: normalizeAlbum,
   albumArtist: normalizeAlbumArtist,
+  playlist: normalizePlaylist,
   song: normalizeSong,
 };

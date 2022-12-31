@@ -62,6 +62,16 @@ export const ALBUMARTIST_TABLE_COLUMNS = [
   { label: 'Song Count', value: TableColumn.SONG_COUNT },
 ];
 
+export const PLAYLIST_TABLE_COLUMNS = [
+  { label: 'Row Index', value: TableColumn.ROW_INDEX },
+  { label: 'Title', value: TableColumn.TITLE },
+  { label: 'Title (Combined)', value: TableColumn.TITLE_COMBINED },
+  { label: 'Duration', value: TableColumn.DURATION },
+  { label: 'Owner', value: TableColumn.OWNER },
+  // { label: 'Genre', value: TableColumn.GENRE },
+  { label: 'Song Count', value: TableColumn.SONG_COUNT },
+];
+
 interface TableConfigDropdownProps {
   type: TableType;
 }
