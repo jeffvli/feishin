@@ -13,7 +13,6 @@ const StyledScrollArea = styled(MantineScrollArea)`
   }
 
   & .mantine-ScrollArea-scrollbar {
-    width: 12px;
     padding: 0;
     background: var(--scrollbar-track-bg);
   }
@@ -22,7 +21,7 @@ const StyledScrollArea = styled(MantineScrollArea)`
 export const ScrollArea = ({ children, ...props }: ScrollAreaProps) => {
   return (
     <StyledScrollArea
-      offsetScrollbars
+      scrollbarSize={12}
       {...props}
     >
       {children}
