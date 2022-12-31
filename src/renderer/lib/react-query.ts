@@ -39,6 +39,7 @@ export type QueryOptions = {
   onError?: (err: any) => void;
   onSettled?: any;
   onSuccess?: any;
+  queryKey?: UseQueryOptions['queryKey'];
   refetchInterval?: number;
   refetchIntervalInBackground?: UseQueryOptions['refetchIntervalInBackground'];
   refetchOnWindowFocus?: boolean;
