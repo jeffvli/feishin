@@ -158,7 +158,7 @@ export const DefaultCard = ({
                 animationDuration={0.3}
                 height={cardSize}
                 imgStyle={{ objectFit: 'cover' }}
-                placeholder="var(--card-default-bg)"
+                placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
                 src={data?.imageUrl}
                 width={cardSize}
               />

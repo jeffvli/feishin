@@ -151,7 +151,7 @@ export const AlbumCard = ({
                 animationDuration={0.3}
                 height={size}
                 imgStyle={{ objectFit: 'cover' }}
-                placeholder="var(--card-default-bg)"
+                placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
                 src={data?.imageUrl}
                 width={size}
               />

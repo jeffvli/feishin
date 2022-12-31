@@ -466,7 +466,13 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
     size: imageSize || 300,
   });
 
-  const imagePlaceholderUrl = imageUrl?.replace(/size=\d+/, 'size=50') || null;
+  const imagePlaceholderUrl = getCoverArtUrl({
+    baseUrl: server.url,
+    coverArtId: item.coverArtId,
+    credential: server.credential,
+    size: 1,
+  });
+
   const imageBackdropUrl = imageUrl?.replace(/size=\d+/, 'size=1000') || null;
 
   return {

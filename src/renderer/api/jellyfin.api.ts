@@ -636,7 +636,11 @@ const normalizeAlbum = (item: JFAlbum, server: ServerListItem, imageSize?: numbe
     duration: item.RunTimeTicks / 10000000,
     genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
     id: item.Id,
-    imagePlaceholderUrl: null,
+    imagePlaceholderUrl: getAlbumCoverArtUrl({
+      baseUrl: server.url,
+      item,
+      size: 1,
+    }),
     imageUrl: getAlbumCoverArtUrl({
       baseUrl: server.url,
       item,

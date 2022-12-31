@@ -153,7 +153,7 @@ export const PosterCard = ({
                   animationDuration={0.3}
                   height={sizes.itemWidth}
                   importance="auto"
-                  placeholder="var(--card-default-bg)"
+                  placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
                   src={data?.imageUrl}
                   width={sizes.itemWidth}
                 />
