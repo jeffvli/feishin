@@ -33,6 +33,8 @@ import type {
   PlaylistSongListArgs,
   ArtistListArgs,
   RawArtistListResponse,
+  UpdatePlaylistArgs,
+  RawUpdatePlaylistResponse,
 } from '/@/renderer/api/types';
 import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
@@ -60,7 +62,7 @@ export type ControllerEndpoint = Partial<{
   getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<RawSongListResponse>;
   getSongDetail: (args: SongDetailArgs) => Promise<RawSongDetailResponse>;
   getSongList: (args: SongListArgs) => Promise<RawSongListResponse>;
-  updatePlaylist: () => void;
+  updatePlaylist: (args: UpdatePlaylistArgs) => Promise<RawUpdatePlaylistResponse>;
   updateRating: (args: RatingArgs) => Promise<RawRatingResponse>;
 }>;
 
@@ -120,7 +122,7 @@ const endpoints: ApiController = {
     getPlaylistSongList: navidromeApi.getPlaylistSongList,
     getSongDetail: navidromeApi.getSongDetail,
     getSongList: navidromeApi.getSongList,
-    updatePlaylist: undefined,
+    updatePlaylist: navidromeApi.updatePlaylist,
     updateRating: subsonicApi.updateRating,
   },
   subsonic: {
@@ -203,7 +205,16 @@ const getPlaylistList = async (args: PlaylistListArgs) => {
   return (apiController('getPlaylistList') as ControllerEndpoint['getPlaylistList'])?.(args);
 };
 
+const createPlaylist = async (args: CreatePlaylistArgs) => {
+  return (apiController('createPlaylist') as ControllerEndpoint['createPlaylist'])?.(args);
+};
+
+const updatePlaylist = async (args: UpdatePlaylistArgs) => {
+  return (apiController('updatePlaylist') as ControllerEndpoint['updatePlaylist'])?.(args);
+};
+
 export const controller = {
+  createPlaylist,
   getAlbumArtistList,
   getAlbumDetail,
   getAlbumList,
@@ -212,4 +223,5 @@ export const controller = {
   getMusicFolderList,
   getPlaylistList,
   getSongList,
+  updatePlaylist,
 };

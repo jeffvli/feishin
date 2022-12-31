@@ -1,9 +1,12 @@
+import { MouseEvent } from 'react';
 import { Stack, Grid, Accordion, Center, Group } from '@mantine/core';
+import { closeAllModals, openModal } from '@mantine/modals';
 import { SpotlightProvider } from '@mantine/spotlight';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BsCollection } from 'react-icons/bs';
-import { Button, TextInput } from '/@/renderer/components';
+import { Button, ScrollArea, TextInput } from '/@/renderer/components';
 import {
+  RiAddFill,
   RiAlbumFill,
   RiAlbumLine,
   RiArrowDownSLine,
@@ -16,22 +19,26 @@ import {
   RiFolder3Line,
   RiHome5Fill,
   RiHome5Line,
+  RiMenuUnfoldLine,
   RiMusicFill,
   RiMusicLine,
   RiPlayListLine,
   RiSearchLine,
+  RiUserVoiceFill,
   RiUserVoiceLine,
 } from 'react-icons/ri';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link, useLocation, generatePath } from 'react-router-dom';
 import styled from 'styled-components';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useSidebarStore, useAppStoreActions, useCurrentSong } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
+import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
+import { PlaylistListSort, SortOrder } from '/@/renderer/api/types';
 
 const SidebarContainer = styled.div`
   height: 100%;
-  max-height: calc(100vh - 85px); // Account for and playerbar
+  max-height: calc(100vh - 85px); // Account for playerbar
   user-select: none;
 `;
 
@@ -68,20 +75,35 @@ export const Sidebar = () => {
   const sidebar = useSidebarStore();
   const { setSidebar } = useAppStoreActions();
   const imageUrl = useCurrentSong()?.imageUrl;
-
   const showImage = sidebar.image;
+
+  const playlistsQuery = usePlaylistList({
+    limit: 0,
+    sortBy: PlaylistListSort.NAME,
+    sortOrder: SortOrder.ASC,
+    startIndex: 0,
+  });
+
+  const handleCreatePlaylistModal = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    openModal({
+      children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
+      size: 'sm',
+      title: 'Create Playlist',
+    });
+  };
 
   return (
     <SidebarContainer>
       <Stack
+        h="100%"
         justify="space-between"
         spacing={0}
-        sx={{ height: '100%' }}
       >
         <Stack
-          sx={{
-            maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%',
-          }}
+          spacing={0}
+          sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
         >
           <ActionsContainer p={10}>
             <Grid.Col span={8}>
@@ -120,121 +142,167 @@ export const Sidebar = () => {
               </Group>
             </Grid.Col>
           </ActionsContainer>
-          <Stack
-            spacing={0}
-            sx={{ overflowY: 'auto' }}
+
+          <ScrollArea
+            offsetScrollbars={false}
+            scrollbarSize={6}
           >
-            <SidebarItem to={AppRoute.HOME}>
-              <Group>
-                {location.pathname === AppRoute.HOME ? (
-                  <RiHome5Fill size={15} />
-                ) : (
-                  <RiHome5Line size={15} />
-                )}
-                Home
-              </Group>
-            </SidebarItem>
-            <Accordion
-              multiple
-              styles={{
-                control: {
-                  '&:hover': { background: 'none', color: 'var(--sidebar-fg-hover)' },
-                  color: 'var(--sidebar-fg)',
-                  transition: 'color 0.2s ease-in-out',
-                },
-                item: { borderBottom: 'none', color: 'var(--sidebar-fg)' },
-                itemTitle: { color: 'var(--sidebar-fg)' },
-                panel: {
-                  marginLeft: '1rem',
-                },
-              }}
-              value={sidebar.expanded}
-              onChange={(e) => setSidebar({ expanded: e })}
-            >
-              <Accordion.Item value="library">
-                <Accordion.Control p="1rem">
-                  <Group>
-                    {location.pathname.includes('/library/') ? (
-                      <RiDatabaseFill size={15} />
-                    ) : (
-                      <RiDatabaseLine size={15} />
-                    )}
-                    Library
-                  </Group>
-                </Accordion.Control>
-                <Accordion.Panel>
-                  <SidebarItem to={AppRoute.LIBRARY_ALBUMS}>
+            <Stack spacing={0}>
+              <SidebarItem
+                px="1rem"
+                py="0.5rem"
+                to={AppRoute.HOME}
+              >
+                <Group fw="600">
+                  {location.pathname === AppRoute.HOME ? (
+                    <RiHome5Fill size={15} />
+                  ) : (
+                    <RiHome5Line size={15} />
+                  )}
+                  Home
+                </Group>
+              </SidebarItem>
+              <Accordion
+                multiple
+                styles={{
+                  control: {
+                    '&:hover': { background: 'none', color: 'var(--sidebar-fg-hover)' },
+                    color: 'var(--sidebar-fg)',
+                    padding: '1rem 1rem',
+                    transition: 'color 0.2s ease-in-out',
+                  },
+                  item: { borderBottom: 'none', color: 'var(--sidebar-fg)' },
+                  itemTitle: { color: 'var(--sidebar-fg)' },
+                  label: { fontWeight: 600 },
+                  panel: { padding: '0 1rem' },
+                }}
+                value={sidebar.expanded}
+                onChange={(e) => setSidebar({ expanded: e })}
+              >
+                <Accordion.Item value="library">
+                  <Accordion.Control>
                     <Group>
-                      {location.pathname === AppRoute.LIBRARY_ALBUMS ? (
-                        <RiAlbumFill />
+                      {location.pathname.includes('/library/') ? (
+                        <RiDatabaseFill size={15} />
                       ) : (
-                        <RiAlbumLine />
+                        <RiDatabaseLine size={15} />
                       )}
-                      Albums
+                      Library
                     </Group>
-                  </SidebarItem>
-                  <SidebarItem to={AppRoute.LIBRARY_SONGS}>
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    <SidebarItem to={AppRoute.LIBRARY_ALBUMS}>
+                      <Group>
+                        {location.pathname === AppRoute.LIBRARY_ALBUMS ? (
+                          <RiAlbumFill />
+                        ) : (
+                          <RiAlbumLine />
+                        )}
+                        Albums
+                      </Group>
+                    </SidebarItem>
+                    <SidebarItem to={AppRoute.LIBRARY_SONGS}>
+                      <Group>
+                        {location.pathname === AppRoute.LIBRARY_SONGS ? (
+                          <RiMusicFill />
+                        ) : (
+                          <RiMusicLine />
+                        )}
+                        Tracks
+                      </Group>
+                    </SidebarItem>
+                    <SidebarItem to={AppRoute.LIBRARY_ALBUMARTISTS}>
+                      <Group>
+                        {location.pathname === AppRoute.LIBRARY_ALBUMARTISTS ? (
+                          <RiUserVoiceFill />
+                        ) : (
+                          <RiUserVoiceLine />
+                        )}
+                        Album Artists
+                      </Group>
+                    </SidebarItem>
+                    <SidebarItem
+                      disabled
+                      to={AppRoute.LIBRARY_FOLDERS}
+                    >
+                      <Group>
+                        <RiFlag2Line />
+                        Genres
+                      </Group>
+                    </SidebarItem>
+                    <SidebarItem
+                      disabled
+                      to={AppRoute.LIBRARY_FOLDERS}
+                    >
+                      <Group>
+                        <RiFolder3Line />
+                        Folders
+                      </Group>
+                    </SidebarItem>
+                  </Accordion.Panel>
+                </Accordion.Item>
+                <Accordion.Item value="collections">
+                  <Accordion.Control disabled>
                     <Group>
-                      {location.pathname === AppRoute.LIBRARY_SONGS ? (
-                        <RiMusicFill />
-                      ) : (
-                        <RiMusicLine />
-                      )}
-                      Tracks
+                      <BsCollection size={15} />
+                      Collections
                     </Group>
-                  </SidebarItem>
-                  <SidebarItem to={AppRoute.LIBRARY_ALBUMARTISTS}>
-                    <Group>
-                      <RiUserVoiceLine />
-                      Album Artists
+                  </Accordion.Control>
+                  <Accordion.Panel />
+                </Accordion.Item>
+                <Accordion.Item value="playlists">
+                  <Accordion.Control>
+                    <Group
+                      noWrap
+                      position="apart"
+                    >
+                      <Group noWrap>
+                        <RiPlayListLine size={15} />
+                        Playlists
+                      </Group>
+                      <Group
+                        noWrap
+                        spacing="xs"
+                      >
+                        <Button
+                          compact
+                          component="div"
+                          h={13}
+                          tooltip={{ label: 'Create playlist', openDelay: 500 }}
+                          variant="subtle"
+                          onClick={handleCreatePlaylistModal}
+                        >
+                          <RiAddFill size={13} />
+                        </Button>
+                        <Button
+                          compact
+                          component={Link}
+                          h={13}
+                          to={AppRoute.PLAYLISTS}
+                          tooltip={{ label: 'Playlist list', openDelay: 500 }}
+                          variant="subtle"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <RiMenuUnfoldLine size={13} />
+                        </Button>
+                      </Group>
                     </Group>
-                  </SidebarItem>
-                  <SidebarItem
-                    disabled
-                    to={AppRoute.LIBRARY_FOLDERS}
-                  >
-                    <Group>
-                      <RiFlag2Line />
-                      Genres
-                    </Group>
-                  </SidebarItem>
-                  <SidebarItem
-                    disabled
-                    to={AppRoute.LIBRARY_FOLDERS}
-                  >
-                    <Group>
-                      <RiFolder3Line />
-                      Folders
-                    </Group>
-                  </SidebarItem>
-                </Accordion.Panel>
-              </Accordion.Item>
-              <Accordion.Item value="collections">
-                <Accordion.Control
-                  disabled
-                  p="1rem"
-                >
-                  <Group>
-                    <BsCollection size={15} />
-                    Collections
-                  </Group>
-                </Accordion.Control>
-                <Accordion.Panel />
-              </Accordion.Item>
-              <Accordion.Item value="playlists">
-                <Accordion.Control
-                  disabled
-                  p="1rem"
-                >
-                  <Group>
-                    <RiPlayListLine size={15} />
-                    Playlists
-                  </Group>
-                </Accordion.Control>
-                <Accordion.Panel />
-              </Accordion.Item>
-            </Accordion>
-          </Stack>
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    {playlistsQuery?.data?.items?.map((playlist) => (
+                      <SidebarItem
+                        key={`sidebar-playlist-${playlist.id}`}
+                        p={0}
+                        to={generatePath(AppRoute.PLAYLISTS_DETAIL, { playlistId: playlist.id })}
+                      >
+                        {playlist.name}
+                      </SidebarItem>
+                    ))}
+                  </Accordion.Panel>
+                </Accordion.Item>
+              </Accordion>
+            </Stack>
+          </ScrollArea>
         </Stack>
         <AnimatePresence
           initial={false}

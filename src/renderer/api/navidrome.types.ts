@@ -259,7 +259,8 @@ export type NDAlbumArtistListParams = {
 export type NDCreatePlaylistParams = {
   comment?: string;
   name: string;
-  public: boolean;
+  public?: boolean;
+  rules?: Record<string, any> | null;
 };
 
 export type NDCreatePlaylistResponse = {
@@ -267,6 +268,10 @@ export type NDCreatePlaylistResponse = {
 };
 
 export type NDCreatePlaylist = NDCreatePlaylistResponse;
+
+export type NDUpdatePlaylistParams = NDPlaylist;
+
+export type NDUpdatePlaylistResponse = NDPlaylist;
 
 export type NDDeletePlaylistParams = {
   id: string;

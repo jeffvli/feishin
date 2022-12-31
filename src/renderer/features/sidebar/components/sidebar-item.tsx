@@ -1,16 +1,16 @@
 import type { ReactNode } from 'react';
+import { createPolymorphicComponent, Flex, FlexProps } from '@mantine/core';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
-interface ListItemProps {
+interface ListItemProps extends FlexProps {
   children: ReactNode;
   disabled?: boolean;
   to?: string;
 }
 
-const StyledItem = styled.div`
-  display: flex;
+const StyledItem = styled(Flex)`
   width: 100%;
   font-family: var(--content-font-family);
 
@@ -32,11 +32,7 @@ const ItemStyle = css`
   }
 `;
 
-const Box = styled.div`
-  ${ItemStyle}
-`;
-
-const ItemLink = styled(Link)<LinkProps & { disabled?: boolean }>`
+const _ItemLink = styled(StyledItem)<LinkProps & { disabled?: boolean }>`
   opacity: ${(props) => props.disabled && 0.6};
   pointer-events: ${(props) => props.disabled && 'none'};
 
@@ -47,12 +43,15 @@ const ItemLink = styled(Link)<LinkProps & { disabled?: boolean }>`
   ${ItemStyle}
 `;
 
-export const SidebarItem = ({ to, children, ...rest }: ListItemProps) => {
+const ItemLink = createPolymorphicComponent<'a', ListItemProps>(_ItemLink);
+
+export const SidebarItem = ({ to, children, ...props }: ListItemProps) => {
   if (to) {
     return (
       <ItemLink
+        component={Link}
         to={to}
-        {...rest}
+        {...props}
       >
         {children}
       </ItemLink>
@@ -61,14 +60,12 @@ export const SidebarItem = ({ to, children, ...rest }: ListItemProps) => {
   return (
     <StyledItem
       tabIndex={0}
-      {...rest}
+      {...props}
     >
       {children}
     </StyledItem>
   );
 };
-
-SidebarItem.Box = Box;
 
 SidebarItem.Link = ItemLink;
 

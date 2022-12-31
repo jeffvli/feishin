@@ -120,16 +120,6 @@ export interface BasePaginatedResponse<T> {
   totalRecordCount: number;
 }
 
-export type ApiError = {
-  error: {
-    message: string;
-    path: string;
-    trace: string[];
-  };
-  response: string;
-  statusCode: number;
-};
-
 export type AuthenticationResponse = {
   credential: string;
   ndCredential?: string;
@@ -740,9 +730,29 @@ export type RawCreatePlaylistResponse = CreatePlaylistResponse | undefined;
 
 export type CreatePlaylistResponse = { id: string; name: string };
 
-export type CreatePlaylistQuery = { comment?: string; name: string; public?: boolean };
+export type CreatePlaylistQuery = {
+  comment?: string;
+  name: string;
+  public?: boolean;
+  rules?: Record<string, any>;
+};
 
 export type CreatePlaylistArgs = { query: CreatePlaylistQuery } & BaseEndpointArgs;
+
+// Update Playlist
+export type RawUpdatePlaylistResponse = UpdatePlaylistResponse | undefined;
+
+export type UpdatePlaylistResponse = { id: string; name: string };
+
+export type UpdatePlaylistQuery = {
+  comment?: string;
+  name: string;
+  previous: RawPlaylistDetailResponse;
+  public?: boolean;
+  rules?: Record<string, any>;
+};
+
+export type UpdatePlaylistArgs = { query: UpdatePlaylistQuery } & BaseEndpointArgs;
 
 // Delete Playlist
 export type RawDeletePlaylistResponse = NDDeletePlaylist | undefined;

@@ -32,6 +32,8 @@ import type {
   NDSongListResponse,
   NDAlbumArtist,
   NDPlaylist,
+  NDUpdatePlaylistParams,
+  NDUpdatePlaylistResponse,
 } from '/@/renderer/api/navidrome.types';
 import { NDPlaylistListSort, NDSongListSort, NDSortOrder } from '/@/renderer/api/navidrome.types';
 import type {
@@ -53,6 +55,8 @@ import type {
   PlaylistSongListArgs,
   AlbumArtist,
   Playlist,
+  UpdatePlaylistResponse,
+  UpdatePlaylistArgs,
 } from '/@/renderer/api/types';
 import {
   playlistListSortMap,
@@ -286,7 +290,7 @@ const getSongDetail = async (args: SongDetailArgs): Promise<NDSongDetail> => {
 };
 
 const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistResponse> => {
-  const { query, server, signal } = args;
+  const { query, server } = args;
 
   const json: NDCreatePlaylistParams = {
     comment: query.comment,
@@ -299,9 +303,35 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
       headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
       json,
       prefixUrl: server?.url,
-      signal,
     })
     .json<NDCreatePlaylistResponse>();
+
+  return {
+    id: data.id,
+    name: query.name,
+  };
+};
+
+const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistResponse> => {
+  const { query, server, signal } = args;
+
+  const previous = query.previous as NDPlaylist;
+
+  const json: NDUpdatePlaylistParams = {
+    ...previous,
+    comment: query.comment || '',
+    name: query.name,
+    public: query.public || false,
+  };
+
+  const data = await api
+    .post(`api/playlist/${previous.id}`, {
+      headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
+      json,
+      prefixUrl: server?.url,
+      signal,
+    })
+    .json<NDUpdatePlaylistResponse>();
 
   return {
     id: data.id,
@@ -552,6 +582,7 @@ export const navidromeApi = {
   getPlaylistSongList,
   getSongDetail,
   getSongList,
+  updatePlaylist,
 };
 
 export const ndNormalize = {

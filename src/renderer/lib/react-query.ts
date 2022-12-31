@@ -1,4 +1,4 @@
-import type { UseQueryOptions, DefaultOptions } from '@tanstack/react-query';
+import type { UseQueryOptions, DefaultOptions, UseMutationOptions } from '@tanstack/react-query';
 import { QueryClient, QueryCache } from '@tanstack/react-query';
 import { toast } from '/@/renderer/components';
 
@@ -47,5 +47,15 @@ export type QueryOptions = {
   retryDelay?: UseQueryOptions['retryDelay'];
   staleTime?: UseQueryOptions['staleTime'];
   suspense?: UseQueryOptions['suspense'];
+  useErrorBoundary?: boolean;
+};
+
+export type MutationOptions = {
+  mutationKey: UseMutationOptions['mutationKey'];
+  onError?: (err: any) => void;
+  onSettled?: any;
+  onSuccess?: any;
+  retry?: UseQueryOptions['retry'];
+  retryDelay?: UseQueryOptions['retryDelay'];
   useErrorBoundary?: boolean;
 };
