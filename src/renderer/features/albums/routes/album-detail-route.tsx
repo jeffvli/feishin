@@ -15,7 +15,7 @@ const AlbumDetailRoute = () => {
   const background = useFastAverageColor(detailQuery.data?.imageUrl);
 
   return (
-    <AnimatedPage>
+    <AnimatedPage key={`album-detail-${albumId}`}>
       <PageHeader
         useOpacity
         position="absolute"
