@@ -272,7 +272,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
     openContextMenu({
       data: selectedRows,
       menuItems: ALBUM_CONTEXT_MENU_ITEMS,
-      type: LibraryItem.ALBUM,
+      type: LibraryItem.ALBUM_ARTIST,
       xPos: clickEvent.clientX,
       yPos: clickEvent.clientY,
     });
