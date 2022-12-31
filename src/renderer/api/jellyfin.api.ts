@@ -177,6 +177,7 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<JFAlbumArt
     limit: query.limit,
     parentId: query.musicFolderId,
     recursive: true,
+    searchTerm: query.searchTerm,
     sortBy: albumArtistListSortMap.jellyfin[query.sortBy],
     sortOrder: sortOrderMap.jellyfin[query.sortOrder],
     startIndex: query.startIndex,

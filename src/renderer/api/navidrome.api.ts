@@ -159,6 +159,7 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<NDAlbumArt
     _order: sortOrderMap.navidrome[query.sortOrder],
     _sort: albumArtistListSortMap.navidrome[query.sortBy],
     _start: query.startIndex,
+    name: query.searchTerm,
     ...query.ndParams,
   };
 
