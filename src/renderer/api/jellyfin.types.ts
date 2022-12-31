@@ -23,7 +23,11 @@ export interface JFAlbumArtistListResponse extends JFBasePaginatedResponse {
   Items: JFAlbumArtist[];
 }
 
-export type JFAlbumArtistList = JFAlbumArtistListResponse;
+export type JFAlbumArtistList = {
+  items: JFAlbumArtist[];
+  startIndex: number;
+  totalRecordCount: number;
+};
 
 export interface JFArtistListResponse extends JFBasePaginatedResponse {
   Items: JFAlbumArtist[];
@@ -149,6 +153,13 @@ export type JFAlbumArtist = {
   RunTimeTicks: number;
   ServerId: string;
   Type: string;
+  UserData: {
+    IsFavorite: boolean;
+    Key: string;
+    PlayCount: number;
+    PlaybackPositionTicks: number;
+    Played: boolean;
+  };
 };
 
 export type JFArtist = {
@@ -474,6 +485,7 @@ type JFBaseParams = {
   imageTypeLimit?: number;
   parentId?: string;
   recursive?: boolean;
+  userId?: string;
 };
 
 type JFPaginationParams = {

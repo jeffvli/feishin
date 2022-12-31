@@ -202,13 +202,19 @@ export type Song = {
 };
 
 export type AlbumArtist = {
+  albumCount: number | null;
+  backgroundImageUrl: string | null;
   biography: string | null;
-  createdAt: string;
+  duration: number | null;
+  genres: Genre[];
   id: string;
+  imageUrl: string | null;
+  isFavorite: boolean;
+  lastPlayedAt: string | null;
   name: string;
-  remoteCreatedAt: string | null;
-  serverFolderId: string;
-  updatedAt: string;
+  playCount: number | null;
+  rating: number | null;
+  songCount: number | null;
 };
 
 export type RelatedAlbumArtist = {
@@ -418,6 +424,7 @@ export enum SongListSort {
 
 export type SongListQuery = {
   albumIds?: string[];
+  artistIds?: string[];
   jfParams?: {
     filters?: string;
     genreIds?: string;
@@ -432,7 +439,8 @@ export type SongListQuery = {
   limit?: number;
   musicFolderId?: string;
   ndParams?: {
-    artist_id?: string;
+    album_id?: string[];
+    artist_id?: string[];
     compilation?: boolean;
     genre_id?: string;
     has_rating?: boolean;
@@ -554,6 +562,7 @@ export type AlbumArtistListQuery = {
     name?: string;
     starred?: boolean;
   };
+  searchTerm?: string;
   sortBy: AlbumArtistListSort;
   sortOrder: SortOrder;
   startIndex: number;

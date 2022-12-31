@@ -2,6 +2,7 @@ import ky from 'ky';
 import { nanoid } from 'nanoid/non-secure';
 import type {
   JFAlbum,
+  JFAlbumArtist,
   JFAlbumArtistDetail,
   JFAlbumArtistDetailResponse,
   JFAlbumArtistList,
@@ -33,6 +34,7 @@ import type {
 import { JFCollectionType } from '/@/renderer/api/jellyfin.types';
 import type {
   Album,
+  AlbumArtist,
   AlbumArtistDetailArgs,
   AlbumArtistListArgs,
   AlbumDetailArgs,
@@ -138,7 +140,7 @@ const getAlbumArtistDetail = async (args: AlbumArtistDetailArgs): Promise<JFAlbu
   };
 
   const data = await api
-    .get(`/users/${server?.userId}/items/${query.id}`, {
+    .get(`users/${server?.userId}/items/${query.id}`, {
       headers: { 'X-MediaBrowser-Token': server?.credential },
       prefixUrl: server?.url,
       searchParams: parseSearchParams(searchParams),
@@ -170,12 +172,15 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<JFAlbumArt
   const { query, server, signal } = args;
 
   const searchParams: JFAlbumArtistListParams = {
+    fields: 'Genres, DateCreated, ExternalUrls, Overview',
+    imageTypeLimit: 1,
     limit: query.limit,
     parentId: query.musicFolderId,
     recursive: true,
     sortBy: albumArtistListSortMap.jellyfin[query.sortBy],
     sortOrder: sortOrderMap.jellyfin[query.sortOrder],
     startIndex: query.startIndex,
+    userId: server?.userId || undefined,
   };
 
   const data = await api
@@ -187,7 +192,11 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<JFAlbumArt
     })
     .json<JFAlbumArtistListResponse>();
 
-  return data;
+  return {
+    items: data.Items,
+    startIndex: query.startIndex,
+    totalRecordCount: data.TotalRecordCount,
+  };
 };
 
 const getArtistList = async (args: ArtistListArgs): Promise<JFArtistList> => {
@@ -303,9 +312,11 @@ const getSongList = async (args: SongListArgs): Promise<JFSongList> => {
 
   const yearsFilter = yearsGroup.length ? getCommaDelimitedString(yearsGroup) : undefined;
   const albumIdsFilter = query.albumIds ? getCommaDelimitedString(query.albumIds) : undefined;
+  const artistIdsFilter = query.artistIds ? getCommaDelimitedString(query.artistIds) : undefined;
 
   const searchParams: JFSongListParams & { maxYear?: number; minYear?: number } = {
     albumIds: albumIdsFilter,
+    artistIds: artistIdsFilter,
     fields: 'Genres, DateCreated, MediaSources, ParentId',
     includeItemTypes: 'Audio',
     limit: query.limit,
@@ -496,6 +507,26 @@ const getStreamUrl = (args: {
   );
 };
 
+const getAlbumArtistCoverArtUrl = (args: {
+  baseUrl: string;
+  item: JFAlbumArtist;
+  size: number;
+}) => {
+  const size = args.size ? args.size : 300;
+
+  if (!args.item.ImageTags?.Primary) {
+    return null;
+  }
+
+  return (
+    `${args.baseUrl}/Items` +
+    `/${args.item.Id}` +
+    '/Images/Primary' +
+    `?width=${size}&height=${size}` +
+    '&quality=96'
+  );
+};
+
 const getAlbumCoverArtUrl = (args: { baseUrl: string; item: JFAlbum; size: number }) => {
   const size = args.size ? args.size : 300;
 
@@ -628,6 +659,32 @@ const normalizeAlbum = (item: JFAlbum, server: ServerListItem, imageSize?: numbe
   };
 };
 
+const normalizeAlbumArtist = (
+  item: JFAlbumArtist,
+  server: ServerListItem,
+  imageSize?: number,
+): AlbumArtist => {
+  return {
+    albumCount: null,
+    backgroundImageUrl: null,
+    biography: item.Overview || null,
+    duration: item.RunTimeTicks / 10000000,
+    genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
+    id: item.Id,
+    imageUrl: getAlbumArtistCoverArtUrl({
+      baseUrl: server.url,
+      item,
+      size: imageSize || 300,
+    }),
+    isFavorite: item.UserData.IsFavorite || false,
+    lastPlayedAt: null,
+    name: item.Name,
+    playCount: item.UserData.PlayCount,
+    rating: null,
+    songCount: null,
+  };
+};
+
 // const normalizeArtist = (item: any) => {
 //   return {
 //     album: (item.album || []).map((entry: any) => normalizeAlbum(entry)),
@@ -717,5 +774,6 @@ export const jellyfinApi = {
 
 export const jfNormalize = {
   album: normalizeAlbum,
+  albumArtist: normalizeAlbumArtist,
   song: normalizeSong,
 };

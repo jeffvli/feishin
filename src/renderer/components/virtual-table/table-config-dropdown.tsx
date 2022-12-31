@@ -49,6 +49,19 @@ export const ALBUM_TABLE_COLUMNS = [
   { label: 'Plays', value: TableColumn.PLAY_COUNT },
 ];
 
+export const ALBUMARTIST_TABLE_COLUMNS = [
+  { label: 'Row Index', value: TableColumn.ROW_INDEX },
+  { label: 'Title', value: TableColumn.TITLE },
+  { label: 'Title (Combined)', value: TableColumn.TITLE_COMBINED },
+  { label: 'Duration', value: TableColumn.DURATION },
+  { label: 'Biography', value: TableColumn.BIOGRAPHY },
+  { label: 'Genre', value: TableColumn.GENRE },
+  { label: 'Last Played', value: TableColumn.LAST_PLAYED },
+  { label: 'Plays', value: TableColumn.PLAY_COUNT },
+  { label: 'Album Count', value: TableColumn.ALBUM_COUNT },
+  { label: 'Song Count', value: TableColumn.SONG_COUNT },
+];
+
 interface TableConfigDropdownProps {
   type: TableType;
 }

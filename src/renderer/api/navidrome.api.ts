@@ -30,6 +30,7 @@ import type {
   NDPlaylistDetailResponse,
   NDSongList,
   NDSongListResponse,
+  NDAlbumArtist,
 } from '/@/renderer/api/navidrome.types';
 import { NDPlaylistListSort, NDSongListSort, NDSortOrder } from '/@/renderer/api/navidrome.types';
 import type {
@@ -49,6 +50,7 @@ import type {
   PlaylistDetailArgs,
   CreatePlaylistResponse,
   PlaylistSongListArgs,
+  AlbumArtist,
 } from '/@/renderer/api/types';
 import {
   playlistListSortMap,
@@ -160,15 +162,21 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<NDAlbumArt
     ...query.ndParams,
   };
 
-  const data = await api
-    .get('api/artist', {
-      headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
-      searchParams,
-      signal,
-    })
-    .json<NDArtistListResponse>();
+  const res = await api.get('api/artist', {
+    headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
+    prefixUrl: server?.url,
+    searchParams: parseSearchParams(searchParams),
+    signal,
+  });
 
-  return data;
+  const data = await res.json<NDArtistListResponse>();
+  const itemCount = res.headers.get('x-total-count');
+
+  return {
+    items: data,
+    startIndex: query.startIndex,
+    totalRecordCount: Number(itemCount),
+  };
 };
 
 const getAlbumDetail = async (args: AlbumDetailArgs): Promise<NDAlbumDetail> => {
@@ -238,6 +246,7 @@ const getSongList = async (args: SongListArgs): Promise<NDSongList> => {
     _sort: songListSortMap.navidrome[query.sortBy],
     _start: query.startIndex,
     album_id: query.albumIds,
+    artist_id: query.artistIds,
     title: query.searchTerm,
     ...query.ndParams,
   };
@@ -487,6 +496,24 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
   };
 };
 
+const normalizeAlbumArtist = (item: NDAlbumArtist): AlbumArtist => {
+  return {
+    albumCount: item.albumCount,
+    backgroundImageUrl: null,
+    biography: item.biography,
+    duration: null,
+    genres: item.genres,
+    id: item.id,
+    imageUrl: item.largeImageUrl,
+    isFavorite: item.starred,
+    lastPlayedAt: item.playDate ? item.playDate.split('T')[0] : null,
+    name: item.name,
+    playCount: item.playCount,
+    rating: item.rating,
+    songCount: item.songCount,
+  };
+};
+
 export const navidromeApi = {
   authenticate,
   createPlaylist,
@@ -505,5 +532,6 @@ export const navidromeApi = {
 
 export const ndNormalize = {
   album: normalizeAlbum,
+  albumArtist: normalizeAlbumArtist,
   song: normalizeSong,
 };

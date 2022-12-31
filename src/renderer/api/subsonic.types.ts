@@ -33,7 +33,11 @@ export type SSAlbumArtistDetailResponse = {
   };
 };
 
-export type SSAlbumArtistList = SSAlbumArtistListEntry[];
+export type SSAlbumArtistList = {
+  items: SSAlbumArtistListEntry[];
+  startIndex: number;
+  totalRecordCount: number | null;
+};
 
 export type SSAlbumArtistListResponse = {
   artists: {

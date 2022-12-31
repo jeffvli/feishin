@@ -118,7 +118,11 @@ export type NDAlbumArtist = {
 
 export type NDAuthenticationResponse = NDAuthenticate;
 
-export type NDAlbumArtistList = NDAlbumArtist[];
+export type NDAlbumArtistList = {
+  items: NDAlbumArtist[];
+  startIndex: number;
+  totalRecordCount: number;
+};
 
 export type NDAlbumArtistDetail = NDAlbumArtist;
 
@@ -230,6 +234,7 @@ export enum NDSongListSort {
 export type NDSongListParams = {
   _sort?: NDSongListSort;
   album_id?: string[];
+  artist_id?: string[];
   genre_id?: string;
   starred?: boolean;
 } & NDPagination &

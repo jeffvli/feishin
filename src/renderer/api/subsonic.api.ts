@@ -177,7 +177,11 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<SSAlbumArt
 
   const artists = (data.artists?.index || []).flatMap((index: SSArtistIndex) => index.artist);
 
-  return artists;
+  return {
+    items: artists,
+    startIndex: query.startIndex,
+    totalRecordCount: null,
+  };
 };
 
 const getGenreList = async (args: GenreListArgs): Promise<SSGenreList> => {

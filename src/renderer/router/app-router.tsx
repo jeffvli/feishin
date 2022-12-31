@@ -8,6 +8,7 @@ import {
 import { AppRoute } from './routes';
 import { RouteErrorBoundary } from '/@/renderer/features/action-required';
 import AlbumDetailRoute from '/@/renderer/features/albums/routes/album-detail-route';
+import AlbumArtistListRoute from '/@/renderer/features/artists/routes/album-artist-list-route';
 import HomeRoute from '/@/renderer/features/home/routes/home-route';
 import { DefaultLayout } from '/@/renderer/layouts';
 import { AppOutlet } from '/@/renderer/router/app-outlet';
@@ -64,8 +65,8 @@ export const AppRouter = () => {
                 path={AppRoute.LIBRARY_SONGS}
               />
               <Route
-                element={<></>}
-                path={AppRoute.LIBRARY_ARTISTS}
+                element={<AlbumArtistListRoute />}
+                path={AppRoute.LIBRARY_ALBUMARTISTS}
               />
               <Route
                 element={<InvalidRoute />}

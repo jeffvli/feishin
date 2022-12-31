@@ -183,13 +183,10 @@ export const Sidebar = () => {
                       Tracks
                     </Group>
                   </SidebarItem>
-                  <SidebarItem
-                    disabled
-                    to={AppRoute.LIBRARY_ALBUMARTISTS}
-                  >
+                  <SidebarItem to={AppRoute.LIBRARY_ALBUMARTISTS}>
                     <Group>
                       <RiUserVoiceLine />
-                      Artists
+                      Album Artists
                     </Group>
                   </SidebarItem>
                   <SidebarItem
