@@ -6,6 +6,7 @@ import type {
   GridReadyEvent,
   IDatasource,
   PaginationChangedEvent,
+  RowDoubleClickedEvent,
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Stack } from '@mantine/core';
@@ -32,6 +33,9 @@ import debounce from 'lodash/debounce';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import sortBy from 'lodash/sortBy';
+import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { QueueSong } from '/@/renderer/api/types';
 
 interface SongListContentProps {
   tableRef: MutableRefObject<AgGridReactType | null>;
@@ -45,6 +49,8 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
   const pagination = useSongTablePagination();
   const setPagination = useSetSongTablePagination();
   const setTable = useSetSongTable();
+  const handlePlayQueueAdd = useHandlePlayQueueAdd();
+  const playButtonBehavior = usePlayButtonBehavior();
 
   const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
 
@@ -180,6 +186,14 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
     });
   };
 
+  const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
+    if (!e.data) return;
+    handlePlayQueueAdd({
+      byData: [e.data],
+      play: playButtonBehavior,
+    });
+  };
+
   return (
     <Stack
       h="100%"
@@ -221,6 +235,7 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
           onGridReady={onGridReady}
           onGridSizeChanged={handleGridSizeChange}
           onPaginationChanged={onPaginationChanged}
+          onRowDoubleClicked={handleRowDoubleClick}
         />
       </VirtualGridAutoSizerContainer>
       <AnimatePresence
