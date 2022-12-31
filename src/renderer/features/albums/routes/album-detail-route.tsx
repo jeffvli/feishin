@@ -24,14 +24,14 @@ const AlbumDetailRoute = () => {
       <ScrollArea
         h="100%"
         offsetScrollbars={false}
-        styles={{
-          scrollbar: {
-            marginTop: '35px',
-          },
-        }}
+        styles={{ scrollbar: { marginTop: '35px' } }}
       >
-        <AlbumDetailHeader background={background} />
-        <AlbumDetailContent tableRef={tableRef} />
+        {background && (
+          <>
+            <AlbumDetailHeader background={background} />
+            <AlbumDetailContent tableRef={tableRef} />
+          </>
+        )}
       </ScrollArea>
     </AnimatedPage>
   );
