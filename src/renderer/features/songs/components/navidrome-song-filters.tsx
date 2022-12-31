@@ -1,8 +1,9 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
-import { NumberInput, Switch, Text } from '/@/renderer/components';
+import { NumberInput, Select, Switch, Text } from '/@/renderer/components';
 import { SongListFilter, useSetSongFilters, useSongListStore } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
+import { useGenreList } from '/@/renderer/features/genres';
 
 interface NavidromeSongFiltersProps {
   handleFilterChange: (filters: SongListFilter) => void;
@@ -11,6 +12,26 @@ interface NavidromeSongFiltersProps {
 export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFiltersProps) => {
   const { filter } = useSongListStore();
   const setFilters = useSetSongFilters();
+
+  const genreListQuery = useGenreList(null);
+
+  const genreList = useMemo(() => {
+    if (!genreListQuery?.data) return [];
+    return genreListQuery.data.map((genre) => ({
+      label: genre.name,
+      value: genre.id,
+    }));
+  }, [genreListQuery.data]);
+
+  const handleGenresFilter = debounce((e: string | null) => {
+    const updatedFilters = setFilters({
+      ndParams: {
+        ...filter.ndParams,
+        genre_id: e || undefined,
+      },
+    });
+    handleFilterChange(updatedFilters);
+  }, 250);
 
   const toggleFilters = [
     {
@@ -38,6 +59,29 @@ export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFilter
 
   return (
     <Stack p="0.8rem">
+      <Group position="apart">
+        <Text>Year</Text>
+        <NumberInput
+          max={5000}
+          min={0}
+          value={filter.ndParams?.year}
+          width={50}
+          onChange={handleYearFilter}
+        />
+      </Group>
+      <Divider my="0.5rem" />
+      <Group position="apart">
+        <Text>Genre</Text>
+        <Select
+          clearable
+          searchable
+          data={genreList}
+          defaultValue={filter.ndParams?.genre_id}
+          width={150}
+          onChange={handleGenresFilter}
+        />
+      </Group>
+      <Divider my="0.5rem" />
       {toggleFilters.map((filter) => (
         <Group
           key={`nd-filter-${filter.label}`}
@@ -51,18 +95,6 @@ export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFilter
           />
         </Group>
       ))}
-      <Divider my="0.5rem" />
-      <Group position="apart">
-        <Text>Year</Text>
-        <NumberInput
-          max={5000}
-          min={0}
-          size="xs"
-          value={filter.ndParams?.year}
-          width={50}
-          onChange={handleYearFilter}
-        />
-      </Group>
     </Stack>
   );
 };
