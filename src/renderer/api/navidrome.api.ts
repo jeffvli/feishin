@@ -450,20 +450,6 @@ const normalizeSong = (
   deviceId: string,
   imageSize?: number,
 ): Song => {
-  const imageUrl = getCoverArtUrl({
-    baseUrl: server.url,
-    coverArtId: item.id,
-    credential: server.credential,
-    size: imageSize || 300,
-  });
-
-  const imagePlaceholderUrl = getCoverArtUrl({
-    baseUrl: server.url,
-    coverArtId: item.albumId,
-    credential: server.credential,
-    size: 1,
-  });
-
   let id;
 
   // Dynamically determine the id field based on whether or not the item is a playlist song
@@ -472,6 +458,20 @@ const normalizeSong = (
   } else {
     id = item.id;
   }
+
+  const imageUrl = getCoverArtUrl({
+    baseUrl: server.url,
+    coverArtId: id,
+    credential: server.credential,
+    size: imageSize || 300,
+  });
+
+  const imagePlaceholderUrl = getCoverArtUrl({
+    baseUrl: server.url,
+    coverArtId: id,
+    credential: server.credential,
+    size: 1,
+  });
 
   return {
     album: item.album,
