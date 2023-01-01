@@ -14,12 +14,20 @@ import { useContainerQuery } from '/@/renderer/hooks';
 import { TablePagination as TablePaginationType } from '/@/renderer/types';
 
 interface TablePaginationProps {
+  id?: string;
   pagination: TablePaginationType;
-  setPagination: (pagination: Partial<TablePaginationType>) => void;
+  setIdPagination?: (id: string, pagination: Partial<TablePaginationType>) => void;
+  setPagination?: (pagination: Partial<TablePaginationType>) => void;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const TablePagination = ({ tableRef, pagination, setPagination }: TablePaginationProps) => {
+export const TablePagination = ({
+  id,
+  tableRef,
+  pagination,
+  setPagination,
+  setIdPagination,
+}: TablePaginationProps) => {
   const [isGoToPageOpen, handlers] = useDisclosure(false);
   const containerQuery = useContainerQuery();
 
@@ -32,7 +40,10 @@ export const TablePagination = ({ tableRef, pagination, setPagination }: TablePa
   const handlePagination = (index: number) => {
     const newPage = index - 1;
     tableRef.current?.api.paginationGoToPage(newPage);
-    setPagination({ currentPage: newPage });
+    setPagination?.({ currentPage: newPage });
+    setIdPagination?.(id || '', { currentPage: newPage });
+
+    console.log('newPage', newPage);
   };
 
   const handleGoSubmit = goToForm.onSubmit((values) => {
@@ -43,11 +54,14 @@ export const TablePagination = ({ tableRef, pagination, setPagination }: TablePa
 
     const newPage = values.pageNumber - 1;
     tableRef.current?.api.paginationGoToPage(newPage);
-    setPagination({ currentPage: newPage });
+    setPagination?.({ currentPage: newPage });
+    setIdPagination?.(id || '', { currentPage: newPage });
   });
 
   const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage + 1;
-  const currentPageStopIndex = (pagination.currentPage + 1) * pagination.itemsPerPage;
+  const currentPageMaxIndex = (pagination.currentPage + 1) * pagination.itemsPerPage;
+  const currentPageStopIndex =
+    currentPageMaxIndex > pagination.totalItems ? pagination.totalItems : currentPageMaxIndex;
 
   return (
     <MotionFlex
