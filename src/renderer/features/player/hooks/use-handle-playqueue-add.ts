@@ -31,7 +31,20 @@ export const useHandlePlayQueueAdd = () => {
         let songsList;
         let queryFilter: any;
         let queryKey: any;
-        if (options.byItemType.type === LibraryItem.ALBUM) {
+        if (options.byItemType.type === LibraryItem.PLAYLIST) {
+          queryFilter = {
+            id: options.byItemType?.id || [],
+            sortBy: 'id',
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+          };
+
+          queryKey = queryKeys.playlists.songList(
+            server?.id,
+            options.byItemType?.id?.[0] || '',
+            queryFilter,
+          );
+        } else if (options.byItemType.type === LibraryItem.ALBUM) {
           queryFilter = {
             albumIds: options.byItemType?.id || [],
             sortBy: SongListSort.ALBUM,
@@ -49,25 +62,28 @@ export const useHandlePlayQueueAdd = () => {
           };
 
           queryKey = queryKeys.songs.list(server?.id, queryFilter);
-        } else if (options.byItemType.type === LibraryItem.PLAYLIST) {
-          queryFilter = {
-            artistIds: options.byItemType?.id || [],
-            sortBy: SongListSort.ALBUM,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-          };
-
-          queryKey = queryKeys.songs.list(server?.id, queryFilter);
         }
 
         try {
-          songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-            api.controller.getSongList({
-              query: queryFilter,
-              server,
-              signal,
-            }),
-          );
+          if (options.byItemType?.type === LibraryItem.PLAYLIST) {
+            songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+              api.controller.getPlaylistSongList({
+                query: queryFilter,
+                server,
+                signal,
+              }),
+            );
+
+            console.log('songsList', songsList);
+          } else {
+            songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+              api.controller.getSongList({
+                query: queryFilter,
+                server,
+                signal,
+              }),
+            );
+          }
         } catch (err: any) {
           return toast.error({
             message: err.message,
@@ -91,6 +107,8 @@ export const useHandlePlayQueueAdd = () => {
           case 'subsonic':
             break;
         }
+
+        console.log('songs', songs);
       } else if (options.byData) {
         songs = options.byData.map((song) => ({ ...song, uniqueId: nanoid() }));
       }

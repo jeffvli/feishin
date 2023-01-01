@@ -93,10 +93,13 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         handlePlayQueueAdd?.({ byData: ctx.data, play });
         break;
       case LibraryItem.PLAYLIST:
-        handlePlayQueueAdd?.({
-          byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
-          play,
-        });
+        for (const item of ctx.data) {
+          handlePlayQueueAdd?.({
+            byItemType: { id: [item.id], type: ctx.type },
+            play,
+          });
+        }
+
         break;
     }
   };
