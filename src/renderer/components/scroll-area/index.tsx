@@ -1,3 +1,4 @@
+import { forwardRef, Ref } from 'react';
 import type { ScrollAreaProps as MantineScrollAreaProps } from '@mantine/core';
 import { ScrollArea as MantineScrollArea } from '@mantine/core';
 import styled from 'styled-components';
@@ -18,13 +19,14 @@ const StyledScrollArea = styled(MantineScrollArea)`
   }
 `;
 
-export const ScrollArea = ({ children, ...props }: ScrollAreaProps) => {
+export const ScrollArea = forwardRef(({ children, ...props }: ScrollAreaProps, ref: Ref<any>) => {
   return (
     <StyledScrollArea
+      ref={ref}
       scrollbarSize={12}
       {...props}
     >
       {children}
     </StyledScrollArea>
   );
-};
+});
