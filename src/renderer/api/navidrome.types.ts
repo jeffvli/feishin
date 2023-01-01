@@ -325,3 +325,16 @@ export type NDPlaylistListParams = {
   owner_id?: string;
 } & NDPagination &
   NDOrder;
+
+export type NDPlaylistSong = NDSong & {
+  mediaFileId: string;
+  playlistId: string;
+};
+
+export type NDPlaylistSongListResponse = NDPlaylistSong[];
+
+export type NDPlaylistSongList = {
+  items: NDPlaylistSong[];
+  startIndex: number;
+  totalRecordCount: number;
+};

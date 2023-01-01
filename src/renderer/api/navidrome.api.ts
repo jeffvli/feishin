@@ -34,6 +34,9 @@ import type {
   NDPlaylist,
   NDUpdatePlaylistParams,
   NDUpdatePlaylistResponse,
+  NDPlaylistSongListResponse,
+  NDPlaylistSongList,
+  NDPlaylistSong,
 } from '/@/renderer/api/navidrome.types';
 import { NDPlaylistListSort, NDSongListSort, NDSortOrder } from '/@/renderer/api/navidrome.types';
 import type {
@@ -391,7 +394,7 @@ const getPlaylistDetail = async (args: PlaylistDetailArgs): Promise<NDPlaylistDe
   return data;
 };
 
-const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<NDSongList> => {
+const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<NDPlaylistSongList> => {
   const { query, server, signal } = args;
 
   const searchParams: NDSongListParams & { playlist_id: string } = {
@@ -409,7 +412,7 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<NDSongLi
     signal,
   });
 
-  const data = await res.json<NDSongListResponse>();
+  const data = await res.json<NDPlaylistSongListResponse>();
   const itemCount = res.headers.get('x-total-count');
 
   return {
@@ -442,7 +445,7 @@ const getCoverArtUrl = (args: {
 };
 
 const normalizeSong = (
-  item: NDSong,
+  item: NDSong | NDPlaylistSong,
   server: ServerListItem,
   deviceId: string,
   imageSize?: number,
@@ -453,6 +456,14 @@ const normalizeSong = (
     credential: server.credential,
     size: imageSize || 300,
   });
+  let id;
+
+  // Dynamically determine the id field based on whether or not the item is a playlist song
+  if ('mediaFileId' in item) {
+    id = item.mediaFileId;
+  } else {
+    id = item.id;
+  }
 
   return {
     album: item.album,
@@ -469,7 +480,7 @@ const normalizeSong = (
     discNumber: item.discNumber,
     duration: item.duration,
     genres: item.genres,
-    id: item.id,
+    id,
     imageUrl,
     isFavorite: item.starred,
     lastPlayedAt: item.playDate ? item.playDate : null,
@@ -481,7 +492,7 @@ const normalizeSong = (
     releaseYear: String(item.year),
     serverId: server.id,
     size: item.size,
-    streamUrl: `${server.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=feishin_${deviceId}&${server.credential}`,
+    streamUrl: `${server.url}/rest/stream.view?id=${id}&v=1.13.0&c=feishin_${deviceId}&${server.credential}`,
     trackNumber: item.trackNumber,
     type: ServerType.NAVIDROME,
     uniqueId: nanoid(),
