@@ -63,6 +63,7 @@ const SidebarContainer = styled.div`
 const RightSidebarContainer = styled(motion.div)`
   position: relative;
   grid-area: right-sidebar;
+  height: 100%;
   background: var(--sidebar-bg);
   border-left: var(--sidebar-border);
 `;

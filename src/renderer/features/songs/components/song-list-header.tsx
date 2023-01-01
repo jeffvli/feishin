@@ -242,7 +242,7 @@ export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
   };
 
   return (
-    <PageHeader>
+    <PageHeader p="1rem">
       <Flex
         ref={cq.ref}
         direction="row"

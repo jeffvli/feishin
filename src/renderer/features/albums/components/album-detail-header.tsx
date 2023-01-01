@@ -1,5 +1,6 @@
 import { Center, Group } from '@mantine/core';
-import { Fragment } from 'react';
+import { useMergedRef } from '@mantine/hooks';
+import { forwardRef, Fragment, Ref } from 'react';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -64,119 +65,122 @@ const BackgroundImageOverlay = styled.div`
   z-index: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(25, 26, 28, 5%), var(--main-bg));
+  background: linear-gradient(180deg, rgba(25, 26, 28, 5%), var(--main-bg)), var(--background-noise);
 `;
 
 interface AlbumDetailHeaderProps {
   background: string;
 }
 
-export const AlbumDetailHeader = ({ background }: AlbumDetailHeaderProps) => {
-  const { albumId } = useParams() as { albumId: string };
-  const detailQuery = useAlbumDetail({ id: albumId });
-  const cq = useContainerQuery();
+export const AlbumDetailHeader = forwardRef(
+  ({ background }: AlbumDetailHeaderProps, ref: Ref<HTMLDivElement>) => {
+    const { albumId } = useParams() as { albumId: string };
+    const detailQuery = useAlbumDetail({ id: albumId });
+    const cq = useContainerQuery();
+    const mergedRef = useMergedRef(ref, cq.ref);
 
-  const titleSize = cq.isXl
-    ? '6rem'
-    : cq.isLg
-    ? '5.5rem'
-    : cq.isMd
-    ? '4.5rem'
-    : cq.isSm
-    ? '3.5rem'
-    : '2rem';
+    const titleSize = cq.isXl
+      ? '6rem'
+      : cq.isLg
+      ? '5.5rem'
+      : cq.isMd
+      ? '4.5rem'
+      : cq.isSm
+      ? '3.5rem'
+      : '2rem';
 
-  return (
-    <HeaderContainer ref={cq.ref}>
-      <BackgroundImage background={background} />
-      <BackgroundImageOverlay />
-      <CoverImageWrapper>
-        {detailQuery?.data?.imageUrl ? (
-          <StyledImage
-            alt="cover"
-            height={225}
-            src={detailQuery?.data.imageUrl}
-            width={225}
-          />
-        ) : (
-          <Center
+    return (
+      <HeaderContainer ref={mergedRef}>
+        <BackgroundImage background={background} />
+        <BackgroundImageOverlay />
+        <CoverImageWrapper>
+          {detailQuery?.data?.imageUrl ? (
+            <StyledImage
+              alt="cover"
+              height={225}
+              src={detailQuery?.data.imageUrl}
+              width={225}
+            />
+          ) : (
+            <Center
+              sx={{
+                background: 'var(--placeholder-bg)',
+                borderRadius: 'var(--card-default-radius)',
+                height: `${225}px`,
+                width: `${225}px`,
+              }}
+            >
+              <RiAlbumFill
+                color="var(--placeholder-fg)"
+                size={35}
+              />
+            </Center>
+          )}
+        </CoverImageWrapper>
+        <MetadataWrapper>
+          <Group>
+            <Text
+              $link
+              component={Link}
+              fw="600"
+              sx={{ textTransform: 'uppercase' }}
+              to={AppRoute.LIBRARY_ALBUMS}
+            >
+              Album
+            </Text>
+            {detailQuery?.data?.releaseYear && (
+              <>
+                <Text>•</Text>
+                <Text>{detailQuery?.data?.releaseYear}</Text>
+              </>
+            )}
+          </Group>
+          <TextTitle
+            fw="900"
+            lh="1"
+            mb="0.12em"
+            mt=".08em"
+            sx={{ fontSize: titleSize }}
+          >
+            {detailQuery?.data?.name}
+          </TextTitle>
+          <Group
+            spacing="xs"
             sx={{
-              background: 'var(--placeholder-bg)',
-              borderRadius: 'var(--card-default-radius)',
-              height: `${80}px`,
-              width: `${80}px`,
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 2,
+              display: '-webkit-box',
+              overflow: 'hidden',
             }}
           >
-            <RiAlbumFill
-              color="var(--placeholder-fg)"
-              size={35}
-            />
-          </Center>
-        )}
-      </CoverImageWrapper>
-      <MetadataWrapper>
-        <Group>
-          <Text
-            $link
-            component={Link}
-            fw="600"
-            sx={{ textTransform: 'uppercase' }}
-            to={AppRoute.LIBRARY_ALBUMS}
-          >
-            Album
-          </Text>
-          {detailQuery?.data?.releaseYear && (
-            <>
-              <Text>•</Text>
-              <Text>{detailQuery?.data?.releaseYear}</Text>
-            </>
-          )}
-        </Group>
-        <TextTitle
-          fw="900"
-          lh="1"
-          mb="0.12em"
-          mt=".08em"
-          sx={{ fontSize: titleSize }}
-        >
-          {detailQuery?.data?.name}
-        </TextTitle>
-        <Group
-          spacing="xs"
-          sx={{
-            WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 2,
-            display: '-webkit-box',
-            overflow: 'hidden',
-          }}
-        >
-          {detailQuery?.data?.albumArtists.map((artist, index) => (
-            <Fragment key={`artist-${artist.id}`}>
-              {index > 0 && (
+            {detailQuery?.data?.albumArtists.map((artist, index) => (
+              <Fragment key={`artist-${artist.id}`}>
+                {index > 0 && (
+                  <Text
+                    $noSelect
+                    sx={{
+                      display: 'inline-block',
+                      padding: '0 0.5rem',
+                    }}
+                  >
+                    •
+                  </Text>
+                )}
                 <Text
-                  $noSelect
-                  sx={{
-                    display: 'inline-block',
-                    padding: '0 0.5rem',
-                  }}
+                  $link
+                  component={Link}
+                  fw="600"
+                  to={generatePath(AppRoute.LIBRARY_ALBUMARTISTS_DETAIL, {
+                    albumArtistId: artist.id,
+                  })}
                 >
-                  •
+                  {artist.name}
                 </Text>
-              )}
-              <Text
-                $link
-                component={Link}
-                fw="600"
-                to={generatePath(AppRoute.LIBRARY_ALBUMARTISTS_DETAIL, {
-                  albumArtistId: artist.id,
-                })}
-              >
-                {artist.name}
-              </Text>
-            </Fragment>
-          ))}
-        </Group>
-      </MetadataWrapper>
-    </HeaderContainer>
-  );
-};
+              </Fragment>
+            ))}
+          </Group>
+        </MetadataWrapper>
+      </HeaderContainer>
+    );
+  },
+);

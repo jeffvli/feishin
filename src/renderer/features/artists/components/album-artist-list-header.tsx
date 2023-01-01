@@ -289,7 +289,7 @@ export const AlbumArtistListHeader = ({ gridRef, tableRef }: AlbumArtistListHead
   };
 
   return (
-    <PageHeader>
+    <PageHeader p="1rem">
       <HeaderItems ref={cq.ref}>
         <Flex
           align="center"

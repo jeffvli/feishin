@@ -1,22 +1,26 @@
+import { Flex, FlexProps } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useShouldPadTitlebar } from '/@/renderer/hooks';
 
-const Container = styled(motion.div)<{ $useOpacity?: boolean; height?: string; position?: string }>`
-  position: ${(props) => props.position};
-  z-index: 100;
+const Container = styled(motion(Flex))<{ $isHidden?: boolean; height?: string; position?: string }>`
+  position: ${(props) => props.position || 'relative'};
+  z-index: 2000;
   width: 100%;
   height: ${(props) => props.height || '60px'};
-  opacity: ${(props) => props.$useOpacity && 'var(--header-opacity)'};
+  opacity: ${(props) => (props.$isHidden ? 0 : 1)};
   transition: opacity 0.3s ease-in-out;
+  user-select: ${(props) => (props.$isHidden ? 'none' : 'auto')};
+  pointer-events: ${(props) => (props.$isHidden ? 'none' : 'auto')};
 `;
 
 const Header = styled(motion.div)<{ $padRight?: boolean }>`
+  position: relative;
   z-index: 15;
+  width: 100%;
   height: 100%;
   margin-right: ${(props) => props.$padRight && '170px'};
-  padding: 1rem;
   -webkit-app-region: drag;
 
   button {
@@ -28,40 +32,41 @@ const Header = styled(motion.div)<{ $padRight?: boolean }>`
   }
 `;
 
-// const BackgroundImage = styled.div<{ background: string }>`
-//   position: absolute;
-//   top: 0;
-//   z-index: -1;
-//   width: 100%;
-//   height: 100%;
-//   background: ${(props) => props.background};
-// `;
+const BackgroundImage = styled.div<{ background: string }>`
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background: ${(props) => props.background || 'var(--titlebar-bg)'};
+`;
 
-// const BackgroundImageOverlay = styled.div`
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   z-index: -1;
-//   width: 100%;
-//   height: 100%;
-//   /* background: linear-gradient(180deg, rgba(25, 26, 28, 0%), var(--main-bg)); */
-//   /* background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1IiBkPSJNMCAwaDMwMHYzMDBIMHoiLz48L3N2Zz4='); */
-// `;
+const BackgroundImageOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 30%), var(--background-noise);
+`;
 
-interface PageHeaderProps {
+interface PageHeaderProps
+  extends Omit<FlexProps, 'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'> {
   backgroundColor?: string;
   children?: React.ReactNode;
   height?: string;
+  isHidden?: boolean;
   position?: string;
-  useOpacity?: boolean;
 }
 
 export const PageHeader = ({
   position,
   height,
   backgroundColor,
-  useOpacity,
+  isHidden,
   children,
+  ...props
 }: PageHeaderProps) => {
   const ref = useRef(null);
   const padRight = useShouldPadTitlebar();
@@ -74,17 +79,18 @@ export const PageHeader = ({
   return (
     <Container
       ref={ref}
-      $useOpacity={useOpacity}
-      animate={{
-        backgroundColor,
-        transition: { duration: 1.5 },
-      }}
+      $isHidden={isHidden}
       height={height}
       position={position}
+      {...props}
     >
-      <Header $padRight={padRight}>{children}</Header>
-      {/* <BackgroundImage background={backgroundColor} /> */}
-      {/* <BackgroundImageOverlay /> */}
+      <Header $padRight={padRight}>{!isHidden && <>{children}</>}</Header>
+      {backgroundColor && (
+        <>
+          <BackgroundImage background={'var(--titlebar-bg)' || ''} />
+          <BackgroundImageOverlay />
+        </>
+      )}
     </Container>
   );
 };

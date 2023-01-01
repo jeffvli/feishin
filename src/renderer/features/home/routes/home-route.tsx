@@ -204,7 +204,7 @@ const HomeRoute = () => {
     <AnimatedPage>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <PageHeader
-          useOpacity
+          isHidden
           backgroundColor="var(--sidebar-bg)"
         />
         <Box

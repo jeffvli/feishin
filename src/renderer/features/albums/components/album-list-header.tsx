@@ -296,7 +296,7 @@ export const AlbumListHeader = ({ gridRef, tableRef }: AlbumListHeaderProps) => 
   };
 
   return (
-    <PageHeader>
+    <PageHeader p="1rem">
       <HeaderItems ref={cq.ref}>
         <Flex
           align="center"
