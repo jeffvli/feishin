@@ -452,10 +452,18 @@ const normalizeSong = (
 ): Song => {
   const imageUrl = getCoverArtUrl({
     baseUrl: server.url,
-    coverArtId: item.albumId,
+    coverArtId: item.id,
     credential: server.credential,
     size: imageSize || 300,
   });
+
+  const imagePlaceholderUrl = getCoverArtUrl({
+    baseUrl: server.url,
+    coverArtId: item.albumId,
+    credential: server.credential,
+    size: 1,
+  });
+
   let id;
 
   // Dynamically determine the id field based on whether or not the item is a playlist song
@@ -481,6 +489,7 @@ const normalizeSong = (
     duration: item.duration,
     genres: item.genres,
     id,
+    imagePlaceholderUrl,
     imageUrl,
     isFavorite: item.starred,
     lastPlayedAt: item.playDate ? item.playDate : null,

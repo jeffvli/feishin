@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
+import { SimpleImg } from 'react-simple-img';
 import styled from 'styled-components';
 import type { AlbumArtist, Artist } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components/text';
@@ -40,8 +41,10 @@ const MetadataWrapper = styled.div`
   width: 100%;
 `;
 
-const StyledImage = styled.img`
-  object-fit: cover;
+const StyledImage = styled(SimpleImg)`
+  img {
+    object-fit: cover;
+  }
 `;
 
 export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams) => {
@@ -78,6 +81,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
           <StyledImage
             alt="cover"
             height={(node.rowHeight || 40) - 10}
+            placeholder={value.imagePlaceholderUrl || 'var(--placeholder-bg)'}
             src={value.imageUrl}
             style={{}}
             width={(node.rowHeight || 40) - 10}

@@ -174,6 +174,7 @@ export type Song = {
   duration: number;
   genres: Genre[];
   id: string;
+  imagePlaceholderUrl: string | null;
   imageUrl: string | null;
   isFavorite: boolean;
   lastPlayedAt: string | null;

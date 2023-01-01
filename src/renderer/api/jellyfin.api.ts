@@ -604,6 +604,7 @@ const normalizeSong = (
     duration: item.RunTimeTicks / 10000000,
     genres: item.GenreItems.map((entry: any) => ({ id: entry.Id, name: entry.Name })),
     id: item.Id,
+    imagePlaceholderUrl: getSongCoverArtUrl({ baseUrl: server.url, item, size: 1 }),
     imageUrl: getSongCoverArtUrl({ baseUrl: server.url, item, size: imageSize || 300 }),
     isFavorite: (item.UserData && item.UserData.IsFavorite) || false,
     lastPlayedAt: null,
