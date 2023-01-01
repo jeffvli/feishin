@@ -436,6 +436,7 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
   const body = {
     MediaType: 'Audio',
     Name: query.name,
+    Overview: query.comment || '',
     UserId: server?.userId,
   };
 
