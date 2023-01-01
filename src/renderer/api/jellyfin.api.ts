@@ -376,8 +376,11 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<JFSongLi
   const searchParams: JFSongListParams = {
     fields: 'Genres, DateCreated, MediaSources, UserData, ParentId',
     includeItemTypes: 'Audio',
+    limit: query.limit,
+    sortBy: query.sortBy ? songListSortMap.jellyfin[query.sortBy] : undefined,
     sortOrder: query.sortOrder ? sortOrderMap.jellyfin[query.sortOrder] : undefined,
     startIndex: 0,
+    userId: server?.userId || '',
   };
 
   const data = await api

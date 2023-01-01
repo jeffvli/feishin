@@ -78,7 +78,7 @@ export const Sidebar = () => {
   const showImage = sidebar.image;
 
   const playlistsQuery = usePlaylistList({
-    limit: 0,
+    limit: 100,
     sortBy: PlaylistListSort.NAME,
     sortOrder: SortOrder.ASC,
     startIndex: 0,

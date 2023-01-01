@@ -4,6 +4,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { PlaylistListArgs, PlaylistListSort, SortOrder } from '/@/renderer/api/types';
 import { DataTableProps } from '/@/renderer/store/settings.store';
+import { SongListFilter } from '/@/renderer/store/song.store';
 import { ListDisplayType, TableColumn, TablePagination } from '/@/renderer/types';
 
 type TableProps = {
@@ -17,14 +18,33 @@ type ListProps<T> = {
   table: TableProps;
 };
 
+type DetailPaginationProps = TablePagination & {
+  scrollOffset: number;
+};
+
+type DetailTableProps = DataTableProps & {
+  id: {
+    [key: string]: DetailPaginationProps & { filter: SongListFilter };
+  };
+};
+
+type DetailProps = {
+  display: ListDisplayType;
+  table: DetailTableProps;
+};
+
 export type PlaylistListFilter = Omit<PlaylistListArgs['query'], 'startIndex' | 'limit'>;
 
 interface PlaylistState {
+  detail: DetailProps;
   list: ListProps<PlaylistListFilter>;
 }
 
 export interface PlaylistSlice extends PlaylistState {
   actions: {
+    setDetailFilters: (id: string, data: Partial<SongListFilter>) => SongListFilter;
+    setDetailTable: (data: Partial<DetailTableProps>) => void;
+    setDetailTablePagination: (id: string, data: Partial<DetailPaginationProps>) => void;
     setFilters: (data: Partial<PlaylistListFilter>) => PlaylistListFilter;
     setStore: (data: Partial<PlaylistSlice>) => void;
     setTable: (data: Partial<TableProps>) => void;
@@ -37,6 +57,32 @@ export const usePlaylistStore = create<PlaylistSlice>()(
     devtools(
       immer((set, get) => ({
         actions: {
+          setDetailFilters: (id, data) => {
+            set((state) => {
+              state.detail.table.id[id] = {
+                ...state.detail.table.id[id],
+                filter: {
+                  ...state.detail.table.id[id].filter,
+                  ...data,
+                },
+              };
+            });
+
+            return get().detail.table.id[id].filter;
+          },
+          setDetailTable: (data) => {
+            set((state) => {
+              state.detail.table = { ...state.detail.table, ...data };
+            });
+          },
+          setDetailTablePagination: (id, data) => {
+            set((state) => {
+              state.detail.table.id[id] = {
+                ...state.detail.table.id[id],
+                ...data,
+              };
+            });
+          },
           setFilters: (data) => {
             set((state) => {
               state.list.filter = { ...state.list.filter, ...data };
@@ -56,6 +102,32 @@ export const usePlaylistStore = create<PlaylistSlice>()(
             set((state) => {
               state.list.table.pagination = { ...state.list.table.pagination, ...data };
             });
+          },
+        },
+        detail: {
+          display: ListDisplayType.TABLE,
+          table: {
+            autoFit: true,
+            columns: [
+              {
+                column: TableColumn.ROW_INDEX,
+                width: 50,
+              },
+              {
+                column: TableColumn.TITLE_COMBINED,
+                width: 500,
+              },
+              {
+                column: TableColumn.DURATION,
+                width: 100,
+              },
+              {
+                column: TableColumn.ALBUM,
+                width: 500,
+              },
+            ],
+            id: {},
+            rowHeight: 60,
           },
         },
         list: {
@@ -123,3 +195,17 @@ export const useSetPlaylistTablePagination = () =>
   usePlaylistStore((state) => state.actions.setTablePagination);
 
 export const useSetPlaylistTable = () => usePlaylistStore((state) => state.actions.setTable);
+
+export const usePlaylistDetailStore = () => usePlaylistStore((state) => state.detail);
+
+export const usePlaylistDetailTablePagination = (id: string) =>
+  usePlaylistStore((state) => state.detail.table.id[id]);
+
+export const useSetPlaylistDetailTablePagination = () =>
+  usePlaylistStore((state) => state.actions.setDetailTablePagination);
+
+export const useSetPlaylistDetailTable = () =>
+  usePlaylistStore((state) => state.actions.setDetailTable);
+
+export const useSetPlaylistDetailFilters = () =>
+  usePlaylistStore((state) => state.actions.setDetailFilters);

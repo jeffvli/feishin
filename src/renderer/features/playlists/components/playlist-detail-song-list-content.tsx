@@ -3,71 +3,72 @@ import type {
   BodyScrollEvent,
   CellContextMenuEvent,
   ColDef,
+  GridReadyEvent,
+  IDatasource,
+  PaginationChangedEvent,
   RowDoubleClickedEvent,
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { getColumnDefs, VirtualTable } from '/@/renderer/components';
-import { useCurrentServer, useSetSongTable, useSongListStore } from '/@/renderer/store';
-import { LibraryItem } from '/@/renderer/types';
+import { getColumnDefs, TablePagination, VirtualTable } from '/@/renderer/components';
+import {
+  useCurrentServer,
+  usePlaylistDetailStore,
+  usePlaylistDetailTablePagination,
+  useSetPlaylistDetailTable,
+  useSetPlaylistDetailTablePagination,
+} from '/@/renderer/store';
+import { LibraryItem, ListDisplayType } from '/@/renderer/types';
+import { useQueryClient } from '@tanstack/react-query';
+import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import sortBy from 'lodash/sortBy';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { QueueSong } from '/@/renderer/api/types';
+import { PlaylistSongListQuery, QueueSong, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
 import { useParams } from 'react-router';
-import styled from 'styled-components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-
-const ContentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  max-width: 1920px;
-  padding: 1rem 2rem;
-  overflow: hidden;
-
-  .ag-theme-alpine-dark {
-    --ag-header-background-color: rgba(0, 0, 0, 0%);
-  }
-
-  .ag-header-container {
-    z-index: 1000;
-  }
-
-  .ag-header-cell-resize {
-    top: 25%;
-    width: 7px;
-    height: 50%;
-    background-color: rgb(70, 70, 70, 20%);
-  }
-`;
+import { api } from '/@/renderer/api';
+import { queryKeys } from '/@/renderer/api/query-keys';
 
 interface PlaylistDetailContentProps {
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) => {
+export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailContentProps) => {
   const { playlistId } = useParams() as { playlistId: string };
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const server = useCurrentServer();
-  const page = useSongListStore();
+  const page = usePlaylistDetailStore();
+  const filters: Partial<PlaylistSongListQuery> = useMemo(() => {
+    return {
+      sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
+      sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
+    };
+  }, [page?.table.id, playlistId]);
 
-  // const pagination = useSongTablePagination();
-  // const setPagination = useSetSongTablePagination();
-  const setTable = useSetSongTable();
+  const p = usePlaylistDetailTablePagination(playlistId);
+  const pagination = {
+    currentPage: p?.currentPage || 0,
+    itemsPerPage: p?.itemsPerPage || 100,
+    scrollOffset: p?.scrollOffset || 0,
+    totalItems: p?.totalItems || 1,
+    totalPages: p?.totalPages || 1,
+  };
+
+  const setPagination = useSetPlaylistDetailTablePagination();
+  const setTable = useSetPlaylistDetailTable();
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
 
-  // const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
+  const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
 
-  const playlistSongsQuery = usePlaylistSongList({
+  const checkPlaylistList = usePlaylistSongList({
     id: playlistId,
-    limit: 50,
+    limit: 1,
     startIndex: 0,
   });
-
-  console.log('checkPlaylistList.data', playlistSongsQuery.data);
 
   const columnDefs: ColDef[] = useMemo(
     () => getColumnDefs(page.table.columns),
@@ -82,58 +83,66 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     };
   }, []);
 
-  // const onGridReady = useCallback(
-  //   (params: GridReadyEvent) => {
-  //     const dataSource: IDatasource = {
-  //       getRows: async (params) => {
-  //         const limit = params.endRow - params.startRow;
-  //         const startIndex = params.startRow;
+  const onGridReady = useCallback(
+    (params: GridReadyEvent) => {
+      const dataSource: IDatasource = {
+        getRows: async (params) => {
+          const limit = params.endRow - params.startRow;
+          const startIndex = params.startRow;
 
-  //         const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, {
-  //           id: playlistId,
-  //           limit,
-  //           startIndex,
-  //         });
+          const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, {
+            id: playlistId,
+            limit,
+            startIndex,
+            ...filters,
+          });
 
-  //         const songsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-  //           api.controller.getPlaylistSongList({
-  //             query: {
-  //               id: playlistId,
-  //               limit,
-  //               startIndex,
-  //             },
-  //             server,
-  //             signal,
-  //           }),
-  //         );
+          const songsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+            api.controller.getPlaylistSongList({
+              query: {
+                id: playlistId,
+                limit,
+                startIndex,
+                ...filters,
+              },
+              server,
+              signal,
+            }),
+          );
 
-  //         const songs = api.normalize.songList(songsRes, server);
-  //         params.successCallback(songs?.items || [], songsRes?.totalRecordCount);
-  //       },
-  //       rowCount: undefined,
-  //     };
-  //     params.api.setDatasource(dataSource);
-  //     params.api.ensureIndexVisible(page.table.scrollOffset, 'top');
-  //   },
-  //   [page.table.scrollOffset, playlistId, queryClient, server],
-  // );
+          const songs = api.normalize.songList(songsRes, server);
+          params.successCallback(songs?.items || [], songsRes?.totalRecordCount);
+        },
+        rowCount: undefined,
+      };
+      params.api.setDatasource(dataSource);
+      params.api.ensureIndexVisible(pagination.scrollOffset, 'top');
+    },
+    [filters, pagination.scrollOffset, playlistId, queryClient, server],
+  );
 
-  // const onPaginationChanged = useCallback(
-  //   (event: PaginationChangedEvent) => {
-  //     if (!isPaginationEnabled || !event.api) return;
+  const onPaginationChanged = useCallback(
+    (event: PaginationChangedEvent) => {
+      if (!isPaginationEnabled || !event.api) return;
 
-  //     // Scroll to top of page on pagination change
-  //     const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage;
-  //     event.api?.ensureIndexVisible(currentPageStartIndex, 'top');
+      // Scroll to top of page on pagination change
+      const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage;
+      event.api?.ensureIndexVisible(currentPageStartIndex, 'top');
 
-  //     setPagination({
-  //       itemsPerPage: event.api.paginationGetPageSize(),
-  //       totalItems: event.api.paginationGetRowCount(),
-  //       totalPages: event.api.paginationGetTotalPages() + 1,
-  //     });
-  //   },
-  //   [isPaginationEnabled, pagination.currentPage, pagination.itemsPerPage, setPagination],
-  // );
+      setPagination(playlistId, {
+        itemsPerPage: event.api.paginationGetPageSize(),
+        totalItems: event.api.paginationGetRowCount(),
+        totalPages: event.api.paginationGetTotalPages() + 1,
+      });
+    },
+    [
+      isPaginationEnabled,
+      pagination.currentPage,
+      pagination.itemsPerPage,
+      playlistId,
+      setPagination,
+    ],
+  );
 
   const handleGridSizeChange = () => {
     if (page.table.autoFit) {
@@ -169,7 +178,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
 
   const handleScroll = (e: BodyScrollEvent) => {
     const scrollOffset = Number((e.top / page.table.rowHeight).toFixed(0));
-    setTable({ scrollOffset });
+    setPagination(playlistId, { scrollOffset });
   };
 
   const handleContextMenu = (e: CellContextMenuEvent) => {
@@ -205,50 +214,58 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
   };
 
   return (
-    <ContentContainer>
+    <>
       <VirtualTable
         // https://github.com/ag-grid/ag-grid/issues/5284
         // Key is used to force remount of table when display, rowHeight, or server changes
         key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
         ref={tableRef}
+        alwaysShowHorizontalScroll
         animateRows
-        detailRowAutoHeight
         maintainColumnOrder
         suppressCopyRowsToClipboard
         suppressMoveWhenRowDragging
         suppressPaginationPanel
         suppressRowDrag
         suppressScrollOnNewData
+        blockLoadDebounceMillis={200}
+        cacheBlockSize={500}
+        cacheOverflowSize={1}
         columnDefs={columnDefs}
         defaultColDef={defaultColumnDefs}
         enableCellChangeFlash={false}
-        rowData={playlistSongsQuery.data?.items}
-        rowHeight={page.table.rowHeight || 60}
+        getRowId={(data) => data.data.id}
+        infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 100}
+        pagination={isPaginationEnabled}
+        paginationAutoPageSize={isPaginationEnabled}
+        paginationPageSize={pagination.itemsPerPage || 100}
+        rowBuffer={20}
+        rowHeight={page.table.rowHeight || 40}
+        rowModelType="infinite"
         rowSelection="multiple"
         onBodyScrollEnd={handleScroll}
         onCellContextMenu={handleContextMenu}
         onColumnMoved={handleColumnChange}
         onColumnResized={debouncedColumnChange}
-        onGridReady={(params) => {
-          params.api.setDomLayout('autoHeight');
-          params.api.sizeColumnsToFit();
-        }}
+        onGridReady={onGridReady}
         onGridSizeChanged={handleGridSizeChange}
+        onPaginationChanged={onPaginationChanged}
         onRowDoubleClicked={handleRowDoubleClick}
       />
-      {/* <AnimatePresence
+      <AnimatePresence
         presenceAffectsLayout
         initial={false}
         mode="wait"
       >
         {page.display === ListDisplayType.TABLE_PAGINATED && (
           <TablePagination
+            id={playlistId}
             pagination={pagination}
-            setPagination={setPagination}
+            setIdPagination={setPagination}
             tableRef={tableRef}
           />
         )}
-      </AnimatePresence> */}
-    </ContentContainer>
+      </AnimatePresence>
+    </>
   );
 };
