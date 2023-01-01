@@ -7,8 +7,6 @@ const MotionButton = styled(motion(_Button))`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
   background-color: var(--primary-color);
   border: none;
   border-radius: 50%;
@@ -19,7 +17,9 @@ const MotionButton = styled(motion(_Button))`
 export const PlayButton = ({ ...props }: Omit<ButtonProps, 'children'>) => {
   return (
     <MotionButton
+      h={50}
       variant="filled"
+      w={50}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       {...props}
