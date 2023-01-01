@@ -5,16 +5,16 @@ import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { NotificationsProvider } from '@mantine/notifications';
-import { QueryClientProvider } from '@tanstack/react-query';
 import { initSimpleImg } from 'react-simple-img';
 import { BaseContextModal } from './components';
 import { useTheme } from './hooks';
-import { queryClient } from './lib/react-query';
 import { AppRouter } from './router/app-router';
 import { useSettingsStore } from './store/settings.store';
 import './styles/global.scss';
 import '@ag-grid-community/styles/ag-grid.css';
 import { ContextMenuProvider } from '/@/renderer/features/context-menu';
+import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
+import { PlayQueueHandlerContext } from '/@/renderer/features/player';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -24,87 +24,89 @@ export const App = () => {
   const theme = useTheme();
   const contentFont = useSettingsStore((state) => state.general.fontContent);
 
+  const handlePlayQueueAdd = useHandlePlayQueueAdd();
+
   useEffect(() => {
     const root = document.documentElement;
     root.style.setProperty('--content-font-family', contentFont);
   }, [contentFont]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <MantineProvider
-        withGlobalStyles
-        withNormalizeCSS
-        theme={{
-          breakpoints: {
-            lg: 1200,
-            md: 1000,
-            sm: 800,
-            xl: 1400,
-            xs: 500,
-          },
-          colorScheme: theme as 'light' | 'dark',
-          components: { Modal: { styles: { body: { padding: '.5rem' } } } },
-          defaultRadius: 'xs',
-          dir: 'ltr',
-          focusRing: 'auto',
-          focusRingStyles: {
-            inputStyles: () => ({
-              border: '1px solid var(--primary-color)',
-            }),
-            resetStyles: () => ({ outline: 'none' }),
-            styles: () => ({
-              outline: '1px solid var(--primary-color)',
-              outlineOffset: '-1px',
-            }),
-          },
-          fontFamily: 'var(--content-font-family)',
-          fontSizes: {
-            lg: 16,
-            md: 14,
-            sm: 12,
-            xl: 18,
-            xs: 10,
-          },
-          headings: { fontFamily: 'var(--content-font-family)' },
-          other: {},
-          spacing: {
-            lg: 12,
-            md: 8,
-            sm: 4,
-            xl: 16,
-            xs: 2,
-          },
+    <MantineProvider
+      withGlobalStyles
+      withNormalizeCSS
+      theme={{
+        breakpoints: {
+          lg: 1200,
+          md: 1000,
+          sm: 800,
+          xl: 1400,
+          xs: 500,
+        },
+        colorScheme: theme as 'light' | 'dark',
+        components: { Modal: { styles: { body: { padding: '.5rem' } } } },
+        defaultRadius: 'xs',
+        dir: 'ltr',
+        focusRing: 'auto',
+        focusRingStyles: {
+          inputStyles: () => ({
+            border: '1px solid var(--primary-color)',
+          }),
+          resetStyles: () => ({ outline: 'none' }),
+          styles: () => ({
+            outline: '1px solid var(--primary-color)',
+            outlineOffset: '-1px',
+          }),
+        },
+        fontFamily: 'var(--content-font-family)',
+        fontSizes: {
+          lg: 16,
+          md: 14,
+          sm: 12,
+          xl: 18,
+          xs: 10,
+        },
+        headings: { fontFamily: 'var(--content-font-family)' },
+        other: {},
+        spacing: {
+          lg: 12,
+          md: 8,
+          sm: 4,
+          xl: 16,
+          xs: 2,
+        },
+      }}
+    >
+      <NotificationsProvider
+        autoClose={1500}
+        position="bottom-right"
+        style={{
+          marginBottom: '85px',
+          opacity: '.8',
+          userSelect: 'none',
+          width: '250px',
         }}
+        transitionDuration={200}
       >
-        <NotificationsProvider
-          autoClose={1500}
-          position="bottom-right"
-          style={{
-            marginBottom: '85px',
-            opacity: '.8',
-            userSelect: 'none',
-            width: '250px',
+        <ModalsProvider
+          modalProps={{
+            centered: true,
+            exitTransitionDuration: 300,
+            overflow: 'inside',
+            overlayBlur: 0,
+            overlayOpacity: 0.8,
+            transition: 'slide-down',
+            transitionDuration: 300,
           }}
-          transitionDuration={200}
+          modals={{ base: BaseContextModal }}
         >
-          <ModalsProvider
-            modalProps={{
-              centered: true,
-              exitTransitionDuration: 300,
-              overflow: 'inside',
-              overlayBlur: 0,
-              overlayOpacity: 0.8,
-              transition: 'slide-down',
-              transitionDuration: 300,
-            }}
-            modals={{ base: BaseContextModal }}
-          >
+          <PlayQueueHandlerContext.Provider value={{ handlePlayQueueAdd }}>
             <ContextMenuProvider>
               <AppRouter />
             </ContextMenuProvider>
-          </ModalsProvider>
-        </NotificationsProvider>
-      </MantineProvider>
-    </QueryClientProvider>
+          </PlayQueueHandlerContext.Provider>
+        </ModalsProvider>
+      </NotificationsProvider>
+    </MantineProvider>
   );
 };

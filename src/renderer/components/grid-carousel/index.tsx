@@ -9,7 +9,7 @@ import type { CardRow } from '/@/renderer/types';
 import { LibraryItem, Play } from '/@/renderer/types';
 import styled from 'styled-components';
 import { AlbumCard } from '/@/renderer/components/card';
-import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 
 interface GridCarouselProps {
   cardRows: CardRow<any>[];
@@ -80,7 +80,7 @@ const Carousel = ({ data, cardRows }: any) => {
   const { loading, pagination, gridHeight, imageSize, direction, uniqueId } =
     useContext(GridCarouselContext);
 
-  const handlePlayQueueAdd = useHandlePlayQueueAdd();
+  const handlePlayQueueAdd = usePlayQueueAdd();
 
   return (
     <Wrapper>

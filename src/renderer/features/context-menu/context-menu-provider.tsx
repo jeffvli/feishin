@@ -7,7 +7,7 @@ import {
   SetContextMenuItems,
   useContextMenuEvents,
 } from '/@/renderer/features/context-menu/events';
-import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { LibraryItem, Play } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
@@ -45,7 +45,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     yPos: 0,
   });
 
-  const handlePlayQueueAdd = useHandlePlayQueueAdd();
+  const handlePlayQueueAdd = usePlayQueueAdd();
 
   const openContextMenu = (args: OpenContextMenuProps) => {
     const { xPos, yPos, menuItems, data, type } = args;
@@ -70,32 +70,30 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   });
 
   const handlePlay = (play: Play) => {
-    console.log('ctx', ctx);
-
     switch (ctx.type) {
       case LibraryItem.ALBUM:
-        handlePlayQueueAdd({
+        handlePlayQueueAdd?.({
           byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
           play,
         });
         break;
       case LibraryItem.ARTIST:
-        handlePlayQueueAdd({
+        handlePlayQueueAdd?.({
           byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
           play,
         });
         break;
       case LibraryItem.ALBUM_ARTIST:
-        handlePlayQueueAdd({
+        handlePlayQueueAdd?.({
           byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
           play,
         });
         break;
       case LibraryItem.SONG:
-        handlePlayQueueAdd({ byData: ctx.data, play });
+        handlePlayQueueAdd?.({ byData: ctx.data, play });
         break;
       case LibraryItem.PLAYLIST:
-        handlePlayQueueAdd({
+        handlePlayQueueAdd?.({
           byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
           play,
         });

@@ -19,7 +19,6 @@ import { useSongListStore } from '/@/renderer/store';
 import styled from 'styled-components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { LibraryItem, Play } from '/@/renderer/types';
@@ -27,6 +26,7 @@ import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/conte
 import { PlayButton, PLAY_TYPES } from '/@/renderer/features/shared';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import { AlbumListSort, SortOrder } from '/@/renderer/api/types';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 const ContentContainer = styled.div`
   display: flex;
@@ -59,7 +59,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
   const { albumId } = useParams() as { albumId: string };
   const detailQuery = useAlbumDetail({ id: albumId });
   const cq = useContainerQuery();
-  const handlePlayQueueAdd = useHandlePlayQueueAdd();
+  const handlePlayQueueAdd = usePlayQueueAdd();
 
   const page = useSongListStore();
 

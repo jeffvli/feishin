@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '/@/renderer/api/index';
 import { jfNormalize } from '/@/renderer/api/jellyfin.api';
@@ -21,90 +22,102 @@ export const useHandlePlayQueueAdd = () => {
   const deviceId = useAuthStore.getState().deviceId;
   const server = useAuthStore.getState().currentServer;
 
-  const handlePlayQueueAdd = async (options: PlayQueueAddOptions) => {
-    if (!server) return toast.error({ message: 'No server selected', type: 'error' });
-    let songs = null;
+  const handlePlayQueueAdd = useCallback(
+    async (options: PlayQueueAddOptions) => {
+      if (!server) return toast.error({ message: 'No server selected', type: 'error' });
+      let songs = null;
 
-    if (options.byItemType) {
-      let songsList;
-      let queryFilter: any;
-      let queryKey: any;
-      if (options.byItemType.type === LibraryItem.ALBUM) {
-        queryFilter = {
-          albumIds: options.byItemType?.id || [],
-          sortBy: SongListSort.ALBUM,
-          sortOrder: SortOrder.ASC,
-          startIndex: 0,
-        };
+      if (options.byItemType) {
+        let songsList;
+        let queryFilter: any;
+        let queryKey: any;
+        if (options.byItemType.type === LibraryItem.ALBUM) {
+          queryFilter = {
+            albumIds: options.byItemType?.id || [],
+            sortBy: SongListSort.ALBUM,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+          };
 
-        queryKey = queryKeys.songs.list(server?.id, queryFilter);
-      } else if (options.byItemType.type === LibraryItem.ALBUM_ARTIST) {
-        queryFilter = {
-          artistIds: options.byItemType?.id || [],
-          sortBy: SongListSort.ALBUM,
-          sortOrder: SortOrder.ASC,
-          startIndex: 0,
-        };
+          queryKey = queryKeys.songs.list(server?.id, queryFilter);
+        } else if (options.byItemType.type === LibraryItem.ALBUM_ARTIST) {
+          queryFilter = {
+            artistIds: options.byItemType?.id || [],
+            sortBy: SongListSort.ALBUM,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+          };
 
-        queryKey = queryKeys.songs.list(server?.id, queryFilter);
-      }
+          queryKey = queryKeys.songs.list(server?.id, queryFilter);
+        } else if (options.byItemType.type === LibraryItem.PLAYLIST) {
+          queryFilter = {
+            artistIds: options.byItemType?.id || [],
+            sortBy: SongListSort.ALBUM,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+          };
 
-      try {
-        songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-          api.controller.getSongList({
-            query: queryFilter,
-            server,
-            signal,
-          }),
-        );
-      } catch (err: any) {
-        return toast.error({
-          message: err.message,
-          title: 'Play queue add failed',
-        });
-      }
+          queryKey = queryKeys.songs.list(server?.id, queryFilter);
+        }
 
-      if (!songsList) return toast.warn({ message: 'No songs found' });
-
-      switch (server?.type) {
-        case 'jellyfin':
-          songs = songsList.items?.map((song) =>
-            jfNormalize.song(song as JFSong, server, deviceId),
+        try {
+          songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+            api.controller.getSongList({
+              query: queryFilter,
+              server,
+              signal,
+            }),
           );
-          break;
-        case 'navidrome':
-          songs = songsList.items?.map((song) =>
-            ndNormalize.song(song as NDSong, server, deviceId),
-          );
-          break;
-        case 'subsonic':
-          break;
-      }
-    } else if (options.byData) {
-      songs = options.byData.map((song) => ({ ...song, uniqueId: nanoid() }));
-    }
+        } catch (err: any) {
+          return toast.error({
+            message: err.message,
+            title: 'Play queue add failed',
+          });
+        }
 
-    if (!songs) return toast.warn({ message: 'No songs found' });
+        if (!songsList) return toast.warn({ message: 'No songs found' });
 
-    const playerData = usePlayerStore.getState().actions.addToQueue(songs, options.play);
-
-    if (options.play === Play.NEXT || options.play === Play.LAST) {
-      if (playerType === PlaybackType.LOCAL) {
-        mpvPlayer.setQueueNext(playerData);
-      }
-    }
-
-    if (options.play === Play.NOW) {
-      if (playerType === PlaybackType.LOCAL) {
-        mpvPlayer.setQueue(playerData);
-        mpvPlayer.play();
+        switch (server?.type) {
+          case 'jellyfin':
+            songs = songsList.items?.map((song) =>
+              jfNormalize.song(song as JFSong, server, deviceId),
+            );
+            break;
+          case 'navidrome':
+            songs = songsList.items?.map((song) =>
+              ndNormalize.song(song as NDSong, server, deviceId),
+            );
+            break;
+          case 'subsonic':
+            break;
+        }
+      } else if (options.byData) {
+        songs = options.byData.map((song) => ({ ...song, uniqueId: nanoid() }));
       }
 
-      usePlayerStore.getState().actions.play();
-    }
+      if (!songs) return toast.warn({ message: 'No songs found' });
 
-    return null;
-  };
+      const playerData = usePlayerStore.getState().actions.addToQueue(songs, options.play);
+
+      if (options.play === Play.NEXT || options.play === Play.LAST) {
+        if (playerType === PlaybackType.LOCAL) {
+          mpvPlayer.setQueueNext(playerData);
+        }
+      }
+
+      if (options.play === Play.NOW) {
+        if (playerType === PlaybackType.LOCAL) {
+          mpvPlayer.setQueue(playerData);
+          mpvPlayer.play();
+        }
+
+        usePlayerStore.getState().actions.play();
+      }
+
+      return null;
+    },
+    [deviceId, playerType, queryClient, server],
+  );
 
   return handlePlayQueueAdd;
 };

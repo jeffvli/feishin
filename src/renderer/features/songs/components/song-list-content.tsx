@@ -33,9 +33,9 @@ import debounce from 'lodash/debounce';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import sortBy from 'lodash/sortBy';
-import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { QueueSong } from '/@/renderer/api/types';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 interface SongListContentProps {
   tableRef: MutableRefObject<AgGridReactType | null>;
@@ -49,7 +49,7 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
   const pagination = useSongTablePagination();
   const setPagination = useSetSongTablePagination();
   const setTable = useSetSongTable();
-  const handlePlayQueueAdd = useHandlePlayQueueAdd();
+  const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
 
   const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
@@ -189,7 +189,7 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;
-    handlePlayQueueAdd({
+    handlePlayQueueAdd?.({
       byData: [e.data],
       play: playButtonBehavior,
     });

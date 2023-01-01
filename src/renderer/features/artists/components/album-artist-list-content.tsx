@@ -15,7 +15,6 @@ import { ListOnScrollProps } from 'react-window';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumArtist, AlbumArtistListSort } from '/@/renderer/api/types';
-import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useCurrentServer,
@@ -42,6 +41,7 @@ import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/cont
 import sortBy from 'lodash/sortBy';
 import { generatePath, useNavigate } from 'react-router';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 interface AlbumArtistListContentProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -54,7 +54,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
   const server = useCurrentServer();
   const page = useAlbumArtistListStore();
   const setPage = useSetAlbumArtistStore();
-  const handlePlayQueueAdd = useHandlePlayQueueAdd();
+  const handlePlayQueueAdd = usePlayQueueAdd();
 
   const pagination = useAlbumArtistTablePagination();
   const setPagination = useSetAlbumArtistTablePagination();

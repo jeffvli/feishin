@@ -118,7 +118,7 @@ export const CardControls = ({
   itemType,
   handlePlayQueueAdd,
 }: {
-  handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
+  handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   itemData: any;
   itemType: LibraryItem;
 }) => {
@@ -127,7 +127,7 @@ export const CardControls = ({
   const handlePlay = (e: MouseEvent<HTMLButtonElement>, playType?: Play) => {
     e.preventDefault();
     e.stopPropagation();
-    handlePlayQueueAdd({
+    handlePlayQueueAdd?.({
       byItemType: {
         id: itemData.id,
         type: itemType,

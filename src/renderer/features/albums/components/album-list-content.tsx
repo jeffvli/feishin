@@ -17,7 +17,6 @@ import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { Album, AlbumListSort } from '/@/renderer/api/types';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
-import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useCurrentServer,
@@ -43,6 +42,7 @@ import { openContextMenu } from '/@/renderer/features/context-menu';
 import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import sortBy from 'lodash/sortBy';
 import { generatePath, useNavigate } from 'react-router';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 interface AlbumListContentProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -55,7 +55,7 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
   const server = useCurrentServer();
   const page = useAlbumListStore();
   const setPage = useSetAlbumStore();
-  const handlePlayQueueAdd = useHandlePlayQueueAdd();
+  const handlePlayQueueAdd = usePlayQueueAdd();
 
   const pagination = useAlbumTablePagination();
   const setPagination = useSetAlbumTablePagination();

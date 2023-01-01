@@ -109,7 +109,7 @@ interface BaseGridCardProps {
     route: CardRoute;
   };
   data: any;
-  handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
+  handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   loading?: boolean;
   size: number;
 }
