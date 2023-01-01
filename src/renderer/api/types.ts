@@ -742,17 +742,23 @@ export type CreatePlaylistArgs = { query: CreatePlaylistQuery } & BaseEndpointAr
 // Update Playlist
 export type RawUpdatePlaylistResponse = UpdatePlaylistResponse | undefined;
 
-export type UpdatePlaylistResponse = { id: string; name: string };
+export type UpdatePlaylistResponse = { id: string };
 
 export type UpdatePlaylistQuery = {
+  id: string;
+};
+
+export type UpdatePlaylistBody = {
   comment?: string;
   name: string;
-  previous: RawPlaylistDetailResponse;
   public?: boolean;
   rules?: Record<string, any>;
 };
 
-export type UpdatePlaylistArgs = { query: UpdatePlaylistQuery } & BaseEndpointArgs;
+export type UpdatePlaylistArgs = {
+  body: UpdatePlaylistBody;
+  query: UpdatePlaylistQuery;
+} & BaseEndpointArgs;
 
 // Delete Playlist
 export type RawDeletePlaylistResponse = NDDeletePlaylist | undefined;

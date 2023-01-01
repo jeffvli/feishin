@@ -23,6 +23,7 @@ import type {
   RawAlbumListResponse,
   RawGenreListResponse,
   RawMusicFolderListResponse,
+  RawPlaylistDetailResponse,
   RawPlaylistListResponse,
   RawSongListResponse,
 } from '/@/renderer/api/types';
@@ -191,12 +192,32 @@ const playlistList = (data: RawPlaylistListResponse | undefined, server: ServerL
   };
 };
 
+const playlistDetail = (
+  data: RawPlaylistDetailResponse | undefined,
+  server: ServerListItem | null,
+) => {
+  let playlist;
+  switch (server?.type) {
+    case 'jellyfin':
+      playlist = jfNormalize.playlist(data as JFPlaylist);
+      break;
+    case 'navidrome':
+      playlist = ndNormalize.playlist(data as NDPlaylist);
+      break;
+    case 'subsonic':
+      break;
+  }
+
+  return playlist;
+};
+
 export const normalize = {
   albumArtistList,
   albumDetail,
   albumList,
   genreList,
   musicFolderList,
+  playlistDetail,
   playlistList,
   songList,
 };

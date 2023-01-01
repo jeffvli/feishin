@@ -269,7 +269,7 @@ export type NDCreatePlaylistResponse = {
 
 export type NDCreatePlaylist = NDCreatePlaylistResponse;
 
-export type NDUpdatePlaylistParams = NDPlaylist;
+export type NDUpdatePlaylistParams = Partial<NDPlaylist>;
 
 export type NDUpdatePlaylistResponse = NDPlaylist;
 

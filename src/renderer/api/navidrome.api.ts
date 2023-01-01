@@ -313,19 +313,16 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
 };
 
 const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistResponse> => {
-  const { query, server, signal } = args;
-
-  const previous = query.previous as NDPlaylist;
+  const { query, body, server, signal } = args;
 
   const json: NDUpdatePlaylistParams = {
-    ...previous,
-    comment: query.comment || '',
-    name: query.name,
-    public: query.public || false,
+    comment: body.comment || '',
+    name: body.name,
+    public: body.public || false,
   };
 
   const data = await api
-    .post(`api/playlist/${previous.id}`, {
+    .post(`api/playlist/${query.id}`, {
       headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
       json,
       prefixUrl: server?.url,
@@ -335,7 +332,6 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
 
   return {
     id: data.id,
-    name: query.name,
   };
 };
 
@@ -406,19 +402,20 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<NDSongLi
     playlist_id: query.id,
   };
 
-  const data = await api
-    .get(`api/playlist/${query.id}/tracks`, {
-      headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
-      prefixUrl: server?.url,
-      searchParams: parseSearchParams(searchParams),
-      signal,
-    })
-    .json<NDSongListResponse>();
+  const res = await api.get(`api/playlist/${query.id}/tracks`, {
+    headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
+    prefixUrl: server?.url,
+    searchParams: parseSearchParams(searchParams),
+    signal,
+  });
+
+  const data = await res.json<NDSongListResponse>();
+  const itemCount = res.headers.get('x-total-count');
 
   return {
     items: data,
     startIndex: query?.startIndex || 0,
-    totalRecordCount: data.length,
+    totalRecordCount: Number(itemCount),
   };
 };
 

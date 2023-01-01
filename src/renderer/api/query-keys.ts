@@ -6,6 +6,7 @@ import type {
   ArtistListQuery,
   PlaylistListQuery,
   PlaylistDetailQuery,
+  PlaylistSongListQuery,
 } from './types';
 
 export const queryKeys = {
@@ -48,8 +49,8 @@ export const queryKeys = {
   },
   playlists: {
     detail: (serverId: string, id?: string, query?: PlaylistDetailQuery) => {
-      if (query) return [serverId, 'playlists', 'detail', id, query] as const;
-      if (id) return [serverId, 'playlists', 'detail', id] as const;
+      if (query) return [serverId, 'playlists', id, 'detail', query] as const;
+      if (id) return [serverId, 'playlists', id, 'detail'] as const;
       return [serverId, 'playlists', 'detail'] as const;
     },
     list: (serverId: string, query?: PlaylistListQuery) => {
@@ -57,6 +58,11 @@ export const queryKeys = {
       return [serverId, 'playlists', 'list'] as const;
     },
     root: (serverId: string) => [serverId, 'playlists'] as const,
+    songList: (serverId: string, id: string, query?: PlaylistSongListQuery) => {
+      if (query) return [serverId, 'playlists', id, 'songList', query] as const;
+      if (id) return [serverId, 'playlists', id, 'songList'] as const;
+      return [serverId, 'playlists', 'songList'] as const;
+    },
   },
   server: {
     root: (serverId: string) => [serverId] as const,
