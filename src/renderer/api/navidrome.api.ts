@@ -512,14 +512,14 @@ const normalizeSong = (
 const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: number): Album => {
   const imageUrl = getCoverArtUrl({
     baseUrl: server.url,
-    coverArtId: item.coverArtId,
+    coverArtId: item.coverArtId || item.id,
     credential: server.credential,
     size: imageSize || 300,
   });
 
   const imagePlaceholderUrl = getCoverArtUrl({
     baseUrl: server.url,
-    coverArtId: item.coverArtId,
+    coverArtId: item.coverArtId || item.id,
     credential: server.credential,
     size: 1,
   });
@@ -571,10 +571,30 @@ const normalizeAlbumArtist = (item: NDAlbumArtist): AlbumArtist => {
   };
 };
 
-const normalizePlaylist = (item: NDPlaylist): Playlist => {
+const normalizePlaylist = (
+  item: NDPlaylist,
+  server: ServerListItem,
+  imageSize?: number,
+): Playlist => {
+  const imageUrl = getCoverArtUrl({
+    baseUrl: server.url,
+    coverArtId: item.id,
+    credential: server.credential,
+    size: imageSize || 300,
+  });
+
+  const imagePlaceholderUrl = getCoverArtUrl({
+    baseUrl: server.url,
+    coverArtId: item.id,
+    credential: server.credential,
+    size: 1,
+  });
+
   return {
     duration: item.duration,
     id: item.id,
+    imagePlaceholderUrl,
+    imageUrl,
     name: item.name,
     public: item.public,
     rules: item?.rules || null,

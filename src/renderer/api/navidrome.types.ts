@@ -20,8 +20,8 @@ export type NDAlbum = {
   artist: string;
   artistId: string;
   compilation: boolean;
-  coverArtId: string;
-  coverArtPath: string;
+  coverArtId?: string; // Removed after v0.48.0
+  coverArtPath?: string; // Removed after v0.48.0
   createdAt: string;
   duration: number;
   fullText: string;

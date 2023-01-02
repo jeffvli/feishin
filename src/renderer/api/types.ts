@@ -237,6 +237,8 @@ export type MusicFolder = {
 export type Playlist = {
   duration: number | null;
   id: string;
+  imagePlaceholderUrl: string | null;
+  imageUrl: string | null;
   name: string;
   public: boolean | null;
   rules?: Record<string, any> | null;

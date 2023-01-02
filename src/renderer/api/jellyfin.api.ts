@@ -582,6 +582,22 @@ const getSongCoverArtUrl = (args: { baseUrl: string; item: JFSong; size: number 
   );
 };
 
+const getPlaylistCoverArtUrl = (args: { baseUrl: string; item: JFPlaylist; size: number }) => {
+  const size = args.size ? args.size : 300;
+
+  if (!args.item.ImageTags?.Primary) {
+    return null;
+  }
+
+  return (
+    `${args.baseUrl}/Items` +
+    `/${args.item.Id}` +
+    '/Images/Primary' +
+    `?width=${size}&height=${size}` +
+    '&quality=96'
+  );
+};
+
 const normalizeSong = (
   item: JFSong,
   server: ServerListItem,
@@ -698,10 +714,28 @@ const normalizeAlbumArtist = (
   };
 };
 
-const normalizePlaylist = (item: JFPlaylist): Playlist => {
+const normalizePlaylist = (
+  item: JFPlaylist,
+  server: ServerListItem,
+  imageSize?: number,
+): Playlist => {
+  const imageUrl = getPlaylistCoverArtUrl({
+    baseUrl: server.url,
+    item,
+    size: imageSize || 300,
+  });
+
+  const imagePlaceholderUrl = getPlaylistCoverArtUrl({
+    baseUrl: server.url,
+    item,
+    size: 1,
+  });
+
   return {
     duration: item.RunTimeTicks / 10000000,
     id: item.Id,
+    imagePlaceholderUrl,
+    imageUrl,
     name: item.Name,
     public: null,
     rules: null,

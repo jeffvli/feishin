@@ -176,10 +176,10 @@ const playlistList = (data: RawPlaylistListResponse | undefined, server: ServerL
   let playlists;
   switch (server?.type) {
     case 'jellyfin':
-      playlists = data?.items.map((item) => jfNormalize.playlist(item as JFPlaylist));
+      playlists = data?.items.map((item) => jfNormalize.playlist(item as JFPlaylist, server));
       break;
     case 'navidrome':
-      playlists = data?.items.map((item) => ndNormalize.playlist(item as NDPlaylist));
+      playlists = data?.items.map((item) => ndNormalize.playlist(item as NDPlaylist, server));
       break;
     case 'subsonic':
       break;
@@ -199,10 +199,10 @@ const playlistDetail = (
   let playlist;
   switch (server?.type) {
     case 'jellyfin':
-      playlist = jfNormalize.playlist(data as JFPlaylist);
+      playlist = jfNormalize.playlist(data as JFPlaylist, server);
       break;
     case 'navidrome':
-      playlist = ndNormalize.playlist(data as NDPlaylist);
+      playlist = ndNormalize.playlist(data as NDPlaylist, server);
       break;
     case 'subsonic':
       break;
