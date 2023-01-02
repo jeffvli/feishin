@@ -1,4 +1,9 @@
-import type { UseQueryOptions, DefaultOptions, UseMutationOptions } from '@tanstack/react-query';
+import type {
+  UseQueryOptions,
+  DefaultOptions,
+  UseMutationOptions,
+  UseInfiniteQueryOptions,
+} from '@tanstack/react-query';
 import { QueryClient, QueryCache } from '@tanstack/react-query';
 import { toast } from '/@/renderer/components';
 
@@ -57,5 +62,24 @@ export type MutationOptions = {
   onSuccess?: any;
   retry?: UseQueryOptions['retry'];
   retryDelay?: UseQueryOptions['retryDelay'];
+  useErrorBoundary?: boolean;
+};
+
+export type InfiniteQueryOptions = {
+  cacheTime?: UseInfiniteQueryOptions['cacheTime'];
+  enabled?: UseInfiniteQueryOptions['enabled'];
+  keepPreviousData?: UseInfiniteQueryOptions['keepPreviousData'];
+  meta?: UseInfiniteQueryOptions['meta'];
+  onError?: (err: any) => void;
+  onSettled?: any;
+  onSuccess?: any;
+  queryKey?: UseInfiniteQueryOptions['queryKey'];
+  refetchInterval?: number;
+  refetchIntervalInBackground?: UseInfiniteQueryOptions['refetchIntervalInBackground'];
+  refetchOnWindowFocus?: boolean;
+  retry?: UseInfiniteQueryOptions['retry'];
+  retryDelay?: UseInfiniteQueryOptions['retryDelay'];
+  staleTime?: UseInfiniteQueryOptions['staleTime'];
+  suspense?: UseInfiniteQueryOptions['suspense'];
   useErrorBoundary?: boolean;
 };

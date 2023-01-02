@@ -1,32 +1,42 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useRef } from 'react';
 import { useParams } from 'react-router';
+import { PageHeader, ScrollArea } from '/@/renderer/components';
+import { PlaylistDetailContent } from '/@/renderer/features/playlists/components/playlist-detail-content';
+import { PlaylistDetailHeader } from '/@/renderer/features/playlists/components/playlist-detail-header';
+import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { AnimatedPage } from '/@/renderer/features/shared';
+import { useFastAverageColor, useShouldPadTitlebar } from '/@/renderer/hooks';
 
 const PlaylistDetailRoute = () => {
-  // const tableRef = useRef<AgGridReactType | null>(null);
+  const tableRef = useRef<AgGridReactType | null>(null);
   const { playlistId } = useParams() as { playlistId: string };
+  const padTitlebar = useShouldPadTitlebar();
 
-  // const detailsQuery = usePlaylistDetail({
-  //   id: playlistId,
-  // });
+  const detailQuery = usePlaylistDetail({ id: playlistId });
+  const background = useFastAverageColor(detailQuery?.data?.imageUrl, 'dominant');
 
-  // const playlistSongsQuery = usePlaylistSongList({
-  //   id: playlistId,
-  //   limit: 50,
-  //   startIndex: 0,
-  // });
-
-  // const imageUrl = playlistSongsQuery.data?.items?.[0]?.imageUrl;
-  // const background = useFastAverageColor(imageUrl);
-  // const containerRef = useRef();
-
-  // const { ref, entry } = useIntersection({
-  //   root: containerRef.current,
-  //   threshold: 0.3,
-  // });
-
-  return <AnimatedPage key={`playlist-detail-${playlistId}`}>Placeholder</AnimatedPage>;
+  return (
+    <>
+      <PageHeader position="absolute" />
+      {background && (
+        <AnimatedPage key={`playlist-detail-${playlistId}`}>
+          <ScrollArea
+            h="100%"
+            offsetScrollbars={false}
+            styles={{ scrollbar: { marginTop: padTitlebar ? '35px' : 0 } }}
+          >
+            <PlaylistDetailHeader
+              background={background}
+              imagePlaceholderUrl={detailQuery?.data?.imageUrl}
+              imageUrl={detailQuery?.data?.imageUrl}
+            />
+            <PlaylistDetailContent tableRef={tableRef} />
+          </ScrollArea>
+        </AnimatedPage>
+      )}
+    </>
+  );
 };
 
 export default PlaylistDetailRoute;

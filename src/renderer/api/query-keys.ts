@@ -53,6 +53,11 @@ export const queryKeys = {
       if (id) return [serverId, 'playlists', id, 'detail'] as const;
       return [serverId, 'playlists', 'detail'] as const;
     },
+    detailSongList: (serverId: string, id: string, query?: PlaylistSongListQuery) => {
+      if (query) return [serverId, 'playlists', id, 'detailSongList', query] as const;
+      if (id) return [serverId, 'playlists', id, 'detailSongList'] as const;
+      return [serverId, 'playlists', 'detailSongList'] as const;
+    },
     list: (serverId: string, query?: PlaylistListQuery) => {
       if (query) return [serverId, 'playlists', 'list', query] as const;
       return [serverId, 'playlists', 'list'] as const;

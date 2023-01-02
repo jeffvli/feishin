@@ -234,7 +234,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
         columnDefs={columnDefs}
         defaultColDef={defaultColumnDefs}
         enableCellChangeFlash={false}
-        getRowId={(data) => data.data.id}
+        getRowId={(data) => data.data.uniqueId}
         infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 100}
         pagination={isPaginationEnabled}
         paginationAutoPageSize={isPaginationEnabled}
