@@ -1,6 +1,6 @@
 import { Flex, FlexProps } from '@mantine/core';
 import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import styled from 'styled-components';
 import { useShouldPadTitlebar } from '/@/renderer/hooks';
 
@@ -70,11 +70,6 @@ export const PageHeader = ({
 }: PageHeaderProps) => {
   const ref = useRef(null);
   const padRight = useShouldPadTitlebar();
-
-  useEffect(() => {
-    const rootElement = document.querySelector(':root') as HTMLElement;
-    rootElement?.style?.setProperty('--header-opacity', '0');
-  }, []);
 
   return (
     <Container

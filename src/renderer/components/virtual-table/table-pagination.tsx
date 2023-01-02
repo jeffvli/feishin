@@ -42,8 +42,6 @@ export const TablePagination = ({
     tableRef.current?.api.paginationGoToPage(newPage);
     setPagination?.({ currentPage: newPage });
     setIdPagination?.(id || '', { currentPage: newPage });
-
-    console.log('newPage', newPage);
   };
 
   const handleGoSubmit = goToForm.onSubmit((values) => {

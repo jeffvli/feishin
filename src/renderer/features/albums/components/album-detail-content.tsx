@@ -237,7 +237,6 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
         rowHeight={60}
         rowSelection="multiple"
         onCellContextMenu={handleContextMenu}
-        onColumnResized={() => console.log('resize')}
         onGridReady={(params) => {
           params.api.setDomLayout('autoHeight');
           params.api.sizeColumnsToFit();
