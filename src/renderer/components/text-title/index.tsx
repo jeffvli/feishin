@@ -17,12 +17,12 @@ interface TextTitleProps extends MantineTextTitleDivProps {
 }
 
 const StyledTextTitle = styled(MantineHeader)<TextTitleProps>`
-  overflow: ${(props) => props.overflow === 'visible' && 'visible'};
+  overflow: ${(props) => props.overflow};
   color: ${(props) => (props.$secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)')};
   cursor: ${(props) => props.$link && 'cursor'};
   transition: color 0.2s ease-in-out;
   user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
-  ${(props) => props.overflow === 'hidden' && textEllipsis}
+  ${(props) => props.overflow === 'hidden' && !props.lineClamp && textEllipsis}
 
   &:hover {
     color: ${(props) => props.$link && 'var(--main-fg)'};
