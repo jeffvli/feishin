@@ -531,7 +531,7 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
     artists: [{ id: item.artistId, name: item.artist }],
     backdropImageUrl: imageBackdropUrl,
     createdAt: item.createdAt.split('T')[0],
-    duration: item.duration || null,
+    duration: item.duration * 1000 || null,
     genres: item.genres,
     id: item.id,
     imagePlaceholderUrl,
@@ -591,7 +591,7 @@ const normalizePlaylist = (
   });
 
   return {
-    duration: item.duration,
+    duration: item.duration * 1000,
     id: item.id,
     imagePlaceholderUrl,
     imageUrl,
