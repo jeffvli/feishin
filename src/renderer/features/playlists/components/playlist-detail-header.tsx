@@ -1,10 +1,10 @@
 import { Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
-import { forwardRef, Ref } from 'react';
+import { forwardRef, Fragment, Ref } from 'react';
 import { RiMoreFill } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
-import { DropdownMenu, Button, ConfirmModal, toast } from '/@/renderer/components';
+import { DropdownMenu, Button, ConfirmModal, toast, Text } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { UpdatePlaylistForm } from './update-playlist-form';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
@@ -13,6 +13,7 @@ import { LibraryHeader, PlayButton, PLAY_TYPES } from '/@/renderer/features/shar
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem, Play } from '/@/renderer/types';
+import { formatDurationString } from '/@/renderer/utils';
 
 interface PlaylistDetailHeaderProps {
   background: string;
@@ -47,6 +48,7 @@ export const PlaylistDetailHeader = forwardRef(
           <UpdatePlaylistForm
             body={{
               comment: detailQuery?.data?.description || undefined,
+              genres: detailQuery?.data?.genres,
               name: detailQuery?.data?.name,
               public: detailQuery?.data?.public || false,
               rules: detailQuery?.data?.rules || undefined,
@@ -97,6 +99,19 @@ export const PlaylistDetailHeader = forwardRef(
       });
     };
 
+    const metadataItems = [
+      {
+        id: 'songCount',
+        secondary: false,
+        value: `${detailQuery?.data?.songCount || 0} songs`,
+      },
+      {
+        id: 'duration',
+        secondary: true,
+        value: detailQuery?.data?.duration && formatDurationString(detailQuery.data.duration),
+      },
+    ];
+
     return (
       <Stack>
         <LibraryHeader
@@ -107,16 +122,17 @@ export const PlaylistDetailHeader = forwardRef(
           item={{ route: AppRoute.PLAYLISTS, type: LibraryItem.PLAYLIST }}
           title={detailQuery?.data?.name || ''}
         >
-          <Group>
-            <Button
-              compact
-              component={Link}
-              to={generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId })}
-              variant="subtle"
-            >
-              View full playlist
-            </Button>
-          </Group>
+          <Stack mt="1rem">
+            <Group>
+              {metadataItems.map((item, index) => (
+                <Fragment key={`item-${item.id}-${index}`}>
+                  {index > 0 && <Text $noSelect>•</Text>}
+                  <Text $secondary={item.secondary}>{item.value}</Text>
+                </Fragment>
+              ))}
+            </Group>
+            <Text lineClamp={3}>{detailQuery?.data?.description}</Text>
+          </Stack>
         </LibraryHeader>
         <Group
           maw="1920px"
@@ -150,6 +166,15 @@ export const PlaylistDetailHeader = forwardRef(
                 <DropdownMenu.Item onClick={openDeletePlaylist}>Delete playlist</DropdownMenu.Item>
               </DropdownMenu.Dropdown>
             </DropdownMenu>
+
+            <Button
+              compact
+              component={Link}
+              to={generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId })}
+              variant="subtle"
+            >
+              View full playlist
+            </Button>
           </Group>
         </Group>
       </Stack>

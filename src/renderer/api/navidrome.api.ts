@@ -578,6 +578,7 @@ const normalizePlaylist = (
   return {
     description: item.comment,
     duration: item.duration * 1000,
+    genres: [],
     id: item.id,
     imagePlaceholderUrl,
     imageUrl,

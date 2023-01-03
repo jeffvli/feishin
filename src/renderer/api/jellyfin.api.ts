@@ -61,6 +61,8 @@ import {
   artistListSortMap,
   sortOrderMap,
   albumArtistListSortMap,
+  UpdatePlaylistArgs,
+  UpdatePlaylistResponse,
 } from '/@/renderer/api/types';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
@@ -312,9 +314,6 @@ const getSongList = async (args: SongListArgs): Promise<JFSongList> => {
     }
   }
 
-  console.log('yearsGroup :>> ', yearsGroup);
-  console.log('albumIds', query.albumIds);
-  console.log('artistIds :>> ', query.artistIds);
   const yearsFilter = yearsGroup.length ? getCommaDelimitedString(yearsGroup) : undefined;
   const albumIdsFilter = query.albumIds ? getCommaDelimitedString(query.albumIds) : undefined;
   const artistIdsFilter = query.artistIds ? getCommaDelimitedString(query.artistIds) : undefined;
@@ -454,6 +453,33 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
   return {
     id: data.Id,
     name: query.name,
+  };
+};
+
+const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistResponse> => {
+  const { query, body, server } = args;
+
+  const json = {
+    Genres: body.genres?.map((item) => ({ Id: item.id, Name: item.name })) || [],
+    MediaType: 'Audio',
+    Name: body.name,
+    Overview: body.comment || '',
+    PremiereDate: null,
+    ProviderIds: {},
+    Tags: [],
+    UserId: server?.userId, // Required
+  };
+
+  await api
+    .post(`items/${query.id}`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      json,
+      prefixUrl: server?.url,
+    })
+    .json<null>();
+
+  return {
+    id: query.id,
   };
 };
 
@@ -728,10 +754,11 @@ const normalizePlaylist = (
 
   return {
     description: item.Overview || null,
-    duration: item.RunTimeTicks / 10000000,
+    duration: item.RunTimeTicks / 10000,
+    genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
     id: item.Id,
     imagePlaceholderUrl,
-    imageUrl,
+    imageUrl: imageUrl || null,
     name: item.Name,
     public: null,
     rules: null,
@@ -809,6 +836,7 @@ export const jellyfinApi = {
   getPlaylistList,
   getPlaylistSongList,
   getSongList,
+  updatePlaylist,
 };
 
 export const jfNormalize = {

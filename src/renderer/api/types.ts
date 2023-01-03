@@ -237,6 +237,7 @@ export type MusicFolder = {
 export type Playlist = {
   description: string | null;
   duration: number | null;
+  genres: Genre[];
   id: string;
   imagePlaceholderUrl: string | null;
   imageUrl: string | null;
@@ -758,6 +759,7 @@ export type UpdatePlaylistQuery = {
 
 export type UpdatePlaylistBody = {
   comment?: string;
+  genres?: Genre[];
   name: string;
   public?: boolean;
   rules?: Record<string, any>;

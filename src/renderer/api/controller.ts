@@ -96,7 +96,7 @@ const endpoints: ApiController = {
     getPlaylistSongList: jellyfinApi.getPlaylistSongList,
     getSongDetail: undefined,
     getSongList: jellyfinApi.getSongList,
-    updatePlaylist: undefined,
+    updatePlaylist: jellyfinApi.updatePlaylist,
     updateRating: undefined,
   },
   navidrome: {
