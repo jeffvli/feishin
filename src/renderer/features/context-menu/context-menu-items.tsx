@@ -34,5 +34,5 @@ export const PLAYLIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { id: 'play' },
   { id: 'playLast' },
   { divider: true, id: 'playNext' },
-  { disabled: true, id: 'deletePlaylist' },
+  { id: 'deletePlaylist' },
 ];

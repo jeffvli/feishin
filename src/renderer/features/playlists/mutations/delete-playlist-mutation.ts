@@ -17,6 +17,10 @@ export const useDeletePlaylist = (options?: MutationOptions) => {
     null
   >({
     mutationFn: (args) => api.controller.deletePlaylist({ ...args, server }),
+    onMutate: () => {
+      queryClient.cancelQueries(queryKeys.playlists.list(server?.id || ''));
+      return null;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(queryKeys.playlists.list(server?.id || ''));
     },

@@ -38,8 +38,6 @@ export const AlbumDetailHeader = forwardRef(
       },
     ];
 
-    console.log('detailQuery?.data?.duration :>> ', detailQuery?.data?.duration);
-
     return (
       <Stack ref={cq.ref}>
         <LibraryHeader

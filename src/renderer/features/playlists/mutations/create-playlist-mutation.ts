@@ -18,7 +18,7 @@ export const useCreatePlaylist = (options?: MutationOptions) => {
   >({
     mutationFn: (args) => api.controller.createPlaylist({ ...args, server }),
     onSuccess: () => {
-      queryClient.invalidateQueries(queryKeys.playlists.list(server?.id || ''));
+      queryClient.invalidateQueries(queryKeys.playlists.list(server?.id || ''), { exact: false });
     },
     ...options,
   });

@@ -1,13 +1,15 @@
-import { Divider, Stack } from '@mantine/core';
+import { Divider, Group, Stack } from '@mantine/core';
 import { useClickOutside, useResizeObserver, useSetState, useViewportSize } from '@mantine/hooks';
+import { closeAllModals, openModal } from '@mantine/modals';
 import { createContext, Fragment, useState } from 'react';
-import { ContextMenu, ContextMenuButton } from '/@/renderer/components';
+import { ConfirmModal, ContextMenu, ContextMenuButton, Text, toast } from '/@/renderer/components';
 import {
   OpenContextMenuProps,
   SetContextMenuItems,
   useContextMenuEvents,
 } from '/@/renderer/features/context-menu/events';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { useDeletePlaylist } from '/@/renderer/features/playlists';
 import { LibraryItem, Play } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
@@ -104,10 +106,62 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     }
   };
 
+  const deletePlaylistMutation = useDeletePlaylist();
+
+  const handleDeletePlaylist = () => {
+    for (const item of ctx.data) {
+      deletePlaylistMutation?.mutate(
+        { query: { id: item.id } },
+        {
+          onError: (err) => {
+            toast.error({
+              message: err.message,
+              title: 'Error deleting playlist',
+            });
+          },
+          onSuccess: () => {
+            toast.success({
+              message: `${item.name} was successfully deleted`,
+              title: 'Playlist deleted',
+            });
+          },
+        },
+      );
+    }
+    closeAllModals();
+  };
+
+  const openDeletePlaylistModal = () => {
+    openModal({
+      children: (
+        <ConfirmModal onConfirm={handleDeletePlaylist}>
+          <Stack>
+            <Text>Are you sure you want to delete the following playlist(s)?</Text>
+            <ul>
+              {ctx.data.map((item) => (
+                <li key={item.id}>
+                  <Group>
+                    —<Text $secondary>{item.name}</Text>
+                  </Group>
+                </li>
+              ))}
+            </ul>
+          </Stack>
+        </ConfirmModal>
+      ),
+      title: 'Delete playlist(s)',
+    });
+  };
+
   const contextMenuItems = {
     addToFavorites: { id: 'addToFavorites', label: 'Add to favorites', onClick: () => {} },
     addToPlaylist: { id: 'addToPlaylist', label: 'Add to playlist', onClick: () => {} },
-    deletePlaylist: { id: 'deletePlaylist', label: 'Delete playlist', onClick: () => {} },
+    createPlaylist: { id: 'createPlaylist', label: 'Create playlist', onClick: () => {} },
+    deletePlaylist: {
+      id: 'deletePlaylist',
+      label: 'Delete playlist',
+      onClick: openDeletePlaylistModal,
+    },
     play: {
       id: 'play',
       label: 'Play',
