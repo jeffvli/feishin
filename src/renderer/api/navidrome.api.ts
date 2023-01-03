@@ -466,12 +466,7 @@ const normalizeSong = (
     size: imageSize || 300,
   });
 
-  const imagePlaceholderUrl = getCoverArtUrl({
-    baseUrl: server.url,
-    coverArtId: id,
-    credential: server.credential,
-    size: 1,
-  });
+  const imagePlaceholderUrl = null;
 
   return {
     album: item.album,
