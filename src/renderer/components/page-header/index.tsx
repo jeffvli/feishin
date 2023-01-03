@@ -2,7 +2,7 @@ import { Flex, FlexProps } from '@mantine/core';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { useRef } from 'react';
 import styled from 'styled-components';
-import { useShouldPadTitlebar } from '/@/renderer/hooks';
+import { useShouldPadTitlebar, useTheme } from '/@/renderer/hooks';
 
 const Container = styled(motion(Flex))<{
   height?: string;
@@ -42,14 +42,17 @@ const BackgroundImage = styled.div<{ background: string }>`
   background: ${(props) => props.background || 'var(--titlebar-bg)'};
 `;
 
-const BackgroundImageOverlay = styled.div`
+const BackgroundImageOverlay = styled.div<{ theme: 'light' | 'dark' }>`
   position: absolute;
   top: 0;
   left: 0;
   z-index: 10;
   width: 100%;
   height: 100%;
-  background: linear-gradient(rgba(0, 0, 0, 30%), rgba(0, 0, 0, 30%));
+  background: ${(props) =>
+    props.theme === 'light'
+      ? 'linear-gradient(rgba(0, 0, 0, 20%), rgba(0, 0, 0, 20%))'
+      : 'linear-gradient(rgba(0, 0, 0, 50%), rgba(0, 0, 0, 50%))'};
 `;
 
 export interface PageHeaderProps
@@ -82,6 +85,7 @@ export const PageHeader = ({
 }: PageHeaderProps) => {
   const ref = useRef(null);
   const padRight = useShouldPadTitlebar();
+  const theme = useTheme();
 
   return (
     <Container
@@ -110,7 +114,7 @@ export const PageHeader = ({
       {backgroundColor && (
         <>
           <BackgroundImage background={backgroundColor || 'var(--titlebar-bg)'} />
-          <BackgroundImageOverlay />
+          <BackgroundImageOverlay theme={theme} />
         </>
       )}
     </Container>
