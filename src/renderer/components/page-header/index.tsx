@@ -49,7 +49,7 @@ const BackgroundImageOverlay = styled.div`
   z-index: 10;
   width: 100%;
   height: 100%;
-  background: linear-gradient(rgba(0, 0, 0, 50%), rgba(0, 0, 0, 50%));
+  background: linear-gradient(rgba(0, 0, 0, 30%), rgba(0, 0, 0, 30%));
 `;
 
 export interface PageHeaderProps
