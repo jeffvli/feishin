@@ -21,7 +21,7 @@ const PlaylistDetailRoute = () => {
   const background = useFastAverageColor(
     detailQuery?.data?.imageUrl,
     !detailQuery?.isLoading,
-    'dominant',
+    'sqrt',
   );
 
   const handlePlayQueueAdd = usePlayQueueAdd();
