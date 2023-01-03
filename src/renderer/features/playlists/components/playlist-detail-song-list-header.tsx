@@ -20,6 +20,8 @@ import {
   Text,
   TextTitle,
 } from '/@/renderer/components';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
   useCurrentServer,
@@ -30,7 +32,7 @@ import {
   useSetPlaylistDetailFilters,
   useSetPlaylistStore,
 } from '/@/renderer/store';
-import { ListDisplayType, TableColumn } from '/@/renderer/types';
+import { LibraryItem, ListDisplayType, Play, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
   jellyfin: [
@@ -92,6 +94,9 @@ export const PlaylistDetailSongListHeader = ({ tableRef }: PlaylistDetailHeaderP
     sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
     sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
   };
+
+  const detailQuery = usePlaylistDetail({ id: playlistId });
+  const handlePlayQueueAdd = usePlayQueueAdd();
 
   const cq = useContainerQuery();
 
@@ -217,6 +222,15 @@ export const PlaylistDetailSongListHeader = ({ tableRef }: PlaylistDetailHeaderP
     }
   };
 
+  const handlePlay = async (playType: Play) => {
+    handlePlayQueueAdd?.({
+      byItemType: { id: [playlistId], type: LibraryItem.PLAYLIST },
+      play: playType,
+    });
+  };
+
+  if (detailQuery.isLoading) return null;
+
   return (
     <PageHeader p="1rem">
       <HeaderItems ref={cq.ref}>
@@ -238,7 +252,7 @@ export const PlaylistDetailSongListHeader = ({ tableRef }: PlaylistDetailHeaderP
                   fw="bold"
                   order={3}
                 >
-                  Playlist
+                  {detailQuery?.data?.name}
                 </TextTitle>
               </Button>
             </DropdownMenu.Target>
@@ -350,44 +364,23 @@ export const PlaylistDetailSongListHeader = ({ tableRef }: PlaylistDetailHeaderP
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-              <DropdownMenu.Item disabled>Play</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Add to queue (next)</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Add to queue (last)</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => handlePlay(Play.NOW)}>Play</DropdownMenu.Item>
+              <DropdownMenu.Item
+                disabled
+                onClick={() => handlePlay(Play.NEXT)}
+              >
+                Add to queue (last)
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
+                disabled
+                onClick={() => handlePlay(Play.LAST)}
+              >
+                Add to queue (next)
+              </DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
         </Flex>
       </HeaderItems>
-      {/* <HeaderContainer ref={mergedRef}> */}
-      {/* <MetadataWrapper>
-        <Group>
-          <Text
-            $link
-            component={Link}
-            fw="600"
-            sx={{ textTransform: 'uppercase' }}
-            to={AppRoute.LIBRARY_ALBUMS}
-          >
-            Playlist
-          </Text>
-        </Group>
-        <TextTitle
-          fw="900"
-          lh="1"
-          mb="0.12em"
-          mt=".08em"
-          sx={{ fontSize: titleSize }}
-        >
-          {detailQuery?.data?.name}
-        </TextTitle>
-        <Group
-          py="1rem"
-          spacing="xs"
-        >
-          <PlayButton />
-        </Group>
-      </MetadataWrapper> */}
-      {/* </HeaderContainer> */}
     </PageHeader>
   );
 };
