@@ -1,4 +1,5 @@
 import { Group, Stack } from '@mantine/core';
+import { forwardRef, Ref } from 'react';
 import { RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -16,77 +17,79 @@ interface PlaylistDetailHeaderProps {
   imageUrl?: string | null;
 }
 
-export const PlaylistDetailHeader = ({
-  background,
-  imageUrl,
-  imagePlaceholderUrl,
-}: PlaylistDetailHeaderProps) => {
-  const { playlistId } = useParams() as { playlistId: string };
-  const detailQuery = usePlaylistDetail({ id: playlistId });
-  const handlePlayQueueAdd = usePlayQueueAdd();
-  const playButtonBehavior = usePlayButtonBehavior();
+export const PlaylistDetailHeader = forwardRef(
+  (
+    { background, imageUrl, imagePlaceholderUrl }: PlaylistDetailHeaderProps,
+    ref: Ref<HTMLDivElement>,
+  ) => {
+    const { playlistId } = useParams() as { playlistId: string };
+    const detailQuery = usePlaylistDetail({ id: playlistId });
+    const handlePlayQueueAdd = usePlayQueueAdd();
+    const playButtonBehavior = usePlayButtonBehavior();
 
-  const handlePlay = (playType?: Play) => {
-    handlePlayQueueAdd?.({
-      byItemType: {
-        id: [playlistId],
-        type: LibraryItem.PLAYLIST,
-      },
-      play: playType || playButtonBehavior,
-    });
-  };
+    const handlePlay = (playType?: Play) => {
+      handlePlayQueueAdd?.({
+        byItemType: {
+          id: [playlistId],
+          type: LibraryItem.PLAYLIST,
+        },
+        play: playType || playButtonBehavior,
+      });
+    };
 
-  return (
-    <Stack>
-      <LibraryHeader
-        background={background}
-        imagePlaceholderUrl={imagePlaceholderUrl}
-        imageUrl={imageUrl}
-        item={{ route: AppRoute.PLAYLISTS, type: LibraryItem.PLAYLIST }}
-        title={detailQuery?.data?.name || ''}
-      >
-        <Group>
-          <Button
-            compact
-            component={Link}
-            to={generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId })}
-            variant="subtle"
-          >
-            View full playlist
-          </Button>
-        </Group>
-      </LibraryHeader>
-      <Group
-        maw="1920px"
-        p="1rem"
-        position="apart"
-      >
-        <Group>
-          <PlayButton onClick={() => handlePlay()} />
-          <DropdownMenu position="bottom-start">
-            <DropdownMenu.Target>
-              <Button
-                compact
-                variant="subtle"
-              >
-                <RiMoreFill size={20} />
-              </Button>
-            </DropdownMenu.Target>
-            <DropdownMenu.Dropdown>
-              {PLAY_TYPES.filter((type) => type.play !== playButtonBehavior).map((type) => (
-                <DropdownMenu.Item
-                  key={`playtype-${type.play}`}
-                  onClick={() => handlePlay(type.play)}
+    return (
+      <Stack>
+        <LibraryHeader
+          ref={ref}
+          background={background}
+          imagePlaceholderUrl={imagePlaceholderUrl}
+          imageUrl={imageUrl}
+          item={{ route: AppRoute.PLAYLISTS, type: LibraryItem.PLAYLIST }}
+          title={detailQuery?.data?.name || ''}
+        >
+          <Group>
+            <Button
+              compact
+              component={Link}
+              to={generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId })}
+              variant="subtle"
+            >
+              View full playlist
+            </Button>
+          </Group>
+        </LibraryHeader>
+        <Group
+          maw="1920px"
+          p="1rem"
+          position="apart"
+        >
+          <Group>
+            <PlayButton onClick={() => handlePlay()} />
+            <DropdownMenu position="bottom-start">
+              <DropdownMenu.Target>
+                <Button
+                  compact
+                  variant="subtle"
                 >
-                  {type.label}
-                </DropdownMenu.Item>
-              ))}
-              <DropdownMenu.Divider />
-              <DropdownMenu.Item disabled>Edit playlist</DropdownMenu.Item>
-            </DropdownMenu.Dropdown>
-          </DropdownMenu>
+                  <RiMoreFill size={20} />
+                </Button>
+              </DropdownMenu.Target>
+              <DropdownMenu.Dropdown>
+                {PLAY_TYPES.filter((type) => type.play !== playButtonBehavior).map((type) => (
+                  <DropdownMenu.Item
+                    key={`playtype-${type.play}`}
+                    onClick={() => handlePlay(type.play)}
+                  >
+                    {type.label}
+                  </DropdownMenu.Item>
+                ))}
+                <DropdownMenu.Divider />
+                <DropdownMenu.Item disabled>Edit playlist</DropdownMenu.Item>
+              </DropdownMenu.Dropdown>
+            </DropdownMenu>
+          </Group>
         </Group>
-      </Group>
-    </Stack>
-  );
-};
+      </Stack>
+    );
+  },
+);
