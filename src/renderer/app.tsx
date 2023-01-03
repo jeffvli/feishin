@@ -79,12 +79,12 @@ export const App = () => {
     >
       <NotificationsProvider
         autoClose={1500}
-        position="bottom-right"
+        position="bottom-center"
         style={{
           marginBottom: '85px',
           opacity: '.8',
           userSelect: 'none',
-          width: '250px',
+          width: '300px',
         }}
         transitionDuration={200}
       >
