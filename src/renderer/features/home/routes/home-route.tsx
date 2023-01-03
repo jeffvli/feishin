@@ -1,17 +1,17 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { Box, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { AlbumListSort, ServerType, SortOrder } from '/@/renderer/api/types';
-import { TextTitle, PageHeader, FeatureCarousel, GridCarousel } from '/@/renderer/components';
+import { TextTitle, FeatureCarousel, GridCarousel, NativeScrollArea } from '/@/renderer/components';
 import { useAlbumList } from '/@/renderer/features/albums';
 import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-played-query';
-import { AnimatedPage } from '/@/renderer/features/shared';
+import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 
 const HomeRoute = () => {
-  // const rootElement = document.querySelector(':root') as HTMLElement;
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const server = useCurrentServer();
   const cq = useContainerQuery();
   const itemsPerPage = cq.isXl ? 9 : cq.isLg ? 7 : cq.isMd ? 5 : cq.isSm ? 4 : 3;
@@ -111,16 +111,6 @@ const HomeRoute = () => {
     [pagination, setPagination],
   );
 
-  // const handleScroll = (position: { x: number; y: number }) => {
-  //   if (position.y <= 15) {
-  //     return rootElement?.style?.setProperty('--header-opacity', '0');
-  //   }
-
-  //   return rootElement?.style?.setProperty('--header-opacity', '1');
-  // };
-
-  // const throttledScroll = throttle(handleScroll, 200);
-
   const carousels = [
     {
       data: random?.data?.items,
@@ -202,74 +192,73 @@ const HomeRoute = () => {
 
   return (
     <AnimatedPage>
-      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <PageHeader
-          isHidden
-          backgroundColor="var(--sidebar-bg)"
-        />
+      <NativeScrollArea
+        ref={scrollAreaRef}
+        pageHeaderProps={{
+          backgroundColor: 'var(--titlebar-bg)',
+          children: (
+            <LibraryHeaderBar>
+              <LibraryHeaderBar.Title>Home</LibraryHeaderBar.Title>
+            </LibraryHeaderBar>
+          ),
+          offset: ['0px', '200px'],
+        }}
+      >
         <Box
-          mb="1rem"
-          mt="-1.5rem"
-          px="1rem"
+          ref={cq.ref}
+          pt="3rem"
+          px="2rem"
           sx={{
             height: '100%',
-            overflow: 'auto',
+            maxWidth: '1920px',
+            width: '100%',
           }}
         >
-          <Box
-            ref={cq.ref}
-            sx={{
-              height: '100%',
-              maxWidth: '1920px',
-              width: '100%',
-            }}
-          >
-            <Stack spacing={35}>
-              <FeatureCarousel data={featureItemsWithImage} />
-              {carousels
-                .filter((carousel) => {
-                  if (
-                    server?.type === ServerType.JELLYFIN &&
-                    carousel.uniqueId === 'recentlyPlayed'
-                  ) {
-                    return null;
-                  }
+          <Stack spacing={35}>
+            <FeatureCarousel data={featureItemsWithImage} />
+            {carousels
+              .filter((carousel) => {
+                if (
+                  server?.type === ServerType.JELLYFIN &&
+                  carousel.uniqueId === 'recentlyPlayed'
+                ) {
+                  return null;
+                }
 
-                  return carousel;
-                })
-                .map((carousel, index) => (
-                  <GridCarousel
-                    key={`carousel-${carousel.uniqueId}-${index}`}
-                    cardRows={[
-                      {
-                        property: 'name',
-                        route: {
-                          route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                          slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
-                        },
+                return carousel;
+              })
+              .map((carousel, index) => (
+                <GridCarousel
+                  key={`carousel-${carousel.uniqueId}-${index}`}
+                  cardRows={[
+                    {
+                      property: 'name',
+                      route: {
+                        route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                        slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
                       },
-                      {
-                        arrayProperty: 'name',
-                        property: 'albumArtists',
-                        route: {
-                          route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
-                          slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
-                        },
+                    },
+                    {
+                      arrayProperty: 'name',
+                      property: 'albumArtists',
+                      route: {
+                        route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+                        slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
                       },
-                    ]}
-                    containerWidth={cq.width}
-                    data={carousel.data}
-                    loading={carousel.loading}
-                    pagination={carousel.pagination}
-                    uniqueId={carousel.uniqueId}
-                  >
-                    <GridCarousel.Title>{carousel.title}</GridCarousel.Title>
-                  </GridCarousel>
-                ))}
-            </Stack>
-          </Box>
+                    },
+                  ]}
+                  containerWidth={cq.width}
+                  data={carousel.data}
+                  loading={carousel.loading}
+                  pagination={carousel.pagination}
+                  uniqueId={carousel.uniqueId}
+                >
+                  <GridCarousel.Title>{carousel.title}</GridCarousel.Title>
+                </GridCarousel>
+              ))}
+          </Stack>
         </Box>
-      </Box>
+      </NativeScrollArea>
     </AnimatedPage>
   );
 };
