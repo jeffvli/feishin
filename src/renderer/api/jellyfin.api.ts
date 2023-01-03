@@ -312,6 +312,9 @@ const getSongList = async (args: SongListArgs): Promise<JFSongList> => {
     }
   }
 
+  console.log('yearsGroup :>> ', yearsGroup);
+  console.log('albumIds', query.albumIds);
+  console.log('artistIds :>> ', query.artistIds);
   const yearsFilter = yearsGroup.length ? getCommaDelimitedString(yearsGroup) : undefined;
   const albumIdsFilter = query.albumIds ? getCommaDelimitedString(query.albumIds) : undefined;
   const artistIdsFilter = query.artistIds ? getCommaDelimitedString(query.artistIds) : undefined;
@@ -658,7 +661,7 @@ const normalizeAlbum = (item: JFAlbum, server: ServerListItem, imageSize?: numbe
     artists: item.ArtistItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
     backdropImageUrl: null,
     createdAt: item.DateCreated,
-    duration: item.RunTimeTicks / 10000000,
+    duration: item.RunTimeTicks / 10000,
     genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
     id: item.Id,
     imagePlaceholderUrl: null,
@@ -693,7 +696,7 @@ const normalizeAlbumArtist = (
     albumCount: null,
     backgroundImageUrl: null,
     biography: item.Overview || null,
-    duration: item.RunTimeTicks / 10000000,
+    duration: item.RunTimeTicks / 10000,
     genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
     id: item.Id,
     imageUrl: getAlbumArtistCoverArtUrl({
