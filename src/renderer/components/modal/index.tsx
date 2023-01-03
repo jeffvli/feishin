@@ -1,10 +1,16 @@
-import React from 'react';
-import type { ModalProps as MantineModalProps } from '@mantine/core';
-import { Modal as MantineModal } from '@mantine/core';
-import type { ContextModalProps } from '@mantine/modals';
+import React, { ReactNode } from 'react';
+import {
+  ModalProps as MantineModalProps,
+  Stack,
+  Modal as MantineModal,
+  Flex,
+  Group,
+} from '@mantine/core';
+import { closeAllModals, ContextModalProps } from '@mantine/modals';
+import { Button } from '/@/renderer/components/button';
 
 export interface ModalProps extends Omit<MantineModalProps, 'onClose'> {
-  children?: React.ReactNode;
+  children?: ReactNode;
   handlers: {
     close: () => void;
     open: () => void;
@@ -40,4 +46,45 @@ export const BaseContextModal = ({
 
 Modal.defaultProps = {
   children: undefined,
+};
+
+interface ConfirmModalProps {
+  children: ReactNode;
+  labels?: {
+    cancel?: string;
+    confirm?: string;
+  };
+  onCancel?: () => void;
+  onConfirm: () => void;
+}
+
+export const ConfirmModal = ({ labels, onCancel, onConfirm, children }: ConfirmModalProps) => {
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else {
+      closeAllModals();
+    }
+  };
+
+  return (
+    <Stack>
+      <Flex>{children}</Flex>
+      <Group position="right">
+        <Button
+          data-focus
+          variant="default"
+          onClick={handleCancel}
+        >
+          {labels?.cancel ? labels.cancel : 'Cancel'}
+        </Button>
+        <Button
+          variant="filled"
+          onClick={onConfirm}
+        >
+          {labels?.confirm ? labels.confirm : 'Confirm'}
+        </Button>
+      </Group>
+    </Stack>
+  );
 };
