@@ -325,7 +325,7 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
   };
 
   const data = await api
-    .post(`api/playlist/${query.id}`, {
+    .put(`api/playlist/${query.id}`, {
       headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
       json,
       prefixUrl: server?.url,
@@ -591,6 +591,7 @@ const normalizePlaylist = (
   });
 
   return {
+    description: item.comment,
     duration: item.duration * 1000,
     id: item.id,
     imagePlaceholderUrl,

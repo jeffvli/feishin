@@ -213,6 +213,10 @@ const updatePlaylist = async (args: UpdatePlaylistArgs) => {
   return (apiController('updatePlaylist') as ControllerEndpoint['updatePlaylist'])?.(args);
 };
 
+const deletePlaylist = async (args: DeletePlaylistArgs) => {
+  return (apiController('deletePlaylist') as ControllerEndpoint['deletePlaylist'])?.(args);
+};
+
 const getPlaylistDetail = async (args: PlaylistDetailArgs) => {
   return (apiController('getPlaylistDetail') as ControllerEndpoint['getPlaylistDetail'])?.(args);
 };
@@ -225,6 +229,7 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs) => {
 
 export const controller = {
   createPlaylist,
+  deletePlaylist,
   getAlbumArtistList,
   getAlbumDetail,
   getAlbumList,

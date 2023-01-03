@@ -1,10 +1,13 @@
 import { Group, Stack } from '@mantine/core';
+import { closeAllModals, openModal } from '@mantine/modals';
 import { forwardRef, Ref } from 'react';
 import { RiMoreFill } from 'react-icons/ri';
-import { generatePath, useParams } from 'react-router';
+import { generatePath, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
-import { DropdownMenu, Button } from '/@/renderer/components';
+import { DropdownMenu, Button, ConfirmModal, toast } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { UpdatePlaylistForm } from './update-playlist-form';
+import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { LibraryHeader, PlayButton, PLAY_TYPES } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -22,6 +25,7 @@ export const PlaylistDetailHeader = forwardRef(
     { background, imageUrl, imagePlaceholderUrl }: PlaylistDetailHeaderProps,
     ref: Ref<HTMLDivElement>,
   ) => {
+    const navigate = useNavigate();
     const { playlistId } = useParams() as { playlistId: string };
     const detailQuery = usePlaylistDetail({ id: playlistId });
     const handlePlayQueueAdd = usePlayQueueAdd();
@@ -34,6 +38,62 @@ export const PlaylistDetailHeader = forwardRef(
           type: LibraryItem.PLAYLIST,
         },
         play: playType || playButtonBehavior,
+      });
+    };
+
+    const openUpdatePlaylistModal = () => {
+      openModal({
+        children: (
+          <UpdatePlaylistForm
+            body={{
+              comment: detailQuery?.data?.description || undefined,
+              name: detailQuery?.data?.name,
+              public: detailQuery?.data?.public || false,
+              rules: detailQuery?.data?.rules || undefined,
+            }}
+            query={{ id: playlistId }}
+            onCancel={closeAllModals}
+          />
+        ),
+        title: 'Edit playlist',
+      });
+    };
+
+    const deletePlaylistMutation = useDeletePlaylist();
+
+    const handleDeletePlaylist = () => {
+      deletePlaylistMutation.mutate(
+        { query: { id: playlistId } },
+        {
+          onError: (err) => {
+            toast.error({
+              message: err.message,
+              title: 'Error deleting playlist',
+            });
+          },
+          onSuccess: () => {
+            toast.success({
+              message: `${detailQuery?.data?.name} was successfully deleted`,
+              title: 'Playlist deleted',
+            });
+            closeAllModals();
+            navigate(AppRoute.PLAYLISTS);
+          },
+        },
+      );
+    };
+
+    const openDeletePlaylist = () => {
+      openModal({
+        children: (
+          <ConfirmModal
+            loading={deletePlaylistMutation.isLoading}
+            onConfirm={handleDeletePlaylist}
+          >
+            Are you sure you want to delete this playlist?
+          </ConfirmModal>
+        ),
+        title: 'Delete playlist',
       });
     };
 
@@ -84,7 +144,10 @@ export const PlaylistDetailHeader = forwardRef(
                   </DropdownMenu.Item>
                 ))}
                 <DropdownMenu.Divider />
-                <DropdownMenu.Item disabled>Edit playlist</DropdownMenu.Item>
+                <DropdownMenu.Item onClick={openUpdatePlaylistModal}>
+                  Edit playlist
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onClick={openDeletePlaylist}>Delete playlist</DropdownMenu.Item>
               </DropdownMenu.Dropdown>
             </DropdownMenu>
           </Group>
