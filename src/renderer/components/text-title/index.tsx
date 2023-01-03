@@ -17,6 +17,7 @@ interface TextTitleProps extends MantineTextTitleDivProps {
 }
 
 const StyledTextTitle = styled(MantineHeader)<TextTitleProps>`
+  overflow: ${(props) => props.overflow === 'visible' && 'visible'};
   color: ${(props) => (props.$secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)')};
   cursor: ${(props) => props.$link && 'cursor'};
   transition: color 0.2s ease-in-out;
