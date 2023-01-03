@@ -9,7 +9,7 @@ import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
 import { navidromeApi } from '/@/renderer/api/navidrome.api';
 import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { AuthenticationResponse } from '/@/renderer/api/types';
-import { useAuthStoreActions } from '/@/renderer/store';
+import { useAuthStore, useAuthStoreActions } from '/@/renderer/store';
 import { ServerType } from '/@/renderer/types';
 
 const SERVER_TYPES = [
@@ -31,7 +31,8 @@ interface AddServerFormProps {
 export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
   const focusTrapRef = useFocusTrap(true);
   const [isLoading, setIsLoading] = useState(false);
-  const { addServer } = useAuthStoreActions();
+  const { addServer, setCurrentServer } = useAuthStoreActions();
+  const serverList = useAuthStore((state) => state.serverList);
 
   const form = useForm({
     initialValues: {
@@ -62,7 +63,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         username: values.username,
       });
 
-      addServer({
+      const serverItem = {
         credential: data.credential,
         id: nanoid(),
         name: values.name,
@@ -71,10 +72,18 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         url: values.url.replace(/\/$/, ''),
         userId: data.userId,
         username: data.username,
-      });
+      };
 
-      toast.success({ message: 'Server added' });
+      addServer(serverItem);
+      setCurrentServer(serverItem);
       closeAllModals();
+
+      if (serverList.length === 0) {
+        toast.success({ message: 'Server added, reloading...' });
+        setTimeout(() => window.location.reload(), 2000);
+      } else {
+        toast.success({ message: 'Server added' });
+      }
     } catch (err: any) {
       setIsLoading(false);
       return toast.error({ message: err?.message });
