@@ -73,8 +73,6 @@ export const useHandlePlayQueueAdd = () => {
                 signal,
               }),
             );
-
-            console.log('songsList', songsList);
           } else {
             songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
               api.controller.getSongList({
@@ -107,8 +105,6 @@ export const useHandlePlayQueueAdd = () => {
           case 'subsonic':
             break;
         }
-
-        console.log('songs', songs);
       } else if (options.byData) {
         songs = options.byData.map((song) => ({ ...song, uniqueId: nanoid() }));
       }
