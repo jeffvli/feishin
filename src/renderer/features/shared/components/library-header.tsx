@@ -143,22 +143,13 @@ export const LibraryHeader = forwardRef(
           </Group>
           <TextTitle
             fw="900"
-            lh="1"
-            mb="0.12em"
+            lh="1.15"
+            lineClamp={2}
             mt=".08em"
-            sx={{ fontSize: titleSize }}
+            sx={{ fontSize: titleSize, overflow: 'hidden' }}
           >
             {title}
           </TextTitle>
-          <Group
-            spacing="xs"
-            sx={{
-              WebkitBoxOrient: 'vertical',
-              WebkitLineClamp: 2,
-              display: '-webkit-box',
-              overflow: 'hidden',
-            }}
-          />
           {children}
         </MetadataWrapper>
       </HeaderContainer>
