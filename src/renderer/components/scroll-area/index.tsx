@@ -50,7 +50,7 @@ export const ScrollArea = forwardRef(({ children, ...props }: ScrollAreaProps, r
 interface NativeScrollAreaProps {
   children: React.ReactNode;
   debugScrollPosition?: boolean;
-  pageHeaderProps?: PageHeaderProps & { offset?: any; target: any };
+  pageHeaderProps?: PageHeaderProps & { offset?: any; target?: any };
 }
 
 export const NativeScrollArea = forwardRef(
