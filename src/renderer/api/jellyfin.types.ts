@@ -95,6 +95,7 @@ export type JFPlaylist = {
   LocationType: string;
   MediaType: string;
   Name: string;
+  Overview?: string;
   RunTimeTicks: number;
   ServerId: string;
   Type: string;

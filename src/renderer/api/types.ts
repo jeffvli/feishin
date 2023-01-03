@@ -235,6 +235,7 @@ export type MusicFolder = {
 };
 
 export type Playlist = {
+  description: string | null;
   duration: number | null;
   id: string;
   imagePlaceholderUrl: string | null;

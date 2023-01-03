@@ -732,6 +732,7 @@ const normalizePlaylist = (
   });
 
   return {
+    description: item.Overview || null,
     duration: item.RunTimeTicks / 10000000,
     id: item.Id,
     imagePlaceholderUrl,
