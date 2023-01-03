@@ -1,26 +1,27 @@
 import { Flex, FlexProps } from '@mantine/core';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { useRef } from 'react';
 import styled from 'styled-components';
 import { useShouldPadTitlebar } from '/@/renderer/hooks';
 
-const Container = styled(motion(Flex))<{ $isHidden?: boolean; height?: string; position?: string }>`
+const Container = styled(motion(Flex))<{
+  height?: string;
+  position?: string;
+}>`
   position: ${(props) => props.position || 'relative'};
   z-index: 2000;
   width: 100%;
   height: ${(props) => props.height || '60px'};
-  opacity: ${(props) => (props.$isHidden ? 0 : 1)};
-  transition: opacity 0.3s ease-in-out;
-  user-select: ${(props) => (props.$isHidden ? 'none' : 'auto')};
-  pointer-events: ${(props) => (props.$isHidden ? 'none' : 'auto')};
 `;
 
-const Header = styled(motion.div)<{ $padRight?: boolean }>`
+const Header = styled(motion.div)<{ $isHidden?: boolean; $padRight?: boolean }>`
   position: relative;
   z-index: 15;
   width: 100%;
   height: 100%;
   margin-right: ${(props) => props.$padRight && '170px'};
+  user-select: ${(props) => (props.$isHidden ? 'none' : 'auto')};
+  pointer-events: ${(props) => (props.$isHidden ? 'none' : 'auto')};
   -webkit-app-region: drag;
 
   button {
@@ -45,13 +46,13 @@ const BackgroundImageOverlay = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 2;
+  z-index: 10;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 30%), var(--background-noise);
+  background: linear-gradient(rgba(0, 0, 0, 50%), rgba(0, 0, 0, 50%));
 `;
 
-interface PageHeaderProps
+export interface PageHeaderProps
   extends Omit<FlexProps, 'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'> {
   backgroundColor?: string;
   children?: React.ReactNode;
@@ -59,6 +60,17 @@ interface PageHeaderProps
   isHidden?: boolean;
   position?: string;
 }
+
+const TitleWrapper = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+`;
+
+const variants: Variants = {
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  initial: { opacity: 0 },
+};
 
 export const PageHeader = ({
   position,
@@ -74,15 +86,30 @@ export const PageHeader = ({
   return (
     <Container
       ref={ref}
-      $isHidden={isHidden}
       height={height}
       position={position}
       {...props}
     >
-      <Header $padRight={padRight}>{!isHidden && <>{children}</>}</Header>
+      <Header
+        $isHidden={isHidden}
+        $padRight={padRight}
+      >
+        <AnimatePresence>
+          {!isHidden && (
+            <TitleWrapper
+              animate="animate"
+              exit="exit"
+              initial="initial"
+              variants={variants}
+            >
+              {children}
+            </TitleWrapper>
+          )}
+        </AnimatePresence>
+      </Header>
       {backgroundColor && (
         <>
-          <BackgroundImage background={'var(--titlebar-bg)' || ''} />
+          <BackgroundImage background={backgroundColor || 'var(--titlebar-bg)'} />
           <BackgroundImageOverlay />
         </>
       )}
