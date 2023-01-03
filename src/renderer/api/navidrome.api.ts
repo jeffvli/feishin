@@ -517,12 +517,7 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
     size: imageSize || 300,
   });
 
-  const imagePlaceholderUrl = getCoverArtUrl({
-    baseUrl: server.url,
-    coverArtId: item.coverArtId || item.id,
-    credential: server.credential,
-    size: 1,
-  });
+  const imagePlaceholderUrl = null;
 
   const imageBackdropUrl = imageUrl?.replace(/size=\d+/, 'size=1000') || null;
 
@@ -583,12 +578,7 @@ const normalizePlaylist = (
     size: imageSize || 300,
   });
 
-  const imagePlaceholderUrl = getCoverArtUrl({
-    baseUrl: server.url,
-    coverArtId: item.id,
-    credential: server.credential,
-    size: 1,
-  });
+  const imagePlaceholderUrl = null;
 
   return {
     description: item.comment,

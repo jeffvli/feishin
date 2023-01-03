@@ -620,7 +620,7 @@ const normalizeSong = (
     duration: item.RunTimeTicks / 10000000,
     genres: item.GenreItems.map((entry: any) => ({ id: entry.Id, name: entry.Name })),
     id: item.Id,
-    imagePlaceholderUrl: getSongCoverArtUrl({ baseUrl: server.url, item, size: 1 }),
+    imagePlaceholderUrl: null,
     imageUrl: getSongCoverArtUrl({ baseUrl: server.url, item, size: imageSize || 300 }),
     isFavorite: (item.UserData && item.UserData.IsFavorite) || false,
     lastPlayedAt: null,
@@ -661,11 +661,7 @@ const normalizeAlbum = (item: JFAlbum, server: ServerListItem, imageSize?: numbe
     duration: item.RunTimeTicks / 10000000,
     genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
     id: item.Id,
-    imagePlaceholderUrl: getAlbumCoverArtUrl({
-      baseUrl: server.url,
-      item,
-      size: 1,
-    }),
+    imagePlaceholderUrl: null,
     imageUrl: getAlbumCoverArtUrl({
       baseUrl: server.url,
       item,
@@ -725,11 +721,7 @@ const normalizePlaylist = (
     size: imageSize || 300,
   });
 
-  const imagePlaceholderUrl = getPlaylistCoverArtUrl({
-    baseUrl: server.url,
-    item,
-    size: 1,
-  });
+  const imagePlaceholderUrl = null;
 
   return {
     description: item.Overview || null,
