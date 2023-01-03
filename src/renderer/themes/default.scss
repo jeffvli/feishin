@@ -17,8 +17,8 @@
   --titlebar-bg: rgb(7, 7, 7);
 
   --sidebar-bg: rgb(0, 0, 0);
-  --sidebar-fg: rgb(255, 255, 255);
-  --sidebar-fg-hover: #dddddd;
+  --sidebar-fg: rgb(210, 210, 210);
+  --sidebar-fg-hover: rgb(255, 255, 255);
   --sidebar-handle-bg: #4d4d4d;
   --sidebar-border: none;
 
@@ -97,6 +97,8 @@
   --card-poster-bg: transparent;
   --card-poster-bg-hover: transparent;
   --card-poster-radius: 3px;
+
+  --background-noise: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1IiBkPSJNMCAwaDMwMHYzMDBIMHoiLz48L3N2Zz4=');
 
   .ag-theme-alpine-dark {
     --ag-font-family: var(--content-font-family);
