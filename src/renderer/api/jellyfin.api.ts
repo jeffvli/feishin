@@ -87,7 +87,7 @@ const authenticate = async (
     .post(`${cleanServerUrl}/users/authenticatebyname`, {
       headers: {
         'X-Emby-Authorization':
-          'MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="0.0.1-alpha2"',
+          'MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="0.0.1"',
       },
       json: {
         pw: body.password,
