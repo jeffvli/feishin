@@ -6,7 +6,12 @@ import { JFSong } from '/@/renderer/api/jellyfin.types';
 import { ndNormalize } from '/@/renderer/api/navidrome.api';
 import { NDSong } from '/@/renderer/api/navidrome.types';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { useAuthStore, usePlayerStore } from '/@/renderer/store';
+import {
+  useAuthStore,
+  useCurrentServer,
+  usePlayerControls,
+  usePlayerStore,
+} from '/@/renderer/store';
 import { usePlayerType } from '/@/renderer/store/settings.store';
 import { PlayQueueAddOptions, LibraryItem, Play, PlaybackType } from '/@/renderer/types';
 import { toast } from '/@/renderer/components/toast';
@@ -20,7 +25,8 @@ export const useHandlePlayQueueAdd = () => {
   const queryClient = useQueryClient();
   const playerType = usePlayerType();
   const deviceId = useAuthStore.getState().deviceId;
-  const server = useAuthStore.getState().currentServer;
+  const server = useCurrentServer();
+  const { play } = usePlayerControls();
 
   const handlePlayQueueAdd = useCallback(
     async (options: PlayQueueAddOptions) => {
@@ -125,12 +131,12 @@ export const useHandlePlayQueueAdd = () => {
           mpvPlayer.play();
         }
 
-        usePlayerStore.getState().actions.play();
+        play();
       }
 
       return null;
     },
-    [deviceId, playerType, queryClient, server],
+    [deviceId, play, playerType, queryClient, server],
   );
 
   return handlePlayQueueAdd;
