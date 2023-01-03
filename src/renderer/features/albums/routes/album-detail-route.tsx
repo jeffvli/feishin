@@ -18,7 +18,7 @@ const AlbumDetailRoute = () => {
 
   const { albumId } = useParams() as { albumId: string };
   const detailQuery = useAlbumDetail({ id: albumId });
-  const background = useFastAverageColor(detailQuery.data?.imageUrl);
+  const background = useFastAverageColor(detailQuery.data?.imageUrl, !detailQuery.isLoading);
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
 

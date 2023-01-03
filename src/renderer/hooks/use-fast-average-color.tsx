@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FastAverageColor } from 'fast-average-color';
 
 export const useFastAverageColor = (
   src?: string | null,
+  srcLoaded?: boolean,
   aglorithm?: 'dominant' | 'simple' | 'sqrt',
 ) => {
-  const isMountedRef = useRef<boolean | null>(null);
   const [color, setColor] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const fac = new FastAverageColor();
 
-    if (src) {
+    if (src && srcLoaded) {
       fac
         .getColorAsync(src, {
           algorithm: aglorithm || 'dominant',
@@ -28,16 +28,14 @@ export const useFastAverageColor = (
           console.log('Error fetching average color', e);
           return setColor('rgba(0, 0, 0, 0)');
         });
-    } else if (isMountedRef.current) {
+    } else if (srcLoaded) {
       return setColor('var(--placeholder-bg)');
-    } else {
-      isMountedRef.current = true;
     }
 
     return () => {
       fac.destroy();
     };
-  }, [aglorithm, src]);
+  }, [aglorithm, srcLoaded, src]);
 
   return color;
 };

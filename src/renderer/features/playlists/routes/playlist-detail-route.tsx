@@ -18,7 +18,11 @@ const PlaylistDetailRoute = () => {
   const { playlistId } = useParams() as { playlistId: string };
 
   const detailQuery = usePlaylistDetail({ id: playlistId });
-  const background = useFastAverageColor(detailQuery?.data?.imageUrl, 'dominant');
+  const background = useFastAverageColor(
+    detailQuery?.data?.imageUrl,
+    !detailQuery?.isLoading,
+    'dominant',
+  );
 
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
