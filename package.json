@@ -271,7 +271,7 @@
     "electron-updater": "^4.6.5",
     "fast-average-color": "^9.2.0",
     "format-duration": "^2.0.0",
-    "framer-motion": "^7.10.2",
+    "framer-motion": "^8.1.3",
     "history": "^5.3.0",
     "i18next": "^21.6.16",
     "immer": "^9.0.15",
