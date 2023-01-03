@@ -199,7 +199,7 @@ export const Sidebar = () => {
               >
                 <Accordion.Item value="library">
                   <Accordion.Control>
-                    <Group>
+                    <Group fw="600">
                       {location.pathname.includes('/library/') ? (
                         <RiDatabaseFill size={15} />
                       ) : (
@@ -210,7 +210,7 @@ export const Sidebar = () => {
                   </Accordion.Control>
                   <Accordion.Panel>
                     <SidebarItem to={AppRoute.LIBRARY_ALBUMS}>
-                      <Group>
+                      <Group fw="600">
                         {location.pathname === AppRoute.LIBRARY_ALBUMS ? (
                           <RiAlbumFill />
                         ) : (
@@ -220,7 +220,7 @@ export const Sidebar = () => {
                       </Group>
                     </SidebarItem>
                     <SidebarItem to={AppRoute.LIBRARY_SONGS}>
-                      <Group>
+                      <Group fw="600">
                         {location.pathname === AppRoute.LIBRARY_SONGS ? (
                           <RiMusicFill />
                         ) : (
@@ -230,7 +230,7 @@ export const Sidebar = () => {
                       </Group>
                     </SidebarItem>
                     <SidebarItem to={AppRoute.LIBRARY_ALBUMARTISTS}>
-                      <Group>
+                      <Group fw="600">
                         {location.pathname === AppRoute.LIBRARY_ALBUMARTISTS ? (
                           <RiUserVoiceFill />
                         ) : (
@@ -243,7 +243,7 @@ export const Sidebar = () => {
                       disabled
                       to={AppRoute.LIBRARY_FOLDERS}
                     >
-                      <Group>
+                      <Group fw="600">
                         <RiFlag2Line />
                         Genres
                       </Group>
@@ -252,7 +252,7 @@ export const Sidebar = () => {
                       disabled
                       to={AppRoute.LIBRARY_FOLDERS}
                     >
-                      <Group>
+                      <Group fw="600">
                         <RiFolder3Line />
                         Folders
                       </Group>
