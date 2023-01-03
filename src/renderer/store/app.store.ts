@@ -62,7 +62,7 @@ export const useAppStore = create<AppSlice>()(
         sidebar: {
           expanded: [],
           image: false,
-          leftWidth: '230px',
+          leftWidth: '290px',
           rightExpanded: false,
           rightWidth: '400px',
         },
