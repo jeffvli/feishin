@@ -20,6 +20,10 @@ const StyledScrollArea = styled(MantineScrollArea)`
     padding: 0;
     background: var(--scrollbar-track-bg);
   }
+
+  & .mantine-ScrollArea-viewport > div {
+    display: block !important;
+  }
 `;
 
 const StyledNativeScrollArea = styled.div`
