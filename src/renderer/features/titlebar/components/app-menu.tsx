@@ -8,19 +8,23 @@ import {
   RiLockLine,
   RiMenuFill,
 } from 'react-icons/ri';
+import { useNavigate } from 'react-router';
 import { DropdownMenu, Text, Button } from '/@/renderer/components';
 import { ServerList } from '/@/renderer/features/servers';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { Settings } from '/@/renderer/features/settings';
+import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useServerList, useAuthStoreActions } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 
 export const AppMenu = () => {
+  const navigate = useNavigate();
   const currentServer = useCurrentServer();
   const serverList = useServerList();
   const { setCurrentServer } = useAuthStoreActions();
 
   const handleSetCurrentServer = (server: ServerListItem) => {
+    navigate(AppRoute.HOME);
     setCurrentServer(server);
   };
 
