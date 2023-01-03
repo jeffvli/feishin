@@ -29,12 +29,18 @@ import {
 } from 'react-icons/ri';
 import { useNavigate, Link, useLocation, generatePath } from 'react-router-dom';
 import styled from 'styled-components';
-import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
+import {
+  PlaylistSidebarItem,
+  SidebarItem,
+} from '/@/renderer/features/sidebar/components/sidebar-item';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useSidebarStore, useAppStoreActions, useCurrentSong } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
 import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
 import { PlaylistListSort, SortOrder } from '/@/renderer/api/types';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { LibraryItem } from '/@/renderer/types';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 
 const SidebarContainer = styled.div`
   height: 100%;
@@ -76,6 +82,18 @@ export const Sidebar = () => {
   const { setSidebar } = useAppStoreActions();
   const imageUrl = useCurrentSong()?.imageUrl;
   const showImage = sidebar.image;
+  const handlePlayQueueAdd = usePlayQueueAdd();
+  const playButtonBehavior = usePlayButtonBehavior();
+
+  const handlePlayPlaylist = (id: string) => {
+    handlePlayQueueAdd?.({
+      byItemType: {
+        id: [id],
+        type: LibraryItem.PLAYLIST,
+      },
+      play: playButtonBehavior,
+    });
+  };
 
   const playlistsQuery = usePlaylistList({
     limit: 100,
@@ -290,13 +308,13 @@ export const Sidebar = () => {
                   </Accordion.Control>
                   <Accordion.Panel>
                     {playlistsQuery?.data?.items?.map((playlist) => (
-                      <SidebarItem
+                      <PlaylistSidebarItem
                         key={`sidebar-playlist-${playlist.id}`}
-                        p={0}
+                        handlePlay={() => handlePlayPlaylist(playlist.id)}
                         to={generatePath(AppRoute.PLAYLISTS_DETAIL, { playlistId: playlist.id })}
                       >
                         {playlist.name}
-                      </SidebarItem>
+                      </PlaylistSidebarItem>
                     ))}
                   </Accordion.Panel>
                 </Accordion.Item>
