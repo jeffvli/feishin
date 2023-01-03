@@ -5,3 +5,4 @@ export * from './constrain-sidebar-width';
 export * from './title-case';
 export * from './get-header-color';
 export * from './parse-search-params';
+export * from './format-duration-string';
