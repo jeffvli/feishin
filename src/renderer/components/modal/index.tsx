@@ -50,15 +50,24 @@ Modal.defaultProps = {
 
 interface ConfirmModalProps {
   children: ReactNode;
+  disabled?: boolean;
   labels?: {
     cancel?: string;
     confirm?: string;
   };
+  loading?: boolean;
   onCancel?: () => void;
   onConfirm: () => void;
 }
 
-export const ConfirmModal = ({ labels, onCancel, onConfirm, children }: ConfirmModalProps) => {
+export const ConfirmModal = ({
+  loading,
+  disabled,
+  labels,
+  onCancel,
+  onConfirm,
+  children,
+}: ConfirmModalProps) => {
   const handleCancel = () => {
     if (onCancel) {
       onCancel();
@@ -79,6 +88,8 @@ export const ConfirmModal = ({ labels, onCancel, onConfirm, children }: ConfirmM
           {labels?.cancel ? labels.cancel : 'Cancel'}
         </Button>
         <Button
+          disabled={disabled}
+          loading={loading}
           variant="filled"
           onClick={onConfirm}
         >
