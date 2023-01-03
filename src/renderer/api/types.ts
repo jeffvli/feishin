@@ -481,7 +481,7 @@ export const songListSortMap: SongListSortMap = {
     year: undefined,
   },
   navidrome: {
-    album: NDSongListSort.ALBUM,
+    album: NDSongListSort.ALBUM_SONGS,
     albumArtist: NDSongListSort.ALBUM_ARTIST,
     artist: NDSongListSort.ARTIST,
     bpm: NDSongListSort.BPM,
