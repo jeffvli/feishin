@@ -5,3 +5,5 @@ export * from './album.store';
 export * from './song.store';
 export * from './album-artist.store';
 export * from './playlist.store';
+export * from './album-list-data.store';
+export * from './album-artist-list-data.store';

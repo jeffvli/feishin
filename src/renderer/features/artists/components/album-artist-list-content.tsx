@@ -23,6 +23,7 @@ import {
   useSetAlbumArtistStore,
   useSetAlbumArtistTable,
   useSetAlbumArtistTablePagination,
+  useAlbumArtistListItemData,
 } from '/@/renderer/store';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import {
@@ -55,6 +56,8 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
   const page = useAlbumArtistListStore();
   const setPage = useSetAlbumArtistStore();
   const handlePlayQueueAdd = usePlayQueueAdd();
+
+  const { itemData, setItemData } = useAlbumArtistListItemData();
 
   const pagination = useAlbumArtistTablePagination();
   const setPagination = useSetAlbumArtistTablePagination();
@@ -120,6 +123,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
         },
         rowCount: undefined,
       };
+
       params.api.setDatasource(dataSource);
       params.api.ensureIndexVisible(page.table.scrollOffset || 0, 'top');
     },
@@ -298,6 +302,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
                 height={height}
                 initialScrollOffset={page?.grid.scrollOffset || 0}
                 itemCount={checkAlbumArtistList?.data?.totalRecordCount || 0}
+                itemData={itemData}
                 itemGap={20}
                 itemSize={150 + page.grid?.size}
                 itemType={LibraryItem.ALBUM_ARTIST}
@@ -306,6 +311,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
                   route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
                   slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
                 }}
+                setItemData={setItemData}
                 width={width}
                 onScroll={handleGridScroll}
               />

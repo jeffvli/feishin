@@ -1,12 +1,4 @@
-import {
-  useState,
-  useRef,
-  useMemo,
-  useCallback,
-  forwardRef,
-  Ref,
-  useImperativeHandle,
-} from 'react';
+import { useRef, useMemo, useCallback, forwardRef, Ref, useImperativeHandle } from 'react';
 import debounce from 'lodash/debounce';
 import type { FixedSizeListProps } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
@@ -25,11 +17,13 @@ interface VirtualGridProps extends Omit<FixedSizeListProps, 'children' | 'itemSi
   display?: ListDisplayType;
   fetchFn: (options: { columnCount: number; skip: number; take: number }) => Promise<any>;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
+  itemData: any[];
   itemGap: number;
   itemSize: number;
   itemType: LibraryItem;
   minimumBatchSize?: number;
   route?: CardRoute;
+  setItemData: (data: any[]) => void;
 }
 
 const constrainWidth = (width: number) => {
@@ -48,6 +42,8 @@ export const VirtualInfiniteGrid = forwardRef(
       itemSize,
       itemType,
       cardRows,
+      itemData,
+      setItemData,
       route,
       onScroll,
       display,
@@ -60,7 +56,6 @@ export const VirtualInfiniteGrid = forwardRef(
     }: VirtualGridProps,
     ref: Ref<VirtualInfiniteGridRef>,
   ) => {
-    const [itemData, setItemData] = useState<any[]>([]);
     const listRef = useRef<any>(null);
     const loader = useRef<InfiniteLoader>(null);
 
@@ -111,7 +106,7 @@ export const VirtualInfiniteGrid = forwardRef(
 
         setItemData(newData);
       },
-      [columnCount, fetchFn, itemData],
+      [columnCount, fetchFn, itemData, setItemData],
     );
 
     const debouncedLoadMoreItems = debounce(loadMoreItems, 500);
@@ -120,7 +115,7 @@ export const VirtualInfiniteGrid = forwardRef(
       resetLoadMoreItemsCache: () => {
         if (loader.current) {
           loader.current.resetloadMoreItemsCache(false);
-          setItemData(() => []);
+          setItemData([]);
         }
       },
       scrollTo: (index: number) => {

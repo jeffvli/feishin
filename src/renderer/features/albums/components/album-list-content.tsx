@@ -25,6 +25,7 @@ import {
   useAlbumTablePagination,
   useSetAlbumTable,
   useSetAlbumTablePagination,
+  useAlbumListItemData,
 } from '/@/renderer/store';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import {
@@ -56,6 +57,8 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
   const page = useAlbumListStore();
   const setPage = useSetAlbumStore();
   const handlePlayQueueAdd = usePlayQueueAdd();
+
+  const { itemData, setItemData } = useAlbumListItemData();
 
   const pagination = useAlbumTablePagination();
   const setPagination = useSetAlbumTablePagination();
@@ -319,6 +322,7 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
                 height={height}
                 initialScrollOffset={page?.grid.scrollOffset || 0}
                 itemCount={checkAlbumList?.data?.totalRecordCount || 0}
+                itemData={itemData}
                 itemGap={20}
                 itemSize={150 + page.grid?.size}
                 itemType={LibraryItem.ALBUM}
@@ -327,6 +331,7 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
                   route: AppRoute.LIBRARY_ALBUMS_DETAIL,
                   slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
                 }}
+                setItemData={setItemData}
                 width={width}
                 onScroll={handleGridScroll}
               />
