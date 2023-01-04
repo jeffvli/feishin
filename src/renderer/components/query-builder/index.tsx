@@ -1,25 +1,11 @@
 import { Group, Stack } from '@mantine/core';
 import { Select } from '/@/renderer/components/select';
-import { FilterGroupType } from '/@/renderer/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { RiAddLine, RiMore2Line } from 'react-icons/ri';
 import { Button } from '/@/renderer/components/button';
 import { DropdownMenu } from '/@/renderer/components/dropdown-menu';
 import { QueryBuilderOption } from '/@/renderer/components/query-builder/query-builder-option';
-
-export type AdvancedFilterGroup = {
-  children: AdvancedFilterGroup[];
-  rules: AdvancedFilterRule[];
-  type: FilterGroupType;
-  uniqueId: string;
-};
-
-export type AdvancedFilterRule = {
-  field?: string | null;
-  operator?: string | null;
-  uniqueId: string;
-  value?: string | number | Date | undefined | null | any;
-};
+import { QueryBuilderGroup, QueryBuilderRule } from '/@/renderer/types';
 
 const FILTER_GROUP_OPTIONS_DATA = [
   {
@@ -32,58 +18,16 @@ const FILTER_GROUP_OPTIONS_DATA = [
   },
 ];
 
-// const queryJson = [
-//   {
-//     any: [{ is: { loved: true } }, { gt: { rating: 3 } }],
-//   },
-//   { inTheRange: { year: [1981, 1990] } },
-// ];
-
-// const parseQuery = (query: Record<string, any>[]) => {
-//   // for (const ruleset in query) {
-//   //   // console.log('key', key);
-//   //   // console.log('query[key]', query[key]);
-//   //   // console.log('Object.keys(query[key])', Object.keys(query[key]));
-//   //   // console.log('Object.values(query[key])', Object.values(query[key]));
-//   //   // console.log('Object.entries(query[key])', Object.entries(query[key]));
-
-//   //   const keys = Object.keys(query[ruleset]);
-//   // }
-
-//   const res = flatMapDeep(query, flatten);
-//   console.log('res', res);
-
-//   return res;
-// };
-
-// const OperatorSelect = ({ value, onChange }: any) => {
-//   const handleChange = (e: any) => {
-//     onChange(e);
-//   };
-
-//   return (
-//     <Select
-//       data={operators}
-//       label="Operator"
-//       value={value}
-//       onChange={handleChange}
-//     />
-//   );
-// };
-
 type AddArgs = {
   groupIndex: number[];
-  groupValue: string;
   level: number;
 };
 
 type DeleteArgs = {
   groupIndex: number[];
-  groupValue: string;
   level: number;
   uniqueId: string;
 };
-
 interface QueryBuilderProps {
   data: Record<string, any>;
   filters: { label: string; value: string }[];
@@ -115,27 +59,21 @@ export const QueryBuilder = ({
   uniqueId,
   filters,
 }: QueryBuilderProps) => {
-  const groupValue = Object.keys(data)[0];
-  const rules = data[groupValue].filter((rule: any) => !rule.any && !rule.all);
-  const group = data[groupValue].filter((rule: any) => rule.any || rule.all);
-
   const handleAddRule = () => {
-    onAddRule({ groupIndex, groupValue, level });
+    onAddRule({ groupIndex, level });
   };
 
   const handleAddRuleGroup = () => {
-    onAddRuleGroup({ groupIndex, groupValue, level });
+    onAddRuleGroup({ groupIndex, level });
   };
 
   const handleDeleteRuleGroup = () => {
-    onDeleteRuleGroup({ groupIndex, groupValue, level, uniqueId });
+    onDeleteRuleGroup({ groupIndex, level, uniqueId });
   };
 
   const handleChangeType = (value: string | null) => {
     onChangeType({ groupIndex, level, value });
   };
-
-  console.log('rules :>> ', rules);
 
   return (
     <Stack ml={`${level * 10}px`}>
@@ -143,14 +81,14 @@ export const QueryBuilder = ({
         <Select
           data={FILTER_GROUP_OPTIONS_DATA}
           maxWidth={175}
-          size="xs"
-          value={groupValue}
+          size="sm"
+          value={data.type}
           width="20%"
           onChange={handleChangeType}
         />
         <Button
           px={5}
-          size="xs"
+          size="sm"
           tooltip={{ label: 'Add rule' }}
           variant="default"
           onClick={handleAddRule}
@@ -161,7 +99,7 @@ export const QueryBuilder = ({
           <DropdownMenu.Target>
             <Button
               p={0}
-              size="xs"
+              size="sm"
               variant="subtle"
             >
               <RiMore2Line size={20} />
@@ -181,9 +119,9 @@ export const QueryBuilder = ({
         key="advanced-filter-option"
         initial={false}
       >
-        {rules.map((rule: AdvancedFilterRule, i: number) => (
+        {data?.rules?.map((rule: QueryBuilderRule) => (
           <motion.div
-            key={`rule-${level}-${Object.keys(rule)[0]}`}
+            key={rule.uniqueId}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -25 }}
             initial={{ opacity: 0, x: -25 }}
@@ -193,7 +131,7 @@ export const QueryBuilder = ({
               data={rule}
               filters={filters}
               groupIndex={groupIndex || []}
-              groupValue={groupValue}
+              // groupValue={groupValue}
               level={level}
               noRemove={data?.rules?.length === 1}
               onChangeField={onChangeField}
@@ -204,14 +142,14 @@ export const QueryBuilder = ({
           </motion.div>
         ))}
       </AnimatePresence>
-      {group && (
+      {data?.group && (
         <AnimatePresence
           key="advanced-filter-group"
           initial={false}
         >
-          {group.map((group: AdvancedFilterGroup, index: number) => (
+          {data.group?.map((group: QueryBuilderGroup, index: number) => (
             <motion.div
-              key={`group-${level}-${index}`}
+              key={group.uniqueId}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -25 }}
               initial={{ opacity: 0, x: -25 }}

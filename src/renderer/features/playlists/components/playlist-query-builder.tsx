@@ -1,336 +1,346 @@
 import { useState, useImperativeHandle, forwardRef } from 'react';
-import { uniqueId } from 'lodash';
+import { Flex, Group, ScrollArea } from '@mantine/core';
 import clone from 'lodash/clone';
-import setWith from 'lodash/setWith';
 import get from 'lodash/get';
-import sortBy from 'lodash/sortBy';
+import setWith from 'lodash/setWith';
 import { nanoid } from 'nanoid';
 import { NDSongQueryFields } from '/@/renderer/api/navidrome.types';
-import { AdvancedFilterGroup, AdvancedFilterRule, QueryBuilder } from '/@/renderer/components';
-import { FilterGroupType } from '/@/renderer/types';
+import { Button, DropdownMenu, NumberInput, QueryBuilder } from '/@/renderer/components';
+import {
+  convertNDQueryToQueryGroup,
+  convertQueryGroupToNDQuery,
+} from '/@/renderer/features/playlists/utils';
+import { QueryBuilderGroup, QueryBuilderRule } from '/@/renderer/types';
+import { RiMore2Fill } from 'react-icons/ri';
 
 type AddArgs = {
   groupIndex: number[];
-  groupValue: string;
   level: number;
 };
 
 type DeleteArgs = {
   groupIndex: number[];
-  groupValue: string;
   level: number;
   uniqueId: string;
 };
 
-const sortQuery = (query: any) => {
-  let b;
+interface PlaylistQueryBuilderProps {
+  onSave: (parsedFilter: any) => void;
+  onSaveAs: (parsedFilter: any) => void;
+  query: any;
+}
 
-  if (query.all) {
-    b = sortBy(query.all, (item) => {
-      const key = Object.keys(item)[0];
-      return key === 'all' || key === 'any' ? 0 : 1;
-    });
-  } else {
-    b = sortBy(query.any, (item) => {
-      const key = Object.keys(item)[0];
-      return key === 'all' || key === 'any' ? 0 : 1;
-    });
-  }
-
-  return { all: b };
-};
-
-const addUniqueId = (query: any) => {
-  const queryCopy = clone(query);
-  const addId = (item: any) => {
-    const key = Object.keys(item)[0];
-    if (key === 'all' || key === 'any') {
-      item[key].forEach(addId);
-    } else {
-      item[key].uniqueId = nanoid();
-    }
-  };
-
-  addId(queryCopy);
-  return queryCopy;
-};
-
-export const PlaylistQueryBuilder = forwardRef(({ query, onChange }: any, ref) => {
-  const [filters, setFilters] = useState<any>(
-    sortQuery(addUniqueId(query)) || {
-      all: [],
-    },
-  );
-
-  console.log('filters :>> ', JSON.stringify(filters));
-
-  useImperativeHandle(ref, () => ({
-    reset() {
-      setFilters({
+export const PlaylistQueryBuilder = forwardRef(
+  ({ query, onSave, onSaveAs }: PlaylistQueryBuilderProps, ref) => {
+    const [filters, setFilters] = useState<any>(
+      convertNDQueryToQueryGroup(query) || {
         all: [],
-      });
-    },
-  }));
-
-  const setFilterHandler = (newFilters: AdvancedFilterGroup) => {
-    setFilters(newFilters);
-    onChange(newFilters);
-  };
-
-  const handleAddRuleGroup = (args: AddArgs) => {
-    const { level, groupIndex, groupValue } = args;
-    const filtersCopy = clone(filters);
-
-    const getPath = (level: number) => {
-      const rootKey = Object.keys(filters)[0];
-      if (level === 0) return rootKey;
-
-      const str = [rootKey];
-      for (const index of groupIndex) {
-        str.push(`[${index}].${groupValue}`);
-      }
-
-      return `${str.join('.')}`;
-    };
-
-    const path = getPath(level);
-    console.log('path', filtersCopy, path);
-    const updatedFilters = setWith(
-      filtersCopy,
-      path,
-      sortQuery([...get(filtersCopy, path), { any: [{ contains: { title: '' } }] }]),
-      clone,
-    );
-
-    setFilterHandler(updatedFilters);
-  };
-
-  const handleDeleteRuleGroup = (args: DeleteArgs) => {
-    const { uniqueId, level, groupIndex, groupValue } = args;
-    const filtersCopy = clone(filters);
-
-    const getPath = (level: number) => {
-      const rootKey = Object.keys(filters)[0];
-      if (level === 0) return rootKey;
-
-      const str = [];
-      for (let i = 0; i < groupIndex.length; i += 1) {
-        if (groupIndex.length === 1) {
-          str.push(rootKey);
-          break;
-        }
-
-        if (i === 0) {
-          str.push(`${rootKey}[${groupIndex[i]}]`);
-        } else if (i !== groupIndex.length - 1) {
-          str.push(`${groupValue}[${groupIndex[i]}]`);
-        } else {
-          str.push(`${groupValue}`);
-        }
-      }
-
-      return `${str.join('.')}`;
-    };
-
-    const path = getPath(level);
-
-    const dataAtPath = get(filtersCopy, path);
-    const lv = groupIndex[level - 1];
-    const removed = [...dataAtPath.slice(0, lv), ...dataAtPath.slice(lv + 1)];
-    const updatedFilters = setWith(filtersCopy, path, sortQuery(removed), clone);
-
-    setFilterHandler(updatedFilters);
-  };
-
-  const getRulePath = (level: number, groupIndex: number[], groupValue: string) => {
-    if (level === 0) return Object.keys(filters)[0];
-
-    const str = [];
-    for (const index of groupIndex) {
-      str.push(`${Object.keys(filters)[0]}[${index}].${groupValue}`);
-    }
-
-    return `${str.join('.')}`;
-  };
-
-  // const getRulePath = (
-  //   level: number,
-  //   groupIndex: number[],
-  //   groupValue: string,
-  //   uniqueId?: string,
-  // ) => {
-  //   const rootKey = Object.keys(filters)[0];
-  //   if (level === 0) return rootKey;
-
-  //   const str = [];
-  //   for (const index of groupIndex) {
-  //     if (uniqueId) {
-  //       str.push(`${rootKey}[${index}].${groupValue}.${uniqueId}`);
-  //     } else {
-  //       str.push(`${rootKey}[${index}].${groupValue}`);
-  //     }
-  //   }
-
-  //   return `${str.join('.')}`;
-  // };
-
-  const handleAddRule = (args: AddArgs) => {
-    const { level, groupValue, groupIndex } = args;
-    const filtersCopy = clone(filters);
-
-    const path = getRulePath(level, groupIndex, groupValue);
-
-    const updatedFilters = setWith(
-      filtersCopy,
-      path,
-      [...get(filtersCopy, path), { contains: { title: '', uniqueId: nanoid() } }],
-      clone,
-    );
-
-    setFilterHandler(updatedFilters);
-  };
-
-  const handleDeleteRule = (args: DeleteArgs) => {
-    const { uniqueId, level, groupIndex, groupValue } = args;
-    const filtersCopy = clone(filters);
-
-    const path = getRulePath(level, groupIndex, groupValue);
-
-    const dataAtPath = get(filtersCopy, path);
-    const lv = groupIndex[level - 1];
-    const removed = [...dataAtPath.slice(0, lv), ...dataAtPath.slice(lv + 1)];
-
-    console.log('removed :>> ', removed);
-
-    const updatedFilters = setWith(filtersCopy, path, removed, clone);
-
-    setFilterHandler(updatedFilters);
-  };
-
-  const handleChangeField = (args: any) => {
-    const { uniqueId, level, groupIndex, value } = args;
-    const filtersCopy = clone(filters);
-
-    const path = getRulePath(level, groupIndex);
-
-    console.log('path', path);
-
-    const updatedFilters = setWith(
-      filtersCopy,
-      path,
-      get(filtersCopy, path).map((rule: AdvancedFilterRule) => {
-        if (rule.uniqueId !== uniqueId) return rule;
-        // const defaultOperator = FILTER_OPTIONS_DATA.find(
-        //   (option) => option.value === value,
-        // )?.default;
-
-        return {
-          ...rule,
-          field: value,
-          // operator: defaultOperator || '',
-          operator: '',
-          value: '',
-        };
-      }),
-      clone,
-    );
-
-    console.log('updatedFilters', updatedFilters);
-
-    // setFilterHandler(updatedFilters);
-  };
-
-  const handleChangeType = (args: any) => {
-    const { level, groupIndex, value } = args;
-
-    const filtersCopy = clone(filters);
-
-    if (level === 0) {
-      return setFilterHandler({ ...filtersCopy, type: value });
-    }
-
-    const getTypePath = () => {
-      const str = [];
-      for (let i = 0; i < groupIndex.length; i += 1) {
-        str.push(`group[${groupIndex[i]}]`);
-      }
-
-      return `${str.join('.')}`;
-    };
-
-    const path = getTypePath();
-    const updatedFilters = setWith(
-      filtersCopy,
-      path,
-      {
-        ...get(filtersCopy, path),
-        type: value,
       },
-      clone,
     );
 
-    return setFilterHandler(updatedFilters);
-  };
+    useImperativeHandle(ref, () => ({
+      reset() {
+        setFilters({
+          all: [],
+        });
+      },
+    }));
 
-  const handleChangeOperator = (args: any) => {
-    const { uniqueId, level, groupIndex, value } = args;
-    const filtersCopy = clone(filters);
+    const setFilterHandler = (newFilters: QueryBuilderGroup) => {
+      setFilters(newFilters);
+      // onSave(newFilters);
+    };
 
-    const path = getRulePath(level, groupIndex);
-    const updatedFilters = setWith(
-      filtersCopy,
-      path,
-      get(filtersCopy, path).map((rule: AdvancedFilterRule) => {
-        if (rule.uniqueId !== uniqueId) return rule;
-        return {
-          ...rule,
-          operator: value,
-        };
-      }),
-      clone,
+    const handleSave = () => {
+      onSave(convertQueryGroupToNDQuery(filters));
+    };
+
+    const handleSaveAs = () => {
+      onSaveAs(convertQueryGroupToNDQuery(filters));
+    };
+
+    const handleAddRuleGroup = (args: AddArgs) => {
+      const { level, groupIndex } = args;
+      const filtersCopy = clone(filters);
+
+      const getPath = (level: number) => {
+        if (level === 0) return 'group';
+
+        const str = [];
+        for (const index of groupIndex) {
+          str.push(`group[${index}]`);
+        }
+
+        return `${str.join('.')}.group`;
+      };
+
+      const path = getPath(level);
+      const updatedFilters = setWith(
+        filtersCopy,
+        path,
+        [
+          ...get(filtersCopy, path),
+          {
+            group: [],
+            rules: [
+              {
+                field: '',
+                operator: '',
+                uniqueId: nanoid(),
+                value: '',
+              },
+            ],
+            type: 'any',
+            uniqueId: nanoid(),
+          },
+        ],
+        clone,
+      );
+
+      setFilterHandler(updatedFilters);
+    };
+
+    const handleDeleteRuleGroup = (args: DeleteArgs) => {
+      const { uniqueId, level, groupIndex } = args;
+      const filtersCopy = clone(filters);
+
+      const getPath = (level: number) => {
+        if (level === 0) return 'group';
+
+        const str = [];
+        for (let i = 0; i < groupIndex.length; i += 1) {
+          if (i !== groupIndex.length - 1) {
+            str.push(`group[${groupIndex[i]}]`);
+          } else {
+            str.push(`group`);
+          }
+        }
+
+        return `${str.join('.')}`;
+      };
+
+      const path = getPath(level);
+
+      const updatedFilters = setWith(
+        filtersCopy,
+        path,
+        [
+          ...get(filtersCopy, path).filter(
+            (group: QueryBuilderGroup) => group.uniqueId !== uniqueId,
+          ),
+        ],
+        clone,
+      );
+
+      setFilterHandler(updatedFilters);
+    };
+
+    const getRulePath = (level: number, groupIndex: number[]) => {
+      if (level === 0) return 'rules';
+
+      const str = [];
+      for (const index of groupIndex) {
+        str.push(`group[${index}]`);
+      }
+
+      return `${str.join('.')}.rules`;
+    };
+
+    const handleAddRule = (args: AddArgs) => {
+      const { level, groupIndex } = args;
+      const filtersCopy = clone(filters);
+
+      const path = getRulePath(level, groupIndex);
+      const updatedFilters = setWith(
+        filtersCopy,
+        path,
+        [
+          ...get(filtersCopy, path),
+          {
+            field: 'title',
+            operator: 'contains',
+            uniqueId: nanoid(),
+            value: null,
+          },
+        ],
+        clone,
+      );
+
+      setFilterHandler(updatedFilters);
+    };
+
+    const handleDeleteRule = (args: DeleteArgs) => {
+      const { uniqueId, level, groupIndex } = args;
+      const filtersCopy = clone(filters);
+
+      const path = getRulePath(level, groupIndex);
+      const updatedFilters = setWith(
+        filtersCopy,
+        path,
+        get(filtersCopy, path).filter((rule: QueryBuilderRule) => rule.uniqueId !== uniqueId),
+        clone,
+      );
+
+      setFilterHandler(updatedFilters);
+    };
+
+    const handleChangeField = (args: any) => {
+      const { uniqueId, level, groupIndex, value } = args;
+      const filtersCopy = clone(filters);
+
+      const path = getRulePath(level, groupIndex);
+      const updatedFilters = setWith(
+        filtersCopy,
+        path,
+        get(filtersCopy, path).map((rule: QueryBuilderGroup) => {
+          if (rule.uniqueId !== uniqueId) return rule;
+          // const defaultOperator = FILTER_OPTIONS_DATA.find(
+          //   (option) => option.value === value,
+          // )?.default;
+
+          return {
+            ...rule,
+            field: value,
+            operator: '',
+            value: '',
+          };
+        }),
+        clone,
+      );
+
+      setFilterHandler(updatedFilters);
+    };
+
+    const handleChangeType = (args: any) => {
+      const { level, groupIndex, value } = args;
+
+      const filtersCopy = clone(filters);
+
+      if (level === 0) {
+        return setFilterHandler({ ...filtersCopy, type: value });
+      }
+
+      const getTypePath = () => {
+        const str = [];
+        for (let i = 0; i < groupIndex.length; i += 1) {
+          str.push(`group[${groupIndex[i]}]`);
+        }
+
+        return `${str.join('.')}`;
+      };
+
+      const path = getTypePath();
+      const updatedFilters = setWith(
+        filtersCopy,
+        path,
+        {
+          ...get(filtersCopy, path),
+          type: value,
+        },
+        clone,
+      );
+
+      return setFilterHandler(updatedFilters);
+    };
+
+    const handleChangeOperator = (args: any) => {
+      const { uniqueId, level, groupIndex, value } = args;
+      const filtersCopy = clone(filters);
+
+      const path = getRulePath(level, groupIndex);
+      const updatedFilters = setWith(
+        filtersCopy,
+        path,
+        get(filtersCopy, path).map((rule: QueryBuilderRule) => {
+          if (rule.uniqueId !== uniqueId) return rule;
+          return {
+            ...rule,
+            operator: value,
+          };
+        }),
+        clone,
+      );
+
+      setFilterHandler(updatedFilters);
+    };
+
+    const handleChangeValue = (args: any) => {
+      const { uniqueId, level, groupIndex, value } = args;
+      const filtersCopy = clone(filters);
+
+      const path = getRulePath(level, groupIndex);
+      console.log('path', path);
+      const updatedFilters = setWith(
+        filtersCopy,
+        path,
+        get(filtersCopy, path).map((rule: QueryBuilderRule) => {
+          if (rule.uniqueId !== uniqueId) return rule;
+          return {
+            ...rule,
+            value,
+          };
+        }),
+        clone,
+      );
+
+      setFilterHandler(updatedFilters);
+    };
+
+    return (
+      <Flex
+        direction="column"
+        h="100%"
+        justify="space-between"
+      >
+        <ScrollArea h="100%">
+          <QueryBuilder
+            data={filters}
+            filters={NDSongQueryFields}
+            groupIndex={[]}
+            level={0}
+            uniqueId={filters.uniqueId}
+            onAddRule={handleAddRule}
+            onAddRuleGroup={handleAddRuleGroup}
+            onChangeField={handleChangeField}
+            onChangeOperator={handleChangeOperator}
+            onChangeType={handleChangeType}
+            onChangeValue={handleChangeValue}
+            onDeleteRule={handleDeleteRule}
+            onDeleteRuleGroup={handleDeleteRuleGroup}
+          />
+        </ScrollArea>
+        <Group
+          align="flex-end"
+          p="1rem 1rem 0"
+          position="apart"
+        >
+          <NumberInput
+            label="Limit to"
+            width={75}
+          />
+          <Group>
+            <Button
+              variant="filled"
+              onClick={handleSave}
+            >
+              Save
+            </Button>
+            <DropdownMenu position="bottom-end">
+              <DropdownMenu.Target>
+                <Button
+                  p="0.5em"
+                  variant="default"
+                >
+                  <RiMore2Fill size={15} />
+                </Button>
+              </DropdownMenu.Target>
+              <DropdownMenu.Dropdown>
+                <DropdownMenu.Item onClick={handleSaveAs}>Save as</DropdownMenu.Item>
+              </DropdownMenu.Dropdown>
+            </DropdownMenu>
+          </Group>
+        </Group>
+      </Flex>
     );
-
-    setFilterHandler(updatedFilters);
-  };
-
-  const handleChangeValue = (args: any) => {
-    const { uniqueId, level, groupIndex, value } = args;
-    const filtersCopy = clone(filters);
-
-    const path = getRulePath(level, groupIndex);
-    const updatedFilters = setWith(
-      filtersCopy,
-      path,
-      get(filtersCopy, path).map((rule: AdvancedFilterRule) => {
-        if (rule.uniqueId !== uniqueId) return rule;
-        return {
-          ...rule,
-          value,
-        };
-      }),
-      clone,
-    );
-
-    setFilterHandler(updatedFilters);
-  };
-
-  return (
-    <>
-      <QueryBuilder
-        data={filters}
-        filters={NDSongQueryFields}
-        groupIndex={[]}
-        level={0}
-        uniqueId={filters.uniqueId}
-        onAddRule={handleAddRule}
-        onAddRuleGroup={handleAddRuleGroup}
-        onChangeField={handleChangeField}
-        onChangeOperator={handleChangeOperator}
-        onChangeType={handleChangeType}
-        onChangeValue={handleChangeValue}
-        onDeleteRule={handleDeleteRule}
-        onDeleteRuleGroup={handleDeleteRuleGroup}
-      />
-    </>
-  );
-});
+  },
+);

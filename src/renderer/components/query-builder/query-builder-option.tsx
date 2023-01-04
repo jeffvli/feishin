@@ -4,7 +4,7 @@ import { RiSubtractLine } from 'react-icons/ri';
 import { Button } from '/@/renderer/components/button';
 import { TextInput } from '/@/renderer/components/input';
 import { Select } from '/@/renderer/components/select';
-import { AdvancedFilterRule } from '/@/renderer/types';
+import { QueryBuilderRule } from '/@/renderer/types';
 
 const operators = [
   { label: 'is', value: 'is' },
@@ -24,16 +24,15 @@ const operators = [
 
 type DeleteArgs = {
   groupIndex: number[];
-  groupValue: string;
   level: number;
   uniqueId: string;
 };
 
 interface QueryOptionProps {
-  data: AdvancedFilterRule;
+  data: QueryBuilderRule;
   filters: { label: string; value: string }[];
   groupIndex: number[];
-  groupValue: string;
+  // groupValue: string;
   level: number;
   noRemove: boolean;
   onChangeField: (args: any) => void;
@@ -48,7 +47,6 @@ export const QueryBuilderOption = ({
   level,
   onDeleteRule,
   groupIndex,
-  groupValue,
   noRemove,
   onChangeField,
   onChangeOperator,
@@ -57,7 +55,7 @@ export const QueryBuilderOption = ({
   const { field, operator, uniqueId, value } = data;
 
   const handleDeleteRule = () => {
-    onDeleteRule({ groupIndex, groupValue, level, uniqueId });
+    onDeleteRule({ groupIndex, level, uniqueId });
   };
 
   const handleChangeField = (e: any) => {
@@ -69,6 +67,8 @@ export const QueryBuilderOption = ({
   };
 
   const handleChangeValue = (e: any) => {
+    console.log('e', e);
+
     const isDirectValue =
       typeof e === 'string' ||
       typeof e === 'number' ||
@@ -330,7 +330,7 @@ export const QueryBuilderOption = ({
   //   ),
   // };
 
-  const ml = (level + 1) * 10 - level * 5;
+  const ml = (level + 1) * 10;
 
   return (
     <Group ml={ml}>
@@ -338,7 +338,7 @@ export const QueryBuilderOption = ({
         searchable
         data={filters}
         maxWidth={175}
-        size="xs"
+        size="sm"
         value={field}
         width="20%"
         onChange={handleChangeField}
@@ -346,21 +346,29 @@ export const QueryBuilderOption = ({
       <Select
         searchable
         data={operators}
-        // disabled={!field}
+        disabled={!field}
         maxWidth={175}
-        size="xs"
-        value={field}
+        size="sm"
+        value={operator}
         width="20%"
-        onChange={handleChangeField}
+        onChange={handleChangeOperator}
       />
       {field ? (
-        <></>
+        <TextInput
+          defaultValue={value}
+          maxWidth={175}
+          size="sm"
+          width="20%"
+          onChange={handleChangeValue}
+        />
       ) : (
         <TextInput
           disabled
+          defaultValue={value}
           maxWidth={175}
-          size="xs"
+          size="sm"
           width="20%"
+          onChange={handleChangeValue}
         />
       )}
       {/* // filterOperatorMap[ // OPTIONS_MAP[field as keyof typeof OPTIONS_MAP].type as keyof typeof
@@ -368,7 +376,7 @@ export const QueryBuilderOption = ({
       <Button
         disabled={noRemove}
         px={5}
-        size="xs"
+        size="sm"
         tooltip={{ label: 'Remove rule' }}
         variant="default"
         onClick={handleDeleteRule}
