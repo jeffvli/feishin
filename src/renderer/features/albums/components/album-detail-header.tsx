@@ -44,7 +44,7 @@ export const AlbumDetailHeader = forwardRef(
           ref={ref}
           background={background}
           imageUrl={detailQuery?.data?.imageUrl}
-          item={{ route: AppRoute.PLAYLISTS, type: LibraryItem.ALBUM }}
+          item={{ route: AppRoute.LIBRARY_ALBUMS, type: LibraryItem.ALBUM }}
           title={detailQuery?.data?.name || ''}
         >
           <Stack mt="1rem">
