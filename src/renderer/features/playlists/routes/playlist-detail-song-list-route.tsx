@@ -1,7 +1,9 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Stack } from '@mantine/core';
+import { Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { PlaylistDetailSongListContent } from '../components/playlist-detail-song-list-content';
 import { PlaylistDetailSongListHeader } from '../components/playlist-detail-song-list-header';
@@ -11,23 +13,30 @@ import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playli
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
-import { Paper, toast } from '/@/renderer/components';
+import { Button, Paper, Text, toast } from '/@/renderer/components';
 import { SaveAsPlaylistForm } from '/@/renderer/features/playlists/components/save-as-playlist-form';
+import { useCurrentServer } from '/@/renderer/store';
+import { ServerType } from '/@/renderer/api/types';
 
 const PlaylistDetailSongListRoute = () => {
   const navigate = useNavigate();
   const tableRef = useRef<AgGridReactType | null>(null);
   const { playlistId } = useParams() as { playlistId: string };
+  const currentServer = useCurrentServer();
 
   const detailQuery = usePlaylistDetail({ id: playlistId });
   const createPlaylistMutation = useCreatePlaylist();
   const deletePlaylistMutation = useDeletePlaylist();
 
-  const handleSave = (filter: Record<string, any>) => {
+  const handleSave = (
+    filter: Record<string, any>,
+    extraFilters: { limit?: number; sortBy?: string; sortOrder?: string },
+  ) => {
     const rules = {
       ...filter,
-      order: 'desc',
-      sort: 'year',
+      limit: extraFilters.limit || undefined,
+      order: extraFilters.sortOrder || 'desc',
+      sort: extraFilters.sortBy || 'dateAdded',
     };
 
     if (!detailQuery?.data) return;
@@ -87,28 +96,105 @@ const PlaylistDetailSongListRoute = () => {
     });
   };
 
+  const smartPlaylistVariants: Variants = {
+    animate: (custom: { isQueryBuilderExpanded: boolean }) => {
+      return {
+        maxHeight: custom.isQueryBuilderExpanded ? '35vh' : '3.5em',
+        opacity: 1,
+        transition: {
+          duration: 0.3,
+          ease: 'easeInOut',
+        },
+        y: 0,
+      };
+    },
+    exit: {
+      opacity: 0,
+      y: -25,
+    },
+    initial: {
+      opacity: 0,
+      y: -25,
+    },
+  };
+
+  const isSmartPlaylist =
+    !detailQuery?.isLoading &&
+    detailQuery?.data?.rules &&
+    currentServer?.type === ServerType.NAVIDROME;
+
+  const [showQueryBuilder, setShowQueryBuilder] = useState(false);
+  const [isQueryBuilderExpanded, setIsQueryBuilderExpanded] = useState(false);
+
+  const handleToggleExpand = () => {
+    setIsQueryBuilderExpanded((prev) => !prev);
+  };
+
+  const handleToggleShowQueryBuilder = () => {
+    setShowQueryBuilder((prev) => !prev);
+    setIsQueryBuilderExpanded(true);
+  };
+
+  console.log('detailQuery?.data?.rules', detailQuery?.data?.rules);
+
   return (
     <AnimatedPage key={`playlist-detail-songList-${playlistId}`}>
       <Stack
         h="100%"
         spacing={0}
       >
-        <PlaylistDetailSongListHeader tableRef={tableRef} />
-        <Paper
-          sx={{
-            maxHeight: '35vh',
-            padding: '1rem',
-          }}
-          w="100%"
+        <PlaylistDetailSongListHeader
+          handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
+          tableRef={tableRef}
+        />
+        <AnimatePresence
+          custom={{ isQueryBuilderExpanded }}
+          initial={false}
         >
-          {!detailQuery?.isLoading && (
-            <PlaylistQueryBuilder
-              query={detailQuery?.data?.rules || { all: [] }}
-              onSave={handleSave}
-              onSaveAs={handleSaveAs}
-            />
+          {(isSmartPlaylist || showQueryBuilder) && (
+            <motion.div
+              animate="animate"
+              custom={{ isQueryBuilderExpanded }}
+              exit="exit"
+              initial="initial"
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              variants={smartPlaylistVariants}
+            >
+              <Paper
+                h="100%"
+                pos="relative"
+                w="100%"
+              >
+                <Group
+                  pt="1rem"
+                  px="1rem"
+                >
+                  <Button
+                    compact
+                    variant="default"
+                    onClick={handleToggleExpand}
+                  >
+                    {isQueryBuilderExpanded ? (
+                      <RiArrowUpSLine size={20} />
+                    ) : (
+                      <RiArrowDownSLine size={20} />
+                    )}
+                  </Button>
+                  <Text>Query Editor</Text>
+                </Group>
+                <PlaylistQueryBuilder
+                  isSaving={createPlaylistMutation?.isLoading}
+                  limit={detailQuery?.data?.rules?.limit}
+                  query={detailQuery?.data?.rules}
+                  sortBy={detailQuery?.data?.rules?.sort || 'year'}
+                  sortOrder={detailQuery?.data?.rules?.order || 'desc'}
+                  onSave={handleSave}
+                  onSaveAs={handleSaveAs}
+                />
+              </Paper>
+            </motion.div>
           )}
-        </Paper>
+        </AnimatePresence>
         <PlaylistDetailSongListContent tableRef={tableRef} />
       </Stack>
     </AnimatedPage>

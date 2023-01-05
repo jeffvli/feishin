@@ -8,7 +8,7 @@ import { useParams } from 'react-router';
 import styled from 'styled-components';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { PlaylistSongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
+import { PlaylistSongListQuery, ServerType, SongListSort, SortOrder } from '/@/renderer/api/types';
 import {
   Button,
   DropdownMenu,
@@ -79,10 +79,14 @@ const HeaderItems = styled.div`
 `;
 
 interface PlaylistDetailHeaderProps {
+  handleToggleShowQueryBuilder: () => void;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const PlaylistDetailSongListHeader = ({ tableRef }: PlaylistDetailHeaderProps) => {
+export const PlaylistDetailSongListHeader = ({
+  tableRef,
+  handleToggleShowQueryBuilder,
+}: PlaylistDetailHeaderProps) => {
   const { playlistId } = useParams() as { playlistId: string };
 
   const queryClient = useQueryClient();
@@ -365,18 +369,36 @@ export const PlaylistDetailSongListHeader = ({ tableRef }: PlaylistDetailHeaderP
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
               <DropdownMenu.Item onClick={() => handlePlay(Play.NOW)}>Play</DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => handlePlay(Play.LAST)}>
+                Add to queue (last)
+              </DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => handlePlay(Play.NEXT)}>
+                Add to queue (next)
+              </DropdownMenu.Item>
+              <DropdownMenu.Divider />
               <DropdownMenu.Item
                 disabled
-                onClick={() => handlePlay(Play.NEXT)}
+                onClick={() => handlePlay(Play.LAST)}
               >
-                Add to queue (last)
+                Edit playlist
               </DropdownMenu.Item>
               <DropdownMenu.Item
                 disabled
                 onClick={() => handlePlay(Play.LAST)}
               >
-                Add to queue (next)
+                Delete playlist
               </DropdownMenu.Item>
+              {server?.type === ServerType.NAVIDROME && !detailQuery?.data?.rules && (
+                <>
+                  <DropdownMenu.Divider />
+                  <DropdownMenu.Item
+                    $danger
+                    onClick={handleToggleShowQueryBuilder}
+                  >
+                    Toggle smart playlist editor
+                  </DropdownMenu.Item>
+                </>
+              )}
             </DropdownMenu.Dropdown>
           </DropdownMenu>
         </Flex>

@@ -1,26 +1,10 @@
 import { Group } from '@mantine/core';
-import dayjs from 'dayjs';
+import { useState } from 'react';
 import { RiSubtractLine } from 'react-icons/ri';
 import { Button } from '/@/renderer/components/button';
-import { TextInput } from '/@/renderer/components/input';
+import { NumberInput, TextInput } from '/@/renderer/components/input';
 import { Select } from '/@/renderer/components/select';
 import { QueryBuilderRule } from '/@/renderer/types';
-
-const operators = [
-  { label: 'is', value: 'is' },
-  { label: 'is not', value: 'isNot' },
-  { label: 'is greater than', value: 'gt' },
-  { label: 'is less than', value: 'lt' },
-  { label: 'contains', value: 'contains' },
-  { label: 'does not contain', value: 'notContains' },
-  { label: 'starts with', value: 'startsWith' },
-  { label: 'ends with', value: 'endsWith' },
-  { label: 'is in the range', value: 'inTheRange' },
-  { label: 'before', value: 'before' },
-  { label: 'after', value: 'after' },
-  { label: 'is in the last', value: 'inTheLast' },
-  { label: 'is not in the last', value: 'notInTheLast' },
-];
 
 type DeleteArgs = {
   groupIndex: number[];
@@ -30,22 +14,98 @@ type DeleteArgs = {
 
 interface QueryOptionProps {
   data: QueryBuilderRule;
-  filters: { label: string; value: string }[];
+  filters: { label: string; type: string; value: string }[];
   groupIndex: number[];
-  // groupValue: string;
   level: number;
   noRemove: boolean;
   onChangeField: (args: any) => void;
   onChangeOperator: (args: any) => void;
   onChangeValue: (args: any) => void;
   onDeleteRule: (args: DeleteArgs) => void;
+  operators: {
+    boolean: { label: string; value: string }[];
+    date: { label: string; value: string }[];
+    number: { label: string; value: string }[];
+    string: { label: string; value: string }[];
+  };
 }
+
+const QueryValueInput = ({ onChange, type, ...props }: any) => {
+  const [numberRange, setNumberRange] = useState([0, 0]);
+
+  switch (type) {
+    case 'string':
+      return (
+        <TextInput
+          size="sm"
+          onChange={onChange}
+          {...props}
+        />
+      );
+    case 'number':
+      return (
+        <NumberInput
+          size="sm"
+          onChange={onChange}
+          {...props}
+        />
+      );
+    case 'date':
+      return (
+        <TextInput
+          size="sm"
+          onChange={onChange}
+          {...props}
+        />
+      );
+
+    case 'dateRange':
+      return (
+        <>
+          <NumberInput
+            {...props}
+            defaultValue={props.defaultValue?.[0]}
+            maxWidth={81}
+            width="10%"
+            onChange={(e) => {
+              const newRange = [e || 0, numberRange[1]];
+              setNumberRange(newRange);
+              onChange(newRange);
+            }}
+          />
+          <NumberInput
+            {...props}
+            defaultValue={props.defaultValue?.[1]}
+            maxWidth={81}
+            width="10%"
+            onChange={(e) => {
+              const newRange = [numberRange[0], e || 0];
+              setNumberRange(newRange);
+              onChange(newRange);
+            }}
+          />
+        </>
+      );
+
+    case 'boolean':
+      return (
+        <Select
+          data={[]}
+          {...props}
+        />
+      );
+
+    default:
+      return <></>;
+  }
+};
 
 export const QueryBuilderOption = ({
   data,
   filters,
   level,
   onDeleteRule,
+  operators,
   groupIndex,
   noRemove,
   onChangeField,
@@ -67,8 +127,6 @@ export const QueryBuilderOption = ({
   };
 
   const handleChangeValue = (e: any) => {
-    console.log('e', e);
-
     const isDirectValue =
       typeof e === 'string' ||
       typeof e === 'number' ||
@@ -84,14 +142,25 @@ export const QueryBuilderOption = ({
       });
     }
 
-    const isDate = e instanceof Date;
+    // const isDate = e instanceof Date;
 
-    if (isDate) {
+    // if (isDate) {
+    //   return onChangeValue({
+    //     groupIndex,
+    //     level,
+    //     uniqueId,
+    //     value: dayjs(e).format('YYYY-MM-DD'),
+    //   });
+    // }
+
+    const isArray = Array.isArray(e);
+
+    if (isArray) {
       return onChangeValue({
         groupIndex,
         level,
         uniqueId,
-        value: dayjs(e).format('YYYY-MM-DD'),
+        value: e,
       });
     }
 
@@ -103,233 +172,8 @@ export const QueryBuilderOption = ({
     });
   };
 
-  // const filterOperatorMap = {
-  //   date: (
-  //     <Select
-  //       searchable
-  //       data={DATE_FILTER_OPTIONS_DATA}
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={operator}
-  //       width="20%"
-  //       onChange={handleChangeOperator}
-  //     />
-  //   ),
-  //   id: (
-  //     <Select
-  //       searchable
-  //       data={ID_FILTER_OPTIONS_DATA}
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={operator}
-  //       width="20%"
-  //       onChange={handleChangeOperator}
-  //     />
-  //   ),
-  //   number: (
-  //     <Select
-  //       searchable
-  //       data={NUMBER_FILTER_OPTIONS_DATA}
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={operator}
-  //       width="20%"
-  //       onChange={handleChangeOperator}
-  //     />
-  //   ),
-  //   string: (
-  //     <Select
-  //       searchable
-  //       data={STRING_FILTER_OPTIONS_DATA}
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={operator}
-  //       width="20%"
-  //       onChange={handleChangeOperator}
-  //     />
-  //   ),
-  // };
-
-  // const filterInputValueMap = {
-  //   'albumArtists.genres.id': (
-  //     <Select
-  //       searchable
-  //       data={genresData?.albumArtist || []}
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'albumArtists.name': (
-  //     <TextInput
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'albumArtists.ratings.value': (
-  //     <NumberInput
-  //       max={5}
-  //       maxWidth={175}
-  //       min={0}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'albums.dateAdded': (
-  //     <DatePicker
-  //       initialLevel="year"
-  //       maxDate={dayjs(new Date()).year(3000).toDate()}
-  //       maxWidth={175}
-  //       minDate={dayjs(new Date()).year(1950).toDate()}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'albums.genres.id': (
-  //     <Select
-  //       searchable
-  //       data={genresData?.album || []}
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'albums.name': (
-  //     <TextInput
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'albums.playCount': (
-  //     <NumberInput
-  //       maxWidth={175}
-  //       min={0}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={(e) => handleChangeValue(e)}
-  //     />
-  //   ),
-  //   'albums.ratings.value': (
-  //     <NumberInput
-  //       max={5}
-  //       maxWidth={175}
-  //       min={0}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'albums.releaseDate': (
-  //     <DatePicker
-  //       initialLevel="year"
-  //       maxDate={dayjs(new Date()).year(3000).toDate()}
-  //       maxWidth={175}
-  //       minDate={dayjs(new Date()).year(1950).toDate()}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'albums.releaseYear': (
-  //     <NumberInput
-  //       maxWidth={175}
-  //       min={0}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'artists.genres.id': (
-  //     <Select
-  //       searchable
-  //       data={genresData?.artist || []}
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'artists.name': (
-  //     <TextInput
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'artists.ratings.value': (
-  //     <NumberInput
-  //       max={5}
-  //       maxWidth={175}
-  //       min={0}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'songs.genres.id': (
-  //     <Select
-  //       searchable
-  //       data={genresData?.song || []}
-  //       maxWidth={175}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'songs.name': (
-  //     <TextInput
-  //       maxWidth={175}
-  //       size="xs"
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'songs.playCount': (
-  //     <NumberInput
-  //       maxWidth={175}
-  //       min={0}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  //   'songs.ratings.value': (
-  //     <NumberInput
-  //       max={5}
-  //       maxWidth={175}
-  //       min={0}
-  //       size="xs"
-  //       value={value}
-  //       width="20%"
-  //       onChange={handleChangeValue}
-  //     />
-  //   ),
-  // };
-
+  const fieldType = filters.find((f) => f.value === field)?.type;
+  const operatorsByFieldType = operators[fieldType as keyof typeof operators];
   const ml = (level + 1) * 10;
 
   return (
@@ -337,7 +181,7 @@ export const QueryBuilderOption = ({
       <Select
         searchable
         data={filters}
-        maxWidth={175}
+        maxWidth={170}
         size="sm"
         value={field}
         width="20%"
@@ -345,19 +189,20 @@ export const QueryBuilderOption = ({
       />
       <Select
         searchable
-        data={operators}
+        data={operatorsByFieldType || []}
         disabled={!field}
-        maxWidth={175}
+        maxWidth={170}
         size="sm"
         value={operator}
         width="20%"
         onChange={handleChangeOperator}
       />
       {field ? (
-        <TextInput
+        <QueryValueInput
           defaultValue={value}
-          maxWidth={175}
+          maxWidth={170}
           size="sm"
+          type={operator === 'inTheRange' ? 'dateRange' : fieldType}
           width="20%"
           onChange={handleChangeValue}
         />
@@ -365,14 +210,12 @@ export const QueryBuilderOption = ({
         <TextInput
           disabled
           defaultValue={value}
-          maxWidth={175}
+          maxWidth={170}
           size="sm"
           width="20%"
           onChange={handleChangeValue}
         />
       )}
-      {/* // filterOperatorMap[ // OPTIONS_MAP[field as keyof typeof OPTIONS_MAP].type as keyof typeof
-      filterOperatorMap // ] */}
       <Button
         disabled={noRemove}
         px={5}

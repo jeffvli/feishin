@@ -30,7 +30,7 @@ type DeleteArgs = {
 };
 interface QueryBuilderProps {
   data: Record<string, any>;
-  filters: { label: string; value: string }[];
+  filters: { label: string; type: string; value: string }[];
   groupIndex: number[];
   level: number;
   onAddRule: (args: AddArgs) => void;
@@ -39,8 +39,16 @@ interface QueryBuilderProps {
   onChangeOperator: (args: any) => void;
   onChangeType: (args: any) => void;
   onChangeValue: (args: any) => void;
+  onClearFilters: () => void;
   onDeleteRule: (args: DeleteArgs) => void;
   onDeleteRuleGroup: (args: DeleteArgs) => void;
+  onResetFilters: () => void;
+  operators: {
+    boolean: { label: string; value: string }[];
+    date: { label: string; value: string }[];
+    number: { label: string; value: string }[];
+    string: { label: string; value: string }[];
+  };
   uniqueId: string;
 }
 
@@ -53,8 +61,11 @@ export const QueryBuilder = ({
   onAddRuleGroup,
   onChangeType,
   onChangeField,
+  operators,
   onChangeOperator,
   onChangeValue,
+  onClearFilters,
+  onResetFilters,
   groupIndex,
   uniqueId,
   filters,
@@ -95,7 +106,7 @@ export const QueryBuilder = ({
         >
           <RiAddLine size={20} />
         </Button>
-        <DropdownMenu>
+        <DropdownMenu position="bottom-start">
           <DropdownMenu.Target>
             <Button
               p={0}
@@ -107,18 +118,33 @@ export const QueryBuilder = ({
           </DropdownMenu.Target>
           <DropdownMenu.Dropdown>
             <DropdownMenu.Item onClick={handleAddRuleGroup}>Add rule group</DropdownMenu.Item>
+
             {level > 0 && (
               <DropdownMenu.Item onClick={handleDeleteRuleGroup}>
                 Remove rule group
               </DropdownMenu.Item>
             )}
+            {level === 0 && (
+              <>
+                <DropdownMenu.Divider />
+                <DropdownMenu.Item
+                  $danger
+                  onClick={onResetFilters}
+                >
+                  Reset to default
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                  $danger
+                  onClick={onClearFilters}
+                >
+                  Clear filters
+                </DropdownMenu.Item>
+              </>
+            )}
           </DropdownMenu.Dropdown>
         </DropdownMenu>
       </Group>
-      <AnimatePresence
-        key="advanced-filter-option"
-        initial={false}
-      >
+      <AnimatePresence initial={false}>
         {data?.rules?.map((rule: QueryBuilderRule) => (
           <motion.div
             key={rule.uniqueId}
@@ -131,9 +157,9 @@ export const QueryBuilder = ({
               data={rule}
               filters={filters}
               groupIndex={groupIndex || []}
-              // groupValue={groupValue}
               level={level}
               noRemove={data?.rules?.length === 1}
+              operators={operators}
               onChangeField={onChangeField}
               onChangeOperator={onChangeOperator}
               onChangeValue={onChangeValue}
@@ -143,10 +169,7 @@ export const QueryBuilder = ({
         ))}
       </AnimatePresence>
       {data?.group && (
-        <AnimatePresence
-          key="advanced-filter-group"
-          initial={false}
-        >
+        <AnimatePresence initial={false}>
           {data.group?.map((group: QueryBuilderGroup, index: number) => (
             <motion.div
               key={group.uniqueId}
@@ -160,6 +183,7 @@ export const QueryBuilder = ({
                 filters={filters}
                 groupIndex={[...(groupIndex || []), index]}
                 level={level + 1}
+                operators={operators}
                 uniqueId={group.uniqueId}
                 onAddRule={onAddRule}
                 onAddRuleGroup={onAddRuleGroup}
@@ -167,8 +191,10 @@ export const QueryBuilder = ({
                 onChangeOperator={onChangeOperator}
                 onChangeType={onChangeType}
                 onChangeValue={onChangeValue}
+                onClearFilters={onClearFilters}
                 onDeleteRule={onDeleteRule}
                 onDeleteRuleGroup={onDeleteRuleGroup}
+                onResetFilters={onResetFilters}
               />
             </motion.div>
           ))}
