@@ -35,6 +35,8 @@ import type {
   RawArtistListResponse,
   UpdatePlaylistArgs,
   RawUpdatePlaylistResponse,
+  UserListArgs,
+  RawUserListResponse,
 } from '/@/renderer/api/types';
 import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
@@ -62,6 +64,7 @@ export type ControllerEndpoint = Partial<{
   getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<RawSongListResponse>;
   getSongDetail: (args: SongDetailArgs) => Promise<RawSongDetailResponse>;
   getSongList: (args: SongListArgs) => Promise<RawSongListResponse>;
+  getUserList: (args: UserListArgs) => Promise<RawUserListResponse>;
   updatePlaylist: (args: UpdatePlaylistArgs) => Promise<RawUpdatePlaylistResponse>;
   updateRating: (args: RatingArgs) => Promise<RawRatingResponse>;
 }>;
@@ -96,6 +99,7 @@ const endpoints: ApiController = {
     getPlaylistSongList: jellyfinApi.getPlaylistSongList,
     getSongDetail: undefined,
     getSongList: jellyfinApi.getSongList,
+    getUserList: undefined,
     updatePlaylist: jellyfinApi.updatePlaylist,
     updateRating: undefined,
   },
@@ -122,6 +126,7 @@ const endpoints: ApiController = {
     getPlaylistSongList: navidromeApi.getPlaylistSongList,
     getSongDetail: navidromeApi.getSongDetail,
     getSongList: navidromeApi.getSongList,
+    getUserList: navidromeApi.getUserList,
     updatePlaylist: navidromeApi.updatePlaylist,
     updateRating: subsonicApi.updateRating,
   },
@@ -147,6 +152,7 @@ const endpoints: ApiController = {
     getPlaylistList: undefined,
     getSongDetail: undefined,
     getSongList: undefined,
+    getUserList: undefined,
     updatePlaylist: undefined,
     updateRating: undefined,
   },
@@ -227,6 +233,10 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs) => {
   );
 };
 
+const getUserList = async (args: UserListArgs) => {
+  return (apiController('getUserList') as ControllerEndpoint['getUserList'])?.(args);
+};
+
 export const controller = {
   createPlaylist,
   deletePlaylist,
@@ -240,5 +250,6 @@ export const controller = {
   getPlaylistList,
   getPlaylistSongList,
   getSongList,
+  getUserList,
   updatePlaylist,
 };

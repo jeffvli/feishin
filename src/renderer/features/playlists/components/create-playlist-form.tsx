@@ -1,6 +1,6 @@
 import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { CreatePlaylistQuery, ServerType } from '/@/renderer/api/types';
+import { CreatePlaylistBody, ServerType } from '/@/renderer/api/types';
 import { Button, Switch, TextInput, toast } from '/@/renderer/components';
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { useCurrentServer } from '/@/renderer/store';
@@ -13,18 +13,20 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
   const mutation = useCreatePlaylist();
   const server = useCurrentServer();
 
-  const form = useForm<CreatePlaylistQuery>({
+  const form = useForm<CreatePlaylistBody>({
     initialValues: {
       comment: '',
       name: '',
-      public: false,
-      rules: undefined,
+      ndParams: {
+        public: false,
+        rules: undefined,
+      },
     },
   });
 
   const handleSubmit = form.onSubmit((values) => {
     mutation.mutate(
-      { query: values },
+      { body: values },
       {
         onError: (err) => {
           toast.error({ message: err.message, title: 'Error creating playlist' });
@@ -56,7 +58,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
         {isPublicDisplayed && (
           <Switch
             label="Is Public?"
-            {...form.getInputProps('public')}
+            {...form.getInputProps('ndParams.public')}
           />
         )}
         <Group position="right">

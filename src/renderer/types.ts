@@ -111,22 +111,17 @@ export interface UniqueId {
   uniqueId: string;
 }
 
-export enum FilterGroupType {
-  AND = 'AND',
-  OR = 'OR',
-}
-
-export type AdvancedFilterRule = {
+export type QueryBuilderRule = {
   field?: string | null;
   operator?: string | null;
   uniqueId: string;
   value?: string | number | Date | undefined | null | any;
 };
 
-export type AdvancedFilterGroup = {
-  group: AdvancedFilterGroup[];
-  rules: AdvancedFilterRule[];
-  type: FilterGroupType;
+export type QueryBuilderGroup = {
+  group: QueryBuilderGroup[];
+  rules: QueryBuilderRule[];
+  type: 'any' | 'all';
   uniqueId: string;
 };
 

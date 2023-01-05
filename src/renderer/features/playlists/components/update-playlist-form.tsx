@@ -1,27 +1,37 @@
 import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { ServerType, UpdatePlaylistBody, UpdatePlaylistQuery } from '/@/renderer/api/types';
-import { Button, Switch, TextInput, toast } from '/@/renderer/components';
+import { ServerType, UpdatePlaylistBody, UpdatePlaylistQuery, User } from '/@/renderer/api/types';
+import { Button, Select, Switch, TextInput, toast } from '/@/renderer/components';
 import { useUpdatePlaylist } from '/@/renderer/features/playlists/mutations/update-playlist-mutation';
 import { useCurrentServer } from '/@/renderer/store';
 
-interface CreatePlaylistFormProps {
+interface UpdatePlaylistFormProps {
   body: Partial<UpdatePlaylistBody>;
   onCancel: () => void;
   query: UpdatePlaylistQuery;
+  users?: User[];
 }
 
-export const UpdatePlaylistForm = ({ query, body, onCancel }: CreatePlaylistFormProps) => {
+export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlaylistFormProps) => {
   const mutation = useUpdatePlaylist();
   const server = useCurrentServer();
 
+  const userList = users?.map((user) => ({
+    label: user.name,
+    value: user.id,
+  }));
+
   const form = useForm<UpdatePlaylistBody>({
     initialValues: {
-      comment: '',
-      name: '',
-      public: false,
-      rules: undefined,
-      ...body,
+      comment: body?.comment || '',
+      name: body?.name || '',
+      ndParams: {
+        owner: body?.ndParams?.owner || '',
+        ownerId: body?.ndParams?.ownerId || '',
+        public: body?.ndParams?.public || false,
+        rules: undefined,
+        sync: body?.ndParams?.sync || false,
+      },
     },
   });
 
@@ -55,6 +65,11 @@ export const UpdatePlaylistForm = ({ query, body, onCancel }: CreatePlaylistForm
         <TextInput
           label="Description"
           {...form.getInputProps('comment')}
+        />
+        <Select
+          data={userList || []}
+          {...form.getInputProps('ndParams.ownerId')}
+          label="Owner"
         />
         {isPublicDisplayed && (
           <Switch

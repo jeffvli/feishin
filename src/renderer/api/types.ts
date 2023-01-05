@@ -33,6 +33,8 @@ import {
   NDPlaylistListSort,
   NDPlaylistDetail,
   NDSongListSort,
+  NDUserList,
+  NDUserListSort,
 } from '/@/renderer/api/navidrome.types';
 import {
   SSAlbumList,
@@ -47,6 +49,16 @@ export enum SortOrder {
   ASC = 'ASC',
   DESC = 'DESC',
 }
+
+export type User = {
+  createdAt: string | null;
+  email: string | null;
+  id: string;
+  isAdmin: boolean | null;
+  lastLoginAt: string | null;
+  name: string;
+  updatedAt: string | null;
+};
 
 export type ServerListItem = {
   credential: string;
@@ -242,12 +254,13 @@ export type Playlist = {
   imagePlaceholderUrl: string | null;
   imageUrl: string | null;
   name: string;
+  owner: string | null;
+  ownerId: string | null;
   public: boolean | null;
   rules?: Record<string, any> | null;
   size: number | null;
   songCount: number | null;
-  userId: string | null;
-  username: string | null;
+  sync?: boolean | null;
 };
 
 export type GenresResponse = Genre[];
@@ -739,14 +752,19 @@ export type RawCreatePlaylistResponse = CreatePlaylistResponse | undefined;
 
 export type CreatePlaylistResponse = { id: string; name: string };
 
-export type CreatePlaylistQuery = {
+export type CreatePlaylistBody = {
   comment?: string;
   name: string;
-  public?: boolean;
-  rules?: Record<string, any>;
+  ndParams?: {
+    owner?: string;
+    ownerId?: string;
+    public?: boolean;
+    rules?: Record<string, any>;
+    sync?: boolean;
+  };
 };
 
-export type CreatePlaylistArgs = { query: CreatePlaylistQuery } & BaseEndpointArgs;
+export type CreatePlaylistArgs = { body: CreatePlaylistBody } & BaseEndpointArgs;
 
 // Update Playlist
 export type RawUpdatePlaylistResponse = UpdatePlaylistResponse | undefined;
@@ -761,8 +779,13 @@ export type UpdatePlaylistBody = {
   comment?: string;
   genres?: Genre[];
   name: string;
-  public?: boolean;
-  rules?: Record<string, any>;
+  ndParams?: {
+    owner?: string;
+    ownerId?: string;
+    public?: boolean;
+    rules?: Record<string, any>;
+    sync?: boolean;
+  };
 };
 
 export type UpdatePlaylistArgs = {
@@ -880,3 +903,44 @@ export type CreateFavoriteResponse = { id: string };
 export type CreateFavoriteQuery = { comment?: string; name: string; public?: boolean };
 
 export type CreateFavoriteArgs = { query: CreateFavoriteQuery } & BaseEndpointArgs;
+
+// User list
+// Playlist List
+export type RawUserListResponse = NDUserList | undefined;
+
+export type UserListResponse = BasePaginatedResponse<User[]>;
+
+export enum UserListSort {
+  NAME = 'name',
+}
+
+export type UserListQuery = {
+  limit?: number;
+  ndParams?: {
+    owner_id?: string;
+  };
+  searchTerm?: string;
+  sortBy: UserListSort;
+  sortOrder: SortOrder;
+  startIndex: number;
+};
+
+export type UserListArgs = { query: UserListQuery } & BaseEndpointArgs;
+
+type UserListSortMap = {
+  jellyfin: Record<UserListSort, undefined>;
+  navidrome: Record<UserListSort, NDUserListSort | undefined>;
+  subsonic: Record<UserListSort, undefined>;
+};
+
+export const userListSortMap: UserListSortMap = {
+  jellyfin: {
+    name: undefined,
+  },
+  navidrome: {
+    name: NDUserListSort.NAME,
+  },
+  subsonic: {
+    name: undefined,
+  },
+};

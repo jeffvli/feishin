@@ -433,26 +433,26 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<JFPlaylistList> 
 };
 
 const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistResponse> => {
-  const { query, server } = args;
+  const { body, server } = args;
 
-  const body = {
+  const json = {
     MediaType: 'Audio',
-    Name: query.name,
-    Overview: query.comment || '',
+    Name: body.name,
+    Overview: body.comment || '',
     UserId: server?.userId,
   };
 
   const data = await api
     .post('playlists', {
       headers: { 'X-MediaBrowser-Token': server?.credential },
-      json: body,
+      json,
       prefixUrl: server?.url,
     })
     .json<JFCreatePlaylistResponse>();
 
   return {
     id: data.Id,
-    name: query.name,
+    name: body.name,
   };
 };
 
@@ -760,12 +760,13 @@ const normalizePlaylist = (
     imagePlaceholderUrl,
     imageUrl: imageUrl || null,
     name: item.Name,
+    owner: null,
+    ownerId: null,
     public: null,
     rules: null,
     size: null,
     songCount: item?.ChildCount || null,
-    userId: null,
-    username: null,
+    sync: null,
   };
 };
 

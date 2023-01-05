@@ -1,6 +1,7 @@
+import { forwardRef, Fragment, Ref } from 'react';
 import { Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
-import { forwardRef, Fragment, Ref } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { RiMoreFill } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -14,6 +15,10 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem, Play } from '/@/renderer/types';
 import { formatDurationString } from '/@/renderer/utils';
+import { UserListSort, SortOrder, UserListQuery } from '/@/renderer/api/types';
+import { useCurrentServer } from '/@/renderer/store';
+import { api } from '/@/renderer/api';
+import { queryKeys } from '/@/renderer/api/query-keys';
 
 interface PlaylistDetailHeaderProps {
   background: string;
@@ -27,10 +32,12 @@ export const PlaylistDetailHeader = forwardRef(
     ref: Ref<HTMLDivElement>,
   ) => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const { playlistId } = useParams() as { playlistId: string };
     const detailQuery = usePlaylistDetail({ id: playlistId });
     const handlePlayQueueAdd = usePlayQueueAdd();
     const playButtonBehavior = usePlayButtonBehavior();
+    const server = useCurrentServer();
 
     const handlePlay = (playType?: Play) => {
       handlePlayQueueAdd?.({
@@ -42,7 +49,20 @@ export const PlaylistDetailHeader = forwardRef(
       });
     };
 
-    const openUpdatePlaylistModal = () => {
+    const openUpdatePlaylistModal = async () => {
+      const query: UserListQuery = {
+        sortBy: UserListSort.NAME,
+        sortOrder: SortOrder.ASC,
+        startIndex: 0,
+      };
+
+      const users = await queryClient.fetchQuery({
+        queryFn: ({ signal }) => api.controller.getUserList({ query, server, signal }),
+        queryKey: queryKeys.users.list(server?.id || '', query),
+      });
+
+      const normalizedUsers = api.normalize.userList(users, server);
+
       openModal({
         children: (
           <UpdatePlaylistForm
@@ -50,10 +70,16 @@ export const PlaylistDetailHeader = forwardRef(
               comment: detailQuery?.data?.description || undefined,
               genres: detailQuery?.data?.genres,
               name: detailQuery?.data?.name,
-              public: detailQuery?.data?.public || false,
-              rules: detailQuery?.data?.rules || undefined,
+              ndParams: {
+                owner: detailQuery?.data?.owner || undefined,
+                ownerId: detailQuery?.data?.ownerId || undefined,
+                public: detailQuery?.data?.public || false,
+                rules: detailQuery?.data?.rules || undefined,
+                sync: detailQuery?.data?.sync || undefined,
+              },
             }}
             query={{ id: playlistId }}
+            users={normalizedUsers.items}
             onCancel={closeAllModals}
           />
         ),

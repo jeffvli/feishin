@@ -37,9 +37,13 @@ import type {
   NDPlaylistSongListResponse,
   NDPlaylistSongList,
   NDPlaylistSong,
+  NDUserList,
+  NDUserListResponse,
+  NDUserListParams,
+  NDUser,
 } from '/@/renderer/api/navidrome.types';
-import { NDPlaylistListSort, NDSongListSort, NDSortOrder } from '/@/renderer/api/navidrome.types';
-import type {
+import { NDSongListSort, NDSortOrder } from '/@/renderer/api/navidrome.types';
+import {
   Album,
   Song,
   AuthenticationResponse,
@@ -60,13 +64,14 @@ import type {
   Playlist,
   UpdatePlaylistResponse,
   UpdatePlaylistArgs,
-} from '/@/renderer/api/types';
-import {
+  UserListArgs,
+  userListSortMap,
   playlistListSortMap,
   albumArtistListSortMap,
   songListSortMap,
   albumListSortMap,
   sortOrderMap,
+  User,
 } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components/toast';
 import { useAuthStore } from '/@/renderer/store';
@@ -129,6 +134,34 @@ const authenticate = async (
     ndCredential: data.token,
     userId: data.id,
     username: data.username,
+  };
+};
+
+const getUserList = async (args: UserListArgs): Promise<NDUserList> => {
+  const { query, server, signal } = args;
+
+  const searchParams: NDUserListParams = {
+    _end: query.startIndex + (query.limit || 0),
+    _order: sortOrderMap.navidrome[query.sortOrder],
+    _sort: userListSortMap.navidrome[query.sortBy],
+    _start: query.startIndex,
+    ...query.ndParams,
+  };
+
+  const res = await api.get('api/user', {
+    headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
+    prefixUrl: server?.url,
+    searchParams: parseSearchParams(searchParams),
+    signal,
+  });
+
+  const data = await res.json<NDUserListResponse>();
+  const itemCount = res.headers.get('x-total-count');
+
+  return {
+    items: data,
+    startIndex: query?.startIndex || 0,
+    totalRecordCount: Number(itemCount),
   };
 };
 
@@ -293,12 +326,14 @@ const getSongDetail = async (args: SongDetailArgs): Promise<NDSongDetail> => {
 };
 
 const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistResponse> => {
-  const { query, server } = args;
+  const { body, server } = args;
 
   const json: NDCreatePlaylistParams = {
-    comment: query.comment,
-    name: query.name,
-    public: query.public || false,
+    comment: body.comment,
+    name: body.name,
+    ...body.ndParams,
+    public: body.ndParams?.public || false,
+    rules: body.ndParams?.rules ? body.ndParams.rules : undefined,
   };
 
   const data = await api
@@ -311,7 +346,7 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
 
   return {
     id: data.id,
-    name: query.name,
+    name: body.name,
   };
 };
 
@@ -321,7 +356,11 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
   const json: NDUpdatePlaylistParams = {
     comment: body.comment || '',
     name: body.name,
-    public: body.public || false,
+    ownerId: body.ndParams?.ownerId || undefined,
+    ownerName: body.ndParams?.owner || undefined,
+    public: body.ndParams?.public || false,
+    rules: body.ndParams?.rules ? body.ndParams?.rules : undefined,
+    sync: body.ndParams?.sync || undefined,
   };
 
   const data = await api
@@ -357,8 +396,8 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<NDPlaylistList> 
 
   const searchParams: NDPlaylistListParams = {
     _end: query.startIndex + (query.limit || 0),
-    _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : NDSortOrder.ASC,
-    _sort: query.sortBy ? playlistListSortMap.navidrome[query.sortBy] : NDPlaylistListSort.NAME,
+    _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : undefined,
+    _sort: query.sortBy ? playlistListSortMap.navidrome[query.sortBy] : undefined,
     _start: query.startIndex,
     ...query.ndParams,
   };
@@ -583,12 +622,25 @@ const normalizePlaylist = (
     imagePlaceholderUrl,
     imageUrl,
     name: item.name,
+    owner: item.ownerName,
+    ownerId: item.ownerId,
     public: item.public,
     rules: item?.rules || null,
     size: item.size,
     songCount: item.songCount,
-    userId: item.ownerId,
-    username: item.ownerName,
+    sync: item.sync,
+  };
+};
+
+const normalizeUser = (item: NDUser): User => {
+  return {
+    createdAt: item.createdAt,
+    email: item.email,
+    id: item.id,
+    isAdmin: item.isAdmin,
+    lastLoginAt: item.lastLoginAt,
+    name: item.userName,
+    updatedAt: item.updatedAt,
   };
 };
 
@@ -606,6 +658,7 @@ export const navidromeApi = {
   getPlaylistSongList,
   getSongDetail,
   getSongList,
+  getUserList,
   updatePlaylist,
 };
 
@@ -614,4 +667,5 @@ export const ndNormalize = {
   albumArtist: normalizeAlbumArtist,
   playlist: normalizePlaylist,
   song: normalizeSong,
+  user: normalizeUser,
 };

@@ -8,6 +8,18 @@ export type NDAuthenticate = {
   username: string;
 };
 
+export type NDUser = {
+  createdAt: string;
+  email: string;
+  id: string;
+  isAdmin: boolean;
+  lastAccessAt: string;
+  lastLoginAt: string;
+  name: string;
+  updatedAt: string;
+  userName: string;
+};
+
 export type NDGenre = {
   id: string;
   name: string;
@@ -376,3 +388,20 @@ export const NDSongQueryFields = [
   { label: 'Play count', value: 'playcount' },
   { label: 'Rating', value: 'rating' },
 ];
+
+export type NDUserListParams = {
+  _sort?: NDUserListSort;
+} & NDPagination &
+  NDOrder;
+
+export type NDUserListResponse = NDUser[];
+
+export type NDUserList = {
+  items: NDUser[];
+  startIndex: number;
+  totalRecordCount: number;
+};
+
+export enum NDUserListSort {
+  NAME = 'name',
+}
