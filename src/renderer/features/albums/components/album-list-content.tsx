@@ -312,29 +312,32 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
         {page.display === ListDisplayType.CARD || page.display === ListDisplayType.POSTER ? (
           <AutoSizer>
             {({ height, width }) => (
-              <VirtualInfiniteGrid
-                key={`album-list-${server?.id}-${page.display}`}
-                ref={gridRef}
-                cardRows={cardRows}
-                display={page.display || ListDisplayType.CARD}
-                fetchFn={fetch}
-                handlePlayQueueAdd={handlePlayQueueAdd}
-                height={height}
-                initialScrollOffset={page?.grid.scrollOffset || 0}
-                itemCount={checkAlbumList?.data?.totalRecordCount || 0}
-                itemData={itemData}
-                itemGap={20}
-                itemSize={150 + page.grid?.size}
-                itemType={LibraryItem.ALBUM}
-                minimumBatchSize={40}
-                route={{
-                  route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                  slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
-                }}
-                setItemData={setItemData}
-                width={width}
-                onScroll={handleGridScroll}
-              />
+              <>
+                <VirtualInfiniteGrid
+                  key={`album-list-${server?.id}-${page.display}`}
+                  ref={gridRef}
+                  cardRows={cardRows}
+                  display={page.display || ListDisplayType.CARD}
+                  fetchFn={fetch}
+                  handlePlayQueueAdd={handlePlayQueueAdd}
+                  height={height}
+                  initialScrollOffset={page?.grid.scrollOffset || 0}
+                  itemCount={checkAlbumList?.data?.totalRecordCount || 0}
+                  itemData={itemData}
+                  itemGap={20}
+                  itemSize={150 + page.grid?.size}
+                  itemType={LibraryItem.ALBUM}
+                  loading={checkAlbumList.isLoading}
+                  minimumBatchSize={40}
+                  route={{
+                    route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                    slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
+                  }}
+                  setItemData={setItemData}
+                  width={width}
+                  onScroll={handleGridScroll}
+                />
+              </>
             )}
           </AutoSizer>
         ) : (

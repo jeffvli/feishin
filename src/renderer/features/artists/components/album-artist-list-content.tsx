@@ -306,6 +306,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
                 itemGap={20}
                 itemSize={150 + page.grid?.size}
                 itemType={LibraryItem.ALBUM_ARTIST}
+                loading={checkAlbumArtistList.isLoading}
                 minimumBatchSize={40}
                 route={{
                   route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,

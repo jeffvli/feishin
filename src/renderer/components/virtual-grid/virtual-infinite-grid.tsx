@@ -21,6 +21,7 @@ interface VirtualGridProps extends Omit<FixedSizeListProps, 'children' | 'itemSi
   itemGap: number;
   itemSize: number;
   itemType: LibraryItem;
+  loading?: boolean;
   minimumBatchSize?: number;
   route?: CardRoute;
   setItemData: (data: any[]) => void;
@@ -50,6 +51,7 @@ export const VirtualInfiniteGrid = forwardRef(
       handlePlayQueueAdd,
       minimumBatchSize,
       fetchFn,
+      loading,
       initialScrollOffset,
       height,
       width,
@@ -126,41 +128,45 @@ export const VirtualInfiniteGrid = forwardRef(
       },
     }));
 
+    if (loading) return null;
+
     return (
-      <InfiniteLoader
-        ref={loader}
-        isItemLoaded={(index) => isItemLoaded(index)}
-        itemCount={itemCount || 0}
-        loadMoreItems={debouncedLoadMoreItems}
-        minimumBatchSize={minimumBatchSize}
-        threshold={30}
-      >
-        {({ onItemsRendered, ref: infiniteLoaderRef }) => (
-          <VirtualGridWrapper
-            cardRows={cardRows}
-            columnCount={columnCount}
-            display={display || ListDisplayType.CARD}
-            handlePlayQueueAdd={handlePlayQueueAdd}
-            height={height}
-            initialScrollOffset={initialScrollOffset}
-            itemCount={itemCount || 0}
-            itemData={itemData}
-            itemGap={itemGap}
-            itemHeight={itemHeight + itemGap / 2}
-            itemType={itemType}
-            itemWidth={itemSize}
-            refInstance={(list) => {
-              infiniteLoaderRef(list);
-              listRef.current = list;
-            }}
-            route={route}
-            rowCount={rowCount}
-            width={width}
-            onItemsRendered={onItemsRendered}
-            onScroll={onScroll}
-          />
-        )}
-      </InfiniteLoader>
+      <>
+        <InfiniteLoader
+          ref={loader}
+          isItemLoaded={(index) => isItemLoaded(index)}
+          itemCount={itemCount || 0}
+          loadMoreItems={debouncedLoadMoreItems}
+          minimumBatchSize={minimumBatchSize}
+          threshold={30}
+        >
+          {({ onItemsRendered, ref: infiniteLoaderRef }) => (
+            <VirtualGridWrapper
+              cardRows={cardRows}
+              columnCount={columnCount}
+              display={display || ListDisplayType.CARD}
+              handlePlayQueueAdd={handlePlayQueueAdd}
+              height={height}
+              initialScrollOffset={initialScrollOffset}
+              itemCount={itemCount || 0}
+              itemData={itemData}
+              itemGap={itemGap}
+              itemHeight={itemHeight + itemGap / 2}
+              itemType={itemType}
+              itemWidth={itemSize}
+              refInstance={(list) => {
+                infiniteLoaderRef(list);
+                listRef.current = list;
+              }}
+              route={route}
+              rowCount={rowCount}
+              width={width}
+              onItemsRendered={onItemsRendered}
+              onScroll={onScroll}
+            />
+          )}
+        </InfiniteLoader>
+      </>
     );
   },
 );
