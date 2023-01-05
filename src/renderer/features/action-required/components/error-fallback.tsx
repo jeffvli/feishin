@@ -1,15 +1,18 @@
 import { Box, Center, Divider, Group, Stack } from '@mantine/core';
 import type { FallbackProps } from 'react-error-boundary';
-import { RiErrorWarningLine, RiArrowLeftLine } from 'react-icons/ri';
+import { RiErrorWarningLine, RiHomeFill, RiArrowLeftSLine } from 'react-icons/ri';
 import { useNavigate, useRouteError } from 'react-router';
 import styled from 'styled-components';
 import { Button, Text } from '/@/renderer/components';
+import { AppRoute } from '/@/renderer/router/routes';
 
 const Container = styled(Box)`
   background: var(--main-bg);
 `;
 
-export const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
+export const ErrorFallback = ({ resetErrorBoundary }: FallbackProps) => {
+  const error = useRouteError() as any;
+
   return (
     <Container>
       <Center sx={{ height: '100vh' }}>
@@ -47,11 +50,22 @@ export const RouteErrorBoundary = () => {
     navigate(-1);
   };
 
+  const handleHome = () => {
+    navigate(AppRoute.HOME);
+  };
+
   return (
     <Container>
       <Center sx={{ height: '100vh' }}>
         <Stack sx={{ maxWidth: '50%' }}>
           <Group>
+            <Button
+              px={10}
+              variant="subtle"
+              onClick={handleReturn}
+            >
+              <RiArrowLeftSLine size={20} />
+            </Button>
             <RiErrorWarningLine
               color="var(--danger-color)"
               size={30}
@@ -62,12 +76,12 @@ export const RouteErrorBoundary = () => {
           <Text size="sm">{error?.message}</Text>
           <Group grow>
             <Button
-              leftIcon={<RiArrowLeftLine />}
+              leftIcon={<RiHomeFill />}
               sx={{ flex: 0.5 }}
               variant="default"
-              onClick={handleReturn}
+              onClick={handleHome}
             >
-              Go back
+              Go home
             </Button>
             <Button
               variant="filled"

@@ -55,41 +55,51 @@ export const AppRouter = () => {
               <Route
                 index
                 element={<HomeRoute />}
+                errorElement={<RouteErrorBoundary />}
               />
               <Route
                 element={<HomeRoute />}
+                errorElement={<RouteErrorBoundary />}
                 path={AppRoute.HOME}
               />
               <Route
                 element={<NowPlayingRoute />}
+                errorElement={<RouteErrorBoundary />}
                 path={AppRoute.NOW_PLAYING}
               />
               <Route
                 element={<AlbumListRoute />}
+                errorElement={<RouteErrorBoundary />}
                 path={AppRoute.LIBRARY_ALBUMS}
               />
               <Route
                 element={<AlbumDetailRoute />}
+                errorElement={<RouteErrorBoundary />}
                 path={AppRoute.LIBRARY_ALBUMS_DETAIL}
               />
               <Route
                 element={<SongListRoute />}
+                errorElement={<RouteErrorBoundary />}
                 path={AppRoute.LIBRARY_SONGS}
               />
               <Route
                 element={<PlaylistListRoute />}
+                errorElement={<RouteErrorBoundary />}
                 path={AppRoute.PLAYLISTS}
               />
               <Route
                 element={<PlaylistDetailRoute />}
+                errorElement={<RouteErrorBoundary />}
                 path={AppRoute.PLAYLISTS_DETAIL}
               />
               <Route
                 element={<PlaylistDetailSongListRoute />}
+                errorElement={<RouteErrorBoundary />}
                 path={AppRoute.PLAYLISTS_DETAIL_SONGS}
               />
               <Route
                 element={<AlbumArtistListRoute />}
+                errorElement={<RouteErrorBoundary />}
                 path={AppRoute.LIBRARY_ALBUMARTISTS}
               />
               <Route
