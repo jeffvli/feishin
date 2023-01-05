@@ -12,6 +12,7 @@ import styled from 'styled-components';
 type MenuProps = MantineMenuProps;
 type MenuLabelProps = MantineMenuLabelProps;
 interface MenuItemProps extends MantineMenuItemProps {
+  $danger?: boolean;
   $isActive?: boolean;
   children: React.ReactNode;
 }
@@ -46,7 +47,7 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   }
 
   & .mantine-Menu-itemLabel {
-    color: var(--dropdown-menu-fg);
+    color: ${(props) => (props.$danger ? 'var(--danger-color)' : 'var(--dropdown-menu-fg)')};
     font-weight: 500;
     font-size: 1em;
   }
@@ -90,9 +91,10 @@ const MenuLabel = ({ children, ...props }: MenuLabelProps) => {
   return <StyledMenuLabel {...props}>{children}</StyledMenuLabel>;
 };
 
-const pMenuItem = ({ $isActive, children, ...props }: MenuItemProps) => {
+const pMenuItem = ({ $isActive, $danger, children, ...props }: MenuItemProps) => {
   return (
     <StyledMenuItem
+      $danger={$danger}
       $isActive={$isActive}
       rightSection={$isActive && <RiArrowLeftSFill size={20} />}
       {...props}
