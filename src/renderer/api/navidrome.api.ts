@@ -503,7 +503,7 @@ const normalizeSong = (
     baseUrl: server.url,
     coverArtId: id,
     credential: server.credential,
-    size: imageSize || 300,
+    size: imageSize || 100,
   });
 
   const imagePlaceholderUrl = null;

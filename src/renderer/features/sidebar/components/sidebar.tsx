@@ -80,6 +80,12 @@ export const Sidebar = () => {
   const sidebar = useSidebarStore();
   const { setSidebar } = useAppStoreActions();
   const imageUrl = useCurrentSong()?.imageUrl;
+
+  const upsizedImageUrl = imageUrl
+    ?.replace(/size=\d+/, 'size=300')
+    .replace(/width=\d+/, 'width=300')
+    .replace(/height=\d+/, 'height=300');
+
   const showImage = sidebar.image;
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
@@ -335,10 +341,10 @@ export const Sidebar = () => {
               to={AppRoute.NOW_PLAYING}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-              {imageUrl ? (
+              {upsizedImageUrl ? (
                 <SidebarImage
                   loading="eager"
-                  src={imageUrl}
+                  src={upsizedImageUrl}
                 />
               ) : (
                 <Center sx={{ background: 'var(--placeholder-bg)', height: '100%' }}>

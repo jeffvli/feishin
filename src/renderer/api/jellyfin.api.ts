@@ -582,7 +582,7 @@ const getAlbumCoverArtUrl = (args: { baseUrl: string; item: JFAlbum; size: numbe
 };
 
 const getSongCoverArtUrl = (args: { baseUrl: string; item: JFSong; size: number }) => {
-  const size = args.size ? args.size : 300;
+  const size = args.size ? args.size : 100;
 
   if (!args.item.ImageTags?.Primary) {
     return null;
@@ -652,7 +652,7 @@ const normalizeSong = (
     genres: item.GenreItems.map((entry: any) => ({ id: entry.Id, name: entry.Name })),
     id: item.Id,
     imagePlaceholderUrl: null,
-    imageUrl: getSongCoverArtUrl({ baseUrl: server.url, item, size: imageSize || 300 }),
+    imageUrl: getSongCoverArtUrl({ baseUrl: server.url, item, size: imageSize || 100 }),
     itemType: LibraryItem.SONG,
     lastPlayedAt: null,
     name: item.Name,
