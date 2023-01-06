@@ -179,6 +179,7 @@ export type Song = {
   bitRate: number;
   bpm: number | null;
   channels: number | null;
+  comment: string | null;
   compilation: boolean | null;
   container: string | null;
   createdAt: string;
@@ -191,7 +192,6 @@ export type Song = {
   isFavorite: boolean;
   lastPlayedAt: string | null;
   name: string;
-  note: string | null;
   path: string | null;
   playCount: number;
   releaseDate: string | null;

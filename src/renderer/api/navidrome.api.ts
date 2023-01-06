@@ -516,6 +516,7 @@ const normalizeSong = (
     bitRate: item.bitRate,
     bpm: item.bpm ? item.bpm : null,
     channels: item.channels ? item.channels : null,
+    comment: item.comment ? item.comment : null,
     compilation: item.compilation,
     container: item.suffix,
     createdAt: item.createdAt.split('T')[0],
@@ -526,9 +527,8 @@ const normalizeSong = (
     imagePlaceholderUrl,
     imageUrl,
     isFavorite: item.starred,
-    lastPlayedAt: item.playDate ? item.playDate : null,
+    lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
     name: item.title,
-    note: item.comment ? item.comment : null,
     path: item.path,
     playCount: item.playCount,
     releaseDate: new Date(item.year, 0, 1).toISOString(),
@@ -567,7 +567,7 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
     imageUrl,
     isCompilation: item.compilation,
     isFavorite: item.starred,
-    lastPlayedAt: item.playDate ? item.playDate.split('T')[0] : null,
+    lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
     name: item.name,
     playCount: item.playCount,
     rating: item.rating,
@@ -583,16 +583,18 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
 };
 
 const normalizeAlbumArtist = (item: NDAlbumArtist): AlbumArtist => {
+  console.log('item :>> ', item);
+
   return {
     albumCount: item.albumCount,
     backgroundImageUrl: null,
-    biography: item.biography,
+    biography: item.biography || null,
     duration: null,
     genres: item.genres,
     id: item.id,
-    imageUrl: item.largeImageUrl,
+    imageUrl: item.largeImageUrl || null,
     isFavorite: item.starred,
-    lastPlayedAt: item.playDate ? item.playDate.split('T')[0] : null,
+    lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
     name: item.name,
     playCount: item.playCount,
     rating: item.rating,
