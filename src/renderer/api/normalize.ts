@@ -161,7 +161,9 @@ const albumArtistList = (
       );
       break;
     case 'navidrome':
-      albumArtists = data?.items.map((item) => ndNormalize.albumArtist(item as NDAlbumArtist));
+      albumArtists = data?.items.map((item) =>
+        ndNormalize.albumArtist(item as NDAlbumArtist, server),
+      );
       break;
     case 'subsonic':
       break;

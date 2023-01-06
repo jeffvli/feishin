@@ -2,10 +2,11 @@ import type { ReactNode } from 'react';
 import type { IHeaderParams } from '@ag-grid-community/core';
 import { AiOutlineNumber } from 'react-icons/ai';
 import { FiClock } from 'react-icons/fi';
+import { RiHeartLine, RiStarLine } from 'react-icons/ri';
 import styled from 'styled-components';
 import { _Text } from '/@/renderer/components/text';
 
-type Presets = 'duration' | 'rowIndex';
+type Presets = 'duration' | 'rowIndex' | 'userFavorite' | 'userRating';
 
 type Options = {
   children?: ReactNode;
@@ -39,7 +40,12 @@ const TextHeaderWrapper = styled(_Text)<{ position: Options['position'] }>`
   text-transform: uppercase;
 `;
 
-const headerPresets = { duration: <FiClock size={15} />, rowIndex: <AiOutlineNumber size={15} /> };
+const headerPresets = {
+  duration: <FiClock size={15} />,
+  rowIndex: <AiOutlineNumber size={15} />,
+  userFavorite: <RiHeartLine size={15} />,
+  userRating: <RiStarLine size={15} />,
+};
 
 export const GenericTableHeader = (
   { displayName }: IHeaderParams,

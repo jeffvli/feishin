@@ -1,5 +1,4 @@
-import type { Ref } from 'react';
-import { forwardRef, useRef } from 'react';
+import { Ref, forwardRef, useRef } from 'react';
 import type {
   ICellRendererParams,
   ValueGetterParams,
@@ -25,6 +24,8 @@ import { GenericTableHeader } from '/@/renderer/components/virtual-table/headers
 import { AppRoute } from '/@/renderer/router/routes';
 import { PersistedTableColumn } from '/@/renderer/store/settings.store';
 import { TableColumn } from '/@/renderer/types';
+import { RatingCell } from '/@/renderer/components/virtual-table/cells/rating-cell';
+import { FavoriteCell } from '/@/renderer/components/virtual-table/cells/favorite-cell';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -265,6 +266,31 @@ const tableColumns: { [key: string]: ColDef } = {
     suppressSizeToFit: true,
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.trackNumber : undefined),
     width: 80,
+  },
+  userFavorite: {
+    cellClass: (params) => (params.value ? 'visible ag-cell-favorite' : 'ag-cell-favorite'),
+    cellRenderer: FavoriteCell,
+    colId: TableColumn.USER_FAVORITE,
+    field: 'userFavorite',
+    headerComponent: (params: IHeaderParams) =>
+      GenericTableHeader(params, { position: 'center', preset: 'userFavorite' }),
+    headerName: 'Favorite',
+    suppressSizeToFit: true,
+    valueGetter: (params: ValueGetterParams) =>
+      params.data ? params.data.userFavorite : undefined,
+    width: 50,
+  },
+  userRating: {
+    cellClass: (params) => (params.value ? 'visible ag-cell-rating' : 'ag-cell-rating'),
+    cellRenderer: RatingCell,
+    colId: TableColumn.USER_RATING,
+    field: 'userRating',
+    headerComponent: (params: IHeaderParams) =>
+      GenericTableHeader(params, { position: 'center', preset: 'userRating' }),
+    headerName: 'Rating',
+    suppressSizeToFit: true,
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.userRating : undefined),
+    width: 95,
   },
 };
 

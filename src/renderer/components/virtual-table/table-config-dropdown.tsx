@@ -28,9 +28,9 @@ export const SONG_TABLE_COLUMNS = [
   { label: 'Date Added', value: TableColumn.DATE_ADDED },
   { label: 'Path', value: TableColumn.PATH },
   { label: 'Plays', value: TableColumn.PLAY_COUNT },
-  // { label: 'Favorite', value: TableColumn.FAVORITE },
-  // { label: 'Rating', value: TableColumn.RATING },
-  // { label: 'Size', value: TableColumn.SIZE },
+  { label: 'Favorite', value: TableColumn.USER_FAVORITE },
+  { label: 'Rating', value: TableColumn.USER_RATING },
+  { label: 'Size', value: TableColumn.SIZE },
   // { label: 'Skip', value: TableColumn.SKIP },
 ];
 

@@ -125,6 +125,26 @@
     margin: 0.5rem 0.5rem;
   }
 
+  .ag-cell-rating,
+  .ag-cell-favorite {
+    display: none;
+  }
+
+  .ag-cell-rating.visible {
+    display: block;
+  }
+
+  .ag-cell-favorite.visible {
+    display: block;
+  }
+
+  .ag-row-hover {
+    .ag-cell-rating,
+    .ag-cell-favorite {
+      display: block;
+    }
+  }
+
   .ag-header-cell,
   .ag-header-group-cell {
     padding-left: 0.5rem;

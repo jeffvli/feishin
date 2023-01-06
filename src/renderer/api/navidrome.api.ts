@@ -72,6 +72,7 @@ import {
   albumListSortMap,
   sortOrderMap,
   User,
+  LibraryItem,
 } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components/toast';
 import { useAuthStore } from '/@/renderer/store';
@@ -526,7 +527,7 @@ const normalizeSong = (
     id,
     imagePlaceholderUrl,
     imageUrl,
-    isFavorite: item.starred,
+    itemType: LibraryItem.SONG,
     lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
     name: item.title,
     path: item.path,
@@ -534,12 +535,14 @@ const normalizeSong = (
     releaseDate: new Date(item.year, 0, 1).toISOString(),
     releaseYear: String(item.year),
     serverId: server.id,
+    serverType: ServerType.NAVIDROME,
     size: item.size,
     streamUrl: `${server.url}/rest/stream.view?id=${id}&v=1.13.0&c=feishin_${deviceId}&${server.credential}`,
     trackNumber: item.trackNumber,
-    type: ServerType.NAVIDROME,
     uniqueId: nanoid(),
     updatedAt: item.updatedAt,
+    userFavorite: item.starred || false,
+    userRating: item.rating || null,
   };
 };
 
@@ -566,25 +569,25 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
     imagePlaceholderUrl,
     imageUrl,
     isCompilation: item.compilation,
-    isFavorite: item.starred,
+    itemType: LibraryItem.ALBUM,
     lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
     name: item.name,
     playCount: item.playCount,
-    rating: item.rating,
     releaseDate: new Date(item.minYear, 0, 1).toISOString(),
     releaseYear: item.minYear,
+    serverId: server.id,
     serverType: ServerType.NAVIDROME,
     size: item.size,
     songCount: item.songCount,
     songs: item.songs ? item.songs.map((song) => normalizeSong(song, server, '')) : undefined,
     uniqueId: nanoid(),
     updatedAt: item.updatedAt,
+    userFavorite: item.starred,
+    userRating: item.rating,
   };
 };
 
-const normalizeAlbumArtist = (item: NDAlbumArtist): AlbumArtist => {
-  console.log('item :>> ', item);
-
+const normalizeAlbumArtist = (item: NDAlbumArtist, server: ServerListItem): AlbumArtist => {
   return {
     albumCount: item.albumCount,
     backgroundImageUrl: null,
@@ -593,12 +596,15 @@ const normalizeAlbumArtist = (item: NDAlbumArtist): AlbumArtist => {
     genres: item.genres,
     id: item.id,
     imageUrl: item.largeImageUrl || null,
-    isFavorite: item.starred,
+    itemType: LibraryItem.ALBUM_ARTIST,
     lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
     name: item.name,
     playCount: item.playCount,
-    rating: item.rating,
+    serverId: server.id,
+    serverType: ServerType.NAVIDROME,
     songCount: item.songCount,
+    userFavorite: item.starred,
+    userRating: item.rating,
   };
 };
 
@@ -623,11 +629,14 @@ const normalizePlaylist = (
     id: item.id,
     imagePlaceholderUrl,
     imageUrl,
+    itemType: LibraryItem.PLAYLIST,
     name: item.name,
     owner: item.ownerName,
     ownerId: item.ownerId,
     public: item.public,
     rules: item?.rules || null,
+    serverId: server.id,
+    serverType: ServerType.NAVIDROME,
     size: item.size,
     songCount: item.songCount,
     sync: item.sync,

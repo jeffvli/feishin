@@ -63,6 +63,7 @@ import {
   albumArtistListSortMap,
   UpdatePlaylistArgs,
   UpdatePlaylistResponse,
+  LibraryItem,
 } from '/@/renderer/api/types';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
@@ -652,7 +653,7 @@ const normalizeSong = (
     id: item.Id,
     imagePlaceholderUrl: null,
     imageUrl: getSongCoverArtUrl({ baseUrl: server.url, item, size: imageSize || 300 }),
-    isFavorite: (item.UserData && item.UserData.IsFavorite) || false,
+    itemType: LibraryItem.SONG,
     lastPlayedAt: null,
     name: item.Name,
     path: (item.MediaSources && item.MediaSources[0]?.Path) || null,
@@ -661,6 +662,7 @@ const normalizeSong = (
     releaseDate: null,
     releaseYear: (item.ProductionYear && String(item.ProductionYear)) || null,
     serverId: server.id,
+    serverType: ServerType.JELLYFIN,
     size: item.MediaSources && item.MediaSources[0]?.Size,
     streamUrl: getStreamUrl({
       container: item.MediaSources[0]?.Container,
@@ -671,9 +673,10 @@ const normalizeSong = (
       server,
     }),
     trackNumber: item.IndexNumber,
-    type: ServerType.JELLYFIN,
     uniqueId: nanoid(),
     updatedAt: item.DateCreated,
+    userFavorite: (item.UserData && item.UserData.IsFavorite) || false,
+    userRating: null,
   };
 };
 
@@ -697,19 +700,21 @@ const normalizeAlbum = (item: JFAlbum, server: ServerListItem, imageSize?: numbe
       size: imageSize || 300,
     }),
     isCompilation: null,
-    isFavorite: item.UserData?.IsFavorite || false,
+    itemType: LibraryItem.ALBUM,
     lastPlayedAt: null,
     name: item.Name,
     playCount: item.UserData?.PlayCount || 0,
-    rating: null,
     releaseDate: item.PremiereDate?.split('T')[0] || null,
     releaseYear: item.ProductionYear,
+    serverId: server.id,
     serverType: ServerType.JELLYFIN,
     size: null,
     songCount: item?.ChildCount || null,
     songs: item.songs?.map((song) => normalizeSong(song, server, '', imageSize)),
     uniqueId: nanoid(),
     updatedAt: item?.DateLastMediaAdded || item.DateCreated,
+    userFavorite: item.UserData?.IsFavorite || false,
+    userRating: null,
   };
 };
 
@@ -730,12 +735,15 @@ const normalizeAlbumArtist = (
       item,
       size: imageSize || 300,
     }),
-    isFavorite: item.UserData.IsFavorite || false,
+    itemType: LibraryItem.ALBUM_ARTIST,
     lastPlayedAt: null,
     name: item.Name,
     playCount: item.UserData.PlayCount,
-    rating: null,
+    serverId: server.id,
+    serverType: ServerType.JELLYFIN,
     songCount: null,
+    userFavorite: item.UserData.IsFavorite || false,
+    userRating: null,
   };
 };
 
@@ -759,11 +767,14 @@ const normalizePlaylist = (
     id: item.Id,
     imagePlaceholderUrl,
     imageUrl: imageUrl || null,
+    itemType: LibraryItem.PLAYLIST,
     name: item.Name,
     owner: null,
     ownerId: null,
     public: null,
     rules: null,
+    serverId: server.id,
+    serverType: ServerType.JELLYFIN,
     size: null,
     songCount: item?.ChildCount || null,
     sync: null,

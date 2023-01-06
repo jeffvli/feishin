@@ -163,19 +163,21 @@ export type Album = {
   imagePlaceholderUrl: string | null;
   imageUrl: string | null;
   isCompilation: boolean | null;
-  isFavorite: boolean;
+  itemType: LibraryItem.ALBUM;
   lastPlayedAt: string | null;
   name: string;
   playCount: number | null;
-  rating: number | null;
   releaseDate: string | null;
   releaseYear: number | null;
+  serverId: string;
   serverType: ServerType;
   size: number | null;
   songCount: number | null;
   songs?: Song[];
   uniqueId: string;
   updatedAt: string;
+  userFavorite: boolean;
+  userRating: number | null;
 } & { songs?: Song[] };
 
 export type Song = {
@@ -197,7 +199,7 @@ export type Song = {
   id: string;
   imagePlaceholderUrl: string | null;
   imageUrl: string | null;
-  isFavorite: boolean;
+  itemType: LibraryItem.SONG;
   lastPlayedAt: string | null;
   name: string;
   path: string | null;
@@ -205,12 +207,14 @@ export type Song = {
   releaseDate: string | null;
   releaseYear: string | null;
   serverId: string;
+  serverType: ServerType;
   size: number;
   streamUrl: string;
   trackNumber: number;
-  type: ServerType;
   uniqueId: string;
   updatedAt: string;
+  userFavorite: boolean;
+  userRating: number | null;
 };
 
 export type AlbumArtist = {
@@ -221,12 +225,15 @@ export type AlbumArtist = {
   genres: Genre[];
   id: string;
   imageUrl: string | null;
-  isFavorite: boolean;
+  itemType: LibraryItem.ALBUM_ARTIST;
   lastPlayedAt: string | null;
   name: string;
   playCount: number | null;
-  rating: number | null;
+  serverId: string;
+  serverType: ServerType;
   songCount: number | null;
+  userFavorite: boolean;
+  userRating: number | null;
 };
 
 export type RelatedAlbumArtist = {
@@ -238,9 +245,12 @@ export type Artist = {
   biography: string | null;
   createdAt: string;
   id: string;
+  itemType: LibraryItem.ARTIST;
   name: string;
   remoteCreatedAt: string | null;
   serverFolderId: string;
+  serverId: string;
+  serverType: ServerType;
   updatedAt: string;
 };
 
@@ -261,11 +271,14 @@ export type Playlist = {
   id: string;
   imagePlaceholderUrl: string | null;
   imageUrl: string | null;
+  itemType: LibraryItem.PLAYLIST;
   name: string;
   owner: string | null;
   ownerId: string | null;
   public: boolean | null;
   rules?: Record<string, any> | null;
+  serverId: string;
+  serverType: ServerType;
   size: number | null;
   songCount: number | null;
   sync?: boolean | null;

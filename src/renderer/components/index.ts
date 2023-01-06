@@ -32,3 +32,4 @@ export * from './virtual-table';
 export * from './motion';
 export * from './context-menu';
 export * from './query-builder';
+export * from './rating';
