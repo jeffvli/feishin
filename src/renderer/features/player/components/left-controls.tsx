@@ -137,7 +137,7 @@ export const LeftControls = () => {
             </ImageWrapper>
           )}
         </AnimatePresence>
-        <MetadataStack layout>
+        <MetadataStack layout="position">
           <LineItem>
             <Text
               $link

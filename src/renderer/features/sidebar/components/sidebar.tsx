@@ -4,7 +4,7 @@ import { closeAllModals, openModal } from '@mantine/modals';
 import { SpotlightProvider } from '@mantine/spotlight';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BsCollection } from 'react-icons/bs';
-import { Button, ScrollArea, TextInput } from '/@/renderer/components';
+import { Button, MotionStack, ScrollArea, TextInput } from '/@/renderer/components';
 import { MdOutlineFeaturedPlayList, MdFeaturedPlayList } from 'react-icons/md';
 import {
   RiAddFill,
@@ -124,7 +124,8 @@ export const Sidebar = () => {
         justify="space-between"
         spacing={0}
       >
-        <Stack
+        <MotionStack
+          layout="position"
           spacing={0}
           sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
         >
@@ -329,16 +330,16 @@ export const Sidebar = () => {
               </Accordion>
             </Stack>
           </ScrollArea>
-        </Stack>
+        </MotionStack>
         <AnimatePresence
           initial={false}
-          mode="wait"
+          mode="popLayout"
         >
           {showImage && (
             <ImageContainer
               key="sidebar-image"
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
+              exit={{ opacity: 0, y: 200 }}
               height={sidebar.leftWidth}
               initial={{ opacity: 0, y: 200 }}
               to={AppRoute.NOW_PLAYING}
