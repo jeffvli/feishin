@@ -1,6 +1,7 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useRef } from 'react';
 import { useParams } from 'react-router';
+import { LibraryItem } from '/@/renderer/api/types';
 import { NativeScrollArea } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { PlaylistDetailContent } from '/@/renderer/features/playlists/components/playlist-detail-content';
@@ -9,7 +10,6 @@ import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playli
 import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { LibraryItem } from '/@/renderer/types';
 
 const PlaylistDetailRoute = () => {
   const tableRef = useRef<AgGridReactType | null>(null);

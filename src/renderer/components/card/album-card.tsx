@@ -6,10 +6,10 @@ import { Link } from 'react-router-dom';
 import { SimpleImg } from 'react-simple-img';
 import styled from 'styled-components';
 import { Text } from '/@/renderer/components/text';
-import type { LibraryItem, CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
+import type { CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
 import { Skeleton } from '/@/renderer/components/skeleton';
 import { CardControls } from '/@/renderer/components/card/card-controls';
-import { Album } from '/@/renderer/api/types';
+import { Album, LibraryItem } from '/@/renderer/api/types';
 
 const CardWrapper = styled.div<{
   link?: boolean;

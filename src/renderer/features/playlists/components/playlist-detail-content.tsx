@@ -6,13 +6,13 @@ import { MutableRefObject, useMemo } from 'react';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { LibraryItem } from '/@/renderer/api/types';
 import { Button, getColumnDefs, Text, VirtualTable } from '/@/renderer/components';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlaylistSongListInfinite } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useSongListStore } from '/@/renderer/store';
-import { LibraryItem } from '/@/renderer/types';
 
 const ContentContainer = styled.div`
   display: flex;

@@ -8,7 +8,13 @@ import { useParams } from 'react-router';
 import styled from 'styled-components';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { PlaylistSongListQuery, ServerType, SongListSort, SortOrder } from '/@/renderer/api/types';
+import {
+  LibraryItem,
+  PlaylistSongListQuery,
+  ServerType,
+  SongListSort,
+  SortOrder,
+} from '/@/renderer/api/types';
 import {
   Button,
   DropdownMenu,
@@ -32,7 +38,7 @@ import {
   useSetPlaylistDetailFilters,
   useSetPlaylistStore,
 } from '/@/renderer/store';
-import { LibraryItem, ListDisplayType, Play, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, Play, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
   jellyfin: [

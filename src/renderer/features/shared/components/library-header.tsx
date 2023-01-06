@@ -5,9 +5,9 @@ import { RiAlbumFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { SimpleImg } from 'react-simple-img';
 import styled from 'styled-components';
+import { LibraryItem } from '/@/renderer/api/types';
 import { Text, TextTitle } from '/@/renderer/components';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { LibraryItem } from '/@/renderer/types';
 
 const HeaderContainer = styled.div<{ imageSize: number }>`
   position: relative;

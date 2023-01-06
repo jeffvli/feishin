@@ -37,9 +37,8 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useSidebarStore, useAppStoreActions, useCurrentSong } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
 import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
-import { PlaylistListSort, SortOrder } from '/@/renderer/api/types';
+import { LibraryItem, PlaylistListSort, SortOrder } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { LibraryItem } from '/@/renderer/types';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 
 const SidebarContainer = styled.div`

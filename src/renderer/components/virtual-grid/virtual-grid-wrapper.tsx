@@ -5,14 +5,8 @@ import type { FixedSizeListProps } from 'react-window';
 import { FixedSizeList } from 'react-window';
 import styled from 'styled-components';
 import { GridCard } from '/@/renderer/components/virtual-grid/grid-card';
-import type {
-  CardRow,
-  LibraryItem,
-  ListDisplayType,
-  CardRoute,
-  PlayQueueAddOptions,
-} from '/@/renderer/types';
-import { Album, AlbumArtist, Artist } from '/@/renderer/api/types';
+import type { CardRow, ListDisplayType, CardRoute, PlayQueueAddOptions } from '/@/renderer/types';
+import { Album, AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
 
 const createItemData = memoize(
   (

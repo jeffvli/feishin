@@ -6,9 +6,9 @@ import { SimpleImg } from 'react-simple-img';
 import type { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Skeleton } from '/@/renderer/components/skeleton';
-import type { LibraryItem, CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
+import type { CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
 import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
-import { Album, Artist, AlbumArtist } from '/@/renderer/api/types';
+import { Album, Artist, AlbumArtist, LibraryItem } from '/@/renderer/api/types';
 import { CardRows } from '/@/renderer/components/card';
 
 const CardWrapper = styled.div<{

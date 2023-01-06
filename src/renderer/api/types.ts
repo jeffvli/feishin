@@ -45,6 +45,14 @@ import {
   SSGenreList,
 } from '/@/renderer/api/subsonic.types';
 
+export enum LibraryItem {
+  ALBUM = 'album',
+  ALBUM_ARTIST = 'albumArtist',
+  ARTIST = 'artist',
+  PLAYLIST = 'playlist',
+  SONG = 'song',
+}
+
 export enum SortOrder {
   ASC = 'ASC',
   DESC = 'DESC',

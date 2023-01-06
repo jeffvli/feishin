@@ -17,7 +17,7 @@ import {
   useSetPlaylistDetailTable,
   useSetPlaylistDetailTablePagination,
 } from '/@/renderer/store';
-import { LibraryItem, ListDisplayType } from '/@/renderer/types';
+import { ListDisplayType } from '/@/renderer/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
@@ -25,7 +25,13 @@ import { openContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import sortBy from 'lodash/sortBy';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { PlaylistSongListQuery, QueueSong, SongListSort, SortOrder } from '/@/renderer/api/types';
+import {
+  LibraryItem,
+  PlaylistSongListQuery,
+  QueueSong,
+  SongListSort,
+  SortOrder,
+} from '/@/renderer/api/types';
 import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
 import { useParams } from 'react-router';
 import { usePlayQueueAdd } from '/@/renderer/features/player';

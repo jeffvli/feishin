@@ -1,5 +1,5 @@
 import { createUseExternalEvents } from '@mantine/utils';
-import { LibraryItem } from '/@/renderer/types';
+import { LibraryItem } from '/@/renderer/api/types';
 
 export type OpenContextMenuProps = {
   data: any[];

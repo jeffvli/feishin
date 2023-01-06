@@ -4,10 +4,10 @@ import { generatePath, useNavigate } from 'react-router';
 import { SimpleImg } from 'react-simple-img';
 import type { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
-import type { LibraryItem, CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
+import type { CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
 import { Skeleton } from '/@/renderer/components/skeleton';
 import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
-import { Album, AlbumArtist, Artist } from '/@/renderer/api/types';
+import { Album, AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
 import { CardRows } from '/@/renderer/components/card';
 
 const CardWrapper = styled.div<{

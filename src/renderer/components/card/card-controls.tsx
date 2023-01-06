@@ -6,9 +6,10 @@ import { RiPlayFill, RiMore2Fill, RiHeartFill, RiHeartLine } from 'react-icons/r
 import styled from 'styled-components';
 import { _Button } from '/@/renderer/components/button';
 import { DropdownMenu } from '/@/renderer/components/dropdown-menu';
-import type { LibraryItem, PlayQueueAddOptions } from '/@/renderer/types';
+import type { PlayQueueAddOptions } from '/@/renderer/types';
 import { Play } from '/@/renderer/types';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { LibraryItem } from '/@/renderer/api/types';
 
 type PlayButtonType = UnstyledButtonProps & React.ComponentPropsWithoutRef<'button'>;
 

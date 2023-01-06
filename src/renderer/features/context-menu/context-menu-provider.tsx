@@ -2,6 +2,7 @@ import { Divider, Group, Stack } from '@mantine/core';
 import { useClickOutside, useResizeObserver, useSetState, useViewportSize } from '@mantine/hooks';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { createContext, Fragment, useState } from 'react';
+import { LibraryItem } from '/@/renderer/api/types';
 import { ConfirmModal, ContextMenu, ContextMenuButton, Text, toast } from '/@/renderer/components';
 import {
   OpenContextMenuProps,
@@ -10,7 +11,7 @@ import {
 } from '/@/renderer/features/context-menu/events';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useDeletePlaylist } from '/@/renderer/features/playlists';
-import { LibraryItem, Play } from '/@/renderer/types';
+import { Play } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
   closeContextMenu: () => void;

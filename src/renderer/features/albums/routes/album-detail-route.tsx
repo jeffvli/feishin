@@ -9,7 +9,7 @@ import { AlbumDetailContent } from '/@/renderer/features/albums/components/album
 import { AlbumDetailHeader } from '/@/renderer/features/albums/components/album-detail-header';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { LibraryItem } from '/@/renderer/types';
+import { LibraryItem } from '/@/renderer/api/types';
 
 const AlbumDetailRoute = () => {
   const tableRef = useRef<AgGridReactType | null>(null);

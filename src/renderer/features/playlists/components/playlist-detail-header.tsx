@@ -13,9 +13,9 @@ import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playli
 import { LibraryHeader, PlayButton, PLAY_TYPES } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { LibraryItem, Play } from '/@/renderer/types';
+import { Play } from '/@/renderer/types';
 import { formatDurationString } from '/@/renderer/utils';
-import { UserListSort, SortOrder, UserListQuery } from '/@/renderer/api/types';
+import { UserListSort, SortOrder, UserListQuery, LibraryItem } from '/@/renderer/api/types';
 import { useCurrentServer } from '/@/renderer/store';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';

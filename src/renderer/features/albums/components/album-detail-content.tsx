@@ -21,11 +21,11 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { openContextMenu } from '/@/renderer/features/context-menu';
-import { LibraryItem, Play } from '/@/renderer/types';
+import { Play } from '/@/renderer/types';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { PlayButton, PLAY_TYPES } from '/@/renderer/features/shared';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
-import { AlbumListSort, SortOrder } from '/@/renderer/api/types';
+import { AlbumListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 const ContentContainer = styled.div`

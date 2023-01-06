@@ -6,10 +6,11 @@ import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { Button } from '/@/renderer/components/button';
 import { AppRoute } from '/@/renderer/router/routes';
 import type { CardRow } from '/@/renderer/types';
-import { LibraryItem, Play } from '/@/renderer/types';
+import { Play } from '/@/renderer/types';
 import styled from 'styled-components';
 import { AlbumCard } from '/@/renderer/components/card';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { LibraryItem } from '/@/renderer/api/types';
 
 interface GridCarouselProps {
   cardRows: CardRow<any>[];

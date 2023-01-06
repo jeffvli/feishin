@@ -13,11 +13,11 @@ import {
   usePlayerStore,
 } from '/@/renderer/store';
 import { usePlayerType } from '/@/renderer/store/settings.store';
-import { PlayQueueAddOptions, LibraryItem, Play, PlaybackType } from '/@/renderer/types';
+import { PlayQueueAddOptions, Play, PlaybackType } from '/@/renderer/types';
 import { toast } from '/@/renderer/components/toast';
 import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
-import { SongListSort, SortOrder } from '/@/renderer/api/types';
+import { LibraryItem, SongListSort, SortOrder } from '/@/renderer/api/types';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 

@@ -1,4 +1,4 @@
-import { Album, AlbumArtist, Artist, QueueSong } from '/@/renderer/api/types';
+import { Album, AlbumArtist, Artist, LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { AppRoute } from '/@/renderer/router/routes';
 
 export type TablePagination = {
@@ -31,14 +31,6 @@ export enum ListDisplayType {
   POSTER = 'poster',
   TABLE = 'table',
   TABLE_PAGINATED = 'paginatedTable',
-}
-
-export enum LibraryItem {
-  ALBUM = 'album',
-  ALBUM_ARTIST = 'albumArtist',
-  ARTIST = 'artist',
-  PLAYLIST = 'playlist',
-  SONG = 'song',
 }
 
 export enum Platform {
@@ -138,20 +130,21 @@ export enum TableColumn {
   DATE_ADDED = 'dateAdded',
   DISC_NUMBER = 'discNumber',
   DURATION = 'duration',
-  FAVORITE = 'favorite',
   GENRE = 'genre',
   LAST_PLAYED = 'lastPlayedAt',
   OWNER = 'username',
   PATH = 'path',
   PLAY_COUNT = 'playCount',
-  RATING = 'rating',
   RELEASE_DATE = 'releaseDate',
   ROW_INDEX = 'rowIndex',
+  SIZE = 'size',
+  SKIP = 'skip',
   SONG_COUNT = 'songCount',
-  // SKIP = 'skip',
   TITLE = 'title',
   TITLE_COMBINED = 'titleCombined',
   TRACK_NUMBER = 'trackNumber',
+  USER_FAVORITE = 'userFavorite',
+  USER_RATING = 'userRating',
   YEAR = 'releaseYear',
 }
 

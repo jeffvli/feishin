@@ -26,7 +26,7 @@ import {
   useSetPlaylistTable,
   useSetPlaylistTablePagination,
 } from '/@/renderer/store';
-import { LibraryItem, ListDisplayType } from '/@/renderer/types';
+import { ListDisplayType } from '/@/renderer/types';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { openContextMenu } from '/@/renderer/features/context-menu';
@@ -35,6 +35,7 @@ import sortBy from 'lodash/sortBy';
 import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
 import { generatePath, useNavigate } from 'react-router';
 import { AppRoute } from '/@/renderer/router/routes';
+import { LibraryItem } from '/@/renderer/api/types';
 
 interface PlaylistListContentProps {
   tableRef: MutableRefObject<AgGridReactType | null>;

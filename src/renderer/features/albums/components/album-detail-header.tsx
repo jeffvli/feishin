@@ -2,12 +2,12 @@ import { Group, Stack } from '@mantine/core';
 import { forwardRef, Fragment, Ref } from 'react';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
+import { LibraryItem } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
 import { LibraryHeader } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
-import { LibraryItem } from '/@/renderer/types';
 import { formatDurationString } from '/@/renderer/utils';
 
 interface AlbumDetailHeaderProps {

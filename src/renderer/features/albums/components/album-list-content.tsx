@@ -8,14 +8,14 @@ import {
   VirtualTable,
 } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
-import { ListDisplayType, CardRow, LibraryItem } from '/@/renderer/types';
+import { ListDisplayType, CardRow } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { ListOnScrollProps } from 'react-window';
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { Album, AlbumListSort } from '/@/renderer/api/types';
+import { Album, AlbumListSort, LibraryItem } from '/@/renderer/api/types';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import { useQueryClient } from '@tanstack/react-query';
 import {

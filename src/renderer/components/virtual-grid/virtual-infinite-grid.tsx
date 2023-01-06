@@ -3,8 +3,9 @@ import debounce from 'lodash/debounce';
 import type { FixedSizeListProps } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 import { VirtualGridWrapper } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
-import type { CardRoute, CardRow, LibraryItem, PlayQueueAddOptions } from '/@/renderer/types';
+import type { CardRoute, CardRow, PlayQueueAddOptions } from '/@/renderer/types';
 import { ListDisplayType } from '/@/renderer/types';
+import { LibraryItem } from '/@/renderer/api/types';
 
 export type VirtualInfiniteGridRef = {
   resetLoadMoreItemsCache: () => void;

@@ -27,14 +27,14 @@ import {
   useSongListStore,
   useSongTablePagination,
 } from '/@/renderer/store';
-import { LibraryItem, ListDisplayType } from '/@/renderer/types';
+import { ListDisplayType } from '/@/renderer/types';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import sortBy from 'lodash/sortBy';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { QueueSong } from '/@/renderer/api/types';
+import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 interface SongListContentProps {
