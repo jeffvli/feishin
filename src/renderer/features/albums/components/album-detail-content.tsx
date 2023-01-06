@@ -5,11 +5,12 @@ import {
   getColumnDefs,
   GridCarousel,
   TextTitle,
+  useFixedTableHeader,
   VirtualTable,
 } from '/@/renderer/components';
 import { CellContextMenuEvent, ColDef } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Group, Stack } from '@mantine/core';
+import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import sortBy from 'lodash/sortBy';
 import { RiHeartLine, RiMoreFill } from 'react-icons/ri';
@@ -29,18 +30,15 @@ import { AlbumListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 const ContentContainer = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   max-width: 1920px;
-  padding: 1rem 2rem;
+  padding: 1rem 2rem 5rem;
   overflow: hidden;
 
   .ag-theme-alpine-dark {
     --ag-header-background-color: rgba(0, 0, 0, 0%);
-  }
-
-  .ag-header-container {
-    z-index: 1000;
   }
 `;
 
@@ -170,9 +168,13 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     });
   };
 
+  const { intersectRef, tableContainerRef } = useFixedTableHeader();
+
   return (
     <ContentContainer>
       <Group
+        ref={intersectRef}
+        className="test"
         pb="2rem"
         pt="1rem"
         spacing="lg"
@@ -210,34 +212,36 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
           </DropdownMenu>
         </Group>
       </Group>
-      <VirtualTable
-        ref={tableRef}
-        animateRows
-        detailRowAutoHeight
-        maintainColumnOrder
-        suppressCellFocus
-        suppressCopyRowsToClipboard
-        suppressLoadingOverlay
-        suppressMoveWhenRowDragging
-        suppressPaginationPanel
-        suppressRowDrag
-        suppressScrollOnNewData
-        columnDefs={columnDefs}
-        defaultColDef={defaultColumnDefs}
-        enableCellChangeFlash={false}
-        getRowId={(data) => data.data.id}
-        rowData={detailQuery.data?.songs}
-        rowHeight={60}
-        rowSelection="multiple"
-        onCellContextMenu={handleContextMenu}
-        onGridReady={(params) => {
-          params.api.setDomLayout('autoHeight');
-          params.api.sizeColumnsToFit();
-        }}
-        onGridSizeChanged={(params) => {
-          params.api.sizeColumnsToFit();
-        }}
-      />
+      <Box ref={tableContainerRef}>
+        <VirtualTable
+          ref={tableRef}
+          animateRows
+          detailRowAutoHeight
+          maintainColumnOrder
+          suppressCellFocus
+          suppressCopyRowsToClipboard
+          suppressLoadingOverlay
+          suppressMoveWhenRowDragging
+          suppressPaginationPanel
+          suppressRowDrag
+          suppressScrollOnNewData
+          columnDefs={columnDefs}
+          defaultColDef={defaultColumnDefs}
+          enableCellChangeFlash={false}
+          getRowId={(data) => data.data.id}
+          rowData={detailQuery.data?.songs}
+          rowHeight={60}
+          rowSelection="multiple"
+          onCellContextMenu={handleContextMenu}
+          onGridReady={(params) => {
+            params.api.setDomLayout('autoHeight');
+            params.api.sizeColumnsToFit();
+          }}
+          onGridSizeChanged={(params) => {
+            params.api.sizeColumnsToFit();
+          }}
+        />
+      </Box>
       <Stack
         ref={cq.ref}
         mt="5rem"

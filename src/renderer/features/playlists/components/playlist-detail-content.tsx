@@ -1,18 +1,39 @@
 import { CellContextMenuEvent, ColDef } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Group } from '@mantine/core';
+import { Box, Group } from '@mantine/core';
+import { closeAllModals, openModal } from '@mantine/modals';
+import { useQueryClient } from '@tanstack/react-query';
 import { sortBy } from 'lodash';
-import { MutableRefObject, useMemo } from 'react';
-import { generatePath, useParams } from 'react-router';
+import { MutableRefObject, useMemo, useRef } from 'react';
+import { RiMoreFill } from 'react-icons/ri';
+import { generatePath, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { LibraryItem } from '/@/renderer/api/types';
-import { Button, getColumnDefs, Text, VirtualTable } from '/@/renderer/components';
+import { api } from '/@/renderer/api';
+import { queryKeys } from '/@/renderer/api/query-keys';
+import { LibraryItem, SortOrder, UserListQuery, UserListSort } from '/@/renderer/api/types';
+import {
+  Button,
+  ConfirmModal,
+  DropdownMenu,
+  getColumnDefs,
+  MotionGroup,
+  toast,
+  useFixedTableHeader,
+  VirtualTable,
+} from '/@/renderer/components';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { UpdatePlaylistForm } from '/@/renderer/features/playlists/components/update-playlist-form';
+import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
+import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { usePlaylistSongListInfinite } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
+import { PlayButton, PLAY_TYPES } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useSongListStore } from '/@/renderer/store';
+import { useCurrentServer, useSongListStore } from '/@/renderer/store';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { Play } from '/@/renderer/types';
 
 const ContentContainer = styled.div`
   display: flex;
@@ -24,10 +45,6 @@ const ContentContainer = styled.div`
   .ag-theme-alpine-dark {
     --ag-header-background-color: rgba(0, 0, 0, 0%);
   }
-
-  .ag-header-container {
-    z-index: 1000;
-  }
 `;
 
 interface PlaylistDetailContentProps {
@@ -35,8 +52,14 @@ interface PlaylistDetailContentProps {
 }
 
 export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) => {
+  const navigate = useNavigate();
   const { playlistId } = useParams() as { playlistId: string };
   const page = useSongListStore();
+  const handlePlayQueueAdd = usePlayQueueAdd();
+  const detailQuery = usePlaylistDetail({ id: playlistId });
+  const playButtonBehavior = usePlayButtonBehavior();
+  const queryClient = useQueryClient();
+  const server = useCurrentServer();
 
   const playlistSongsQueryInfinite = usePlaylistSongListInfinite(
     {
@@ -44,7 +67,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
       limit: 50,
       startIndex: 0,
     },
-    { keepPreviousData: false },
+    { cacheTime: 0, keepPreviousData: false },
   );
 
   const handleLoadMore = () => {
@@ -94,41 +117,178 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     [playlistSongsQueryInfinite.data?.pages],
   );
 
+  console.log('playlistSongData', playlistSongData);
+
+  const { intersectRef, tableContainerRef } = useFixedTableHeader();
+
+  const deletePlaylistMutation = useDeletePlaylist();
+
+  const handleDeletePlaylist = () => {
+    deletePlaylistMutation.mutate(
+      { query: { id: playlistId } },
+      {
+        onError: (err) => {
+          toast.error({
+            message: err.message,
+            title: 'Error deleting playlist',
+          });
+        },
+        onSuccess: () => {
+          toast.success({
+            message: `${detailQuery?.data?.name} was successfully deleted`,
+            title: 'Playlist deleted',
+          });
+          closeAllModals();
+          navigate(AppRoute.PLAYLISTS);
+        },
+      },
+    );
+  };
+
+  const openDeletePlaylist = () => {
+    openModal({
+      children: (
+        <ConfirmModal
+          loading={deletePlaylistMutation.isLoading}
+          onConfirm={handleDeletePlaylist}
+        >
+          Are you sure you want to delete this playlist?
+        </ConfirmModal>
+      ),
+      title: 'Delete playlist',
+    });
+  };
+
+  const handlePlay = (playType?: Play) => {
+    handlePlayQueueAdd?.({
+      byItemType: {
+        id: [playlistId],
+        type: LibraryItem.PLAYLIST,
+      },
+      play: playType || playButtonBehavior,
+    });
+  };
+
+  const openUpdatePlaylistModal = async () => {
+    const query: UserListQuery = {
+      sortBy: UserListSort.NAME,
+      sortOrder: SortOrder.ASC,
+      startIndex: 0,
+    };
+
+    const users = await queryClient.fetchQuery({
+      queryFn: ({ signal }) => api.controller.getUserList({ query, server, signal }),
+      queryKey: queryKeys.users.list(server?.id || '', query),
+    });
+
+    const normalizedUsers = api.normalize.userList(users, server);
+
+    openModal({
+      children: (
+        <UpdatePlaylistForm
+          body={{
+            comment: detailQuery?.data?.description || undefined,
+            genres: detailQuery?.data?.genres,
+            name: detailQuery?.data?.name,
+            ndParams: {
+              owner: detailQuery?.data?.owner || undefined,
+              ownerId: detailQuery?.data?.ownerId || undefined,
+              public: detailQuery?.data?.public || false,
+              rules: detailQuery?.data?.rules || undefined,
+              sync: detailQuery?.data?.sync || undefined,
+            },
+          }}
+          query={{ id: playlistId }}
+          users={normalizedUsers.items}
+          onCancel={closeAllModals}
+        />
+      ),
+      title: 'Edit playlist',
+    });
+  };
+
+  const loadMoreRef = useRef<HTMLButtonElement | null>(null);
+
   return (
     <ContentContainer>
-      <VirtualTable
-        ref={tableRef}
-        animateRows
-        detailRowAutoHeight
-        maintainColumnOrder
-        suppressCellFocus
-        suppressCopyRowsToClipboard
-        suppressLoadingOverlay
-        suppressMoveWhenRowDragging
-        suppressPaginationPanel
-        suppressRowDrag
-        suppressScrollOnNewData
-        columnDefs={columnDefs}
-        defaultColDef={defaultColumnDefs}
-        enableCellChangeFlash={false}
-        getRowId={(data) => data.data.uniqueId}
-        rowData={playlistSongData}
-        rowHeight={60}
-        rowSelection="multiple"
-        onCellContextMenu={handleContextMenu}
-        onGridReady={(params) => {
-          params.api.setDomLayout('autoHeight');
-          params.api.sizeColumnsToFit();
-        }}
-        onGridSizeChanged={(params) => {
-          params.api.sizeColumnsToFit();
-        }}
-      />
       <Group
+        ref={intersectRef}
+        maw="1920px"
+        p="1rem"
+        position="apart"
+      >
+        <Group>
+          <PlayButton onClick={() => handlePlay()} />
+          <DropdownMenu position="bottom-start">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                variant="subtle"
+              >
+                <RiMoreFill size={20} />
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              {PLAY_TYPES.filter((type) => type.play !== playButtonBehavior).map((type) => (
+                <DropdownMenu.Item
+                  key={`playtype-${type.play}`}
+                  onClick={() => handlePlay(type.play)}
+                >
+                  {type.label}
+                </DropdownMenu.Item>
+              ))}
+              <DropdownMenu.Divider />
+              <DropdownMenu.Item onClick={openUpdatePlaylistModal}>Edit playlist</DropdownMenu.Item>
+              <DropdownMenu.Item onClick={openDeletePlaylist}>Delete playlist</DropdownMenu.Item>
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
+          <Button
+            compact
+            component={Link}
+            to={generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId })}
+            variant="subtle"
+          >
+            View full playlist
+          </Button>
+        </Group>
+      </Group>
+      <Box ref={tableContainerRef}>
+        <VirtualTable
+          ref={tableRef}
+          animateRows
+          detailRowAutoHeight
+          maintainColumnOrder
+          suppressCellFocus
+          suppressCopyRowsToClipboard
+          suppressLoadingOverlay
+          suppressMoveWhenRowDragging
+          suppressPaginationPanel
+          suppressRowDrag
+          suppressScrollOnNewData
+          columnDefs={columnDefs}
+          defaultColDef={defaultColumnDefs}
+          enableCellChangeFlash={false}
+          getRowId={(data) => data.data.id}
+          rowData={playlistSongData}
+          rowHeight={60}
+          rowSelection="multiple"
+          onCellContextMenu={handleContextMenu}
+          onGridReady={(params) => {
+            params.api.setDomLayout('autoHeight');
+            params.api.sizeColumnsToFit();
+          }}
+          onGridSizeChanged={(params) => {
+            params.api.sizeColumnsToFit();
+          }}
+        />
+      </Box>
+      <MotionGroup
         p="2rem"
         position="center"
+        onViewportEnter={handleLoadMore}
       >
         <Button
+          ref={loadMoreRef}
           compact
           disabled={!playlistSongsQueryInfinite.hasNextPage}
           loading={playlistSongsQueryInfinite.isFetchingNextPage}
@@ -137,16 +297,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
         >
           Load more
         </Button>
-        <Text>or</Text>
-        <Button
-          compact
-          component={Link}
-          to={generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId })}
-          variant="subtle"
-        >
-          View full playlist
-        </Button>
-      </Group>
+      </MotionGroup>
     </ContentContainer>
   );
 };
