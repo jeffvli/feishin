@@ -41,10 +41,30 @@ const TextHeaderWrapper = styled(_Text)<{ position: Options['position'] }>`
 `;
 
 const headerPresets = {
-  duration: <FiClock size={15} />,
-  rowIndex: <AiOutlineNumber size={15} />,
-  userFavorite: <RiHeartLine size={15} />,
-  userRating: <RiStarLine size={15} />,
+  duration: (
+    <FiClock
+      color="var(--ag-header-foreground-color)"
+      size="1em"
+    />
+  ),
+  rowIndex: (
+    <AiOutlineNumber
+      color="var(--ag-header-foreground-color)"
+      size="1em"
+    />
+  ),
+  userFavorite: (
+    <RiHeartLine
+      color="var(--ag-header-foreground-color)"
+      size="1em"
+    />
+  ),
+  userRating: (
+    <RiStarLine
+      color="var(--ag-header-foreground-color)"
+      size="1em"
+    />
+  ),
 };
 
 export const GenericTableHeader = (
