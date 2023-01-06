@@ -8,7 +8,7 @@ import {
   useFixedTableHeader,
   VirtualTable,
 } from '/@/renderer/components';
-import { CellContextMenuEvent, ColDef } from '@ag-grid-community/core';
+import { CellContextMenuEvent, ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
@@ -26,7 +26,7 @@ import { Play } from '/@/renderer/types';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { PlayButton, PLAY_TYPES } from '/@/renderer/features/shared';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
-import { AlbumListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 const ContentContainer = styled.div`
@@ -168,6 +168,14 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     });
   };
 
+  const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
+    if (!e.data) return;
+    handlePlayQueueAdd?.({
+      byData: [e.data],
+      play: playButtonBehavior,
+    });
+  };
+
   const { intersectRef, tableContainerRef } = useFixedTableHeader();
 
   return (
@@ -216,10 +224,12 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
         <VirtualTable
           ref={tableRef}
           animateRows
+          deselectOnClickOutside
           detailRowAutoHeight
           maintainColumnOrder
           suppressCellFocus
           suppressCopyRowsToClipboard
+          suppressHorizontalScroll
           suppressLoadingOverlay
           suppressMoveWhenRowDragging
           suppressPaginationPanel
@@ -240,6 +250,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
           onGridSizeChanged={(params) => {
             params.api.sizeColumnsToFit();
           }}
+          onRowDoubleClicked={handleRowDoubleClick}
         />
       </Box>
       <Stack

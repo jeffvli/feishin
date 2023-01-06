@@ -1,4 +1,4 @@
-import { CellContextMenuEvent, ColDef } from '@ag-grid-community/core';
+import { CellContextMenuEvent, ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
@@ -11,7 +11,13 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { LibraryItem, SortOrder, UserListQuery, UserListSort } from '/@/renderer/api/types';
+import {
+  LibraryItem,
+  QueueSong,
+  SortOrder,
+  UserListQuery,
+  UserListSort,
+} from '/@/renderer/api/types';
 import {
   Button,
   ConfirmModal,
@@ -36,6 +42,7 @@ import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
 
 const ContentContainer = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   max-width: 1920px;
@@ -116,8 +123,6 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     () => playlistSongsQueryInfinite.data?.pages.flatMap((p) => p.items),
     [playlistSongsQueryInfinite.data?.pages],
   );
-
-  console.log('playlistSongData', playlistSongData);
 
   const { intersectRef, tableContainerRef } = useFixedTableHeader();
 
@@ -207,6 +212,14 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     });
   };
 
+  const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
+    if (!e.data) return;
+    handlePlayQueueAdd?.({
+      byData: [e.data],
+      play: playButtonBehavior,
+    });
+  };
+
   const loadMoreRef = useRef<HTMLButtonElement | null>(null);
 
   return (
@@ -256,10 +269,12 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
         <VirtualTable
           ref={tableRef}
           animateRows
+          deselectOnClickOutside
           detailRowAutoHeight
           maintainColumnOrder
           suppressCellFocus
           suppressCopyRowsToClipboard
+          suppressHorizontalScroll
           suppressLoadingOverlay
           suppressMoveWhenRowDragging
           suppressPaginationPanel
@@ -268,7 +283,10 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
           columnDefs={columnDefs}
           defaultColDef={defaultColumnDefs}
           enableCellChangeFlash={false}
-          getRowId={(data) => data.data.id}
+          getRowId={(data) => {
+            // It's possible that there are duplicate song ids in a playlist
+            return `${data.data.id}-${data.data.pageIndex}`;
+          }}
           rowData={playlistSongData}
           rowHeight={60}
           rowSelection="multiple"
@@ -280,6 +298,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
           onGridSizeChanged={(params) => {
             params.api.sizeColumnsToFit();
           }}
+          onRowDoubleClicked={handleRowDoubleClick}
         />
       </Box>
       <MotionGroup

@@ -135,8 +135,6 @@ const PlaylistDetailSongListRoute = () => {
     setIsQueryBuilderExpanded(true);
   };
 
-  console.log('detailQuery?.data?.rules', detailQuery?.data?.rules);
-
   return (
     <AnimatedPage key={`playlist-detail-songList-${playlistId}`}>
       <Stack
