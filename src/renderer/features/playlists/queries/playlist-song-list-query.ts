@@ -49,8 +49,8 @@ export const usePlaylistSongListInfinite = (
       (data: InfiniteData<RawSongListResponse | undefined>) => {
         return {
           ...data,
-          pages: data.pages.map((page) => {
-            return api.normalize.songList(page, server);
+          pages: data.pages.map((page, index) => {
+            return { ...api.normalize.songList(page, server), pageIndex: index };
           }),
         };
       },
