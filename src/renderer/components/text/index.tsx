@@ -33,7 +33,7 @@ const StyledText = styled(MantineText)<TextProps>`
   }
 `;
 
-const _Text = ({ children, $secondary, overflow, font, $noSelect, ...rest }: TextProps) => {
+export const _Text = ({ children, $secondary, overflow, font, $noSelect, ...rest }: TextProps) => {
   return (
     <StyledText
       $noSelect={$noSelect}
