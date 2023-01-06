@@ -16,10 +16,11 @@ export const useFastAverageColor = (
         .getColorAsync(src, {
           algorithm: aglorithm || 'dominant',
           ignoredColor: [
-            [255, 255, 255, 255], // White
-            [0, 0, 0, 255], // Black
+            [255, 255, 255, 255, 40], // White
+            [0, 0, 0, 255, 20], // Black
+            [0, 0, 0, 0, 20], // Transparent
           ],
-          mode: 'precision',
+          mode: 'speed',
         })
         .then((color) => {
           return setColor(color.rgb);
