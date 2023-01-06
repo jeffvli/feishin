@@ -116,10 +116,27 @@
     --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
   }
 
+  .ag-header {
+    border-bottom: 1px solid rgb(50, 50, 50, 0.5);
+    margin-bottom: 1rem;
+  }
+
+  .ag-header-cell-comp-wrapper {
+    margin: 0.5rem 0.5rem;
+  }
+
+  .ag-header-cell,
+  .ag-header-group-cell {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
   .ag-header-cell-resize {
-    background-color: rgb(70, 70, 70, 0.4);
-    height: 50%;
-    top: 25%;
+    background-color: transparent;
+  }
+
+  .ag-header:hover .ag-header-cell-resize {
+    border-left: 2px rgb(70, 70, 70, 1) solid;
     width: 7px;
   }
 

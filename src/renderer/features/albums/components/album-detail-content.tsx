@@ -42,13 +42,6 @@ const ContentContainer = styled.div`
   .ag-header-container {
     z-index: 1000;
   }
-
-  .ag-header-cell-resize {
-    top: 25%;
-    width: 7px;
-    height: 50%;
-    background-color: rgb(70, 70, 70, 20%);
-  }
 `;
 
 interface AlbumDetailContentProps {

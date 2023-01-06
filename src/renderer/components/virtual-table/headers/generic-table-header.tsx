@@ -3,6 +3,7 @@ import type { IHeaderParams } from '@ag-grid-community/core';
 import { AiOutlineNumber } from 'react-icons/ai';
 import { FiClock } from 'react-icons/fi';
 import styled from 'styled-components';
+import { _Text } from '/@/renderer/components/text';
 
 type Presets = 'duration' | 'rowIndex';
 
@@ -12,7 +13,7 @@ type Options = {
   preset?: Presets;
 };
 
-const HeaderWrapper = styled.div<{ position: 'left' | 'center' | 'right' }>`
+const HeaderWrapper = styled.div<{ position: Options['position'] }>`
   display: flex;
   justify-content: ${(props) =>
     props.position === 'right'
@@ -25,6 +26,19 @@ const HeaderWrapper = styled.div<{ position: 'left' | 'center' | 'right' }>`
   text-transform: uppercase;
 `;
 
+const TextHeaderWrapper = styled(_Text)<{ position: Options['position'] }>`
+  width: 100%;
+  color: var(--ag-header-foreground-color);
+  font-weight: 500;
+  text-align: ${(props) =>
+    props.position === 'right'
+      ? 'flex-end'
+      : props.position === 'center'
+      ? 'center'
+      : 'flex-start'};
+  text-transform: uppercase;
+`;
+
 const headerPresets = { duration: <FiClock size={15} />, rowIndex: <AiOutlineNumber size={15} /> };
 
 export const GenericTableHeader = (
@@ -32,10 +46,18 @@ export const GenericTableHeader = (
   { preset, children, position }: Options,
 ) => {
   if (preset) {
-    return <HeaderWrapper position={position || 'left'}>{headerPresets[preset]}</HeaderWrapper>;
+    return <HeaderWrapper position={position}>{headerPresets[preset]}</HeaderWrapper>;
   }
 
-  return <HeaderWrapper position={position || 'left'}>{children || displayName}</HeaderWrapper>;
+  return (
+    <TextHeaderWrapper
+      fw="500"
+      overflow="hidden"
+      position={position}
+    >
+      {children || displayName}
+    </TextHeaderWrapper>
+  );
 };
 
 GenericTableHeader.defaultProps = {

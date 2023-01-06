@@ -11,6 +11,8 @@ import type { AgGridReactProps } from '@ag-grid-community/react';
 import { AgGridReact } from '@ag-grid-community/react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useMergedRef } from '@mantine/hooks';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import formatDuration from 'format-duration';
 import { generatePath } from 'react-router';
 import styled from 'styled-components';
@@ -34,6 +36,8 @@ const TableWrapper = styled.div`
   height: 100%;
 `;
 
+dayjs.extend(relativeTime);
+
 const tableColumns: { [key: string]: ColDef } = {
   album: {
     cellRenderer: (params: ICellRendererParams) =>
@@ -49,6 +53,7 @@ const tableColumns: { [key: string]: ColDef } = {
             value: params.data?.album,
           }
         : undefined,
+    width: 200,
   },
   albumArtist: {
     cellRenderer: AlbumArtistCell,
@@ -56,6 +61,7 @@ const tableColumns: { [key: string]: ColDef } = {
     headerName: 'Album Artist',
     valueGetter: (params: ValueGetterParams) =>
       params.data ? params.data.albumArtists : undefined,
+    width: 150,
   },
   albumCount: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
@@ -63,36 +69,42 @@ const tableColumns: { [key: string]: ColDef } = {
     field: 'albumCount',
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'Albums',
+    suppressSizeToFit: true,
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.albumCount : undefined),
+    width: 80,
   },
   artist: {
     cellRenderer: ArtistCell,
     colId: TableColumn.ARTIST,
     headerName: 'Artist',
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.artists : undefined),
+    width: 150,
   },
   biography: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
     colId: TableColumn.BIOGRAPHY,
     field: 'biography',
-    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'left' }),
     headerName: 'Biography',
-    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.biography : undefined),
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.biography : ''),
+    width: 200,
   },
   bitRate: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
     colId: TableColumn.BIT_RATE,
     field: 'bitRate',
-    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'left' }),
+    suppressSizeToFit: true,
     valueFormatter: (params: ValueFormatterParams) => `${params.value} kbps`,
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.bitRate : undefined),
+    width: 90,
   },
   bpm: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
     colId: TableColumn.BPM,
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'BPM',
+    suppressSizeToFit: true,
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.bpm : undefined),
+    width: 60,
   },
   channels: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
@@ -100,60 +112,70 @@ const tableColumns: { [key: string]: ColDef } = {
     field: 'channels',
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.channels : undefined),
+    width: 100,
   },
   comment: {
     cellRenderer: GenericCell,
     colId: TableColumn.COMMENT,
     headerName: 'Note',
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.comment : undefined),
+    width: 150,
   },
   dateAdded: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
     colId: TableColumn.DATE_ADDED,
     field: 'createdAt',
-    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'left' }),
     headerName: 'Date Added',
-    valueFormatter: (params: ValueFormatterParams) => params.value?.split('T')[0],
+    suppressSizeToFit: true,
+    valueFormatter: (params: ValueFormatterParams) =>
+      params.value ? dayjs(params.value).format('MMM D, YYYY') : '',
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.createdAt : undefined),
+    width: 110,
   },
   discNumber: {
-    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'right' }),
     colId: TableColumn.DISC_NUMBER,
     field: 'discNumber',
-    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
+    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'right' }),
     headerName: 'Disc',
-    initialWidth: 75,
     suppressSizeToFit: true,
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.discNumber : undefined),
+    width: 60,
   },
   duration: {
-    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'right' }),
     colId: TableColumn.DURATION,
     field: 'duration',
     headerComponent: (params: IHeaderParams) =>
-      GenericTableHeader(params, { position: 'center', preset: 'duration' }),
-    initialWidth: 100,
+      GenericTableHeader(params, { position: 'right', preset: 'duration' }),
+    suppressSizeToFit: true,
     valueFormatter: (params: ValueFormatterParams) => formatDuration(params.value * 1000),
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.duration : undefined),
+    width: 60,
   },
   genre: {
     cellRenderer: GenreCell,
     colId: TableColumn.GENRE,
     headerName: 'Genre',
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.genres : undefined),
+    width: 100,
   },
   lastPlayedAt: {
     cellRenderer: GenericCell,
     colId: TableColumn.LAST_PLAYED,
     headerName: 'Last Played',
+    valueFormatter: (params: ValueFormatterParams) =>
+      params.value ? dayjs(params.value).fromNow() : '',
     valueGetter: (params: ValueGetterParams) =>
       params.data ? params.data.lastPlayedAt : undefined,
+    width: 130,
   },
   path: {
     cellRenderer: GenericCell,
     colId: TableColumn.PATH,
     headerName: 'Path',
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.path : undefined),
+    width: 200,
   },
   playCount: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
@@ -161,16 +183,20 @@ const tableColumns: { [key: string]: ColDef } = {
     field: 'playCount',
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'Plays',
+    suppressSizeToFit: true,
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.playCount : undefined),
+    width: 90,
   },
   releaseDate: {
-    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
     colId: TableColumn.RELEASE_DATE,
     field: 'releaseDate',
-    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'Release Date',
-    valueFormatter: (params: ValueFormatterParams) => params.value?.split('T')[0],
+    suppressSizeToFit: true,
+    valueFormatter: (params: ValueFormatterParams) =>
+      params.value ? dayjs(params.value).format('MMM D, YYYY') : '',
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.releaseDate : undefined),
+    width: 130,
   },
   releaseYear: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
@@ -178,26 +204,29 @@ const tableColumns: { [key: string]: ColDef } = {
     field: 'releaseYear',
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'Year',
+    suppressSizeToFit: true,
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.releaseYear : undefined),
+    width: 60,
   },
   rowIndex: {
-    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'right' }),
     colId: TableColumn.ROW_INDEX,
     headerComponent: (params: IHeaderParams) =>
-      GenericTableHeader(params, { position: 'left', preset: 'rowIndex' }),
-    initialWidth: 50,
+      GenericTableHeader(params, { position: 'right', preset: 'rowIndex' }),
     suppressSizeToFit: true,
     valueGetter: (params) => {
       return (params.node?.rowIndex || 0) + 1;
     },
+    width: 65,
   },
   songCount: {
     cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
     colId: TableColumn.SONG_COUNT,
     field: 'songCount',
-    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'Songs',
+    suppressSizeToFit: true,
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.songCount : undefined),
+    width: 80,
   },
   title: {
     cellRenderer: (params: ICellRendererParams) =>
@@ -206,6 +235,7 @@ const tableColumns: { [key: string]: ColDef } = {
     field: 'name',
     headerName: 'Title',
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.name : undefined),
+    width: 250,
   },
   titleCombined: {
     cellRenderer: CombinedTitleCell,
@@ -224,16 +254,17 @@ const tableColumns: { [key: string]: ColDef } = {
             type: params.data?.type,
           }
         : undefined,
+    width: 250,
   },
   trackNumber: {
-    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'right' }),
     colId: TableColumn.TRACK_NUMBER,
     field: 'trackNumber',
-    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
+    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'right' }),
     headerName: 'Track',
-    initialWidth: 75,
     suppressSizeToFit: true,
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.trackNumber : undefined),
+    width: 80,
   },
 };
 
