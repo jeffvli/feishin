@@ -3,7 +3,13 @@ import styled from 'styled-components';
 
 type RatingProps = MantineRatingProps;
 
-const StyledRating = styled(MantineRating)``;
+const StyledRating = styled(MantineRating)`
+  & .mantine-Rating-symbolBody {
+    svg {
+      stroke: var(--main-fg-secondary);
+    }
+  }
+`;
 
 export const Rating = ({ ...props }: RatingProps) => {
   return <StyledRating {...props} />;
