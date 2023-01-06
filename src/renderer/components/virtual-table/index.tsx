@@ -9,7 +9,7 @@ import type {
 import type { AgGridReactProps } from '@ag-grid-community/react';
 import { AgGridReact } from '@ag-grid-community/react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { useMergedRef } from '@mantine/hooks';
+import { useClickOutside, useMergedRef } from '@mantine/hooks';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import formatDuration from 'format-duration';
@@ -30,6 +30,7 @@ import { FavoriteCell } from '/@/renderer/components/virtual-table/cells/favorit
 export * from './table-config-dropdown';
 export * from './table-pagination';
 export * from './hooks/use-fixed-table-header';
+export * from './hooks/use-click-outside-deselect';
 
 const TableWrapper = styled.div`
   display: flex;
@@ -314,14 +315,25 @@ export const getColumnDefs = (columns: PersistedTableColumn[]) => {
   return columnDefs;
 };
 
+interface VirtualTableProps extends AgGridReactProps {
+  deselectOnClickOutside?: boolean;
+}
+
 export const VirtualTable = forwardRef(
-  ({ ...rest }: AgGridReactProps, ref: Ref<AgGridReactType | null>) => {
+  ({ deselectOnClickOutside, ...rest }: VirtualTableProps, ref: Ref<AgGridReactType | null>) => {
     const tableRef = useRef<AgGridReactType | null>(null);
 
     const mergedRef = useMergedRef(ref, tableRef);
 
+    const deselectRef = useClickOutside(() => {
+      return deselectOnClickOutside ? tableRef?.current?.api?.deselectAll() : undefined;
+    });
+
     return (
-      <TableWrapper className="ag-theme-alpine-dark">
+      <TableWrapper
+        ref={deselectRef}
+        className="ag-theme-alpine-dark"
+      >
         <AgGridReact
           ref={mergedRef}
           suppressMoveWhenRowDragging
