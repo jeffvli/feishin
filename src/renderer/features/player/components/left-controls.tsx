@@ -121,7 +121,7 @@ export const LeftControls = () => {
                   radius={50}
                   size="xs"
                   sx={{ position: 'absolute', right: 2, top: 2 }}
-                  tooltip={{ label: 'Expand' }}
+                  tooltip={{ label: 'Expand', openDelay: 500 }}
                   variant="default"
                   onClick={(e) => {
                     e.preventDefault();

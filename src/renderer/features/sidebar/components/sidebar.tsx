@@ -363,7 +363,7 @@ export const Sidebar = () => {
                 radius={100}
                 size="sm"
                 sx={{ position: 'absolute', right: 5, top: 5 }}
-                tooltip={{ label: 'Collapse' }}
+                tooltip={{ label: 'Collapse', openDelay: 500 }}
                 variant="default"
                 onClick={(e) => {
                   e.preventDefault();
