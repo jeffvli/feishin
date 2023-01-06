@@ -314,7 +314,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
           variant="subtle"
           onClick={handleLoadMore}
         >
-          Load more
+          {playlistSongsQueryInfinite.hasNextPage ? 'Load more' : 'End of playlist'}
         </Button>
       </MotionGroup>
     </ContentContainer>
