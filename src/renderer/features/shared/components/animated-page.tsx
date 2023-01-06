@@ -7,7 +7,7 @@ interface AnimatedPageProps {
   children: ReactNode;
 }
 
-const StyledAnimatedPage = styled(motion.div)`
+const StyledAnimatedPage = styled(motion.main)`
   position: relative;
   display: flex;
   flex-direction: column;

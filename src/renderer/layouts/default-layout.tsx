@@ -28,7 +28,7 @@ if (!isElectron()) {
 const Layout = styled.div`
   display: grid;
   grid-template-areas:
-    'main'
+    'main-content'
     'player';
   grid-template-rows: calc(100vh - 85px) 85px;
   grid-template-columns: 1fr;
@@ -36,7 +36,7 @@ const Layout = styled.div`
   height: 100%;
 `;
 
-const MainContainer = styled.main<{
+const MainContentContainer = styled.div<{
   leftSidebarWidth: string;
   rightExpanded?: boolean;
   rightSidebarWidth?: string;
@@ -44,7 +44,7 @@ const MainContainer = styled.main<{
 }>`
   position: relative;
   display: ${(props) => (props.shell ? 'flex' : 'grid')};
-  grid-area: main;
+  grid-area: main-content;
   grid-template-areas: 'sidebar . right-sidebar';
   grid-template-rows: 1fr;
   grid-template-columns: ${(props) => props.leftSidebarWidth} 1fr ${(props) =>
@@ -53,14 +53,14 @@ const MainContainer = styled.main<{
   background: var(--main-bg);
 `;
 
-const SidebarContainer = styled.div`
+const SidebarContainer = styled.aside`
   position: relative;
   grid-area: sidebar;
   background: var(--sidebar-bg);
   border-right: var(--sidebar-border);
 `;
 
-const RightSidebarContainer = styled(motion.div)`
+const RightSidebarContainer = styled(motion.aside)`
   position: relative;
   grid-area: right-sidebar;
   height: 100%;
@@ -253,125 +253,126 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   }, [throttledResize, stopResizing]);
 
   return (
-    <>
-      <Layout>
-        <MainContainer
-          leftSidebarWidth={sidebar.leftWidth}
-          rightExpanded={showSideQueue && sideQueueType === 'sideQueue'}
-          rightSidebarWidth={sidebar.rightWidth}
-          shell={shell}
-        >
-          {!shell && (
-            <>
-              <SidebarContainer>
-                <ResizeHandle
-                  ref={sidebarRef}
-                  isResizing={isResizing}
-                  placement="right"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    startResizing('left');
-                  }}
-                />
-                <Sidebar />
-              </SidebarContainer>
-              <AnimatePresence
-                initial={false}
-                mode="wait"
-              >
-                {isQueueDrawerButtonVisible && (
-                  <QueueDrawerArea
-                    key="queue-drawer-button"
-                    animate="visible"
-                    exit="hidden"
-                    initial="hidden"
-                    variants={queueDrawerButtonVariants}
-                    whileHover={{ opacity: 1, scale: 2, transition: { duration: 0.5 } }}
-                    onMouseEnter={handleEnterDrawerButton}
-                    onMouseLeave={handleLeaveDrawerButton}
-                  >
-                    <TbArrowBarLeft size={12} />
-                  </QueueDrawerArea>
-                )}
+    <Layout id="default-layout">
+      <MainContentContainer
+        id="main-content"
+        leftSidebarWidth={sidebar.leftWidth}
+        rightExpanded={showSideQueue && sideQueueType === 'sideQueue'}
+        rightSidebarWidth={sidebar.rightWidth}
+        shell={shell}
+      >
+        {!shell && (
+          <>
+            <SidebarContainer id="sidebar">
+              <ResizeHandle
+                ref={sidebarRef}
+                isResizing={isResizing}
+                placement="right"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  startResizing('left');
+                }}
+              />
+              <Sidebar />
+            </SidebarContainer>
+            <AnimatePresence
+              initial={false}
+              mode="wait"
+            >
+              {isQueueDrawerButtonVisible && (
+                <QueueDrawerArea
+                  key="queue-drawer-button"
+                  animate="visible"
+                  exit="hidden"
+                  initial="hidden"
+                  variants={queueDrawerButtonVariants}
+                  whileHover={{ opacity: 1, scale: 2, transition: { duration: 0.5 } }}
+                  onMouseEnter={handleEnterDrawerButton}
+                  onMouseLeave={handleLeaveDrawerButton}
+                >
+                  <TbArrowBarLeft size={12} />
+                </QueueDrawerArea>
+              )}
 
-                {drawer && (
-                  <QueueDrawer
-                    key="queue-drawer"
-                    animate="open"
-                    exit="closed"
-                    initial="closed"
-                    variants={queueDrawerVariants}
-                    onMouseLeave={() => {
-                      // The drawer will close due to the delay when setting isReorderingQueue
-                      setTimeout(() => {
-                        if (useAppStore.getState().isReorderingQueue) return;
-                        drawerHandler.close();
-                      }, 50);
-                    }}
-                  >
-                    <DrawerPlayQueue />
-                  </QueueDrawer>
-                )}
-              </AnimatePresence>
-              <AnimatePresence
-                key="queue-sidebar"
-                presenceAffectsLayout
-                initial={false}
-                mode="wait"
-              >
-                {showSideQueue && (
-                  <>
-                    {sideQueueType === 'sideQueue' ? (
-                      <RightSidebarContainer
-                        key="queue-sidebar"
-                        animate="open"
-                        exit="closed"
-                        initial="closed"
-                        variants={queueSidebarVariants}
-                      >
-                        <ResizeHandle
-                          ref={rightSidebarRef}
-                          isResizing={isResizingRight}
-                          placement="left"
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            startResizing('right');
-                          }}
-                        />
-                        <SidebarPlayQueue />
-                      </RightSidebarContainer>
-                    ) : (
-                      <QueueDrawer
-                        key="queue-drawer"
-                        animate="open"
-                        exit="closed"
-                        initial="closed"
-                        variants={queueDrawerVariants}
-                        onMouseLeave={() => {
-                          // The drawer will close due to the delay when setting isReorderingQueue
-                          setTimeout(() => {
-                            if (useAppStore.getState().isReorderingQueue) return;
-                            drawerHandler.close();
-                          }, 50);
+              {drawer && (
+                <QueueDrawer
+                  key="queue-drawer"
+                  animate="open"
+                  exit="closed"
+                  initial="closed"
+                  variants={queueDrawerVariants}
+                  onMouseLeave={() => {
+                    // The drawer will close due to the delay when setting isReorderingQueue
+                    setTimeout(() => {
+                      if (useAppStore.getState().isReorderingQueue) return;
+                      drawerHandler.close();
+                    }, 50);
+                  }}
+                >
+                  <DrawerPlayQueue />
+                </QueueDrawer>
+              )}
+            </AnimatePresence>
+            <AnimatePresence
+              key="queue-sidebar"
+              presenceAffectsLayout
+              initial={false}
+              mode="wait"
+            >
+              {showSideQueue && (
+                <>
+                  {sideQueueType === 'sideQueue' ? (
+                    <RightSidebarContainer
+                      key="queue-sidebar"
+                      animate="open"
+                      exit="closed"
+                      id="sidebar-queue"
+                      initial="closed"
+                      variants={queueSidebarVariants}
+                    >
+                      <ResizeHandle
+                        ref={rightSidebarRef}
+                        isResizing={isResizingRight}
+                        placement="left"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          startResizing('right');
                         }}
-                      >
-                        <DrawerPlayQueue />
-                      </QueueDrawer>
-                    )}
-                  </>
-                )}
-              </AnimatePresence>
-            </>
-          )}
-          <Suspense fallback={<></>}>
-            <Outlet />
-          </Suspense>
-        </MainContainer>
-        <PlayerbarContainer>
-          <Playerbar />
-        </PlayerbarContainer>
-      </Layout>
-    </>
+                      />
+                      <SidebarPlayQueue />
+                    </RightSidebarContainer>
+                  ) : (
+                    <QueueDrawer
+                      key="queue-drawer"
+                      animate="open"
+                      exit="closed"
+                      id="drawer-queue"
+                      initial="closed"
+                      variants={queueDrawerVariants}
+                      onMouseLeave={() => {
+                        // The drawer will close due to the delay when setting isReorderingQueue
+                        setTimeout(() => {
+                          if (useAppStore.getState().isReorderingQueue) return;
+                          drawerHandler.close();
+                        }, 50);
+                      }}
+                    >
+                      <DrawerPlayQueue />
+                    </QueueDrawer>
+                  )}
+                </>
+              )}
+            </AnimatePresence>
+          </>
+        )}
+        <Suspense fallback={<></>}>
+          <Outlet />
+        </Suspense>
+      </MainContentContainer>
+      <PlayerbarContainer id="player-bar">
+        <Playerbar />
+      </PlayerbarContainer>
+    </Layout>
   );
 };
 

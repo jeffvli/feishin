@@ -14,8 +14,8 @@ export const useFixedTableHeader = () => {
   });
 
   useEffect(() => {
-    const header = document.querySelector('.ag-header');
-    const root = document.querySelector('.ag-root');
+    const header = document.querySelector('main .ag-header');
+    const root = document.querySelector('main .ag-root');
 
     if (isNotPastTableIntersection || !tableInView) {
       header?.classList.remove('ag-header-fixed');
