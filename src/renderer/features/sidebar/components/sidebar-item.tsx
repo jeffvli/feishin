@@ -14,6 +14,7 @@ interface ListItemProps extends FlexProps {
 const StyledItem = styled(Flex)`
   width: 100%;
   font-family: var(--content-font-family);
+  letter-spacing: 0.5px;
 
   &:focus-visible {
     border: 1px solid var(--primary-color);
