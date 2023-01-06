@@ -103,16 +103,19 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
             ...page.filter,
           });
 
-          const albumArtistsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-            api.controller.getAlbumArtistList({
-              query: {
-                limit,
-                startIndex,
-                ...page.filter,
-              },
-              server,
-              signal,
-            }),
+          const albumArtistsRes = await queryClient.fetchQuery(
+            queryKey,
+            async ({ signal }) =>
+              api.controller.getAlbumArtistList({
+                query: {
+                  limit,
+                  startIndex,
+                  ...page.filter,
+                },
+                server,
+                signal,
+              }),
+            { cacheTime: 1000 * 60 * 1 },
           );
 
           const albums = api.normalize.albumArtistList(albumArtistsRes, server);
@@ -192,16 +195,19 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
         ...page.filter,
       });
 
-      const albumArtistsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-        api.controller.getAlbumArtistList({
-          query: {
-            limit,
-            startIndex,
-            ...page.filter,
-          },
-          server,
-          signal,
-        }),
+      const albumArtistsRes = await queryClient.fetchQuery(
+        queryKey,
+        async ({ signal }) =>
+          api.controller.getAlbumArtistList({
+            query: {
+              limit,
+              startIndex,
+              ...page.filter,
+            },
+            server,
+            signal,
+          }),
+        { cacheTime: 1000 * 60 * 1 },
       );
 
       return api.normalize.albumArtistList(albumArtistsRes, server);

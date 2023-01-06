@@ -85,16 +85,19 @@ export const PlaylistListContent = ({ tableRef }: PlaylistListContentProps) => {
             ...page.filter,
           });
 
-          const playlistsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-            api.controller.getPlaylistList({
-              query: {
-                limit,
-                startIndex,
-                ...page.filter,
-              },
-              server,
-              signal,
-            }),
+          const playlistsRes = await queryClient.fetchQuery(
+            queryKey,
+            async ({ signal }) =>
+              api.controller.getPlaylistList({
+                query: {
+                  limit,
+                  startIndex,
+                  ...page.filter,
+                },
+                server,
+                signal,
+              }),
+            { cacheTime: 1000 * 60 * 1 },
           );
 
           const playlists = api.normalize.playlistList(playlistsRes, server);

@@ -138,17 +138,20 @@ export const PlaylistDetailSongListHeader = ({
             ...filters,
           });
 
-          const songsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-            api.controller.getPlaylistSongList({
-              query: {
-                id: playlistId,
-                limit,
-                startIndex,
-                ...filters,
-              },
-              server,
-              signal,
-            }),
+          const songsRes = await queryClient.fetchQuery(
+            queryKey,
+            async ({ signal }) =>
+              api.controller.getPlaylistSongList({
+                query: {
+                  id: playlistId,
+                  limit,
+                  startIndex,
+                  ...filters,
+                },
+                server,
+                signal,
+              }),
+            { cacheTime: 1000 * 60 * 1 },
           );
 
           const songs = api.normalize.songList(songsRes, server);

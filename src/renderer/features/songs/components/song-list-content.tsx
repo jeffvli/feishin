@@ -86,16 +86,19 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
             ...page.filter,
           });
 
-          const songsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-            api.controller.getSongList({
-              query: {
-                limit,
-                startIndex,
-                ...page.filter,
-              },
-              server,
-              signal,
-            }),
+          const songsRes = await queryClient.fetchQuery(
+            queryKey,
+            async ({ signal }) =>
+              api.controller.getSongList({
+                query: {
+                  limit,
+                  startIndex,
+                  ...page.filter,
+                },
+                server,
+                signal,
+              }),
+            { cacheTime: 1000 * 60 * 1 },
           );
 
           const songs = api.normalize.songList(songsRes, server);
