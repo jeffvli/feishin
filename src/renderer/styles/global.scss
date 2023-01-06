@@ -1,6 +1,7 @@
 @use '../themes/default.scss';
 @use '../themes/dark.scss';
 @use '../themes/light.scss';
+@use './ag-grid.scss';
 
 * {
   box-sizing: border-box;

@@ -1,0 +1,15 @@
+.ag-header-fixed {
+  position: fixed !important;
+  top: 61px;
+  z-index: 5;
+  background: #181818 !important;
+  margin: 0 -24px;
+  padding: 0 24px;
+  border-bottom: 1px solid hsla(0, 0%, 100%, 0.1);
+  box-shadow: 0 -1px 0 0 #181818;
+  transition: position 0.2s ease-in-out;
+}
+
+.ag-header-fixed-margin {
+  margin-top: 49px !important;
+}

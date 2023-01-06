@@ -29,6 +29,7 @@ import { FavoriteCell } from '/@/renderer/components/virtual-table/cells/favorit
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
+export * from './hooks/use-fixed-table-header';
 
 const TableWrapper = styled.div`
   display: flex;
@@ -325,6 +326,7 @@ export const VirtualTable = forwardRef(
           ref={mergedRef}
           suppressMoveWhenRowDragging
           suppressScrollOnNewData
+          headerHeight={36}
           rowBuffer={30}
           {...rest}
         />
