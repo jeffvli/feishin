@@ -133,16 +133,19 @@ export const AlbumListHeader = ({ gridRef, tableRef }: AlbumListHeaderProps) => 
         ...filters,
       });
 
-      const albums = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-        controller.getAlbumList({
-          query: {
-            limit: take,
-            startIndex: skip,
-            ...filters,
-          },
-          server,
-          signal,
-        }),
+      const albums = await queryClient.fetchQuery(
+        queryKey,
+        async ({ signal }) =>
+          controller.getAlbumList({
+            query: {
+              limit: take,
+              startIndex: skip,
+              ...filters,
+            },
+            server,
+            signal,
+          }),
+        { cacheTime: 1000 * 60 * 1 },
       );
 
       return api.normalize.albumList(albums, server);
@@ -167,16 +170,19 @@ export const AlbumListHeader = ({ gridRef, tableRef }: AlbumListHeaderProps) => 
               ...filters,
             });
 
-            const albumsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-              api.controller.getAlbumList({
-                query: {
-                  limit,
-                  startIndex,
-                  ...filters,
-                },
-                server,
-                signal,
-              }),
+            const albumsRes = await queryClient.fetchQuery(
+              queryKey,
+              async ({ signal }) =>
+                api.controller.getAlbumList({
+                  query: {
+                    limit,
+                    startIndex,
+                    ...filters,
+                  },
+                  server,
+                  signal,
+                }),
+              { cacheTime: 1000 * 60 * 1 },
             );
 
             const albums = api.normalize.albumList(albumsRes, server);

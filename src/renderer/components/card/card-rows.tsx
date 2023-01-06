@@ -166,7 +166,7 @@ export const ALBUM_CARD_ROWS: { [key: string]: CardRow<Album> } = {
     property: 'playCount',
   },
   rating: {
-    property: 'rating',
+    property: 'userRating',
   },
   releaseDate: {
     property: 'releaseDate',
@@ -203,7 +203,7 @@ export const ALBUMARTIST_CARD_ROWS: { [key: string]: CardRow<AlbumArtist> } = {
     property: 'playCount',
   },
   rating: {
-    property: 'rating',
+    property: 'userRating',
   },
   songCount: {
     property: 'songCount',

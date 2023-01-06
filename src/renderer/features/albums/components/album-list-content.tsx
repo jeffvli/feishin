@@ -98,16 +98,19 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
             ...page.filter,
           });
 
-          const albumsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-            api.controller.getAlbumList({
-              query: {
-                limit,
-                startIndex,
-                ...page.filter,
-              },
-              server,
-              signal,
-            }),
+          const albumsRes = await queryClient.fetchQuery(
+            queryKey,
+            async ({ signal }) =>
+              api.controller.getAlbumList({
+                query: {
+                  limit,
+                  startIndex,
+                  ...page.filter,
+                },
+                server,
+                signal,
+              }),
+            { cacheTime: 1000 * 60 * 1 },
           );
 
           const albums = api.normalize.albumList(albumsRes, server);
