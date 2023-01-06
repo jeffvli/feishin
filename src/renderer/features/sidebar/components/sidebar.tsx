@@ -18,11 +18,11 @@ import {
   RiDiscLine,
   RiFlag2Line,
   RiFolder3Line,
-  RiHome5Fill,
-  RiHome5Line,
+  RiHome4Fill,
+  RiHome4Line,
   RiListUnordered,
-  RiMusicFill,
-  RiMusicLine,
+  RiMusic2Fill,
+  RiMusic2Line,
   RiSearchLine,
   RiUserVoiceFill,
   RiUserVoiceLine,
@@ -178,9 +178,9 @@ export const Sidebar = () => {
               >
                 <Group>
                   {location.pathname === AppRoute.HOME ? (
-                    <RiHome5Fill size="1.3em" />
+                    <RiHome4Fill size="1.3em" />
                   ) : (
-                    <RiHome5Line size="1.3em" />
+                    <RiHome4Line size="1.3em" />
                   )}
                   Home
                 </Group>
@@ -226,9 +226,9 @@ export const Sidebar = () => {
                     <SidebarItem to={AppRoute.LIBRARY_SONGS}>
                       <Group>
                         {location.pathname === AppRoute.LIBRARY_SONGS ? (
-                          <RiMusicFill size="1.1em" />
+                          <RiMusic2Fill size="1.1em" />
                         ) : (
-                          <RiMusicLine size="1.1em" />
+                          <RiMusic2Line size="1.1em" />
                         )}
                         Tracks
                       </Group>
