@@ -77,14 +77,6 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
     [page.table.columns],
   );
 
-  const defaultColumnDefs: ColDef = useMemo(() => {
-    return {
-      lockPinned: true,
-      lockVisible: true,
-      resizable: true,
-    };
-  }, []);
-
   const onTableReady = useCallback(
     (params: GridReadyEvent) => {
       const dataSource: IDatasource = {
@@ -140,12 +132,6 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
     },
     [isPaginationEnabled, pagination.currentPage, pagination.itemsPerPage, setPagination],
   );
-
-  const handleTableSizeChange = () => {
-    if (page.table.autoFit) {
-      tableRef?.current?.api.sizeColumnsToFit();
-    }
-  };
 
   const handleTableColumnChange = useCallback(() => {
     const { columnApi } = tableRef?.current || {};
@@ -350,34 +336,22 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
             key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
             ref={tableRef}
             alwaysShowHorizontalScroll
-            animateRows
-            maintainColumnOrder
-            suppressCopyRowsToClipboard
-            suppressMoveWhenRowDragging
-            suppressPaginationPanel
-            suppressRowDrag
-            suppressScrollOnNewData
+            autoFitColumns={page.table.autoFit}
             blockLoadDebounceMillis={200}
-            cacheBlockSize={500}
-            cacheOverflowSize={1}
             columnDefs={columnDefs}
-            defaultColDef={defaultColumnDefs}
-            enableCellChangeFlash={false}
             getRowId={(data) => data.data.id}
-            infiniteInitialRowCount={checkAlbumList.data?.totalRecordCount || 100}
+            infiniteInitialRowCount={checkAlbumList.data?.totalRecordCount || 1}
             pagination={isPaginationEnabled}
             paginationAutoPageSize={isPaginationEnabled}
             paginationPageSize={page.table.pagination.itemsPerPage || 100}
             rowBuffer={20}
             rowHeight={page.table.rowHeight || 40}
             rowModelType="infinite"
-            rowSelection="multiple"
             onBodyScrollEnd={handleTableScroll}
             onCellContextMenu={handleContextMenu}
             onColumnMoved={handleTableColumnChange}
             onColumnResized={debouncedTableColumnChange}
             onGridReady={onTableReady}
-            onGridSizeChanged={handleTableSizeChange}
             onPaginationChanged={onTablePaginationChanged}
             onRowDoubleClicked={handleRowDoubleClick}
           />

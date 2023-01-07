@@ -407,11 +407,15 @@ export const VirtualTable = forwardRef(
         <AgGridReact
           ref={mergedRef}
           animateRows
+          maintainColumnOrder
           suppressContextMenu
           suppressCopyRowsToClipboard
           suppressMoveWhenRowDragging
           suppressPaginationPanel
           suppressScrollOnNewData
+          blockLoadDebounceMillis={200}
+          cacheBlockSize={300}
+          cacheOverflowSize={1}
           defaultColDef={defaultColumnDefs}
           enableCellChangeFlash={false}
           headerHeight={36}

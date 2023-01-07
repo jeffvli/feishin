@@ -81,14 +81,6 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     [page.table.columns],
   );
 
-  const defaultColumnDefs: ColDef = useMemo(() => {
-    return {
-      lockPinned: true,
-      lockVisible: true,
-      resizable: true,
-    };
-  }, []);
-
   const onGridReady = useCallback(
     (params: GridReadyEvent) => {
       const dataSource: IDatasource = {
@@ -152,12 +144,6 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
       setPagination,
     ],
   );
-
-  const handleGridSizeChange = () => {
-    if (page.table.autoFit) {
-      tableRef?.current?.api.sizeColumnsToFit();
-    }
-  };
 
   const handleColumnChange = useCallback(() => {
     const { columnApi } = tableRef?.current || {};
@@ -230,34 +216,19 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
         key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
         ref={tableRef}
         alwaysShowHorizontalScroll
-        animateRows
-        maintainColumnOrder
-        suppressCopyRowsToClipboard
-        suppressMoveWhenRowDragging
-        suppressPaginationPanel
-        suppressRowDrag
-        suppressScrollOnNewData
-        blockLoadDebounceMillis={200}
-        cacheBlockSize={500}
-        cacheOverflowSize={1}
         columnDefs={columnDefs}
-        defaultColDef={defaultColumnDefs}
-        enableCellChangeFlash={false}
         getRowId={(data) => data.data.uniqueId}
-        infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 100}
+        infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 1}
         pagination={isPaginationEnabled}
         paginationAutoPageSize={isPaginationEnabled}
         paginationPageSize={pagination.itemsPerPage || 100}
-        rowBuffer={20}
         rowHeight={page.table.rowHeight || 40}
         rowModelType="infinite"
-        rowSelection="multiple"
         onBodyScrollEnd={handleScroll}
         onCellContextMenu={handleContextMenu}
         onColumnMoved={handleColumnChange}
         onColumnResized={debouncedColumnChange}
         onGridReady={onGridReady}
-        onGridSizeChanged={handleGridSizeChange}
         onPaginationChanged={onPaginationChanged}
         onRowDoubleClicked={handleRowDoubleClick}
       />
