@@ -122,7 +122,7 @@ export const VirtualInfiniteGrid = forwardRef(
         }
       },
       scrollTo: (index: number) => {
-        listRef.current.scrollToItem(index);
+        listRef?.current?.scrollToItem(index);
       },
       setItemData: (data: any[]) => {
         setItemData(data);
