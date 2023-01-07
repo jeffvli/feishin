@@ -128,6 +128,8 @@
 
     --ag-row-hover-color: var(--table-row-hover-bg);
     --ag-selected-row-background-color: var(--table-row-selected-bg);
+
+    --ag-cell-horizontal-padding: 0.5rem;
   }
 
   .ag-header {
@@ -135,12 +137,16 @@
     margin-bottom: 1rem;
   }
 
+  .ag-ltr .ag-header-cell-resize {
+    right: 0px;
+  }
+
   .ag-header:hover .ag-header-cell-resize {
     position: absolute;
     top: 25%;
-    border-left: 1px var(--table-border-color) solid;
+    border: 1px var(--table-border-color) solid;
     height: 50%;
-    width: 0.5em;
+    width: 0.2em;
   }
 
   .ag-header-cell-label {
