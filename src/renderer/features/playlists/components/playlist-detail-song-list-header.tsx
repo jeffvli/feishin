@@ -379,10 +379,10 @@ export const PlaylistDetailSongListHeader = ({
             <DropdownMenu.Dropdown>
               <DropdownMenu.Item onClick={() => handlePlay(Play.NOW)}>Play</DropdownMenu.Item>
               <DropdownMenu.Item onClick={() => handlePlay(Play.LAST)}>
-                Add to queue (last)
+                Add to queue
               </DropdownMenu.Item>
               <DropdownMenu.Item onClick={() => handlePlay(Play.NEXT)}>
-                Add to queue (next)
+                Add to queue next
               </DropdownMenu.Item>
               <DropdownMenu.Divider />
               <DropdownMenu.Item

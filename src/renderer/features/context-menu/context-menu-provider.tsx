@@ -170,12 +170,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     },
     playLast: {
       id: 'playLast',
-      label: 'Add to queue (last)',
+      label: 'Add to queue',
       onClick: () => handlePlay(Play.LAST),
     },
     playNext: {
       id: 'playNext',
-      label: 'Add to queue (next)',
+      label: 'Add to queue next',
       onClick: () => handlePlay(Play.NEXT),
     },
     removeFromFavorites: {
