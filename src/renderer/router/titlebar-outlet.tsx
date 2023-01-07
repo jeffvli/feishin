@@ -8,9 +8,8 @@ const TitlebarContainer = styled.header`
   right: 0;
   z-index: 5000;
   height: 2.5rem;
-  background: var(--titlebar-bg);
+  background: var(--titlebar-controls-bg);
   -webkit-app-region: drag;
-  opacity: 0.85;
 `;
 
 export const TitlebarOutlet = () => {

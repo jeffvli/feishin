@@ -51,7 +51,7 @@ const BackgroundImageOverlay = styled.div<{ theme: 'light' | 'dark' }>`
   height: 100%;
   background: ${(props) =>
     props.theme === 'light'
-      ? 'linear-gradient(rgba(0, 0, 0, 20%), rgba(0, 0, 0, 20%))'
+      ? 'linear-gradient(rgba(255, 255, 255, 25%), rgba(255, 255, 255, 25%))'
       : 'linear-gradient(rgba(0, 0, 0, 50%), rgba(0, 0, 0, 50%))'};
 `;
 

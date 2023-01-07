@@ -31,7 +31,7 @@ export const WindowsButton = styled.div<{ $exit?: boolean }>`
   }
 
   &:hover {
-    background: ${({ $exit }) => ($exit ? 'rgba(200, 50, 0, 30%)' : 'rgba(125, 125, 125, 30%)')};
+    background: ${({ $exit }) => ($exit ? 'var(--danger-color)' : 'rgba(125, 125, 125, 30%)')};
   }
 `;
 
@@ -69,20 +69,20 @@ export const WindowControls = ({ style }: WindowControlsProps) => {
                 role="button"
                 onClick={handleMinimize}
               >
-                <RiSubtractLine size={20} />
+                <RiSubtractLine size={19} />
               </WindowsButton>
               <WindowsButton
                 role="button"
                 onClick={handleMaximize}
               >
-                <RiCheckboxBlankLine size={15} />
+                <RiCheckboxBlankLine size={13} />
               </WindowsButton>
               <WindowsButton
                 $exit
                 role="button"
                 onClick={handleClose}
               >
-                <RiCloseLine size={20} />
+                <RiCloseLine size={19} />
               </WindowsButton>
             </WindowsButtonGroup>
           )}
