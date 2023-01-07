@@ -1,15 +1,49 @@
 .ag-header-fixed {
   position: fixed !important;
   top: 61px;
-  z-index: 5;
-  background: #181818 !important;
+  z-index: 15;
+  background: var(--table-header-bg) !important;
   margin: 0 -2rem;
   padding: 0 2rem;
-  border-bottom: 1px solid hsla(0, 0%, 100%, 0.1);
+  border-bottom: 1px solid var(--table-border-color);
   box-shadow: 0 -1px 0 0 #181818;
   transition: position 0.2s ease-in-out;
 }
 
 .ag-header-fixed-margin {
   margin-top: 49px !important;
+}
+
+.ag-header-cell-comp-wrapper {
+  margin: 0.5rem 0.5rem;
+}
+
+.ag-cell-rating,
+.ag-cell-favorite {
+  display: none;
+}
+
+.ag-cell-rating.visible {
+  display: block;
+}
+
+.ag-cell-favorite.visible {
+  display: block;
+}
+
+.ag-row-hover {
+  .ag-cell-rating,
+  .ag-cell-favorite {
+    display: block;
+  }
+}
+
+.ag-header-cell,
+.ag-header-group-cell {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.ag-header-cell-resize {
+  background-color: transparent;
 }
