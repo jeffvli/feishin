@@ -26,13 +26,27 @@ const StyledMenuLabel = styled(MantineMenu.Label)<MenuLabelProps>`
 `;
 
 const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
-  padding: 0.8rem;
-  font-size: 0.9em;
+  position: relative;
+  padding: var(--dropdown-menu-item-padding);
+  font-size: var(--dropdown-menu-item-font-size);
   font-family: var(--content-font-family);
-  background-color: ${({ $isActive }) => {
-    if (!$isActive) return undefined;
-    return 'var(--dropdown-menu-bg-hover)';
-  }};
+
+  ${(props) =>
+    props.$isActive &&
+    `
+      &::before {
+        content: ''; // ::before and ::after both require content
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--primary-color);
+        opacity: 0.2;
+        z-index: -1;
+      }
+
+  `}
 
   &:disabled {
     opacity: 0.6;
@@ -56,6 +70,8 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
     display: flex;
     margin-left: 2rem !important;
   }
+
+  cursor: default;
 `;
 
 const StyledMenuDropdown = styled(MantineMenu.Dropdown)`
@@ -73,13 +89,12 @@ export const DropdownMenu = ({ children, ...props }: MenuProps) => {
   return (
     <StyledMenu
       withinPortal
-      radius="sm"
       styles={{
         dropdown: {
           filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))',
         },
       }}
-      transition="scale-y"
+      transition="fade"
       {...props}
     >
       {children}

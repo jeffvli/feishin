@@ -64,7 +64,7 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
         },
       }}
       sx={{ maxWidth, width }}
-      transition="pop"
+      transition="fade"
       transitionDuration={100}
       {...props}
     />
@@ -126,7 +126,7 @@ export const MultiSelect = ({ width, maxWidth, ...props }: MultiSelectProps) => 
         },
       }}
       sx={{ maxWidth, width }}
-      transition="pop"
+      transition="fade"
       transitionDuration={100}
       {...props}
     />
