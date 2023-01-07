@@ -128,6 +128,8 @@ export const useSetAlbumFilters = () => useAlbumStore((state) => state.actions.s
 
 export const useAlbumListStore = () => useAlbumStore((state) => state.list);
 
+export const useAlbumListFilters = () => useAlbumStore((state) => state.list.filter);
+
 export const useAlbumTablePagination = () => useAlbumStore((state) => state.list.table.pagination);
 
 export const useSetAlbumTablePagination = () =>

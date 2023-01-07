@@ -134,6 +134,8 @@ export const useSongFilters = () => {
   return useSongStore((state) => [state.list.filter, state.actions.setFilters]);
 };
 
+export const useSongListFilters = () => useSongStore((state) => state.list.filter);
+
 export const useSongListStore = () => useSongStore((state) => state.list);
 
 export const useSongTablePagination = () => useSongStore((state) => state.list.table.pagination);
