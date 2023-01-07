@@ -746,6 +746,12 @@ export const usePlayerStore = create<PlayerSlice>()(
         return merge(currentState, persistedState);
       },
       name: 'store_player',
+      partialize: (state) => {
+        const notPersisted = ['queue', 'current'];
+        return Object.fromEntries(
+          Object.entries(state).filter(([key]) => !notPersisted.includes(key)),
+        );
+      },
       version: 1,
     },
   ),
