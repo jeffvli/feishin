@@ -170,7 +170,9 @@ const tableColumns: { [key: string]: ColDef } = {
     width: 100,
   },
   lastPlayedAt: {
+    cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
     colId: TableColumn.LAST_PLAYED,
+    headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'Last Played',
     valueFormatter: (params: ValueFormatterParams) =>
       params.value ? dayjs(params.value).fromNow() : '',
