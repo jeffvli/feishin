@@ -16,7 +16,6 @@ import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { Album, AlbumListSort, LibraryItem } from '/@/renderer/api/types';
-import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useCurrentServer,
@@ -47,10 +46,11 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 interface AlbumListContentProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+  itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) => {
+export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListContentProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const server = useCurrentServer();
@@ -65,12 +65,6 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
   const setTable = useSetAlbumTable();
 
   const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
-
-  const checkAlbumList = useAlbumList({
-    limit: 1,
-    startIndex: 0,
-    ...page.filter,
-  });
 
   const columnDefs: ColDef[] = useMemo(
     () => getColumnDefs(page.table.columns),
@@ -311,12 +305,12 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
                   handlePlayQueueAdd={handlePlayQueueAdd}
                   height={height}
                   initialScrollOffset={page?.grid.scrollOffset || 0}
-                  itemCount={checkAlbumList?.data?.totalRecordCount || 0}
+                  itemCount={itemCount || 0}
                   itemData={itemData}
                   itemGap={20}
                   itemSize={150 + page.grid?.size}
                   itemType={LibraryItem.ALBUM}
-                  loading={checkAlbumList.isLoading}
+                  loading={!itemCount}
                   minimumBatchSize={40}
                   route={{
                     route: AppRoute.LIBRARY_ALBUMS_DETAIL,
@@ -340,7 +334,7 @@ export const AlbumListContent = ({ gridRef, tableRef }: AlbumListContentProps) =
             blockLoadDebounceMillis={200}
             columnDefs={columnDefs}
             getRowId={(data) => data.data.id}
-            infiniteInitialRowCount={checkAlbumList.data?.totalRecordCount || 1}
+            infiniteInitialRowCount={itemCount || 1}
             pagination={isPaginationEnabled}
             paginationAutoPageSize={isPaginationEnabled}
             paginationPageSize={page.table.pagination.itemsPerPage || 100}

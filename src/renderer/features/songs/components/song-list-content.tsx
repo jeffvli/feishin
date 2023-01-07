@@ -19,7 +19,6 @@ import {
   VirtualGridAutoSizerContainer,
   VirtualTable,
 } from '/@/renderer/components';
-import { useSongList } from '/@/renderer/features/songs/queries/song-list-query';
 import {
   useCurrentServer,
   useSetSongTable,
@@ -38,10 +37,11 @@ import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 interface SongListContentProps {
+  itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SongListContent = ({ tableRef }: SongListContentProps) => {
+export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
   const page = useSongListStore();
@@ -53,12 +53,6 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
   const playButtonBehavior = usePlayButtonBehavior();
 
   const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
-
-  const checkSongList = useSongList({
-    limit: 1,
-    startIndex: 0,
-    ...page.filter,
-  });
 
   const columnDefs: ColDef[] = useMemo(
     () => getColumnDefs(page.table.columns),
@@ -224,7 +218,7 @@ export const SongListContent = ({ tableRef }: SongListContentProps) => {
           defaultColDef={defaultColumnDefs}
           enableCellChangeFlash={false}
           getRowId={(data) => data.data.id}
-          infiniteInitialRowCount={checkSongList.data?.totalRecordCount || 100}
+          infiniteInitialRowCount={itemCount || 100}
           pagination={isPaginationEnabled}
           paginationAutoPageSize={isPaginationEnabled}
           paginationPageSize={page.table.pagination.itemsPerPage || 100}

@@ -17,9 +17,10 @@ import styled from 'styled-components';
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumListSort, ServerType, SortOrder } from '/@/renderer/api/types';
+import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
 import {
   ALBUM_TABLE_COLUMNS,
+  Badge,
   Button,
   DropdownMenu,
   MultiSelect,
@@ -27,6 +28,7 @@ import {
   Popover,
   SearchInput,
   Slider,
+  SpinnerIcon,
   Switch,
   Text,
   TextTitle,
@@ -45,7 +47,8 @@ import {
   useSetAlbumTable,
   useSetAlbumTablePagination,
 } from '/@/renderer/store';
-import { ListDisplayType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, Play, TableColumn } from '/@/renderer/types';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 const FILTERS = {
   jellyfin: [
@@ -90,10 +93,11 @@ const HeaderItems = styled.div`
 
 interface AlbumListHeaderProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+  itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const AlbumListHeader = ({ gridRef, tableRef }: AlbumListHeaderProps) => {
+export const AlbumListHeader = ({ itemCount, gridRef, tableRef }: AlbumListHeaderProps) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
   const setPage = useSetAlbumStore();
@@ -213,6 +217,11 @@ export const AlbumListHeader = ({ gridRef, tableRef }: AlbumListHeaderProps) => 
     [page.display, tableRef, setPagination, server, queryClient, gridRef, fetch],
   );
 
+  const handleRefresh = useCallback(() => {
+    queryClient.invalidateQueries(queryKeys.albums.list(server?.id || ''));
+    handleFilterChange(filters);
+  }, [filters, handleFilterChange, queryClient, server?.id]);
+
   const handleSetSortBy = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value || !server?.type) return;
@@ -301,6 +310,31 @@ export const AlbumListHeader = ({ gridRef, tableRef }: AlbumListHeaderProps) => 
     }
   };
 
+  const handlePlayQueueAdd = usePlayQueueAdd();
+
+  const handlePlay = async (play: Play) => {
+    if (!itemCount || itemCount === 0) return;
+
+    const query = { startIndex: 0, ...filters };
+    const queryKey = queryKeys.albums.list(server?.id || '', query);
+
+    const albumListRes = await queryClient.fetchQuery({
+      queryFn: ({ signal }) => api.controller.getAlbumList({ query, server, signal }),
+      queryKey,
+    });
+
+    const albumIds =
+      api.normalize.albumList(albumListRes, server).items?.map((item) => item.id) || [];
+
+    handlePlayQueueAdd?.({
+      byItemType: {
+        id: albumIds,
+        type: LibraryItem.ALBUM,
+      },
+      play,
+    });
+  };
+
   return (
     <PageHeader p="1rem">
       <HeaderItems ref={cq.ref}>
@@ -311,20 +345,30 @@ export const AlbumListHeader = ({ gridRef, tableRef }: AlbumListHeaderProps) => 
         >
           <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
-              <Button
-                compact
-                px={0}
-                rightIcon={<RiArrowDownSLine size={15} />}
-                size="xl"
-                variant="subtle"
-              >
-                <TextTitle
-                  fw="bold"
-                  order={3}
+              <Group>
+                <Button
+                  compact
+                  px={0}
+                  rightIcon={<RiArrowDownSLine size={15} />}
+                  size="xl"
+                  variant="subtle"
                 >
-                  Albums
-                </TextTitle>
-              </Button>
+                  <Group>
+                    <TextTitle
+                      fw="bold"
+                      order={3}
+                    >
+                      Albums
+                    </TextTitle>
+                    <Badge
+                      radius="xl"
+                      size="lg"
+                    >
+                      {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
+                    </Badge>
+                  </Group>
+                </Button>
+              </Group>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
               <DropdownMenu.Label>Display type</DropdownMenu.Label>
@@ -495,10 +539,15 @@ export const AlbumListHeader = ({ gridRef, tableRef }: AlbumListHeaderProps) => 
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-              <DropdownMenu.Item disabled>Play</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Add to queue (next)</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Add to queue (last)</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => handlePlay(Play.NOW)}>Play</DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => handlePlay(Play.LAST)}>
+                Add to queue (last)
+              </DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => handlePlay(Play.NEXT)}>
+                Add to queue (next)
+              </DropdownMenu.Item>
+              <DropdownMenu.Divider />
+              <DropdownMenu.Item onClick={handleRefresh}>Refresh</DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
         </Flex>

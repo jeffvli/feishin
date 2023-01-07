@@ -13,7 +13,13 @@ import {
 } from 'react-icons/ri';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { ServerType, SongListSort, SortOrder } from '/@/renderer/api/types';
+import {
+  LibraryItem,
+  ServerType,
+  SongListQuery,
+  SongListSort,
+  SortOrder,
+} from '/@/renderer/api/types';
 import {
   Button,
   DropdownMenu,
@@ -25,7 +31,10 @@ import {
   MultiSelect,
   Text,
   SONG_TABLE_COLUMNS,
+  Badge,
+  SpinnerIcon,
 } from '/@/renderer/components';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useMusicFolders } from '/@/renderer/features/shared';
 import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jellyfin-song-filters';
 import { NavidromeSongFilters } from '/@/renderer/features/songs/components/navidrome-song-filters';
@@ -40,7 +49,7 @@ import {
   useSetSongTablePagination,
   useSongListStore,
 } from '/@/renderer/store';
-import { ListDisplayType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, Play, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
   jellyfin: [
@@ -80,16 +89,18 @@ const ORDER = [
 ];
 
 interface SongListHeaderProps {
+  itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
+export const SongListHeader = ({ itemCount, tableRef }: SongListHeaderProps) => {
   const server = useCurrentServer();
   const page = useSongListStore();
   const setPage = useSetSongStore();
   const setFilter = useSetSongFilters();
   const setTable = useSetSongTable();
   const setPagination = useSetSongTablePagination();
+  const handlePlayQueueAdd = usePlayQueueAdd();
   const cq = useContainerQuery();
 
   const musicFoldersQuery = useMusicFolders();
@@ -244,6 +255,24 @@ export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
     setTable({ rowHeight: e });
   };
 
+  const handleRefresh = () => {
+    queryClient.invalidateQueries(queryKeys.songs.list(server?.id || ''));
+    handleFilterChange(page.filter);
+  };
+
+  const handlePlay = async (play: Play) => {
+    if (!itemCount || itemCount === 0) return;
+    const query: SongListQuery = { startIndex: 0, ...page.filter };
+
+    handlePlayQueueAdd?.({
+      byItemType: {
+        id: query,
+        type: LibraryItem.SONG,
+      },
+      play,
+    });
+  };
+
   return (
     <PageHeader p="1rem">
       <Flex
@@ -265,12 +294,20 @@ export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
                 sx={{ paddingLeft: 0, paddingRight: 0 }}
                 variant="subtle"
               >
-                <TextTitle
-                  fw="bold"
-                  order={3}
-                >
-                  Tracks
-                </TextTitle>
+                <Group>
+                  <TextTitle
+                    fw="bold"
+                    order={3}
+                  >
+                    Tracks
+                  </TextTitle>
+                  <Badge
+                    radius="xl"
+                    size="lg"
+                  >
+                    {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
+                  </Badge>
+                </Group>
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
@@ -420,10 +457,15 @@ export const SongListHeader = ({ tableRef }: SongListHeaderProps) => {
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-              <DropdownMenu.Item disabled>Play</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Add to queue (last)</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Add to queue (next)</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => handlePlay(Play.NOW)}>Play</DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => handlePlay(Play.LAST)}>
+                Add to queue (last)
+              </DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => handlePlay(Play.NEXT)}>
+                Add to queue (next)
+              </DropdownMenu.Item>
+              <DropdownMenu.Divider />
+              <DropdownMenu.Item onClick={handleRefresh}>Refresh</DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
         </Flex>
