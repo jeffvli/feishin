@@ -89,22 +89,33 @@ body[data-theme='defaultLight'] {
   --card-poster-bg-hover: transparent;
   --card-poster-radius: 5px;
 
-  .ag-theme-alpine-dark {
-    --ag-font-family: poppins;
-    --ag-font-size: 12px;
+  --table-header-bg: rgb(245, 245, 245);
+  --table-header-fg: rgb(40, 40, 40);
+  --table-border: none;
+  --table-border-color: rgba(50, 50, 50, 0.3);
+  --table-bg: var(--main-bg);
+  --table-alt-bg: var(--main-bg);
+  --table-fg: rgb(179, 179, 179);
+  --table-row-hover-bg: rgba(100, 100, 100, 0.2);
+  --table-row-selected-bg: rgba(100, 100, 100, 0.4);
 
-    --ag-borders: none;
+  .ag-theme-alpine-dark {
+    --ag-font-family: var(--content-font-family);
+
+    --ag-borders: var(--table-border);
     --ag-border-color: rgb(50, 50, 50);
 
-    --ag-header-background-color: var(--main-bg);
-    --ag-header-foreground-color: var(--main-fg);
+    --ag-header-background-color: var(--table-header-bg);
+    --ag-header-foreground-color: var(--table-header-fg);
 
     --ag-foreground-color: rgb(0, 0, 0);
 
-    --ag-background-color: var(--main-bg);
-    --ag-odd-row-background-color: rgb(230, 230, 230);
-    --ag-row-hover-color: rgba(100, 100, 100, 0.2);
-    --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
+    --ag-background-color: var(--table-bg);
+    --ag-odd-row-background-color: var(--table-alt-bg);
+    --ag-foreground-color: var(--table-fg);
+
+    --ag-row-hover-color: var(--table-row-hover-bg);
+    --ag-selected-row-background-color: var(--table-row-selected-bg);
   }
 
   .ag-root ::-webkit-scrollbar-corner {
@@ -115,10 +126,5 @@ body[data-theme='defaultLight'] {
   }
   .ag-root ::-webkit-scrollbar-thumb {
     background: var(--scrollbar-thumb-bg);
-    // background: black;
-  }
-
-  .ag-cell-focus {
-    border: 1px rgba(60, 60, 60, 0.3) solid !important;
   }
 }

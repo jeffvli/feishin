@@ -100,64 +100,44 @@
 
   --background-noise: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1IiBkPSJNMCAwaDMwMHYzMDBIMHoiLz48L3N2Zz4=');
 
+  --table-header-bg: rgb(24, 24, 24);
+  --table-header-fg: rgb(179, 179, 179);
+  --table-border: none;
+  --table-border-color: hsla(0, 0%, 100%, 0.1);
+  --table-bg: var(--main-bg);
+  --table-alt-bg: var(--main-bg);
+  --table-fg: rgb(179, 179, 179);
+  --table-row-hover-bg: rgba(100, 100, 100, 0.2);
+  --table-row-selected-bg: rgba(100, 100, 100, 0.4);
+
   .ag-theme-alpine-dark {
     --ag-font-family: var(--content-font-family);
 
-    --ag-borders: none;
-    --ag-border-color: rgb(50, 50, 50);
+    --ag-borders: var(--table-border);
+    --ag-border-color: var(--table-border-color);
 
-    --ag-header-background-color: rgb(16, 16, 16);
-    --ag-header-foreground-color: rgb(179, 179, 179);
+    --ag-header-background-color: var(--table-header-bg);
+    --ag-header-foreground-color: var(--table-header-fg);
 
-    --ag-foreground-color: rgb(179, 179, 179);
+    --ag-background-color: var(--table-bg);
+    --ag-odd-row-background-color: var(--table-alt-bg);
+    --ag-foreground-color: var(--table-fg);
 
-    --ag-background-color: var(--main-bg);
-    --ag-row-hover-color: rgba(100, 100, 100, 0.2);
-    --ag-selected-row-background-color: rgba(100, 100, 100, 0.4);
+    --ag-row-hover-color: var(--table-row-hover-bg);
+    --ag-selected-row-background-color: var(--table-row-selected-bg);
   }
 
   .ag-header {
-    border-bottom: 1px solid rgb(50, 50, 50, 0.5);
+    border-bottom: 1px solid var(--table-border-color);
     margin-bottom: 1rem;
   }
 
-  .ag-header-cell-comp-wrapper {
-    margin: 0.5rem 0.5rem;
-  }
-
-  .ag-cell-rating,
-  .ag-cell-favorite {
-    display: none;
-  }
-
-  .ag-cell-rating.visible {
-    display: block;
-  }
-
-  .ag-cell-favorite.visible {
-    display: block;
-  }
-
-  .ag-row-hover {
-    .ag-cell-rating,
-    .ag-cell-favorite {
-      display: block;
-    }
-  }
-
-  .ag-header-cell,
-  .ag-header-group-cell {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-  }
-
-  .ag-header-cell-resize {
-    background-color: transparent;
-  }
-
   .ag-header:hover .ag-header-cell-resize {
-    border-left: 2px rgb(70, 70, 70, 1) solid;
-    width: 7px;
+    position: absolute;
+    top: 25%;
+    border-left: 1px var(--table-border-color) solid;
+    height: 50%;
+    width: 0.5em;
   }
 
   .ag-header-cell-label {
@@ -167,7 +147,7 @@
   }
 
   .ag-cell-focus {
-    border: 1px rgba(155, 155, 155, 0.3) solid !important;
+    border: 1px var(--table-border-color) solid !important;
   }
 
   .current-song {
