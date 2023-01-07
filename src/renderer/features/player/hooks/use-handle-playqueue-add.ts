@@ -33,11 +33,25 @@ export const useHandlePlayQueueAdd = () => {
       if (!server) return toast.error({ message: 'No server selected', type: 'error' });
       let songs = null;
 
+      // const itemCount = options.byItemType?.id?.length || 0;
+      // const fetchId = itemCount > 1 ? nanoid() : null;
+
       if (options.byItemType) {
         let songsList;
         let queryFilter: any;
         let queryKey: any;
+
         if (options.byItemType.type === LibraryItem.PLAYLIST) {
+          // if (fetchId) {
+          //   toast.success({
+          //     autoClose: false,
+          //     id: fetchId,
+          //     loading: true,
+          //     message: `This may take a while...`,
+          //     title: `Adding ${itemCount} albums to the queue`,
+          //   });
+          // }
+
           queryFilter = {
             id: options.byItemType?.id || [],
             sortBy: 'id',
@@ -51,6 +65,16 @@ export const useHandlePlayQueueAdd = () => {
             queryFilter,
           );
         } else if (options.byItemType.type === LibraryItem.ALBUM) {
+          // if (fetchId) {
+          //   toast.success({
+          //     autoClose: false,
+          //     id: fetchId,
+          //     loading: true,
+          //     message: `This may take a while...`,
+          //     title: `Adding ${itemCount} albums to the queue`,
+          //   });
+          // }
+
           queryFilter = {
             albumIds: options.byItemType?.id || [],
             sortBy: SongListSort.ALBUM,
@@ -60,32 +84,57 @@ export const useHandlePlayQueueAdd = () => {
 
           queryKey = queryKeys.songs.list(server?.id, queryFilter);
         } else if (options.byItemType.type === LibraryItem.ALBUM_ARTIST) {
+          // if (fetchId) {
+          //   toast.success({
+          //     autoClose: false,
+          //     id: fetchId,
+          //     loading: true,
+          //     message: `This may take a while...`,
+          //     title: `Adding ${itemCount} album artists to the queue`,
+          //   });
+          // }
+
           queryFilter = {
             artistIds: options.byItemType?.id || [],
-            sortBy: SongListSort.ALBUM,
+            sortBy: SongListSort.ALBUM_ARTIST,
             sortOrder: SortOrder.ASC,
             startIndex: 0,
           };
 
           queryKey = queryKeys.songs.list(server?.id, queryFilter);
+        } else if (options.byItemType.type === LibraryItem.SONG) {
+          queryFilter = options.byItemType.id;
+          queryKey = queryKeys.songs.list(server?.id, queryFilter);
         }
 
         try {
           if (options.byItemType?.type === LibraryItem.PLAYLIST) {
-            songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-              api.controller.getPlaylistSongList({
-                query: queryFilter,
-                server,
-                signal,
-              }),
+            songsList = await queryClient.fetchQuery(
+              queryKey,
+              async ({ signal }) =>
+                api.controller.getPlaylistSongList({
+                  query: queryFilter,
+                  server,
+                  signal,
+                }),
+              {
+                cacheTime: 1000 * 60,
+                staleTime: 1000 * 60,
+              },
             );
           } else {
-            songsList = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-              api.controller.getSongList({
-                query: queryFilter,
-                server,
-                signal,
-              }),
+            songsList = await queryClient.fetchQuery(
+              queryKey,
+              async ({ signal }) =>
+                api.controller.getSongList({
+                  query: queryFilter,
+                  server,
+                  signal,
+                }),
+              {
+                cacheTime: 1000 * 60,
+                staleTime: 1000 * 60,
+              },
             );
           }
         } catch (err: any) {
@@ -133,6 +182,21 @@ export const useHandlePlayQueueAdd = () => {
 
         play();
       }
+
+      // if (fetchId) {
+      //   toast.update({
+      //     autoClose: 1000,
+      //     id: fetchId,
+      //     message: '',
+      //     title: `Added ${songs.length} items to the queue`,
+      //   });
+      //   // toast.hide(fetchId);
+      // } else {
+      //   toast.success({
+      //     // message: 'Success',
+      //     title: `Added ${songs.length} items to the queue`,
+      //   });
+      // }
 
       return null;
     },
