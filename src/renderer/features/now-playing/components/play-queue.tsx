@@ -2,7 +2,6 @@ import type { Ref } from 'react';
 import { useState, forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
 import type {
   CellDoubleClickedEvent,
-  ColDef,
   RowClassRules,
   RowDragEvent,
   RowNode,
@@ -68,13 +67,6 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
   }));
 
   const columnDefs = useMemo(() => getColumnDefs(tableConfig.columns), [tableConfig.columns]);
-  const defaultColumnDefs: ColDef = useMemo(() => {
-    return {
-      lockPinned: true,
-      lockVisible: true,
-      resizable: true,
-    };
-  }, []);
 
   const handleDoubleClick = (e: CellDoubleClickedEvent) => {
     const playerData = setCurrentTrack(e.data.uniqueId);
@@ -196,20 +188,6 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     }
   }, [currentSong, previousSong, tableConfig.followCurrentSong]);
 
-  // Auto resize the columns when the column config changes
-  useEffect(() => {
-    if (tableConfig.autoFit) {
-      const { api } = tableRef?.current || {};
-      api?.sizeColumnsToFit();
-    }
-  }, [tableConfig.autoFit, tableConfig.columns]);
-
-  useEffect(() => {
-    const { api } = tableRef?.current || {};
-    api?.resetRowHeights();
-    api?.redrawRows();
-  }, [tableConfig.rowHeight]);
-
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <VirtualGridContainer>
@@ -217,23 +195,14 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
           <VirtualTable
             ref={mergedRef}
             alwaysShowHorizontalScroll
-            animateRows
-            maintainColumnOrder
             rowDragEntireRow
             rowDragMultiRow
-            suppressCopyRowsToClipboard
-            suppressMoveWhenRowDragging
-            suppressRowDrag
-            suppressScrollOnNewData
+            autoFitColumns={tableConfig.autoFit}
             columnDefs={columnDefs}
-            defaultColDef={defaultColumnDefs}
-            enableCellChangeFlash={false}
             getRowId={(data) => data.data.uniqueId}
-            rowBuffer={30}
             rowClassRules={rowClassRules}
             rowData={queue}
             rowHeight={tableConfig.rowHeight || 40}
-            rowSelection="multiple"
             onCellDoubleClicked={handleDoubleClick}
             onColumnMoved={handleColumnChange}
             onColumnResized={debouncedColumnChange}

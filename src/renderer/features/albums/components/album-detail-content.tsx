@@ -60,14 +60,6 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     [page.table.columns],
   );
 
-  const defaultColumnDefs: ColDef = useMemo(() => {
-    return {
-      lockPinned: true,
-      lockVisible: true,
-      resizable: true,
-    };
-  }, []);
-
   const [pagination, setPagination] = useSetState({
     artist: 0,
   });
@@ -223,33 +215,20 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
       <Box ref={tableContainerRef}>
         <VirtualTable
           ref={tableRef}
-          animateRows
+          autoFitColumns
+          autoHeight
           deselectOnClickOutside
-          detailRowAutoHeight
-          maintainColumnOrder
           suppressCellFocus
-          suppressCopyRowsToClipboard
           suppressHorizontalScroll
           suppressLoadingOverlay
-          suppressMoveWhenRowDragging
-          suppressPaginationPanel
           suppressRowDrag
-          suppressScrollOnNewData
           columnDefs={columnDefs}
-          defaultColDef={defaultColumnDefs}
           enableCellChangeFlash={false}
           getRowId={(data) => data.data.id}
           rowData={detailQuery.data?.songs}
           rowHeight={60}
           rowSelection="multiple"
           onCellContextMenu={handleContextMenu}
-          onGridReady={(params) => {
-            params.api.setDomLayout('autoHeight');
-            params.api.sizeColumnsToFit();
-          }}
-          onGridSizeChanged={(params) => {
-            params.api.sizeColumnsToFit();
-          }}
           onRowDoubleClicked={handleRowDoubleClick}
         />
       </Box>

@@ -1,10 +1,14 @@
-import { Ref, forwardRef, useRef } from 'react';
+import { Ref, forwardRef, useRef, useEffect, useCallback, useMemo } from 'react';
 import type {
   ICellRendererParams,
   ValueGetterParams,
   IHeaderParams,
   ValueFormatterParams,
   ColDef,
+  ColumnMovedEvent,
+  NewColumnsLoadedEvent,
+  GridReadyEvent,
+  GridSizeChangedEvent,
 } from '@ag-grid-community/core';
 import type { AgGridReactProps } from '@ag-grid-community/react';
 import { AgGridReact } from '@ag-grid-community/react';
@@ -316,11 +320,25 @@ export const getColumnDefs = (columns: PersistedTableColumn[]) => {
 };
 
 interface VirtualTableProps extends AgGridReactProps {
+  autoFitColumns?: boolean;
+  autoHeight?: boolean;
   deselectOnClickOutside?: boolean;
 }
 
 export const VirtualTable = forwardRef(
-  ({ deselectOnClickOutside, ...rest }: VirtualTableProps, ref: Ref<AgGridReactType | null>) => {
+  (
+    {
+      autoFitColumns,
+      deselectOnClickOutside,
+      autoHeight,
+      onColumnMoved,
+      onNewColumnsLoaded,
+      onGridReady,
+      onGridSizeChanged,
+      ...rest
+    }: VirtualTableProps,
+    ref: Ref<AgGridReactType | null>,
+  ) => {
     const tableRef = useRef<AgGridReactType | null>(null);
 
     const mergedRef = useMergedRef(ref, tableRef);
@@ -329,6 +347,58 @@ export const VirtualTable = forwardRef(
       return deselectOnClickOutside ? tableRef?.current?.api?.deselectAll() : undefined;
     });
 
+    const defaultColumnDefs: ColDef = useMemo(() => {
+      return {
+        lockPinned: true,
+        lockVisible: true,
+        resizable: true,
+      };
+    }, []);
+
+    // Auto fit columns on column change
+    useEffect(() => {
+      if (autoFitColumns) tableRef?.current?.api?.sizeColumnsToFit();
+    }, [autoFitColumns]);
+
+    // Reset row heights on row height change
+    useEffect(() => {
+      tableRef?.current?.api?.resetRowHeights();
+      tableRef?.current?.api?.redrawRows();
+    }, [rest.rowHeight]);
+
+    const handleColumnMoved = useCallback(
+      (e: ColumnMovedEvent) => {
+        onColumnMoved?.(e);
+        if (autoFitColumns) e.api.sizeColumnsToFit();
+      },
+      [autoFitColumns, onColumnMoved],
+    );
+
+    const handleNewColumnsLoaded = useCallback(
+      (e: NewColumnsLoadedEvent) => {
+        onNewColumnsLoaded?.(e);
+        if (autoFitColumns) e.api?.sizeColumnsToFit();
+      },
+      [autoFitColumns, onNewColumnsLoaded],
+    );
+
+    const handleGridReady = useCallback(
+      (e: GridReadyEvent) => {
+        onGridReady?.(e);
+        if (autoHeight) e.api.setDomLayout('autoHeight');
+        if (autoFitColumns) e.api.sizeColumnsToFit();
+      },
+      [autoHeight, autoFitColumns, onGridReady],
+    );
+
+    const handleGridSizeChanged = useCallback(
+      (e: GridSizeChangedEvent) => {
+        onGridSizeChanged?.(e);
+        if (autoFitColumns) e.api.sizeColumnsToFit();
+      },
+      [autoFitColumns, onGridSizeChanged],
+    );
+
     return (
       <TableWrapper
         ref={deselectRef}
@@ -336,11 +406,22 @@ export const VirtualTable = forwardRef(
       >
         <AgGridReact
           ref={mergedRef}
+          animateRows
+          suppressContextMenu
+          suppressCopyRowsToClipboard
           suppressMoveWhenRowDragging
+          suppressPaginationPanel
           suppressScrollOnNewData
+          defaultColDef={defaultColumnDefs}
+          enableCellChangeFlash={false}
           headerHeight={36}
           rowBuffer={30}
+          rowSelection="multiple"
           {...rest}
+          onColumnMoved={handleColumnMoved}
+          onGridReady={handleGridReady}
+          onGridSizeChanged={handleGridSizeChanged}
+          onNewColumnsLoaded={handleNewColumnsLoaded}
         />
       </TableWrapper>
     );

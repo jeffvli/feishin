@@ -87,14 +87,6 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     [page.table.columns],
   );
 
-  const defaultColumnDefs: ColDef = useMemo(() => {
-    return {
-      lockPinned: true,
-      lockVisible: true,
-      resizable: true,
-    };
-  }, []);
-
   const handleContextMenu = (e: CellContextMenuEvent) => {
     if (!e.event) return;
     const clickEvent = e.event as MouseEvent;
@@ -268,21 +260,14 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
       <Box ref={tableContainerRef}>
         <VirtualTable
           ref={tableRef}
-          animateRows
+          autoFitColumns
+          autoHeight
           deselectOnClickOutside
-          detailRowAutoHeight
-          maintainColumnOrder
           suppressCellFocus
-          suppressCopyRowsToClipboard
           suppressHorizontalScroll
           suppressLoadingOverlay
-          suppressMoveWhenRowDragging
-          suppressPaginationPanel
           suppressRowDrag
-          suppressScrollOnNewData
           columnDefs={columnDefs}
-          defaultColDef={defaultColumnDefs}
-          enableCellChangeFlash={false}
           getRowId={(data) => {
             // It's possible that there are duplicate song ids in a playlist
             return `${data.data.id}-${data.data.pageIndex}`;
@@ -291,13 +276,6 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
           rowHeight={60}
           rowSelection="multiple"
           onCellContextMenu={handleContextMenu}
-          onGridReady={(params) => {
-            params.api.setDomLayout('autoHeight');
-            params.api.sizeColumnsToFit();
-          }}
-          onGridSizeChanged={(params) => {
-            params.api.sizeColumnsToFit();
-          }}
           onRowDoubleClicked={handleRowDoubleClick}
         />
       </Box>
