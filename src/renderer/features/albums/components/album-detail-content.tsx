@@ -38,7 +38,7 @@ const ContentContainer = styled.div`
   overflow: hidden;
 
   .ag-theme-alpine-dark {
-    --ag-header-background-color: rgba(0, 0, 0, 0%);
+    --ag-header-background-color: rgba(0, 0, 0, 0%) !important;
   }
 `;
 
