@@ -6,7 +6,7 @@ export const useFixedTableHeader = () => {
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
 
   const isNotPastTableIntersection = useInView(intersectRef, {
-    margin: '-64px 0px 0px 0px',
+    margin: '-63px 0px 0px 0px',
   });
 
   const tableInView = useInView(tableContainerRef, {
