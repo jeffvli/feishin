@@ -155,6 +155,25 @@
     text-transform: uppercase;
   }
 
+  .ag-cell-rating,
+  .ag-cell-favorite {
+    display: none;
+  }
+
+  .ag-cell-rating.visible {
+    display: block;
+  }
+
+  .ag-cell-favorite.visible {
+    display: block;
+  }
+
+  .ag-row-hover {
+    .ag-cell-rating,
+    .ag-cell-favorite {
+      display: block;
+    }
+  }
   .ag-cell-focus {
     border: 1px var(--table-border-color) solid !important;
   }
