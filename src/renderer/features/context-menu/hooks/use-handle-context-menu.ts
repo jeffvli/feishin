@@ -1,5 +1,5 @@
 import { CellContextMenuEvent } from '@ag-grid-community/core';
-import { sortBy } from 'lodash';
+import sortBy from 'lodash/sortBy';
 import { LibraryItem } from '/@/renderer/api/types';
 import { openContextMenu, SetContextMenuItems } from '/@/renderer/features/context-menu/events';
 
