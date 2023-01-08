@@ -2,21 +2,17 @@ import { ReactNode } from 'react';
 import { Group } from '@mantine/core';
 import { TextTitle } from '/@/renderer/components';
 import { PlayButton as PlayBtn } from '/@/renderer/features/shared/components/play-button';
-import { useShouldPadTitlebar } from '/@/renderer/hooks';
 
 interface LibraryHeaderBarProps {
   children: ReactNode;
 }
 
 export const LibraryHeaderBar = ({ children }: LibraryHeaderBarProps) => {
-  const padRight = useShouldPadTitlebar();
-
   return (
     <Group
       noWrap
       align="center"
       h="100%"
-      mr={padRight ? '170px' : 0}
       px="1rem"
       spacing="xl"
     >
