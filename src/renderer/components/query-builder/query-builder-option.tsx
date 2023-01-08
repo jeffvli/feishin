@@ -48,6 +48,7 @@ const QueryValueInput = ({ onChange, type, ...props }: any) => {
           size="sm"
           onChange={onChange}
           {...props}
+          defaultValue={props.defaultValue && Number(props.defaultValue)}
         />
       );
     case 'date':
@@ -64,7 +65,7 @@ const QueryValueInput = ({ onChange, type, ...props }: any) => {
         <>
           <NumberInput
             {...props}
-            defaultValue={props.defaultValue?.[0]}
+            defaultValue={props.defaultValue && Number(props.defaultValue?.[0])}
             maxWidth={81}
             width="10%"
             onChange={(e) => {
@@ -75,7 +76,7 @@ const QueryValueInput = ({ onChange, type, ...props }: any) => {
           />
           <NumberInput
             {...props}
-            defaultValue={props.defaultValue?.[1]}
+            defaultValue={props.defaultValue && Number(props.defaultValue?.[1])}
             maxWidth={81}
             width="10%"
             onChange={(e) => {
