@@ -753,11 +753,11 @@ export const artistListSortMap: ArtistListSortMap = {
 // Favorite
 export type RawFavoriteResponse = FavoriteResponse | undefined;
 
-export type FavoriteResponse = { id: string[]; type: FavoriteQuery['type'] };
+export type FavoriteResponse = { id: string[]; type: LibraryItem };
 
 export type FavoriteQuery = {
   id: string[];
-  type?: LibraryItem.SONG | LibraryItem.ALBUM | LibraryItem.ALBUM_ARTIST;
+  type?: LibraryItem;
 };
 
 export type FavoriteArgs = { query: FavoriteQuery } & BaseEndpointArgs;
