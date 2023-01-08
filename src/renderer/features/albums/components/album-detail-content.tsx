@@ -12,7 +12,7 @@ import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
-import { RiHeartLine, RiMoreFill } from 'react-icons/ri';
+import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { useParams } from 'react-router';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
 import { useSongListStore } from '/@/renderer/store';
@@ -23,7 +23,12 @@ import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { Play } from '/@/renderer/types';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-import { PlayButton, PLAY_TYPES } from '/@/renderer/features/shared';
+import {
+  PlayButton,
+  PLAY_TYPES,
+  useCreateFavorite,
+  useDeleteFavorite,
+} from '/@/renderer/features/shared';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
@@ -149,6 +154,29 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     });
   };
 
+  const createFavoriteMutation = useCreateFavorite();
+  const deleteFavoriteMutation = useDeleteFavorite();
+
+  const handleFavorite = () => {
+    if (!detailQuery?.data) return;
+
+    if (detailQuery.data.userFavorite) {
+      deleteFavoriteMutation.mutate({
+        query: {
+          id: [detailQuery.data.id],
+          type: LibraryItem.ALBUM,
+        },
+      });
+    } else {
+      createFavoriteMutation.mutate({
+        query: {
+          id: [detailQuery.data.id],
+          type: LibraryItem.ALBUM,
+        },
+      });
+    }
+  };
+
   const { intersectRef, tableContainerRef } = useFixedTableHeader();
 
   return (
@@ -164,10 +192,18 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
         <Group spacing="xs">
           <Button
             compact
-            disabled
+            loading={createFavoriteMutation.isLoading || deleteFavoriteMutation.isLoading}
             variant="subtle"
+            onClick={handleFavorite}
           >
-            <RiHeartLine size={20} />
+            {detailQuery?.data?.userFavorite ? (
+              <RiHeartFill
+                color="red"
+                size={20}
+              />
+            ) : (
+              <RiHeartLine size={20} />
+            )}
           </Button>
           <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
