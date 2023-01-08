@@ -498,26 +498,32 @@ const deletePlaylist = async (args: DeletePlaylistArgs): Promise<null> => {
 const createFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
   const { query, server } = args;
 
-  await api.post(`users/${server?.userId}/favoriteitems/${query.id}`, {
-    headers: { 'X-MediaBrowser-Token': server?.credential },
-    prefixUrl: server?.url,
-  });
+  for (const id of query.id) {
+    await api.post(`users/${server?.userId}/favoriteitems/${id}`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      prefixUrl: server?.url,
+    });
+  }
 
   return {
     id: query.id,
+    type: query.type,
   };
 };
 
 const deleteFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
   const { query, server } = args;
 
-  await api.delete(`users/${server?.userId}/favoriteitems/${query.id}`, {
-    headers: { 'X-MediaBrowser-Token': server?.credential },
-    prefixUrl: server?.url,
-  });
+  for (const id of query.id) {
+    await api.delete(`users/${server?.userId}/favoriteitems/${id}`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      prefixUrl: server?.url,
+    });
+  }
 
   return {
     id: query.id,
+    type: query.type,
   };
 };
 

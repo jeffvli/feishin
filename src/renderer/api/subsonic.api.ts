@@ -1,6 +1,6 @@
 import ky from 'ky';
 import md5 from 'md5';
-import { randomString } from '/@/renderer/utils';
+import { parseSearchParams, randomString } from '/@/renderer/utils';
 import type {
   SSAlbumListResponse,
   SSAlbumDetailResponse,
@@ -16,13 +16,11 @@ import type {
   SSAlbumArtistDetail,
   SSAlbumArtistDetailResponse,
   SSFavoriteParams,
-  SSFavoriteResponse,
   SSRatingParams,
-  SSRatingResponse,
   SSAlbumArtistDetailParams,
   SSAlbumArtistListParams,
 } from '/@/renderer/api/subsonic.types';
-import type {
+import {
   AlbumArtistDetailArgs,
   AlbumArtistListArgs,
   AlbumDetailArgs,
@@ -31,10 +29,12 @@ import type {
   FavoriteArgs,
   FavoriteResponse,
   GenreListArgs,
+  LibraryItem,
   MusicFolderListArgs,
   RatingArgs,
+  RatingResponse,
+  ServerListItem,
 } from '/@/renderer/api/types';
-import { useAuthStore } from '/@/renderer/store';
 import { toast } from '/@/renderer/components/toast';
 
 const getCoverArtUrl = (args: {
@@ -65,39 +65,39 @@ const api = ky.create({
       async (_request, _options, response) => {
         const data = await response.json();
         if (data['subsonic-response'].status !== 'ok') {
-          toast.warn({ message: 'Issue from Subsonic API' });
+          toast.error({
+            message: data['subsonic-response'].error.message,
+            title: 'Issue from Subsonic API',
+          });
         }
 
         return new Response(JSON.stringify(data['subsonic-response']), { status: 200 });
       },
     ],
-    beforeRequest: [
-      (request) => {
-        const server = useAuthStore.getState().currentServer;
-
-        const searchParams = new URLSearchParams();
-
-        if (server) {
-          const authParams = server.credential.split(/&?\w=/gm);
-
-          searchParams.set('u', server.username);
-          searchParams.set('v', '1.13.0');
-          searchParams.set('c', 'Feishin');
-          searchParams.set('f', 'json');
-
-          if (authParams?.length === 4) {
-            searchParams.set('s', authParams[2]);
-            searchParams.set('t', authParams[3]);
-          } else if (authParams?.length === 3) {
-            searchParams.set('p', authParams[2]);
-          }
-        }
-
-        return ky(request, { searchParams });
-      },
-    ],
   },
 });
+
+const getDefaultParams = (server: ServerListItem | null) => {
+  if (!server) return {};
+
+  const authParams = server.credential.split(/&?\w=/gm);
+
+  const params: Record<string, string> = {
+    c: 'Feishin',
+    f: 'json',
+    u: server.username,
+    v: '1.13.0',
+  };
+
+  if (authParams?.length === 4) {
+    params.s = authParams[2];
+    params.t = authParams[3];
+  } else if (authParams?.length === 3) {
+    params.p = authParams[2];
+  }
+
+  return params;
+};
 
 const authenticate = async (
   url: string,
@@ -129,10 +129,12 @@ const authenticate = async (
 
 const getMusicFolderList = async (args: MusicFolderListArgs): Promise<SSMusicFolderList> => {
   const { signal, server } = args;
+  const defaultParams = getDefaultParams(server);
 
   const data = await api
     .get('rest/getMusicFolders.view', {
       prefixUrl: server?.url,
+      searchParams: defaultParams,
       signal,
     })
     .json<SSMusicFolderListResponse>();
@@ -144,9 +146,11 @@ export const getAlbumArtistDetail = async (
   args: AlbumArtistDetailArgs,
 ): Promise<SSAlbumArtistDetail> => {
   const { server, signal, query } = args;
+  const defaultParams = getDefaultParams(server);
 
   const searchParams: SSAlbumArtistDetailParams = {
     id: query.id,
+    ...defaultParams,
   };
 
   const data = await api
@@ -162,9 +166,11 @@ export const getAlbumArtistDetail = async (
 
 const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<SSAlbumArtistList> => {
   const { signal, server, query } = args;
+  const defaultParams = getDefaultParams(server);
 
   const searchParams: SSAlbumArtistListParams = {
     musicFolderId: query.musicFolderId,
+    ...defaultParams,
   };
 
   const data = await api
@@ -186,10 +192,12 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<SSAlbumArt
 
 const getGenreList = async (args: GenreListArgs): Promise<SSGenreList> => {
   const { server, signal } = args;
+  const defaultParams = getDefaultParams(server);
 
   const data = await api
     .get('rest/getGenres.view', {
       prefixUrl: server?.url,
+      searchParams: defaultParams,
       signal,
     })
     .json<SSGenreListResponse>();
@@ -199,11 +207,17 @@ const getGenreList = async (args: GenreListArgs): Promise<SSGenreList> => {
 
 const getAlbumDetail = async (args: AlbumDetailArgs): Promise<SSAlbumDetail> => {
   const { server, query, signal } = args;
+  const defaultParams = getDefaultParams(server);
+
+  const searchParams = {
+    id: query.id,
+    ...defaultParams,
+  };
 
   const data = await api
     .get('rest/getAlbum.view', {
       prefixUrl: server?.url,
-      searchParams: { id: query.id },
+      searchParams: parseSearchParams(searchParams),
       signal,
     })
     .json<SSAlbumDetailResponse>();
@@ -214,12 +228,15 @@ const getAlbumDetail = async (args: AlbumDetailArgs): Promise<SSAlbumDetail> => 
 
 const getAlbumList = async (args: AlbumListArgs): Promise<SSAlbumList> => {
   const { server, query, signal } = args;
+  const defaultParams = getDefaultParams(server);
 
-  const normalizedParams = {};
+  const searchParams = {
+    ...defaultParams,
+  };
   const data = await api
     .get('rest/getAlbumList2.view', {
       prefixUrl: server?.url,
-      searchParams: normalizedParams,
+      searchParams: parseSearchParams(searchParams),
       signal,
     })
     .json<SSAlbumListResponse>();
@@ -233,65 +250,79 @@ const getAlbumList = async (args: AlbumListArgs): Promise<SSAlbumList> => {
 
 const createFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
   const { server, query, signal } = args;
+  const defaultParams = getDefaultParams(server);
 
-  const searchParams: SSFavoriteParams = {
-    albumId: query.type === 'album' ? query.id : undefined,
-    artistId: query.type === 'albumArtist' ? query.id : undefined,
-    id: query.type === 'song' ? query.id : undefined,
-  };
+  for (const id of query.id) {
+    const searchParams: SSFavoriteParams = {
+      albumId: query.type === LibraryItem.ALBUM ? id : undefined,
+      artistId: query.type === LibraryItem.ALBUM_ARTIST ? id : undefined,
+      id: query.type === LibraryItem.SONG ? id : undefined,
+      ...defaultParams,
+    };
 
-  await api
-    .get('rest/star.view', {
+    await api.get('rest/star.view', {
       prefixUrl: server?.url,
-      searchParams,
+      searchParams: parseSearchParams(searchParams),
       signal,
-    })
-    .json<SSFavoriteResponse>();
+    });
+    // .json<SSFavoriteResponse>();
+  }
 
   return {
     id: query.id,
+    type: query.type,
   };
 };
 
 const deleteFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
   const { server, query, signal } = args;
+  const defaultParams = getDefaultParams(server);
 
-  const searchParams: SSFavoriteParams = {
-    albumId: query.type === 'album' ? query.id : undefined,
-    artistId: query.type === 'albumArtist' ? query.id : undefined,
-    id: query.type === 'song' ? query.id : undefined,
-  };
+  for (const id of query.id) {
+    const searchParams: SSFavoriteParams = {
+      albumId: query.type === LibraryItem.ALBUM ? id : undefined,
+      artistId: query.type === LibraryItem.ALBUM_ARTIST ? id : undefined,
+      id: query.type === LibraryItem.SONG ? id : undefined,
+      ...defaultParams,
+    };
 
-  await api
-    .get('rest/unstar.view', {
+    await api.get('rest/unstar.view', {
       prefixUrl: server?.url,
-      searchParams,
+      searchParams: parseSearchParams(searchParams),
       signal,
-    })
-    .json<SSFavoriteResponse>();
+    });
+    // .json<SSFavoriteResponse>();
+  }
 
   return {
     id: query.id,
+    type: query.type,
   };
 };
 
-const updateRating = async (args: RatingArgs) => {
+const updateRating = async (args: RatingArgs): Promise<RatingResponse> => {
   const { server, query, signal } = args;
+  const defaultParams = getDefaultParams(server);
 
-  const searchParams: SSRatingParams = {
+  for (const id of query.id) {
+    const searchParams: SSRatingParams = {
+      id,
+      rating: query.rating,
+      ...defaultParams,
+    };
+
+    await api.get('rest/setRating.view', {
+      prefixUrl: server?.url,
+      searchParams: parseSearchParams(searchParams),
+      signal,
+    });
+    // .json<SSRatingResponse>();
+  }
+
+  return {
     id: query.id,
     rating: query.rating,
   };
-
-  const data = await api
-    .get('rest/setRating.view', {
-      prefixUrl: server?.url,
-      searchParams,
-      signal,
-    })
-    .json<SSRatingResponse>();
-
-  return data;
 };
 
 export const subsonicApi = {

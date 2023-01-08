@@ -16,7 +16,6 @@ import type {
   RawAlbumArtistListResponse,
   RatingArgs,
   RawRatingResponse,
-  FavoriteArgs,
   RawFavoriteResponse,
   GenreListArgs,
   RawGenreListResponse,
@@ -37,6 +36,7 @@ import type {
   RawUpdatePlaylistResponse,
   UserListArgs,
   RawUserListResponse,
+  FavoriteArgs,
 } from '/@/renderer/api/types';
 import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
@@ -237,8 +237,22 @@ const getUserList = async (args: UserListArgs) => {
   return (apiController('getUserList') as ControllerEndpoint['getUserList'])?.(args);
 };
 
+const createFavorite = async (args: FavoriteArgs) => {
+  return (apiController('createFavorite') as ControllerEndpoint['createFavorite'])?.(args);
+};
+
+const deleteFavorite = async (args: FavoriteArgs) => {
+  return (apiController('deleteFavorite') as ControllerEndpoint['deleteFavorite'])?.(args);
+};
+
+const updateRating = async (args: RatingArgs) => {
+  return (apiController('updateRating') as ControllerEndpoint['updateRating'])?.(args);
+};
+
 export const controller = {
+  createFavorite,
   createPlaylist,
+  deleteFavorite,
   deletePlaylist,
   getAlbumArtistList,
   getAlbumDetail,
@@ -252,4 +266,5 @@ export const controller = {
   getSongList,
   getUserList,
   updatePlaylist,
+  updateRating,
 };

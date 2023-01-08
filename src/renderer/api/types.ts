@@ -753,18 +753,21 @@ export const artistListSortMap: ArtistListSortMap = {
 // Favorite
 export type RawFavoriteResponse = FavoriteResponse | undefined;
 
-export type FavoriteResponse = { id: string };
+export type FavoriteResponse = { id: string[]; type: FavoriteQuery['type'] };
 
-export type FavoriteQuery = { id: string; type?: 'song' | 'album' | 'albumArtist' };
+export type FavoriteQuery = {
+  id: string[];
+  type?: LibraryItem.SONG | LibraryItem.ALBUM | LibraryItem.ALBUM_ARTIST;
+};
 
 export type FavoriteArgs = { query: FavoriteQuery } & BaseEndpointArgs;
 
 // Rating
-export type RawRatingResponse = null | undefined;
+export type RawRatingResponse = RatingResponse | undefined;
 
-export type RatingResponse = null;
+export type RatingResponse = { id: string[]; rating: number };
 
-export type RatingQuery = { id: string; rating: number };
+export type RatingQuery = { id: string[]; rating: number };
 
 export type RatingArgs = { query: RatingQuery } & BaseEndpointArgs;
 
@@ -915,15 +918,6 @@ export type RawMusicFolderListResponse = SSMusicFolderList | JFMusicFolderList |
 export type MusicFolderListResponse = BasePaginatedResponse<Playlist[]>;
 
 export type MusicFolderListArgs = BaseEndpointArgs;
-
-// Create Favorite
-export type RawCreateFavoriteResponse = CreateFavoriteResponse | undefined;
-
-export type CreateFavoriteResponse = { id: string };
-
-export type CreateFavoriteQuery = { comment?: string; name: string; public?: boolean };
-
-export type CreateFavoriteArgs = { query: CreateFavoriteQuery } & BaseEndpointArgs;
 
 // User list
 // Playlist List
