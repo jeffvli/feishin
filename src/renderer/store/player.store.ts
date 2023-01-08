@@ -75,7 +75,9 @@ export interface PlayerSlice extends PlayerState {
     setCurrentIndex: (index: number) => PlayerData;
     setCurrentTime: (time: number) => void;
     setCurrentTrack: (uniqueId: string) => PlayerData;
+    setFavorite: (ids: string[], favorite: boolean) => string[];
     setMuted: (muted: boolean) => void;
+    setRating: (ids: string[], rating: number | null) => string[];
     setRepeat: (type: PlayerRepeat) => PlayerData;
     setShuffle: (type: PlayerShuffle) => PlayerData;
     setShuffledIndex: (index: number) => PlayerData;
@@ -643,10 +645,42 @@ export const usePlayerStore = create<PlayerSlice>()(
 
             return get().actions.getPlayerData();
           },
+          setFavorite: (ids, favorite) => {
+            const { default: queue } = get().queue;
+            const foundUniqueIds = [];
+
+            for (const id of ids) {
+              const foundIndex = queue.findIndex((song) => song.id === id);
+              if (foundIndex !== -1) {
+                foundUniqueIds.push(queue[foundIndex].uniqueId);
+                set((state) => {
+                  state.queue.default[foundIndex].userFavorite = favorite;
+                });
+              }
+            }
+
+            return foundUniqueIds;
+          },
           setMuted: (muted: boolean) => {
             set((state) => {
               state.muted = muted;
             });
+          },
+          setRating: (ids, rating) => {
+            const { default: queue } = get().queue;
+            const foundUniqueIds = [];
+
+            for (const id of ids) {
+              const foundIndex = queue.findIndex((song) => song.id === id);
+              if (foundIndex !== -1) {
+                foundUniqueIds.push(queue[foundIndex].uniqueId);
+                set((state) => {
+                  state.queue.default[foundIndex].userRating = rating;
+                });
+              }
+            }
+
+            return foundUniqueIds;
           },
           setRepeat: (type: PlayerRepeat) => {
             set((state) => {
@@ -825,3 +859,7 @@ export const useCurrentTime = () => usePlayerStore((state) => state.current.time
 export const useVolume = () => usePlayerStore((state) => state.volume);
 
 export const useMuted = () => usePlayerStore((state) => state.muted);
+
+export const useSetQueueFavorite = () => usePlayerStore((state) => state.actions.setFavorite);
+
+export const useSetQueueRating = () => usePlayerStore((state) => state.actions.setRating);

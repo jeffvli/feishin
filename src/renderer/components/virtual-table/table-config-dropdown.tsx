@@ -28,9 +28,9 @@ export const SONG_TABLE_COLUMNS = [
   { label: 'Date Added', value: TableColumn.DATE_ADDED },
   { label: 'Path', value: TableColumn.PATH },
   { label: 'Plays', value: TableColumn.PLAY_COUNT },
+  { label: 'Size', value: TableColumn.SIZE },
   { label: 'Favorite', value: TableColumn.USER_FAVORITE },
   { label: 'Rating', value: TableColumn.USER_RATING },
-  { label: 'Size', value: TableColumn.SIZE },
   // { label: 'Skip', value: TableColumn.SKIP },
 ];
 
@@ -47,6 +47,8 @@ export const ALBUM_TABLE_COLUMNS = [
   { label: 'Last Played', value: TableColumn.LAST_PLAYED },
   { label: 'Date Added', value: TableColumn.DATE_ADDED },
   { label: 'Plays', value: TableColumn.PLAY_COUNT },
+  { label: 'Favorite', value: TableColumn.USER_FAVORITE },
+  { label: 'Rating', value: TableColumn.USER_RATING },
 ];
 
 export const ALBUMARTIST_TABLE_COLUMNS = [
@@ -60,6 +62,8 @@ export const ALBUMARTIST_TABLE_COLUMNS = [
   { label: 'Plays', value: TableColumn.PLAY_COUNT },
   { label: 'Album Count', value: TableColumn.ALBUM_COUNT },
   { label: 'Song Count', value: TableColumn.SONG_COUNT },
+  { label: 'Favorite', value: TableColumn.USER_FAVORITE },
+  { label: 'Rating', value: TableColumn.USER_RATING },
 ];
 
 export const PLAYLIST_TABLE_COLUMNS = [
