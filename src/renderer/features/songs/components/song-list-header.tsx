@@ -294,7 +294,7 @@ export const SongListHeader = ({ itemCount, tableRef }: SongListHeaderProps) => 
                 sx={{ paddingLeft: 0, paddingRight: 0 }}
                 variant="subtle"
               >
-                <Group>
+                <Group noWrap>
                   <TextTitle
                     fw="bold"
                     order={3}

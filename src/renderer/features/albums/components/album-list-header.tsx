@@ -345,30 +345,28 @@ export const AlbumListHeader = ({ itemCount, gridRef, tableRef }: AlbumListHeade
         >
           <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
-              <Group>
-                <Button
-                  compact
-                  px={0}
-                  rightIcon={<RiArrowDownSLine size={15} />}
-                  size="xl"
-                  variant="subtle"
-                >
-                  <Group>
-                    <TextTitle
-                      fw="bold"
-                      order={3}
-                    >
-                      Albums
-                    </TextTitle>
-                    <Badge
-                      radius="xl"
-                      size="lg"
-                    >
-                      {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
-                    </Badge>
-                  </Group>
-                </Button>
-              </Group>
+              <Button
+                compact
+                px={0}
+                rightIcon={<RiArrowDownSLine size={15} />}
+                size="xl"
+                variant="subtle"
+              >
+                <Group noWrap>
+                  <TextTitle
+                    fw="bold"
+                    order={3}
+                  >
+                    Albums
+                  </TextTitle>
+                  <Badge
+                    radius="xl"
+                    size="lg"
+                  >
+                    {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
+                  </Badge>
+                </Group>
+              </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
               <DropdownMenu.Label>Display type</DropdownMenu.Label>
