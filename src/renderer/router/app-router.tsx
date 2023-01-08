@@ -6,10 +6,6 @@ import {
   createHashRouter,
 } from 'react-router-dom';
 import { AppRoute } from './routes';
-import { RouteErrorBoundary } from '/@/renderer/features/action-required';
-import AlbumDetailRoute from '/@/renderer/features/albums/routes/album-detail-route';
-import AlbumArtistListRoute from '/@/renderer/features/artists/routes/album-artist-list-route';
-import HomeRoute from '/@/renderer/features/home/routes/home-route';
 import { DefaultLayout } from '/@/renderer/layouts';
 import { AppOutlet } from '/@/renderer/router/app-outlet';
 import { TitlebarOutlet } from '/@/renderer/router/titlebar-outlet';
@@ -40,6 +36,20 @@ const ActionRequiredRoute = lazy(
 
 const InvalidRoute = lazy(
   () => import('/@/renderer/features/action-required/routes/invalid-route'),
+);
+
+const HomeRoute = lazy(() => import('/@/renderer/features/home/routes/home-route'));
+
+const AlbumArtistListRoute = lazy(
+  () => import('/@/renderer/features/artists/routes/album-artist-list-route'),
+);
+
+const AlbumDetailRoute = lazy(
+  () => import('/@/renderer/features/albums/routes/album-detail-route'),
+);
+
+const RouteErrorBoundary = lazy(
+  () => import('/@/renderer/features/action-required/components/route-error-boundary'),
 );
 
 export const AppRouter = () => {
