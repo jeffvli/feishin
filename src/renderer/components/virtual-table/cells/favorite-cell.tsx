@@ -6,21 +6,43 @@ import { useMutation } from '@tanstack/react-query';
 import { HTTPError } from 'ky';
 import { api } from '/@/renderer/api';
 import { RawFavoriteResponse, FavoriteArgs, LibraryItem } from '/@/renderer/api/types';
-import { useCurrentServer, useSetQueueFavorite } from '/@/renderer/store';
+import {
+  useCurrentServer,
+  useSetAlbumListItemDataById,
+  useSetQueueFavorite,
+} from '/@/renderer/store';
 
 const useCreateFavorite = () => {
   const server = useCurrentServer();
+  const setAlbumListData = useSetAlbumListItemDataById();
 
   return useMutation<RawFavoriteResponse, HTTPError, Omit<FavoriteArgs, 'server'>, null>({
     mutationFn: (args) => api.controller.createFavorite({ ...args, server }),
+    onSuccess: (_data, variables) => {
+      for (const id of variables.query.id) {
+        // Set the userFavorite property to true for the album in the album list data store
+        if (variables.query.type === LibraryItem.ALBUM) {
+          setAlbumListData(id, { userFavorite: true });
+        }
+      }
+    },
   });
 };
 
 const useDeleteFavorite = () => {
   const server = useCurrentServer();
+  const setAlbumListData = useSetAlbumListItemDataById();
 
   return useMutation<RawFavoriteResponse, HTTPError, Omit<FavoriteArgs, 'server'>, null>({
     mutationFn: (args) => api.controller.deleteFavorite({ ...args, server }),
+    onSuccess: (_data, variables) => {
+      for (const id of variables.query.id) {
+        // Set the userFavorite property to false for the album in the album list data store
+        if (variables.query.type === LibraryItem.ALBUM) {
+          setAlbumListData(id, { userFavorite: false });
+        }
+      }
+    },
   });
 };
 

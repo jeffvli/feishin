@@ -162,6 +162,7 @@ export type GridCardData = {
   cardRows: CardRow<Album | AlbumArtist | Artist>[];
   columnCount: number;
   display: ListDisplayType;
+  handleFavorite: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
   handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
   itemCount: number;
   itemData: any[];

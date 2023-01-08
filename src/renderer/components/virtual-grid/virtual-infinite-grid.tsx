@@ -17,6 +17,7 @@ interface VirtualGridProps extends Omit<FixedSizeListProps, 'children' | 'itemSi
   cardRows: CardRow<any>[];
   display?: ListDisplayType;
   fetchFn: (options: { columnCount: number; skip: number; take: number }) => Promise<any>;
+  handleFavorite?: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   itemData: any[];
   itemGap: number;
@@ -54,6 +55,7 @@ export const VirtualInfiniteGrid = forwardRef(
       fetchFn,
       loading,
       initialScrollOffset,
+      handleFavorite,
       height,
       width,
     }: VirtualGridProps,
@@ -146,6 +148,7 @@ export const VirtualInfiniteGrid = forwardRef(
               cardRows={cardRows}
               columnCount={columnCount}
               display={display || ListDisplayType.CARD}
+              handleFavorite={handleFavorite}
               handlePlayQueueAdd={handlePlayQueueAdd}
               height={height}
               initialScrollOffset={initialScrollOffset}

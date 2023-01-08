@@ -21,10 +21,12 @@ const createItemData = memoize(
     itemWidth,
     route,
     handlePlayQueueAdd,
+    handleFavorite,
   ) => ({
     cardRows,
     columnCount,
     display,
+    handleFavorite,
     handlePlayQueueAdd,
     itemCount,
     itemData,
@@ -50,6 +52,7 @@ export const VirtualGridWrapper = ({
   columnCount,
   rowCount,
   initialScrollOffset,
+  handleFavorite,
   handlePlayQueueAdd,
   itemData,
   route,
@@ -59,6 +62,7 @@ export const VirtualGridWrapper = ({
   cardRows: CardRow<Album | AlbumArtist | Artist>[];
   columnCount: number;
   display: ListDisplayType;
+  handleFavorite?: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   itemData: any[];
   itemGap: number;
@@ -81,6 +85,7 @@ export const VirtualGridWrapper = ({
     itemWidth,
     route,
     handlePlayQueueAdd,
+    handleFavorite,
   );
 
   const memoizedOnScroll = createScrollHandler(onScroll);

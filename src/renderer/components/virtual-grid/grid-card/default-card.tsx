@@ -101,6 +101,7 @@ interface BaseGridCardProps {
   columnIndex: number;
   controls: {
     cardRows: CardRow<Album | AlbumArtist | Artist>[];
+    handleFavorite: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
     handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
     itemType: LibraryItem;
     playButtonBehavior: Play;
@@ -179,6 +180,7 @@ export const DefaultCard = ({
             )}
             <ControlsContainer>
               <GridCardControls
+                handleFavorite={controls.handleFavorite}
                 handlePlayQueueAdd={handlePlayQueueAdd}
                 itemData={data}
                 itemType={itemType}

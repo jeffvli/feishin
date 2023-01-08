@@ -9,6 +9,7 @@ export interface AlbumListDataState {
 export interface AlbumListDataSlice extends AlbumListDataState {
   actions: {
     setItemData: (data: any[]) => void;
+    setItemDataById: (id: string, data: any) => void;
   };
 }
 
@@ -19,6 +20,13 @@ export const useAlbumListDataStore = create<AlbumListDataSlice>()(
         setItemData: (data) => {
           set((state) => {
             state.itemData = data;
+          });
+        },
+        setItemDataById: (id, data) => {
+          set((state) => {
+            const index = state.itemData.findIndex((item) => item?.id === id);
+            if (index === -1) return;
+            state.itemData[index] = { ...state.itemData[index], ...data };
           });
         },
       },
@@ -34,3 +42,6 @@ export const useAlbumListItemData = () =>
   useAlbumListDataStore((state) => {
     return { itemData: state.itemData, setItemData: state.actions.setItemData };
   });
+
+export const useSetAlbumListItemDataById = () =>
+  useAlbumListDataStore((state) => state.actions.setItemDataById);

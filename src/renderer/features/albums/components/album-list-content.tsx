@@ -41,6 +41,7 @@ import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { generatePath, useNavigate } from 'react-router';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 
 interface AlbumListContentProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -265,6 +266,32 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
     navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: e.data.id }));
   };
 
+  const createFavoriteMutation = useCreateFavorite();
+  const deleteFavoriteMutation = useDeleteFavorite();
+
+  const handleFavorite = (options: {
+    id: string[];
+    isFavorite: boolean;
+    itemType: LibraryItem;
+  }) => {
+    const { id, itemType, isFavorite } = options;
+    if (isFavorite) {
+      deleteFavoriteMutation.mutate({
+        query: {
+          id,
+          type: itemType,
+        },
+      });
+    } else {
+      createFavoriteMutation.mutate({
+        query: {
+          id,
+          type: itemType,
+        },
+      });
+    }
+  };
+
   return (
     <>
       <VirtualGridAutoSizerContainer>
@@ -278,6 +305,7 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
                   cardRows={cardRows}
                   display={page.display || ListDisplayType.CARD}
                   fetchFn={fetch}
+                  handleFavorite={handleFavorite}
                   handlePlayQueueAdd={handlePlayQueueAdd}
                   height={height}
                   initialScrollOffset={page?.grid.scrollOffset || 0}

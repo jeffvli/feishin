@@ -118,7 +118,9 @@ export const GridCardControls = ({
   itemData,
   itemType,
   handlePlayQueueAdd,
+  handleFavorite,
 }: {
+  handleFavorite: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   itemData: any;
   itemType: LibraryItem;
@@ -138,6 +140,17 @@ export const GridCardControls = ({
     });
   };
 
+  const handleFavorites = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    handleFavorite?.({
+      id: [itemData.id],
+      isFavorite: itemData.userFavorite,
+      itemType,
+    });
+  };
+
   return (
     <GridCardControlsContainer>
       {/* <TopControls /> */}
@@ -148,13 +161,13 @@ export const GridCardControls = ({
         </PlayButton>
         <Group spacing="xs">
           <SecondaryButton
-            disabled
             p={5}
             sx={{ svg: { fill: 'white !important' } }}
             variant="subtle"
+            onClick={handleFavorites}
           >
             <FavoriteWrapper isFavorite={itemData?.isFavorite}>
-              {itemData?.isFavorite ? (
+              {itemData?.userFavorite ? (
                 <RiHeartFill size={20} />
               ) : (
                 <RiHeartLine

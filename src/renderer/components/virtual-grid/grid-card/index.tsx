@@ -18,6 +18,7 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
     itemType,
     playButtonBehavior,
     handlePlayQueueAdd,
+    handleFavorite,
     route,
     display,
   } = data as GridCardData;
@@ -35,6 +36,7 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
         columnIndex={i}
         controls={{
           cardRows,
+          handleFavorite,
           handlePlayQueueAdd,
           itemType,
           playButtonBehavior,
