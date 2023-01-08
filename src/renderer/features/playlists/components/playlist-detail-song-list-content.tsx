@@ -8,7 +8,12 @@ import type {
   RowDoubleClickedEvent,
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { getColumnDefs, TablePagination, VirtualTable } from '/@/renderer/components';
+import {
+  getColumnDefs,
+  TablePagination,
+  VirtualGridAutoSizerContainer,
+  VirtualTable,
+} from '/@/renderer/components';
 import {
   useCurrentServer,
   usePlaylistDetailStore,
@@ -185,7 +190,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
   };
 
   return (
-    <>
+    <VirtualGridAutoSizerContainer>
       <VirtualTable
         // https://github.com/ag-grid/ag-grid/issues/5284
         // Key is used to force remount of table when display, rowHeight, or server changes
@@ -222,6 +227,6 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
           />
         )}
       </AnimatePresence>
-    </>
+    </VirtualGridAutoSizerContainer>
   );
 };
