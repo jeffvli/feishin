@@ -757,7 +757,7 @@ export type FavoriteResponse = { id: string[]; type: LibraryItem };
 
 export type FavoriteQuery = {
   id: string[];
-  type?: LibraryItem;
+  type: LibraryItem;
 };
 
 export type FavoriteArgs = { query: FavoriteQuery } & BaseEndpointArgs;
