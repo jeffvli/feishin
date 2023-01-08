@@ -1,7 +1,7 @@
-import { Container, Center, Stack, Group, Button, Divider } from '@mantine/core';
-import { RiArrowLeftSLine, RiErrorWarningLine, RiHomeFill } from 'react-icons/ri';
+import { Center, Stack, Group, Divider, Box } from '@mantine/core';
+import { RiArrowLeftSLine, RiErrorWarningLine, RiHome4Line } from 'react-icons/ri';
 import { useNavigate, useRouteError } from 'react-router';
-import { Text } from '/@/renderer/components';
+import { Button, Text } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
 
 const RouteErrorBoundary = () => {
@@ -22,7 +22,7 @@ const RouteErrorBoundary = () => {
   };
 
   return (
-    <Container>
+    <Box bg="var(--main-bg)">
       <Center sx={{ height: '100vh' }}>
         <Stack sx={{ maxWidth: '50%' }}>
           <Group>
@@ -43,7 +43,7 @@ const RouteErrorBoundary = () => {
           <Text size="sm">{error?.message}</Text>
           <Group grow>
             <Button
-              leftIcon={<RiHomeFill />}
+              leftIcon={<RiHome4Line />}
               sx={{ flex: 0.5 }}
               variant="default"
               onClick={handleHome}
@@ -59,7 +59,7 @@ const RouteErrorBoundary = () => {
           </Group>
         </Stack>
       </Center>
-    </Container>
+    </Box>
   );
 };
 
