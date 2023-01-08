@@ -79,13 +79,15 @@ export const FavoriteCell = ({ value, data, node }: ICellRendererParams) => {
         compact
         sx={{
           svg: {
-            fill: 'var(--primary-color)',
+            fill: !value
+              ? 'var(--main-fg-secondary) !important'
+              : 'var(--primary-color) !important',
           },
         }}
         variant="subtle"
         onClick={handleToggleFavorite}
       >
-        {!value ? <RiHeartLine /> : <RiHeartFill fill="var(--primary-color)" />}
+        {!value ? <RiHeartLine size="1.3em" /> : <RiHeartFill size="1.3em" />}
       </Button>
     </CellContainer>
   );
