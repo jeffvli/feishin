@@ -1,9 +1,8 @@
-import { CellContextMenuEvent, ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
+import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
-import { sortBy } from 'lodash';
 import { MutableRefObject, useMemo, useRef } from 'react';
 import { RiMoreFill } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
@@ -28,7 +27,7 @@ import {
   useFixedTableHeader,
   VirtualTable,
 } from '/@/renderer/components';
-import { openContextMenu } from '/@/renderer/features/context-menu';
+import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { UpdatePlaylistForm } from '/@/renderer/features/playlists/components/update-playlist-form';
@@ -87,29 +86,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     [page.table.columns],
   );
 
-  const handleContextMenu = (e: CellContextMenuEvent) => {
-    if (!e.event) return;
-    const clickEvent = e.event as MouseEvent;
-    clickEvent.preventDefault();
-
-    const selectedNodes = e.api.getSelectedNodes();
-    const selectedIds = selectedNodes.map((node) => node.data.id);
-    let selectedRows = sortBy(selectedNodes, ['rowIndex']).map((node) => node.data);
-
-    if (!selectedIds.includes(e.data.id)) {
-      e.api.deselectAll();
-      e.node.setSelected(true);
-      selectedRows = [e.data];
-    }
-
-    openContextMenu({
-      data: selectedRows,
-      menuItems: SONG_CONTEXT_MENU_ITEMS,
-      type: LibraryItem.SONG,
-      xPos: clickEvent.clientX,
-      yPos: clickEvent.clientY,
-    });
-  };
+  const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
   const playlistSongData = useMemo(
     () => playlistSongsQueryInfinite.data?.pages.flatMap((p) => p.items),

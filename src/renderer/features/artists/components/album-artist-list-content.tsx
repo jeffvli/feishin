@@ -28,7 +28,6 @@ import {
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import {
   BodyScrollEvent,
-  CellContextMenuEvent,
   ColDef,
   GridReadyEvent,
   IDatasource,
@@ -37,9 +36,8 @@ import {
 } from '@ag-grid-community/core';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
-import { openContextMenu } from '/@/renderer/features/context-menu';
+import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-import sortBy from 'lodash/sortBy';
 import { generatePath, useNavigate } from 'react-router';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
@@ -250,29 +248,10 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
     return rows;
   }, [page.filter.sortBy]);
 
-  const handleContextMenu = (e: CellContextMenuEvent) => {
-    if (!e.event) return;
-    const clickEvent = e.event as MouseEvent;
-    clickEvent.preventDefault();
-
-    const selectedNodes = e.api.getSelectedNodes();
-    const selectedIds = selectedNodes.map((node) => node.data.id);
-    let selectedRows = sortBy(selectedNodes, ['rowIndex']).map((node) => node.data);
-
-    if (!selectedIds.includes(e.data.id)) {
-      e.api.deselectAll();
-      e.node.setSelected(true);
-      selectedRows = [e.data];
-    }
-
-    openContextMenu({
-      data: selectedRows,
-      menuItems: ALBUM_CONTEXT_MENU_ITEMS,
-      type: LibraryItem.ALBUM_ARTIST,
-      xPos: clickEvent.clientX,
-      yPos: clickEvent.clientY,
-    });
-  };
+  const handleContextMenu = useHandleTableContextMenu(
+    LibraryItem.ALBUM_ARTIST,
+    ALBUM_CONTEXT_MENU_ITEMS,
+  );
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent) => {
     navigate(generatePath(AppRoute.LIBRARY_ALBUMARTISTS_DETAIL, { albumArtistId: e.data.id }));

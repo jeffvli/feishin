@@ -34,15 +34,11 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const clickOutsideRef = useClickOutside(() => setOpened(false));
   const viewport = useViewportSize();
   const [ref, menuRect] = useResizeObserver();
-  const [ctx, setCtx] = useSetState<{
-    data: any[];
-    menuItems: SetContextMenuItems;
-    type: LibraryItem;
-    xPos: number;
-    yPos: number;
-  }>({
+  const [ctx, setCtx] = useSetState<OpenContextMenuProps>({
     data: [],
+    dataNodes: [],
     menuItems: [],
+    tableRef: undefined,
     type: LibraryItem.SONG,
     xPos: 0,
     yPos: 0,
@@ -51,7 +47,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const handlePlayQueueAdd = usePlayQueueAdd();
 
   const openContextMenu = (args: OpenContextMenuProps) => {
-    const { xPos, yPos, menuItems, data, type } = args;
+    const { xPos, yPos, menuItems, data, type, tableRef, dataNodes } = args;
 
     const shouldReverseY = yPos + menuRect.height > viewport.height;
     const shouldReverseX = xPos + menuRect.width > viewport.width;
@@ -59,12 +55,29 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const calculatedXPos = shouldReverseX ? xPos - menuRect.width : xPos;
     const calculatedYPos = shouldReverseY ? yPos - menuRect.height : yPos;
 
-    setCtx({ data, menuItems, type, xPos: calculatedXPos, yPos: calculatedYPos });
+    setCtx({
+      data,
+      dataNodes,
+      menuItems,
+      tableRef,
+      type,
+      xPos: calculatedXPos,
+      yPos: calculatedYPos,
+    });
     setOpened(true);
   };
 
   const closeContextMenu = () => {
     setOpened(false);
+    setCtx({
+      data: [],
+      dataNodes: [],
+      menuItems: [],
+      tableRef: undefined,
+      type: LibraryItem.SONG,
+      xPos: 0,
+      yPos: 0,
+    });
   };
 
   useContextMenuEvents({

@@ -8,11 +8,10 @@ import {
   useFixedTableHeader,
   VirtualTable,
 } from '/@/renderer/components';
-import { CellContextMenuEvent, ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
+import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
-import sortBy from 'lodash/sortBy';
 import { RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { useParams } from 'react-router';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
@@ -21,7 +20,7 @@ import styled from 'styled-components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { openContextMenu } from '/@/renderer/features/context-menu';
+import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { Play } from '/@/renderer/types';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { PlayButton, PLAY_TYPES } from '/@/renderer/features/shared';
@@ -136,29 +135,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     });
   };
 
-  const handleContextMenu = (e: CellContextMenuEvent) => {
-    if (!e.event) return;
-    const clickEvent = e.event as MouseEvent;
-    clickEvent.preventDefault();
-
-    const selectedNodes = e.api.getSelectedNodes();
-    const selectedIds = selectedNodes.map((node) => node.data.id);
-    let selectedRows = sortBy(selectedNodes, ['rowIndex']).map((node) => node.data);
-
-    if (!selectedIds.includes(e.data.id)) {
-      e.api.deselectAll();
-      e.node.setSelected(true);
-      selectedRows = [e.data];
-    }
-
-    openContextMenu({
-      data: selectedRows,
-      menuItems: SONG_CONTEXT_MENU_ITEMS,
-      type: LibraryItem.SONG,
-      xPos: clickEvent.clientX,
-      yPos: clickEvent.clientY,
-    });
-  };
+  const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;

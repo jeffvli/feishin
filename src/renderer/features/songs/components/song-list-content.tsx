@@ -1,7 +1,6 @@
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import type {
   BodyScrollEvent,
-  CellContextMenuEvent,
   ColDef,
   GridReadyEvent,
   IDatasource,
@@ -29,9 +28,8 @@ import {
 import { ListDisplayType } from '/@/renderer/types';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
-import { openContextMenu } from '/@/renderer/features/context-menu';
+import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-import sortBy from 'lodash/sortBy';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
@@ -160,29 +158,7 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
     setTable({ scrollOffset });
   };
 
-  const handleContextMenu = (e: CellContextMenuEvent) => {
-    if (!e.event) return;
-    const clickEvent = e.event as MouseEvent;
-    clickEvent.preventDefault();
-
-    const selectedNodes = e.api.getSelectedNodes();
-    const selectedIds = selectedNodes.map((node) => node.data.id);
-    let selectedRows = sortBy(selectedNodes, ['rowIndex']).map((node) => node.data);
-
-    if (!selectedIds.includes(e.data.id)) {
-      e.api.deselectAll();
-      e.node.setSelected(true);
-      selectedRows = [e.data];
-    }
-
-    openContextMenu({
-      data: selectedRows,
-      menuItems: SONG_CONTEXT_MENU_ITEMS,
-      type: LibraryItem.SONG,
-      xPos: clickEvent.clientX,
-      yPos: clickEvent.clientY,
-    });
-  };
+  const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;
