@@ -103,9 +103,9 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
         rowCount: undefined,
       };
       params.api.setDatasource(dataSource);
-      // params.api.ensureIndexVisible(page.table.scrollOffset || 0, 'top');
+      params.api.ensureIndexVisible(page.table.scrollOffset || 0, 'top');
     },
-    [page.filter, queryClient, server],
+    [page.filter, page.table.scrollOffset, queryClient, server],
   );
 
   const onTablePaginationChanged = useCallback(
