@@ -530,7 +530,7 @@ export const songListSortMap: SongListSortMap = {
     playCount: NDSongListSort.PLAY_COUNT,
     random: undefined,
     rating: NDSongListSort.RATING,
-    recentlyAdded: NDSongListSort.PLAY_DATE,
+    recentlyAdded: NDSongListSort.RECENTLY_ADDED,
     recentlyPlayed: NDSongListSort.PLAY_DATE,
     releaseDate: undefined,
     year: NDSongListSort.YEAR,
