@@ -6,11 +6,11 @@ import { LibraryItem } from '/@/renderer/api/types';
 import { ConfirmModal, ContextMenu, ContextMenuButton, Text, toast } from '/@/renderer/components';
 import {
   OpenContextMenuProps,
-  SetContextMenuItems,
   useContextMenuEvents,
 } from '/@/renderer/features/context-menu/events';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useDeletePlaylist } from '/@/renderer/features/playlists';
+import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { Play } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
@@ -167,8 +167,61 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     });
   };
 
+  const createFavoriteMutation = useCreateFavorite();
+  const deleteFavoriteMutation = useDeleteFavorite();
+  const handleAddToFavorites = () => {
+    if (!ctx.dataNodes) return;
+    const nodesToFavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
+    createFavoriteMutation.mutate(
+      {
+        query: {
+          id: nodesToFavorite.map((item) => item.data.id),
+          type: ctx.type,
+        },
+      },
+      {
+        onError: (err) => {
+          toast.error({
+            message: err.message,
+            title: 'Error adding to favorites',
+          });
+        },
+        onSuccess: () => {
+          for (const node of nodesToFavorite) {
+            node.setData({ ...node.data, userFavorite: true });
+          }
+        },
+      },
+    );
+  };
+
+  const handleRemoveFromFavorites = () => {
+    if (!ctx.dataNodes) return;
+    const nodesToUnfavorite = ctx.dataNodes.filter((item) => item.data.userFavorite);
+
+    deleteFavoriteMutation.mutate(
+      {
+        query: {
+          id: nodesToUnfavorite.map((item) => item.data.id),
+          type: ctx.type,
+        },
+      },
+      {
+        onSuccess: () => {
+          for (const node of nodesToUnfavorite) {
+            node.setData({ ...node.data, userFavorite: false });
+          }
+        },
+      },
+    );
+  };
+
   const contextMenuItems = {
-    addToFavorites: { id: 'addToFavorites', label: 'Add to favorites', onClick: () => {} },
+    addToFavorites: {
+      id: 'addToFavorites',
+      label: 'Add to favorites',
+      onClick: handleAddToFavorites,
+    },
     addToPlaylist: { id: 'addToPlaylist', label: 'Add to playlist', onClick: () => {} },
     createPlaylist: { id: 'createPlaylist', label: 'Create playlist', onClick: () => {} },
     deletePlaylist: {
@@ -194,7 +247,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     removeFromFavorites: {
       id: 'removeFromFavorites',
       label: 'Remove from favorites',
-      onClick: () => {},
+      onClick: handleRemoveFromFavorites,
     },
     setRating: { id: 'setRating', label: 'Set rating', onClick: () => {} },
   };

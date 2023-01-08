@@ -5,8 +5,8 @@ export const SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { id: 'playLast' },
   { divider: true, id: 'playNext' },
   { disabled: true, id: 'addToPlaylist' },
-  { disabled: true, id: 'addToFavorites' },
-  { disabled: true, id: 'removeFromFavorites' },
+  { id: 'addToFavorites' },
+  { id: 'removeFromFavorites' },
   { disabled: true, id: 'setRating' },
 ];
 
@@ -15,8 +15,8 @@ export const ALBUM_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { id: 'playLast' },
   { divider: true, id: 'playNext' },
   { disabled: true, id: 'addToPlaylist' },
-  { disabled: true, id: 'addToFavorites' },
-  { disabled: true, id: 'removeFromFavorites' },
+  { id: 'addToFavorites' },
+  { id: 'removeFromFavorites' },
   { disabled: true, id: 'setRating' },
 ];
 
@@ -25,8 +25,8 @@ export const ARTIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { id: 'playLast' },
   { divider: true, id: 'playNext' },
   { disabled: true, id: 'addToPlaylist' },
-  { disabled: true, id: 'addToFavorites' },
-  { disabled: true, id: 'removeFromFavorites' },
+  { id: 'addToFavorites' },
+  { id: 'removeFromFavorites' },
   { disabled: true, id: 'setRating' },
 ];
 
