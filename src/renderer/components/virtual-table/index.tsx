@@ -160,7 +160,7 @@ const tableColumns: { [key: string]: ColDef } = {
     suppressSizeToFit: true,
     valueFormatter: (params: ValueFormatterParams) => formatDuration(params.value * 1000),
     valueGetter: (params: ValueGetterParams) => (params.data ? params.data.duration : undefined),
-    width: 60,
+    width: 70,
   },
   genre: {
     cellRenderer: GenreCell,
