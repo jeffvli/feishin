@@ -328,6 +328,7 @@ interface VirtualTableProps extends AgGridReactProps {
   autoFitColumns?: boolean;
   autoHeight?: boolean;
   deselectOnClickOutside?: boolean;
+  transparentHeader?: boolean;
 }
 
 export const VirtualTable = forwardRef(
@@ -336,6 +337,7 @@ export const VirtualTable = forwardRef(
       autoFitColumns,
       deselectOnClickOutside,
       autoHeight,
+      transparentHeader,
       onColumnMoved,
       onNewColumnsLoaded,
       onGridReady,
@@ -349,7 +351,9 @@ export const VirtualTable = forwardRef(
     const mergedRef = useMergedRef(ref, tableRef);
 
     const deselectRef = useClickOutside(() => {
-      return deselectOnClickOutside ? tableRef?.current?.api?.deselectAll() : undefined;
+      if (tableRef?.current?.api && deselectOnClickOutside) {
+        tableRef?.current?.api?.deselectAll();
+      }
     });
 
     const defaultColumnDefs: ColDef = useMemo(() => {
@@ -362,44 +366,52 @@ export const VirtualTable = forwardRef(
 
     // Auto fit columns on column change
     useEffect(() => {
-      if (autoFitColumns) tableRef?.current?.api?.sizeColumnsToFit();
+      if (!tableRef?.current?.api) return;
+      if (autoFitColumns && tableRef?.current?.api) {
+        tableRef?.current?.api?.sizeColumnsToFit?.();
+      }
     }, [autoFitColumns]);
 
     // Reset row heights on row height change
     useEffect(() => {
+      if (!tableRef?.current?.api) return;
       tableRef?.current?.api?.resetRowHeights();
       tableRef?.current?.api?.redrawRows();
     }, [rest.rowHeight]);
 
     const handleColumnMoved = useCallback(
       (e: ColumnMovedEvent) => {
+        if (!e?.api) return;
         onColumnMoved?.(e);
-        if (autoFitColumns) e.api.sizeColumnsToFit();
+        if (autoFitColumns) e.api?.sizeColumnsToFit?.();
       },
       [autoFitColumns, onColumnMoved],
     );
 
     const handleNewColumnsLoaded = useCallback(
       (e: NewColumnsLoadedEvent) => {
+        if (!e?.api) return;
         onNewColumnsLoaded?.(e);
-        if (autoFitColumns) e.api?.sizeColumnsToFit();
+        if (autoFitColumns) e.api?.sizeColumnsToFit?.();
       },
       [autoFitColumns, onNewColumnsLoaded],
     );
 
     const handleGridReady = useCallback(
       (e: GridReadyEvent) => {
+        if (!e?.api) return;
         onGridReady?.(e);
         if (autoHeight) e.api.setDomLayout('autoHeight');
-        if (autoFitColumns) e.api.sizeColumnsToFit();
+        if (autoFitColumns) e.api?.sizeColumnsToFit?.();
       },
       [autoHeight, autoFitColumns, onGridReady],
     );
 
     const handleGridSizeChanged = useCallback(
       (e: GridSizeChangedEvent) => {
+        if (!e?.api) return;
         onGridSizeChanged?.(e);
-        if (autoFitColumns) e.api.sizeColumnsToFit();
+        if (autoFitColumns) e.api?.sizeColumnsToFit?.();
       },
       [autoFitColumns, onGridSizeChanged],
     );
@@ -407,7 +419,9 @@ export const VirtualTable = forwardRef(
     return (
       <TableWrapper
         ref={deselectRef}
-        className="ag-theme-alpine-dark"
+        className={
+          transparentHeader ? 'ag-header-transparent ag-theme-alpine-dark' : 'ag-theme-alpine-dark'
+        }
       >
         <AgGridReact
           ref={mergedRef}

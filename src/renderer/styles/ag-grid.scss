@@ -10,6 +10,10 @@
   transition: position 0.2s ease-in-out;
 }
 
+.ag-header-transparent {
+  --ag-header-background-color: rgba(0, 0, 0, 0%) !important;
+}
+
 .ag-header-fixed-margin {
   margin-top: 43px !important;
 }
