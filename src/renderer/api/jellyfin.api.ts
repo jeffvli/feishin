@@ -666,7 +666,7 @@ const normalizeSong = (
     playCount: (item.UserData && item.UserData.PlayCount) || 0,
     // releaseDate: (item.ProductionYear && new Date(item.ProductionYear, 0, 1).toISOString()) || null,
     releaseDate: null,
-    releaseYear: (item.ProductionYear && String(item.ProductionYear)) || null,
+    releaseYear: item.ProductionYear ? String(item.ProductionYear) : null,
     serverId: server.id,
     serverType: ServerType.JELLYFIN,
     size: item.MediaSources && item.MediaSources[0]?.Size,

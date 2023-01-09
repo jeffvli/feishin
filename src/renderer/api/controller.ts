@@ -199,6 +199,12 @@ const getGenreList = async (args: GenreListArgs) => {
   return (apiController('getGenreList') as ControllerEndpoint['getGenreList'])?.(args);
 };
 
+const getAlbumArtistDetail = async (args: AlbumArtistDetailArgs) => {
+  return (apiController('getAlbumArtistDetail') as ControllerEndpoint['getAlbumArtistDetail'])?.(
+    args,
+  );
+};
+
 const getAlbumArtistList = async (args: AlbumArtistListArgs) => {
   return (apiController('getAlbumArtistList') as ControllerEndpoint['getAlbumArtistList'])?.(args);
 };
@@ -254,6 +260,7 @@ export const controller = {
   createPlaylist,
   deleteFavorite,
   deletePlaylist,
+  getAlbumArtistDetail,
   getAlbumArtistList,
   getAlbumDetail,
   getAlbumList,

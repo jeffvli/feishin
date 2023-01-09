@@ -19,6 +19,8 @@ import type {
 import { SSGenreList, SSMusicFolderList } from '/@/renderer/api/subsonic.types';
 import type {
   Album,
+  AlbumArtist,
+  RawAlbumArtistDetailResponse,
   RawAlbumArtistListResponse,
   RawAlbumDetailResponse,
   RawAlbumListResponse,
@@ -149,6 +151,25 @@ const genreList = (data: RawGenreListResponse | undefined, server: ServerListIte
   return genres;
 };
 
+const albumArtistDetail = (
+  data: RawAlbumArtistDetailResponse | undefined,
+  server: ServerListItem | null,
+): AlbumArtist | undefined => {
+  let albumArtist: AlbumArtist | undefined;
+  switch (server?.type) {
+    case 'jellyfin':
+      albumArtist = jfNormalize.albumArtist(data as JFAlbumArtist, server);
+      break;
+    case 'navidrome':
+      albumArtist = ndNormalize.albumArtist(data as NDAlbumArtist, server);
+      break;
+    case 'subsonic':
+      break;
+  }
+
+  return albumArtist;
+};
+
 const albumArtistList = (
   data: RawAlbumArtistListResponse | undefined,
   server: ServerListItem | null,
@@ -235,6 +256,7 @@ const userList = (data: RawUserListResponse | undefined, server: ServerListItem 
 };
 
 export const normalize = {
+  albumArtistDetail,
   albumArtistList,
   albumDetail,
   albumList,

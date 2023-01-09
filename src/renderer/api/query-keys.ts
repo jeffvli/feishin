@@ -8,11 +8,12 @@ import type {
   PlaylistDetailQuery,
   PlaylistSongListQuery,
   UserListQuery,
+  AlbumArtistDetailQuery,
 } from './types';
 
 export const queryKeys = {
   albumArtists: {
-    detail: (serverId: string, query?: AlbumArtistListQuery) => {
+    detail: (serverId: string, query?: AlbumArtistDetailQuery) => {
       if (query) return [serverId, 'albumArtists', 'detail', query] as const;
       return [serverId, 'albumArtists', 'detail'] as const;
     },
