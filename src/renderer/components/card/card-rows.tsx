@@ -59,7 +59,7 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                       row.route!.slugs?.reduce((acc, slug) => {
                         return {
                           ...acc,
-                          [slug.slugProperty]: data[slug.idProperty],
+                          [slug.slugProperty]: data[row.property][itemIndex][slug.idProperty],
                         };
                       }, {}),
                     )}
