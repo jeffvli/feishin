@@ -26,16 +26,16 @@ const StyledScrollArea = styled(MantineScrollArea)`
   }
 `;
 
-const StyledNativeScrollArea = styled.div`
+const StyledNativeScrollArea = styled.div<{ scrollBarOffset?: string }>`
   height: 100%;
-  overflow-y: overlay;
+  overflow-y: overlay !important;
 
   &::-webkit-scrollbar-track {
-    margin-top: 35px;
+    margin-top: ${(props) => props.scrollBarOffset || '35px'};
   }
 
   &::-webkit-scrollbar-thumb {
-    margin-top: 35px;
+    margin-top: ${(props) => props.scrollBarOffset || '35px'};
   }
 `;
 
@@ -55,11 +55,18 @@ interface NativeScrollAreaProps {
   children: React.ReactNode;
   debugScrollPosition?: boolean;
   pageHeaderProps?: PageHeaderProps & { offset?: any; target?: any };
+  scrollBarOffset?: string;
 }
 
 export const NativeScrollArea = forwardRef(
   (
-    { children, pageHeaderProps, debugScrollPosition, ...props }: NativeScrollAreaProps,
+    {
+      children,
+      pageHeaderProps,
+      debugScrollPosition,
+      scrollBarOffset,
+      ...props
+    }: NativeScrollAreaProps,
     ref: Ref<HTMLDivElement>,
   ) => {
     const [hideScrollbar, setHideScrollbar] = useState(false);
@@ -112,6 +119,7 @@ export const NativeScrollArea = forwardRef(
         <StyledNativeScrollArea
           ref={mergedRef}
           className={hideScrollbar ? 'hide-scrollbar' : undefined}
+          scrollBarOffset={scrollBarOffset}
           onMouseEnter={() => {
             setHideScrollbar(false);
             clear();
