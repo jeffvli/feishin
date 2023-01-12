@@ -1,15 +1,14 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { Center } from '@mantine/core';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 import { SimpleImg } from 'react-simple-img';
 import styled from 'styled-components';
-import { Text } from '/@/renderer/components/text';
 import type { CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
 import { Skeleton } from '/@/renderer/components/skeleton';
 import { CardControls } from '/@/renderer/components/card/card-controls';
-import { Album, LibraryItem } from '/@/renderer/api/types';
+import { Album, AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
+import { CardRows } from '/@/renderer/components/card/card-rows';
 
 const CardWrapper = styled.div<{
   link?: boolean;
@@ -103,7 +102,7 @@ const Row = styled.div<{ $secondary?: boolean }>`
 
 interface BaseGridCardProps {
   controls: {
-    cardRows: CardRow<Album>[];
+    cardRows: CardRow<Album | Artist | AlbumArtist>[];
     itemType: LibraryItem;
     playButtonBehavior: Play;
     route: CardRoute;
@@ -179,104 +178,10 @@ export const AlbumCard = ({
             </ControlsContainer>
           </ImageSection>
           <DetailSection>
-            {cardRows.map((row: CardRow<Album>, index: number) => {
-              if (row.arrayProperty && row.route) {
-                return (
-                  <Row
-                    key={`row-${row.property}-${index}`}
-                    $secondary={index > 0}
-                  >
-                    {data[row.property].map((item: any, itemIndex: number) => (
-                      <React.Fragment key={`${data.id}-${item.id}`}>
-                        {itemIndex > 0 && (
-                          <Text
-                            $noSelect
-                            sx={{
-                              display: 'inline-block',
-                              padding: '0 2px 0 1px',
-                            }}
-                          >
-                            ,
-                          </Text>
-                        )}{' '}
-                        <Text
-                          $link
-                          $noSelect
-                          $secondary={index > 0}
-                          component={Link}
-                          overflow="hidden"
-                          size={index > 0 ? 'xs' : 'md'}
-                          to={generatePath(
-                            row.route!.route,
-                            row.route!.slugs?.reduce((acc, slug) => {
-                              return {
-                                ...acc,
-                                [slug.slugProperty]: data[slug.idProperty],
-                              };
-                            }, {}),
-                          )}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {row.arrayProperty && item[row.arrayProperty]}
-                        </Text>
-                      </React.Fragment>
-                    ))}
-                  </Row>
-                );
-              }
-
-              if (row.arrayProperty) {
-                return (
-                  <Row key={`row-${row.property}`}>
-                    {data[row.property].map((item: any) => (
-                      <Text
-                        key={`${data.id}-${item.id}`}
-                        $noSelect
-                        $secondary={index > 0}
-                        overflow="hidden"
-                        size={index > 0 ? 'xs' : 'md'}
-                      >
-                        {row.arrayProperty && item[row.arrayProperty]}
-                      </Text>
-                    ))}
-                  </Row>
-                );
-              }
-
-              return (
-                <Row key={`row-${row.property}`}>
-                  {row.route ? (
-                    <Text
-                      $link
-                      $noSelect
-                      component={Link}
-                      overflow="hidden"
-                      to={generatePath(
-                        row.route.route,
-                        row.route.slugs?.reduce((acc, slug) => {
-                          return {
-                            ...acc,
-                            [slug.slugProperty]: data[slug.idProperty],
-                          };
-                        }, {}),
-                      )}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {data && data[row.property]}
-                    </Text>
-                  ) : (
-                    <Text
-                      $noSelect
-                      $secondary={index > 0}
-                      overflow="hidden"
-                      size={index > 0 ? 'xs' : 'md'}
-                    >
-                      {data && data[row.property]}
-                    </Text>
-                  )}
-                </Row>
-              );
-            })}
+            <CardRows
+              data={data}
+              rows={cardRows}
+            />
           </DetailSection>
         </StyledCard>
       </CardWrapper>
