@@ -80,7 +80,7 @@ export const AlbumDetailHeader = forwardRef(
                     $link
                     component={Link}
                     fw="600"
-                    to={generatePath(AppRoute.LIBRARY_ALBUMARTISTS_DETAIL, {
+                    to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                       albumArtistId: artist.id,
                     })}
                   >

@@ -254,7 +254,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
   );
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent) => {
-    navigate(generatePath(AppRoute.LIBRARY_ALBUMARTISTS_DETAIL, { albumArtistId: e.data.id }));
+    navigate(generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, { albumArtistId: e.data.id }));
   };
 
   return (
@@ -280,7 +280,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
                 loading={checkAlbumArtistList.isLoading}
                 minimumBatchSize={40}
                 route={{
-                  route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+                  route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
                   slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
                 }}
                 setItemData={setItemData}

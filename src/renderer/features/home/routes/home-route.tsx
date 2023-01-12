@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { Box, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
-import { AlbumListSort, ServerType, SortOrder } from '/@/renderer/api/types';
+import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
 import { TextTitle, FeatureCarousel, GridCarousel, NativeScrollArea } from '/@/renderer/components';
 import { useAlbumList } from '/@/renderer/features/albums';
 import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-played-query';
@@ -242,13 +242,14 @@ const HomeRoute = () => {
                       arrayProperty: 'name',
                       property: 'albumArtists',
                       route: {
-                        route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+                        route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
                         slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
                       },
                     },
                   ]}
                   containerWidth={cq.width}
                   data={carousel.data}
+                  itemType={LibraryItem.ALBUM}
                   loading={carousel.loading}
                   pagination={carousel.pagination}
                   uniqueId={carousel.uniqueId}

@@ -44,7 +44,7 @@ export const AlbumArtistCell = ({ value, data }: ICellRendererParams) => {
               component={Link}
               overflow="hidden"
               size="sm"
-              to={generatePath(AppRoute.LIBRARY_ALBUMARTISTS_DETAIL, {
+              to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                 albumArtistId: item.id,
               })}
             >

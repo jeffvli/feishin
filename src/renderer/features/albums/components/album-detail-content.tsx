@@ -268,13 +268,14 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
                 arrayProperty: 'name',
                 property: 'albumArtists',
                 route: {
-                  route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+                  route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
                   slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
                 },
               },
             ]}
             containerWidth={cq.width}
             data={carousel.data}
+            itemType={LibraryItem.ALBUM}
             loading={carousel.loading}
             pagination={carousel.pagination}
             uniqueId={carousel.uniqueId}

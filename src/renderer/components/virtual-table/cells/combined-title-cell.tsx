@@ -125,7 +125,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
                   overflow="hidden"
                   size="sm"
                   sx={{ width: 'fit-content' }}
-                  to={generatePath(AppRoute.LIBRARY_ALBUMARTISTS_DETAIL, {
+                  to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                     albumArtistId: artist.id,
                   })}
                 >

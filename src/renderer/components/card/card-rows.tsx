@@ -134,7 +134,7 @@ export const ALBUM_CARD_ROWS: { [key: string]: CardRow<Album> } = {
     arrayProperty: 'name',
     property: 'albumArtists',
     route: {
-      route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+      route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
       slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
     },
   },
@@ -142,7 +142,7 @@ export const ALBUM_CARD_ROWS: { [key: string]: CardRow<Album> } = {
     arrayProperty: 'name',
     property: 'artists',
     route: {
-      route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+      route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
       slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
     },
   },
@@ -195,7 +195,7 @@ export const ALBUMARTIST_CARD_ROWS: { [key: string]: CardRow<AlbumArtist> } = {
   name: {
     property: 'name',
     route: {
-      route: AppRoute.LIBRARY_ALBUMARTISTS_DETAIL,
+      route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
       slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
     },
   },
