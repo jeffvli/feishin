@@ -11,12 +11,14 @@ import styled from 'styled-components';
 import { AlbumCard } from '/@/renderer/components/card';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { LibraryItem } from '/@/renderer/api/types';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 
 interface GridCarouselProps {
   cardRows: CardRow<any>[];
   children: React.ReactElement;
   containerWidth: number;
   data: any[] | undefined;
+  itemType: LibraryItem;
   loading?: boolean;
   pagination?: {
     handleNextPage?: () => void;
@@ -78,8 +80,10 @@ const variants: Variants = {
 };
 
 const Carousel = ({ data, cardRows }: any) => {
-  const { loading, pagination, gridHeight, imageSize, direction, uniqueId } =
+  const { loading, pagination, gridHeight, imageSize, direction, uniqueId, itemType } =
     useContext(GridCarouselContext);
+
+  const playButtonBehavior = usePlayButtonBehavior();
 
   const handlePlayQueueAdd = usePlayQueueAdd();
 
@@ -105,9 +109,9 @@ const Carousel = ({ data, cardRows }: any) => {
               key={`card-${uniqueId}-${index}`}
               controls={{
                 cardRows,
-                itemType: LibraryItem.ALBUM,
-                playButtonBehavior: Play.NOW,
-                route: {
+                itemType: itemType || LibraryItem.ALBUM,
+                playButtonBehavior: playButtonBehavior || Play.NOW,
+                route: cardRows[0]?.route || {
                   route: AppRoute.LIBRARY_ALBUMS_DETAIL,
                   slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
                 },
@@ -131,6 +135,7 @@ export const GridCarousel = ({
   children,
   containerWidth,
   uniqueId,
+  itemType,
 }: GridCarouselProps) => {
   const [direction, setDirection] = useState(0);
 
@@ -148,12 +153,13 @@ export const GridCarousel = ({
       direction,
       gridHeight,
       imageSize,
+      itemType,
       loading,
       pagination,
       setDirection,
       uniqueId,
     }),
-    [cardRows, data, direction, gridHeight, imageSize, loading, pagination, uniqueId],
+    [cardRows, data, direction, gridHeight, imageSize, itemType, loading, pagination, uniqueId],
   );
 
   return (
@@ -177,6 +183,7 @@ interface TitleProps {
 
 const Title = ({ children }: TitleProps) => {
   const { pagination, setDirection } = useContext(GridCarouselContext);
+  const showPaginationButtons = pagination?.handleNextPage && pagination?.handlePreviousPage;
 
   const handleNextPage = useCallback(() => {
     setDirection(1);
@@ -191,23 +198,25 @@ const Title = ({ children }: TitleProps) => {
   return (
     <Group position="apart">
       {children}
-      <Group>
-        <Button
-          compact
-          disabled={!pagination?.hasPreviousPage}
-          variant="default"
-          onClick={handlePreviousPage}
-        >
-          <RiArrowLeftSLine size={15} />
-        </Button>
-        <Button
-          compact
-          variant="default"
-          onClick={handleNextPage}
-        >
-          <RiArrowRightSLine size={15} />
-        </Button>
-      </Group>
+      {showPaginationButtons && (
+        <Group>
+          <Button
+            compact
+            disabled={!pagination?.hasPreviousPage}
+            variant="default"
+            onClick={handlePreviousPage}
+          >
+            <RiArrowLeftSLine size={15} />
+          </Button>
+          <Button
+            compact
+            variant="default"
+            onClick={handleNextPage}
+          >
+            <RiArrowRightSLine size={15} />
+          </Button>
+        </Group>
+      )}
     </Group>
   );
 };
