@@ -11,7 +11,7 @@ interface TextProps extends MantineTextDivProps {
   $link?: boolean;
   $noSelect?: boolean;
   $secondary?: boolean;
-  children: ReactNode;
+  children?: ReactNode;
   font?: Font;
   overflow?: 'hidden' | 'visible';
   to?: string;

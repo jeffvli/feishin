@@ -10,7 +10,7 @@ interface TextTitleProps extends MantineTextTitleDivProps {
   $link?: boolean;
   $noSelect?: boolean;
   $secondary?: boolean;
-  children: ReactNode;
+  children?: ReactNode;
   overflow?: 'hidden' | 'visible';
   to?: string;
   weight?: number;
