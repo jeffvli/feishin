@@ -7,6 +7,7 @@ export enum AppRoute {
   LIBRARY_ALBUM_ARTISTS = '/library/album-artists',
   LIBRARY_ALBUM_ARTISTS_DETAIL = '/library/album-artists/:albumArtistId',
   LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY = '/library/album-artists/:albumArtistId/discography',
+  LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS = '/library/album-artists/:albumArtistId/songs',
   LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS = '/library/album-artists/:albumArtistId/top-songs',
   LIBRARY_ARTISTS = '/library/artists',
   LIBRARY_ARTISTS_DETAIL = '/library/artists/:artistId',
