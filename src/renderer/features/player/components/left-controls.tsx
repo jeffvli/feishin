@@ -170,8 +170,8 @@ export const LeftControls = () => {
                   size="xs"
                   to={
                     artist.id
-                      ? generatePath(AppRoute.LIBRARY_ARTISTS_DETAIL, {
-                          artistId: artist.id,
+                      ? generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                          albumArtistId: artist.id,
                         })
                       : ''
                   }
