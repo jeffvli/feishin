@@ -39,6 +39,7 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                   {itemIndex > 0 && (
                     <Text
                       $noSelect
+                      $secondary
                       sx={{
                         display: 'inline-block',
                         padding: '0 2px 0 1px',
