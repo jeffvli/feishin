@@ -230,7 +230,7 @@ export type NDAlbumListParams = {
 
 export enum NDSongListSort {
   ALBUM = 'album, order_album_artist_name, disc_number, track_number, title',
-  ALBUM_ARTIST = 'albumArtist',
+  ALBUM_ARTIST = 'order_album_artist_name, album, disc_number, track_number, title',
   ALBUM_SONGS = 'album, discNumber, trackNumber',
   ARTIST = 'artist',
   BPM = 'bpm',
@@ -246,7 +246,7 @@ export enum NDSongListSort {
   RECENTLY_ADDED = 'createdAt',
   TITLE = 'title',
   TRACK = 'track',
-  YEAR = 'year',
+  YEAR = 'year, album, discNumber, trackNumber',
 }
 
 export type NDSongListParams = {

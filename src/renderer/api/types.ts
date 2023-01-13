@@ -461,6 +461,7 @@ export type SongListQuery = {
   albumIds?: string[];
   artistIds?: string[];
   jfParams?: {
+    artistIds?: string;
     filters?: string;
     genreIds?: string;
     genres?: string;
