@@ -37,8 +37,6 @@ export const AlbumArtistDetailHeader = forwardRef(
       },
     ];
 
-    console.log('detailQuery?.data', detailQuery?.data);
-
     return (
       <Stack ref={cq.ref}>
         <LibraryHeader

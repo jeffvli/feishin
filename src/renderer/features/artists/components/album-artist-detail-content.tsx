@@ -279,9 +279,30 @@ export const AlbumArtistDetailContent = () => {
                 <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
               </DropdownMenu.Dropdown>
             </DropdownMenu>
+            <Button
+              compact
+              uppercase
+              component={Link}
+              to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY, {
+                albumArtistId,
+              })}
+              variant="subtle"
+            >
+              View discography
+            </Button>
+            <Button
+              compact
+              uppercase
+              component={Link}
+              to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS, { albumArtistId })}
+              variant="subtle"
+            >
+              View all songs
+            </Button>
           </Group>
         </Group>
       </Box>
+
       {showGenres && (
         <Box component="section">
           <Group>
