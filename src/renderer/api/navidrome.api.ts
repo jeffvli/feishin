@@ -78,6 +78,7 @@ import { toast } from '/@/renderer/components/toast';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import { parseSearchParams } from '/@/renderer/utils';
+import { subsonicApi } from '/@/renderer/api/subsonic.api';
 
 const api = ky.create({
   hooks: {
@@ -183,6 +184,15 @@ const getGenreList = async (args: GenreListArgs): Promise<NDGenreList> => {
 const getAlbumArtistDetail = async (args: AlbumArtistDetailArgs): Promise<NDAlbumArtistDetail> => {
   const { query, server, signal } = args;
 
+  const artistInfo = await subsonicApi.getArtistInfo({
+    query: {
+      artistId: query.id,
+      limit: 15,
+    },
+    server,
+    signal,
+  });
+
   const data = await api
     .get(`api/artist/${query.id}`, {
       headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
@@ -191,7 +201,7 @@ const getAlbumArtistDetail = async (args: AlbumArtistDetailArgs): Promise<NDAlbu
     })
     .json<NDAlbumArtistDetailResponse>();
 
-  return { ...data };
+  return { ...data, similarArtists: artistInfo.similarArtist };
 };
 
 const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<NDAlbumArtistList> => {
@@ -510,10 +520,10 @@ const normalizeSong = (
 
   return {
     album: item.album,
-    albumArtists: [{ id: item.artistId, name: item.artist }],
+    albumArtists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
     albumId: item.albumId,
     artistName: item.artist,
-    artists: [{ id: item.artistId, name: item.artist }],
+    artists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
     bitRate: item.bitRate,
     bpm: item.bpm ? item.bpm : null,
     channels: item.channels ? item.channels : null,
@@ -559,8 +569,8 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
   const imageBackdropUrl = imageUrl?.replace(/size=\d+/, 'size=1000') || null;
 
   return {
-    albumArtists: [{ id: item.albumArtistId, name: item.albumArtist }],
-    artists: [{ id: item.artistId, name: item.artist }],
+    albumArtists: [{ id: item.albumArtistId, imageUrl: null, name: item.albumArtist }],
+    artists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
     backdropImageUrl: imageBackdropUrl,
     createdAt: item.createdAt.split('T')[0],
     duration: item.duration * 1000 || null,
@@ -602,6 +612,12 @@ const normalizeAlbumArtist = (item: NDAlbumArtist, server: ServerListItem): Albu
     playCount: item.playCount,
     serverId: server.id,
     serverType: ServerType.NAVIDROME,
+    similarArtists:
+      item.similarArtists?.map((artist) => ({
+        id: artist.id,
+        imageUrl: artist?.artistImageUrl || null,
+        name: artist.name,
+      })) || null,
     songCount: item.songCount,
     userFavorite: item.starred,
     userRating: item.rating,

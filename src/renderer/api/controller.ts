@@ -37,6 +37,8 @@ import type {
   UserListArgs,
   RawUserListResponse,
   FavoriteArgs,
+  TopSongListArgs,
+  RawTopSongListResponse,
 } from '/@/renderer/api/types';
 import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
@@ -52,6 +54,7 @@ export type ControllerEndpoint = Partial<{
   getAlbumDetail: (args: AlbumDetailArgs) => Promise<RawAlbumDetailResponse>;
   getAlbumList: (args: AlbumListArgs) => Promise<RawAlbumListResponse>;
   getArtistDetail: () => void;
+  getArtistInfo: (args: any) => void;
   getArtistList: (args: ArtistListArgs) => Promise<RawArtistListResponse>;
   getFavoritesList: () => void;
   getFolderItemList: () => void;
@@ -64,6 +67,7 @@ export type ControllerEndpoint = Partial<{
   getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<RawSongListResponse>;
   getSongDetail: (args: SongDetailArgs) => Promise<RawSongDetailResponse>;
   getSongList: (args: SongListArgs) => Promise<RawSongListResponse>;
+  getTopSongs: (args: TopSongListArgs) => Promise<RawTopSongListResponse>;
   getUserList: (args: UserListArgs) => Promise<RawUserListResponse>;
   updatePlaylist: (args: UpdatePlaylistArgs) => Promise<RawUpdatePlaylistResponse>;
   updateRating: (args: RatingArgs) => Promise<RawRatingResponse>;
@@ -87,6 +91,7 @@ const endpoints: ApiController = {
     getAlbumDetail: jellyfinApi.getAlbumDetail,
     getAlbumList: jellyfinApi.getAlbumList,
     getArtistDetail: undefined,
+    getArtistInfo: undefined,
     getArtistList: jellyfinApi.getArtistList,
     getFavoritesList: undefined,
     getFolderItemList: undefined,
@@ -99,6 +104,7 @@ const endpoints: ApiController = {
     getPlaylistSongList: jellyfinApi.getPlaylistSongList,
     getSongDetail: undefined,
     getSongList: jellyfinApi.getSongList,
+    getTopSongs: undefined,
     getUserList: undefined,
     updatePlaylist: jellyfinApi.updatePlaylist,
     updateRating: undefined,
@@ -114,6 +120,7 @@ const endpoints: ApiController = {
     getAlbumDetail: navidromeApi.getAlbumDetail,
     getAlbumList: navidromeApi.getAlbumList,
     getArtistDetail: undefined,
+    getArtistInfo: undefined,
     getArtistList: undefined,
     getFavoritesList: undefined,
     getFolderItemList: undefined,
@@ -126,6 +133,7 @@ const endpoints: ApiController = {
     getPlaylistSongList: navidromeApi.getPlaylistSongList,
     getSongDetail: navidromeApi.getSongDetail,
     getSongList: navidromeApi.getSongList,
+    getTopSongs: subsonicApi.getTopSongList,
     getUserList: navidromeApi.getUserList,
     updatePlaylist: navidromeApi.updatePlaylist,
     updateRating: subsonicApi.updateRating,
@@ -141,6 +149,7 @@ const endpoints: ApiController = {
     getAlbumDetail: subsonicApi.getAlbumDetail,
     getAlbumList: subsonicApi.getAlbumList,
     getArtistDetail: undefined,
+    getArtistInfo: undefined,
     getArtistList: undefined,
     getFavoritesList: undefined,
     getFolderItemList: undefined,
@@ -152,6 +161,7 @@ const endpoints: ApiController = {
     getPlaylistList: undefined,
     getSongDetail: undefined,
     getSongList: undefined,
+    getTopSongs: subsonicApi.getTopSongList,
     getUserList: undefined,
     updatePlaylist: undefined,
     updateRating: undefined,
@@ -255,6 +265,10 @@ const updateRating = async (args: RatingArgs) => {
   return (apiController('updateRating') as ControllerEndpoint['updateRating'])?.(args);
 };
 
+const getTopSongList = async (args: TopSongListArgs) => {
+  return (apiController('getTopSongs') as ControllerEndpoint['getTopSongs'])?.(args);
+};
+
 export const controller = {
   createFavorite,
   createPlaylist,
@@ -271,6 +285,7 @@ export const controller = {
   getPlaylistList,
   getPlaylistSongList,
   getSongList,
+  getTopSongList,
   getUserList,
   updatePlaylist,
   updateRating,

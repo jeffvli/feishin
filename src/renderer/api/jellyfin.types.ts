@@ -173,6 +173,10 @@ export type JFAlbumArtist = {
     PlaybackPositionTicks: number;
     Played: boolean;
   };
+} & {
+  similarArtists: {
+    items: JFAlbumArtist[];
+  };
 };
 
 export type JFArtist = {

@@ -43,6 +43,7 @@ import {
   SSAlbumArtistDetail,
   SSMusicFolderList,
   SSGenreList,
+  SSTopSongList,
 } from '/@/renderer/api/subsonic.types';
 
 export enum LibraryItem {
@@ -231,6 +232,7 @@ export type AlbumArtist = {
   playCount: number | null;
   serverId: string;
   serverType: ServerType;
+  similarArtists: RelatedArtist[] | null;
   songCount: number | null;
   userFavorite: boolean;
   userRating: number | null;
@@ -256,6 +258,7 @@ export type Artist = {
 
 export type RelatedArtist = {
   id: string;
+  imageUrl: string | null;
   name: string;
 };
 
@@ -959,3 +962,24 @@ export const userListSortMap: UserListSortMap = {
     name: undefined,
   },
 };
+
+// Top Songs List
+export type RawTopSongListResponse = SSTopSongList | undefined;
+
+export type TopSongListResponse = BasePaginatedResponse<Song[]>;
+
+export type TopSongListQuery = {
+  artist: string;
+  limit?: number;
+};
+
+export type TopSongListArgs = { query: TopSongListQuery } & BaseEndpointArgs;
+
+// Artist Info
+export type ArtistInfoQuery = {
+  artistId: string;
+  limit: number;
+  musicFolderId?: string;
+};
+
+export type ArtistInfoArgs = { query: ArtistInfoQuery } & BaseEndpointArgs;

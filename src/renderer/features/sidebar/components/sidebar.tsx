@@ -234,9 +234,9 @@ export const Sidebar = () => {
                         Tracks
                       </Group>
                     </SidebarItem>
-                    <SidebarItem to={AppRoute.LIBRARY_ALBUMARTISTS}>
+                    <SidebarItem to={AppRoute.LIBRARY_ALBUM_ARTISTS}>
                       <Group>
-                        {location.pathname === AppRoute.LIBRARY_ALBUMARTISTS ? (
+                        {location.pathname === AppRoute.LIBRARY_ALBUM_ARTISTS ? (
                           <RiUserVoiceFill size="1.1em" />
                         ) : (
                           <RiUserVoiceLine size="1.1em" />

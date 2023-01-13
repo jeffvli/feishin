@@ -1,3 +1,5 @@
+import { SSArtistInfo } from '/@/renderer/api/subsonic.types';
+
 export type NDAuthenticate = {
   id: string;
   isAdmin: boolean;
@@ -126,6 +128,8 @@ export type NDAlbumArtist = {
   songCount: number;
   starred: boolean;
   starredAt: string;
+} & {
+  similarArtists?: SSArtistInfo['similarArtist'];
 };
 
 export type NDAuthenticationResponse = NDAuthenticate;

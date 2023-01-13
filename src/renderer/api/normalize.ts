@@ -16,7 +16,8 @@ import type {
   NDSong,
   NDUser,
 } from '/@/renderer/api/navidrome.types';
-import { SSGenreList, SSMusicFolderList } from '/@/renderer/api/subsonic.types';
+import { ssNormalize } from '/@/renderer/api/subsonic.api';
+import { SSGenreList, SSMusicFolderList, SSSong } from '/@/renderer/api/subsonic.types';
 import type {
   Album,
   AlbumArtist,
@@ -29,6 +30,7 @@ import type {
   RawPlaylistDetailResponse,
   RawPlaylistListResponse,
   RawSongListResponse,
+  RawTopSongListResponse,
   RawUserListResponse,
 } from '/@/renderer/api/types';
 import { ServerListItem } from '/@/renderer/types';
@@ -89,6 +91,25 @@ const songList = (data: RawSongListResponse | undefined, server: ServerListItem 
     items: songs,
     startIndex: data?.startIndex,
     totalRecordCount: data?.totalRecordCount,
+  };
+};
+
+const topSongList = (data: RawTopSongListResponse | undefined, server: ServerListItem | null) => {
+  let songs;
+
+  switch (server?.type) {
+    case 'jellyfin':
+      break;
+    case 'navidrome':
+      songs = data?.items?.map((item) => ssNormalize.song(item as SSSong, server, ''));
+      break;
+    case 'subsonic':
+      songs = data?.items?.map((item) => ssNormalize.song(item as SSSong, server, ''));
+      break;
+  }
+
+  return {
+    items: songs,
   };
 };
 
@@ -265,5 +286,6 @@ export const normalize = {
   playlistDetail,
   playlistList,
   songList,
+  topSongList,
   userList,
 };

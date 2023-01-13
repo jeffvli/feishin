@@ -140,7 +140,7 @@ const getAlbumArtistDetail = async (args: AlbumArtistDetailArgs): Promise<JFAlbu
   const { query, server, signal } = args;
 
   const searchParams = {
-    fields: 'Genres',
+    fields: 'Genres, Overview',
   };
 
   const data = await api
@@ -152,7 +152,16 @@ const getAlbumArtistDetail = async (args: AlbumArtistDetailArgs): Promise<JFAlbu
     })
     .json<JFAlbumArtistDetailResponse>();
 
-  return data;
+  const similarArtists = await api
+    .get(`artists/${query.id}/similar`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      prefixUrl: server?.url,
+      searchParams: parseSearchParams({ limit: 10 }),
+      signal,
+    })
+    .json<JFAlbumArtistListResponse>();
+
+  return { ...data, similarArtists: { items: similarArtists.Items } };
 };
 
 // const getAlbumArtistAlbums = () => {
@@ -642,10 +651,14 @@ const normalizeSong = (
 ): Song => {
   return {
     album: item.Album,
-    albumArtists: item.AlbumArtists?.map((entry) => ({ id: entry.Id, name: entry.Name })),
+    albumArtists: item.AlbumArtists?.map((entry) => ({
+      id: entry.Id,
+      imageUrl: null,
+      name: entry.Name,
+    })),
     albumId: item.AlbumId,
     artistName: item.ArtistItems[0]?.Name,
-    artists: item.ArtistItems.map((entry) => ({ id: entry.Id, name: entry.Name })),
+    artists: item.ArtistItems.map((entry) => ({ id: entry.Id, imageUrl: null, name: entry.Name })),
     bitRate: item.MediaSources && Number(Math.trunc(item.MediaSources[0]?.Bitrate / 1000)),
     bpm: null,
     channels: null,
@@ -691,9 +704,10 @@ const normalizeAlbum = (item: JFAlbum, server: ServerListItem, imageSize?: numbe
     albumArtists:
       item.AlbumArtists.map((entry) => ({
         id: entry.Id,
+        imageUrl: null,
         name: entry.Name,
       })) || [],
-    artists: item.ArtistItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
+    artists: item.ArtistItems?.map((entry) => ({ id: entry.Id, imageUrl: null, name: entry.Name })),
     backdropImageUrl: null,
     createdAt: item.DateCreated,
     duration: item.RunTimeTicks / 10000,
@@ -747,6 +761,17 @@ const normalizeAlbumArtist = (
     playCount: item.UserData.PlayCount,
     serverId: server.id,
     serverType: ServerType.JELLYFIN,
+    similarArtists: item.similarArtists?.items
+      ?.filter((entry) => entry.Name !== 'Various Artists')
+      .map((entry) => ({
+        id: entry.Id,
+        imageUrl: getAlbumArtistCoverArtUrl({
+          baseUrl: server.url,
+          item: entry,
+          size: imageSize || 300,
+        }),
+        name: entry.Name,
+      })),
     songCount: null,
     userFavorite: item.UserData.IsFavorite || false,
     userRating: null,

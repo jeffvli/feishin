@@ -9,6 +9,7 @@ import type {
   PlaylistSongListQuery,
   UserListQuery,
   AlbumArtistDetailQuery,
+  TopSongListQuery,
 } from './types';
 
 export const queryKeys = {
@@ -22,6 +23,10 @@ export const queryKeys = {
       return [serverId, 'albumArtists', 'list'] as const;
     },
     root: (serverId: string) => [serverId, 'albumArtists'] as const,
+    topSongs: (serverId: string, query?: TopSongListQuery) => {
+      if (query) return [serverId, 'albumArtists', 'topSongs', query] as const;
+      return [serverId, 'albumArtists', 'topSongs'] as const;
+    },
   },
   albums: {
     detail: (serverId: string, query?: AlbumDetailQuery) =>

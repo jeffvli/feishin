@@ -19,12 +19,20 @@ import type {
   SSRatingParams,
   SSAlbumArtistDetailParams,
   SSAlbumArtistListParams,
+  SSTopSongListParams,
+  SSTopSongListResponse,
+  SSArtistInfoParams,
+  SSArtistInfoResponse,
+  SSArtistInfo,
+  SSSong,
+  SSTopSongList,
 } from '/@/renderer/api/subsonic.types';
 import {
   AlbumArtistDetailArgs,
   AlbumArtistListArgs,
   AlbumDetailArgs,
   AlbumListArgs,
+  ArtistInfoArgs,
   AuthenticationResponse,
   FavoriteArgs,
   FavoriteResponse,
@@ -34,8 +42,12 @@ import {
   RatingArgs,
   RatingResponse,
   ServerListItem,
+  ServerType,
+  Song,
+  TopSongListArgs,
 } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components/toast';
+import { nanoid } from 'nanoid/non-secure';
 
 const getCoverArtUrl = (args: {
   baseUrl: string;
@@ -50,7 +62,7 @@ const getCoverArtUrl = (args: {
   }
 
   return (
-    `${args.baseUrl}/getCoverArt.view` +
+    `${args.baseUrl}/rest/getCoverArt.view` +
     `?id=${args.coverArtId}` +
     `&${args.credential}` +
     '&v=1.13.0' +
@@ -65,10 +77,13 @@ const api = ky.create({
       async (_request, _options, response) => {
         const data = await response.json();
         if (data['subsonic-response'].status !== 'ok') {
-          toast.error({
-            message: data['subsonic-response'].error.message,
-            title: 'Issue from Subsonic API',
-          });
+          // Suppress code related to non-linked lastfm or spotify from Navidrome
+          if (data['subsonic-response'].error.code !== 0) {
+            toast.error({
+              message: data['subsonic-response'].error.message,
+              title: 'Issue from Subsonic API',
+            });
+          }
         }
 
         return new Response(JSON.stringify(data['subsonic-response']), { status: 200 });
@@ -325,6 +340,118 @@ const updateRating = async (args: RatingArgs): Promise<RatingResponse> => {
   };
 };
 
+const getTopSongList = async (args: TopSongListArgs): Promise<SSTopSongList> => {
+  const { signal, server, query } = args;
+  const defaultParams = getDefaultParams(server);
+
+  const searchParams: SSTopSongListParams = {
+    artist: query.artist,
+    count: query.limit,
+    ...defaultParams,
+  };
+
+  const data = await api
+    .get('rest/getTopSongs.view', {
+      prefixUrl: server?.url,
+      searchParams: parseSearchParams(searchParams),
+      signal,
+    })
+    .json<SSTopSongListResponse>();
+
+  return {
+    items: data?.topSongs?.song,
+    startIndex: 0,
+    totalRecordCount: data?.topSongs?.song?.length || 0,
+  };
+};
+
+const getArtistInfo = async (args: ArtistInfoArgs): Promise<SSArtistInfo> => {
+  const { signal, server, query } = args;
+  const defaultParams = getDefaultParams(server);
+
+  const searchParams: SSArtistInfoParams = {
+    count: query.limit,
+    id: query.artistId,
+    ...defaultParams,
+  };
+
+  const data = await api
+    .get('rest/getArtistInfo2.view', {
+      prefixUrl: server?.url,
+      searchParams,
+      signal,
+    })
+    .json<SSArtistInfoResponse>();
+
+  return data.artistInfo2;
+};
+
+const normalizeSong = (item: SSSong, server: ServerListItem, deviceId: string): Song => {
+  const imageUrl =
+    getCoverArtUrl({
+      baseUrl: server.url,
+      coverArtId: item.coverArt,
+      credential: server.credential,
+      size: 300,
+    }) || null;
+
+  const streamUrl = `${server.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=feishin_${deviceId}&${server.credential}`;
+
+  return {
+    album: item.album,
+    albumArtists: [
+      {
+        id: item.artistId || '',
+        imageUrl: null,
+        name: item.artist,
+      },
+    ],
+    albumId: item.albumId,
+    artistName: item.artist,
+    artists: [
+      {
+        id: item.artistId || '',
+        imageUrl: null,
+        name: item.artist,
+      },
+    ],
+    bitRate: item.bitRate,
+    bpm: null,
+    channels: null,
+    comment: null,
+    compilation: null,
+    container: item.contentType,
+    createdAt: item.created,
+    discNumber: item.discNumber || 1,
+    duration: item.duration,
+    genres: [
+      {
+        id: item.genre,
+        name: item.genre,
+      },
+    ],
+    id: item.id,
+    imagePlaceholderUrl: null,
+    imageUrl,
+    itemType: LibraryItem.SONG,
+    lastPlayedAt: null,
+    name: item.title,
+    path: item.path,
+    playCount: item?.playCount || 0,
+    releaseDate: null,
+    releaseYear: item.year ? String(item.year) : null,
+    serverId: server.id,
+    serverType: ServerType.SUBSONIC,
+    size: item.size,
+    streamUrl,
+    trackNumber: item.track,
+    uniqueId: nanoid(),
+    updatedAt: '',
+    userFavorite: item.starred || false,
+    userRating: item.userRating || null,
+  };
+};
+
 export const subsonicApi = {
   authenticate,
   createFavorite,
@@ -333,8 +460,14 @@ export const subsonicApi = {
   getAlbumArtistList,
   getAlbumDetail,
   getAlbumList,
+  getArtistInfo,
   getCoverArtUrl,
   getGenreList,
   getMusicFolderList,
+  getTopSongList,
   updateRating,
+};
+
+export const ssNormalize = {
+  song: normalizeSong,
 };

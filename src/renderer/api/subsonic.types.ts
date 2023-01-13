@@ -65,6 +65,12 @@ export type SSAlbumDetailResponse = {
   album: SSAlbum;
 };
 
+export type SSArtistInfoParams = {
+  count?: number;
+  id: string;
+  includeNotPresent?: boolean;
+};
+
 export type SSArtistInfoResponse = {
   artistInfo2: SSArtistInfo;
 };
@@ -75,6 +81,13 @@ export type SSArtistInfo = {
   lastFmUrl?: string;
   mediumImageUrl?: string;
   musicBrainzId?: string;
+  similarArtist?: {
+    albumCount: string;
+    artistImageUrl?: string;
+    coverArt?: string;
+    id: string;
+    name: string;
+  }[];
   smallImageUrl?: string;
 };
 
@@ -186,3 +199,20 @@ export type SSRatingParams = {
 export type SSRating = null;
 
 export type SSRatingResponse = null;
+
+export type SSTopSongListParams = {
+  artist: string;
+  count?: number;
+};
+
+export type SSTopSongListResponse = {
+  topSongs: {
+    song: SSSong[];
+  };
+};
+
+export type SSTopSongList = {
+  items: SSSong[];
+  startIndex: number;
+  totalRecordCount: number | null;
+};
