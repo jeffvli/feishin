@@ -13,9 +13,10 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
-import { useParams } from 'react-router';
+import { generatePath, useParams } from 'react-router';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
 import { useSongListStore } from '/@/renderer/store';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -177,58 +178,85 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     }
   };
 
+  const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
+
   const { intersectRef, tableContainerRef } = useFixedTableHeader();
 
   return (
     <ContentContainer>
-      <Group
-        ref={intersectRef}
-        className="test"
-        pb="2rem"
-        pt="1rem"
-        spacing="lg"
-      >
-        <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-        <Group spacing="xs">
-          <Button
-            compact
-            loading={createFavoriteMutation.isLoading || deleteFavoriteMutation.isLoading}
-            variant="subtle"
-            onClick={handleFavorite}
-          >
-            {detailQuery?.data?.userFavorite ? (
-              <RiHeartFill
-                color="red"
-                size={20}
-              />
-            ) : (
-              <RiHeartLine size={20} />
-            )}
-          </Button>
-          <DropdownMenu position="bottom-start">
-            <DropdownMenu.Target>
-              <Button
-                compact
-                variant="subtle"
-              >
-                <RiMoreFill size={20} />
-              </Button>
-            </DropdownMenu.Target>
-            <DropdownMenu.Dropdown>
-              {PLAY_TYPES.filter((type) => type.play !== playButtonBehavior).map((type) => (
-                <DropdownMenu.Item
-                  key={`playtype-${type.play}`}
-                  onClick={() => handlePlay(type.play)}
+      <Box component="section">
+        <Group
+          ref={showGenres ? null : intersectRef}
+          className="test"
+          pb="2rem"
+          pt="1rem"
+          spacing="lg"
+        >
+          <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+          <Group spacing="xs">
+            <Button
+              compact
+              loading={createFavoriteMutation.isLoading || deleteFavoriteMutation.isLoading}
+              variant="subtle"
+              onClick={handleFavorite}
+            >
+              {detailQuery?.data?.userFavorite ? (
+                <RiHeartFill
+                  color="red"
+                  size={20}
+                />
+              ) : (
+                <RiHeartLine size={20} />
+              )}
+            </Button>
+            <DropdownMenu position="bottom-start">
+              <DropdownMenu.Target>
+                <Button
+                  compact
+                  variant="subtle"
                 >
-                  {type.label}
-                </DropdownMenu.Item>
-              ))}
-              <DropdownMenu.Divider />
-              <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
-            </DropdownMenu.Dropdown>
-          </DropdownMenu>
+                  <RiMoreFill size={20} />
+                </Button>
+              </DropdownMenu.Target>
+              <DropdownMenu.Dropdown>
+                {PLAY_TYPES.filter((type) => type.play !== playButtonBehavior).map((type) => (
+                  <DropdownMenu.Item
+                    key={`playtype-${type.play}`}
+                    onClick={() => handlePlay(type.play)}
+                  >
+                    {type.label}
+                  </DropdownMenu.Item>
+                ))}
+                <DropdownMenu.Divider />
+                <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
+              </DropdownMenu.Dropdown>
+            </DropdownMenu>
+          </Group>
         </Group>
-      </Group>
+      </Box>
+      {showGenres && (
+        <Box
+          ref={showGenres ? intersectRef : null}
+          component="section"
+          py="1rem"
+        >
+          <Group>
+            {detailQuery?.data?.genres?.map((genre) => (
+              <Button
+                key={`genre-${genre.id}`}
+                compact
+                component={Link}
+                radius="md"
+                size="sm"
+                to={generatePath(`${AppRoute.LIBRARY_ALBUMS}?genre=${genre.id}`, { albumId })}
+                variant="default"
+              >
+                {genre.name}
+              </Button>
+            ))}
+          </Group>
+        </Box>
+      )}
       <Box ref={tableContainerRef}>
         <VirtualTable
           ref={tableRef}
