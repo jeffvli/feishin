@@ -3,7 +3,7 @@ import {
   Route,
   createRoutesFromElements,
   RouterProvider,
-  createHashRouter,
+  createBrowserRouter,
 } from 'react-router-dom';
 import { AppRoute } from './routes';
 import { DefaultLayout } from '/@/renderer/layouts';
@@ -52,6 +52,10 @@ const AlbumArtistDetailSongListRoute = lazy(
   () => import('../features/artists/routes/album-artist-detail-song-list-route'),
 );
 
+const AlbumArtistDetailTopSongsListRoute = lazy(
+  () => import('../features/artists/routes/album-artist-detail-top-songs-list-route'),
+);
+
 const AlbumArtistDetailDiscographyRoute = lazy(
   () => import('../features/artists/routes/album-artist-detail-discography-route'),
 );
@@ -65,7 +69,7 @@ const RouteErrorBoundary = lazy(
 );
 
 export const AppRouter = () => {
-  const router = createHashRouter(
+  const router = createBrowserRouter(
     createRoutesFromElements(
       <>
         <Route element={<TitlebarOutlet />}>
@@ -139,6 +143,10 @@ export const AppRouter = () => {
                   <Route
                     element={<AlbumArtistDetailSongListRoute />}
                     path={AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS}
+                  />
+                  <Route
+                    element={<AlbumArtistDetailTopSongsListRoute />}
+                    path={AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS}
                   />
                 </Route>
               </Route>
