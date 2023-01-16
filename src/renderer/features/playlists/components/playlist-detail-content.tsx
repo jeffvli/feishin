@@ -230,6 +230,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
           </DropdownMenu>
           <Button
             compact
+            uppercase
             component={Link}
             to={generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId })}
             variant="subtle"
