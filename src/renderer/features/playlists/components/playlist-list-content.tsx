@@ -185,13 +185,8 @@ export const PlaylistListContent = ({ tableRef }: PlaylistListContentProps) => {
           key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
           ref={tableRef}
           alwaysShowHorizontalScroll
-          animateRows
-          maintainColumnOrder
-          suppressCopyRowsToClipboard
-          suppressMoveWhenRowDragging
-          suppressPaginationPanel
           suppressRowDrag
-          suppressScrollOnNewData
+          autoFitColumns={page.table.autoFit}
           blockLoadDebounceMillis={200}
           cacheBlockSize={200}
           cacheOverflowSize={1}

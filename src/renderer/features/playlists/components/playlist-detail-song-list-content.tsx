@@ -197,6 +197,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
         key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
         ref={tableRef}
         alwaysShowHorizontalScroll
+        autoFitColumns={page.table.autoFit}
         columnDefs={columnDefs}
         getRowId={(data) => data.data.uniqueId}
         infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 1}

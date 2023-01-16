@@ -57,14 +57,6 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
     [page.table.columns],
   );
 
-  const defaultColumnDefs: ColDef = useMemo(() => {
-    return {
-      lockPinned: true,
-      lockVisible: true,
-      resizable: true,
-    };
-  }, []);
-
   const onGridReady = useCallback(
     (params: GridReadyEvent) => {
       const dataSource: IDatasource = {
@@ -180,18 +172,12 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
           key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
           ref={tableRef}
           alwaysShowHorizontalScroll
-          animateRows
-          maintainColumnOrder
-          suppressCopyRowsToClipboard
-          suppressMoveWhenRowDragging
-          suppressPaginationPanel
           suppressRowDrag
-          suppressScrollOnNewData
+          autoFitColumns={page.table.autoFit}
           blockLoadDebounceMillis={200}
           cacheBlockSize={500}
           cacheOverflowSize={1}
           columnDefs={columnDefs}
-          defaultColDef={defaultColumnDefs}
           enableCellChangeFlash={false}
           getRowId={(data) => data.data.id}
           infiniteInitialRowCount={itemCount || 100}
