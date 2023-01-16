@@ -1,9 +1,11 @@
+import isElectron from 'is-electron';
 import { lazy, Suspense } from 'react';
 import {
   Route,
   createRoutesFromElements,
   RouterProvider,
   createBrowserRouter,
+  createHashRouter,
 } from 'react-router-dom';
 import { AppRoute } from './routes';
 import { DefaultLayout } from '/@/renderer/layouts';
@@ -68,8 +70,10 @@ const RouteErrorBoundary = lazy(
   () => import('/@/renderer/features/action-required/components/route-error-boundary'),
 );
 
+const dynamicRouter = isElectron() ? createHashRouter : createBrowserRouter;
+
 export const AppRouter = () => {
-  const router = createBrowserRouter(
+  const router = dynamicRouter(
     createRoutesFromElements(
       <>
         <Route element={<TitlebarOutlet />}>
