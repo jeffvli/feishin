@@ -73,12 +73,32 @@ export const AlbumArtistDetailContent = () => {
     artistName: detailQuery?.data?.name || '',
   })}`;
 
+  const artistSongsLink = `${generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS, {
+    albumArtistId,
+  })}?${createSearchParams({
+    artistId: albumArtistId,
+    artistName: detailQuery?.data?.name || '',
+  })}`;
+
   const recentAlbumsQuery = useAlbumList({
     jfParams: server?.type === ServerType.JELLYFIN ? { artistIds: albumArtistId } : undefined,
     limit: itemsPerPage,
     ndParams:
       server?.type === ServerType.NAVIDROME
         ? { artist_id: albumArtistId, compilation: false }
+        : undefined,
+    sortBy: AlbumListSort.RELEASE_DATE,
+    sortOrder: SortOrder.DESC,
+    startIndex: 0,
+  });
+
+  const compilationAlbumsQuery = useAlbumList({
+    jfParams:
+      server?.type === ServerType.JELLYFIN ? { contributingArtistIds: albumArtistId } : undefined,
+    limit: itemsPerPage,
+    ndParams:
+      server?.type === ServerType.NAVIDROME
+        ? { artist_id: albumArtistId, compilation: true }
         : undefined,
     sortBy: AlbumListSort.RELEASE_DATE,
     sortOrder: SortOrder.DESC,
@@ -136,6 +156,7 @@ export const AlbumArtistDetailContent = () => {
   const carousels = [
     {
       data: recentAlbumsQuery?.data?.items,
+      isHidden: !recentAlbumsQuery?.data?.items?.length,
       itemType: LibraryItem.ALBUM,
       loading: recentAlbumsQuery?.isLoading || recentAlbumsQuery.isFetching,
       pagination: {
@@ -147,7 +168,7 @@ export const AlbumArtistDetailContent = () => {
             fw="bold"
             order={3}
           >
-            Recent albums
+            Recent releases
           </TextTitle>
           <Button
             compact
@@ -160,7 +181,25 @@ export const AlbumArtistDetailContent = () => {
           </Button>
         </>
       ),
-      uniqueId: 'recentAlbums',
+      uniqueId: 'recentReleases',
+    },
+    {
+      data: compilationAlbumsQuery?.data?.items,
+      isHidden: !compilationAlbumsQuery?.data?.items?.length,
+      itemType: LibraryItem.ALBUM,
+      loading: compilationAlbumsQuery?.isLoading || compilationAlbumsQuery.isFetching,
+      pagination: {
+        itemsPerPage,
+      },
+      title: (
+        <TextTitle
+          fw="bold"
+          order={3}
+        >
+          Appears on
+        </TextTitle>
+      ),
+      uniqueId: 'compilationAlbums',
     },
     {
       data: detailQuery?.data?.similarArtists?.slice(0, itemsPerPage),
@@ -232,12 +271,10 @@ export const AlbumArtistDetailContent = () => {
   const showBiography =
     detailQuery?.data?.biography !== undefined && detailQuery?.data?.biography !== null;
   const showTopSongs = server?.type !== ServerType.JELLYFIN && topSongsQuery?.data?.items?.length;
-  const showGenres = detailQuery?.data?.genres?.length !== 0;
+  const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
 
   const isLoading =
-    detailQuery?.isLoading ||
-    recentAlbumsQuery?.isLoading ||
-    (server?.type === ServerType.NAVIDROME && topSongsQuery?.isLoading);
+    detailQuery?.isLoading || (server?.type === ServerType.NAVIDROME && topSongsQuery?.isLoading);
 
   if (isLoading) return <ContentContainer ref={cq.ref} />;
 
@@ -297,7 +334,7 @@ export const AlbumArtistDetailContent = () => {
               compact
               uppercase
               component={Link}
-              to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS, { albumArtistId })}
+              to={artistSongsLink}
               variant="subtle"
             >
               View all songs

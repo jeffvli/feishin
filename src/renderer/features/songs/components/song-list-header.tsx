@@ -1,6 +1,7 @@
 import type { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
+import { openModal } from '@mantine/modals';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import {
@@ -89,11 +90,18 @@ const ORDER = [
 ];
 
 interface SongListHeaderProps {
+  customFilters?: Partial<SongListFilter>;
   itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
+  title?: string;
 }
 
-export const SongListHeader = ({ itemCount, tableRef }: SongListHeaderProps) => {
+export const SongListHeader = ({
+  customFilters,
+  title,
+  itemCount,
+  tableRef,
+}: SongListHeaderProps) => {
   const server = useCurrentServer();
   const page = useSongListStore();
   const setPage = useSetSongStore();
@@ -123,21 +131,20 @@ export const SongListHeader = ({ itemCount, tableRef }: SongListHeaderProps) => 
 
           const pageFilters = filters || page.filter;
 
-          const queryKey = queryKeys.songs.list(server?.id || '', {
+          const query: SongListQuery = {
             limit,
             startIndex,
             ...pageFilters,
-          });
+            ...customFilters,
+          };
+
+          const queryKey = queryKeys.songs.list(server?.id || '', query);
 
           const songsRes = await queryClient.fetchQuery(
             queryKey,
             async ({ signal }) =>
               api.controller.getSongList({
-                query: {
-                  limit,
-                  startIndex,
-                  ...pageFilters,
-                },
+                query,
                 server,
                 signal,
               }),
@@ -154,7 +161,7 @@ export const SongListHeader = ({ itemCount, tableRef }: SongListHeaderProps) => 
       tableRef.current?.api.ensureIndexVisible(0, 'top');
       setPagination({ currentPage: 0 });
     },
-    [page.filter, server, setPagination, tableRef],
+    [customFilters, page.filter, server, setPagination, tableRef],
   );
 
   const handleSetSortBy = useCallback(
@@ -273,6 +280,21 @@ export const SongListHeader = ({ itemCount, tableRef }: SongListHeaderProps) => 
     });
   };
 
+  const handleOpenFiltersModal = () => {
+    openModal({
+      children: (
+        <>
+          {server?.type === ServerType.NAVIDROME ? (
+            <NavidromeSongFilters handleFilterChange={handleFilterChange} />
+          ) : (
+            <JellyfinSongFilters handleFilterChange={handleFilterChange} />
+          )}
+        </>
+      ),
+      title: 'Song Filters',
+    });
+  };
+
   return (
     <PageHeader p="1rem">
       <Flex
@@ -297,9 +319,11 @@ export const SongListHeader = ({ itemCount, tableRef }: SongListHeaderProps) => 
                 <Group noWrap>
                   <TextTitle
                     fw="bold"
+                    maw="20vw"
                     order={3}
+                    overflow="hidden"
                   >
-                    Tracks
+                    {title || 'Tracks'}
                   </TextTitle>
                   <Badge
                     radius="xl"
@@ -428,24 +452,14 @@ export const SongListHeader = ({ itemCount, tableRef }: SongListHeaderProps) => 
               </DropdownMenu.Dropdown>
             </DropdownMenu>
           )}
-          <DropdownMenu position="bottom-start">
-            <DropdownMenu.Target>
-              <Button
-                compact
-                fw="600"
-                variant="subtle"
-              >
-                {cq.isMd ? 'Filters' : <RiFilter3Line size={15} />}
-              </Button>
-            </DropdownMenu.Target>
-            <DropdownMenu.Dropdown>
-              {server?.type === ServerType.NAVIDROME ? (
-                <NavidromeSongFilters handleFilterChange={handleFilterChange} />
-              ) : (
-                <JellyfinSongFilters handleFilterChange={handleFilterChange} />
-              )}
-            </DropdownMenu.Dropdown>
-          </DropdownMenu>
+          <Button
+            compact
+            fw="600"
+            variant="subtle"
+            onClick={handleOpenFiltersModal}
+          >
+            {cq.isMd ? 'Filters' : <RiFilter3Line size={15} />}
+          </Button>
           <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
               <Button

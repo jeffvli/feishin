@@ -19,6 +19,7 @@ import {
   VirtualTable,
 } from '/@/renderer/components';
 import {
+  SongListFilter,
   useCurrentServer,
   useSetSongTable,
   useSetSongTablePagination,
@@ -31,15 +32,16 @@ import debounce from 'lodash/debounce';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { LibraryItem, QueueSong } from '/@/renderer/api/types';
+import { LibraryItem, QueueSong, SongListQuery } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 interface SongListContentProps {
+  customFilters?: Partial<SongListFilter>;
   itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) => {
+export const SongListContent = ({ customFilters, itemCount, tableRef }: SongListContentProps) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
   const page = useSongListStore();
@@ -64,21 +66,20 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
           const limit = params.endRow - params.startRow;
           const startIndex = params.startRow;
 
-          const queryKey = queryKeys.songs.list(server?.id || '', {
+          const query: SongListQuery = {
             limit,
             startIndex,
             ...page.filter,
-          });
+            ...customFilters,
+          };
+
+          const queryKey = queryKeys.songs.list(server?.id || '', query);
 
           const songsRes = await queryClient.fetchQuery(
             queryKey,
             async ({ signal }) =>
               api.controller.getSongList({
-                query: {
-                  limit,
-                  startIndex,
-                  ...page.filter,
-                },
+                query,
                 server,
                 signal,
               }),
@@ -93,7 +94,7 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
       params.api.setDatasource(dataSource);
       params.api.ensureIndexVisible(page.table.scrollOffset, 'top');
     },
-    [page.filter, page.table.scrollOffset, queryClient, server],
+    [customFilters, page.filter, page.table.scrollOffset, queryClient, server],
   );
 
   const onPaginationChanged = useCallback(

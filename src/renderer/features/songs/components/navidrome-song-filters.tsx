@@ -59,29 +59,6 @@ export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFilter
 
   return (
     <Stack p="0.8rem">
-      <Group position="apart">
-        <Text>Year</Text>
-        <NumberInput
-          max={5000}
-          min={0}
-          value={filter.ndParams?.year}
-          width={50}
-          onChange={handleYearFilter}
-        />
-      </Group>
-      <Divider my="0.5rem" />
-      <Group position="apart">
-        <Text>Genre</Text>
-        <Select
-          clearable
-          searchable
-          data={genreList}
-          defaultValue={filter.ndParams?.genre_id}
-          width={150}
-          onChange={handleGenresFilter}
-        />
-      </Group>
-      <Divider my="0.5rem" />
       {toggleFilters.map((filter) => (
         <Group
           key={`nd-filter-${filter.label}`}
@@ -95,6 +72,26 @@ export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFilter
           />
         </Group>
       ))}
+      <Divider my="0.5rem" />
+      <Group grow>
+        <NumberInput
+          label="Year"
+          max={5000}
+          min={0}
+          value={filter.ndParams?.year}
+          width={50}
+          onChange={handleYearFilter}
+        />
+        <Select
+          clearable
+          searchable
+          data={genreList}
+          defaultValue={filter.ndParams?.genre_id}
+          label="Genre"
+          width={150}
+          onChange={handleGenresFilter}
+        />
+      </Group>
     </Stack>
   );
 };

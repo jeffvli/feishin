@@ -96,38 +96,34 @@ export const JellyfinSongFilters = ({ handleFilterChange }: JellyfinSongFiltersP
         </Group>
       ))}
       <Divider my="0.5rem" />
-      <Group position="apart">
-        <Text>Year range</Text>
-        <Group>
-          <NumberInput
-            required
-            max={2300}
-            min={1700}
-            value={filter.jfParams?.minYear}
-            width={60}
-            onChange={handleMinYearFilter}
-          />
-          <NumberInput
-            max={2300}
-            min={1700}
-            value={filter.jfParams?.maxYear}
-            width={60}
-            onChange={handleMaxYearFilter}
-          />
-        </Group>
+      <Group grow>
+        <NumberInput
+          required
+          label="From year"
+          max={2300}
+          min={1700}
+          value={filter.jfParams?.minYear}
+          onChange={handleMinYearFilter}
+        />
+        <NumberInput
+          label="To year"
+          max={2300}
+          min={1700}
+          value={filter.jfParams?.maxYear}
+          onChange={handleMaxYearFilter}
+        />
       </Group>
-      <Divider my="0.5rem" />
-      <Stack>
-        <Text>Genres</Text>
+      <Group grow>
         <MultiSelect
           clearable
           searchable
           data={genreList}
           defaultValue={selectedGenres}
+          label="Genres"
           width={250}
           onChange={handleGenresFilter}
         />
-      </Stack>
+      </Group>
     </Stack>
   );
 };
