@@ -598,6 +598,9 @@ const normalizeAlbum = (item: NDAlbum, server: ServerListItem, imageSize?: numbe
 };
 
 const normalizeAlbumArtist = (item: NDAlbumArtist, server: ServerListItem): AlbumArtist => {
+  const imageUrl =
+    item.largeImageUrl === '/app/artist-placeholder.webp' ? null : item.largeImageUrl;
+
   return {
     albumCount: item.albumCount,
     backgroundImageUrl: null,
@@ -605,7 +608,7 @@ const normalizeAlbumArtist = (item: NDAlbumArtist, server: ServerListItem): Albu
     duration: null,
     genres: item.genres,
     id: item.id,
-    imageUrl: item.largeImageUrl || null,
+    imageUrl: imageUrl || null,
     itemType: LibraryItem.ALBUM_ARTIST,
     lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
     name: item.name,
