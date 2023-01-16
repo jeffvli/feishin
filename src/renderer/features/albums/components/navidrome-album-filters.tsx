@@ -1,15 +1,22 @@
-import { ChangeEvent, useMemo } from 'react';
+import { ChangeEvent, useMemo, useState } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
-import { NumberInput, Switch, Text, Select } from '/@/renderer/components';
+import { NumberInput, Switch, Text, Select, SpinnerIcon } from '/@/renderer/components';
 import { AlbumListFilter, useAlbumListStore, useSetAlbumFilters } from '/@/renderer/store';
+import { useDebouncedValue } from '@mantine/hooks';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
+import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
+import { AlbumArtistListSort, SortOrder } from '/@/renderer/api/types';
 
 interface NavidromeAlbumFiltersProps {
+  disableArtistFilter?: boolean;
   handleFilterChange: (filters: AlbumListFilter) => void;
 }
 
-export const NavidromeAlbumFilters = ({ handleFilterChange }: NavidromeAlbumFiltersProps) => {
+export const NavidromeAlbumFilters = ({
+  handleFilterChange,
+  disableArtistFilter,
+}: NavidromeAlbumFiltersProps) => {
   const { filter } = useAlbumListStore();
   const setFilters = useSetAlbumFilters();
 
@@ -89,35 +96,33 @@ export const NavidromeAlbumFilters = ({ handleFilterChange }: NavidromeAlbumFilt
     handleFilterChange(updatedFilters);
   }, 500);
 
+  const [albumArtistSearchTerm, setAlbumArtistSearchTerm] = useState<string>('');
+  const [debouncedSearchTerm] = useDebouncedValue(albumArtistSearchTerm, 200);
+
+  const albumArtistListQuery = useAlbumArtistList(
+    {
+      limit: 300,
+      searchTerm: debouncedSearchTerm,
+      sortBy: AlbumArtistListSort.NAME,
+      sortOrder: SortOrder.ASC,
+      startIndex: 0,
+    },
+    {
+      enabled: debouncedSearchTerm ? debouncedSearchTerm !== '' : false,
+    },
+  );
+
+  const selectableAlbumArtists = useMemo(() => {
+    if (!albumArtistListQuery?.data?.items) return [];
+
+    return albumArtistListQuery?.data?.items?.map((artist) => ({
+      label: artist.name,
+      value: artist.id,
+    }));
+  }, [albumArtistListQuery?.data?.items]);
+
   return (
     <Stack p="0.8rem">
-      <Group position="apart">
-        <Text>Year</Text>
-        <NumberInput
-          hideControls={false}
-          max={5000}
-          min={0}
-          value={filter.ndParams?.year}
-          width={80}
-          onChange={handleYearFilter}
-        />
-      </Group>
-      <Divider my="0.5rem" />
-      <Group
-        position="apart"
-        spacing={20}
-      >
-        <Text>Genre</Text>
-        <Select
-          clearable
-          searchable
-          data={genreList}
-          defaultValue={filter.ndParams?.genre_id}
-          width={150}
-          onChange={handleGenresFilter}
-        />
-      </Group>
-      <Divider my="0.5rem" />
       {toggleFilters.map((filter) => (
         <Group
           key={`nd-filter-${filter.label}`}
@@ -130,6 +135,39 @@ export const NavidromeAlbumFilters = ({ handleFilterChange }: NavidromeAlbumFilt
           />
         </Group>
       ))}
+      <Divider my="0.5rem" />
+      <Group grow>
+        <NumberInput
+          hideControls={false}
+          label="Year"
+          max={5000}
+          min={0}
+          value={filter.ndParams?.year}
+          onChange={handleYearFilter}
+        />
+        <Select
+          clearable
+          searchable
+          data={genreList}
+          defaultValue={filter.ndParams?.genre_id}
+          label="Genre"
+          onChange={handleGenresFilter}
+        />
+      </Group>
+      <Group grow>
+        <Select
+          clearable
+          searchable
+          data={selectableAlbumArtists}
+          disabled={disableArtistFilter}
+          label="Artist"
+          limit={300}
+          placeholder="Type to search for an artist"
+          rightSection={albumArtistListQuery.isFetching ? <SpinnerIcon /> : undefined}
+          searchValue={albumArtistSearchTerm}
+          onSearchChange={setAlbumArtistSearchTerm}
+        />
+      </Group>
     </Stack>
   );
 };

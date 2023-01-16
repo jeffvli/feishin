@@ -58,10 +58,6 @@ const AlbumArtistDetailTopSongsListRoute = lazy(
   () => import('../features/artists/routes/album-artist-detail-top-songs-list-route'),
 );
 
-const AlbumArtistDetailDiscographyRoute = lazy(
-  () => import('../features/artists/routes/album-artist-detail-discography-route'),
-);
-
 const AlbumDetailRoute = lazy(
   () => import('/@/renderer/features/albums/routes/album-detail-route'),
 );
@@ -141,7 +137,7 @@ export const AppRouter = () => {
                     element={<AlbumArtistDetailRoute />}
                   />
                   <Route
-                    element={<AlbumArtistDetailDiscographyRoute />}
+                    element={<AlbumListRoute />}
                     path={AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY}
                   />
                   <Route

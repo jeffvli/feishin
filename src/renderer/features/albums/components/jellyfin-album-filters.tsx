@@ -1,15 +1,22 @@
-import { ChangeEvent, useMemo } from 'react';
+import { ChangeEvent, useMemo, useState } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
-import { MultiSelect, NumberInput, Switch, Text } from '/@/renderer/components';
+import { MultiSelect, NumberInput, SpinnerIcon, Switch, Text } from '/@/renderer/components';
 import { AlbumListFilter, useAlbumListStore, useSetAlbumFilters } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
+import { useDebouncedValue } from '@mantine/hooks';
+import { AlbumArtistListSort, SortOrder } from '/@/renderer/api/types';
+import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 
 interface JellyfinAlbumFiltersProps {
+  disableArtistFilter?: boolean;
   handleFilterChange: (filters: AlbumListFilter) => void;
 }
 
-export const JellyfinAlbumFilters = ({ handleFilterChange }: JellyfinAlbumFiltersProps) => {
+export const JellyfinAlbumFilters = ({
+  disableArtistFilter,
+  handleFilterChange,
+}: JellyfinAlbumFiltersProps) => {
   const { filter } = useAlbumListStore();
   const setFilters = useSetAlbumFilters();
 
@@ -74,46 +81,33 @@ export const JellyfinAlbumFilters = ({ handleFilterChange }: JellyfinAlbumFilter
     handleFilterChange(updatedFilters);
   }, 250);
 
+  const [albumArtistSearchTerm, setAlbumArtistSearchTerm] = useState<string>('');
+  const [debouncedSearchTerm] = useDebouncedValue(albumArtistSearchTerm, 200);
+
+  const albumArtistListQuery = useAlbumArtistList(
+    {
+      limit: 300,
+      searchTerm: debouncedSearchTerm,
+      sortBy: AlbumArtistListSort.NAME,
+      sortOrder: SortOrder.ASC,
+      startIndex: 0,
+    },
+    {
+      enabled: debouncedSearchTerm ? debouncedSearchTerm !== '' : false,
+    },
+  );
+
+  const selectableAlbumArtists = useMemo(() => {
+    if (!albumArtistListQuery?.data?.items) return [];
+
+    return albumArtistListQuery?.data?.items?.map((artist) => ({
+      label: artist.name,
+      value: artist.id,
+    }));
+  }, [albumArtistListQuery?.data?.items]);
+
   return (
     <Stack p="0.8rem">
-      <Group position="apart">
-        <Text>Year range</Text>
-        <Group>
-          <NumberInput
-            required
-            hideControls={false}
-            max={2300}
-            min={1700}
-            value={filter.jfParams?.minYear}
-            width={80}
-            onChange={handleMinYearFilter}
-          />
-          <NumberInput
-            hideControls={false}
-            max={2300}
-            min={1700}
-            value={filter.jfParams?.maxYear}
-            width={80}
-            onChange={handleMaxYearFilter}
-          />
-        </Group>
-      </Group>
-      <Divider my="0.5rem" />
-      <Group
-        position="apart"
-        spacing={20}
-      >
-        <Text>Genres</Text>
-        <MultiSelect
-          clearable
-          searchable
-          data={genreList}
-          defaultValue={selectedGenres}
-          width={250}
-          onChange={handleGenresFilter}
-        />
-      </Group>
-      <Divider my="0.5rem" />
       {toggleFilters.map((filter) => (
         <Group
           key={`nd-filter-${filter.label}`}
@@ -127,14 +121,52 @@ export const JellyfinAlbumFilters = ({ handleFilterChange }: JellyfinAlbumFilter
           />
         </Group>
       ))}
-      {/* <Divider my="0.5rem" />
-      <Stack>
-        <Text>Tags</Text>
-        <MultiSelect
-          disabled
-          data={[]}
+      <Divider my="0.5rem" />
+      <Group grow>
+        <NumberInput
+          hideControls={false}
+          label="From year"
+          max={2300}
+          min={1700}
+          required={!!filter.jfParams?.maxYear}
+          value={filter.jfParams?.minYear}
+          onChange={handleMinYearFilter}
         />
-      </Stack> */}
+        <NumberInput
+          hideControls={false}
+          label="To year"
+          max={2300}
+          min={1700}
+          required={!!filter.jfParams?.minYear}
+          value={filter.jfParams?.maxYear}
+          onChange={handleMaxYearFilter}
+        />
+      </Group>
+      <Group grow>
+        <MultiSelect
+          clearable
+          searchable
+          data={genreList}
+          defaultValue={selectedGenres}
+          label="Genres"
+          onChange={handleGenresFilter}
+        />
+      </Group>
+
+      <Group grow>
+        <MultiSelect
+          clearable
+          searchable
+          data={selectableAlbumArtists}
+          disabled={disableArtistFilter}
+          label="Artist"
+          limit={300}
+          placeholder="Type to search for an artist"
+          rightSection={albumArtistListQuery.isFetching ? <SpinnerIcon /> : undefined}
+          searchValue={albumArtistSearchTerm}
+          onSearchChange={setAlbumArtistSearchTerm}
+        />
+      </Group>
     </Stack>
   );
 };

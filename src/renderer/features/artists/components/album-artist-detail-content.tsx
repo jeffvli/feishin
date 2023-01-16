@@ -13,7 +13,7 @@ import { Box, Group, Stack } from '@mantine/core';
 import { RiArrowDownSLine, RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { useCurrentServer } from '/@/renderer/store';
-import { Link } from 'react-router-dom';
+import { createSearchParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -65,6 +65,13 @@ export const AlbumArtistDetailContent = () => {
   const itemsPerPage = cq.isXl ? 9 : cq.isLg ? 7 : cq.isMd ? 5 : cq.isSm ? 4 : 3;
 
   const detailQuery = useAlbumArtistDetail({ id: albumArtistId });
+
+  const artistDiscographyLink = `${generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY, {
+    albumArtistId,
+  })}?${createSearchParams({
+    artistId: albumArtistId,
+    artistName: detailQuery?.data?.name || '',
+  })}`;
 
   const recentAlbumsQuery = useAlbumList({
     jfParams: server?.type === ServerType.JELLYFIN ? { artistIds: albumArtistId } : undefined,
@@ -146,9 +153,7 @@ export const AlbumArtistDetailContent = () => {
             compact
             uppercase
             component={Link}
-            to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY, {
-              albumArtistId,
-            })}
+            to={artistDiscographyLink}
             variant="subtle"
           >
             View discography
@@ -283,9 +288,7 @@ export const AlbumArtistDetailContent = () => {
               compact
               uppercase
               component={Link}
-              to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY, {
-                albumArtistId,
-              })}
+              to={artistDiscographyLink}
               variant="subtle"
             >
               View discography
@@ -302,7 +305,6 @@ export const AlbumArtistDetailContent = () => {
           </Group>
         </Group>
       </Box>
-
       {showGenres && (
         <Box component="section">
           <Group>

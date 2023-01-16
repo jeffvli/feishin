@@ -10,12 +10,12 @@ import {
 import { AppRoute } from '/@/renderer/router/routes';
 import { ListDisplayType, CardRow } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { MutableRefObject, useCallback, useMemo } from 'react';
+import { MutableRefObject, useCallback, useMemo, useState } from 'react';
 import { ListOnScrollProps } from 'react-window';
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { Album, AlbumListSort, LibraryItem } from '/@/renderer/api/types';
+import { Album, AlbumListQuery, AlbumListSort, LibraryItem } from '/@/renderer/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useCurrentServer,
@@ -25,6 +25,7 @@ import {
   useSetAlbumTable,
   useSetAlbumTablePagination,
   useAlbumListItemData,
+  AlbumListFilter,
 } from '/@/renderer/store';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import {
@@ -44,12 +45,18 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 
 interface AlbumListContentProps {
+  customFilters?: Partial<AlbumListFilter>;
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
   itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListContentProps) => {
+export const AlbumListContent = ({
+  customFilters,
+  itemCount,
+  gridRef,
+  tableRef,
+}: AlbumListContentProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const server = useCurrentServer();
@@ -58,6 +65,7 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
   const handlePlayQueueAdd = usePlayQueueAdd();
 
   const { itemData, setItemData } = useAlbumListItemData();
+  const [localItemData, setLocalItemData] = useState<any[]>([]);
 
   const pagination = useAlbumTablePagination();
   const setPagination = useSetAlbumTablePagination();
@@ -77,21 +85,28 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
           const limit = params.endRow - params.startRow;
           const startIndex = params.startRow;
 
-          const queryKey = queryKeys.albums.list(server?.id || '', {
+          const query: AlbumListQuery = {
             limit,
             startIndex,
             ...page.filter,
-          });
+            ...customFilters,
+            jfParams: {
+              ...page.filter.jfParams,
+              ...customFilters?.jfParams,
+            },
+            ndParams: {
+              ...page.filter.ndParams,
+              ...customFilters?.ndParams,
+            },
+          };
+
+          const queryKey = queryKeys.albums.list(server?.id || '', query);
 
           const albumsRes = await queryClient.fetchQuery(
             queryKey,
             async ({ signal }) =>
               api.controller.getAlbumList({
-                query: {
-                  limit,
-                  startIndex,
-                  ...page.filter,
-                },
+                query,
                 server,
                 signal,
               }),
@@ -104,9 +119,12 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
         rowCount: undefined,
       };
       params.api.setDatasource(dataSource);
-      params.api.ensureIndexVisible(page.table.scrollOffset || 0, 'top');
+
+      if (!customFilters) {
+        params.api.ensureIndexVisible(page.table.scrollOffset || 0, 'top');
+      }
     },
-    [page.filter, page.table.scrollOffset, queryClient, server],
+    [customFilters, page.filter, page.table.scrollOffset, queryClient, server],
   );
 
   const onTablePaginationChanged = useCallback(
@@ -153,25 +171,33 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
   const debouncedTableColumnChange = debounce(handleTableColumnChange, 200);
 
   const handleTableScroll = (e: BodyScrollEvent) => {
+    if (customFilters) return;
     const scrollOffset = Number((e.top / page.table.rowHeight).toFixed(0));
     setTable({ scrollOffset });
   };
 
   const fetch = useCallback(
     async ({ skip, take }: { skip: number; take: number }) => {
-      const queryKey = queryKeys.albums.list(server?.id || '', {
+      const query: AlbumListQuery = {
         limit: take,
         startIndex: skip,
         ...page.filter,
-      });
+        ...customFilters,
+        jfParams: {
+          ...page.filter.jfParams,
+          ...customFilters?.jfParams,
+        },
+        ndParams: {
+          ...page.filter.ndParams,
+          ...customFilters?.ndParams,
+        },
+      };
+
+      const queryKey = queryKeys.albums.list(server?.id || '', query);
 
       const albums = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
         controller.getAlbumList({
-          query: {
-            limit: take,
-            startIndex: skip,
-            ...page.filter,
-          },
+          query,
           server,
           signal,
         }),
@@ -179,11 +205,12 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
 
       return api.normalize.albumList(albums, server);
     },
-    [page.filter, queryClient, server],
+    [customFilters, page.filter, queryClient, server],
   );
 
   const handleGridScroll = useCallback(
     (e: ListOnScrollProps) => {
+      if (customFilters) return;
       setPage({
         list: {
           ...page,
@@ -194,7 +221,7 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
         },
       });
     },
-    [page, setPage],
+    [customFilters, page, setPage],
   );
 
   const cardRows = useMemo(() => {
@@ -308,9 +335,9 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
                   handleFavorite={handleFavorite}
                   handlePlayQueueAdd={handlePlayQueueAdd}
                   height={height}
-                  initialScrollOffset={page?.grid.scrollOffset || 0}
+                  initialScrollOffset={customFilters ? 0 : page?.grid.scrollOffset || 0}
                   itemCount={itemCount || 0}
-                  itemData={itemData}
+                  itemData={customFilters ? localItemData : itemData}
                   itemGap={20}
                   itemSize={150 + page.grid?.size}
                   itemType={LibraryItem.ALBUM}
@@ -320,7 +347,7 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
                     route: AppRoute.LIBRARY_ALBUMS_DETAIL,
                     slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
                   }}
-                  setItemData={setItemData}
+                  setItemData={customFilters ? setLocalItemData : setItemData}
                   width={width}
                   onScroll={handleGridScroll}
                 />
@@ -334,6 +361,7 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
             key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
             ref={tableRef}
             alwaysShowHorizontalScroll
+            suppressRowDrag
             autoFitColumns={page.table.autoFit}
             blockLoadDebounceMillis={200}
             columnDefs={columnDefs}
