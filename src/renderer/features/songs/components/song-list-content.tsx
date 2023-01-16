@@ -92,7 +92,10 @@ export const SongListContent = ({ customFilters, itemCount, tableRef }: SongList
         rowCount: undefined,
       };
       params.api.setDatasource(dataSource);
-      params.api.ensureIndexVisible(page.table.scrollOffset, 'top');
+
+      if (!customFilters) {
+        params.api.ensureIndexVisible(page.table.scrollOffset, 'top');
+      }
     },
     [customFilters, page.filter, page.table.scrollOffset, queryClient, server],
   );
@@ -147,6 +150,7 @@ export const SongListContent = ({ customFilters, itemCount, tableRef }: SongList
   const debouncedColumnChange = debounce(handleColumnChange, 200);
 
   const handleScroll = (e: BodyScrollEvent) => {
+    if (customFilters) return;
     const scrollOffset = Number((e.top / page.table.rowHeight).toFixed(0));
     setTable({ scrollOffset });
   };
