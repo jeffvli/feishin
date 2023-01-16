@@ -125,6 +125,12 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     [filters, pagination.scrollOffset, playlistId, queryClient, server],
   );
 
+  const handleGridSizeChange = () => {
+    if (page.table.autoFit) {
+      tableRef?.current?.api.sizeColumnsToFit();
+    }
+  };
+
   const onPaginationChanged = useCallback(
     (event: PaginationChangedEvent) => {
       if (!isPaginationEnabled || !event.api) return;
@@ -211,6 +217,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
         onColumnMoved={handleColumnChange}
         onColumnResized={debouncedColumnChange}
         onGridReady={onGridReady}
+        onGridSizeChanged={handleGridSizeChange}
         onPaginationChanged={onPaginationChanged}
         onRowDoubleClicked={handleRowDoubleClick}
       />
