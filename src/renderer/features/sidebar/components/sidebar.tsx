@@ -34,10 +34,15 @@ import {
   SidebarItem,
 } from '/@/renderer/features/sidebar/components/sidebar-item';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useSidebarStore, useAppStoreActions, useCurrentSong } from '/@/renderer/store';
+import {
+  useSidebarStore,
+  useAppStoreActions,
+  useCurrentSong,
+  useCurrentServer,
+} from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
 import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
-import { LibraryItem, PlaylistListSort, SortOrder } from '/@/renderer/api/types';
+import { LibraryItem, PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 
@@ -80,6 +85,7 @@ export const Sidebar = () => {
   const sidebar = useSidebarStore();
   const { setSidebar } = useAppStoreActions();
   const imageUrl = useCurrentSong()?.imageUrl;
+  const server = useCurrentServer();
 
   const upsizedImageUrl = imageUrl
     ?.replace(/size=\d+/, 'size=300')
@@ -112,7 +118,7 @@ export const Sidebar = () => {
 
     openModal({
       children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
-      size: 'sm',
+      size: server?.type === ServerType?.NAVIDROME ? 'lg' : 'sm',
       title: 'Create Playlist',
     });
   };
