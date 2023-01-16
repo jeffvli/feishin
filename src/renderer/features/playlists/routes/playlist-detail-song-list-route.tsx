@@ -16,7 +16,7 @@ import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/dele
 import { Button, Paper, Text, toast, VirtualGridContainer } from '/@/renderer/components';
 import { SaveAsPlaylistForm } from '/@/renderer/features/playlists/components/save-as-playlist-form';
 import { useCurrentServer } from '/@/renderer/store';
-import { ServerType } from '/@/renderer/api/types';
+import { ServerType, SongListSort, SortOrder } from '/@/renderer/api/types';
 
 const PlaylistDetailSongListRoute = () => {
   const navigate = useNavigate();
@@ -181,8 +181,8 @@ const PlaylistDetailSongListRoute = () => {
                   isSaving={createPlaylistMutation?.isLoading}
                   limit={detailQuery?.data?.rules?.limit}
                   query={detailQuery?.data?.rules}
-                  sortBy={detailQuery?.data?.rules?.sort || 'year'}
-                  sortOrder={detailQuery?.data?.rules?.order || 'desc'}
+                  sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
+                  sortOrder={detailQuery?.data?.rules?.order || 'asc'}
                   onSave={handleSave}
                   onSaveAs={handleSaveAs}
                 />
