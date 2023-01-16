@@ -24,7 +24,7 @@ const ContextMenuContainer = styled(motion.div)<Omit<ContextMenuProps, 'children
 `;
 
 export const ContextMenuButton = styled(_Button)`
-  padding: 0.5rem;
+  padding: 0.5rem 1.5rem;
   background: var(--dropdown-menu-bg);
   cursor: default;
 
