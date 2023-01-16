@@ -27,7 +27,7 @@ export const Settings = () => {
   return (
     <Box
       m={5}
-      sx={{ height: '800px', maxHeight: '50vh', overflowX: 'hidden' }}
+      sx={{ height: '50vh', maxHeight: '500px', overflowX: 'hidden' }}
     >
       <AnimatePresence initial={false}>
         <Tabs
