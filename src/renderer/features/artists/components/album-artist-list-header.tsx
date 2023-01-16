@@ -5,14 +5,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import {
-  RiArrowDownSLine,
-  RiFilter3Line,
-  RiFolder2Line,
-  RiMoreFill,
-  RiSortAsc,
-  RiSortDesc,
-} from 'react-icons/ri';
+import { RiArrowDownSLine, RiFolder2Line, RiMoreFill, RiSortAsc, RiSortDesc } from 'react-icons/ri';
 import styled from 'styled-components';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -23,7 +16,6 @@ import {
   DropdownMenu,
   MultiSelect,
   PageHeader,
-  Popover,
   SearchInput,
   Slider,
   Switch,
@@ -294,6 +286,11 @@ export const AlbumArtistListHeader = ({ gridRef, tableRef }: AlbumArtistListHead
     }
   };
 
+  const handleRefresh = useCallback(() => {
+    queryClient.invalidateQueries(queryKeys.albumArtists.list(server?.id || ''));
+    handleFilterChange(filters);
+  }, [filters, handleFilterChange, queryClient, server?.id]);
+
   return (
     <PageHeader p="1rem">
       <HeaderItems ref={cq.ref}>
@@ -460,24 +457,6 @@ export const AlbumArtistListHeader = ({ gridRef, tableRef }: AlbumArtistListHead
               </DropdownMenu.Dropdown>
             </DropdownMenu>
           )}
-          <Popover position="bottom-start">
-            <Popover.Target>
-              <Button
-                compact
-                fw="600"
-                variant="subtle"
-              >
-                {cq.isMd ? 'Filters' : <RiFilter3Line size={15} />}
-              </Button>
-            </Popover.Target>
-            <Popover.Dropdown>
-              {/* {server?.type === ServerType.NAVIDROME ? (
-                <NavidromeAlbumFilters handleFilterChange={handleFilterChange} />
-              ) : (
-                <JellyfinAlbumFilters handleFilterChange={handleFilterChange} />
-              )} */}
-            </Popover.Dropdown>
-          </Popover>
           <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
               <Button
@@ -491,7 +470,8 @@ export const AlbumArtistListHeader = ({ gridRef, tableRef }: AlbumArtistListHead
               <DropdownMenu.Item disabled>Play</DropdownMenu.Item>
               <DropdownMenu.Item disabled>Add to queue next</DropdownMenu.Item>
               <DropdownMenu.Item disabled>Add to queue</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
+              <DropdownMenu.Divider />
+              <DropdownMenu.Item onClick={handleRefresh}>Refresh</DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
         </Flex>

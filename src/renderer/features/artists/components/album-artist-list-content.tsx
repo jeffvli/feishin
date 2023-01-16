@@ -214,6 +214,12 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
     [page, setPage],
   );
 
+  const handleGridSizeChange = () => {
+    if (page.table.autoFit) {
+      tableRef?.current?.api.sizeColumnsToFit();
+    }
+  };
+
   const cardRows = useMemo(() => {
     const rows: CardRow<AlbumArtist>[] = [ALBUMARTIST_CARD_ROWS.name];
 
@@ -296,6 +302,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
             key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
             ref={tableRef}
             alwaysShowHorizontalScroll
+            suppressRowDrag
             autoFitColumns={page.table.autoFit}
             columnDefs={columnDefs}
             getRowId={(data) => data.data.id}
@@ -310,6 +317,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
             onColumnMoved={handleTableColumnChange}
             onColumnResized={debouncedTableColumnChange}
             onGridReady={onTableReady}
+            onGridSizeChanged={handleGridSizeChange}
             onPaginationChanged={onTablePaginationChanged}
             onRowDoubleClicked={handleRowDoubleClick}
           />
