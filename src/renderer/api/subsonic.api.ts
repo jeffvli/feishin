@@ -39,11 +39,11 @@ import {
   GenreListArgs,
   LibraryItem,
   MusicFolderListArgs,
+  QueueSong,
   RatingArgs,
   RatingResponse,
   ServerListItem,
   ServerType,
-  Song,
   TopSongListArgs,
 } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components/toast';
@@ -386,7 +386,7 @@ const getArtistInfo = async (args: ArtistInfoArgs): Promise<SSArtistInfo> => {
   return data.artistInfo2;
 };
 
-const normalizeSong = (item: SSSong, server: ServerListItem, deviceId: string): Song => {
+const normalizeSong = (item: SSSong, server: ServerListItem, deviceId: string): QueueSong => {
   const imageUrl =
     getCoverArtUrl({
       baseUrl: server.url,
