@@ -19,9 +19,7 @@ const ContextMenuContainer = styled(motion.div)<Omit<ContextMenuProps, 'children
   z-index: 1000;
   min-width: ${({ minWidth }) => minWidth}px;
   max-width: ${({ maxWidth }) => maxWidth}px;
-  padding: 0.5rem;
   background: var(--dropdown-menu-bg);
-  border-radius: 5px;
   box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 40%);
 `;
 
