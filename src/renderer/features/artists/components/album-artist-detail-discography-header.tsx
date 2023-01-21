@@ -1,9 +1,15 @@
 import type { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
-import debounce from 'lodash/debounce';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
-import { RiArrowDownSLine, RiFolder2Line, RiMoreFill, RiSortAsc, RiSortDesc } from 'react-icons/ri';
+import {
+  RiArrowDownSLine,
+  RiFilter3Line,
+  RiFolder2Line,
+  RiMoreFill,
+  RiSortAsc,
+  RiSortDesc,
+} from 'react-icons/ri';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import {
@@ -17,7 +23,6 @@ import {
   Button,
   DropdownMenu,
   PageHeader,
-  SearchInput,
   Slider,
   TextTitle,
   Switch,
@@ -29,11 +34,14 @@ import {
 } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useMusicFolders } from '/@/renderer/features/shared';
+import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jellyfin-song-filters';
+import { NavidromeSongFilters } from '/@/renderer/features/songs/components/navidrome-song-filters';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { queryClient } from '/@/renderer/lib/react-query';
 import {
   SongListFilter,
   useCurrentServer,
+  useSetSongFilters,
   useSetSongStore,
   useSetSongTable,
   useSetSongTablePagination,
@@ -78,24 +86,16 @@ const ORDER = [
   { name: 'Descending', value: SortOrder.DESC },
 ];
 
-interface AlbumArtistDetailSongListHeaderProps {
-  filter: SongListFilter;
+interface SongListHeaderProps {
   itemCount?: number;
-  setFilter: (filter: Partial<SongListFilter>) => void;
   tableRef: MutableRefObject<AgGridReactType | null>;
-  title: string;
 }
 
-export const AlbumArtistDetailSongListHeader = ({
-  filter,
-  setFilter,
-  title,
-  itemCount,
-  tableRef,
-}: AlbumArtistDetailSongListHeaderProps) => {
+export const AlbumArtistDiscographyHeader = ({ itemCount, tableRef }: SongListHeaderProps) => {
   const server = useCurrentServer();
   const page = useSongListStore();
   const setPage = useSetSongStore();
+  const setFilter = useSetSongFilters();
   const setTable = useSetSongTable();
   const setPagination = useSetSongTablePagination();
   const handlePlayQueueAdd = usePlayQueueAdd();
@@ -106,11 +106,11 @@ export const AlbumArtistDetailSongListHeader = ({
   const sortByLabel =
     (server?.type &&
       (FILTERS[server.type as keyof typeof FILTERS] as { name: string; value: string }[]).find(
-        (f) => f.value === filter.sortBy,
+        (f) => f.value === page.filter.sortBy,
       )?.name) ||
     'Unknown';
 
-  const sortOrderLabel = ORDER.find((s) => s.value === filter.sortOrder)?.name;
+  const sortOrderLabel = ORDER.find((s) => s.value === page.filter.sortOrder)?.name;
 
   const handleFilterChange = useCallback(
     async (filters?: SongListFilter) => {
@@ -119,7 +119,7 @@ export const AlbumArtistDetailSongListHeader = ({
           const limit = params.endRow - params.startRow;
           const startIndex = params.startRow;
 
-          const pageFilters = filters || filter;
+          const pageFilters = filters || page.filter;
 
           const queryKey = queryKeys.songs.list(server?.id || '', {
             limit,
@@ -152,7 +152,7 @@ export const AlbumArtistDetailSongListHeader = ({
       tableRef.current?.api.ensureIndexVisible(0, 'top');
       setPagination({ currentPage: 0 });
     },
-    [filter, server, setPagination, tableRef],
+    [page.filter, server, setPagination, tableRef],
   );
 
   const handleSetSortBy = useCallback(
@@ -163,18 +163,14 @@ export const AlbumArtistDetailSongListHeader = ({
         (f) => f.value === e.currentTarget.value,
       )?.defaultOrder;
 
-      setFilter({
+      const updatedFilters = setFilter({
         sortBy: e.currentTarget.value as SongListSort,
         sortOrder: sortOrder || SortOrder.ASC,
       });
 
-      handleFilterChange({
-        ...filter,
-        sortBy: e.currentTarget.value as SongListSort,
-        sortOrder: sortOrder || SortOrder.ASC,
-      });
+      handleFilterChange(updatedFilters);
     },
-    [filter, handleFilterChange, server?.type, setFilter],
+    [handleFilterChange, server?.type, setFilter],
   );
 
   const handleSetMusicFolder = useCallback(
@@ -183,23 +179,21 @@ export const AlbumArtistDetailSongListHeader = ({
 
       let updatedFilters = null;
       if (e.currentTarget.value === String(page.filter.musicFolderId)) {
-        updatedFilters = { musicFolderId: undefined };
-        setFilter(updatedFilters);
+        updatedFilters = setFilter({ musicFolderId: undefined });
       } else {
-        updatedFilters = { musicFolderId: e.currentTarget.value };
-        setFilter(updatedFilters);
+        updatedFilters = setFilter({ musicFolderId: e.currentTarget.value });
       }
 
-      handleFilterChange({ ...filter, ...updatedFilters });
+      handleFilterChange(updatedFilters);
     },
-    [filter, handleFilterChange, page.filter.musicFolderId, setFilter],
+    [handleFilterChange, page.filter.musicFolderId, setFilter],
   );
 
   const handleToggleSortOrder = useCallback(() => {
-    const newSortOrder = filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
-    setFilter({ sortOrder: newSortOrder });
-    handleFilterChange({ ...filter, sortOrder: newSortOrder });
-  }, [filter, handleFilterChange, setFilter]);
+    const newSortOrder = page.filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
+    const updatedFilters = setFilter({ sortOrder: newSortOrder });
+    handleFilterChange(updatedFilters);
+  }, [page.filter.sortOrder, handleFilterChange, setFilter]);
 
   const handleSetViewType = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -217,12 +211,12 @@ export const AlbumArtistDetailSongListHeader = ({
     [page, setPage, setPagination, tableRef],
   );
 
-  const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-    const previousSearchTerm = filter.searchTerm;
-    const searchTerm = e.target.value === '' ? undefined : e.target.value;
-    setFilter({ searchTerm });
-    if (previousSearchTerm !== searchTerm) handleFilterChange({ ...filter, searchTerm });
-  }, 500);
+  // const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
+  //   const previousSearchTerm = page.filter.searchTerm;
+  //   const searchTerm = e.target.value === '' ? undefined : e.target.value;
+  //   const updatedFilters = setFilter({ searchTerm });
+  //   if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
+  // }, 500);
 
   const handleTableColumns = (values: TableColumn[]) => {
     const existingColumns = page.table.columns;
@@ -261,11 +255,12 @@ export const AlbumArtistDetailSongListHeader = ({
 
   const handleRefresh = () => {
     queryClient.invalidateQueries(queryKeys.songs.list(server?.id || ''));
-    handleFilterChange(filter);
+    handleFilterChange(page.filter);
   };
 
   const handlePlay = async (play: Play) => {
-    const query: SongListQuery = { startIndex: 0, ...filter };
+    if (!itemCount || itemCount === 0) return;
+    const query: SongListQuery = { startIndex: 0, ...page.filter };
 
     handlePlayQueueAdd?.({
       byItemType: {
@@ -300,11 +295,9 @@ export const AlbumArtistDetailSongListHeader = ({
                 <Group noWrap>
                   <TextTitle
                     fw="bold"
-                    maw="20vw"
                     order={3}
-                    overflow="hidden"
                   >
-                    {title}
+                    Tracks
                   </TextTitle>
                   <Badge
                     radius="xl"
@@ -367,7 +360,6 @@ export const AlbumArtistDetailSongListHeader = ({
               </DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
-
           <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
               <Button
@@ -401,7 +393,7 @@ export const AlbumArtistDetailSongListHeader = ({
               sortOrderLabel
             ) : (
               <>
-                {filter.sortOrder === SortOrder.ASC ? (
+                {page.filter.sortOrder === SortOrder.ASC ? (
                   <RiSortAsc size={15} />
                 ) : (
                   <RiSortDesc size={15} />
@@ -441,6 +433,24 @@ export const AlbumArtistDetailSongListHeader = ({
                 fw="600"
                 variant="subtle"
               >
+                {cq.isMd ? 'Filters' : <RiFilter3Line size={15} />}
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              {server?.type === ServerType.NAVIDROME ? (
+                <NavidromeSongFilters handleFilterChange={handleFilterChange} />
+              ) : (
+                <JellyfinSongFilters handleFilterChange={handleFilterChange} />
+              )}
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
+          <DropdownMenu position="bottom-start">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                fw="600"
+                variant="subtle"
+              >
                 <RiMoreFill size={15} />
               </Button>
             </DropdownMenu.Target>
@@ -456,13 +466,6 @@ export const AlbumArtistDetailSongListHeader = ({
               <DropdownMenu.Item onClick={handleRefresh}>Refresh</DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
-        </Flex>
-        <Flex gap="md">
-          <SearchInput
-            defaultValue={filter.searchTerm}
-            openedWidth={cq.isLg ? 300 : cq.isMd ? 250 : cq.isSm ? 150 : 75}
-            onChange={handleSearch}
-          />
         </Flex>
       </Flex>
     </PageHeader>
