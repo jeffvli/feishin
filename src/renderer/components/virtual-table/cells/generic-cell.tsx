@@ -25,6 +25,7 @@ export const CellContainer = styled(motion.div)<{ position?: 'left' | 'center' |
       : 'flex-start'};
   width: 100%;
   height: 100%;
+  letter-spacing: 0.5px;
 `;
 
 type Options = {

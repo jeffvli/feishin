@@ -22,6 +22,7 @@ const CellContainer = styled(motion.div)<{ height: number }>`
   width: 100%;
   max-width: 100%;
   height: 100%;
+  letter-spacing: 0.5px;
 `;
 
 const ImageWrapper = styled.div`
