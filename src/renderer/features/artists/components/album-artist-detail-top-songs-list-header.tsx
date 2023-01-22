@@ -54,10 +54,10 @@ export const AlbumArtistDetailTopSongsListHeader = ({
           >
             <Group noWrap>
               <TextTitle
-                fw="bold"
                 maw="20vw"
                 order={3}
                 overflow="hidden"
+                weight={700}
               >
                 {title}
               </TextTitle>

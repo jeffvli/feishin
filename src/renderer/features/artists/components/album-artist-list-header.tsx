@@ -309,8 +309,8 @@ export const AlbumArtistListHeader = ({ gridRef, tableRef }: AlbumArtistListHead
                 variant="subtle"
               >
                 <TextTitle
-                  fw="bold"
                   order={3}
+                  weight={700}
                 >
                   Album Artists
                 </TextTitle>

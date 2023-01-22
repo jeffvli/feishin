@@ -415,10 +415,10 @@ export const AlbumListHeader = ({
               >
                 <Group noWrap>
                   <TextTitle
-                    fw="bold"
                     maw="20vw"
                     order={3}
                     overflow="hidden"
+                    weight={700}
                   >
                     {title || 'Albums'}
                   </TextTitle>
@@ -510,7 +510,7 @@ export const AlbumListHeader = ({
             <DropdownMenu.Target>
               <Button
                 compact
-                fw="600"
+                fw={600}
                 variant="subtle"
               >
                 {sortByLabel}
@@ -531,7 +531,7 @@ export const AlbumListHeader = ({
           </DropdownMenu>
           <Button
             compact
-            fw="600"
+            fw={600}
             variant="subtle"
             onClick={handleToggleSortOrder}
           >
@@ -552,7 +552,7 @@ export const AlbumListHeader = ({
               <DropdownMenu.Target>
                 <Button
                   compact
-                  fw="600"
+                  fw={600}
                   variant="subtle"
                 >
                   {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}
@@ -574,7 +574,7 @@ export const AlbumListHeader = ({
           )}
           <Button
             compact
-            fw="600"
+            fw={600}
             variant="subtle"
             onClick={handleOpenFiltersModal}
           >

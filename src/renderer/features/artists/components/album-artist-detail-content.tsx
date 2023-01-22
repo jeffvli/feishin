@@ -165,8 +165,8 @@ export const AlbumArtistDetailContent = () => {
       title: (
         <>
           <TextTitle
-            fw="bold"
             order={3}
+            weight={700}
           >
             Recent releases
           </TextTitle>
@@ -193,8 +193,8 @@ export const AlbumArtistDetailContent = () => {
       },
       title: (
         <TextTitle
-          fw="bold"
           order={3}
+          weight={700}
         >
           Appears on
         </TextTitle>
@@ -211,8 +211,8 @@ export const AlbumArtistDetailContent = () => {
       },
       title: (
         <TextTitle
-          fw="bold"
           order={3}
+          weight={700}
         >
           Related artists
         </TextTitle>
@@ -369,8 +369,8 @@ export const AlbumArtistDetailContent = () => {
           maw="1280px"
         >
           <TextTitle
-            fw="bold"
             order={3}
+            weight={700}
           >
             About {detailQuery?.data?.name}
           </TextTitle>
@@ -393,8 +393,8 @@ export const AlbumArtistDetailContent = () => {
               align="flex-end"
             >
               <TextTitle
-                fw="bold"
                 order={3}
+                weight={700}
               >
                 Top Songs
               </TextTitle>

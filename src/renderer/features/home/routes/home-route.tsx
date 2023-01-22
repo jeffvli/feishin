@@ -123,8 +123,8 @@ const HomeRoute = () => {
       },
       title: (
         <TextTitle
-          fw="bold"
           order={3}
+          weight={700}
         >
           Explore from your library
         </TextTitle>
@@ -142,8 +142,8 @@ const HomeRoute = () => {
       },
       title: (
         <TextTitle
-          fw="bold"
           order={3}
+          weight={700}
         >
           Recently played
         </TextTitle>
@@ -161,8 +161,8 @@ const HomeRoute = () => {
       },
       title: (
         <TextTitle
-          fw="bold"
           order={3}
+          weight={700}
         >
           Newly added releases
         </TextTitle>
@@ -180,8 +180,8 @@ const HomeRoute = () => {
       },
       title: (
         <TextTitle
-          fw="bold"
           order={3}
+          weight={700}
         >
           Most played
         </TextTitle>

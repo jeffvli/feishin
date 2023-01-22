@@ -294,8 +294,8 @@ export const AlbumArtistDiscographyHeader = ({ itemCount, tableRef }: SongListHe
               >
                 <Group noWrap>
                   <TextTitle
-                    fw="bold"
                     order={3}
+                    weight={700}
                   >
                     Tracks
                   </TextTitle>
@@ -364,7 +364,7 @@ export const AlbumArtistDiscographyHeader = ({ itemCount, tableRef }: SongListHe
             <DropdownMenu.Target>
               <Button
                 compact
-                fw="600"
+                fw={600}
                 variant="subtle"
               >
                 {sortByLabel}
@@ -385,7 +385,7 @@ export const AlbumArtistDiscographyHeader = ({ itemCount, tableRef }: SongListHe
           </DropdownMenu>
           <Button
             compact
-            fw="600"
+            fw={600}
             variant="subtle"
             onClick={handleToggleSortOrder}
           >
@@ -406,7 +406,7 @@ export const AlbumArtistDiscographyHeader = ({ itemCount, tableRef }: SongListHe
               <DropdownMenu.Target>
                 <Button
                   compact
-                  fw="600"
+                  fw={600}
                   variant="subtle"
                 >
                   {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}

@@ -134,20 +134,19 @@ export const LibraryHeader = forwardRef(
             <Text
               $link
               component={Link}
-              fw="600"
-              sx={{ textTransform: 'uppercase' }}
               to={item.route}
+              tt="uppercase"
+              weight={600}
             >
               {item.type}
             </Text>
           </Group>
           <TextTitle
-            fw="900"
-            lh="1.12"
             lineClamp={2}
             overflow="hidden"
             pb=".06em"
             sx={{ fontSize: titleSize, overflow: 'hidden' }}
+            weight={900}
           >
             {title}
           </TextTitle>

@@ -46,7 +46,7 @@ export const AlbumArtistDetailHeader = forwardRef(
           item={{ route: AppRoute.LIBRARY_ALBUM_ARTISTS, type: LibraryItem.ALBUM_ARTIST }}
           title={detailQuery?.data?.name || ''}
         >
-          <Stack mt="1rem">
+          <Stack>
             <Group>
               {metadataItems
                 .filter((i) => i.value)

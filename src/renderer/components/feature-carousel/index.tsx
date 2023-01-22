@@ -154,14 +154,14 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
               <InfoColumn>
                 <Stack sx={{ width: '100%' }}>
                   <TitleWrapper>
-                    <TextTitle fw="bold">{currentItem?.name}</TextTitle>
+                    <TextTitle weight={700}>{currentItem?.name}</TextTitle>
                   </TitleWrapper>
                   <TitleWrapper>
                     {currentItem?.albumArtists.map((artist) => (
                       <TextTitle
                         key={`carousel-artist-${artist.id}`}
-                        fw="600"
                         order={3}
+                        weight={600}
                       >
                         {artist.name}
                       </TextTitle>

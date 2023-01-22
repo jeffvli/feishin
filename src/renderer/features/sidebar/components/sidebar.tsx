@@ -1,7 +1,6 @@
 import { MouseEvent } from 'react';
 import { Stack, Grid, Accordion, Center, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
-import { SpotlightProvider } from '@mantine/spotlight';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BsCollection } from 'react-icons/bs';
 import { Button, MotionStack, ScrollArea, TextInput } from '/@/renderer/components';
@@ -137,16 +136,14 @@ export const Sidebar = () => {
         >
           <ActionsContainer p={10}>
             <Grid.Col span={8}>
-              <SpotlightProvider actions={[]}>
-                <TextInput
-                  disabled
-                  readOnly
-                  icon={<RiSearchLine />}
-                  placeholder="Search"
-                  rightSectionWidth={90}
-                  // onClick={() => openSpotlight()}
-                />
-              </SpotlightProvider>
+              <TextInput
+                disabled
+                readOnly
+                icon={<RiSearchLine />}
+                placeholder="Search"
+                rightSectionWidth={90}
+                // onClick={() => openSpotlight()}
+              />
             </Grid.Col>
             <Grid.Col span={4}>
               <Group

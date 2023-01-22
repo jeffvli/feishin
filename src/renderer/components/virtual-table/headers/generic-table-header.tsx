@@ -77,9 +77,9 @@ export const GenericTableHeader = (
 
   return (
     <TextHeaderWrapper
-      fw="500"
       overflow="hidden"
       position={position}
+      weight={500}
     >
       {children || displayName}
     </TextHeaderWrapper>

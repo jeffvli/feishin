@@ -318,10 +318,10 @@ export const SongListHeader = ({
               >
                 <Group noWrap>
                   <TextTitle
-                    fw="bold"
                     maw="20vw"
                     order={3}
                     overflow="hidden"
+                    weight={700}
                   >
                     {title || 'Tracks'}
                   </TextTitle>

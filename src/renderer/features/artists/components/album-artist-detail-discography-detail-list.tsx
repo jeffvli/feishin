@@ -64,8 +64,8 @@ const RowVirtualizer = ({
               />
               <Stack>
                 <TextTitle
-                  fw="bold"
                   order={1}
+                  weight={700}
                 >
                   {rows?.[virtualRow.index]?.name}
                 </TextTitle>

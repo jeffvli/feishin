@@ -45,7 +45,7 @@ export const PlaylistDetailHeader = forwardRef(
           item={{ route: AppRoute.PLAYLISTS, type: LibraryItem.PLAYLIST }}
           title={detailQuery?.data?.name || ''}
         >
-          <Stack mt="1rem">
+          <Stack>
             <Group>
               {metadataItems.map((item, index) => (
                 <Fragment key={`item-${item.id}-${index}`}>
