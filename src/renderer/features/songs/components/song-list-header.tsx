@@ -326,8 +326,9 @@ export const SongListHeader = ({
                     {title || 'Tracks'}
                   </TextTitle>
                   <Badge
+                    px="1rem"
                     radius="xl"
-                    size="lg"
+                    size="xl"
                   >
                     {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
                   </Badge>

@@ -423,8 +423,9 @@ export const AlbumListHeader = ({
                     {title || 'Albums'}
                   </TextTitle>
                   <Badge
+                    px="1rem"
                     radius="xl"
-                    size="lg"
+                    size="xl"
                   >
                     {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
                   </Badge>
