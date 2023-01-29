@@ -23,7 +23,7 @@ export const SidebarPlayQueue = () => {
     <>
       <Flex
         bg="var(--titlebar-bg)"
-        h="60px"
+        h="65px"
         sx={{ position: 'relative' }}
         w="100%"
       >
@@ -40,7 +40,7 @@ export const SidebarPlayQueue = () => {
       </Flex>
       <Flex
         direction="column"
-        h="calc(100% - 60px)"
+        h="calc(100% - 65px)"
         sx={{ borderLeft: '2px solid var(--generic-border-color)' }}
         w="100%"
       >
