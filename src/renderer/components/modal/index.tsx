@@ -21,8 +21,6 @@ export interface ModalProps extends Omit<MantineModalProps, 'onClose'> {
 export const Modal = ({ children, handlers, ...rest }: ModalProps) => {
   return (
     <MantineModal
-      overlayBlur={2}
-      overlayOpacity={0.2}
       {...rest}
       onClose={handlers.close}
     >

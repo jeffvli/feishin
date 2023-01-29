@@ -199,10 +199,11 @@ const Title = ({ children }: TitleProps) => {
     <Group position="apart">
       {children}
       {showPaginationButtons && (
-        <Group>
+        <Group spacing="sm">
           <Button
             compact
             disabled={!pagination?.hasPreviousPage}
+            size="md"
             variant="default"
             onClick={handlePreviousPage}
           >
@@ -210,6 +211,7 @@ const Title = ({ children }: TitleProps) => {
           </Button>
           <Button
             compact
+            size="md"
             variant="default"
             onClick={handleNextPage}
           >

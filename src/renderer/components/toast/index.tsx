@@ -34,7 +34,6 @@ const showToast = ({ type, ...props }: NotificationProps) => {
 
   return showNotification({
     autoClose: defaultDuration,
-    disallowClose: true,
     styles: () => ({
       closeButton: {},
       description: {
