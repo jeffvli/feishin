@@ -189,7 +189,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
           ref={showGenres ? null : intersectRef}
           className="test"
           py="1rem"
-          spacing="lg"
+          spacing="md"
         >
           <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
           <Group spacing="xs">

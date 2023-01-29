@@ -142,9 +142,9 @@ export const LibraryHeader = forwardRef(
             </Text>
           </Group>
           <TextTitle
+            lh="5rem"
             lineClamp={2}
             overflow="hidden"
-            pb=".06em"
             sx={{ fontSize: titleSize, overflow: 'hidden' }}
             weight={900}
           >

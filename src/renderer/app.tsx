@@ -53,20 +53,31 @@ export const App = () => {
         },
         fontFamily: 'var(--content-font-family)',
         fontSizes: {
-          lg: '1.2rem',
+          lg: '1.5rem',
           md: '1.1rem',
           sm: '0.9rem',
-          xl: '1.5rem',
+          xl: '2rem',
           xs: '0.8rem',
         },
-        headings: { fontFamily: 'var(--content-font-family)' },
+        headings: {
+          fontFamily: 'var(--content-font-family)',
+          fontWeight: 700,
+          sizes: {
+            h1: '6rem',
+            h2: '4rem',
+            h3: '3rem',
+            h4: '1.5rem',
+            h5: '1.2rem',
+            h6: '1rem',
+          },
+        },
         other: {},
         spacing: {
-          lg: '1.5rem',
+          lg: '2rem',
           md: '1rem',
           sm: '0.5rem',
-          xl: '2rem',
-          xs: '0.1rem',
+          xl: '4rem',
+          xs: '0rem',
         },
       }}
     >

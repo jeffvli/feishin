@@ -14,7 +14,7 @@ export const LibraryHeaderBar = ({ children }: LibraryHeaderBarProps) => {
       align="center"
       h="100%"
       px="1rem"
-      spacing="xl"
+      spacing="md"
     >
       {children}
     </Group>
@@ -39,14 +39,13 @@ const Title = ({ children }: TitleProps) => {
 
 interface PlayButtonProps {
   onClick: () => void;
-  size?: number;
 }
 
-const PlayButton = ({ size, onClick }: PlayButtonProps) => {
+const PlayButton = ({ onClick }: PlayButtonProps) => {
   return (
     <PlayBtn
-      h={size || 45}
-      w={size || 45}
+      h="50px"
+      w="50px"
       onClick={onClick}
     />
   );

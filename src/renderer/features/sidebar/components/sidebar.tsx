@@ -134,7 +134,10 @@ export const Sidebar = () => {
           spacing={0}
           sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
         >
-          <ActionsContainer p={10}>
+          <ActionsContainer
+            gutter="sm"
+            p={10}
+          >
             <Grid.Col span={8}>
               <TextInput
                 disabled
@@ -142,16 +145,17 @@ export const Sidebar = () => {
                 icon={<RiSearchLine />}
                 placeholder="Search"
                 rightSectionWidth={90}
-                // onClick={() => openSpotlight()}
+                size="md"
               />
             </Grid.Col>
             <Grid.Col span={4}>
               <Group
                 grow
-                spacing={5}
+                spacing="sm"
               >
                 <Button
                   px={5}
+                  size="md"
                   sx={{ color: 'var(--titlebar-fg)' }}
                   variant="default"
                   onClick={() => navigate(-1)}
@@ -160,6 +164,7 @@ export const Sidebar = () => {
                 </Button>
                 <Button
                   px={5}
+                  size="md"
                   sx={{ color: 'var(--titlebar-fg)' }}
                   variant="default"
                   onClick={() => navigate(1)}

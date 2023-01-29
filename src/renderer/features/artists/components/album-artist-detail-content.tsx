@@ -281,7 +281,7 @@ export const AlbumArtistDetailContent = () => {
   return (
     <ContentContainer ref={cq.ref}>
       <Box component="section">
-        <Group spacing="lg">
+        <Group spacing="md">
           <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
           <Group spacing="xs">
             <Button
