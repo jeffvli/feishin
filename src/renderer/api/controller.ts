@@ -39,11 +39,16 @@ import type {
   FavoriteArgs,
   TopSongListArgs,
   RawTopSongListResponse,
+  AddToPlaylistArgs,
+  RawAddToPlaylistResponse,
+  RemoveFromPlaylistArgs,
+  RawRemoveFromPlaylistResponse,
 } from '/@/renderer/api/types';
 import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
 
 export type ControllerEndpoint = Partial<{
+  addToPlaylist: (args: AddToPlaylistArgs) => Promise<RawAddToPlaylistResponse>;
   clearPlaylist: () => void;
   createFavorite: (args: FavoriteArgs) => Promise<RawFavoriteResponse>;
   createPlaylist: (args: CreatePlaylistArgs) => Promise<RawCreatePlaylistResponse>;
@@ -69,6 +74,7 @@ export type ControllerEndpoint = Partial<{
   getSongList: (args: SongListArgs) => Promise<RawSongListResponse>;
   getTopSongs: (args: TopSongListArgs) => Promise<RawTopSongListResponse>;
   getUserList: (args: UserListArgs) => Promise<RawUserListResponse>;
+  removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RawRemoveFromPlaylistResponse>;
   updatePlaylist: (args: UpdatePlaylistArgs) => Promise<RawUpdatePlaylistResponse>;
   updateRating: (args: RatingArgs) => Promise<RawRatingResponse>;
 }>;
@@ -81,6 +87,7 @@ type ApiController = {
 
 const endpoints: ApiController = {
   jellyfin: {
+    addToPlaylist: jellyfinApi.addToPlaylist,
     clearPlaylist: undefined,
     createFavorite: jellyfinApi.createFavorite,
     createPlaylist: jellyfinApi.createPlaylist,
@@ -106,10 +113,12 @@ const endpoints: ApiController = {
     getSongList: jellyfinApi.getSongList,
     getTopSongs: undefined,
     getUserList: undefined,
+    removeFromPlaylist: jellyfinApi.removeFromPlaylist,
     updatePlaylist: jellyfinApi.updatePlaylist,
     updateRating: undefined,
   },
   navidrome: {
+    addToPlaylist: navidromeApi.addToPlaylist,
     clearPlaylist: undefined,
     createFavorite: subsonicApi.createFavorite,
     createPlaylist: navidromeApi.createPlaylist,
@@ -135,6 +144,7 @@ const endpoints: ApiController = {
     getSongList: navidromeApi.getSongList,
     getTopSongs: subsonicApi.getTopSongList,
     getUserList: navidromeApi.getUserList,
+    removeFromPlaylist: navidromeApi.removeFromPlaylist,
     updatePlaylist: navidromeApi.updatePlaylist,
     updateRating: subsonicApi.updateRating,
   },
@@ -239,6 +249,14 @@ const deletePlaylist = async (args: DeletePlaylistArgs) => {
   return (apiController('deletePlaylist') as ControllerEndpoint['deletePlaylist'])?.(args);
 };
 
+const addToPlaylist = async (args: AddToPlaylistArgs) => {
+  return (apiController('addToPlaylist') as ControllerEndpoint['addToPlaylist'])?.(args);
+};
+
+const removeFromPlaylist = async (args: RemoveFromPlaylistArgs) => {
+  return (apiController('removeFromPlaylist') as ControllerEndpoint['removeFromPlaylist'])?.(args);
+};
+
 const getPlaylistDetail = async (args: PlaylistDetailArgs) => {
   return (apiController('getPlaylistDetail') as ControllerEndpoint['getPlaylistDetail'])?.(args);
 };
@@ -270,6 +288,7 @@ const getTopSongList = async (args: TopSongListArgs) => {
 };
 
 export const controller = {
+  addToPlaylist,
   createFavorite,
   createPlaylist,
   deleteFavorite,
@@ -287,6 +306,7 @@ export const controller = {
   getSongList,
   getTopSongList,
   getUserList,
+  removeFromPlaylist,
   updatePlaylist,
   updateRating,
 };

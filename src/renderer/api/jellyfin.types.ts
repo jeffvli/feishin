@@ -59,6 +59,25 @@ export type JFSongList = {
   totalRecordCount: number;
 };
 
+export type JFAddToPlaylistResponse = {
+  added: number;
+};
+
+export type JFAddToPlaylistParams = {
+  ids: string[];
+  userId: string;
+};
+
+export type JFAddToPlaylist = null;
+
+export type JFRemoveFromPlaylistResponse = null;
+
+export type JFRemoveFromPlaylistParams = {
+  EntryIds: string[];
+};
+
+export type JFRemoveFromPlaylist = null;
+
 export interface JFPlaylistListResponse extends JFBasePaginatedResponse {
   Items: JFPlaylist[];
 }

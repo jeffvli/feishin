@@ -1,6 +1,8 @@
 import ky from 'ky';
 import { nanoid } from 'nanoid/non-secure';
 import type {
+  JFAddToPlaylist,
+  JFAddToPlaylistParams,
   JFAlbum,
   JFAlbumArtist,
   JFAlbumArtistDetail,
@@ -27,6 +29,7 @@ import type {
   JFPlaylistDetailResponse,
   JFPlaylistList,
   JFPlaylistListResponse,
+  JFRemoveFromPlaylist,
   JFSong,
   JFSongList,
   JFSongListParams,
@@ -64,6 +67,8 @@ import {
   UpdatePlaylistArgs,
   UpdatePlaylistResponse,
   LibraryItem,
+  RemoveFromPlaylistArgs,
+  AddToPlaylistArgs,
 } from '/@/renderer/api/types';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
@@ -360,6 +365,45 @@ const getSongList = async (args: SongListArgs): Promise<JFSongList> => {
     startIndex: query.startIndex,
     totalRecordCount: data.TotalRecordCount,
   };
+};
+
+const addToPlaylist = async (args: AddToPlaylistArgs): Promise<JFAddToPlaylist> => {
+  const { query, body, server, signal } = args;
+
+  const searchParams: JFAddToPlaylistParams = {
+    ids: body.songId,
+    userId: server?.userId || '',
+  };
+
+  await api
+    .post(`playlists/${query.id}/items`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      prefixUrl: server?.url,
+      searchParams: parseSearchParams(searchParams),
+      signal,
+    })
+    .json<JFPlaylistDetailResponse>();
+
+  return null;
+};
+
+const removeFromPlaylist = async (args: RemoveFromPlaylistArgs): Promise<JFRemoveFromPlaylist> => {
+  const { query, server, signal } = args;
+
+  const searchParams = {
+    ids: query.songId,
+  };
+
+  await api
+    .delete(`playlists/${query.id}/items`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      prefixUrl: server?.url,
+      searchParams: parseSearchParams(searchParams),
+      signal,
+    })
+    .json<JFPlaylistDetailResponse>();
+
+  return null;
 };
 
 const getPlaylistDetail = async (args: PlaylistDetailArgs): Promise<JFPlaylistDetail> => {
@@ -863,6 +907,7 @@ const normalizePlaylist = (
 // };
 
 export const jellyfinApi = {
+  addToPlaylist,
   authenticate,
   createFavorite,
   createPlaylist,
@@ -879,6 +924,7 @@ export const jellyfinApi = {
   getPlaylistList,
   getPlaylistSongList,
   getSongList,
+  removeFromPlaylist,
   updatePlaylist,
 };
 

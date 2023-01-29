@@ -41,6 +41,12 @@ import type {
   NDUserListResponse,
   NDUserListParams,
   NDUser,
+  NDAddToPlaylist,
+  NDAddToPlaylistBody,
+  NDAddToPlaylistResponse,
+  NDRemoveFromPlaylistParams,
+  NDRemoveFromPlaylistResponse,
+  NDRemoveFromPlaylist,
 } from '/@/renderer/api/navidrome.types';
 import { NDSongListSort, NDSortOrder } from '/@/renderer/api/navidrome.types';
 import {
@@ -73,6 +79,8 @@ import {
   sortOrderMap,
   User,
   LibraryItem,
+  AddToPlaylistArgs,
+  RemoveFromPlaylistArgs,
 } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components/toast';
 import { useAuthStore } from '/@/renderer/store';
@@ -472,6 +480,44 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<NDPlayli
   };
 };
 
+const addToPlaylist = async (args: AddToPlaylistArgs): Promise<NDAddToPlaylist> => {
+  const { query, body, server, signal } = args;
+
+  const json: NDAddToPlaylistBody = {
+    ids: body.songId,
+  };
+
+  await api
+    .post(`api/playlist/${query.id}/tracks`, {
+      headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
+      json,
+      prefixUrl: server?.url,
+      signal,
+    })
+    .json<NDAddToPlaylistResponse>();
+
+  return null;
+};
+
+const removeFromPlaylist = async (args: RemoveFromPlaylistArgs): Promise<NDRemoveFromPlaylist> => {
+  const { query, server, signal } = args;
+
+  const searchParams: NDRemoveFromPlaylistParams = {
+    id: query.songId,
+  };
+
+  await api
+    .delete(`api/playlist/${query.id}/tracks`, {
+      headers: { 'x-nd-authorization': `Bearer ${server?.ndCredential}` },
+      prefixUrl: server?.url,
+      searchParams: parseSearchParams(searchParams),
+      signal,
+    })
+    .json<NDRemoveFromPlaylistResponse>();
+
+  return null;
+};
+
 const getCoverArtUrl = (args: {
   baseUrl: string;
   coverArtId: string;
@@ -675,6 +721,7 @@ const normalizeUser = (item: NDUser): User => {
 };
 
 export const navidromeApi = {
+  addToPlaylist,
   authenticate,
   createPlaylist,
   deletePlaylist,
@@ -689,6 +736,7 @@ export const navidromeApi = {
   getSongDetail,
   getSongList,
   getUserList,
+  removeFromPlaylist,
   updatePlaylist,
 };
 

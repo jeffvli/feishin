@@ -777,6 +777,32 @@ export type RatingQuery = { id: string[]; rating: number };
 
 export type RatingArgs = { query: RatingQuery } & BaseEndpointArgs;
 
+// Add to playlist
+export type RawAddToPlaylistResponse = null | undefined;
+
+export type AddToPlaylistQuery = {
+  id: string;
+};
+
+export type AddToPlaylistBody = {
+  songId: string[];
+};
+
+export type AddToPlaylistArgs = {
+  body: AddToPlaylistBody;
+  query: AddToPlaylistQuery;
+} & BaseEndpointArgs;
+
+// Remove from playlist
+export type RawRemoveFromPlaylistResponse = null | undefined;
+
+export type RemoveFromPlaylistQuery = {
+  id: string;
+  songId: string[];
+};
+
+export type RemoveFromPlaylistArgs = { query: RemoveFromPlaylistQuery } & BaseEndpointArgs;
+
 // Create Playlist
 export type RawCreatePlaylistResponse = CreatePlaylistResponse | undefined;
 
