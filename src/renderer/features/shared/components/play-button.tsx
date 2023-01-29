@@ -17,9 +17,9 @@ const MotionButton = styled(motion(_Button))`
 export const PlayButton = ({ ...props }: Omit<ButtonProps, 'children'>) => {
   return (
     <MotionButton
-      h={50}
+      h="50px"
       variant="filled"
-      w={50}
+      w="50px"
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       {...props}

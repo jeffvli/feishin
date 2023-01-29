@@ -44,6 +44,7 @@ export const SearchInput = ({
       ref={mergedRef}
       {...props}
       icon={showIcon && <RiSearchLine size={15} />}
+      size="md"
       styles={{
         icon: { svg: { fill: 'var(--btn-default-fg)' } },
         input: {

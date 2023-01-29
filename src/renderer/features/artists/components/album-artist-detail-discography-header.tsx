@@ -1,8 +1,6 @@
 import type { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
-import { openModal } from '@mantine/modals';
-import debounce from 'lodash/debounce';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import {
   RiArrowDownSLine,
@@ -25,7 +23,6 @@ import {
   Button,
   DropdownMenu,
   PageHeader,
-  SearchInput,
   Slider,
   TextTitle,
   Switch,
@@ -90,18 +87,11 @@ const ORDER = [
 ];
 
 interface SongListHeaderProps {
-  customFilters?: Partial<SongListFilter>;
   itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
-  title?: string;
 }
 
-export const SongListHeader = ({
-  customFilters,
-  title,
-  itemCount,
-  tableRef,
-}: SongListHeaderProps) => {
+export const AlbumArtistDiscographyHeader = ({ itemCount, tableRef }: SongListHeaderProps) => {
   const server = useCurrentServer();
   const page = useSongListStore();
   const setPage = useSetSongStore();
@@ -131,20 +121,21 @@ export const SongListHeader = ({
 
           const pageFilters = filters || page.filter;
 
-          const query: SongListQuery = {
+          const queryKey = queryKeys.songs.list(server?.id || '', {
             limit,
             startIndex,
             ...pageFilters,
-            ...customFilters,
-          };
-
-          const queryKey = queryKeys.songs.list(server?.id || '', query);
+          });
 
           const songsRes = await queryClient.fetchQuery(
             queryKey,
             async ({ signal }) =>
               api.controller.getSongList({
-                query,
+                query: {
+                  limit,
+                  startIndex,
+                  ...pageFilters,
+                },
                 server,
                 signal,
               }),
@@ -161,7 +152,7 @@ export const SongListHeader = ({
       tableRef.current?.api.ensureIndexVisible(0, 'top');
       setPagination({ currentPage: 0 });
     },
-    [customFilters, page.filter, server, setPagination, tableRef],
+    [page.filter, server, setPagination, tableRef],
   );
 
   const handleSetSortBy = useCallback(
@@ -220,12 +211,12 @@ export const SongListHeader = ({
     [page, setPage, setPagination, tableRef],
   );
 
-  const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-    const previousSearchTerm = page.filter.searchTerm;
-    const searchTerm = e.target.value === '' ? undefined : e.target.value;
-    const updatedFilters = setFilter({ searchTerm });
-    if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
-  }, 500);
+  // const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
+  //   const previousSearchTerm = page.filter.searchTerm;
+  //   const searchTerm = e.target.value === '' ? undefined : e.target.value;
+  //   const updatedFilters = setFilter({ searchTerm });
+  //   if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
+  // }, 500);
 
   const handleTableColumns = (values: TableColumn[]) => {
     const existingColumns = page.table.columns;
@@ -280,21 +271,6 @@ export const SongListHeader = ({
     });
   };
 
-  const handleOpenFiltersModal = () => {
-    openModal({
-      children: (
-        <>
-          {server?.type === ServerType.NAVIDROME ? (
-            <NavidromeSongFilters handleFilterChange={handleFilterChange} />
-          ) : (
-            <JellyfinSongFilters handleFilterChange={handleFilterChange} />
-          )}
-        </>
-      ),
-      title: 'Song Filters',
-    });
-  };
-
   return (
     <PageHeader p="1rem">
       <Flex
@@ -318,17 +294,14 @@ export const SongListHeader = ({
               >
                 <Group noWrap>
                   <TextTitle
-                    maw="20vw"
                     order={3}
-                    overflow="hidden"
                     weight={700}
                   >
-                    {title || 'Tracks'}
+                    Tracks
                   </TextTitle>
                   <Badge
-                    px="1rem"
                     radius="xl"
-                    size="xl"
+                    size="lg"
                   >
                     {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
                   </Badge>
@@ -391,7 +364,7 @@ export const SongListHeader = ({
             <DropdownMenu.Target>
               <Button
                 compact
-                fw="600"
+                fw={600}
                 variant="subtle"
               >
                 {sortByLabel}
@@ -412,7 +385,7 @@ export const SongListHeader = ({
           </DropdownMenu>
           <Button
             compact
-            fw="600"
+            fw={600}
             variant="subtle"
             onClick={handleToggleSortOrder}
           >
@@ -433,7 +406,7 @@ export const SongListHeader = ({
               <DropdownMenu.Target>
                 <Button
                   compact
-                  fw="600"
+                  fw={600}
                   variant="subtle"
                 >
                   {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}
@@ -453,14 +426,24 @@ export const SongListHeader = ({
               </DropdownMenu.Dropdown>
             </DropdownMenu>
           )}
-          <Button
-            compact
-            fw="600"
-            variant="subtle"
-            onClick={handleOpenFiltersModal}
-          >
-            {cq.isMd ? 'Filters' : <RiFilter3Line size={15} />}
-          </Button>
+          <DropdownMenu position="bottom-start">
+            <DropdownMenu.Target>
+              <Button
+                compact
+                fw="600"
+                variant="subtle"
+              >
+                {cq.isMd ? 'Filters' : <RiFilter3Line size={15} />}
+              </Button>
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+              {server?.type === ServerType.NAVIDROME ? (
+                <NavidromeSongFilters handleFilterChange={handleFilterChange} />
+              ) : (
+                <JellyfinSongFilters handleFilterChange={handleFilterChange} />
+              )}
+            </DropdownMenu.Dropdown>
+          </DropdownMenu>
           <DropdownMenu position="bottom-start">
             <DropdownMenu.Target>
               <Button
@@ -483,13 +466,6 @@ export const SongListHeader = ({
               <DropdownMenu.Item onClick={handleRefresh}>Refresh</DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
-        </Flex>
-        <Flex gap="md">
-          <SearchInput
-            defaultValue={page.filter.searchTerm}
-            openedWidth={cq.isLg ? 300 : cq.isMd ? 250 : cq.isSm ? 150 : 75}
-            onChange={handleSearch}
-          />
         </Flex>
       </Flex>
     </PageHeader>

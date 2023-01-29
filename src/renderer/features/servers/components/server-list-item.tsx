@@ -20,16 +20,11 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
   };
 
   return (
-    <Stack
-      mt="1rem"
-      p="1rem"
-      spacing="xl"
-    >
+    <Stack>
       <ServerSection
         title={
           <Group position="apart">
             <Text>Server details</Text>
-            <Group spacing="md" />
           </Group>
         }
       >
@@ -39,30 +34,31 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
             onCancel={() => editHandlers.toggle()}
           />
         ) : (
-          <Group position="apart">
-            <Group>
+          <Stack>
+            <Group noWrap>
               <Stack>
                 <Text>URL</Text>
                 <Text>Username</Text>
               </Stack>
               <Stack>
-                <Text size="sm">{server.url}</Text>
-                <Text size="sm">{server.username}</Text>
+                <Text>{server.url}</Text>
+                <Text>{server.username}</Text>
               </Stack>
             </Group>
-            <Group>
+            <Group grow>
               <Button
+                leftIcon={<RiEdit2Fill />}
                 tooltip={{ label: 'Edit server details' }}
                 variant="subtle"
                 onClick={() => editHandlers.toggle()}
               >
-                <RiEdit2Fill />
+                Edit
               </Button>
             </Group>
-          </Group>
+          </Stack>
         )}
       </ServerSection>
-      <Divider my="xl" />
+      <Divider my="sm" />
       <TimeoutButton
         leftIcon={<RiDeleteBin2Line />}
         timeoutProps={{ callback: handleDeleteServer, duration: 1500 }}

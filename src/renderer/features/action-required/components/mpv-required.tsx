@@ -22,7 +22,7 @@ export const MpvRequired = () => {
 
   return (
     <>
-      <Text size="lg">Set your MPV executable location below and restart the application.</Text>
+      <Text>Set your MPV executable location below and restart the application.</Text>
       <Text>
         MPV is available at the following:{' '}
         <a

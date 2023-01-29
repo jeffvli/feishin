@@ -92,7 +92,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     opacity: 0.6;
   }
 
-  &:hover {
+  &:not([data-disabled])&:hover {
     color: ${(props) => {
       switch (props.variant) {
         case 'default':
@@ -100,7 +100,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
         case 'filled':
           return 'var(--btn-primary-fg-hover)';
         case 'subtle':
-          return 'var(--btn-subtle-fg-hover)';
+          return 'var(--btn-subtle-fg-hover) !important';
         default:
           return '';
       }
@@ -134,7 +134,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     }
   }
 
-  &:focus-visible {
+  &:not([data-disabled])&:focus-visible {
     color: ${(props) => {
       switch (props.variant) {
         case 'default':

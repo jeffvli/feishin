@@ -12,12 +12,14 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumArtistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import {
   ALBUMARTIST_TABLE_COLUMNS,
+  Badge,
   Button,
   DropdownMenu,
   MultiSelect,
   PageHeader,
   SearchInput,
   Slider,
+  SpinnerIcon,
   Switch,
   Text,
   TextTitle,
@@ -72,10 +74,15 @@ const HeaderItems = styled.div`
 
 interface AlbumArtistListHeaderProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+  itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const AlbumArtistListHeader = ({ gridRef, tableRef }: AlbumArtistListHeaderProps) => {
+export const AlbumArtistListHeader = ({
+  itemCount,
+  gridRef,
+  tableRef,
+}: AlbumArtistListHeaderProps) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
   const setPage = useSetAlbumArtistStore();
@@ -308,12 +315,21 @@ export const AlbumArtistListHeader = ({ gridRef, tableRef }: AlbumArtistListHead
                 size="xl"
                 variant="subtle"
               >
-                <TextTitle
-                  fw="bold"
-                  order={3}
-                >
-                  Album Artists
-                </TextTitle>
+                <Group noWrap>
+                  <TextTitle
+                    order={3}
+                    weight={700}
+                  >
+                    Album Artists
+                  </TextTitle>
+                  <Badge
+                    px="1rem"
+                    radius="xl"
+                    size="xl"
+                  >
+                    {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
+                  </Badge>
+                </Group>
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>

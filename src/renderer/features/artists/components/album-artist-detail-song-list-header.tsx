@@ -96,7 +96,6 @@ export const AlbumArtistDetailSongListHeader = ({
   const server = useCurrentServer();
   const page = useSongListStore();
   const setPage = useSetSongStore();
-  // const setFilter = useSetSongFilters();
   const setTable = useSetSongTable();
   const setPagination = useSetSongTablePagination();
   const handlePlayQueueAdd = usePlayQueueAdd();
@@ -300,10 +299,10 @@ export const AlbumArtistDetailSongListHeader = ({
               >
                 <Group noWrap>
                   <TextTitle
-                    fw="bold"
                     maw="20vw"
                     order={3}
                     overflow="hidden"
+                    weight={700}
                   >
                     {title}
                   </TextTitle>
@@ -402,7 +401,7 @@ export const AlbumArtistDetailSongListHeader = ({
               sortOrderLabel
             ) : (
               <>
-                {page.filter.sortOrder === SortOrder.ASC ? (
+                {filter.sortOrder === SortOrder.ASC ? (
                   <RiSortAsc size={15} />
                 ) : (
                   <RiSortDesc size={15} />

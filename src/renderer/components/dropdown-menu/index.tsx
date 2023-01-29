@@ -63,7 +63,6 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   & .mantine-Menu-itemLabel {
     color: ${(props) => (props.$danger ? 'var(--danger-color)' : 'var(--dropdown-menu-fg)')};
     font-weight: 500;
-    font-size: 1em;
   }
 
   & .mantine-Menu-itemRightSection {

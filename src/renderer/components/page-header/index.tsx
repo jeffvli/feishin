@@ -11,7 +11,7 @@ const Container = styled(motion(Flex))<{
   position: ${(props) => props.position || 'relative'};
   z-index: 2000;
   width: 100%;
-  height: ${(props) => props.height || '60px'};
+  height: ${(props) => props.height || '65px'};
 `;
 
 const Header = styled(motion.div)<{ $isHidden?: boolean; $padRight?: boolean }>`

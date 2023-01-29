@@ -10,7 +10,6 @@ const StyledBadge = styled(MantineBadge)<BadgeProps>`
   }
 
   .mantine-Badge-inner {
-    padding: 0 0.5rem;
     color: var(--badge-fg);
   }
 `;

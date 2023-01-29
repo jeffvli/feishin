@@ -196,7 +196,7 @@ export const GeneralTab = () => {
   ];
 
   return (
-    <Stack spacing="xl">
+    <Stack spacing="md">
       {options
         .filter((o) => !o.isHidden)
         .map((option) => (

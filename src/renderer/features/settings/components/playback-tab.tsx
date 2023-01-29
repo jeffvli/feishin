@@ -360,7 +360,7 @@ export const PlaybackTab = () => {
   ];
 
   return (
-    <Stack spacing="xl">
+    <Stack spacing="md">
       {playerOptions
         .filter((o) => !o.isHidden)
         .map((option) => (

@@ -47,7 +47,7 @@ export const AlbumDetailHeader = forwardRef(
           item={{ route: AppRoute.LIBRARY_ALBUMS, type: LibraryItem.ALBUM }}
           title={detailQuery?.data?.name || ''}
         >
-          <Stack mt="1rem">
+          <Stack spacing="sm">
             <Group>
               {metadataItems.map((item, index) => (
                 <Fragment key={`item-${item.id}-${index}`}>
@@ -79,10 +79,10 @@ export const AlbumDetailHeader = forwardRef(
                   <Text
                     $link
                     component={Link}
-                    fw="600"
                     to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                       albumArtistId: artist.id,
                     })}
+                    weight={600}
                   >
                     {artist.name}
                   </Text>

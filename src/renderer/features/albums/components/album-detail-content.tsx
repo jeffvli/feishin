@@ -126,8 +126,8 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
       },
       title: (
         <TextTitle
-          fw="bold"
           order={3}
+          weight={700}
         >
           More from this artist
         </TextTitle>
@@ -189,7 +189,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
           ref={showGenres ? null : intersectRef}
           className="test"
           py="1rem"
-          spacing="lg"
+          spacing="md"
         >
           <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
           <Group spacing="xs">

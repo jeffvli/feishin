@@ -30,7 +30,7 @@ export const ServerList = () => {
         sx={{
           position: 'absolute',
           right: 55,
-          transform: 'translateY(-4.5rem)',
+          transform: 'translateY(-2.5rem)',
         }}
       >
         <Button

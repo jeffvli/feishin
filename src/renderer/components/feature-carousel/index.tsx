@@ -27,8 +27,7 @@ const Grid = styled.div`
   grid-auto-columns: 1fr;
   grid-template-areas: 'image info';
   grid-template-rows: 1fr;
-  grid-template-columns: 225px 1fr;
-  gap: 0.5rem;
+  grid-template-columns: 200px 1fr;
   width: 100%;
   max-width: 100%;
   height: 100%;
@@ -152,16 +151,27 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                 />
               </ImageColumn>
               <InfoColumn>
-                <Stack sx={{ width: '100%' }}>
+                <Stack
+                  spacing="md"
+                  sx={{ width: '100%' }}
+                >
                   <TitleWrapper>
-                    <TextTitle fw="bold">{currentItem?.name}</TextTitle>
+                    <TextTitle
+                      lh="4rem"
+                      lineClamp={2}
+                      order={1}
+                      sx={{ fontSize: '4rem' }}
+                      weight={900}
+                    >
+                      {currentItem?.name}
+                    </TextTitle>
                   </TitleWrapper>
                   <TitleWrapper>
                     {currentItem?.albumArtists.map((artist) => (
                       <TextTitle
                         key={`carousel-artist-${artist.id}`}
-                        fw="600"
-                        order={3}
+                        order={2}
+                        weight={600}
                       >
                         {artist.name}
                       </TextTitle>
@@ -169,10 +179,15 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                   </TitleWrapper>
                   <Group>
                     {currentItem?.genres?.map((genre) => (
-                      <Badge key={`carousel-genre-${genre.id}`}>{genre.name}</Badge>
+                      <Badge
+                        key={`carousel-genre-${genre.id}`}
+                        size="lg"
+                      >
+                        {genre.name}
+                      </Badge>
                     ))}
-                    <Badge>{currentItem?.releaseYear}</Badge>
-                    <Badge>{currentItem?.songCount} tracks</Badge>
+                    <Badge size="lg">{currentItem?.releaseYear}</Badge>
+                    <Badge size="lg">{currentItem?.songCount} tracks</Badge>
                   </Group>
                 </Stack>
               </InfoColumn>
@@ -187,25 +202,25 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
       </AnimatePresence>
       <Group
         spacing="xs"
-        sx={{ bottom: 0, position: 'absolute', right: 0, zIndex: 20 }}
+        sx={{ bottom: '1rem', position: 'absolute', right: 0, zIndex: 20 }}
       >
         <Button
           disabled={itemIndex === 0}
-          px="lg"
           radius={100}
-          variant="subtle"
+          size="md"
+          variant="default"
           onClick={handlePrevious}
         >
-          <RiArrowLeftSLine size={15} />
+          <RiArrowLeftSLine size="2rem" />
         </Button>
         <Button
           disabled={itemIndex === (data?.length || 1) - 1}
-          px="lg"
           radius={100}
-          variant="subtle"
+          size="md"
+          variant="default"
           onClick={handleNext}
         >
-          <RiArrowRightSLine size={15} />
+          <RiArrowRightSLine size="2rem" />
         </Button>
       </Group>
     </Wrapper>

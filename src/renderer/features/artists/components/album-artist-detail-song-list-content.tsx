@@ -1,6 +1,5 @@
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import type {
-  BodyScrollEvent,
   ColDef,
   GridReadyEvent,
   IDatasource,
@@ -8,6 +7,7 @@ import type {
   RowDoubleClickedEvent,
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { useSetState } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -21,11 +21,9 @@ import {
   SongListFilter,
   useCurrentServer,
   useSetSongTable,
-  useSetSongTablePagination,
   useSongListStore,
-  useSongTablePagination,
 } from '/@/renderer/store';
-import { ListDisplayType } from '/@/renderer/types';
+import { ListDisplayType, TablePagination as TablePaginationType } from '/@/renderer/types';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
@@ -49,8 +47,13 @@ export const AlbumArtistDetailSongListContent = ({
   const server = useCurrentServer();
   const page = useSongListStore();
 
-  const pagination = useSongTablePagination();
-  const setPagination = useSetSongTablePagination();
+  const [pagination, setPagination] = useSetState<TablePaginationType>({
+    currentPage: 0,
+    itemsPerPage: 100,
+    totalItems: itemCount || 0,
+    totalPages: 0,
+  });
+
   const setTable = useSetSongTable();
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
@@ -62,14 +65,6 @@ export const AlbumArtistDetailSongListContent = ({
     [page.table.columns],
   );
 
-  const defaultColumnDefs: ColDef = useMemo(() => {
-    return {
-      lockPinned: true,
-      lockVisible: true,
-      resizable: true,
-    };
-  }, []);
-
   const onGridReady = useCallback(
     (params: GridReadyEvent) => {
       const dataSource: IDatasource = {
@@ -79,10 +74,7 @@ export const AlbumArtistDetailSongListContent = ({
 
           const queryKey = queryKeys.songs.list(server?.id || '', {
             ...filter,
-            // artistIds: [albumArtistId],
             limit,
-            // sortBy: SongListSort.ALBUM,
-            // sortOrder: SortOrder.ASC,
             startIndex,
           });
 
@@ -91,11 +83,8 @@ export const AlbumArtistDetailSongListContent = ({
             async ({ signal }) =>
               api.controller.getSongList({
                 query: {
-                  // artistIds: [albumArtistId],
                   ...filter,
                   limit,
-                  // sortBy: SongListSort.ALBUM,
-                  // sortOrder: SortOrder.ASC,
                   startIndex,
                 },
                 server,
@@ -110,9 +99,8 @@ export const AlbumArtistDetailSongListContent = ({
         rowCount: undefined,
       };
       params.api.setDatasource(dataSource);
-      params.api.ensureIndexVisible(page.table.scrollOffset, 'top');
     },
-    [filter, page.table.scrollOffset, queryClient, server],
+    [filter, queryClient, server],
   );
 
   const onPaginationChanged = useCallback(
@@ -131,12 +119,6 @@ export const AlbumArtistDetailSongListContent = ({
     },
     [isPaginationEnabled, pagination.currentPage, pagination.itemsPerPage, setPagination],
   );
-
-  const handleGridSizeChange = () => {
-    if (page.table.autoFit) {
-      tableRef?.current?.api.sizeColumnsToFit();
-    }
-  };
 
   const handleColumnChange = useCallback(() => {
     const { columnApi } = tableRef?.current || {};
@@ -164,11 +146,6 @@ export const AlbumArtistDetailSongListContent = ({
 
   const debouncedColumnChange = debounce(handleColumnChange, 200);
 
-  const handleScroll = (e: BodyScrollEvent) => {
-    const scrollOffset = Number((e.top / page.table.rowHeight).toFixed(0));
-    setTable({ scrollOffset });
-  };
-
   const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
@@ -189,18 +166,17 @@ export const AlbumArtistDetailSongListContent = ({
           ref={tableRef}
           alwaysShowHorizontalScroll
           animateRows
-          autoFitColumns
           maintainColumnOrder
           suppressCopyRowsToClipboard
           suppressMoveWhenRowDragging
           suppressPaginationPanel
           suppressRowDrag
           suppressScrollOnNewData
+          autoFitColumns={page.table.autoFit}
           blockLoadDebounceMillis={200}
           cacheBlockSize={500}
           cacheOverflowSize={1}
           columnDefs={columnDefs}
-          defaultColDef={defaultColumnDefs}
           enableCellChangeFlash={false}
           getRowId={(data) => data.data.id}
           infiniteInitialRowCount={itemCount || 100}
@@ -211,12 +187,10 @@ export const AlbumArtistDetailSongListContent = ({
           rowHeight={page.table.rowHeight || 40}
           rowModelType="infinite"
           rowSelection="multiple"
-          onBodyScrollEnd={handleScroll}
           onCellContextMenu={handleContextMenu}
           onColumnMoved={handleColumnChange}
           onColumnResized={debouncedColumnChange}
           onGridReady={onGridReady}
-          onGridSizeChanged={handleGridSizeChange}
           onPaginationChanged={onPaginationChanged}
           onRowDoubleClicked={handleRowDoubleClick}
         />
