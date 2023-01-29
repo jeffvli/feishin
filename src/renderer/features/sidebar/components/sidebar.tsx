@@ -185,7 +185,7 @@ export const Sidebar = () => {
                 py="0.5rem"
                 to={AppRoute.HOME}
               >
-                <Group>
+                <Group spacing="sm">
                   {location.pathname === AppRoute.HOME ? (
                     <RiHome4Fill size="1.3em" />
                   ) : (
@@ -212,7 +212,7 @@ export const Sidebar = () => {
               >
                 <Accordion.Item value="library">
                   <Accordion.Control>
-                    <Group>
+                    <Group spacing="sm">
                       {location.pathname.includes('/library/') ? (
                         <RiDatabaseFill size="1.3em" />
                       ) : (
@@ -223,7 +223,7 @@ export const Sidebar = () => {
                   </Accordion.Control>
                   <Accordion.Panel>
                     <SidebarItem to={AppRoute.LIBRARY_ALBUMS}>
-                      <Group>
+                      <Group spacing="sm">
                         {location.pathname === AppRoute.LIBRARY_ALBUMS ? (
                           <RiAlbumFill size="1.1em" />
                         ) : (
@@ -233,7 +233,7 @@ export const Sidebar = () => {
                       </Group>
                     </SidebarItem>
                     <SidebarItem to={AppRoute.LIBRARY_SONGS}>
-                      <Group>
+                      <Group spacing="sm">
                         {location.pathname === AppRoute.LIBRARY_SONGS ? (
                           <RiMusic2Fill size="1.1em" />
                         ) : (
@@ -243,7 +243,7 @@ export const Sidebar = () => {
                       </Group>
                     </SidebarItem>
                     <SidebarItem to={AppRoute.LIBRARY_ALBUM_ARTISTS}>
-                      <Group>
+                      <Group spacing="sm">
                         {location.pathname === AppRoute.LIBRARY_ALBUM_ARTISTS ? (
                           <RiUserVoiceFill size="1.1em" />
                         ) : (
@@ -256,7 +256,7 @@ export const Sidebar = () => {
                       disabled
                       to={AppRoute.LIBRARY_FOLDERS}
                     >
-                      <Group>
+                      <Group spacing="sm">
                         <RiFlag2Line size="1.1em" />
                         Genres
                       </Group>
@@ -265,7 +265,7 @@ export const Sidebar = () => {
                       disabled
                       to={AppRoute.LIBRARY_FOLDERS}
                     >
-                      <Group>
+                      <Group spacing="sm">
                         <RiFolder3Line size="1.1em" />
                         Folders
                       </Group>
@@ -274,7 +274,7 @@ export const Sidebar = () => {
                 </Accordion.Item>
                 <Accordion.Item value="collections">
                   <Accordion.Control disabled>
-                    <Group>
+                    <Group spacing="sm">
                       <BsCollection size="1.3em" />
                       Collections
                     </Group>
@@ -287,7 +287,10 @@ export const Sidebar = () => {
                       noWrap
                       position="apart"
                     >
-                      <Group noWrap>
+                      <Group
+                        noWrap
+                        spacing="sm"
+                      >
                         {location.pathname.includes('/playlists/') ? (
                           <MdFeaturedPlayList size="1.3em" />
                         ) : (
@@ -302,7 +305,7 @@ export const Sidebar = () => {
                         <Button
                           compact
                           component="div"
-                          h="1.5em"
+                          h="1.5rem"
                           tooltip={{ label: 'Create playlist', openDelay: 500 }}
                           variant="default"
                           onClick={handleCreatePlaylistModal}
@@ -312,7 +315,7 @@ export const Sidebar = () => {
                         <Button
                           compact
                           component={Link}
-                          h="1.5em"
+                          h="1.5rem"
                           to={AppRoute.PLAYLISTS}
                           tooltip={{ label: 'Playlist list', openDelay: 500 }}
                           variant="default"
