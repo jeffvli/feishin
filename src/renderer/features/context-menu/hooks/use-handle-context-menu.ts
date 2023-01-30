@@ -6,6 +6,7 @@ import { openContextMenu, SetContextMenuItems } from '/@/renderer/features/conte
 export const useHandleTableContextMenu = (
   itemType: LibraryItem,
   contextMenuItems: SetContextMenuItems,
+  context?: any,
 ) => {
   const handleContextMenu = (e: CellContextMenuEvent) => {
     if (!e.event) return;
@@ -25,6 +26,7 @@ export const useHandleTableContextMenu = (
     }
 
     openContextMenu({
+      context,
       data: selectedRows,
       dataNodes: selectedNodes,
       menuItems: contextMenuItems,

@@ -15,6 +15,7 @@ import '@ag-grid-community/styles/ag-grid.css';
 import { ContextMenuProvider } from '/@/renderer/features/context-menu';
 import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { PlayQueueHandlerContext } from '/@/renderer/features/player';
+import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -53,10 +54,10 @@ export const App = () => {
         },
         fontFamily: 'var(--content-font-family)',
         fontSizes: {
-          lg: '1.5rem',
-          md: '1.1rem',
+          lg: '1.1rem',
+          md: '1rem',
           sm: '0.9rem',
-          xl: '2rem',
+          xl: '1.5rem',
           xs: '0.8rem',
         },
         headings: {
@@ -90,7 +91,7 @@ export const App = () => {
             transition: 'slide-down',
           },
         }}
-        modals={{ base: BaseContextModal }}
+        modals={{ addToPlaylist: AddToPlaylistContextModal, base: BaseContextModal }}
       >
         <PlayQueueHandlerContext.Provider value={{ handlePlayQueueAdd }}>
           <ContextMenuProvider>

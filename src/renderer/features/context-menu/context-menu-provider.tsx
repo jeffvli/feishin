@@ -1,8 +1,8 @@
 import { Divider, Group, Stack } from '@mantine/core';
 import { useClickOutside, useResizeObserver, useSetState, useViewportSize } from '@mantine/hooks';
-import { closeAllModals, openModal } from '@mantine/modals';
+import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
 import { createContext, Fragment, useState } from 'react';
-import { LibraryItem } from '/@/renderer/api/types';
+import { LibraryItem, ServerType } from '/@/renderer/api/types';
 import { ConfirmModal, ContextMenu, ContextMenuButton, Text, toast } from '/@/renderer/components';
 import {
   OpenContextMenuProps,
@@ -10,7 +10,9 @@ import {
 } from '/@/renderer/features/context-menu/events';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useDeletePlaylist } from '/@/renderer/features/playlists';
+import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
 import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { useCurrentServer } from '/@/renderer/store';
 import { Play } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
@@ -33,6 +35,8 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [opened, setOpened] = useState(false);
   const clickOutsideRef = useClickOutside(() => setOpened(false));
   const viewport = useViewportSize();
+  const server = useCurrentServer();
+  const serverType = server?.type;
   const [ref, menuRect] = useResizeObserver();
   const [ctx, setCtx] = useSetState<OpenContextMenuProps>({
     data: [],
@@ -47,7 +51,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const handlePlayQueueAdd = usePlayQueueAdd();
 
   const openContextMenu = (args: OpenContextMenuProps) => {
-    const { xPos, yPos, menuItems, data, type, tableRef, dataNodes } = args;
+    const { xPos, yPos, menuItems, data, type, tableRef, dataNodes, context } = args;
 
     const shouldReverseY = yPos + menuRect.height > viewport.height;
     const shouldReverseX = xPos + menuRect.width > viewport.width;
@@ -56,6 +60,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const calculatedYPos = shouldReverseY ? yPos - menuRect.height : yPos;
 
     setCtx({
+      context,
       data,
       dataNodes,
       menuItems,
@@ -216,13 +221,78 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     );
   };
 
+  const handleAddToPlaylist = () => {
+    if (!ctx.dataNodes) return;
+    openContextModal({
+      innerProps: {
+        albumId:
+          ctx.type === LibraryItem.ALBUM ? ctx.dataNodes.map((node) => node.data.id) : undefined,
+        artistId:
+          ctx.type === LibraryItem.ARTIST ? ctx.dataNodes.map((node) => node.data.id) : undefined,
+        songId:
+          ctx.type === LibraryItem.SONG ? ctx.dataNodes.map((node) => node.data.id) : undefined,
+      },
+      modal: 'addToPlaylist',
+      size: 'md',
+      title: 'Add to playlist',
+    });
+  };
+
+  const removeFromPlaylistMutation = useRemoveFromPlaylist();
+
+  const handleRemoveFromPlaylist = () => {
+    const songId =
+      (serverType === ServerType.NAVIDROME || ServerType.JELLYFIN
+        ? ctx.dataNodes?.map((node) => node.data.playlistItemId)
+        : ctx.dataNodes?.map((node) => node.data.id)) || [];
+
+    const confirm = () => {
+      removeFromPlaylistMutation.mutate(
+        {
+          query: {
+            id: ctx.context.playlistId,
+            songId,
+          },
+        },
+        {
+          onError: (err) => {
+            toast.error({
+              message: err.message,
+              title: 'Error removing song(s) from playlist',
+            });
+          },
+          onSuccess: () => {
+            toast.success({
+              message: `${songId.length} song(s) were removed from the playlist`,
+              title: 'Song(s) removed from playlist',
+            });
+            ctx.context?.tableRef?.current?.api?.refreshInfiniteCache();
+            closeAllModals();
+          },
+        },
+      );
+    };
+
+    openModal({
+      children: (
+        <ConfirmModal
+          loading={removeFromPlaylistMutation.isLoading}
+          onConfirm={confirm}
+        >
+          Are you sure you want to remove the following song(s) from the playlist?
+        </ConfirmModal>
+      ),
+      title: 'Remove song(s) from playlist',
+    });
+  };
+
   const contextMenuItems = {
     addToFavorites: {
       id: 'addToFavorites',
       label: 'Add to favorites',
       onClick: handleAddToFavorites,
     },
-    addToPlaylist: { id: 'addToPlaylist', label: 'Add to playlist', onClick: () => {} },
+    addToPlaylist: { id: 'addToPlaylist', label: 'Add to playlist', onClick: handleAddToPlaylist },
     createPlaylist: { id: 'createPlaylist', label: 'Create playlist', onClick: () => {} },
     deletePlaylist: {
       id: 'deletePlaylist',
@@ -248,6 +318,11 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       id: 'removeFromFavorites',
       label: 'Remove from favorites',
       onClick: handleRemoveFromFavorites,
+    },
+    removeFromPlaylist: {
+      id: 'removeFromPlaylist',
+      label: 'Remove from playlist',
+      onClick: handleRemoveFromPlaylist,
     },
     setRating: { id: 'setRating', label: 'Set rating', onClick: () => {} },
   };

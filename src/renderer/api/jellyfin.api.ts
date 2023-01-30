@@ -1,6 +1,8 @@
 import ky from 'ky';
 import { nanoid } from 'nanoid/non-secure';
 import type {
+  JFAddToPlaylist,
+  JFAddToPlaylistParams,
   JFAlbum,
   JFAlbumArtist,
   JFAlbumArtistDetail,
@@ -27,6 +29,8 @@ import type {
   JFPlaylistDetailResponse,
   JFPlaylistList,
   JFPlaylistListResponse,
+  JFRemoveFromPlaylist,
+  JFRemoveFromPlaylistParams,
   JFSong,
   JFSongList,
   JFSongListParams,
@@ -64,6 +68,8 @@ import {
   UpdatePlaylistArgs,
   UpdatePlaylistResponse,
   LibraryItem,
+  RemoveFromPlaylistArgs,
+  AddToPlaylistArgs,
 } from '/@/renderer/api/types';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
@@ -360,6 +366,45 @@ const getSongList = async (args: SongListArgs): Promise<JFSongList> => {
     startIndex: query.startIndex,
     totalRecordCount: data.TotalRecordCount,
   };
+};
+
+const addToPlaylist = async (args: AddToPlaylistArgs): Promise<JFAddToPlaylist> => {
+  const { query, body, server, signal } = args;
+
+  const searchParams: JFAddToPlaylistParams = {
+    ids: body.songId,
+    userId: server?.userId || '',
+  };
+
+  await api
+    .post(`playlists/${query.id}/items`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      prefixUrl: server?.url,
+      searchParams: parseSearchParams(searchParams),
+      signal,
+    })
+    .json<JFPlaylistDetailResponse>();
+
+  return null;
+};
+
+const removeFromPlaylist = async (args: RemoveFromPlaylistArgs): Promise<JFRemoveFromPlaylist> => {
+  const { query, server, signal } = args;
+
+  const searchParams: JFRemoveFromPlaylistParams = {
+    entryIds: query.songId,
+  };
+
+  await api
+    .delete(`playlists/${query.id}/items`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      prefixUrl: server?.url,
+      searchParams: parseSearchParams(searchParams),
+      signal,
+    })
+    .json<JFPlaylistDetailResponse>();
+
+  return null;
 };
 
 const getPlaylistDetail = async (args: PlaylistDetailArgs): Promise<JFPlaylistDetail> => {
@@ -677,6 +722,7 @@ const normalizeSong = (
     name: item.Name,
     path: (item.MediaSources && item.MediaSources[0]?.Path) || null,
     playCount: (item.UserData && item.UserData.PlayCount) || 0,
+    playlistItemId: item.PlaylistItemId,
     // releaseDate: (item.ProductionYear && new Date(item.ProductionYear, 0, 1).toISOString()) || null,
     releaseDate: null,
     releaseYear: item.ProductionYear ? String(item.ProductionYear) : null,
@@ -863,6 +909,7 @@ const normalizePlaylist = (
 // };
 
 export const jellyfinApi = {
+  addToPlaylist,
   authenticate,
   createFavorite,
   createPlaylist,
@@ -879,6 +926,7 @@ export const jellyfinApi = {
   getPlaylistList,
   getPlaylistSongList,
   getSongList,
+  removeFromPlaylist,
   updatePlaylist,
 };
 

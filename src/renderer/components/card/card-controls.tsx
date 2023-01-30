@@ -2,6 +2,7 @@ import type { MouseEvent } from 'react';
 import React from 'react';
 import type { UnstyledButtonProps } from '@mantine/core';
 import { Group } from '@mantine/core';
+import { openContextModal } from '@mantine/modals';
 import { RiPlayFill, RiMore2Fill, RiHeartFill, RiHeartLine } from 'react-icons/ri';
 import styled from 'styled-components';
 import { _Button } from '/@/renderer/components/button';
@@ -137,6 +138,19 @@ export const CardControls = ({
     });
   };
 
+  const openAddToPlaylistModal = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    openContextModal({
+      innerProps: {
+        albumId: itemType === LibraryItem.ALBUM ? [itemData.id] : undefined,
+        artistId: itemType === LibraryItem.ALBUM_ARTIST ? [itemData.id] : undefined,
+      },
+      modal: 'addToPlaylist',
+      size: 'md',
+      title: 'Add to playlist',
+    });
+  };
+
   return (
     <GridCardControlsContainer>
       <BottomControls>
@@ -190,8 +204,9 @@ export const CardControls = ({
                   {type.label}
                 </DropdownMenu.Item>
               ))}
-              <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
-              <DropdownMenu.Item disabled>Refresh metadata</DropdownMenu.Item>
+              <DropdownMenu.Item onClick={openAddToPlaylistModal}>
+                Add to playlist
+              </DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
         </Group>

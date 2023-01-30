@@ -274,6 +274,26 @@ export type NDAlbumArtistListParams = {
 } & NDPagination &
   NDOrder;
 
+export type NDAddToPlaylistResponse = {
+  added: number;
+};
+
+export type NDAddToPlaylistBody = {
+  ids: string[];
+};
+
+export type NDAddToPlaylist = null;
+
+export type NDRemoveFromPlaylistResponse = {
+  ids: string[];
+};
+
+export type NDRemoveFromPlaylistParams = {
+  id: string[];
+};
+
+export type NDRemoveFromPlaylist = null;
+
 export type NDCreatePlaylistParams = {
   comment?: string;
   name: string;
