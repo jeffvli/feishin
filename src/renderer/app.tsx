@@ -54,10 +54,10 @@ export const App = () => {
         },
         fontFamily: 'var(--content-font-family)',
         fontSizes: {
-          lg: '1.5rem',
-          md: '1.1rem',
+          lg: '1.1rem',
+          md: '1rem',
           sm: '0.9rem',
-          xl: '2rem',
+          xl: '1.5rem',
           xs: '0.8rem',
         },
         headings: {
