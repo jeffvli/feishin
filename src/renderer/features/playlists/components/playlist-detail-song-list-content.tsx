@@ -26,7 +26,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
-import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import { PLAYLIST_SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import {
   LibraryItem,
@@ -185,7 +185,11 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     setPagination(playlistId, { scrollOffset });
   };
 
-  const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
+  const handleContextMenu = useHandleTableContextMenu(
+    LibraryItem.SONG,
+    PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
+    { playlistId, tableRef },
+  );
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;

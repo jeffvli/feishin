@@ -5,6 +5,7 @@ import { MutableRefObject } from 'react';
 import { LibraryItem } from '/@/renderer/api/types';
 
 export type OpenContextMenuProps = {
+  context?: any;
   data: any[];
   dataNodes?: RowNode[];
   menuItems: SetContextMenuItems;
@@ -24,6 +25,7 @@ export type ContextMenuItem =
   | 'playLast'
   | 'playNext'
   | 'addToPlaylist'
+  | 'removeFromPlaylist'
   | 'addToFavorites'
   | 'removeFromFavorites'
   | 'setRating'

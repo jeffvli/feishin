@@ -28,7 +28,7 @@ import {
   VirtualTable,
 } from '/@/renderer/components';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
-import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import { PLAYLIST_SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { UpdatePlaylistForm } from '/@/renderer/features/playlists/components/update-playlist-form';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
@@ -90,7 +90,11 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     [page.table.columns],
   );
 
-  const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
+  const handleContextMenu = useHandleTableContextMenu(
+    LibraryItem.SONG,
+    PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
+    { playlistId },
+  );
 
   const playlistSongData = useMemo(
     () => playlistSongsQueryInfinite.data?.pages.flatMap((p) => p.items),
