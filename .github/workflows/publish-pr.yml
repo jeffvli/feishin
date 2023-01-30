@@ -36,7 +36,7 @@ jobs:
           command: |
             npm run postinstall
             npm run build
-            npm exec electron-builder -- --publish never --win --mac --linux
+            npm run package:pr
           on_retry_command: npm cache clean --force
 
       - uses: actions/upload-artifact@v3
