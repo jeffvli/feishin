@@ -28,10 +28,6 @@ const StyledTextTitle = styled(MantineHeader)<TextTitleProps>`
     color: ${(props) => props.$link && 'var(--main-fg)'};
     text-decoration: ${(props) => (props.$link ? 'underline' : 'none')};
   }
-
-  h1 {
-    font-size: 4rem;
-  }
 `;
 
 const _TextTitle = ({ children, $secondary, overflow, $noSelect, ...rest }: TextTitleProps) => {

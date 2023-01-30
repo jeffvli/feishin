@@ -262,7 +262,7 @@ export const PlaylistDetailSongListHeader = ({
                 variant="subtle"
               >
                 <TextTitle
-                  order={3}
+                  order={2}
                   weight={700}
                 >
                   {detailQuery?.data?.name}

@@ -35,7 +35,7 @@ export const Settings = () => {
           orientation="vertical"
           styles={{
             tab: {
-              fontSize: '1.1rem',
+              fontSize: '1rem',
               padding: '0.5rem 1rem',
             },
           }}

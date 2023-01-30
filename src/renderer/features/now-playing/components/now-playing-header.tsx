@@ -9,7 +9,7 @@ export const NowPlayingHeader = () => {
     <PageHeader>
       <Group p="1rem">
         <TextTitle
-          order={3}
+          order={2}
           weight={700}
         >
           Queue

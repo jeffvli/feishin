@@ -317,7 +317,7 @@ export const AlbumArtistListHeader = ({
               >
                 <Group noWrap>
                   <TextTitle
-                    order={3}
+                    order={2}
                     weight={700}
                   >
                     Album Artists

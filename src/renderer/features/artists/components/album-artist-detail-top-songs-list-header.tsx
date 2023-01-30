@@ -55,7 +55,7 @@ export const AlbumArtistDetailTopSongsListHeader = ({
             <Group noWrap>
               <TextTitle
                 maw="20vw"
-                order={3}
+                order={2}
                 overflow="hidden"
                 weight={700}
               >

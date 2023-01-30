@@ -127,7 +127,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
       },
       title: (
         <TextTitle
-          order={3}
+          order={2}
           weight={700}
         >
           More from this artist

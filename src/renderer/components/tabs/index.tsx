@@ -22,6 +22,7 @@ const StyledTabs = styled(MantineTabs)`
   button {
     padding: 1rem;
     color: var(--btn-subtle-fg);
+    border-radius: 0;
 
     &:hover {
       color: var(--btn-subtle-fg-hover);
@@ -33,14 +34,22 @@ const StyledTabs = styled(MantineTabs)`
 
   button[data-active] {
     color: var(--btn-primary-fg);
-    background: var(--primary-color);
-    border-color: var(--primary-color);
+    background: none;
+    box-shadow: 2px 0 0 var(--primary-color) inset;
 
     &:hover {
-      background: var(--btn-primary-bg-hover);
-      border-color: var(--primary-color);
+      background: none;
     }
   }
+
+  /* button[data-active]::before {
+    content: '';
+    border-left: 2px solid var(--primary-color);
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  } */
 `;
 
 export const Tabs = ({ children, ...props }: TabsProps) => {

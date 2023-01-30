@@ -123,7 +123,7 @@ const HomeRoute = () => {
       },
       title: (
         <TextTitle
-          order={3}
+          order={2}
           weight={700}
         >
           Explore from your library
@@ -142,7 +142,7 @@ const HomeRoute = () => {
       },
       title: (
         <TextTitle
-          order={3}
+          order={2}
           weight={700}
         >
           Recently played
@@ -161,7 +161,7 @@ const HomeRoute = () => {
       },
       title: (
         <TextTitle
-          order={3}
+          order={2}
           weight={700}
         >
           Newly added releases
@@ -180,7 +180,7 @@ const HomeRoute = () => {
       },
       title: (
         <TextTitle
-          order={3}
+          order={2}
           weight={700}
         >
           Most played

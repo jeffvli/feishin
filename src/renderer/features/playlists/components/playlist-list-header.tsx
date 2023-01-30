@@ -214,7 +214,7 @@ export const PlaylistListHeader = ({ tableRef }: PlaylistListHeaderProps) => {
               >
                 <TextTitle
                   fw="bold"
-                  order={3}
+                  order={2}
                 >
                   Playlists
                 </TextTitle>

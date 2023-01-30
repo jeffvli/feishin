@@ -48,7 +48,7 @@ export const AlbumDetailHeader = forwardRef(
           title={detailQuery?.data?.name || ''}
         >
           <Stack spacing="sm">
-            <Group>
+            <Group spacing="sm">
               {metadataItems.map((item, index) => (
                 <Fragment key={`item-${item.id}-${index}`}>
                   {index > 0 && <Text $noSelect>•</Text>}
@@ -57,6 +57,7 @@ export const AlbumDetailHeader = forwardRef(
               ))}
             </Group>
             <Group
+              spacing="sm"
               sx={{
                 WebkitBoxOrient: 'vertical',
                 WebkitLineClamp: 2,

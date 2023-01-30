@@ -373,7 +373,7 @@ export const Sidebar = () => {
                 compact
                 opacity={0.8}
                 radius={100}
-                size="sm"
+                size="md"
                 sx={{ position: 'absolute', right: 5, top: 5 }}
                 tooltip={{ label: 'Collapse', openDelay: 500 }}
                 variant="default"

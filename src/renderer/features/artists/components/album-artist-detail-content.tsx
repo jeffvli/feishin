@@ -166,7 +166,7 @@ export const AlbumArtistDetailContent = () => {
       title: (
         <>
           <TextTitle
-            order={3}
+            order={2}
             weight={700}
           >
             Recent releases
@@ -194,7 +194,7 @@ export const AlbumArtistDetailContent = () => {
       },
       title: (
         <TextTitle
-          order={3}
+          order={2}
           weight={700}
         >
           Appears on
@@ -212,7 +212,7 @@ export const AlbumArtistDetailContent = () => {
       },
       title: (
         <TextTitle
-          order={3}
+          order={2}
           weight={700}
         >
           Related artists
@@ -381,7 +381,7 @@ export const AlbumArtistDetailContent = () => {
           maw="1280px"
         >
           <TextTitle
-            order={3}
+            order={2}
             weight={700}
           >
             About {detailQuery?.data?.name}
@@ -405,7 +405,7 @@ export const AlbumArtistDetailContent = () => {
               align="flex-end"
             >
               <TextTitle
-                order={3}
+                order={2}
                 weight={700}
               >
                 Top Songs

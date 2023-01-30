@@ -67,7 +67,6 @@ export const AppMenu = () => {
       withArrow
       withinPortal
       position="bottom"
-      width={200}
     >
       <DropdownMenu.Target>
         <Button

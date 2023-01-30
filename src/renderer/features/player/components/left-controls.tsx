@@ -119,7 +119,7 @@ export const LeftControls = () => {
                   compact
                   opacity={0.8}
                   radius={50}
-                  size="xs"
+                  size="md"
                   sx={{ position: 'absolute', right: 2, top: 2 }}
                   tooltip={{ label: 'Expand', openDelay: 500 }}
                   variant="default"

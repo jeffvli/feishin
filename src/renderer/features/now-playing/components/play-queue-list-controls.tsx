@@ -90,51 +90,51 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
       sx={{ alignItems: 'center' }}
       w="100%"
     >
-      <Group>
+      <Group spacing="sm">
         <Button
           compact
-          size="sm"
+          size="md"
           tooltip={{ label: 'Shuffle queue' }}
           variant="default"
           onClick={handleShuffleQueue}
         >
-          <RiShuffleLine size={15} />
+          <RiShuffleLine size="1.1rem" />
         </Button>
         <Button
           compact
-          size="sm"
+          size="md"
           tooltip={{ label: 'Move selected to top' }}
           variant="default"
           onClick={handleMoveToTop}
         >
-          <RiArrowUpLine size={15} />
+          <RiArrowUpLine size="1.1rem" />
         </Button>
         <Button
           compact
-          size="sm"
+          size="md"
           tooltip={{ label: 'Move selected to bottom' }}
           variant="default"
           onClick={handleMoveToBottom}
         >
-          <RiArrowDownLine size={15} />
+          <RiArrowDownLine size="1.1rem" />
         </Button>
         <Button
           compact
-          size="sm"
+          size="md"
           tooltip={{ label: 'Remove selected' }}
           variant="default"
           onClick={handleRemoveSelected}
         >
-          <RiEraserLine size={15} />
+          <RiEraserLine size="1.1rem" />
         </Button>
         <Button
           compact
-          size="sm"
+          size="md"
           tooltip={{ label: 'Clear queue' }}
           variant="default"
           onClick={handleClearQueue}
         >
-          <RiDeleteBinLine size={15} />
+          <RiDeleteBinLine size="1.1rem" />
         </Button>
       </Group>
       <Group>
@@ -142,11 +142,11 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
           <Popover.Target>
             <Button
               compact
-              size="sm"
+              size="md"
               tooltip={{ label: 'Configure' }}
               variant="default"
             >
-              <RiListSettingsLine size={15} />
+              <RiListSettingsLine size="1.1rem" />
             </Button>
           </Popover.Target>
           <Popover.Dropdown>

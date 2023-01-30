@@ -41,8 +41,8 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: var(--primary-color);
-        opacity: 0.2;
+        background-color: var(--dropdown-menu-bg-hover);
+        opacity: 0.5;
         z-index: -1;
       }
 

@@ -28,7 +28,7 @@ interface TitleProps {
 const Title = ({ children }: TitleProps) => {
   return (
     <TextTitle
-      order={2}
+      order={1}
       overflow="hidden"
       weight={700}
     >
