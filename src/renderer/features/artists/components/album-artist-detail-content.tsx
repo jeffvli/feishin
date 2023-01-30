@@ -10,6 +10,7 @@ import {
 } from '/@/renderer/components';
 import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { Box, Group, Stack } from '@mantine/core';
+import { openContextModal } from '@mantine/modals';
 import { RiArrowDownSLine, RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { useCurrentServer } from '/@/renderer/store';
@@ -266,6 +267,17 @@ export const AlbumArtistDetailContent = () => {
     }
   };
 
+  const handleAddToPlaylist = () => {
+    openContextModal({
+      innerProps: {
+        artistId: [albumArtistId],
+      },
+      modal: 'addToPlaylist',
+      size: 'md',
+      title: 'Add to playlist',
+    });
+  };
+
   const topSongs = topSongsQuery?.data?.items?.slice(0, 10);
 
   const showBiography =
@@ -318,7 +330,7 @@ export const AlbumArtistDetailContent = () => {
                   </DropdownMenu.Item>
                 ))}
                 <DropdownMenu.Divider />
-                <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
+                <DropdownMenu.Item onClick={handleAddToPlaylist}>Add to playlist</DropdownMenu.Item>
               </DropdownMenu.Dropdown>
             </DropdownMenu>
             <Button

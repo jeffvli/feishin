@@ -12,6 +12,7 @@ import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
+import { openContextModal } from '@mantine/modals';
 import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
@@ -182,6 +183,17 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
 
   const { intersectRef, tableContainerRef } = useFixedTableHeader();
 
+  const handleAddToPlaylist = () => {
+    openContextModal({
+      innerProps: {
+        albumId: [albumId],
+      },
+      modal: 'addToPlaylist',
+      size: 'md',
+      title: 'Add to playlist',
+    });
+  };
+
   return (
     <ContentContainer>
       <Box component="section">
@@ -227,7 +239,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
                   </DropdownMenu.Item>
                 ))}
                 <DropdownMenu.Divider />
-                <DropdownMenu.Item disabled>Add to playlist</DropdownMenu.Item>
+                <DropdownMenu.Item onClick={handleAddToPlaylist}>Add to playlist</DropdownMenu.Item>
               </DropdownMenu.Dropdown>
             </DropdownMenu>
           </Group>
