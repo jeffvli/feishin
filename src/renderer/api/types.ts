@@ -1014,3 +1014,17 @@ export type ArtistInfoQuery = {
 };
 
 export type ArtistInfoArgs = { query: ArtistInfoQuery } & BaseEndpointArgs;
+
+// Scrobble
+export type RawScrobbleResponse = null | undefined;
+
+export type ScrobbleArgs = {
+  query: ScrobbleQuery;
+} & BaseEndpointArgs;
+
+export type ScrobbleQuery = {
+  event?: 'pause' | 'unpause' | 'timeupdate' | 'start';
+  id: string;
+  position?: number;
+  submission: boolean;
+};

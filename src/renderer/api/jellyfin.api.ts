@@ -70,6 +70,8 @@ import {
   LibraryItem,
   RemoveFromPlaylistArgs,
   AddToPlaylistArgs,
+  ScrobbleArgs,
+  RawScrobbleResponse,
 } from '/@/renderer/api/types';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
@@ -581,6 +583,56 @@ const deleteFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
   };
 };
 
+const scrobble = async (args: ScrobbleArgs): Promise<RawScrobbleResponse> => {
+  const { query } = args;
+
+  const position = query.position && Math.round(query.position);
+
+  if (query.submission) {
+    // Checked by jellyfin-plugin-lastfm for whether or not to send the "finished" scrobble (uses PositionTicks)
+    api.post(`sessions/playing/stopped`, {
+      json: {
+        IsPaused: true,
+        ItemId: query.id,
+        PositionTicks: position,
+      },
+    });
+  }
+
+  if (query.event) {
+    if (query.event === 'start') {
+      await api.post(`sessions/playing`, {
+        json: {
+          ItemId: query.id,
+          PositionTicks: position,
+        },
+      });
+
+      return null;
+    }
+
+    await api.post(`sessions/playing/progress`, {
+      json: {
+        EventName: query.event,
+        IsPaused: query.event === 'pause',
+        ItemId: query.id,
+        PositionTicks: position,
+      },
+    });
+
+    return null;
+  }
+
+  await api.post(`sessions/playing/progress`, {
+    json: {
+      ItemId: query.id,
+      PositionTicks: position,
+    },
+  });
+
+  return null;
+};
+
 const getStreamUrl = (args: {
   container?: string;
   deviceId: string;
@@ -927,6 +979,7 @@ export const jellyfinApi = {
   getPlaylistSongList,
   getSongList,
   removeFromPlaylist,
+  scrobble,
   updatePlaylist,
 };
 

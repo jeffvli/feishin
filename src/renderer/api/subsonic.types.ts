@@ -216,3 +216,9 @@ export type SSTopSongList = {
   startIndex: number;
   totalRecordCount: number | null;
 };
+
+export type SSScrobbleParams = {
+  id: string;
+  submission?: boolean;
+  time?: number;
+};
