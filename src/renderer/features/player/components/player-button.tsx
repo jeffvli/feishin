@@ -122,11 +122,7 @@ export const PlayerButton = ({ tooltip, variant, icon, ...rest }: PlayerButtonPr
   if (tooltip) {
     return (
       <Tooltip {...tooltip}>
-        <MotionWrapper
-          variant={variant}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 1 }}
-        >
+        <MotionWrapper variant={variant}>
           <StyledPlayerButton
             variant={variant}
             {...rest}
