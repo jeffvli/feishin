@@ -205,6 +205,7 @@ export type Song = {
   name: string;
   path: string | null;
   playCount: number;
+  playlistItemId?: string;
   releaseDate: string | null;
   releaseYear: string | null;
   serverId: string;
@@ -876,6 +877,7 @@ export type PlaylistListQuery = {
   limit?: number;
   ndParams?: {
     owner_id?: string;
+    smart?: boolean;
   };
   searchTerm?: string;
   sortBy: PlaylistListSort;

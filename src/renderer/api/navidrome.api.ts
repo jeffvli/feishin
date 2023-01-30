@@ -547,10 +547,12 @@ const normalizeSong = (
   imageSize?: number,
 ): Song => {
   let id;
+  let playlistItemId;
 
   // Dynamically determine the id field based on whether or not the item is a playlist song
   if ('mediaFileId' in item) {
     id = item.mediaFileId;
+    playlistItemId = item.id;
   } else {
     id = item.id;
   }
@@ -588,6 +590,7 @@ const normalizeSong = (
     name: item.title,
     path: item.path,
     playCount: item.playCount,
+    playlistItemId,
     releaseDate: new Date(item.year, 0, 1).toISOString(),
     releaseYear: String(item.year),
     serverId: server.id,
