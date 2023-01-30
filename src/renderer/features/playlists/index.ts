@@ -1,4 +1,5 @@
 export * from './queries/playlist-list-query';
+export * from './components/add-to-playlist-context-modal';
 export * from './components/create-playlist-form';
 export * from './mutations/delete-playlist-mutation';
 export * from './mutations/create-playlist-mutation';
