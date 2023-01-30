@@ -103,14 +103,14 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
       <MetadataWrapper>
         <Text
           overflow="hidden"
-          size="sm"
+          size="md"
         >
           {value.name}
         </Text>
         <Text
           $secondary
           overflow="hidden"
-          size="sm"
+          size="md"
         >
           {artists?.length ? (
             artists.map((artist: Artist | AlbumArtist, index: number) => (
@@ -121,7 +121,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
                   $secondary
                   component={Link}
                   overflow="hidden"
-                  size="sm"
+                  size="md"
                   sx={{ width: 'fit-content' }}
                   to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                     albumArtistId: artist.id,

@@ -11,14 +11,14 @@ export const GenreCell = ({ value, data }: ICellRendererParams) => {
       <Text
         $secondary
         overflow="hidden"
-        size="sm"
+        size="md"
       >
         {value?.map((item: Artist | AlbumArtist, index: number) => (
           <React.Fragment key={`row-${item.id}-${data.uniqueId}`}>
             {index > 0 && (
               <Text
                 $secondary
-                size="sm"
+                size="md"
                 style={{ display: 'inline-block' }}
               >
                 ,
@@ -29,7 +29,7 @@ export const GenreCell = ({ value, data }: ICellRendererParams) => {
               $secondary
               component={Link}
               overflow="hidden"
-              size="sm"
+              size="md"
               to="/"
             >
               {item.name || '—'}

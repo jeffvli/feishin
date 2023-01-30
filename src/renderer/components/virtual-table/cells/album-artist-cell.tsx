@@ -25,14 +25,14 @@ export const AlbumArtistCell = ({ value, data }: ICellRendererParams) => {
       <Text
         $secondary
         overflow="hidden"
-        size="sm"
+        size="md"
       >
         {value?.map((item: Artist | AlbumArtist, index: number) => (
           <React.Fragment key={`row-${item.id}-${data.uniqueId}`}>
             {index > 0 && (
               <Text
                 $secondary
-                size="sm"
+                size="md"
                 style={{ display: 'inline-block' }}
               >
                 ,
@@ -43,7 +43,7 @@ export const AlbumArtistCell = ({ value, data }: ICellRendererParams) => {
               $secondary
               component={Link}
               overflow="hidden"
-              size="sm"
+              size="md"
               to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                 albumArtistId: item.id,
               })}
