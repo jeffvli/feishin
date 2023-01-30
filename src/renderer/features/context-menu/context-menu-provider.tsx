@@ -242,7 +242,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
   const handleRemoveFromPlaylist = () => {
     const songId =
-      (serverType === ServerType.NAVIDROME
+      (serverType === ServerType.NAVIDROME || ServerType.JELLYFIN
         ? ctx.dataNodes?.map((node) => node.data.playlistItemId)
         : ctx.dataNodes?.map((node) => node.data.id)) || [];
 

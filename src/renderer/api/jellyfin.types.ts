@@ -73,7 +73,7 @@ export type JFAddToPlaylist = null;
 export type JFRemoveFromPlaylistResponse = null;
 
 export type JFRemoveFromPlaylistParams = {
-  EntryIds: string[];
+  entryIds: string[];
 };
 
 export type JFRemoveFromPlaylist = null;
@@ -271,6 +271,7 @@ export type JFSong = {
   MediaType: string;
   Name: string;
   ParentIndexNumber: number;
+  PlaylistItemId?: string;
   PremiereDate?: string;
   ProductionYear: number;
   RunTimeTicks: number;

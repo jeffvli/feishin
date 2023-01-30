@@ -30,6 +30,7 @@ import type {
   JFPlaylistList,
   JFPlaylistListResponse,
   JFRemoveFromPlaylist,
+  JFRemoveFromPlaylistParams,
   JFSong,
   JFSongList,
   JFSongListParams,
@@ -390,8 +391,8 @@ const addToPlaylist = async (args: AddToPlaylistArgs): Promise<JFAddToPlaylist> 
 const removeFromPlaylist = async (args: RemoveFromPlaylistArgs): Promise<JFRemoveFromPlaylist> => {
   const { query, server, signal } = args;
 
-  const searchParams = {
-    ids: query.songId,
+  const searchParams: JFRemoveFromPlaylistParams = {
+    entryIds: query.songId,
   };
 
   await api
@@ -721,6 +722,7 @@ const normalizeSong = (
     name: item.Name,
     path: (item.MediaSources && item.MediaSources[0]?.Path) || null,
     playCount: (item.UserData && item.UserData.PlayCount) || 0,
+    playlistItemId: item.PlaylistItemId,
     // releaseDate: (item.ProductionYear && new Date(item.ProductionYear, 0, 1).toISOString()) || null,
     releaseDate: null,
     releaseYear: item.ProductionYear ? String(item.ProductionYear) : null,
