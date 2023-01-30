@@ -350,13 +350,19 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
               return (
                 <Fragment key={`context-menu-${item.id}`}>
                   <ContextMenuButton
+                    as="button"
                     disabled={item.disabled}
-                    variant="default"
                     onClick={contextMenuItems[item.id as keyof typeof contextMenuItems].onClick}
                   >
                     {contextMenuItems[item.id as keyof typeof contextMenuItems].label}
                   </ContextMenuButton>
-                  {item.divider && <Divider key={`context-menu-divider-${item.id}`} />}
+                  {item.divider && (
+                    <Divider
+                      key={`context-menu-divider-${item.id}`}
+                      color="rgb(62, 62, 62)"
+                      size="sm"
+                    />
+                  )}
                 </Fragment>
               );
             })}

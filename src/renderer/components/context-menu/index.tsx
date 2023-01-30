@@ -1,8 +1,7 @@
 import { forwardRef, ReactNode, Ref } from 'react';
-import { Portal } from '@mantine/core';
+import { Portal, UnstyledButton } from '@mantine/core';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
-import { _Button } from '/@/renderer/components/button';
 
 interface ContextMenuProps {
   children: ReactNode;
@@ -23,17 +22,27 @@ const ContextMenuContainer = styled(motion.div)<Omit<ContextMenuProps, 'children
   box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 40%);
 `;
 
-export const ContextMenuButton = styled(_Button)`
-  padding: 0.5rem 1.5rem;
+export const ContextMenuButton = styled(UnstyledButton)`
+  padding: 1rem 1.5rem;
+  color: var(--dropdown-menu-fg);
+  font-weight: 500;
+  font-family: var(--content-font-family);
+  text-align: left;
   background: var(--dropdown-menu-bg);
+  border: none;
   cursor: default;
 
   & .mantine-Button-inner {
     justify-content: flex-start;
   }
 
+  &:hover {
+    background: var(--dropdown-menu-bg-hover);
+  }
+
   &:disabled {
     background: transparent;
+    opacity: 0.6;
   }
 `;
 
