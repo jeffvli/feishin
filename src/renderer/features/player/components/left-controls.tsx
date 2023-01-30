@@ -1,19 +1,22 @@
 import React from 'react';
-import { Center } from '@mantine/core';
+import { Center, Group } from '@mantine/core';
+import { openContextModal } from '@mantine/modals';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { RiArrowUpSLine, RiDiscLine } from 'react-icons/ri';
+import { RiArrowUpSLine, RiDiscLine, RiMore2Fill } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Button, Text } from '/@/renderer/components';
+import { Button, DropdownMenu, Text } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAppStoreActions, useAppStore, useCurrentSong } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
+import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { LibraryItem } from '/@/renderer/api/types';
 
 const LeftControlsContainer = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
-  margin-left: 1rem;
+  padding-left: 1rem;
 `;
 
 const ImageWrapper = styled.div`
@@ -77,6 +80,44 @@ export const LeftControls = () => {
   const title = currentSong?.name;
   const artists = currentSong?.artists;
 
+  const isSongDefined = Boolean(currentSong?.id);
+
+  const openAddToPlaylistModal = () => {
+    openContextModal({
+      innerProps: {
+        songId: [currentSong?.id],
+      },
+      modal: 'addToPlaylist',
+      size: 'md',
+      title: 'Add to playlist',
+    });
+  };
+
+  const addToFavoritesMutation = useCreateFavorite();
+  const removeFromFavoritesMutation = useDeleteFavorite();
+
+  const handleAddToFavorites = () => {
+    if (!isSongDefined || !currentSong) return;
+
+    addToFavoritesMutation.mutate({
+      query: {
+        id: [currentSong.id],
+        type: LibraryItem.SONG,
+      },
+    });
+  };
+
+  const handleRemoveFromFavorites = () => {
+    if (!isSongDefined || !currentSong) return;
+
+    removeFromFavoritesMutation.mutate({
+      query: {
+        id: [currentSong.id],
+        type: LibraryItem.SONG,
+      },
+    });
+  };
+
   return (
     <LeftControlsContainer>
       <LayoutGroup>
@@ -139,16 +180,45 @@ export const LeftControls = () => {
         </AnimatePresence>
         <MetadataStack layout="position">
           <LineItem>
-            <Text
-              $link
-              component={Link}
-              overflow="hidden"
-              size="sm"
-              to={AppRoute.NOW_PLAYING}
-              weight={500}
+            <Group
+              align="flex-start"
+              spacing="xs"
             >
-              {title || '—'}
-            </Text>
+              <Text
+                $link
+                component={Link}
+                overflow="hidden"
+                size="md"
+                to={AppRoute.NOW_PLAYING}
+                weight={500}
+              >
+                {title || '—'}
+              </Text>
+              {isSongDefined && (
+                <DropdownMenu>
+                  <DropdownMenu.Target>
+                    <Button
+                      compact
+                      variant="subtle"
+                    >
+                      <RiMore2Fill size="1.2rem" />
+                    </Button>
+                  </DropdownMenu.Target>
+                  <DropdownMenu.Dropdown>
+                    <DropdownMenu.Item onClick={openAddToPlaylistModal}>
+                      Add to playlist
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Divider />
+                    <DropdownMenu.Item onClick={handleAddToFavorites}>
+                      Add to favorites
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item onClick={handleRemoveFromFavorites}>
+                      Remove from favorites
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Dropdown>
+                </DropdownMenu>
+              )}
+            </Group>
           </LineItem>
           <LineItem $secondary>
             {artists?.map((artist, index) => (
@@ -157,7 +227,7 @@ export const LeftControls = () => {
                   <Text
                     $link
                     $secondary
-                    size="xs"
+                    size="md"
                     style={{ display: 'inline-block' }}
                   >
                     ,
@@ -167,7 +237,7 @@ export const LeftControls = () => {
                   $link
                   component={Link}
                   overflow="hidden"
-                  size="xs"
+                  size="md"
                   to={
                     artist.id
                       ? generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
@@ -187,7 +257,7 @@ export const LeftControls = () => {
               $link
               component={Link}
               overflow="hidden"
-              size="xs"
+              size="md"
               to={
                 currentSong?.albumId
                   ? generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {

@@ -659,6 +659,15 @@ export const usePlayerStore = create<PlayerSlice>()(
               }
             }
 
+            const currentSongId = get().current.song?.id;
+            if (currentSongId && ids.includes(currentSongId)) {
+              set((state) => {
+                if (state.current.song) {
+                  state.current.song.userFavorite = favorite;
+                }
+              });
+            }
+
             return foundUniqueIds;
           },
           setMuted: (muted: boolean) => {
