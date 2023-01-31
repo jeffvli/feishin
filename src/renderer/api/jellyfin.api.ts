@@ -70,10 +70,13 @@ import {
   LibraryItem,
   RemoveFromPlaylistArgs,
   AddToPlaylistArgs,
+  ScrobbleArgs,
+  RawScrobbleResponse,
 } from '/@/renderer/api/types';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import { parseSearchParams } from '/@/renderer/utils';
+import packageJson from '../../../package.json';
 
 const getCommaDelimitedString = (value: string[]) => {
   return value.join(',');
@@ -93,8 +96,7 @@ const authenticate = async (
   const data = await ky
     .post(`${cleanServerUrl}/users/authenticatebyname`, {
       headers: {
-        'X-Emby-Authorization':
-          'MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="0.0.1"',
+        'X-Emby-Authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="${packageJson.version}"`,
       },
       json: {
         pw: body.password,
@@ -581,6 +583,81 @@ const deleteFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
   };
 };
 
+const scrobble = async (args: ScrobbleArgs): Promise<RawScrobbleResponse> => {
+  const { query, server } = args;
+
+  const position = query.position && Math.round(query.position);
+
+  if (query.submission) {
+    // Checked by jellyfin-plugin-lastfm for whether or not to send the "finished" scrobble (uses PositionTicks)
+    api.post(`sessions/playing/stopped`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      json: {
+        IsPaused: true,
+        ItemId: query.id,
+        PositionTicks: position,
+      },
+      prefixUrl: server?.url,
+    });
+
+    return null;
+  }
+
+  if (query.event === 'start') {
+    await api.post(`sessions/playing`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      json: {
+        ItemId: query.id,
+        PositionTicks: position,
+      },
+      prefixUrl: server?.url,
+    });
+
+    return null;
+  }
+
+  if (query.event === 'pause') {
+    await api.post(`sessions/playing/progress`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      json: {
+        EventName: query.event,
+        IsPaused: true,
+        ItemId: query.id,
+        PositionTicks: position,
+      },
+      prefixUrl: server?.url,
+    });
+
+    return null;
+  }
+
+  if (query.event === 'unpause') {
+    await api.post(`sessions/playing/progress`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      json: {
+        EventName: query.event,
+        IsPaused: false,
+        ItemId: query.id,
+        PositionTicks: position,
+      },
+      prefixUrl: server?.url,
+    });
+
+    return null;
+  }
+
+  await api.post(`sessions/playing/progress`, {
+    headers: { 'X-MediaBrowser-Token': server?.credential },
+    json: {
+      ItemId: query.id,
+      PositionTicks: position,
+    },
+    prefixUrl: server?.url,
+  });
+
+  return null;
+};
+
 const getStreamUrl = (args: {
   container?: string;
   deviceId: string;
@@ -927,6 +1004,7 @@ export const jellyfinApi = {
   getPlaylistSongList,
   getSongList,
   removeFromPlaylist,
+  scrobble,
   updatePlaylist,
 };
 

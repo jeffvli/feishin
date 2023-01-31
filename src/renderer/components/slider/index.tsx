@@ -10,6 +10,10 @@ const StyledSlider = styled(MantineSlider)`
     background-color: var(--slider-track-bg);
   }
 
+  & .mantine-Slider-bar {
+    background-color: var(--primary-color);
+  }
+
   & .mantine-Slider-thumb {
     width: 1rem;
     height: 1rem;

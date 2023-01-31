@@ -295,6 +295,7 @@ export type MusicFoldersResponse = MusicFolder[];
 export type ListSortOrder = NDOrder | JFSortOrder;
 
 type BaseEndpointArgs = {
+  _serverId?: string;
   server: ServerListItem | null;
   signal?: AbortSignal;
 };
@@ -1014,3 +1015,17 @@ export type ArtistInfoQuery = {
 };
 
 export type ArtistInfoArgs = { query: ArtistInfoQuery } & BaseEndpointArgs;
+
+// Scrobble
+export type RawScrobbleResponse = null | undefined;
+
+export type ScrobbleArgs = {
+  query: ScrobbleQuery;
+} & BaseEndpointArgs;
+
+export type ScrobbleQuery = {
+  event?: 'pause' | 'unpause' | 'timeupdate' | 'start';
+  id: string;
+  position?: number;
+  submission: boolean;
+};

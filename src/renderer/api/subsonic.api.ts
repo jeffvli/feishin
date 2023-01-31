@@ -26,6 +26,7 @@ import type {
   SSArtistInfo,
   SSSong,
   SSTopSongList,
+  SSScrobbleParams,
 } from '/@/renderer/api/subsonic.types';
 import {
   AlbumArtistDetailArgs,
@@ -42,6 +43,8 @@ import {
   QueueSong,
   RatingArgs,
   RatingResponse,
+  RawScrobbleResponse,
+  ScrobbleArgs,
   ServerListItem,
   ServerType,
   TopSongListArgs,
@@ -386,6 +389,25 @@ const getArtistInfo = async (args: ArtistInfoArgs): Promise<SSArtistInfo> => {
   return data.artistInfo2;
 };
 
+const scrobble = async (args: ScrobbleArgs): Promise<RawScrobbleResponse> => {
+  const { signal, server, query } = args;
+  const defaultParams = getDefaultParams(server);
+
+  const searchParams: SSScrobbleParams = {
+    id: query.id,
+    submission: query.submission,
+    ...defaultParams,
+  };
+
+  await api.get('rest/scrobble.view', {
+    prefixUrl: server?.url,
+    searchParams,
+    signal,
+  });
+
+  return null;
+};
+
 const normalizeSong = (item: SSSong, server: ServerListItem, deviceId: string): QueueSong => {
   const imageUrl =
     getCoverArtUrl({
@@ -465,6 +487,7 @@ export const subsonicApi = {
   getGenreList,
   getMusicFolderList,
   getTopSongList,
+  scrobble,
   updateRating,
 };
 

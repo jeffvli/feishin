@@ -263,6 +263,84 @@ export const PlaybackTab = () => {
     },
   ];
 
+  const scrobbleOptions = [
+    {
+      control: (
+        <Switch
+          aria-label="Toggle scrobble"
+          defaultChecked={settings.scrobble.enabled}
+          onChange={(e) => {
+            setSettings({
+              player: {
+                ...settings,
+                scrobble: {
+                  ...settings.scrobble,
+                  enabled: e.currentTarget.checked,
+                },
+              },
+            });
+          }}
+        />
+      ),
+      description: 'Enable or disable scrobbling to your media server',
+      isHidden: !isElectron(),
+      title: 'Scrobble',
+    },
+    {
+      control: (
+        <Slider
+          aria-label="Scrobble percentage"
+          defaultValue={settings.scrobble.scrobbleAtPercentage}
+          label={`${settings.scrobble.scrobbleAtPercentage}%`}
+          max={90}
+          min={25}
+          w={100}
+          onChange={(e) => {
+            setSettings({
+              player: {
+                ...settings,
+                scrobble: {
+                  ...settings.scrobble,
+                  scrobbleAtPercentage: e,
+                },
+              },
+            });
+          }}
+        />
+      ),
+      description: 'The percentage of the song that must be played before submitting a scrobble',
+      isHidden: !isElectron(),
+      title: 'Minimum scrobble percentage*',
+    },
+    {
+      control: (
+        <NumberInput
+          aria-label="Scrobble duration in seconds"
+          defaultValue={settings.scrobble.scrobbleAtDuration}
+          max={1200}
+          min={0}
+          width={75}
+          onChange={(e) => {
+            if (e === '') return;
+            setSettings({
+              player: {
+                ...settings,
+                scrobble: {
+                  ...settings.scrobble,
+                  scrobbleAtDuration: e,
+                },
+              },
+            });
+          }}
+        />
+      ),
+      description:
+        'The duration in seconds of a song that must be played before submitting a scrobble',
+      isHidden: !isElectron(),
+      title: 'Minimum scrobble duration (seconds)*',
+    },
+  ];
+
   const otherOptions = [
     {
       control: (
@@ -369,6 +447,22 @@ export const PlaybackTab = () => {
             {...option}
           />
         ))}
+      <Divider />
+
+      {scrobbleOptions
+        .filter((o) => !o.isHidden)
+        .map((option) => (
+          <SettingsOptions
+            key={`'scrobble-${option.title}`}
+            {...option}
+          />
+        ))}
+      <Text
+        $secondary
+        size="xs"
+      >
+        *The scrobble will be submitted if one or more of the above conditions is met
+      </Text>
       <Divider />
       {otherOptions
         .filter((o) => !o.isHidden)

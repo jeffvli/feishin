@@ -47,6 +47,7 @@ export interface SettingsState {
     playButtonBehavior: Play;
     scrobble: {
       enabled: boolean;
+      scrobbleAtDuration: number;
       scrobbleAtPercentage: number;
     };
     skipButtons: {
@@ -98,7 +99,8 @@ export const useSettingsStore = create<SettingsSlice>()(
           muted: false,
           playButtonBehavior: Play.NOW,
           scrobble: {
-            enabled: false,
+            enabled: true,
+            scrobbleAtDuration: 240,
             scrobbleAtPercentage: 75,
           },
           skipButtons: {
@@ -220,7 +222,7 @@ export const useSettingsStore = create<SettingsSlice>()(
         return merge(currentState, persistedState);
       },
       name: 'store_settings',
-      version: 1,
+      version: 2,
     },
   ),
 );

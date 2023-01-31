@@ -43,9 +43,12 @@ import type {
   RawAddToPlaylistResponse,
   RemoveFromPlaylistArgs,
   RawRemoveFromPlaylistResponse,
+  ScrobbleArgs,
+  RawScrobbleResponse,
 } from '/@/renderer/api/types';
 import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
+import { ServerListItem } from '/@/renderer/types';
 
 export type ControllerEndpoint = Partial<{
   addToPlaylist: (args: AddToPlaylistArgs) => Promise<RawAddToPlaylistResponse>;
@@ -75,6 +78,7 @@ export type ControllerEndpoint = Partial<{
   getTopSongs: (args: TopSongListArgs) => Promise<RawTopSongListResponse>;
   getUserList: (args: UserListArgs) => Promise<RawUserListResponse>;
   removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RawRemoveFromPlaylistResponse>;
+  scrobble: (args: ScrobbleArgs) => Promise<RawScrobbleResponse>;
   updatePlaylist: (args: UpdatePlaylistArgs) => Promise<RawUpdatePlaylistResponse>;
   updateRating: (args: RatingArgs) => Promise<RawRatingResponse>;
 }>;
@@ -114,6 +118,7 @@ const endpoints: ApiController = {
     getTopSongs: undefined,
     getUserList: undefined,
     removeFromPlaylist: jellyfinApi.removeFromPlaylist,
+    scrobble: jellyfinApi.scrobble,
     updatePlaylist: jellyfinApi.updatePlaylist,
     updateRating: undefined,
   },
@@ -145,6 +150,7 @@ const endpoints: ApiController = {
     getTopSongs: subsonicApi.getTopSongList,
     getUserList: navidromeApi.getUserList,
     removeFromPlaylist: navidromeApi.removeFromPlaylist,
+    scrobble: subsonicApi.scrobble,
     updatePlaylist: navidromeApi.updatePlaylist,
     updateRating: subsonicApi.updateRating,
   },
@@ -173,13 +179,14 @@ const endpoints: ApiController = {
     getSongList: undefined,
     getTopSongs: subsonicApi.getTopSongList,
     getUserList: undefined,
+    scrobble: subsonicApi.scrobble,
     updatePlaylist: undefined,
     updateRating: undefined,
   },
 };
 
-const apiController = (endpoint: keyof ControllerEndpoint) => {
-  const serverType = useAuthStore.getState().currentServer?.type;
+const apiController = (endpoint: keyof ControllerEndpoint, server?: ServerListItem | null) => {
+  const serverType = server?.type || useAuthStore.getState().currentServer?.type;
 
   if (!serverType) {
     toast.error({ message: 'No server selected', title: 'Unable to route request' });
@@ -287,6 +294,10 @@ const getTopSongList = async (args: TopSongListArgs) => {
   return (apiController('getTopSongs') as ControllerEndpoint['getTopSongs'])?.(args);
 };
 
+const scrobble = async (args: ScrobbleArgs) => {
+  return (apiController('scrobble', args.server) as ControllerEndpoint['scrobble'])?.(args);
+};
+
 export const controller = {
   addToPlaylist,
   createFavorite,
@@ -307,6 +318,7 @@ export const controller = {
   getTopSongList,
   getUserList,
   removeFromPlaylist,
+  scrobble,
   updatePlaylist,
   updateRating,
 };
