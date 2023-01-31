@@ -10,8 +10,8 @@ export const DrawerPlayQueue = () => {
 
   return (
     <Stack
-      pb="1rem"
-      sx={{ height: '100%' }}
+      h="100%"
+      spacing={0}
     >
       <PlayQueue
         ref={queueRef}

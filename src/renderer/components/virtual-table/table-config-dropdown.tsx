@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react';
-import { Stack } from '@mantine/core';
+import { Divider, Stack } from '@mantine/core';
 import { MultiSelect } from '/@/renderer/components/select';
 import { Slider } from '/@/renderer/components/slider';
 import { Switch } from '/@/renderer/components/switch';
@@ -170,7 +170,7 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
   return (
     <Stack
       p="1rem"
-      spacing="xl"
+      spacing="md"
     >
       <Stack spacing="xs">
         <Text>Table Columns</Text>
@@ -193,20 +193,17 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
           onChangeEnd={handleUpdateRowHeight}
         />
       </Stack>
-      <Stack spacing="xs">
-        <Text>Auto Fit Columns</Text>
-        <Switch
-          defaultChecked={tableConfig[type]?.autoFit}
-          onChange={handleUpdateAutoFit}
-        />
-      </Stack>
-      <Stack spacing="xs">
-        <Text>Follow Current Song</Text>
-        <Switch
-          defaultChecked={tableConfig[type]?.followCurrentSong}
-          onChange={handleUpdateFollow}
-        />
-      </Stack>
+      <Divider my="0.5rem" />
+      <Switch
+        defaultChecked={tableConfig[type]?.autoFit}
+        label="Auto-fit columns"
+        onChange={handleUpdateAutoFit}
+      />
+      <Switch
+        defaultChecked={tableConfig[type]?.followCurrentSong}
+        label="Follow current song"
+        onChange={handleUpdateFollow}
+      />
     </Stack>
   );
 };
