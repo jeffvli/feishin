@@ -76,6 +76,7 @@ import {
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import { parseSearchParams } from '/@/renderer/utils';
+import packageJson from '../../../package.json';
 
 const getCommaDelimitedString = (value: string[]) => {
   return value.join(',');
@@ -95,8 +96,7 @@ const authenticate = async (
   const data = await ky
     .post(`${cleanServerUrl}/users/authenticatebyname`, {
       headers: {
-        'X-Emby-Authorization':
-          'MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="0.0.1"',
+        'X-Emby-Authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="${packageJson.version}"`,
       },
       json: {
         pw: body.password,
