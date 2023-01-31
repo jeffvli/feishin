@@ -181,6 +181,7 @@ export const LeftControls = () => {
         <MetadataStack layout="position">
           <LineItem>
             <Group
+              noWrap
               align="flex-start"
               spacing="xs"
             >
