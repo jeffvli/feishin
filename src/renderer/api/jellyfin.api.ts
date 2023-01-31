@@ -584,50 +584,58 @@ const deleteFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
 };
 
 const scrobble = async (args: ScrobbleArgs): Promise<RawScrobbleResponse> => {
-  const { query } = args;
+  const { query, server } = args;
 
   const position = query.position && Math.round(query.position);
 
   if (query.submission) {
     // Checked by jellyfin-plugin-lastfm for whether or not to send the "finished" scrobble (uses PositionTicks)
     api.post(`sessions/playing/stopped`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
       json: {
         IsPaused: true,
         ItemId: query.id,
         PositionTicks: position,
       },
+      prefixUrl: server?.url,
     });
   }
 
   if (query.event) {
     if (query.event === 'start') {
       await api.post(`sessions/playing`, {
+        headers: { 'X-MediaBrowser-Token': server?.credential },
         json: {
           ItemId: query.id,
           PositionTicks: position,
         },
+        prefixUrl: server?.url,
       });
 
       return null;
     }
 
     await api.post(`sessions/playing/progress`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
       json: {
         EventName: query.event,
         IsPaused: query.event === 'pause',
         ItemId: query.id,
         PositionTicks: position,
       },
+      prefixUrl: server?.url,
     });
 
     return null;
   }
 
   await api.post(`sessions/playing/progress`, {
+    headers: { 'X-MediaBrowser-Token': server?.credential },
     json: {
       ItemId: query.id,
       PositionTicks: position,
     },
+    prefixUrl: server?.url,
   });
 
   return null;
