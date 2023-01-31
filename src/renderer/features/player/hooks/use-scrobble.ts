@@ -79,10 +79,15 @@ export const useScrobble = () => {
     [isScrobbleEnabled, sendScrobble],
   );
 
+  const progressIntervalId = useRef<ReturnType<typeof setInterval> | null>(null);
   const songChangeTimeoutId = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleScrobbleFromSongChange = useCallback(
     (current: (QueueSong | number | undefined)[], previous: (QueueSong | number | undefined)[]) => {
       if (!isScrobbleEnabled) return;
+
+      if (progressIntervalId.current) {
+        clearInterval(progressIntervalId.current);
+      }
 
       // const currentSong = current[0] as QueueSong | undefined;
       const previousSong = previous[0] as QueueSong;
@@ -97,11 +102,18 @@ export const useScrobble = () => {
           songDuration: previousSong.duration,
         });
 
-        if (!isCurrentSongScrobbled && shouldSubmitScrobble) {
+        if (
+          (!isCurrentSongScrobbled && shouldSubmitScrobble) ||
+          previousSong?.serverType === ServerType.JELLYFIN
+        ) {
+          const position =
+            previousSong?.serverType === ServerType.JELLYFIN ? previousSongTime * 1e7 : undefined;
+
           sendScrobble.mutate({
             _serverId: previousSong?.serverId,
             query: {
               id: previousSong.id,
+              position,
               submission: true,
             },
           });
@@ -122,23 +134,31 @@ export const useScrobble = () => {
             query: {
               event: 'start',
               id: currentSong.id,
+              position: 0,
               submission: false,
             },
           });
+
+          if (currentSong?.serverType === ServerType.JELLYFIN) {
+            progressIntervalId.current = setInterval(() => {
+              const currentTime = usePlayerStore.getState().current.time;
+              handleScrobbleFromSeek(currentTime);
+            }, 10000);
+          }
         }
       }, 2000);
     },
     [
-      isCurrentSongScrobbled,
       isScrobbleEnabled,
-      sendScrobble,
       scrobbleSettings?.scrobbleAtDuration,
       scrobbleSettings?.scrobbleAtPercentage,
+      isCurrentSongScrobbled,
+      sendScrobble,
       status,
+      handleScrobbleFromSeek,
     ],
   );
 
-  const progressIntervalId = useRef<ReturnType<typeof setInterval> | null>(null);
   const handleScrobbleFromStatusChange = useCallback(
     (status: PlayerStatus | undefined) => {
       if (!isScrobbleEnabled) return;
@@ -157,7 +177,7 @@ export const useScrobble = () => {
         sendScrobble.mutate({
           _serverId: currentSong?.serverId,
           query: {
-            event: 'start',
+            event: 'unpause',
             id: currentSong.id,
             position,
             submission: false,
@@ -254,7 +274,7 @@ export const useScrobble = () => {
         sendScrobble.mutate({
           _serverId: currentSong?.serverId,
           query: {
-            event: 'timeupdate',
+            event: 'start',
             id: currentSong.id,
             position: 0,
             submission: false,

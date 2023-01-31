@@ -599,27 +599,44 @@ const scrobble = async (args: ScrobbleArgs): Promise<RawScrobbleResponse> => {
       },
       prefixUrl: server?.url,
     });
+
+    return null;
   }
 
-  if (query.event) {
-    if (query.event === 'start') {
-      await api.post(`sessions/playing`, {
-        headers: { 'X-MediaBrowser-Token': server?.credential },
-        json: {
-          ItemId: query.id,
-          PositionTicks: position,
-        },
-        prefixUrl: server?.url,
-      });
+  if (query.event === 'start') {
+    await api.post(`sessions/playing`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      json: {
+        ItemId: query.id,
+        PositionTicks: position,
+      },
+      prefixUrl: server?.url,
+    });
 
-      return null;
-    }
+    return null;
+  }
 
+  if (query.event === 'pause') {
     await api.post(`sessions/playing/progress`, {
       headers: { 'X-MediaBrowser-Token': server?.credential },
       json: {
         EventName: query.event,
-        IsPaused: query.event === 'pause',
+        IsPaused: true,
+        ItemId: query.id,
+        PositionTicks: position,
+      },
+      prefixUrl: server?.url,
+    });
+
+    return null;
+  }
+
+  if (query.event === 'unpause') {
+    await api.post(`sessions/playing/progress`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      json: {
+        EventName: query.event,
+        IsPaused: false,
         ItemId: query.id,
         PositionTicks: position,
       },
