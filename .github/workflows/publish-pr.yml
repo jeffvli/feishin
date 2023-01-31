@@ -41,10 +41,20 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: binaries
+          name: windows-binaries
           path: |
             release/build/*.exe
-            release/build/*.dmg
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: linux-binaries
+          path: |
             release/build/*.AppImage
             release/build/*.deb
             release/build/*.rpm
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: macos-binaries
+          path: |
+            release/build/*.dmg
