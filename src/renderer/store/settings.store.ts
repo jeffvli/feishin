@@ -37,6 +37,7 @@ export interface SettingsState {
     theme: AppTheme;
     themeDark: AppTheme;
     themeLight: AppTheme;
+    volumeWheelStep: number;
   };
   player: {
     audioDeviceId?: string | null;
@@ -90,6 +91,7 @@ export const useSettingsStore = create<SettingsSlice>()(
           theme: AppTheme.DEFAULT_DARK,
           themeDark: AppTheme.DEFAULT_DARK,
           themeLight: AppTheme.DEFAULT_LIGHT,
+          volumeWheelStep: 5,
         },
         player: {
           audioDeviceId: undefined,
@@ -222,7 +224,7 @@ export const useSettingsStore = create<SettingsSlice>()(
         return merge(currentState, persistedState);
       },
       name: 'store_settings',
-      version: 2,
+      version: 3,
     },
   ),
 );

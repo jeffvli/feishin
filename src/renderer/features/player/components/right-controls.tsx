@@ -7,7 +7,6 @@ import {
   RiHeartLine,
   RiHeartFill,
 } from 'react-icons/ri';
-import styled from 'styled-components';
 import {
   useAppStoreActions,
   useCurrentServer,
@@ -19,34 +18,10 @@ import {
 } from '/@/renderer/store';
 import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';
-import { Slider } from './slider';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
 import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { Rating } from '/@/renderer/components';
-
-const RightControlsContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  width: 100%;
-  height: 100%;
-`;
-
-const VolumeSliderWrapper = styled.div`
-  display: flex;
-  gap: 0.3rem;
-  align-items: center;
-  width: 90px;
-`;
-
-const MetadataStack = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  align-items: flex-end;
-  justify-content: center;
-  overflow: visible;
-`;
+import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 
 export const RightControls = () => {
   const volume = useVolume();
@@ -55,7 +30,7 @@ export const RightControls = () => {
   const currentSong = useCurrentSong();
   const { setSidebar } = useAppStoreActions();
   const { rightExpanded: isQueueExpanded } = useSidebarStore();
-  const { handleVolumeSlider, handleVolumeSliderState, handleMute } = useRightControls();
+  const { handleVolumeSlider, handleVolumeWheel, handleMute } = useRightControls();
 
   const addToFavoritesMutation = useCreateFavorite();
   const removeFromFavoritesMutation = useDeleteFavorite();
@@ -115,77 +90,82 @@ export const RightControls = () => {
       align="flex-end"
       direction="column"
       h="100%"
-      p="1rem"
+      px="1rem"
+      py="0.5rem"
     >
-      {showRating && (
-        <Group>
+      <Group h="calc(100% / 3)">
+        {showRating && (
           <Rating
             readOnly
             size="sm"
             value={currentSong?.userRating ?? 0}
           />
-        </Group>
-      )}
-      <RightControlsContainer>
-        <Group spacing="xs">
+        )}
+      </Group>
+      <Group
+        noWrap
+        align="center"
+        spacing="xs"
+      >
+        <PlayerButton
+          icon={
+            currentSong?.userFavorite ? (
+              <RiHeartFill
+                color="var(--primary-color)"
+                size="1.1rem"
+              />
+            ) : (
+              <RiHeartLine size="1.1rem" />
+            )
+          }
+          sx={{
+            svg: {
+              fill: !currentSong?.userFavorite ? undefined : 'var(--primary-color) !important',
+            },
+          }}
+          tooltip={{
+            label: currentSong?.userFavorite ? 'Unfavorite' : 'Favorite',
+            openDelay: 500,
+          }}
+          variant="secondary"
+          onClick={handleToggleFavorite}
+        />
+        <PlayerButton
+          icon={<HiOutlineQueueList size="1.1rem" />}
+          tooltip={{ label: 'View queue', openDelay: 500 }}
+          variant="secondary"
+          onClick={() => setSidebar({ rightExpanded: !isQueueExpanded })}
+        />
+        <Group
+          noWrap
+          spacing="xs"
+        >
           <PlayerButton
             icon={
-              currentSong?.userFavorite ? (
-                <RiHeartFill
-                  color="var(--primary-color)"
-                  size="1.3rem"
-                />
+              muted ? (
+                <RiVolumeMuteFill size="1.2rem" />
+              ) : volume > 50 ? (
+                <RiVolumeUpFill size="1.2rem" />
               ) : (
-                <RiHeartLine size="1.3rem" />
+                <RiVolumeDownFill size="1.2rem" />
               )
             }
-            sx={{
-              svg: {
-                fill: !currentSong?.userFavorite ? undefined : 'var(--primary-color) !important',
-              },
-            }}
-            tooltip={{
-              label: currentSong?.userFavorite ? 'Unfavorite' : 'Favorite',
-              openDelay: 500,
-            }}
+            tooltip={{ label: muted ? 'Muted' : volume, openDelay: 500 }}
             variant="secondary"
-            onClick={handleToggleFavorite}
+            onClick={handleMute}
           />
-          <PlayerButton
-            icon={<HiOutlineQueueList size="1.3rem" />}
-            tooltip={{ label: 'View queue', openDelay: 500 }}
-            variant="secondary"
-            onClick={() => setSidebar({ rightExpanded: !isQueueExpanded })}
+          <PlayerbarSlider
+            max={100}
+            min={0}
+            size={6}
+            value={volume}
+            w="60px"
+            onChange={handleVolumeSlider}
+            onWheel={handleVolumeWheel}
           />
         </Group>
-        <MetadataStack>
-          <VolumeSliderWrapper>
-            <PlayerButton
-              icon={
-                muted ? (
-                  <RiVolumeMuteFill size="1.2rem" />
-                ) : volume > 50 ? (
-                  <RiVolumeUpFill size="1.2rem" />
-                ) : (
-                  <RiVolumeDownFill size="1.2rem" />
-                )
-              }
-              tooltip={{ label: muted ? 'Muted' : volume, openDelay: 500 }}
-              variant="secondary"
-              onClick={handleMute}
-            />
-            <Slider
-              hasTooltip
-              height="60%"
-              max={100}
-              min={0}
-              value={volume}
-              onAfterChange={handleVolumeSliderState}
-              onChange={handleVolumeSlider}
-            />
-          </VolumeSliderWrapper>
-        </MetadataStack>
-      </RightControlsContainer>
+      </Group>
+      <Group h="calc(100% / 3)" />
     </Flex>
   );
 };

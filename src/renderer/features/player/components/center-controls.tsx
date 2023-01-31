@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import format from 'format-duration';
+import formatDuration from 'format-duration';
 import isElectron from 'is-electron';
 import { IoIosPause } from 'react-icons/io';
 import {
@@ -16,7 +16,6 @@ import styled from 'styled-components';
 import { Text } from '/@/renderer/components';
 import { useCenterControls } from '../hooks/use-center-controls';
 import { PlayerButton } from './player-button';
-import { Slider } from './slider';
 import {
   useCurrentSong,
   useCurrentStatus,
@@ -28,6 +27,7 @@ import {
 } from '/@/renderer/store';
 import { usePlayerType, useSettingsStore } from '/@/renderer/store/settings.store';
 import { PlayerStatus, PlaybackType, PlayerShuffle, PlayerRepeat } from '/@/renderer/types';
+import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 
 interface CenterControlsProps {
   playersRef: any;
@@ -61,6 +61,7 @@ const SliderValueWrapper = styled.div<{ position: 'left' | 'right' }>`
 const SliderWrapper = styled.div`
   display: flex;
   flex: 6;
+  align-items: center;
   height: 100%;
 `;
 
@@ -91,8 +92,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
 
   const currentTime = useCurrentTime();
   const currentPlayerRef = player === 1 ? player1 : player2;
-  const duration = format((songDuration || 0) * 1000);
-  const formattedTime = format(currentTime * 1000 || 0);
+  const duration = formatDuration((songDuration || 0) * 1000);
+  const formattedTime = formatDuration(currentTime * 1000 || 0);
 
   useEffect(() => {
     let interval: any;
@@ -210,13 +211,14 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
           </Text>
         </SliderValueWrapper>
         <SliderWrapper>
-          <Slider
-            height="100%"
+          <PlayerbarSlider
+            label={(value) => formatDuration(value * 1000)}
             max={songDuration}
             min={0}
-            tooltipType="time"
+            size={6}
             value={currentTime}
-            onAfterChange={(e) => {
+            w="100%"
+            onChange={(e) => {
               handleSeekSlider(e);
               setIsSeeking(false);
             }}

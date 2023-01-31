@@ -1,5 +1,5 @@
 import { Divider, Stack } from '@mantine/core';
-import { Select, Switch } from '/@/renderer/components';
+import { Select, Slider, Switch } from '/@/renderer/components';
 import isElectron from 'is-electron';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 import { THEME_DATA } from '/@/renderer/hooks';
@@ -195,6 +195,31 @@ export const GeneralTab = () => {
     },
   ];
 
+  const miscOptions = [
+    {
+      control: (
+        <Slider
+          defaultValue={settings.volumeWheelStep}
+          max={20}
+          min={1}
+          w={100}
+          onChangeEnd={(e) => {
+            setSettings({
+              general: {
+                ...settings,
+                volumeWheelStep: e,
+              },
+            });
+          }}
+        />
+      ),
+      description:
+        'The amount of volume to change when scrolling the mouse wheel on the volume slider',
+      isHidden: false,
+      title: 'Volume wheel step',
+    },
+  ];
+
   return (
     <Stack spacing="md">
       {options
@@ -216,6 +241,15 @@ export const GeneralTab = () => {
         ))}
       <Divider />
       {layoutOptions
+        .filter((o) => !o.isHidden)
+        .map((option) => (
+          <SettingsOptions
+            key={`general-${option.title}`}
+            {...option}
+          />
+        ))}
+      <Divider />
+      {miscOptions
         .filter((o) => !o.isHidden)
         .map((option) => (
           <SettingsOptions

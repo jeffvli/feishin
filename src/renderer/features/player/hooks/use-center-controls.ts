@@ -13,6 +13,7 @@ import {
 } from '/@/renderer/store';
 import { usePlayerType, useSettingsStore } from '/@/renderer/store/settings.store';
 import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
+import debounce from 'lodash/debounce';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
@@ -439,19 +440,21 @@ export const useCenterControls = (args: { playersRef: any }) => {
     }
   };
 
+  const debouncedSeek = debounce((e: number) => {
+    if (isMpvPlayer) {
+      mpvPlayer.seekTo(e);
+    } else {
+      currentPlayerRef.seekTo(e);
+    }
+  }, 100);
+
   const handleSeekSlider = useCallback(
     (e: number | any) => {
       setCurrentTime(e);
-
       handleScrobbleFromSeek(e);
-
-      if (isMpvPlayer) {
-        mpvPlayer.seekTo(e);
-      } else {
-        currentPlayerRef.seekTo(e);
-      }
+      debouncedSeek(e);
     },
-    [currentPlayerRef, handleScrobbleFromSeek, isMpvPlayer, setCurrentTime],
+    [debouncedSeek, handleScrobbleFromSeek, setCurrentTime],
   );
 
   const handleQuit = useCallback(() => {
