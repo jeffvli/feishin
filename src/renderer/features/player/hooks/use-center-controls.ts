@@ -12,6 +12,7 @@ import {
   useShuffleStatus,
 } from '/@/renderer/store';
 import { usePlayerType, useSettingsStore } from '/@/renderer/store/settings.store';
+import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
@@ -34,6 +35,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
   const player2Ref = playersRef?.current?.player2;
   const currentPlayerRef = currentPlayer === 1 ? player1Ref : player2Ref;
   const nextPlayerRef = currentPlayer === 1 ? player2Ref : player1Ref;
+
+  const { handleScrobbleFromSongRestart, handleScrobbleFromSeek } = useScrobble();
 
   const resetPlayers = useCallback(() => {
     if (player1Ref.getInternalPlayer()) {
@@ -289,6 +292,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     // Reset the current track more than 10 seconds have elapsed
     if (currentTime >= 10) {
       setCurrentTime(0);
+      handleScrobbleFromSongRestart(currentTime);
 
       if (isMpvPlayer) {
         return mpvPlayer.seekTo(0);
@@ -373,6 +377,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
   }, [
     checkIsFirstTrack,
     currentPlayerRef,
+    handleScrobbleFromSongRestart,
     isMpvPlayer,
     pause,
     playerType,
@@ -438,13 +443,15 @@ export const useCenterControls = (args: { playersRef: any }) => {
     (e: number | any) => {
       setCurrentTime(e);
 
+      handleScrobbleFromSeek(e);
+
       if (isMpvPlayer) {
         mpvPlayer.seekTo(e);
       } else {
         currentPlayerRef.seekTo(e);
       }
     },
-    [currentPlayerRef, isMpvPlayer, setCurrentTime],
+    [currentPlayerRef, handleScrobbleFromSeek, isMpvPlayer, setCurrentTime],
   );
 
   const handleQuit = useCallback(() => {
