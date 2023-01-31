@@ -295,6 +295,7 @@ export type MusicFoldersResponse = MusicFolder[];
 export type ListSortOrder = NDOrder | JFSortOrder;
 
 type BaseEndpointArgs = {
+  _serverId?: string;
   server: ServerListItem | null;
   signal?: AbortSignal;
 };
