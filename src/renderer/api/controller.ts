@@ -48,6 +48,7 @@ import type {
 } from '/@/renderer/api/types';
 import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
+import { ServerListItem } from '/@/renderer/types';
 
 export type ControllerEndpoint = Partial<{
   addToPlaylist: (args: AddToPlaylistArgs) => Promise<RawAddToPlaylistResponse>;
@@ -184,8 +185,8 @@ const endpoints: ApiController = {
   },
 };
 
-const apiController = (endpoint: keyof ControllerEndpoint) => {
-  const serverType = useAuthStore.getState().currentServer?.type;
+const apiController = (endpoint: keyof ControllerEndpoint, server?: ServerListItem | null) => {
+  const serverType = server?.type || useAuthStore.getState().currentServer?.type;
 
   if (!serverType) {
     toast.error({ message: 'No server selected', title: 'Unable to route request' });
@@ -294,7 +295,7 @@ const getTopSongList = async (args: TopSongListArgs) => {
 };
 
 const scrobble = async (args: ScrobbleArgs) => {
-  return (apiController('scrobble') as ControllerEndpoint['scrobble'])?.(args);
+  return (apiController('scrobble', args.server) as ControllerEndpoint['scrobble'])?.(args);
 };
 
 export const controller = {
