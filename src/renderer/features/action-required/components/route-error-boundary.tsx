@@ -41,9 +41,13 @@ const RouteErrorBoundary = () => {
           </Group>
           <Divider my={5} />
           <Text size="sm">{error?.message}</Text>
-          <Group grow>
+          <Group
+            grow
+            spacing="sm"
+          >
             <Button
               leftIcon={<RiHome4Line />}
+              size="md"
               sx={{ flex: 0.5 }}
               variant="default"
               onClick={handleHome}
@@ -51,6 +55,7 @@ const RouteErrorBoundary = () => {
               Go home
             </Button>
             <Button
+              size="md"
               variant="filled"
               onClick={handleReload}
             >
