@@ -20,6 +20,7 @@ export interface AuthSlice extends AuthState {
   actions: {
     addServer: (args: ServerListItem) => void;
     deleteServer: (id: string) => void;
+    getServer: (id?: string) => ServerListItem | undefined;
     setCurrentServer: (server: ServerListItem | null) => void;
     updateServer: (id: string, args: Partial<ServerListItem>) => void;
   };
@@ -28,7 +29,7 @@ export interface AuthSlice extends AuthState {
 export const useAuthStore = create<AuthSlice>()(
   persist(
     devtools(
-      immer((set) => ({
+      immer((set, get) => ({
         actions: {
           addServer: (args) => {
             set((state) => {
@@ -42,6 +43,9 @@ export const useAuthStore = create<AuthSlice>()(
                 state.currentServer = null;
               }
             });
+          },
+          getServer: (id) => {
+            return get().serverList.find((server) => server.id === id);
           },
           setCurrentServer: (server) => {
             set((state) => {
