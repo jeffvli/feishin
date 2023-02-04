@@ -773,9 +773,12 @@ export type FavoriteArgs = { query: FavoriteQuery } & BaseEndpointArgs;
 // Rating
 export type RawRatingResponse = RatingResponse | undefined;
 
-export type RatingResponse = { id: string[]; rating: number };
+export type RatingResponse = null;
 
-export type RatingQuery = { id: string[]; rating: number };
+export type RatingQuery = {
+  item: QueueSong[] | Song[] | Album[] | Artist[] | AlbumArtist[];
+  rating: number;
+};
 
 export type RatingArgs = { query: RatingQuery } & BaseEndpointArgs;
 

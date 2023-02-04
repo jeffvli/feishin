@@ -322,7 +322,9 @@ const updateRating = async (args: RatingArgs): Promise<RatingResponse> => {
   const { server, query, signal } = args;
   const defaultParams = getDefaultParams(server);
 
-  for (const id of query.id) {
+  const itemIds = query.item.map((item) => item.id);
+
+  for (const id of itemIds) {
     const searchParams: SSRatingParams = {
       id,
       rating: query.rating,
@@ -334,13 +336,9 @@ const updateRating = async (args: RatingArgs): Promise<RatingResponse> => {
       searchParams: parseSearchParams(searchParams),
       signal,
     });
-    // .json<SSRatingResponse>();
   }
 
-  return {
-    id: query.id,
-    rating: query.rating,
-  };
+  return null;
 };
 
 const getTopSongList = async (args: TopSongListArgs): Promise<SSTopSongList> => {
