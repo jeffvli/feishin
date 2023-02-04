@@ -1,3 +1,4 @@
+import { MouseEvent } from 'react';
 import { Flex, Group } from '@mantine/core';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import {
@@ -19,7 +20,7 @@ import {
 import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
-import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { useCreateFavorite, useDeleteFavorite, useUpdateRating } from '/@/renderer/features/shared';
 import { Rating } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 
@@ -32,6 +33,7 @@ export const RightControls = () => {
   const { rightExpanded: isQueueExpanded } = useSidebarStore();
   const { handleVolumeSlider, handleVolumeWheel, handleMute } = useRightControls();
 
+  const updateRatingMutation = useUpdateRating();
   const addToFavoritesMutation = useCreateFavorite();
   const removeFromFavoritesMutation = useDeleteFavorite();
   const setFavorite = useSetQueueFavorite();
@@ -52,6 +54,33 @@ export const RightControls = () => {
         },
       },
     );
+  };
+
+  const handleUpdateRating = (rating: number) => {
+    if (!currentSong) return;
+
+    updateRatingMutation.mutate({
+      _serverId: currentSong?.serverId,
+      query: {
+        item: [currentSong],
+        rating,
+      },
+    });
+  };
+
+  const handleClearRating = (_e: MouseEvent<HTMLDivElement>, rating?: number) => {
+    if (!currentSong || !rating) return;
+
+    const isSameRatingAsPrevious = rating === currentSong?.userRating;
+    if (!isSameRatingAsPrevious) return;
+
+    updateRatingMutation.mutate({
+      _serverId: currentSong?.serverId,
+      query: {
+        item: [currentSong],
+        rating: 0,
+      },
+    });
   };
 
   const handleRemoveFromFavorites = () => {
@@ -96,9 +125,10 @@ export const RightControls = () => {
       <Group h="calc(100% / 3)">
         {showRating && (
           <Rating
-            readOnly
             size="sm"
-            value={currentSong?.userRating ?? 0}
+            value={currentSong?.userRating || 0}
+            onChange={handleUpdateRating}
+            onClick={handleClearRating}
           />
         )}
       </Group>
