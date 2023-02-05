@@ -7,12 +7,11 @@ import { SSAlbumArtistDetail, SSAlbumDetail } from '/@/renderer/api/subsonic.typ
 import {
   Album,
   AlbumArtist,
-  Artist,
+  AnyLibraryItems,
   LibraryItem,
   RatingArgs,
   RawRatingResponse,
   ServerType,
-  Song,
 } from '/@/renderer/api/types';
 import { MutationOptions } from '/@/renderer/lib/react-query';
 import {
@@ -32,7 +31,7 @@ export const useUpdateRating = (options?: MutationOptions) => {
     RawRatingResponse,
     HTTPError,
     Omit<RatingArgs, 'server'>,
-    { previous: { items: Album[] | Song[] | AlbumArtist[] | Artist[] } | undefined }
+    { previous: { items: AnyLibraryItems } | undefined }
   >({
     mutationFn: (args) => {
       const server = useAuthStore.getState().actions.getServer(args._serverId) || currentServer;

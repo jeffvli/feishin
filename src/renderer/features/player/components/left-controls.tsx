@@ -1,16 +1,16 @@
 import React from 'react';
 import { Center, Group } from '@mantine/core';
-import { openContextModal } from '@mantine/modals';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { RiArrowUpSLine, RiDiscLine, RiMore2Fill } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Button, DropdownMenu, Text } from '/@/renderer/components';
+import { Button, Text } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAppStoreActions, useAppStore, useCurrentSong } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
-import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { LibraryItem } from '/@/renderer/api/types';
+import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 
 const LeftControlsContainer = styled.div`
   display: flex;
@@ -82,41 +82,10 @@ export const LeftControls = () => {
 
   const isSongDefined = Boolean(currentSong?.id);
 
-  const openAddToPlaylistModal = () => {
-    openContextModal({
-      innerProps: {
-        songId: [currentSong?.id],
-      },
-      modal: 'addToPlaylist',
-      size: 'md',
-      title: 'Add to playlist',
-    });
-  };
-
-  const addToFavoritesMutation = useCreateFavorite();
-  const removeFromFavoritesMutation = useDeleteFavorite();
-
-  const handleAddToFavorites = () => {
-    if (!isSongDefined || !currentSong) return;
-
-    addToFavoritesMutation.mutate({
-      query: {
-        id: [currentSong.id],
-        type: LibraryItem.SONG,
-      },
-    });
-  };
-
-  const handleRemoveFromFavorites = () => {
-    if (!isSongDefined || !currentSong) return;
-
-    removeFromFavoritesMutation.mutate({
-      query: {
-        id: [currentSong.id],
-        type: LibraryItem.SONG,
-      },
-    });
-  };
+  const handleGeneralContextMenu = useHandleGeneralContextMenu(
+    LibraryItem.SONG,
+    SONG_CONTEXT_MENU_ITEMS,
+  );
 
   return (
     <LeftControlsContainer>
@@ -196,28 +165,13 @@ export const LeftControls = () => {
                 {title || '—'}
               </Text>
               {isSongDefined && (
-                <DropdownMenu>
-                  <DropdownMenu.Target>
-                    <Button
-                      compact
-                      variant="subtle"
-                    >
-                      <RiMore2Fill size="1.2rem" />
-                    </Button>
-                  </DropdownMenu.Target>
-                  <DropdownMenu.Dropdown>
-                    <DropdownMenu.Item onClick={openAddToPlaylistModal}>
-                      Add to playlist
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Divider />
-                    <DropdownMenu.Item onClick={handleAddToFavorites}>
-                      Add to favorites
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item onClick={handleRemoveFromFavorites}>
-                      Remove from favorites
-                    </DropdownMenu.Item>
-                  </DropdownMenu.Dropdown>
-                </DropdownMenu>
+                <Button
+                  compact
+                  variant="subtle"
+                  onClick={(e) => handleGeneralContextMenu(e, [currentSong!])}
+                >
+                  <RiMore2Fill size="1.2rem" />
+                </Button>
               )}
             </Group>
           </LineItem>

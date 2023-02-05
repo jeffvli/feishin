@@ -2,15 +2,18 @@ import type { MouseEvent } from 'react';
 import React from 'react';
 import type { UnstyledButtonProps } from '@mantine/core';
 import { Group } from '@mantine/core';
-import { openContextModal } from '@mantine/modals';
 import { RiPlayFill, RiMore2Fill, RiHeartFill, RiHeartLine } from 'react-icons/ri';
 import styled from 'styled-components';
 import { _Button } from '/@/renderer/components/button';
-import { DropdownMenu } from '/@/renderer/components/dropdown-menu';
 import type { PlayQueueAddOptions } from '/@/renderer/types';
 import { Play } from '/@/renderer/types';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { LibraryItem } from '/@/renderer/api/types';
+import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
+import {
+  ALBUM_CONTEXT_MENU_ITEMS,
+  ARTIST_CONTEXT_MENU_ITEMS,
+} from '/@/renderer/features/context-menu/context-menu-items';
 
 type PlayButtonType = UnstyledButtonProps & React.ComponentPropsWithoutRef<'button'>;
 
@@ -100,21 +103,6 @@ const FavoriteWrapper = styled.span<{ isFavorite: boolean }>`
   }
 `;
 
-const PLAY_TYPES = [
-  {
-    label: 'Play',
-    play: Play.NOW,
-  },
-  {
-    label: 'Add to queue',
-    play: Play.LAST,
-  },
-  {
-    label: 'Add to queue next',
-    play: Play.NEXT,
-  },
-];
-
 export const CardControls = ({
   itemData,
   itemType,
@@ -138,18 +126,10 @@ export const CardControls = ({
     });
   };
 
-  const openAddToPlaylistModal = (e: MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    openContextModal({
-      innerProps: {
-        albumId: itemType === LibraryItem.ALBUM ? [itemData.id] : undefined,
-        artistId: itemType === LibraryItem.ALBUM_ARTIST ? [itemData.id] : undefined,
-      },
-      modal: 'addToPlaylist',
-      size: 'md',
-      title: 'Add to playlist',
-    });
-  };
+  const handleContextMenu = useHandleGeneralContextMenu(
+    itemType,
+    itemType === LibraryItem.ALBUM ? ALBUM_CONTEXT_MENU_ITEMS : ARTIST_CONTEXT_MENU_ITEMS,
+  );
 
   return (
     <GridCardControlsContainer>
@@ -175,40 +155,21 @@ export const CardControls = ({
               )}
             </FavoriteWrapper>
           </SecondaryButton>
-          <DropdownMenu
-            withinPortal
-            position="bottom-start"
+          <SecondaryButton
+            p={5}
+            sx={{ svg: { fill: 'white !important' } }}
+            variant="subtle"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleContextMenu(e, [itemData]);
+            }}
           >
-            <DropdownMenu.Target>
-              <SecondaryButton
-                p={5}
-                sx={{ svg: { fill: 'white !important' } }}
-                variant="subtle"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              >
-                <RiMore2Fill
-                  color="white"
-                  size={20}
-                />
-              </SecondaryButton>
-            </DropdownMenu.Target>
-            <DropdownMenu.Dropdown>
-              {PLAY_TYPES.filter((type) => type.play !== playButtonBehavior).map((type) => (
-                <DropdownMenu.Item
-                  key={`playtype-${type.play}`}
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => handlePlay(e, type.play)}
-                >
-                  {type.label}
-                </DropdownMenu.Item>
-              ))}
-              <DropdownMenu.Item onClick={openAddToPlaylistModal}>
-                Add to playlist
-              </DropdownMenu.Item>
-            </DropdownMenu.Dropdown>
-          </DropdownMenu>
+            <RiMore2Fill
+              color="white"
+              size={20}
+            />
+          </SecondaryButton>
         </Group>
       </BottomControls>
     </GridCardControlsContainer>

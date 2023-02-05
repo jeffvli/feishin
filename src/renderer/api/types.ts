@@ -54,6 +54,16 @@ export enum LibraryItem {
   SONG = 'song',
 }
 
+export type AnyLibraryItem = Album | AlbumArtist | Artist | Playlist | Song | QueueSong;
+
+export type AnyLibraryItems =
+  | Album[]
+  | AlbumArtist[]
+  | Artist[]
+  | Playlist[]
+  | Song[]
+  | QueueSong[];
+
 export enum SortOrder {
   ASC = 'ASC',
   DESC = 'DESC',
@@ -776,7 +786,7 @@ export type RawRatingResponse = RatingResponse | undefined;
 export type RatingResponse = null;
 
 export type RatingQuery = {
-  item: QueueSong[] | Song[] | Album[] | Artist[] | AlbumArtist[];
+  item: AnyLibraryItems;
   rating: number;
 };
 

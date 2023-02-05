@@ -1,3 +1,4 @@
+import { RowNode } from '@ag-grid-community/core';
 import { Divider, Group, Portal, Stack } from '@mantine/core';
 import {
   useClickOutside,
@@ -20,7 +21,7 @@ import {
   RiPlayListAddFill,
   RiStarFill,
 } from 'react-icons/ri';
-import { LibraryItem, ServerType } from '/@/renderer/api/types';
+import { AnyLibraryItems, LibraryItem, ServerType } from '/@/renderer/api/types';
 import {
   ConfirmModal,
   ContextMenu,
@@ -221,12 +222,25 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const createFavoriteMutation = useCreateFavorite();
   const deleteFavoriteMutation = useDeleteFavorite();
   const handleAddToFavorites = useCallback(() => {
-    if (!ctx.dataNodes) return;
-    const nodesToFavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
+    if (!ctx.dataNodes && !ctx.data) return;
+
+    let itemsToFavorite: AnyLibraryItems = [];
+    let nodesToFavorite: RowNode<any>[] = [];
+
+    if (ctx.dataNodes) {
+      nodesToFavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
+    } else {
+      itemsToFavorite = ctx.data.filter((item) => !item.userFavorite);
+    }
+
+    const idsToFavorite = nodesToFavorite
+      ? nodesToFavorite.map((node) => node.data.id)
+      : itemsToFavorite.map((item) => item.id);
+
     createFavoriteMutation.mutate(
       {
         query: {
-          id: nodesToFavorite.map((item) => item.data.id),
+          id: idsToFavorite,
           type: ctx.type,
         },
       },
@@ -238,22 +252,36 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
           });
         },
         onSuccess: () => {
-          for (const node of nodesToFavorite) {
-            node.setData({ ...node.data, userFavorite: true });
+          if (ctx.dataNodes) {
+            for (const node of nodesToFavorite) {
+              node.setData({ ...node.data, userFavorite: true });
+            }
           }
         },
       },
     );
-  }, [createFavoriteMutation, ctx.dataNodes, ctx.type]);
+  }, [createFavoriteMutation, ctx.data, ctx.dataNodes, ctx.type]);
 
   const handleRemoveFromFavorites = useCallback(() => {
-    if (!ctx.dataNodes) return;
-    const nodesToUnfavorite = ctx.dataNodes.filter((item) => item.data.userFavorite);
+    if (!ctx.dataNodes && !ctx.data) return;
+
+    let itemsToUnfavorite: AnyLibraryItems = [];
+    let nodesToUnfavorite: RowNode<any>[] = [];
+
+    if (ctx.dataNodes) {
+      nodesToUnfavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
+    } else {
+      itemsToUnfavorite = ctx.data.filter((item) => !item.userFavorite);
+    }
+
+    const idsToUnfavorite = nodesToUnfavorite
+      ? nodesToUnfavorite.map((node) => node.data.id)
+      : itemsToUnfavorite.map((item) => item.id);
 
     deleteFavoriteMutation.mutate(
       {
         query: {
-          id: nodesToUnfavorite.map((item) => item.data.id),
+          id: idsToUnfavorite,
           type: ctx.type,
         },
       },
@@ -265,24 +293,56 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         },
       },
     );
-  }, [ctx.dataNodes, ctx.type, deleteFavoriteMutation]);
+  }, [ctx.data, ctx.dataNodes, ctx.type, deleteFavoriteMutation]);
 
   const handleAddToPlaylist = useCallback(() => {
-    if (!ctx.dataNodes) return;
+    if (!ctx.dataNodes && !ctx.data) return;
+
+    const albumId: string[] = [];
+    const artistId: string[] = [];
+    const songId: string[] = [];
+
+    if (ctx.dataNodes) {
+      for (const node of ctx.dataNodes) {
+        switch (node.data.type) {
+          case LibraryItem.ALBUM:
+            albumId.push(node.data.id);
+            break;
+          case LibraryItem.ARTIST:
+            artistId.push(node.data.id);
+            break;
+          case LibraryItem.SONG:
+            songId.push(node.data.id);
+            break;
+        }
+      }
+    } else {
+      for (const item of ctx.data) {
+        switch (item.type) {
+          case LibraryItem.ALBUM:
+            albumId.push(item.id);
+            break;
+          case LibraryItem.ARTIST:
+            artistId.push(item.id);
+            break;
+          case LibraryItem.SONG:
+            songId.push(item.id);
+            break;
+        }
+      }
+    }
+
     openContextModal({
       innerProps: {
-        albumId:
-          ctx.type === LibraryItem.ALBUM ? ctx.dataNodes.map((node) => node.data.id) : undefined,
-        artistId:
-          ctx.type === LibraryItem.ARTIST ? ctx.dataNodes.map((node) => node.data.id) : undefined,
-        songId:
-          ctx.type === LibraryItem.SONG ? ctx.dataNodes.map((node) => node.data.id) : undefined,
+        albumId: albumId.length > 0 ? albumId : undefined,
+        artistId: artistId.length > 0 ? artistId : undefined,
+        songId: songId.length > 0 ? songId : undefined,
       },
       modal: 'addToPlaylist',
       size: 'md',
       title: 'Add to playlist',
     });
-  }, [ctx.dataNodes, ctx.type]);
+  }, [ctx.data, ctx.dataNodes]);
 
   const removeFromPlaylistMutation = useRemoveFromPlaylist();
 
@@ -342,19 +402,35 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
   const handleUpdateRating = useCallback(
     (rating: number) => {
-      if (!ctx.dataNodes) return;
+      if (!ctx.dataNodes || !ctx.data) return;
 
-      const uniqueServerIds = ctx.dataNodes.reduce((acc, node) => {
-        if (!acc.includes(node.data.serverId)) {
-          acc.push(node.data.serverId);
-        }
-        return acc;
-      }, [] as string[]);
+      let uniqueServerIds: string[] = [];
+      let items: AnyLibraryItems = [];
+
+      if (ctx.dataNodes) {
+        uniqueServerIds = ctx.dataNodes.reduce((acc, node) => {
+          if (!acc.includes(node.data.serverId)) {
+            acc.push(node.data.serverId);
+          }
+          return acc;
+        }, [] as string[]);
+      } else {
+        uniqueServerIds = ctx.data.reduce((acc, item) => {
+          if (!acc.includes(item.serverId)) {
+            acc.push(item.serverId);
+          }
+          return acc;
+        }, [] as string[]);
+      }
 
       for (const serverId of uniqueServerIds) {
-        const items = ctx.dataNodes
-          .filter((node) => node.data.serverId === serverId)
-          .map((node) => node.data);
+        if (ctx.dataNodes) {
+          items = ctx.dataNodes
+            .filter((node) => node.data.serverId === serverId)
+            .map((node) => node.data);
+        } else {
+          items = ctx.data.filter((item) => item.serverId === serverId);
+        }
 
         updateRatingMutation.mutate({
           _serverId: serverId,
@@ -365,7 +441,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         });
       }
     },
-    [ctx.dataNodes, updateRatingMutation],
+    [ctx.data, ctx.dataNodes, updateRatingMutation],
   );
 
   const contextMenuItems: Record<ContextMenuItemType, ContextMenuItem> = useMemo(() => {
