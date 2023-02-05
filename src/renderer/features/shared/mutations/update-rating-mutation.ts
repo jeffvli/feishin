@@ -78,7 +78,7 @@ export const useUpdateRating = (options?: MutationOptions) => {
             case ServerType.NAVIDROME:
               queryClient.setQueryData<NDAlbumDetail>(queryKey, {
                 ...previous,
-                userRating: variables.query.rating,
+                rating: variables.query.rating,
               });
               break;
             case ServerType.SUBSONIC:
@@ -111,7 +111,7 @@ export const useUpdateRating = (options?: MutationOptions) => {
             case ServerType.NAVIDROME:
               queryClient.setQueryData<NDAlbumArtistDetail>(queryKey, {
                 ...previous,
-                userRating: variables.query.rating,
+                rating: variables.query.rating,
               });
               break;
             case ServerType.SUBSONIC:
