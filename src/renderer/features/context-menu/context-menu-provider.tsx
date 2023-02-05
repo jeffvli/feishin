@@ -515,64 +515,74 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
           xPos={ctx.xPos}
           yPos={ctx.yPos}
         >
-          <Stack
-            spacing={0}
-            onClick={closeContextMenu}
-          >
-            {ctx.menuItems?.map((item) => {
-              return (
-                <Fragment key={`context-menu-${item.id}`}>
-                  {item.children ? (
-                    <HoverCard position="right">
-                      <HoverCard.Target>
-                        <ContextMenuButton
-                          disabled={item.disabled}
-                          leftIcon={contextMenuItems[item.id].leftIcon}
-                          rightIcon={contextMenuItems[item.id].rightIcon}
-                          onClick={contextMenuItems[item.id].onClick}
-                        >
-                          {contextMenuItems[item.id].label}
-                        </ContextMenuButton>
-                      </HoverCard.Target>
-                      <HoverCard.Dropdown>
-                        <Stack spacing={0}>
-                          {contextMenuItems[item.id].children?.map((child) => (
-                            <>
-                              <ContextMenuButton
-                                key={`sub-${child.id}`}
-                                disabled={child.disabled}
-                                leftIcon={child.leftIcon}
-                                rightIcon={child.rightIcon}
-                                onClick={child.onClick}
-                              >
-                                {child.label}
-                              </ContextMenuButton>
-                            </>
-                          ))}
-                        </Stack>
-                      </HoverCard.Dropdown>
-                    </HoverCard>
-                  ) : (
-                    <ContextMenuButton
-                      disabled={item.disabled}
-                      leftIcon={contextMenuItems[item.id].leftIcon}
-                      rightIcon={contextMenuItems[item.id].rightIcon}
-                      onClick={contextMenuItems[item.id].onClick}
-                    >
-                      {contextMenuItems[item.id].label}
-                    </ContextMenuButton>
-                  )}
+          <Stack spacing={0}>
+            <Stack
+              spacing={0}
+              onClick={closeContextMenu}
+            >
+              {ctx.menuItems?.map((item) => {
+                return (
+                  <Fragment key={`context-menu-${item.id}`}>
+                    {item.children ? (
+                      <HoverCard
+                        offset={5}
+                        position="right"
+                      >
+                        <HoverCard.Target>
+                          <ContextMenuButton
+                            disabled={item.disabled}
+                            leftIcon={contextMenuItems[item.id].leftIcon}
+                            rightIcon={contextMenuItems[item.id].rightIcon}
+                            onClick={contextMenuItems[item.id].onClick}
+                          >
+                            {contextMenuItems[item.id].label}
+                          </ContextMenuButton>
+                        </HoverCard.Target>
+                        <HoverCard.Dropdown>
+                          <Stack spacing={0}>
+                            {contextMenuItems[item.id].children?.map((child) => (
+                              <>
+                                <ContextMenuButton
+                                  key={`sub-${child.id}`}
+                                  disabled={child.disabled}
+                                  leftIcon={child.leftIcon}
+                                  rightIcon={child.rightIcon}
+                                  onClick={child.onClick}
+                                >
+                                  {child.label}
+                                </ContextMenuButton>
+                              </>
+                            ))}
+                          </Stack>
+                        </HoverCard.Dropdown>
+                      </HoverCard>
+                    ) : (
+                      <ContextMenuButton
+                        disabled={item.disabled}
+                        leftIcon={contextMenuItems[item.id].leftIcon}
+                        rightIcon={contextMenuItems[item.id].rightIcon}
+                        onClick={contextMenuItems[item.id].onClick}
+                      >
+                        {contextMenuItems[item.id].label}
+                      </ContextMenuButton>
+                    )}
 
-                  {item.divider && (
-                    <Divider
-                      key={`context-menu-divider-${item.id}`}
-                      color="rgb(62, 62, 62)"
-                      size="sm"
-                    />
-                  )}
-                </Fragment>
-              );
-            })}
+                    {item.divider && (
+                      <Divider
+                        key={`context-menu-divider-${item.id}`}
+                        color="rgb(62, 62, 62)"
+                        size="sm"
+                      />
+                    )}
+                  </Fragment>
+                );
+              })}
+            </Stack>
+            <Divider
+              color="rgb(62, 62, 62)"
+              size="sm"
+            />
+            <ContextMenuButton disabled>{ctx.data?.length} selected</ContextMenuButton>
           </Stack>
         </ContextMenu>
       )}
