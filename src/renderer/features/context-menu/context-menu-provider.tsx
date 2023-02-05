@@ -1,4 +1,4 @@
-import { Divider, Group, Stack } from '@mantine/core';
+import { Divider, Group, Portal, Stack } from '@mantine/core';
 import {
   useClickOutside,
   useMergedRef,
@@ -7,6 +7,7 @@ import {
   useViewportSize,
 } from '@mantine/hooks';
 import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
+import { AnimatePresence } from 'framer-motion';
 import { createContext, Fragment, ReactNode, useState, useMemo, useCallback } from 'react';
 import {
   RiAddBoxFill,
@@ -513,27 +514,57 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         openContextMenu,
       }}
     >
-      {opened && (
-        <ContextMenu
-          ref={mergedRef}
-          minWidth={125}
-          xPos={ctx.xPos}
-          yPos={ctx.yPos}
-        >
-          <Stack spacing={0}>
-            <Stack
-              spacing={0}
-              onClick={closeContextMenu}
+      <Portal>
+        <AnimatePresence>
+          {opened && (
+            <ContextMenu
+              ref={mergedRef}
+              minWidth={125}
+              xPos={ctx.xPos}
+              yPos={ctx.yPos}
             >
-              {ctx.menuItems?.map((item) => {
-                return (
-                  <Fragment key={`context-menu-${item.id}`}>
-                    {item.children ? (
-                      <HoverCard
-                        offset={5}
-                        position="right"
-                      >
-                        <HoverCard.Target>
+              <Stack spacing={0}>
+                <Stack
+                  spacing={0}
+                  onClick={closeContextMenu}
+                >
+                  {ctx.menuItems?.map((item) => {
+                    return (
+                      <Fragment key={`context-menu-${item.id}`}>
+                        {item.children ? (
+                          <HoverCard
+                            offset={5}
+                            position="right"
+                          >
+                            <HoverCard.Target>
+                              <ContextMenuButton
+                                disabled={item.disabled}
+                                leftIcon={contextMenuItems[item.id].leftIcon}
+                                rightIcon={contextMenuItems[item.id].rightIcon}
+                                onClick={contextMenuItems[item.id].onClick}
+                              >
+                                {contextMenuItems[item.id].label}
+                              </ContextMenuButton>
+                            </HoverCard.Target>
+                            <HoverCard.Dropdown>
+                              <Stack spacing={0}>
+                                {contextMenuItems[item.id].children?.map((child) => (
+                                  <>
+                                    <ContextMenuButton
+                                      key={`sub-${child.id}`}
+                                      disabled={child.disabled}
+                                      leftIcon={child.leftIcon}
+                                      rightIcon={child.rightIcon}
+                                      onClick={child.onClick}
+                                    >
+                                      {child.label}
+                                    </ContextMenuButton>
+                                  </>
+                                ))}
+                              </Stack>
+                            </HoverCard.Dropdown>
+                          </HoverCard>
+                        ) : (
                           <ContextMenuButton
                             disabled={item.disabled}
                             leftIcon={contextMenuItems[item.id].leftIcon}
@@ -542,57 +573,30 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                           >
                             {contextMenuItems[item.id].label}
                           </ContextMenuButton>
-                        </HoverCard.Target>
-                        <HoverCard.Dropdown>
-                          <Stack spacing={0}>
-                            {contextMenuItems[item.id].children?.map((child) => (
-                              <>
-                                <ContextMenuButton
-                                  key={`sub-${child.id}`}
-                                  disabled={child.disabled}
-                                  leftIcon={child.leftIcon}
-                                  rightIcon={child.rightIcon}
-                                  onClick={child.onClick}
-                                >
-                                  {child.label}
-                                </ContextMenuButton>
-                              </>
-                            ))}
-                          </Stack>
-                        </HoverCard.Dropdown>
-                      </HoverCard>
-                    ) : (
-                      <ContextMenuButton
-                        disabled={item.disabled}
-                        leftIcon={contextMenuItems[item.id].leftIcon}
-                        rightIcon={contextMenuItems[item.id].rightIcon}
-                        onClick={contextMenuItems[item.id].onClick}
-                      >
-                        {contextMenuItems[item.id].label}
-                      </ContextMenuButton>
-                    )}
+                        )}
 
-                    {item.divider && (
-                      <Divider
-                        key={`context-menu-divider-${item.id}`}
-                        color="rgb(62, 62, 62)"
-                        size="sm"
-                      />
-                    )}
-                  </Fragment>
-                );
-              })}
-            </Stack>
-            <Divider
-              color="rgb(62, 62, 62)"
-              size="sm"
-            />
-            <ContextMenuButton disabled>{ctx.data?.length} selected</ContextMenuButton>
-          </Stack>
-        </ContextMenu>
-      )}
-
-      {children}
+                        {item.divider && (
+                          <Divider
+                            key={`context-menu-divider-${item.id}`}
+                            color="rgb(62, 62, 62)"
+                            size="sm"
+                          />
+                        )}
+                      </Fragment>
+                    );
+                  })}
+                </Stack>
+                <Divider
+                  color="rgb(62, 62, 62)"
+                  size="sm"
+                />
+                <ContextMenuButton disabled>{ctx.data?.length} selected</ContextMenuButton>
+              </Stack>
+            </ContextMenu>
+          )}
+        </AnimatePresence>
+        {children}
+      </Portal>
     </ContextMenuContext.Provider>
   );
 };

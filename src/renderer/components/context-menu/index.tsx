@@ -1,6 +1,6 @@
 import { forwardRef, ReactNode, Ref } from 'react';
-import { Grid, Group, Portal, UnstyledButton, UnstyledButtonProps } from '@mantine/core';
-import { motion } from 'framer-motion';
+import { Grid, Group, UnstyledButton, UnstyledButtonProps } from '@mantine/core';
+import { motion, Variants } from 'framer-motion';
 import styled from 'styled-components';
 
 interface ContextMenuProps {
@@ -94,20 +94,36 @@ export const ContextMenuButton = forwardRef(
   },
 );
 
+const variants: Variants = {
+  closed: {
+    opacity: 0,
+    transition: {
+      duration: 0.1,
+    },
+  },
+  open: {
+    opacity: 1,
+    transition: {
+      duration: 0.1,
+    },
+  },
+};
+
 export const ContextMenu = forwardRef(
   ({ yPos, xPos, minWidth, maxWidth, children }: ContextMenuProps, ref: Ref<HTMLDivElement>) => {
     return (
-      <Portal>
-        <ContextMenuContainer
-          ref={ref}
-          maxWidth={maxWidth}
-          minWidth={minWidth}
-          xPos={xPos}
-          yPos={yPos}
-        >
-          {children}
-        </ContextMenuContainer>
-      </Portal>
+      <ContextMenuContainer
+        ref={ref}
+        animate="open"
+        initial="closed"
+        maxWidth={maxWidth}
+        minWidth={minWidth}
+        variants={variants}
+        xPos={xPos}
+        yPos={yPos}
+      >
+        {children}
+      </ContextMenuContainer>
     );
   },
 );
