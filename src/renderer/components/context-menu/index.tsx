@@ -1,5 +1,5 @@
 import { forwardRef, ReactNode, Ref } from 'react';
-import { Portal, UnstyledButton } from '@mantine/core';
+import { Grid, Group, Portal, UnstyledButton, UnstyledButtonProps } from '@mantine/core';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
 
@@ -22,8 +22,8 @@ const ContextMenuContainer = styled(motion.div)<Omit<ContextMenuProps, 'children
   box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 40%);
 `;
 
-export const ContextMenuButton = styled(UnstyledButton)`
-  padding: 1rem 1.5rem;
+export const StyledContextMenuButton = styled(UnstyledButton)`
+  padding: 1rem;
   color: var(--dropdown-menu-fg);
   font-weight: 500;
   font-family: var(--content-font-family);
@@ -45,6 +45,54 @@ export const ContextMenuButton = styled(UnstyledButton)`
     opacity: 0.6;
   }
 `;
+
+export const ContextMenuButton = forwardRef(
+  (
+    {
+      children,
+      rightIcon,
+      leftIcon,
+      ...props
+    }: UnstyledButtonProps &
+      React.ComponentPropsWithoutRef<'button'> & {
+        leftIcon?: ReactNode;
+        rightIcon?: ReactNode;
+      },
+    ref: any,
+  ) => {
+    return (
+      <StyledContextMenuButton
+        {...props}
+        key={props.key}
+        ref={ref}
+        as="button"
+        disabled={props.disabled}
+        onClick={props.onClick}
+      >
+        <Grid>
+          <Grid.Col
+            span={2}
+            sx={{ alignSelf: 'center' }}
+          >
+            {leftIcon}
+          </Grid.Col>
+          <Grid.Col span={8}>{children} </Grid.Col>
+          <Grid.Col
+            span={2}
+            sx={{ alignSelf: 'center' }}
+          >
+            <Group
+              align="flex-end"
+              position="right"
+            >
+              {rightIcon}
+            </Group>
+          </Grid.Col>
+        </Grid>
+      </StyledContextMenuButton>
+    );
+  },
+);
 
 export const ContextMenu = forwardRef(
   ({ yPos, xPos, minWidth, maxWidth, children }: ContextMenuProps, ref: Ref<HTMLDivElement>) => {

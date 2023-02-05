@@ -1,23 +1,59 @@
 import { Divider, Group, Stack } from '@mantine/core';
-import { useClickOutside, useResizeObserver, useSetState, useViewportSize } from '@mantine/hooks';
-import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
-import { createContext, Fragment, useState } from 'react';
-import { LibraryItem, ServerType } from '/@/renderer/api/types';
-import { ConfirmModal, ContextMenu, ContextMenuButton, Text, toast } from '/@/renderer/components';
 import {
+  useClickOutside,
+  useMergedRef,
+  useResizeObserver,
+  useSetState,
+  useViewportSize,
+} from '@mantine/hooks';
+import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
+import { createContext, Fragment, ReactNode, useState, useMemo, useCallback } from 'react';
+import {
+  RiAddBoxFill,
+  RiAddCircleFill,
+  RiArrowRightSFill,
+  RiDeleteBinFill,
+  RiDislikeFill,
+  RiHeartFill,
+  RiPlayFill,
+  RiPlayListAddFill,
+  RiStarFill,
+} from 'react-icons/ri';
+import { LibraryItem, ServerType } from '/@/renderer/api/types';
+import {
+  ConfirmModal,
+  ContextMenu,
+  ContextMenuButton,
+  HoverCard,
+  Rating,
+  Text,
+  toast,
+} from '/@/renderer/components';
+import {
+  ContextMenuItemType,
   OpenContextMenuProps,
   useContextMenuEvents,
 } from '/@/renderer/features/context-menu/events';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useDeletePlaylist } from '/@/renderer/features/playlists';
 import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
-import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { useCreateFavorite, useDeleteFavorite, useUpdateRating } from '/@/renderer/features/shared';
 import { useCurrentServer } from '/@/renderer/store';
 import { Play } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
   closeContextMenu: () => void;
   openContextMenu: (args: OpenContextMenuProps) => void;
+};
+
+type ContextMenuItem = {
+  children?: ContextMenuItem[];
+  disabled?: boolean;
+  id: string;
+  label: string | ReactNode;
+  leftIcon?: ReactNode;
+  onClick?: (...args: any) => any;
+  rightIcon?: ReactNode;
 };
 
 const ContextMenuContext = createContext<ContextMenuContextProps>({
@@ -34,6 +70,7 @@ export interface ContextMenuProviderProps {
 export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [opened, setOpened] = useState(false);
   const clickOutsideRef = useClickOutside(() => setOpened(false));
+
   const viewport = useViewportSize();
   const server = useCurrentServer();
   const serverType = server?.type;
@@ -90,44 +127,47 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     openContextMenu,
   });
 
-  const handlePlay = (play: Play) => {
-    switch (ctx.type) {
-      case LibraryItem.ALBUM:
-        handlePlayQueueAdd?.({
-          byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
-          play,
-        });
-        break;
-      case LibraryItem.ARTIST:
-        handlePlayQueueAdd?.({
-          byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
-          play,
-        });
-        break;
-      case LibraryItem.ALBUM_ARTIST:
-        handlePlayQueueAdd?.({
-          byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
-          play,
-        });
-        break;
-      case LibraryItem.SONG:
-        handlePlayQueueAdd?.({ byData: ctx.data, play });
-        break;
-      case LibraryItem.PLAYLIST:
-        for (const item of ctx.data) {
+  const handlePlay = useCallback(
+    (play: Play) => {
+      switch (ctx.type) {
+        case LibraryItem.ALBUM:
           handlePlayQueueAdd?.({
-            byItemType: { id: [item.id], type: ctx.type },
+            byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
             play,
           });
-        }
+          break;
+        case LibraryItem.ARTIST:
+          handlePlayQueueAdd?.({
+            byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
+            play,
+          });
+          break;
+        case LibraryItem.ALBUM_ARTIST:
+          handlePlayQueueAdd?.({
+            byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
+            play,
+          });
+          break;
+        case LibraryItem.SONG:
+          handlePlayQueueAdd?.({ byData: ctx.data, play });
+          break;
+        case LibraryItem.PLAYLIST:
+          for (const item of ctx.data) {
+            handlePlayQueueAdd?.({
+              byItemType: { id: [item.id], type: ctx.type },
+              play,
+            });
+          }
 
-        break;
-    }
-  };
+          break;
+      }
+    },
+    [ctx.data, ctx.type, handlePlayQueueAdd],
+  );
 
   const deletePlaylistMutation = useDeletePlaylist();
 
-  const handleDeletePlaylist = () => {
+  const handleDeletePlaylist = useCallback(() => {
     for (const item of ctx.data) {
       deletePlaylistMutation?.mutate(
         { query: { id: item.id } },
@@ -148,9 +188,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       );
     }
     closeAllModals();
-  };
+  }, [ctx.data, deletePlaylistMutation]);
 
-  const openDeletePlaylistModal = () => {
+  const openDeletePlaylistModal = useCallback(() => {
     openModal({
       children: (
         <ConfirmModal onConfirm={handleDeletePlaylist}>
@@ -170,11 +210,11 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       ),
       title: 'Delete playlist(s)',
     });
-  };
+  }, [ctx.data, handleDeletePlaylist]);
 
   const createFavoriteMutation = useCreateFavorite();
   const deleteFavoriteMutation = useDeleteFavorite();
-  const handleAddToFavorites = () => {
+  const handleAddToFavorites = useCallback(() => {
     if (!ctx.dataNodes) return;
     const nodesToFavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
     createFavoriteMutation.mutate(
@@ -198,9 +238,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         },
       },
     );
-  };
+  }, [createFavoriteMutation, ctx.dataNodes, ctx.type]);
 
-  const handleRemoveFromFavorites = () => {
+  const handleRemoveFromFavorites = useCallback(() => {
     if (!ctx.dataNodes) return;
     const nodesToUnfavorite = ctx.dataNodes.filter((item) => item.data.userFavorite);
 
@@ -219,9 +259,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         },
       },
     );
-  };
+  }, [ctx.dataNodes, ctx.type, deleteFavoriteMutation]);
 
-  const handleAddToPlaylist = () => {
+  const handleAddToPlaylist = useCallback(() => {
     if (!ctx.dataNodes) return;
     openContextModal({
       innerProps: {
@@ -236,11 +276,11 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       size: 'md',
       title: 'Add to playlist',
     });
-  };
+  }, [ctx.dataNodes, ctx.type]);
 
   const removeFromPlaylistMutation = useRemoveFromPlaylist();
 
-  const handleRemoveFromPlaylist = () => {
+  const handleRemoveFromPlaylist = useCallback(() => {
     const songId =
       (serverType === ServerType.NAVIDROME || ServerType.JELLYFIN
         ? ctx.dataNodes?.map((node) => node.data.playlistItemId)
@@ -284,48 +324,182 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       ),
       title: 'Remove song(s) from playlist',
     });
-  };
+  }, [
+    ctx.context?.playlistId,
+    ctx.context?.tableRef,
+    ctx.dataNodes,
+    removeFromPlaylistMutation,
+    serverType,
+  ]);
 
-  const contextMenuItems = {
-    addToFavorites: {
-      id: 'addToFavorites',
-      label: 'Add to favorites',
-      onClick: handleAddToFavorites,
+  const updateRatingMutation = useUpdateRating();
+
+  const handleUpdateRating = useCallback(
+    (rating: number) => {
+      if (!ctx.dataNodes) return;
+
+      const uniqueServerIds = ctx.dataNodes.reduce((acc, node) => {
+        if (!acc.includes(node.data.serverId)) {
+          acc.push(node.data.serverId);
+        }
+        return acc;
+      }, [] as string[]);
+
+      for (const serverId of uniqueServerIds) {
+        const items = ctx.dataNodes
+          .filter((node) => node.data.serverId === serverId)
+          .map((node) => node.data);
+
+        updateRatingMutation.mutate({
+          _serverId: serverId,
+          query: {
+            item: items,
+            rating,
+          },
+        });
+      }
     },
-    addToPlaylist: { id: 'addToPlaylist', label: 'Add to playlist', onClick: handleAddToPlaylist },
-    createPlaylist: { id: 'createPlaylist', label: 'Create playlist', onClick: () => {} },
-    deletePlaylist: {
-      id: 'deletePlaylist',
-      label: 'Delete playlist',
-      onClick: openDeletePlaylistModal,
-    },
-    play: {
-      id: 'play',
-      label: 'Play',
-      onClick: () => handlePlay(Play.NOW),
-    },
-    playLast: {
-      id: 'playLast',
-      label: 'Add to queue',
-      onClick: () => handlePlay(Play.LAST),
-    },
-    playNext: {
-      id: 'playNext',
-      label: 'Add to queue next',
-      onClick: () => handlePlay(Play.NEXT),
-    },
-    removeFromFavorites: {
-      id: 'removeFromFavorites',
-      label: 'Remove from favorites',
-      onClick: handleRemoveFromFavorites,
-    },
-    removeFromPlaylist: {
-      id: 'removeFromPlaylist',
-      label: 'Remove from playlist',
-      onClick: handleRemoveFromPlaylist,
-    },
-    setRating: { id: 'setRating', label: 'Set rating', onClick: () => {} },
-  };
+    [ctx.dataNodes, updateRatingMutation],
+  );
+
+  const contextMenuItems: Record<ContextMenuItemType, ContextMenuItem> = useMemo(() => {
+    return {
+      addToFavorites: {
+        id: 'addToFavorites',
+        label: 'Add to favorites',
+        leftIcon: <RiHeartFill size="1.1rem" />,
+        onClick: handleAddToFavorites,
+      },
+      addToPlaylist: {
+        id: 'addToPlaylist',
+        label: 'Add to playlist',
+        leftIcon: <RiPlayListAddFill size="1.1rem" />,
+        onClick: handleAddToPlaylist,
+      },
+      createPlaylist: { id: 'createPlaylist', label: 'Create playlist', onClick: () => {} },
+      deletePlaylist: {
+        id: 'deletePlaylist',
+        label: 'Delete playlist',
+        leftIcon: <RiDeleteBinFill size="1.1rem" />,
+        onClick: openDeletePlaylistModal,
+      },
+      play: {
+        id: 'play',
+        label: 'Play',
+        leftIcon: <RiPlayFill size="1.1rem" />,
+        onClick: () => handlePlay(Play.NOW),
+      },
+      playLast: {
+        id: 'playLast',
+        label: 'Add to queue',
+        leftIcon: <RiAddBoxFill size="1.1rem" />,
+        onClick: () => handlePlay(Play.LAST),
+      },
+      playNext: {
+        id: 'playNext',
+        label: 'Add to queue next',
+        leftIcon: <RiAddCircleFill size="1.1rem" />,
+        onClick: () => handlePlay(Play.NEXT),
+      },
+      removeFromFavorites: {
+        id: 'removeFromFavorites',
+        label: 'Remove from favorites',
+        leftIcon: <RiDislikeFill size="1.1rem" />,
+        onClick: handleRemoveFromFavorites,
+      },
+      removeFromPlaylist: {
+        id: 'removeFromPlaylist',
+        label: 'Remove from playlist',
+        leftIcon: <RiDeleteBinFill size="1.1rem" />,
+        onClick: handleRemoveFromPlaylist,
+      },
+      setRating: {
+        children: [
+          {
+            id: 'zeroStar',
+            label: (
+              <Rating
+                readOnly
+                value={0}
+                onClick={() => {}}
+              />
+            ),
+            onClick: () => handleUpdateRating(0),
+          },
+          {
+            id: 'oneStar',
+            label: (
+              <Rating
+                readOnly
+                value={1}
+                onClick={() => {}}
+              />
+            ),
+            onClick: () => handleUpdateRating(1),
+          },
+          {
+            id: 'twoStar',
+            label: (
+              <Rating
+                readOnly
+                value={2}
+                onClick={() => {}}
+              />
+            ),
+            onClick: () => handleUpdateRating(2),
+          },
+          {
+            id: 'threeStar',
+            label: (
+              <Rating
+                readOnly
+                value={3}
+                onClick={() => {}}
+              />
+            ),
+            onClick: () => handleUpdateRating(3),
+          },
+          {
+            id: 'fourStar',
+            label: (
+              <Rating
+                readOnly
+                value={4}
+                onClick={() => {}}
+              />
+            ),
+            onClick: () => handleUpdateRating(4),
+          },
+          {
+            id: 'fiveStar',
+            label: (
+              <Rating
+                readOnly
+                value={5}
+                onClick={() => {}}
+              />
+            ),
+            onClick: () => handleUpdateRating(5),
+          },
+        ],
+        id: 'setRating',
+        label: 'Set rating',
+        leftIcon: <RiStarFill size="1.1rem" />,
+        onClick: () => {},
+        rightIcon: <RiArrowRightSFill size="1.2rem" />,
+      },
+    };
+  }, [
+    handleAddToFavorites,
+    handleAddToPlaylist,
+    handlePlay,
+    handleRemoveFromFavorites,
+    handleRemoveFromPlaylist,
+    handleUpdateRating,
+    openDeletePlaylistModal,
+  ]);
+
+  const mergedRef = useMergedRef(ref, clickOutsideRef);
 
   return (
     <ContextMenuContext.Provider
@@ -336,26 +510,59 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     >
       {opened && (
         <ContextMenu
-          ref={ref}
+          ref={mergedRef}
           minWidth={125}
           xPos={ctx.xPos}
           yPos={ctx.yPos}
         >
           <Stack
-            ref={clickOutsideRef}
             spacing={0}
             onClick={closeContextMenu}
           >
             {ctx.menuItems?.map((item) => {
               return (
                 <Fragment key={`context-menu-${item.id}`}>
-                  <ContextMenuButton
-                    as="button"
-                    disabled={item.disabled}
-                    onClick={contextMenuItems[item.id as keyof typeof contextMenuItems].onClick}
-                  >
-                    {contextMenuItems[item.id as keyof typeof contextMenuItems].label}
-                  </ContextMenuButton>
+                  {item.children ? (
+                    <HoverCard position="right">
+                      <HoverCard.Target>
+                        <ContextMenuButton
+                          disabled={item.disabled}
+                          leftIcon={contextMenuItems[item.id].leftIcon}
+                          rightIcon={contextMenuItems[item.id].rightIcon}
+                          onClick={contextMenuItems[item.id].onClick}
+                        >
+                          {contextMenuItems[item.id].label}
+                        </ContextMenuButton>
+                      </HoverCard.Target>
+                      <HoverCard.Dropdown>
+                        <Stack spacing={0}>
+                          {contextMenuItems[item.id].children?.map((child) => (
+                            <>
+                              <ContextMenuButton
+                                key={`sub-${child.id}`}
+                                disabled={child.disabled}
+                                leftIcon={child.leftIcon}
+                                rightIcon={child.rightIcon}
+                                onClick={child.onClick}
+                              >
+                                {child.label}
+                              </ContextMenuButton>
+                            </>
+                          ))}
+                        </Stack>
+                      </HoverCard.Dropdown>
+                    </HoverCard>
+                  ) : (
+                    <ContextMenuButton
+                      disabled={item.disabled}
+                      leftIcon={contextMenuItems[item.id].leftIcon}
+                      rightIcon={contextMenuItems[item.id].rightIcon}
+                      onClick={contextMenuItems[item.id].onClick}
+                    >
+                      {contextMenuItems[item.id].label}
+                    </ContextMenuButton>
+                  )}
+
                   {item.divider && (
                     <Divider
                       key={`context-menu-divider-${item.id}`}

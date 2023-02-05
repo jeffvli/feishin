@@ -20,7 +20,7 @@ export type ContextMenuEvents = {
   openContextMenu: (args: OpenContextMenuProps) => void;
 };
 
-export type ContextMenuItem =
+export type ContextMenuItemType =
   | 'play'
   | 'playLast'
   | 'playNext'
@@ -33,9 +33,10 @@ export type ContextMenuItem =
   | 'createPlaylist';
 
 export type SetContextMenuItems = {
+  children?: boolean;
   disabled?: boolean;
   divider?: boolean;
-  id: ContextMenuItem;
+  id: ContextMenuItemType;
   onClick?: () => void;
 }[];
 
