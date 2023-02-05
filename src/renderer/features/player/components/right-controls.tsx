@@ -71,9 +71,6 @@ export const RightControls = () => {
   const handleClearRating = (_e: MouseEvent<HTMLDivElement>, rating?: number) => {
     if (!currentSong || !rating) return;
 
-    const isSameRatingAsPrevious = rating === currentSong?.userRating;
-    if (!isSameRatingAsPrevious) return;
-
     updateRatingMutation.mutate({
       _serverId: currentSong?.serverId,
       query: {

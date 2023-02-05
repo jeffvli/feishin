@@ -1,10 +1,10 @@
-import { Group, Stack } from '@mantine/core';
-import { forwardRef, Fragment, Ref } from 'react';
+import { Group, Rating, Stack } from '@mantine/core';
+import { forwardRef, Fragment, Ref, MouseEvent } from 'react';
 import { useParams } from 'react-router';
-import { LibraryItem } from '/@/renderer/api/types';
+import { LibraryItem, ServerType } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
-import { LibraryHeader } from '/@/renderer/features/shared';
+import { LibraryHeader, useUpdateRating } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { formatDurationString } from '/@/renderer/utils';
@@ -37,6 +37,39 @@ export const AlbumArtistDetailHeader = forwardRef(
       },
     ];
 
+    const updateRatingMutation = useUpdateRating();
+
+    const handleUpdateRating = (rating: number) => {
+      if (!detailQuery?.data) return;
+
+      updateRatingMutation.mutate({
+        _serverId: detailQuery?.data.serverId,
+        query: {
+          item: [detailQuery.data],
+          rating,
+        },
+      });
+    };
+
+    const handleClearRating = (_e: MouseEvent<HTMLDivElement>, rating?: number) => {
+      if (!detailQuery?.data || !detailQuery?.data.userRating) return;
+
+      console.log(rating, detailQuery.data.userRating);
+
+      const isSameRatingAsPrevious = rating === detailQuery.data.userRating;
+      if (!isSameRatingAsPrevious) return;
+
+      updateRatingMutation.mutate({
+        _serverId: detailQuery.data.serverId,
+        query: {
+          item: [detailQuery.data],
+          rating: 0,
+        },
+      });
+    };
+
+    const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
+
     return (
       <Stack ref={cq.ref}>
         <LibraryHeader
@@ -56,6 +89,17 @@ export const AlbumArtistDetailHeader = forwardRef(
                     <Text $secondary={item.secondary}>{item.value}</Text>
                   </Fragment>
                 ))}
+              {showRating && (
+                <>
+                  <Text $noSelect>•</Text>
+                  <Rating
+                    readOnly={detailQuery?.isFetching || updateRatingMutation.isLoading}
+                    value={detailQuery?.data?.userRating || 0}
+                    onChange={handleUpdateRating}
+                    onClick={handleClearRating}
+                  />
+                </>
+              )}
             </Group>
             <Group
               sx={{

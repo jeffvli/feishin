@@ -22,12 +22,9 @@ export const RatingCell = ({ value }: ICellRendererParams) => {
     setRatingValue(rating);
   };
 
-  const handleClearRating = (_e: MouseEvent<HTMLDivElement>, rating?: number) => {
-    if (!value || !ratingValue) return;
-
-    const isSameRatingAsPrevious = rating === ratingValue;
-    if (!isSameRatingAsPrevious) return;
-
+  const handleClearRating = (e: MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     updateRatingMutation.mutate({
       _serverId: value?.serverId,
       query: {
