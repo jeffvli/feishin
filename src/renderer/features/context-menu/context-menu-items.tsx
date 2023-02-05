@@ -7,7 +7,7 @@ export const SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { divider: true, id: 'addToPlaylist' },
   { id: 'addToFavorites' },
   { divider: true, id: 'removeFromFavorites' },
-  { disabled: true, id: 'setRating' },
+  { children: true, disabled: false, id: 'setRating' },
 ];
 
 export const PLAYLIST_SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
@@ -18,7 +18,7 @@ export const PLAYLIST_SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { divider: true, id: 'removeFromPlaylist' },
   { id: 'addToFavorites' },
   { divider: true, id: 'removeFromFavorites' },
-  { disabled: true, id: 'setRating' },
+  { children: true, disabled: false, id: 'setRating' },
 ];
 
 export const ALBUM_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
@@ -28,7 +28,7 @@ export const ALBUM_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { divider: true, id: 'addToPlaylist' },
   { id: 'addToFavorites' },
   { id: 'removeFromFavorites' },
-  { disabled: true, id: 'setRating' },
+  { children: true, disabled: false, id: 'setRating' },
 ];
 
 export const ARTIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
@@ -38,7 +38,7 @@ export const ARTIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { divider: true, id: 'addToPlaylist' },
   { id: 'addToFavorites' },
   { divider: true, id: 'removeFromFavorites' },
-  { disabled: true, id: 'setRating' },
+  { children: true, disabled: false, id: 'setRating' },
 ];
 
 export const PLAYLIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [

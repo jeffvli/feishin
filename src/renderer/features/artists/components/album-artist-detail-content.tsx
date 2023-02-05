@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import {
   Button,
-  DropdownMenu,
   getColumnDefs,
   GridCarousel,
   Text,
@@ -10,8 +9,7 @@ import {
 } from '/@/renderer/components';
 import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { Box, Group, Stack } from '@mantine/core';
-import { openContextModal } from '@mantine/modals';
-import { RiArrowDownSLine, RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
+import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { useCurrentServer } from '/@/renderer/store';
 import { createSearchParams, Link } from 'react-router-dom';
@@ -19,15 +17,16 @@ import styled from 'styled-components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
-import { Play, TableColumn } from '/@/renderer/types';
-import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import {
-  PlayButton,
-  PLAY_TYPES,
-  useCreateFavorite,
-  useDeleteFavorite,
-} from '/@/renderer/features/shared';
+  useHandleGeneralContextMenu,
+  useHandleTableContextMenu,
+} from '/@/renderer/features/context-menu';
+import { Play, TableColumn } from '/@/renderer/types';
+import {
+  ARTIST_CONTEXT_MENU_ITEMS,
+  SONG_CONTEXT_MENU_ITEMS,
+} from '/@/renderer/features/context-menu/context-menu-items';
+import { PlayButton, useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import {
   AlbumListSort,
@@ -267,16 +266,10 @@ export const AlbumArtistDetailContent = () => {
     }
   };
 
-  const handleAddToPlaylist = () => {
-    openContextModal({
-      innerProps: {
-        artistId: [albumArtistId],
-      },
-      modal: 'addToPlaylist',
-      size: 'md',
-      title: 'Add to playlist',
-    });
-  };
+  const handleGeneralContextMenu = useHandleGeneralContextMenu(
+    LibraryItem.ALBUM_ARTIST,
+    ARTIST_CONTEXT_MENU_ITEMS,
+  );
 
   const topSongs = topSongsQuery?.data?.items?.slice(0, 10);
 
@@ -311,28 +304,16 @@ export const AlbumArtistDetailContent = () => {
                 <RiHeartLine size={20} />
               )}
             </Button>
-            <DropdownMenu position="bottom-start">
-              <DropdownMenu.Target>
-                <Button
-                  compact
-                  variant="subtle"
-                >
-                  <RiMoreFill size={20} />
-                </Button>
-              </DropdownMenu.Target>
-              <DropdownMenu.Dropdown>
-                {PLAY_TYPES.filter((type) => type.play !== playButtonBehavior).map((type) => (
-                  <DropdownMenu.Item
-                    key={`playtype-${type.play}`}
-                    onClick={() => handlePlay(type.play)}
-                  >
-                    {type.label}
-                  </DropdownMenu.Item>
-                ))}
-                <DropdownMenu.Divider />
-                <DropdownMenu.Item onClick={handleAddToPlaylist}>Add to playlist</DropdownMenu.Item>
-              </DropdownMenu.Dropdown>
-            </DropdownMenu>
+            <Button
+              compact
+              variant="subtle"
+              onClick={(e) => {
+                if (!detailQuery?.data) return;
+                handleGeneralContextMenu(e, [detailQuery.data!]);
+              }}
+            >
+              <RiMoreFill size={20} />
+            </Button>
             <Button
               compact
               uppercase
@@ -422,22 +403,6 @@ export const AlbumArtistDetailContent = () => {
                 View all
               </Button>
             </Group>
-            <DropdownMenu>
-              <DropdownMenu.Target>
-                <Button
-                  compact
-                  uppercase
-                  rightIcon={<RiArrowDownSLine size={20} />}
-                  variant="subtle"
-                >
-                  Community
-                </Button>
-              </DropdownMenu.Target>
-              <DropdownMenu.Dropdown>
-                <DropdownMenu.Item>Community</DropdownMenu.Item>
-                <DropdownMenu.Item>User</DropdownMenu.Item>
-              </DropdownMenu.Dropdown>
-            </DropdownMenu>
           </Group>
           <VirtualTable
             autoFitColumns

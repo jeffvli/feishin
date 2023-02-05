@@ -1,6 +1,6 @@
 import { CellContextMenuEvent } from '@ag-grid-community/core';
 import sortBy from 'lodash/sortBy';
-import { LibraryItem } from '/@/renderer/api/types';
+import { Album, AlbumArtist, Artist, LibraryItem, QueueSong, Song } from '/@/renderer/api/types';
 import { openContextMenu, SetContextMenuItems } from '/@/renderer/features/context-menu/events';
 
 export const useHandleTableContextMenu = (
@@ -33,6 +33,33 @@ export const useHandleTableContextMenu = (
       type: itemType,
       xPos: clickEvent.clientX,
       yPos: clickEvent.clientY,
+    });
+  };
+
+  return handleContextMenu;
+};
+
+export const useHandleGeneralContextMenu = (
+  itemType: LibraryItem,
+  contextMenuItems: SetContextMenuItems,
+  context?: any,
+) => {
+  const handleContextMenu = (
+    e: any,
+    data: Song[] | QueueSong[] | AlbumArtist[] | Artist[] | Album[],
+  ) => {
+    if (!e) return;
+    const clickEvent = e as MouseEvent;
+    clickEvent.preventDefault();
+
+    openContextMenu({
+      context,
+      data,
+      dataNodes: undefined,
+      menuItems: contextMenuItems,
+      type: itemType,
+      xPos: clickEvent.clientX + 15,
+      yPos: clickEvent.clientY + 5,
     });
   };
 

@@ -300,7 +300,7 @@ const tableColumns: { [key: string]: ColDef } = {
       GenericTableHeader(params, { position: 'center', preset: 'userRating' }),
     headerName: 'Rating',
     suppressSizeToFit: true,
-    valueGetter: (params: ValueGetterParams) => (params.data ? params.data.userRating : undefined),
+    valueGetter: (params: ValueGetterParams) => (params.data ? params.data : undefined),
     width: 95,
   },
 };

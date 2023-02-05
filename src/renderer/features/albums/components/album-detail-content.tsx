@@ -1,7 +1,6 @@
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import {
   Button,
-  DropdownMenu,
   getColumnDefs,
   GridCarousel,
   TextTitle,
@@ -12,7 +11,6 @@ import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
-import { openContextModal } from '@mantine/modals';
 import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
@@ -22,15 +20,16 @@ import styled from 'styled-components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
-import { Play } from '/@/renderer/types';
-import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import {
-  PlayButton,
-  PLAY_TYPES,
-  useCreateFavorite,
-  useDeleteFavorite,
-} from '/@/renderer/features/shared';
+  useHandleGeneralContextMenu,
+  useHandleTableContextMenu,
+} from '/@/renderer/features/context-menu';
+import { Play } from '/@/renderer/types';
+import {
+  ALBUM_CONTEXT_MENU_ITEMS,
+  SONG_CONTEXT_MENU_ITEMS,
+} from '/@/renderer/features/context-menu/context-menu-items';
+import { PlayButton, useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
@@ -183,16 +182,10 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
 
   const { intersectRef, tableContainerRef } = useFixedTableHeader();
 
-  const handleAddToPlaylist = () => {
-    openContextModal({
-      innerProps: {
-        albumId: [albumId],
-      },
-      modal: 'addToPlaylist',
-      size: 'md',
-      title: 'Add to playlist',
-    });
-  };
+  const handleGeneralContextMenu = useHandleGeneralContextMenu(
+    LibraryItem.ALBUM,
+    ALBUM_CONTEXT_MENU_ITEMS,
+  );
 
   return (
     <ContentContainer>
@@ -220,28 +213,16 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
                 <RiHeartLine size={20} />
               )}
             </Button>
-            <DropdownMenu position="bottom-start">
-              <DropdownMenu.Target>
-                <Button
-                  compact
-                  variant="subtle"
-                >
-                  <RiMoreFill size={20} />
-                </Button>
-              </DropdownMenu.Target>
-              <DropdownMenu.Dropdown>
-                {PLAY_TYPES.filter((type) => type.play !== playButtonBehavior).map((type) => (
-                  <DropdownMenu.Item
-                    key={`playtype-${type.play}`}
-                    onClick={() => handlePlay(type.play)}
-                  >
-                    {type.label}
-                  </DropdownMenu.Item>
-                ))}
-                <DropdownMenu.Divider />
-                <DropdownMenu.Item onClick={handleAddToPlaylist}>Add to playlist</DropdownMenu.Item>
-              </DropdownMenu.Dropdown>
-            </DropdownMenu>
+            <Button
+              compact
+              variant="subtle"
+              onClick={(e) => {
+                if (!detailQuery?.data) return;
+                handleGeneralContextMenu(e, [detailQuery.data!]);
+              }}
+            >
+              <RiMoreFill size={20} />
+            </Button>
           </Group>
         </Group>
       </Box>
