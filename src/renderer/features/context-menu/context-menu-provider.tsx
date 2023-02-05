@@ -90,11 +90,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const openContextMenu = (args: OpenContextMenuProps) => {
     const { xPos, yPos, menuItems, data, type, tableRef, dataNodes, context } = args;
 
-    const shouldReverseY = yPos + menuRect.height > viewport.height;
-    const shouldReverseX = xPos + menuRect.width > viewport.width;
+    // If the context menu dimension can't be automatically calculated, calculate it manually
+    // This is a hacky way since resize observer may not automatically recalculate when not rendered
+    const menuHeight = menuRect.height || (menuItems.length + 1) * 50;
+    const menuWidth = menuRect.width || 220;
 
-    const calculatedXPos = shouldReverseX ? xPos - menuRect.width : xPos;
-    const calculatedYPos = shouldReverseY ? yPos - menuRect.height : yPos;
+    const shouldReverseY = yPos + menuHeight > viewport.height;
+    const shouldReverseX = xPos + menuWidth > viewport.width;
+
+    const calculatedXPos = shouldReverseX ? xPos - menuWidth : xPos;
+    const calculatedYPos = shouldReverseY ? yPos - menuHeight : yPos;
 
     setCtx({
       context,
