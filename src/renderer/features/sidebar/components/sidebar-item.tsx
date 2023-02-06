@@ -1,9 +1,8 @@
 import type { ReactNode } from 'react';
-import { createPolymorphicComponent, Flex, FlexProps, Group } from '@mantine/core';
+import { createPolymorphicComponent, Flex, FlexProps } from '@mantine/core';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { textEllipsis } from '/@/renderer/styles';
 
 interface ListItemProps extends FlexProps {
   children: ReactNode;
@@ -13,8 +12,8 @@ interface ListItemProps extends FlexProps {
 
 const StyledItem = styled(Flex)`
   width: 100%;
+  font-weight: 600;
   font-family: var(--content-font-family);
-  letter-spacing: 0.5px;
 
   &:focus-visible {
     border: 1px solid var(--primary-color);
@@ -74,61 +73,4 @@ SidebarItem.Link = ItemLink;
 SidebarItem.defaultProps = {
   disabled: false,
   to: undefined,
-};
-
-const _PlaylistItemLink = styled(StyledItem)<LinkProps & { disabled?: boolean }>`
-  display: block;
-  padding: 0.3rem 0;
-  overflow: hidden;
-  color: var(--sidebar-fg);
-  cursor: default;
-  opacity: ${(props) => (props.disabled ? 0.6 : 0.8)};
-  transition: color 0.2s ease-in-out;
-  transition: opacity 0.2s ease-in-out;
-  pointer-events: ${(props) => props.disabled && 'none'};
-  ${textEllipsis}
-
-  &:hover {
-    color: var(--sidebar-fg-hover);
-    opacity: 1;
-  }
-
-  &:focus-visible {
-    border: 1px solid var(--primary-color);
-  }
-`;
-
-const PlaylistItemLink = createPolymorphicComponent<'a', ListItemProps>(_PlaylistItemLink);
-
-export const PlaylistSidebarItem = ({
-  handlePlay,
-  to,
-  children,
-  ...props
-}: ListItemProps & { handlePlay: () => void }) => {
-  if (to) {
-    return (
-      <Group
-        noWrap
-        position="apart"
-      >
-        <PlaylistItemLink
-          component={Link}
-          to={to}
-          {...props}
-        >
-          {children}
-        </PlaylistItemLink>
-      </Group>
-    );
-  }
-
-  return (
-    <StyledItem
-      tabIndex={0}
-      {...props}
-    >
-      {children}
-    </StyledItem>
-  );
 };
