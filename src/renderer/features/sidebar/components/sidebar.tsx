@@ -2,14 +2,7 @@ import { MouseEvent } from 'react';
 import { Stack, Grid, Accordion, Center, Group, Divider, Box, Flex } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  Button,
-  DropdownMenu,
-  MotionStack,
-  Spinner,
-  TextInput,
-  TextTitle,
-} from '/@/renderer/components';
+import { Button, DropdownMenu, MotionStack, Spinner, TextInput } from '/@/renderer/components';
 import {
   RiAddFill,
   RiAlbumFill,
@@ -79,6 +72,10 @@ const SidebarImage = styled.img`
 
 const ActionsContainer = styled(Grid)`
   -webkit-app-region: drag;
+
+  input {
+    -webkit-app-region: no-drag;
+  }
 `;
 
 export const Sidebar = () => {
@@ -121,29 +118,65 @@ export const Sidebar = () => {
         h="65px"
         px="1rem"
         py="0.5rem"
-        sx={{ '-webkit-app-region': 'drag' }}
+        sx={{
+          '-webkit-app-region': 'drag',
+          a: {
+            '-webkit-app-region': 'no-drag',
+          },
+        }}
       >
-        <DropdownMenu position="bottom-start">
-          <DropdownMenu.Target>
-            <Button
-              p="0.5rem"
-              size="md"
-              variant="subtle"
-            >
-              <RiMenuFill size="2rem" />
-            </Button>
-          </DropdownMenu.Target>
-          <DropdownMenu.Dropdown>
-            <AppMenu />
-          </DropdownMenu.Dropdown>
-        </DropdownMenu>
-
-        <TextTitle
-          fw="900"
-          order={1}
+        <ActionsContainer
+          gutter="sm"
+          w="100%"
         >
-          Feishin
-        </TextTitle>
+          <Grid.Col span={7}>
+            <TextInput
+              disabled
+              readOnly
+              icon={<RiSearchLine />}
+              placeholder="Search"
+              rightSectionWidth={90}
+              size="md"
+            />
+          </Grid.Col>
+          <Grid.Col span={5}>
+            <Group
+              grow
+              spacing="sm"
+            >
+              <DropdownMenu position="bottom-start">
+                <DropdownMenu.Target>
+                  <Button
+                    p="0.5rem"
+                    size="md"
+                    variant="default"
+                  >
+                    <RiMenuFill size="1rem" />
+                  </Button>
+                </DropdownMenu.Target>
+                <DropdownMenu.Dropdown>
+                  <AppMenu />
+                </DropdownMenu.Dropdown>
+              </DropdownMenu>
+              <Button
+                px={5}
+                size="md"
+                variant="default"
+                onClick={() => navigate(-1)}
+              >
+                <RiArrowLeftSLine size="1.5rem" />
+              </Button>
+              <Button
+                px={5}
+                size="md"
+                variant="default"
+                onClick={() => navigate(1)}
+              >
+                <RiArrowRightSLine size="1.5rem" />
+              </Button>
+            </Group>
+          </Grid.Col>
+        </ActionsContainer>
       </Flex>
       <Stack
         h="100%"
@@ -155,46 +188,6 @@ export const Sidebar = () => {
           spacing={0}
           sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
         >
-          <ActionsContainer
-            gutter="sm"
-            p={10}
-          >
-            <Grid.Col span={8}>
-              <TextInput
-                disabled
-                readOnly
-                icon={<RiSearchLine />}
-                placeholder="Search"
-                rightSectionWidth={90}
-                size="md"
-              />
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <Group
-                grow
-                spacing="sm"
-              >
-                <Button
-                  px={5}
-                  size="md"
-                  sx={{ color: 'var(--titlebar-fg)' }}
-                  variant="default"
-                  onClick={() => navigate(-1)}
-                >
-                  <RiArrowLeftSLine size={20} />
-                </Button>
-                <Button
-                  px={5}
-                  size="md"
-                  sx={{ color: 'var(--titlebar-fg)' }}
-                  variant="default"
-                  onClick={() => navigate(1)}
-                >
-                  <RiArrowRightSLine size={20} />
-                </Button>
-              </Group>
-            </Grid.Col>
-          </ActionsContainer>
           <Stack spacing={0}>
             <SidebarItem
               px="1rem"
@@ -292,11 +285,11 @@ export const Sidebar = () => {
               </Accordion.Item>
             </Accordion>
           </Stack>
-          <Divider my="0.5rem" />
+          <Divider m="0.5rem" />
           <Group
             position="apart"
             pt="1rem"
-            px="1rem"
+            px="1.5rem"
           >
             <Group>
               <Box
