@@ -33,7 +33,7 @@ const StyledTabs = styled(MantineTabs)`
   }
 
   button[data-active] {
-    color: var(--btn-primary-fg);
+    color: var(--btn-subtle-fg);
     background: none;
     box-shadow: 2px 0 0 var(--primary-color) inset;
 
