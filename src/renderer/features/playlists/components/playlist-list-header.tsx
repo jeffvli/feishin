@@ -39,14 +39,7 @@ export const PlaylistListHeader = ({ itemCount, tableRef }: PlaylistListHeaderPr
           </LibraryHeaderBar>
         </Flex>
       </PageHeader>
-      <Paper
-        p="1rem"
-        shadow="xl"
-        sx={{
-          boxShadow: '1px 1px 10px 5px rgba(0, 0, 0, 0.3)',
-          zIndex: 100,
-        }}
-      >
+      <Paper p="1rem">
         <PlaylistListHeaderFilters tableRef={tableRef} />
       </Paper>
     </Stack>
