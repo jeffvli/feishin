@@ -31,11 +31,11 @@ const StyledNativeScrollArea = styled.div<{ scrollBarOffset?: string }>`
   overflow-y: overlay !important;
 
   &::-webkit-scrollbar-track {
-    margin-top: ${(props) => props.scrollBarOffset || '35px'};
+    margin-top: ${(props) => props.scrollBarOffset || '65px'};
   }
 
   &::-webkit-scrollbar-thumb {
-    margin-top: ${(props) => props.scrollBarOffset || '35px'};
+    margin-top: ${(props) => props.scrollBarOffset || '65px'};
   }
 `;
 
@@ -78,7 +78,7 @@ export const NativeScrollArea = forwardRef(
     const [hideHeader, setHideHeader] = useState(true);
     const { start, clear } = useTimeout(
       () => setHideScrollbar(true),
-      scrollHideDelay !== undefined ? scrollHideDelay * 1000 : 1000,
+      scrollHideDelay !== undefined ? scrollHideDelay * 1000 : 0,
     );
 
     const containerRef = useRef(null);

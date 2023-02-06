@@ -30,7 +30,7 @@ const Layout = styled.div`
   grid-template-areas:
     'main-content'
     'player';
-  grid-template-rows: calc(100vh - 85px) 85px;
+  grid-template-rows: calc(100vh - 90px) 90px;
   grid-template-columns: 1fr;
   gap: 0;
   height: 100%;

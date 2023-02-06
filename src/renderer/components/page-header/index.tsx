@@ -19,7 +19,7 @@ const Header = styled(motion.div)<{ $isHidden?: boolean; $padRight?: boolean }>`
   z-index: 15;
   width: 100%;
   height: 100%;
-  margin-right: ${(props) => props.$padRight && '170px'};
+  margin-right: ${(props) => props.$padRight && '140px'};
   user-select: ${(props) => (props.$isHidden ? 'none' : 'auto')};
   pointer-events: ${(props) => (props.$isHidden ? 'none' : 'auto')};
   -webkit-app-region: drag;
@@ -66,6 +66,7 @@ export interface PageHeaderProps
 
 const TitleWrapper = styled(motion.div)`
   position: absolute;
+  display: flex;
   width: 100%;
   height: 100%;
 `;

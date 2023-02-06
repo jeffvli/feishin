@@ -114,7 +114,7 @@ export const SongListHeader = ({
       <PageHeader backgroundColor="var(--titlebar-bg)">
         <Flex
           justify="space-between"
-          py="1rem"
+          w="100%"
         >
           <LibraryHeaderBar>
             <Group>

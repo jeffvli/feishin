@@ -23,7 +23,7 @@ export const WindowsButton = styled.div<{ $exit?: boolean }>`
   justify-content: center;
   -webkit-app-region: no-drag;
   width: 50px;
-  height: 30px;
+  height: 65px;
 
   img {
     width: 35%;

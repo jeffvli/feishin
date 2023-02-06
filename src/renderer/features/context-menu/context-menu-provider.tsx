@@ -40,7 +40,7 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useDeletePlaylist } from '/@/renderer/features/playlists';
 import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
 import { useCreateFavorite, useDeleteFavorite, useUpdateRating } from '/@/renderer/features/shared';
-import { useCurrentServer } from '/@/renderer/store';
+import { useAuthStore, useCurrentServer } from '/@/renderer/store';
 import { Play } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
@@ -64,6 +64,10 @@ const ContextMenuContext = createContext<ContextMenuContextProps>({
     return args;
   },
 });
+
+const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating'];
+// const NAVIDROME_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
+// const SUBSONIC_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 
 export interface ContextMenuProviderProps {
   children: React.ReactNode;
@@ -92,6 +96,13 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const openContextMenu = (args: OpenContextMenuProps) => {
     const { xPos, yPos, menuItems, data, type, tableRef, dataNodes, context } = args;
 
+    const serverType = data[0]?.serverType || useAuthStore.getState().currentServer?.type;
+    let validMenuItems = menuItems;
+
+    if (serverType === ServerType.JELLYFIN) {
+      validMenuItems = menuItems.filter((item) => !JELLYFIN_IGNORED_MENU_ITEMS.includes(item.id));
+    }
+
     // If the context menu dimension can't be automatically calculated, calculate it manually
     // This is a hacky way since resize observer may not automatically recalculate when not rendered
     const menuHeight = menuRect.height || (menuItems.length + 1) * 50;
@@ -107,7 +118,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       context,
       data,
       dataNodes,
-      menuItems,
+      menuItems: validMenuItems,
       tableRef,
       type,
       xPos: calculatedXPos,

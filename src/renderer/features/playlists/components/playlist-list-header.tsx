@@ -20,10 +20,7 @@ export const PlaylistListHeader = ({ itemCount, tableRef }: PlaylistListHeaderPr
       spacing={0}
     >
       <PageHeader backgroundColor="var(--titlebar-bg)">
-        <Flex
-          justify="space-between"
-          py="1rem"
-        >
+        <Flex justify="space-between">
           <LibraryHeaderBar>
             <Group>
               <LibraryHeaderBar.Title>Playlists</LibraryHeaderBar.Title>

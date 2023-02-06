@@ -42,6 +42,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
   return (
     <NativeScrollArea
       ref={scrollAreaRef}
+      noHeader
       scrollBarOffset="0px"
       scrollHideDelay={0}
       style={{ margin: '0.5rem 0', padding: '0 1rem' }}

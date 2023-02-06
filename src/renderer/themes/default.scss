@@ -14,7 +14,7 @@
   --main-fg-secondary: rgb(150, 150, 150);
 
   --titlebar-fg: rgb(255, 255, 255);
-  --titlebar-bg: rgb(7, 7, 7);
+  --titlebar-bg: rgb(14, 14, 14);
   --titlebar-controls-bg: rgba(0, 0, 0, 0);
 
   --sidebar-bg: rgb(0, 0, 0);
@@ -40,7 +40,7 @@
   --tooltip-fg: #000000;
 
   --scrollbar-track-bg: transparent;
-  --scrollbar-thumb-bg: rgba(90, 90, 90, 0.5);
+  --scrollbar-thumb-bg: rgba(90, 90, 90, 0.8);
 
   --btn-primary-bg: var(--primary-color);
   --btn-primary-bg-hover: rgb(0, 71, 252);
@@ -84,12 +84,12 @@
   --toast-description-fg: rgb(193, 194, 197);
   --toast-bg: rgb(16, 16, 16);
 
-  --modal-bg: rgb(26, 26, 26);
+  --modal-bg: var(--main-bg);
 
   --badge-bg: rgb(0, 0, 0);
   --badge-fg: rgb(255, 255, 255);
 
-  --paper-bg: rgb(30, 30, 30);
+  --paper-bg: rgb(24, 24, 24);
 
   --placeholder-bg: rgba(53, 53, 53, 0.5);
   --placeholder-fg: rgba(126, 126, 126);

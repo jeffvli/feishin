@@ -1,8 +1,15 @@
 import { MouseEvent } from 'react';
-import { Stack, Grid, Accordion, Center, Group, Divider, Box } from '@mantine/core';
+import { Stack, Grid, Accordion, Center, Group, Divider, Box, Flex } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button, MotionStack, Spinner, TextInput } from '/@/renderer/components';
+import {
+  Button,
+  DropdownMenu,
+  MotionStack,
+  Spinner,
+  TextInput,
+  TextTitle,
+} from '/@/renderer/components';
 import {
   RiAddFill,
   RiAlbumFill,
@@ -18,6 +25,7 @@ import {
   RiHome5Fill,
   RiHome5Line,
   RiListUnordered,
+  RiMenuFill,
   RiMusic2Fill,
   RiMusic2Line,
   RiSearchLine,
@@ -38,10 +46,11 @@ import { fadeIn } from '/@/renderer/styles';
 import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
 import { PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import { SidebarPlaylistList } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
+import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 
 const SidebarContainer = styled.div`
   height: 100%;
-  max-height: calc(100vh - 85px); // Account for playerbar
+  max-height: calc(100vh - 155px); // Account for playerbar (90px) and titlebar (65px)
   user-select: none;
 `;
 
@@ -105,6 +114,37 @@ export const Sidebar = () => {
 
   return (
     <SidebarContainer>
+      <Flex
+        align="center"
+        className="sidebar-header"
+        gap="0.5rem"
+        h="65px"
+        px="1rem"
+        py="0.5rem"
+        sx={{ '-webkit-app-region': 'drag' }}
+      >
+        <DropdownMenu position="bottom-start">
+          <DropdownMenu.Target>
+            <Button
+              p="0.5rem"
+              size="md"
+              variant="subtle"
+            >
+              <RiMenuFill size="2rem" />
+            </Button>
+          </DropdownMenu.Target>
+          <DropdownMenu.Dropdown>
+            <AppMenu />
+          </DropdownMenu.Dropdown>
+        </DropdownMenu>
+
+        <TextTitle
+          fw="900"
+          order={1}
+        >
+          Feishin
+        </TextTitle>
+      </Flex>
       <Stack
         h="100%"
         justify="space-between"
@@ -155,7 +195,6 @@ export const Sidebar = () => {
               </Group>
             </Grid.Col>
           </ActionsContainer>
-
           <Stack spacing={0}>
             <SidebarItem
               px="1rem"
