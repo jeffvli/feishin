@@ -17,6 +17,10 @@ const StyledSegmentedControl = styled(MantineSegmentedControl)<MantineSegmentedC
     opacity: 0.6;
   }
 
+  & [data-disabled='true'] {
+    opacity: 0.6;
+  }
+
   & .mantine-SegmentedControl-active {
     color: var(--input-active-fg);
     background-color: var(--input-active-bg);

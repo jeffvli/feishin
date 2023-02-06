@@ -20,7 +20,7 @@ const StyledSelect = styled(MantineSelect)`
     background: var(--input-bg);
   }
 
-  & .mantine-Select-disabled {
+  & [data-disabled='true'] {
     background: var(--input-bg);
     opacity: 0.6;
   }
@@ -76,8 +76,8 @@ const StyledMultiSelect = styled(MantineMultiSelect)`
     background: var(--input-select-bg);
   }
 
-  & .mantine-MultiSelect-disabled {
-    background: var(--input-select-bg);
+  & [data-disabled='true'] {
+    background: var(--input-bg);
     opacity: 0.6;
   }
 

@@ -83,6 +83,10 @@ const StyledTextInput = styled(MantineTextInput)<TextInputProps>`
     opacity: 0.6;
   }
 
+  & [data-disabled='true'] {
+    opacity: 0.6;
+  }
+
   transition: width 0.3s ease-in-out;
 `;
 
@@ -130,6 +134,10 @@ const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
     opacity: 0.6;
   }
 
+  & [data-disabled='true'] {
+    opacity: 0.6;
+  }
+
   transition: width 0.3s ease-in-out;
 `;
 
@@ -156,6 +164,10 @@ const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
   }
 
   & .mantine-PasswordInput-disabled {
+    opacity: 0.6;
+  }
+
+  & [data-disabled='true'] {
     opacity: 0.6;
   }
 
@@ -188,6 +200,10 @@ const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
     opacity: 0.6;
   }
 
+  & [data-disabled='true'] {
+    opacity: 0.6;
+  }
+
   transition: width 0.3s ease-in-out;
 `;
 
@@ -217,6 +233,10 @@ const StyledJsonInput = styled(MantineJsonInput)<JsonInputProps>`
     opacity: 0.6;
   }
 
+  & [data-disabled='true'] {
+    opacity: 0.6;
+  }
+
   transition: width 0.3s ease-in-out;
 `;
 
@@ -239,6 +259,10 @@ const StyledTextarea = styled(MantineTextarea)<TextareaProps>`
   }
 
   & .mantine-Textarea-disabled {
+    opacity: 0.6;
+  }
+
+  & [data-disabled='true'] {
     opacity: 0.6;
   }
 
