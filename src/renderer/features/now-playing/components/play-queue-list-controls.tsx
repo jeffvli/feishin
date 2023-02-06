@@ -138,7 +138,10 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         </Button>
       </Group>
       <Group>
-        <Popover transition="fade">
+        <Popover
+          position="top-end"
+          transition="fade"
+        >
           <Popover.Target>
             <Button
               compact
