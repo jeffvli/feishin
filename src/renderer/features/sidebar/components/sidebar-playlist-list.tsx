@@ -68,6 +68,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
             <Group
               noWrap
               className="sidebar-playlist-item"
+              pl="1rem"
               pos="relative"
               position="apart"
               sx={{
@@ -85,7 +86,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
                 className="sidebar-playlist-name"
                 component={Link}
                 overflow="hidden"
-                size="lg"
+                size="md"
                 sx={{
                   color: 'var(--sidebar-fg) !important',
                   cursor: 'default',
