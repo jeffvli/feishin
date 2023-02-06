@@ -111,6 +111,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     return () => clearInterval(interval);
   }, [currentPlayerRef, isSeeking, setCurrentTime, playerType, status]);
 
+  const [seekValue, setSeekValue] = useState(0);
+
   return (
     <>
       <ControlsContainer>
@@ -216,11 +218,16 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             max={songDuration}
             min={0}
             size={6}
-            value={currentTime}
+            value={!isSeeking ? currentTime : seekValue}
             w="100%"
             onChange={(e) => {
+              setIsSeeking(true);
+              setSeekValue(e);
+            }}
+            onChangeEnd={(e) => {
               handleSeekSlider(e);
               setIsSeeking(false);
+              console.log('end');
             }}
           />
         </SliderWrapper>
