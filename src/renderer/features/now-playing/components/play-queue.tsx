@@ -200,6 +200,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
             autoFitColumns={tableConfig.autoFit}
             columnDefs={columnDefs}
             getRowId={(data) => data.data.uniqueId}
+            rowBuffer={50}
             rowClassRules={rowClassRules}
             rowData={queue}
             rowHeight={tableConfig.rowHeight || 40}
