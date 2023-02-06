@@ -44,7 +44,6 @@ const ContentContainer = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  max-width: 1920px;
   padding: 1rem 2rem 5rem;
   overflow: hidden;
 
@@ -203,7 +202,6 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     <ContentContainer>
       <Group
         ref={intersectRef}
-        maw="1920px"
         p="1rem"
         position="apart"
       >

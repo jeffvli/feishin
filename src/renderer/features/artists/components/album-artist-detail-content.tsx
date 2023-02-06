@@ -44,7 +44,6 @@ const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 3rem;
-  max-width: 1920px;
   padding: 1rem 2rem 5rem;
   overflow: hidden;
 
