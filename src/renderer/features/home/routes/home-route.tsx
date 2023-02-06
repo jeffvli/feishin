@@ -210,7 +210,6 @@ const HomeRoute = () => {
           px="2rem"
           sx={{
             height: '100%',
-            maxWidth: '1920px',
             width: '100%',
           }}
         >
