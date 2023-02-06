@@ -188,10 +188,17 @@
   }
 
   .mantine-Modal-header {
-    font-weight: bold;
-    font-size: medium;
     padding-bottom: 1rem;
     margin-right: 0.5rem;
     border-bottom: 1px solid var(--generic-border-color);
+  }
+
+  .mantine-Modal-title {
+    font-weight: bold;
+    font-size: medium;
+  }
+
+  .mantine-Modal-body {
+    padding: 1rem;
   }
 }
