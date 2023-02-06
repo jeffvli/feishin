@@ -1,5 +1,5 @@
 import { MouseEvent } from 'react';
-import { Stack, Grid, Accordion, Center, Group, Divider, Box, Flex } from '@mantine/core';
+import { Stack, Grid, Accordion, Center, Group, Divider, Box } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, DropdownMenu, MotionStack, Spinner, TextInput } from '/@/renderer/components';
@@ -40,6 +40,7 @@ import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playli
 import { PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import { SidebarPlaylistList } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
+import { useContainerQuery } from '/@/renderer/hooks';
 
 const SidebarContainer = styled.div`
   height: 100%;
@@ -71,6 +72,8 @@ const SidebarImage = styled.img`
 `;
 
 const ActionsContainer = styled(Grid)`
+  height: 65px;
+  padding: 1rem;
   -webkit-app-region: drag;
 
   input {
@@ -109,75 +112,59 @@ export const Sidebar = () => {
     startIndex: 0,
   });
 
+  const cq = useContainerQuery({ sm: 300 });
+
   return (
-    <SidebarContainer>
-      <Flex
-        align="center"
-        className="sidebar-header"
-        gap="0.5rem"
-        h="65px"
-        px="1rem"
-        py="0.5rem"
-        sx={{
-          '-webkit-app-region': 'drag',
-          a: {
-            '-webkit-app-region': 'no-drag',
-          },
-        }}
-      >
-        <ActionsContainer
-          gutter="sm"
-          w="100%"
-        >
-          <Grid.Col span={7}>
-            <TextInput
-              disabled
-              readOnly
-              icon={<RiSearchLine />}
-              placeholder="Search"
-              rightSectionWidth={90}
+    <SidebarContainer ref={cq.ref}>
+      <ActionsContainer gutter="sm">
+        <Grid.Col span={cq.isSm ? 7 : 5}>
+          <TextInput
+            disabled
+            readOnly
+            icon={<RiSearchLine />}
+            size="md"
+          />
+        </Grid.Col>
+        <Grid.Col span={cq.isSm ? 5 : 7}>
+          <Group
+            grow
+            noWrap
+            spacing="sm"
+          >
+            <DropdownMenu position="bottom-start">
+              <DropdownMenu.Target>
+                <Button
+                  p="0.5rem"
+                  size="md"
+                  variant="default"
+                >
+                  <RiMenuFill size="1rem" />
+                </Button>
+              </DropdownMenu.Target>
+              <DropdownMenu.Dropdown>
+                <AppMenu />
+              </DropdownMenu.Dropdown>
+            </DropdownMenu>
+            <Button
+              p="0.5rem"
               size="md"
-            />
-          </Grid.Col>
-          <Grid.Col span={5}>
-            <Group
-              grow
-              spacing="sm"
+              variant="default"
+              onClick={() => navigate(-1)}
             >
-              <DropdownMenu position="bottom-start">
-                <DropdownMenu.Target>
-                  <Button
-                    p="0.5rem"
-                    size="md"
-                    variant="default"
-                  >
-                    <RiMenuFill size="1rem" />
-                  </Button>
-                </DropdownMenu.Target>
-                <DropdownMenu.Dropdown>
-                  <AppMenu />
-                </DropdownMenu.Dropdown>
-              </DropdownMenu>
-              <Button
-                px={5}
-                size="md"
-                variant="default"
-                onClick={() => navigate(-1)}
-              >
-                <RiArrowLeftSLine size="1.5rem" />
-              </Button>
-              <Button
-                px={5}
-                size="md"
-                variant="default"
-                onClick={() => navigate(1)}
-              >
-                <RiArrowRightSLine size="1.5rem" />
-              </Button>
-            </Group>
-          </Grid.Col>
-        </ActionsContainer>
-      </Flex>
+              <RiArrowLeftSLine size="1.5rem" />
+            </Button>
+            <Button
+              p="0.5rem"
+              size="md"
+              variant="default"
+              onClick={() => navigate(1)}
+            >
+              <RiArrowRightSLine size="1.5rem" />
+            </Button>
+          </Group>
+        </Grid.Col>
+      </ActionsContainer>
+      {/* </Flex> */}
       <Stack
         h="100%"
         justify="space-between"

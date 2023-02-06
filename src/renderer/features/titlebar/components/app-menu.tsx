@@ -79,17 +79,17 @@ export const AppMenu = () => {
       })}
       <DropdownMenu.Divider />
       <DropdownMenu.Item
-        icon={<RiSettings3Fill />}
-        onClick={handleSettingsModal}
-      >
-        Settings
-      </DropdownMenu.Item>
-      <DropdownMenu.Divider />
-      <DropdownMenu.Item
         icon={<RiEdit2Fill />}
         onClick={handleManageServersModal}
       >
         Manage servers
+      </DropdownMenu.Item>
+      <DropdownMenu.Divider />
+      <DropdownMenu.Item
+        icon={<RiSettings3Fill />}
+        onClick={handleSettingsModal}
+      >
+        Settings
       </DropdownMenu.Item>
     </>
   );
