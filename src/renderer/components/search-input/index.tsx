@@ -43,10 +43,10 @@ export const SearchInput = ({
     <TextInput
       ref={mergedRef}
       {...props}
-      icon={showIcon && <RiSearchLine size={15} />}
+      icon={showIcon && <RiSearchLine />}
       size="md"
       styles={{
-        icon: { svg: { fill: 'var(--btn-default-fg)' } },
+        icon: { svg: { fill: 'var(--titlebar-fg)' } },
         input: {
           backgroundColor: isOpened ? 'inherit' : 'transparent !important',
           border: 'none !important',
