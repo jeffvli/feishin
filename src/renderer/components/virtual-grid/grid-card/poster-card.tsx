@@ -2,7 +2,6 @@ import { Center } from '@mantine/core';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
-import { SimpleImg } from 'react-simple-img';
 import type { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Skeleton } from '/@/renderer/components/skeleton';
@@ -78,13 +77,10 @@ interface ImageProps {
   isLoading?: boolean;
 }
 
-const Image = styled(SimpleImg)<ImageProps>`
+const Image = styled.img<ImageProps>`
+  object-fit: cover;
   border: 0;
   border-radius: var(--card-poster-radius);
-
-  img {
-    object-fit: cover;
-  }
 `;
 
 const ControlsContainer = styled.div`
@@ -151,9 +147,7 @@ export const PosterCard = ({
             <ImageSection style={{ height: `${sizes.itemWidth}px` }}>
               {data?.imageUrl ? (
                 <Image
-                  animationDuration={0.3}
                   height={sizes.itemWidth}
-                  importance="auto"
                   placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
                   src={data?.imageUrl}
                   width={sizes.itemWidth}

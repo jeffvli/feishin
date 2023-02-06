@@ -1,7 +1,6 @@
 import { Center } from '@mantine/core';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router';
-import { SimpleImg } from 'react-simple-img';
 import type { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import type { CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
@@ -78,7 +77,8 @@ const ImageSection = styled.div<{ size?: number }>`
   }
 `;
 
-const Image = styled(SimpleImg)`
+const Image = styled.img`
+  object-fit: cover;
   border-radius: var(--card-default-radius);
   box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 20%);
 `;
@@ -156,9 +156,7 @@ export const DefaultCard = ({
           <ImageSection size={itemWidth}>
             {data?.imageUrl ? (
               <Image
-                animationDuration={0.3}
                 height={cardSize}
-                imgStyle={{ objectFit: 'cover' }}
                 placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
                 src={data?.imageUrl}
                 width={cardSize}
