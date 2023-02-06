@@ -30,16 +30,16 @@ import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { PLAYLIST_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
 import { generatePath, useNavigate } from 'react-router';
 import { AppRoute } from '/@/renderer/router/routes';
 import { LibraryItem } from '/@/renderer/api/types';
 
 interface PlaylistListContentProps {
+  itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const PlaylistListContent = ({ tableRef }: PlaylistListContentProps) => {
+export const PlaylistListContent = ({ tableRef, itemCount }: PlaylistListContentProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const server = useCurrentServer();
@@ -50,12 +50,6 @@ export const PlaylistListContent = ({ tableRef }: PlaylistListContentProps) => {
   const setTable = useSetPlaylistTable();
 
   const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
-
-  const checkPlaylistList = usePlaylistList({
-    limit: 1,
-    startIndex: 0,
-    ...page.filter,
-  });
 
   const columnDefs: ColDef[] = useMemo(
     () => getColumnDefs(page.table.columns),
@@ -194,7 +188,7 @@ export const PlaylistListContent = ({ tableRef }: PlaylistListContentProps) => {
           defaultColDef={defaultColumnDefs}
           enableCellChangeFlash={false}
           getRowId={(data) => data.data.id}
-          infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 100}
+          infiniteInitialRowCount={itemCount || 100}
           pagination={isPaginationEnabled}
           paginationAutoPageSize={isPaginationEnabled}
           paginationPageSize={page.table.pagination.itemsPerPage || 100}
