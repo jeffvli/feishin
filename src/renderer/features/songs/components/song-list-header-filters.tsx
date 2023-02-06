@@ -384,7 +384,7 @@ export const SongListHeaderFilters = ({
         </DropdownMenu>
       </Group>
       <Group>
-        <DropdownMenu position="bottom-start">
+        <DropdownMenu position="bottom-end">
           <DropdownMenu.Target>
             <Button
               compact
