@@ -46,7 +46,6 @@ export const Pagination = ({ $hideDividers, ...props }: PaginationProps) => {
     <StyledPagination
       $hideDividers={$hideDividers}
       radius="xl"
-      size="md"
       {...props}
     />
   );

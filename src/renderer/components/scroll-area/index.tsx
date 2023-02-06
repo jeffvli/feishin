@@ -58,7 +58,7 @@ interface NativeScrollAreaProps {
   pageHeaderProps?: PageHeaderProps & { offset?: any; target?: any };
   scrollBarOffset?: string;
   scrollHideDelay?: number;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
 }
 
 export const NativeScrollArea = forwardRef(

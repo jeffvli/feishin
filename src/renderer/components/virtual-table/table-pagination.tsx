@@ -108,10 +108,9 @@ export const TablePagination = ({
         >
           <Popover.Target>
             <Button
-              compact
               radius="sm"
-              size="lg"
-              sx={{ height: '32px', padding: 0, width: '32px' }}
+              size="sm"
+              sx={{ height: '26px', padding: '0', width: '26px' }}
               tooltip={{ label: 'Go to page' }}
               variant="default"
               onClick={() => handlers.toggle()}

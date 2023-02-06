@@ -44,8 +44,8 @@ interface PlayButtonProps {
 const PlayButton = ({ onClick }: PlayButtonProps) => {
   return (
     <PlayBtn
-      h="50px"
-      w="50px"
+      h="45px"
+      w="45px"
       onClick={onClick}
     />
   );

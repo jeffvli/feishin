@@ -57,7 +57,7 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   }
 
   & .mantine-Menu-itemIcon {
-    margin-right: 0.5rem;
+    margin-right: 1rem;
   }
 
   & .mantine-Menu-itemLabel {
