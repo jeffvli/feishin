@@ -54,8 +54,11 @@ export const ScrollArea = forwardRef(({ children, ...props }: ScrollAreaProps, r
 interface NativeScrollAreaProps {
   children: React.ReactNode;
   debugScrollPosition?: boolean;
+  noHeader?: boolean;
   pageHeaderProps?: PageHeaderProps & { offset?: any; target?: any };
   scrollBarOffset?: string;
+  scrollHideDelay?: number;
+  style: React.CSSProperties;
 }
 
 export const NativeScrollArea = forwardRef(
@@ -65,13 +68,18 @@ export const NativeScrollArea = forwardRef(
       pageHeaderProps,
       debugScrollPosition,
       scrollBarOffset,
+      scrollHideDelay,
+      noHeader,
       ...props
     }: NativeScrollAreaProps,
     ref: Ref<HTMLDivElement>,
   ) => {
     const [hideScrollbar, setHideScrollbar] = useState(false);
     const [hideHeader, setHideHeader] = useState(true);
-    const { start, clear } = useTimeout(() => setHideScrollbar(true), 1000);
+    const { start, clear } = useTimeout(
+      () => setHideScrollbar(true),
+      scrollHideDelay !== undefined ? scrollHideDelay * 1000 : 1000,
+    );
 
     const containerRef = useRef(null);
     const mergedRef = useMergedRef(ref, containerRef);
@@ -110,12 +118,14 @@ export const NativeScrollArea = forwardRef(
 
     return (
       <>
-        <PageHeader
-          isHidden={hideHeader}
-          position="absolute"
-          style={{ opacity: scrollYProgress as any }}
-          {...pageHeaderProps}
-        />
+        {!noHeader && (
+          <PageHeader
+            isHidden={hideHeader}
+            position="absolute"
+            style={{ opacity: scrollYProgress as any }}
+            {...pageHeaderProps}
+          />
+        )}
         <StyledNativeScrollArea
           ref={mergedRef}
           className={hideScrollbar ? 'hide-scrollbar' : undefined}
