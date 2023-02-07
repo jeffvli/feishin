@@ -85,8 +85,8 @@ export const App = () => {
       <ModalsProvider
         modalProps={{
           centered: true,
-          transitionDuration: 300,
           transitionProps: {
+            duration: 300,
             exitDuration: 300,
             transition: 'slide-down',
           },
