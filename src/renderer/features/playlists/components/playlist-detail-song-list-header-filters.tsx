@@ -152,7 +152,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
           );
 
           const songs = api.normalize.songList(songsRes, server);
-          params.successCallback(songs?.items || [], songsRes?.totalRecordCount || undefined);
+          params.successCallback(songs?.items || [], songsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };

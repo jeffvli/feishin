@@ -4,7 +4,6 @@ import { MultiSelect, NumberInput, SpinnerIcon, Switch, Text } from '/@/renderer
 import { AlbumListFilter, useAlbumListStore, useSetAlbumFilters } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
-import { useDebouncedValue } from '@mantine/hooks';
 import { AlbumArtistListSort, SortOrder } from '/@/renderer/api/types';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 
@@ -48,30 +47,30 @@ export const JellyfinAlbumFilters = ({
     },
   ];
 
-  const handleMinYearFilter = debounce((e: number | undefined) => {
-    if (e && (e < 1700 || e > 2300)) return;
+  const handleMinYearFilter = debounce((e: number | string) => {
+    if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
     const updatedFilters = setFilters({
       jfParams: {
         ...filter.jfParams,
-        minYear: e,
+        minYear: e === '' ? undefined : (e as number),
       },
     });
     handleFilterChange(updatedFilters);
   }, 500);
 
-  const handleMaxYearFilter = debounce((e: number | undefined) => {
-    if (e && (e < 1700 || e > 2300)) return;
+  const handleMaxYearFilter = debounce((e: number | string) => {
+    if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
     const updatedFilters = setFilters({
       jfParams: {
         ...filter.jfParams,
-        maxYear: e,
+        maxYear: e === '' ? undefined : (e as number),
       },
     });
     handleFilterChange(updatedFilters);
   }, 500);
 
   const handleGenresFilter = debounce((e: string[] | undefined) => {
-    const genreFilterString = e?.join(',');
+    const genreFilterString = e?.length ? e.join(',') : undefined;
     const updatedFilters = setFilters({
       jfParams: {
         ...filter.jfParams,
@@ -82,18 +81,16 @@ export const JellyfinAlbumFilters = ({
   }, 250);
 
   const [albumArtistSearchTerm, setAlbumArtistSearchTerm] = useState<string>('');
-  const [debouncedSearchTerm] = useDebouncedValue(albumArtistSearchTerm, 200);
 
   const albumArtistListQuery = useAlbumArtistList(
     {
-      limit: 300,
-      searchTerm: debouncedSearchTerm,
       sortBy: AlbumArtistListSort.NAME,
       sortOrder: SortOrder.ASC,
       startIndex: 0,
     },
     {
-      enabled: debouncedSearchTerm ? debouncedSearchTerm !== '' : false,
+      cacheTime: 1000 * 60 * 2,
+      staleTime: 1000 * 60 * 1,
     },
   );
 
@@ -105,6 +102,17 @@ export const JellyfinAlbumFilters = ({
       value: artist.id,
     }));
   }, [albumArtistListQuery?.data?.items]);
+
+  const handleAlbumArtistFilter = (e: string[] | null) => {
+    const albumArtistFilterString = e?.length ? e.join(',') : undefined;
+    const updatedFilters = setFilters({
+      jfParams: {
+        ...filter.jfParams,
+        albumArtistIds: albumArtistFilterString,
+      },
+    });
+    handleFilterChange(updatedFilters);
+  };
 
   return (
     <Stack p="0.8rem">
@@ -124,22 +132,22 @@ export const JellyfinAlbumFilters = ({
       <Divider my="0.5rem" />
       <Group grow>
         <NumberInput
+          defaultValue={filter.jfParams?.minYear}
           hideControls={false}
           label="From year"
           max={2300}
           min={1700}
           required={!!filter.jfParams?.maxYear}
-          value={filter.jfParams?.minYear}
-          onChange={handleMinYearFilter}
+          onChange={(e) => handleMinYearFilter(e)}
         />
         <NumberInput
+          defaultValue={filter.jfParams?.maxYear}
           hideControls={false}
           label="To year"
           max={2300}
           min={1700}
           required={!!filter.jfParams?.minYear}
-          value={filter.jfParams?.maxYear}
-          onChange={handleMaxYearFilter}
+          onChange={(e) => handleMaxYearFilter(e)}
         />
       </Group>
       <Group grow>
@@ -158,12 +166,14 @@ export const JellyfinAlbumFilters = ({
           clearable
           searchable
           data={selectableAlbumArtists}
+          defaultValue={filter.jfParams?.albumArtistIds?.split(',')}
           disabled={disableArtistFilter}
           label="Artist"
           limit={300}
           placeholder="Type to search for an artist"
           rightSection={albumArtistListQuery.isFetching ? <SpinnerIcon /> : undefined}
           searchValue={albumArtistSearchTerm}
+          onChange={handleAlbumArtistFilter}
           onSearchChange={setAlbumArtistSearchTerm}
         />
       </Group>

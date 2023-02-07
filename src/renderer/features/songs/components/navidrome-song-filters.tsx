@@ -46,11 +46,11 @@ export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFilter
     },
   ];
 
-  const handleYearFilter = debounce((e: number | undefined) => {
+  const handleYearFilter = debounce((e: number | string) => {
     const updatedFilters = setFilters({
       ndParams: {
         ...filter.ndParams,
-        year: e,
+        year: e === '' ? undefined : (e as number),
       },
     });
 
@@ -80,7 +80,7 @@ export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFilter
           min={0}
           value={filter.ndParams?.year}
           width={50}
-          onChange={handleYearFilter}
+          onChange={(e) => handleYearFilter(e)}
         />
         <Select
           clearable

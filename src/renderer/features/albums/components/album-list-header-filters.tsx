@@ -1,4 +1,4 @@
-import { MutableRefObject, useCallback, MouseEvent, ChangeEvent } from 'react';
+import { MutableRefObject, useCallback, MouseEvent, ChangeEvent, useMemo } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
@@ -8,13 +8,13 @@ import {
   RiSortAsc,
   RiSortDesc,
   RiFolder2Line,
-  RiFilter3Line,
   RiMoreFill,
   RiAddBoxFill,
   RiPlayFill,
   RiAddCircleFill,
   RiRefreshLine,
   RiSettings3Fill,
+  RiFilterFill,
 } from 'react-icons/ri';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -189,7 +189,7 @@ export const AlbumListHeaderFilters = ({
             );
 
             const albums = api.normalize.albumList(albumsRes, server);
-            params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || undefined);
+            params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || 0);
           },
           rowCount: undefined,
         };
@@ -371,6 +371,22 @@ export const AlbumListHeaderFilters = ({
     }
   };
 
+  const isFilterApplied = useMemo(() => {
+    const isNavidromeFilterApplied =
+      server?.type === ServerType.NAVIDROME &&
+      page.filter.ndParams &&
+      Object.values(page.filter.ndParams).some((value) => value !== undefined);
+
+    const isJellyfinFilterApplied =
+      server?.type === ServerType.JELLYFIN &&
+      page.filter.jfParams &&
+      Object.values(page.filter.jfParams).some((value) => value !== undefined);
+
+    console.log(page.filter.jfParams);
+
+    return isNavidromeFilterApplied || isJellyfinFilterApplied;
+  }, [page.filter.jfParams, page.filter.ndParams, server?.type]);
+
   return (
     <Flex justify="space-between">
       <Group
@@ -447,15 +463,6 @@ export const AlbumListHeaderFilters = ({
             </DropdownMenu.Dropdown>
           </DropdownMenu>
         )}
-        <Button
-          compact
-          fw={600}
-          size="md"
-          variant="subtle"
-          onClick={handleOpenFiltersModal}
-        >
-          {cq.isSm ? 'Filters' : <RiFilter3Line size="1.3rem" />}
-        </Button>
         <DropdownMenu position="bottom-start">
           <DropdownMenu.Target>
             <Button
@@ -495,7 +502,20 @@ export const AlbumListHeaderFilters = ({
           </DropdownMenu.Dropdown>
         </DropdownMenu>
       </Group>
-      <Group>
+      <Group
+        noWrap
+        spacing="sm"
+      >
+        <Button
+          compact
+          size="md"
+          sx={{ svg: { fill: isFilterApplied ? 'var(--primary-color) !important' : undefined } }}
+          tooltip={{ label: 'Filters' }}
+          variant="subtle"
+          onClick={handleOpenFiltersModal}
+        >
+          <RiFilterFill size="1.3rem" />
+        </Button>
         <DropdownMenu position="bottom-end">
           <DropdownMenu.Target>
             <Button

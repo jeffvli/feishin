@@ -319,8 +319,6 @@ export const AlbumListContent = ({
     }
   };
 
-  console.log(itemCount);
-
   return (
     <>
       <VirtualGridAutoSizerContainer>

@@ -103,7 +103,7 @@ export const PlaylistListHeaderFilters = ({ tableRef }: PlaylistListHeaderFilter
           );
 
           const playlists = api.normalize.playlistList(playlistsRes, server);
-          params.successCallback(playlists?.items || [], playlistsRes?.totalRecordCount);
+          params.successCallback(playlists?.items || [], playlistsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };

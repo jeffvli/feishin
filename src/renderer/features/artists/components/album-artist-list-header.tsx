@@ -108,7 +108,7 @@ export const AlbumArtistListHeader = ({
             const albumArtists = api.normalize.albumArtistList(albumArtistsRes, server);
             params.successCallback(
               albumArtists?.items || [],
-              albumArtistsRes?.totalRecordCount || undefined,
+              albumArtistsRes?.totalRecordCount || 0,
             );
           },
           rowCount: undefined,

@@ -2,7 +2,6 @@ import { ChangeEvent, useMemo, useState } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import { NumberInput, Switch, Text, Select, SpinnerIcon } from '/@/renderer/components';
 import { AlbumListFilter, useAlbumListStore, useSetAlbumFilters } from '/@/renderer/store';
-import { useDebouncedValue } from '@mantine/hooks';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
@@ -86,29 +85,28 @@ export const NavidromeAlbumFilters = ({
     },
   ];
 
-  const handleYearFilter = debounce((e: number | undefined) => {
+  const handleYearFilter = debounce((e: number | string) => {
     const updatedFilters = setFilters({
       ndParams: {
         ...filter.ndParams,
-        year: e,
+        year: e === '' ? undefined : (e as number),
       },
     });
     handleFilterChange(updatedFilters);
   }, 500);
 
   const [albumArtistSearchTerm, setAlbumArtistSearchTerm] = useState<string>('');
-  const [debouncedSearchTerm] = useDebouncedValue(albumArtistSearchTerm, 200);
 
   const albumArtistListQuery = useAlbumArtistList(
     {
-      limit: 300,
-      searchTerm: debouncedSearchTerm,
+      // searchTerm: debouncedSearchTerm,
       sortBy: AlbumArtistListSort.NAME,
       sortOrder: SortOrder.ASC,
       startIndex: 0,
     },
     {
-      enabled: debouncedSearchTerm ? debouncedSearchTerm !== '' : false,
+      cacheTime: 1000 * 60 * 2,
+      staleTime: 1000 * 60 * 1,
     },
   );
 
@@ -120,6 +118,16 @@ export const NavidromeAlbumFilters = ({
       value: artist.id,
     }));
   }, [albumArtistListQuery?.data?.items]);
+
+  const handleAlbumArtistFilter = (e: string | null) => {
+    const updatedFilters = setFilters({
+      ndParams: {
+        ...filter.ndParams,
+        artist_id: e || undefined,
+      },
+    });
+    handleFilterChange(updatedFilters);
+  };
 
   return (
     <Stack p="0.8rem">
@@ -138,12 +146,12 @@ export const NavidromeAlbumFilters = ({
       <Divider my="0.5rem" />
       <Group grow>
         <NumberInput
+          defaultValue={filter.ndParams?.year}
           hideControls={false}
           label="Year"
           max={5000}
           min={0}
-          value={filter.ndParams?.year}
-          onChange={handleYearFilter}
+          onChange={(e) => handleYearFilter(e)}
         />
         <Select
           clearable
@@ -159,12 +167,14 @@ export const NavidromeAlbumFilters = ({
           clearable
           searchable
           data={selectableAlbumArtists}
+          defaultValue={filter.ndParams?.artist_id}
           disabled={disableArtistFilter}
           label="Artist"
           limit={300}
           placeholder="Type to search for an artist"
           rightSection={albumArtistListQuery.isFetching ? <SpinnerIcon /> : undefined}
           searchValue={albumArtistSearchTerm}
+          onChange={handleAlbumArtistFilter}
           onSearchChange={setAlbumArtistSearchTerm}
         />
       </Group>

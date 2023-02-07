@@ -129,7 +129,7 @@ export const AlbumListHeader = ({
             );
 
             const albums = api.normalize.albumList(albumsRes, server);
-            params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || undefined);
+            params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || 0);
           },
           rowCount: undefined,
         };
