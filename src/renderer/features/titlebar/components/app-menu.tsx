@@ -84,7 +84,6 @@ export const AppMenu = () => {
       >
         Manage servers
       </DropdownMenu.Item>
-      <DropdownMenu.Divider />
       <DropdownMenu.Item
         icon={<RiSettings3Fill />}
         onClick={handleSettingsModal}
