@@ -427,6 +427,7 @@ export const VirtualTable = forwardRef(
           ref={mergedRef}
           animateRows
           maintainColumnOrder
+          suppressAsyncEvents
           suppressContextMenu
           suppressCopyRowsToClipboard
           suppressMoveWhenRowDragging
