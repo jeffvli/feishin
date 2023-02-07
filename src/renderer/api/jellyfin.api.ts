@@ -848,7 +848,7 @@ const normalizeAlbum = (item: JFAlbum, server: ServerListItem, imageSize?: numbe
     name: item.Name,
     playCount: item.UserData?.PlayCount || 0,
     releaseDate: item.PremiereDate?.split('T')[0] || null,
-    releaseYear: item.ProductionYear,
+    releaseYear: item.ProductionYear || null,
     serverId: server.id,
     serverType: ServerType.JELLYFIN,
     size: null,
