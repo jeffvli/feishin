@@ -359,7 +359,7 @@ export const PlaylistQueryBuilder = forwardRef(
     return (
       <MotionFlex
         direction="column"
-        h="calc(100% - 3rem)"
+        h="calc(100% - 2rem)"
         justify="space-between"
       >
         <ScrollArea
@@ -432,7 +432,10 @@ export const PlaylistQueryBuilder = forwardRef(
             />
           </Group>
           {onSave && onSaveAs && (
-            <Group noWrap>
+            <Group
+              noWrap
+              spacing="sm"
+            >
               <Button
                 loading={isSaving}
                 variant="filled"

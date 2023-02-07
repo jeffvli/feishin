@@ -178,7 +178,10 @@ export const QueryBuilderOption = ({
   const ml = (level + 1) * 10;
 
   return (
-    <Group ml={ml}>
+    <Group
+      ml={ml}
+      spacing="sm"
+    >
       <Select
         searchable
         data={filters}
