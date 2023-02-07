@@ -44,7 +44,7 @@ import { useContainerQuery } from '/@/renderer/hooks';
 
 const SidebarContainer = styled.div`
   height: 100%;
-  max-height: calc(100vh - 155px); // Account for playerbar (90px) and titlebar (65px)
+  max-height: calc(100vh - 149px); // Playerbar (90px), titlebar (65px)
   user-select: none;
 `;
 
@@ -122,6 +122,7 @@ export const Sidebar = () => {
             disabled
             readOnly
             icon={<RiSearchLine />}
+            placeholder="Search"
             size="md"
           />
         </Grid.Col>
@@ -164,7 +165,6 @@ export const Sidebar = () => {
           </Group>
         </Grid.Col>
       </ActionsContainer>
-      {/* </Flex> */}
       <Stack
         h="100%"
         justify="space-between"
@@ -272,7 +272,10 @@ export const Sidebar = () => {
               </Accordion.Item>
             </Accordion>
           </Stack>
-          <Divider m="0.5rem" />
+          <Divider
+            mx="1rem"
+            my="0.5rem"
+          />
           <Group
             position="apart"
             pt="1rem"
