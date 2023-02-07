@@ -115,7 +115,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
           );
 
           const songs = api.normalize.songList(songsRes, server);
-          params.successCallback(songs?.items || [], songsRes?.totalRecordCount);
+          params.successCallback(songs?.items || [], songsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };
@@ -200,45 +200,48 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
   };
 
   return (
-    <VirtualGridAutoSizerContainer>
-      <VirtualTable
-        // https://github.com/ag-grid/ag-grid/issues/5284
-        // Key is used to force remount of table when display, rowHeight, or server changes
-        key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
-        ref={tableRef}
-        alwaysShowHorizontalScroll
-        autoFitColumns={page.table.autoFit}
-        columnDefs={columnDefs}
-        getRowId={(data) => data.data.uniqueId}
-        infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 1}
-        pagination={isPaginationEnabled}
-        paginationAutoPageSize={isPaginationEnabled}
-        paginationPageSize={pagination.itemsPerPage || 100}
-        rowHeight={page.table.rowHeight || 40}
-        rowModelType="infinite"
-        onBodyScrollEnd={handleScroll}
-        onCellContextMenu={handleContextMenu}
-        onColumnMoved={handleColumnChange}
-        onColumnResized={debouncedColumnChange}
-        onGridReady={onGridReady}
-        onGridSizeChanged={handleGridSizeChange}
-        onPaginationChanged={onPaginationChanged}
-        onRowDoubleClicked={handleRowDoubleClick}
-      />
-      <AnimatePresence
-        presenceAffectsLayout
-        initial={false}
-        mode="wait"
-      >
-        {page.display === ListDisplayType.TABLE_PAGINATED && (
-          <TablePagination
-            id={playlistId}
-            pagination={pagination}
-            setIdPagination={setPagination}
-            tableRef={tableRef}
-          />
-        )}
-      </AnimatePresence>
-    </VirtualGridAutoSizerContainer>
+    <>
+      <VirtualGridAutoSizerContainer>
+        <VirtualTable
+          // https://github.com/ag-grid/ag-grid/issues/5284
+          // Key is used to force remount of table when display, rowHeight, or server changes
+          key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
+          ref={tableRef}
+          alwaysShowHorizontalScroll
+          autoFitColumns={page.table.autoFit}
+          columnDefs={columnDefs}
+          getRowId={(data) => data.data.uniqueId}
+          infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 100}
+          pagination={isPaginationEnabled}
+          paginationAutoPageSize={isPaginationEnabled}
+          paginationPageSize={pagination.itemsPerPage || 100}
+          rowHeight={page.table.rowHeight || 40}
+          rowModelType="infinite"
+          onBodyScrollEnd={handleScroll}
+          onCellContextMenu={handleContextMenu}
+          onColumnMoved={handleColumnChange}
+          onColumnResized={debouncedColumnChange}
+          onGridReady={onGridReady}
+          onGridSizeChanged={handleGridSizeChange}
+          onPaginationChanged={onPaginationChanged}
+          onRowDoubleClicked={handleRowDoubleClick}
+        />
+      </VirtualGridAutoSizerContainer>
+      {isPaginationEnabled && (
+        <AnimatePresence
+          presenceAffectsLayout
+          initial={false}
+          mode="wait"
+        >
+          {page.display === ListDisplayType.TABLE_PAGINATED && (
+            <TablePagination
+              pagination={pagination}
+              setIdPagination={setPagination}
+              tableRef={tableRef}
+            />
+          )}
+        </AnimatePresence>
+      )}
+    </>
   );
 };

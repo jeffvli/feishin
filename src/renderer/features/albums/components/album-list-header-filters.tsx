@@ -501,6 +501,7 @@ export const AlbumListHeaderFilters = ({
             <Button
               compact
               size="md"
+              tooltip={{ label: 'Configure' }}
               variant="subtle"
             >
               <RiSettings3Fill size="1.3rem" />

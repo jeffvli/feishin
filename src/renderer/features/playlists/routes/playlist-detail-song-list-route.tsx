@@ -15,8 +15,9 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
 import { Button, Paper, Text, toast, VirtualGridContainer } from '/@/renderer/components';
 import { SaveAsPlaylistForm } from '/@/renderer/features/playlists/components/save-as-playlist-form';
-import { useCurrentServer } from '/@/renderer/store';
-import { ServerType, SongListSort } from '/@/renderer/api/types';
+import { useCurrentServer, usePlaylistDetailStore } from '/@/renderer/store';
+import { PlaylistSongListQuery, ServerType, SongListSort, SortOrder } from '/@/renderer/api/types';
+import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
 
 const PlaylistDetailSongListRoute = () => {
   const navigate = useNavigate();
@@ -135,11 +136,36 @@ const PlaylistDetailSongListRoute = () => {
     setIsQueryBuilderExpanded(true);
   };
 
+  const page = usePlaylistDetailStore();
+  const filters: Partial<PlaylistSongListQuery> = {
+    sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
+    sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
+  };
+
+  const itemCountCheck = usePlaylistSongList(
+    {
+      id: playlistId,
+      limit: 1,
+      startIndex: 0,
+      ...filters,
+    },
+    {
+      cacheTime: 1000 * 60 * 60 * 2,
+      staleTime: 1000 * 60 * 60 * 2,
+    },
+  );
+
+  const itemCount =
+    itemCountCheck.data?.totalRecordCount === null
+      ? undefined
+      : itemCountCheck.data?.totalRecordCount;
+
   return (
     <AnimatedPage key={`playlist-detail-songList-${playlistId}`}>
       <VirtualGridContainer>
         <PlaylistDetailSongListHeader
           handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
+          itemCount={itemCount}
           tableRef={tableRef}
         />
         <AnimatePresence

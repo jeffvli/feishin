@@ -114,7 +114,7 @@ export const AlbumListContent = ({
           );
 
           const albums = api.normalize.albumList(albumsRes, server);
-          params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || undefined);
+          params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };
@@ -319,6 +319,8 @@ export const AlbumListContent = ({
     }
   };
 
+  console.log(itemCount);
+
   return (
     <>
       <VirtualGridAutoSizerContainer>
@@ -341,7 +343,7 @@ export const AlbumListContent = ({
                   itemGap={20}
                   itemSize={150 + page.grid?.size}
                   itemType={LibraryItem.ALBUM}
-                  loading={!itemCount}
+                  loading={itemCount === undefined || itemCount === null}
                   minimumBatchSize={40}
                   route={{
                     route: AppRoute.LIBRARY_ALBUMS_DETAIL,
@@ -366,7 +368,7 @@ export const AlbumListContent = ({
             blockLoadDebounceMillis={200}
             columnDefs={columnDefs}
             getRowId={(data) => data.data.id}
-            infiniteInitialRowCount={itemCount || 1}
+            infiniteInitialRowCount={itemCount || 100}
             pagination={isPaginationEnabled}
             paginationAutoPageSize={isPaginationEnabled}
             paginationPageSize={page.table.pagination.itemsPerPage || 100}

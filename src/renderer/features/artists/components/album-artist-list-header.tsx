@@ -154,9 +154,7 @@ export const AlbumArtistListHeader = ({
           w="100%"
         >
           <LibraryHeaderBar>
-            <Group noWrap>
-              <LibraryHeaderBar.Title>Album Artists</LibraryHeaderBar.Title>
-            </Group>
+            <LibraryHeaderBar.Title>Album Artists</LibraryHeaderBar.Title>
             <Paper
               fw="600"
               px="1rem"

@@ -109,10 +109,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
           );
 
           const albums = api.normalize.albumArtistList(albumArtistsRes, server);
-          params.successCallback(
-            albums?.items || [],
-            albumArtistsRes?.totalRecordCount || undefined,
-          );
+          params.successCallback(albums?.items || [], albumArtistsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };

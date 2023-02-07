@@ -359,7 +359,8 @@ export const PlaylistQueryBuilder = forwardRef(
     return (
       <MotionFlex
         direction="column"
-        h="calc(100% - 2rem)"
+        // h="calc(100% - 1rem)"
+        h="calc(100% - 2.5rem)"
         justify="space-between"
       >
         <ScrollArea
@@ -393,7 +394,7 @@ export const PlaylistQueryBuilder = forwardRef(
         <Group
           noWrap
           align="flex-end"
-          p="1rem"
+          m="1rem"
           position="apart"
         >
           <Group
@@ -456,12 +457,7 @@ export const PlaylistQueryBuilder = forwardRef(
                 <DropdownMenu.Dropdown>
                   <DropdownMenu.Item
                     $danger
-                    rightSection={
-                      <RiSaveLine
-                        color="var(--danger-color)"
-                        size={15}
-                      />
-                    }
+                    icon={<RiSaveLine color="var(--danger-color)" />}
                     onClick={handleSave}
                   >
                     Save and replace

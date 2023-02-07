@@ -212,10 +212,8 @@ export const AlbumListHeader = ({
           w="100%"
         >
           <LibraryHeaderBar>
-            <Group noWrap>
-              <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-              <LibraryHeaderBar.Title>{title || 'Albums'}</LibraryHeaderBar.Title>
-            </Group>
+            <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+            <LibraryHeaderBar.Title>{title || 'Albums'}</LibraryHeaderBar.Title>
             <Paper
               fw="600"
               px="1rem"
