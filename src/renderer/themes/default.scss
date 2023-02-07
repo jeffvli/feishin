@@ -180,25 +180,4 @@
   .current-song {
     background: rgba(96, 144, 240, 0.3) !important;
   }
-
-  .mantine-Modal-modal {
-    background: var(--modal-bg);
-    border-radius: 10px;
-    backdrop-filter: blur(8px);
-  }
-
-  .mantine-Modal-header {
-    padding-bottom: 1rem;
-    margin-right: 0.5rem;
-    border-bottom: 1px solid var(--generic-border-color);
-  }
-
-  .mantine-Modal-title {
-    font-weight: bold;
-    font-size: medium;
-  }
-
-  .mantine-Modal-body {
-    padding: 1rem;
-  }
 }
