@@ -97,8 +97,7 @@ const ResizeHandle = styled.div<{
 `;
 
 const QueueDrawer = styled(motion.div)`
-  background: var(--sidebar-bg);
-  border-left: var(--sidebar-border);
+  background: transparent;
 `;
 
 const QueueDrawerArea = styled(motion.div)`
@@ -162,7 +161,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
 
   const queueDrawerVariants: Variants = {
     closed: {
-      height: 'calc(100vh - 170px)',
+      height: 'calc(100vh - 190px)',
       position: 'absolute',
       right: 0,
       top: '75px',
@@ -174,8 +173,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
       x: '50vw',
     },
     open: {
-      boxShadow: '1px 1px 10px 5px rgba(0, 0, 0, 0.3)',
-      height: 'calc(100vh - 170px)',
+      height: 'calc(100vh - 190px)',
       position: 'absolute',
       right: '20px',
       top: '75px',
