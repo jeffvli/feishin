@@ -8,11 +8,7 @@ import type {
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import '@ag-grid-community/styles/ag-theme-alpine.css';
-import {
-  VirtualGridAutoSizerContainer,
-  VirtualGridContainer,
-  getColumnDefs,
-} from '/@/renderer/components';
+import { VirtualGridAutoSizerContainer, getColumnDefs } from '/@/renderer/components';
 import {
   useAppStoreActions,
   useCurrentSong,
@@ -190,30 +186,28 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <VirtualGridContainer>
-        <VirtualGridAutoSizerContainer>
-          <VirtualTable
-            ref={mergedRef}
-            alwaysShowHorizontalScroll
-            rowDragEntireRow
-            rowDragMultiRow
-            autoFitColumns={tableConfig.autoFit}
-            columnDefs={columnDefs}
-            getRowId={(data) => data.data.uniqueId}
-            rowBuffer={50}
-            rowClassRules={rowClassRules}
-            rowData={queue}
-            rowHeight={tableConfig.rowHeight || 40}
-            onCellDoubleClicked={handleDoubleClick}
-            onColumnMoved={handleColumnChange}
-            onColumnResized={debouncedColumnChange}
-            onDragStarted={handleDragStart}
-            onGridReady={handleGridReady}
-            onGridSizeChanged={handleGridSizeChange}
-            onRowDragEnd={handleDragEnd}
-          />
-        </VirtualGridAutoSizerContainer>
-      </VirtualGridContainer>
+      <VirtualGridAutoSizerContainer>
+        <VirtualTable
+          ref={mergedRef}
+          alwaysShowHorizontalScroll
+          rowDragEntireRow
+          rowDragMultiRow
+          autoFitColumns={tableConfig.autoFit}
+          columnDefs={columnDefs}
+          getRowId={(data) => data.data.uniqueId}
+          rowBuffer={50}
+          rowClassRules={rowClassRules}
+          rowData={queue}
+          rowHeight={tableConfig.rowHeight || 40}
+          onCellDoubleClicked={handleDoubleClick}
+          onColumnMoved={handleColumnChange}
+          onColumnResized={debouncedColumnChange}
+          onDragStarted={handleDragStart}
+          onGridReady={handleGridReady}
+          onGridSizeChanged={handleGridSizeChange}
+          onRowDragEnd={handleDragEnd}
+        />
+      </VirtualGridAutoSizerContainer>
     </ErrorBoundary>
   );
 });

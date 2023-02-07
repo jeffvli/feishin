@@ -147,7 +147,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
               compact
               size="md"
               tooltip={{ label: 'Configure' }}
-              variant="default"
+              variant="subtle"
             >
               <RiListSettingsLine size="1.1rem" />
             </Button>
