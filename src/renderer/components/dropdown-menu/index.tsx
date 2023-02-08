@@ -65,14 +65,26 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
 `;
 
 const StyledMenuDropdown = styled(MantineMenu.Dropdown)`
+  margin: 0;
+  padding: 0;
   background: var(--dropdown-menu-bg);
   border: var(--dropdown-menu-border);
   border-radius: var(--dropdown-menu-border-radius);
   filter: drop-shadow(0 0 5px rgb(0, 0, 0, 50%));
+
+  *:first-child {
+    border-top-left-radius: var(--dropdown-menu-border-radius);
+    border-top-right-radius: var(--dropdown-menu-border-radius);
+  }
+
+  *:last-child {
+    border-bottom-right-radius: var(--dropdown-menu-border-radius);
+    border-bottom-left-radius: var(--dropdown-menu-border-radius);
+  }
 `;
 
 const StyledMenuDivider = styled(MantineMenu.Divider)`
-  margin: 0.3rem 0;
+  /* margin: 0.3rem 0; */
 `;
 
 export const DropdownMenu = ({ children, ...props }: MenuProps) => {

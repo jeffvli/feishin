@@ -13,20 +13,20 @@ export const DrawerPlayQueue = () => {
       direction="column"
       h="100%"
       sx={{
-        borderTopLeftRadius: '5px',
-        borderTopRightRadius: '5px',
+        borderRadius: '10px',
       }}
     >
-      <Box
-        bg="var(--main-bg)"
-        sx={{ borderTopLeftRadius: '5px', borderTopRightRadius: '5px' }}
-      >
+      <Box bg="var(--main-bg)">
         <PlayQueueListControls
           tableRef={queueRef}
           type="sideQueue"
         />
       </Box>
-      <Flex h="100%">
+      <Flex
+        bg="var(--main-bg)"
+        h="100%"
+        mb="0.6rem"
+      >
         <PlayQueue
           ref={queueRef}
           type="sideQueue"

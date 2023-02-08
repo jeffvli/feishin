@@ -97,9 +97,8 @@ const ResizeHandle = styled.div<{
 `;
 
 const QueueDrawer = styled(motion.div)`
-  background: transparent;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  background: var(--main-bg);
+  border-radius: 10px;
 `;
 
 const QueueDrawerArea = styled(motion.div)`
