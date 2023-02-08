@@ -21,6 +21,7 @@ type MenuDropdownProps = MantineMenuDropdownProps;
 const StyledMenu = styled(MantineMenu)<MenuProps>``;
 
 const StyledMenuLabel = styled(MantineMenu.Label)<MenuLabelProps>`
+  padding: 0.5rem;
   font-family: var(--content-font-family);
 `;
 
