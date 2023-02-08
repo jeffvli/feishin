@@ -13,7 +13,12 @@ const unmaximize = () => {
   ipcRenderer.send('window-unmaximize');
 };
 
+const devtools = () => {
+  ipcRenderer.send('window-dev-tools');
+};
+
 export const browser = {
+  devtools,
   exit,
   maximize,
   minimize,

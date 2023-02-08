@@ -1,6 +1,13 @@
 import { Group } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
-import { RiLockLine, RiServerFill, RiEdit2Fill, RiSettings3Fill } from 'react-icons/ri';
+import isElectron from 'is-electron';
+import {
+  RiLockLine,
+  RiServerFill,
+  RiEdit2Fill,
+  RiSettings3Fill,
+  RiWindowFill,
+} from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { DropdownMenu, Text } from '/@/renderer/components';
 import { ServerList } from '/@/renderer/features/servers';
@@ -9,6 +16,8 @@ import { Settings } from '/@/renderer/features/settings';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useServerList, useAuthStoreActions } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
+
+const browser = isElectron() ? window.electron.browser : null;
 
 export const AppMenu = () => {
   const navigate = useNavigate();
@@ -55,6 +64,12 @@ export const AppMenu = () => {
     });
   };
 
+  const handleBrowserDevTools = () => {
+    browser?.devtools();
+  };
+
+  const showBrowserDevToolsButton = isElectron();
+
   return (
     <>
       <DropdownMenu.Label>Select a server</DropdownMenu.Label>
@@ -90,6 +105,17 @@ export const AppMenu = () => {
       >
         Settings
       </DropdownMenu.Item>
+      {showBrowserDevToolsButton && (
+        <>
+          <DropdownMenu.Divider />
+          <DropdownMenu.Item
+            icon={<RiWindowFill />}
+            onClick={handleBrowserDevTools}
+          >
+            Open browser devtools
+          </DropdownMenu.Item>
+        </>
+      )}
     </>
   );
 };

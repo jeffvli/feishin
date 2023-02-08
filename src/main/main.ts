@@ -89,6 +89,10 @@ const createWindow = async () => {
     mainWindow?.webContents.openDevTools();
   });
 
+  ipcMain.on('window-dev-tools', () => {
+    mainWindow?.webContents.openDevTools();
+  });
+
   ipcMain.on('window-maximize', () => {
     mainWindow?.maximize();
   });
