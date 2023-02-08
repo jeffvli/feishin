@@ -359,7 +359,6 @@ export const PlaylistQueryBuilder = forwardRef(
     return (
       <MotionFlex
         direction="column"
-        // h="calc(100% - 1rem)"
         h="calc(100% - 2.5rem)"
         justify="space-between"
       >
@@ -407,7 +406,7 @@ export const PlaylistQueryBuilder = forwardRef(
               data={sortOptions}
               label="Sort"
               maxWidth="20%"
-              width={125}
+              width={150}
               {...extraFiltersForm.getInputProps('sortBy')}
             />
             <Select
