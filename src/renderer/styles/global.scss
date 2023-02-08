@@ -75,6 +75,10 @@ button {
   -webkit-app-region: no-drag;
 }
 
+.overlay-scrollbar {
+  overflow-y: overlay !important;
+}
+
 .hide-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
