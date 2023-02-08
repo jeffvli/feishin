@@ -280,9 +280,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     let nodesToUnfavorite: RowNode<any>[] = [];
 
     if (ctx.dataNodes) {
-      nodesToUnfavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
+      nodesToUnfavorite = ctx.dataNodes.filter((item) => item.data.userFavorite);
     } else {
-      itemsToUnfavorite = ctx.data.filter((item) => !item.userFavorite);
+      itemsToUnfavorite = ctx.data.filter((item) => item.userFavorite);
     }
 
     const idsToUnfavorite = nodesToUnfavorite
@@ -443,13 +443,24 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
           items = ctx.data.filter((item) => item.serverId === serverId);
         }
 
-        updateRatingMutation.mutate({
-          _serverId: serverId,
-          query: {
-            item: items,
-            rating,
+        updateRatingMutation.mutate(
+          {
+            _serverId: serverId,
+            query: {
+              item: items,
+              rating,
+            },
           },
-        });
+          {
+            onSuccess: () => {
+              if (ctx.dataNodes) {
+                for (const node of ctx.dataNodes) {
+                  node.setData({ ...node.data, userRating: rating });
+                }
+              }
+            },
+          },
+        );
       }
     },
     [ctx.data, ctx.dataNodes, updateRatingMutation],

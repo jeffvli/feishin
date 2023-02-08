@@ -7,12 +7,17 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { SSAlbumArtistDetail, SSAlbumDetail } from '/@/renderer/api/subsonic.types';
 import { FavoriteArgs, LibraryItem, RawFavoriteResponse, ServerType } from '/@/renderer/api/types';
 import { MutationOptions } from '/@/renderer/lib/react-query';
-import { useCurrentServer, useSetAlbumListItemDataById } from '/@/renderer/store';
+import {
+  useCurrentServer,
+  useSetAlbumListItemDataById,
+  useSetQueueFavorite,
+} from '/@/renderer/store';
 
 export const useDeleteFavorite = (options?: MutationOptions) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
   const setAlbumListData = useSetAlbumListItemDataById();
+  const setQueueFavorite = useSetQueueFavorite();
 
   return useMutation<RawFavoriteResponse, HTTPError, Omit<FavoriteArgs, 'server'>, null>({
     mutationFn: (args) => api.controller.deleteFavorite({ ...args, server }),
@@ -22,6 +27,10 @@ export const useDeleteFavorite = (options?: MutationOptions) => {
         if (variables.query.type === LibraryItem.ALBUM) {
           setAlbumListData(id, { userFavorite: false });
         }
+      }
+
+      if (variables.query.type === LibraryItem.SONG) {
+        setQueueFavorite(variables.query.id, false);
       }
 
       // We only need to set if we're already on the album detail page

@@ -13,7 +13,6 @@ import {
   useCurrentServer,
   useCurrentSong,
   useMuted,
-  useSetQueueFavorite,
   useSidebarStore,
   useVolume,
 } from '/@/renderer/store';
@@ -36,24 +35,16 @@ export const RightControls = () => {
   const updateRatingMutation = useUpdateRating();
   const addToFavoritesMutation = useCreateFavorite();
   const removeFromFavoritesMutation = useDeleteFavorite();
-  const setFavorite = useSetQueueFavorite();
 
   const handleAddToFavorites = () => {
     if (!currentSong) return;
 
-    addToFavoritesMutation.mutate(
-      {
-        query: {
-          id: [currentSong.id],
-          type: LibraryItem.SONG,
-        },
+    addToFavoritesMutation.mutate({
+      query: {
+        id: [currentSong.id],
+        type: LibraryItem.SONG,
       },
-      {
-        onSuccess: () => {
-          setFavorite([currentSong.id], true);
-        },
-      },
-    );
+    });
   };
 
   const handleUpdateRating = (rating: number) => {
@@ -83,19 +74,12 @@ export const RightControls = () => {
   const handleRemoveFromFavorites = () => {
     if (!currentSong) return;
 
-    removeFromFavoritesMutation.mutate(
-      {
-        query: {
-          id: [currentSong.id],
-          type: LibraryItem.SONG,
-        },
+    removeFromFavoritesMutation.mutate({
+      query: {
+        id: [currentSong.id],
+        type: LibraryItem.SONG,
       },
-      {
-        onSuccess: () => {
-          setFavorite([currentSong.id], false);
-        },
-      },
-    );
+    });
   };
 
   const handleToggleFavorite = () => {
