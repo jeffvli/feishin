@@ -106,8 +106,6 @@ export const convertNDQueryToQueryGroup = (query: Record<string, any>) => {
       const field = Object.keys(rule[operator])[0];
       let value = rule[operator][field];
 
-      console.log(operator, field, value);
-
       const booleanFields = NDSongQueryFields.filter(
         (queryField) => queryField.type === 'boolean',
       ).map((field) => field.value);

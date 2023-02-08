@@ -636,17 +636,15 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <HoverCard.Dropdown>
                               <Stack spacing={0}>
                                 {contextMenuItems[item.id].children?.map((child) => (
-                                  <>
-                                    <ContextMenuButton
-                                      key={`sub-${child.id}`}
-                                      disabled={child.disabled}
-                                      leftIcon={child.leftIcon}
-                                      rightIcon={child.rightIcon}
-                                      onClick={child.onClick}
-                                    >
-                                      {child.label}
-                                    </ContextMenuButton>
-                                  </>
+                                  <ContextMenuButton
+                                    key={`sub-${child.id}`}
+                                    disabled={child.disabled}
+                                    leftIcon={child.leftIcon}
+                                    rightIcon={child.rightIcon}
+                                    onClick={child.onClick}
+                                  >
+                                    {child.label}
+                                  </ContextMenuButton>
                                 ))}
                               </Stack>
                             </HoverCard.Dropdown>

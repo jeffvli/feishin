@@ -54,8 +54,6 @@ export const AlbumArtistDetailHeader = forwardRef(
     const handleClearRating = (_e: MouseEvent<HTMLDivElement>, rating?: number) => {
       if (!detailQuery?.data || !detailQuery?.data.userRating) return;
 
-      console.log(rating, detailQuery.data.userRating);
-
       const isSameRatingAsPrevious = rating === detailQuery.data.userRating;
       if (!isSameRatingAsPrevious) return;
 

@@ -382,8 +382,6 @@ export const AlbumListHeaderFilters = ({
       page.filter.jfParams &&
       Object.values(page.filter.jfParams).some((value) => value !== undefined);
 
-    console.log(page.filter.jfParams);
-
     return isNavidromeFilterApplied || isJellyfinFilterApplied;
   }, [page.filter.jfParams, page.filter.ndParams, server?.type]);
 
