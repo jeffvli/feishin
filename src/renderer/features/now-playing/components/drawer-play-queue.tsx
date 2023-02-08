@@ -12,11 +12,9 @@ export const DrawerPlayQueue = () => {
     <Flex
       direction="column"
       h="100%"
-      m="0.5rem"
       sx={{
         borderTopLeftRadius: '5px',
         borderTopRightRadius: '5px',
-        boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.8)',
       }}
     >
       <Box

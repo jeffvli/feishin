@@ -98,6 +98,8 @@ const ResizeHandle = styled.div<{
 
 const QueueDrawer = styled(motion.div)`
   background: transparent;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 `;
 
 const QueueDrawerArea = styled(motion.div)`
@@ -173,11 +175,11 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
       x: '50vw',
     },
     open: {
+      boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.8)',
       height: 'calc(100vh - 190px)',
       position: 'absolute',
       right: '20px',
       top: '75px',
-
       transition: {
         damping: 10,
         delay: 0,
