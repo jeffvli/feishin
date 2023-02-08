@@ -34,15 +34,25 @@ export const useRightControls = () => {
   };
 
   const handleVolumeWheel = (e: WheelEvent<HTMLDivElement>) => {
-    let newVolume;
+    let volumeToSet;
     if (e.deltaY > 0) {
-      newVolume = volume - volumeWheelStep;
+      const newVolumeLessThanZero = volume - volumeWheelStep < 0;
+      if (newVolumeLessThanZero) {
+        volumeToSet = 0;
+      } else {
+        volumeToSet = volume - volumeWheelStep;
+      }
     } else {
-      newVolume = volume + volumeWheelStep;
+      const newVolumeGreaterThanHundred = volume + volumeWheelStep > 100;
+      if (newVolumeGreaterThanHundred) {
+        volumeToSet = 100;
+      } else {
+        volumeToSet = volume + volumeWheelStep;
+      }
     }
 
-    mpvPlayer.volume(newVolume);
-    setVolume(newVolume);
+    mpvPlayer.volume(volumeToSet);
+    setVolume(volumeToSet);
   };
 
   const handleMute = () => {
