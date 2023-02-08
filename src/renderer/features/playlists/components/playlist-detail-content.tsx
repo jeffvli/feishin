@@ -116,7 +116,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
         },
         onSuccess: () => {
           toast.success({
-            message: `Playlist ${detailQuery?.data?.name} has been deleted`,
+            message: `Playlist has been deleted`,
           });
           closeAllModals();
           navigate(AppRoute.PLAYLISTS);
