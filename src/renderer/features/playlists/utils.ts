@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid/non-secure';
+import { NDSongQueryFields } from '/@/renderer/api/navidrome.types';
 import { QueryBuilderGroup } from '/@/renderer/types';
 
 export const parseQueryBuilderChildren = (groups: QueryBuilderGroup[], data: any[]) => {
@@ -53,15 +54,24 @@ export const convertQueryGroupToNDQuery = (filter: QueryBuilderGroup) => {
 
   for (const rule of filter.rules) {
     if (rule.field && rule.operator) {
-      const [table] = rule.field.split('.');
+      const [field] = rule.field.split('.');
       const operator = rule.operator;
-      const value = rule.value;
+      let value = rule.value;
 
-      switch (table) {
+      const booleanFields = NDSongQueryFields.filter(
+        (queryField) => queryField.type === 'boolean',
+      ).map((field) => field.value);
+
+      // Convert string values to boolean
+      if (booleanFields.includes(field)) {
+        value = value === 'true';
+      }
+
+      switch (field) {
         default:
           rootQuery[rootQueryType].push({
             [operator]: {
-              [table]: value,
+              [field]: value,
             },
           });
           break;
@@ -94,7 +104,18 @@ export const convertNDQueryToQueryGroup = (query: Record<string, any>) => {
     } else {
       const operator = Object.keys(rule)[0];
       const field = Object.keys(rule[operator])[0];
-      const value = rule[operator][field];
+      let value = rule[operator][field];
+
+      console.log(operator, field, value);
+
+      const booleanFields = NDSongQueryFields.filter(
+        (queryField) => queryField.type === 'boolean',
+      ).map((field) => field.value);
+
+      // Convert boolean values to string
+      if (booleanFields.includes(field)) {
+        value = value.toString();
+      }
 
       rootGroup.rules.push({
         field,

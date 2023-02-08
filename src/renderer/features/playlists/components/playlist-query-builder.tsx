@@ -399,6 +399,7 @@ export const PlaylistQueryBuilder = forwardRef(
         >
           <Group
             noWrap
+            spacing="sm"
             w="100%"
           >
             <Select
