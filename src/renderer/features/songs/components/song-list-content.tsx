@@ -104,10 +104,13 @@ export const SongListContent = ({ customFilters, itemCount, tableRef }: SongList
     (event: PaginationChangedEvent) => {
       if (!isPaginationEnabled || !event.api) return;
 
-      // Scroll to top of page on pagination change
-      const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage;
-      event.api?.ensureIndexVisible(currentPageStartIndex, 'top');
-
+      try {
+        // Scroll to top of page on pagination change
+        const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage;
+        event.api?.ensureIndexVisible(currentPageStartIndex, 'top');
+      } catch (err) {
+        console.log(err);
+      }
       setPagination({
         itemsPerPage: event.api.paginationGetPageSize(),
         totalItems: event.api.paginationGetRowCount(),
