@@ -30,6 +30,7 @@ export const useHandleTableContextMenu = (
       data: selectedRows,
       dataNodes: selectedNodes,
       menuItems: contextMenuItems,
+      tableApi: e.api,
       type: itemType,
       xPos: clickEvent.clientX,
       yPos: clickEvent.clientY,

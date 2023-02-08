@@ -1,3 +1,4 @@
+import { createContext, Fragment, ReactNode, useState, useMemo, useCallback } from 'react';
 import { RowNode } from '@ag-grid-community/core';
 import { Divider, Group, Portal, Stack } from '@mantine/core';
 import {
@@ -9,17 +10,20 @@ import {
 } from '@mantine/hooks';
 import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
 import { AnimatePresence } from 'framer-motion';
-import { createContext, Fragment, ReactNode, useState, useMemo, useCallback } from 'react';
+import isElectron from 'is-electron';
 import {
   RiAddBoxFill,
   RiAddCircleFill,
+  RiArrowDownLine,
   RiArrowRightSFill,
+  RiArrowUpLine,
   RiDeleteBinFill,
   RiDislikeFill,
   RiHeartFill,
   RiPlayFill,
   RiPlayListAddFill,
   RiStarFill,
+  RiCloseCircleLine,
 } from 'react-icons/ri';
 import { AnyLibraryItems, LibraryItem, ServerType } from '/@/renderer/api/types';
 import {
@@ -40,8 +44,9 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useDeletePlaylist } from '/@/renderer/features/playlists';
 import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
 import { useCreateFavorite, useDeleteFavorite, useUpdateRating } from '/@/renderer/features/shared';
-import { useAuthStore, useCurrentServer } from '/@/renderer/store';
-import { Play } from '/@/renderer/types';
+import { useAuthStore, useCurrentServer, useQueueControls } from '/@/renderer/store';
+import { usePlayerType } from '/@/renderer/store/settings.store';
+import { Play, PlaybackType } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
   closeContextMenu: () => void;
@@ -69,6 +74,8 @@ const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating'];
 // const NAVIDROME_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 // const SUBSONIC_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 
+const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+
 export interface ContextMenuProviderProps {
   children: React.ReactNode;
 }
@@ -85,7 +92,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     data: [],
     dataNodes: [],
     menuItems: [],
-    tableRef: undefined,
+    tableApi: undefined,
     type: LibraryItem.SONG,
     xPos: 0,
     yPos: 0,
@@ -94,7 +101,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const handlePlayQueueAdd = usePlayQueueAdd();
 
   const openContextMenu = (args: OpenContextMenuProps) => {
-    const { xPos, yPos, menuItems, data, type, tableRef, dataNodes, context } = args;
+    const { xPos, yPos, menuItems, data, type, tableApi, dataNodes, context } = args;
 
     const serverType = data[0]?.serverType || useAuthStore.getState().currentServer?.type;
     let validMenuItems = menuItems;
@@ -119,7 +126,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       data,
       dataNodes,
       menuItems: validMenuItems,
-      tableRef,
+      tableApi,
       type,
       xPos: calculatedXPos,
       yPos: calculatedYPos,
@@ -133,7 +140,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       data: [],
       dataNodes: [],
       menuItems: [],
-      tableRef: undefined,
+      tableApi: undefined,
       type: LibraryItem.SONG,
       xPos: 0,
       yPos: 0,
@@ -464,11 +471,51 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     [ctx.data, ctx.dataNodes, updateRatingMutation],
   );
 
+  const playerType = usePlayerType();
+  const { moveToBottomOfQueue, moveToTopOfQueue, removeFromQueue } = useQueueControls();
+
+  const handleMoveToBottom = useCallback(() => {
+    const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
+    if (!uniqueIds?.length) return;
+
+    const playerData = moveToBottomOfQueue(uniqueIds);
+
+    if (playerType === PlaybackType.LOCAL) {
+      mpvPlayer.setQueueNext(playerData);
+    }
+  }, [ctx.dataNodes, moveToBottomOfQueue, playerType]);
+
+  const handleMoveToTop = useCallback(() => {
+    const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
+    if (!uniqueIds?.length) return;
+
+    const playerData = moveToTopOfQueue(uniqueIds);
+
+    if (playerType === PlaybackType.LOCAL) {
+      mpvPlayer.setQueueNext(playerData);
+    }
+  }, [ctx.dataNodes, moveToTopOfQueue, playerType]);
+
+  const handleRemoveSelected = useCallback(() => {
+    const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
+    if (!uniqueIds?.length) return;
+
+    const playerData = removeFromQueue(uniqueIds);
+
+    if (playerType === PlaybackType.LOCAL) {
+      mpvPlayer.setQueueNext(playerData);
+    }
+  }, [ctx.dataNodes, playerType, removeFromQueue]);
+
+  const handleDeselectAll = useCallback(() => {
+    ctx.tableApi?.deselectAll();
+  }, [ctx.tableApi]);
+
   const contextMenuItems: Record<ContextMenuItemType, ContextMenuItem> = useMemo(() => {
     return {
       addToFavorites: {
         id: 'addToFavorites',
-        label: 'Add to favorites',
+        label: 'Add favorite',
         leftIcon: <RiHeartFill size="1.1rem" />,
         onClick: handleAddToFavorites,
       },
@@ -484,6 +531,24 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         label: 'Delete playlist',
         leftIcon: <RiDeleteBinFill size="1.1rem" />,
         onClick: openDeletePlaylistModal,
+      },
+      deselectAll: {
+        id: 'deselectAll',
+        label: 'Deselect all',
+        leftIcon: <RiCloseCircleLine size="1.1rem" />,
+        onClick: handleDeselectAll,
+      },
+      moveToBottomOfQueue: {
+        id: 'moveToBottomOfQueue',
+        label: 'Move to bottom',
+        leftIcon: <RiArrowDownLine size="1.1rem" />,
+        onClick: handleMoveToBottom,
+      },
+      moveToTopOfQueue: {
+        id: 'moveToTopOfQueue',
+        label: 'Move to top',
+        leftIcon: <RiArrowUpLine size="1.1rem" />,
+        onClick: handleMoveToTop,
       },
       play: {
         id: 'play',
@@ -505,7 +570,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       },
       removeFromFavorites: {
         id: 'removeFromFavorites',
-        label: 'Remove from favorites',
+        label: 'Remove favorite',
         leftIcon: <RiDislikeFill size="1.1rem" />,
         onClick: handleRemoveFromFavorites,
       },
@@ -514,6 +579,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         label: 'Remove from playlist',
         leftIcon: <RiDeleteBinFill size="1.1rem" />,
         onClick: handleRemoveFromPlaylist,
+      },
+      removeFromQueue: {
+        id: 'moveToBottomOfQueue',
+        label: 'Remove songs',
+        leftIcon: <RiDeleteBinFill size="1.1rem" />,
+        onClick: handleRemoveSelected,
       },
       setRating: {
         children: [
@@ -594,9 +665,13 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   }, [
     handleAddToFavorites,
     handleAddToPlaylist,
+    handleDeselectAll,
+    handleMoveToBottom,
+    handleMoveToTop,
     handlePlay,
     handleRemoveFromFavorites,
     handleRemoveFromPlaylist,
+    handleRemoveSelected,
     handleUpdateRating,
     openDeletePlaylistModal,
   ]);

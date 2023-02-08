@@ -103,20 +103,20 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         <Button
           compact
           size="md"
-          tooltip={{ label: 'Move selected to top' }}
-          variant="default"
-          onClick={handleMoveToTop}
-        >
-          <RiArrowUpLine size="1.1rem" />
-        </Button>
-        <Button
-          compact
-          size="md"
           tooltip={{ label: 'Move selected to bottom' }}
           variant="default"
           onClick={handleMoveToBottom}
         >
           <RiArrowDownLine size="1.1rem" />
+        </Button>
+        <Button
+          compact
+          size="md"
+          tooltip={{ label: 'Move selected to top' }}
+          variant="default"
+          onClick={handleMoveToTop}
+        >
+          <RiArrowUpLine size="1.1rem" />
         </Button>
         <Button
           compact

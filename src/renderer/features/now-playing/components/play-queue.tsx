@@ -29,7 +29,9 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import { PlaybackType, TableType } from '/@/renderer/types';
-import { QueueSong } from '/@/renderer/api/types';
+import { LibraryItem, QueueSong } from '/@/renderer/api/types';
+import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
+import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
@@ -184,6 +186,8 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     }
   }, [currentSong, previousSong, tableConfig.followCurrentSong]);
 
+  const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, QUEUE_CONTEXT_MENU_ITEMS);
+
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <VirtualGridAutoSizerContainer>
@@ -199,6 +203,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
           rowClassRules={rowClassRules}
           rowData={queue}
           rowHeight={tableConfig.rowHeight || 40}
+          onCellContextMenu={handleContextMenu}
           onCellDoubleClicked={handleDoubleClick}
           onColumnMoved={handleColumnChange}
           onColumnResized={debouncedColumnChange}

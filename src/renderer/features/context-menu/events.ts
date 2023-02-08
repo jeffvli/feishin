@@ -1,7 +1,5 @@
-import { RowNode } from '@ag-grid-community/core';
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { GridOptions, RowNode } from '@ag-grid-community/core';
 import { createUseExternalEvents } from '@mantine/utils';
-import { MutableRefObject } from 'react';
 import { LibraryItem } from '/@/renderer/api/types';
 
 export type OpenContextMenuProps = {
@@ -9,7 +7,7 @@ export type OpenContextMenuProps = {
   data: any[];
   dataNodes?: RowNode[];
   menuItems: SetContextMenuItems;
-  tableRef?: MutableRefObject<AgGridReactType | null>;
+  tableApi?: GridOptions['api'];
   type: LibraryItem;
   xPos: number;
   yPos: number;
@@ -30,7 +28,11 @@ export type ContextMenuItemType =
   | 'removeFromFavorites'
   | 'setRating'
   | 'deletePlaylist'
-  | 'createPlaylist';
+  | 'createPlaylist'
+  | 'moveToBottomOfQueue'
+  | 'moveToTopOfQueue'
+  | 'removeFromQueue'
+  | 'deselectAll';
 
 export type SetContextMenuItems = {
   children?: boolean;
