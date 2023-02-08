@@ -35,7 +35,7 @@ export const SaveAsPlaylistForm = ({ body, onSuccess, onCancel }: SaveAsPlaylist
           toast.error({ message: err.message, title: 'Error creating playlist' });
         },
         onSuccess: (data) => {
-          toast.success({ message: 'Playlist created successfully' });
+          toast.success({ message: `Playlist has been created` });
           onSuccess(data);
           onCancel();
         },

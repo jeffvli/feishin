@@ -1,3 +1,4 @@
+import { Notifications } from '@mantine/notifications';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createRoot } from 'react-dom/client';
 import { App } from './app';
@@ -8,6 +9,10 @@ const root = createRoot(container);
 
 root.render(
   <QueryClientProvider client={queryClient}>
+    <Notifications
+      containerWidth="300px"
+      position="bottom-center"
+    />
     <App />
   </QueryClientProvider>,
 );

@@ -198,8 +198,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
           },
           onSuccess: () => {
             toast.success({
-              message: `${item.name} was successfully deleted`,
-              title: 'Playlist deleted',
+              message: `Playlist has been deleted`,
             });
           },
         },
@@ -381,7 +380,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
           onSuccess: () => {
             toast.success({
               message: `${songId.length} song(s) were removed from the playlist`,
-              title: 'Song(s) removed from playlist',
             });
             ctx.context?.tableRef?.current?.api?.refreshInfiniteCache();
             closeAllModals();

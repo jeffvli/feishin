@@ -43,7 +43,7 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
           toast.error({ message: err.message, title: 'Error updating playlist' });
         },
         onSuccess: () => {
-          toast.success({ message: 'Playlist updated successfully' });
+          toast.success({ message: `Playlist has been saved` });
           onCancel();
         },
       },

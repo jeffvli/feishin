@@ -73,7 +73,7 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
       updateServer(server.id, serverItem);
       setCurrentServer(serverItem);
 
-      toast.success({ message: 'Server updated' });
+      toast.success({ message: 'Server has been updated' });
     } catch (err: any) {
       setIsLoading(false);
       return toast.error({ message: err?.message });

@@ -63,7 +63,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
           toast.error({ message: err.message, title: 'Error creating playlist' });
         },
         onSuccess: () => {
-          toast.success({ message: 'Playlist created successfully' });
+          toast.success({ message: `Playlist has been created` });
           onCancel();
         },
       },

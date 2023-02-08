@@ -7,7 +7,6 @@ import { ModalsProvider } from '@mantine/modals';
 import { initSimpleImg } from 'react-simple-img';
 import { BaseContextModal } from './components';
 import { useTheme } from './hooks';
-import { Notifications } from '@mantine/notifications';
 import { AppRouter } from './router/app-router';
 import { useSettingsStore } from './store/settings.store';
 import './styles/global.scss';
@@ -109,7 +108,6 @@ export const App = () => {
       >
         <PlayQueueHandlerContext.Provider value={{ handlePlayQueueAdd }}>
           <ContextMenuProvider>
-            <Notifications />
             <AppRouter />
           </ContextMenuProvider>
         </PlayQueueHandlerContext.Provider>

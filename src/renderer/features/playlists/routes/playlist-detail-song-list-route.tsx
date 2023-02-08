@@ -58,7 +58,7 @@ const PlaylistDetailSongListRoute = () => {
       },
       {
         onSuccess: (data) => {
-          toast.success({ message: 'Smart playlist saved' });
+          toast.success({ message: 'Playlist has been saved' });
           navigate(generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data?.id || '' }), {
             replace: true,
           });
