@@ -1,7 +1,7 @@
 import { Group, Stack } from '@mantine/core';
 import { Select } from '/@/renderer/components/select';
 import { AnimatePresence, motion } from 'framer-motion';
-import { RiAddLine, RiMore2Line } from 'react-icons/ri';
+import { RiAddFill, RiAddLine, RiDeleteBinFill, RiMore2Line, RiRestartLine } from 'react-icons/ri';
 import { Button } from '/@/renderer/components/button';
 import { DropdownMenu } from '/@/renderer/components/dropdown-menu';
 import { QueryBuilderOption } from '/@/renderer/components/query-builder/query-builder-option';
@@ -120,10 +120,18 @@ export const QueryBuilder = ({
             </Button>
           </DropdownMenu.Target>
           <DropdownMenu.Dropdown>
-            <DropdownMenu.Item onClick={handleAddRuleGroup}>Add rule group</DropdownMenu.Item>
+            <DropdownMenu.Item
+              icon={<RiAddFill />}
+              onClick={handleAddRuleGroup}
+            >
+              Add rule group
+            </DropdownMenu.Item>
 
             {level > 0 && (
-              <DropdownMenu.Item onClick={handleDeleteRuleGroup}>
+              <DropdownMenu.Item
+                icon={<RiDeleteBinFill />}
+                onClick={handleDeleteRuleGroup}
+              >
                 Remove rule group
               </DropdownMenu.Item>
             )}
@@ -132,12 +140,14 @@ export const QueryBuilder = ({
                 <DropdownMenu.Divider />
                 <DropdownMenu.Item
                   $danger
+                  icon={<RiRestartLine color="var(--danger-color)" />}
                   onClick={onResetFilters}
                 >
                   Reset to default
                 </DropdownMenu.Item>
                 <DropdownMenu.Item
                   $danger
+                  icon={<RiDeleteBinFill color="var(--danger-color)" />}
                   onClick={onClearFilters}
                 >
                   Clear filters
