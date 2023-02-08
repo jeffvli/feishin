@@ -21,6 +21,16 @@ export const PLAYLIST_SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { children: true, disabled: false, id: 'setRating' },
 ];
 
+export const SMART_PLAYLIST_SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
+  { id: 'play' },
+  { id: 'playLast' },
+  { divider: true, id: 'playNext' },
+  { divider: true, id: 'addToPlaylist' },
+  { id: 'addToFavorites' },
+  { divider: true, id: 'removeFromFavorites' },
+  { children: true, disabled: false, id: 'setRating' },
+];
+
 export const ALBUM_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
   { id: 'play' },
   { id: 'playLast' },

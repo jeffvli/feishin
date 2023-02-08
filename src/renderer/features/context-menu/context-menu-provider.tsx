@@ -314,7 +314,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
     if (ctx.dataNodes) {
       for (const node of ctx.dataNodes) {
-        switch (node.data.type) {
+        switch (node.data.itemType) {
           case LibraryItem.ALBUM:
             albumId.push(node.data.id);
             break;
@@ -328,7 +328,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       }
     } else {
       for (const item of ctx.data) {
-        switch (item.type) {
+        switch (item.itemType) {
           case LibraryItem.ALBUM:
             albumId.push(item.id);
             break;
