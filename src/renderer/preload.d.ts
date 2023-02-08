@@ -40,8 +40,10 @@ declare global {
         windowUnmaximize(): void;
       };
       localSettings: any;
+      mpris: any;
       mpvPlayer: any;
       mpvPlayerListener: any;
+      utils: any;
     };
   }
 }

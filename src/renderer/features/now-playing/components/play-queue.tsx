@@ -34,6 +34,7 @@ import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+const mpris = isElectron() ? window.electron.mpris : null;
 
 type QueueProps = {
   type: TableType;
@@ -68,6 +69,11 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
   const handleDoubleClick = (e: CellDoubleClickedEvent) => {
     const playerData = setCurrentTrack(e.data.uniqueId);
+    mpris?.updateSong({
+      currentTime: 0,
+      song: playerData.current.song,
+      status: 'Playing',
+    });
 
     if (playerType === PlaybackType.LOCAL) {
       mpvPlayer.setQueue(playerData);

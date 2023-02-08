@@ -20,6 +20,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { LibraryItem, SongListSort, SortOrder } from '/@/renderer/api/types';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+const mpris = isElectron() ? window.electron.mpris : null;
 
 export const useHandlePlayQueueAdd = () => {
   const queryClient = useQueryClient();
@@ -167,6 +168,13 @@ export const useHandlePlayQueueAdd = () => {
       if (!songs) return toast.warn({ message: 'No songs found' });
 
       const playerData = usePlayerStore.getState().actions.addToQueue(songs, options.play);
+      mpris?.updateSong({
+        currentTime: usePlayerStore.getState().current.time,
+        repeat: usePlayerStore.getState().repeat,
+        shuffle: usePlayerStore.getState().shuffle,
+        song: playerData.current.song,
+        status: 'Playing',
+      });
 
       if (options.play === Play.NEXT || options.play === Play.LAST) {
         if (playerType === PlaybackType.LOCAL) {
