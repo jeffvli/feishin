@@ -171,6 +171,7 @@ export const Sidebar = () => {
         spacing={0}
       >
         <MotionStack
+          h="100%"
           layout="position"
           spacing={0}
           sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
