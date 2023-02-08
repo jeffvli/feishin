@@ -14,13 +14,14 @@ export const DrawerPlayQueue = () => {
       h="100%"
       m="0.5rem"
       sx={{
-        borderRadius: '10px',
+        borderTopLeftRadius: '5px',
+        borderTopRightRadius: '5px',
         boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.8)',
       }}
     >
       <Box
         bg="var(--main-bg)"
-        sx={{ borderTopLeftRadius: '10px', borderTopRightRadius: '10px' }}
+        sx={{ borderTopLeftRadius: '5px', borderTopRightRadius: '5px' }}
       >
         <PlayQueueListControls
           tableRef={queueRef}
