@@ -51,7 +51,6 @@ const tableColumns: { [key: string]: ColDef } = {
       GenericCell(params, { isLink: true, position: 'left' }),
     colId: TableColumn.ALBUM,
     headerName: 'Album',
-    maxWidth: 900,
     valueGetter: (params: ValueGetterParams) =>
       params.data
         ? {
@@ -67,7 +66,6 @@ const tableColumns: { [key: string]: ColDef } = {
     cellRenderer: AlbumArtistCell,
     colId: TableColumn.ALBUM_ARTIST,
     headerName: 'Album Artist',
-    maxWidth: 500,
     valueGetter: (params: ValueGetterParams) =>
       params.data ? params.data.albumArtists : undefined,
     width: 150,
@@ -176,7 +174,6 @@ const tableColumns: { [key: string]: ColDef } = {
     colId: TableColumn.LAST_PLAYED,
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'Last Played',
-    maxWidth: 300,
     valueFormatter: (params: ValueFormatterParams) =>
       params.value ? dayjs(params.value).fromNow() : '',
     valueGetter: (params: ValueGetterParams) =>
@@ -206,7 +203,6 @@ const tableColumns: { [key: string]: ColDef } = {
     field: 'releaseDate',
     headerComponent: (params: IHeaderParams) => GenericTableHeader(params, { position: 'center' }),
     headerName: 'Release Date',
-    maxWidth: 250,
     suppressSizeToFit: true,
     valueFormatter: (params: ValueFormatterParams) =>
       params.value ? dayjs(params.value).format('MMM D, YYYY') : '',
@@ -258,7 +254,6 @@ const tableColumns: { [key: string]: ColDef } = {
     colId: TableColumn.TITLE_COMBINED,
     headerName: 'Title',
     initialWidth: 500,
-    maxWidth: 900,
     minWidth: 150,
     valueGetter: (params: ValueGetterParams) =>
       params.data
