@@ -26,7 +26,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
-import { PLAYLIST_SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import {
+  PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
+  SMART_PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
+} from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import {
   LibraryItem,
@@ -40,6 +43,7 @@ import { useParams } from 'react-router';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 
 interface PlaylistDetailContentProps {
   tableRef: MutableRefObject<AgGridReactType | null>;
@@ -56,6 +60,8 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
       sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
     };
   }, [page?.table.id, playlistId]);
+
+  const detailQuery = usePlaylistDetail({ id: playlistId });
 
   const p = usePlaylistDetailTablePagination(playlistId);
   const pagination = {
@@ -189,11 +195,18 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     setPagination(playlistId, { scrollOffset });
   };
 
-  const handleContextMenu = useHandleTableContextMenu(
-    LibraryItem.SONG,
-    PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
-    { playlistId, tableRef },
-  );
+  const contextMenuItems = useMemo(() => {
+    if (detailQuery?.data?.rules) {
+      return SMART_PLAYLIST_SONG_CONTEXT_MENU_ITEMS;
+    }
+
+    return PLAYLIST_SONG_CONTEXT_MENU_ITEMS;
+  }, [detailQuery?.data?.rules]);
+
+  const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, contextMenuItems, {
+    playlistId,
+    tableRef,
+  });
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;
