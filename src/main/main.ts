@@ -27,6 +27,10 @@ export default class AppUpdater {
   }
 }
 
+if (store.get('ignore_ssl')) {
+  app.commandLine.appendSwitch('ignore-certificate-errors');
+}
+
 let mainWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -65,8 +69,6 @@ const createWindow = async () => {
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);
   };
-
-  console.log(store.get('ignore_cors'), 'ignore_cors');
 
   mainWindow = new BrowserWindow({
     frame: false,

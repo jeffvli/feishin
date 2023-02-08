@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import { Group, Stack } from '@mantine/core';
+import { Divider, Group, Stack } from '@mantine/core';
 import { Accordion, Button, ContextModalVars, Switch } from '/@/renderer/components';
 import { useLocalStorage } from '@mantine/hooks';
 import { openContextModal } from '@mantine/modals';
@@ -32,9 +32,25 @@ export const ServerList = () => {
     key: 'ignore_cors',
   });
 
+  const [ignoreSSL, setIgnoreSSL] = useLocalStorage({
+    defaultValue: 'false',
+    key: 'ignore_ssl',
+  });
+
   const handleUpdateIgnoreCORS = (e: ChangeEvent<HTMLInputElement>) => {
-    localSettings.set('ignore_cors', e.currentTarget.checked);
     setIgnoreCORS(String(e.currentTarget.checked));
+
+    if (isElectron()) {
+      localSettings?.set('ignore_cors', e.currentTarget.checked);
+    }
+  };
+
+  const handleUpdateIgnoreSSL = (e: ChangeEvent<HTMLInputElement>) => {
+    setIgnoreSSL(String(e.currentTarget.checked));
+
+    if (isElectron()) {
+      localSettings?.set('ignore_ssl', e.currentTarget.checked);
+    }
   };
 
   return (
@@ -77,11 +93,19 @@ export const ServerList = () => {
             </Accordion.Item>
           ))}
         </Accordion>
-        <Group position="right">
+        <Divider />
+        <Group>
           <Switch
             checked={ignoreCORS === 'true'}
             label="Ignore CORS (requires restart)"
             onChange={handleUpdateIgnoreCORS}
+          />
+        </Group>
+        <Group>
+          <Switch
+            checked={ignoreSSL === 'true'}
+            label="Ignore SSL (requires restart)"
+            onChange={handleUpdateIgnoreSSL}
           />
         </Group>
       </Stack>
