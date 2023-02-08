@@ -254,6 +254,7 @@ const tableColumns: { [key: string]: ColDef } = {
     colId: TableColumn.TITLE_COMBINED,
     headerName: 'Title',
     initialWidth: 500,
+    minWidth: 150,
     valueGetter: (params: ValueGetterParams) =>
       params.data
         ? {
@@ -292,7 +293,7 @@ const tableColumns: { [key: string]: ColDef } = {
     width: 50,
   },
   userRating: {
-    cellClass: (params) => (params.value ? 'visible ag-cell-rating' : 'ag-cell-rating'),
+    cellClass: (params) => (params.value.userRating ? 'visible ag-cell-rating' : 'ag-cell-rating'),
     cellRenderer: RatingCell,
     colId: TableColumn.USER_RATING,
     field: 'userRating',
@@ -427,6 +428,7 @@ export const VirtualTable = forwardRef(
           ref={mergedRef}
           animateRows
           maintainColumnOrder
+          suppressAsyncEvents
           suppressContextMenu
           suppressCopyRowsToClipboard
           suppressMoveWhenRowDragging

@@ -227,7 +227,6 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             onChangeEnd={(e) => {
               handleSeekSlider(e);
               setIsSeeking(false);
-              console.log('end');
             }}
           />
         </SliderWrapper>

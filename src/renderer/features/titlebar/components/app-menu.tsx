@@ -1,15 +1,8 @@
 import { Group } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
-import {
-  RiSearch2Line,
-  RiSettings2Fill,
-  RiSettings2Line,
-  RiEdit2Line,
-  RiLockLine,
-  RiMenuFill,
-} from 'react-icons/ri';
+import { RiLockLine, RiServerFill, RiEdit2Fill, RiSettings3Fill } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
-import { DropdownMenu, Text, Button } from '/@/renderer/components';
+import { DropdownMenu, Text } from '/@/renderer/components';
 import { ServerList } from '/@/renderer/features/servers';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { Settings } from '/@/renderer/features/settings';
@@ -55,7 +48,7 @@ export const AppMenu = () => {
       size: 'xl',
       title: (
         <Group position="center">
-          <RiSettings2Fill size={20} />
+          <RiSettings3Fill size={20} />
           <Text>Settings</Text>
         </Group>
       ),
@@ -63,72 +56,40 @@ export const AppMenu = () => {
   };
 
   return (
-    <DropdownMenu
-      withArrow
-      withinPortal
-      position="bottom"
-    >
-      <DropdownMenu.Target>
-        <Button
-          px={5}
-          size="xs"
-          variant="subtle"
-        >
-          <RiMenuFill
-            color="var(--titlebar-fg)"
-            size={15}
-          />
-        </Button>
-      </DropdownMenu.Target>
-      <DropdownMenu.Dropdown>
-        <DropdownMenu.Label>Select a server</DropdownMenu.Label>
-        {serverList.map((s) => {
-          const isNavidromeExpired = s.type === ServerType.NAVIDROME && !s.ndCredential;
-          const isJellyfinExpired = false;
-          const isSessionExpired = isNavidromeExpired || isJellyfinExpired;
+    <>
+      <DropdownMenu.Label>Select a server</DropdownMenu.Label>
+      {serverList.map((s) => {
+        const isNavidromeExpired = s.type === ServerType.NAVIDROME && !s.ndCredential;
+        const isJellyfinExpired = false;
+        const isSessionExpired = isNavidromeExpired || isJellyfinExpired;
 
-          return (
-            <DropdownMenu.Item
-              key={`server-${s.id}`}
-              $isActive={s.id === currentServer?.id}
-              icon={
-                isSessionExpired && (
-                  <RiLockLine
-                    color="var(--danger-color)"
-                    size={12}
-                  />
-                )
-              }
-              onClick={() => {
-                if (!isSessionExpired) return handleSetCurrentServer(s);
-                return handleCredentialsModal(s);
-              }}
-            >
-              <Group>{s.name}</Group>
-            </DropdownMenu.Item>
-          );
-        })}
-        <DropdownMenu.Divider />
-        <DropdownMenu.Item
-          disabled
-          rightSection={<RiSearch2Line />}
-        >
-          Search
-        </DropdownMenu.Item>
-        <DropdownMenu.Item
-          rightSection={<RiSettings2Line />}
-          onClick={handleSettingsModal}
-        >
-          Settings
-        </DropdownMenu.Item>
-        <DropdownMenu.Divider />
-        <DropdownMenu.Item
-          rightSection={<RiEdit2Line />}
-          onClick={handleManageServersModal}
-        >
-          Manage servers
-        </DropdownMenu.Item>
-      </DropdownMenu.Dropdown>
-    </DropdownMenu>
+        return (
+          <DropdownMenu.Item
+            key={`server-${s.id}`}
+            $isActive={s.id === currentServer?.id}
+            icon={isSessionExpired ? <RiLockLine color="var(--danger-color)" /> : <RiServerFill />}
+            onClick={() => {
+              if (!isSessionExpired) return handleSetCurrentServer(s);
+              return handleCredentialsModal(s);
+            }}
+          >
+            <Group>{s.name}</Group>
+          </DropdownMenu.Item>
+        );
+      })}
+      <DropdownMenu.Divider />
+      <DropdownMenu.Item
+        icon={<RiEdit2Fill />}
+        onClick={handleManageServersModal}
+      >
+        Manage servers
+      </DropdownMenu.Item>
+      <DropdownMenu.Item
+        icon={<RiSettings3Fill />}
+        onClick={handleSettingsModal}
+      >
+        Settings
+      </DropdownMenu.Item>
+    </>
   );
 };

@@ -12,6 +12,7 @@ const Container = styled(motion(Flex))<{
   z-index: 2000;
   width: 100%;
   height: ${(props) => props.height || '65px'};
+  background: var(--titlebar-bg);
 `;
 
 const Header = styled(motion.div)<{ $isHidden?: boolean; $padRight?: boolean }>`
@@ -19,7 +20,7 @@ const Header = styled(motion.div)<{ $isHidden?: boolean; $padRight?: boolean }>`
   z-index: 15;
   width: 100%;
   height: 100%;
-  margin-right: ${(props) => props.$padRight && '170px'};
+  margin-right: ${(props) => (props.$padRight ? '140px' : '1rem')};
   user-select: ${(props) => (props.$isHidden ? 'none' : 'auto')};
   pointer-events: ${(props) => (props.$isHidden ? 'none' : 'auto')};
   -webkit-app-region: drag;
@@ -66,6 +67,7 @@ export interface PageHeaderProps
 
 const TitleWrapper = styled(motion.div)`
   position: absolute;
+  display: flex;
   width: 100%;
   height: 100%;
 `;

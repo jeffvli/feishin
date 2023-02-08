@@ -28,7 +28,10 @@ import {
   VirtualTable,
 } from '/@/renderer/components';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
-import { PLAYLIST_SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import {
+  PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
+  SMART_PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
+} from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { UpdatePlaylistForm } from '/@/renderer/features/playlists/components/update-playlist-form';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
@@ -44,7 +47,6 @@ const ContentContainer = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  max-width: 1920px;
   padding: 1rem 2rem 5rem;
   overflow: hidden;
 
@@ -90,11 +92,17 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     [page.table.columns],
   );
 
-  const handleContextMenu = useHandleTableContextMenu(
-    LibraryItem.SONG,
-    PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
-    { playlistId },
-  );
+  const contextMenuItems = useMemo(() => {
+    if (detailQuery?.data?.rules) {
+      return SMART_PLAYLIST_SONG_CONTEXT_MENU_ITEMS;
+    }
+
+    return PLAYLIST_SONG_CONTEXT_MENU_ITEMS;
+  }, [detailQuery?.data?.rules]);
+
+  const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, contextMenuItems, {
+    playlistId,
+  });
 
   const playlistSongData = useMemo(
     () => playlistSongsQueryInfinite.data?.pages.flatMap((p) => p.items),
@@ -117,8 +125,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
         },
         onSuccess: () => {
           toast.success({
-            message: `${detailQuery?.data?.name} was successfully deleted`,
-            title: 'Playlist deleted',
+            message: `Playlist has been deleted`,
           });
           closeAllModals();
           navigate(AppRoute.PLAYLISTS);
@@ -203,7 +210,6 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     <ContentContainer>
       <Group
         ref={intersectRef}
-        maw="1920px"
         p="1rem"
         position="apart"
       >

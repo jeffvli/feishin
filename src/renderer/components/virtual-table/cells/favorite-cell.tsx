@@ -6,11 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import { HTTPError } from 'ky';
 import { api } from '/@/renderer/api';
 import { RawFavoriteResponse, FavoriteArgs, LibraryItem } from '/@/renderer/api/types';
-import {
-  useCurrentServer,
-  useSetAlbumListItemDataById,
-  useSetQueueFavorite,
-} from '/@/renderer/store';
+import { useCurrentServer, useSetAlbumListItemDataById } from '/@/renderer/store';
 
 const useCreateFavorite = () => {
   const server = useCurrentServer();
@@ -50,9 +46,6 @@ export const FavoriteCell = ({ value, data, node }: ICellRendererParams) => {
   const createMutation = useCreateFavorite();
   const deleteMutation = useDeleteFavorite();
 
-  // Since the queue is using client-side state, we need to update it manually
-  const setFavorite = useSetQueueFavorite();
-
   const handleToggleFavorite = () => {
     const newFavoriteValue = !value;
 
@@ -66,10 +59,6 @@ export const FavoriteCell = ({ value, data, node }: ICellRendererParams) => {
         },
         {
           onSuccess: () => {
-            if (data.itemType === LibraryItem.SONG) {
-              setFavorite([data.id], newFavoriteValue);
-            }
-
             node.setData({ ...data, userFavorite: newFavoriteValue });
           },
         },
@@ -84,10 +73,6 @@ export const FavoriteCell = ({ value, data, node }: ICellRendererParams) => {
         },
         {
           onSuccess: () => {
-            if (data.itemType === LibraryItem.SONG) {
-              setFavorite([data.id], newFavoriteValue);
-            }
-
             node.setData({ ...data, userFavorite: newFavoriteValue });
           },
         },

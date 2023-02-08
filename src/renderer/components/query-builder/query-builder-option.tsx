@@ -91,7 +91,11 @@ const QueryValueInput = ({ onChange, type, ...props }: any) => {
     case 'boolean':
       return (
         <Select
-          data={[]}
+          data={[
+            { label: 'true', value: 'true' },
+            { label: 'false', value: 'false' },
+          ]}
+          onChange={onChange}
           {...props}
         />
       );
@@ -178,14 +182,17 @@ export const QueryBuilderOption = ({
   const ml = (level + 1) * 10;
 
   return (
-    <Group ml={ml}>
+    <Group
+      ml={ml}
+      spacing="sm"
+    >
       <Select
         searchable
         data={filters}
         maxWidth={170}
         size="sm"
         value={field}
-        width="20%"
+        width="25%"
         onChange={handleChangeField}
       />
       <Select
@@ -195,7 +202,7 @@ export const QueryBuilderOption = ({
         maxWidth={170}
         size="sm"
         value={operator}
-        width="20%"
+        width="25%"
         onChange={handleChangeOperator}
       />
       {field ? (
@@ -204,7 +211,7 @@ export const QueryBuilderOption = ({
           maxWidth={170}
           size="sm"
           type={operator === 'inTheRange' ? 'dateRange' : fieldType}
-          width="20%"
+          width="25%"
           onChange={handleChangeValue}
         />
       ) : (
@@ -213,7 +220,7 @@ export const QueryBuilderOption = ({
           defaultValue={value}
           maxWidth={170}
           size="sm"
-          width="20%"
+          width="25%"
           onChange={handleChangeValue}
         />
       )}

@@ -42,9 +42,10 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
   return (
     <NativeScrollArea
       ref={scrollAreaRef}
+      noHeader
       scrollBarOffset="0px"
       scrollHideDelay={0}
-      style={{ margin: '0.5rem 0', padding: '0 1rem' }}
+      style={{ margin: '0.5rem 0', padding: '0 1.5rem' }}
     >
       <div
         style={{
@@ -68,7 +69,6 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
             <Group
               noWrap
               className="sidebar-playlist-item"
-              pl="1rem"
               pos="relative"
               position="apart"
               sx={{

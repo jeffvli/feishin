@@ -7,7 +7,6 @@ import { ModalsProvider } from '@mantine/modals';
 import { initSimpleImg } from 'react-simple-img';
 import { BaseContextModal } from './components';
 import { useTheme } from './hooks';
-import { Notifications } from '@mantine/notifications';
 import { AppRouter } from './router/app-router';
 import { useSettingsStore } from './store/settings.store';
 import './styles/global.scss';
@@ -38,7 +37,21 @@ export const App = () => {
       withNormalizeCSS
       theme={{
         colorScheme: theme as 'light' | 'dark',
-        components: { Modal: { styles: { body: { padding: '.5rem' } } } },
+        components: {
+          Modal: {
+            styles: {
+              body: { background: 'var(--modal-bg)', padding: '1rem !important' },
+              close: { marginRight: '0.5rem' },
+              content: { borderRadius: '10px' },
+              header: {
+                background: 'var(--modal-bg)',
+                borderBottom: '1px solid var(--generic-border-color)',
+                paddingBottom: '1rem',
+              },
+              title: { fontSize: 'medium', fontWeight: 'bold' },
+            },
+          },
+        },
         defaultRadius: 'xs',
         dir: 'ltr',
         focusRing: 'auto',
@@ -85,8 +98,8 @@ export const App = () => {
       <ModalsProvider
         modalProps={{
           centered: true,
-          transitionDuration: 300,
           transitionProps: {
+            duration: 300,
             exitDuration: 300,
             transition: 'slide-down',
           },
@@ -95,7 +108,6 @@ export const App = () => {
       >
         <PlayQueueHandlerContext.Provider value={{ handlePlayQueueAdd }}>
           <ContextMenuProvider>
-            <Notifications />
             <AppRouter />
           </ContextMenuProvider>
         </PlayQueueHandlerContext.Provider>

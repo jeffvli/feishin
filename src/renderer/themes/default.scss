@@ -2,7 +2,7 @@
   --root-font-size: 13px;
   --icon-color: rgb(255, 255, 255);
 
-  --primary-color: rgb(34, 104, 255);
+  --primary-color: rgb(53, 116, 252);
   --secondary-color: rgb(255, 120, 120);
   --success-color: green;
   --warning-color: orange;
@@ -14,7 +14,7 @@
   --main-fg-secondary: rgb(150, 150, 150);
 
   --titlebar-fg: rgb(255, 255, 255);
-  --titlebar-bg: rgb(7, 7, 7);
+  --titlebar-bg: rgb(24, 24, 24);
   --titlebar-controls-bg: rgba(0, 0, 0, 0);
 
   --sidebar-bg: rgb(0, 0, 0);
@@ -40,10 +40,11 @@
   --tooltip-fg: #000000;
 
   --scrollbar-track-bg: transparent;
-  --scrollbar-thumb-bg: rgba(90, 90, 90, 0.5);
+  --scrollbar-thumb-bg: rgba(160, 160, 160, 0.3);
+  --scrollbar-thumb-bg-hover: rgba(160, 160, 160, 0.6);
 
   --btn-primary-bg: var(--primary-color);
-  --btn-primary-bg-hover: rgb(0, 71, 252);
+  --btn-primary-bg-hover: rgb(34, 96, 255);
   --btn-primary-fg: #ffffff;
   --btn-primary-fg-hover: #ffffff;
 
@@ -59,7 +60,7 @@
 
   --input-bg: rgb(35, 35, 35);
   --input-fg: rgb(193, 193, 193);
-  --input-placeholder-fg: rgb(119, 126, 139);
+  --input-placeholder-fg: rgb(107, 108, 109);
   --input-active-fg: rgb(193, 193, 193);
   --input-active-bg: rgba(255, 255, 255, 0.1);
 
@@ -84,12 +85,12 @@
   --toast-description-fg: rgb(193, 194, 197);
   --toast-bg: rgb(16, 16, 16);
 
-  --modal-bg: rgb(26, 26, 26);
+  --modal-bg: var(--main-bg);
 
   --badge-bg: rgb(0, 0, 0);
   --badge-fg: rgb(255, 255, 255);
 
-  --paper-bg: rgb(30, 30, 30);
+  --paper-bg: rgb(20, 20, 20);
 
   --placeholder-bg: rgba(53, 53, 53, 0.5);
   --placeholder-fg: rgba(126, 126, 126);
@@ -179,26 +180,5 @@
 
   .current-song {
     background: rgba(96, 144, 240, 0.3) !important;
-  }
-
-  .mantine-Modal-modal {
-    background: var(--modal-bg);
-    border-radius: 10px;
-    backdrop-filter: blur(8px);
-  }
-
-  .mantine-Modal-header {
-    padding-bottom: 1rem;
-    margin-right: 0.5rem;
-    border-bottom: 1px solid var(--generic-border-color);
-  }
-
-  .mantine-Modal-title {
-    font-weight: bold;
-    font-size: medium;
-  }
-
-  .mantine-Modal-body {
-    padding: 1rem;
   }
 }

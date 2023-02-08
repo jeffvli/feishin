@@ -45,25 +45,25 @@ export const JellyfinSongFilters = ({ handleFilterChange }: JellyfinSongFiltersP
     },
   ];
 
-  const handleMinYearFilter = debounce((e: number | undefined) => {
-    if (e && (e < 1700 || e > 2300)) return;
+  const handleMinYearFilter = debounce((e: number | string) => {
+    if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
     const updatedFilters = setFilters({
       jfParams: {
         ...filter.jfParams,
         includeItemTypes: 'Audio',
-        minYear: e,
+        minYear: e === '' ? undefined : (e as number),
       },
     });
     handleFilterChange(updatedFilters);
   }, 500);
 
-  const handleMaxYearFilter = debounce((e: number | undefined) => {
-    if (e && (e < 1700 || e > 2300)) return;
+  const handleMaxYearFilter = debounce((e: number | string) => {
+    if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
     const updatedFilters = setFilters({
       jfParams: {
         ...filter.jfParams,
         includeItemTypes: 'Audio',
-        maxYear: e,
+        maxYear: e === '' ? undefined : (e as number),
       },
     });
     handleFilterChange(updatedFilters);
@@ -99,17 +99,17 @@ export const JellyfinSongFilters = ({ handleFilterChange }: JellyfinSongFiltersP
       <Group grow>
         <NumberInput
           required
+          defaultValue={filter.jfParams?.minYear}
           label="From year"
           max={2300}
           min={1700}
-          value={filter.jfParams?.minYear}
           onChange={handleMinYearFilter}
         />
         <NumberInput
+          defaultValue={filter.jfParams?.maxYear}
           label="To year"
           max={2300}
           min={1700}
-          value={filter.jfParams?.maxYear}
           onChange={handleMaxYearFilter}
         />
       </Group>

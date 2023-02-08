@@ -2,7 +2,7 @@ import { MouseEvent } from 'react';
 import { Stack, Grid, Accordion, Center, Group, Divider, Box } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button, MotionStack, Spinner, TextInput } from '/@/renderer/components';
+import { Button, DropdownMenu, MotionStack, Spinner, TextInput } from '/@/renderer/components';
 import {
   RiAddFill,
   RiAlbumFill,
@@ -18,6 +18,7 @@ import {
   RiHome5Fill,
   RiHome5Line,
   RiListUnordered,
+  RiMenuFill,
   RiMusic2Fill,
   RiMusic2Line,
   RiSearchLine,
@@ -38,10 +39,12 @@ import { fadeIn } from '/@/renderer/styles';
 import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
 import { PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import { SidebarPlaylistList } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
+import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
+import { useContainerQuery } from '/@/renderer/hooks';
 
 const SidebarContainer = styled.div`
   height: 100%;
-  max-height: calc(100vh - 85px); // Account for playerbar
+  max-height: calc(100vh - 149px); // Playerbar (90px), titlebar (65px)
   user-select: none;
 `;
 
@@ -69,7 +72,13 @@ const SidebarImage = styled.img`
 `;
 
 const ActionsContainer = styled(Grid)`
+  height: 65px;
+  padding: 1rem;
   -webkit-app-region: drag;
+
+  input {
+    -webkit-app-region: no-drag;
+  }
 `;
 
 export const Sidebar = () => {
@@ -103,8 +112,59 @@ export const Sidebar = () => {
     startIndex: 0,
   });
 
+  const cq = useContainerQuery({ sm: 300 });
+
   return (
-    <SidebarContainer>
+    <SidebarContainer ref={cq.ref}>
+      <ActionsContainer gutter="sm">
+        <Grid.Col span={cq.isSm ? 7 : 5}>
+          <TextInput
+            disabled
+            readOnly
+            icon={<RiSearchLine />}
+            placeholder="Search"
+            size="md"
+          />
+        </Grid.Col>
+        <Grid.Col span={cq.isSm ? 5 : 7}>
+          <Group
+            grow
+            noWrap
+            spacing="sm"
+          >
+            <DropdownMenu position="bottom-start">
+              <DropdownMenu.Target>
+                <Button
+                  p="0.5rem"
+                  size="md"
+                  variant="default"
+                >
+                  <RiMenuFill size="1rem" />
+                </Button>
+              </DropdownMenu.Target>
+              <DropdownMenu.Dropdown>
+                <AppMenu />
+              </DropdownMenu.Dropdown>
+            </DropdownMenu>
+            <Button
+              p="0.5rem"
+              size="md"
+              variant="default"
+              onClick={() => navigate(-1)}
+            >
+              <RiArrowLeftSLine size="1.5rem" />
+            </Button>
+            <Button
+              p="0.5rem"
+              size="md"
+              variant="default"
+              onClick={() => navigate(1)}
+            >
+              <RiArrowRightSLine size="1.5rem" />
+            </Button>
+          </Group>
+        </Grid.Col>
+      </ActionsContainer>
       <Stack
         h="100%"
         justify="space-between"
@@ -115,47 +175,6 @@ export const Sidebar = () => {
           spacing={0}
           sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
         >
-          <ActionsContainer
-            gutter="sm"
-            p={10}
-          >
-            <Grid.Col span={8}>
-              <TextInput
-                disabled
-                readOnly
-                icon={<RiSearchLine />}
-                placeholder="Search"
-                rightSectionWidth={90}
-                size="md"
-              />
-            </Grid.Col>
-            <Grid.Col span={4}>
-              <Group
-                grow
-                spacing="sm"
-              >
-                <Button
-                  px={5}
-                  size="md"
-                  sx={{ color: 'var(--titlebar-fg)' }}
-                  variant="default"
-                  onClick={() => navigate(-1)}
-                >
-                  <RiArrowLeftSLine size={20} />
-                </Button>
-                <Button
-                  px={5}
-                  size="md"
-                  sx={{ color: 'var(--titlebar-fg)' }}
-                  variant="default"
-                  onClick={() => navigate(1)}
-                >
-                  <RiArrowRightSLine size={20} />
-                </Button>
-              </Group>
-            </Grid.Col>
-          </ActionsContainer>
-
           <Stack spacing={0}>
             <SidebarItem
               px="1rem"
@@ -253,11 +272,14 @@ export const Sidebar = () => {
               </Accordion.Item>
             </Accordion>
           </Stack>
-          <Divider my="0.5rem" />
+          <Divider
+            mx="1rem"
+            my="0.5rem"
+          />
           <Group
             position="apart"
             pt="1rem"
-            px="1rem"
+            px="1.5rem"
           >
             <Group>
               <Box

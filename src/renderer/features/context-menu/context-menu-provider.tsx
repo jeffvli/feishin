@@ -40,7 +40,7 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useDeletePlaylist } from '/@/renderer/features/playlists';
 import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
 import { useCreateFavorite, useDeleteFavorite, useUpdateRating } from '/@/renderer/features/shared';
-import { useCurrentServer } from '/@/renderer/store';
+import { useAuthStore, useCurrentServer } from '/@/renderer/store';
 import { Play } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
@@ -64,6 +64,10 @@ const ContextMenuContext = createContext<ContextMenuContextProps>({
     return args;
   },
 });
+
+const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating'];
+// const NAVIDROME_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
+// const SUBSONIC_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 
 export interface ContextMenuProviderProps {
   children: React.ReactNode;
@@ -92,6 +96,13 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const openContextMenu = (args: OpenContextMenuProps) => {
     const { xPos, yPos, menuItems, data, type, tableRef, dataNodes, context } = args;
 
+    const serverType = data[0]?.serverType || useAuthStore.getState().currentServer?.type;
+    let validMenuItems = menuItems;
+
+    if (serverType === ServerType.JELLYFIN) {
+      validMenuItems = menuItems.filter((item) => !JELLYFIN_IGNORED_MENU_ITEMS.includes(item.id));
+    }
+
     // If the context menu dimension can't be automatically calculated, calculate it manually
     // This is a hacky way since resize observer may not automatically recalculate when not rendered
     const menuHeight = menuRect.height || (menuItems.length + 1) * 50;
@@ -107,7 +118,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       context,
       data,
       dataNodes,
-      menuItems,
+      menuItems: validMenuItems,
       tableRef,
       type,
       xPos: calculatedXPos,
@@ -187,8 +198,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
           },
           onSuccess: () => {
             toast.success({
-              message: `${item.name} was successfully deleted`,
-              title: 'Playlist deleted',
+              message: `Playlist has been deleted`,
             });
           },
         },
@@ -269,9 +279,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     let nodesToUnfavorite: RowNode<any>[] = [];
 
     if (ctx.dataNodes) {
-      nodesToUnfavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
+      nodesToUnfavorite = ctx.dataNodes.filter((item) => item.data.userFavorite);
     } else {
-      itemsToUnfavorite = ctx.data.filter((item) => !item.userFavorite);
+      itemsToUnfavorite = ctx.data.filter((item) => item.userFavorite);
     }
 
     const idsToUnfavorite = nodesToUnfavorite
@@ -304,7 +314,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
     if (ctx.dataNodes) {
       for (const node of ctx.dataNodes) {
-        switch (node.data.type) {
+        switch (node.data.itemType) {
           case LibraryItem.ALBUM:
             albumId.push(node.data.id);
             break;
@@ -318,7 +328,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       }
     } else {
       for (const item of ctx.data) {
-        switch (item.type) {
+        switch (item.itemType) {
           case LibraryItem.ALBUM:
             albumId.push(item.id);
             break;
@@ -370,7 +380,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
           onSuccess: () => {
             toast.success({
               message: `${songId.length} song(s) were removed from the playlist`,
-              title: 'Song(s) removed from playlist',
             });
             ctx.context?.tableRef?.current?.api?.refreshInfiniteCache();
             closeAllModals();
@@ -432,13 +441,24 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
           items = ctx.data.filter((item) => item.serverId === serverId);
         }
 
-        updateRatingMutation.mutate({
-          _serverId: serverId,
-          query: {
-            item: items,
-            rating,
+        updateRatingMutation.mutate(
+          {
+            _serverId: serverId,
+            query: {
+              item: items,
+              rating,
+            },
           },
-        });
+          {
+            onSuccess: () => {
+              if (ctx.dataNodes) {
+                for (const node of ctx.dataNodes) {
+                  node.setData({ ...node.data, userRating: rating });
+                }
+              }
+            },
+          },
+        );
       }
     },
     [ctx.data, ctx.dataNodes, updateRatingMutation],
@@ -625,17 +645,15 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <HoverCard.Dropdown>
                               <Stack spacing={0}>
                                 {contextMenuItems[item.id].children?.map((child) => (
-                                  <>
-                                    <ContextMenuButton
-                                      key={`sub-${child.id}`}
-                                      disabled={child.disabled}
-                                      leftIcon={child.leftIcon}
-                                      rightIcon={child.rightIcon}
-                                      onClick={child.onClick}
-                                    >
-                                      {child.label}
-                                    </ContextMenuButton>
-                                  </>
+                                  <ContextMenuButton
+                                    key={`sub-${child.id}`}
+                                    disabled={child.disabled}
+                                    leftIcon={child.leftIcon}
+                                    rightIcon={child.rightIcon}
+                                    onClick={child.onClick}
+                                  >
+                                    {child.label}
+                                  </ContextMenuButton>
                                 ))}
                               </Stack>
                             </HoverCard.Dropdown>

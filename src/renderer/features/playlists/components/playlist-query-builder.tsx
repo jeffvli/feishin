@@ -359,7 +359,7 @@ export const PlaylistQueryBuilder = forwardRef(
     return (
       <MotionFlex
         direction="column"
-        h="calc(100% - 3rem)"
+        h="calc(100% - 2.5rem)"
         justify="space-between"
       >
         <ScrollArea
@@ -393,11 +393,12 @@ export const PlaylistQueryBuilder = forwardRef(
         <Group
           noWrap
           align="flex-end"
-          p="1rem"
+          m="1rem"
           position="apart"
         >
           <Group
             noWrap
+            spacing="sm"
             w="100%"
           >
             <Select
@@ -405,7 +406,7 @@ export const PlaylistQueryBuilder = forwardRef(
               data={sortOptions}
               label="Sort"
               maxWidth="20%"
-              width={125}
+              width={150}
               {...extraFiltersForm.getInputProps('sortBy')}
             />
             <Select
@@ -432,7 +433,10 @@ export const PlaylistQueryBuilder = forwardRef(
             />
           </Group>
           {onSave && onSaveAs && (
-            <Group noWrap>
+            <Group
+              noWrap
+              spacing="sm"
+            >
               <Button
                 loading={isSaving}
                 variant="filled"
@@ -453,12 +457,7 @@ export const PlaylistQueryBuilder = forwardRef(
                 <DropdownMenu.Dropdown>
                   <DropdownMenu.Item
                     $danger
-                    rightSection={
-                      <RiSaveLine
-                        color="var(--danger-color)"
-                        size={15}
-                      />
-                    }
+                    icon={<RiSaveLine color="var(--danger-color)" />}
                     onClick={handleSave}
                   >
                     Save and replace

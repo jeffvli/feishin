@@ -90,12 +90,12 @@ export const LibraryHeader = forwardRef(
       : cq.isLg
       ? '5.5rem'
       : cq.isMd
-      ? '4.5rem'
+      ? '5rem'
       : cq.isSm
-      ? '3.5rem'
-      : '2rem';
+      ? '4.5rem'
+      : '3rem';
 
-    const imageSize = cq.isLg ? 225 : cq.isMd ? 200 : cq.isSm ? 175 : 150;
+    const imageSize = cq.isLg ? 250 : cq.isMd ? 225 : cq.isSm ? 200 : 175;
 
     return (
       <HeaderContainer
@@ -142,10 +142,10 @@ export const LibraryHeader = forwardRef(
             </Text>
           </Group>
           <TextTitle
-            lh="5.1rem"
+            lh={1.15}
             lineClamp={2}
-            mb="1rem"
             overflow="hidden"
+            pb={cq.isXs ? '0' : cq.isSm ? '0.2rem' : '0.36rem'}
             sx={{ fontSize: titleSize, overflow: 'hidden' }}
             weight={900}
           >

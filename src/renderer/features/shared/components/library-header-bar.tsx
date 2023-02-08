@@ -15,6 +15,7 @@ export const LibraryHeaderBar = ({ children }: LibraryHeaderBarProps) => {
       h="100%"
       px="1rem"
       spacing="md"
+      w="100%"
     >
       {children}
     </Group>

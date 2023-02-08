@@ -30,15 +30,19 @@ const showToast = ({ type, ...props }: NotificationProps) => {
       ? 'Error'
       : 'Info';
 
-  const defaultDuration = type === 'error' ? 3500 : 2000;
+  const defaultDuration = type === 'error' ? 4000 : 2000;
 
   return showNotification({
     autoClose: defaultDuration,
     styles: () => ({
-      closeButton: {},
+      closeButton: {
+        '&:hover': {
+          background: 'transparent',
+        },
+      },
       description: {
         color: 'var(--toast-description-fg)',
-        fontSize: '.9em',
+        fontSize: '1rem',
       },
       loader: {
         margin: '1rem',
@@ -46,10 +50,12 @@ const showToast = ({ type, ...props }: NotificationProps) => {
       root: {
         '&::before': { backgroundColor: color },
         background: 'var(--toast-bg)',
+        border: '2px solid var(--generic-border-color)',
+        bottom: '90px',
       },
       title: {
         color: 'var(--toast-title-fg)',
-        fontSize: '1em',
+        fontSize: '1.3rem',
       },
     }),
     title: defaultTitle,

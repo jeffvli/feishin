@@ -1,10 +1,24 @@
-import { Text } from '/@/renderer/components';
+import { RiMenuFill } from 'react-icons/ri';
+import { Button, DropdownMenu, Text } from '/@/renderer/components';
+import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 
 export const ServerRequired = () => {
   return (
     <>
       <Text>No server selected.</Text>
-      <Text>Add or select a server in the file menu.</Text>
+      <DropdownMenu>
+        <DropdownMenu.Target>
+          <Button
+            leftIcon={<RiMenuFill />}
+            variant="filled"
+          >
+            Open menu
+          </Button>
+        </DropdownMenu.Target>
+        <DropdownMenu.Dropdown>
+          <AppMenu />
+        </DropdownMenu.Dropdown>
+      </DropdownMenu>
     </>
   );
 };

@@ -143,7 +143,7 @@ export const AlbumArtistDiscographyHeader = ({ itemCount, tableRef }: SongListHe
           );
 
           const songs = api.normalize.songList(songsRes, server);
-          params.successCallback(songs?.items || [], songsRes?.totalRecordCount);
+          params.successCallback(songs?.items || [], songsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };

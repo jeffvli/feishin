@@ -3,28 +3,28 @@ import {
   Button,
   getColumnDefs,
   GridCarousel,
+  Text,
   TextTitle,
   useFixedTableHeader,
   VirtualTable,
 } from '/@/renderer/components';
-import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
+import { ColDef, RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
-import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
+import { RiDiscFill, RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
-import { useSongListStore } from '/@/renderer/store';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { PersistedTableColumn, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import {
   useHandleGeneralContextMenu,
   useHandleTableContextMenu,
 } from '/@/renderer/features/context-menu';
-import { Play } from '/@/renderer/types';
+import { Play, ServerType, TableColumn } from '/@/renderer/types';
 import {
   ALBUM_CONTEXT_MENU_ITEMS,
   SONG_CONTEXT_MENU_ITEMS,
@@ -34,11 +34,14 @@ import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-que
 import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 
+const isFullWidthRow = (node: RowNode) => {
+  return node.id?.includes('disc-');
+};
+
 const ContentContainer = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  max-width: 1920px;
   padding: 1rem 2rem 5rem;
   overflow: hidden;
 
@@ -61,13 +64,82 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
   const cq = useContainerQuery();
   const handlePlayQueueAdd = usePlayQueueAdd();
 
-  const page = useSongListStore();
+  // TODO: Make this customizable
+  const columnDefs: ColDef[] = useMemo(() => {
+    const userRatingColumn =
+      detailQuery?.data?.serverType !== ServerType.JELLYFIN
+        ? [
+            {
+              column: TableColumn.USER_RATING,
+              width: 0,
+            },
+          ]
+        : [];
 
-  const columnDefs: ColDef[] = useMemo(
-    () =>
-      getColumnDefs(page.table.columns).filter((c) => c.colId !== 'album' && c.colId !== 'artist'),
-    [page.table.columns],
-  );
+    const cols: PersistedTableColumn[] = [
+      {
+        column: TableColumn.TRACK_NUMBER,
+        width: 0,
+      },
+      {
+        column: TableColumn.TITLE_COMBINED,
+        width: 0,
+      },
+
+      {
+        column: TableColumn.DURATION,
+        width: 0,
+      },
+      {
+        column: TableColumn.BIT_RATE,
+        width: 0,
+      },
+      {
+        column: TableColumn.PLAY_COUNT,
+        width: 0,
+      },
+      {
+        column: TableColumn.LAST_PLAYED,
+        width: 0,
+      },
+      ...userRatingColumn,
+      {
+        column: TableColumn.USER_FAVORITE,
+        width: 0,
+      },
+    ];
+    return getColumnDefs(cols).filter((c) => c.colId !== 'album' && c.colId !== 'artist');
+  }, [detailQuery?.data?.serverType]);
+
+  const getRowHeight = useCallback((params: RowHeightParams) => {
+    if (isFullWidthRow(params.node)) {
+      return 45;
+    }
+
+    return 60;
+  }, []);
+
+  const songsRowData = useMemo(() => {
+    if (!detailQuery.data?.songs) {
+      return [];
+    }
+
+    const uniqueDiscNumbers = new Set(detailQuery.data?.songs.map((s) => s.discNumber));
+
+    if (uniqueDiscNumbers.size === 1) {
+      return detailQuery.data?.songs;
+    }
+
+    const rowData: (QueueSong | { id: string; name: string })[] = [];
+
+    for (const discNumber of uniqueDiscNumbers.values()) {
+      const songsByDiscNumber = detailQuery.data?.songs.filter((s) => s.discNumber === discNumber);
+      rowData.push({ id: `disc-${discNumber}`, name: `DISC ${discNumber}` });
+      rowData.push(...songsByDiscNumber);
+    }
+
+    return rowData;
+  }, [detailQuery.data?.songs]);
 
   const [pagination, setPagination] = useSetState({
     artist: 0,
@@ -261,9 +333,29 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
           suppressRowDrag
           columnDefs={columnDefs}
           enableCellChangeFlash={false}
+          fullWidthCellRenderer={(data: any) => {
+            if (!data.data) return null;
+            return (
+              <Group
+                align="center"
+                h="100%"
+                spacing="sm"
+              >
+                <RiDiscFill />
+                <Text>{data.data.name}</Text>
+              </Group>
+            );
+          }}
+          getRowHeight={getRowHeight}
           getRowId={(data) => data.data.id}
-          rowData={detailQuery.data?.songs}
-          rowHeight={60}
+          isFullWidthRow={(data) => {
+            return isFullWidthRow(data.rowNode) || false;
+          }}
+          isRowSelectable={(data) => {
+            if (isFullWidthRow(data.data)) return false;
+            return true;
+          }}
+          rowData={songsRowData}
           rowSelection="multiple"
           onCellContextMenu={handleContextMenu}
           onRowDoubleClicked={handleRowDoubleClick}

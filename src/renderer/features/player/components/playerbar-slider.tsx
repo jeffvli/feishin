@@ -33,6 +33,11 @@ export const PlayerbarSlider = ({ ...props }: SliderProps) => {
           opacity: 0,
           width: '1rem',
         },
+        track: {
+          '&::before': {
+            backgroundColor: 'var(--playerbar-slider-track-bg)',
+          },
+        },
       }}
       {...props}
     />

@@ -138,13 +138,16 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         </Button>
       </Group>
       <Group>
-        <Popover transition="fade">
+        <Popover
+          position="top-end"
+          transition="fade"
+        >
           <Popover.Target>
             <Button
               compact
               size="md"
               tooltip={{ label: 'Configure' }}
-              variant="default"
+              variant="subtle"
             >
               <RiListSettingsLine size="1.1rem" />
             </Button>

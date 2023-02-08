@@ -8,8 +8,8 @@ import {
   RiSortDesc,
   RiFolder2Line,
   RiMoreFill,
-  RiSettings2Fill,
   RiRefreshLine,
+  RiSettings3Fill,
 } from 'react-icons/ri';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -168,7 +168,7 @@ export const AlbumArtistListHeaderFilters = ({
             const albumArtists = api.normalize.albumArtistList(albumArtistsRes, server);
             params.successCallback(
               albumArtists?.items || [],
-              albumArtistsRes?.totalRecordCount || undefined,
+              albumArtistsRes?.totalRecordCount || 0,
             );
           },
           rowCount: undefined,
@@ -379,14 +379,14 @@ export const AlbumArtistListHeaderFilters = ({
         </DropdownMenu>
       </Group>
       <Group>
-        <DropdownMenu position="bottom-start">
+        <DropdownMenu position="bottom-end">
           <DropdownMenu.Target>
             <Button
               compact
               size="md"
               variant="subtle"
             >
-              <RiSettings2Fill size="1.3rem" />
+              <RiSettings3Fill size="1.3rem" />
             </Button>
           </DropdownMenu.Target>
           <DropdownMenu.Dropdown>

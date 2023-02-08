@@ -1,16 +1,9 @@
-import { Flex, Group } from '@mantine/core';
-import { RiMoreFill } from 'react-icons/ri';
+import { RiAddBoxFill, RiAddCircleFill, RiMoreFill, RiPlayFill } from 'react-icons/ri';
 import { QueueSong } from '/@/renderer/api/types';
-import {
-  Button,
-  DropdownMenu,
-  PageHeader,
-  TextTitle,
-  Badge,
-  SpinnerIcon,
-} from '/@/renderer/components';
+import { Button, DropdownMenu, PageHeader, SpinnerIcon, Paper } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { useContainerQuery } from '/@/renderer/hooks';
+import { LibraryHeaderBar } from '/@/renderer/features/shared';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
 
 interface AlbumArtistDetailTopSongsListHeaderProps {
@@ -25,7 +18,7 @@ export const AlbumArtistDetailTopSongsListHeader = ({
   data,
 }: AlbumArtistDetailTopSongsListHeaderProps) => {
   const handlePlayQueueAdd = usePlayQueueAdd();
-  const cq = useContainerQuery();
+  const playButtonBehavior = usePlayButtonBehavior();
 
   const handlePlay = async (play: Play) => {
     handlePlayQueueAdd?.({
@@ -36,61 +29,49 @@ export const AlbumArtistDetailTopSongsListHeader = ({
 
   return (
     <PageHeader p="1rem">
-      <Flex
-        ref={cq.ref}
-        direction="row"
-        justify="space-between"
-      >
-        <Flex
-          align="center"
-          gap="md"
-          justify="center"
+      <LibraryHeaderBar>
+        <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+        <LibraryHeaderBar.Title>Top songs from {title}</LibraryHeaderBar.Title>
+        <Paper
+          fw="600"
+          px="1rem"
+          py="0.3rem"
+          radius="sm"
         >
-          <Button
-            compact
-            size="xl"
-            sx={{ paddingLeft: 0, paddingRight: 0 }}
-            variant="subtle"
-          >
-            <Group noWrap>
-              <TextTitle
-                maw="20vw"
-                order={2}
-                overflow="hidden"
-                weight={700}
-              >
-                {title}
-              </TextTitle>
-              <Badge
-                radius="xl"
-                size="lg"
-              >
-                {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
-              </Badge>
-            </Group>
-          </Button>
-          <DropdownMenu position="bottom-start">
-            <DropdownMenu.Target>
-              <Button
-                compact
-                fw="600"
-                variant="subtle"
-              >
-                <RiMoreFill size={15} />
-              </Button>
-            </DropdownMenu.Target>
-            <DropdownMenu.Dropdown>
-              <DropdownMenu.Item onClick={() => handlePlay(Play.NOW)}>Play</DropdownMenu.Item>
-              <DropdownMenu.Item onClick={() => handlePlay(Play.LAST)}>
-                Add to queue
-              </DropdownMenu.Item>
-              <DropdownMenu.Item onClick={() => handlePlay(Play.NEXT)}>
-                Add to queue next
-              </DropdownMenu.Item>
-            </DropdownMenu.Dropdown>
-          </DropdownMenu>
-        </Flex>
-      </Flex>
+          {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
+        </Paper>
+        <DropdownMenu position="bottom-start">
+          <DropdownMenu.Target>
+            <Button
+              compact
+              fw="600"
+              variant="subtle"
+            >
+              <RiMoreFill size={15} />
+            </Button>
+          </DropdownMenu.Target>
+          <DropdownMenu.Dropdown>
+            <DropdownMenu.Item
+              icon={<RiPlayFill />}
+              onClick={() => handlePlay(Play.NOW)}
+            >
+              Play
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              icon={<RiAddBoxFill />}
+              onClick={() => handlePlay(Play.LAST)}
+            >
+              Add to queue
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              icon={<RiAddCircleFill />}
+              onClick={() => handlePlay(Play.NEXT)}
+            >
+              Add to queue next
+            </DropdownMenu.Item>
+          </DropdownMenu.Dropdown>
+        </DropdownMenu>
+      </LibraryHeaderBar>
     </PageHeader>
   );
 };

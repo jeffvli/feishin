@@ -129,7 +129,7 @@ export const AlbumListHeader = ({
             );
 
             const albums = api.normalize.albumList(albumsRes, server);
-            params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || undefined);
+            params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || 0);
           },
           rowCount: undefined,
         };
@@ -209,13 +209,11 @@ export const AlbumListHeader = ({
       <PageHeader backgroundColor="var(--titlebar-bg)">
         <Flex
           justify="space-between"
-          py="1rem"
+          w="100%"
         >
           <LibraryHeaderBar>
-            <Group noWrap>
-              <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-              <LibraryHeaderBar.Title>{title || 'Albums'}</LibraryHeaderBar.Title>
-            </Group>
+            <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+            <LibraryHeaderBar.Title>{title || 'Albums'}</LibraryHeaderBar.Title>
             <Paper
               fw="600"
               px="1rem"

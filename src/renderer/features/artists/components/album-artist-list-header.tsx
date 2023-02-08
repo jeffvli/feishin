@@ -108,7 +108,7 @@ export const AlbumArtistListHeader = ({
             const albumArtists = api.normalize.albumArtistList(albumArtistsRes, server);
             params.successCallback(
               albumArtists?.items || [],
-              albumArtistsRes?.totalRecordCount || undefined,
+              albumArtistsRes?.totalRecordCount || 0,
             );
           },
           rowCount: undefined,
@@ -151,12 +151,10 @@ export const AlbumArtistListHeader = ({
       <PageHeader backgroundColor="var(--titlebar-bg)">
         <Flex
           justify="space-between"
-          py="1rem"
+          w="100%"
         >
           <LibraryHeaderBar>
-            <Group noWrap>
-              <LibraryHeaderBar.Title>Album Artists</LibraryHeaderBar.Title>
-            </Group>
+            <LibraryHeaderBar.Title>Album Artists</LibraryHeaderBar.Title>
             <Paper
               fw="600"
               px="1rem"

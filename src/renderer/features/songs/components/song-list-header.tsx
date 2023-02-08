@@ -72,7 +72,7 @@ export const SongListHeader = ({
           );
 
           const songs = api.normalize.songList(songsRes, server);
-          params.successCallback(songs?.items || [], songsRes?.totalRecordCount);
+          params.successCallback(songs?.items || [], songsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };
@@ -114,13 +114,11 @@ export const SongListHeader = ({
       <PageHeader backgroundColor="var(--titlebar-bg)">
         <Flex
           justify="space-between"
-          py="1rem"
+          w="100%"
         >
           <LibraryHeaderBar>
-            <Group>
-              <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-              <LibraryHeaderBar.Title>{title || 'Tracks'}</LibraryHeaderBar.Title>
-            </Group>
+            <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+            <LibraryHeaderBar.Title>{title || 'Tracks'}</LibraryHeaderBar.Title>
             <Paper
               fw="600"
               px="1rem"

@@ -1,7 +1,7 @@
 import { forwardRef, Fragment, Ref } from 'react';
 import { Group, Stack } from '@mantine/core';
 import { useParams } from 'react-router';
-import { Text } from '/@/renderer/components';
+import { Badge, Text } from '/@/renderer/components';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { LibraryHeader } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -35,6 +35,8 @@ export const PlaylistDetailHeader = forwardRef(
       },
     ];
 
+    const isSmartPlaylist = detailQuery?.data?.rules;
+
     return (
       <Stack>
         <LibraryHeader
@@ -46,13 +48,24 @@ export const PlaylistDetailHeader = forwardRef(
           title={detailQuery?.data?.name || ''}
         >
           <Stack>
-            <Group>
+            <Group spacing="sm">
               {metadataItems.map((item, index) => (
                 <Fragment key={`item-${item.id}-${index}`}>
                   {index > 0 && <Text $noSelect>•</Text>}
                   <Text $secondary={item.secondary}>{item.value}</Text>
                 </Fragment>
               ))}
+              {isSmartPlaylist && (
+                <>
+                  <Text $noSelect>•</Text>
+                  <Badge
+                    radius="sm"
+                    size="md"
+                  >
+                    Smart Playlist
+                  </Badge>
+                </>
+              )}
             </Group>
             <Text lineClamp={3}>{detailQuery?.data?.description}</Text>
           </Stack>

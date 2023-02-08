@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Stack } from '@mantine/core';
+import { Box, Flex } from '@mantine/core';
 import { PlayQueueListControls } from './play-queue-list-controls';
 import { Song } from '/@/renderer/api/types';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
@@ -9,18 +9,29 @@ export const DrawerPlayQueue = () => {
   const queueRef = useRef<{ grid: AgGridReactType<Song> } | null>(null);
 
   return (
-    <Stack
+    <Flex
+      direction="column"
       h="100%"
-      spacing={0}
+      sx={{
+        borderTopLeftRadius: '5px',
+        borderTopRightRadius: '5px',
+      }}
     >
-      <PlayQueue
-        ref={queueRef}
-        type="sideQueue"
-      />
-      <PlayQueueListControls
-        tableRef={queueRef}
-        type="sideQueue"
-      />
-    </Stack>
+      <Box
+        bg="var(--main-bg)"
+        sx={{ borderTopLeftRadius: '5px', borderTopRightRadius: '5px' }}
+      >
+        <PlayQueueListControls
+          tableRef={queueRef}
+          type="sideQueue"
+        />
+      </Box>
+      <Flex h="100%">
+        <PlayQueue
+          ref={queueRef}
+          type="sideQueue"
+        />
+      </Flex>
+    </Flex>
   );
 };

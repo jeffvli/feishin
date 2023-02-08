@@ -1,20 +1,15 @@
-import { Group } from '@mantine/core';
-import { PageHeader, TextTitle } from '/@/renderer/components';
+import { PageHeader } from '/@/renderer/components';
+import { LibraryHeaderBar } from '/@/renderer/features/shared';
 
 export const NowPlayingHeader = () => {
   // const currentSong = useCurrentSong();
   // const theme = useTheme();
 
   return (
-    <PageHeader>
-      <Group p="1rem">
-        <TextTitle
-          order={2}
-          weight={700}
-        >
-          Queue
-        </TextTitle>
-      </Group>
+    <PageHeader backgroundColor="var(--titlebar-bg)">
+      <LibraryHeaderBar>
+        <LibraryHeaderBar.Title>Queue</LibraryHeaderBar.Title>
+      </LibraryHeaderBar>
     </PageHeader>
   );
 };

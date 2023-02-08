@@ -103,7 +103,7 @@ export const PlaylistListHeaderFilters = ({ tableRef }: PlaylistListHeaderFilter
           );
 
           const playlists = api.normalize.playlistList(playlistsRes, server);
-          params.successCallback(playlists?.items || [], playlistsRes?.totalRecordCount);
+          params.successCallback(playlists?.items || [], playlistsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };
@@ -257,7 +257,7 @@ export const PlaylistListHeaderFilters = ({ tableRef }: PlaylistListHeaderFilter
         </DropdownMenu>
       </Group>
       <Group>
-        <DropdownMenu position="bottom-start">
+        <DropdownMenu position="bottom-end">
           <DropdownMenu.Target>
             <Button
               compact
