@@ -120,7 +120,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
         rowCount: undefined,
       };
       params.api.setDatasource(dataSource);
-      params.api.ensureIndexVisible(pagination.scrollOffset, 'top');
+      params.api?.ensureIndexVisible(pagination.scrollOffset, 'top');
     },
     [filters, pagination.scrollOffset, playlistId, queryClient, server],
   );
@@ -135,9 +135,13 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     (event: PaginationChangedEvent) => {
       if (!isPaginationEnabled || !event.api) return;
 
-      // Scroll to top of page on pagination change
-      const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage;
-      event.api?.ensureIndexVisible(currentPageStartIndex, 'top');
+      try {
+        // Scroll to top of page on pagination change
+        const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage;
+        event.api?.ensureIndexVisible(currentPageStartIndex, 'top');
+      } catch (err) {
+        console.log(err);
+      }
 
       setPagination(playlistId, {
         itemsPerPage: event.api.paginationGetPageSize(),
@@ -235,6 +239,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
         >
           {page.display === ListDisplayType.TABLE_PAGINATED && (
             <TablePagination
+              id={playlistId}
               pagination={pagination}
               setIdPagination={setPagination}
               tableRef={tableRef}
