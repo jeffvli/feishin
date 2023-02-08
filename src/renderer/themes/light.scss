@@ -35,7 +35,8 @@ body[data-theme='defaultLight'] {
   --tooltip-fg: rgb(0, 0, 0);
 
   --scrollbar-track-bg: transparent;
-  --scrollbar-thumb-bg: rgb(140, 140, 140);
+  --scrollbar-thumb-bg: rgba(140, 140, 140, 0.3);
+  --scrollbar-thumb-bg: rgba(140, 140, 140, 0.6);
 
   --btn-primary-bg: var(--primary-color);
   --btn-primary-fg: #ffffff;
