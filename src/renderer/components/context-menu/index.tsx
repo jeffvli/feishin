@@ -1,5 +1,5 @@
 import { forwardRef, ReactNode, Ref } from 'react';
-import { Grid, Group, UnstyledButton, UnstyledButtonProps } from '@mantine/core';
+import { Box, Group, UnstyledButton, UnstyledButtonProps } from '@mantine/core';
 import { motion, Variants } from 'framer-motion';
 import styled from 'styled-components';
 
@@ -75,26 +75,13 @@ export const ContextMenuButton = forwardRef(
         disabled={props.disabled}
         onClick={props.onClick}
       >
-        <Grid>
-          <Grid.Col
-            span={2}
-            sx={{ alignSelf: 'center' }}
-          >
-            {leftIcon}
-          </Grid.Col>
-          <Grid.Col span={8}>{children} </Grid.Col>
-          <Grid.Col
-            span={2}
-            sx={{ alignSelf: 'center' }}
-          >
-            <Group
-              align="flex-end"
-              position="right"
-            >
-              {rightIcon}
-            </Group>
-          </Grid.Col>
-        </Grid>
+        <Group position="apart">
+          <Group spacing="md">
+            <Box>{leftIcon}</Box>
+            <Box mr="2rem">{children}</Box>
+          </Group>
+          <Box>{rightIcon}</Box>
+        </Group>
       </StyledContextMenuButton>
     );
   },
