@@ -280,6 +280,7 @@
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
     "memoize-one": "^6.0.0",
+    "mpris-service": "^2.1.2",
     "nanoid": "^3.3.3",
     "net": "^1.0.2",
     "node-mpv": "^2.0.0-beta.2",

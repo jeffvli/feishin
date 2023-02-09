@@ -17,7 +17,12 @@ export const AppOutlet = () => {
     const getMpvPath = async () => {
       if (!isElectron()) return setIsMpvRequired(false);
       const mpvPath = await localSettings.get('mpv_path');
-      return setIsMpvRequired(!mpvPath);
+
+      if (mpvPath) {
+        return setIsMpvRequired(false);
+      }
+
+      return setIsMpvRequired(true);
     };
 
     getMpvPath();

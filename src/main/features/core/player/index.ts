@@ -1,83 +1,8 @@
 import { ipcMain } from 'electron';
-import uniq from 'lodash/uniq';
-import MpvAPI from 'node-mpv';
-import { store } from '../settings';
-import { getMainWindow } from '../../../main';
+import { mpv } from '../../../main';
 import { PlayerData } from '/@/renderer/store';
 
 declare module 'node-mpv';
-
-const BINARY_PATH = store.get('mpv_path') as string | undefined;
-const MPV_PARAMETERS = store.get('mpv_parameters') as Array<string> | undefined;
-const DEFAULT_MPV_PARAMETERS = () => {
-  const parameters = [];
-  if (
-    !MPV_PARAMETERS?.includes('--gapless-audio=weak') ||
-    !MPV_PARAMETERS?.includes('--gapless-audio=no') ||
-    !MPV_PARAMETERS?.includes('--gapless-audio=yes') ||
-    !MPV_PARAMETERS?.includes('--gapless-audio')
-  ) {
-    parameters.push('--gapless-audio=yes');
-  }
-
-  if (
-    !MPV_PARAMETERS?.includes('--prefetch-playlist=no') ||
-    !MPV_PARAMETERS?.includes('--prefetch-playlist=yes') ||
-    !MPV_PARAMETERS?.includes('--prefetch-playlist')
-  ) {
-    parameters.push('--prefetch-playlist=yes');
-  }
-
-  return parameters;
-};
-
-const mpv = new MpvAPI(
-  {
-    audio_only: true,
-    auto_restart: true,
-    binary: BINARY_PATH || '',
-    time_update: 1,
-  },
-  MPV_PARAMETERS
-    ? uniq([...DEFAULT_MPV_PARAMETERS(), ...MPV_PARAMETERS])
-    : DEFAULT_MPV_PARAMETERS(),
-);
-
-mpv.start().catch((error) => {
-  console.log('error starting mpv', error);
-});
-
-mpv.on('status', (status) => {
-  if (status.property === 'playlist-pos') {
-    if (status.value !== 0) {
-      getMainWindow()?.webContents.send('renderer-player-auto-next');
-    }
-  }
-});
-
-// Automatically updates the play button when the player is playing
-mpv.on('resumed', () => {
-  getMainWindow()?.webContents.send('renderer-player-play');
-});
-
-// Automatically updates the play button when the player is stopped
-mpv.on('stopped', () => {
-  getMainWindow()?.webContents.send('renderer-player-stop');
-});
-
-// Automatically updates the play button when the player is paused
-mpv.on('paused', () => {
-  getMainWindow()?.webContents.send('renderer-player-pause');
-});
-
-mpv.on('quit', () => {
-  console.log('mpv quit');
-});
-
-// Event output every interval set by time_update, used to update the current time
-mpv.on('timeposition', (time: number) => {
-  getMainWindow()?.webContents.send('renderer-player-current-time', time);
-});
 
 // Starts the player
 ipcMain.on('player-play', async () => {
@@ -161,5 +86,5 @@ ipcMain.on('player-mute', async () => {
 });
 
 ipcMain.on('player-quit', async () => {
-  await mpv.quit();
+  await mpv.stop();
 });

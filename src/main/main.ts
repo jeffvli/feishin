@@ -13,11 +13,15 @@ import { app, BrowserWindow, shell, ipcMain, globalShortcut } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
+import uniq from 'lodash/uniq';
+import MpvAPI from 'node-mpv';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './utils';
 import './features';
+
+declare module 'node-mpv';
 
 export default class AppUpdater {
   constructor() {
@@ -95,6 +99,7 @@ const createWindow = async () => {
 
   ipcMain.on('window-maximize', () => {
     mainWindow?.maximize();
+    mainWindow?.webContents.send('renderer-player-quit');
   });
 
   ipcMain.on('window-unmaximize', () => {
@@ -142,6 +147,7 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', () => {
+    // mainWindow?.webContents.send('renderer-player-quit');
     mainWindow = null;
   });
 
@@ -169,16 +175,88 @@ export const getMainWindow = () => {
   return mainWindow;
 };
 
+const BINARY_PATH = store.get('mpv_path') as string | undefined;
+const MPV_PARAMETERS = store.get('mpv_parameters') as Array<string> | undefined;
+const DEFAULT_MPV_PARAMETERS = () => {
+  const parameters = [];
+  if (
+    !MPV_PARAMETERS?.includes('--gapless-audio=weak') ||
+    !MPV_PARAMETERS?.includes('--gapless-audio=no') ||
+    !MPV_PARAMETERS?.includes('--gapless-audio=yes') ||
+    !MPV_PARAMETERS?.includes('--gapless-audio')
+  ) {
+    parameters.push('--gapless-audio=yes');
+  }
+
+  if (
+    !MPV_PARAMETERS?.includes('--prefetch-playlist=no') ||
+    !MPV_PARAMETERS?.includes('--prefetch-playlist=yes') ||
+    !MPV_PARAMETERS?.includes('--prefetch-playlist')
+  ) {
+    parameters.push('--prefetch-playlist=yes');
+  }
+
+  return parameters;
+};
+
+export const mpv = new MpvAPI(
+  {
+    audio_only: true,
+    auto_restart: true,
+    binary: BINARY_PATH || '',
+    time_update: 1,
+  },
+  MPV_PARAMETERS
+    ? uniq([...DEFAULT_MPV_PARAMETERS(), ...MPV_PARAMETERS])
+    : DEFAULT_MPV_PARAMETERS(),
+);
+
+mpv.start().catch((error) => {
+  console.log('error starting mpv', error);
+});
+
+mpv.on('status', (status) => {
+  if (status.property === 'playlist-pos') {
+    if (status.value !== 0) {
+      getMainWindow()?.webContents.send('renderer-player-auto-next');
+    }
+  }
+});
+
+// Automatically updates the play button when the player is playing
+mpv.on('resumed', () => {
+  getMainWindow()?.webContents.send('renderer-player-play');
+});
+
+// Automatically updates the play button when the player is stopped
+mpv.on('stopped', () => {
+  getMainWindow()?.webContents.send('renderer-player-stop');
+});
+
+// Automatically updates the play button when the player is paused
+mpv.on('paused', () => {
+  getMainWindow()?.webContents.send('renderer-player-pause');
+});
+
+// Event output every interval set by time_update, used to update the current time
+mpv.on('timeposition', (time: number) => {
+  getMainWindow()?.webContents.send('renderer-player-current-time', time);
+});
+
 app.on('before-quit', () => {
-  mainWindow?.webContents.send('renderer-player-quit');
+  mpv.stop();
 });
 
 app.on('window-all-closed', () => {
+  globalShortcut.unregisterAll();
+
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
-  globalShortcut.unregisterAll();
   if (process.platform !== 'darwin') {
     app.quit();
+  } else {
+    mpv.stop();
+    mainWindow = null;
   }
 });
 
