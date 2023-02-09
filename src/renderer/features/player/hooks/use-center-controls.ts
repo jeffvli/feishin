@@ -169,7 +169,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
         play();
       },
       web: () => {
-        autoNext();
+        const playerData = autoNext();
+        mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
       },
     };
 
@@ -257,7 +258,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
         mpvPlayer.next();
       },
       web: () => {
-        next();
+        const playerData = next();
+        mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
       },
     };
 
@@ -278,11 +280,13 @@ export const useCenterControls = (args: { playersRef: any }) => {
       },
       web: () => {
         if (isLastTrack) {
-          setCurrentIndex(0);
+          const playerData = setCurrentIndex(0);
+          mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
           resetPlayers();
           pause();
         } else {
-          next();
+          const playerData = next();
+          mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
           resetPlayers();
         }
       },
@@ -297,7 +301,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
       },
       web: () => {
         if (!isLastTrack) {
-          next();
+          const playerData = next();
+          mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
         }
       },
     };
@@ -338,7 +343,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     if (currentTime >= 10) {
       setCurrentTime(0);
       handleScrobbleFromSongRestart(currentTime);
-
+      mpris?.updateSeek(0);
       if (isMpvPlayer) {
         return mpvPlayer.seekTo(0);
       }
@@ -363,10 +368,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
       },
       web: () => {
         if (isFirstTrack) {
-          setCurrentIndex(queue.length - 1);
+          const playerData = setCurrentIndex(queue.length - 1);
+          mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
           resetPlayers();
         } else {
-          previous();
+          const playerData = previous();
+          mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
           resetPlayers();
         }
       },
@@ -385,9 +392,11 @@ export const useCenterControls = (args: { playersRef: any }) => {
       web: () => {
         if (isFirstTrack) {
           resetPlayers();
+          mprisUpdateSong({ status: PlayerStatus.PAUSED });
           pause();
         } else {
-          previous();
+          const playerData = previous();
+          mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
           resetPlayers();
         }
       },
@@ -405,7 +414,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
         }
       },
       web: () => {
-        previous();
+        const playerData = previous();
+        mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
         resetPlayers();
       },
     };
@@ -458,14 +468,15 @@ export const useCenterControls = (args: { playersRef: any }) => {
       ? usePlayerStore.getState().current.time
       : currentPlayerRef.getCurrentTime();
 
+    const evaluatedTime = currentTime - seconds;
+    const newTime = evaluatedTime < 0 ? 0 : evaluatedTime;
+    setCurrentTime(newTime);
+    mpris?.updateSeek(newTime);
+
     if (isMpvPlayer) {
-      const newTime = currentTime - seconds;
       mpvPlayer.seek(-seconds);
-      setCurrentTime(newTime < 0 ? 0 : newTime);
     } else {
-      const newTime = currentTime - seconds;
       resetNextPlayer();
-      setCurrentTime(newTime);
       currentPlayerRef.seekTo(newTime);
     }
   };
@@ -478,12 +489,14 @@ export const useCenterControls = (args: { playersRef: any }) => {
     if (isMpvPlayer) {
       const newTime = currentTime + seconds;
       mpvPlayer.seek(seconds);
+      mpris?.updateSeek(newTime);
       setCurrentTime(newTime);
     } else {
       const checkNewTime = currentTime + seconds;
       const songDuration = currentPlayerRef.player.player.duration;
 
       const newTime = checkNewTime >= songDuration ? songDuration - 1 : checkNewTime;
+      mpris?.updateSeek(newTime);
 
       resetNextPlayer();
       setCurrentTime(newTime);

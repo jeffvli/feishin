@@ -1,4 +1,5 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
+import isElectron from 'is-electron';
 import styled from 'styled-components';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { PlaybackType } from '/@/renderer/types';
@@ -50,6 +51,9 @@ const CenterGridItem = styled.div`
   overflow: hidden;
 `;
 
+const utils = isElectron() ? window.electron.utils : null;
+const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
+
 export const Playerbar = () => {
   const playersRef = useRef<any>();
   const settings = useSettingsStore((state) => state.player);
@@ -59,6 +63,14 @@ export const Playerbar = () => {
   const status = useCurrentStatus();
   const player = useCurrentPlayer();
   const { autoNext } = usePlayerControls();
+
+  const autoNextFn = useCallback(() => {
+    const playerData = autoNext();
+    mpris?.updateSong({
+      currentTime: 0,
+      song: playerData.current.song,
+    });
+  }, [autoNext]);
 
   return (
     <PlayerbarContainer>
@@ -76,7 +88,7 @@ export const Playerbar = () => {
       {settings.type === PlaybackType.WEB && (
         <AudioPlayer
           ref={playersRef}
-          autoNext={autoNext}
+          autoNext={autoNextFn}
           crossfadeDuration={settings.crossfadeDuration}
           crossfadeStyle={settings.crossfadeStyle}
           currentPlayer={player}
