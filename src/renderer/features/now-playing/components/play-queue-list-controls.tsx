@@ -12,9 +12,10 @@ import {
   RiEraserLine,
 } from 'react-icons/ri';
 import { Song } from '/@/renderer/api/types';
-import { useQueueControls } from '/@/renderer/store';
+import { usePlayerControls, useQueueControls } from '/@/renderer/store';
 import { PlaybackType, TableType } from '/@/renderer/types';
 import { usePlayerType } from '/@/renderer/store/settings.store';
+import { useSetCurrentTime } from '../../../store/player.store';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
@@ -27,7 +28,10 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
   const { clearQueue, moveToBottomOfQueue, moveToTopOfQueue, shuffleQueue, removeFromQueue } =
     useQueueControls();
 
+  const { pause } = usePlayerControls();
+
   const playerType = usePlayerType();
+  const setCurrentTime = useSetCurrentTime();
 
   const handleMoveToBottom = () => {
     const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
@@ -70,8 +74,11 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
 
     if (playerType === PlaybackType.LOCAL) {
       mpvPlayer.setQueue(playerData);
-      mpvPlayer.stop();
+      mpvPlayer.pause();
     }
+
+    setCurrentTime(0);
+    pause();
   };
 
   const handleShuffleQueue = () => {
