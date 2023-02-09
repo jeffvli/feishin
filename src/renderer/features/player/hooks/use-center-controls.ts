@@ -19,8 +19,8 @@ import { QueueSong } from '/@/renderer/api/types';
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
 const ipc = isElectron() ? window.electron.ipc : null;
-const mpris = isElectron() ? window.electron.mpris : null;
 const utils = isElectron() ? window.electron.utils : null;
+const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
 
 export const useCenterControls = (args: { playersRef: any }) => {
   const { playersRef } = args;

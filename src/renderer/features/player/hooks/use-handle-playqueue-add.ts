@@ -20,8 +20,8 @@ import { nanoid } from 'nanoid/non-secure';
 import { LibraryItem, SongListSort, SortOrder } from '/@/renderer/api/types';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const mpris = isElectron() ? window.electron.mpris : null;
-
+const utils = isElectron() ? window.electron.utils : null;
+const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
 export const useHandlePlayQueueAdd = () => {
   const queryClient = useQueryClient();
   const playerType = usePlayerType();

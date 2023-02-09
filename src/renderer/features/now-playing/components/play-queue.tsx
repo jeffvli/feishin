@@ -34,7 +34,8 @@ import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const mpris = isElectron() ? window.electron.mpris : null;
+const utils = isElectron() ? window.electron.utils : null;
+const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
 
 type QueueProps = {
   type: TableType;
