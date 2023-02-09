@@ -24,7 +24,12 @@ const ActionRequiredRoute = () => {
     const getMpvPath = async () => {
       if (!isElectron()) return setIsMpvRequired(false);
       const mpvPath = await localSettings.get('mpv_path');
-      return setIsMpvRequired(!mpvPath);
+
+      if (mpvPath) {
+        return setIsMpvRequired(false);
+      }
+
+      return setIsMpvRequired(true);
     };
 
     getMpvPath();
@@ -47,6 +52,8 @@ const ActionRequiredRoute = () => {
       valid: !isServerRequired,
     },
   ];
+
+  console.log(checks);
 
   const canReturnHome = checks.every((c) => c.valid);
   const displayedCheck = checks.find((c) => !c.valid);
