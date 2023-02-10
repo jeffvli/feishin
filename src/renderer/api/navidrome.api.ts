@@ -88,6 +88,8 @@ import { ServerListItem, ServerType } from '/@/renderer/types';
 import { parseSearchParams } from '/@/renderer/utils';
 import { subsonicApi } from '/@/renderer/api/subsonic.api';
 
+const IGNORE_CORS = localStorage.getItem('IGNORE_CORS') === 'true';
+
 const api = ky.create({
   hooks: {
     afterResponse: [
@@ -122,6 +124,7 @@ const api = ky.create({
       },
     ],
   },
+  mode: IGNORE_CORS ? 'cors' : undefined,
 });
 
 const authenticate = async (

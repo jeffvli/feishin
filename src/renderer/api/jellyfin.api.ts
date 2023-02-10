@@ -78,11 +78,15 @@ import { ServerListItem, ServerType } from '/@/renderer/types';
 import { parseSearchParams } from '/@/renderer/utils';
 import packageJson from '../../../package.json';
 
+const IGNORE_CORS = localStorage.getItem('IGNORE_CORS') === 'true';
+
 const getCommaDelimitedString = (value: string[]) => {
   return value.join(',');
 };
 
-const api = ky.create({});
+const api = ky.create({
+  mode: IGNORE_CORS ? 'cors' : undefined,
+});
 
 const authenticate = async (
   url: string,

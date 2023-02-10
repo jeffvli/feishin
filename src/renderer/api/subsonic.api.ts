@@ -52,6 +52,8 @@ import {
 import { toast } from '/@/renderer/components/toast';
 import { nanoid } from 'nanoid/non-secure';
 
+const IGNORE_CORS = localStorage.getItem('IGNORE_CORS') === 'true';
+
 const getCoverArtUrl = (args: {
   baseUrl: string;
   coverArtId: string;
@@ -93,6 +95,7 @@ const api = ky.create({
       },
     ],
   },
+  mode: IGNORE_CORS ? 'cors' : undefined,
 });
 
 const getDefaultParams = (server: ServerListItem | null) => {

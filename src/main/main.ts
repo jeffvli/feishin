@@ -31,6 +31,10 @@ export default class AppUpdater {
   }
 }
 
+if (store.get('ignore_ssl')) {
+  app.commandLine.appendSwitch('ignore-certificate-errors');
+}
+
 let mainWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -85,6 +89,7 @@ const createWindow = async () => {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
+      webSecurity: store.get('ignore_cors') ? false : undefined,
     },
     width: 1440,
   });
