@@ -37,7 +37,6 @@ const StyledDatePicker = styled(MantineDatePicker)<DatePickerProps>`
 export const DatePicker = ({ width, maxWidth, ...props }: DatePickerProps) => {
   return (
     <StyledDatePicker
-      withinPortal
       {...props}
       sx={{ maxWidth, width }}
     />
