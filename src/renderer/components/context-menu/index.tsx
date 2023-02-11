@@ -26,6 +26,11 @@ const ContextMenuContainer = styled(motion.div)<Omit<ContextMenuProps, 'children
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
   }
+
+  button:last-child {
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+  }
 `;
 
 export const StyledContextMenuButton = styled(UnstyledButton)`
