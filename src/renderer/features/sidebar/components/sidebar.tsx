@@ -34,6 +34,8 @@ import {
   useAppStoreActions,
   useCurrentSong,
   useCurrentServer,
+  useSetFullScreenPlayerStore,
+  useFullScreenPlayerStore,
 } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
 import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
@@ -48,7 +50,7 @@ const SidebarContainer = styled.div`
   user-select: none;
 `;
 
-const ImageContainer = styled(motion(Link))<{ height: string }>`
+const ImageContainer = styled(motion.div)<{ height: string }>`
   position: relative;
   height: ${(props) => props.height};
 
@@ -111,6 +113,12 @@ export const Sidebar = () => {
     sortOrder: SortOrder.ASC,
     startIndex: 0,
   });
+
+  const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
+  const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
+  const expandFullScreenPlayer = () => {
+    setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
+  };
 
   const cq = useContainerQuery({ sm: 300 });
 
@@ -327,8 +335,9 @@ export const Sidebar = () => {
               exit={{ opacity: 0, y: 200 }}
               height={sidebar.leftWidth}
               initial={{ opacity: 0, y: 200 }}
-              to={AppRoute.NOW_PLAYING}
+              role="button"
               transition={{ duration: 0.3, ease: 'easeInOut' }}
+              onClick={expandFullScreenPlayer}
             >
               {upsizedImageUrl ? (
                 <SidebarImage
@@ -352,7 +361,7 @@ export const Sidebar = () => {
                 tooltip={{ label: 'Collapse', openDelay: 500 }}
                 variant="default"
                 onClick={(e) => {
-                  e.preventDefault();
+                  e.stopPropagation();
                   setSidebar({ image: false });
                 }}
               >

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import { Center, Group } from '@mantine/core';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { RiArrowUpSLine, RiDiscLine, RiMore2Fill } from 'react-icons/ri';
@@ -6,7 +6,13 @@ import { generatePath, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button, Text } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useAppStoreActions, useAppStore, useCurrentSong } from '/@/renderer/store';
+import {
+  useAppStoreActions,
+  useAppStore,
+  useCurrentSong,
+  useSetFullScreenPlayerStore,
+  useFullScreenPlayerStore,
+} from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
 import { LibraryItem } from '/@/renderer/api/types';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
@@ -35,7 +41,7 @@ const MetadataStack = styled(motion.div)`
   overflow: hidden;
 `;
 
-const Image = styled(motion(Link))`
+const Image = styled(motion.div)`
   width: 60px;
   height: 60px;
   filter: drop-shadow(0 0 5px rgb(0, 0, 0, 100%));
@@ -75,6 +81,8 @@ const LineItem = styled.div<{ $secondary?: boolean }>`
 
 export const LeftControls = () => {
   const { setSidebar } = useAppStoreActions();
+  const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
+  const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
   const hideImage = useAppStore((state) => state.sidebar.image);
   const currentSong = useCurrentSong();
   const title = currentSong?.name;
@@ -86,6 +94,16 @@ export const LeftControls = () => {
     LibraryItem.SONG,
     SONG_CONTEXT_MENU_ITEMS,
   );
+
+  const handleToggleFullScreenPlayer = (e: MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
+  };
+
+  const handleToggleSidebarImage = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setSidebar({ image: true });
+  };
 
   return (
     <LeftControlsContainer>
@@ -101,8 +119,9 @@ export const LeftControls = () => {
                 animate={{ opacity: 1, scale: 1, x: 0 }}
                 exit={{ opacity: 0, x: -50 }}
                 initial={{ opacity: 0, x: -50 }}
-                to={AppRoute.NOW_PLAYING}
+                role="button"
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
+                onClick={handleToggleFullScreenPlayer}
               >
                 {currentSong?.imageUrl ? (
                   <PlayerbarImage
@@ -133,10 +152,7 @@ export const LeftControls = () => {
                   sx={{ position: 'absolute', right: 2, top: 2 }}
                   tooltip={{ label: 'Expand', openDelay: 500 }}
                   variant="default"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setSidebar({ image: true });
-                  }}
+                  onClick={handleToggleSidebarImage}
                 >
                   <RiArrowUpSLine
                     color="white"
