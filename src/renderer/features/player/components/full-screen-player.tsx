@@ -183,8 +183,6 @@ export const FullScreenPlayer = () => {
     return min;
   }, [cq.isMd, rect?.height, rect?.width]);
 
-  console.log(size);
-
   return (
     <FullScreenPlayerContainer
       ref={cq.ref}
@@ -193,6 +191,46 @@ export const FullScreenPlayer = () => {
       initial="closed"
       variants={containerVariants}
     >
+      <Group
+        p="1rem"
+        pos="absolute"
+        sx={{
+          left: 0,
+          top: 0,
+        }}
+      >
+        <Button
+          tooltip={{ label: 'Minimize' }}
+          variant="subtle"
+          onClick={handleToggleFullScreenPlayer}
+        >
+          <RiArrowDownSLine size="2rem" />
+        </Button>
+        <DropdownMenu position="bottom-start">
+          <DropdownMenu.Target>
+            <Button
+              tooltip={{ label: 'Configure' }}
+              variant="subtle"
+            >
+              <RiSettings3Line size="1.5rem" />
+            </Button>
+          </DropdownMenu.Target>
+          <DropdownMenu.Dropdown>
+            <DropdownMenu.Item closeMenuOnClick={false}>
+              <Switch
+                defaultChecked={dynamicBackground}
+                label="Dynamic background"
+                onChange={(e) =>
+                  setStore({
+                    dynamicBackground: e.target.checked,
+                  })
+                }
+              />
+            </DropdownMenu.Item>
+            <TableConfigDropdown type="fullScreen" />
+          </DropdownMenu.Dropdown>
+        </DropdownMenu>
+      </Group>
       {dynamicBackground && <BackgroundImageOverlay />}
       <Flex
         direction="column"
@@ -201,39 +239,6 @@ export const FullScreenPlayer = () => {
         maw="2560px"
         w="100%"
       >
-        <Group>
-          <Button
-            tooltip={{ label: 'Minimize' }}
-            variant="subtle"
-            onClick={handleToggleFullScreenPlayer}
-          >
-            <RiArrowDownSLine size="2rem" />
-          </Button>
-          <DropdownMenu position="bottom-start">
-            <DropdownMenu.Target>
-              <Button
-                tooltip={{ label: 'Configure' }}
-                variant="subtle"
-              >
-                <RiSettings3Line size="1.5rem" />
-              </Button>
-            </DropdownMenu.Target>
-            <DropdownMenu.Dropdown>
-              <DropdownMenu.Item closeMenuOnClick={false}>
-                <Switch
-                  defaultChecked={dynamicBackground}
-                  label="Dynamic background"
-                  onChange={(e) =>
-                    setStore({
-                      dynamicBackground: e.target.checked,
-                    })
-                  }
-                />
-              </DropdownMenu.Item>
-              <TableConfigDropdown type="fullScreen" />
-            </DropdownMenu.Dropdown>
-          </DropdownMenu>
-        </Group>
         <>
           <Grid
             h="100%"
