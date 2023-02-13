@@ -1,5 +1,5 @@
-import { useLayoutEffect, useRef } from 'react';
-import { Box, Center, Flex, Grid, Group, MediaQuery, Stack } from '@mantine/core';
+import { useLayoutEffect, useMemo, useRef } from 'react';
+import { Box, Center, Flex, Grid, Group, Stack } from '@mantine/core';
 import { useResizeObserver } from '@mantine/hooks';
 import { Variants, motion, AnimatePresence } from 'framer-motion';
 import { HiOutlineQueueList } from 'react-icons/hi2';
@@ -10,9 +10,11 @@ import {
   RiInformationFill,
   RiSettings3Line,
 } from 'react-icons/ri';
-import { useLocation } from 'react-router';
+import { useLocation, generatePath } from 'react-router';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import {
+  Badge,
   Button,
   DropdownMenu,
   Switch,
@@ -21,15 +23,14 @@ import {
   TextTitle,
 } from '/@/renderer/components';
 import {
-  useAppStoreActions,
   useCurrentSong,
-  useFullScreenPlayer,
   useFullScreenPlayerStore,
   useFullScreenPlayerStoreActions,
 } from '/@/renderer/store';
 import { useFastAverageColor } from '../../../hooks/use-fast-average-color';
 import { PlayQueue } from '/@/renderer/features/now-playing';
 import { useContainerQuery } from '/@/renderer/hooks';
+import { AppRoute } from '/@/renderer/router/routes';
 
 const FullScreenPlayerContainer = styled(motion.div)`
   z-index: 100;
@@ -39,6 +40,7 @@ const FullScreenPlayerContainer = styled(motion.div)`
 `;
 
 const QueueContainer = styled.div`
+  position: relative;
   display: flex;
   height: 100%;
 
@@ -80,12 +82,10 @@ const ActiveTabIndicator = styled(motion.div)`
 `;
 
 export const FullScreenPlayer = () => {
-  const { setFullScreenPlayer } = useAppStoreActions();
-  const { dynamicBackground, activeTab } = useFullScreenPlayerStore();
+  const { dynamicBackground, activeTab, expanded } = useFullScreenPlayerStore();
   const { setStore } = useFullScreenPlayerStoreActions();
-  const fullScreenPlayer = useFullScreenPlayer();
   const handleToggleFullScreenPlayer = () => {
-    setFullScreenPlayer({ expanded: !fullScreenPlayer.expanded });
+    setStore({ expanded: !expanded });
   };
 
   const location = useLocation();
@@ -93,11 +93,11 @@ export const FullScreenPlayer = () => {
 
   useLayoutEffect(() => {
     if (isOpenedRef.current !== null) {
-      setFullScreenPlayer({ expanded: false });
+      setStore({ expanded: false });
     }
 
     isOpenedRef.current = true;
-  }, [location, setFullScreenPlayer]);
+  }, [location, setStore]);
 
   const currentSong = useCurrentSong();
   const scaledImageUrl = currentSong?.imageUrl
@@ -175,6 +175,16 @@ export const FullScreenPlayer = () => {
   const cq = useContainerQuery({ md: 960 });
   const [resizeRef, rect] = useResizeObserver();
 
+  const size = useMemo(() => {
+    const width = rect?.width * (cq.isMd ? 0.7 : 0.5);
+    const height = rect?.height * (cq.isMd ? 0.7 : 0.5);
+
+    const min = Math.min(width, height);
+    return min;
+  }, [cq.isMd, rect?.height, rect?.width]);
+
+  console.log(size);
+
   return (
     <FullScreenPlayerContainer
       ref={cq.ref}
@@ -183,7 +193,7 @@ export const FullScreenPlayer = () => {
       initial="closed"
       variants={containerVariants}
     >
-      <BackgroundImageOverlay />
+      {dynamicBackground && <BackgroundImageOverlay />}
       <Flex
         direction="column"
         h="100%"
@@ -224,114 +234,178 @@ export const FullScreenPlayer = () => {
             </DropdownMenu.Dropdown>
           </DropdownMenu>
         </Group>
-        {cq.isMd ? (
-          <>
-            <Grid
-              h="100%"
-              p="3rem"
+        <>
+          <Grid
+            h="100%"
+            p="3rem"
+          >
+            <Grid.Col
+              ref={resizeRef}
+              md={6}
+              sm={12}
             >
-              <Grid.Col
-                ref={resizeRef}
-                span={6}
+              <Flex
+                align="center"
+                h="100%"
+                justify="center"
+                sx={{
+                  img: {
+                    maxHeight: '100%',
+                    maxWidth: '100%',
+                  },
+                }}
               >
-                <Flex
-                  align="center"
-                  h="100%"
-                  justify="center"
-                  sx={{
-                    img: {
-                      maxHeight: '100%',
-                      maxWidth: '100%',
-                      minHeight: '300px',
-                    },
-                  }}
+                <Stack
+                  maw={`${size}px`}
+                  spacing="sm"
                 >
-                  <Stack>
-                    <AnimatePresence
-                      initial={false}
-                      mode="wait"
-                    >
-                      <Image
-                        key={imageKey}
-                        animate="open"
-                        exit="closed"
-                        height={rect?.width * 0.8}
-                        initial="closed"
-                        src={scaledImageUrl}
-                        variants={imageVariants}
-                        width={rect?.width * 0.8}
-                      />
-                    </AnimatePresence>
-                  </Stack>
-                </Flex>
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <Stack h="100%">
-                  <Group
-                    grow
-                    align="center"
-                    position="center"
+                  <AnimatePresence
+                    initial={false}
+                    mode="wait"
                   >
-                    {headerItems.map((item) => (
-                      <Box pos="relative">
-                        <Button
-                          fullWidth
-                          uppercase
-                          fw="600"
-                          pos="relative"
-                          size="lg"
+                    <Image
+                      key={imageKey}
+                      animate="open"
+                      draggable={false}
+                      exit="closed"
+                      height={size}
+                      initial="closed"
+                      src={scaledImageUrl}
+                      variants={imageVariants}
+                      width={size}
+                    />
+                  </AnimatePresence>
+                  <TextTitle
+                    align="center"
+                    order={1}
+                    overflow="hidden"
+                    w="100%"
+                    weight={900}
+                  >
+                    {currentSong?.name}
+                  </TextTitle>
+                  <TextTitle
+                    $link
+                    align="center"
+                    component={Link}
+                    order={2}
+                    overflow="hidden"
+                    to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                      albumId: currentSong?.albumId || '',
+                    })}
+                    w="100%"
+                    weight={600}
+                  >
+                    {currentSong?.album}{' '}
+                  </TextTitle>
+                  {currentSong?.artists?.map((artist, index) => (
+                    <TextTitle
+                      key={`fs-artist-${artist.id}`}
+                      align="center"
+                      order={4}
+                    >
+                      {index > 0 && (
+                        <Text
                           sx={{
-                            alignItems: 'center',
-                            color: item.active
-                              ? 'var(--main-fg) !important'
-                              : 'var(--main-fg-secondary) !important',
-                            letterSpacing: '1px',
+                            display: 'inline-block',
+                            padding: '0 0.5rem',
                           }}
-                          variant="subtle"
-                          onClick={item.onClick}
                         >
-                          {item.label}
-                        </Button>
-                        {item.active ? <ActiveTabIndicator layoutId="underline" /> : null}
-                      </Box>
-                    ))}
+                          •
+                        </Text>
+                      )}
+                      <Text
+                        $link
+                        component={Link}
+                        to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                          albumArtistId: artist.id,
+                        })}
+                        weight={600}
+                      >
+                        {artist.name}
+                      </Text>
+                    </TextTitle>
+                  ))}
+                  <Group position="center">
+                    {currentSong?.container && (
+                      <Badge size="lg">
+                        {currentSong?.container} {currentSong?.bitRate}
+                      </Badge>
+                    )}
+                    {currentSong?.releaseYear && (
+                      <Badge size="lg">{currentSong?.releaseYear}</Badge>
+                    )}
                   </Group>
-                  {activeTab === 'queue' ? (
-                    <QueueContainer>
-                      <PlayQueue type="fullScreen" />
-                    </QueueContainer>
-                  ) : activeTab === 'related' ? (
-                    <Center>
-                      <Group>
-                        <RiInformationFill size="2rem" />
-                        <TextTitle
-                          order={3}
-                          weight={700}
-                        >
-                          COMING SOON
-                        </TextTitle>
-                      </Group>
-                    </Center>
-                  ) : activeTab === 'lyrics' ? (
-                    <Center>
-                      <Group>
-                        <RiInformationFill size="2rem" />
-                        <TextTitle
-                          order={3}
-                          weight={700}
-                        >
-                          COMING SOON
-                        </TextTitle>
-                      </Group>
-                    </Center>
-                  ) : null}
                 </Stack>
-              </Grid.Col>
-            </Grid>
-          </>
-        ) : (
-          <></>
-        )}
+              </Flex>
+            </Grid.Col>
+            <Grid.Col
+              md={6}
+              sm={12}
+            >
+              <Stack h="100%">
+                <Group
+                  grow
+                  align="center"
+                  position="center"
+                >
+                  {headerItems.map((item) => (
+                    <Box pos="relative">
+                      <Button
+                        fullWidth
+                        uppercase
+                        fw="600"
+                        pos="relative"
+                        size="lg"
+                        sx={{
+                          alignItems: 'center',
+                          color: item.active
+                            ? 'var(--main-fg) !important'
+                            : 'var(--main-fg-secondary) !important',
+                          letterSpacing: '1px',
+                        }}
+                        variant="subtle"
+                        onClick={item.onClick}
+                      >
+                        {item.label}
+                      </Button>
+                      {item.active ? <ActiveTabIndicator layoutId="underline" /> : null}
+                    </Box>
+                  ))}
+                </Group>
+                {activeTab === 'queue' ? (
+                  <QueueContainer>
+                    <PlayQueue type="fullScreen" />
+                  </QueueContainer>
+                ) : activeTab === 'related' ? (
+                  <Center>
+                    <Group>
+                      <RiInformationFill size="2rem" />
+                      <TextTitle
+                        order={3}
+                        weight={700}
+                      >
+                        COMING SOON
+                      </TextTitle>
+                    </Group>
+                  </Center>
+                ) : activeTab === 'lyrics' ? (
+                  <Center>
+                    <Group>
+                      <RiInformationFill size="2rem" />
+                      <TextTitle
+                        order={3}
+                        weight={700}
+                      >
+                        COMING SOON
+                      </TextTitle>
+                    </Group>
+                  </Center>
+                ) : null}
+              </Stack>
+            </Grid.Col>
+          </Grid>
+        </>
       </Flex>
     </FullScreenPlayerContainer>
   );

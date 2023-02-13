@@ -11,10 +11,11 @@ import { DrawerPlayQueue, SidebarPlayQueue } from '/@/renderer/features/now-play
 import { Playerbar } from '/@/renderer/features/player';
 import { Sidebar } from '/@/renderer/features/sidebar/components/sidebar';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useAppStore, useAppStoreActions } from '/@/renderer/store';
+import { useAppStore, useAppStoreActions, useFullScreenPlayerStore } from '/@/renderer/store';
 import { useSettingsStore, useGeneralSettings } from '/@/renderer/store/settings.store';
 import { PlaybackType } from '/@/renderer/types';
 import { constrainSidebarWidth, constrainRightSidebarWidth } from '/@/renderer/utils';
+import { FullScreenPlayer } from '/@/renderer/features/player/components/full-screen-player';
 
 if (!isElectron()) {
   useSettingsStore.getState().actions.setSettings({
@@ -84,7 +85,7 @@ const ResizeHandle = styled.div<{
   right: ${(props) => props.placement === 'right' && 0};
   bottom: ${(props) => props.placement === 'bottom' && 0};
   left: ${(props) => props.placement === 'left' && 0};
-  z-index: 100;
+  z-index: 90;
   width: 2px;
   height: 100%;
   background-color: var(--sidebar-handle-bg);
@@ -147,6 +148,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
     location.pathname !== AppRoute.NOW_PLAYING;
 
   const showSideQueue = sidebar.rightExpanded && location.pathname !== AppRoute.NOW_PLAYING;
+  const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
 
   const queueDrawerButtonVariants: Variants = {
     hidden: {
@@ -259,6 +261,12 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
       >
         {!shell && (
           <>
+            <AnimatePresence
+              initial={false}
+              mode="wait"
+            >
+              {isFullScreenPlayerExpanded && <FullScreenPlayer />}
+            </AnimatePresence>
             <SidebarContainer id="sidebar">
               <ResizeHandle
                 ref={sidebarRef}
