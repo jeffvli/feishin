@@ -95,7 +95,7 @@ export const SongListHeader = ({
 
   const handlePlay = async (play: Play) => {
     if (!itemCount || itemCount === 0) return;
-    const query: SongListQuery = { startIndex: 0, ...page.filter };
+    const query: SongListQuery = { startIndex: 0, ...page.filter, ...customFilters };
 
     handlePlayQueueAdd?.({
       byItemType: {
