@@ -1,7 +1,6 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useRef } from 'react';
 import { useParams } from 'react-router';
-import { VirtualGridContainer } from '/@/renderer/components';
 import { AlbumArtistDetailTopSongsListContent } from '/@/renderer/features/artists/components/album-artist-detail-top-songs-list-content';
 import { AlbumArtistDetailTopSongsListHeader } from '/@/renderer/features/artists/components/album-artist-detail-top-songs-list-header';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
@@ -28,17 +27,15 @@ const AlbumArtistDetailTopSongsListRoute = () => {
 
   return (
     <AnimatedPage>
-      <VirtualGridContainer>
-        <AlbumArtistDetailTopSongsListHeader
-          data={topSongsQuery?.data?.items || []}
-          itemCount={itemCount}
-          title={detailQuery?.data?.name || 'Unknown'}
-        />
-        <AlbumArtistDetailTopSongsListContent
-          data={topSongsQuery?.data?.items || []}
-          tableRef={tableRef}
-        />
-      </VirtualGridContainer>
+      <AlbumArtistDetailTopSongsListHeader
+        data={topSongsQuery?.data?.items || []}
+        itemCount={itemCount}
+        title={detailQuery?.data?.name || 'Unknown'}
+      />
+      <AlbumArtistDetailTopSongsListContent
+        data={topSongsQuery?.data?.items || []}
+        tableRef={tableRef}
+      />
     </AnimatedPage>
   );
 };

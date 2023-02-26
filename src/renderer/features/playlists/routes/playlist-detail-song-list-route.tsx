@@ -13,7 +13,7 @@ import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playli
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
-import { Button, Paper, Text, toast, VirtualGridContainer } from '/@/renderer/components';
+import { Button, Paper, Text, toast } from '/@/renderer/components';
 import { SaveAsPlaylistForm } from '/@/renderer/features/playlists/components/save-as-playlist-form';
 import { useCurrentServer, usePlaylistDetailStore } from '/@/renderer/store';
 import { PlaylistSongListQuery, ServerType, SongListSort, SortOrder } from '/@/renderer/api/types';
@@ -162,63 +162,61 @@ const PlaylistDetailSongListRoute = () => {
 
   return (
     <AnimatedPage key={`playlist-detail-songList-${playlistId}`}>
-      <VirtualGridContainer>
-        <PlaylistDetailSongListHeader
-          handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
-          itemCount={itemCount}
-          tableRef={tableRef}
-        />
-        <AnimatePresence
-          custom={{ isQueryBuilderExpanded }}
-          initial={false}
-        >
-          {(isSmartPlaylist || showQueryBuilder) && (
-            <motion.div
-              animate="animate"
-              custom={{ isQueryBuilderExpanded }}
-              exit="exit"
-              initial="initial"
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-              variants={smartPlaylistVariants}
+      <PlaylistDetailSongListHeader
+        handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
+        itemCount={itemCount}
+        tableRef={tableRef}
+      />
+      <AnimatePresence
+        custom={{ isQueryBuilderExpanded }}
+        initial={false}
+      >
+        {(isSmartPlaylist || showQueryBuilder) && (
+          <motion.div
+            animate="animate"
+            custom={{ isQueryBuilderExpanded }}
+            exit="exit"
+            initial="initial"
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            variants={smartPlaylistVariants}
+          >
+            <Paper
+              h="100%"
+              pos="relative"
+              w="100%"
             >
-              <Paper
-                h="100%"
-                pos="relative"
-                w="100%"
+              <Group
+                pt="1rem"
+                px="1rem"
               >
-                <Group
-                  pt="1rem"
-                  px="1rem"
+                <Button
+                  compact
+                  variant="default"
+                  onClick={handleToggleExpand}
                 >
-                  <Button
-                    compact
-                    variant="default"
-                    onClick={handleToggleExpand}
-                  >
-                    {isQueryBuilderExpanded ? (
-                      <RiArrowUpSLine size={20} />
-                    ) : (
-                      <RiArrowDownSLine size={20} />
-                    )}
-                  </Button>
-                  <Text>Query Editor</Text>
-                </Group>
-                <PlaylistQueryBuilder
-                  key={JSON.stringify(detailQuery?.data?.rules)}
-                  isSaving={createPlaylistMutation?.isLoading}
-                  limit={detailQuery?.data?.rules?.limit}
-                  query={detailQuery?.data?.rules}
-                  sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
-                  sortOrder={detailQuery?.data?.rules?.order || 'asc'}
-                  onSave={handleSave}
-                  onSaveAs={handleSaveAs}
-                />
-              </Paper>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <PlaylistDetailSongListContent tableRef={tableRef} />
-      </VirtualGridContainer>
+                  {isQueryBuilderExpanded ? (
+                    <RiArrowUpSLine size={20} />
+                  ) : (
+                    <RiArrowDownSLine size={20} />
+                  )}
+                </Button>
+                <Text>Query Editor</Text>
+              </Group>
+              <PlaylistQueryBuilder
+                key={JSON.stringify(detailQuery?.data?.rules)}
+                isSaving={createPlaylistMutation?.isLoading}
+                limit={detailQuery?.data?.rules?.limit}
+                query={detailQuery?.data?.rules}
+                sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
+                sortOrder={detailQuery?.data?.rules?.order || 'asc'}
+                onSave={handleSave}
+                onSaveAs={handleSaveAs}
+              />
+            </Paper>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <PlaylistDetailSongListContent tableRef={tableRef} />
     </AnimatedPage>
   );
 };

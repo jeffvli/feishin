@@ -2,7 +2,6 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SongListQuery } from '/@/renderer/api/types';
-import { VirtualGridContainer } from '/@/renderer/components';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { SongListContent } from '/@/renderer/features/songs/components/song-list-content';
 import { SongListHeader } from '/@/renderer/features/songs/components/song-list-header';
@@ -50,19 +49,17 @@ const TrackListRoute = () => {
 
   return (
     <AnimatedPage>
-      <VirtualGridContainer>
-        <SongListHeader
-          customFilters={customFilters}
-          itemCount={itemCount}
-          tableRef={tableRef}
-          title={searchParams.get('artistName') || undefined}
-        />
-        <SongListContent
-          customFilters={customFilters}
-          itemCount={itemCount}
-          tableRef={tableRef}
-        />
-      </VirtualGridContainer>
+      <SongListHeader
+        customFilters={customFilters}
+        itemCount={itemCount}
+        tableRef={tableRef}
+        title={searchParams.get('artistName') || undefined}
+      />
+      <SongListContent
+        customFilters={customFilters}
+        itemCount={itemCount}
+        tableRef={tableRef}
+      />
     </AnimatedPage>
   );
 };

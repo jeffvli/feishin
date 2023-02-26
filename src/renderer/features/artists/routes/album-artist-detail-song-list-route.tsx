@@ -3,7 +3,6 @@ import { useSetState } from '@mantine/hooks';
 import { useRef } from 'react';
 import { useParams } from 'react-router';
 import { SongListSort, SortOrder } from '/@/renderer/api/types';
-import { VirtualGridContainer } from '/@/renderer/components';
 import { AlbumArtistDetailSongListContent } from '/@/renderer/features/artists/components/album-artist-detail-song-list-content';
 import { AlbumArtistDetailSongListHeader } from '/@/renderer/features/artists/components/album-artist-detail-song-list-header';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
@@ -44,20 +43,18 @@ const AlbumArtistDetailSongListRoute = () => {
 
   return (
     <AnimatedPage>
-      <VirtualGridContainer>
-        <AlbumArtistDetailSongListHeader
-          filter={filter}
-          itemCount={itemCount}
-          setFilter={setFilter}
-          tableRef={tableRef}
-          title={detailQuery?.data?.name || 'Unknown'}
-        />
-        <AlbumArtistDetailSongListContent
-          filter={filter}
-          itemCount={itemCount}
-          tableRef={tableRef}
-        />
-      </VirtualGridContainer>
+      <AlbumArtistDetailSongListHeader
+        filter={filter}
+        itemCount={itemCount}
+        setFilter={setFilter}
+        tableRef={tableRef}
+        title={detailQuery?.data?.name || 'Unknown'}
+      />
+      <AlbumArtistDetailSongListContent
+        filter={filter}
+        itemCount={itemCount}
+        tableRef={tableRef}
+      />
     </AnimatedPage>
   );
 };

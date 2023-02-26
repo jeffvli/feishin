@@ -1,4 +1,4 @@
-import { VirtualGridContainer, VirtualInfiniteGridRef } from '/@/renderer/components';
+import { VirtualInfiniteGridRef } from '/@/renderer/components';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AlbumListHeader } from '/@/renderer/features/albums/components/album-list-header';
 import { AlbumListContent } from '/@/renderer/features/albums/components/album-list-content';
@@ -62,21 +62,19 @@ const AlbumListRoute = () => {
 
   return (
     <AnimatedPage>
-      <VirtualGridContainer>
-        <AlbumListHeader
-          customFilters={customFilters}
-          gridRef={gridRef}
-          itemCount={itemCount}
-          tableRef={tableRef}
-          title={searchParams.get('artistName') || undefined}
-        />
-        <AlbumListContent
-          customFilters={customFilters}
-          gridRef={gridRef}
-          itemCount={itemCount}
-          tableRef={tableRef}
-        />
-      </VirtualGridContainer>
+      <AlbumListHeader
+        customFilters={customFilters}
+        gridRef={gridRef}
+        itemCount={itemCount}
+        tableRef={tableRef}
+        title={searchParams.get('artistName') || undefined}
+      />
+      <AlbumListContent
+        customFilters={customFilters}
+        gridRef={gridRef}
+        itemCount={itemCount}
+        tableRef={tableRef}
+      />
     </AnimatedPage>
   );
 };

@@ -1,4 +1,4 @@
-import { VirtualGridContainer, VirtualInfiniteGridRef } from '/@/renderer/components';
+import { VirtualInfiniteGridRef } from '/@/renderer/components';
 import { AlbumArtistListHeader } from '/@/renderer/features/artists/components/album-artist-list-header';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
@@ -32,17 +32,15 @@ const AlbumArtistListRoute = () => {
 
   return (
     <AnimatedPage>
-      <VirtualGridContainer>
-        <AlbumArtistListHeader
-          gridRef={gridRef}
-          itemCount={itemCount}
-          tableRef={tableRef}
-        />
-        <AlbumArtistListContent
-          gridRef={gridRef}
-          tableRef={tableRef}
-        />
-      </VirtualGridContainer>
+      <AlbumArtistListHeader
+        gridRef={gridRef}
+        itemCount={itemCount}
+        tableRef={tableRef}
+      />
+      <AlbumArtistListContent
+        gridRef={gridRef}
+        tableRef={tableRef}
+      />
     </AnimatedPage>
   );
 };
