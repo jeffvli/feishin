@@ -293,7 +293,7 @@ const tableColumns: { [key: string]: ColDef } = {
     width: 50,
   },
   userRating: {
-    cellClass: (params) => (params.value.userRating ? 'visible ag-cell-rating' : 'ag-cell-rating'),
+    cellClass: (params) => (params.value?.userRating ? 'visible ag-cell-rating' : 'ag-cell-rating'),
     cellRenderer: RatingCell,
     colId: TableColumn.USER_RATING,
     field: 'userRating',
