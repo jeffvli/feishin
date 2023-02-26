@@ -8,10 +8,9 @@ import {
   RawRatingResponse,
   RatingArgs,
   Album,
-  Song,
   AlbumArtist,
-  Artist,
   LibraryItem,
+  AnyLibraryItems,
 } from '/@/renderer/api/types';
 import {
   useCurrentServer,
@@ -31,7 +30,7 @@ export const useUpdateRating = () => {
     RawRatingResponse,
     HTTPError,
     Omit<RatingArgs, 'server'>,
-    { previous: { items: Album[] | Song[] | AlbumArtist[] | Artist[] } | undefined }
+    { previous: { items: AnyLibraryItems } | undefined }
   >({
     mutationFn: (args) => {
       const server = useAuthStore.getState().actions.getServer(args._serverId) || currentServer;
