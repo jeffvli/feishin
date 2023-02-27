@@ -99,6 +99,7 @@ const topSongList = (data: RawTopSongListResponse | undefined, server: ServerLis
 
   switch (server?.type) {
     case 'jellyfin':
+      songs = data?.items.map((item) => jfNormalize.song(item as JFSong, server, ''));
       break;
     case 'navidrome':
       songs = data?.items?.map((item) => ssNormalize.song(item as SSSong, server, ''));

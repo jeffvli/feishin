@@ -105,8 +105,8 @@ export const AlbumArtistDetailContent = () => {
   });
 
   const topSongsQuery = useTopSongsList(
-    { artist: detailQuery?.data?.name || '' },
-    { enabled: server?.type !== ServerType.JELLYFIN && !!detailQuery?.data?.name },
+    { artist: detailQuery?.data?.name || '', artistId: albumArtistId },
+    { enabled: !!detailQuery?.data?.name },
   );
 
   const topSongsColumnDefs: ColDef[] = useMemo(
@@ -270,11 +270,13 @@ export const AlbumArtistDetailContent = () => {
     ARTIST_CONTEXT_MENU_ITEMS,
   );
 
+  console.log('topSongsQuery?.data :>> ', topSongsQuery?.data);
+
   const topSongs = topSongsQuery?.data?.items?.slice(0, 10);
 
   const showBiography =
     detailQuery?.data?.biography !== undefined && detailQuery?.data?.biography !== null;
-  const showTopSongs = server?.type !== ServerType.JELLYFIN && topSongsQuery?.data?.items?.length;
+  const showTopSongs = topSongsQuery?.data?.items?.length;
   const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
 
   const isLoading =

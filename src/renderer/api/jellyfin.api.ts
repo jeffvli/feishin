@@ -1,6 +1,6 @@
 import ky from 'ky';
 import { nanoid } from 'nanoid/non-secure';
-import type {
+import {
   JFAddToPlaylist,
   JFAddToPlaylistParams,
   JFAlbum,
@@ -35,8 +35,9 @@ import type {
   JFSongList,
   JFSongListParams,
   JFSongListResponse,
+  JFSongListSort,
+  JFCollectionType,
 } from '/@/renderer/api/jellyfin.types';
-import { JFCollectionType } from '/@/renderer/api/jellyfin.types';
 import {
   Album,
   AlbumArtist,
@@ -72,6 +73,8 @@ import {
   AddToPlaylistArgs,
   ScrobbleArgs,
   RawScrobbleResponse,
+  TopSongListArgs,
+  SortOrder,
 } from '/@/renderer/api/types';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
@@ -322,6 +325,36 @@ const getAlbumList = async (args: AlbumListArgs): Promise<JFAlbumList> => {
   return {
     items: data.Items,
     startIndex: query.startIndex,
+    totalRecordCount: data.TotalRecordCount,
+  };
+};
+
+const getTopSongList = async (args: TopSongListArgs): Promise<any> => {
+  const { signal, server, query } = args;
+
+  const searchParams: any = {
+    artistIds: query.artistId,
+    fields: 'Genres, DateCreated, MediaSources, ParentId',
+    includeItemTypes: 'Audio',
+    limit: query.limit,
+    recursive: true,
+    sortBy: JFSongListSort.COMMUNITY_RATING,
+    sortOrder: SortOrder.DESC,
+    userId: server?.userId || '',
+  };
+
+  const data = await api
+    .get(`users/${server?.userId}/items`, {
+      headers: { 'X-MediaBrowser-Token': server?.credential },
+      prefixUrl: server?.url,
+      searchParams: parseSearchParams(searchParams),
+      signal,
+    })
+    .json<any>();
+
+  return {
+    items: data.Items,
+    startIndex: 0,
     totalRecordCount: data.TotalRecordCount,
   };
 };
@@ -1007,6 +1040,7 @@ export const jellyfinApi = {
   getPlaylistList,
   getPlaylistSongList,
   getSongList,
+  getTopSongList,
   removeFromPlaylist,
   scrobble,
   updatePlaylist,

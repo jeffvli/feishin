@@ -6,19 +6,16 @@ import { AlbumArtistDetailTopSongsListHeader } from '/@/renderer/features/artist
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
 import { useTopSongsList } from '/@/renderer/features/artists/queries/top-songs-list-query';
 import { AnimatedPage } from '/@/renderer/features/shared';
-import { useCurrentServer } from '/@/renderer/store';
-import { ServerType } from '/@/renderer/types';
 
 const AlbumArtistDetailTopSongsListRoute = () => {
   const tableRef = useRef<AgGridReactType | null>(null);
   const { albumArtistId } = useParams() as { albumArtistId: string };
-  const server = useCurrentServer();
 
   const detailQuery = useAlbumArtistDetail({ id: albumArtistId });
 
   const topSongsQuery = useTopSongsList(
-    { artist: detailQuery?.data?.name || '' },
-    { enabled: server?.type !== ServerType.JELLYFIN && !!detailQuery?.data?.name },
+    { artist: detailQuery?.data?.name || '', artistId: albumArtistId },
+    { enabled: !!detailQuery?.data?.name },
   );
 
   const itemCount = topSongsQuery?.data?.items?.length || 0;

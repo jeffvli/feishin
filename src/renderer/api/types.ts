@@ -1009,12 +1009,13 @@ export const userListSortMap: UserListSortMap = {
 };
 
 // Top Songs List
-export type RawTopSongListResponse = SSTopSongList | undefined;
+export type RawTopSongListResponse = SSTopSongList | JFSongList | undefined;
 
 export type TopSongListResponse = BasePaginatedResponse<Song[]>;
 
 export type TopSongListQuery = {
   artist: string;
+  artistId: string;
   limit?: number;
 };
 

@@ -567,6 +567,7 @@ export enum JFSongListSort {
   ALBUM = 'Album,SortName',
   ALBUM_ARTIST = 'AlbumArtist,Album,SortName',
   ARTIST = 'Artist,Album,SortName',
+  COMMUNITY_RATING = 'CommunityRating,SortName',
   DURATION = 'Runtime,AlbumArtist,Album,SortName',
   NAME = 'Name,SortName',
   PLAY_COUNT = 'PlayCount,SortName',

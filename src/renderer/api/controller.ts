@@ -115,7 +115,7 @@ const endpoints: ApiController = {
     getPlaylistSongList: jellyfinApi.getPlaylistSongList,
     getSongDetail: undefined,
     getSongList: jellyfinApi.getSongList,
-    getTopSongs: undefined,
+    getTopSongs: jellyfinApi.getTopSongList,
     getUserList: undefined,
     removeFromPlaylist: jellyfinApi.removeFromPlaylist,
     scrobble: jellyfinApi.scrobble,
