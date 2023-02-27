@@ -37,6 +37,7 @@ import {
   JFSongListResponse,
   JFSongListSort,
   JFCollectionType,
+  JFSortOrder,
 } from '/@/renderer/api/jellyfin.types';
 import {
   Album,
@@ -74,7 +75,6 @@ import {
   ScrobbleArgs,
   RawScrobbleResponse,
   TopSongListArgs,
-  SortOrder,
 } from '/@/renderer/api/types';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
@@ -329,17 +329,17 @@ const getAlbumList = async (args: AlbumListArgs): Promise<JFAlbumList> => {
   };
 };
 
-const getTopSongList = async (args: TopSongListArgs): Promise<any> => {
+const getTopSongList = async (args: TopSongListArgs): Promise<JFSongList> => {
   const { signal, server, query } = args;
 
-  const searchParams: any = {
+  const searchParams: JFSongListParams = {
     artistIds: query.artistId,
     fields: 'Genres, DateCreated, MediaSources, ParentId',
     includeItemTypes: 'Audio',
     limit: query.limit,
     recursive: true,
     sortBy: JFSongListSort.COMMUNITY_RATING,
-    sortOrder: SortOrder.DESC,
+    sortOrder: JFSortOrder.DESC,
     userId: server?.userId || '',
   };
 
@@ -350,7 +350,7 @@ const getTopSongList = async (args: TopSongListArgs): Promise<any> => {
       searchParams: parseSearchParams(searchParams),
       signal,
     })
-    .json<any>();
+    .json<JFSongListResponse>();
 
   return {
     items: data.Items,
