@@ -27,24 +27,27 @@
 
 Repository for the rewrite of [Sonixd](https://github.com/jeffvli/sonixd).
 
+## Features
+
+- [x] MPV player backend
+- [x] Web player backend
+- [x] Modern UI
+- [x] Scrobble playback to your server
+- [x] Smart playlist editor (Navidrome)
+- [ ] [Request a feature](https://github.com/jeffvli/feishin/issues) or [view taskboard](https://github.com/users/jeffvli/projects/5/views/1)
+
 ## Getting Started
 
 Download the [latest desktop client](https://github.com/jeffvli/feishin/releases).
-
-### After installing the server and database
-
-You can access the desktop client via the [latest release](https://github.com/jeffvli/feishin/releases), or you can visit the web client at your server URL (e.g http://192.168.0.1:8643).
 
 ## FAQ
 
 ### What music servers does Feishin support?
 
-Feishin supports any music server that implements a [Navidrome](https://www.navidrome.org/) or [Jellyfin](https://jellyfin.org/) API.
+Feishin supports any music server that implements a [Navidrome](https://www.navidrome.org/) or [Jellyfin](https://jellyfin.org/) API. **Subsonic API is not currently supported**. This will likely be added in [later when the new Subsonic API is decided on](https://support.symfonium.app/t/subsonic-servers-participation/1233).
 
-- [Jellyfin](https://github.com/jellyfin/jellyfin)
 - [Navidrome](https://github.com/navidrome/navidrome)
-- ~~[Airsonic](https://github.com/airsonic/airsonic)~~
-- ~~[Airsonic-Advanced](https://github.com/airsonic-advanced/airsonic-advanced)~~
+- [Jellyfin](https://github.com/jellyfin/jellyfin)
 - ~~[Gonic](https://github.com/sentriz/gonic)~~
 - ~~[Astiga](https://asti.ga/)~~
 - ~~[Supysonic](https://github.com/spl0k/supysonic)~~
