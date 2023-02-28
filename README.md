@@ -25,7 +25,7 @@
     </a>
   </p>
 
-Repository for the rewrite of [Sonixd](https://github.com/jeffvli/sonixd).
+Rewrite of [Sonixd](https://github.com/jeffvli/sonixd).
 
 ## Features
 
@@ -35,6 +35,10 @@ Repository for the rewrite of [Sonixd](https://github.com/jeffvli/sonixd).
 - [x] Scrobble playback to your server
 - [x] Smart playlist editor (Navidrome)
 - [ ] [Request a feature](https://github.com/jeffvli/feishin/issues) or [view taskboard](https://github.com/users/jeffvli/projects/5/views/1)
+
+## Screenshots
+
+<a href="https://raw.githubusercontent.com/jeffvli/feishin/development/assets/media/preview_home.png"><img src="https://raw.githubusercontent.com/jeffvli/feishin/development/assets/media/preview_home.png" width="49.5%"/></a> <a href="https://raw.githubusercontent.com/jeffvli/feishin/development/assets/media/preview_album_artist_detail.png"><img src="https://raw.githubusercontent.com/jeffvli/feishin/development/assets/media/preview_album_artist_detail.png" width="49.5%"/></a> <a href="https://raw.githubusercontent.com/jeffvli/feishin/development/assets/media/preview_album_detail.png"><img src="https://raw.githubusercontent.com/jeffvli/feishin/development/assets/media/preview_album_detail.png" width="49.5%"/></a> <a href="https://raw.githubusercontent.com/jeffvli/feishin/development/assets/media/preview_smart_playlist.png"><img src="https://raw.githubusercontent.com/jeffvli/feishin/development/assets/media/preview_smart_playlist.png" width="49.5%"/></a>
 
 ## Getting Started
 
