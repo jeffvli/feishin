@@ -85,7 +85,8 @@ const StyledMenuDropdown = styled(MantineMenu.Dropdown)`
 `;
 
 const StyledMenuDivider = styled(MantineMenu.Divider)`
-  /* margin: 0.3rem 0; */
+  margin: 0;
+  padding: 0;
 `;
 
 export const DropdownMenu = ({ children, ...props }: MenuProps) => {
@@ -97,7 +98,6 @@ export const DropdownMenu = ({ children, ...props }: MenuProps) => {
           filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))',
         },
       }}
-      transition="fade"
       {...props}
     >
       {children}

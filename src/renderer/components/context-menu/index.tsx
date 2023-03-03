@@ -19,17 +19,17 @@ const ContextMenuContainer = styled(motion.div)<Omit<ContextMenuProps, 'children
   min-width: ${({ minWidth }) => minWidth}px;
   max-width: ${({ maxWidth }) => maxWidth}px;
   background: var(--dropdown-menu-bg);
-  border-radius: 10px;
+  border-radius: var(--dropdown-menu-border-radius);
   box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 40%);
 
   button:first-child {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    border-top-left-radius: var(--dropdown-menu-border-radius);
+    border-top-right-radius: var(--dropdown-menu-border-radius);
   }
 
   button:last-child {
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: var(--dropdown-menu-border-radius);
+    border-bottom-left-radius: var(--dropdown-menu-border-radius);
   }
 `;
 

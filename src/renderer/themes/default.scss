@@ -64,13 +64,13 @@
   --input-active-fg: rgb(193, 193, 193);
   --input-active-bg: rgba(255, 255, 255, 0.1);
 
-  --dropdown-menu-bg: rgb(40, 40, 40);
+  --dropdown-menu-bg: rgb(45, 45, 45);
   --dropdown-menu-fg: rgb(235, 235, 235);
-  --dropdown-menu-item-padding: 1rem;
+  --dropdown-menu-item-padding: 0.8rem;
   --dropdown-menu-item-font-size: 1rem;
   --dropdown-menu-bg-hover: rgb(62, 62, 62);
-  --dropdown-menu-border: none;
-  --dropdown-menu-border-radius: 10px;
+  --dropdown-menu-border: 1px var(--generic-border-color) solid;
+  --dropdown-menu-border-radius: 0;
 
   --switch-track-bg: rgb(50, 50, 50);
   --switch-track-enabled-bg: var(--primary-color);
