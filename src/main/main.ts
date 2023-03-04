@@ -104,7 +104,6 @@ const createWindow = async () => {
 
   ipcMain.on('window-maximize', () => {
     mainWindow?.maximize();
-    mainWindow?.webContents.send('renderer-player-quit');
   });
 
   ipcMain.on('window-unmaximize', () => {
