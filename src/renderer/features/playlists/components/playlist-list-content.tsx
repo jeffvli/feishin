@@ -116,9 +116,11 @@ export const PlaylistListContent = ({ tableRef, itemCount }: PlaylistListContent
       }
 
       setPagination({
-        itemsPerPage: event.api.paginationGetPageSize(),
-        totalItems: event.api.paginationGetRowCount(),
-        totalPages: event.api.paginationGetTotalPages() + 1,
+        data: {
+          itemsPerPage: event.api.paginationGetPageSize(),
+          totalItems: event.api.paginationGetRowCount(),
+          totalPages: event.api.paginationGetTotalPages() + 1,
+        },
       });
     },
     [isPaginationEnabled, pagination.currentPage, pagination.itemsPerPage, setPagination],
@@ -217,6 +219,7 @@ export const PlaylistListContent = ({ tableRef, itemCount }: PlaylistListContent
       >
         {page.display === ListDisplayType.TABLE_PAGINATED && (
           <TablePagination
+            pageKey=""
             pagination={pagination}
             setPagination={setPagination}
             tableRef={tableRef}

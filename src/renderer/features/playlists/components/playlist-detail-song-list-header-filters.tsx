@@ -161,7 +161,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
       tableRef.current?.api.ensureIndexVisible(0, 'top');
 
       if (page.display === ListDisplayType.TABLE_PAGINATED) {
-        setPagination({ currentPage: 0 });
+        setPagination({ data: { currentPage: 0 } });
       }
     },
     [tableRef, page.display, server, playlistId, queryClient, setPagination],

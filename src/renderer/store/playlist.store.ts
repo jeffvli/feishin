@@ -48,7 +48,7 @@ export interface PlaylistSlice extends PlaylistState {
     setFilters: (data: Partial<PlaylistListFilter>) => PlaylistListFilter;
     setStore: (data: Partial<PlaylistSlice>) => void;
     setTable: (data: Partial<TableProps>) => void;
-    setTablePagination: (data: Partial<TableProps['pagination']>) => void;
+    setTablePagination: (args: { data: Partial<TablePagination> }) => void;
   };
 }
 
@@ -98,9 +98,9 @@ export const usePlaylistStore = create<PlaylistSlice>()(
               state.list.table = { ...state.list.table, ...data };
             });
           },
-          setTablePagination: (data) => {
+          setTablePagination: (args) => {
             set((state) => {
-              state.list.table.pagination = { ...state.list.table.pagination, ...data };
+              state.list.table.pagination = { ...state.list.table.pagination, ...args.data };
             });
           },
         },

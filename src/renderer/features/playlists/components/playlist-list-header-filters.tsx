@@ -110,7 +110,7 @@ export const PlaylistListHeaderFilters = ({ tableRef }: PlaylistListHeaderFilter
       tableRef.current?.api.setDatasource(dataSource);
       tableRef.current?.api.purgeInfiniteCache();
       tableRef.current?.api.ensureIndexVisible(0, 'top');
-      setPagination({ currentPage: 0 });
+      setPagination({ data: { currentPage: 0 } });
     },
     [page.filter, queryClient, server, setPagination, tableRef],
   );
@@ -147,9 +147,9 @@ export const PlaylistListHeaderFilters = ({ tableRef }: PlaylistListHeaderFilter
 
       if (display === ListDisplayType.TABLE) {
         tableRef.current?.api.paginationSetPageSize(tableRef.current.props.infiniteInitialRowCount);
-        setPagination({ currentPage: 0 });
+        setPagination({ data: { currentPage: 0 } });
       } else if (display === ListDisplayType.TABLE_PAGINATED) {
-        setPagination({ currentPage: 0 });
+        setPagination({ data: { currentPage: 0 } });
       }
     },
     [page, setPage, setPagination, tableRef],
