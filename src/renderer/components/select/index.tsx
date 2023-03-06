@@ -64,8 +64,7 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
         },
       }}
       sx={{ maxWidth, width }}
-      transition="fade"
-      transitionDuration={100}
+      transitionProps={{ duration: 100, transition: 'fade' }}
       {...props}
     />
   );
@@ -126,8 +125,7 @@ export const MultiSelect = ({ width, maxWidth, ...props }: MultiSelectProps) => 
         },
       }}
       sx={{ maxWidth, width }}
-      transition="fade"
-      transitionDuration={100}
+      transitionProps={{ duration: 100, transition: 'fade' }}
       {...props}
     />
   );
