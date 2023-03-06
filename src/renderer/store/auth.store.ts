@@ -3,11 +3,9 @@ import { nanoid } from 'nanoid/non-secure';
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { AlbumListSort, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { useAlbumArtistListDataStore } from '/@/renderer/store/album-artist-list-data.store';
 import { useAlbumListDataStore } from '/@/renderer/store/album-list-data.store';
-import { useAlbumStore } from '/@/renderer/store/album.store';
-import { useSongStore } from '/@/renderer/store/song.store';
+import { useListStore } from '/@/renderer/store/list.store';
 import { ServerListItem } from '/@/renderer/types';
 
 export interface AuthState {
@@ -52,16 +50,8 @@ export const useAuthStore = create<AuthSlice>()(
               state.currentServer = server;
 
               if (server) {
-                useAlbumStore.getState().actions.setFilters({
-                  musicFolderId: undefined,
-                  sortBy: AlbumListSort.RECENTLY_ADDED,
-                  sortOrder: SortOrder.DESC,
-                });
-                useSongStore.getState().actions.setFilters({
-                  musicFolderId: undefined,
-                  sortBy: SongListSort.RECENTLY_ADDED,
-                  sortOrder: SortOrder.DESC,
-                });
+                // Reset list filters
+                useListStore.getState()._actions.resetFilter();
 
                 // Reset persisted grid list stores
                 useAlbumListDataStore.getState().actions.setItemData([]);

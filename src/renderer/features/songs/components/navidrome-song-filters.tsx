@@ -1,17 +1,23 @@
 import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import { NumberInput, Select, Switch, Text } from '/@/renderer/components';
-import { SongListFilter, useSetSongFilters, useSongListStore } from '/@/renderer/store';
+import { SongListFilter, useListStoreActions, useSongListFilter } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
 
 interface NavidromeSongFiltersProps {
   handleFilterChange: (filters: SongListFilter) => void;
+  id?: string;
+  pageKey: string;
 }
 
-export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFiltersProps) => {
-  const { filter } = useSongListStore();
-  const setFilters = useSetSongFilters();
+export const NavidromeSongFilters = ({
+  handleFilterChange,
+  pageKey,
+  id,
+}: NavidromeSongFiltersProps) => {
+  const { setFilter } = useListStoreActions();
+  const filter = useSongListFilter({ id, key: pageKey });
 
   const genreListQuery = useGenreList(null);
 
@@ -24,12 +30,15 @@ export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFilter
   }, [genreListQuery.data]);
 
   const handleGenresFilter = debounce((e: string | null) => {
-    const updatedFilters = setFilters({
-      ndParams: {
-        ...filter.ndParams,
-        genre_id: e || undefined,
+    const updatedFilters = setFilter({
+      data: {
+        ndParams: {
+          ...filter.ndParams,
+          genre_id: e || undefined,
+        },
       },
-    });
+      key: pageKey,
+    }) as SongListFilter;
     handleFilterChange(updatedFilters);
   }, 250);
 
@@ -37,9 +46,14 @@ export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFilter
     {
       label: 'Is favorited',
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
-        const updatedFilters = setFilters({
-          ndParams: { ...filter.ndParams, starred: e.currentTarget.checked ? true : undefined },
-        });
+        const updatedFilters = setFilter({
+          data: {
+            ndParams: { ...filter.ndParams, starred: e.currentTarget.checked ? true : undefined },
+          },
+          key: pageKey,
+        }) as SongListFilter;
+
+        console.log('updatedFilters :>> ', updatedFilters);
         handleFilterChange(updatedFilters);
       },
       value: filter.ndParams?.starred,
@@ -47,12 +61,15 @@ export const NavidromeSongFilters = ({ handleFilterChange }: NavidromeSongFilter
   ];
 
   const handleYearFilter = debounce((e: number | string) => {
-    const updatedFilters = setFilters({
-      ndParams: {
-        ...filter.ndParams,
-        year: e === '' ? undefined : (e as number),
+    const updatedFilters = setFilter({
+      data: {
+        ndParams: {
+          ...filter.ndParams,
+          year: e === '' ? undefined : (e as number),
+        },
       },
-    });
+      key: pageKey,
+    }) as SongListFilter;
 
     handleFilterChange(updatedFilters);
   }, 500);

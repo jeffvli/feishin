@@ -1,44 +1,33 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { SongListQuery } from '/@/renderer/api/types';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { SongListContent } from '/@/renderer/features/songs/components/song-list-content';
 import { SongListHeader } from '/@/renderer/features/songs/components/song-list-header';
+import { SongListContext } from '/@/renderer/features/songs/context/song-list-context';
 import { useSongList } from '/@/renderer/features/songs/queries/song-list-query';
-import { useSongListFilters } from '/@/renderer/store';
+import { generatePageKey, useCurrentServer, useSongListFilter } from '/@/renderer/store';
 
 const TrackListRoute = () => {
   const tableRef = useRef<AgGridReactType | null>(null);
-  const filters = useSongListFilters();
-
+  const server = useCurrentServer();
   const [searchParams] = useSearchParams();
+  const { albumArtistId } = useParams();
+  const pageKey = generatePageKey(
+    'song',
+    albumArtistId ? `${albumArtistId}_${server?.id}` : undefined,
+  );
 
-  const customFilters: Partial<SongListQuery> | undefined = searchParams.get('artistId')
-    ? {
-        artistIds: [searchParams.get('artistId') as string],
-      }
-    : undefined;
-
+  const songListFilter = useSongListFilter({ id: albumArtistId, key: pageKey });
   const itemCountCheck = useSongList(
     {
       limit: 1,
       startIndex: 0,
-      ...filters,
-      ...customFilters,
-      jfParams: {
-        ...customFilters?.jfParams,
-        ...filters.jfParams,
-        includeItemTypes: 'Audio',
-      },
-      ndParams: {
-        ...customFilters?.ndParams,
-        ...filters.ndParams,
-      },
+      ...songListFilter,
     },
     {
-      cacheTime: 1000 * 60 * 60 * 2,
-      staleTime: 1000 * 60 * 60 * 2,
+      cacheTime: 1000 * 60,
+      staleTime: 1000 * 60,
     },
   );
 
@@ -49,17 +38,17 @@ const TrackListRoute = () => {
 
   return (
     <AnimatedPage>
-      <SongListHeader
-        customFilters={customFilters}
-        itemCount={itemCount}
-        tableRef={tableRef}
-        title={searchParams.get('artistName') || undefined}
-      />
-      <SongListContent
-        customFilters={customFilters}
-        itemCount={itemCount}
-        tableRef={tableRef}
-      />
+      <SongListContext.Provider value={{ id: albumArtistId, pageKey }}>
+        <SongListHeader
+          itemCount={itemCount}
+          tableRef={tableRef}
+          title={searchParams.get('artistName') || undefined}
+        />
+        <SongListContent
+          itemCount={itemCount}
+          tableRef={tableRef}
+        />
+      </SongListContext.Provider>
     </AnimatedPage>
   );
 };

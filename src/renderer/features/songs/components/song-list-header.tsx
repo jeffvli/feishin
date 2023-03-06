@@ -10,13 +10,13 @@ import { PageHeader, Paper, SearchInput, SpinnerIcon } from '/@/renderer/compone
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { SongListHeaderFilters } from '/@/renderer/features/songs/components/song-list-header-filters';
+import { useSongListContext } from '/@/renderer/features/songs/context/song-list-context';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { queryClient } from '/@/renderer/lib/react-query';
 import {
   SongListFilter,
   useCurrentServer,
-  useSetSongFilters,
-  useSetSongTablePagination,
+  useListStoreActions,
   useSongListStore,
 } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
@@ -36,9 +36,9 @@ export const SongListHeader = ({
   tableRef,
 }: SongListHeaderProps) => {
   const server = useCurrentServer();
-  const page = useSongListStore();
-  const setFilter = useSetSongFilters();
-  const setPagination = useSetSongTablePagination();
+  const { pageKey } = useSongListContext();
+  const { filter } = useSongListStore();
+  const { setFilter, setTablePagination } = useListStoreActions();
   const handlePlayQueueAdd = usePlayQueueAdd();
   const cq = useContainerQuery();
 
@@ -49,7 +49,7 @@ export const SongListHeader = ({
           const limit = params.endRow - params.startRow;
           const startIndex = params.startRow;
 
-          const pageFilters = filters || page.filter;
+          const pageFilters = filters || filter;
 
           const query: SongListQuery = {
             limit,
@@ -79,15 +79,15 @@ export const SongListHeader = ({
       tableRef.current?.api.setDatasource(dataSource);
       tableRef.current?.api.purgeInfiniteCache();
       tableRef.current?.api.ensureIndexVisible(0, 'top');
-      setPagination({ currentPage: 0 });
+      setTablePagination({ data: { currentPage: 0 }, key: pageKey });
     },
-    [customFilters, page.filter, server, setPagination, tableRef],
+    [customFilters, filter, pageKey, server, setTablePagination, tableRef],
   );
 
   const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-    const previousSearchTerm = page.filter.searchTerm;
+    const previousSearchTerm = filter.searchTerm;
     const searchTerm = e.target.value === '' ? undefined : e.target.value;
-    const updatedFilters = setFilter({ searchTerm });
+    const updatedFilters = setFilter({ data: { searchTerm }, key: pageKey }) as SongListFilter;
     if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
   }, 500);
 
@@ -95,7 +95,7 @@ export const SongListHeader = ({
 
   const handlePlay = async (play: Play) => {
     if (!itemCount || itemCount === 0) return;
-    const query: SongListQuery = { startIndex: 0, ...page.filter, ...customFilters };
+    const query: SongListQuery = { startIndex: 0, ...filter, ...customFilters };
 
     handlePlayQueueAdd?.({
       byItemType: {
@@ -130,7 +130,7 @@ export const SongListHeader = ({
           </LibraryHeaderBar>
           <Group>
             <SearchInput
-              defaultValue={page.filter.searchTerm}
+              defaultValue={filter.searchTerm}
               openedWidth={cq.isMd ? 250 : cq.isSm ? 200 : 150}
               onChange={handleSearch}
             />

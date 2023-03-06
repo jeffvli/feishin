@@ -281,6 +281,7 @@ const getAlbumList = async (args: AlbumListArgs): Promise<NDAlbumList> => {
     _order: sortOrderMap.navidrome[query.sortOrder],
     _sort: albumListSortMap.navidrome[query.sortBy],
     _start: query.startIndex,
+    artist_id: query.artistIds?.[0],
     name: query.searchTerm,
     ...query.ndParams,
   };

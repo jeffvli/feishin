@@ -29,21 +29,19 @@ import {
   Text,
   VirtualInfiniteGridRef,
 } from '/@/renderer/components';
-import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
-import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
   AlbumListFilter,
   useAlbumListStore,
   useCurrentServer,
-  useSetAlbumFilters,
-  useSetAlbumStore,
-  useSetAlbumTable,
-  useSetAlbumTablePagination,
+  useListStoreActions,
 } from '/@/renderer/store';
 import { ServerType, Play, ListDisplayType, TableColumn } from '/@/renderer/types';
 import { useMusicFolders } from '/@/renderer/features/shared';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
+import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
+import { useAlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
 
 const FILTERS = {
   jellyfin: [
@@ -94,25 +92,21 @@ export const AlbumListHeaderFilters = ({
   itemCount,
 }: AlbumListHeaderFiltersProps) => {
   const queryClient = useQueryClient();
+  const { id, pageKey } = useAlbumListContext();
   const server = useCurrentServer();
-
-  const setPage = useSetAlbumStore();
-  const setFilter = useSetAlbumFilters();
-  const page = useAlbumListStore();
-  const filters = page.filter;
+  const { setFilter, setTablePagination, setTable, setGrid, setDisplayType, setTableColumns } =
+    useListStoreActions();
+  const { display, filter, table, grid } = useAlbumListStore();
   const cq = useContainerQuery();
 
   const musicFoldersQuery = useMusicFolders();
 
-  const setPagination = useSetAlbumTablePagination();
-  const setTable = useSetAlbumTable();
-
   const sortByLabel =
     (server?.type &&
-      FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filters.sortBy)?.name) ||
+      FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filter.sortBy)?.name) ||
     'Unknown';
 
-  const sortOrderLabel = ORDER.find((o) => o.value === filters.sortOrder)?.name || 'Unknown';
+  const sortOrderLabel = ORDER.find((o) => o.value === filter.sortOrder)?.name || 'Unknown';
 
   const fetch = useCallback(
     async (skip: number, take: number, filters: AlbumListFilter) => {
@@ -151,10 +145,7 @@ export const AlbumListHeaderFilters = ({
 
   const handleFilterChange = useCallback(
     async (filters: AlbumListFilter) => {
-      if (
-        page.display === ListDisplayType.TABLE ||
-        page.display === ListDisplayType.TABLE_PAGINATED
-      ) {
+      if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
         const dataSource: IDatasource = {
           getRows: async (params) => {
             const limit = params.endRow - params.startRow;
@@ -197,8 +188,8 @@ export const AlbumListHeaderFilters = ({
         tableRef.current?.api.purgeInfiniteCache();
         tableRef.current?.api.ensureIndexVisible(0, 'top');
 
-        if (page.display === ListDisplayType.TABLE_PAGINATED) {
-          setPagination({ currentPage: 0 });
+        if (display === ListDisplayType.TABLE_PAGINATED) {
+          setTablePagination({ data: { currentPage: 0 }, key: 'album' });
         }
       } else {
         gridRef.current?.scrollTo(0);
@@ -213,7 +204,7 @@ export const AlbumListHeaderFilters = ({
         gridRef.current?.setItemData(data.items);
       }
     },
-    [page.display, tableRef, customFilters, server, queryClient, setPagination, gridRef, fetch],
+    [display, tableRef, customFilters, server, queryClient, setTablePagination, gridRef, fetch],
   );
 
   const handleOpenFiltersModal = () => {
@@ -224,11 +215,15 @@ export const AlbumListHeaderFilters = ({
             <NavidromeAlbumFilters
               disableArtistFilter={!!customFilters}
               handleFilterChange={handleFilterChange}
+              id={id}
+              pageKey={pageKey}
             />
           ) : (
             <JellyfinAlbumFilters
               disableArtistFilter={!!customFilters}
               handleFilterChange={handleFilterChange}
+              id={id}
+              pageKey={pageKey}
             />
           )}
         </>
@@ -239,8 +234,8 @@ export const AlbumListHeaderFilters = ({
 
   const handleRefresh = useCallback(() => {
     queryClient.invalidateQueries(queryKeys.albums.list(server?.id || ''));
-    handleFilterChange(filters);
-  }, [filters, handleFilterChange, queryClient, server?.id]);
+    handleFilterChange(filter);
+  }, [filter, handleFilterChange, queryClient, server?.id]);
 
   const handleSetSortBy = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -251,9 +246,12 @@ export const AlbumListHeaderFilters = ({
       )?.defaultOrder;
 
       const updatedFilters = setFilter({
-        sortBy: e.currentTarget.value as AlbumListSort,
-        sortOrder: sortOrder || SortOrder.ASC,
-      });
+        data: {
+          sortBy: e.currentTarget.value as AlbumListSort,
+          sortOrder: sortOrder || SortOrder.ASC,
+        },
+        key: 'album',
+      }) as AlbumListFilter;
 
       handleFilterChange(updatedFilters);
     },
@@ -265,22 +263,31 @@ export const AlbumListHeaderFilters = ({
       if (!e.currentTarget?.value) return;
 
       let updatedFilters = null;
-      if (e.currentTarget.value === String(page.filter.musicFolderId)) {
-        updatedFilters = setFilter({ musicFolderId: undefined });
+      if (e.currentTarget.value === String(filter.musicFolderId)) {
+        updatedFilters = setFilter({
+          data: { musicFolderId: undefined },
+          key: 'album',
+        }) as AlbumListFilter;
       } else {
-        updatedFilters = setFilter({ musicFolderId: e.currentTarget.value });
+        updatedFilters = setFilter({
+          data: { musicFolderId: e.currentTarget.value },
+          key: 'album',
+        }) as AlbumListFilter;
       }
 
       handleFilterChange(updatedFilters);
     },
-    [handleFilterChange, page.filter.musicFolderId, setFilter],
+    [handleFilterChange, filter.musicFolderId, setFilter],
   );
 
   const handleToggleSortOrder = useCallback(() => {
-    const newSortOrder = filters.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
-    const updatedFilters = setFilter({ sortOrder: newSortOrder });
+    const newSortOrder = filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
+    const updatedFilters = setFilter({
+      data: { sortOrder: newSortOrder },
+      key: 'album',
+    }) as AlbumListFilter;
     handleFilterChange(updatedFilters);
-  }, [filters.sortOrder, handleFilterChange, setFilter]);
+  }, [filter.sortOrder, handleFilterChange, setFilter]);
 
   const handlePlayQueueAdd = usePlayQueueAdd();
 
@@ -289,14 +296,14 @@ export const AlbumListHeaderFilters = ({
 
     const query = {
       startIndex: 0,
-      ...filters,
+      ...filter,
       ...customFilters,
       jfParams: {
-        ...filters.jfParams,
+        ...filter.jfParams,
         ...customFilters?.jfParams,
       },
       ndParams: {
-        ...filters.ndParams,
+        ...filter.ndParams,
         ...customFilters?.ndParams,
       },
     };
@@ -320,30 +327,28 @@ export const AlbumListHeaderFilters = ({
   };
 
   const handleItemSize = (e: number) => {
-    if (
-      page.display === ListDisplayType.TABLE ||
-      page.display === ListDisplayType.TABLE_PAGINATED
-    ) {
-      setTable({ rowHeight: e });
+    if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
+      setTable({ data: { rowHeight: e }, key: 'album' });
     } else {
-      setPage({ list: { ...page, grid: { ...page.grid, size: e } } });
+      setGrid({ data: { size: e }, key: 'album' });
     }
   };
 
   const handleSetViewType = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      setPage({ list: { ...page, display: e.currentTarget.value as ListDisplayType } });
+      setDisplayType({ data: e.currentTarget.value as ListDisplayType, key: 'album' });
     },
-    [page, setPage],
+    [setDisplayType],
   );
 
   const handleTableColumns = (values: TableColumn[]) => {
-    const existingColumns = page.table.columns;
+    const existingColumns = table.columns;
 
     if (values.length === 0) {
-      return setTable({
-        columns: [],
+      return setTableColumns({
+        data: [],
+        key: 'album',
       });
     }
 
@@ -351,20 +356,20 @@ export const AlbumListHeaderFilters = ({
     if (values.length > existingColumns.length) {
       const newColumn = { column: values[values.length - 1], width: 100 };
 
-      setTable({ columns: [...existingColumns, newColumn] });
+      setTableColumns({ data: [...existingColumns, newColumn], key: 'album' });
     } else {
       // If removing a column
       const removed = existingColumns.filter((column) => !values.includes(column.column));
       const newColumns = existingColumns.filter((column) => !removed.includes(column));
 
-      setTable({ columns: newColumns });
+      setTableColumns({ data: newColumns, key: 'album' });
     }
 
     return tableRef.current?.api.sizeColumnsToFit();
   };
 
   const handleAutoFitColumns = (e: ChangeEvent<HTMLInputElement>) => {
-    setTable({ autoFit: e.currentTarget.checked });
+    setTable({ data: { autoFit: e.currentTarget.checked }, key: 'album' });
 
     if (e.currentTarget.checked) {
       tableRef.current?.api.sizeColumnsToFit();
@@ -374,16 +379,16 @@ export const AlbumListHeaderFilters = ({
   const isFilterApplied = useMemo(() => {
     const isNavidromeFilterApplied =
       server?.type === ServerType.NAVIDROME &&
-      page.filter.ndParams &&
-      Object.values(page.filter.ndParams).some((value) => value !== undefined);
+      filter.ndParams &&
+      Object.values(filter.ndParams).some((value) => value !== undefined);
 
     const isJellyfinFilterApplied =
       server?.type === ServerType.JELLYFIN &&
-      page.filter.jfParams &&
-      Object.values(page.filter.jfParams).some((value) => value !== undefined);
+      filter.jfParams &&
+      Object.values(filter.jfParams).some((value) => value !== undefined);
 
     return isNavidromeFilterApplied || isJellyfinFilterApplied;
-  }, [page.filter.jfParams, page.filter.ndParams, server?.type]);
+  }, [filter.jfParams, filter.ndParams, server?.type]);
 
   return (
     <Flex justify="space-between">
@@ -404,14 +409,14 @@ export const AlbumListHeaderFilters = ({
             </Button>
           </DropdownMenu.Target>
           <DropdownMenu.Dropdown>
-            {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
+            {FILTERS[server?.type as keyof typeof FILTERS].map((f) => (
               <DropdownMenu.Item
-                key={`filter-${filter.name}`}
-                $isActive={filter.value === filters.sortBy}
-                value={filter.value}
+                key={`filter-${f.name}`}
+                $isActive={f.value === filter.sortBy}
+                value={f.value}
                 onClick={handleSetSortBy}
               >
-                {filter.name}
+                {f.name}
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Dropdown>
@@ -427,7 +432,7 @@ export const AlbumListHeaderFilters = ({
             sortOrderLabel
           ) : (
             <>
-              {filters.sortOrder === SortOrder.ASC ? (
+              {filter.sortOrder === SortOrder.ASC ? (
                 <RiSortAsc size={15} />
               ) : (
                 <RiSortDesc size={15} />
@@ -451,7 +456,7 @@ export const AlbumListHeaderFilters = ({
               {musicFoldersQuery.data?.map((folder) => (
                 <DropdownMenu.Item
                   key={`musicFolder-${folder.id}`}
-                  $isActive={filters.musicFolderId === folder.id}
+                  $isActive={filter.musicFolderId === folder.id}
                   value={folder.id}
                   onClick={handleSetMusicFolder}
                 >
@@ -528,28 +533,28 @@ export const AlbumListHeaderFilters = ({
           <DropdownMenu.Dropdown>
             <DropdownMenu.Label>Display type</DropdownMenu.Label>
             <DropdownMenu.Item
-              $isActive={page.display === ListDisplayType.CARD}
+              $isActive={display === ListDisplayType.CARD}
               value={ListDisplayType.CARD}
               onClick={handleSetViewType}
             >
               Card
             </DropdownMenu.Item>
             <DropdownMenu.Item
-              $isActive={page.display === ListDisplayType.POSTER}
+              $isActive={display === ListDisplayType.POSTER}
               value={ListDisplayType.POSTER}
               onClick={handleSetViewType}
             >
               Poster
             </DropdownMenu.Item>
             <DropdownMenu.Item
-              $isActive={page.display === ListDisplayType.TABLE}
+              $isActive={display === ListDisplayType.TABLE}
               value={ListDisplayType.TABLE}
               onClick={handleSetViewType}
             >
               Table
             </DropdownMenu.Item>
             <DropdownMenu.Item
-              $isActive={page.display === ListDisplayType.TABLE_PAGINATED}
+              $isActive={display === ListDisplayType.TABLE_PAGINATED}
               value={ListDisplayType.TABLE_PAGINATED}
               onClick={handleSetViewType}
             >
@@ -560,9 +565,9 @@ export const AlbumListHeaderFilters = ({
             <DropdownMenu.Item closeMenuOnClick={false}>
               <Slider
                 defaultValue={
-                  page.display === ListDisplayType.CARD || page.display === ListDisplayType.POSTER
-                    ? page.grid.size
-                    : page.table.rowHeight
+                  display === ListDisplayType.CARD || display === ListDisplayType.POSTER
+                    ? grid?.size || 0
+                    : table.rowHeight
                 }
                 label={null}
                 max={100}
@@ -570,8 +575,7 @@ export const AlbumListHeaderFilters = ({
                 onChangeEnd={handleItemSize}
               />
             </DropdownMenu.Item>
-            {(page.display === ListDisplayType.TABLE ||
-              page.display === ListDisplayType.TABLE_PAGINATED) && (
+            {(display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) && (
               <>
                 <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
                 <DropdownMenu.Item
@@ -583,14 +587,14 @@ export const AlbumListHeaderFilters = ({
                     <MultiSelect
                       clearable
                       data={ALBUM_TABLE_COLUMNS}
-                      defaultValue={page.table?.columns.map((column) => column.column)}
+                      defaultValue={table?.columns.map((column) => column.column)}
                       width={300}
                       onChange={handleTableColumns}
                     />
                     <Group position="apart">
                       <Text>Auto Fit Columns</Text>
                       <Switch
-                        defaultChecked={page.table.autoFit}
+                        defaultChecked={table.autoFit}
                         onChange={handleAutoFitColumns}
                       />
                     </Group>

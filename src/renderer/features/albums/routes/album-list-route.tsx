@@ -5,53 +5,34 @@ import { AlbumListContent } from '/@/renderer/features/albums/components/album-l
 import { useRef } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
-import { useAlbumListFilters, useCurrentServer } from '/@/renderer/store';
-import { useSearchParams } from 'react-router-dom';
-import { AlbumListQuery, ServerType } from '/@/renderer/api/types';
+import { generatePageKey, useAlbumListFilter, useCurrentServer } from '/@/renderer/store';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { AlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
 
 const AlbumListRoute = () => {
   const gridRef = useRef<VirtualInfiniteGridRef | null>(null);
   const tableRef = useRef<AgGridReactType | null>(null);
-  const filters = useAlbumListFilters();
   const server = useCurrentServer();
 
   const [searchParams] = useSearchParams();
+  const { albumArtistId } = useParams();
 
-  const customFilters: Partial<AlbumListQuery> | undefined = searchParams.get('artistId')
-    ? {
-        jfParams:
-          server?.type === ServerType.JELLYFIN
-            ? {
-                artistIds: searchParams.get('artistId') as string,
-              }
-            : undefined,
-        ndParams:
-          server?.type === ServerType.NAVIDROME
-            ? {
-                artist_id: searchParams.get('artistId') as string,
-              }
-            : undefined,
-      }
-    : undefined;
+  const pageKey = generatePageKey(
+    'album',
+    albumArtistId ? `${albumArtistId}_${server?.id}` : undefined,
+  );
+
+  const albumListFilter = useAlbumListFilter({ id: albumArtistId || undefined, key: pageKey });
 
   const itemCountCheck = useAlbumList(
     {
       limit: 1,
       startIndex: 0,
-      ...filters,
-      ...customFilters,
-      jfParams: {
-        ...filters.jfParams,
-        ...customFilters?.jfParams,
-      },
-      ndParams: {
-        ...filters.ndParams,
-        ...customFilters?.ndParams,
-      },
+      ...albumListFilter,
     },
     {
-      cacheTime: 1000 * 60 * 60 * 2,
-      staleTime: 1000 * 60 * 60 * 2,
+      cacheTime: 1000 * 60,
+      staleTime: 1000 * 60,
     },
   );
 
@@ -62,19 +43,19 @@ const AlbumListRoute = () => {
 
   return (
     <AnimatedPage>
-      <AlbumListHeader
-        customFilters={customFilters}
-        gridRef={gridRef}
-        itemCount={itemCount}
-        tableRef={tableRef}
-        title={searchParams.get('artistName') || undefined}
-      />
-      <AlbumListContent
-        customFilters={customFilters}
-        gridRef={gridRef}
-        itemCount={itemCount}
-        tableRef={tableRef}
-      />
+      <AlbumListContext.Provider value={{ id: albumArtistId || undefined, pageKey }}>
+        <AlbumListHeader
+          gridRef={gridRef}
+          itemCount={itemCount}
+          tableRef={tableRef}
+          title={searchParams.get('artistName') || undefined}
+        />
+        <AlbumListContent
+          gridRef={gridRef}
+          itemCount={itemCount}
+          tableRef={tableRef}
+        />
+      </AlbumListContext.Provider>
     </AnimatedPage>
   );
 };

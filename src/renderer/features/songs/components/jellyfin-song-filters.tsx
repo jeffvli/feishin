@@ -1,17 +1,23 @@
 import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import { MultiSelect, NumberInput, Switch, Text } from '/@/renderer/components';
-import { SongListFilter, useSetSongFilters, useSongListStore } from '/@/renderer/store';
+import { SongListFilter, useListStoreActions, useSongListFilter } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
 
 interface JellyfinSongFiltersProps {
   handleFilterChange: (filters: SongListFilter) => void;
+  id?: string;
+  pageKey: string;
 }
 
-export const JellyfinSongFilters = ({ handleFilterChange }: JellyfinSongFiltersProps) => {
-  const { filter } = useSongListStore();
-  const setFilters = useSetSongFilters();
+export const JellyfinSongFilters = ({
+  id,
+  pageKey,
+  handleFilterChange,
+}: JellyfinSongFiltersProps) => {
+  const { setFilter } = useListStoreActions();
+  const filter = useSongListFilter({ id, key: pageKey });
 
   // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
   const genreListQuery = useGenreList(null);
@@ -32,13 +38,16 @@ export const JellyfinSongFilters = ({ handleFilterChange }: JellyfinSongFiltersP
     {
       label: 'Is favorited',
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
-        const updatedFilters = setFilters({
-          jfParams: {
-            ...filter.jfParams,
-            includeItemTypes: 'Audio',
-            isFavorite: e.currentTarget.checked ? true : undefined,
+        const updatedFilters = setFilter({
+          data: {
+            jfParams: {
+              ...filter.jfParams,
+              includeItemTypes: 'Audio',
+              isFavorite: e.currentTarget.checked ? true : undefined,
+            },
           },
-        });
+          key: pageKey,
+        }) as SongListFilter;
         handleFilterChange(updatedFilters);
       },
       value: filter.jfParams?.isFavorite,
@@ -47,37 +56,46 @@ export const JellyfinSongFilters = ({ handleFilterChange }: JellyfinSongFiltersP
 
   const handleMinYearFilter = debounce((e: number | string) => {
     if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
-    const updatedFilters = setFilters({
-      jfParams: {
-        ...filter.jfParams,
-        includeItemTypes: 'Audio',
-        minYear: e === '' ? undefined : (e as number),
+    const updatedFilters = setFilter({
+      data: {
+        jfParams: {
+          ...filter.jfParams,
+          includeItemTypes: 'Audio',
+          minYear: e === '' ? undefined : (e as number),
+        },
       },
-    });
+      key: pageKey,
+    }) as SongListFilter;
     handleFilterChange(updatedFilters);
   }, 500);
 
   const handleMaxYearFilter = debounce((e: number | string) => {
     if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
-    const updatedFilters = setFilters({
-      jfParams: {
-        ...filter.jfParams,
-        includeItemTypes: 'Audio',
-        maxYear: e === '' ? undefined : (e as number),
+    const updatedFilters = setFilter({
+      data: {
+        jfParams: {
+          ...filter.jfParams,
+          includeItemTypes: 'Audio',
+          maxYear: e === '' ? undefined : (e as number),
+        },
       },
-    });
+      key: pageKey,
+    }) as SongListFilter;
     handleFilterChange(updatedFilters);
   }, 500);
 
   const handleGenresFilter = debounce((e: string[] | undefined) => {
     const genreFilterString = e?.length ? e.join(',') : undefined;
-    const updatedFilters = setFilters({
-      jfParams: {
-        ...filter.jfParams,
-        genreIds: genreFilterString,
-        includeItemTypes: 'Audio',
+    const updatedFilters = setFilter({
+      data: {
+        jfParams: {
+          ...filter.jfParams,
+          genreIds: genreFilterString,
+          includeItemTypes: 'Audio',
+        },
       },
-    });
+      key: pageKey,
+    }) as SongListFilter;
     handleFilterChange(updatedFilters);
   }, 250);
 

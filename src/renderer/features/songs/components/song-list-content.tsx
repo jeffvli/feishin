@@ -19,12 +19,10 @@ import {
   VirtualTable,
 } from '/@/renderer/components';
 import {
-  SongListFilter,
   useCurrentServer,
-  useSetSongTable,
-  useSetSongTablePagination,
+  useListStoreActions,
+  useSongListFilter,
   useSongListStore,
-  useSongTablePagination,
 } from '/@/renderer/store';
 import { ListDisplayType } from '/@/renderer/types';
 import { AnimatePresence } from 'framer-motion';
@@ -34,30 +32,28 @@ import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/conte
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem, QueueSong, SongListQuery } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { useSongListContext } from '/@/renderer/features/songs/context/song-list-context';
 
 interface SongListContentProps {
-  customFilters?: Partial<SongListFilter>;
   itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SongListContent = ({ customFilters, itemCount, tableRef }: SongListContentProps) => {
+export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
-  const page = useSongListStore();
 
-  const pagination = useSongTablePagination();
-  const setPagination = useSetSongTablePagination();
-  const setTable = useSetSongTable();
+  const { display, table } = useSongListStore();
+  const { id, pageKey } = useSongListContext();
+  const filter = useSongListFilter({ id, key: pageKey });
+
+  const { setTable, setTablePagination } = useListStoreActions();
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
 
-  const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
+  const isPaginationEnabled = display === ListDisplayType.TABLE_PAGINATED;
 
-  const columnDefs: ColDef[] = useMemo(
-    () => getColumnDefs(page.table.columns),
-    [page.table.columns],
-  );
+  const columnDefs: ColDef[] = useMemo(() => getColumnDefs(table.columns), [table.columns]);
 
   const onGridReady = useCallback(
     (params: GridReadyEvent) => {
@@ -69,8 +65,7 @@ export const SongListContent = ({ customFilters, itemCount, tableRef }: SongList
           const query: SongListQuery = {
             limit,
             startIndex,
-            ...page.filter,
-            ...customFilters,
+            ...filter,
           };
 
           const queryKey = queryKeys.songs.list(server?.id || '', query);
@@ -93,11 +88,9 @@ export const SongListContent = ({ customFilters, itemCount, tableRef }: SongList
       };
       params.api.setDatasource(dataSource);
 
-      if (!customFilters) {
-        params.api.ensureIndexVisible(page.table.scrollOffset, 'top');
-      }
+      params.api.ensureIndexVisible(table.scrollOffset, 'top');
     },
-    [customFilters, page.filter, page.table.scrollOffset, queryClient, server],
+    [filter, table.scrollOffset, queryClient, server],
   );
 
   const onPaginationChanged = useCallback(
@@ -106,22 +99,31 @@ export const SongListContent = ({ customFilters, itemCount, tableRef }: SongList
 
       try {
         // Scroll to top of page on pagination change
-        const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage;
+        const currentPageStartIndex = table.pagination.currentPage * table.pagination.itemsPerPage;
         event.api?.ensureIndexVisible(currentPageStartIndex, 'top');
       } catch (err) {
         console.log(err);
       }
-      setPagination({
-        itemsPerPage: event.api.paginationGetPageSize(),
-        totalItems: event.api.paginationGetRowCount(),
-        totalPages: event.api.paginationGetTotalPages() + 1,
+      setTablePagination({
+        data: {
+          itemsPerPage: event.api.paginationGetPageSize(),
+          totalItems: event.api.paginationGetRowCount(),
+          totalPages: event.api.paginationGetTotalPages() + 1,
+        },
+        key: pageKey,
       });
     },
-    [isPaginationEnabled, pagination.currentPage, pagination.itemsPerPage, setPagination],
+    [
+      isPaginationEnabled,
+      pageKey,
+      setTablePagination,
+      table.pagination.currentPage,
+      table.pagination.itemsPerPage,
+    ],
   );
 
   const handleGridSizeChange = () => {
-    if (page.table.autoFit) {
+    if (table.autoFit) {
       tableRef?.current?.api.sizeColumnsToFit();
     }
   };
@@ -132,7 +134,7 @@ export const SongListContent = ({ customFilters, itemCount, tableRef }: SongList
 
     if (!columnsOrder) return;
 
-    const columnsInSettings = page.table.columns;
+    const columnsInSettings = table.columns;
     const updatedColumns = [];
     for (const column of columnsOrder) {
       const columnInSettings = columnsInSettings.find((c) => c.column === column.getColDef().colId);
@@ -140,22 +142,22 @@ export const SongListContent = ({ customFilters, itemCount, tableRef }: SongList
       if (columnInSettings) {
         updatedColumns.push({
           ...columnInSettings,
-          ...(!page.table.autoFit && {
+          ...(!table.autoFit && {
             width: column.getActualWidth(),
           }),
         });
       }
     }
 
-    setTable({ columns: updatedColumns });
-  }, [page.table.autoFit, page.table.columns, setTable, tableRef]);
+    setTable({ data: { columns: updatedColumns }, key: pageKey });
+  }, [tableRef, table.columns, table.autoFit, setTable, pageKey]);
 
   const debouncedColumnChange = debounce(handleColumnChange, 200);
 
   const handleScroll = (e: BodyScrollEvent) => {
-    if (customFilters) return;
-    const scrollOffset = Number((e.top / page.table.rowHeight).toFixed(0));
-    setTable({ scrollOffset });
+    if (id) return;
+    const scrollOffset = Number((e.top / table.rowHeight).toFixed(0));
+    setTable({ data: { scrollOffset }, key: pageKey });
   };
 
   const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
@@ -177,23 +179,20 @@ export const SongListContent = ({ customFilters, itemCount, tableRef }: SongList
         <VirtualTable
           // https://github.com/ag-grid/ag-grid/issues/5284
           // Key is used to force remount of table when display, rowHeight, or server changes
-          key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
+          key={`table-${display}-${table.rowHeight}-${server?.id}`}
           ref={tableRef}
           alwaysShowHorizontalScroll
           suppressRowDrag
-          autoFitColumns={page.table.autoFit}
+          autoFitColumns={table.autoFit}
           blockLoadDebounceMillis={200}
-          cacheBlockSize={500}
-          cacheOverflowSize={1}
           columnDefs={columnDefs}
-          enableCellChangeFlash={false}
           getRowId={(data) => data.data.id}
           infiniteInitialRowCount={itemCount || 100}
           pagination={isPaginationEnabled}
           paginationAutoPageSize={isPaginationEnabled}
-          paginationPageSize={page.table.pagination.itemsPerPage || 100}
+          paginationPageSize={table.pagination.itemsPerPage || 100}
           rowBuffer={20}
-          rowHeight={page.table.rowHeight || 40}
+          rowHeight={table.rowHeight || 40}
           rowModelType="infinite"
           rowSelection="multiple"
           onBodyScrollEnd={handleScroll}
@@ -211,10 +210,11 @@ export const SongListContent = ({ customFilters, itemCount, tableRef }: SongList
         initial={false}
         mode="wait"
       >
-        {page.display === ListDisplayType.TABLE_PAGINATED && (
+        {display === ListDisplayType.TABLE_PAGINATED && (
           <TablePagination
-            pagination={pagination}
-            setPagination={setPagination}
+            pageKey={pageKey}
+            pagination={table.pagination}
+            setPagination={setTablePagination}
             tableRef={tableRef}
           />
         )}

@@ -22,8 +22,7 @@ import {
   AlbumListFilter,
   useAlbumListStore,
   useCurrentServer,
-  useSetAlbumFilters,
-  useSetAlbumTablePagination,
+  useListStoreActions,
 } from '/@/renderer/store';
 import { ListDisplayType, Play } from '/@/renderer/types';
 import { AlbumListHeaderFilters } from '/@/renderer/features/albums/components/album-list-header-filters';
@@ -47,12 +46,9 @@ export const AlbumListHeader = ({
 }: AlbumListHeaderProps) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
-  const setFilter = useSetAlbumFilters();
-  const page = useAlbumListStore();
-  const filters = page.filter;
+  const { setFilter, setTablePagination } = useListStoreActions();
   const cq = useContainerQuery();
-
-  const setPagination = useSetAlbumTablePagination();
+  const { filter, display } = useAlbumListStore();
 
   const fetch = useCallback(
     async (skip: number, take: number, filters: AlbumListFilter) => {
@@ -91,10 +87,7 @@ export const AlbumListHeader = ({
 
   const handleFilterChange = useCallback(
     async (filters: AlbumListFilter) => {
-      if (
-        page.display === ListDisplayType.TABLE ||
-        page.display === ListDisplayType.TABLE_PAGINATED
-      ) {
+      if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
         const dataSource: IDatasource = {
           getRows: async (params) => {
             const limit = params.endRow - params.startRow;
@@ -137,8 +130,8 @@ export const AlbumListHeader = ({
         tableRef.current?.api.purgeInfiniteCache();
         tableRef.current?.api.ensureIndexVisible(0, 'top');
 
-        if (page.display === ListDisplayType.TABLE_PAGINATED) {
-          setPagination({ currentPage: 0 });
+        if (display === ListDisplayType.TABLE_PAGINATED) {
+          setTablePagination({ data: { currentPage: 0 }, key: 'album' });
         }
       } else {
         gridRef.current?.scrollTo(0);
@@ -153,13 +146,13 @@ export const AlbumListHeader = ({
         gridRef.current?.setItemData(data.items);
       }
     },
-    [page.display, tableRef, customFilters, server, queryClient, setPagination, gridRef, fetch],
+    [display, tableRef, customFilters, server, queryClient, setTablePagination, gridRef, fetch],
   );
 
   const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-    const previousSearchTerm = page.filter.searchTerm;
+    const previousSearchTerm = filter.searchTerm;
     const searchTerm = e.target.value === '' ? undefined : e.target.value;
-    const updatedFilters = setFilter({ searchTerm });
+    const updatedFilters = setFilter({ data: { searchTerm }, key: 'album' }) as AlbumListFilter;
     if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
   }, 500);
 
@@ -171,14 +164,14 @@ export const AlbumListHeader = ({
 
     const query = {
       startIndex: 0,
-      ...filters,
+      ...filter,
       ...customFilters,
       jfParams: {
-        ...filters.jfParams,
+        ...filter.jfParams,
         ...customFilters?.jfParams,
       },
       ndParams: {
-        ...filters.ndParams,
+        ...filter.ndParams,
         ...customFilters?.ndParams,
       },
     };
@@ -225,7 +218,7 @@ export const AlbumListHeader = ({
           </LibraryHeaderBar>
           <Group>
             <SearchInput
-              defaultValue={page.filter.searchTerm}
+              defaultValue={filter.searchTerm}
               openedWidth={cq.isMd ? 250 : cq.isSm ? 200 : 150}
               onChange={handleSearch}
             />

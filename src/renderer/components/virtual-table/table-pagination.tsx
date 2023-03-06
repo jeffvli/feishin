@@ -12,21 +12,21 @@ import { Popover } from '/@/renderer/components/popover';
 import { Text } from '/@/renderer/components/text';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { TablePagination as TablePaginationType } from '/@/renderer/types';
+import { ListKey } from '/@/renderer/store';
 
 interface TablePaginationProps {
-  id?: string;
+  pageKey: ListKey;
   pagination: TablePaginationType;
   setIdPagination?: (id: string, pagination: Partial<TablePaginationType>) => void;
-  setPagination?: (pagination: Partial<TablePaginationType>) => void;
+  setPagination?: (args: { data: Partial<TablePaginationType>; key: ListKey }) => void;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const TablePagination = ({
-  id,
+  pageKey,
   tableRef,
   pagination,
   setPagination,
-  setIdPagination,
 }: TablePaginationProps) => {
   const [isGoToPageOpen, handlers] = useDisclosure(false);
   const containerQuery = useContainerQuery();
@@ -40,8 +40,7 @@ export const TablePagination = ({
   const handlePagination = (index: number) => {
     const newPage = index - 1;
     tableRef.current?.api.paginationGoToPage(newPage);
-    setPagination?.({ currentPage: newPage });
-    setIdPagination?.(id || '', { currentPage: newPage });
+    setPagination?.({ data: { currentPage: newPage }, key: pageKey });
   };
 
   const handleGoSubmit = goToForm.onSubmit((values) => {
@@ -52,8 +51,7 @@ export const TablePagination = ({
 
     const newPage = values.pageNumber - 1;
     tableRef.current?.api.paginationGoToPage(newPage);
-    setPagination?.({ currentPage: newPage });
-    setIdPagination?.(id || '', { currentPage: newPage });
+    setPagination?.({ data: { currentPage: newPage }, key: pageKey });
   });
 
   const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage + 1;
@@ -103,7 +101,6 @@ export const TablePagination = ({
           trapFocus
           opened={isGoToPageOpen}
           position="bottom-start"
-          transition="fade"
           onClose={() => handlers.close()}
         >
           <Popover.Target>
@@ -142,10 +139,10 @@ export const TablePagination = ({
           noWrap
           $hideDividers={!containerQuery.isSm}
           boundaries={1}
-          page={pagination.currentPage + 1}
           radius="sm"
           siblings={containerQuery.isMd ? 2 : containerQuery.isSm ? 1 : 0}
           total={pagination.totalPages - 1}
+          value={pagination.currentPage + 1}
           onChange={handlePagination}
         />
       </Group>

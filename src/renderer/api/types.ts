@@ -343,6 +343,7 @@ export enum AlbumListSort {
 }
 
 export type AlbumListQuery = {
+  artistIds?: string[];
   jfParams?: {
     albumArtistIds?: string;
     artistIds?: string;

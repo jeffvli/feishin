@@ -1,7 +1,7 @@
 import { ChangeEvent, useMemo, useState } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import { MultiSelect, NumberInput, SpinnerIcon, Switch, Text } from '/@/renderer/components';
-import { AlbumListFilter, useAlbumListStore, useSetAlbumFilters } from '/@/renderer/store';
+import { AlbumListFilter, useAlbumListFilter, useListStoreActions } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
 import { AlbumArtistListSort, SortOrder } from '/@/renderer/api/types';
@@ -10,14 +10,18 @@ import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-a
 interface JellyfinAlbumFiltersProps {
   disableArtistFilter?: boolean;
   handleFilterChange: (filters: AlbumListFilter) => void;
+  id?: string;
+  pageKey: string;
 }
 
 export const JellyfinAlbumFilters = ({
   disableArtistFilter,
   handleFilterChange,
+  pageKey,
+  id,
 }: JellyfinAlbumFiltersProps) => {
-  const { filter } = useAlbumListStore();
-  const setFilters = useSetAlbumFilters();
+  const filter = useAlbumListFilter({ id, key: pageKey });
+  const { setFilter } = useListStoreActions();
 
   // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
   const genreListQuery = useGenreList(null);
@@ -38,9 +42,16 @@ export const JellyfinAlbumFilters = ({
     {
       label: 'Is favorited',
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
-        const updatedFilters = setFilters({
-          jfParams: { ...filter.jfParams, isFavorite: e.currentTarget.checked ? true : undefined },
-        });
+        const updatedFilters = setFilter({
+          data: {
+            jfParams: {
+              ...filter.jfParams,
+              includeItemTypes: 'Audio',
+              isFavorite: e.currentTarget.checked ? true : undefined,
+            },
+          },
+          key: pageKey,
+        }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
       },
       value: filter.jfParams?.isFavorite,
@@ -49,34 +60,43 @@ export const JellyfinAlbumFilters = ({
 
   const handleMinYearFilter = debounce((e: number | string) => {
     if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
-    const updatedFilters = setFilters({
-      jfParams: {
-        ...filter.jfParams,
-        minYear: e === '' ? undefined : (e as number),
+    const updatedFilters = setFilter({
+      data: {
+        jfParams: {
+          ...filter.jfParams,
+          minYear: e === '' ? undefined : (e as number),
+        },
       },
-    });
+      key: pageKey,
+    }) as AlbumListFilter;
     handleFilterChange(updatedFilters);
   }, 500);
 
   const handleMaxYearFilter = debounce((e: number | string) => {
     if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
-    const updatedFilters = setFilters({
-      jfParams: {
-        ...filter.jfParams,
-        maxYear: e === '' ? undefined : (e as number),
+    const updatedFilters = setFilter({
+      data: {
+        jfParams: {
+          ...filter.jfParams,
+          maxYear: e === '' ? undefined : (e as number),
+        },
       },
-    });
+      key: pageKey,
+    }) as AlbumListFilter;
     handleFilterChange(updatedFilters);
   }, 500);
 
   const handleGenresFilter = debounce((e: string[] | undefined) => {
     const genreFilterString = e?.length ? e.join(',') : undefined;
-    const updatedFilters = setFilters({
-      jfParams: {
-        ...filter.jfParams,
-        genreIds: genreFilterString,
+    const updatedFilters = setFilter({
+      data: {
+        jfParams: {
+          ...filter.jfParams,
+          genreIds: genreFilterString,
+        },
       },
-    });
+      key: pageKey,
+    }) as AlbumListFilter;
     handleFilterChange(updatedFilters);
   }, 250);
 
@@ -105,12 +125,15 @@ export const JellyfinAlbumFilters = ({
 
   const handleAlbumArtistFilter = (e: string[] | null) => {
     const albumArtistFilterString = e?.length ? e.join(',') : undefined;
-    const updatedFilters = setFilters({
-      jfParams: {
-        ...filter.jfParams,
-        albumArtistIds: albumArtistFilterString,
+    const updatedFilters = setFilter({
+      data: {
+        jfParams: {
+          ...filter.jfParams,
+          albumArtistIds: albumArtistFilterString,
+        },
       },
-    });
+      key: pageKey,
+    }) as AlbumListFilter;
     handleFilterChange(updatedFilters);
   };
 
