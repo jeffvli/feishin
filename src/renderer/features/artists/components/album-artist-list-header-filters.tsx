@@ -28,14 +28,13 @@ import { useMusicFolders } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
   useCurrentServer,
-  useSetAlbumArtistStore,
-  useSetAlbumArtistFilters,
   useAlbumArtistListStore,
-  useSetAlbumArtistTablePagination,
-  useSetAlbumArtistTable,
   AlbumArtistListFilter,
+  useListStoreActions,
+  useAlbumArtistListFilter,
 } from '/@/renderer/store';
 import { ListDisplayType, TableColumn, ServerType } from '/@/renderer/types';
+import { useAlbumArtistListContext } from '../context/album-artist-list-context';
 
 const FILTERS = {
   jellyfin: [
@@ -76,32 +75,27 @@ export const AlbumArtistListHeaderFilters = ({
 }: AlbumArtistListHeaderFiltersProps) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
-  const setPage = useSetAlbumArtistStore();
-  const setFilter = useSetAlbumArtistFilters();
-  const page = useAlbumArtistListStore();
-  const filters = page.filter;
+  const { pageKey } = useAlbumArtistListContext();
+  const { display, table, grid } = useAlbumArtistListStore();
+  const { setFilter, setTable, setTablePagination, setDisplayType, setGrid } =
+    useListStoreActions();
+  const filter = useAlbumArtistListFilter({ key: pageKey });
   const cq = useContainerQuery();
 
   const musicFoldersQuery = useMusicFolders();
 
-  const setPagination = useSetAlbumArtistTablePagination();
-  const setTable = useSetAlbumArtistTable();
-
   const sortByLabel =
     (server?.type &&
-      FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filters.sortBy)?.name) ||
+      FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filter.sortBy)?.name) ||
     'Unknown';
 
-  const sortOrderLabel = ORDER.find((o) => o.value === filters.sortOrder)?.name || 'Unknown';
+  const sortOrderLabel = ORDER.find((o) => o.value === filter.sortOrder)?.name || 'Unknown';
 
   const handleItemSize = (e: number) => {
-    if (
-      page.display === ListDisplayType.TABLE ||
-      page.display === ListDisplayType.TABLE_PAGINATED
-    ) {
-      setTable({ rowHeight: e });
+    if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
+      setTable({ data: { rowHeight: e }, key: pageKey });
     } else {
-      setPage({ list: { ...page, grid: { ...page.grid, size: e } } });
+      setGrid({ data: { size: e }, key: pageKey });
     }
   };
 
@@ -135,10 +129,7 @@ export const AlbumArtistListHeaderFilters = ({
 
   const handleFilterChange = useCallback(
     async (filters: AlbumArtistListFilter) => {
-      if (
-        page.display === ListDisplayType.TABLE ||
-        page.display === ListDisplayType.TABLE_PAGINATED
-      ) {
+      if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
         const dataSource: IDatasource = {
           getRows: async (params) => {
             const limit = params.endRow - params.startRow;
@@ -177,8 +168,8 @@ export const AlbumArtistListHeaderFilters = ({
         tableRef.current?.api.purgeInfiniteCache();
         tableRef.current?.api.ensureIndexVisible(0, 'top');
 
-        if (page.display === ListDisplayType.TABLE_PAGINATED) {
-          setPagination({ currentPage: 0 });
+        if (display === ListDisplayType.TABLE_PAGINATED) {
+          setTablePagination({ data: { currentPage: 0 }, key: pageKey });
         }
       } else {
         gridRef.current?.scrollTo(0);
@@ -193,7 +184,7 @@ export const AlbumArtistListHeaderFilters = ({
         gridRef.current?.setItemData(data.items);
       }
     },
-    [page.display, tableRef, setPagination, server, queryClient, gridRef, fetch],
+    [display, tableRef, server, queryClient, setTablePagination, pageKey, gridRef, fetch],
   );
 
   const handleSetSortBy = useCallback(
@@ -205,13 +196,16 @@ export const AlbumArtistListHeaderFilters = ({
       )?.defaultOrder;
 
       const updatedFilters = setFilter({
-        sortBy: e.currentTarget.value as AlbumArtistListSort,
-        sortOrder: sortOrder || SortOrder.ASC,
-      });
+        data: {
+          sortBy: e.currentTarget.value as AlbumArtistListSort,
+          sortOrder: sortOrder || SortOrder.ASC,
+        },
+        key: pageKey,
+      }) as AlbumArtistListFilter;
 
       handleFilterChange(updatedFilters);
     },
-    [handleFilterChange, server?.type, setFilter],
+    [handleFilterChange, pageKey, server?.type, setFilter],
   );
 
   const handleSetMusicFolder = useCallback(
@@ -219,37 +213,50 @@ export const AlbumArtistListHeaderFilters = ({
       if (!e.currentTarget?.value) return;
 
       let updatedFilters = null;
-      if (e.currentTarget.value === String(page.filter.musicFolderId)) {
-        updatedFilters = setFilter({ musicFolderId: undefined });
+      if (e.currentTarget.value === String(filter.musicFolderId)) {
+        updatedFilters = setFilter({
+          data: { musicFolderId: undefined },
+          key: pageKey,
+        }) as AlbumArtistListFilter;
       } else {
-        updatedFilters = setFilter({ musicFolderId: e.currentTarget.value });
+        updatedFilters = setFilter({
+          data: { musicFolderId: e.currentTarget.value },
+          key: pageKey,
+        }) as AlbumArtistListFilter;
       }
 
       handleFilterChange(updatedFilters);
     },
-    [handleFilterChange, page.filter.musicFolderId, setFilter],
+    [filter.musicFolderId, handleFilterChange, setFilter, pageKey],
   );
 
   const handleToggleSortOrder = useCallback(() => {
-    const newSortOrder = filters.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
-    const updatedFilters = setFilter({ sortOrder: newSortOrder });
+    const newSortOrder = filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
+    const updatedFilters = setFilter({
+      data: { sortOrder: newSortOrder },
+      key: pageKey,
+    }) as AlbumArtistListFilter;
     handleFilterChange(updatedFilters);
-  }, [filters.sortOrder, handleFilterChange, setFilter]);
+  }, [filter.sortOrder, handleFilterChange, pageKey, setFilter]);
 
   const handleSetViewType = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
-      setPage({ list: { ...page, display: e.currentTarget.value as ListDisplayType } });
+
+      setDisplayType({ data: e.currentTarget.value as ListDisplayType, key: pageKey });
     },
-    [page, setPage],
+    [pageKey, setDisplayType],
   );
 
   const handleTableColumns = (values: TableColumn[]) => {
-    const existingColumns = page.table.columns;
+    const existingColumns = table.columns;
 
     if (values.length === 0) {
       return setTable({
-        columns: [],
+        data: {
+          columns: [],
+        },
+        key: pageKey,
       });
     }
 
@@ -257,20 +264,20 @@ export const AlbumArtistListHeaderFilters = ({
     if (values.length > existingColumns.length) {
       const newColumn = { column: values[values.length - 1], width: 100 };
 
-      setTable({ columns: [...existingColumns, newColumn] });
+      setTable({ data: { columns: [...existingColumns, newColumn] }, key: pageKey });
     } else {
       // If removing a column
       const removed = existingColumns.filter((column) => !values.includes(column.column));
       const newColumns = existingColumns.filter((column) => !removed.includes(column));
 
-      setTable({ columns: newColumns });
+      setTable({ data: { columns: newColumns }, key: pageKey });
     }
 
     return tableRef.current?.api.sizeColumnsToFit();
   };
 
   const handleAutoFitColumns = (e: ChangeEvent<HTMLInputElement>) => {
-    setTable({ autoFit: e.currentTarget.checked });
+    setTable({ data: { autoFit: e.currentTarget.checked }, key: pageKey });
 
     if (e.currentTarget.checked) {
       tableRef.current?.api.sizeColumnsToFit();
@@ -279,8 +286,8 @@ export const AlbumArtistListHeaderFilters = ({
 
   const handleRefresh = useCallback(() => {
     queryClient.invalidateQueries(queryKeys.albumArtists.list(server?.id || ''));
-    handleFilterChange(filters);
-  }, [filters, handleFilterChange, queryClient, server?.id]);
+    handleFilterChange(filter);
+  }, [filter, handleFilterChange, queryClient, server?.id]);
 
   return (
     <Flex justify="space-between">
@@ -301,14 +308,14 @@ export const AlbumArtistListHeaderFilters = ({
             </Button>
           </DropdownMenu.Target>
           <DropdownMenu.Dropdown>
-            {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
+            {FILTERS[server?.type as keyof typeof FILTERS].map((f) => (
               <DropdownMenu.Item
-                key={`filter-${filter.name}`}
-                $isActive={filter.value === filters.sortBy}
-                value={filter.value}
+                key={`filter-${f.name}`}
+                $isActive={f.value === filter.sortBy}
+                value={f.value}
                 onClick={handleSetSortBy}
               >
-                {filter.name}
+                {f.name}
               </DropdownMenu.Item>
             ))}
           </DropdownMenu.Dropdown>
@@ -324,7 +331,7 @@ export const AlbumArtistListHeaderFilters = ({
             sortOrderLabel
           ) : (
             <>
-              {filters.sortOrder === SortOrder.ASC ? (
+              {filter.sortOrder === SortOrder.ASC ? (
                 <RiSortAsc size={15} />
               ) : (
                 <RiSortDesc size={15} />
@@ -348,7 +355,7 @@ export const AlbumArtistListHeaderFilters = ({
               {musicFoldersQuery.data?.map((folder) => (
                 <DropdownMenu.Item
                   key={`musicFolder-${folder.id}`}
-                  $isActive={filters.musicFolderId === folder.id}
+                  $isActive={filter.musicFolderId === folder.id}
                   value={folder.id}
                   onClick={handleSetMusicFolder}
                 >
@@ -392,28 +399,28 @@ export const AlbumArtistListHeaderFilters = ({
           <DropdownMenu.Dropdown>
             <DropdownMenu.Label>Display type</DropdownMenu.Label>
             <DropdownMenu.Item
-              $isActive={page.display === ListDisplayType.CARD}
+              $isActive={display === ListDisplayType.CARD}
               value={ListDisplayType.CARD}
               onClick={handleSetViewType}
             >
               Card
             </DropdownMenu.Item>
             <DropdownMenu.Item
-              $isActive={page.display === ListDisplayType.POSTER}
+              $isActive={display === ListDisplayType.POSTER}
               value={ListDisplayType.POSTER}
               onClick={handleSetViewType}
             >
               Poster
             </DropdownMenu.Item>
             <DropdownMenu.Item
-              $isActive={page.display === ListDisplayType.TABLE}
+              $isActive={display === ListDisplayType.TABLE}
               value={ListDisplayType.TABLE}
               onClick={handleSetViewType}
             >
               Table
             </DropdownMenu.Item>
             <DropdownMenu.Item
-              $isActive={page.display === ListDisplayType.TABLE_PAGINATED}
+              $isActive={display === ListDisplayType.TABLE_PAGINATED}
               value={ListDisplayType.TABLE_PAGINATED}
               onClick={handleSetViewType}
             >
@@ -424,9 +431,9 @@ export const AlbumArtistListHeaderFilters = ({
             <DropdownMenu.Item closeMenuOnClick={false}>
               <Slider
                 defaultValue={
-                  page.display === ListDisplayType.CARD || page.display === ListDisplayType.POSTER
-                    ? page.grid.size
-                    : page.table.rowHeight
+                  display === ListDisplayType.CARD || display === ListDisplayType.POSTER
+                    ? grid?.size
+                    : table.rowHeight
                 }
                 label={null}
                 max={100}
@@ -434,8 +441,7 @@ export const AlbumArtistListHeaderFilters = ({
                 onChangeEnd={handleItemSize}
               />
             </DropdownMenu.Item>
-            {(page.display === ListDisplayType.TABLE ||
-              page.display === ListDisplayType.TABLE_PAGINATED) && (
+            {(display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) && (
               <>
                 <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
                 <DropdownMenu.Item
@@ -447,14 +453,14 @@ export const AlbumArtistListHeaderFilters = ({
                     <MultiSelect
                       clearable
                       data={ALBUMARTIST_TABLE_COLUMNS}
-                      defaultValue={page.table?.columns.map((column) => column.column)}
+                      defaultValue={table?.columns.map((column) => column.column)}
                       width={300}
                       onChange={handleTableColumns}
                     />
                     <Group position="apart">
                       <Text>Auto Fit Columns</Text>
                       <Switch
-                        defaultChecked={page.table.autoFit}
+                        defaultChecked={table.autoFit}
                         onChange={handleAutoFitColumns}
                       />
                     </Group>

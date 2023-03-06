@@ -5,23 +5,25 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { useRef } from 'react';
 import { AlbumArtistListContent } from '/@/renderer/features/artists/components/album-artist-list-content';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
-import { useAlbumArtistListStore } from '/@/renderer/store';
+import { generatePageKey, useAlbumArtistListFilter } from '/@/renderer/store';
+import { AlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
 
 const AlbumArtistListRoute = () => {
   const gridRef = useRef<VirtualInfiniteGridRef | null>(null);
   const tableRef = useRef<AgGridReactType | null>(null);
-  const page = useAlbumArtistListStore();
-  const filters = page.filter;
+  const pageKey = generatePageKey('albumArtist', undefined);
+
+  const albumArtistListFilter = useAlbumArtistListFilter({ id: undefined, key: pageKey });
 
   const itemCountCheck = useAlbumArtistList(
     {
       limit: 1,
       startIndex: 0,
-      ...filters,
+      ...albumArtistListFilter,
     },
     {
-      cacheTime: 1000 * 60 * 60 * 2,
-      staleTime: 1000 * 60 * 60 * 2,
+      cacheTime: 1000 * 60,
+      staleTime: 1000 * 60,
     },
   );
 
@@ -32,15 +34,17 @@ const AlbumArtistListRoute = () => {
 
   return (
     <AnimatedPage>
-      <AlbumArtistListHeader
-        gridRef={gridRef}
-        itemCount={itemCount}
-        tableRef={tableRef}
-      />
-      <AlbumArtistListContent
-        gridRef={gridRef}
-        tableRef={tableRef}
-      />
+      <AlbumArtistListContext.Provider value={{ id: undefined, pageKey }}>
+        <AlbumArtistListHeader
+          gridRef={gridRef}
+          itemCount={itemCount}
+          tableRef={tableRef}
+        />
+        <AlbumArtistListContent
+          gridRef={gridRef}
+          tableRef={tableRef}
+        />
+      </AlbumArtistListContext.Provider>
     </AnimatedPage>
   );
 };

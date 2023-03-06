@@ -20,11 +20,11 @@ import {
   AlbumArtistListFilter,
   useAlbumArtistListStore,
   useCurrentServer,
-  useSetAlbumArtistFilters,
-  useSetAlbumArtistTablePagination,
+  useListStoreActions,
 } from '/@/renderer/store';
 import { ListDisplayType } from '/@/renderer/types';
 import { AlbumArtistListHeaderFilters } from '/@/renderer/features/artists/components/album-artist-list-header-filters';
+import { useAlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
 
 interface AlbumArtistListHeaderProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -39,11 +39,10 @@ export const AlbumArtistListHeader = ({
 }: AlbumArtistListHeaderProps) => {
   const queryClient = useQueryClient();
   const server = useCurrentServer();
-  const setFilter = useSetAlbumArtistFilters();
-  const page = useAlbumArtistListStore();
+  const { pageKey } = useAlbumArtistListContext();
+  const { display, filter } = useAlbumArtistListStore();
+  const { setFilter, setTablePagination } = useListStoreActions();
   const cq = useContainerQuery();
-
-  const setPagination = useSetAlbumArtistTablePagination();
 
   const fetch = useCallback(
     async (startIndex: number, limit: number, filters: AlbumArtistListFilter) => {
@@ -75,10 +74,7 @@ export const AlbumArtistListHeader = ({
 
   const handleFilterChange = useCallback(
     async (filters: AlbumArtistListFilter) => {
-      if (
-        page.display === ListDisplayType.TABLE ||
-        page.display === ListDisplayType.TABLE_PAGINATED
-      ) {
+      if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
         const dataSource: IDatasource = {
           getRows: async (params) => {
             const limit = params.endRow - params.startRow;
@@ -117,8 +113,8 @@ export const AlbumArtistListHeader = ({
         tableRef.current?.api.purgeInfiniteCache();
         tableRef.current?.api.ensureIndexVisible(0, 'top');
 
-        if (page.display === ListDisplayType.TABLE_PAGINATED) {
-          setPagination({ currentPage: 0 });
+        if (display === ListDisplayType.TABLE_PAGINATED) {
+          setTablePagination({ data: { currentPage: 0 }, key: pageKey });
         }
       } else {
         gridRef.current?.scrollTo(0);
@@ -133,13 +129,16 @@ export const AlbumArtistListHeader = ({
         gridRef.current?.setItemData(data.items);
       }
     },
-    [page.display, tableRef, setPagination, server, queryClient, gridRef, fetch],
+    [display, tableRef, server, queryClient, setTablePagination, pageKey, gridRef, fetch],
   );
 
   const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-    const previousSearchTerm = page.filter.searchTerm;
+    const previousSearchTerm = filter.searchTerm;
     const searchTerm = e.target.value === '' ? undefined : e.target.value;
-    const updatedFilters = setFilter({ searchTerm });
+    const updatedFilters = setFilter({
+      data: { searchTerm },
+      key: pageKey,
+    }) as AlbumArtistListFilter;
     if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
   }, 500);
 
@@ -166,7 +165,7 @@ export const AlbumArtistListHeader = ({
           </LibraryHeaderBar>
           <Group>
             <SearchInput
-              defaultValue={page.filter.searchTerm}
+              defaultValue={filter.searchTerm}
               openedWidth={cq.isMd ? 250 : cq.isSm ? 200 : 150}
               onChange={handleSearch}
             />

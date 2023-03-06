@@ -94,8 +94,6 @@ export const AlbumListContent = ({
             },
           };
 
-          console.log('query', query);
-
           const queryKey = queryKeys.albums.list(server?.id || '', query);
 
           const albumsRes = await queryClient.fetchQuery(

@@ -19,10 +19,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   useCurrentServer,
   useAlbumArtistListStore,
-  useAlbumArtistTablePagination,
-  useSetAlbumArtistStore,
-  useSetAlbumArtistTable,
-  useSetAlbumArtistTablePagination,
   useAlbumArtistListItemData,
 } from '/@/renderer/store';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
@@ -41,6 +37,8 @@ import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/cont
 import { generatePath, useNavigate } from 'react-router';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { useAlbumArtistListFilter, useListStoreActions } from '../../../store/list.store';
+import { useAlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
 
 interface AlbumArtistListContentProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -51,23 +49,21 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const server = useCurrentServer();
-  const page = useAlbumArtistListStore();
-  const setPage = useSetAlbumArtistStore();
   const handlePlayQueueAdd = usePlayQueueAdd();
 
+  const { id, pageKey } = useAlbumArtistListContext();
+  const filter = useAlbumArtistListFilter({ id, key: pageKey });
+  const { table, grid, display } = useAlbumArtistListStore();
+  const { setTable, setTablePagination, setGrid } = useListStoreActions();
   const { itemData, setItemData } = useAlbumArtistListItemData();
 
-  const pagination = useAlbumArtistTablePagination();
-  const setPagination = useSetAlbumArtistTablePagination();
-  const setTable = useSetAlbumArtistTable();
-
-  const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
+  const isPaginationEnabled = display === ListDisplayType.TABLE_PAGINATED;
 
   const checkAlbumArtistList = useAlbumArtistList(
     {
       limit: 1,
       startIndex: 0,
-      ...page.filter,
+      ...filter,
     },
     {
       cacheTime: Infinity,
@@ -75,10 +71,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
     },
   );
 
-  const columnDefs: ColDef[] = useMemo(
-    () => getColumnDefs(page.table.columns),
-    [page.table.columns],
-  );
+  const columnDefs: ColDef[] = useMemo(() => getColumnDefs(table.columns), [table.columns]);
 
   const onTableReady = useCallback(
     (params: GridReadyEvent) => {
@@ -90,7 +83,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
           const queryKey = queryKeys.albumArtists.list(server?.id || '', {
             limit,
             startIndex,
-            ...page.filter,
+            ...filter,
           });
 
           const albumArtistsRes = await queryClient.fetchQuery(
@@ -100,7 +93,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
                 query: {
                   limit,
                   startIndex,
-                  ...page.filter,
+                  ...filter,
                 },
                 server,
                 signal,
@@ -115,9 +108,9 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
       };
 
       params.api.setDatasource(dataSource);
-      params.api.ensureIndexVisible(page.table.scrollOffset || 0, 'top');
+      params.api.ensureIndexVisible(table.scrollOffset || 0, 'top');
     },
-    [page.filter, page.table.scrollOffset, queryClient, server],
+    [filter, table.scrollOffset, queryClient, server],
   );
 
   const onTablePaginationChanged = useCallback(
@@ -126,19 +119,28 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
 
       try {
         // Scroll to top of page on pagination change
-        const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage;
+        const currentPageStartIndex = table.pagination.currentPage * table.pagination.itemsPerPage;
         event.api?.ensureIndexVisible(currentPageStartIndex, 'top');
       } catch (err) {
         console.log(err);
       }
 
-      setPagination({
-        itemsPerPage: event.api.paginationGetPageSize(),
-        totalItems: event.api.paginationGetRowCount(),
-        totalPages: event.api.paginationGetTotalPages() + 1,
+      setTablePagination({
+        data: {
+          itemsPerPage: event.api.paginationGetPageSize(),
+          totalItems: event.api.paginationGetRowCount(),
+          totalPages: event.api.paginationGetTotalPages() + 1,
+        },
+        key: pageKey,
       });
     },
-    [isPaginationEnabled, pagination.currentPage, pagination.itemsPerPage, setPagination],
+    [
+      isPaginationEnabled,
+      pageKey,
+      setTablePagination,
+      table.pagination.currentPage,
+      table.pagination.itemsPerPage,
+    ],
   );
 
   const handleTableColumnChange = useCallback(() => {
@@ -147,7 +149,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
 
     if (!columnsOrder) return;
 
-    const columnsInSettings = page.table.columns;
+    const columnsInSettings = table.columns;
     const updatedColumns = [];
     for (const column of columnsOrder) {
       const columnInSettings = columnsInSettings.find((c) => c.column === column.getColDef().colId);
@@ -155,21 +157,21 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
       if (columnInSettings) {
         updatedColumns.push({
           ...columnInSettings,
-          ...(!page.table.autoFit && {
+          ...(!table.autoFit && {
             width: column.getColDef().width,
           }),
         });
       }
     }
 
-    setTable({ columns: updatedColumns });
-  }, [page.table.autoFit, page.table.columns, setTable, tableRef]);
+    setTable({ data: { columns: updatedColumns }, key: pageKey });
+  }, [tableRef, table.columns, table.autoFit, setTable, pageKey]);
 
   const debouncedTableColumnChange = debounce(handleTableColumnChange, 200);
 
   const handleTableScroll = (e: BodyScrollEvent) => {
-    const scrollOffset = Number((e.top / page.table.rowHeight).toFixed(0));
-    setTable({ scrollOffset });
+    const scrollOffset = Number((e.top / table.rowHeight).toFixed(0));
+    setTable({ data: { scrollOffset }, key: pageKey });
   };
 
   const fetch = useCallback(
@@ -177,7 +179,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
       const queryKey = queryKeys.albumArtists.list(server?.id || '', {
         limit,
         startIndex,
-        ...page.filter,
+        ...filter,
       });
 
       const albumArtistsRes = await queryClient.fetchQuery(
@@ -187,7 +189,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
             query: {
               limit,
               startIndex,
-              ...page.filter,
+              ...filter,
             },
             server,
             signal,
@@ -197,26 +199,18 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
 
       return api.normalize.albumArtistList(albumArtistsRes, server);
     },
-    [page.filter, queryClient, server],
+    [filter, queryClient, server],
   );
 
   const handleGridScroll = useCallback(
     (e: ListOnScrollProps) => {
-      setPage({
-        list: {
-          ...page,
-          grid: {
-            ...page.grid,
-            scrollOffset: e.scrollOffset,
-          },
-        },
-      });
+      setGrid({ data: { scrollOffset: e.scrollOffset }, key: pageKey });
     },
-    [page, setPage],
+    [pageKey, setGrid],
   );
 
   const handleGridSizeChange = () => {
-    if (page.table.autoFit) {
+    if (table.autoFit) {
       tableRef?.current?.api.sizeColumnsToFit();
     }
   };
@@ -224,7 +218,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
   const cardRows = useMemo(() => {
     const rows: CardRow<AlbumArtist>[] = [ALBUMARTIST_CARD_ROWS.name];
 
-    switch (page.filter.sortBy) {
+    switch (filter.sortBy) {
       case AlbumArtistListSort.DURATION:
         rows.push(ALBUMARTIST_CARD_ROWS.duration);
         break;
@@ -253,7 +247,7 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
     }
 
     return rows;
-  }, [page.filter.sortBy]);
+  }, [filter.sortBy]);
 
   const handleContextMenu = useHandleTableContextMenu(
     LibraryItem.ALBUM_ARTIST,
@@ -267,22 +261,22 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
   return (
     <>
       <VirtualGridAutoSizerContainer>
-        {page.display === ListDisplayType.CARD || page.display === ListDisplayType.POSTER ? (
+        {display === ListDisplayType.CARD || display === ListDisplayType.POSTER ? (
           <AutoSizer>
             {({ height, width }) => (
               <VirtualInfiniteGrid
-                key={`albumartist-list-${server?.id}-${page.display}`}
+                key={`albumartist-list-${server?.id}-${display}`}
                 ref={gridRef}
                 cardRows={cardRows}
-                display={page.display || ListDisplayType.CARD}
+                display={display || ListDisplayType.CARD}
                 fetchFn={fetch}
                 handlePlayQueueAdd={handlePlayQueueAdd}
                 height={height}
-                initialScrollOffset={page?.grid.scrollOffset || 0}
+                initialScrollOffset={grid?.scrollOffset || 0}
                 itemCount={checkAlbumArtistList?.data?.totalRecordCount || 0}
                 itemData={itemData}
                 itemGap={20}
-                itemSize={150 + page.grid?.size}
+                itemSize={150 + (grid?.size || 0)}
                 itemType={LibraryItem.ALBUM_ARTIST}
                 loading={checkAlbumArtistList.isLoading}
                 minimumBatchSize={40}
@@ -300,18 +294,18 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
           <VirtualTable
             // https://github.com/ag-grid/ag-grid/issues/5284
             // Key is used to force remount of table when display, rowHeight, or server changes
-            key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
+            key={`table-${display}-${table.rowHeight}-${server?.id}`}
             ref={tableRef}
             alwaysShowHorizontalScroll
             suppressRowDrag
-            autoFitColumns={page.table.autoFit}
+            autoFitColumns={table.autoFit}
             columnDefs={columnDefs}
             getRowId={(data) => data.data.id}
             infiniteInitialRowCount={checkAlbumArtistList.data?.totalRecordCount || 1}
             pagination={isPaginationEnabled}
             paginationAutoPageSize={isPaginationEnabled}
-            paginationPageSize={page.table.pagination.itemsPerPage || 100}
-            rowHeight={page.table.rowHeight || 40}
+            paginationPageSize={table.pagination.itemsPerPage || 100}
+            rowHeight={table.rowHeight || 40}
             rowModelType="infinite"
             onBodyScrollEnd={handleTableScroll}
             onCellContextMenu={handleContextMenu}
@@ -330,10 +324,11 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
           initial={false}
           mode="wait"
         >
-          {page.display === ListDisplayType.TABLE_PAGINATED && (
+          {display === ListDisplayType.TABLE_PAGINATED && (
             <TablePagination
-              pagination={pagination}
-              setPagination={setPagination}
+              pageKey={pageKey}
+              pagination={table.pagination}
+              setPagination={setTablePagination}
               tableRef={tableRef}
             />
           )}
