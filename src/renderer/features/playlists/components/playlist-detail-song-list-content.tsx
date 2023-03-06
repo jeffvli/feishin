@@ -252,7 +252,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
         >
           {page.display === ListDisplayType.TABLE_PAGINATED && (
             <TablePagination
-              id={playlistId}
+              pageKey={playlistId}
               pagination={pagination}
               setIdPagination={setPagination}
               tableRef={tableRef}

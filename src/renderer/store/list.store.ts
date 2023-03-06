@@ -8,7 +8,6 @@ import {
   AlbumArtistListSort,
   AlbumListArgs,
   AlbumListSort,
-  PlaylistListArgs,
   PlaylistListSort,
   SongListArgs,
   SongListSort,
@@ -24,11 +23,10 @@ export const generatePageKey = (page: string, id?: string) => {
 export type AlbumListFilter = Omit<AlbumListArgs['query'], 'startIndex' | 'limit'>;
 export type SongListFilter = Omit<SongListArgs['query'], 'startIndex' | 'limit'>;
 export type AlbumArtistListFilter = Omit<AlbumArtistListArgs['query'], 'startIndex' | 'limit'>;
-export type PlaylistListFilter = Omit<PlaylistListArgs['query'], 'startIndex' | 'limit'>;
 
 export type ListKey = keyof ListState['item'] | string;
 
-type FilterType = AlbumListFilter | SongListFilter | AlbumArtistListFilter | PlaylistListFilter;
+type FilterType = AlbumListFilter | SongListFilter | AlbumArtistListFilter;
 
 type ListTableProps = {
   pagination: TablePagination;
@@ -55,7 +53,6 @@ export interface ListState {
     album: ItemProps<AlbumListFilter>;
     albumArtist: ItemProps<AlbumArtistListFilter>;
     albumDetail: ItemProps<any>;
-    playlist: ItemProps<PlaylistListFilter>;
     song: ItemProps<SongListFilter>;
   };
 }

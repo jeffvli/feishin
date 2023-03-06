@@ -3,8 +3,8 @@ import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { PlaylistListArgs, PlaylistListSort, SortOrder } from '/@/renderer/api/types';
+import { SongListFilter } from '/@/renderer/store/list.store';
 import { DataTableProps } from '/@/renderer/store/settings.store';
-import { SongListFilter } from '/@/renderer/store/song.store';
 import { ListDisplayType, TableColumn, TablePagination } from '/@/renderer/types';
 
 type TableProps = {

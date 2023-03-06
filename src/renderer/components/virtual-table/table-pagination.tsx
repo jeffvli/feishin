@@ -27,6 +27,7 @@ export const TablePagination = ({
   tableRef,
   pagination,
   setPagination,
+  setIdPagination,
 }: TablePaginationProps) => {
   const [isGoToPageOpen, handlers] = useDisclosure(false);
   const containerQuery = useContainerQuery();
@@ -41,6 +42,7 @@ export const TablePagination = ({
     const newPage = index - 1;
     tableRef.current?.api.paginationGoToPage(newPage);
     setPagination?.({ data: { currentPage: newPage }, key: pageKey });
+    setIdPagination?.(pageKey || '', { currentPage: newPage });
   };
 
   const handleGoSubmit = goToForm.onSubmit((values) => {
@@ -52,6 +54,7 @@ export const TablePagination = ({
     const newPage = values.pageNumber - 1;
     tableRef.current?.api.paginationGoToPage(newPage);
     setPagination?.({ data: { currentPage: newPage }, key: pageKey });
+    setIdPagination?.(pageKey || '', { currentPage: newPage });
   });
 
   const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage + 1;
