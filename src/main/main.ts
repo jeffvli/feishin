@@ -179,24 +179,29 @@ export const getMainWindow = () => {
   return mainWindow;
 };
 
-const BINARY_PATH = store.get('mpv_path') as string | undefined;
+const MPV_BINARY_PATH = store.get('mpv_path') as string | undefined;
 const MPV_PARAMETERS = store.get('mpv_parameters') as Array<string> | undefined;
+
+const gaplessAudioParams = [
+  '--gapless-audio=weak',
+  '--gapless-audio=no',
+  '--gapless-audio=yes',
+  '--gapless-audio',
+];
+
+const prefetchPlaylistParams = [
+  '--prefetch-playlist=no',
+  '--prefetch-playlist=yes',
+  '--prefetch-playlist',
+];
+
 const DEFAULT_MPV_PARAMETERS = () => {
   const parameters = [];
-  if (
-    !MPV_PARAMETERS?.includes('--gapless-audio=weak') ||
-    !MPV_PARAMETERS?.includes('--gapless-audio=no') ||
-    !MPV_PARAMETERS?.includes('--gapless-audio=yes') ||
-    !MPV_PARAMETERS?.includes('--gapless-audio')
-  ) {
-    parameters.push('--gapless-audio=yes');
+  if (!MPV_PARAMETERS?.some((param) => gaplessAudioParams.includes(param))) {
+    parameters.push('--gapless-audio=weak');
   }
 
-  if (
-    !MPV_PARAMETERS?.includes('--prefetch-playlist=no') ||
-    !MPV_PARAMETERS?.includes('--prefetch-playlist=yes') ||
-    !MPV_PARAMETERS?.includes('--prefetch-playlist')
-  ) {
+  if (!MPV_PARAMETERS?.some((param) => prefetchPlaylistParams.includes(param))) {
     parameters.push('--prefetch-playlist=yes');
   }
 
@@ -207,7 +212,7 @@ export const mpv = new MpvAPI(
   {
     audio_only: true,
     auto_restart: true,
-    binary: BINARY_PATH || '',
+    binary: MPV_BINARY_PATH || '',
     time_update: 1,
   },
   MPV_PARAMETERS
