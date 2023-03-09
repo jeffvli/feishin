@@ -4,6 +4,19 @@ import { PlayerData } from '/@/renderer/store';
 
 declare module 'node-mpv';
 
+function wait(timeout: number) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('resolved');
+    }, timeout);
+  });
+}
+
+ipcMain.on('player-start', async () => {
+  await mpv.load('./dummy.mp3', 'replace');
+  await mpv.play();
+});
+
 // Starts the player
 ipcMain.on('player-play', async () => {
   await mpv.play();
@@ -47,15 +60,25 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData) => {
     return;
   }
 
-  if (data.queue.current) {
-    await mpv.load(data.queue.current.streamUrl, 'replace');
-  }
+  let complete = false;
 
-  if (data.queue.next) {
-    await mpv.load(data.queue.next.streamUrl, 'append');
-  }
+  while (!complete) {
+    try {
+      if (data.queue.current) {
+        await mpv.load(data.queue.current.streamUrl, 'replace');
+      }
 
-  await mpv.play();
+      if (data.queue.next) {
+        await mpv.load(data.queue.next.streamUrl, 'append');
+      }
+
+      await mpv.play();
+      complete = true;
+    } catch (err) {
+      console.error(err);
+      await wait(500);
+    }
+  }
 });
 
 // Replaces the queue in position 1 to the given data

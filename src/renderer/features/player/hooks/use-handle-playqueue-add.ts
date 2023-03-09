@@ -168,6 +168,20 @@ export const useHandlePlayQueueAdd = () => {
       if (!songs) return toast.warn({ message: 'No songs found' });
 
       const playerData = usePlayerStore.getState().actions.addToQueue(songs, options.play);
+
+      if (playerType === PlaybackType.LOCAL) {
+        if (options.play === Play.NEXT || options.play === Play.LAST) {
+          mpvPlayer.setQueueNext(playerData);
+        }
+
+        if (options.play === Play.NOW) {
+          mpvPlayer.setQueue(playerData);
+          mpvPlayer.play();
+        }
+      }
+
+      play();
+
       mpris?.updateSong({
         currentTime: usePlayerStore.getState().current.time,
         repeat: usePlayerStore.getState().repeat,
@@ -175,21 +189,6 @@ export const useHandlePlayQueueAdd = () => {
         song: playerData.current.song,
         status: 'Playing',
       });
-
-      if (options.play === Play.NEXT || options.play === Play.LAST) {
-        if (playerType === PlaybackType.LOCAL) {
-          mpvPlayer.setQueueNext(playerData);
-        }
-      }
-
-      if (options.play === Play.NOW) {
-        if (playerType === PlaybackType.LOCAL) {
-          mpvPlayer.setQueue(playerData);
-          mpvPlayer.play();
-        }
-
-        play();
-      }
 
       // if (fetchId) {
       //   toast.update({
