@@ -32,6 +32,7 @@ const DefaultCardContainer = styled.div<{ $isHidden?: boolean }>`
   background: var(--card-default-bg);
   border-radius: var(--card-default-radius);
   opacity: ${({ $isHidden }) => ($isHidden ? 0 : 1)};
+  pointer-events: auto;
 
   &:hover {
     background: var(--card-default-bg-hover);

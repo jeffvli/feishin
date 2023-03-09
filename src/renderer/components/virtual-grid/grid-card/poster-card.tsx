@@ -30,6 +30,7 @@ const PosterCardContainer = styled.div<{ $isHidden?: boolean }>`
   padding: 1rem;
   overflow: hidden;
   opacity: ${({ $isHidden }) => ($isHidden ? 0 : 1)};
+  pointer-events: auto;
 
   .card-controls {
     opacity: 0;
