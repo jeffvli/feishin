@@ -25,7 +25,7 @@ export const useRightControls = () => {
   }, []);
 
   const handleVolumeSlider = (e: number) => {
-    mpvPlayer.volume(e);
+    mpvPlayer?.volume(e);
     setVolume(e);
   };
 
@@ -51,13 +51,13 @@ export const useRightControls = () => {
       }
     }
 
-    mpvPlayer.volume(volumeToSet);
+    mpvPlayer?.volume(volumeToSet);
     setVolume(volumeToSet);
   };
 
   const handleMute = () => {
     setMuted(!muted);
-    mpvPlayer.mute();
+    mpvPlayer?.mute();
   };
 
   return {
