@@ -27,7 +27,7 @@ const DefaultCardContainer = styled.div<{ $isHidden?: boolean }>`
   flex-direction: column;
   width: 100%;
   height: calc(100% - 2rem);
-  margin: 1rem;
+  margin: 0.5rem;
   overflow: hidden;
   background: var(--card-default-bg);
   border-radius: var(--card-default-radius);

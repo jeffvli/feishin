@@ -27,7 +27,7 @@ const PosterCardContainer = styled.div<{ $isHidden?: boolean }>`
   flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: 1rem;
+  margin: 0.5rem;
   overflow: hidden;
   opacity: ${({ $isHidden }) => ($isHidden ? 0 : 1)};
   pointer-events: auto;
