@@ -27,6 +27,10 @@ export const Tooltip = ({ children, ...rest }: TooltipProps) => {
           maxWidth: '250px',
         },
       }}
+      transitionProps={{
+        duration: 250,
+        transition: 'fade',
+      }}
       {...rest}
     >
       {children}
@@ -37,8 +41,6 @@ export const Tooltip = ({ children, ...rest }: TooltipProps) => {
 Tooltip.defaultProps = {
   openDelay: 0,
   position: 'top',
-  transition: 'fade',
-  transitionDuration: 250,
   withArrow: true,
   withinPortal: true,
 };
