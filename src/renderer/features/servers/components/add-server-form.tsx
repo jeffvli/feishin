@@ -45,8 +45,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     },
   });
 
-  const isSubmitDisabled =
-    !form.values.name || !form.values.url || !form.values.username || !form.values.password;
+  const isSubmitDisabled = !form.values.name || !form.values.url || !form.values.username;
 
   const handleSubmit = form.onSubmit(async (values) => {
     const authFunction = AUTH_FUNCTIONS[values.type];
