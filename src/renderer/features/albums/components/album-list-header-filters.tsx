@@ -4,6 +4,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
+import debounce from 'lodash/debounce';
 import {
   RiSortAsc,
   RiSortDesc,
@@ -334,6 +335,8 @@ export const AlbumListHeaderFilters = ({
     }
   };
 
+  const debouncedHandleItemSize = debounce(handleItemSize, 20);
+
   const handleSetViewType = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
       if (!e.currentTarget?.value) return;
@@ -570,9 +573,9 @@ export const AlbumListHeaderFilters = ({
                     : table.rowHeight
                 }
                 label={null}
-                max={100}
-                min={25}
-                onChangeEnd={handleItemSize}
+                max={400}
+                min={-25}
+                onChange={debouncedHandleItemSize}
               />
             </DropdownMenu.Item>
             {(display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) && (

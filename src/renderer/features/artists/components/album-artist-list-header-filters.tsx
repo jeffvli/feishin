@@ -3,6 +3,7 @@ import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Group, Stack, Flex } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
+import debounce from 'lodash/debounce';
 import {
   RiSortAsc,
   RiSortDesc,
@@ -98,6 +99,8 @@ export const AlbumArtistListHeaderFilters = ({
       setGrid({ data: { size: e }, key: pageKey });
     }
   };
+
+  const debouncedHandleItemSize = debounce(handleItemSize, 20);
 
   const fetch = useCallback(
     async (startIndex: number, limit: number, filters: AlbumArtistListFilter) => {
@@ -436,9 +439,9 @@ export const AlbumArtistListHeaderFilters = ({
                     : table.rowHeight
                 }
                 label={null}
-                max={100}
-                min={25}
-                onChangeEnd={handleItemSize}
+                max={400}
+                min={-50}
+                onChange={debouncedHandleItemSize}
               />
             </DropdownMenu.Item>
             {(display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) && (

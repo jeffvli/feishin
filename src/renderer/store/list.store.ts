@@ -264,7 +264,7 @@ export const useListStore = create<ListSlice>()(
               sortBy: AlbumListSort.RECENTLY_ADDED,
               sortOrder: SortOrder.DESC,
             },
-            grid: { scrollOffset: 0, size: 0 },
+            grid: { scrollOffset: 0, size: 200 },
             table: {
               autoFit: true,
               columns: [
@@ -305,7 +305,7 @@ export const useListStore = create<ListSlice>()(
               sortBy: AlbumArtistListSort.NAME,
               sortOrder: SortOrder.DESC,
             },
-            grid: { scrollOffset: 0, size: 0 },
+            grid: { scrollOffset: 0, size: 200 },
             table: {
               autoFit: true,
               columns: [
