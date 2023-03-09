@@ -73,7 +73,7 @@ export const PlaybackTab = () => {
           data={[
             {
               disabled: !isElectron(),
-              label: 'Mpv',
+              label: 'MPV',
               value: PlaybackType.LOCAL,
             },
             { label: 'Web', value: PlaybackType.WEB },
@@ -106,7 +106,7 @@ export const PlaybackTab = () => {
       description: 'The location of your mpv executable',
       isHidden: settings.type !== PlaybackType.LOCAL,
       note: 'Restart required',
-      title: 'Mpv executable path',
+      title: 'MPV executable path',
     },
     {
       control: (
@@ -115,7 +115,9 @@ export const PlaybackTab = () => {
             autosize
             defaultValue={mpvParameters}
             minRows={4}
-            placeholder={'--gapless-playback=yes\n--prefetch-playlist=yes'}
+            placeholder={
+              'Default parameters (one per line):\n--gapless-audio=weak\n--prefetch-playlist=yes'
+            }
             width={225}
             onBlur={(e) => {
               if (isElectron()) {
@@ -142,8 +144,8 @@ export const PlaybackTab = () => {
         </Text>
       ),
       isHidden: settings.type !== PlaybackType.LOCAL,
-      note: 'Restart required',
-      title: 'Mpv parameters',
+      note: 'Restart required.',
+      title: 'MPV parameters',
     },
     {
       control: (
