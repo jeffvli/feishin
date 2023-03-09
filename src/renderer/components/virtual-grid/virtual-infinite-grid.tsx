@@ -29,14 +29,6 @@ interface VirtualGridProps extends Omit<FixedSizeListProps, 'children' | 'itemSi
   setItemData: (data: any[]) => void;
 }
 
-// const constrainWidth = (width: number) => {
-//   if (width < 1920) {
-//     return width;
-//   }
-
-//   return 1920;
-// };
-
 export const VirtualInfiniteGrid = forwardRef(
   (
     {
@@ -64,16 +56,20 @@ export const VirtualInfiniteGrid = forwardRef(
     const listRef = useRef<any>(null);
     const loader = useRef<InfiniteLoader>(null);
 
+    const sz = itemSize / 2;
+
     const { itemHeight, rowCount, columnCount } = useMemo(() => {
-      const itemsPerRow = Math.floor((Number(width) - itemGap + 3) / (itemSize! + itemGap + 2));
+      const itemsPerRow = Math.floor(Number(width) / sz!) - 1;
+      const widthPerItem = Number(width) / itemsPerRow - 10;
+      const itemHeight = widthPerItem + cardRows.length * 26;
 
       return {
         columnCount: itemsPerRow,
-        itemHeight: itemSize! + cardRows.length * 22 + itemGap,
-        itemWidth: itemSize! + itemGap,
+        itemHeight,
+        itemWidth: sz,
         rowCount: Math.ceil(itemCount / itemsPerRow),
       };
-    }, [cardRows.length, itemCount, itemGap, itemSize, width]);
+    }, [cardRows.length, itemCount, sz, width]);
 
     const isItemLoaded = useCallback(
       (index: number) => {
@@ -153,7 +149,7 @@ export const VirtualInfiniteGrid = forwardRef(
               itemCount={itemCount || 0}
               itemData={itemData}
               itemGap={itemGap}
-              itemHeight={itemHeight + itemGap / 2}
+              itemHeight={itemHeight}
               itemType={itemType}
               itemWidth={itemSize}
               refInstance={(list) => {

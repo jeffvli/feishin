@@ -1,28 +1,41 @@
-import { Center } from '@mantine/core';
-import { RiAlbumFill } from 'react-icons/ri';
-import { generatePath } from 'react-router';
-import { Link } from 'react-router-dom';
-import type { ListChildComponentProps } from 'react-window';
+import { generatePath, Link } from 'react-router-dom';
+import { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
-import { Skeleton } from '/@/renderer/components/skeleton';
-import type { CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
-import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
-import { Album, Artist, AlbumArtist, LibraryItem } from '/@/renderer/api/types';
+import { Album, AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
 import { CardRows } from '/@/renderer/components/card';
+import { Skeleton } from '/@/renderer/components/skeleton';
+import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
+import { CardRow, PlayQueueAddOptions, Play, CardRoute } from '/@/renderer/types';
 
-const CardWrapper = styled.div<{
-  itemGap: number;
-  itemHeight: number;
-  itemWidth: number;
-}>`
-  flex: ${({ itemWidth }) => `0 0 ${itemWidth}px`};
-  width: ${({ itemWidth }) => `${itemWidth}px`};
-  height: ${({ itemHeight, itemGap }) => `${itemHeight - itemGap}px`};
-  margin: ${({ itemGap }) => `0 ${itemGap / 2}px`};
-  user-select: none;
-  pointer-events: auto; // https://github.com/bvaughn/react-window/issues/128#issuecomment-460166682
+interface BaseGridCardProps {
+  columnIndex: number;
+  controls: {
+    cardRows: CardRow<Album | AlbumArtist | Artist>[];
+    handleFavorite: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
+    handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
+    itemType: LibraryItem;
+    playButtonBehavior: Play;
+    route: CardRoute;
+  };
+  data: any;
+  isHidden?: boolean;
+  listChildProps: Omit<ListChildComponentProps, 'data' | 'style'>;
+}
 
-  &:hover div {
+const PosterCardContainer = styled.div<{ $isHidden?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  overflow: hidden;
+  opacity: ${({ $isHidden }) => ($isHidden ? 0 : 1)};
+
+  .card-controls {
+    opacity: 0;
+  }
+
+  &:hover .card-controls {
     opacity: 1;
   }
 
@@ -31,30 +44,16 @@ const CardWrapper = styled.div<{
       opacity: 0.5;
     }
   }
-
-  &:focus-visible {
-    outline: 1px solid #fff;
-  }
 `;
 
-const StyledCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  background: var(--card-poster-bg);
-  border-radius: var(--card-poster-radius);
-
-  &:hover {
-    background: var(--card-poster-bg-hover);
-  }
-`;
-
-const ImageSection = styled.div`
+const ImageContainer = styled.div`
   position: relative;
-  width: 100%;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  background: var(--card-default-bg);
   border-radius: var(--card-poster-radius);
 
   &::before {
@@ -72,148 +71,74 @@ const ImageSection = styled.div`
   }
 `;
 
-interface ImageProps {
-  height: number;
-  isLoading?: boolean;
-}
-
-const Image = styled.img<ImageProps>`
+const Image = styled.img`
+  width: 100%;
+  max-width: 100%;
+  height: auto;
   object-fit: cover;
   border: 0;
-  border-radius: var(--card-poster-radius);
 `;
 
-const ControlsContainer = styled.div`
-  position: absolute;
-  bottom: 0;
-  z-index: 50;
-  width: 100%;
-  opacity: 0;
-  transition: all 0.2s ease-in-out;
+const DetailContainer = styled.div`
+  margin-top: 0.5rem;
 `;
-
-const DetailSection = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-interface BaseGridCardProps {
-  columnIndex: number;
-  controls: {
-    cardRows: CardRow<Album | AlbumArtist | Artist>[];
-    handleFavorite: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
-    handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
-    itemType: LibraryItem;
-    playButtonBehavior: Play;
-    route: CardRoute;
-  };
-  data: any;
-  listChildProps: Omit<ListChildComponentProps, 'data' | 'style'>;
-  sizes: {
-    itemGap: number;
-    itemHeight: number;
-    itemWidth: number;
-  };
-}
 
 export const PosterCard = ({
   listChildProps,
   data,
   columnIndex,
   controls,
-  sizes,
+  isHidden,
 }: BaseGridCardProps) => {
   if (data) {
     return (
-      <CardWrapper
-        key={`card-${columnIndex}-${listChildProps.index}`}
-        itemGap={sizes.itemGap}
-        itemHeight={sizes.itemHeight}
-        itemWidth={sizes.itemWidth}
-      >
-        <StyledCard>
-          <Link
-            tabIndex={0}
-            to={generatePath(
-              controls.route.route,
-              controls.route.slugs?.reduce((acc, slug) => {
-                return {
-                  ...acc,
-                  [slug.slugProperty]: data[slug.idProperty],
-                };
-              }, {}),
-            )}
-          >
-            <ImageSection style={{ height: `${sizes.itemWidth}px` }}>
-              {data?.imageUrl ? (
-                <Image
-                  height={sizes.itemWidth}
-                  placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
-                  src={data?.imageUrl}
-                  width={sizes.itemWidth}
-                />
-              ) : (
-                <Center
-                  sx={{
-                    background: 'var(--placeholder-bg)',
-                    borderRadius: 'var(--card-poster-radius)',
-                    height: '100%',
-                  }}
-                >
-                  <RiAlbumFill
-                    color="var(--placeholder-fg)"
-                    size={35}
-                  />
-                </Center>
-              )}
-              <ControlsContainer>
-                <GridCardControls
-                  handleFavorite={controls.handleFavorite}
-                  handlePlayQueueAdd={controls.handlePlayQueueAdd}
-                  itemData={data}
-                  itemType={controls.itemType}
-                />
-              </ControlsContainer>
-            </ImageSection>
-          </Link>
-          <DetailSection>
-            <CardRows
-              data={data}
-              rows={controls.cardRows}
+      <PosterCardContainer key={`card-${columnIndex}-${listChildProps.index}`}>
+        <Link
+          tabIndex={0}
+          to={generatePath(
+            controls.route.route,
+            controls.route.slugs?.reduce((acc, slug) => {
+              return {
+                ...acc,
+                [slug.slugProperty]: data[slug.idProperty],
+              };
+            }, {}),
+          )}
+        >
+          <ImageContainer>
+            <Image
+              placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
+              src={data?.imageUrl}
             />
-          </DetailSection>
-        </StyledCard>
-      </CardWrapper>
+            <GridCardControls
+              handleFavorite={controls.handleFavorite}
+              handlePlayQueueAdd={controls.handlePlayQueueAdd}
+              itemData={data}
+              itemType={controls.itemType}
+            />
+          </ImageContainer>
+        </Link>
+        <DetailContainer>
+          <CardRows
+            data={data}
+            rows={controls.cardRows}
+          />
+        </DetailContainer>
+      </PosterCardContainer>
     );
   }
 
   return (
-    <CardWrapper
+    <PosterCardContainer
       key={`card-${columnIndex}-${listChildProps.index}`}
-      itemGap={sizes.itemGap}
-      itemHeight={sizes.itemHeight}
-      itemWidth={sizes.itemWidth}
+      $isHidden={isHidden}
     >
-      <StyledCard>
+      <ImageContainer>
         <Skeleton
           visible
           radius="sm"
-        >
-          <ImageSection style={{ height: `${sizes.itemWidth}px` }} />
-        </Skeleton>
-        <DetailSection>
-          {controls.cardRows.map((row: CardRow<Album | Artist | AlbumArtist>, index: number) => (
-            <Skeleton
-              key={`row-${row.property}-${columnIndex}`}
-              height={20}
-              my={2}
-              radius="md"
-              visible={!data}
-              width={!data ? (index > 0 ? '50%' : '90%') : '100%'}
-            />
-          ))}
-        </DetailSection>
-      </StyledCard>
-    </CardWrapper>
+        />
+      </ImageContainer>
+    </PosterCardContainer>
   );
 };

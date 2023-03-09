@@ -3,15 +3,11 @@ import type { ListChildComponentProps } from 'react-window';
 import { areEqual } from 'react-window';
 import { DefaultCard } from '/@/renderer/components/virtual-grid/grid-card/default-card';
 import { PosterCard } from '/@/renderer/components/virtual-grid/grid-card/poster-card';
-import type { GridCardData } from '/@/renderer/types';
-import { ListDisplayType } from '/@/renderer/types';
+import { GridCardData, ListDisplayType } from '/@/renderer/types';
 
 export const GridCard = memo(({ data, index, style }: ListChildComponentProps) => {
   const {
-    itemHeight,
-    itemWidth,
     columnCount,
-    itemGap,
     itemCount,
     cardRows,
     itemData,
@@ -27,9 +23,14 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
   const startIndex = index * columnCount;
   const stopIndex = Math.min(itemCount - 1, startIndex + columnCount - 1);
 
+  const columnCountInRow = stopIndex - startIndex + 1;
+  let columnCountToAdd = 0;
+  if (columnCountInRow !== columnCount) {
+    columnCountToAdd = columnCount - columnCountInRow;
+  }
   const View = display === ListDisplayType.CARD ? DefaultCard : PosterCard;
 
-  for (let i = startIndex; i <= stopIndex; i += 1) {
+  for (let i = startIndex; i <= stopIndex + columnCountToAdd; i += 1) {
     cards.push(
       <View
         key={`card-${i}-${index}`}
@@ -43,24 +44,20 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
           route,
         }}
         data={itemData[i]}
+        isHidden={i > stopIndex}
         listChildProps={{ index }}
-        sizes={{ itemGap, itemHeight, itemWidth }}
       />,
     );
   }
 
   return (
-    <>
-      <div
-        style={{
-          ...style,
-          alignItems: 'center',
-          display: 'flex',
-          justifyContent: 'start',
-        }}
-      >
-        {cards}
-      </div>
-    </>
+    <div
+      style={{
+        ...style,
+        display: 'flex',
+      }}
+    >
+      {cards}
+    </div>
   );
 }, areEqual);

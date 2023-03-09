@@ -1,8 +1,7 @@
 import type { MouseEvent } from 'react';
 import React from 'react';
 import type { UnstyledButtonProps } from '@mantine/core';
-import { Group } from '@mantine/core';
-import { RiPlayFill, RiMore2Fill, RiHeartFill, RiHeartLine } from 'react-icons/ri';
+import { RiPlayFill, RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import styled from 'styled-components';
 import { _Button } from '/@/renderer/components/button';
 import type { PlayQueueAddOptions } from '/@/renderer/types';
@@ -18,6 +17,7 @@ import {
 type PlayButtonType = UnstyledButtonProps & React.ComponentPropsWithoutRef<'button'>;
 
 const PlayButton = styled.button<PlayButtonType>`
+  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,7 +28,7 @@ const PlayButton = styled.button<PlayButtonType>`
   border-radius: 50%;
   opacity: 0.8;
   transition: opacity 0.2s ease-in-out;
-  transition: scale 0.2s linear;
+  transition: scale 0.1s ease-in-out;
 
   &:hover {
     opacity: 1;
@@ -63,6 +63,8 @@ const SecondaryButton = styled(_Button)`
 `;
 
 const GridCardControlsContainer = styled.div`
+  position: absolute;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -76,24 +78,13 @@ const ControlsRow = styled.div`
   height: calc(100% / 3);
 `;
 
-// const TopControls = styled(ControlsRow)`
-//   display: flex;
-//   align-items: flex-start;
-//   justify-content: space-between;
-//   padding: 0.5rem;
-// `;
-
-// const CenterControls = styled(ControlsRow)`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   padding: 0.5rem;
-// `;
-
 const BottomControls = styled(ControlsRow)`
+  position: absolute;
+  bottom: 0;
   display: flex;
+  gap: 0.5rem;
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 1rem 0.5rem;
 `;
 
@@ -146,45 +137,43 @@ export const GridCardControls = ({
   );
 
   return (
-    <GridCardControlsContainer>
+    <GridCardControlsContainer className="card-controls">
+      <PlayButton onClick={handlePlay}>
+        <RiPlayFill size={25} />
+      </PlayButton>
       <BottomControls>
-        <PlayButton onClick={handlePlay}>
-          <RiPlayFill size={25} />
-        </PlayButton>
-        <Group spacing="xs">
-          <SecondaryButton
-            p={5}
-            sx={{ svg: { fill: 'white !important' } }}
-            variant="subtle"
-            onClick={handleFavorites}
-          >
-            <FavoriteWrapper isFavorite={itemData?.isFavorite}>
-              {itemData?.userFavorite ? (
-                <RiHeartFill size={20} />
-              ) : (
-                <RiHeartLine
-                  color="white"
-                  size={20}
-                />
-              )}
-            </FavoriteWrapper>
-          </SecondaryButton>
-          <SecondaryButton
-            p={5}
-            sx={{ svg: { fill: 'white !important' } }}
-            variant="subtle"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleContextMenu(e, [itemData]);
-            }}
-          >
-            <RiMore2Fill
-              color="white"
-              size={20}
-            />
-          </SecondaryButton>
-        </Group>
+        <SecondaryButton
+          p={5}
+          sx={{ svg: { fill: 'white !important' } }}
+          variant="subtle"
+          onClick={handleFavorites}
+        >
+          <FavoriteWrapper isFavorite={itemData?.isFavorite}>
+            {itemData?.userFavorite ? (
+              <RiHeartFill size={20} />
+            ) : (
+              <RiHeartLine
+                color="white"
+                size={20}
+              />
+            )}
+          </FavoriteWrapper>
+        </SecondaryButton>
+        <SecondaryButton
+          p={5}
+          sx={{ svg: { fill: 'white !important' } }}
+          variant="subtle"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleContextMenu(e, [itemData]);
+          }}
+        >
+          <RiMoreFill
+            color="white"
+            size={20}
+          />
+        </SecondaryButton>
       </BottomControls>
     </GridCardControlsContainer>
   );

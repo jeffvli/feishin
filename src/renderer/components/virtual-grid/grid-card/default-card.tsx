@@ -1,37 +1,56 @@
-import { Center } from '@mantine/core';
-import { RiAlbumFill } from 'react-icons/ri';
-import { generatePath, useNavigate } from 'react-router';
-import type { ListChildComponentProps } from 'react-window';
+import { generatePath, Link } from 'react-router-dom';
+import { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
-import type { CardRow, CardRoute, Play, PlayQueueAddOptions } from '/@/renderer/types';
-import { Skeleton } from '/@/renderer/components/skeleton';
-import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
 import { Album, AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
 import { CardRows } from '/@/renderer/components/card';
+import { Skeleton } from '/@/renderer/components/skeleton';
+import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
+import { CardRow, PlayQueueAddOptions, Play, CardRoute } from '/@/renderer/types';
 
-const CardWrapper = styled.div<{
-  itemGap: number;
-  itemHeight: number;
-  itemWidth: number;
-  link?: boolean;
-}>`
-  flex: ${({ itemWidth }) => `0 0 ${itemWidth - 12}px`};
-  width: ${({ itemWidth }) => `${itemWidth}px`};
-  height: ${({ itemHeight, itemGap }) => `${itemHeight - 12 - itemGap}px`};
-  margin: ${({ itemGap }) => `0 ${itemGap / 2}px`};
-  padding: 12px 12px 0;
+interface BaseGridCardProps {
+  columnIndex: number;
+  controls: {
+    cardRows: CardRow<Album | AlbumArtist | Artist>[];
+    handleFavorite: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
+    handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
+    itemType: LibraryItem;
+    playButtonBehavior: Play;
+    route: CardRoute;
+  };
+  data: any;
+  isHidden?: boolean;
+  listChildProps: Omit<ListChildComponentProps, 'data' | 'style'>;
+}
+
+const DefaultCardContainer = styled.div<{ $isHidden?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100% - 2rem);
+  margin: 1rem;
+  overflow: hidden;
   background: var(--card-default-bg);
   border-radius: var(--card-default-radius);
-  cursor: ${({ link }) => link && 'pointer'};
-  transition: border 0.2s ease-in-out, background 0.2s ease-in-out;
-  user-select: none;
-  pointer-events: auto; // https://github.com/bvaughn/react-window/issues/128#issuecomment-460166682
+  opacity: ${({ $isHidden }) => ($isHidden ? 0 : 1)};
 
   &:hover {
     background: var(--card-default-bg-hover);
   }
+`;
 
-  &:hover div {
+const InnerCardContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  overflow: hidden;
+
+  .card-controls {
+    opacity: 0;
+  }
+
+  &:hover .card-controls {
     opacity: 1;
   }
 
@@ -40,26 +59,16 @@ const CardWrapper = styled.div<{
       opacity: 0.5;
     }
   }
-
-  &:focus-visible {
-    outline: 1px solid #fff;
-  }
 `;
 
-const StyledCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  border-radius: var(--card-default-radius);
-`;
-
-const ImageSection = styled.div<{ size?: number }>`
+const ImageContainer = styled.div`
   position: relative;
-  width: ${({ size }) => size && `${size - 24}px`};
-  height: ${({ size }) => size && `${size - 24}px`};
+  display: flex;
+  align-items: center;
+  height: 100%;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  background: var(--placeholder-bg);
   border-radius: var(--card-default-radius);
 
   &::before {
@@ -78,151 +87,77 @@ const ImageSection = styled.div<{ size?: number }>`
 `;
 
 const Image = styled.img`
-  object-fit: cover;
-  border-radius: var(--card-default-radius);
-  box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 20%);
-`;
-
-const ControlsContainer = styled.div`
-  position: absolute;
-  bottom: 0;
-  z-index: 50;
   width: 100%;
-  opacity: 0;
-  transition: all 0.2s ease-in-out;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  border: 0;
 `;
 
-const DetailSection = styled.div`
-  display: flex;
-  flex-direction: column;
+const DetailContainer = styled.div`
+  margin-top: 0.5rem;
 `;
-
-interface BaseGridCardProps {
-  columnIndex: number;
-  controls: {
-    cardRows: CardRow<Album | AlbumArtist | Artist>[];
-    handleFavorite: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
-    handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
-    itemType: LibraryItem;
-    playButtonBehavior: Play;
-    route: CardRoute;
-  };
-  data: any;
-  listChildProps: Omit<ListChildComponentProps, 'data' | 'style'>;
-  sizes: {
-    itemGap: number;
-    itemHeight: number;
-    itemWidth: number;
-  };
-}
 
 export const DefaultCard = ({
   listChildProps,
   data,
   columnIndex,
   controls,
-  sizes,
+  isHidden,
 }: BaseGridCardProps) => {
-  const navigate = useNavigate();
-  const { index } = listChildProps;
-  const { itemGap, itemHeight, itemWidth } = sizes;
-  const { itemType, cardRows, route, handlePlayQueueAdd } = controls;
-
-  const cardSize = itemWidth - 24;
-
   if (data) {
     return (
-      <CardWrapper
-        key={`card-${columnIndex}-${index}`}
-        link
-        itemGap={itemGap}
-        itemHeight={itemHeight}
-        itemWidth={itemWidth}
-        onClick={() =>
-          navigate(
-            generatePath(
-              route.route,
-              route.slugs?.reduce((acc, slug) => {
-                return {
-                  ...acc,
-                  [slug.slugProperty]: data[slug.idProperty],
-                };
-              }, {}),
-            ),
-          )
-        }
-      >
-        <StyledCard>
-          <ImageSection size={itemWidth}>
-            {data?.imageUrl ? (
+      <DefaultCardContainer>
+        <Link
+          tabIndex={0}
+          to={generatePath(
+            controls.route.route,
+            controls.route.slugs?.reduce((acc, slug) => {
+              return {
+                ...acc,
+                [slug.slugProperty]: data[slug.idProperty],
+              };
+            }, {}),
+          )}
+        >
+          <InnerCardContainer key={`card-${columnIndex}-${listChildProps.index}`}>
+            <ImageContainer>
               <Image
-                height={cardSize}
-                placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
+                placeholder={data?.imagePlaceholderUrl || 'var(--placeholder-bg)'}
                 src={data?.imageUrl}
-                width={cardSize}
               />
-            ) : (
-              <Center
-                sx={{
-                  background: 'var(--placeholder-bg)',
-                  borderRadius: 'var(--card-default-radius)',
-                  height: '100%',
-                  width: '100%',
-                }}
-              >
-                <RiAlbumFill
-                  color="var(--placeholder-fg)"
-                  size={35}
-                />
-              </Center>
-            )}
-            <ControlsContainer>
               <GridCardControls
                 handleFavorite={controls.handleFavorite}
-                handlePlayQueueAdd={handlePlayQueueAdd}
+                handlePlayQueueAdd={controls.handlePlayQueueAdd}
                 itemData={data}
-                itemType={itemType}
+                itemType={controls.itemType}
               />
-            </ControlsContainer>
-          </ImageSection>
-          <DetailSection>
-            <CardRows
-              data={data}
-              rows={cardRows}
-            />
-          </DetailSection>
-        </StyledCard>
-      </CardWrapper>
+            </ImageContainer>
+            <DetailContainer>
+              <CardRows
+                data={data}
+                rows={controls.cardRows}
+              />
+            </DetailContainer>
+          </InnerCardContainer>
+        </Link>
+      </DefaultCardContainer>
     );
   }
 
   return (
-    <CardWrapper
-      key={`card-${columnIndex}-${index}`}
-      itemGap={itemGap}
-      itemHeight={itemHeight}
-      itemWidth={itemWidth + 12}
+    <DefaultCardContainer
+      key={`card-${columnIndex}-${listChildProps.index}`}
+      $isHidden={isHidden}
     >
-      <StyledCard>
-        <Skeleton
-          visible
-          radius="sm"
-        >
-          <ImageSection size={itemWidth} />
-        </Skeleton>
-        <DetailSection>
-          {cardRows.map((row: CardRow<Album | Artist | AlbumArtist>, index: number) => (
-            <Skeleton
-              key={`row-${row.property}-${columnIndex}`}
-              height={20}
-              my={2}
-              radius="md"
-              visible={!data}
-              width={!data ? (index > 0 ? '50%' : '90%') : '100%'}
-            />
-          ))}
-        </DetailSection>
-      </StyledCard>
-    </CardWrapper>
+      <InnerCardContainer>
+        <ImageContainer>
+          <Skeleton
+            visible
+            radius="sm"
+          />
+        </ImageContainer>
+      </InnerCardContainer>
+    </DefaultCardContainer>
   );
 };
