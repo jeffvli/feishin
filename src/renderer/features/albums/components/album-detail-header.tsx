@@ -3,7 +3,7 @@ import { forwardRef, Fragment, Ref } from 'react';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
-import { Rating, Text } from '/@/renderer/components';
+import { Button, Rating, Text } from '/@/renderer/components';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
 import { LibraryHeader, useUpdateRating } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -104,29 +104,18 @@ export const AlbumDetailHeader = forwardRef(
                 overflow: 'hidden',
               }}
             >
-              {detailQuery?.data?.albumArtists.map((artist, index) => (
-                <Fragment key={`artist-${artist.id}`}>
-                  {index > 0 && (
-                    <Text
-                      sx={{
-                        display: 'inline-block',
-                        padding: '0 0.5rem',
-                      }}
-                    >
-                      •
-                    </Text>
-                  )}
-                  <Text
-                    $link
-                    component={Link}
-                    to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
-                      albumArtistId: artist.id,
-                    })}
-                    weight={600}
-                  >
-                    {artist.name}
-                  </Text>
-                </Fragment>
+              {detailQuery?.data?.albumArtists.map((artist) => (
+                <Button
+                  key={`artist-${artist.id}`}
+                  component={Link}
+                  size="sm"
+                  to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                    albumArtistId: artist.id,
+                  })}
+                  variant="outline"
+                >
+                  {artist.name}
+                </Button>
               ))}
             </Group>
           </Stack>
