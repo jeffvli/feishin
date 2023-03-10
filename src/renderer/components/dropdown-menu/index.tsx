@@ -73,7 +73,7 @@ const StyledMenuDropdown = styled(MantineMenu.Dropdown)`
   border-radius: var(--dropdown-menu-border-radius);
   filter: drop-shadow(0 0 5px rgb(0, 0, 0, 50%));
 
-  *:first-child {
+  /* *:first-child {
     border-top-left-radius: var(--dropdown-menu-border-radius);
     border-top-right-radius: var(--dropdown-menu-border-radius);
   }
@@ -81,7 +81,7 @@ const StyledMenuDropdown = styled(MantineMenu.Dropdown)`
   *:last-child {
     border-bottom-right-radius: var(--dropdown-menu-border-radius);
     border-bottom-left-radius: var(--dropdown-menu-border-radius);
-  }
+  } */
 `;
 
 const StyledMenuDivider = styled(MantineMenu.Divider)`
