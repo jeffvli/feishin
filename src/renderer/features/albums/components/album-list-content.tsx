@@ -10,7 +10,7 @@ import {
 import { AppRoute } from '/@/renderer/router/routes';
 import { ListDisplayType, CardRow } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { MutableRefObject, useCallback, useMemo, useState } from 'react';
+import { MutableRefObject, useCallback, useMemo } from 'react';
 import { ListOnScrollProps } from 'react-window';
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
@@ -21,7 +21,6 @@ import {
   useCurrentServer,
   useAlbumListStore,
   useAlbumListItemData,
-  AlbumListFilter,
   useListStoreActions,
   useAlbumListFilter,
 } from '/@/renderer/store';
@@ -44,30 +43,23 @@ import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/share
 import { useAlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
 
 interface AlbumListContentProps {
-  customFilters?: Partial<AlbumListFilter>;
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
   itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const AlbumListContent = ({
-  customFilters,
-  itemCount,
-  gridRef,
-  tableRef,
-}: AlbumListContentProps) => {
+export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListContentProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const server = useCurrentServer();
   const handlePlayQueueAdd = usePlayQueueAdd();
 
   const { itemData, setItemData } = useAlbumListItemData();
-  const [localItemData, setLocalItemData] = useState<any[]>([]);
 
   const { id, pageKey } = useAlbumListContext();
   const filter = useAlbumListFilter({ id, key: pageKey });
   const { setTable, setTablePagination, setGrid } = useListStoreActions();
-  const { table, grid, display } = useAlbumListStore();
+  const { table, grid, display } = useAlbumListStore({ id, key: pageKey });
   const isPaginationEnabled = display === ListDisplayType.TABLE_PAGINATED;
 
   const columnDefs: ColDef[] = useMemo(() => getColumnDefs(table.columns), [table.columns]);
@@ -83,14 +75,11 @@ export const AlbumListContent = ({
             limit,
             startIndex,
             ...filter,
-            ...customFilters,
             jfParams: {
               ...filter.jfParams,
-              ...customFilters?.jfParams,
             },
             ndParams: {
               ...filter.ndParams,
-              ...customFilters?.ndParams,
             },
           };
 
@@ -113,12 +102,8 @@ export const AlbumListContent = ({
         rowCount: undefined,
       };
       params.api.setDatasource(dataSource);
-
-      if (!customFilters) {
-        params.api.ensureIndexVisible(table.scrollOffset || 0, 'top');
-      }
     },
-    [customFilters, filter, table.scrollOffset, queryClient, server],
+    [filter, queryClient, server],
   );
 
   const onTablePaginationChanged = useCallback(
@@ -178,7 +163,6 @@ export const AlbumListContent = ({
   const debouncedTableColumnChange = debounce(handleTableColumnChange, 200);
 
   const handleTableScroll = (e: BodyScrollEvent) => {
-    if (customFilters) return;
     const scrollOffset = Number((e.top / table.rowHeight).toFixed(0));
     setTable({ data: { scrollOffset }, key: pageKey });
   };
@@ -189,14 +173,11 @@ export const AlbumListContent = ({
         limit: take,
         startIndex: skip,
         ...filter,
-        ...customFilters,
         jfParams: {
           ...filter.jfParams,
-          ...customFilters?.jfParams,
         },
         ndParams: {
           ...filter.ndParams,
-          ...customFilters?.ndParams,
         },
       };
 
@@ -212,15 +193,14 @@ export const AlbumListContent = ({
 
       return api.normalize.albumList(albums, server);
     },
-    [customFilters, filter, queryClient, server],
+    [filter, queryClient, server],
   );
 
   const handleGridScroll = useCallback(
     (e: ListOnScrollProps) => {
-      if (customFilters) return;
       setGrid({ data: { scrollOffset: e.scrollOffset }, key: pageKey });
     },
-    [customFilters, pageKey, setGrid],
+    [pageKey, setGrid],
   );
 
   const cardRows = useMemo(() => {
@@ -334,9 +314,9 @@ export const AlbumListContent = ({
                   handleFavorite={handleFavorite}
                   handlePlayQueueAdd={handlePlayQueueAdd}
                   height={height}
-                  initialScrollOffset={customFilters ? 0 : grid?.scrollOffset || 0}
+                  initialScrollOffset={grid?.scrollOffset || 0}
                   itemCount={itemCount || 0}
-                  itemData={customFilters ? localItemData : itemData}
+                  itemData={itemData}
                   itemGap={20}
                   itemSize={150 + (grid?.size || 0)}
                   itemType={LibraryItem.ALBUM}
@@ -346,7 +326,7 @@ export const AlbumListContent = ({
                     route: AppRoute.LIBRARY_ALBUMS_DETAIL,
                     slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
                   }}
-                  setItemData={customFilters ? setLocalItemData : setItemData}
+                  setItemData={setItemData}
                   width={width}
                   onScroll={handleGridScroll}
                 />

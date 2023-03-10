@@ -43,9 +43,9 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
   const queryClient = useQueryClient();
   const server = useCurrentServer();
 
-  const { display, table } = useSongListStore();
   const { id, pageKey } = useSongListContext();
   const filter = useSongListFilter({ id, key: pageKey });
+  const { display, table } = useSongListStore({ id, key: pageKey });
 
   const { setTable, setTablePagination } = useListStoreActions();
   const handlePlayQueueAdd = usePlayQueueAdd();
@@ -155,7 +155,6 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
   const debouncedColumnChange = debounce(handleColumnChange, 200);
 
   const handleScroll = (e: BodyScrollEvent) => {
-    if (id) return;
     const scrollOffset = Number((e.top / table.rowHeight).toFixed(0));
     setTable({ data: { scrollOffset }, key: pageKey });
   };

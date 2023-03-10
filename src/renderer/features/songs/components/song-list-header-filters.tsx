@@ -93,7 +93,7 @@ export const SongListHeaderFilters = ({
 }: SongListHeaderFiltersProps) => {
   const server = useCurrentServer();
   const { id, pageKey } = useSongListContext();
-  const { display, table } = useSongListStore();
+  const { display, table } = useSongListStore({ id, key: pageKey });
   const { setFilter, setTable, setTablePagination, setDisplayType } = useListStoreActions();
   const filter = useSongListFilter({ id, key: pageKey });
 

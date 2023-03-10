@@ -36,8 +36,8 @@ export const SongListHeader = ({
   tableRef,
 }: SongListHeaderProps) => {
   const server = useCurrentServer();
-  const { pageKey } = useSongListContext();
-  const { filter } = useSongListStore();
+  const { id, pageKey } = useSongListContext();
+  const { filter } = useSongListStore({ id, key: pageKey });
   const { setFilter, setTablePagination } = useListStoreActions();
   const handlePlayQueueAdd = usePlayQueueAdd();
   const cq = useContainerQuery();

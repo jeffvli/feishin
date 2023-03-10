@@ -270,8 +270,6 @@ export const AlbumArtistDetailContent = () => {
     ARTIST_CONTEXT_MENU_ITEMS,
   );
 
-  console.log('topSongsQuery?.data :>> ', topSongsQuery?.data);
-
   const topSongs = topSongsQuery?.data?.items?.slice(0, 10);
 
   const showBiography =

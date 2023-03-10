@@ -97,7 +97,7 @@ export const AlbumListHeaderFilters = ({
   const server = useCurrentServer();
   const { setFilter, setTablePagination, setTable, setGrid, setDisplayType, setTableColumns } =
     useListStoreActions();
-  const { display, filter, table, grid } = useAlbumListStore();
+  const { display, filter, table, grid } = useAlbumListStore({ id, key: pageKey });
   const cq = useContainerQuery();
 
   const musicFoldersQuery = useMusicFolders();

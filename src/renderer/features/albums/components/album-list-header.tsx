@@ -28,6 +28,7 @@ import { ListDisplayType, Play } from '/@/renderer/types';
 import { AlbumListHeaderFilters } from '/@/renderer/features/albums/components/album-list-header-filters';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { useAlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
 
 interface AlbumListHeaderProps {
   customFilters?: Partial<AlbumListFilter>;
@@ -48,7 +49,8 @@ export const AlbumListHeader = ({
   const server = useCurrentServer();
   const { setFilter, setTablePagination } = useListStoreActions();
   const cq = useContainerQuery();
-  const { filter, display } = useAlbumListStore();
+  const { id, pageKey } = useAlbumListContext();
+  const { filter, display } = useAlbumListStore({ id, key: pageKey });
 
   const fetch = useCallback(
     async (skip: number, take: number, filters: AlbumListFilter) => {

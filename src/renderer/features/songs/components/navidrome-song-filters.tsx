@@ -53,7 +53,6 @@ export const NavidromeSongFilters = ({
           key: pageKey,
         }) as SongListFilter;
 
-        console.log('updatedFilters :>> ', updatedFilters);
         handleFilterChange(updatedFilters);
       },
       value: filter.ndParams?.starred,

@@ -23,8 +23,6 @@ export const NavidromeAlbumFilters = ({
   const filter = useAlbumListFilter({ id, key: pageKey });
   const { setFilter } = useListStoreActions();
 
-  console.log('pageKey, id', pageKey, id);
-
   const genreListQuery = useGenreList(null);
 
   const genreList = useMemo(() => {
@@ -74,7 +72,6 @@ export const NavidromeAlbumFilters = ({
           },
           key: pageKey,
         }) as AlbumListFilter;
-        console.log('updatedFilters :>> ', updatedFilters);
         handleFilterChange(updatedFilters);
       },
       value: filter.ndParams?.starred,

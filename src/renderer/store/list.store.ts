@@ -47,7 +47,7 @@ type ItemProps<TFilter = any> = {
 
 export interface ListState {
   detail: {
-    [key: string]: Omit<ItemProps<any>, 'display' | 'grid'>;
+    [key: string]: Omit<ItemProps<any>, 'display'>;
   };
   item: {
     album: ItemProps<AlbumListFilter>;
@@ -125,7 +125,6 @@ export const useListStore = create<ListSlice>()(
           },
           setFilter: (args) => {
             const [, id] = args.key.split('_');
-            console.log('args', args);
 
             set((state) => {
               if (id) {
@@ -158,10 +157,37 @@ export const useListStore = create<ListSlice>()(
             return get()._actions.getFilter({ id, key: args.key });
           },
           setGrid: (args) => {
+            const [page, id] = args.key.split('_');
+
             set((state) => {
-              if (state.item[args.key as keyof ListState['item']].grid) {
-                state.item[args.key as keyof ListState['item']].grid = {
-                  ...state.item[args.key as keyof ListState['item']]?.grid,
+              if (id) {
+                if (!state.detail[args.key]) {
+                  state.detail[args.key] = {
+                    filter: {} as FilterType,
+                    grid: {
+                      scrollOffset: 0,
+                      size: state.item[page as keyof ListState['item']].grid?.size || 200,
+                    },
+                    table: {
+                      pagination: {
+                        currentPage: 1,
+                        itemsPerPage: 100,
+                        totalItems: 0,
+                        totalPages: 0,
+                      },
+                    } as ListTableProps,
+                  };
+                }
+
+                if (state.detail[args.key as keyof ListState['item']].grid) {
+                  state.detail[args.key as keyof ListState['item']].grid = {
+                    ...state.detail[args.key as keyof ListState['item']]?.grid,
+                    ...args.data,
+                  };
+                }
+              } else if (state.item[page as keyof ListState['item']].grid) {
+                state.item[page as keyof ListState['item']].grid = {
+                  ...state.item[page as keyof ListState['item']]?.grid,
                   ...args.data,
                 };
               }
@@ -177,7 +203,11 @@ export const useListStore = create<ListSlice>()(
               if (id) {
                 if (!state.detail[args.key]) {
                   state.detail[args.key] = {
-                    filter: {} as FilterType,
+                    filter: {
+                      ...state.item[page as keyof ListState['item']].filter,
+                      jfParams: {},
+                      ndParams: {},
+                    } as FilterType,
                     table: {
                       pagination: {
                         currentPage: 1,
@@ -185,27 +215,15 @@ export const useListStore = create<ListSlice>()(
                         totalItems: 0,
                         totalPages: 0,
                       },
+                      scrollOffset: 0,
                     } as ListTableProps,
                   };
                 }
 
-                if (!state.detail[args.key]?.table) {
-                  state.detail[args.key].table = {
-                    ...state.item[page as keyof ListState['item']].table,
-                    pagination: {
-                      currentPage: 1,
-                      itemsPerPage: 100,
-                      totalItems: 0,
-                      totalPages: 0,
-                    },
-                  };
-                }
-
-                if (!state.detail[args.key]?.filter) {
-                  state.detail[args.key].filter = {
-                    ...state.item[page as keyof ListState['item']].filter,
-                    jfParams: {},
-                    ndParams: {},
+                if (state.detail[args.key as keyof ListState['item']].table) {
+                  state.detail[args.key as keyof ListState['item']].table = {
+                    ...state.detail[args.key as keyof ListState['item']]?.table,
+                    ...args.data,
                   };
                 }
               } else {
@@ -459,12 +477,50 @@ export const useListStore = create<ListSlice>()(
 
 export const useListStoreActions = () => useListStore((state) => state._actions);
 
-export const useAlbumListStore = () => useListStore((state) => state.item.album, shallow);
+export const useAlbumListStore = (args?: { id?: string; key?: string }) =>
+  useListStore((state) => {
+    const detail = args?.key ? state.detail[args.key] : undefined;
+
+    return {
+      ...state.item.album,
+      filter: {
+        ...state.item.album.filter,
+        ...detail?.filter,
+      },
+      grid: {
+        ...state.item.album.grid,
+        ...detail?.grid,
+      },
+      table: {
+        ...state.item.album.table,
+        ...detail?.table,
+      },
+    };
+  }, shallow);
 
 export const useAlbumArtistListStore = () =>
   useListStore((state) => state.item.albumArtist, shallow);
 
-export const useSongListStore = () => useListStore((state) => state.item.song, shallow);
+export const useSongListStore = (args?: { id?: string; key?: string }) =>
+  useListStore((state) => {
+    const detail = args?.key ? state.detail[args.key] : undefined;
+
+    return {
+      ...state.item.song,
+      filter: {
+        ...state.item.song.filter,
+        ...detail?.filter,
+      },
+      grid: {
+        ...state.item.song.grid,
+        ...detail?.grid,
+      },
+      table: {
+        ...state.item.song.table,
+        ...detail?.table,
+      },
+    };
+  }, shallow);
 
 export const useSongListFilter = (args: { id?: string; key?: string }) =>
   useListStore((state) => {
