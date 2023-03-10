@@ -1,28 +1,43 @@
-import { motion } from 'framer-motion';
+import { UnstyledButton } from '@mantine/core';
 import { RiPlayFill } from 'react-icons/ri';
 import styled from 'styled-components';
-import { ButtonProps, _Button } from '/@/renderer/components';
 
-const MotionButton = styled(motion(_Button))`
+const MotionButton = styled(UnstyledButton)`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--primary-color);
+  background-color: var(--btn-primary-bg);
   border: none;
   border-radius: 50%;
   opacity: 0.8;
-  transition: background-color 0.2s linear;
+
+  svg {
+    fill: var(--btn-primary-fg);
+  }
+
+  &:hover {
+    background-color: var(--btn-primary-bg-hover);
+    transform: scale(1.1);
+
+    svg {
+      fill: var(--btn-primary-fg-hover);
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  transition: background-color 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
 `;
 
-export const PlayButton = ({ ...props }: Omit<ButtonProps, 'children'>) => {
+export const PlayButton = ({ ...props }: any) => {
   return (
     <MotionButton
-      h="50px"
-      variant="filled"
-      w="50px"
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.95 }}
       {...props}
+      h="50px"
+      w="50px"
     >
       <RiPlayFill size={20} />
     </MotionButton>
