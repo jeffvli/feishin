@@ -20,145 +20,36 @@ interface StyledButtonProps extends ButtonProps {
 }
 
 const StyledButton = styled(MantineButton)<StyledButtonProps>`
-  color: ${(props) => {
-    switch (props.variant) {
-      case 'default':
-        return 'var(--btn-default-fg)';
-      case 'filled':
-        return 'var(--btn-primary-fg)';
-      case 'subtle':
-        return 'var(--btn-subtle-fg)';
-      default:
-        return '';
-    }
-  }};
-  background: ${(props) => {
-    switch (props.variant) {
-      case 'default':
-        return 'var(--btn-default-bg)';
-      case 'filled':
-        return 'var(--btn-primary-bg)';
-      case 'subtle':
-        return 'var(--btn-subtle-bg)';
-      default:
-        return '';
-    }
-  }};
-  border: none;
+  color: ${(props) => `var(--btn-${props.variant}-fg)`};
+  background: ${(props) => `var(--btn-${props.variant}-bg)`};
+  border: ${(props) => `var(--btn-${props.variant}-border)`};
+  border-radius: ${(props) => `var(--btn-${props.variant}-radius)`};
   transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 
   svg {
     transition: fill 0.2s ease-in-out;
-    fill: ${(props) => {
-      switch (props.variant) {
-        case 'default':
-          return 'var(--btn-default-fg)';
-        case 'filled':
-          return 'var(--btn-primary-fg)';
-        case 'subtle':
-          return 'var(--btn-subtle-fg)';
-        default:
-          return '';
-      }
-    }};
+    fill: ${(props) => `var(--btn-${props.variant}-fg)`};
   }
 
   &:disabled {
-    color: ${(props) => {
-      switch (props.variant) {
-        case 'default':
-          return 'var(--btn-default-fg)';
-        case 'filled':
-          return 'var(--btn-primary-fg)';
-        case 'subtle':
-          return 'var(--btn-subtle-fg)';
-        default:
-          return '';
-      }
-    }};
-    background: ${(props) => {
-      switch (props.variant) {
-        case 'default':
-          return 'var(--btn-default-bg)';
-        case 'filled':
-          return 'var(--btn-primary-bg)';
-        case 'subtle':
-          return 'var(--btn-subtle-bg)';
-        default:
-          return '';
-      }
-    }};
+    color: ${(props) => `var(--btn-${props.variant}-fg)`};
+    background: ${(props) => `var(--btn-${props.variant}-bg)`};
 
     opacity: 0.6;
   }
 
   &:not([data-disabled])&:hover {
-    color: ${(props) => {
-      switch (props.variant) {
-        case 'default':
-          return 'var(--btn-default-fg-hover)';
-        case 'filled':
-          return 'var(--btn-primary-fg-hover)';
-        case 'subtle':
-          return 'var(--btn-subtle-fg-hover) !important';
-        default:
-          return '';
-      }
-    }};
-    background: ${(props) => {
-      switch (props.variant) {
-        case 'default':
-          return 'var(--btn-default-bg-hover)';
-        case 'filled':
-          return 'var(--btn-primary-bg-hover)';
-        case 'subtle':
-          return 'var(--btn-subtle-bg-hover)';
-        default:
-          return '';
-      }
-    }};
+    color: ${(props) => `var(--btn-${props.variant}-fg-hover) !important`};
+    background: ${(props) => `var(--btn-${props.variant}-bg-hover)`};
 
     svg {
-      fill: ${(props) => {
-        switch (props.variant) {
-          case 'default':
-            return 'var(--btn-default-fg-hover)';
-          case 'filled':
-            return 'var(--btn-primary-fg-hover)';
-          case 'subtle':
-            return 'var(--btn-subtle-fg-hover)';
-          default:
-            return '';
-        }
-      }};
+      fill: ${(props) => `var(--btn-${props.variant}-fg-hover)`};
     }
   }
 
   &:not([data-disabled])&:focus-visible {
-    color: ${(props) => {
-      switch (props.variant) {
-        case 'default':
-          return 'var(--btn-default-fg-hover)';
-        case 'filled':
-          return 'var(--btn-primary-fg-hover)';
-        case 'subtle':
-          return 'var(--btn-subtle-fg-hover)';
-        default:
-          return '';
-      }
-    }};
-    background: ${(props) => {
-      switch (props.variant) {
-        case 'default':
-          return 'var(--btn-default-bg-hover)';
-        case 'filled':
-          return 'var(--btn-primary-bg-hover)';
-        case 'subtle':
-          return 'var(--btn-subtle-bg-hover)';
-        default:
-          return '';
-      }
-    }};
+    color: ${(props) => `var(--btn-${props.variant}-fg-hover)`};
+    background: ${(props) => `var(--btn-${props.variant}-bg-hover)`};
   }
 
   &:active {

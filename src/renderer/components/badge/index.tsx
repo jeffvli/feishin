@@ -5,6 +5,8 @@ import styled from 'styled-components';
 export type BadgeProps = MantineBadgeProps;
 
 const StyledBadge = styled(MantineBadge)<BadgeProps>`
+  border-radius: var(--badge-radius);
+
   .mantine-Badge-root {
     color: var(--badge-fg);
   }

@@ -47,16 +47,29 @@
   --btn-primary-bg-hover: rgb(34, 96, 255);
   --btn-primary-fg: #ffffff;
   --btn-primary-fg-hover: #ffffff;
+  --btn-primary-border: none;
+  --btn-primary-radius: 0;
 
   --btn-default-bg: rgb(31, 31, 32);
   --btn-default-bg-hover: rgb(63, 63, 63);
   --btn-default-fg: rgb(193, 193, 193);
   --btn-default-fg-hover: rgb(193, 193, 193);
+  --btn-default-border: none;
+  --btn-default-radius: 0;
 
   --btn-subtle-bg: transparent;
   --btn-subtle-bg-hover: transparent;
   --btn-subtle-fg: rgb(220, 220, 220);
   --btn-subtle-fg-hover: rgb(255, 255, 255);
+  --btn-subtle-border: none;
+  --btn-subtle-radius: 0;
+
+  --btn-outline-bg: transparent;
+  --btn-outline-bg-hover: transparent;
+  --btn-outline-fg: rgb(220, 220, 220);
+  --btn-outline-fg-hover: rgb(255, 255, 255);
+  --btn-outline-border: 1px rgba(140, 140, 140, 0.5) solid;
+  --btn-outline-radius: 1px;
 
   --input-bg: rgb(35, 35, 35);
   --input-fg: rgb(193, 193, 193);
@@ -89,6 +102,7 @@
 
   --badge-bg: rgb(0, 0, 0);
   --badge-fg: rgb(255, 255, 255);
+  --badge-radius: 0;
 
   --paper-bg: rgb(20, 20, 20);
 
