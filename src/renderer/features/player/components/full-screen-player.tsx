@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { Box, Center, Flex, Grid, Group, Stack } from '@mantine/core';
-import { useResizeObserver } from '@mantine/hooks';
+import { useHotkeys, useResizeObserver } from '@mantine/hooks';
 import { Variants, motion, AnimatePresence } from 'framer-motion';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import {
@@ -91,6 +91,8 @@ export const FullScreenPlayer = () => {
 
   const location = useLocation();
   const isOpenedRef = useRef<boolean | null>(null);
+
+  useHotkeys([['Escape', handleToggleFullScreenPlayer]]);
 
   useLayoutEffect(() => {
     if (isOpenedRef.current !== null) {
