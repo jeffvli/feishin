@@ -140,6 +140,7 @@ export const PosterCard = ({
           radius="sm"
         />
       </ImageContainer>
+      <DetailContainer />
     </PosterCardContainer>
   );
 };
