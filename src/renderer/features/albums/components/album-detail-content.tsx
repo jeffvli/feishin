@@ -304,16 +304,16 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
           component="section"
           py="1rem"
         >
-          <Group>
+          <Group spacing="sm">
             {detailQuery?.data?.genres?.map((genre) => (
               <Button
                 key={`genre-${genre.id}`}
                 compact
                 component={Link}
-                radius="md"
-                size="sm"
+                radius={0}
+                size="md"
                 to={generatePath(`${AppRoute.LIBRARY_ALBUMS}?genre=${genre.id}`, { albumId })}
-                variant="default"
+                variant="outline"
               >
                 {genre.name}
               </Button>

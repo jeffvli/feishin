@@ -336,18 +336,18 @@ export const AlbumArtistDetailContent = () => {
       </Box>
       {showGenres && (
         <Box component="section">
-          <Group>
+          <Group spacing="sm">
             {detailQuery?.data?.genres?.map((genre) => (
               <Button
                 key={`genre-${genre.id}`}
                 compact
                 component={Link}
                 radius="md"
-                size="sm"
+                size="md"
                 to={generatePath(`${AppRoute.LIBRARY_ALBUM_ARTISTS}?genre=${genre.id}`, {
                   albumArtistId,
                 })}
-                variant="default"
+                variant="outline"
               >
                 {genre.name}
               </Button>
