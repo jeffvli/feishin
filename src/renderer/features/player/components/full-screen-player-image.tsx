@@ -11,17 +11,19 @@ import { useCurrentSong } from '/@/renderer/store';
 const Image = styled(motion.img)`
   width: 100%;
   max-width: 100%;
+  height: 100%;
   max-height: 100%;
   object-fit: cover;
   border-radius: 5px;
+  box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 40%);
 `;
 
 const ImageContainer = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+  height: 65%;
   aspect-ratio: 1/1;
-  box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 40%);
 `;
 
 export const FullScreenPlayerImage = () => {
@@ -47,10 +49,11 @@ export const FullScreenPlayerImage = () => {
 
   return (
     <Flex
+      key={imageKey}
       align="center"
       className="full-screen-player-image-container"
       direction="column"
-      justify="center"
+      justify="flex-start"
       sx={{ flex: 0.5, gap: '1rem' }}
     >
       <AnimatePresence

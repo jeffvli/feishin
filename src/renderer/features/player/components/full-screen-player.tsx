@@ -31,14 +31,20 @@ const ResponsiveContainer = styled.div`
   margin-top: 70px;
 
   .full-screen-player-image {
-    max-height: 30vh;
+    max-height: calc(35vh - 90px);
   }
 
   @media screen and (min-width: 1080px) {
     flex-direction: row;
 
     .full-screen-player-image {
-      max-height: 100%;
+      max-height: calc(70vh - 90px);
+    }
+  }
+
+  @media screen and (max-height: 800px) and (min-width: 1080px) {
+    .full-screen-player-image {
+      max-height: calc(50vh - 90px);
     }
   }
 `;
