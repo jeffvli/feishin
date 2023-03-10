@@ -48,21 +48,21 @@
   --btn-primary-fg: #ffffff;
   --btn-primary-fg-hover: #ffffff;
   --btn-primary-border: none;
-  --btn-primary-radius: 0;
+  --btn-primary-radius: 4px;
 
   --btn-default-bg: rgb(31, 31, 32);
   --btn-default-bg-hover: rgb(63, 63, 63);
   --btn-default-fg: rgb(193, 193, 193);
   --btn-default-fg-hover: rgb(193, 193, 193);
   --btn-default-border: none;
-  --btn-default-radius: 0;
+  --btn-default-radius: 2px;
 
   --btn-subtle-bg: transparent;
   --btn-subtle-bg-hover: transparent;
   --btn-subtle-fg: rgb(220, 220, 220);
   --btn-subtle-fg-hover: rgb(255, 255, 255);
   --btn-subtle-border: none;
-  --btn-subtle-radius: 0;
+  --btn-subtle-radius: 4px;
 
   --btn-outline-bg: transparent;
   --btn-outline-bg-hover: transparent;
@@ -83,7 +83,7 @@
   --dropdown-menu-item-font-size: 1rem;
   --dropdown-menu-bg-hover: rgb(62, 62, 62);
   --dropdown-menu-border: 1px var(--generic-border-color) solid;
-  --dropdown-menu-border-radius: 0;
+  --dropdown-menu-border-radius: 4px;
 
   --switch-track-bg: rgb(50, 50, 50);
   --switch-track-enabled-bg: var(--primary-color);
