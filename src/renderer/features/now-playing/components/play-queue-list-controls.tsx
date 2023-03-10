@@ -1,7 +1,7 @@
 import type { MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Group } from '@mantine/core';
-import { Button, DropdownMenu, TableConfigDropdown } from '/@/renderer/components';
+import { Button, Popover, TableConfigDropdown } from '/@/renderer/components';
 import isElectron from 'is-electron';
 import {
   RiArrowDownLine,
@@ -145,11 +145,11 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         </Button>
       </Group>
       <Group>
-        <DropdownMenu
+        <Popover
           position="top-end"
           transitionProps={{ transition: 'fade' }}
         >
-          <DropdownMenu.Target>
+          <Popover.Target>
             <Button
               compact
               size="md"
@@ -158,11 +158,11 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
             >
               <RiListSettingsLine size="1.1rem" />
             </Button>
-          </DropdownMenu.Target>
-          <DropdownMenu.Dropdown>
+          </Popover.Target>
+          <Popover.Dropdown>
             <TableConfigDropdown type={type} />
-          </DropdownMenu.Dropdown>
-        </DropdownMenu>
+          </Popover.Dropdown>
+        </Popover>
       </Group>
     </Group>
   );

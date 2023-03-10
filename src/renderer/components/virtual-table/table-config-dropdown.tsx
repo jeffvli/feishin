@@ -4,7 +4,7 @@ import { Slider } from '/@/renderer/components/slider';
 import { Switch } from '/@/renderer/components/switch';
 import { useSettingsStoreActions, useSettingsStore } from '/@/renderer/store/settings.store';
 import { TableColumn, TableType } from '/@/renderer/types';
-import { DropdownMenu } from '/@/renderer/components/dropdown-menu';
+import { Option } from '/@/renderer/components/option';
 
 export const SONG_TABLE_COLUMNS = [
   { label: 'Row Index', value: TableColumn.ROW_INDEX },
@@ -168,44 +168,48 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
 
   return (
     <>
-      <DropdownMenu.Item closeMenuOnClick={false}>
-        <Switch
-          defaultChecked={tableConfig[type]?.autoFit}
-          label="Auto-fit columns"
-          onChange={handleUpdateAutoFit}
-        />
-      </DropdownMenu.Item>
-      <DropdownMenu.Item closeMenuOnClick={false}>
-        <Switch
-          defaultChecked={tableConfig[type]?.followCurrentSong}
-          label="Follow current song"
-          onChange={handleUpdateFollow}
-        />
-      </DropdownMenu.Item>
-      <DropdownMenu.Label>Row Height</DropdownMenu.Label>
-      <DropdownMenu.Item closeMenuOnClick={false}>
-        <Slider
-          defaultValue={tableConfig[type]?.rowHeight}
-          max={100}
-          min={25}
-          onChangeEnd={handleUpdateRowHeight}
-        />
-      </DropdownMenu.Item>
-      <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
-      <DropdownMenu.Item
-        closeMenuOnClick={false}
-        component="div"
-        sx={{ cursor: 'default' }}
-      >
-        <MultiSelect
-          clearable
-          data={SONG_TABLE_COLUMNS}
-          defaultValue={tableConfig[type]?.columns.map((column) => column.column)}
-          dropdownPosition="bottom"
-          width={300}
-          onChange={handleAddOrRemoveColumns}
-        />
-      </DropdownMenu.Item>
+      <Option>
+        <Option.Label>Auto-fit Columns</Option.Label>
+        <Option.Control>
+          <Switch
+            defaultChecked={tableConfig[type]?.autoFit}
+            onChange={handleUpdateAutoFit}
+          />
+        </Option.Control>
+      </Option>
+      <Option>
+        <Option.Label>Follow current song</Option.Label>
+        <Option.Control>
+          <Switch
+            defaultChecked={tableConfig[type]?.followCurrentSong}
+            onChange={handleUpdateFollow}
+          />
+        </Option.Control>
+      </Option>
+      <Option>
+        <Option.Control>
+          <Slider
+            defaultValue={tableConfig[type]?.rowHeight}
+            label={(value) => `Item size: ${value}`}
+            max={100}
+            min={25}
+            w="100%"
+            onChangeEnd={handleUpdateRowHeight}
+          />
+        </Option.Control>
+      </Option>
+      <Option>
+        <Option.Control>
+          <MultiSelect
+            clearable
+            data={SONG_TABLE_COLUMNS}
+            defaultValue={tableConfig[type]?.columns.map((column) => column.column)}
+            dropdownPosition="bottom"
+            width={300}
+            onChange={handleAddOrRemoveColumns}
+          />
+        </Option.Control>
+      </Option>
     </>
   );
 };

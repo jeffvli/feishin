@@ -16,7 +16,8 @@ import styled from 'styled-components';
 import {
   Badge,
   Button,
-  DropdownMenu,
+  Option,
+  Popover,
   Switch,
   TableConfigDropdown,
   Text,
@@ -206,30 +207,33 @@ export const FullScreenPlayer = () => {
         >
           <RiArrowDownSLine size="2rem" />
         </Button>
-        <DropdownMenu position="bottom-start">
-          <DropdownMenu.Target>
+        <Popover position="bottom-start">
+          <Popover.Target>
             <Button
               tooltip={{ label: 'Configure' }}
               variant="subtle"
             >
               <RiSettings3Line size="1.5rem" />
             </Button>
-          </DropdownMenu.Target>
-          <DropdownMenu.Dropdown>
-            <DropdownMenu.Item closeMenuOnClick={false}>
-              <Switch
-                defaultChecked={dynamicBackground}
-                label="Dynamic background"
-                onChange={(e) =>
-                  setStore({
-                    dynamicBackground: e.target.checked,
-                  })
-                }
-              />
-            </DropdownMenu.Item>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Option>
+              <Option.Label>Dynamic Background</Option.Label>
+              <Option.Control>
+                <Switch
+                  defaultChecked={dynamicBackground}
+                  onChange={(e) =>
+                    setStore({
+                      dynamicBackground: e.target.checked,
+                    })
+                  }
+                />
+              </Option.Control>
+            </Option>
+
             <TableConfigDropdown type="fullScreen" />
-          </DropdownMenu.Dropdown>
-        </DropdownMenu>
+          </Popover.Dropdown>
+        </Popover>
       </Group>
       {dynamicBackground && <BackgroundImageOverlay />}
       <Flex
