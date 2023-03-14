@@ -59,78 +59,30 @@ const BackgroundImageOverlay = styled.div`
   background: linear-gradient(180deg, rgba(20, 21, 23, 40%), var(--main-bg));
 `;
 
-export const FullScreenPlayer = () => {
+const Controls = () => {
   const { dynamicBackground, expanded } = useFullScreenPlayerStore();
   const { setStore } = useFullScreenPlayerStoreActions();
+
   const handleToggleFullScreenPlayer = () => {
     setStore({ expanded: !expanded });
   };
 
-  const location = useLocation();
-  const isOpenedRef = useRef<boolean | null>(null);
-
   useHotkeys([['Escape', handleToggleFullScreenPlayer]]);
 
-  useLayoutEffect(() => {
-    if (isOpenedRef.current !== null) {
-      setStore({ expanded: false });
-    }
-
-    isOpenedRef.current = true;
-  }, [location, setStore]);
-
-  const currentSong = useCurrentSong();
-
-  const background = useFastAverageColor(currentSong?.imageUrl, true, 'dominant');
-
-  const containerVariants: Variants = {
-    closed: {
-      height: 'calc(100vh - 90px)',
-      position: 'absolute',
-      top: '100vh',
-      transition: {
-        duration: 0.5,
-        ease: 'easeInOut',
-      },
-      width: '100vw',
-      y: -100,
-    },
-    open: {
-      background: dynamicBackground ? background : 'var(--main-bg)',
-      height: 'calc(100vh - 90px)',
-      left: 0,
-      position: 'absolute',
-      top: 0,
-      transition: {
-        background: {
-          duration: 1,
-          ease: 'easeInOut',
-        },
-        delay: 0.1,
-        duration: 0.5,
-        ease: 'easeInOut',
-      },
-      width: '100vw',
-      y: 0,
-    },
-  };
-
   return (
-    <Container
-      animate="open"
-      exit="closed"
-      initial="closed"
-      variants={containerVariants}
-    >
+    <>
       <Group
         p="1rem"
         pos="absolute"
+        spacing="sm"
         sx={{
           left: 0,
-          top: 0,
+          top: 10,
         }}
       >
         <Button
+          compact
+          size="sm"
           tooltip={{ label: 'Minimize' }}
           variant="subtle"
           onClick={handleToggleFullScreenPlayer}
@@ -140,6 +92,8 @@ export const FullScreenPlayer = () => {
         <Popover position="bottom-start">
           <Popover.Target>
             <Button
+              compact
+              size="sm"
               tooltip={{ label: 'Configure' }}
               variant="subtle"
             >
@@ -160,11 +114,76 @@ export const FullScreenPlayer = () => {
                 />
               </Option.Control>
             </Option>
-
             <TableConfigDropdown type="fullScreen" />
           </Popover.Dropdown>
         </Popover>
       </Group>
+    </>
+  );
+};
+
+const containerVariants: Variants = {
+  closed: {
+    height: 'calc(100vh - 90px)',
+    position: 'absolute',
+    top: '100vh',
+    transition: {
+      duration: 0.5,
+      ease: 'easeInOut',
+    },
+    width: '100vw',
+    y: -100,
+  },
+  open: (custom) => {
+    const { dynamicBackground, background } = custom;
+    return {
+      background: dynamicBackground ? background : 'var(--main-bg)',
+      height: 'calc(100vh - 90px)',
+      left: 0,
+      position: 'absolute',
+      top: 0,
+      transition: {
+        background: {
+          duration: 1,
+          ease: 'easeInOut',
+        },
+        delay: 0.1,
+        duration: 0.5,
+        ease: 'easeInOut',
+      },
+      width: '100vw',
+      y: 0,
+    };
+  },
+};
+
+export const FullScreenPlayer = () => {
+  const { dynamicBackground } = useFullScreenPlayerStore();
+  const { setStore } = useFullScreenPlayerStoreActions();
+
+  const location = useLocation();
+  const isOpenedRef = useRef<boolean | null>(null);
+
+  useLayoutEffect(() => {
+    if (isOpenedRef.current !== null) {
+      setStore({ expanded: false });
+    }
+
+    isOpenedRef.current = true;
+  }, [location, setStore]);
+
+  const currentSong = useCurrentSong();
+  const background = useFastAverageColor(currentSong?.imageUrl, true, 'dominant');
+
+  return (
+    <Container
+      animate="open"
+      custom={{ background, dynamicBackground }}
+      exit="closed"
+      initial="closed"
+      variants={containerVariants}
+    >
+      <Controls />
       {dynamicBackground && <BackgroundImageOverlay />}
       <ResponsiveContainer>
         <FullScreenPlayerImage />
