@@ -1,14 +1,19 @@
-import { Flex, Stack, Group } from '@mantine/core';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { Flex, Stack, Group, Center } from '@mantine/core';
+import { useSetState } from '@mantine/hooks';
+import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'framer-motion';
+import { useEffect } from 'react';
+import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { QueueSong } from '/@/renderer/api/types';
 import { Badge, Text, TextTitle } from '/@/renderer/components';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentSong } from '/@/renderer/store';
+import { PlayerData, usePlayerData, usePlayerStore } from '/@/renderer/store';
 
 const Image = styled(motion.img)`
+  position: absolute;
   width: 100%;
   max-width: 100%;
   height: 100%;
@@ -18,7 +23,7 @@ const Image = styled(motion.img)`
   box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 40%);
 `;
 
-const ImageContainer = styled.div`
+const ImageContainer = styled(motion.div)`
   position: relative;
   display: flex;
   align-items: center;
@@ -26,54 +31,147 @@ const ImageContainer = styled.div`
   aspect-ratio: 1/1;
 `;
 
-export const FullScreenPlayerImage = () => {
-  const currentSong = useCurrentSong();
-  const scaledImageUrl = currentSong?.imageUrl
+const imageVariants: Variants = {
+  closed: {
+    opacity: 0,
+    transition: {
+      duration: 0.8,
+      ease: 'linear',
+    },
+  },
+  initial: {
+    opacity: 0,
+  },
+  open: (custom) => {
+    const { isOpen } = custom;
+    return {
+      opacity: isOpen ? 1 : 0,
+      transition: {
+        duration: 0.4,
+        ease: 'linear',
+      },
+    };
+  },
+};
+
+const scaleImageUrl = (url?: string | null) => {
+  return url
     ?.replace(/&size=\d+/, '&size=800')
     .replace(/\?width=\d+/, '?width=800')
     .replace(/&height=\d+/, '&height=800');
+};
 
-  const background = useFastAverageColor(currentSong?.imageUrl, true, 'dominant');
+const ImageWithPlaceholder = ({ ...props }: HTMLMotionProps<'img'>) => {
+  if (!props.src) {
+    return (
+      <Center
+        sx={{
+          background: 'var(--placeholder-bg)',
+          borderRadius: 'var(--card-default-radius)',
+          height: '100%',
+          width: '100%',
+        }}
+      >
+        <RiAlbumFill
+          color="var(--placeholder-fg)"
+          size="25%"
+        />
+      </Center>
+    );
+  }
+
+  return <Image {...props} />;
+};
+
+export const FullScreenPlayerImage = () => {
+  const { queue } = usePlayerData();
+  const currentSong = queue.current;
+  const background = useFastAverageColor(queue.current?.imageUrl, true, 'dominant');
   const imageKey = `image-${background}`;
 
-  const imageVariants: Variants = {
-    closed: {},
-    open: {
-      opacity: 1,
-      transition: {
-        duration: 1,
-        ease: 'easeInOut',
+  const [imageState, setImageState] = useSetState({
+    bottomImage: scaleImageUrl(queue.next?.imageUrl),
+    current: 0,
+    topImage: scaleImageUrl(queue.current?.imageUrl),
+  });
+
+  useEffect(() => {
+    const unsubSongChange = usePlayerStore.subscribe(
+      (state) => [state.current.song, state.actions.getPlayerData().queue],
+      (state) => {
+        const isTop = imageState.current === 0;
+        const queue = state[1] as PlayerData['queue'];
+
+        const currentImageUrl = scaleImageUrl(queue.current?.imageUrl);
+        const nextImageUrl = scaleImageUrl(queue.next?.imageUrl);
+
+        setImageState({
+          bottomImage: isTop ? currentImageUrl : nextImageUrl,
+          current: isTop ? 1 : 0,
+          topImage: isTop ? nextImageUrl : currentImageUrl,
+        });
       },
-    },
-  };
+      { equalityFn: (a, b) => (a[0] as QueueSong)?.id === (b[0] as QueueSong)?.id },
+    );
+
+    return () => {
+      unsubSongChange();
+    };
+  }, [imageState, queue, setImageState]);
 
   return (
     <Flex
-      key={imageKey}
       align="center"
       className="full-screen-player-image-container"
       direction="column"
       justify="flex-start"
+      p="1rem"
       sx={{ flex: 0.5, gap: '1rem' }}
     >
-      <AnimatePresence
-        initial={false}
-        mode="wait"
+      <ImageContainer>
+        <AnimatePresence
+          initial={false}
+          mode="popLayout"
+        >
+          {imageState.current === 0 && (
+            <ImageWithPlaceholder
+              key={imageKey}
+              animate="open"
+              className="full-screen-player-image"
+              custom={{ isOpen: imageState.current === 0 }}
+              draggable={false}
+              exit="closed"
+              initial="closed"
+              placeholder="var(--placeholder-bg)"
+              src={imageState.topImage || ''}
+              variants={imageVariants}
+            />
+          )}
+        </AnimatePresence>
+        <AnimatePresence
+          initial={false}
+          mode="popLayout"
+        >
+          {imageState.current === 1 && (
+            <ImageWithPlaceholder
+              key={imageKey}
+              animate="open"
+              className="full-screen-player-image"
+              custom={{ isOpen: imageState.current === 1 }}
+              draggable={false}
+              exit="closed"
+              initial="closed"
+              placeholder="var(--placeholder-bg)"
+              src={imageState.bottomImage || ''}
+              variants={imageVariants}
+            />
+          )}
+        </AnimatePresence>
+      </ImageContainer>
+      <Stack
+        className="full-screen-player-image-metadata"
+        spacing="sm"
       >
-        <ImageContainer>
-          <Image
-            key={imageKey}
-            animate="open"
-            className="full-screen-player-image"
-            draggable={false}
-            exit="closed"
-            initial="closed"
-            src={scaledImageUrl}
-            variants={imageVariants}
-          />
-        </ImageContainer>
-      </AnimatePresence>
-      <Stack spacing="sm">
         <TextTitle
           align="center"
           order={1}
