@@ -264,7 +264,7 @@ const tableColumns: { [key: string]: ColDef } = {
             imageUrl: params.data?.imageUrl,
             name: params.data?.name,
             rowHeight: params.node?.rowHeight,
-            type: params.data?.type,
+            type: params.data?.serverType,
           }
         : undefined,
     width: 250,
