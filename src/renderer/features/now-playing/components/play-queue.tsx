@@ -13,6 +13,7 @@ import {
   useAppStoreActions,
   useCurrentSong,
   useDefaultQueue,
+  usePlayerControls,
   usePreviousSong,
   useQueueControls,
 } from '/@/renderer/store';
@@ -53,6 +54,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
   const tableConfig = useTableSettings(type);
   const [gridApi, setGridApi] = useState<AgGridReactType | undefined>();
   const playerType = usePlayerType();
+  const { play } = usePlayerControls();
 
   useEffect(() => {
     if (tableRef.current) {
@@ -79,6 +81,8 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     if (playerType === PlaybackType.LOCAL) {
       mpvPlayer.setQueue(playerData);
     }
+
+    play();
   };
 
   const handleDragStart = () => {
@@ -160,7 +164,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     }
   };
 
-  const rowClassRules = useMemo<RowClassRules>(() => {
+  const rowClassRules = useMemo<RowClassRules | undefined>(() => {
     return {
       'current-song': (params) => {
         return params.data.uniqueId === currentSong?.uniqueId;
@@ -205,11 +209,13 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
           rowDragMultiRow
           autoFitColumns={tableConfig.autoFit}
           columnDefs={columnDefs}
+          deselectOnClickOutside={type === 'fullScreen'}
           getRowId={(data) => data.data.uniqueId}
           rowBuffer={50}
           rowClassRules={rowClassRules}
           rowData={queue}
           rowHeight={tableConfig.rowHeight || 40}
+          suppressCellFocus={type === 'fullScreen'}
           onCellContextMenu={handleContextMenu}
           onCellDoubleClicked={handleDoubleClick}
           onColumnMoved={handleColumnChange}

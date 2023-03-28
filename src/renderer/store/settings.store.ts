@@ -61,6 +61,7 @@ export interface SettingsState {
   };
   tab: 'general' | 'playback' | 'view' | string;
   tables: {
+    fullScreen: DataTableProps;
     nowPlaying: DataTableProps;
     sideDrawerQueue: DataTableProps;
     sideQueue: DataTableProps;
@@ -116,6 +117,25 @@ export const useSettingsStore = create<SettingsSlice>()(
 
         tab: 'general',
         tables: {
+          fullScreen: {
+            autoFit: true,
+            columns: [
+              {
+                column: TableColumn.TITLE_COMBINED,
+                width: 500,
+              },
+              {
+                column: TableColumn.DURATION,
+                width: 100,
+              },
+              {
+                column: TableColumn.USER_FAVORITE,
+                width: 100,
+              },
+            ],
+            followCurrentSong: true,
+            rowHeight: 60,
+          },
           nowPlaying: {
             autoFit: true,
             columns: [

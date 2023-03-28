@@ -1,11 +1,10 @@
 import type { ChangeEvent } from 'react';
-import { Divider, Stack } from '@mantine/core';
 import { MultiSelect } from '/@/renderer/components/select';
 import { Slider } from '/@/renderer/components/slider';
 import { Switch } from '/@/renderer/components/switch';
-import { Text } from '/@/renderer/components/text';
 import { useSettingsStoreActions, useSettingsStore } from '/@/renderer/store/settings.store';
 import { TableColumn, TableType } from '/@/renderer/types';
+import { Option } from '/@/renderer/components/option';
 
 export const SONG_TABLE_COLUMNS = [
   { label: 'Row Index', value: TableColumn.ROW_INDEX },
@@ -168,42 +167,49 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
   };
 
   return (
-    <Stack
-      p="1rem"
-      spacing="md"
-    >
-      <Stack spacing="xs">
-        <Text>Table Columns</Text>
-        <MultiSelect
-          clearable
-          data={SONG_TABLE_COLUMNS}
-          defaultValue={tableConfig[type]?.columns.map((column) => column.column)}
-          dropdownPosition="top"
-          width={300}
-          onChange={handleAddOrRemoveColumns}
-        />
-      </Stack>
-      <Stack spacing="xs">
-        <Text>Row Height</Text>
-        <Slider
-          defaultValue={tableConfig[type]?.rowHeight}
-          max={100}
-          min={25}
-          sx={{ width: 150 }}
-          onChangeEnd={handleUpdateRowHeight}
-        />
-      </Stack>
-      <Divider my="0.5rem" />
-      <Switch
-        defaultChecked={tableConfig[type]?.autoFit}
-        label="Auto-fit columns"
-        onChange={handleUpdateAutoFit}
-      />
-      <Switch
-        defaultChecked={tableConfig[type]?.followCurrentSong}
-        label="Follow current song"
-        onChange={handleUpdateFollow}
-      />
-    </Stack>
+    <>
+      <Option>
+        <Option.Label>Auto-fit Columns</Option.Label>
+        <Option.Control>
+          <Switch
+            defaultChecked={tableConfig[type]?.autoFit}
+            onChange={handleUpdateAutoFit}
+          />
+        </Option.Control>
+      </Option>
+      <Option>
+        <Option.Label>Follow current song</Option.Label>
+        <Option.Control>
+          <Switch
+            defaultChecked={tableConfig[type]?.followCurrentSong}
+            onChange={handleUpdateFollow}
+          />
+        </Option.Control>
+      </Option>
+      <Option>
+        <Option.Control>
+          <Slider
+            defaultValue={tableConfig[type]?.rowHeight}
+            label={(value) => `Item size: ${value}`}
+            max={100}
+            min={25}
+            w="100%"
+            onChangeEnd={handleUpdateRowHeight}
+          />
+        </Option.Control>
+      </Option>
+      <Option>
+        <Option.Control>
+          <MultiSelect
+            clearable
+            data={SONG_TABLE_COLUMNS}
+            defaultValue={tableConfig[type]?.columns.map((column) => column.column)}
+            dropdownPosition="bottom"
+            width={300}
+            onChange={handleAddOrRemoveColumns}
+          />
+        </Option.Control>
+      </Option>
+    </>
   );
 };

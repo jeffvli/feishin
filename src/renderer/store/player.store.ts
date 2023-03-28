@@ -892,6 +892,12 @@ export const useDefaultQueue = () => usePlayerStore((state) => state.queue.defau
 
 export const useCurrentSong = () => usePlayerStore((state) => state.current.song);
 
+export const usePlayerData = () =>
+  usePlayerStore(
+    (state) => state.actions.getPlayerData(),
+    (a, b) => a.current.nextIndex === b.current.nextIndex,
+  );
+
 export const useCurrentPlayer = () => usePlayerStore((state) => state.current.player);
 
 export const useCurrentStatus = () => usePlayerStore((state) => state.current.status);
