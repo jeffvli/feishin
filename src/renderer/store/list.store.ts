@@ -34,8 +34,8 @@ type ListTableProps = {
 } & DataTableProps;
 
 type ListGridProps = {
+  itemsPerRow?: number;
   scrollOffset?: number;
-  size?: number;
 };
 
 type ItemProps<TFilter = any> = {
@@ -165,8 +165,9 @@ export const useListStore = create<ListSlice>()(
                   state.detail[args.key] = {
                     filter: {} as FilterType,
                     grid: {
+                      itemsPerRow:
+                        state.item[page as keyof ListState['item']].grid?.itemsPerRow || 5,
                       scrollOffset: 0,
-                      size: state.item[page as keyof ListState['item']].grid?.size || 200,
                     },
                     table: {
                       pagination: {
@@ -282,7 +283,7 @@ export const useListStore = create<ListSlice>()(
               sortBy: AlbumListSort.RECENTLY_ADDED,
               sortOrder: SortOrder.DESC,
             },
-            grid: { scrollOffset: 0, size: 200 },
+            grid: { itemsPerRow: 5, scrollOffset: 0 },
             table: {
               autoFit: true,
               columns: [
@@ -323,7 +324,7 @@ export const useListStore = create<ListSlice>()(
               sortBy: AlbumArtistListSort.NAME,
               sortOrder: SortOrder.DESC,
             },
-            grid: { scrollOffset: 0, size: 200 },
+            grid: { itemsPerRow: 5, scrollOffset: 0 },
             table: {
               autoFit: true,
               columns: [
@@ -409,7 +410,7 @@ export const useListStore = create<ListSlice>()(
               sortBy: SongListSort.RECENTLY_ADDED,
               sortOrder: SortOrder.DESC,
             },
-            grid: { scrollOffset: 0, size: 0 },
+            grid: { itemsPerRow: 5, scrollOffset: 0 },
             table: {
               autoFit: true,
               columns: [
@@ -470,7 +471,7 @@ export const useListStore = create<ListSlice>()(
           Object.entries(state).filter(([key]) => !['detail'].includes(key)),
         );
       },
-      version: 1,
+      version: 2,
     },
   ),
 );

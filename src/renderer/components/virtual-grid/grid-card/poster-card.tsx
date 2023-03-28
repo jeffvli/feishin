@@ -1,4 +1,5 @@
-import { generatePath, Link } from 'react-router-dom';
+import { Stack } from '@mantine/core';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Album, AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
@@ -27,7 +28,7 @@ const PosterCardContainer = styled.div<{ $isHidden?: boolean }>`
   flex-direction: column;
   width: 100%;
   height: 100%;
-  margin: 0.5rem;
+  margin: 1rem;
   overflow: hidden;
   opacity: ${({ $isHidden }) => ($isHidden ? 0 : 1)};
   pointer-events: auto;
@@ -35,16 +36,10 @@ const PosterCardContainer = styled.div<{ $isHidden?: boolean }>`
   .card-controls {
     opacity: 0;
   }
+`;
 
-  &:hover .card-controls {
-    opacity: 1;
-  }
-
-  &:hover * {
-    &::before {
-      opacity: 0.5;
-    }
-  }
+const LinkContainer = styled.div`
+  cursor: pointer;
 `;
 
 const ImageContainer = styled.div`
@@ -70,6 +65,16 @@ const ImageContainer = styled.div`
     content: '';
     user-select: none;
   }
+
+  &:hover {
+    &::before {
+      opacity: 0.5;
+    }
+  }
+
+  &:hover .card-controls {
+    opacity: 1;
+  }
 `;
 
 const Image = styled.img`
@@ -91,21 +96,22 @@ export const PosterCard = ({
   controls,
   isHidden,
 }: BaseGridCardProps) => {
+  const navigate = useNavigate();
+
   if (data) {
+    const path = generatePath(
+      controls.route.route,
+      controls.route.slugs?.reduce((acc, slug) => {
+        return {
+          ...acc,
+          [slug.slugProperty]: data[slug.idProperty],
+        };
+      }, {}),
+    );
+
     return (
       <PosterCardContainer key={`card-${columnIndex}-${listChildProps.index}`}>
-        <Link
-          tabIndex={0}
-          to={generatePath(
-            controls.route.route,
-            controls.route.slugs?.reduce((acc, slug) => {
-              return {
-                ...acc,
-                [slug.slugProperty]: data[slug.idProperty],
-              };
-            }, {}),
-          )}
-        >
+        <LinkContainer onClick={() => navigate(path)}>
           <ImageContainer>
             <Image
               placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
@@ -118,7 +124,7 @@ export const PosterCard = ({
               itemType={controls.itemType}
             />
           </ImageContainer>
-        </Link>
+        </LinkContainer>
         <DetailContainer>
           <CardRows
             data={data}
@@ -134,13 +140,24 @@ export const PosterCard = ({
       key={`card-${columnIndex}-${listChildProps.index}`}
       $isHidden={isHidden}
     >
-      <ImageContainer>
-        <Skeleton
-          visible
-          radius="sm"
-        />
-      </ImageContainer>
-      <DetailContainer />
+      <Skeleton
+        visible
+        radius="sm"
+      >
+        <ImageContainer />
+      </Skeleton>
+      <DetailContainer>
+        <Stack spacing="sm">
+          {controls.cardRows.map((row) => (
+            <Skeleton
+              key={row.arrayProperty}
+              visible
+              height={14}
+              radius="sm"
+            />
+          ))}
+        </Stack>
+      </DetailContainer>
     </PosterCardContainer>
   );
 };

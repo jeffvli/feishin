@@ -56,20 +56,17 @@ export const VirtualInfiniteGrid = forwardRef(
     const listRef = useRef<any>(null);
     const loader = useRef<InfiniteLoader>(null);
 
-    const sz = itemSize / 2;
-
     const { itemHeight, rowCount, columnCount } = useMemo(() => {
-      const itemsPerRow = Math.floor(Number(width) / sz!) - 1;
-      const widthPerItem = Number(width) / itemsPerRow - 10;
+      const itemsPerRow = itemSize;
+      const widthPerItem = Number(width) / itemsPerRow;
       const itemHeight = widthPerItem + cardRows.length * 26;
 
       return {
         columnCount: itemsPerRow,
         itemHeight,
-        itemWidth: sz,
         rowCount: Math.ceil(itemCount / itemsPerRow),
       };
-    }, [cardRows.length, itemCount, sz, width]);
+    }, [cardRows.length, itemCount, itemSize, width]);
 
     const isItemLoaded = useCallback(
       (index: number) => {

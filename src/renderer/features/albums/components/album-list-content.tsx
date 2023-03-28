@@ -318,7 +318,7 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
                   itemCount={itemCount || 0}
                   itemData={itemData}
                   itemGap={20}
-                  itemSize={150 + (grid?.size || 0)}
+                  itemSize={grid?.itemsPerRow || 5}
                   itemType={LibraryItem.ALBUM}
                   loading={itemCount === undefined || itemCount === null}
                   minimumBatchSize={40}

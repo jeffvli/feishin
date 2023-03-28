@@ -96,7 +96,7 @@ export const AlbumArtistListHeaderFilters = ({
     if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
       setTable({ data: { rowHeight: e }, key: pageKey });
     } else {
-      setGrid({ data: { size: e }, key: pageKey });
+      setGrid({ data: { itemsPerRow: e }, key: pageKey });
     }
   };
 
@@ -432,17 +432,23 @@ export const AlbumArtistListHeaderFilters = ({
             <DropdownMenu.Divider />
             <DropdownMenu.Label>Item size</DropdownMenu.Label>
             <DropdownMenu.Item closeMenuOnClick={false}>
-              <Slider
-                defaultValue={
-                  display === ListDisplayType.CARD || display === ListDisplayType.POSTER
-                    ? grid?.size
-                    : table.rowHeight
-                }
-                label={null}
-                max={400}
-                min={-50}
-                onChange={debouncedHandleItemSize}
-              />
+              {display === ListDisplayType.CARD || display === ListDisplayType.POSTER ? (
+                <Slider
+                  defaultValue={grid?.itemsPerRow}
+                  label={null}
+                  max={10}
+                  min={2}
+                  onChange={debouncedHandleItemSize}
+                />
+              ) : (
+                <Slider
+                  defaultValue={table.rowHeight}
+                  label={null}
+                  max={100}
+                  min={30}
+                  onChange={debouncedHandleItemSize}
+                />
+              )}
             </DropdownMenu.Item>
             {(display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) && (
               <>

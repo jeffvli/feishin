@@ -1,4 +1,4 @@
-import { generatePath, Link } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Album, AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
@@ -31,6 +31,7 @@ const DefaultCardContainer = styled.div<{ $isHidden?: boolean }>`
   overflow: hidden;
   background: var(--card-default-bg);
   border-radius: var(--card-default-radius);
+  cursor: pointer;
   opacity: ${({ $isHidden }) => ($isHidden ? 0 : 1)};
   pointer-events: auto;
 
@@ -106,42 +107,44 @@ export const DefaultCard = ({
   controls,
   isHidden,
 }: BaseGridCardProps) => {
+  const navigate = useNavigate();
+
   if (data) {
+    const path = generatePath(
+      controls.route.route,
+      controls.route.slugs?.reduce((acc, slug) => {
+        return {
+          ...acc,
+          [slug.slugProperty]: data[slug.idProperty],
+        };
+      }, {}),
+    );
+
     return (
-      <DefaultCardContainer>
-        <Link
-          tabIndex={0}
-          to={generatePath(
-            controls.route.route,
-            controls.route.slugs?.reduce((acc, slug) => {
-              return {
-                ...acc,
-                [slug.slugProperty]: data[slug.idProperty],
-              };
-            }, {}),
-          )}
-        >
-          <InnerCardContainer key={`card-${columnIndex}-${listChildProps.index}`}>
-            <ImageContainer>
-              <Image
-                placeholder={data?.imagePlaceholderUrl || 'var(--placeholder-bg)'}
-                src={data?.imageUrl}
-              />
-              <GridCardControls
-                handleFavorite={controls.handleFavorite}
-                handlePlayQueueAdd={controls.handlePlayQueueAdd}
-                itemData={data}
-                itemType={controls.itemType}
-              />
-            </ImageContainer>
-            <DetailContainer>
-              <CardRows
-                data={data}
-                rows={controls.cardRows}
-              />
-            </DetailContainer>
-          </InnerCardContainer>
-        </Link>
+      <DefaultCardContainer
+        key={`card-${columnIndex}-${listChildProps.index}`}
+        onClick={() => navigate(path)}
+      >
+        <InnerCardContainer>
+          <ImageContainer>
+            <Image
+              placeholder={data?.imagePlaceholderUrl || 'var(--placeholder-bg)'}
+              src={data?.imageUrl}
+            />
+            <GridCardControls
+              handleFavorite={controls.handleFavorite}
+              handlePlayQueueAdd={controls.handlePlayQueueAdd}
+              itemData={data}
+              itemType={controls.itemType}
+            />
+          </ImageContainer>
+          <DetailContainer>
+            <CardRows
+              data={data}
+              rows={controls.cardRows}
+            />
+          </DetailContainer>
+        </InnerCardContainer>
       </DefaultCardContainer>
     );
   }

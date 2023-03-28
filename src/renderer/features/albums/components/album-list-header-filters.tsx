@@ -331,7 +331,7 @@ export const AlbumListHeaderFilters = ({
     if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
       setTable({ data: { rowHeight: e }, key: 'album' });
     } else {
-      setGrid({ data: { size: e }, key: 'album' });
+      setGrid({ data: { itemsPerRow: e }, key: 'album' });
     }
   };
 
@@ -564,17 +564,21 @@ export const AlbumListHeaderFilters = ({
               Table (paginated)
             </DropdownMenu.Item>
             <DropdownMenu.Divider />
-            <DropdownMenu.Label>Item size</DropdownMenu.Label>
+            <DropdownMenu.Label>
+              {display === ListDisplayType.CARD || display === ListDisplayType.POSTER
+                ? 'Items per row'
+                : 'Item size'}
+            </DropdownMenu.Label>
             <DropdownMenu.Item closeMenuOnClick={false}>
               <Slider
                 defaultValue={
                   display === ListDisplayType.CARD || display === ListDisplayType.POSTER
-                    ? grid?.size || 0
+                    ? grid?.itemsPerRow || 0
                     : table.rowHeight
                 }
                 label={null}
-                max={400}
-                min={-25}
+                max={14}
+                min={2}
                 onChange={debouncedHandleItemSize}
               />
             </DropdownMenu.Item>
