@@ -61,6 +61,12 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+const singleInstance = app.requestSingleInstanceLock();
+
+if (!singleInstance) {
+  app.quit();
+}
+
 const createWindow = async () => {
   if (isDevelopment) {
     await installExtensions();
