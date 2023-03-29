@@ -27,7 +27,7 @@ const SIDE_QUEUE_OPTIONS = [
   { label: 'Floating', value: 'sideDrawerQueue' },
 ];
 
-const TITLEBAR_OPTIONS = [
+const WINDOWBAR_OPTIONS = [
   { label: 'Web (hidden)', value: Platform.WEB },
   { label: 'Windows', value: Platform.WINDOWS },
   { label: 'macOS', value: Platform.MACOS },
@@ -41,7 +41,7 @@ export const GeneralTab = () => {
     {
       control: (
         <Select
-          data={TITLEBAR_OPTIONS}
+          data={WINDOWBAR_OPTIONS}
           disabled={!isElectron()}
           value={settings.windowBarStyle}
           onChange={(e) => {
@@ -55,9 +55,9 @@ export const GeneralTab = () => {
           }}
         />
       ),
-      description: 'Adjust the style of the titlebar',
+      description: 'Adjust the style of the windowbar',
       isHidden: !isElectron(),
-      title: 'Titlebar style',
+      title: 'Windowbar style',
     },
     {
       control: (
