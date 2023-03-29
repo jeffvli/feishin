@@ -17,7 +17,7 @@ import {
   SongListFilter,
   useCurrentServer,
   useListStoreActions,
-  useSongListStore,
+  useSongListFilter,
 } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
@@ -37,7 +37,7 @@ export const SongListHeader = ({
 }: SongListHeaderProps) => {
   const server = useCurrentServer();
   const { id, pageKey } = useSongListContext();
-  const { filter } = useSongListStore({ id, key: pageKey });
+  const filter = useSongListFilter({ id, key: pageKey });
   const { setFilter, setTablePagination } = useListStoreActions();
   const handlePlayQueueAdd = usePlayQueueAdd();
   const cq = useContainerQuery();
