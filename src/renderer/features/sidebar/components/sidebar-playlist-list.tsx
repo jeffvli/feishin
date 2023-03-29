@@ -1,5 +1,6 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Flex, Group } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
 import { RiAddBoxFill, RiAddCircleFill, RiPlayFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -110,6 +111,13 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
   const { isScrollbarHidden, hideScrollbarElementProps } = useHideScrollbar(0);
   const handlePlayQueueAdd = usePlayQueueAdd();
 
+  const [rect, setRect] = useState({
+    height: 0,
+    width: 0,
+  });
+
+  const [debounced] = useDebouncedValue(rect, 25);
+
   const handlePlayPlaylist = useCallback(
     (id: string, play: Play) => {
       handlePlayQueueAdd?.({
@@ -135,16 +143,16 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
       h="100%"
       {...hideScrollbarElementProps}
     >
-      <AutoSizer>
-        {({ height, width }) => (
+      <AutoSizer onResize={(e) => setRect(e)}>
+        {() => (
           <FixedSizeList
             className={isScrollbarHidden ? 'hide-scrollbar overlay-scrollbar' : 'overlay-scrollbar'}
-            height={height}
+            height={debounced.height}
             itemCount={data?.items?.length || 0}
             itemData={memoizedItemData}
             itemSize={25}
             overscanCount={20}
-            width={width}
+            width={debounced.width}
           >
             {PlaylistRow}
           </FixedSizeList>
