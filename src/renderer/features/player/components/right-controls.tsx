@@ -28,7 +28,7 @@ export const RightControls = () => {
   const muted = useMuted();
   const server = useCurrentServer();
   const currentSong = useCurrentSong();
-  const { setSidebar } = useAppStoreActions();
+  const { setSideBar } = useAppStoreActions();
   const { rightExpanded: isQueueExpanded } = useSidebarStore();
   const { handleVolumeSlider, handleVolumeWheel, handleMute } = useRightControls();
 
@@ -145,7 +145,7 @@ export const RightControls = () => {
           icon={<HiOutlineQueueList size="1.1rem" />}
           tooltip={{ label: 'View queue', openDelay: 500 }}
           variant="secondary"
-          onClick={() => setSidebar({ rightExpanded: !isQueueExpanded })}
+          onClick={() => setSideBar({ rightExpanded: !isQueueExpanded })}
         />
         <Group
           noWrap

@@ -17,92 +17,94 @@ interface SidebarPlaylistListProps {
   data: ReturnType<typeof usePlaylistList>['data'];
 }
 
-const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => (
-  <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
-    <Group
-      noWrap
-      className="sidebar-playlist-item"
-      pos="relative"
-      position="apart"
-      sx={{
-        '&:hover': {
-          '.sidebar-playlist-controls': {
-            display: 'flex',
-          },
-          '.sidebar-playlist-name': {
-            color: 'var(--sidebar-fg-hover) !important',
-          },
-        },
-      }}
-    >
-      <Text
-        className="sidebar-playlist-name"
-        component={Link}
-        overflow="hidden"
-        size="md"
-        sx={{
-          color: 'var(--sidebar-fg) !important',
-          cursor: 'default',
-          width: '100%',
-        }}
-        to={
-          data?.items[index].id
-            ? generatePath(AppRoute.PLAYLISTS_DETAIL, {
-                playlistId: data?.items[index].id,
-              })
-            : undefined
-        }
-      >
-        {data?.items[index].name}
-      </Text>
+const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
+  return (
+    <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
       <Group
         noWrap
-        className="sidebar-playlist-controls"
-        display="none"
-        pos="absolute"
-        right="0"
-        spacing="sm"
+        className="sidebar-playlist-item"
+        pos="relative"
+        position="apart"
+        sx={{
+          '&:hover': {
+            '.sidebar-playlist-controls': {
+              display: 'flex',
+            },
+            '.sidebar-playlist-name': {
+              color: 'var(--sidebar-fg-hover) !important',
+            },
+          },
+        }}
       >
-        <Button
-          compact
+        <Text
+          className="sidebar-playlist-name"
+          component={Link}
+          overflow="hidden"
           size="md"
-          tooltip={{ label: 'Play', openDelay: 500 }}
-          variant="default"
-          onClick={() => {
-            if (!data?.items?.[index].id) return;
-            data.handlePlay(data?.items[index].id, Play.NOW);
+          sx={{
+            color: 'var(--sidebar-fg) !important',
+            cursor: 'default',
+            width: '100%',
           }}
+          to={
+            data?.items[index].id
+              ? generatePath(AppRoute.PLAYLISTS_DETAIL, {
+                  playlistId: data?.items[index].id,
+                })
+              : undefined
+          }
         >
-          <RiPlayFill />
-        </Button>
-        <Button
-          compact
-          size="md"
-          tooltip={{ label: 'Add to queue', openDelay: 500 }}
-          variant="default"
-          onClick={() => {
-            if (!data?.items?.[index].id) return;
-            data.handlePlay(data?.items[index].id, Play.LAST);
-          }}
+          {data?.items[index].name}
+        </Text>
+        <Group
+          noWrap
+          className="sidebar-playlist-controls"
+          display="none"
+          pos="absolute"
+          right="0"
+          spacing="sm"
         >
-          <RiAddBoxFill />
-        </Button>
-        <Button
-          compact
-          size="md"
-          tooltip={{ label: 'Add to queue next', openDelay: 500 }}
-          variant="default"
-          onClick={() => {
-            if (!data?.items?.[index].id) return;
-            data.handlePlay(data?.items[index].id, Play.NEXT);
-          }}
-        >
-          <RiAddCircleFill />
-        </Button>
+          <Button
+            compact
+            size="md"
+            tooltip={{ label: 'Play', openDelay: 500 }}
+            variant="default"
+            onClick={() => {
+              if (!data?.items?.[index].id) return;
+              data.handlePlay(data?.items[index].id, Play.NOW);
+            }}
+          >
+            <RiPlayFill />
+          </Button>
+          <Button
+            compact
+            size="md"
+            tooltip={{ label: 'Add to queue', openDelay: 500 }}
+            variant="default"
+            onClick={() => {
+              if (!data?.items?.[index].id) return;
+              data.handlePlay(data?.items[index].id, Play.LAST);
+            }}
+          >
+            <RiAddBoxFill />
+          </Button>
+          <Button
+            compact
+            size="md"
+            tooltip={{ label: 'Add to queue next', openDelay: 500 }}
+            variant="default"
+            onClick={() => {
+              if (!data?.items?.[index].id) return;
+              data.handlePlay(data?.items[index].id, Play.NEXT);
+            }}
+          >
+            <RiAddCircleFill />
+          </Button>
+        </Group>
       </Group>
-    </Group>
-  </div>
-);
+    </div>
+  );
+};
 
 export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
   const { isScrollbarHidden, hideScrollbarElementProps } = useHideScrollbar(0);

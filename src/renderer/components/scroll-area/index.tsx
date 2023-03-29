@@ -5,6 +5,8 @@ import { useMergedRef, useTimeout } from '@mantine/hooks';
 import { motion, useScroll } from 'framer-motion';
 import styled from 'styled-components';
 import { PageHeader, PageHeaderProps } from '/@/renderer/components/page-header';
+import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { Platform } from '/@/renderer/types';
 
 interface ScrollAreaProps extends MantineScrollAreaProps {
   children: React.ReactNode;
@@ -26,16 +28,18 @@ const StyledScrollArea = styled(MantineScrollArea)`
   }
 `;
 
-const StyledNativeScrollArea = styled.div<{ scrollBarOffset?: string }>`
+const StyledNativeScrollArea = styled.div<{ scrollBarOffset?: string; windowBarStyle?: Platform }>`
   height: 100%;
   overflow-y: overlay !important;
 
   &::-webkit-scrollbar-track {
-    margin-top: ${(props) => props.scrollBarOffset || '65px'};
+    margin-top: ${(props) =>
+      props.windowBarStyle !== Platform.WEB ? '0px' : props.scrollBarOffset || '65px'};
   }
 
   &::-webkit-scrollbar-thumb {
-    margin-top: ${(props) => props.scrollBarOffset || '65px'};
+    margin-top: ${(props) =>
+      props.windowBarStyle !== Platform.WEB ? '0px' : props.scrollBarOffset || '65px'};
   }
 `;
 
@@ -74,6 +78,7 @@ export const NativeScrollArea = forwardRef(
     }: NativeScrollAreaProps,
     ref: Ref<HTMLDivElement>,
   ) => {
+    const { windowBarStyle } = useGeneralSettings();
     const [hideScrollbar, setHideScrollbar] = useState(false);
     const [hideHeader, setHideHeader] = useState(true);
     const { start, clear } = useTimeout(
@@ -130,6 +135,7 @@ export const NativeScrollArea = forwardRef(
           ref={mergedRef}
           className={hideScrollbar ? 'hide-scrollbar' : undefined}
           scrollBarOffset={scrollBarOffset}
+          windowBarStyle={windowBarStyle}
           onMouseEnter={() => {
             setHideScrollbar(false);
             clear();

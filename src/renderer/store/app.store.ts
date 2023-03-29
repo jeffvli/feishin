@@ -33,8 +33,8 @@ export interface AppState {
 export interface AppSlice extends AppState {
   actions: {
     setAppStore: (data: Partial<AppSlice>) => void;
-    setSidebar: (options: Partial<SidebarProps>) => void;
-    setTitlebar: (options: Partial<TitlebarProps>) => void;
+    setSideBar: (options: Partial<SidebarProps>) => void;
+    setTitleBar: (options: Partial<TitlebarProps>) => void;
   };
 }
 
@@ -46,12 +46,12 @@ export const useAppStore = create<AppSlice>()(
           setAppStore: (data) => {
             set({ ...get(), ...data });
           },
-          setSidebar: (options) => {
+          setSideBar: (options) => {
             set((state) => {
               state.sidebar = { ...state.sidebar, ...options };
             });
           },
-          setTitlebar: (options) => {
+          setTitleBar: (options) => {
             set((state) => {
               state.titlebar = { ...state.titlebar, ...options };
             });
@@ -89,6 +89,6 @@ export const useSidebarStore = () => useAppStore((state) => state.sidebar);
 
 export const useSidebarRightExpanded = () => useAppStore((state) => state.sidebar.rightExpanded);
 
-export const useSetTitlebar = () => useAppStore((state) => state.actions.setTitlebar);
+export const useSetTitlebar = () => useAppStore((state) => state.actions.setTitleBar);
 
 export const useTitlebarStore = () => useAppStore((state) => state.titlebar);

@@ -4,6 +4,7 @@ import merge from 'lodash/merge';
 import create from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import shallow from 'zustand/shallow';
 import { AppTheme } from '/@/renderer/themes/types';
 import {
   TableColumn,
@@ -12,6 +13,7 @@ import {
   PlaybackStyle,
   PlaybackType,
   TableType,
+  Platform,
 } from '/@/renderer/types';
 
 export type PersistedTableColumn = {
@@ -38,6 +40,7 @@ export interface SettingsState {
     themeDark: AppTheme;
     themeLight: AppTheme;
     volumeWheelStep: number;
+    windowBarStyle: Platform;
   };
   player: {
     audioDeviceId?: string | null;
@@ -93,6 +96,7 @@ export const useSettingsStore = create<SettingsSlice>()(
           themeDark: AppTheme.DEFAULT_DARK,
           themeLight: AppTheme.DEFAULT_LIGHT,
           volumeWheelStep: 5,
+          windowBarStyle: Platform.WEB,
         },
         player: {
           audioDeviceId: undefined,
@@ -244,21 +248,21 @@ export const useSettingsStore = create<SettingsSlice>()(
         return merge(currentState, persistedState);
       },
       name: 'store_settings',
-      version: 3,
+      version: 4,
     },
   ),
 );
 
 export const useSettingsStoreActions = () => useSettingsStore((state) => state.actions);
 
-export const usePlayerSettings = () => useSettingsStore((state) => state.player);
+export const usePlayerSettings = () => useSettingsStore((state) => state.player, shallow);
 
 export const useTableSettings = (type: TableType) =>
   useSettingsStore((state) => state.tables[type]);
 
-export const useGeneralSettings = () => useSettingsStore((state) => state.general);
+export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
 
-export const usePlayerType = () => useSettingsStore((state) => state.player.type);
+export const usePlayerType = () => useSettingsStore((state) => state.player.type, shallow);
 
 export const usePlayButtonBehavior = () =>
-  useSettingsStore((state) => state.player.playButtonBehavior);
+  useSettingsStore((state) => state.player.playButtonBehavior, shallow);

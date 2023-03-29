@@ -13,15 +13,18 @@
   --main-fg: rgb(245, 245, 245);
   --main-fg-secondary: rgb(150, 150, 150);
 
+  --window-bar-bg: rgb(24, 24, 24);
+  --window-bar-fg: rgb(255, 255, 255);
+
   --titlebar-fg: rgb(255, 255, 255);
-  --titlebar-bg: rgb(24, 24, 24);
+  --titlebar-bg: rgb(12, 12, 12);
   --titlebar-controls-bg: rgba(0, 0, 0, 0);
 
   --sidebar-bg: rgb(0, 0, 0);
   --sidebar-fg: rgb(210, 210, 210);
   --sidebar-fg-hover: rgb(255, 255, 255);
   --sidebar-handle-bg: #4d4d4d;
-  --sidebar-border: none;
+  --sidebar-border: 2px rgba(18, 18, 18, 0.7) solid;
 
   --playerbar-bg: rgb(24, 24, 24);
   --playerbar-btn-main-fg: rgb(0, 0, 0);

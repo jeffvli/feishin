@@ -80,7 +80,7 @@ const LineItem = styled.div<{ $secondary?: boolean }>`
 `;
 
 export const LeftControls = () => {
-  const { setSidebar } = useAppStoreActions();
+  const { setSideBar } = useAppStoreActions();
   const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
   const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
   const hideImage = useAppStore((state) => state.sidebar.image);
@@ -102,7 +102,7 @@ export const LeftControls = () => {
 
   const handleToggleSidebarImage = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    setSidebar({ image: true });
+    setSideBar({ image: true });
   };
 
   return (

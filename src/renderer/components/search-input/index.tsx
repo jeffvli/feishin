@@ -54,7 +54,7 @@ export const SearchInput = ({
           padding: isOpened ? '10px' : 0,
         },
       }}
-      width={isOpened ? openedWidth || 150 : initialWidth || 50}
+      width={isOpened ? openedWidth || 150 : initialWidth || 35}
       onChange={onChange}
       onKeyDown={handleEscape}
     />

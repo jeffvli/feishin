@@ -1,6 +1,8 @@
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
 import { Titlebar } from '/@/renderer/features/titlebar/components/titlebar';
+import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { Platform } from '/@/renderer/types';
 
 const TitlebarContainer = styled.header`
   position: absolute;
@@ -13,11 +15,15 @@ const TitlebarContainer = styled.header`
 `;
 
 export const TitlebarOutlet = () => {
+  const { windowBarStyle } = useGeneralSettings();
+
   return (
     <>
-      <TitlebarContainer>
-        <Titlebar />
-      </TitlebarContainer>
+      {windowBarStyle === Platform.WEB && (
+        <TitlebarContainer>
+          <Titlebar />
+        </TitlebarContainer>
+      )}
       <Outlet />
     </>
   );

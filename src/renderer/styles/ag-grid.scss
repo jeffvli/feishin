@@ -10,6 +10,10 @@
   transition: position 0.2s ease-in-out;
 }
 
+.window-frame {
+  top: 95px;
+}
+
 .ag-header-transparent {
   --ag-header-background-color: rgba(0, 0, 0, 0%) !important;
 }

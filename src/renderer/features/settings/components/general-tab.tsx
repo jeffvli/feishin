@@ -9,6 +9,7 @@ import {
   SideQueueType,
 } from '/@/renderer/store/settings.store';
 import { AppTheme } from '/@/renderer/themes/types';
+import { Platform } from '/@/renderer/types';
 
 const FONT_OPTIONS = [
   { label: 'Archivo', value: 'Archivo' },
@@ -26,6 +27,12 @@ const SIDE_QUEUE_OPTIONS = [
   { label: 'Floating', value: 'sideDrawerQueue' },
 ];
 
+const TITLEBAR_OPTIONS = [
+  { label: 'Web (hidden)', value: Platform.WEB },
+  { label: 'Windows', value: Platform.WINDOWS },
+  { label: 'macOS', value: Platform.MACOS },
+];
+
 export const GeneralTab = () => {
   const settings = useGeneralSettings();
   const { setSettings } = useSettingsStoreActions();
@@ -34,9 +41,18 @@ export const GeneralTab = () => {
     {
       control: (
         <Select
-          disabled
-          data={['Windows', 'macOS']}
-          defaultValue="Windows"
+          data={TITLEBAR_OPTIONS}
+          disabled={!isElectron()}
+          value={settings.windowBarStyle}
+          onChange={(e) => {
+            if (!e) return;
+            setSettings({
+              general: {
+                ...settings,
+                windowBarStyle: e as Platform,
+              },
+            });
+          }}
         />
       ),
       description: 'Adjust the style of the titlebar',

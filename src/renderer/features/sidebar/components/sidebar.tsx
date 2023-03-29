@@ -87,7 +87,7 @@ export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const sidebar = useSidebarStore();
-  const { setSidebar } = useAppStoreActions();
+  const { setSideBar } = useAppStoreActions();
   const imageUrl = useCurrentSong()?.imageUrl;
   const server = useCurrentServer();
 
@@ -215,7 +215,7 @@ export const Sidebar = () => {
                 panel: { padding: '0 1rem' },
               }}
               value={sidebar.expanded}
-              onChange={(e) => setSidebar({ expanded: e })}
+              onChange={(e) => setSideBar({ expanded: e })}
             >
               <Accordion.Item value="library">
                 <Accordion.Control>
@@ -362,7 +362,7 @@ export const Sidebar = () => {
                 variant="default"
                 onClick={(e) => {
                   e.stopPropagation();
-                  setSidebar({ image: false });
+                  setSideBar({ image: false });
                 }}
               >
                 <RiArrowDownSLine

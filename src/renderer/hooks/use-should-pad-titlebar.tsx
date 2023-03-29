@@ -2,14 +2,20 @@ import { useLocation } from 'react-router';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useSidebarRightExpanded } from '/@/renderer/store';
 import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { Platform } from '/@/renderer/types';
 
 export const useShouldPadTitlebar = () => {
   const location = useLocation();
   const isSidebarExpanded = useSidebarRightExpanded();
   const isQueuePage = location.pathname === AppRoute.NOW_PLAYING;
-  const { sideQueueType } = useGeneralSettings();
+  const { sideQueueType, windowBarStyle } = useGeneralSettings();
 
-  // If the sidebar is expanded, the sidebar queue is enabled, and the user is not on the queue page
+  const conditions = [
+    windowBarStyle === Platform.WEB,
+    !(isSidebarExpanded && sideQueueType === 'sideQueue' && !isQueuePage),
+  ];
 
-  return !(isSidebarExpanded && sideQueueType === 'sideQueue' && !isQueuePage);
+  const shouldPadTitlebar = conditions.every((condition) => condition);
+
+  return shouldPadTitlebar;
 };

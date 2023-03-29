@@ -49,6 +49,7 @@ export interface PlayerData {
 
 export interface QueueData {
   current?: QueueSong;
+  length: number;
   next?: QueueSong;
   previous?: QueueSong;
 }
@@ -318,6 +319,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                   player2,
                   queue: {
                     current,
+                    length: get().queue.default.length || 0,
                     next,
                     previous,
                   },
@@ -377,6 +379,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                 player2,
                 queue: {
                   current: queue[currentIndex],
+                  length: get().queue.default.length || 0,
                   next: nextSongIndex !== undefined ? queue[nextSongIndex] : undefined,
                   previous: queue[currentIndex - 1],
                 },
@@ -386,6 +389,7 @@ export const usePlayerStore = create<PlayerSlice>()(
               const queue = get().queue.default;
               return {
                 current: queue[get().current.index],
+                length: queue.length || 0,
                 next: queue[get().current.index + 1],
                 previous: queue[get().current.index - 1],
               };
@@ -895,7 +899,9 @@ export const useCurrentSong = () => usePlayerStore((state) => state.current.song
 export const usePlayerData = () =>
   usePlayerStore(
     (state) => state.actions.getPlayerData(),
-    (a, b) => a.current.nextIndex === b.current.nextIndex,
+    (a, b) => {
+      return a.current.nextIndex === b.current.nextIndex;
+    },
   );
 
 export const useCurrentPlayer = () => usePlayerStore((state) => state.current.player);
@@ -920,3 +926,13 @@ export const useSetQueueRating = () => usePlayerStore((state) => state.actions.s
 
 export const useIncrementQueuePlayCount = () =>
   usePlayerStore((state) => state.actions.incrementPlayCount);
+
+export const useQueueStatus = () =>
+  usePlayerStore(
+    (state) => ({
+      currentSong: state.current.song,
+      index: state.current.index,
+      length: state.queue.default.length,
+    }),
+    shallow,
+  );
