@@ -3,6 +3,8 @@ import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { useRef } from 'react';
 import styled from 'styled-components';
 import { useShouldPadTitlebar, useTheme } from '/@/renderer/hooks';
+import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { Platform } from '/@/renderer/types';
 
 const Container = styled(motion(Flex))<{
   height?: string;
@@ -15,7 +17,11 @@ const Container = styled(motion(Flex))<{
   background: var(--titlebar-bg);
 `;
 
-const Header = styled(motion.div)<{ $isHidden?: boolean; $padRight?: boolean }>`
+const Header = styled(motion.div)<{
+  $isDraggable?: boolean;
+  $isHidden?: boolean;
+  $padRight?: boolean;
+}>`
   position: relative;
   z-index: 15;
   width: 100%;
@@ -23,7 +29,7 @@ const Header = styled(motion.div)<{ $isHidden?: boolean; $padRight?: boolean }>`
   margin-right: ${(props) => (props.$padRight ? '140px' : '1rem')};
   user-select: ${(props) => (props.$isHidden ? 'none' : 'auto')};
   pointer-events: ${(props) => (props.$isHidden ? 'none' : 'auto')};
-  -webkit-app-region: drag;
+  -webkit-app-region: ${(props) => props.$isDraggable && 'drag'};
 
   button {
     -webkit-app-region: no-drag;
@@ -88,6 +94,7 @@ export const PageHeader = ({
 }: PageHeaderProps) => {
   const ref = useRef(null);
   const padRight = useShouldPadTitlebar();
+  const { windowBarStyle } = useGeneralSettings();
   const theme = useTheme();
 
   return (
@@ -98,6 +105,7 @@ export const PageHeader = ({
       {...props}
     >
       <Header
+        $isDraggable={windowBarStyle === Platform.WEB}
         $isHidden={isHidden}
         $padRight={padRight}
       >
