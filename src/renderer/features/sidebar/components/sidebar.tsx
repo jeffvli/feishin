@@ -1,15 +1,13 @@
 import { MouseEvent } from 'react';
-import { Stack, Grid, Accordion, Center, Group, Divider, Box } from '@mantine/core';
+import { Stack, Accordion, Center, Group, Divider, Box } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button, DropdownMenu, MotionStack, Spinner, TextInput } from '/@/renderer/components';
+import { Button, MotionStack, Spinner } from '/@/renderer/components';
 import {
   RiAddFill,
   RiAlbumFill,
   RiAlbumLine,
   RiArrowDownSLine,
-  RiArrowLeftSLine,
-  RiArrowRightSLine,
   RiDatabaseFill,
   RiDatabaseLine,
   RiDiscLine,
@@ -18,14 +16,12 @@ import {
   RiHome5Fill,
   RiHome5Line,
   RiListUnordered,
-  RiMenuFill,
   RiMusic2Fill,
   RiMusic2Line,
-  RiSearchLine,
   RiUserVoiceFill,
   RiUserVoiceLine,
 } from 'react-icons/ri';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -41,12 +37,17 @@ import { fadeIn } from '/@/renderer/styles';
 import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
 import { PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import { SidebarPlaylistList } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
-import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 import { useContainerQuery } from '/@/renderer/hooks';
+import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
+import { Platform } from '/@/renderer/types';
+import { useGeneralSettings } from '../../../store/settings.store';
 
-const SidebarContainer = styled.div`
+const SidebarContainer = styled.div<{ windowBarStyle: Platform }>`
   height: 100%;
-  max-height: calc(100vh - 149px); // Playerbar (90px), titlebar (65px)
+  max-height: ${(props) =>
+    props.windowBarStyle === Platform.WEB
+      ? 'calc(100vh - 149px)'
+      : 'calc(100vh - 179px)'}; // Playerbar (90px), titlebar (65px), windowbar (30px)
   user-select: none;
 `;
 
@@ -73,21 +74,11 @@ const SidebarImage = styled.img`
   background: var(--placeholder-bg);
 `;
 
-const ActionsContainer = styled(Grid)`
-  height: 65px;
-  padding: 1rem;
-  -webkit-app-region: drag;
-
-  input {
-    -webkit-app-region: no-drag;
-  }
-`;
-
 export const Sidebar = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const sidebar = useSidebarStore();
   const { setSideBar } = useAppStoreActions();
+  const { windowBarStyle } = useGeneralSettings();
   const imageUrl = useCurrentSong()?.imageUrl;
   const server = useCurrentServer();
 
@@ -123,56 +114,11 @@ export const Sidebar = () => {
   const cq = useContainerQuery({ sm: 300 });
 
   return (
-    <SidebarContainer ref={cq.ref}>
-      <ActionsContainer gutter="sm">
-        <Grid.Col span={cq.isSm ? 7 : 5}>
-          <TextInput
-            disabled
-            readOnly
-            icon={<RiSearchLine />}
-            placeholder="Search"
-            size="md"
-          />
-        </Grid.Col>
-        <Grid.Col span={cq.isSm ? 5 : 7}>
-          <Group
-            grow
-            noWrap
-            spacing="sm"
-          >
-            <DropdownMenu position="bottom-start">
-              <DropdownMenu.Target>
-                <Button
-                  p="0.5rem"
-                  size="md"
-                  variant="default"
-                >
-                  <RiMenuFill size="1rem" />
-                </Button>
-              </DropdownMenu.Target>
-              <DropdownMenu.Dropdown>
-                <AppMenu />
-              </DropdownMenu.Dropdown>
-            </DropdownMenu>
-            <Button
-              p="0.5rem"
-              size="md"
-              variant="default"
-              onClick={() => navigate(-1)}
-            >
-              <RiArrowLeftSLine size="1.5rem" />
-            </Button>
-            <Button
-              p="0.5rem"
-              size="md"
-              variant="default"
-              onClick={() => navigate(1)}
-            >
-              <RiArrowRightSLine size="1.5rem" />
-            </Button>
-          </Group>
-        </Grid.Col>
-      </ActionsContainer>
+    <SidebarContainer
+      ref={cq.ref}
+      windowBarStyle={windowBarStyle}
+    >
+      <ActionBar />
       <Stack
         h="100%"
         justify="space-between"
