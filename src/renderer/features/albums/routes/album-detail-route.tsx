@@ -1,5 +1,5 @@
 import { NativeScrollArea } from '/@/renderer/components';
-import { AnimatedPage, LibraryHeaderBar, PlayButton } from '/@/renderer/features/shared';
+import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useRef } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
@@ -42,7 +42,7 @@ const AlbumDetailRoute = () => {
           backgroundColor: background,
           children: (
             <LibraryHeaderBar>
-              <PlayButton onClick={handlePlay} />
+              <LibraryHeaderBar.PlayButton onClick={handlePlay} />
               <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
             </LibraryHeaderBar>
           ),

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Group } from '@mantine/core';
+import { Group, Box } from '@mantine/core';
 import { TextTitle } from '/@/renderer/components';
 import { PlayButton as PlayBtn } from '/@/renderer/features/shared/components/play-button';
 
@@ -44,11 +44,13 @@ interface PlayButtonProps {
 
 const PlayButton = ({ onClick }: PlayButtonProps) => {
   return (
-    <PlayBtn
-      h="45px"
-      w="45px"
-      onClick={onClick}
-    />
+    <Box>
+      <PlayBtn
+        h="45px"
+        w="45px"
+        onClick={onClick}
+      />
+    </Box>
   );
 };
 
