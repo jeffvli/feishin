@@ -5,16 +5,24 @@ import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queu
 import { PlayQueueListControls } from './play-queue-list-controls';
 import { Song } from '/@/renderer/api/types';
 import { PageHeader, Paper, VirtualGridContainer } from '/@/renderer/components';
+import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { Platform } from '/@/renderer/types';
 
 export const SidebarPlayQueue = () => {
   const queueRef = useRef<{ grid: AgGridReactType<Song> } | null>(null);
+  const { windowBarStyle } = useGeneralSettings();
 
   return (
     <VirtualGridContainer>
-      <Stack>
-        <PageHeader backgroundColor="var(--titlebar-bg)" />
-      </Stack>
-      <Paper>
+      {windowBarStyle === Platform.WEB && (
+        <Stack mr={windowBarStyle === Platform.WEB ? '130px' : undefined}>
+          <PageHeader backgroundColor="var(--titlebar-bg)" />
+        </Stack>
+      )}
+      <Paper
+        display={windowBarStyle !== Platform.WEB ? 'flex' : undefined}
+        h={windowBarStyle !== Platform.WEB ? '65px' : undefined}
+      >
         <PlayQueueListControls
           tableRef={queueRef}
           type="sideQueue"
