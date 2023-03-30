@@ -58,6 +58,8 @@ const AlbumDetailRoute = lazy(
   () => import('/@/renderer/features/albums/routes/album-detail-route'),
 );
 
+const SettingsRoute = lazy(() => import('/@/renderer/features/settings/routes/settings-route'));
+
 const RouteErrorBoundary = lazy(
   () => import('/@/renderer/features/action-required/components/route-error-boundary'),
 );
@@ -83,6 +85,11 @@ export const AppRouter = () => {
                 element={<HomeRoute />}
                 errorElement={<RouteErrorBoundary />}
                 path={AppRoute.HOME}
+              />
+              <Route
+                element={<SettingsRoute />}
+                errorElement={<RouteErrorBoundary />}
+                path={AppRoute.SETTINGS}
               />
               <Route
                 element={<NowPlayingRoute />}

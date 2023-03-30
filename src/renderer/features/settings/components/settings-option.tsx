@@ -29,7 +29,7 @@ export const SettingsOptions = ({ title, description, control, note }: SettingsO
           <Group>
             <Text
               $noSelect
-              size="sm"
+              size="md"
             >
               {title}
             </Text>

@@ -3,7 +3,6 @@ import { Divider, Group, SelectItem, Stack } from '@mantine/core';
 import {
   FileInput,
   NumberInput,
-  SegmentedControl,
   Select,
   Slider,
   Switch,
@@ -69,7 +68,7 @@ export const PlaybackTab = () => {
   const playerOptions = [
     {
       control: (
-        <SegmentedControl
+        <Select
           data={[
             {
               disabled: !isElectron(),
@@ -98,7 +97,6 @@ export const PlaybackTab = () => {
       control: (
         <FileInput
           placeholder={mpvPath}
-          size="sm"
           width={225}
           onChange={handleSetMpvPath}
         />
@@ -115,9 +113,7 @@ export const PlaybackTab = () => {
             autosize
             defaultValue={mpvParameters}
             minRows={4}
-            placeholder={
-              'Default parameters (one per line):\n--gapless-audio=weak\n--prefetch-playlist=yes'
-            }
+            placeholder={'(Add one per line):\n--gapless-audio=weak\n--prefetch-playlist=yes'}
             width={225}
             onBlur={(e) => {
               if (isElectron()) {
@@ -128,20 +124,23 @@ export const PlaybackTab = () => {
         </Stack>
       ),
       description: (
-        <Text
-          $noSelect
-          $secondary
-          size="sm"
-        >
-          Options to pass to the player{' '}
-          <a
-            href="https://mpv.io/manual/stable/#audio"
-            rel="noreferrer"
-            target="_blank"
+        <Stack spacing={0}>
+          <Text
+            $noSelect
+            $secondary
           >
-            https://mpv.io/manual/stable/#audio
-          </a>
-        </Text>
+            Options to pass to the player
+          </Text>
+          <Text>
+            <a
+              href="https://mpv.io/manual/stable/#audio"
+              rel="noreferrer"
+              target="_blank"
+            >
+              https://mpv.io/manual/stable/#audio
+            </a>
+          </Text>
+        </Stack>
       ),
       isHidden: settings.type !== PlaybackType.LOCAL,
       note: 'Restart required.',
@@ -163,7 +162,7 @@ export const PlaybackTab = () => {
     },
     {
       control: (
-        <SegmentedControl
+        <Select
           data={[
             { label: 'Normal', value: PlaybackStyle.GAPLESS },
             { label: 'Crossfade', value: PlaybackStyle.CROSSFADE },
@@ -346,7 +345,7 @@ export const PlaybackTab = () => {
   const otherOptions = [
     {
       control: (
-        <SegmentedControl
+        <Select
           data={[
             { label: 'Now', value: Play.NOW },
             { label: 'Next', value: Play.NEXT },
@@ -366,28 +365,6 @@ export const PlaybackTab = () => {
       description: 'The default behavior of the play button when adding songs to the queue',
       isHidden: false,
       title: 'Play button behavior',
-    },
-    {
-      control: (
-        <Switch
-          aria-label="Toggle skip buttons"
-          defaultChecked={settings.skipButtons?.enabled}
-          onChange={(e) =>
-            setSettings({
-              player: {
-                ...settings,
-                skipButtons: {
-                  ...settings.skipButtons,
-                  enabled: e.currentTarget.checked,
-                },
-              },
-            })
-          }
-        />
-      ),
-      description: 'Show or hide the skip buttons on the playerbar',
-      isHidden: false,
-      title: 'Show skip buttons',
     },
     {
       control: (
@@ -437,6 +414,28 @@ export const PlaybackTab = () => {
       isHidden: false,
       title: 'Skip duration',
     },
+    {
+      control: (
+        <Switch
+          aria-label="Toggle skip buttons"
+          defaultChecked={settings.skipButtons?.enabled}
+          onChange={(e) =>
+            setSettings({
+              player: {
+                ...settings,
+                skipButtons: {
+                  ...settings.skipButtons,
+                  enabled: e.currentTarget.checked,
+                },
+              },
+            })
+          }
+        />
+      ),
+      description: 'Show or hide the skip buttons on the playerbar',
+      isHidden: false,
+      title: 'Show skip buttons',
+    },
   ];
 
   return (
@@ -461,7 +460,7 @@ export const PlaybackTab = () => {
         ))}
       <Text
         $secondary
-        size="xs"
+        size="sm"
       >
         *The scrobble will be submitted if one or more of the above conditions is met
       </Text>

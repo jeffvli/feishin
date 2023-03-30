@@ -1,5 +1,5 @@
-import type { TabsProps as MantineTabsProps } from '@mantine/core';
-import { Tabs as MantineTabs } from '@mantine/core';
+import { Suspense } from 'react';
+import { TabsPanelProps, TabsProps as MantineTabsProps, Tabs as MantineTabs } from '@mantine/core';
 import styled from 'styled-components';
 
 type TabsProps = MantineTabsProps;
@@ -12,11 +12,14 @@ const StyledTabs = styled(MantineTabs)`
   }
 
   &.mantine-Tabs-tab {
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 1rem;
     background-color: var(--main-bg);
   }
 
   & .mantine-Tabs-panel {
-    padding: 0 1rem;
+    padding: 1.5rem 0.5rem;
   }
 
   button {
@@ -35,27 +38,26 @@ const StyledTabs = styled(MantineTabs)`
   button[data-active] {
     color: var(--btn-subtle-fg);
     background: none;
-    box-shadow: 2px 0 0 var(--primary-color) inset;
+    border-color: var(--primary-color);
 
     &:hover {
       background: none;
     }
   }
-
-  /* button[data-active]::before {
-    content: '';
-    border-left: 2px solid var(--primary-color);
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  } */
 `;
 
 export const Tabs = ({ children, ...props }: TabsProps) => {
   return <StyledTabs {...props}>{children}</StyledTabs>;
 };
 
+const Panel = ({ children, ...props }: TabsPanelProps) => {
+  return (
+    <StyledTabs.Panel {...props}>
+      <Suspense fallback={<></>}>{children}</Suspense>
+    </StyledTabs.Panel>
+  );
+};
+
 Tabs.List = StyledTabs.List;
-Tabs.Panel = StyledTabs.Panel;
+Tabs.Panel = Panel;
 Tabs.Tab = StyledTabs.Tab;

@@ -20,4 +20,5 @@ export enum AppRoute {
   PLAYLISTS_DETAIL_SONGS = '/playlists/:playlistId/songs',
   SEARCH = '/search',
   SERVERS = '/servers',
+  SETTINGS = '/settings',
 }
