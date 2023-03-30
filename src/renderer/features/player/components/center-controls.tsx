@@ -69,7 +69,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
   const [isSeeking, setIsSeeking] = useState(false);
   const currentSong = useCurrentSong();
   const songDuration = currentSong?.duration;
-  const skip = useSettingsStore((state) => state.player.skipButtons);
+  const skip = useSettingsStore((state) => state.general.skipButtons);
   const playerType = usePlayerType();
   const player1 = playersRef?.current?.player1;
   const player2 = playersRef?.current?.player2;

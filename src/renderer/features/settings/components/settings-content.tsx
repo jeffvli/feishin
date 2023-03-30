@@ -1,10 +1,10 @@
 import { lazy } from 'react';
-import { Box } from '@mantine/core';
 import { Tabs } from '/@/renderer/components';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import styled from 'styled-components';
 
 const GeneralTab = lazy(() =>
-  import('/@/renderer/features/settings/components/general-tab').then((module) => ({
+  import('/@/renderer/features/settings/components/general/general-tab').then((module) => ({
     default: module.GeneralTab,
   })),
 );
@@ -15,16 +15,25 @@ const PlaybackTab = lazy(() =>
   })),
 );
 
+const ApplicationTab = lazy(() =>
+  import('/@/renderer/features/settings/components/window/window-tab').then((module) => ({
+    default: module.WindowTab,
+  })),
+);
+
+const TabContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  overflow: scroll;
+`;
+
 export const SettingsContent = () => {
   const currentTab = useSettingsStore((state) => state.tab);
   const { setSettings } = useSettingsStoreActions();
 
   return (
-    <Box
-      h="100%"
-      p="1rem"
-      sx={{ overflow: 'scroll' }}
-    >
+    <TabContainer>
       <Tabs
         keepMounted={false}
         orientation="horizontal"
@@ -35,6 +44,7 @@ export const SettingsContent = () => {
         <Tabs.List>
           <Tabs.Tab value="general">General</Tabs.Tab>
           <Tabs.Tab value="playback">Playback</Tabs.Tab>
+          <Tabs.Tab value="window">Window</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="general">
           <GeneralTab />
@@ -42,7 +52,10 @@ export const SettingsContent = () => {
         <Tabs.Panel value="playback">
           <PlaybackTab />
         </Tabs.Panel>
+        <Tabs.Panel value="window">
+          <ApplicationTab />
+        </Tabs.Panel>
       </Tabs>
-    </Box>
+    </TabContainer>
   );
 };

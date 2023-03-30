@@ -1,9 +1,9 @@
+import { useRef } from 'react';
 import { Flex, FlexProps } from '@mantine/core';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
-import { useRef } from 'react';
 import styled from 'styled-components';
 import { useShouldPadTitlebar, useTheme } from '/@/renderer/hooks';
-import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
 
 const Container = styled(motion(Flex))<{
@@ -94,7 +94,7 @@ export const PageHeader = ({
 }: PageHeaderProps) => {
   const ref = useRef(null);
   const padRight = useShouldPadTitlebar();
-  const { windowBarStyle } = useGeneralSettings();
+  const { windowBarStyle } = useWindowSettings();
   const theme = useTheme();
 
   return (

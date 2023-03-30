@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState, useRef } from 'react';
 import { QueueSong, ServerType } from '/@/renderer/api/types';
 import { useSendScrobble } from '/@/renderer/features/player/mutations/scrobble-mutation';
 import { useCurrentStatus, usePlayerStore } from '/@/renderer/store';
-import { usePlayerSettings } from '/@/renderer/store/settings.store';
+import { usePlaybackSettings } from '/@/renderer/store/settings.store';
 import { PlayerStatus } from '/@/renderer/types';
 
 /*
@@ -49,7 +49,7 @@ const checkScrobbleConditions = (args: {
 
 export const useScrobble = () => {
   const status = useCurrentStatus();
-  const scrobbleSettings = usePlayerSettings().scrobble;
+  const scrobbleSettings = usePlaybackSettings().scrobble;
   const isScrobbleEnabled = scrobbleSettings?.enabled;
   const sendScrobble = useSendScrobble();
 

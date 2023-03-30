@@ -40,7 +40,7 @@ import { SidebarPlaylistList } from '/@/renderer/features/sidebar/components/sid
 import { useContainerQuery } from '/@/renderer/hooks';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { Platform } from '/@/renderer/types';
-import { useGeneralSettings } from '../../../store/settings.store';
+import { useWindowSettings } from '../../../store/settings.store';
 
 const SidebarContainer = styled.div<{ windowBarStyle: Platform }>`
   height: 100%;
@@ -78,7 +78,7 @@ export const Sidebar = () => {
   const location = useLocation();
   const sidebar = useSidebarStore();
   const { setSideBar } = useAppStoreActions();
-  const { windowBarStyle } = useGeneralSettings();
+  const { windowBarStyle } = useWindowSettings();
   const imageUrl = useCurrentSong()?.imageUrl;
   const server = useCurrentServer();
 

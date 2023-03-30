@@ -56,7 +56,7 @@ const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
 
 export const Playerbar = () => {
   const playersRef = useRef<any>();
-  const settings = useSettingsStore((state) => state.player);
+  const settings = useSettingsStore((state) => state.playback);
   const volume = useVolume();
   const player1 = usePlayer1Data();
   const player2 = usePlayer2Data();

@@ -34,41 +34,44 @@ export interface SettingsState {
   general: {
     followSystemTheme: boolean;
     fontContent: string;
+    playButtonBehavior: Play;
     showQueueDrawerButton: boolean;
     sideQueueType: SideQueueType;
-    theme: AppTheme;
-    themeDark: AppTheme;
-    themeLight: AppTheme;
-    volumeWheelStep: number;
-    windowBarStyle: Platform;
-  };
-  player: {
-    audioDeviceId?: string | null;
-    crossfadeDuration: number;
-    crossfadeStyle: CrossfadeStyle;
-    globalMediaHotkeys: boolean;
-    muted: boolean;
-    playButtonBehavior: Play;
-    scrobble: {
-      enabled: boolean;
-      scrobbleAtDuration: number;
-      scrobbleAtPercentage: number;
-    };
     skipButtons: {
       enabled: boolean;
       skipBackwardSeconds: number;
       skipForwardSeconds: number;
     };
+    theme: AppTheme;
+    themeDark: AppTheme;
+    themeLight: AppTheme;
+    volumeWheelStep: number;
+  };
+  playback: {
+    audioDeviceId?: string | null;
+    crossfadeDuration: number;
+    crossfadeStyle: CrossfadeStyle;
+    globalMediaHotkeys: boolean;
+    muted: boolean;
+    scrobble: {
+      enabled: boolean;
+      scrobbleAtDuration: number;
+      scrobbleAtPercentage: number;
+    };
+
     style: PlaybackStyle;
     type: PlaybackType;
   };
-  tab: 'general' | 'playback' | 'view' | string;
+  tab: 'general' | 'playback' | 'window' | string;
   tables: {
     fullScreen: DataTableProps;
     nowPlaying: DataTableProps;
     sideDrawerQueue: DataTableProps;
     sideQueue: DataTableProps;
     songs: DataTableProps;
+  };
+  window: {
+    windowBarStyle: Platform;
   };
 }
 
@@ -90,35 +93,34 @@ export const useSettingsStore = create<SettingsSlice>()(
         general: {
           followSystemTheme: false,
           fontContent: 'Poppins',
+          playButtonBehavior: Play.NOW,
           showQueueDrawerButton: false,
           sideQueueType: 'sideDrawerQueue',
-          theme: AppTheme.DEFAULT_DARK,
-          themeDark: AppTheme.DEFAULT_DARK,
-          themeLight: AppTheme.DEFAULT_LIGHT,
-          volumeWheelStep: 5,
-          windowBarStyle: Platform.WEB,
-        },
-        player: {
-          audioDeviceId: undefined,
-          crossfadeDuration: 5,
-          crossfadeStyle: CrossfadeStyle.EQUALPOWER,
-          globalMediaHotkeys: false,
-          muted: false,
-          playButtonBehavior: Play.NOW,
-          scrobble: {
-            enabled: true,
-            scrobbleAtDuration: 240,
-            scrobbleAtPercentage: 75,
-          },
           skipButtons: {
             enabled: false,
             skipBackwardSeconds: 5,
             skipForwardSeconds: 10,
           },
+          theme: AppTheme.DEFAULT_DARK,
+          themeDark: AppTheme.DEFAULT_DARK,
+          themeLight: AppTheme.DEFAULT_LIGHT,
+          volumeWheelStep: 5,
+        },
+        playback: {
+          audioDeviceId: undefined,
+          crossfadeDuration: 5,
+          crossfadeStyle: CrossfadeStyle.EQUALPOWER,
+          globalMediaHotkeys: false,
+          muted: false,
+          scrobble: {
+            enabled: true,
+            scrobbleAtDuration: 240,
+            scrobbleAtPercentage: 75,
+          },
+
           style: PlaybackStyle.GAPLESS,
           type: PlaybackType.LOCAL,
         },
-
         tab: 'general',
         tables: {
           fullScreen: {
@@ -240,6 +242,9 @@ export const useSettingsStore = create<SettingsSlice>()(
             rowHeight: 60,
           },
         },
+        window: {
+          windowBarStyle: Platform.WEB,
+        },
       })),
       { name: 'store_settings' },
     ),
@@ -248,21 +253,23 @@ export const useSettingsStore = create<SettingsSlice>()(
         return merge(currentState, persistedState);
       },
       name: 'store_settings',
-      version: 4,
+      version: 5,
     },
   ),
 );
 
 export const useSettingsStoreActions = () => useSettingsStore((state) => state.actions);
 
-export const usePlayerSettings = () => useSettingsStore((state) => state.player, shallow);
+export const usePlaybackSettings = () => useSettingsStore((state) => state.playback, shallow);
 
 export const useTableSettings = (type: TableType) =>
   useSettingsStore((state) => state.tables[type]);
 
 export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
 
-export const usePlayerType = () => useSettingsStore((state) => state.player.type, shallow);
+export const usePlayerType = () => useSettingsStore((state) => state.playback.type, shallow);
 
 export const usePlayButtonBehavior = () =>
-  useSettingsStore((state) => state.player.playButtonBehavior, shallow);
+  useSettingsStore((state) => state.general.playButtonBehavior, shallow);
+
+export const useWindowSettings = () => useSettingsStore((state) => state.window, shallow);

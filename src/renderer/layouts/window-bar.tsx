@@ -3,7 +3,7 @@ import isElectron from 'is-electron';
 import { RiCheckboxBlankLine, RiCloseLine, RiSubtractLine } from 'react-icons/ri';
 import styled from 'styled-components';
 import { useCurrentStatus, useQueueStatus } from '/@/renderer/store';
-import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform, PlayerStatus } from '/@/renderer/types';
 import appIcon from '../../../assets/icon.svg';
 import macCloseHover from './assets/close-mac-hover.png';
@@ -212,7 +212,7 @@ const MacOsControls = ({ controls, title }: WindowBarControlsProps) => {
 export const WindowBar = () => {
   const playerStatus = useCurrentStatus();
   const { currentSong, index, length } = useQueueStatus();
-  const { windowBarStyle } = useGeneralSettings();
+  const { windowBarStyle } = useWindowSettings();
 
   const statusString = playerStatus === PlayerStatus.PAUSED ? '(Paused) ' : '';
   const queueString = length ? `(${index + 1} / ${length}) ` : '';

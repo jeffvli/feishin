@@ -5,7 +5,7 @@ import { useMergedRef, useTimeout } from '@mantine/hooks';
 import { motion, useScroll } from 'framer-motion';
 import styled from 'styled-components';
 import { PageHeader, PageHeaderProps } from '/@/renderer/components/page-header';
-import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
 
 interface ScrollAreaProps extends MantineScrollAreaProps {
@@ -78,7 +78,7 @@ export const NativeScrollArea = forwardRef(
     }: NativeScrollAreaProps,
     ref: Ref<HTMLDivElement>,
   ) => {
-    const { windowBarStyle } = useGeneralSettings();
+    const { windowBarStyle } = useWindowSettings();
     const [hideScrollbar, setHideScrollbar] = useState(false);
     const [hideHeader, setHideHeader] = useState(true);
     const { start, clear } = useTimeout(

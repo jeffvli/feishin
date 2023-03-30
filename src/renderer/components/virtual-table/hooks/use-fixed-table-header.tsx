@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { useInView } from 'framer-motion';
-import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
 
 export const useFixedTableHeader = () => {
   const intersectRef = useRef<HTMLDivElement | null>(null);
   const tableContainerRef = useRef<HTMLDivElement | null>(null);
-  const { windowBarStyle } = useGeneralSettings();
+  const { windowBarStyle } = useWindowSettings();
 
   const isNotPastTableIntersection = useInView(intersectRef, {
     margin: windowBarStyle === Platform.WEB ? '-68px 0px 0px 0px' : '-98px 0px 0px 0px',

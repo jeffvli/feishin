@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { _Button } from '/@/renderer/components/button';
 import type { PlayQueueAddOptions } from '/@/renderer/types';
 import { Play } from '/@/renderer/types';
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem } from '/@/renderer/api/types';
 import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 import {
@@ -105,7 +105,7 @@ export const GridCardControls = ({
   itemData: any;
   itemType: LibraryItem;
 }) => {
-  const playButtonBehavior = useSettingsStore((state) => state.player.playButtonBehavior);
+  const playButtonBehavior = usePlayButtonBehavior();
 
   const handlePlay = async (e: MouseEvent<HTMLButtonElement>, playType?: Play) => {
     e.preventDefault();
@@ -144,7 +144,6 @@ export const GridCardControls = ({
       <BottomControls>
         <SecondaryButton
           p={5}
-          sx={{ svg: { fill: 'white !important' } }}
           variant="subtle"
           onClick={handleFavorites}
         >
@@ -161,7 +160,6 @@ export const GridCardControls = ({
         </SecondaryButton>
         <SecondaryButton
           p={5}
-          sx={{ svg: { fill: 'white !important' } }}
           variant="subtle"
           onClick={(e) => {
             e.preventDefault();

@@ -10,7 +10,7 @@ import { FullScreenPlayer } from '/@/renderer/features/player/components/full-sc
 import { Sidebar } from '/@/renderer/features/sidebar/components/sidebar';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAppStore, useAppStoreActions, useFullScreenPlayerStore } from '/@/renderer/store';
-import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { useWindowSettings, useGeneralSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
 import { constrainSidebarWidth, constrainRightSidebarWidth } from '/@/renderer/utils';
 
@@ -154,7 +154,7 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
   const [drawer, drawerHandler] = useDisclosure(false);
   const location = useLocation();
   const { sideQueueType, showQueueDrawerButton } = useGeneralSettings();
-  const { windowBarStyle } = useGeneralSettings();
+  const { windowBarStyle } = useWindowSettings();
 
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const rightSidebarRef = useRef<HTMLDivElement | null>(null);

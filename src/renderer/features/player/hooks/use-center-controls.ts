@@ -25,7 +25,7 @@ const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
 export const useCenterControls = (args: { playersRef: any }) => {
   const { playersRef } = args;
 
-  const settings = useSettingsStore((state) => state.player);
+  const settings = useSettingsStore((state) => state.playback);
   const currentPlayer = useCurrentPlayer();
   const { setShuffle, setRepeat, play, pause, previous, next, setCurrentIndex, autoNext } =
     usePlayerControls();

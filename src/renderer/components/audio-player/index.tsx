@@ -52,7 +52,7 @@ export const AudioPlayer = forwardRef(
     const player1Ref = useRef<any>(null);
     const player2Ref = useRef<any>(null);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const audioDeviceId = useSettingsStore((state) => state.player.audioDeviceId);
+    const audioDeviceId = useSettingsStore((state) => state.playback.audioDeviceId);
 
     useImperativeHandle(ref, () => ({
       get player1() {

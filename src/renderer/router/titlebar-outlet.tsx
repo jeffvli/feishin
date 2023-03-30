@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
 import { Titlebar } from '/@/renderer/features/titlebar/components/titlebar';
-import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
 
 const TitlebarContainer = styled.header`
@@ -15,7 +15,7 @@ const TitlebarContainer = styled.header`
 `;
 
 export const TitlebarOutlet = () => {
-  const { windowBarStyle } = useGeneralSettings();
+  const { windowBarStyle } = useWindowSettings();
 
   return (
     <>

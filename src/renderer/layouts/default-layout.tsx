@@ -1,15 +1,15 @@
 import { lazy } from 'react';
 import isElectron from 'is-electron';
 import styled from 'styled-components';
-import { useGeneralSettings, useSettingsStore } from '/@/renderer/store/settings.store';
+import { useWindowSettings, useSettingsStore } from '/@/renderer/store/settings.store';
 import { Platform, PlaybackType } from '/@/renderer/types';
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
 
 if (!isElectron()) {
   useSettingsStore.getState().actions.setSettings({
-    player: {
-      ...useSettingsStore.getState().player,
+    playback: {
+      ...useSettingsStore.getState().playback,
       type: PlaybackType.WEB,
     },
   });
@@ -41,7 +41,7 @@ interface DefaultLayoutProps {
 }
 
 export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
-  const { windowBarStyle } = useGeneralSettings();
+  const { windowBarStyle } = useWindowSettings();
 
   return (
     <>
