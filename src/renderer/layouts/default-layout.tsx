@@ -21,9 +21,10 @@ const Layout = styled.div<{ windowBarStyle: Platform }>`
     'window-bar'
     'main-content'
     'player';
-  grid-template-rows:
-    ${(props) => (props.windowBarStyle !== Platform.WEB ? '30px' : '0px')} calc(100vh - 120px)
-    90px;
+  grid-template-rows: ${(props) =>
+    props.windowBarStyle !== Platform.WEB
+      ? '30px calc(100vh - 120px) 90px'
+      : '0px calc(100vh - 90px) 90px'};
   grid-template-columns: 1fr;
   gap: 0;
   height: 100%;
