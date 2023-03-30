@@ -9,7 +9,16 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, globalShortcut } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  shell,
+  ipcMain,
+  globalShortcut,
+  Tray,
+  Menu,
+  nativeImage,
+} from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
@@ -18,7 +27,7 @@ import MpvAPI from 'node-mpv';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './utils';
+import { isLinux, isMacOS, isWindows, resolveHtmlPath } from './utils';
 import './features';
 
 declare module 'node-mpv';
@@ -36,6 +45,9 @@ if (store.get('ignore_ssl')) {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let tray: Tray | null = null;
+let exitFromTray = false;
+let forceQuit = false;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -67,18 +79,104 @@ if (!singleInstance) {
   app.quit();
 }
 
+const RESOURCES_PATH = app.isPackaged
+  ? path.join(process.resourcesPath, 'assets')
+  : path.join(__dirname, '../../assets');
+
+const getAssetPath = (...paths: string[]): string => {
+  return path.join(RESOURCES_PATH, ...paths);
+};
+
+export const getMainWindow = () => {
+  return mainWindow;
+};
+
+const createWinThumbarButtons = () => {
+  if (isWindows()) {
+    console.log('setting buttons');
+    getMainWindow()?.setThumbarButtons([
+      {
+        click: () => getMainWindow()?.webContents.send('renderer-player-previous'),
+        icon: nativeImage.createFromPath(getAssetPath('skip-previous.png')),
+        tooltip: 'Previous Track',
+      },
+      {
+        click: () => getMainWindow()?.webContents.send('renderer-player-play-pause'),
+        icon: nativeImage.createFromPath(getAssetPath('play-circle.png')),
+        tooltip: 'Play/Pause',
+      },
+      {
+        click: () => getMainWindow()?.webContents.send('renderer-player-next'),
+        icon: nativeImage.createFromPath(getAssetPath('skip-next.png')),
+        tooltip: 'Next Track',
+      },
+    ]);
+  }
+};
+
+const createTray = () => {
+  if (isMacOS()) {
+    return;
+  }
+
+  tray = isLinux() ? new Tray(getAssetPath('icon.png')) : new Tray(getAssetPath('icon.ico'));
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      click: () => {
+        getMainWindow()?.webContents.send('renderer-player-play-pause');
+      },
+      label: 'Play/Pause',
+    },
+    {
+      click: () => {
+        getMainWindow()?.webContents.send('renderer-player-next');
+      },
+      label: 'Next Track',
+    },
+    {
+      click: () => {
+        getMainWindow()?.webContents.send('renderer-player-previous');
+      },
+      label: 'Previous Track',
+    },
+    {
+      click: () => {
+        getMainWindow()?.webContents.send('renderer-player-stop');
+      },
+      label: 'Stop',
+    },
+    {
+      type: 'separator',
+    },
+    {
+      click: () => {
+        mainWindow?.show();
+        createWinThumbarButtons();
+      },
+      label: 'Open main window',
+    },
+    {
+      click: () => {
+        exitFromTray = true;
+        app.quit();
+      },
+      label: 'Quit',
+    },
+  ]);
+
+  tray.on('double-click', () => {
+    mainWindow?.show();
+    createWinThumbarButtons();
+  });
+
+  tray.setToolTip('Feishin');
+  tray.setContextMenu(contextMenu);
+};
+
 const createWindow = async () => {
   if (isDevelopment) {
     await installExtensions();
   }
-
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
 
   mainWindow = new BrowserWindow({
     frame: false,
@@ -153,13 +251,40 @@ const createWindow = async () => {
       mainWindow.minimize();
     } else {
       mainWindow.show();
+      createWinThumbarButtons();
     }
   });
 
   mainWindow.on('closed', () => {
-    // mainWindow?.webContents.send('renderer-player-quit');
     mainWindow = null;
   });
+
+  mainWindow.on('close', (event) => {
+    if (!exitFromTray && store.get('window_exit_to_tray')) {
+      if (isMacOS() && !forceQuit) {
+        exitFromTray = true;
+      }
+      event.preventDefault();
+      mainWindow?.hide();
+    }
+  });
+
+  mainWindow.on('minimize', (event: any) => {
+    if (store.get('window_minimize_to_tray') === true) {
+      event.preventDefault();
+      mainWindow?.hide();
+    }
+  });
+
+  if (isWindows()) {
+    app.setAppUserModelId(process.execPath);
+  }
+
+  if (isMacOS()) {
+    app.on('before-quit', () => {
+      forceQuit = true;
+    });
+  }
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
@@ -175,15 +300,7 @@ const createWindow = async () => {
   new AppUpdater();
 };
 
-/**
- * Add event listeners...
- */
-
 app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
-
-export const getMainWindow = () => {
-  return mainWindow;
-};
 
 const MPV_BINARY_PATH = store.get('mpv_path') as string | undefined;
 const MPV_PARAMETERS = store.get('mpv_parameters') as Array<string> | undefined;
@@ -267,11 +384,10 @@ app.on('window-all-closed', () => {
 
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
-  } else {
-    mpv.stop();
+  if (isMacOS()) {
     mainWindow = null;
+  } else {
+    app.quit();
   }
 });
 
@@ -279,6 +395,7 @@ app
   .whenReady()
   .then(() => {
     createWindow();
+    createTray();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.

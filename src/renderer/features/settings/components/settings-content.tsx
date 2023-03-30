@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { Tabs } from '/@/renderer/components';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import isElectron from 'is-electron';
 import styled from 'styled-components';
 
 const GeneralTab = lazy(() =>
@@ -44,7 +45,7 @@ export const SettingsContent = () => {
         <Tabs.List>
           <Tabs.Tab value="general">General</Tabs.Tab>
           <Tabs.Tab value="playback">Playback</Tabs.Tab>
-          <Tabs.Tab value="window">Window</Tabs.Tab>
+          {isElectron() && <Tabs.Tab value="window">Window</Tabs.Tab>}
         </Tabs.List>
         <Tabs.Panel value="general">
           <GeneralTab />
@@ -52,9 +53,11 @@ export const SettingsContent = () => {
         <Tabs.Panel value="playback">
           <PlaybackTab />
         </Tabs.Panel>
-        <Tabs.Panel value="window">
-          <ApplicationTab />
-        </Tabs.Panel>
+        {isElectron() && (
+          <Tabs.Panel value="window">
+            <ApplicationTab />
+          </Tabs.Panel>
+        )}
       </Tabs>
     </TabContainer>
   );
