@@ -44,7 +44,8 @@ const MetadataStack = styled(motion.div)`
 const Image = styled(motion.div)`
   width: 60px;
   height: 60px;
-  filter: drop-shadow(0 0 5px rgb(0, 0, 0, 100%));
+  background-color: var(--placeholder-bg);
+  filter: drop-shadow(0 5px 6px rgb(0, 0, 0, 50%));
 
   ${fadeIn};
   animation: fadein 0.2s ease-in-out;
