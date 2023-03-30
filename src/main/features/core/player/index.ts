@@ -13,7 +13,6 @@ function wait(timeout: number) {
 }
 
 ipcMain.on('player-start', async () => {
-  await mpv.load('./dummy.mp3', 'replace');
   await mpv.play();
 });
 
@@ -72,7 +71,6 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData) => {
         await mpv.load(data.queue.next.streamUrl, 'append');
       }
 
-      await mpv.play();
       complete = true;
     } catch (err) {
       console.error(err);
