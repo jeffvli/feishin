@@ -3,6 +3,7 @@ import { closeAllModals, openModal } from '@mantine/modals';
 import { RiSettings2Fill } from 'react-icons/ri';
 import { Button, ConfirmModal, PageHeader } from '/@/renderer/components';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
+import packageJson from '../../../../../package.json';
 import { useSettingsStoreActions } from '../../../store/settings.store';
 
 export const SettingsHeader = () => {
@@ -31,6 +32,7 @@ export const SettingsHeader = () => {
           <Group noWrap>
             <RiSettings2Fill size="2rem" />
             <LibraryHeaderBar.Title>Settings</LibraryHeaderBar.Title>
+            <LibraryHeaderBar.Badge>v{packageJson.version}</LibraryHeaderBar.Badge>
           </Group>
           <Button
             compact
