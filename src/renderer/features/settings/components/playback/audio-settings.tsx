@@ -56,8 +56,10 @@ export const AudioSettings = () => {
         .catch(() => toast.error({ message: 'Error fetching audio devices' }));
     };
 
-    getAudioDevices();
-  }, []);
+    if (settings.type === PlaybackType.WEB) {
+      getAudioDevices();
+    }
+  }, [settings.type]);
 
   const audioOptions: SettingOption[] = [
     {
