@@ -10,6 +10,10 @@
   transition: position 0.2s ease-in-out;
 }
 
+.ag-header {
+  z-index: 5;
+}
+
 .window-frame {
   top: 95px;
 }

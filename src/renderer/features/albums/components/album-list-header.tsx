@@ -9,14 +9,8 @@ import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListQuery, LibraryItem } from '/@/renderer/api/types';
-import {
-  PageHeader,
-  Paper,
-  SearchInput,
-  SpinnerIcon,
-  VirtualInfiniteGridRef,
-} from '/@/renderer/components';
-import { LibraryHeaderBar } from '/@/renderer/features/shared';
+import { PageHeader, SearchInput, VirtualInfiniteGridRef } from '/@/renderer/components';
+import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
   AlbumListFilter,
@@ -209,14 +203,9 @@ export const AlbumListHeader = ({
           <LibraryHeaderBar>
             <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
             <LibraryHeaderBar.Title>{title || 'Albums'}</LibraryHeaderBar.Title>
-            <Paper
-              fw="600"
-              px="1rem"
-              py="0.3rem"
-              radius="sm"
-            >
-              {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
-            </Paper>
+            <LibraryHeaderBar.Badge isLoading={itemCount === null || itemCount === undefined}>
+              {itemCount}
+            </LibraryHeaderBar.Badge>
           </LibraryHeaderBar>
           <Group>
             <SearchInput
@@ -227,14 +216,14 @@ export const AlbumListHeader = ({
           </Group>
         </Flex>
       </PageHeader>
-      <Paper p="1rem">
+      <FilterBar>
         <AlbumListHeaderFilters
           customFilters={customFilters}
           gridRef={gridRef}
           itemCount={itemCount}
           tableRef={tableRef}
         />
-      </Paper>
+      </FilterBar>
     </Stack>
   );
 };

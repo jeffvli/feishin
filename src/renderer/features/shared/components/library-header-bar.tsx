@@ -1,25 +1,25 @@
 import { ReactNode } from 'react';
-import { Group, Box } from '@mantine/core';
-import { TextTitle } from '/@/renderer/components';
+import { Box } from '@mantine/core';
+import { Paper, PaperProps, SpinnerIcon, TextTitle } from '/@/renderer/components';
 import { PlayButton as PlayBtn } from '/@/renderer/features/shared/components/play-button';
+import styled from 'styled-components';
 
 interface LibraryHeaderBarProps {
   children: ReactNode;
 }
 
+const HeaderContainer = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 1rem;
+`;
+
 export const LibraryHeaderBar = ({ children }: LibraryHeaderBarProps) => {
-  return (
-    <Group
-      noWrap
-      align="center"
-      h="100%"
-      px="1rem"
-      spacing="md"
-      w="100%"
-    >
-      {children}
-    </Group>
-  );
+  return <HeaderContainer>{children}</HeaderContainer>;
 };
 
 interface TitleProps {
@@ -54,5 +54,20 @@ const PlayButton = ({ onClick }: PlayButtonProps) => {
   );
 };
 
+const Badge = styled(Paper)`
+  padding: 0.3rem 1rem;
+  font-weight: 600;
+  border-radius: 0.3rem;
+`;
+
+interface HeaderBadgeProps extends PaperProps {
+  isLoading?: boolean;
+}
+
+const HeaderBadge = ({ children, isLoading, ...props }: HeaderBadgeProps) => {
+  return <Badge {...props}>{isLoading ? <SpinnerIcon /> : children}</Badge>;
+};
+
 LibraryHeaderBar.Title = Title;
 LibraryHeaderBar.PlayButton = PlayButton;
+LibraryHeaderBar.Badge = HeaderBadge;

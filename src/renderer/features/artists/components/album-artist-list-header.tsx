@@ -7,13 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import {
-  PageHeader,
-  Paper,
-  SearchInput,
-  SpinnerIcon,
-  VirtualInfiniteGridRef,
-} from '/@/renderer/components';
+import { PageHeader, SearchInput, VirtualInfiniteGridRef } from '/@/renderer/components';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
@@ -25,6 +19,7 @@ import {
 import { ListDisplayType } from '/@/renderer/types';
 import { AlbumArtistListHeaderFilters } from '/@/renderer/features/artists/components/album-artist-list-header-filters';
 import { useAlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
+import { FilterBar } from '../../shared/components/filter-bar';
 
 interface AlbumArtistListHeaderProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -154,14 +149,9 @@ export const AlbumArtistListHeader = ({
         >
           <LibraryHeaderBar>
             <LibraryHeaderBar.Title>Album Artists</LibraryHeaderBar.Title>
-            <Paper
-              fw="600"
-              px="1rem"
-              py="0.3rem"
-              radius="sm"
-            >
-              {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
-            </Paper>
+            <LibraryHeaderBar.Badge isLoading={itemCount === null || itemCount === undefined}>
+              {itemCount}
+            </LibraryHeaderBar.Badge>
           </LibraryHeaderBar>
           <Group>
             <SearchInput
@@ -172,12 +162,12 @@ export const AlbumArtistListHeader = ({
           </Group>
         </Flex>
       </PageHeader>
-      <Paper p="1rem">
+      <FilterBar>
         <AlbumArtistListHeaderFilters
           gridRef={gridRef}
           tableRef={tableRef}
         />
-      </Paper>
+      </FilterBar>
     </Stack>
   );
 };

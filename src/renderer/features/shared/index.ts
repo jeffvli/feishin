@@ -7,3 +7,4 @@ export * from './components/library-header-bar';
 export * from './mutations/create-favorite-mutation';
 export * from './mutations/delete-favorite-mutation';
 export * from './mutations/update-rating-mutation';
+export * from './components/filter-bar';
