@@ -117,6 +117,8 @@ const MacOsContainer = styled.div`
   align-items: center;
   justify-content: center;
   -webkit-app-region: drag;
+  color: var(--window-bar-fg);
+  background-color: var(--window-bar-bg);
 `;
 
 const MacOsButtonGroup = styled.div`
