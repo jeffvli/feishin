@@ -278,7 +278,7 @@ export const useListStore = create<ListSlice>()(
         detail: {},
         item: {
           album: {
-            display: ListDisplayType.CARD,
+            display: ListDisplayType.POSTER,
             filter: {
               sortBy: AlbumListSort.RECENTLY_ADDED,
               sortOrder: SortOrder.DESC,
@@ -319,7 +319,7 @@ export const useListStore = create<ListSlice>()(
             },
           },
           albumArtist: {
-            display: ListDisplayType.CARD,
+            display: ListDisplayType.POSTER,
             filter: {
               sortBy: AlbumArtistListSort.NAME,
               sortOrder: SortOrder.DESC,
@@ -368,7 +368,7 @@ export const useListStore = create<ListSlice>()(
             },
           },
           playlist: {
-            display: ListDisplayType.CARD,
+            display: ListDisplayType.POSTER,
             filter: {
               sortBy: PlaylistListSort.NAME,
               sortOrder: SortOrder.DESC,
@@ -405,7 +405,7 @@ export const useListStore = create<ListSlice>()(
             },
           },
           song: {
-            display: ListDisplayType.CARD,
+            display: ListDisplayType.POSTER,
             filter: {
               sortBy: SongListSort.RECENTLY_ADDED,
               sortOrder: SortOrder.DESC,
