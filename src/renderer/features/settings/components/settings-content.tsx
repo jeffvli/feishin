@@ -22,6 +22,12 @@ const ApplicationTab = lazy(() =>
   })),
 );
 
+const HotkeysTab = lazy(() =>
+  import('/@/renderer/features/settings/components/hotkeys/hotkeys-tab').then((module) => ({
+    default: module.HotkeysTab,
+  })),
+);
+
 const TabContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -45,6 +51,7 @@ export const SettingsContent = () => {
         <Tabs.List>
           <Tabs.Tab value="general">General</Tabs.Tab>
           <Tabs.Tab value="playback">Playback</Tabs.Tab>
+          <Tabs.Tab value="hotkeys">Hotkeys</Tabs.Tab>
           {isElectron() && <Tabs.Tab value="window">Window</Tabs.Tab>}
         </Tabs.List>
         <Tabs.Panel value="general">
@@ -52,6 +59,9 @@ export const SettingsContent = () => {
         </Tabs.Panel>
         <Tabs.Panel value="playback">
           <PlaybackTab />
+        </Tabs.Panel>
+        <Tabs.Panel value="hotkeys">
+          <HotkeysTab />
         </Tabs.Panel>
         {isElectron() && (
           <Tabs.Panel value="window">

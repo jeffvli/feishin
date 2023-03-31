@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SelectItem, Stack } from '@mantine/core';
 import isElectron from 'is-electron';
-import { Select, FileInput, Slider, Switch, Textarea, Text, toast } from '/@/renderer/components';
+import { Select, FileInput, Slider, Textarea, Text, toast } from '/@/renderer/components';
 import {
   SettingsSection,
   SettingOption,
@@ -229,34 +229,6 @@ export const AudioSettings = () => {
       isHidden: settings.type !== PlaybackType.WEB,
       note: status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
       title: 'Crossfade Style',
-    },
-    {
-      control: (
-        <Switch
-          aria-label="Toggle global media hotkeys"
-          defaultChecked={settings.globalMediaHotkeys}
-          disabled={!isElectron()}
-          onChange={(e) => {
-            setSettings({
-              playback: {
-                ...settings,
-                globalMediaHotkeys: e.currentTarget.checked,
-              },
-            });
-            localSettings.set('global_media_hotkeys', e.currentTarget.checked);
-
-            if (e.currentTarget.checked) {
-              localSettings.enableMediaKeys();
-            } else {
-              localSettings.disableMediaKeys();
-            }
-          }}
-        />
-      ),
-      description:
-        'Enable or disable the usage of your system media hotkeys to control the audio player (desktop only)',
-      isHidden: !isElectron(),
-      title: 'Global media hotkeys',
     },
   ];
 

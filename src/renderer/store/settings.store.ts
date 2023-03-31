@@ -48,11 +48,13 @@ export interface SettingsState {
     themeLight: AppTheme;
     volumeWheelStep: number;
   };
+  hotkeys: {
+    globalMediaHotkeys: boolean;
+  };
   playback: {
     audioDeviceId?: string | null;
     crossfadeDuration: number;
     crossfadeStyle: CrossfadeStyle;
-    globalMediaHotkeys: boolean;
     muted: boolean;
     scrobble: {
       enabled: boolean;
@@ -63,7 +65,7 @@ export interface SettingsState {
     style: PlaybackStyle;
     type: PlaybackType;
   };
-  tab: 'general' | 'playback' | 'window' | string;
+  tab: 'general' | 'playback' | 'window' | 'hotkeys' | string;
   tables: {
     fullScreen: DataTableProps;
     nowPlaying: DataTableProps;
@@ -103,11 +105,13 @@ const initialState: SettingsState = {
     themeLight: AppTheme.DEFAULT_LIGHT,
     volumeWheelStep: 5,
   },
+  hotkeys: {
+    globalMediaHotkeys: false,
+  },
   playback: {
     audioDeviceId: undefined,
     crossfadeDuration: 5,
     crossfadeStyle: CrossfadeStyle.EQUALPOWER,
-    globalMediaHotkeys: false,
     muted: false,
     scrobble: {
       enabled: true,
@@ -298,3 +302,5 @@ export const usePlayButtonBehavior = () =>
   useSettingsStore((state) => state.general.playButtonBehavior, shallow);
 
 export const useWindowSettings = () => useSettingsStore((state) => state.window, shallow);
+
+export const useHotkeySettings = () => useSettingsStore((state) => state.hotkeys, shallow);
