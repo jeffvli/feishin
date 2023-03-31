@@ -22,27 +22,29 @@ export const SettingsHeader = () => {
   };
 
   return (
-    <PageHeader>
-      <LibraryHeaderBar>
-        <Flex
-          align="center"
-          justify="space-between"
-          w="100%"
-        >
-          <Group noWrap>
-            <RiSettings2Fill size="2rem" />
-            <LibraryHeaderBar.Title>Settings</LibraryHeaderBar.Title>
-            <LibraryHeaderBar.Badge>v{packageJson.version}</LibraryHeaderBar.Badge>
-          </Group>
-          <Button
-            compact
-            variant="default"
-            onClick={openResetConfirmModal}
+    <Flex>
+      <PageHeader>
+        <LibraryHeaderBar>
+          <Flex
+            align="center"
+            justify="space-between"
+            w="100%"
           >
-            Reset to default
-          </Button>
-        </Flex>
-      </LibraryHeaderBar>
-    </PageHeader>
+            <Group noWrap>
+              <RiSettings2Fill size="2rem" />
+              <LibraryHeaderBar.Title>Settings</LibraryHeaderBar.Title>
+              <LibraryHeaderBar.Badge>v{packageJson.version}</LibraryHeaderBar.Badge>
+            </Group>
+            <Button
+              compact
+              variant="default"
+              onClick={openResetConfirmModal}
+            >
+              Reset to default
+            </Button>
+          </Flex>
+        </LibraryHeaderBar>
+      </PageHeader>
+    </Flex>
   );
 };

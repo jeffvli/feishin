@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { useLocation } from 'react-router';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useSidebarRightExpanded, useGeneralSettings, useWindowSettings } from '/@/renderer/store';
@@ -11,6 +12,7 @@ export const useShouldPadTitlebar = () => {
   const { windowBarStyle } = useWindowSettings();
 
   const conditions = [
+    isElectron(),
     windowBarStyle === Platform.WEB,
     !(isSidebarExpanded && sideQueueType === 'sideQueue' && !isQueuePage),
   ];
