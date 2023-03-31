@@ -295,9 +295,10 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
+  if (store.get('disable_auto_updates') !== true) {
+    // eslint-disable-next-line
+    new AppUpdater();
+  }
 };
 
 app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');

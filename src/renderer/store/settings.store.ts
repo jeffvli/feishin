@@ -71,6 +71,7 @@ export interface SettingsState {
     songs: DataTableProps;
   };
   window: {
+    disableAutoUpdate: boolean;
     exitToTray: boolean;
     minimizeToTray: boolean;
     windowBarStyle: Platform;
@@ -245,6 +246,7 @@ export const useSettingsStore = create<SettingsSlice>()(
           },
         },
         window: {
+          disableAutoUpdate: true,
           exitToTray: false,
           minimizeToTray: false,
           windowBarStyle: Platform.WEB,

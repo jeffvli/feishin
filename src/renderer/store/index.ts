@@ -6,3 +6,4 @@ export * from './playlist.store';
 export * from './album-list-data.store';
 export * from './album-artist-list-data.store';
 export * from './full-screen-player.store';
+export * from './settings.store';
