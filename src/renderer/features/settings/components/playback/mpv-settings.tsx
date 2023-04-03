@@ -156,7 +156,7 @@ export const MpvSettings = () => {
         </Stack>
       ),
       isHidden: settings.type !== PlaybackType.LOCAL,
-      note: 'Requires restart',
+      note: 'Restart required',
       title: 'MPV parameters',
     },
   ];
@@ -259,13 +259,13 @@ export const MpvSettings = () => {
         <NumberInput
           defaultValue={settings.mpvProperties.replayGainFallbackDB}
           width={75}
-          onChange={(e) => handleSetMpvProperty('replayGainFallbackDB', e)}
+          onBlur={(e) => handleSetMpvProperty('replayGainFallbackDB', e)}
         />
       ),
       description:
         'Gain in dB to apply if the file has no replay gain tags. This option is always applied if the replaygain logic is somehow inactive. If this is applied, no other replaygain options are applied',
       isHidden: settings.type !== PlaybackType.LOCAL,
-      title: 'ReplayGain fallback',
+      title: 'ReplayGain fallback (dB)',
     },
   ];
 
