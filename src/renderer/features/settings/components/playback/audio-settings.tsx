@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { SelectItem, Stack } from '@mantine/core';
+import { SelectItem } from '@mantine/core';
 import isElectron from 'is-electron';
-import { Select, FileInput, Slider, Textarea, Text, toast } from '/@/renderer/components';
+import { Select, Slider, toast } from '/@/renderer/components';
 import {
   SettingsSection,
   SettingOption,
@@ -10,7 +10,6 @@ import { useCurrentStatus, usePlayerStore } from '/@/renderer/store';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { PlaybackType, PlayerStatus, PlaybackStyle, CrossfadeStyle } from '/@/renderer/types';
 
-const localSettings = isElectron() ? window.electron.localSettings : null;
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 const getAudioDevice = async () => {
@@ -24,30 +23,6 @@ export const AudioSettings = () => {
   const status = useCurrentStatus();
 
   const [audioDevices, setAudioDevices] = useState<SelectItem[]>([]);
-  const [mpvPath, setMpvPath] = useState('');
-  const [mpvParameters, setMpvParameters] = useState('');
-
-  const handleSetMpvPath = (e: File) => {
-    localSettings.set('mpv_path', e.path);
-  };
-
-  useEffect(() => {
-    const getMpvPath = async () => {
-      if (!isElectron()) return setMpvPath('');
-      const mpvPath = (await localSettings.get('mpv_path')) as string;
-      return setMpvPath(mpvPath);
-    };
-
-    const getMpvParameters = async () => {
-      if (!isElectron()) return setMpvPath('');
-      const mpvParametersFromSettings = (await localSettings.get('mpv_parameters')) as string[];
-      const mpvParameters = mpvParametersFromSettings?.join('\n');
-      return setMpvParameters(mpvParameters);
-    };
-
-    getMpvPath();
-    getMpvParameters();
-  }, []);
 
   useEffect(() => {
     const getAudioDevices = () => {
@@ -88,59 +63,6 @@ export const AudioSettings = () => {
       isHidden: !isElectron(),
       note: status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
       title: 'Audio player',
-    },
-    {
-      control: (
-        <FileInput
-          placeholder={mpvPath}
-          width={225}
-          onChange={handleSetMpvPath}
-        />
-      ),
-      description: 'The location of your mpv executable',
-      isHidden: settings.type !== PlaybackType.LOCAL,
-      note: 'Restart required',
-      title: 'MPV executable path',
-    },
-    {
-      control: (
-        <Stack spacing="xs">
-          <Textarea
-            autosize
-            defaultValue={mpvParameters}
-            minRows={4}
-            placeholder={'(Add one per line):\n--gapless-audio=weak\n--prefetch-playlist=yes'}
-            width={225}
-            onBlur={(e) => {
-              if (isElectron()) {
-                localSettings.set('mpv_parameters', e.currentTarget.value.split('\n'));
-              }
-            }}
-          />
-        </Stack>
-      ),
-      description: (
-        <Stack spacing={0}>
-          <Text
-            $noSelect
-            $secondary
-          >
-            Options to pass to the player
-          </Text>
-          <Text>
-            <a
-              href="https://mpv.io/manual/stable/#audio"
-              rel="noreferrer"
-              target="_blank"
-            >
-              https://mpv.io/manual/stable/#audio
-            </a>
-          </Text>
-        </Stack>
-      ),
-      isHidden: settings.type !== PlaybackType.LOCAL,
-      note: 'Restart required.',
-      title: 'MPV parameters',
     },
     {
       control: (

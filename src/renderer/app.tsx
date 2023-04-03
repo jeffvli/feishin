@@ -15,10 +15,15 @@ import { ContextMenuProvider } from '/@/renderer/features/context-menu';
 import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { PlayQueueHandlerContext } from '/@/renderer/features/player';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
+import isElectron from 'is-electron';
+import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
+import { usePlayerStore } from '/@/renderer/store';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
 initSimpleImg({ threshold: 0.05 }, true);
+
+const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 export const App = () => {
   const theme = useTheme();
@@ -30,6 +35,20 @@ export const App = () => {
     const root = document.documentElement;
     root.style.setProperty('--content-font-family', contentFont);
   }, [contentFont]);
+
+  // Start the mpv instance on startup
+  useEffect(() => {
+    const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
+    const properties = {
+      ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
+      volume: usePlayerStore.getState().volume,
+    };
+
+    mpvPlayer.restart({
+      extraParameters,
+      properties,
+    });
+  }, []);
 
   return (
     <MantineProvider

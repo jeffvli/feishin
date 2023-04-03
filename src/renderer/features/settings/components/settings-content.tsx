@@ -11,7 +11,7 @@ const GeneralTab = lazy(() =>
 );
 
 const PlaybackTab = lazy(() =>
-  import('/@/renderer/features/settings/components/playback-tab').then((module) => ({
+  import('/@/renderer/features/settings/components/playback/playback-tab').then((module) => ({
     default: module.PlaybackTab,
   })),
 );

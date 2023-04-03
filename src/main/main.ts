@@ -306,13 +306,6 @@ app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,Media
 const MPV_BINARY_PATH = store.get('mpv_path') as string | undefined;
 const MPV_PARAMETERS = store.get('mpv_parameters') as Array<string> | undefined;
 
-const gaplessAudioParams = [
-  '--gapless-audio=weak',
-  '--gapless-audio=no',
-  '--gapless-audio=yes',
-  '--gapless-audio',
-];
-
 const prefetchPlaylistParams = [
   '--prefetch-playlist=no',
   '--prefetch-playlist=yes',
@@ -321,9 +314,6 @@ const prefetchPlaylistParams = [
 
 const DEFAULT_MPV_PARAMETERS = () => {
   const parameters = [];
-  if (!MPV_PARAMETERS?.some((param) => gaplessAudioParams.includes(param))) {
-    parameters.push('--gapless-audio=weak');
-  }
 
   if (!MPV_PARAMETERS?.some((param) => prefetchPlaylistParams.includes(param))) {
     parameters.push('--prefetch-playlist=yes');
@@ -332,57 +322,89 @@ const DEFAULT_MPV_PARAMETERS = () => {
   return parameters;
 };
 
-export const mpv = new MpvAPI(
-  {
-    audio_only: true,
-    auto_restart: true,
-    binary: MPV_BINARY_PATH || '',
-    time_update: 1,
-  },
-  MPV_PARAMETERS
-    ? uniq([...DEFAULT_MPV_PARAMETERS(), ...MPV_PARAMETERS])
-    : DEFAULT_MPV_PARAMETERS(),
-);
+let mpvInstance: MpvAPI | null = null;
 
-mpv.start().catch((error) => {
-  console.log('error starting mpv', error);
-});
+const createMpv = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
+  const { extraParameters, properties } = data;
 
-mpv.on('status', (status) => {
-  if (status.property === 'playlist-pos') {
-    if (status.value !== 0) {
-      getMainWindow()?.webContents.send('renderer-player-auto-next');
+  mpvInstance = new MpvAPI(
+    {
+      audio_only: true,
+      auto_restart: false,
+      binary: MPV_BINARY_PATH || '',
+      time_update: 1,
+    },
+    MPV_PARAMETERS || extraParameters
+      ? uniq([...DEFAULT_MPV_PARAMETERS(), ...(MPV_PARAMETERS || []), ...(extraParameters || [])])
+      : DEFAULT_MPV_PARAMETERS(),
+  );
+
+  mpvInstance.setMultipleProperties(properties || {});
+
+  mpvInstance.start().catch((error) => {
+    console.log('error starting mpv', error);
+  });
+
+  mpvInstance.on('status', (status) => {
+    if (status.property === 'playlist-pos') {
+      if (status.value !== 0) {
+        getMainWindow()?.webContents.send('renderer-player-auto-next');
+      }
     }
+  });
+
+  // Automatically updates the play button when the player is playing
+  mpvInstance.on('resumed', () => {
+    getMainWindow()?.webContents.send('renderer-player-play');
+  });
+
+  // Automatically updates the play button when the player is stopped
+  mpvInstance.on('stopped', () => {
+    getMainWindow()?.webContents.send('renderer-player-stop');
+  });
+
+  // Automatically updates the play button when the player is paused
+  mpvInstance.on('paused', () => {
+    getMainWindow()?.webContents.send('renderer-player-pause');
+  });
+
+  // Event output every interval set by time_update, used to update the current time
+  mpvInstance.on('timeposition', (time: number) => {
+    getMainWindow()?.webContents.send('renderer-player-current-time', time);
+  });
+};
+
+export const getMpvInstance = () => {
+  return mpvInstance;
+};
+
+ipcMain.on('player-set-properties', async (_event, data: Record<string, any>) => {
+  if (data.length === 0) {
+    return;
+  }
+
+  if (data.length === 1) {
+    getMpvInstance()?.setProperty(Object.keys(data)[0], Object.values(data)[0]);
+  } else {
+    getMpvInstance()?.setMultipleProperties(data);
   }
 });
 
-// Automatically updates the play button when the player is playing
-mpv.on('resumed', () => {
-  getMainWindow()?.webContents.send('renderer-player-play');
-});
-
-// Automatically updates the play button when the player is stopped
-mpv.on('stopped', () => {
-  getMainWindow()?.webContents.send('renderer-player-stop');
-});
-
-// Automatically updates the play button when the player is paused
-mpv.on('paused', () => {
-  getMainWindow()?.webContents.send('renderer-player-pause');
-});
-
-// Event output every interval set by time_update, used to update the current time
-mpv.on('timeposition', (time: number) => {
-  getMainWindow()?.webContents.send('renderer-player-current-time', time);
-});
+ipcMain.on(
+  'player-restart',
+  async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
+    getMpvInstance()?.quit();
+    createMpv(data);
+  },
+);
 
 app.on('before-quit', () => {
-  mpv.stop();
+  getMpvInstance()?.stop();
 });
 
 app.on('window-all-closed', () => {
   globalShortcut.unregisterAll();
-
+  getMpvInstance()?.quit();
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (isMacOS()) {

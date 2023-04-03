@@ -31,6 +31,17 @@ export type DataTableProps = {
 
 export type SideQueueType = 'sideQueue' | 'sideDrawerQueue';
 
+type MpvSettings = {
+  audioExclusiveMode: 'yes' | 'no';
+  audioFormat?: 's16' | 's32' | 'float';
+  audioSampleRateHz?: number;
+  gaplessAudio: 'yes' | 'no' | 'weak';
+  replayGainClip: boolean;
+  replayGainFallbackDB?: number;
+  replayGainMode: 'no' | 'track' | 'album';
+  replayGainPreampDB?: number;
+};
+
 export interface SettingsState {
   general: {
     followSystemTheme: boolean;
@@ -55,13 +66,14 @@ export interface SettingsState {
     audioDeviceId?: string | null;
     crossfadeDuration: number;
     crossfadeStyle: CrossfadeStyle;
+    mpvExtraParameters: string[];
+    mpvProperties: MpvSettings;
     muted: boolean;
     scrobble: {
       enabled: boolean;
       scrobbleAtDuration: number;
       scrobbleAtPercentage: number;
     };
-
     style: PlaybackStyle;
     type: PlaybackType;
   };
@@ -112,13 +124,23 @@ const initialState: SettingsState = {
     audioDeviceId: undefined,
     crossfadeDuration: 5,
     crossfadeStyle: CrossfadeStyle.EQUALPOWER,
+    mpvExtraParameters: [],
+    mpvProperties: {
+      audioExclusiveMode: 'no',
+      audioFormat: undefined,
+      audioSampleRateHz: undefined,
+      gaplessAudio: 'weak',
+      replayGainClip: true,
+      replayGainFallbackDB: undefined,
+      replayGainMode: 'no',
+      replayGainPreampDB: 0,
+    },
     muted: false,
     scrobble: {
       enabled: true,
       scrobbleAtDuration: 240,
       scrobbleAtPercentage: 75,
     },
-
     style: PlaybackStyle.GAPLESS,
     type: PlaybackType.LOCAL,
   },
@@ -304,3 +326,6 @@ export const usePlayButtonBehavior = () =>
 export const useWindowSettings = () => useSettingsStore((state) => state.window, shallow);
 
 export const useHotkeySettings = () => useSettingsStore((state) => state.hotkeys, shallow);
+
+export const useMpvSettings = () =>
+  useSettingsStore((state) => state.playback.mpvProperties, shallow);
