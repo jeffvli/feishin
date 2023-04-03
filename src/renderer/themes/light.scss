@@ -12,7 +12,8 @@ body[data-theme='defaultLight'] {
   --sidebar-bg: rgb(240, 241, 242);
   --sidebar-fg: rgb(0, 0, 0);
   --sidebar-fg-hover: rgb(85, 85, 85);
-  --sidebar-handle-bg: #4d4d4d;
+  --sidebar-handle-bg: rgb(220, 220, 220);
+  --sidebar-border: 1px rgba(220, 220, 220, 0.7) solid;
 
   --playerbar-bg: linear-gradient(
     rgb(220, 220, 220) 0%,
