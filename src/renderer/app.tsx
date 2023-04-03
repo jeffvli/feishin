@@ -44,7 +44,7 @@ export const App = () => {
       volume: usePlayerStore.getState().volume,
     };
 
-    mpvPlayer.restart({
+    mpvPlayer?.restart({
       extraParameters,
       properties,
     });
