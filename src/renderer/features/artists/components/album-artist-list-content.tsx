@@ -16,11 +16,7 @@ import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumArtist, AlbumArtistListSort, LibraryItem } from '/@/renderer/api/types';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  useCurrentServer,
-  useAlbumArtistListStore,
-  useAlbumArtistListItemData,
-} from '/@/renderer/store';
+import { useCurrentServer, useAlbumArtistListStore } from '/@/renderer/store';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import {
   BodyScrollEvent,
@@ -55,7 +51,6 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
   const filter = useAlbumArtistListFilter({ id, key: pageKey });
   const { table, grid, display } = useAlbumArtistListStore();
   const { setTable, setTablePagination, setGrid } = useListStoreActions();
-  const { itemData, setItemData } = useAlbumArtistListItemData();
 
   const isPaginationEnabled = display === ListDisplayType.TABLE_PAGINATED;
 
@@ -265,7 +260,6 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
           <AutoSizer>
             {({ height, width }) => (
               <VirtualInfiniteGrid
-                key={`albumartist-list-${server?.id}-${display}`}
                 ref={gridRef}
                 cardRows={cardRows}
                 display={display || ListDisplayType.CARD}
@@ -274,7 +268,6 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
                 height={height}
                 initialScrollOffset={grid?.scrollOffset || 0}
                 itemCount={checkAlbumArtistList?.data?.totalRecordCount || 0}
-                itemData={itemData}
                 itemGap={20}
                 itemSize={grid?.itemsPerRow || 5}
                 itemType={LibraryItem.ALBUM_ARTIST}
@@ -284,7 +277,6 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
                   route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
                   slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
                 }}
-                setItemData={setItemData}
                 width={width}
                 onScroll={handleGridScroll}
               />

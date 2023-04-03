@@ -1,4 +1,12 @@
-import { useRef, useMemo, useCallback, forwardRef, Ref, useImperativeHandle } from 'react';
+import {
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+  forwardRef,
+  Ref,
+  useImperativeHandle,
+} from 'react';
 import debounce from 'lodash/debounce';
 import type { FixedSizeListProps } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
@@ -19,14 +27,12 @@ interface VirtualGridProps extends Omit<FixedSizeListProps, 'children' | 'itemSi
   fetchFn: (options: { columnCount: number; skip: number; take: number }) => Promise<any>;
   handleFavorite?: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
-  itemData: any[];
   itemGap: number;
   itemSize: number;
   itemType: LibraryItem;
   loading?: boolean;
   minimumBatchSize?: number;
   route?: CardRoute;
-  setItemData: (data: any[]) => void;
 }
 
 export const VirtualInfiniteGrid = forwardRef(
@@ -37,8 +43,6 @@ export const VirtualInfiniteGrid = forwardRef(
       itemSize,
       itemType,
       cardRows,
-      itemData,
-      setItemData,
       route,
       onScroll,
       display,
@@ -55,6 +59,8 @@ export const VirtualInfiniteGrid = forwardRef(
   ) => {
     const listRef = useRef<any>(null);
     const loader = useRef<InfiniteLoader>(null);
+
+    const [itemData, setItemData] = useState<any[]>([]);
 
     const { itemHeight, rowCount, columnCount } = useMemo(() => {
       const itemsPerRow = itemSize;

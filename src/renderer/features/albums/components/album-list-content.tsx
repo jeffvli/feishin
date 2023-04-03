@@ -20,7 +20,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   useCurrentServer,
   useAlbumListStore,
-  useAlbumListItemData,
   useListStoreActions,
   useAlbumListFilter,
 } from '/@/renderer/store';
@@ -53,9 +52,6 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
   const navigate = useNavigate();
   const server = useCurrentServer();
   const handlePlayQueueAdd = usePlayQueueAdd();
-
-  const { itemData, setItemData } = useAlbumListItemData();
-
   const { id, pageKey } = useAlbumListContext();
   const filter = useAlbumListFilter({ id, key: pageKey });
   const { setTable, setTablePagination, setGrid } = useListStoreActions();
@@ -316,7 +312,6 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
                   height={height}
                   initialScrollOffset={grid?.scrollOffset || 0}
                   itemCount={itemCount || 0}
-                  itemData={itemData}
                   itemGap={20}
                   itemSize={grid?.itemsPerRow || 5}
                   itemType={LibraryItem.ALBUM}
@@ -326,7 +321,6 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
                     route: AppRoute.LIBRARY_ALBUMS_DETAIL,
                     slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
                   }}
-                  setItemData={setItemData}
                   width={width}
                   onScroll={handleGridScroll}
                 />
