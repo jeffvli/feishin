@@ -40,6 +40,10 @@ export default class AppUpdater {
   }
 }
 
+process.on('uncaughtException', (error: any) => {
+  console.log('Error in main process', error);
+});
+
 if (store.get('ignore_ssl')) {
   app.commandLine.appendSwitch('ignore-certificate-errors');
 }
@@ -393,7 +397,7 @@ ipcMain.on('player-set-properties', async (_event, data: Record<string, any>) =>
 ipcMain.on(
   'player-restart',
   async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-    getMpvInstance()?.quit();
+    mpvInstance?.quit();
     createMpv(data);
   },
 );
