@@ -51,6 +51,7 @@
       "package.json"
     ],
     "afterSign": ".erb/scripts/notarize.js",
+    "electronVersion": "22.3.1",
     "mac": {
       "target": {
         "target": "default",
@@ -307,6 +308,11 @@
     "npm": ">=7.x"
   },
   "browserslist": [],
+  "workspaces": {
+    "nohoist": [
+      "electron"
+    ]
+  },
   "electronmon": {
     "patterns": [
       "!server",

@@ -15,5 +15,8 @@
   "dependencies": {
     "mpris-service": "^2.1.2"
   },
+  "devDependencies": {
+    "electron": "22.3.1"
+  },
   "license": "GPL-3.0"
 }
