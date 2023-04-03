@@ -14,6 +14,7 @@ import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
   AlbumListFilter,
+  useAlbumListFilter,
   useAlbumListStore,
   useCurrentServer,
   useListStoreActions,
@@ -44,7 +45,8 @@ export const AlbumListHeader = ({
   const { setFilter, setTablePagination } = useListStoreActions();
   const cq = useContainerQuery();
   const { id, pageKey } = useAlbumListContext();
-  const { filter, display } = useAlbumListStore({ id, key: pageKey });
+  const { display } = useAlbumListStore({ id, key: pageKey });
+  const filter = useAlbumListFilter({ id, key: pageKey });
 
   const fetch = useCallback(
     async (skip: number, take: number, filters: AlbumListFilter) => {
