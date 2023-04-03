@@ -308,11 +308,6 @@
     "npm": ">=7.x"
   },
   "browserslist": [],
-  "workspaces": {
-    "nohoist": [
-      "electron"
-    ]
-  },
   "electronmon": {
     "patterns": [
       "!server",
