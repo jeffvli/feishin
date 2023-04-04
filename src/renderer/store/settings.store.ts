@@ -266,7 +266,7 @@ const initialState: SettingsState = {
     },
   },
   window: {
-    disableAutoUpdate: true,
+    disableAutoUpdate: false,
     exitToTray: false,
     minimizeToTray: false,
     windowBarStyle: Platform.WEB,
