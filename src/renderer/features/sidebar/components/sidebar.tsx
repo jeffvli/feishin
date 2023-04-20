@@ -152,7 +152,6 @@ export const Sidebar = () => {
                 control: {
                   '&:hover': { background: 'none', color: 'var(--sidebar-fg-hover)' },
                   color: 'var(--sidebar-fg)',
-                  padding: '1rem 1rem',
                   transition: 'color 0.2s ease-in-out',
                 },
                 item: { borderBottom: 'none', color: 'var(--sidebar-fg)' },
