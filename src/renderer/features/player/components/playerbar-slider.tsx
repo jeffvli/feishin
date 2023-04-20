@@ -36,6 +36,7 @@ export const PlayerbarSlider = ({ ...props }: SliderProps) => {
         track: {
           '&::before': {
             backgroundColor: 'var(--playerbar-slider-track-bg)',
+            right: 'calc(0.1rem * -1)',
           },
         },
       }}
