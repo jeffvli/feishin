@@ -42,14 +42,14 @@ export const contract = c.router({
   },
   getAlbumArtistDetail: {
     method: 'GET',
-    path: 'albumArtist/:id',
+    path: 'artist/:id',
     responses: {
       200: resultWithHeaders(ndType._response.albumArtist),
     },
   },
   getAlbumArtistList: {
     method: 'GET',
-    path: 'albumArtist',
+    path: 'artist',
     query: ndType._parameters.albumArtistList,
     responses: {
       200: resultWithHeaders(ndType._response.albumArtistList),
