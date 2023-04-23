@@ -1,6 +1,7 @@
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { Method, AxiosError, AxiosResponse, isAxiosError } from 'axios';
 import { ndType } from './navidrome-types';
+import { resultWithHeaders } from '/@/renderer/api/utils';
 import { toast } from '/@/renderer/components';
 import { useAuthStore } from '/@/renderer/store';
 
@@ -12,7 +13,7 @@ export const contract = c.router({
     method: 'POST',
     path: 'playlist/:id/tracks',
     responses: {
-      200: ndType._response.addToPlaylist,
+      200: resultWithHeaders(ndType._response.addToPlaylist),
     },
   },
   authenticate: {
@@ -20,7 +21,7 @@ export const contract = c.router({
     method: 'POST',
     path: 'auth/login',
     responses: {
-      200: ndType._response.authenticate,
+      200: resultWithHeaders(ndType._response.authenticate),
     },
   },
   createPlaylist: {
@@ -28,7 +29,7 @@ export const contract = c.router({
     method: 'POST',
     path: 'playlist',
     responses: {
-      200: ndType._response.createPlaylist,
+      200: resultWithHeaders(ndType._response.createPlaylist),
     },
   },
   deletePlaylist: {
@@ -36,79 +37,79 @@ export const contract = c.router({
     method: 'DELETE',
     path: 'playlist/:id',
     responses: {
-      200: ndType._response.deletePlaylist,
+      200: resultWithHeaders(ndType._response.deletePlaylist),
     },
   },
   getAlbumArtistDetail: {
     method: 'GET',
     path: 'albumArtist/:id',
     responses: {
-      200: ndType._response.albumArtist,
+      200: resultWithHeaders(ndType._response.albumArtist),
     },
   },
   getAlbumArtistList: {
     method: 'GET',
     path: 'albumArtist',
-    pathParams: ndType._parameters.albumArtistList,
+    query: ndType._parameters.albumArtistList,
     responses: {
-      200: ndType._response.albumArtistList,
+      200: resultWithHeaders(ndType._response.albumArtistList),
     },
   },
   getAlbumDetail: {
     method: 'GET',
     path: 'album/:id',
     responses: {
-      200: ndType._response.album,
+      200: resultWithHeaders(ndType._response.album),
     },
   },
   getAlbumList: {
     method: 'GET',
     path: 'album',
     responses: {
-      200: ndType._response.albumList,
+      200: resultWithHeaders(ndType._response.albumList),
     },
   },
   getGenreList: {
     method: 'GET',
     path: 'genre',
     responses: {
-      200: ndType._response.genreList,
+      200: resultWithHeaders(ndType._response.genreList),
     },
   },
   getPlaylistDetail: {
     method: 'GET',
     path: 'playlist/:id',
     responses: {
-      200: ndType._response.playlist,
+      200: resultWithHeaders(ndType._response.playlist),
     },
   },
   getPlaylistList: {
     method: 'GET',
     path: 'playlist',
     responses: {
-      200: ndType._response.playlistList,
+      200: resultWithHeaders(ndType._response.playlistList),
     },
   },
   getSongDetail: {
     method: 'GET',
     path: 'song/:id',
     responses: {
-      200: ndType._response.song,
+      200: resultWithHeaders(ndType._response.song),
     },
   },
   getSongList: {
     method: 'GET',
     path: 'song',
-    pathParams: ndType._parameters.songList,
+    query: ndType._parameters.songList,
     responses: {
-      200: ndType._response.songList,
+      200: resultWithHeaders(ndType._response.songList),
     },
   },
   getUserList: {
     method: 'GET',
     path: 'user',
     responses: {
-      200: ndType._response.userList,
+      200: resultWithHeaders(ndType._response.userList),
     },
   },
   removeFromPlaylist: {
@@ -117,7 +118,7 @@ export const contract = c.router({
     path: 'playlist/:id/tracks',
     query: ndType._parameters.removeFromPlaylist,
     responses: {
-      200: ndType._response.removeFromPlaylist,
+      200: resultWithHeaders(ndType._response.removeFromPlaylist),
     },
   },
   updatePlaylist: {
@@ -125,7 +126,7 @@ export const contract = c.router({
     method: 'PUT',
     path: 'playlist/:id',
     responses: {
-      200: ndType._response.updatePlaylist,
+      200: resultWithHeaders(ndType._response.updatePlaylist),
     },
   },
 });
@@ -175,12 +176,18 @@ export const ndApiClient = initClient(contract, {
         method: method as Method,
         url: `${baseUrl}/${path}`,
       });
-      return { body: result.data, status: result.status };
+      return {
+        body: { data: result.data, headers: result.headers },
+        status: result.status,
+      };
     } catch (e: Error | AxiosError | any) {
       if (isAxiosError(e)) {
         const error = e as AxiosError;
         const response = error.response as AxiosResponse;
-        return { body: response.data, status: response.status };
+        return {
+          body: { data: response.data, headers: response.headers },
+          status: response.status,
+        };
       }
       throw e;
     }
