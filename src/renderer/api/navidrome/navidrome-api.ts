@@ -4,6 +4,7 @@ import { ndType } from './navidrome-types';
 import { resultWithHeaders } from '/@/renderer/api/utils';
 import { toast } from '/@/renderer/components';
 import { useAuthStore } from '/@/renderer/store';
+import { ServerListItem } from '/@/renderer/types';
 
 const c = initContract();
 
@@ -163,37 +164,49 @@ axiosClient.interceptors.response.use(
   },
 );
 
-export const ndApiClient = initClient(contract, {
-  api: async ({ path, method, headers, body }) => {
-    const server = useAuthStore.getState().currentServer;
-    const baseUrl = `${server?.url}/api`;
-    const token = server?.ndCredential;
+export const ndApiClient = (server: ServerListItem | string) => {
+  return initClient(contract, {
+    api: async ({ path, method, headers, body }) => {
+      let baseUrl: string | undefined;
+      let token: string | undefined;
 
-    try {
-      const result = await axiosClient.request({
-        data: body,
-        headers: { ...headers, 'x-nd-authorization': `Bearer ${token}` },
-        method: method as Method,
-        url: `${baseUrl}/${path}`,
-      });
-      return {
-        body: { data: result.data, headers: result.headers },
-        status: result.status,
-      };
-    } catch (e: Error | AxiosError | any) {
-      if (isAxiosError(e)) {
-        const error = e as AxiosError;
-        const response = error.response as AxiosResponse;
-        return {
-          body: { data: response.data, headers: response.headers },
-          status: response.status,
-        };
+      if (typeof server === 'object') {
+        const selectedServer = useAuthStore.getState().actions.getServer(server.id);
+        baseUrl = `${selectedServer?.url}/api`;
+        token = selectedServer?.ndCredential;
+      } else {
+        baseUrl = server;
       }
-      throw e;
-    }
-  },
-  baseHeaders: {
-    'Content-Type': 'application/json',
-  },
-  baseUrl: '',
-});
+
+      try {
+        const result = await axiosClient.request({
+          data: body,
+          headers: {
+            ...headers,
+            ...(token && { 'x-nd-authorization': `Bearer ${token}` }),
+          },
+          method: method as Method,
+          url: `${baseUrl}/${path}`,
+        });
+        return {
+          body: { data: result.data, headers: result.headers },
+          status: result.status,
+        };
+      } catch (e: Error | AxiosError | any) {
+        if (isAxiosError(e)) {
+          const error = e as AxiosError;
+          const response = error.response as AxiosResponse;
+          return {
+            body: { data: response.data, headers: response.headers },
+            status: response.status,
+          };
+        }
+        throw e;
+      }
+    },
+    baseHeaders: {
+      'Content-Type': 'application/json',
+    },
+    baseUrl: '',
+  });
+};
