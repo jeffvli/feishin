@@ -1,86 +1,86 @@
 import { useAuthStore } from '/@/renderer/store';
-import { navidromeApi } from '/@/renderer/api/navidrome.api';
 import { toast } from '/@/renderer/components/toast';
 import type {
   AlbumDetailArgs,
-  RawAlbumDetailResponse,
-  RawAlbumListResponse,
   AlbumListArgs,
   SongListArgs,
-  RawSongListResponse,
   SongDetailArgs,
-  RawSongDetailResponse,
   AlbumArtistDetailArgs,
-  RawAlbumArtistDetailResponse,
   AlbumArtistListArgs,
-  RawAlbumArtistListResponse,
   RatingArgs,
-  RawRatingResponse,
-  RawFavoriteResponse,
   GenreListArgs,
-  RawGenreListResponse,
   CreatePlaylistArgs,
-  RawCreatePlaylistResponse,
   DeletePlaylistArgs,
-  RawDeletePlaylistResponse,
   PlaylistDetailArgs,
-  RawPlaylistDetailResponse,
   PlaylistListArgs,
-  RawPlaylistListResponse,
   MusicFolderListArgs,
-  RawMusicFolderListResponse,
   PlaylistSongListArgs,
   ArtistListArgs,
-  RawArtistListResponse,
   UpdatePlaylistArgs,
-  RawUpdatePlaylistResponse,
   UserListArgs,
-  RawUserListResponse,
   FavoriteArgs,
   TopSongListArgs,
-  RawTopSongListResponse,
   AddToPlaylistArgs,
-  RawAddToPlaylistResponse,
+  AddToPlaylistResponse,
   RemoveFromPlaylistArgs,
-  RawRemoveFromPlaylistResponse,
+  RemoveFromPlaylistResponse,
   ScrobbleArgs,
-  RawScrobbleResponse,
+  ScrobbleResponse,
+  AlbumArtistDetailResponse,
+  FavoriteResponse,
+  CreatePlaylistResponse,
+  AlbumArtistListResponse,
+  AlbumDetailResponse,
+  AlbumListResponse,
+  ArtistListResponse,
+  GenreListResponse,
+  MusicFolderListResponse,
+  PlaylistDetailResponse,
+  PlaylistListResponse,
+  RatingResponse,
+  SongDetailResponse,
+  SongListResponse,
+  TopSongListResponse,
+  UpdatePlaylistResponse,
+  UserListResponse,
 } from '/@/renderer/api/types';
-import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
 import { ServerListItem } from '/@/renderer/types';
+import { DeletePlaylistResponse } from './types';
+import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
+import { ssController } from '/@/renderer/api/subsonic/subsonic-controller';
 
 export type ControllerEndpoint = Partial<{
-  addToPlaylist: (args: AddToPlaylistArgs) => Promise<RawAddToPlaylistResponse>;
+  addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
   clearPlaylist: () => void;
-  createFavorite: (args: FavoriteArgs) => Promise<RawFavoriteResponse>;
-  createPlaylist: (args: CreatePlaylistArgs) => Promise<RawCreatePlaylistResponse>;
-  deleteFavorite: (args: FavoriteArgs) => Promise<RawFavoriteResponse>;
-  deletePlaylist: (args: DeletePlaylistArgs) => Promise<RawDeletePlaylistResponse>;
-  getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<RawAlbumArtistDetailResponse>;
-  getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<RawAlbumArtistListResponse>;
-  getAlbumDetail: (args: AlbumDetailArgs) => Promise<RawAlbumDetailResponse>;
-  getAlbumList: (args: AlbumListArgs) => Promise<RawAlbumListResponse>;
+  createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
+  createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse>;
+  deleteFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
+  deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
+  getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
+  getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
+  getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse>;
+  getAlbumList: (args: AlbumListArgs) => Promise<AlbumListResponse>;
   getArtistDetail: () => void;
   getArtistInfo: (args: any) => void;
-  getArtistList: (args: ArtistListArgs) => Promise<RawArtistListResponse>;
+  getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse>;
   getFavoritesList: () => void;
   getFolderItemList: () => void;
   getFolderList: () => void;
   getFolderSongs: () => void;
-  getGenreList: (args: GenreListArgs) => Promise<RawGenreListResponse>;
-  getMusicFolderList: (args: MusicFolderListArgs) => Promise<RawMusicFolderListResponse>;
-  getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<RawPlaylistDetailResponse>;
-  getPlaylistList: (args: PlaylistListArgs) => Promise<RawPlaylistListResponse>;
-  getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<RawSongListResponse>;
-  getSongDetail: (args: SongDetailArgs) => Promise<RawSongDetailResponse>;
-  getSongList: (args: SongListArgs) => Promise<RawSongListResponse>;
-  getTopSongs: (args: TopSongListArgs) => Promise<RawTopSongListResponse>;
-  getUserList: (args: UserListArgs) => Promise<RawUserListResponse>;
-  removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RawRemoveFromPlaylistResponse>;
-  scrobble: (args: ScrobbleArgs) => Promise<RawScrobbleResponse>;
-  updatePlaylist: (args: UpdatePlaylistArgs) => Promise<RawUpdatePlaylistResponse>;
-  updateRating: (args: RatingArgs) => Promise<RawRatingResponse>;
+  getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
+  getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
+  getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
+  getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
+  getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
+  getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
+  getSongList: (args: SongListArgs) => Promise<SongListResponse>;
+  getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
+  getUserList: (args: UserListArgs) => Promise<UserListResponse>;
+  removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
+  scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
+  updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
+  updateRating: (args: RatingArgs) => Promise<RatingResponse>;
 }>;
 
 type ApiController = {
@@ -123,16 +123,16 @@ const endpoints: ApiController = {
     updateRating: undefined,
   },
   navidrome: {
-    addToPlaylist: navidromeApi.addToPlaylist,
+    addToPlaylist: ndController.addToPlaylist,
     clearPlaylist: undefined,
-    createFavorite: subsonicApi.createFavorite,
-    createPlaylist: navidromeApi.createPlaylist,
-    deleteFavorite: subsonicApi.deleteFavorite,
-    deletePlaylist: navidromeApi.deletePlaylist,
-    getAlbumArtistDetail: navidromeApi.getAlbumArtistDetail,
-    getAlbumArtistList: navidromeApi.getAlbumArtistList,
-    getAlbumDetail: navidromeApi.getAlbumDetail,
-    getAlbumList: navidromeApi.getAlbumList,
+    createFavorite: ssController.createFavorite,
+    createPlaylist: ndController.createPlaylist,
+    deleteFavorite: ssController.removeFavorite,
+    deletePlaylist: ndController.deletePlaylist,
+    getAlbumArtistDetail: ndController.getAlbumArtistDetail,
+    getAlbumArtistList: ndController.getAlbumArtistList,
+    getAlbumDetail: ndController.getAlbumDetail,
+    getAlbumList: ndController.getAlbumList,
     getArtistDetail: undefined,
     getArtistInfo: undefined,
     getArtistList: undefined,
@@ -140,30 +140,30 @@ const endpoints: ApiController = {
     getFolderItemList: undefined,
     getFolderList: undefined,
     getFolderSongs: undefined,
-    getGenreList: navidromeApi.getGenreList,
-    getMusicFolderList: subsonicApi.getMusicFolderList,
-    getPlaylistDetail: navidromeApi.getPlaylistDetail,
-    getPlaylistList: navidromeApi.getPlaylistList,
-    getPlaylistSongList: navidromeApi.getPlaylistSongList,
-    getSongDetail: navidromeApi.getSongDetail,
-    getSongList: navidromeApi.getSongList,
-    getTopSongs: subsonicApi.getTopSongList,
-    getUserList: navidromeApi.getUserList,
-    removeFromPlaylist: navidromeApi.removeFromPlaylist,
-    scrobble: subsonicApi.scrobble,
-    updatePlaylist: navidromeApi.updatePlaylist,
-    updateRating: subsonicApi.updateRating,
+    getGenreList: ndController.getGenreList,
+    getMusicFolderList: ssController.getMusicFolderList,
+    getPlaylistDetail: ndController.getPlaylistDetail,
+    getPlaylistList: ndController.getPlaylistList,
+    getPlaylistSongList: ndController.getPlaylistSongList,
+    getSongDetail: ndController.getSongDetail,
+    getSongList: ndController.getSongList,
+    getTopSongs: ssController.getTopSongList,
+    getUserList: ndController.getUserList,
+    removeFromPlaylist: ndController.removeFromPlaylist,
+    scrobble: ssController.scrobble,
+    updatePlaylist: ndController.updatePlaylist,
+    updateRating: ssController.setRating,
   },
   subsonic: {
     clearPlaylist: undefined,
-    createFavorite: subsonicApi.createFavorite,
+    createFavorite: ssController.createFavorite,
     createPlaylist: undefined,
-    deleteFavorite: subsonicApi.deleteFavorite,
+    deleteFavorite: ssController.removeFavorite,
     deletePlaylist: undefined,
-    getAlbumArtistDetail: subsonicApi.getAlbumArtistDetail,
-    getAlbumArtistList: subsonicApi.getAlbumArtistList,
-    getAlbumDetail: subsonicApi.getAlbumDetail,
-    getAlbumList: subsonicApi.getAlbumList,
+    getAlbumArtistDetail: undefined,
+    getAlbumArtistList: undefined,
+    getAlbumDetail: undefined,
+    getAlbumList: undefined,
     getArtistDetail: undefined,
     getArtistInfo: undefined,
     getArtistList: undefined,
@@ -172,14 +172,14 @@ const endpoints: ApiController = {
     getFolderList: undefined,
     getFolderSongs: undefined,
     getGenreList: undefined,
-    getMusicFolderList: subsonicApi.getMusicFolderList,
+    getMusicFolderList: ssController.getMusicFolderList,
     getPlaylistDetail: undefined,
     getPlaylistList: undefined,
     getSongDetail: undefined,
     getSongList: undefined,
-    getTopSongs: subsonicApi.getTopSongList,
+    getTopSongs: ssController.getTopSongList,
     getUserList: undefined,
-    scrobble: subsonicApi.scrobble,
+    scrobble: ssController.scrobble,
     updatePlaylist: undefined,
     updateRating: undefined,
   },
