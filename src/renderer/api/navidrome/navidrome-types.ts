@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 
 const sortOrderValues = ['ASC', 'DESC'] as const;
 
@@ -36,6 +36,14 @@ const user = z.object({
 });
 
 const userList = z.array(user);
+
+const ndUserListSort = {
+  NAME: 'name',
+} as const;
+
+const userListParameters = paginationParameters.extend({
+  _sort: z.nativeEnum(ndUserListSort).optional(),
+});
 
 const genre = z.object({
   id: z.string(),
@@ -221,8 +229,8 @@ const ndSongListSort = {
 
 const songListParameters = paginationParameters.extend({
   _sort: z.nativeEnum(ndSongListSort).optional(),
-  album_id: z.string().optional(),
-  artist_id: z.string().optional(),
+  album_id: z.array(z.string()).optional(),
+  artist_id: z.array(z.string()).optional(),
   genre_id: z.string().optional(),
   starred: z.boolean().optional(),
 });
@@ -238,7 +246,7 @@ const playlist = z.object({
   ownerName: z.string(),
   path: z.string(),
   public: z.boolean(),
-  rules: z.string(),
+  rules: z.record(z.string(), z.any()),
   size: z.number(),
   songCount: z.number(),
   sync: z.boolean(),
@@ -247,10 +255,26 @@ const playlist = z.object({
 
 const playlistList = z.array(playlist);
 
-const playlistSong = playlist.extend({
+const ndPlaylistListSort = {
+  DURATION: 'duration',
+  NAME: 'name',
+  OWNER: 'ownerName',
+  PUBLIC: 'public',
+  SONG_COUNT: 'songCount',
+  UPDATED_AT: 'updatedAt',
+} as const;
+
+const playlistListParameters = paginationParameters.extend({
+  _sort: z.nativeEnum(ndPlaylistListSort).optional(),
+  owner_id: z.string().optional(),
+});
+
+const playlistSong = song.extend({
   mediaFileId: z.string(),
   playlistId: z.string(),
 });
+
+const playlistSongList = z.array(playlistSong);
 
 const createPlaylist = playlist.pick({
   id: true,
@@ -287,15 +311,24 @@ const removeFromPlaylistParameters = z.object({
 });
 
 export const ndType = {
+  _enum: {
+    albumArtistList: ndAlbumArtistListSort,
+    albumList: ndAlbumListSort,
+    playlistList: ndPlaylistListSort,
+    songList: ndSongListSort,
+    userList: ndUserListSort,
+  },
   _parameters: {
     addToPlaylist: addToPlaylistParameters,
     albumArtistList: albumArtistListParameters,
     albumList: albumListParameters,
     authenticate: authenticateParameters,
     createPlaylist: createPlaylistParameters,
+    playlistList: playlistListParameters,
     removeFromPlaylist: removeFromPlaylistParameters,
     songList: songListParameters,
     updatePlaylist: updatePlaylistParameters,
+    userList: userListParameters,
   },
   _response: {
     addToPlaylist,
@@ -311,6 +344,7 @@ export const ndType = {
     playlist,
     playlistList,
     playlistSong,
+    playlistSongList,
     removeFromPlaylist,
     song,
     songList,

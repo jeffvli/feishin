@@ -66,6 +66,7 @@ export const contract = c.router({
   getAlbumList: {
     method: 'GET',
     path: 'album',
+    query: ndType._parameters.albumList,
     responses: {
       200: resultWithHeaders(ndType._response.albumList),
     },
@@ -87,8 +88,17 @@ export const contract = c.router({
   getPlaylistList: {
     method: 'GET',
     path: 'playlist',
+    query: ndType._parameters.playlistList,
     responses: {
       200: resultWithHeaders(ndType._response.playlistList),
+    },
+  },
+  getPlaylistSongList: {
+    method: 'GET',
+    path: 'playlist/:id/tracks',
+    query: ndType._parameters.songList,
+    responses: {
+      200: resultWithHeaders(ndType._response.playlistSongList),
     },
   },
   getSongDetail: {
@@ -109,6 +119,7 @@ export const contract = c.router({
   getUserList: {
     method: 'GET',
     path: 'user',
+    query: ndType._parameters.userList,
     responses: {
       200: resultWithHeaders(ndType._response.userList),
     },
@@ -164,7 +175,9 @@ axiosClient.interceptors.response.use(
   },
 );
 
-export const ndApiClient = (server: ServerListItem | string) => {
+export const ndApiClient = (args: { server: ServerListItem | string; signal?: AbortSignal }) => {
+  const { server, signal } = args;
+
   return initClient(contract, {
     api: async ({ path, method, headers, body }) => {
       let baseUrl: string | undefined;
@@ -186,6 +199,7 @@ export const ndApiClient = (server: ServerListItem | string) => {
             ...(token && { 'x-nd-authorization': `Bearer ${token}` }),
           },
           method: method as Method,
+          signal,
           url: `${baseUrl}/${path}`,
         });
         return {
