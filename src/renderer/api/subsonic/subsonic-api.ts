@@ -1,8 +1,8 @@
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { Method, AxiosError, isAxiosError, AxiosResponse } from 'axios';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
+import { ServerListItem } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components';
-import { useAuthStore } from '/@/renderer/store';
 
 const c = initContract();
 
@@ -95,29 +95,24 @@ axiosClient.interceptors.response.use(
   },
 );
 
-export const ssApiClient = (args: { serverId?: string; signal?: AbortSignal; url?: string }) => {
-  const { serverId, url, signal } = args;
+export const ssApiClient = (args: {
+  server?: ServerListItem;
+  signal?: AbortSignal;
+  url?: string;
+}) => {
+  const { server, url, signal } = args;
 
   return initClient(contract, {
     api: async ({ path, method, headers, body }) => {
       let baseUrl: string | undefined;
       const authParams: Record<string, any> = {};
 
-      if (serverId) {
-        const selectedServer = useAuthStore.getState().actions.getServer(serverId);
-
-        if (!selectedServer) {
-          return {
-            body: { data: null, headers: null },
-            status: 500,
-          };
-        }
-
-        baseUrl = `${selectedServer?.url}/rest`;
-        const token = selectedServer.credential;
+      if (server) {
+        baseUrl = `${server.url}/rest`;
+        const token = server.credential;
         const params = token.split(/&?\w=/gm);
 
-        authParams.u = selectedServer.username;
+        authParams.u = server.username;
         if (params?.length === 4) {
           authParams.s = params[2];
           authParams.t = params[3];

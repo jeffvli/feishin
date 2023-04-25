@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 const sortOrderValues = ['ASC', 'DESC'] as const;
 
+const error = z.string();
+
 const paginationParameters = z.object({
   _end: z.number().optional(),
   _order: z.enum(sortOrderValues),
@@ -339,6 +341,7 @@ export const ndType = {
     authenticate,
     createPlaylist,
     deletePlaylist,
+    error,
     genre,
     genreList,
     playlist,

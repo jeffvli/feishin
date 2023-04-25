@@ -157,7 +157,7 @@ const normalizeAlbumArtist = (
     lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
     name: item.name,
     playCount: item.playCount,
-    serverId: server?.id || '',
+    serverId: server.id,
     serverType: ServerType.NAVIDROME,
     similarArtists: null,
     // similarArtists:

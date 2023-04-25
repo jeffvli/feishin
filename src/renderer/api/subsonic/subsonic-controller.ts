@@ -72,13 +72,9 @@ const authenticate = async (
 };
 
 const getMusicFolderList = async (args: MusicFolderListArgs): Promise<MusicFolderListResponse> => {
-  const { signal, serverId } = args;
+  const { apiClientProps } = args;
 
-  if (!serverId) {
-    throw new Error('No server id');
-  }
-
-  const res = await ssApiClient({ serverId, signal }).getMusicFolderList({});
+  const res = await ssApiClient(apiClientProps).getMusicFolderList({});
 
   if (res.status !== 200) {
     throw new Error('Failed to get music folder list');
@@ -198,13 +194,9 @@ const getMusicFolderList = async (args: MusicFolderListArgs): Promise<MusicFolde
 // };
 
 const createFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
-  const { serverId, query, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!serverId) {
-    throw new Error('No server id');
-  }
-
-  const res = await ssApiClient({ serverId, signal }).createFavorite({
+  const res = await ssApiClient(apiClientProps).createFavorite({
     query: {
       albumId: query.type === LibraryItem.ALBUM ? query.id : undefined,
       artistId: query.type === LibraryItem.ALBUM_ARTIST ? query.id : undefined,
@@ -223,13 +215,9 @@ const createFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
 };
 
 const removeFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
-  const { serverId, query, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!serverId) {
-    throw new Error('No server id');
-  }
-
-  const res = await ssApiClient({ serverId, signal }).removeFavorite({
+  const res = await ssApiClient(apiClientProps).removeFavorite({
     query: {
       albumId: query.type === LibraryItem.ALBUM ? query.id : undefined,
       artistId: query.type === LibraryItem.ALBUM_ARTIST ? query.id : undefined,
@@ -248,16 +236,12 @@ const removeFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
 };
 
 const setRating = async (args: RatingArgs): Promise<RatingResponse> => {
-  const { serverId, query, signal } = args;
-
-  if (!serverId) {
-    throw new Error('No server id');
-  }
+  const { query, apiClientProps } = args;
 
   const itemIds = query.item.map((item) => item.id);
 
   for (const id of itemIds) {
-    await ssApiClient({ serverId, signal }).setRating({
+    await ssApiClient(apiClientProps).setRating({
       query: {
         id,
         rating: query.rating,
@@ -269,13 +253,9 @@ const setRating = async (args: RatingArgs): Promise<RatingResponse> => {
 };
 
 const getTopSongList = async (args: TopSongListArgs): Promise<SongListResponse> => {
-  const { signal, serverId, query, server } = args;
+  const { query, apiClientProps } = args;
 
-  if (!serverId || !server) {
-    throw new Error('No server id');
-  }
-
-  const res = await ssApiClient({ serverId, signal }).getTopSongsList({
+  const res = await ssApiClient(apiClientProps).getTopSongsList({
     query: {
       artist: query.artist,
       count: query.limit,
@@ -287,7 +267,7 @@ const getTopSongList = async (args: TopSongListArgs): Promise<SongListResponse> 
   }
 
   return {
-    items: res.body.topSongs.song.map((song) => ssNormalize.song(song, server, '')),
+    items: res.body.topSongs.song.map((song) => ssNormalize.song(song, apiClientProps.server, '')),
     startIndex: 0,
     totalRecordCount: res.body.topSongs.song.length || 0,
   };
@@ -296,13 +276,9 @@ const getTopSongList = async (args: TopSongListArgs): Promise<SongListResponse> 
 const getArtistInfo = async (
   args: ArtistInfoArgs,
 ): Promise<z.infer<typeof ssType._response.artistInfo>> => {
-  const { signal, serverId, query } = args;
+  const { query, apiClientProps } = args;
 
-  if (!serverId) {
-    throw new Error('No server id');
-  }
-
-  const res = await ssApiClient({ serverId, signal }).getArtistInfo({
+  const res = await ssApiClient(apiClientProps).getArtistInfo({
     query: {
       count: query.limit,
       id: query.artistId,
@@ -317,13 +293,9 @@ const getArtistInfo = async (
 };
 
 const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
-  const { signal, serverId, query } = args;
+  const { query, apiClientProps } = args;
 
-  if (!serverId) {
-    throw new Error('No server id');
-  }
-
-  const res = await ssApiClient({ serverId, signal }).scrobble({
+  const res = await ssApiClient(apiClientProps).scrobble({
     query: {
       id: query.id,
       submission: query.submission,

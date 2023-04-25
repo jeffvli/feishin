@@ -49,7 +49,7 @@ const authenticate = async (
 ): Promise<AuthenticationResponse> => {
   const cleanServerUrl = url.replace(/\/$/, '');
 
-  const res = await ndApiClient({ server: cleanServerUrl }).authenticate({
+  const res = await ndApiClient({ url: cleanServerUrl }).authenticate({
     body: {
       password: body.password,
       username: body.username,
@@ -69,19 +69,15 @@ const authenticate = async (
 };
 
 const getUserList = async (args: UserListArgs): Promise<UserListResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).getUserList({
+  const res = await ndApiClient(apiClientProps).getUserList({
     query: {
       _end: query.startIndex + (query.limit || 0),
       _order: sortOrderMap.navidrome[query.sortOrder],
       _sort: userListSortMap.navidrome[query.sortBy],
       _start: query.startIndex,
-      ...query.ndParams,
+      ...query._custom?.navidrome,
     },
   });
 
@@ -97,13 +93,9 @@ const getUserList = async (args: UserListArgs): Promise<UserListResponse> => {
 };
 
 const getGenreList = async (args: GenreListArgs): Promise<GenreListResponse> => {
-  const { server, signal } = args;
+  const { apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).getGenreList({});
+  const res = await ndApiClient(apiClientProps).getGenreList({});
 
   if (res.status !== 200) {
     throw new Error('Failed to get genre list');
@@ -119,13 +111,9 @@ const getGenreList = async (args: GenreListArgs): Promise<GenreListResponse> => 
 const getAlbumArtistDetail = async (
   args: AlbumArtistDetailArgs,
 ): Promise<AlbumArtistDetailResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).getAlbumArtistDetail({
+  const res = await ndApiClient(apiClientProps).getAlbumArtistDetail({
     params: {
       id: query.id,
     },
@@ -135,17 +123,17 @@ const getAlbumArtistDetail = async (
     throw new Error('Failed to get album artist detail');
   }
 
-  return ndNormalize.albumArtist(res.body.data, server);
+  if (!apiClientProps.server) {
+    throw new Error('Server is required');
+  }
+
+  return ndNormalize.albumArtist(res.body.data, apiClientProps.server);
 };
 
 const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<AlbumArtistListResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).getAlbumArtistList({
+  const res = await ndApiClient(apiClientProps).getAlbumArtistList({
     query: {
       _end: query.startIndex + (query.limit || 0),
       _order: sortOrderMap.navidrome[query.sortOrder],
@@ -160,27 +148,29 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<AlbumArtis
     throw new Error('Failed to get album artist list');
   }
 
+  if (!apiClientProps.server) {
+    throw new Error('Server is required');
+  }
+
   return {
-    items: res.body.data.map((albumArtist) => ndNormalize.albumArtist(albumArtist, server)),
+    items: res.body.data.map((albumArtist) =>
+      ndNormalize.albumArtist(albumArtist, apiClientProps.server),
+    ),
     startIndex: query.startIndex,
     totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
   };
 };
 
 const getAlbumDetail = async (args: AlbumDetailArgs): Promise<AlbumDetailResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const albumRes = await ndApiClient({ server, signal }).getAlbumDetail({
+  const albumRes = await ndApiClient(apiClientProps).getAlbumDetail({
     params: {
       id: query.id,
     },
   });
 
-  const songsData = await ndApiClient({ server, signal }).getSongList({
+  const songsData = await ndApiClient(apiClientProps).getSongList({
     query: {
       _end: 0,
       _order: 'ASC',
@@ -194,17 +184,16 @@ const getAlbumDetail = async (args: AlbumDetailArgs): Promise<AlbumDetailRespons
     throw new Error('Failed to get album detail');
   }
 
-  return ndNormalize.album({ ...albumRes.body.data, songs: songsData.body.data }, server);
+  return ndNormalize.album(
+    { ...albumRes.body.data, songs: songsData.body.data },
+    apiClientProps.server,
+  );
 };
 
 const getAlbumList = async (args: AlbumListArgs): Promise<AlbumListResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).getAlbumList({
+  const res = await ndApiClient(apiClientProps).getAlbumList({
     query: {
       _end: query.startIndex + (query.limit || 0),
       _order: sortOrderMap.navidrome[query.sortOrder],
@@ -221,20 +210,18 @@ const getAlbumList = async (args: AlbumListArgs): Promise<AlbumListResponse> => 
   }
 
   return {
-    items: res.body.data.map((album) => ndNormalize.album(album, server)),
+    items: res.body.data.map((album) => ndNormalize.album(album, apiClientProps.server)),
     startIndex: query?.startIndex || 0,
     totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
   };
 };
 
 const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
+  console.log('query :>> ', query);
 
-  const res = await ndApiClient({ server, signal }).getSongList({
+  const res = await ndApiClient(apiClientProps).getSongList({
     query: {
       _end: query.startIndex + (query.limit || -1),
       _order: sortOrderMap.navidrome[query.sortOrder],
@@ -252,20 +239,16 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
   }
 
   return {
-    items: res.body.data.map((song) => ndNormalize.song(song, server, '')),
+    items: res.body.data.map((song) => ndNormalize.song(song, apiClientProps.server, '')),
     startIndex: query?.startIndex || 0,
     totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
   };
 };
 
 const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).getSongDetail({
+  const res = await ndApiClient(apiClientProps).getSongDetail({
     params: {
       id: query.id,
     },
@@ -275,23 +258,19 @@ const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> 
     throw new Error('Failed to get song detail');
   }
 
-  return ndNormalize.song(res.body.data, server, '');
+  return ndNormalize.song(res.body.data, apiClientProps.server, '');
 };
 
 const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistResponse> => {
-  const { body, server } = args;
+  const { body, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server }).createPlaylist({
+  const res = await ndApiClient(apiClientProps).createPlaylist({
     body: {
       comment: body.comment,
       name: body.name,
-      public: body._custom.navidrome?.public,
-      rules: body._custom.navidrome?.rules,
-      sync: body._custom.navidrome?.sync,
+      public: body._custom?.navidrome?.public,
+      rules: body._custom?.navidrome?.rules,
+      sync: body._custom?.navidrome?.sync,
     },
   });
 
@@ -306,19 +285,15 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
 };
 
 const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistResponse> => {
-  const { query, body, server, signal } = args;
+  const { query, body, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).updatePlaylist({
+  const res = await ndApiClient(apiClientProps).updatePlaylist({
     body: {
       comment: body.comment || '',
       name: body.name,
-      public: body.ndParams?.public || false,
-      rules: body.ndParams?.rules ? body.ndParams?.rules : undefined,
-      sync: body.ndParams?.sync || undefined,
+      public: body._custom?.navidrome?.public || false,
+      rules: body._custom?.navidrome?.rules ? body._custom.navidrome.rules : undefined,
+      sync: body._custom?.navidrome?.sync || undefined,
     },
     params: {
       id: query.id,
@@ -335,13 +310,9 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
 };
 
 const deletePlaylist = async (args: DeletePlaylistArgs): Promise<DeletePlaylistResponse> => {
-  const { query, server } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server }).deletePlaylist({
+  const res = await ndApiClient(apiClientProps).deletePlaylist({
     body: null,
     params: {
       id: query.id,
@@ -356,13 +327,9 @@ const deletePlaylist = async (args: DeletePlaylistArgs): Promise<DeletePlaylistR
 };
 
 const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).getPlaylistList({
+  const res = await ndApiClient(apiClientProps).getPlaylistList({
     query: {
       _end: query.startIndex + (query.limit || 0),
       _order: sortOrderMap.navidrome[query.sortOrder],
@@ -377,20 +344,16 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
   }
 
   return {
-    items: res.body.data.map((item) => ndNormalize.playlist(item, server)),
+    items: res.body.data.map((item) => ndNormalize.playlist(item, apiClientProps.server)),
     startIndex: query?.startIndex || 0,
     totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
   };
 };
 
 const getPlaylistDetail = async (args: PlaylistDetailArgs): Promise<PlaylistDetailResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).getPlaylistDetail({
+  const res = await ndApiClient(apiClientProps).getPlaylistDetail({
     params: {
       id: query.id,
     },
@@ -400,19 +363,15 @@ const getPlaylistDetail = async (args: PlaylistDetailArgs): Promise<PlaylistDeta
     throw new Error('Failed to get playlist detail');
   }
 
-  return ndNormalize.playlist(res.body.data, server);
+  return ndNormalize.playlist(res.body.data, apiClientProps.server);
 };
 
 const getPlaylistSongList = async (
   args: PlaylistSongListArgs,
 ): Promise<PlaylistSongListResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).getPlaylistSongList({
+  const res = await ndApiClient(apiClientProps).getPlaylistSongList({
     params: {
       id: query.id,
     },
@@ -429,20 +388,16 @@ const getPlaylistSongList = async (
   }
 
   return {
-    items: res.body.data.map((item) => ndNormalize.song(item, server, '')),
+    items: res.body.data.map((item) => ndNormalize.song(item, apiClientProps.server, '')),
     startIndex: query?.startIndex || 0,
     totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
   };
 };
 
 const addToPlaylist = async (args: AddToPlaylistArgs): Promise<AddToPlaylistResponse> => {
-  const { body, query, server } = args;
+  const { body, query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server }).addToPlaylist({
+  const res = await ndApiClient(apiClientProps).addToPlaylist({
     body: {
       ids: body.songId,
     },
@@ -461,13 +416,9 @@ const addToPlaylist = async (args: AddToPlaylistArgs): Promise<AddToPlaylistResp
 const removeFromPlaylist = async (
   args: RemoveFromPlaylistArgs,
 ): Promise<RemoveFromPlaylistResponse> => {
-  const { query, server, signal } = args;
+  const { query, apiClientProps } = args;
 
-  if (!server) {
-    throw new Error('No server');
-  }
-
-  const res = await ndApiClient({ server, signal }).removeFromPlaylist({
+  const res = await ndApiClient(apiClientProps).removeFromPlaylist({
     body: null,
     params: {
       id: query.id,
