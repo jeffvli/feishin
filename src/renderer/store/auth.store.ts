@@ -11,14 +11,14 @@ import { ServerListItem } from '/@/renderer/types';
 export interface AuthState {
   currentServer: ServerListItem | null;
   deviceId: string;
-  serverList: ServerListItem[];
+  serverList: Record<string, ServerListItem>;
 }
 
 export interface AuthSlice extends AuthState {
   actions: {
     addServer: (args: ServerListItem) => void;
     deleteServer: (id: string) => void;
-    getServer: (id?: string) => ServerListItem | undefined;
+    getServer: (id: string) => ServerListItem | undefined;
     setCurrentServer: (server: ServerListItem | null) => void;
     updateServer: (id: string, args: Partial<ServerListItem>) => void;
   };
@@ -31,19 +31,20 @@ export const useAuthStore = create<AuthSlice>()(
         actions: {
           addServer: (args) => {
             set((state) => {
-              state.serverList.push(args);
+              state.serverList[args.id] = args;
             });
           },
           deleteServer: (id) => {
             set((state) => {
-              state.serverList = state.serverList.filter((credential) => credential.id !== id);
+              delete state.serverList[id];
+
               if (state.currentServer?.id === id) {
                 state.currentServer = null;
               }
             });
           },
           getServer: (id) => {
-            return get().serverList.find((server) => server.id === id);
+            return get().serverList[id];
           },
           setCurrentServer: (server) => {
             set((state) => {
@@ -61,16 +62,17 @@ export const useAuthStore = create<AuthSlice>()(
           },
           updateServer: (id: string, args: Partial<ServerListItem>) => {
             set((state) => {
-              const server = state.serverList.find((server) => server.id === id);
-              if (server) {
-                Object.assign(server, { ...server, ...args });
+              state.serverList[id] = { ...state.serverList[id], ...args };
+
+              if (state.currentServer?.id === id) {
+                state.currentServer = { ...state.serverList[id], ...args };
               }
             });
           },
         },
         currentServer: null,
         deviceId: nanoid(),
-        serverList: [],
+        serverList: {},
       })),
       { name: 'store_authentication' },
     ),
