@@ -2,26 +2,26 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { HTTPError } from 'ky';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { RawUpdatePlaylistResponse, UpdatePlaylistArgs } from '/@/renderer/api/types';
-import { MutationOptions } from '/@/renderer/lib/react-query';
-import { useCurrentServer } from '/@/renderer/store';
+import { UpdatePlaylistArgs, UpdatePlaylistResponse } from '/@/renderer/api/types';
+import { MutationHookArgs } from '/@/renderer/lib/react-query';
+import { getServerById } from '/@/renderer/store';
 
-export const useUpdatePlaylist = (options?: MutationOptions) => {
+export const useUpdatePlaylist = (args: MutationHookArgs) => {
+  const { options } = args || {};
   const queryClient = useQueryClient();
-  const server = useCurrentServer();
 
-  return useMutation<
-    RawUpdatePlaylistResponse,
-    HTTPError,
-    Omit<UpdatePlaylistArgs, 'server'>,
-    null
-  >({
-    mutationFn: (args) => api.controller.updatePlaylist({ ...args, server }),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries(queryKeys.playlists.list(server?.id || ''));
+  return useMutation<UpdatePlaylistResponse, HTTPError, Omit<UpdatePlaylistArgs, 'server'>, null>({
+    mutationFn: (args) => {
+      const server = getServerById(args.serverId);
+      if (!server) throw new Error('Server not found');
+      return api.controller.updatePlaylist({ ...args, apiClientProps: { server } });
+    },
+    onSuccess: (_data, variables) => {
+      const { query, serverId } = variables;
+      queryClient.invalidateQueries(queryKeys.playlists.list(serverId));
 
-      if (data?.id) {
-        queryClient.invalidateQueries(queryKeys.playlists.detail(server?.id || '', data.id));
+      if (query?.id) {
+        queryClient.invalidateQueries(queryKeys.playlists.detail(serverId, query.id));
       }
     },
     ...options,

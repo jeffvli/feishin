@@ -9,33 +9,29 @@ import {
   AlbumArtist,
   AnyLibraryItems,
   LibraryItem,
-  RatingArgs,
-  RawRatingResponse,
+  SetRatingArgs,
+  RatingResponse,
   ServerType,
 } from '/@/renderer/api/types';
-import { MutationOptions } from '/@/renderer/lib/react-query';
-import {
-  useAuthStore,
-  useCurrentServer,
-  useSetAlbumListItemDataById,
-  useSetQueueRating,
-} from '/@/renderer/store';
+import { MutationHookArgs } from '/@/renderer/lib/react-query';
+import { getServerById, useSetAlbumListItemDataById, useSetQueueRating } from '/@/renderer/store';
 
-export const useUpdateRating = (options?: MutationOptions) => {
+export const useSetRating = (args: MutationHookArgs) => {
+  const { options } = args || {};
   const queryClient = useQueryClient();
-  const currentServer = useCurrentServer();
   const setAlbumListData = useSetAlbumListItemDataById();
   const setQueueRating = useSetQueueRating();
 
   return useMutation<
-    RawRatingResponse,
+    RatingResponse,
     HTTPError,
-    Omit<RatingArgs, 'server'>,
+    Omit<SetRatingArgs, 'server' | 'apiClientProps'>,
     { previous: { items: AnyLibraryItems } | undefined }
   >({
     mutationFn: (args) => {
-      const server = useAuthStore.getState().actions.getServer(args._serverId) || currentServer;
-      return api.controller.updateRating({ ...args, server });
+      const server = getServerById(args.serverId);
+      if (!server) throw new Error('Server not found');
+      return api.controller.updateRating({ ...args, apiClientProps: { server } });
     },
     onError: (_error, _variables, context) => {
       for (const item of context?.previous?.items || []) {
@@ -127,7 +123,6 @@ export const useUpdateRating = (options?: MutationOptions) => {
         }
       }
     },
-
     ...options,
   });
 };

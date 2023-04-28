@@ -2,30 +2,30 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { HTTPError } from 'ky';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { RawRemoveFromPlaylistResponse, RemoveFromPlaylistArgs } from '/@/renderer/api/types';
+import { RemoveFromPlaylistResponse, RemoveFromPlaylistArgs } from '/@/renderer/api/types';
 import { MutationOptions } from '/@/renderer/lib/react-query';
-import { useCurrentServer } from '/@/renderer/store';
+import { getServerById } from '/@/renderer/store';
 
 export const useRemoveFromPlaylist = (options?: MutationOptions) => {
   const queryClient = useQueryClient();
-  const server = useCurrentServer();
 
   return useMutation<
-    RawRemoveFromPlaylistResponse,
+    RemoveFromPlaylistResponse,
     HTTPError,
-    Omit<RemoveFromPlaylistArgs, 'server'>,
+    Omit<RemoveFromPlaylistArgs, 'server' | 'apiClientProps'>,
     null
   >({
-    mutationFn: (args) => api.controller.removeFromPlaylist({ ...args, server }),
+    mutationFn: (args) => {
+      const server = getServerById(args.serverId);
+      if (!server) throw new Error('Server not found');
+      return api.controller.removeFromPlaylist({ ...args, apiClientProps: { server } });
+    },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries(queryKeys.playlists.list(server?.id || ''), { exact: false });
-
+      const { serverId } = variables;
+      queryClient.invalidateQueries(queryKeys.playlists.list(serverId), { exact: false });
+      queryClient.invalidateQueries(queryKeys.playlists.detail(serverId, variables.query.id));
       queryClient.invalidateQueries(
-        queryKeys.playlists.detail(server?.id || '', variables.query.id),
-      );
-
-      queryClient.invalidateQueries(
-        queryKeys.playlists.detailSongList(server?.id || '', variables.query.id),
+        queryKeys.playlists.detailSongList(serverId, variables.query.id),
       );
     },
     ...options,
