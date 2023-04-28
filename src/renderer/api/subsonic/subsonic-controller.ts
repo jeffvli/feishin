@@ -11,7 +11,7 @@ import {
   LibraryItem,
   MusicFolderListArgs,
   MusicFolderListResponse,
-  RatingArgs,
+  SetRatingArgs,
   RatingResponse,
   ScrobbleArgs,
   ScrobbleResponse,
@@ -208,10 +208,7 @@ const createFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
     throw new Error('Failed to create favorite');
   }
 
-  return {
-    id: query.id,
-    type: query.type,
-  };
+  return null;
 };
 
 const removeFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => {
@@ -229,13 +226,10 @@ const removeFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
     throw new Error('Failed to delete favorite');
   }
 
-  return {
-    id: query.id,
-    type: query.type,
-  };
+  return null;
 };
 
-const setRating = async (args: RatingArgs): Promise<RatingResponse> => {
+const setRating = async (args: SetRatingArgs): Promise<RatingResponse> => {
   const { query, apiClientProps } = args;
 
   const itemIds = query.item.map((item) => item.id);

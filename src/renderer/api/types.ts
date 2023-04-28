@@ -1,50 +1,20 @@
 import {
   JFSortOrder,
-  JFGenreList,
-  JFAlbumList,
   JFAlbumListSort,
-  JFAlbumDetail,
-  JFSongList,
   JFSongListSort,
-  JFAlbumArtistList,
   JFAlbumArtistListSort,
-  JFAlbumArtistDetail,
-  JFArtistList,
   JFArtistListSort,
-  JFPlaylistList,
-  JFPlaylistDetail,
-  JFMusicFolderList,
   JFPlaylistListSort,
 } from '/@/renderer/api/jellyfin.types';
 import {
   NDSortOrder,
   NDOrder,
-  NDGenreList,
-  NDAlbumList,
   NDAlbumListSort,
-  NDAlbumDetail,
-  NDSongList,
-  NDSongDetail,
-  NDAlbumArtistList,
   NDAlbumArtistListSort,
-  NDAlbumArtistDetail,
-  NDDeletePlaylist,
-  NDPlaylistList,
   NDPlaylistListSort,
-  NDPlaylistDetail,
   NDSongListSort,
-  NDUserList,
   NDUserListSort,
 } from '/@/renderer/api/navidrome.types';
-import {
-  SSAlbumList,
-  SSAlbumDetail,
-  SSAlbumArtistList,
-  SSAlbumArtistDetail,
-  SSMusicFolderList,
-  SSGenreList,
-  SSTopSongList,
-} from '/@/renderer/api/subsonic.types';
 
 export enum LibraryItem {
   ALBUM = 'album',
@@ -305,14 +275,13 @@ export type MusicFoldersResponse = MusicFolder[];
 export type ListSortOrder = NDOrder | JFSortOrder;
 
 type BaseEndpointArgs = {
-  _serverId?: string;
-  server: ServerListItem | null;
-  signal?: AbortSignal;
+  apiClientProps: {
+    server: ServerListItem;
+    signal?: AbortSignal;
+  };
 };
 
 // Genre List
-export type RawGenreListResponse = NDGenreList | JFGenreList | SSGenreList | undefined;
-
 export type GenreListResponse = BasePaginatedResponse<Genre[]> | null | undefined;
 
 export type GenreListArgs = { query: GenreListQuery } & BaseEndpointArgs;
@@ -320,8 +289,6 @@ export type GenreListArgs = { query: GenreListQuery } & BaseEndpointArgs;
 export type GenreListQuery = null;
 
 // Album List
-export type RawAlbumListResponse = NDAlbumList | SSAlbumList | JFAlbumList | undefined;
-
 export type AlbumListResponse = BasePaginatedResponse<Album[]> | null | undefined;
 
 export enum AlbumListSort {
@@ -343,31 +310,33 @@ export enum AlbumListSort {
 }
 
 export type AlbumListQuery = {
-  artistIds?: string[];
-  jfParams?: {
-    albumArtistIds?: string;
-    artistIds?: string;
-    contributingArtistIds?: string;
-    filters?: string;
-    genreIds?: string;
-    genres?: string;
-    isFavorite?: boolean;
-    maxYear?: number; // Parses to years
-    minYear?: number; // Parses to years
-    tags?: string;
+  _custom?: {
+    jellyfin?: {
+      albumArtistIds?: string;
+      artistIds?: string;
+      contributingArtistIds?: string;
+      filters?: string;
+      genreIds?: string;
+      genres?: string;
+      isFavorite?: boolean;
+      maxYear?: number; // Parses to years
+      minYear?: number; // Parses to years
+      tags?: string;
+    };
+    navidrome?: {
+      artist_id?: string;
+      compilation?: boolean;
+      genre_id?: string;
+      has_rating?: boolean;
+      name?: string;
+      recently_played?: boolean;
+      starred?: boolean;
+      year?: number;
+    };
   };
+  artistIds?: string[];
   limit?: number;
   musicFolderId?: string;
-  ndParams?: {
-    artist_id?: string;
-    compilation?: boolean;
-    genre_id?: string;
-    has_rating?: boolean;
-    name?: string;
-    recently_played?: boolean;
-    starred?: boolean;
-    year?: number;
-  };
   searchTerm?: string;
   sortBy: AlbumListSort;
   sortOrder: SortOrder;
@@ -437,8 +406,6 @@ export const albumListSortMap: AlbumListSortMap = {
 };
 
 // Album Detail
-export type RawAlbumDetailResponse = NDAlbumDetail | SSAlbumDetail | JFAlbumDetail | undefined;
-
 export type AlbumDetailResponse = Album | null | undefined;
 
 export type AlbumDetailQuery = { id: string };
@@ -446,8 +413,6 @@ export type AlbumDetailQuery = { id: string };
 export type AlbumDetailArgs = { query: AlbumDetailQuery } & BaseEndpointArgs;
 
 // Song List
-export type RawSongListResponse = NDSongList | JFSongList | undefined;
-
 export type SongListResponse = BasePaginatedResponse<Song[]>;
 
 export enum SongListSort {
@@ -472,33 +437,35 @@ export enum SongListSort {
 }
 
 export type SongListQuery = {
+  _custom?: {
+    jellyfin?: {
+      artistIds?: string;
+      contributingArtistIds?: string;
+      filters?: string;
+      genreIds?: string;
+      genres?: string;
+      includeItemTypes: 'Audio';
+      isFavorite?: boolean;
+      maxYear?: number; // Parses to years
+      minYear?: number; // Parses to years
+      sortBy?: JFSongListSort;
+      years?: string;
+    };
+    navidrome?: {
+      album_id?: string[];
+      artist_id?: string[];
+      compilation?: boolean;
+      genre_id?: string;
+      has_rating?: boolean;
+      starred?: boolean;
+      title?: string;
+      year?: number;
+    };
+  };
   albumIds?: string[];
   artistIds?: string[];
-  jfParams?: {
-    artistIds?: string;
-    contributingArtistIds?: string;
-    filters?: string;
-    genreIds?: string;
-    genres?: string;
-    includeItemTypes: 'Audio';
-    isFavorite?: boolean;
-    maxYear?: number; // Parses to years
-    minYear?: number; // Parses to years
-    sortBy?: JFSongListSort;
-    years?: string;
-  };
   limit?: number;
   musicFolderId?: string;
-  ndParams?: {
-    album_id?: string[];
-    artist_id?: string[];
-    compilation?: boolean;
-    genre_id?: string;
-    has_rating?: boolean;
-    starred?: boolean;
-    title?: string;
-    year?: number;
-  };
   searchTerm?: string;
   sortBy: SongListSort;
   sortOrder: SortOrder;
@@ -577,8 +544,6 @@ export const songListSortMap: SongListSortMap = {
 };
 
 // Song Detail
-export type RawSongDetailResponse = NDSongDetail | undefined;
-
 export type SongDetailResponse = Song | null | undefined;
 
 export type SongDetailQuery = { id: string };
@@ -586,13 +551,7 @@ export type SongDetailQuery = { id: string };
 export type SongDetailArgs = { query: SongDetailQuery } & BaseEndpointArgs;
 
 // Album Artist List
-export type RawAlbumArtistListResponse =
-  | NDAlbumArtistList
-  | SSAlbumArtistList
-  | JFAlbumArtistList
-  | undefined;
-
-export type AlbumArtistListResponse = BasePaginatedResponse<AlbumArtist[]>;
+export type AlbumArtistListResponse = BasePaginatedResponse<AlbumArtist[]> | null;
 
 export enum AlbumArtistListSort {
   ALBUM = 'album',
@@ -609,13 +568,15 @@ export enum AlbumArtistListSort {
 }
 
 export type AlbumArtistListQuery = {
+  _custom?: {
+    navidrome?: {
+      genre_id?: string;
+      name?: string;
+      starred?: boolean;
+    };
+  };
   limit?: number;
   musicFolderId?: string;
-  ndParams?: {
-    genre_id?: string;
-    name?: string;
-    starred?: boolean;
-  };
   searchTerm?: string;
   sortBy: AlbumArtistListSort;
   sortOrder: SortOrder;
@@ -673,21 +634,14 @@ export const albumArtistListSortMap: AlbumArtistListSortMap = {
 };
 
 // Album Artist Detail
-export type RawAlbumArtistDetailResponse =
-  | NDAlbumArtistDetail
-  | SSAlbumArtistDetail
-  | JFAlbumArtistDetail
-  | undefined;
 
-export type AlbumArtistDetailResponse = BasePaginatedResponse<AlbumArtist[]>;
+export type AlbumArtistDetailResponse = AlbumArtist | null;
 
 export type AlbumArtistDetailQuery = { id: string };
 
 export type AlbumArtistDetailArgs = { query: AlbumArtistDetailQuery } & BaseEndpointArgs;
 
 // Artist List
-export type RawArtistListResponse = JFArtistList | undefined;
-
 export type ArtistListResponse = BasePaginatedResponse<Artist[]>;
 
 export enum ArtistListSort {
@@ -705,13 +659,15 @@ export enum ArtistListSort {
 }
 
 export type ArtistListQuery = {
+  _custom?: {
+    navidrome?: {
+      genre_id?: string;
+      name?: string;
+      starred?: boolean;
+    };
+  };
   limit?: number;
   musicFolderId?: string;
-  ndParams?: {
-    genre_id?: string;
-    name?: string;
-    starred?: boolean;
-  };
   sortBy: ArtistListSort;
   sortOrder: SortOrder;
   startIndex: number;
@@ -770,31 +726,29 @@ export const artistListSortMap: ArtistListSortMap = {
 // Artist Detail
 
 // Favorite
-export type RawFavoriteResponse = FavoriteResponse | undefined;
-
-export type FavoriteResponse = { id: string[]; type: LibraryItem };
+export type FavoriteResponse = null | undefined;
 
 export type FavoriteQuery = {
   id: string[];
+  serverId: string;
   type: LibraryItem;
 };
 
 export type FavoriteArgs = { query: FavoriteQuery } & BaseEndpointArgs;
 
 // Rating
-export type RawRatingResponse = RatingResponse | undefined;
-
-export type RatingResponse = null;
+export type RatingResponse = null | undefined;
 
 export type RatingQuery = {
   item: AnyLibraryItems;
   rating: number;
+  serverId: string;
 };
 
-export type RatingArgs = { query: RatingQuery } & BaseEndpointArgs;
+export type SetRatingArgs = { query: RatingQuery } & BaseEndpointArgs;
 
 // Add to playlist
-export type RawAddToPlaylistResponse = null | undefined;
+export type AddToPlaylistResponse = null | undefined;
 
 export type AddToPlaylistQuery = {
   id: string;
@@ -810,7 +764,7 @@ export type AddToPlaylistArgs = {
 } & BaseEndpointArgs;
 
 // Remove from playlist
-export type RawRemoveFromPlaylistResponse = null | undefined;
+export type RemoveFromPlaylistResponse = null | undefined;
 
 export type RemoveFromPlaylistQuery = {
   id: string;
@@ -820,27 +774,25 @@ export type RemoveFromPlaylistQuery = {
 export type RemoveFromPlaylistArgs = { query: RemoveFromPlaylistQuery } & BaseEndpointArgs;
 
 // Create Playlist
-export type RawCreatePlaylistResponse = CreatePlaylistResponse | undefined;
-
 export type CreatePlaylistResponse = { id: string; name: string };
 
 export type CreatePlaylistBody = {
+  _custom?: {
+    navidrome?: {
+      owner?: string;
+      ownerId?: string;
+      public?: boolean;
+      rules?: Record<string, any>;
+      sync?: boolean;
+    };
+  };
   comment?: string;
   name: string;
-  ndParams?: {
-    owner?: string;
-    ownerId?: string;
-    public?: boolean;
-    rules?: Record<string, any>;
-    sync?: boolean;
-  };
 };
 
 export type CreatePlaylistArgs = { body: CreatePlaylistBody } & BaseEndpointArgs;
 
 // Update Playlist
-export type RawUpdatePlaylistResponse = UpdatePlaylistResponse | undefined;
-
 export type UpdatePlaylistResponse = { id: string };
 
 export type UpdatePlaylistQuery = {
@@ -848,16 +800,18 @@ export type UpdatePlaylistQuery = {
 };
 
 export type UpdatePlaylistBody = {
+  _custom?: {
+    navidrome?: {
+      owner?: string;
+      ownerId?: string;
+      public?: boolean;
+      rules?: Record<string, any>;
+      sync?: boolean;
+    };
+  };
   comment?: string;
   genres?: Genre[];
   name: string;
-  ndParams?: {
-    owner?: string;
-    ownerId?: string;
-    public?: boolean;
-    rules?: Record<string, any>;
-    sync?: boolean;
-  };
 };
 
 export type UpdatePlaylistArgs = {
@@ -866,17 +820,13 @@ export type UpdatePlaylistArgs = {
 } & BaseEndpointArgs;
 
 // Delete Playlist
-export type RawDeletePlaylistResponse = NDDeletePlaylist | undefined;
-
-export type DeletePlaylistResponse = null;
+export type DeletePlaylistResponse = null | undefined;
 
 export type DeletePlaylistQuery = { id: string };
 
 export type DeletePlaylistArgs = { query: DeletePlaylistQuery } & BaseEndpointArgs;
 
 // Playlist List
-export type RawPlaylistListResponse = NDPlaylistList | JFPlaylistList | undefined;
-
 export type PlaylistListResponse = BasePaginatedResponse<Playlist[]>;
 
 export enum PlaylistListSort {
@@ -889,11 +839,13 @@ export enum PlaylistListSort {
 }
 
 export type PlaylistListQuery = {
-  limit?: number;
-  ndParams?: {
-    owner_id?: string;
-    smart?: boolean;
+  _custom?: {
+    navidrome?: {
+      owner_id?: string;
+      smart?: boolean;
+    };
   };
+  limit?: number;
   searchTerm?: string;
   sortBy: PlaylistListSort;
   sortOrder: SortOrder;
@@ -936,9 +888,7 @@ export const playlistListSortMap: PlaylistListSortMap = {
 };
 
 // Playlist Detail
-export type RawPlaylistDetailResponse = NDPlaylistDetail | JFPlaylistDetail | undefined;
-
-export type PlaylistDetailResponse = BasePaginatedResponse<Playlist[]>;
+export type PlaylistDetailResponse = Playlist;
 
 export type PlaylistDetailQuery = {
   id: string;
@@ -947,8 +897,6 @@ export type PlaylistDetailQuery = {
 export type PlaylistDetailArgs = { query: PlaylistDetailQuery } & BaseEndpointArgs;
 
 // Playlist Songs
-export type RawPlaylistSongListResponse = JFSongList | undefined;
-
 export type PlaylistSongListResponse = BasePaginatedResponse<Song[]>;
 
 export type PlaylistSongListQuery = {
@@ -962,16 +910,12 @@ export type PlaylistSongListQuery = {
 export type PlaylistSongListArgs = { query: PlaylistSongListQuery } & BaseEndpointArgs;
 
 // Music Folder List
-export type RawMusicFolderListResponse = SSMusicFolderList | JFMusicFolderList | undefined;
-
-export type MusicFolderListResponse = BasePaginatedResponse<Playlist[]>;
+export type MusicFolderListResponse = BasePaginatedResponse<MusicFolder[]>;
 
 export type MusicFolderListArgs = BaseEndpointArgs;
 
 // User list
 // Playlist List
-export type RawUserListResponse = NDUserList | undefined;
-
 export type UserListResponse = BasePaginatedResponse<User[]>;
 
 export enum UserListSort {
@@ -979,10 +923,12 @@ export enum UserListSort {
 }
 
 export type UserListQuery = {
-  limit?: number;
-  ndParams?: {
-    owner_id?: string;
+  _custom?: {
+    navidrome?: {
+      owner_id?: string;
+    };
   };
+  limit?: number;
   searchTerm?: string;
   sortBy: UserListSort;
   sortOrder: SortOrder;
@@ -1010,8 +956,6 @@ export const userListSortMap: UserListSortMap = {
 };
 
 // Top Songs List
-export type RawTopSongListResponse = SSTopSongList | JFSongList | undefined;
-
 export type TopSongListResponse = BasePaginatedResponse<Song[]>;
 
 export type TopSongListQuery = {
@@ -1032,7 +976,7 @@ export type ArtistInfoQuery = {
 export type ArtistInfoArgs = { query: ArtistInfoQuery } & BaseEndpointArgs;
 
 // Scrobble
-export type RawScrobbleResponse = null | undefined;
+export type ScrobbleResponse = null | undefined;
 
 export type ScrobbleArgs = {
   query: ScrobbleQuery;

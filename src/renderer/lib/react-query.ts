@@ -36,6 +36,16 @@ export const queryClient = new QueryClient({
   queryCache,
 });
 
+export type QueryHookArgs<T> = {
+  options?: QueryOptions;
+  query: T;
+  serverId?: string;
+};
+
+export type MutationHookArgs = {
+  options?: MutationOptions;
+};
+
 export type QueryOptions = {
   cacheTime?: UseQueryOptions['cacheTime'];
   enabled?: UseQueryOptions['enabled'];
