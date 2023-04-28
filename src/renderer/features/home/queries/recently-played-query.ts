@@ -1,20 +1,13 @@
-import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '/@/renderer/api';
-import { ndNormalize } from '/@/renderer/api/navidrome.api';
-import { NDAlbum } from '/@/renderer/api/navidrome.types';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import {
-  AlbumListQuery,
-  AlbumListSort,
-  RawAlbumListResponse,
-  SortOrder,
-} from '/@/renderer/api/types';
-import { useCurrentServer } from '/@/renderer/store';
-import { QueryOptions } from '/@/renderer/lib/react-query';
+import { AlbumListQuery, AlbumListSort, SortOrder } from '/@/renderer/api/types';
+import { getServerById } from '/@/renderer/store';
+import { QueryHookArgs } from '/@/renderer/lib/react-query';
 
-export const useRecentlyPlayed = (query: Partial<AlbumListQuery>, options?: QueryOptions) => {
-  const server = useCurrentServer();
+export const useRecentlyPlayed = (args: QueryHookArgs<Partial<AlbumListQuery>>) => {
+  const { options, query, serverId } = args;
+  const server = getServerById(serverId);
 
   const requestQuery: AlbumListQuery = {
     limit: 5,
@@ -25,34 +18,19 @@ export const useRecentlyPlayed = (query: Partial<AlbumListQuery>, options?: Quer
   };
 
   return useQuery({
-    queryFn: ({ signal }) =>
-      api.controller.getAlbumList({
+    enabled: !!server?.id,
+    queryFn: ({ signal }) => {
+      if (!server) throw new Error('Server not found');
+      return api.controller.getAlbumList({
+        apiClientProps: {
+          server,
+          signal,
+        },
         query: requestQuery,
-        server,
-        signal,
-      }),
-    queryKey: queryKeys.albums.list(server?.id || '', requestQuery),
-    select: useCallback(
-      (data: RawAlbumListResponse | undefined) => {
-        let albums;
-        switch (server?.type) {
-          case 'jellyfin':
-            break;
-          case 'navidrome':
-            albums = data?.items.map((item) => ndNormalize.album(item as NDAlbum, server));
-            break;
-          case 'subsonic':
-            break;
-        }
+      });
+    },
 
-        return {
-          items: albums,
-          startIndex: data?.startIndex,
-          totalRecordCount: data?.totalRecordCount,
-        };
-      },
-      [server],
-    ),
+    queryKey: queryKeys.albums.list(server?.id || '', requestQuery),
     ...options,
   });
 };

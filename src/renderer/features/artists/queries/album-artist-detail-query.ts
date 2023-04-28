@@ -1,23 +1,21 @@
-import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import type { AlbumArtistDetailQuery, RawAlbumArtistDetailResponse } from '/@/renderer/api/types';
-import type { QueryOptions } from '/@/renderer/lib/react-query';
-import { useCurrentServer } from '/@/renderer/store';
+import type { AlbumArtistDetailQuery } from '/@/renderer/api/types';
+import { getServerById } from '/@/renderer/store';
 import { api } from '/@/renderer/api';
+import { QueryHookArgs } from '../../../lib/react-query';
 
-export const useAlbumArtistDetail = (query: AlbumArtistDetailQuery, options?: QueryOptions) => {
-  const server = useCurrentServer();
+export const useAlbumArtistDetail = (args: QueryHookArgs<AlbumArtistDetailQuery>) => {
+  const { options, query, serverId } = args || {};
+  const server = getServerById(serverId);
 
   return useQuery({
     enabled: !!server?.id && !!query.id,
-    queryFn: ({ signal }) => api.controller.getAlbumArtistDetail({ query, server, signal }),
+    queryFn: ({ signal }) => {
+      if (!server) throw new Error('Server not found');
+      return api.controller.getAlbumArtistDetail({ apiClientProps: { server, signal }, query });
+    },
     queryKey: queryKeys.albumArtists.detail(server?.id || '', query),
-    select: useCallback(
-      (data: RawAlbumArtistDetailResponse | undefined) =>
-        api.normalize.albumArtistDetail(data, server),
-      [server],
-    ),
     ...options,
   });
 };

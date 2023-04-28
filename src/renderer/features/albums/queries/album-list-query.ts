@@ -1,23 +1,27 @@
-import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import type { AlbumListQuery, RawAlbumListResponse } from '/@/renderer/api/types';
-import type { QueryOptions } from '/@/renderer/lib/react-query';
-import { useCurrentServer } from '/@/renderer/store';
-import { api } from '/@/renderer/api';
+import type { AlbumListQuery } from '/@/renderer/api/types';
+import type { QueryHookArgs } from '/@/renderer/lib/react-query';
+import { getServerById } from '/@/renderer/store';
 
-export const useAlbumList = (query: AlbumListQuery, options?: QueryOptions) => {
-  const server = useCurrentServer();
+export const useAlbumList = (args: QueryHookArgs<AlbumListQuery>) => {
+  const { options, query, serverId } = args;
+  const server = getServerById(serverId);
 
   return useQuery({
-    enabled: !!server?.id,
-    queryFn: ({ signal }) => controller.getAlbumList({ query, server, signal }),
-    queryKey: queryKeys.albums.list(server?.id || '', query),
-    select: useCallback(
-      (data: RawAlbumListResponse | undefined) => api.normalize.albumList(data, server),
-      [server],
-    ),
+    enabled: !!serverId,
+    queryFn: ({ signal }) => {
+      if (!server) throw new Error('Server not found');
+      return controller.getAlbumList({
+        apiClientProps: {
+          server,
+          signal,
+        },
+        query,
+      });
+    },
+    queryKey: queryKeys.albums.list(serverId || '', query),
     ...options,
   });
 };
