@@ -278,10 +278,7 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
     throw new Error('Failed to create playlist');
   }
 
-  return {
-    id: res.body.data.id,
-    name: body.name,
-  };
+  return null;
 };
 
 const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistResponse> => {
@@ -304,9 +301,7 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
     throw new Error('Failed to update playlist');
   }
 
-  return {
-    id: res.body.data.id,
-  };
+  return null;
 };
 
 const deletePlaylist = async (args: DeletePlaylistArgs): Promise<DeletePlaylistResponse> => {

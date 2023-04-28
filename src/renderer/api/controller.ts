@@ -7,7 +7,7 @@ import type {
   SongDetailArgs,
   AlbumArtistDetailArgs,
   AlbumArtistListArgs,
-  RatingArgs,
+  SetRatingArgs,
   GenreListArgs,
   CreatePlaylistArgs,
   DeletePlaylistArgs,
@@ -79,8 +79,8 @@ export type ControllerEndpoint = Partial<{
   getUserList: (args: UserListArgs) => Promise<UserListResponse>;
   removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
   scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
+  setRating: (args: SetRatingArgs) => Promise<RatingResponse>;
   updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
-  updateRating: (args: RatingArgs) => Promise<RatingResponse>;
 }>;
 
 type ApiController = {
@@ -119,8 +119,8 @@ const endpoints: ApiController = {
     getUserList: undefined,
     removeFromPlaylist: jellyfinApi.removeFromPlaylist,
     scrobble: jellyfinApi.scrobble,
+    setRating: undefined,
     updatePlaylist: jellyfinApi.updatePlaylist,
-    updateRating: undefined,
   },
   navidrome: {
     addToPlaylist: ndController.addToPlaylist,
@@ -151,8 +151,8 @@ const endpoints: ApiController = {
     getUserList: ndController.getUserList,
     removeFromPlaylist: ndController.removeFromPlaylist,
     scrobble: ssController.scrobble,
+    setRating: ssController.setRating,
     updatePlaylist: ndController.updatePlaylist,
-    updateRating: ssController.setRating,
   },
   subsonic: {
     clearPlaylist: undefined,
@@ -180,8 +180,8 @@ const endpoints: ApiController = {
     getTopSongs: ssController.getTopSongList,
     getUserList: undefined,
     scrobble: ssController.scrobble,
+    setRating: undefined,
     updatePlaylist: undefined,
-    updateRating: undefined,
   },
 };
 
@@ -286,8 +286,8 @@ const deleteFavorite = async (args: FavoriteArgs) => {
   return (apiController('deleteFavorite') as ControllerEndpoint['deleteFavorite'])?.(args);
 };
 
-const updateRating = async (args: RatingArgs) => {
-  return (apiController('updateRating') as ControllerEndpoint['updateRating'])?.(args);
+const updateRating = async (args: SetRatingArgs) => {
+  return (apiController('setRating') as ControllerEndpoint['setRating'])?.(args);
 };
 
 const getTopSongList = async (args: TopSongListArgs) => {
@@ -295,7 +295,7 @@ const getTopSongList = async (args: TopSongListArgs) => {
 };
 
 const scrobble = async (args: ScrobbleArgs) => {
-  return (apiController('scrobble', args.server) as ControllerEndpoint['scrobble'])?.(args);
+  return (apiController('scrobble') as ControllerEndpoint['scrobble'])?.(args);
 };
 
 export const controller = {

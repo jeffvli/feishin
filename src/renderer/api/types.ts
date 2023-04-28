@@ -730,11 +730,10 @@ export type FavoriteResponse = null | undefined;
 
 export type FavoriteQuery = {
   id: string[];
-  serverId: string;
   type: LibraryItem;
 };
 
-export type FavoriteArgs = { query: FavoriteQuery } & BaseEndpointArgs;
+export type FavoriteArgs = { query: FavoriteQuery; serverId: string } & BaseEndpointArgs;
 
 // Rating
 export type RatingResponse = null | undefined;
@@ -742,10 +741,9 @@ export type RatingResponse = null | undefined;
 export type RatingQuery = {
   item: AnyLibraryItems;
   rating: number;
-  serverId: string;
 };
 
-export type SetRatingArgs = { query: RatingQuery } & BaseEndpointArgs;
+export type SetRatingArgs = { query: RatingQuery; serverId: string } & BaseEndpointArgs;
 
 // Add to playlist
 export type AddToPlaylistResponse = null | undefined;
@@ -761,6 +759,7 @@ export type AddToPlaylistBody = {
 export type AddToPlaylistArgs = {
   body: AddToPlaylistBody;
   query: AddToPlaylistQuery;
+  serverId: string;
 } & BaseEndpointArgs;
 
 // Remove from playlist
@@ -771,10 +770,13 @@ export type RemoveFromPlaylistQuery = {
   songId: string[];
 };
 
-export type RemoveFromPlaylistArgs = { query: RemoveFromPlaylistQuery } & BaseEndpointArgs;
+export type RemoveFromPlaylistArgs = {
+  query: RemoveFromPlaylistQuery;
+  serverId: string;
+} & BaseEndpointArgs;
 
 // Create Playlist
-export type CreatePlaylistResponse = { id: string; name: string };
+export type CreatePlaylistResponse = null | undefined;
 
 export type CreatePlaylistBody = {
   _custom?: {
@@ -790,10 +792,10 @@ export type CreatePlaylistBody = {
   name: string;
 };
 
-export type CreatePlaylistArgs = { body: CreatePlaylistBody } & BaseEndpointArgs;
+export type CreatePlaylistArgs = { body: CreatePlaylistBody; serverId: string } & BaseEndpointArgs;
 
 // Update Playlist
-export type UpdatePlaylistResponse = { id: string };
+export type UpdatePlaylistResponse = null | undefined;
 
 export type UpdatePlaylistQuery = {
   id: string;
@@ -817,6 +819,7 @@ export type UpdatePlaylistBody = {
 export type UpdatePlaylistArgs = {
   body: UpdatePlaylistBody;
   query: UpdatePlaylistQuery;
+  serverId: string;
 } & BaseEndpointArgs;
 
 // Delete Playlist
@@ -824,7 +827,10 @@ export type DeletePlaylistResponse = null | undefined;
 
 export type DeletePlaylistQuery = { id: string };
 
-export type DeletePlaylistArgs = { query: DeletePlaylistQuery } & BaseEndpointArgs;
+export type DeletePlaylistArgs = {
+  query: DeletePlaylistQuery;
+  serverId: string;
+} & BaseEndpointArgs;
 
 // Playlist List
 export type PlaylistListResponse = BasePaginatedResponse<Playlist[]>;
@@ -980,6 +986,7 @@ export type ScrobbleResponse = null | undefined;
 
 export type ScrobbleArgs = {
   query: ScrobbleQuery;
+  serverId: string;
 } & BaseEndpointArgs;
 
 export type ScrobbleQuery = {
