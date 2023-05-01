@@ -5,9 +5,9 @@ import { QueueSong, LibraryItem } from '/@/renderer/api/types';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 
 const getCoverArtUrl = (args: {
-  baseUrl: string;
+  baseUrl: string | undefined;
   coverArtId?: string;
-  credential: string;
+  credential: string | undefined;
   size: number;
 }) => {
   const size = args.size ? args.size : 150;
@@ -28,18 +28,18 @@ const getCoverArtUrl = (args: {
 
 const normalizeSong = (
   item: z.infer<typeof ssType._response.song>,
-  server: ServerListItem,
+  server: ServerListItem | null,
   deviceId: string,
 ): QueueSong => {
   const imageUrl =
     getCoverArtUrl({
-      baseUrl: server.url,
+      baseUrl: server?.url,
       coverArtId: item.coverArt,
-      credential: server.credential,
-      size: 300,
+      credential: server?.credential,
+      size: 100,
     }) || null;
 
-  const streamUrl = `${server.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=feishin_${deviceId}&${server.credential}`;
+  const streamUrl = `${server?.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=feishin_${deviceId}&${server?.credential}`;
 
   return {
     album: item.album || '',
@@ -86,7 +86,7 @@ const normalizeSong = (
     playCount: item?.playCount || 0,
     releaseDate: null,
     releaseYear: item.year ? String(item.year) : null,
-    serverId: server.id,
+    serverId: server?.id || 'unknown',
     serverType: ServerType.SUBSONIC,
     size: item.size,
     streamUrl,

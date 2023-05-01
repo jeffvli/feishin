@@ -5,9 +5,9 @@ import z from 'zod';
 import { ndType } from './navidrome-types';
 
 const getCoverArtUrl = (args: {
-  baseUrl: string;
+  baseUrl: string | undefined;
   coverArtId: string;
-  credential: string;
+  credential: string | undefined;
   size: number;
 }) => {
   const size = args.size ? args.size : 250;
@@ -28,7 +28,7 @@ const getCoverArtUrl = (args: {
 
 const normalizeSong = (
   item: z.infer<typeof ndType._response.song> | z.infer<typeof ndType._response.playlistSong>,
-  server: ServerListItem,
+  server: ServerListItem | null,
   deviceId: string,
   imageSize?: number,
 ): Song => {
@@ -44,9 +44,9 @@ const normalizeSong = (
   }
 
   const imageUrl = getCoverArtUrl({
-    baseUrl: server.url,
+    baseUrl: server?.url,
     coverArtId: id,
-    credential: server.credential,
+    credential: server?.credential,
     size: imageSize || 100,
   });
 
@@ -79,10 +79,10 @@ const normalizeSong = (
     playlistItemId,
     releaseDate: new Date(item.year, 0, 1).toISOString(),
     releaseYear: String(item.year),
-    serverId: server.id,
+    serverId: server?.id || 'unknown',
     serverType: ServerType.NAVIDROME,
     size: item.size,
-    streamUrl: `${server.url}/rest/stream.view?id=${id}&v=1.13.0&c=feishin_${deviceId}&${server.credential}`,
+    streamUrl: `${server?.url}/rest/stream.view?id=${id}&v=1.13.0&c=feishin_${deviceId}&${server?.credential}`,
     trackNumber: item.trackNumber,
     uniqueId: nanoid(),
     updatedAt: item.updatedAt,
@@ -95,13 +95,13 @@ const normalizeAlbum = (
   item: z.infer<typeof ndType._response.album> & {
     songs?: z.infer<typeof ndType._response.songList>;
   },
-  server: ServerListItem,
+  server: ServerListItem | null,
   imageSize?: number,
 ): Album => {
   const imageUrl = getCoverArtUrl({
-    baseUrl: server.url,
+    baseUrl: server?.url,
     coverArtId: item.coverArtId || item.id,
-    credential: server.credential,
+    credential: server?.credential,
     size: imageSize || 300,
   });
 
@@ -126,7 +126,7 @@ const normalizeAlbum = (
     playCount: item.playCount,
     releaseDate: new Date(item.minYear, 0, 1).toISOString(),
     releaseYear: item.minYear,
-    serverId: server.id,
+    serverId: server?.id || 'unknown',
     serverType: ServerType.NAVIDROME,
     size: item.size,
     songCount: item.songCount,
@@ -140,7 +140,7 @@ const normalizeAlbum = (
 
 const normalizeAlbumArtist = (
   item: z.infer<typeof ndType._response.albumArtist>,
-  server: ServerListItem,
+  server: ServerListItem | null,
 ): AlbumArtist => {
   const imageUrl =
     item.largeImageUrl === '/app/artist-placeholder.webp' ? null : item.largeImageUrl;
@@ -157,7 +157,7 @@ const normalizeAlbumArtist = (
     lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
     name: item.name,
     playCount: item.playCount,
-    serverId: server.id,
+    serverId: server?.id || 'unknown',
     serverType: ServerType.NAVIDROME,
     similarArtists: null,
     // similarArtists:
@@ -174,13 +174,13 @@ const normalizeAlbumArtist = (
 
 const normalizePlaylist = (
   item: z.infer<typeof ndType._response.playlist>,
-  server: ServerListItem,
+  server: ServerListItem | null,
   imageSize?: number,
 ): Playlist => {
   const imageUrl = getCoverArtUrl({
-    baseUrl: server.url,
+    baseUrl: server?.url,
     coverArtId: item.id,
-    credential: server.credential,
+    credential: server?.credential,
     size: imageSize || 300,
   });
 
@@ -199,7 +199,7 @@ const normalizePlaylist = (
     ownerId: item.ownerId,
     public: item.public,
     rules: item?.rules || null,
-    serverId: server.id,
+    serverId: server?.id || 'unknown',
     serverType: ServerType.NAVIDROME,
     size: item.size,
     songCount: item.songCount,

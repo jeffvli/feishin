@@ -1,8 +1,9 @@
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { Method, AxiosError, isAxiosError, AxiosResponse } from 'axios';
+import { z } from 'zod';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
 import { ServerListItem } from '/@/renderer/api/types';
-import { toast } from '/@/renderer/components';
+import { toast } from '/@/renderer/components/toast/index';
 
 const c = initContract();
 
@@ -88,7 +89,7 @@ axiosClient.interceptors.response.use(
       }
     }
 
-    return data['subsonic-response'];
+    return response;
   },
   (error) => {
     return Promise.reject(error);
@@ -96,7 +97,7 @@ axiosClient.interceptors.response.use(
 );
 
 export const ssApiClient = (args: {
-  server?: ServerListItem;
+  server: ServerListItem | null;
   signal?: AbortSignal;
   url?: string;
 }) => {
@@ -124,7 +125,7 @@ export const ssApiClient = (args: {
       }
 
       try {
-        const result = await axiosClient.request({
+        const result = await axiosClient.request<z.infer<typeof ssType._response.baseResponse>>({
           data: body,
           headers,
           method: method as Method,
@@ -137,8 +138,9 @@ export const ssApiClient = (args: {
           signal,
           url: `${baseUrl}/${path}`,
         });
+
         return {
-          body: { data: result.data, headers: result.headers },
+          body: result.data['subsonic-response'],
           status: result.status,
         };
       } catch (e: Error | AxiosError | any) {
@@ -146,7 +148,7 @@ export const ssApiClient = (args: {
           const error = e as AxiosError;
           const response = error.response as AxiosResponse;
           return {
-            body: { data: response.data, headers: response.headers },
+            body: response.data,
             status: response.status,
           };
         }

@@ -55,7 +55,7 @@ const authenticate = async (
     };
   }
 
-  await ssApiClient({ url: cleanServerUrl }).authenticate({
+  await ssApiClient({ server: null, url: cleanServerUrl }).authenticate({
     query: {
       c: 'Feishin',
       f: 'json',
@@ -261,9 +261,11 @@ const getTopSongList = async (args: TopSongListArgs): Promise<SongListResponse> 
   }
 
   return {
-    items: res.body.topSongs.song.map((song) => ssNormalize.song(song, apiClientProps.server, '')),
+    items:
+      res.body.topSongs?.song?.map((song) => ssNormalize.song(song, apiClientProps.server, '')) ||
+      [],
     startIndex: 0,
-    totalRecordCount: res.body.topSongs.song.length || 0,
+    totalRecordCount: res.body.topSongs?.song?.length || 0,
   };
 };
 

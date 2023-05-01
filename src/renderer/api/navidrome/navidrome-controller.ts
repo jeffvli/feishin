@@ -49,7 +49,7 @@ const authenticate = async (
 ): Promise<AuthenticationResponse> => {
   const cleanServerUrl = url.replace(/\/$/, '');
 
-  const res = await ndApiClient({ url: cleanServerUrl }).authenticate({
+  const res = await ndApiClient({ server: null, url: cleanServerUrl }).authenticate({
     body: {
       password: body.password,
       username: body.username,
@@ -148,10 +148,6 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<AlbumArtis
     throw new Error('Failed to get album artist list');
   }
 
-  if (!apiClientProps.server) {
-    throw new Error('Server is required');
-  }
-
   return {
     items: res.body.data.map((albumArtist) =>
       ndNormalize.albumArtist(albumArtist, apiClientProps.server),
@@ -219,8 +215,6 @@ const getAlbumList = async (args: AlbumListArgs): Promise<AlbumListResponse> => 
 const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
   const { query, apiClientProps } = args;
 
-  console.log('query :>> ', query);
-
   const res = await ndApiClient(apiClientProps).getSongList({
     query: {
       _end: query.startIndex + (query.limit || -1),
@@ -278,7 +272,9 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
     throw new Error('Failed to create playlist');
   }
 
-  return null;
+  return {
+    id: res.body.data.id,
+  };
 };
 
 const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistResponse> => {

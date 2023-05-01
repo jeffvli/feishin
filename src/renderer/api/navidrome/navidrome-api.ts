@@ -4,7 +4,7 @@ import omitBy from 'lodash/omitBy';
 import qs from 'qs';
 import { ndType } from './navidrome-types';
 import { resultWithHeaders } from '/@/renderer/api/utils';
-import { toast } from '/@/renderer/components';
+import { toast } from '/@/renderer/components/toast/index';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem } from '/@/renderer/types';
 
@@ -186,9 +186,12 @@ axiosClient.interceptors.response.use(
         message: 'Your session has expired.',
       });
 
-      const serverId = useAuthStore.getState().currentServer?.id;
+      const currentServer = useAuthStore.getState().currentServer;
 
-      if (serverId) {
+      if (currentServer) {
+        const serverId = currentServer.id;
+        const token = currentServer.ndCredential;
+        console.log(`token is expired: ${token}`);
         useAuthStore.getState().actions.setCurrentServer(null);
         useAuthStore.getState().actions.updateServer(serverId, { ndCredential: undefined });
       }
@@ -211,7 +214,7 @@ const parsePath = (fullPath: string) => {
 };
 
 export const ndApiClient = (args: {
-  server?: ServerListItem;
+  server: ServerListItem | null;
   signal?: AbortSignal;
   url?: string;
 }) => {

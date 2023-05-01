@@ -276,7 +276,7 @@ export type ListSortOrder = NDOrder | JFSortOrder;
 
 type BaseEndpointArgs = {
   apiClientProps: {
-    server: ServerListItem;
+    server: ServerListItem | null;
     signal?: AbortSignal;
   };
 };
@@ -776,7 +776,7 @@ export type RemoveFromPlaylistArgs = {
 } & BaseEndpointArgs;
 
 // Create Playlist
-export type CreatePlaylistResponse = null | undefined;
+export type CreatePlaylistResponse = { id: string } | undefined;
 
 export type CreatePlaylistBody = {
   _custom?: {
@@ -917,6 +917,8 @@ export type PlaylistSongListArgs = { query: PlaylistSongListQuery } & BaseEndpoi
 
 // Music Folder List
 export type MusicFolderListResponse = BasePaginatedResponse<MusicFolder[]>;
+
+export type MusicFolderListQuery = null;
 
 export type MusicFolderListArgs = BaseEndpointArgs;
 
