@@ -86,12 +86,15 @@ export const useListStore = create<ListSlice>()(
                 artistIds: [args.id],
                 ...state.item.song.filter,
                 ...state.detail[args.key]?.filter,
-                jfParams: {
-                  ...state.detail[args.key]?.filter.jfParams,
-                  includeItemTypes: 'Audio',
-                },
-                ndParams: {
-                  ...state.detail[args.key]?.filter.ndParams,
+                _custom: {
+                  ...state.detail[args.key]?.filter._custom,
+                  jellyfin: {
+                    ...state.detail[args.key]?.filter._custom.jellyfin,
+                    includeItemTypes: 'Audio',
+                  },
+                  navidrome: {
+                    ...state.detail[args.key]?.filter._custom.navidrome,
+                  },
                 },
               };
             }
@@ -206,8 +209,6 @@ export const useListStore = create<ListSlice>()(
                   state.detail[args.key] = {
                     filter: {
                       ...state.item[page as keyof ListState['item']].filter,
-                      jfParams: {},
-                      ndParams: {},
                     } as FilterType,
                     table: {
                       pagination: {
