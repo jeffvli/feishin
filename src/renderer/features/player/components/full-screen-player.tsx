@@ -5,7 +5,7 @@ import { Variants, motion } from 'framer-motion';
 import { RiArrowDownSLine, RiSettings3Line } from 'react-icons/ri';
 import { useLocation } from 'react-router';
 import styled from 'styled-components';
-import { Button, Option, Popover, Switch, TableConfigDropdown } from '/@/renderer/components';
+import { Button, Option, Popover, Switch } from '/@/renderer/components';
 import {
   useCurrentSong,
   useFullScreenPlayerStore,
@@ -14,6 +14,7 @@ import {
 import { useFastAverageColor } from '../../../hooks/use-fast-average-color';
 import { FullScreenPlayerImage } from '/@/renderer/features/player/components/full-screen-player-image';
 import { FullScreenPlayerQueue } from '/@/renderer/features/player/components/full-screen-player-queue';
+import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 
 const Container = styled(motion.div)`
   z-index: 100;

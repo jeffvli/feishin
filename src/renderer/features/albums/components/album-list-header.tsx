@@ -9,7 +9,7 @@ import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListQuery, LibraryItem } from '/@/renderer/api/types';
-import { PageHeader, SearchInput, VirtualInfiniteGridRef } from '/@/renderer/components';
+import { PageHeader, SearchInput } from '/@/renderer/components';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
@@ -24,6 +24,7 @@ import { AlbumListHeaderFilters } from '/@/renderer/features/albums/components/a
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { useAlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 
 interface AlbumListHeaderProps {
   customFilters?: Partial<AlbumListFilter>;
@@ -54,15 +55,17 @@ export const AlbumListHeader = ({
         limit: take,
         startIndex: skip,
         ...filters,
-        jfParams: {
-          ...filters.jfParams,
-          ...customFilters?.jfParams,
-        },
-        ndParams: {
-          ...filters.ndParams,
-          ...customFilters?.ndParams,
-        },
         ...customFilters,
+        _custom: {
+          jellyfin: {
+            ...filters._custom?.jellyfin,
+            ...customFilters?._custom?.jellyfin,
+          },
+          navidrome: {
+            ...filters._custom?.navidrome,
+            ...customFilters?._custom?.navidrome,
+          },
+        },
       };
 
       const queryKey = queryKeys.albums.list(server?.id || '', query);
@@ -71,14 +74,16 @@ export const AlbumListHeader = ({
         queryKey,
         async ({ signal }) =>
           controller.getAlbumList({
+            apiClientProps: {
+              server,
+              signal,
+            },
             query,
-            server,
-            signal,
           }),
         { cacheTime: 1000 * 60 * 1 },
       );
 
-      return api.normalize.albumList(albums, server);
+      return albums;
     },
     [customFilters, queryClient, server],
   );
@@ -96,13 +101,15 @@ export const AlbumListHeader = ({
               startIndex,
               ...filters,
               ...customFilters,
-              jfParams: {
-                ...filters.jfParams,
-                ...customFilters?.jfParams,
-              },
-              ndParams: {
-                ...filters.ndParams,
-                ...customFilters?.ndParams,
+              _custom: {
+                jellyfin: {
+                  ...filters._custom?.jellyfin,
+                  ...customFilters?._custom?.jellyfin,
+                },
+                navidrome: {
+                  ...filters._custom?.navidrome,
+                  ...customFilters?._custom?.navidrome,
+                },
               },
             };
 
@@ -112,15 +119,16 @@ export const AlbumListHeader = ({
               queryKey,
               async ({ signal }) =>
                 api.controller.getAlbumList({
+                  apiClientProps: {
+                    server,
+                    signal,
+                  },
                   query,
-                  server,
-                  signal,
                 }),
               { cacheTime: 1000 * 60 * 1 },
             );
 
-            const albums = api.normalize.albumList(albumsRes, server);
-            params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || 0);
+            params.successCallback(albumsRes?.items || [], albumsRes?.totalRecordCount || 0);
           },
           rowCount: undefined,
         };
@@ -164,24 +172,26 @@ export const AlbumListHeader = ({
       startIndex: 0,
       ...filter,
       ...customFilters,
-      jfParams: {
-        ...filter.jfParams,
-        ...customFilters?.jfParams,
-      },
-      ndParams: {
-        ...filter.ndParams,
-        ...customFilters?.ndParams,
+      _custom: {
+        jellyfin: {
+          ...filter._custom?.jellyfin,
+          ...customFilters?._custom?.jellyfin,
+        },
+        navidrome: {
+          ...filter._custom?.navidrome,
+          ...customFilters?._custom?.navidrome,
+        },
       },
     };
     const queryKey = queryKeys.albums.list(server?.id || '', query);
 
     const albumListRes = await queryClient.fetchQuery({
-      queryFn: ({ signal }) => api.controller.getAlbumList({ query, server, signal }),
+      queryFn: ({ signal }) =>
+        api.controller.getAlbumList({ apiClientProps: { server, signal }, query }),
       queryKey,
     });
 
-    const albumIds =
-      api.normalize.albumList(albumListRes, server).items?.map((item) => item.id) || [];
+    const albumIds = albumListRes?.items?.map((item) => item.id) || [];
 
     handlePlayQueueAdd?.({
       byItemType: {

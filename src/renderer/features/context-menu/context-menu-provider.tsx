@@ -43,7 +43,7 @@ import {
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useDeletePlaylist } from '/@/renderer/features/playlists';
 import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
-import { useCreateFavorite, useDeleteFavorite, useUpdateRating } from '/@/renderer/features/shared';
+import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
 import { useAuthStore, useCurrentServer, useQueueControls } from '/@/renderer/store';
 import { usePlayerType } from '/@/renderer/store/settings.store';
 import { Play, PlaybackType } from '/@/renderer/types';
@@ -190,7 +190,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     [ctx.data, ctx.type, handlePlayQueueAdd],
   );
 
-  const deletePlaylistMutation = useDeletePlaylist();
+  const deletePlaylistMutation = useDeletePlaylist({});
 
   const handleDeletePlaylist = useCallback(() => {
     for (const item of ctx.data) {
@@ -236,8 +236,8 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     });
   }, [ctx.data, handleDeletePlaylist]);
 
-  const createFavoriteMutation = useCreateFavorite();
-  const deleteFavoriteMutation = useDeleteFavorite();
+  const createFavoriteMutation = useCreateFavorite({});
+  const deleteFavoriteMutation = useDeleteFavorite({});
   const handleAddToFavorites = useCallback(() => {
     if (!ctx.dataNodes && !ctx.data) return;
 
@@ -414,7 +414,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     serverType,
   ]);
 
-  const updateRatingMutation = useUpdateRating();
+  const updateRatingMutation = useSetRating({});
 
   const handleUpdateRating = useCallback(
     (rating: number) => {
@@ -450,11 +450,11 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         updateRatingMutation.mutate(
           {
-            _serverId: serverId,
             query: {
               item: items,
               rating,
             },
+            serverId,
           },
           {
             onSuccess: () => {

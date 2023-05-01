@@ -7,15 +7,7 @@ import { RiSortAsc, RiSortDesc, RiMoreFill, RiRefreshLine, RiSettings3Fill } fro
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { SortOrder, PlaylistListSort } from '/@/renderer/api/types';
-import {
-  DropdownMenu,
-  PLAYLIST_TABLE_COLUMNS,
-  Text,
-  Button,
-  Slider,
-  MultiSelect,
-  Switch,
-} from '/@/renderer/components';
+import { DropdownMenu, Text, Button, Slider, MultiSelect, Switch } from '/@/renderer/components';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
   PlaylistListFilter,
@@ -27,6 +19,7 @@ import {
   useSetPlaylistTablePagination,
 } from '/@/renderer/store';
 import { ListDisplayType, TableColumn } from '/@/renderer/types';
+import { PLAYLIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 
 const FILTERS = {
   jellyfin: [
@@ -91,13 +84,15 @@ export const PlaylistListHeaderFilters = ({ tableRef }: PlaylistListHeaderFilter
             queryKey,
             async ({ signal }) =>
               api.controller.getPlaylistList({
+                apiClientProps: {
+                  server,
+                  signal,
+                },
                 query: {
                   limit,
                   startIndex,
                   ...pageFilters,
                 },
-                server,
-                signal,
               }),
             { cacheTime: 1000 * 60 * 1 },
           );

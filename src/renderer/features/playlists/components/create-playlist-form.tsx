@@ -16,47 +16,54 @@ interface CreatePlaylistFormProps {
 }
 
 export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
-  const mutation = useCreatePlaylist();
+  const mutation = useCreatePlaylist({});
   const server = useCurrentServer();
   const queryBuilderRef = useRef<PlaylistQueryBuilderRef>(null);
 
   const form = useForm<CreatePlaylistBody>({
     initialValues: {
+      _custom: {
+        navidrome: {
+          public: false,
+          rules: undefined,
+        },
+      },
       comment: '',
       name: '',
-      ndParams: {
-        public: false,
-        rules: undefined,
-      },
     },
   });
   const [isSmartPlaylist, setIsSmartPlaylist] = useState(false);
 
   const handleSubmit = form.onSubmit((values) => {
     if (isSmartPlaylist) {
-      values.ndParams = {
-        ...values.ndParams,
+      values._custom!.navidrome = {
+        ...values._custom?.navidrome,
         rules: queryBuilderRef.current?.getFilters(),
       };
     }
 
     const smartPlaylist = queryBuilderRef.current?.getFilters();
 
+    if (!server) return;
+
     mutation.mutate(
       {
         body: {
           ...values,
-          ndParams: {
-            ...values.ndParams,
-            rules:
-              isSmartPlaylist && smartPlaylist?.filters
-                ? {
-                    ...convertQueryGroupToNDQuery(smartPlaylist.filters),
-                    ...smartPlaylist.extraFilters,
-                  }
-                : undefined,
+          _custom: {
+            navidrome: {
+              ...values._custom?.navidrome,
+              rules:
+                isSmartPlaylist && smartPlaylist?.filters
+                  ? {
+                      ...convertQueryGroupToNDQuery(smartPlaylist.filters),
+                      ...smartPlaylist.extraFilters,
+                    }
+                  : undefined,
+            },
           },
         },
+        serverId: server.id,
       },
       {
         onError: (err) => {

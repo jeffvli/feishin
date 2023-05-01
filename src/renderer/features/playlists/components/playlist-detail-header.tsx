@@ -7,6 +7,7 @@ import { LibraryHeader } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { formatDurationString } from '/@/renderer/utils';
 import { LibraryItem } from '/@/renderer/api/types';
+import { useCurrentServer } from '../../../store/auth.store';
 
 interface PlaylistDetailHeaderProps {
   background: string;
@@ -20,7 +21,8 @@ export const PlaylistDetailHeader = forwardRef(
     ref: Ref<HTMLDivElement>,
   ) => {
     const { playlistId } = useParams() as { playlistId: string };
-    const detailQuery = usePlaylistDetail({ id: playlistId });
+    const server = useCurrentServer();
+    const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
 
     const metadataItems = [
       {

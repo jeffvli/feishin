@@ -18,15 +18,7 @@ import {
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { LibraryItem, PlaylistSongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
-import {
-  DropdownMenu,
-  SONG_TABLE_COLUMNS,
-  Button,
-  Slider,
-  MultiSelect,
-  Switch,
-  Text,
-} from '/@/renderer/components';
+import { DropdownMenu, Button, Slider, MultiSelect, Switch, Text } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
@@ -41,6 +33,7 @@ import {
 import { ListDisplayType, ServerType, Play, TableColumn } from '/@/renderer/types';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { useParams } from 'react-router';
+import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 
 const FILTERS = {
   jellyfin: [
@@ -100,7 +93,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
     sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
   };
 
-  const detailQuery = usePlaylistDetail({ id: playlistId });
+  const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
   const isSmartPlaylist = detailQuery.data?.rules;
 
   const handlePlayQueueAdd = usePlayQueueAdd();
@@ -139,14 +132,16 @@ export const PlaylistDetailSongListHeaderFilters = ({
             queryKey,
             async ({ signal }) =>
               api.controller.getPlaylistSongList({
+                apiClientProps: {
+                  server,
+                  signal,
+                },
                 query: {
                   id: playlistId,
                   limit,
                   startIndex,
                   ...filters,
                 },
-                server,
-                signal,
               }),
             { cacheTime: 1000 * 60 * 1 },
           );

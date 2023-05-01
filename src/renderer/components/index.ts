@@ -27,8 +27,6 @@ export * from './text';
 export * from './text-title';
 export * from './toast';
 export * from './tooltip';
-export * from './virtual-grid';
-export * from './virtual-table';
 export * from './motion';
 export * from './context-menu';
 export * from './query-builder';

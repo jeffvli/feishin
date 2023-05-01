@@ -12,6 +12,7 @@ interface JellyfinAlbumFiltersProps {
   handleFilterChange: (filters: AlbumListFilter) => void;
   id?: string;
   pageKey: string;
+  serverId?: string;
 }
 
 export const JellyfinAlbumFilters = ({
@@ -19,24 +20,25 @@ export const JellyfinAlbumFilters = ({
   handleFilterChange,
   pageKey,
   id,
+  serverId,
 }: JellyfinAlbumFiltersProps) => {
   const filter = useAlbumListFilter({ id, key: pageKey });
   const { setFilter } = useListStoreActions();
 
   // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
-  const genreListQuery = useGenreList(null);
+  const genreListQuery = useGenreList({ query: null, serverId });
 
   const genreList = useMemo(() => {
     if (!genreListQuery?.data) return [];
-    return genreListQuery.data.map((genre) => ({
+    return genreListQuery.data.items.map((genre) => ({
       label: genre.name,
       value: genre.id,
     }));
   }, [genreListQuery.data]);
 
   const selectedGenres = useMemo(() => {
-    return filter.jfParams?.genreIds?.split(',');
-  }, [filter.jfParams?.genreIds]);
+    return filter._custom?.jellyfin?.genreIds?.split(',');
+  }, [filter._custom?.jellyfin?.genreIds]);
 
   const toggleFilters = [
     {
@@ -44,17 +46,19 @@ export const JellyfinAlbumFilters = ({
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
         const updatedFilters = setFilter({
           data: {
-            jfParams: {
-              ...filter.jfParams,
-              includeItemTypes: 'Audio',
-              isFavorite: e.currentTarget.checked ? true : undefined,
+            _custom: {
+              ...filter._custom,
+              jellyfin: {
+                ...filter._custom?.jellyfin,
+                isFavorite: e.currentTarget.checked ? true : undefined,
+              },
             },
           },
           key: pageKey,
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
       },
-      value: filter.jfParams?.isFavorite,
+      value: filter._custom?.jellyfin?.isFavorite,
     },
   ];
 
@@ -62,9 +66,12 @@ export const JellyfinAlbumFilters = ({
     if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
     const updatedFilters = setFilter({
       data: {
-        jfParams: {
-          ...filter.jfParams,
-          minYear: e === '' ? undefined : (e as number),
+        _custom: {
+          ...filter._custom,
+          jellyfin: {
+            ...filter._custom?.jellyfin,
+            minYear: e === '' ? undefined : (e as number),
+          },
         },
       },
       key: pageKey,
@@ -76,9 +83,12 @@ export const JellyfinAlbumFilters = ({
     if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
     const updatedFilters = setFilter({
       data: {
-        jfParams: {
-          ...filter.jfParams,
-          maxYear: e === '' ? undefined : (e as number),
+        _custom: {
+          ...filter._custom,
+          jellyfin: {
+            ...filter._custom?.jellyfin,
+            maxYear: e === '' ? undefined : (e as number),
+          },
         },
       },
       key: pageKey,
@@ -90,9 +100,12 @@ export const JellyfinAlbumFilters = ({
     const genreFilterString = e?.length ? e.join(',') : undefined;
     const updatedFilters = setFilter({
       data: {
-        jfParams: {
-          ...filter.jfParams,
-          genreIds: genreFilterString,
+        _custom: {
+          ...filter._custom,
+          jellyfin: {
+            ...filter._custom?.jellyfin,
+            genreIds: genreFilterString,
+          },
         },
       },
       key: pageKey,
@@ -102,17 +115,18 @@ export const JellyfinAlbumFilters = ({
 
   const [albumArtistSearchTerm, setAlbumArtistSearchTerm] = useState<string>('');
 
-  const albumArtistListQuery = useAlbumArtistList(
-    {
+  const albumArtistListQuery = useAlbumArtistList({
+    options: {
+      cacheTime: 1000 * 60 * 2,
+      staleTime: 1000 * 60 * 1,
+    },
+    query: {
       sortBy: AlbumArtistListSort.NAME,
       sortOrder: SortOrder.ASC,
       startIndex: 0,
     },
-    {
-      cacheTime: 1000 * 60 * 2,
-      staleTime: 1000 * 60 * 1,
-    },
-  );
+    serverId,
+  });
 
   const selectableAlbumArtists = useMemo(() => {
     if (!albumArtistListQuery?.data?.items) return [];
@@ -127,9 +141,12 @@ export const JellyfinAlbumFilters = ({
     const albumArtistFilterString = e?.length ? e.join(',') : undefined;
     const updatedFilters = setFilter({
       data: {
-        jfParams: {
-          ...filter.jfParams,
-          albumArtistIds: albumArtistFilterString,
+        _custom: {
+          ...filter._custom,
+          jellyfin: {
+            ...filter._custom?.jellyfin,
+            albumArtistIds: albumArtistFilterString,
+          },
         },
       },
       key: pageKey,
@@ -155,21 +172,21 @@ export const JellyfinAlbumFilters = ({
       <Divider my="0.5rem" />
       <Group grow>
         <NumberInput
-          defaultValue={filter.jfParams?.minYear}
+          defaultValue={filter._custom?.jellyfin?.minYear}
           hideControls={false}
           label="From year"
           max={2300}
           min={1700}
-          required={!!filter.jfParams?.maxYear}
+          required={!!filter._custom?.jellyfin?.maxYear}
           onChange={(e) => handleMinYearFilter(e)}
         />
         <NumberInput
-          defaultValue={filter.jfParams?.maxYear}
+          defaultValue={filter._custom?.jellyfin?.maxYear}
           hideControls={false}
           label="To year"
           max={2300}
           min={1700}
-          required={!!filter.jfParams?.minYear}
+          required={!!filter._custom?.jellyfin?.minYear}
           onChange={(e) => handleMaxYearFilter(e)}
         />
       </Group>
@@ -189,7 +206,7 @@ export const JellyfinAlbumFilters = ({
           clearable
           searchable
           data={selectableAlbumArtists}
-          defaultValue={filter.jfParams?.albumArtistIds?.split(',')}
+          defaultValue={filter._custom?.jellyfin?.albumArtistIds?.split(',')}
           disabled={disableArtistFilter}
           label="Artist"
           limit={300}

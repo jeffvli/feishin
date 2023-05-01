@@ -19,17 +19,18 @@ const TrackListRoute = () => {
   );
 
   const songListFilter = useSongListFilter({ id: albumArtistId, key: pageKey });
-  const itemCountCheck = useSongList(
-    {
+  const itemCountCheck = useSongList({
+    options: {
+      cacheTime: 1000 * 60,
+      staleTime: 1000 * 60,
+    },
+    query: {
       limit: 1,
       startIndex: 0,
       ...songListFilter,
     },
-    {
-      cacheTime: 1000 * 60,
-      staleTime: 1000 * 60,
-    },
-  );
+    serverId: server?.id,
+  });
 
   const itemCount =
     itemCountCheck.data?.totalRecordCount === null

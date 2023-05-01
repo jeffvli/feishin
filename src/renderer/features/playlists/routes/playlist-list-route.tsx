@@ -9,18 +9,18 @@ import { AnimatedPage } from '/@/renderer/features/shared';
 const PlaylistListRoute = () => {
   const tableRef = useRef<AgGridReactType | null>(null);
 
-  const itemCountCheck = usePlaylistList(
-    {
+  const itemCountCheck = usePlaylistList({
+    options: {
+      cacheTime: 1000 * 60 * 60 * 2,
+      staleTime: 1000 * 60 * 60 * 2,
+    },
+    query: {
       limit: 1,
       sortBy: PlaylistListSort.NAME,
       sortOrder: SortOrder.ASC,
       startIndex: 0,
     },
-    {
-      cacheTime: 1000 * 60 * 60 * 2,
-      staleTime: 1000 * 60 * 60 * 2,
-    },
-  );
+  });
 
   const itemCount =
     itemCountCheck.data?.totalRecordCount === null

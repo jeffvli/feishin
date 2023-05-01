@@ -1,5 +1,5 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useRef } from 'react';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useParams } from 'react-router';
 import { LibraryItem } from '/@/renderer/api/types';
 import { NativeScrollArea } from '/@/renderer/components';
@@ -10,14 +10,16 @@ import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playli
 import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { useCurrentServer } from '../../../store/auth.store';
 
 const PlaylistDetailRoute = () => {
   const tableRef = useRef<AgGridReactType | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const { playlistId } = useParams() as { playlistId: string };
+  const server = useCurrentServer();
 
-  const detailQuery = usePlaylistDetail({ id: playlistId });
+  const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
   const background = useFastAverageColor(
     detailQuery?.data?.imageUrl,
     !detailQuery?.isLoading,

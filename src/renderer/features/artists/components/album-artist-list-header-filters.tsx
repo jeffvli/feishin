@@ -15,16 +15,7 @@ import {
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumArtistListSort, SortOrder } from '/@/renderer/api/types';
-import {
-  DropdownMenu,
-  ALBUMARTIST_TABLE_COLUMNS,
-  VirtualInfiniteGridRef,
-  Text,
-  Button,
-  Slider,
-  MultiSelect,
-  Switch,
-} from '/@/renderer/components';
+import { DropdownMenu, Text, Button, Slider, MultiSelect, Switch } from '/@/renderer/components';
 import { useMusicFolders } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
@@ -36,6 +27,8 @@ import {
 } from '/@/renderer/store';
 import { ListDisplayType, TableColumn, ServerType } from '/@/renderer/types';
 import { useAlbumArtistListContext } from '../context/album-artist-list-context';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 
 const FILTERS = {
   jellyfin: [
@@ -83,7 +76,7 @@ export const AlbumArtistListHeaderFilters = ({
   const filter = useAlbumArtistListFilter({ key: pageKey });
   const cq = useContainerQuery();
 
-  const musicFoldersQuery = useMusicFolders();
+  const musicFoldersQuery = useMusicFolders({ query: null, serverId: server?.id });
 
   const sortByLabel =
     (server?.type &&
@@ -114,18 +107,20 @@ export const AlbumArtistListHeaderFilters = ({
         queryKey,
         async ({ signal }) =>
           api.controller.getAlbumArtistList({
+            apiClientProps: {
+              server,
+              signal,
+            },
             query: {
               limit,
               startIndex,
               ...filters,
             },
-            server,
-            signal,
           }),
         { cacheTime: 1000 * 60 * 1 },
       );
 
-      return api.normalize.albumArtistList(albums, server);
+      return albums;
     },
     [queryClient, server],
   );
@@ -148,20 +143,21 @@ export const AlbumArtistListHeaderFilters = ({
               queryKey,
               async ({ signal }) =>
                 api.controller.getAlbumArtistList({
+                  apiClientProps: {
+                    server,
+                    signal,
+                  },
                   query: {
                     limit,
                     startIndex,
                     ...filters,
                   },
-                  server,
-                  signal,
                 }),
               { cacheTime: 1000 * 60 * 1 },
             );
 
-            const albumArtists = api.normalize.albumArtistList(albumArtistsRes, server);
             params.successCallback(
-              albumArtists?.items || [],
+              albumArtistsRes?.items || [],
               albumArtistsRes?.totalRecordCount || 0,
             );
           },
@@ -355,7 +351,7 @@ export const AlbumArtistListHeaderFilters = ({
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-              {musicFoldersQuery.data?.map((folder) => (
+              {musicFoldersQuery.data?.items.map((folder) => (
                 <DropdownMenu.Item
                   key={`musicFolder-${folder.id}`}
                   $isActive={filter.musicFolderId === folder.id}

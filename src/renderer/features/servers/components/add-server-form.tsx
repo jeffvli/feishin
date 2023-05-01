@@ -77,7 +77,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
       setCurrentServer(serverItem);
       closeAllModals();
 
-      if (serverList.length === 0) {
+      if (Object.keys(serverList).length === 0) {
         toast.success({ message: 'Server has been added, reloading...' });
         setTimeout(() => window.location.reload(), 2000);
       } else {

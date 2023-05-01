@@ -23,11 +23,11 @@ const PlaylistDetailSongListRoute = () => {
   const navigate = useNavigate();
   const tableRef = useRef<AgGridReactType | null>(null);
   const { playlistId } = useParams() as { playlistId: string };
-  const currentServer = useCurrentServer();
+  const server = useCurrentServer();
 
-  const detailQuery = usePlaylistDetail({ id: playlistId });
-  const createPlaylistMutation = useCreatePlaylist();
-  const deletePlaylistMutation = useDeletePlaylist();
+  const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
+  const createPlaylistMutation = useCreatePlaylist({});
+  const deletePlaylistMutation = useDeletePlaylist({});
 
   const handleSave = (
     filter: Record<string, any>,
@@ -45,15 +45,17 @@ const PlaylistDetailSongListRoute = () => {
     createPlaylistMutation.mutate(
       {
         body: {
+          _custom: {
+            navidrome: {
+              owner: detailQuery?.data?.owner || '',
+              ownerId: detailQuery?.data?.ownerId || '',
+              public: detailQuery?.data?.public || false,
+              rules,
+              sync: detailQuery?.data?.sync || false,
+            },
+          },
           comment: detailQuery?.data?.description || '',
           name: detailQuery?.data?.name,
-          ndParams: {
-            owner: detailQuery?.data?.owner || '',
-            ownerId: detailQuery?.data?.ownerId || '',
-            public: detailQuery?.data?.public || false,
-            rules,
-            sync: detailQuery?.data?.sync || false,
-          },
         },
       },
       {
@@ -73,19 +75,21 @@ const PlaylistDetailSongListRoute = () => {
       children: (
         <SaveAsPlaylistForm
           body={{
+            _custom: {
+              navidrome: {
+                owner: detailQuery?.data?.owner || '',
+                ownerId: detailQuery?.data?.ownerId || '',
+                public: detailQuery?.data?.public || false,
+                rules: {
+                  ...filter,
+                  order: 'desc',
+                  sort: 'year',
+                },
+                sync: detailQuery?.data?.sync || false,
+              },
+            },
             comment: detailQuery?.data?.description || '',
             name: detailQuery?.data?.name,
-            ndParams: {
-              owner: detailQuery?.data?.owner || '',
-              ownerId: detailQuery?.data?.ownerId || '',
-              public: detailQuery?.data?.public || false,
-              rules: {
-                ...filter,
-                order: 'desc',
-                sort: 'year',
-              },
-              sync: detailQuery?.data?.sync || false,
-            },
           }}
           onCancel={closeAllModals}
           onSuccess={(data) =>
@@ -120,9 +124,7 @@ const PlaylistDetailSongListRoute = () => {
   };
 
   const isSmartPlaylist =
-    !detailQuery?.isLoading &&
-    detailQuery?.data?.rules &&
-    currentServer?.type === ServerType.NAVIDROME;
+    !detailQuery?.isLoading && detailQuery?.data?.rules && server?.type === ServerType.NAVIDROME;
 
   const [showQueryBuilder, setShowQueryBuilder] = useState(false);
   const [isQueryBuilderExpanded, setIsQueryBuilderExpanded] = useState(false);
@@ -142,18 +144,19 @@ const PlaylistDetailSongListRoute = () => {
     sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
   };
 
-  const itemCountCheck = usePlaylistSongList(
-    {
+  const itemCountCheck = usePlaylistSongList({
+    options: {
+      cacheTime: 1000 * 60 * 60 * 2,
+      staleTime: 1000 * 60 * 60 * 2,
+    },
+    query: {
       id: playlistId,
       limit: 1,
       startIndex: 0,
       ...filters,
     },
-    {
-      cacheTime: 1000 * 60 * 60 * 2,
-      staleTime: 1000 * 60 * 60 * 2,
-    },
-  );
+    serverId: server?.id,
+  });
 
   const itemCount =
     itemCountCheck.data?.totalRecordCount === null

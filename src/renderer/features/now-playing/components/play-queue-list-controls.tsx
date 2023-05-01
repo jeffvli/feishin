@@ -1,7 +1,7 @@
 import type { MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Group } from '@mantine/core';
-import { Button, Popover, TableConfigDropdown } from '/@/renderer/components';
+import { Button, Popover } from '/@/renderer/components';
 import isElectron from 'is-electron';
 import {
   RiArrowDownLine,
@@ -16,6 +16,7 @@ import { usePlayerControls, useQueueControls } from '/@/renderer/store';
 import { PlaybackType, TableType } from '/@/renderer/types';
 import { usePlayerType } from '/@/renderer/store/settings.store';
 import { useSetCurrentTime } from '../../../store/player.store';
+import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 

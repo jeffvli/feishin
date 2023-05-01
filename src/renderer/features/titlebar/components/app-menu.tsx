@@ -60,22 +60,23 @@ export const AppMenu = () => {
   return (
     <>
       <DropdownMenu.Label>Select a server</DropdownMenu.Label>
-      {serverList.map((s) => {
-        const isNavidromeExpired = s.type === ServerType.NAVIDROME && !s.ndCredential;
+      {Object.keys(serverList).map((serverId) => {
+        const server = serverList[serverId];
+        const isNavidromeExpired = server.type === ServerType.NAVIDROME && !server.ndCredential;
         const isJellyfinExpired = false;
         const isSessionExpired = isNavidromeExpired || isJellyfinExpired;
 
         return (
           <DropdownMenu.Item
-            key={`server-${s.id}`}
-            $isActive={s.id === currentServer?.id}
+            key={`server-${server.id}`}
+            $isActive={server.id === currentServer?.id}
             icon={isSessionExpired ? <RiLockLine color="var(--danger-color)" /> : <RiServerFill />}
             onClick={() => {
-              if (!isSessionExpired) return handleSetCurrentServer(s);
-              return handleCredentialsModal(s);
+              if (!isSessionExpired) return handleSetCurrentServer(server);
+              return handleCredentialsModal(server);
             }}
           >
-            <Group>{s.name}</Group>
+            <Group>{server.name}</Group>
           </DropdownMenu.Item>
         );
       })}

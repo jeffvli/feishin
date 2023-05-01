@@ -12,6 +12,7 @@ interface NavidromeAlbumFiltersProps {
   handleFilterChange: (filters: AlbumListFilter) => void;
   id?: string;
   pageKey: string;
+  serverId?: string;
 }
 
 export const NavidromeAlbumFilters = ({
@@ -19,15 +20,16 @@ export const NavidromeAlbumFilters = ({
   disableArtistFilter,
   pageKey,
   id,
+  serverId,
 }: NavidromeAlbumFiltersProps) => {
   const filter = useAlbumListFilter({ id, key: pageKey });
   const { setFilter } = useListStoreActions();
 
-  const genreListQuery = useGenreList(null);
+  const genreListQuery = useGenreList({ query: null, serverId });
 
   const genreList = useMemo(() => {
     if (!genreListQuery?.data) return [];
-    return genreListQuery.data.map((genre) => ({
+    return genreListQuery.data.items.map((genre) => ({
       label: genre.name,
       value: genre.id,
     }));
@@ -36,9 +38,12 @@ export const NavidromeAlbumFilters = ({
   const handleGenresFilter = debounce((e: string | null) => {
     const updatedFilters = setFilter({
       data: {
-        ndParams: {
-          ...filter.ndParams,
-          genre_id: e || undefined,
+        _custom: {
+          ...filter._custom,
+          navidrome: {
+            ...filter._custom?.navidrome,
+            genre_id: e || undefined,
+          },
         },
       },
       key: 'album',
@@ -52,70 +57,89 @@ export const NavidromeAlbumFilters = ({
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
         const updatedFilters = setFilter({
           data: {
-            ndParams: {
-              ...filter.ndParams,
-              has_rating: e.currentTarget.checked ? true : undefined,
+            _custom: {
+              ...filter._custom,
+              navidrome: {
+                ...filter._custom?.navidrome,
+                has_rating: e.currentTarget.checked ? true : undefined,
+              },
             },
           },
           key: pageKey,
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
       },
-      value: filter.ndParams?.has_rating,
+      value: filter._custom?.navidrome?.has_rating,
     },
     {
       label: 'Is favorited',
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
+        console.log('e.currentTarget.checked :>> ', e.currentTarget.checked);
         const updatedFilters = setFilter({
           data: {
-            ndParams: { ...filter.ndParams, starred: e.currentTarget.checked ? true : undefined },
+            _custom: {
+              ...filter._custom,
+              navidrome: {
+                ...filter._custom?.navidrome,
+                starred: e.currentTarget.checked ? true : undefined,
+              },
+            },
           },
           key: pageKey,
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
       },
-      value: filter.ndParams?.starred,
+      value: filter._custom?.navidrome?.starred,
     },
     {
       label: 'Is compilation',
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
         const updatedFilters = setFilter({
           data: {
-            ndParams: {
-              ...filter.ndParams,
-              compilation: e.currentTarget.checked ? true : undefined,
+            _custom: {
+              ...filter._custom,
+              navidrome: {
+                ...filter._custom?.navidrome,
+                compilation: e.currentTarget.checked ? true : undefined,
+              },
             },
           },
           key: pageKey,
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
       },
-      value: filter.ndParams?.compilation,
+      value: filter._custom?.navidrome?.compilation,
     },
     {
       label: 'Is recently played',
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
         const updatedFilters = setFilter({
           data: {
-            ndParams: {
-              ...filter.ndParams,
-              recently_played: e.currentTarget.checked ? true : undefined,
+            _custom: {
+              ...filter._custom,
+              navidrome: {
+                ...filter._custom?.navidrome,
+                recently_played: e.currentTarget.checked ? true : undefined,
+              },
             },
           },
           key: pageKey,
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
       },
-      value: filter.ndParams?.recently_played,
+      value: filter._custom?.navidrome?.recently_played,
     },
   ];
 
   const handleYearFilter = debounce((e: number | string) => {
     const updatedFilters = setFilter({
       data: {
-        ndParams: {
-          ...filter.ndParams,
-          year: e === '' ? undefined : (e as number),
+        _custom: {
+          navidrome: {
+            ...filter._custom?.navidrome,
+            year: e === '' ? undefined : (e as number),
+          },
+          ...filter._custom,
         },
       },
       key: pageKey,
@@ -125,18 +149,19 @@ export const NavidromeAlbumFilters = ({
 
   const [albumArtistSearchTerm, setAlbumArtistSearchTerm] = useState<string>('');
 
-  const albumArtistListQuery = useAlbumArtistList(
-    {
+  const albumArtistListQuery = useAlbumArtistList({
+    options: {
+      cacheTime: 1000 * 60 * 2,
+      staleTime: 1000 * 60 * 1,
+    },
+    query: {
       // searchTerm: debouncedSearchTerm,
       sortBy: AlbumArtistListSort.NAME,
       sortOrder: SortOrder.ASC,
       startIndex: 0,
     },
-    {
-      cacheTime: 1000 * 60 * 2,
-      staleTime: 1000 * 60 * 1,
-    },
-  );
+    serverId,
+  });
 
   const selectableAlbumArtists = useMemo(() => {
     if (!albumArtistListQuery?.data?.items) return [];
@@ -150,9 +175,12 @@ export const NavidromeAlbumFilters = ({
   const handleAlbumArtistFilter = (e: string | null) => {
     const updatedFilters = setFilter({
       data: {
-        ndParams: {
-          ...filter.ndParams,
-          artist_id: e || undefined,
+        _custom: {
+          ...filter._custom,
+          navidrome: {
+            ...filter._custom?.navidrome,
+            artist_id: e || undefined,
+          },
         },
       },
       key: pageKey,
@@ -177,7 +205,7 @@ export const NavidromeAlbumFilters = ({
       <Divider my="0.5rem" />
       <Group grow>
         <NumberInput
-          defaultValue={filter.ndParams?.year}
+          defaultValue={filter._custom?.navidrome?.year}
           hideControls={false}
           label="Year"
           max={5000}
@@ -188,7 +216,7 @@ export const NavidromeAlbumFilters = ({
           clearable
           searchable
           data={genreList}
-          defaultValue={filter.ndParams?.genre_id}
+          defaultValue={filter._custom?.navidrome?.genre_id}
           label="Genre"
           onChange={handleGenresFilter}
         />
@@ -198,7 +226,7 @@ export const NavidromeAlbumFilters = ({
           clearable
           searchable
           data={selectableAlbumArtists}
-          defaultValue={filter.ndParams?.artist_id}
+          defaultValue={filter._custom?.navidrome?.artist_id}
           disabled={disableArtistFilter}
           label="Artist"
           limit={300}

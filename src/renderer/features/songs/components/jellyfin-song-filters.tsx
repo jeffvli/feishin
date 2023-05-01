@@ -9,30 +9,32 @@ interface JellyfinSongFiltersProps {
   handleFilterChange: (filters: SongListFilter) => void;
   id?: string;
   pageKey: string;
+  serverId?: string;
 }
 
 export const JellyfinSongFilters = ({
   id,
   pageKey,
   handleFilterChange,
+  serverId,
 }: JellyfinSongFiltersProps) => {
   const { setFilter } = useListStoreActions();
   const filter = useSongListFilter({ id, key: pageKey });
 
   // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
-  const genreListQuery = useGenreList(null);
+  const genreListQuery = useGenreList({ query: null, serverId });
 
   const genreList = useMemo(() => {
     if (!genreListQuery?.data) return [];
-    return genreListQuery.data.map((genre) => ({
+    return genreListQuery.data.items.map((genre) => ({
       label: genre.name,
       value: genre.id,
     }));
   }, [genreListQuery.data]);
 
   const selectedGenres = useMemo(() => {
-    return filter.jfParams?.genreIds?.split(',');
-  }, [filter.jfParams?.genreIds]);
+    return filter._custom?.jellyfin?.genreIds?.split(',');
+  }, [filter._custom?.jellyfin?.genreIds]);
 
   const toggleFilters = [
     {
@@ -40,17 +42,20 @@ export const JellyfinSongFilters = ({
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
         const updatedFilters = setFilter({
           data: {
-            jfParams: {
-              ...filter.jfParams,
-              includeItemTypes: 'Audio',
-              isFavorite: e.currentTarget.checked ? true : undefined,
+            _custom: {
+              ...filter._custom,
+              jellyfin: {
+                ...filter._custom?.jellyfin,
+                includeItemTypes: 'Audio',
+                isFavorite: e.currentTarget.checked ? true : undefined,
+              },
             },
           },
           key: pageKey,
         }) as SongListFilter;
         handleFilterChange(updatedFilters);
       },
-      value: filter.jfParams?.isFavorite,
+      value: filter._custom?.jellyfin?.isFavorite,
     },
   ];
 
@@ -58,10 +63,13 @@ export const JellyfinSongFilters = ({
     if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
     const updatedFilters = setFilter({
       data: {
-        jfParams: {
-          ...filter.jfParams,
-          includeItemTypes: 'Audio',
-          minYear: e === '' ? undefined : (e as number),
+        _custom: {
+          ...filter._custom,
+          jellyfin: {
+            ...filter._custom?.jellyfin,
+            includeItemTypes: 'Audio',
+            minYear: e === '' ? undefined : (e as number),
+          },
         },
       },
       key: pageKey,
@@ -73,10 +81,13 @@ export const JellyfinSongFilters = ({
     if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
     const updatedFilters = setFilter({
       data: {
-        jfParams: {
-          ...filter.jfParams,
-          includeItemTypes: 'Audio',
-          maxYear: e === '' ? undefined : (e as number),
+        _custom: {
+          ...filter._custom,
+          jellyfin: {
+            ...filter._custom?.jellyfin,
+            includeItemTypes: 'Audio',
+            maxYear: e === '' ? undefined : (e as number),
+          },
         },
       },
       key: pageKey,
@@ -88,10 +99,13 @@ export const JellyfinSongFilters = ({
     const genreFilterString = e?.length ? e.join(',') : undefined;
     const updatedFilters = setFilter({
       data: {
-        jfParams: {
-          ...filter.jfParams,
-          genreIds: genreFilterString,
-          includeItemTypes: 'Audio',
+        _custom: {
+          ...filter._custom,
+          jellyfin: {
+            ...filter._custom?.jellyfin,
+            genreIds: genreFilterString,
+            includeItemTypes: 'Audio',
+          },
         },
       },
       key: pageKey,
@@ -117,14 +131,14 @@ export const JellyfinSongFilters = ({
       <Group grow>
         <NumberInput
           required
-          defaultValue={filter.jfParams?.minYear}
+          defaultValue={filter._custom?.jellyfin?.minYear}
           label="From year"
           max={2300}
           min={1700}
           onChange={handleMinYearFilter}
         />
         <NumberInput
-          defaultValue={filter.jfParams?.maxYear}
+          defaultValue={filter._custom?.jellyfin?.maxYear}
           label="To year"
           max={2300}
           min={1700}

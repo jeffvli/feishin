@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { Ref, forwardRef, useRef, useEffect, useCallback, useMemo } from 'react';
 import type {
   ICellRendererParams,
@@ -28,8 +29,8 @@ import { GenericTableHeader } from '/@/renderer/components/virtual-table/headers
 import { AppRoute } from '/@/renderer/router/routes';
 import { PersistedTableColumn } from '/@/renderer/store/settings.store';
 import { TableColumn } from '/@/renderer/types';
-import { RatingCell } from '/@/renderer/components/virtual-table/cells/rating-cell';
 import { FavoriteCell } from '/@/renderer/components/virtual-table/cells/favorite-cell';
+import { RatingCell } from '/@/renderer/components/virtual-table/cells/rating-cell';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';

@@ -10,6 +10,7 @@ import { AlbumDetailHeader } from '/@/renderer/features/albums/components/album-
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem } from '/@/renderer/api/types';
+import { useCurrentServer } from '/@/renderer/store';
 
 const AlbumDetailRoute = () => {
   const tableRef = useRef<AgGridReactType | null>(null);
@@ -17,7 +18,8 @@ const AlbumDetailRoute = () => {
   const headerRef = useRef<HTMLDivElement>(null);
 
   const { albumId } = useParams() as { albumId: string };
-  const detailQuery = useAlbumDetail({ id: albumId });
+  const server = useCurrentServer();
+  const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
   const background = useFastAverageColor(detailQuery.data?.imageUrl, !detailQuery.isLoading);
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();

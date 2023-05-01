@@ -1,6 +1,6 @@
 import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { CreatePlaylistBody, RawCreatePlaylistResponse, ServerType } from '/@/renderer/api/types';
+import { CreatePlaylistBody, CreatePlaylistResponse, ServerType } from '/@/renderer/api/types';
 import { Button, Switch, TextInput, toast } from '/@/renderer/components';
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { useCurrentServer } from '/@/renderer/store';
@@ -8,22 +8,24 @@ import { useCurrentServer } from '/@/renderer/store';
 interface SaveAsPlaylistFormProps {
   body: Partial<CreatePlaylistBody>;
   onCancel: () => void;
-  onSuccess: (data: RawCreatePlaylistResponse) => void;
+  onSuccess: (data: CreatePlaylistResponse) => void;
 }
 
 export const SaveAsPlaylistForm = ({ body, onSuccess, onCancel }: SaveAsPlaylistFormProps) => {
-  const mutation = useCreatePlaylist();
+  const mutation = useCreatePlaylist({});
   const server = useCurrentServer();
 
   const form = useForm<CreatePlaylistBody>({
     initialValues: {
+      _custom: {
+        navidrome: {
+          public: false,
+          rules: undefined,
+          ...body?._custom?.navidrome,
+        },
+      },
       comment: body.comment || '',
       name: body.name || '',
-      ndParams: {
-        public: false,
-        rules: undefined,
-        ...body.ndParams,
-      },
     },
   });
 

@@ -9,15 +9,17 @@ import { LibraryItem } from '/@/renderer/api/types';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
 import { AlbumArtistDetailHeader } from '/@/renderer/features/artists/components/album-artist-detail-header';
 import { AlbumArtistDetailContent } from '/@/renderer/features/artists/components/album-artist-detail-content';
+import { useCurrentServer } from '/@/renderer/store';
 
 const AlbumArtistDetailRoute = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const server = useCurrentServer();
 
   const { albumArtistId } = useParams() as { albumArtistId: string };
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
-  const detailQuery = useAlbumArtistDetail({ id: albumArtistId });
+  const detailQuery = useAlbumArtistDetail({ query: { id: albumArtistId }, serverId: server?.id });
   const background = useFastAverageColor(detailQuery.data?.imageUrl, !detailQuery.isLoading);
 
   const handlePlay = () => {

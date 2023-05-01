@@ -20,16 +20,7 @@ import {
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListQuery, AlbumListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
-import {
-  ALBUM_TABLE_COLUMNS,
-  Button,
-  DropdownMenu,
-  MultiSelect,
-  Slider,
-  Switch,
-  Text,
-  VirtualInfiniteGridRef,
-} from '/@/renderer/components';
+import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
   AlbumListFilter,
@@ -43,6 +34,8 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
 import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
 import { useAlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { ALBUM_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 
 const FILTERS = {
   jellyfin: [
@@ -100,7 +93,7 @@ export const AlbumListHeaderFilters = ({
   const { display, filter, table, grid } = useAlbumListStore({ id, key: pageKey });
   const cq = useContainerQuery();
 
-  const musicFoldersQuery = useMusicFolders();
+  const musicFoldersQuery = useMusicFolders({ query: null, serverId: server?.id });
 
   const sortByLabel =
     (server?.type &&
@@ -115,13 +108,15 @@ export const AlbumListHeaderFilters = ({
         limit: take,
         startIndex: skip,
         ...filters,
-        jfParams: {
-          ...filters.jfParams,
-          ...customFilters?.jfParams,
-        },
-        ndParams: {
-          ...filters.ndParams,
-          ...customFilters?.ndParams,
+        _custom: {
+          jellyfin: {
+            ...filters._custom?.jellyfin,
+            ...customFilters?._custom?.jellyfin,
+          },
+          navidrome: {
+            ...filters._custom?.navidrome,
+            ...customFilters?._custom?.navidrome,
+          },
         },
         ...customFilters,
       };
@@ -132,14 +127,16 @@ export const AlbumListHeaderFilters = ({
         queryKey,
         async ({ signal }) =>
           api.controller.getAlbumList({
+            apiClientProps: {
+              server,
+              signal,
+            },
             query,
-            server,
-            signal,
           }),
         { cacheTime: 1000 * 60 * 1 },
       );
 
-      return api.normalize.albumList(albums, server);
+      return albums;
     },
     [customFilters, queryClient, server],
   );
@@ -157,13 +154,15 @@ export const AlbumListHeaderFilters = ({
               startIndex,
               ...filters,
               ...customFilters,
-              jfParams: {
-                ...filters.jfParams,
-                ...customFilters?.jfParams,
-              },
-              ndParams: {
-                ...filters.ndParams,
-                ...customFilters?.ndParams,
+              _custom: {
+                jellyfin: {
+                  ...filters._custom?.jellyfin,
+                  ...customFilters?._custom?.jellyfin,
+                },
+                navidrome: {
+                  ...filters._custom?.navidrome,
+                  ...customFilters?._custom?.navidrome,
+                },
               },
             };
 
@@ -173,15 +172,16 @@ export const AlbumListHeaderFilters = ({
               queryKey,
               async ({ signal }) =>
                 api.controller.getAlbumList({
+                  apiClientProps: {
+                    server,
+                    signal,
+                  },
                   query,
-                  server,
-                  signal,
                 }),
               { cacheTime: 1000 * 60 * 1 },
             );
 
-            const albums = api.normalize.albumList(albumsRes, server);
-            params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || 0);
+            return params.successCallback(albumsRes?.items || [], albumsRes?.totalRecordCount || 0);
           },
           rowCount: undefined,
         };
@@ -218,6 +218,7 @@ export const AlbumListHeaderFilters = ({
               handleFilterChange={handleFilterChange}
               id={id}
               pageKey={pageKey}
+              serverId={server?.id}
             />
           ) : (
             <JellyfinAlbumFilters
@@ -225,6 +226,7 @@ export const AlbumListHeaderFilters = ({
               handleFilterChange={handleFilterChange}
               id={id}
               pageKey={pageKey}
+              serverId={server?.id}
             />
           )}
         </>
@@ -293,30 +295,32 @@ export const AlbumListHeaderFilters = ({
   const handlePlayQueueAdd = usePlayQueueAdd();
 
   const handlePlay = async (play: Play) => {
-    if (!itemCount || itemCount === 0) return;
+    if (!itemCount || itemCount === 0 || !server) return;
 
     const query = {
       startIndex: 0,
       ...filter,
       ...customFilters,
-      jfParams: {
-        ...filter.jfParams,
-        ...customFilters?.jfParams,
-      },
-      ndParams: {
-        ...filter.ndParams,
-        ...customFilters?.ndParams,
+      _custom: {
+        jellyfin: {
+          ...filter._custom?.jellyfin,
+          ...customFilters?._custom?.jellyfin,
+        },
+        navidrome: {
+          ...filter._custom?.navidrome,
+          ...customFilters?._custom?.navidrome,
+        },
       },
     };
     const queryKey = queryKeys.albums.list(server?.id || '', query);
 
     const albumListRes = await queryClient.fetchQuery({
-      queryFn: ({ signal }) => api.controller.getAlbumList({ query, server, signal }),
+      queryFn: ({ signal }) =>
+        api.controller.getAlbumList({ apiClientProps: { server, signal }, query }),
       queryKey,
     });
 
-    const albumIds =
-      api.normalize.albumList(albumListRes, server).items?.map((item) => item.id) || [];
+    const albumIds = albumListRes?.items?.map((a) => a.id) || [];
 
     handlePlayQueueAdd?.({
       byItemType: {
@@ -382,16 +386,16 @@ export const AlbumListHeaderFilters = ({
   const isFilterApplied = useMemo(() => {
     const isNavidromeFilterApplied =
       server?.type === ServerType.NAVIDROME &&
-      filter.ndParams &&
-      Object.values(filter.ndParams).some((value) => value !== undefined);
+      filter?._custom.navidrome &&
+      Object.values(filter._custom.navidrome).some((value) => value !== undefined);
 
     const isJellyfinFilterApplied =
       server?.type === ServerType.JELLYFIN &&
-      filter.jfParams &&
-      Object.values(filter.jfParams).some((value) => value !== undefined);
+      filter?._custom.jellyfin &&
+      Object.values(filter._custom.jellyfin).some((value) => value !== undefined);
 
     return isNavidromeFilterApplied || isJellyfinFilterApplied;
-  }, [filter.jfParams, filter.ndParams, server?.type]);
+  }, [filter._custom.jellyfin, filter._custom.navidrome, server?.type]);
 
   return (
     <Flex justify="space-between">
@@ -456,7 +460,7 @@ export const AlbumListHeaderFilters = ({
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-              {musicFoldersQuery.data?.map((folder) => (
+              {musicFoldersQuery.data?.items.map((folder) => (
                 <DropdownMenu.Item
                   key={`musicFolder-${folder.id}`}
                   $isActive={filter.musicFolderId === folder.id}

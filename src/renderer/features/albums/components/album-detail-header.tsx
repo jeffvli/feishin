@@ -5,9 +5,10 @@ import { Link } from 'react-router-dom';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
 import { Button, Rating, Text } from '/@/renderer/components';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
-import { LibraryHeader, useUpdateRating } from '/@/renderer/features/shared';
+import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
+import { useCurrentServer } from '/@/renderer/store';
 import { formatDurationString } from '/@/renderer/utils';
 
 interface AlbumDetailHeaderProps {
@@ -17,7 +18,8 @@ interface AlbumDetailHeaderProps {
 export const AlbumDetailHeader = forwardRef(
   ({ background }: AlbumDetailHeaderProps, ref: Ref<HTMLDivElement>) => {
     const { albumId } = useParams() as { albumId: string };
-    const detailQuery = useAlbumDetail({ id: albumId });
+    const server = useCurrentServer();
+    const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
     const cq = useContainerQuery();
 
     const metadataItems = [
@@ -38,17 +40,17 @@ export const AlbumDetailHeader = forwardRef(
       },
     ];
 
-    const updateRatingMutation = useUpdateRating();
+    const updateRatingMutation = useSetRating({});
 
     const handleUpdateRating = (rating: number) => {
       if (!detailQuery?.data) return;
 
       updateRatingMutation.mutate({
-        _serverId: detailQuery?.data.serverId,
         query: {
           item: [detailQuery.data],
           rating,
         },
+        serverId: detailQuery.data.serverId,
       });
     };
 
@@ -56,11 +58,11 @@ export const AlbumDetailHeader = forwardRef(
       if (!detailQuery?.data || !detailQuery?.data.userRating) return;
 
       updateRatingMutation.mutate({
-        _serverId: detailQuery.data.serverId,
         query: {
           item: [detailQuery.data],
           rating: 0,
         },
+        serverId: detailQuery.data.serverId,
       });
     };
 

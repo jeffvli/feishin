@@ -8,7 +8,6 @@ import type {
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import '@ag-grid-community/styles/ag-theme-alpine.css';
-import { VirtualGridAutoSizerContainer, getColumnDefs } from '/@/renderer/components';
 import {
   useAppStoreActions,
   useCurrentSong,
@@ -27,12 +26,13 @@ import { useMergedRef } from '@mantine/hooks';
 import isElectron from 'is-electron';
 import debounce from 'lodash/debounce';
 import { ErrorBoundary } from 'react-error-boundary';
-import { VirtualTable } from '/@/renderer/components/virtual-table';
+import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import { PlaybackType, TableType } from '/@/renderer/types';
 import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const utils = isElectron() ? window.electron.utils : null;

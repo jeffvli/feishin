@@ -9,21 +9,23 @@ interface NavidromeSongFiltersProps {
   handleFilterChange: (filters: SongListFilter) => void;
   id?: string;
   pageKey: string;
+  serverId?: string;
 }
 
 export const NavidromeSongFilters = ({
   handleFilterChange,
   pageKey,
   id,
+  serverId,
 }: NavidromeSongFiltersProps) => {
   const { setFilter } = useListStoreActions();
   const filter = useSongListFilter({ id, key: pageKey });
 
-  const genreListQuery = useGenreList(null);
+  const genreListQuery = useGenreList({ query: null, serverId });
 
   const genreList = useMemo(() => {
     if (!genreListQuery?.data) return [];
-    return genreListQuery.data.map((genre) => ({
+    return genreListQuery.data.items.map((genre) => ({
       label: genre.name,
       value: genre.id,
     }));
@@ -32,9 +34,11 @@ export const NavidromeSongFilters = ({
   const handleGenresFilter = debounce((e: string | null) => {
     const updatedFilters = setFilter({
       data: {
-        ndParams: {
-          ...filter.ndParams,
-          genre_id: e || undefined,
+        _custom: {
+          ...filter._custom,
+          navidrome: {
+            genre_id: e || undefined,
+          },
         },
       },
       key: pageKey,
@@ -48,23 +52,30 @@ export const NavidromeSongFilters = ({
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
         const updatedFilters = setFilter({
           data: {
-            ndParams: { ...filter.ndParams, starred: e.currentTarget.checked ? true : undefined },
+            _custom: {
+              ...filter._custom,
+              navidrome: {
+                starred: e.currentTarget.checked ? true : undefined,
+              },
+            },
           },
           key: pageKey,
         }) as SongListFilter;
 
         handleFilterChange(updatedFilters);
       },
-      value: filter.ndParams?.starred,
+      value: filter._custom?.navidrome?.starred,
     },
   ];
 
   const handleYearFilter = debounce((e: number | string) => {
     const updatedFilters = setFilter({
       data: {
-        ndParams: {
-          ...filter.ndParams,
-          year: e === '' ? undefined : (e as number),
+        _custom: {
+          ...filter._custom,
+          navidrome: {
+            year: e === '' ? undefined : (e as number),
+          },
         },
       },
       key: pageKey,
@@ -94,7 +105,7 @@ export const NavidromeSongFilters = ({
           label="Year"
           max={5000}
           min={0}
-          value={filter.ndParams?.year}
+          value={filter._custom?.navidrome?.year}
           width={50}
           onChange={(e) => handleYearFilter(e)}
         />
@@ -102,7 +113,7 @@ export const NavidromeSongFilters = ({
           clearable
           searchable
           data={genreList}
-          defaultValue={filter.ndParams?.genre_id}
+          defaultValue={filter._custom?.navidrome?.genre_id}
           label="Genre"
           width={150}
           onChange={handleGenresFilter}

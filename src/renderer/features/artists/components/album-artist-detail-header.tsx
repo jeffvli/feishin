@@ -1,13 +1,14 @@
-import { Group, Rating, Stack } from '@mantine/core';
 import { forwardRef, Fragment, Ref, MouseEvent } from 'react';
+import { Group, Rating, Stack } from '@mantine/core';
 import { useParams } from 'react-router';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
-import { LibraryHeader, useUpdateRating } from '/@/renderer/features/shared';
+import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { formatDurationString } from '/@/renderer/utils';
+import { useCurrentServer } from '../../../store/auth.store';
 
 interface AlbumArtistDetailHeaderProps {
   background: string;
@@ -16,7 +17,11 @@ interface AlbumArtistDetailHeaderProps {
 export const AlbumArtistDetailHeader = forwardRef(
   ({ background }: AlbumArtistDetailHeaderProps, ref: Ref<HTMLDivElement>) => {
     const { albumArtistId } = useParams() as { albumArtistId: string };
-    const detailQuery = useAlbumArtistDetail({ id: albumArtistId });
+    const server = useCurrentServer();
+    const detailQuery = useAlbumArtistDetail({
+      query: { id: albumArtistId },
+      serverId: server?.id,
+    });
     const cq = useContainerQuery();
 
     const metadataItems = [
@@ -37,17 +42,17 @@ export const AlbumArtistDetailHeader = forwardRef(
       },
     ];
 
-    const updateRatingMutation = useUpdateRating();
+    const updateRatingMutation = useSetRating({});
 
     const handleUpdateRating = (rating: number) => {
       if (!detailQuery?.data) return;
 
       updateRatingMutation.mutate({
-        _serverId: detailQuery?.data.serverId,
         query: {
           item: [detailQuery.data],
           rating,
         },
+        serverId: detailQuery?.data.serverId,
       });
     };
 
@@ -58,11 +63,11 @@ export const AlbumArtistDetailHeader = forwardRef(
       if (!isSameRatingAsPrevious) return;
 
       updateRatingMutation.mutate({
-        _serverId: detailQuery.data.serverId,
         query: {
           item: [detailQuery.data],
           rating: 0,
         },
+        serverId: detailQuery.data.serverId,
       });
     };
 

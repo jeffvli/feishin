@@ -1,12 +1,4 @@
-import {
-  ALBUMARTIST_CARD_ROWS,
-  getColumnDefs,
-  TablePagination,
-  VirtualGridAutoSizerContainer,
-  VirtualInfiniteGrid,
-  VirtualInfiniteGridRef,
-  VirtualTable,
-} from '/@/renderer/components';
+import { ALBUMARTIST_CARD_ROWS } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { ListDisplayType, CardRow } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -35,6 +27,12 @@ import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-a
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useAlbumArtistListFilter, useListStoreActions } from '../../../store/list.store';
 import { useAlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
+import {
+  VirtualInfiniteGridRef,
+  VirtualGridAutoSizerContainer,
+  VirtualInfiniteGrid,
+} from '/@/renderer/components/virtual-grid';
+import { getColumnDefs, VirtualTable, TablePagination } from '/@/renderer/components/virtual-table';
 
 interface AlbumArtistListContentProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -54,17 +52,18 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
 
   const isPaginationEnabled = display === ListDisplayType.TABLE_PAGINATED;
 
-  const checkAlbumArtistList = useAlbumArtistList(
-    {
+  const checkAlbumArtistList = useAlbumArtistList({
+    options: {
+      cacheTime: Infinity,
+      staleTime: 60 * 1000 * 5,
+    },
+    query: {
       limit: 1,
       startIndex: 0,
       ...filter,
     },
-    {
-      cacheTime: Infinity,
-      staleTime: 60 * 1000 * 5,
-    },
-  );
+    serverId: server?.id,
+  });
 
   const columnDefs: ColDef[] = useMemo(() => getColumnDefs(table.columns), [table.columns]);
 
@@ -85,19 +84,23 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
             queryKey,
             async ({ signal }) =>
               api.controller.getAlbumArtistList({
+                apiClientProps: {
+                  server,
+                  signal,
+                },
                 query: {
                   limit,
                   startIndex,
                   ...filter,
                 },
-                server,
-                signal,
               }),
             { cacheTime: 1000 * 60 * 1 },
           );
 
-          const albums = api.normalize.albumArtistList(albumArtistsRes, server);
-          params.successCallback(albums?.items || [], albumArtistsRes?.totalRecordCount || 0);
+          params.successCallback(
+            albumArtistsRes?.items || [],
+            albumArtistsRes?.totalRecordCount || 0,
+          );
         },
         rowCount: undefined,
       };
@@ -181,18 +184,20 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
         queryKey,
         async ({ signal }) =>
           api.controller.getAlbumArtistList({
+            apiClientProps: {
+              server,
+              signal,
+            },
             query: {
               limit,
               startIndex,
               ...filter,
             },
-            server,
-            signal,
           }),
         { cacheTime: 1000 * 60 * 1 },
       );
 
-      return api.normalize.albumArtistList(albumArtistsRes, server);
+      return albumArtistsRes;
     },
     [filter, queryClient, server],
   );
@@ -259,27 +264,29 @@ export const AlbumArtistListContent = ({ gridRef, tableRef }: AlbumArtistListCon
         {display === ListDisplayType.CARD || display === ListDisplayType.POSTER ? (
           <AutoSizer>
             {({ height, width }) => (
-              <VirtualInfiniteGrid
-                ref={gridRef}
-                cardRows={cardRows}
-                display={display || ListDisplayType.CARD}
-                fetchFn={fetch}
-                handlePlayQueueAdd={handlePlayQueueAdd}
-                height={height}
-                initialScrollOffset={grid?.scrollOffset || 0}
-                itemCount={checkAlbumArtistList?.data?.totalRecordCount || 0}
-                itemGap={20}
-                itemSize={grid?.itemsPerRow || 5}
-                itemType={LibraryItem.ALBUM_ARTIST}
-                loading={checkAlbumArtistList.isLoading}
-                minimumBatchSize={40}
-                route={{
-                  route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
-                  slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
-                }}
-                width={width}
-                onScroll={handleGridScroll}
-              />
+              <>
+                <VirtualInfiniteGrid
+                  ref={gridRef}
+                  cardRows={cardRows}
+                  display={display || ListDisplayType.CARD}
+                  fetchFn={fetch}
+                  handlePlayQueueAdd={handlePlayQueueAdd}
+                  height={height}
+                  initialScrollOffset={grid?.scrollOffset || 0}
+                  itemCount={checkAlbumArtistList?.data?.totalRecordCount || 0}
+                  itemGap={20}
+                  itemSize={grid?.itemsPerRow || 5}
+                  itemType={LibraryItem.ALBUM_ARTIST}
+                  loading={checkAlbumArtistList.isLoading}
+                  minimumBatchSize={40}
+                  route={{
+                    route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
+                    slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
+                  }}
+                  width={width}
+                  onScroll={handleGridScroll}
+                />
+              </>
             )}
           </AutoSizer>
         ) : (

@@ -8,6 +8,7 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { PlaylistDetailSongListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header-filters';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
+import { useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
 
@@ -23,7 +24,8 @@ export const PlaylistDetailSongListHeader = ({
   handleToggleShowQueryBuilder,
 }: PlaylistDetailHeaderProps) => {
   const { playlistId } = useParams() as { playlistId: string };
-  const detailQuery = usePlaylistDetail({ id: playlistId });
+  const server = useCurrentServer();
+  const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
   const handlePlayQueueAdd = usePlayQueueAdd();
 
   const handlePlay = async (playType: Play) => {

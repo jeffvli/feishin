@@ -62,6 +62,7 @@ export const ServerList = () => {
           position: 'absolute',
           right: 55,
           transform: 'translateY(-3.5rem)',
+          zIndex: 2000,
         }}
       >
         <Button
@@ -77,21 +78,24 @@ export const ServerList = () => {
       </Group>
       <Stack>
         <Accordion variant="separated">
-          {serverListQuery?.map((s) => (
-            <Accordion.Item
-              key={s.id}
-              value={s.name}
-            >
-              <Accordion.Control icon={<RiServerFill size={15} />}>
-                <Group position="apart">
-                  {titleCase(s.type)} - {s.name}
-                </Group>
-              </Accordion.Control>
-              <Accordion.Panel>
-                <ServerListItem server={s} />
-              </Accordion.Panel>
-            </Accordion.Item>
-          ))}
+          {Object.keys(serverListQuery)?.map((serverId) => {
+            const server = serverListQuery[serverId];
+            return (
+              <Accordion.Item
+                key={server.id}
+                value={server.name}
+              >
+                <Accordion.Control icon={<RiServerFill size={15} />}>
+                  <Group position="apart">
+                    {titleCase(server?.type)} - {server?.name}
+                  </Group>
+                </Accordion.Control>
+                <Accordion.Panel>
+                  <ServerListItem server={server} />
+                </Accordion.Panel>
+              </Accordion.Item>
+            );
+          })}
         </Accordion>
         <Divider />
         <Group>

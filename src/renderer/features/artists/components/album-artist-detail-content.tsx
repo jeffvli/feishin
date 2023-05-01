@@ -1,12 +1,5 @@
 import { useMemo } from 'react';
-import {
-  Button,
-  getColumnDefs,
-  GridCarousel,
-  Text,
-  TextTitle,
-  VirtualTable,
-} from '/@/renderer/components';
+import { Button, GridCarousel, Text, TextTitle } from '/@/renderer/components';
 import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { Box, Group, Stack } from '@mantine/core';
 import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
@@ -38,6 +31,7 @@ import {
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
 import { useTopSongsList } from '/@/renderer/features/artists/queries/top-songs-list-query';
+import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 
 const ContentContainer = styled.div`
   position: relative;
@@ -63,7 +57,7 @@ export const AlbumArtistDetailContent = () => {
   const server = useCurrentServer();
   const itemsPerPage = cq.isXl ? 9 : cq.isLg ? 7 : cq.isMd ? 5 : cq.isSm ? 4 : 3;
 
-  const detailQuery = useAlbumArtistDetail({ id: albumArtistId });
+  const detailQuery = useAlbumArtistDetail({ query: { id: albumArtistId }, serverId: server?.id });
 
   const artistDiscographyLink = `${generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY, {
     albumArtistId,
@@ -80,34 +74,57 @@ export const AlbumArtistDetailContent = () => {
   })}`;
 
   const recentAlbumsQuery = useAlbumList({
-    jfParams: server?.type === ServerType.JELLYFIN ? { artistIds: albumArtistId } : undefined,
-    limit: itemsPerPage,
-    ndParams:
-      server?.type === ServerType.NAVIDROME
-        ? { artist_id: albumArtistId, compilation: false }
-        : undefined,
-    sortBy: AlbumListSort.RELEASE_DATE,
-    sortOrder: SortOrder.DESC,
-    startIndex: 0,
+    query: {
+      _custom: {
+        jellyfin: {
+          ...(server?.type === ServerType.JELLYFIN ? { artistIds: albumArtistId } : undefined),
+        },
+        navidrome: {
+          ...(server?.type === ServerType.NAVIDROME
+            ? { artist_id: albumArtistId, compilation: false }
+            : undefined),
+        },
+      },
+      limit: itemsPerPage,
+      sortBy: AlbumListSort.RELEASE_DATE,
+      sortOrder: SortOrder.DESC,
+      startIndex: 0,
+    },
+    serverId: server?.id,
   });
 
   const compilationAlbumsQuery = useAlbumList({
-    jfParams:
-      server?.type === ServerType.JELLYFIN ? { contributingArtistIds: albumArtistId } : undefined,
-    limit: itemsPerPage,
-    ndParams:
-      server?.type === ServerType.NAVIDROME
-        ? { artist_id: albumArtistId, compilation: true }
-        : undefined,
-    sortBy: AlbumListSort.RELEASE_DATE,
-    sortOrder: SortOrder.DESC,
-    startIndex: 0,
+    query: {
+      _custom: {
+        jellyfin: {
+          ...(server?.type === ServerType.JELLYFIN
+            ? { contributingArtistIds: albumArtistId }
+            : undefined),
+        },
+        navidrome: {
+          ...(server?.type === ServerType.NAVIDROME
+            ? { artist_id: albumArtistId, compilation: true }
+            : undefined),
+        },
+      },
+      limit: itemsPerPage,
+      sortBy: AlbumListSort.RELEASE_DATE,
+      sortOrder: SortOrder.DESC,
+      startIndex: 0,
+    },
+    serverId: server?.id,
   });
 
-  const topSongsQuery = useTopSongsList(
-    { artist: detailQuery?.data?.name || '', artistId: albumArtistId },
-    { enabled: !!detailQuery?.data?.name },
-  );
+  const topSongsQuery = useTopSongsList({
+    options: {
+      enabled: !!detailQuery?.data?.name,
+    },
+    query: {
+      artist: detailQuery?.data?.name || '',
+      artistId: albumArtistId,
+    },
+    serverId: server?.id,
+  });
 
   const topSongsColumnDefs: ColDef[] = useMemo(
     () =>
@@ -242,8 +259,8 @@ export const AlbumArtistDetailContent = () => {
     });
   };
 
-  const createFavoriteMutation = useCreateFavorite();
-  const deleteFavoriteMutation = useDeleteFavorite();
+  const createFavoriteMutation = useCreateFavorite({});
+  const deleteFavoriteMutation = useDeleteFavorite({});
 
   const handleFavorite = () => {
     if (!detailQuery?.data) return;

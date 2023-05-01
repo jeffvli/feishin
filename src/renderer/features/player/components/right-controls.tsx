@@ -19,7 +19,7 @@ import {
 import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
-import { useCreateFavorite, useDeleteFavorite, useUpdateRating } from '/@/renderer/features/shared';
+import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
 import { Rating } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 
@@ -32,9 +32,9 @@ export const RightControls = () => {
   const { rightExpanded: isQueueExpanded } = useSidebarStore();
   const { handleVolumeSlider, handleVolumeWheel, handleMute } = useRightControls();
 
-  const updateRatingMutation = useUpdateRating();
-  const addToFavoritesMutation = useCreateFavorite();
-  const removeFromFavoritesMutation = useDeleteFavorite();
+  const updateRatingMutation = useSetRating({});
+  const addToFavoritesMutation = useCreateFavorite({});
+  const removeFromFavoritesMutation = useDeleteFavorite({});
 
   const handleAddToFavorites = () => {
     if (!currentSong) return;
@@ -51,11 +51,11 @@ export const RightControls = () => {
     if (!currentSong) return;
 
     updateRatingMutation.mutate({
-      _serverId: currentSong?.serverId,
       query: {
         item: [currentSong],
         rating,
       },
+      serverId: currentSong?.serverId,
     });
   };
 
@@ -63,11 +63,11 @@ export const RightControls = () => {
     if (!currentSong || !rating) return;
 
     updateRatingMutation.mutate({
-      _serverId: currentSong?.serverId,
       query: {
         item: [currentSong],
         rating: 0,
       },
+      serverId: currentSong?.serverId,
     });
   };
 

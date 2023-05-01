@@ -17,16 +17,12 @@ import {
   UserListQuery,
   UserListSort,
 } from '/@/renderer/api/types';
+import { Button, ConfirmModal, DropdownMenu, MotionGroup, toast } from '/@/renderer/components';
 import {
-  Button,
-  ConfirmModal,
-  DropdownMenu,
   getColumnDefs,
-  MotionGroup,
-  toast,
   useFixedTableHeader,
   VirtualTable,
-} from '/@/renderer/components';
+} from '/@/renderer/components/virtual-table';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import {
   PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
@@ -68,19 +64,23 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
   const { playlistId } = useParams() as { playlistId: string };
   const page = useSongListStore();
   const handlePlayQueueAdd = usePlayQueueAdd();
-  const detailQuery = usePlaylistDetail({ id: playlistId });
+  const server = useCurrentServer();
+  const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
   const playButtonBehavior = usePlayButtonBehavior();
   const queryClient = useQueryClient();
-  const server = useCurrentServer();
 
-  const playlistSongsQueryInfinite = usePlaylistSongListInfinite(
-    {
+  const playlistSongsQueryInfinite = usePlaylistSongListInfinite({
+    options: {
+      cacheTime: 0,
+      keepPreviousData: false,
+    },
+    query: {
       id: playlistId,
       limit: 50,
       startIndex: 0,
     },
-    { cacheTime: 0, keepPreviousData: false },
-  );
+    serverId: server?.id,
+  });
 
   const handleLoadMore = () => {
     playlistSongsQueryInfinite.fetchNextPage();
@@ -105,17 +105,17 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
   });
 
   const playlistSongData = useMemo(
-    () => playlistSongsQueryInfinite.data?.pages.flatMap((p) => p.items),
+    () => playlistSongsQueryInfinite.data?.pages.flatMap((p) => p?.items),
     [playlistSongsQueryInfinite.data?.pages],
   );
 
   const { intersectRef, tableContainerRef } = useFixedTableHeader();
 
-  const deletePlaylistMutation = useDeletePlaylist();
+  const deletePlaylistMutation = useDeletePlaylist({});
 
   const handleDeletePlaylist = () => {
     deletePlaylistMutation.mutate(
-      { query: { id: playlistId } },
+      { query: { id: playlistId }, serverId: server?.id },
       {
         onError: (err) => {
           toast.error({
@@ -165,30 +165,33 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
       startIndex: 0,
     };
 
+    if (!server) return;
+
     const users = await queryClient.fetchQuery({
-      queryFn: ({ signal }) => api.controller.getUserList({ query, server, signal }),
+      queryFn: ({ signal }) =>
+        api.controller.getUserList({ apiClientProps: { server, signal }, query }),
       queryKey: queryKeys.users.list(server?.id || '', query),
     });
-
-    const normalizedUsers = api.normalize.userList(users, server);
 
     openModal({
       children: (
         <UpdatePlaylistForm
           body={{
+            _custom: {
+              navidrome: {
+                owner: detailQuery?.data?.owner || undefined,
+                ownerId: detailQuery?.data?.ownerId || undefined,
+                public: detailQuery?.data?.public || false,
+                rules: detailQuery?.data?.rules || undefined,
+                sync: detailQuery?.data?.sync || undefined,
+              },
+            },
             comment: detailQuery?.data?.description || undefined,
             genres: detailQuery?.data?.genres,
             name: detailQuery?.data?.name,
-            ndParams: {
-              owner: detailQuery?.data?.owner || undefined,
-              ownerId: detailQuery?.data?.ownerId || undefined,
-              public: detailQuery?.data?.public || false,
-              rules: detailQuery?.data?.rules || undefined,
-              sync: detailQuery?.data?.sync || undefined,
-            },
           }}
           query={{ id: playlistId }}
-          users={normalizedUsers.items}
+          users={users?.items}
           onCancel={closeAllModals}
         />
       ),

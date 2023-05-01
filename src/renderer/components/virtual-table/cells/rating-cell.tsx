@@ -1,22 +1,23 @@
+/* eslint-disable import/no-cycle */
 import { MouseEvent } from 'react';
 import type { ICellRendererParams } from '@ag-grid-community/core';
 import { Rating } from '/@/renderer/components/rating';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
-import { useUpdateRating } from '/@/renderer/components/virtual-table/hooks/use-rating';
+import { useSetRating } from '/@/renderer/features/shared';
 
 export const RatingCell = ({ value, node }: ICellRendererParams) => {
-  const updateRatingMutation = useUpdateRating();
+  const updateRatingMutation = useSetRating({});
 
   const handleUpdateRating = (rating: number) => {
     if (!value) return;
 
     updateRatingMutation.mutate(
       {
-        _serverId: value?.serverId,
         query: {
           item: [value],
           rating,
         },
+        serverId: value?.serverId,
       },
       {
         onSuccess: () => {
@@ -31,11 +32,11 @@ export const RatingCell = ({ value, node }: ICellRendererParams) => {
     e.stopPropagation();
     updateRatingMutation.mutate(
       {
-        _serverId: value?.serverId,
         query: {
           item: [value],
           rating: 0,
         },
+        serverId: value?.serverId,
       },
       {
         onSuccess: () => {

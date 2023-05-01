@@ -1,12 +1,4 @@
-import {
-  ALBUM_CARD_ROWS,
-  getColumnDefs,
-  TablePagination,
-  VirtualGridAutoSizerContainer,
-  VirtualInfiniteGrid,
-  VirtualInfiniteGridRef,
-  VirtualTable,
-} from '/@/renderer/components';
+import { ALBUM_CARD_ROWS } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
 import { ListDisplayType, CardRow } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -40,6 +32,12 @@ import { generatePath, useNavigate } from 'react-router';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { useAlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
+import {
+  VirtualInfiniteGridRef,
+  VirtualGridAutoSizerContainer,
+  VirtualInfiniteGrid,
+} from '/@/renderer/components/virtual-grid';
+import { getColumnDefs, VirtualTable, TablePagination } from '/@/renderer/components/virtual-table';
 
 interface AlbumListContentProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -71,29 +69,36 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
             limit,
             startIndex,
             ...filter,
-            jfParams: {
-              ...filter.jfParams,
-            },
-            ndParams: {
-              ...filter.ndParams,
+            _custom: {
+              jellyfin: {
+                ...filter._custom?.jellyfin,
+              },
+              navidrome: {
+                ...filter._custom?.navidrome,
+              },
             },
           };
 
           const queryKey = queryKeys.albums.list(server?.id || '', query);
 
+          if (!server) {
+            return params.failCallback();
+          }
+
           const albumsRes = await queryClient.fetchQuery(
             queryKey,
             async ({ signal }) =>
               api.controller.getAlbumList({
+                apiClientProps: {
+                  server,
+                  signal,
+                },
                 query,
-                server,
-                signal,
               }),
             { cacheTime: 1000 * 60 * 1 },
           );
 
-          const albums = api.normalize.albumList(albumsRes, server);
-          params.successCallback(albums?.items || [], albumsRes?.totalRecordCount || 0);
+          return params.successCallback(albumsRes?.items || [], albumsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };
@@ -165,15 +170,21 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
 
   const fetch = useCallback(
     async ({ skip, take }: { skip: number; take: number }) => {
+      if (!server) {
+        return [];
+      }
+
       const query: AlbumListQuery = {
         limit: take,
         startIndex: skip,
         ...filter,
-        jfParams: {
-          ...filter.jfParams,
-        },
-        ndParams: {
-          ...filter.ndParams,
+        _custom: {
+          jellyfin: {
+            ...filter._custom?.jellyfin,
+          },
+          navidrome: {
+            ...filter._custom?.navidrome,
+          },
         },
       };
 
@@ -181,13 +192,15 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
 
       const albums = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
         controller.getAlbumList({
+          apiClientProps: {
+            server,
+            signal,
+          },
           query,
-          server,
-          signal,
         }),
       );
 
-      return api.normalize.albumList(albums, server);
+      return albums;
     },
     [filter, queryClient, server],
   );
@@ -268,8 +281,8 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
     navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: e.data.id }));
   };
 
-  const createFavoriteMutation = useCreateFavorite();
-  const deleteFavoriteMutation = useDeleteFavorite();
+  const createFavoriteMutation = useCreateFavorite({});
+  const deleteFavoriteMutation = useDeleteFavorite({});
 
   const handleFavorite = (options: {
     id: string[];

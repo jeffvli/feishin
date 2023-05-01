@@ -23,75 +23,80 @@ const HomeRoute = () => {
     recentlyPlayed: 0,
   });
 
-  const feature = useAlbumList(
-    {
+  const feature = useAlbumList({
+    options: {
+      cacheTime: 1000 * 60,
+      staleTime: 1000 * 60,
+    },
+    query: {
       limit: 20,
       sortBy: AlbumListSort.RANDOM,
       sortOrder: SortOrder.DESC,
       startIndex: 0,
     },
-    {
-      cacheTime: 1000 * 60,
-      staleTime: 1000 * 60,
-    },
-  );
+    serverId: server?.id,
+  });
 
   const featureItemsWithImage = useMemo(() => {
     return feature.data?.items?.filter((item) => item.imageUrl) ?? [];
   }, [feature.data?.items]);
 
-  const random = useAlbumList(
-    {
+  const random = useAlbumList({
+    options: {
+      cacheTime: 1000 * 60,
+      keepPreviousData: true,
+      staleTime: 1000 * 60,
+    },
+    query: {
       limit: itemsPerPage,
       sortBy: AlbumListSort.RANDOM,
       sortOrder: SortOrder.ASC,
       startIndex: pagination.random * itemsPerPage,
     },
-    {
-      cacheTime: 1000 * 60,
-      keepPreviousData: true,
-      staleTime: 1000 * 60,
-    },
-  );
+    serverId: server?.id,
+  });
 
-  const recentlyPlayed = useRecentlyPlayed(
-    {
+  const recentlyPlayed = useRecentlyPlayed({
+    options: {
+      keepPreviousData: true,
+      staleTime: 0,
+    },
+    query: {
       limit: itemsPerPage,
       sortBy: AlbumListSort.RECENTLY_PLAYED,
       sortOrder: SortOrder.DESC,
       startIndex: pagination.recentlyPlayed * itemsPerPage,
     },
-    {
-      keepPreviousData: true,
-      staleTime: 0,
-    },
-  );
+    serverId: server?.id,
+  });
 
-  const recentlyAdded = useAlbumList(
-    {
+  const recentlyAdded = useAlbumList({
+    options: {
+      keepPreviousData: true,
+      staleTime: 1000 * 60,
+    },
+    query: {
       limit: itemsPerPage,
       sortBy: AlbumListSort.RECENTLY_ADDED,
       sortOrder: SortOrder.DESC,
       startIndex: pagination.recentlyAdded * itemsPerPage,
     },
-    {
-      keepPreviousData: true,
-      staleTime: 1000 * 60,
-    },
-  );
+    serverId: server?.id,
+  });
 
-  const mostPlayed = useAlbumList(
-    {
+  const mostPlayed = useAlbumList({
+    options: {
+      keepPreviousData: true,
+      staleTime: 1000 * 60 * 60,
+    },
+    query: {
       limit: itemsPerPage,
       sortBy: AlbumListSort.PLAY_COUNT,
       sortOrder: SortOrder.DESC,
       startIndex: pagination.mostPlayed * itemsPerPage,
     },
-    {
-      keepPreviousData: true,
-      staleTime: 1000 * 60 * 60,
-    },
-  );
+    serverId: server?.id,
+  });
 
   const handleNextPage = useCallback(
     (key: 'mostPlayed' | 'random' | 'recentlyAdded' | 'recentlyPlayed') => {

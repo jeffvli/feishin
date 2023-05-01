@@ -100,9 +100,12 @@ export const Sidebar = () => {
   };
 
   const playlistsQuery = usePlaylistList({
-    sortBy: PlaylistListSort.NAME,
-    sortOrder: SortOrder.ASC,
-    startIndex: 0,
+    query: {
+      sortBy: PlaylistListSort.NAME,
+      sortOrder: SortOrder.ASC,
+      startIndex: 0,
+    },
+    serverId: server?.id,
   });
 
   const setFullScreenPlayerStore = useSetFullScreenPlayerStore();

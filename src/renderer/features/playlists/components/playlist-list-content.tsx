@@ -13,12 +13,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import {
-  getColumnDefs,
-  TablePagination,
-  VirtualGridAutoSizerContainer,
-  VirtualTable,
-} from '/@/renderer/components';
-import {
   useCurrentServer,
   usePlaylistListStore,
   usePlaylistTablePagination,
@@ -33,6 +27,8 @@ import { PLAYLIST_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/c
 import { generatePath, useNavigate } from 'react-router';
 import { AppRoute } from '/@/renderer/router/routes';
 import { LibraryItem } from '/@/renderer/api/types';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
+import { getColumnDefs, VirtualTable, TablePagination } from '/@/renderer/components/virtual-table';
 
 interface PlaylistListContentProps {
   itemCount?: number;
@@ -81,13 +77,15 @@ export const PlaylistListContent = ({ tableRef, itemCount }: PlaylistListContent
             queryKey,
             async ({ signal }) =>
               api.controller.getPlaylistList({
+                apiClientProps: {
+                  server,
+                  signal,
+                },
                 query: {
                   limit,
                   startIndex,
                   ...page.filter,
                 },
-                server,
-                signal,
               }),
             { cacheTime: 1000 * 60 * 1 },
           );

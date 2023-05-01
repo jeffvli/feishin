@@ -23,15 +23,20 @@ export const AddToPlaylistContextModal = ({
   const server = useCurrentServer();
   const [isLoading, setIsLoading] = useState(false);
 
-  const addToPlaylistMutation = useAddToPlaylist();
+  const addToPlaylistMutation = useAddToPlaylist({});
 
   const playlistList = usePlaylistList({
-    ndParams: {
-      smart: false,
+    query: {
+      _custom: {
+        navidrome: {
+          smart: false,
+        },
+      },
+      sortBy: PlaylistListSort.NAME,
+      sortOrder: SortOrder.ASC,
+      startIndex: 0,
     },
-    sortBy: PlaylistListSort.NAME,
-    sortOrder: SortOrder.ASC,
-    startIndex: 0,
+    serverId: server?.id,
   });
 
   const playlistSelect = useMemo(() => {
@@ -60,11 +65,12 @@ export const AddToPlaylistContextModal = ({
 
     const queryKey = queryKeys.songs.list(server?.id || '', query);
 
-    const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) =>
-      api.controller.getSongList({ query, server, signal }),
-    );
+    const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
+      if (!server) throw new Error('No server');
+      return api.controller.getSongList({ apiClientProps: { server, signal }, query });
+    });
 
-    return api.normalize.songList(songsRes, server);
+    return songsRes;
   };
 
   const getSongsByArtist = async (artistId: string) => {
@@ -77,11 +83,12 @@ export const AddToPlaylistContextModal = ({
 
     const queryKey = queryKeys.songs.list(server?.id || '', query);
 
-    const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) =>
-      api.controller.getSongList({ query, server, signal }),
-    );
+    const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
+      if (!server) throw new Error('No server');
+      return api.controller.getSongList({ apiClientProps: { server, signal }, query });
+    });
 
-    return api.normalize.songList(songsRes, server);
+    return songsRes;
   };
 
   const isSubmitDisabled = form.values.playlistId.length === 0 || addToPlaylistMutation.isLoading;
@@ -118,17 +125,18 @@ export const AddToPlaylistContextModal = ({
 
         const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, query);
 
-        const playlistSongsRes = await queryClient.fetchQuery(queryKey, ({ signal }) =>
-          api.controller.getPlaylistSongList({
+        const playlistSongsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
+          if (!server) throw new Error('No server');
+          return api.controller.getPlaylistSongList({
+            apiClientProps: {
+              server,
+              signal,
+            },
             query: { id: playlistId, startIndex: 0 },
-            server,
-            signal,
-          }),
-        );
+          });
+        });
 
-        const playlistSongIds = api.normalize
-          .songList(playlistSongsRes, server)
-          .items?.map((song) => song.id);
+        const playlistSongIds = playlistSongsRes?.items?.map((song) => song.id);
 
         for (const songId of allSongIds) {
           if (!playlistSongIds?.includes(songId)) {
@@ -138,10 +146,12 @@ export const AddToPlaylistContextModal = ({
       }
 
       if (values.skipDuplicates ? uniqueSongIds.length > 0 : allSongIds.length > 0) {
+        if (!server) return null;
         addToPlaylistMutation.mutate(
           {
             body: { songId: values.skipDuplicates ? uniqueSongIds : allSongIds },
             query: { id: playlistId },
+            serverId: server?.id,
           },
           {
             onError: (err) => {

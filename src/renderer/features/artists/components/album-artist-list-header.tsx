@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { PageHeader, SearchInput, VirtualInfiniteGridRef } from '/@/renderer/components';
+import { PageHeader, SearchInput } from '/@/renderer/components';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
@@ -20,6 +20,7 @@ import { ListDisplayType } from '/@/renderer/types';
 import { AlbumArtistListHeaderFilters } from '/@/renderer/features/artists/components/album-artist-list-header-filters';
 import { useAlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
 import { FilterBar } from '../../shared/components/filter-bar';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 
 interface AlbumArtistListHeaderProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -51,18 +52,20 @@ export const AlbumArtistListHeader = ({
         queryKey,
         async ({ signal }) =>
           api.controller.getAlbumArtistList({
+            apiClientProps: {
+              server,
+              signal,
+            },
             query: {
               limit,
               startIndex,
               ...filters,
             },
-            server,
-            signal,
           }),
         { cacheTime: 1000 * 60 * 1 },
       );
 
-      return api.normalize.albumArtistList(albums, server);
+      return albums;
     },
     [queryClient, server],
   );
@@ -85,20 +88,21 @@ export const AlbumArtistListHeader = ({
               queryKey,
               async ({ signal }) =>
                 api.controller.getAlbumArtistList({
+                  apiClientProps: {
+                    server,
+                    signal,
+                  },
                   query: {
                     limit,
                     startIndex,
                     ...filters,
                   },
-                  server,
-                  signal,
                 }),
               { cacheTime: 1000 * 60 * 1 },
             );
 
-            const albumArtists = api.normalize.albumArtistList(albumArtistsRes, server);
             params.successCallback(
-              albumArtists?.items || [],
+              albumArtistsRes?.items || [],
               albumArtistsRes?.totalRecordCount || 0,
             );
           },

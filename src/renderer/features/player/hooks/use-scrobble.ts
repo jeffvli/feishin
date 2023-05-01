@@ -67,13 +67,13 @@ export const useScrobble = () => {
         currentSong?.serverType === ServerType.JELLYFIN ? currentTime * 1e7 : undefined;
 
       sendScrobble.mutate({
-        _serverId: currentSong?.serverId,
         query: {
           event: 'timeupdate',
           id: currentSong.id,
           position,
           submission: false,
         },
+        serverId: currentSong?.serverId,
       });
     },
     [isScrobbleEnabled, sendScrobble],
@@ -110,12 +110,12 @@ export const useScrobble = () => {
             previousSong?.serverType === ServerType.JELLYFIN ? previousSongTime * 1e7 : undefined;
 
           sendScrobble.mutate({
-            _serverId: previousSong?.serverId,
             query: {
               id: previousSong.id,
               position,
               submission: true,
             },
+            serverId: previousSong?.serverId,
           });
         }
       }
@@ -130,13 +130,13 @@ export const useScrobble = () => {
         // Send start scrobble when song changes and the new song is playing
         if (status === PlayerStatus.PLAYING && currentSong?.id) {
           sendScrobble.mutate({
-            _serverId: currentSong?.serverId,
             query: {
               event: 'start',
               id: currentSong.id,
               position: 0,
               submission: false,
             },
+            serverId: currentSong?.serverId,
           });
 
           if (currentSong?.serverType === ServerType.JELLYFIN) {
@@ -175,13 +175,13 @@ export const useScrobble = () => {
       // Whenever the player is restarted, send a 'start' scrobble
       if (status === PlayerStatus.PLAYING) {
         sendScrobble.mutate({
-          _serverId: currentSong?.serverId,
           query: {
             event: 'unpause',
             id: currentSong.id,
             position,
             submission: false,
           },
+          serverId: currentSong?.serverId,
         });
 
         if (currentSong?.serverType === ServerType.JELLYFIN) {
@@ -194,13 +194,13 @@ export const useScrobble = () => {
         // Jellyfin is the only one that needs to send a 'pause' event to the server
       } else if (currentSong?.serverType === ServerType.JELLYFIN) {
         sendScrobble.mutate({
-          _serverId: currentSong?.serverId,
           query: {
             event: 'pause',
             id: currentSong.id,
             position,
             submission: false,
           },
+          serverId: currentSong?.serverId,
         });
 
         if (progressIntervalId.current) {
@@ -217,11 +217,11 @@ export const useScrobble = () => {
 
         if (!isCurrentSongScrobbled && shouldSubmitScrobble) {
           sendScrobble.mutate({
-            _serverId: currentSong?.serverId,
             query: {
               id: currentSong.id,
               submission: true,
             },
+            serverId: currentSong?.serverId,
           });
 
           setIsCurrentSongScrobbled(true);
@@ -261,24 +261,24 @@ export const useScrobble = () => {
 
       if (!isCurrentSongScrobbled && shouldSubmitScrobble) {
         sendScrobble.mutate({
-          _serverId: currentSong?.serverId,
           query: {
             id: currentSong.id,
             position,
             submission: true,
           },
+          serverId: currentSong?.serverId,
         });
       }
 
       if (currentSong?.serverType === ServerType.JELLYFIN) {
         sendScrobble.mutate({
-          _serverId: currentSong?.serverId,
           query: {
             event: 'start',
             id: currentSong.id,
             position: 0,
             submission: false,
           },
+          serverId: currentSong?.serverId,
         });
       }
 

@@ -9,12 +9,6 @@ import type {
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import {
-  getColumnDefs,
-  TablePagination,
-  VirtualGridAutoSizerContainer,
-  VirtualTable,
-} from '/@/renderer/components';
-import {
   useCurrentServer,
   usePlaylistDetailStore,
   usePlaylistDetailTablePagination,
@@ -44,6 +38,8 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
+import { getColumnDefs, VirtualTable, TablePagination } from '/@/renderer/components/virtual-table';
 
 interface PlaylistDetailContentProps {
   tableRef: MutableRefObject<AgGridReactType | null>;
@@ -61,7 +57,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     };
   }, [page?.table.id, playlistId]);
 
-  const detailQuery = usePlaylistDetail({ id: playlistId });
+  const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
 
   const p = usePlaylistDetailTablePagination(playlistId);
   const pagination = {
@@ -80,9 +76,12 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
   const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
 
   const checkPlaylistList = usePlaylistSongList({
-    id: playlistId,
-    limit: 1,
-    startIndex: 0,
+    query: {
+      id: playlistId,
+      limit: 1,
+      startIndex: 0,
+    },
+    serverId: server?.id,
   });
 
   const columnDefs: ColDef[] = useMemo(
@@ -104,24 +103,27 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
             ...filters,
           });
 
+          if (!server) return;
+
           const songsRes = await queryClient.fetchQuery(
             queryKey,
             async ({ signal }) =>
               api.controller.getPlaylistSongList({
+                apiClientProps: {
+                  server,
+                  signal,
+                },
                 query: {
                   id: playlistId,
                   limit,
                   startIndex,
                   ...filters,
                 },
-                server,
-                signal,
               }),
             { cacheTime: 1000 * 60 * 1 },
           );
 
-          const songs = api.normalize.songList(songsRes, server);
-          params.successCallback(songs?.items || [], songsRes?.totalRecordCount || 0);
+          params.successCallback(songsRes?.items || [], songsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };

@@ -13,7 +13,7 @@ interface UpdatePlaylistFormProps {
 }
 
 export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlaylistFormProps) => {
-  const mutation = useUpdatePlaylist();
+  const mutation = useUpdatePlaylist({});
   const server = useCurrentServer();
 
   const userList = users?.map((user) => ({
@@ -23,21 +23,27 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
 
   const form = useForm<UpdatePlaylistBody>({
     initialValues: {
+      _custom: {
+        navidrome: {
+          owner: body?._custom?.navidrome?.owner || '',
+          ownerId: body?._custom?.navidrome?.ownerId || '',
+          public: body?._custom?.navidrome?.public || false,
+          rules: undefined,
+          sync: body?._custom?.navidrome?.sync || false,
+        },
+      },
       comment: body?.comment || '',
       name: body?.name || '',
-      ndParams: {
-        owner: body?.ndParams?.owner || '',
-        ownerId: body?.ndParams?.ownerId || '',
-        public: body?.ndParams?.public || false,
-        rules: undefined,
-        sync: body?.ndParams?.sync || false,
-      },
     },
   });
 
   const handleSubmit = form.onSubmit((values) => {
     mutation.mutate(
-      { body: values, query },
+      {
+        body: values,
+        query,
+        serverId: server?.id,
+      },
       {
         onError: (err) => {
           toast.error({ message: err.message, title: 'Error updating playlist' });

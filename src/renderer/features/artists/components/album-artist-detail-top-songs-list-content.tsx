@@ -1,13 +1,14 @@
 import { MutableRefObject, useMemo } from 'react';
 import type { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { getColumnDefs, VirtualGridAutoSizerContainer, VirtualTable } from '/@/renderer/components';
 import { useCurrentServer, useSongListStore } from '/@/renderer/store';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
+import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 
 interface AlbumArtistSongListContentProps {
   data: QueueSong[];

@@ -1,20 +1,11 @@
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '/@/renderer/api/index';
-import { jfNormalize } from '/@/renderer/api/jellyfin.api';
-import { JFSong } from '/@/renderer/api/jellyfin.types';
-import { ndNormalize } from '/@/renderer/api/navidrome.api';
-import { NDSong } from '/@/renderer/api/navidrome.types';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import {
-  useAuthStore,
-  useCurrentServer,
-  usePlayerControls,
-  usePlayerStore,
-} from '/@/renderer/store';
+import { useCurrentServer, usePlayerControls, usePlayerStore } from '/@/renderer/store';
 import { usePlayerType } from '/@/renderer/store/settings.store';
 import { PlayQueueAddOptions, Play, PlaybackType } from '/@/renderer/types';
-import { toast } from '/@/renderer/components/toast';
+import { toast } from '/@/renderer/components/toast/index';
 import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
 import { LibraryItem, SongListSort, SortOrder } from '/@/renderer/api/types';
@@ -25,7 +16,6 @@ const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
 export const useHandlePlayQueueAdd = () => {
   const queryClient = useQueryClient();
   const playerType = usePlayerType();
-  const deviceId = useAuthStore.getState().deviceId;
   const server = useCurrentServer();
   const { play } = usePlayerControls();
 
@@ -114,9 +104,11 @@ export const useHandlePlayQueueAdd = () => {
               queryKey,
               async ({ signal }) =>
                 api.controller.getPlaylistSongList({
+                  apiClientProps: {
+                    server,
+                    signal,
+                  },
                   query: queryFilter,
-                  server,
-                  signal,
                 }),
               {
                 cacheTime: 1000 * 60,
@@ -128,9 +120,11 @@ export const useHandlePlayQueueAdd = () => {
               queryKey,
               async ({ signal }) =>
                 api.controller.getSongList({
+                  apiClientProps: {
+                    server,
+                    signal,
+                  },
                   query: queryFilter,
-                  server,
-                  signal,
                 }),
               {
                 cacheTime: 1000 * 60,
@@ -147,20 +141,7 @@ export const useHandlePlayQueueAdd = () => {
 
         if (!songsList) return toast.warn({ message: 'No songs found' });
 
-        switch (server?.type) {
-          case 'jellyfin':
-            songs = songsList.items?.map((song) =>
-              jfNormalize.song(song as JFSong, server, deviceId),
-            );
-            break;
-          case 'navidrome':
-            songs = songsList.items?.map((song) =>
-              ndNormalize.song(song as NDSong, server, deviceId),
-            );
-            break;
-          case 'subsonic':
-            break;
-        }
+        songs = songsList.items?.map((song) => ({ ...song, uniqueId: nanoid() }));
       } else if (options.byData) {
         songs = options.byData.map((song) => ({ ...song, uniqueId: nanoid() }));
       }
@@ -207,7 +188,7 @@ export const useHandlePlayQueueAdd = () => {
 
       return null;
     },
-    [deviceId, play, playerType, queryClient, server],
+    [play, playerType, queryClient, server],
   );
 
   return handlePlayQueueAdd;

@@ -1,13 +1,5 @@
 import { MutableRefObject, useCallback, useMemo } from 'react';
-import {
-  Button,
-  getColumnDefs,
-  GridCarousel,
-  Text,
-  TextTitle,
-  useFixedTableHeader,
-  VirtualTable,
-} from '/@/renderer/components';
+import { Button, GridCarousel, Text, TextTitle } from '/@/renderer/components';
 import { ColDef, RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
@@ -33,6 +25,12 @@ import { PlayButton, useCreateFavorite, useDeleteFavorite } from '/@/renderer/fe
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { useCurrentServer } from '/@/renderer/store';
+import {
+  getColumnDefs,
+  useFixedTableHeader,
+  VirtualTable,
+} from '/@/renderer/components/virtual-table';
 
 const isFullWidthRow = (node: RowNode) => {
   return node.id?.includes('disc-');
@@ -60,7 +58,8 @@ interface AlbumDetailContentProps {
 
 export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
   const { albumId } = useParams() as { albumId: string };
-  const detailQuery = useAlbumDetail({ id: albumId });
+  const server = useCurrentServer();
+  const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
   const cq = useContainerQuery();
   const handlePlayQueueAdd = usePlayQueueAdd();
 
@@ -165,26 +164,29 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
 
   const itemsPerPage = cq.isXl ? 9 : cq.isLg ? 7 : cq.isMd ? 5 : cq.isSm ? 4 : 3;
 
-  const artistQuery = useAlbumList(
-    {
-      jfParams: {
-        albumArtistIds: detailQuery?.data?.albumArtists[0]?.id,
-      },
-      limit: itemsPerPage,
-      ndParams: {
-        artist_id: detailQuery?.data?.albumArtists[0]?.id,
-      },
-      sortBy: AlbumListSort.YEAR,
-      sortOrder: SortOrder.DESC,
-      startIndex: pagination.artist * itemsPerPage,
-    },
-    {
+  const artistQuery = useAlbumList({
+    options: {
       cacheTime: 1000 * 60,
       enabled: detailQuery?.data?.albumArtists[0]?.id !== undefined,
       keepPreviousData: true,
       staleTime: 1000 * 60,
     },
-  );
+    query: {
+      _custom: {
+        jellyfin: {
+          albumArtistIds: detailQuery?.data?.albumArtists[0]?.id,
+        },
+        navidrome: {
+          artist_id: detailQuery?.data?.albumArtists[0]?.id,
+        },
+      },
+      limit: itemsPerPage,
+      sortBy: AlbumListSort.YEAR,
+      sortOrder: SortOrder.DESC,
+      startIndex: pagination.artist * itemsPerPage,
+    },
+    serverId: server?.id,
+  });
 
   const carousels = [
     {
@@ -227,8 +229,8 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     });
   };
 
-  const createFavoriteMutation = useCreateFavorite();
-  const deleteFavoriteMutation = useDeleteFavorite();
+  const createFavoriteMutation = useCreateFavorite({});
+  const deleteFavoriteMutation = useDeleteFavorite({});
 
   const handleFavorite = () => {
     if (!detailQuery?.data) return;

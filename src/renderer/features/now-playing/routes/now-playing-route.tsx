@@ -4,8 +4,9 @@ import { NowPlayingHeader } from '/@/renderer/features/now-playing/components/no
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import type { Song } from '/@/renderer/api/types';
 import { AnimatedPage } from '/@/renderer/features/shared';
-import { Paper, VirtualGridContainer } from '/@/renderer/components';
+import { Paper } from '/@/renderer/components';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
+import { VirtualGridContainer } from '/@/renderer/components/virtual-grid';
 
 const NowPlayingRoute = () => {
   const queueRef = useRef<{ grid: AgGridReactType<Song> } | null>(null);

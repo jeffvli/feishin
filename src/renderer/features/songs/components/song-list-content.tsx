@@ -13,12 +13,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import {
-  getColumnDefs,
-  TablePagination,
-  VirtualGridAutoSizerContainer,
-  VirtualTable,
-} from '/@/renderer/components';
-import {
   useCurrentServer,
   useListStoreActions,
   useSongListFilter,
@@ -33,6 +27,8 @@ import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem, QueueSong, SongListQuery } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useSongListContext } from '/@/renderer/features/songs/context/song-list-context';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
+import { getColumnDefs, VirtualTable, TablePagination } from '/@/renderer/components/virtual-table';
 
 interface SongListContentProps {
   itemCount?: number;
@@ -74,9 +70,11 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
             queryKey,
             async ({ signal }) =>
               api.controller.getSongList({
+                apiClientProps: {
+                  server,
+                  signal,
+                },
                 query,
-                server,
-                signal,
               }),
             { cacheTime: 1000 * 60 * 1 },
           );

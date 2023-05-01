@@ -17,15 +17,7 @@ import {
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
-import {
-  DropdownMenu,
-  SONG_TABLE_COLUMNS,
-  Button,
-  Slider,
-  MultiSelect,
-  Switch,
-  Text,
-} from '/@/renderer/components';
+import { DropdownMenu, Button, Slider, MultiSelect, Switch, Text } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useMusicFolders } from '/@/renderer/features/shared';
 import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jellyfin-song-filters';
@@ -42,6 +34,7 @@ import {
 } from '/@/renderer/store';
 import { ListDisplayType, ServerType, Play, TableColumn } from '/@/renderer/types';
 import { useSongListContext } from '/@/renderer/features/songs/context/song-list-context';
+import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 
 const FILTERS = {
   jellyfin: [
@@ -100,7 +93,7 @@ export const SongListHeaderFilters = ({
   const handlePlayQueueAdd = usePlayQueueAdd();
   const cq = useContainerQuery();
 
-  const musicFoldersQuery = useMusicFolders();
+  const musicFoldersQuery = useMusicFolders({ query: null, serverId: server?.id });
 
   const sortByLabel =
     (server?.type &&
@@ -133,9 +126,11 @@ export const SongListHeaderFilters = ({
             queryKey,
             async ({ signal }) =>
               api.controller.getSongList({
+                apiClientProps: {
+                  server,
+                  signal,
+                },
                 query,
-                server,
-                signal,
               }),
             { cacheTime: 1000 * 60 * 1 },
           );
@@ -306,18 +301,18 @@ export const SongListHeaderFilters = ({
   const isFilterApplied = useMemo(() => {
     const isNavidromeFilterApplied =
       server?.type === ServerType.NAVIDROME &&
-      filter.ndParams &&
-      Object.values(filter.ndParams).some((value) => value !== undefined);
+      filter._custom?.navidrome &&
+      Object.values(filter._custom?.navidrome).some((value) => value !== undefined);
 
     const isJellyfinFilterApplied =
       server?.type === ServerType.JELLYFIN &&
-      filter.jfParams &&
-      Object.values(filter.jfParams)
+      filter._custom?.jellyfin &&
+      Object.values(filter._custom?.jellyfin)
         .filter((value) => value !== 'Audio') // Don't account for includeItemTypes: Audio
         .some((value) => value !== undefined);
 
     return isNavidromeFilterApplied || isJellyfinFilterApplied;
-  }, [filter.jfParams, filter.ndParams, server?.type]);
+  }, [filter._custom?.jellyfin, filter._custom?.navidrome, server?.type]);
 
   return (
     <Flex justify="space-between">
@@ -382,7 +377,7 @@ export const SongListHeaderFilters = ({
               </Button>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-              {musicFoldersQuery.data?.map((folder) => (
+              {musicFoldersQuery.data?.items.map((folder) => (
                 <DropdownMenu.Item
                   key={`musicFolder-${folder.id}`}
                   $isActive={filter.musicFolderId === folder.id}

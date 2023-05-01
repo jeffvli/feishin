@@ -1,4 +1,3 @@
-import { VirtualInfiniteGridRef } from '/@/renderer/components';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AlbumListHeader } from '/@/renderer/features/albums/components/album-list-header';
 import { AlbumListContent } from '/@/renderer/features/albums/components/album-list-content';
@@ -8,6 +7,7 @@ import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-que
 import { generatePageKey, useAlbumListFilter, useCurrentServer } from '/@/renderer/store';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { AlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 
 const AlbumListRoute = () => {
   const gridRef = useRef<VirtualInfiniteGridRef | null>(null);
@@ -24,17 +24,18 @@ const AlbumListRoute = () => {
 
   const albumListFilter = useAlbumListFilter({ id: albumArtistId || undefined, key: pageKey });
 
-  const itemCountCheck = useAlbumList(
-    {
+  const itemCountCheck = useAlbumList({
+    options: {
+      cacheTime: 1000 * 60,
+      staleTime: 1000 * 60,
+    },
+    query: {
       limit: 1,
       startIndex: 0,
       ...albumListFilter,
     },
-    {
-      cacheTime: 1000 * 60,
-      staleTime: 1000 * 60,
-    },
-  );
+    serverId: server?.id,
+  });
 
   const itemCount =
     itemCountCheck.data?.totalRecordCount === null
