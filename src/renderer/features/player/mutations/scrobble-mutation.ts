@@ -8,7 +8,12 @@ import { getServerById, useIncrementQueuePlayCount } from '/@/renderer/store';
 export const useSendScrobble = (options?: MutationOptions) => {
   const incrementPlayCount = useIncrementQueuePlayCount();
 
-  return useMutation<ScrobbleResponse, HTTPError, Omit<ScrobbleArgs, 'server'>, null>({
+  return useMutation<
+    ScrobbleResponse,
+    HTTPError,
+    Omit<ScrobbleArgs, 'server' | 'apiClientProps'>,
+    null
+  >({
     mutationFn: (args) => {
       const server = getServerById(args.serverId);
       if (!server) throw new Error('Server not found');

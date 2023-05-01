@@ -1,9 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { HTTPError } from 'ky';
 import { api } from '/@/renderer/api';
-import { NDAlbumArtistDetail, NDAlbumDetail } from '/@/renderer/api/navidrome.types';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { SSAlbumArtistDetail, SSAlbumDetail } from '/@/renderer/api/subsonic.types';
 import {
   Album,
   AlbumArtist,
@@ -11,7 +9,8 @@ import {
   LibraryItem,
   SetRatingArgs,
   RatingResponse,
-  ServerType,
+  AlbumDetailResponse,
+  AlbumArtistDetailResponse,
 } from '/@/renderer/api/types';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useSetAlbumListItemDataById, useSetQueueRating } from '/@/renderer/store';
@@ -65,61 +64,35 @@ export const useSetRating = (args: MutationHookArgs) => {
         variables.query.item.length === 1 && variables.query.item[0].itemType === LibraryItem.ALBUM;
 
       if (isAlbumDetailPage) {
-        const { serverType, id: albumId, serverId } = variables.query.item[0] as Album;
+        const { id: albumId, serverId } = variables.query.item[0] as Album;
 
         const queryKey = queryKeys.albums.detail(serverId || '', { id: albumId });
-        const previous = queryClient.getQueryData<any>(queryKey);
+        const previous = queryClient.getQueryData<AlbumDetailResponse>(queryKey);
         if (previous) {
-          switch (serverType) {
-            case ServerType.NAVIDROME:
-              queryClient.setQueryData<NDAlbumDetail>(queryKey, {
-                ...previous,
-                rating: variables.query.rating,
-              });
-              break;
-            case ServerType.SUBSONIC:
-              queryClient.setQueryData<SSAlbumDetail>(queryKey, {
-                ...previous,
-                userRating: variables.query.rating,
-              });
-              break;
-            case ServerType.JELLYFIN:
-              // Jellyfin does not support ratings
-              break;
-          }
+          queryClient.setQueryData<AlbumDetailResponse>(queryKey, {
+            ...previous,
+            userRating: variables.query.rating,
+          });
         }
       }
 
-      // We only need to set if we're already on the album detail page
+      // We only need to set if we're already on the album artist detail page
       const isAlbumArtistDetailPage =
         variables.query.item.length === 1 &&
         variables.query.item[0].itemType === LibraryItem.ALBUM_ARTIST;
 
       if (isAlbumArtistDetailPage) {
-        const { serverType, id: albumArtistId, serverId } = variables.query.item[0] as AlbumArtist;
+        const { id: albumArtistId, serverId } = variables.query.item[0] as AlbumArtist;
 
         const queryKey = queryKeys.albumArtists.detail(serverId || '', {
           id: albumArtistId,
         });
-        const previous = queryClient.getQueryData<any>(queryKey);
+        const previous = queryClient.getQueryData<AlbumArtistDetailResponse>(queryKey);
         if (previous) {
-          switch (serverType) {
-            case ServerType.NAVIDROME:
-              queryClient.setQueryData<NDAlbumArtistDetail>(queryKey, {
-                ...previous,
-                rating: variables.query.rating,
-              });
-              break;
-            case ServerType.SUBSONIC:
-              queryClient.setQueryData<SSAlbumArtistDetail>(queryKey, {
-                ...previous,
-                userRating: variables.query.rating,
-              });
-              break;
-            case ServerType.JELLYFIN:
-              // Jellyfin does not support ratings
-              break;
-          }
+          queryClient.setQueryData<AlbumArtistDetailResponse>(queryKey, {
+            ...previous,
+            userRating: variables.query.rating,
+          });
         }
       }
     },

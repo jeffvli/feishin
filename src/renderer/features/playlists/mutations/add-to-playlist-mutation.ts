@@ -23,6 +23,9 @@ export const useAddToPlaylist = (args: MutationHookArgs) => {
     },
     onSuccess: (_data, variables) => {
       const { serverId } = variables;
+
+      if (!serverId) return;
+
       queryClient.invalidateQueries(queryKeys.playlists.list(serverId), { exact: false });
       queryClient.invalidateQueries(queryKeys.playlists.detail(serverId, variables.query.id));
       queryClient.invalidateQueries(

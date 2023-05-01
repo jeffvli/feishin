@@ -5,7 +5,7 @@ import type {
   UseInfiniteQueryOptions,
 } from '@tanstack/react-query';
 import { QueryClient, QueryCache } from '@tanstack/react-query';
-import { toast } from '/@/renderer/components';
+import { toast } from '/@/renderer/components/toast/index';
 
 const queryCache = new QueryCache({
   onError: (error: any, query) => {
@@ -39,7 +39,7 @@ export const queryClient = new QueryClient({
 export type QueryHookArgs<T> = {
   options?: QueryOptions;
   query: T;
-  serverId?: string;
+  serverId: string | undefined;
 };
 
 export type MutationHookArgs = {

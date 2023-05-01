@@ -10,7 +10,12 @@ export const useUpdatePlaylist = (args: MutationHookArgs) => {
   const { options } = args || {};
   const queryClient = useQueryClient();
 
-  return useMutation<UpdatePlaylistResponse, HTTPError, Omit<UpdatePlaylistArgs, 'server'>, null>({
+  return useMutation<
+    UpdatePlaylistResponse,
+    HTTPError,
+    Omit<UpdatePlaylistArgs, 'server' | 'apiClientProps'>,
+    null
+  >({
     mutationFn: (args) => {
       const server = getServerById(args.serverId);
       if (!server) throw new Error('Server not found');
@@ -18,6 +23,9 @@ export const useUpdatePlaylist = (args: MutationHookArgs) => {
     },
     onSuccess: (_data, variables) => {
       const { query, serverId } = variables;
+
+      if (!serverId) return;
+
       queryClient.invalidateQueries(queryKeys.playlists.list(serverId));
 
       if (query?.id) {

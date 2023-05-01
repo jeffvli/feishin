@@ -1,24 +1,22 @@
-import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import type { GenreListQuery, RawGenreListResponse } from '/@/renderer/api/types';
-import type { QueryOptions } from '/@/renderer/lib/react-query';
-import { useCurrentServer } from '/@/renderer/store';
-import { api } from '/@/renderer/api';
+import type { GenreListQuery } from '/@/renderer/api/types';
+import type { QueryHookArgs } from '/@/renderer/lib/react-query';
+import { getServerById } from '/@/renderer/store';
 
-export const useGenreList = (query: GenreListQuery, options?: QueryOptions) => {
-  const server = useCurrentServer();
+export const useGenreList = (args: QueryHookArgs<GenreListQuery>) => {
+  const { options, query, serverId } = args || {};
+  const server = getServerById(serverId);
 
   return useQuery({
     cacheTime: 1000 * 60 * 60 * 2,
-    enabled: !!server?.id,
-    queryFn: ({ signal }) => controller.getGenreList({ query, server, signal }),
+    enabled: !!server,
+    queryFn: ({ signal }) => {
+      if (!server) throw new Error('Server not found');
+      return controller.getGenreList({ apiClientProps: { server, signal }, query });
+    },
     queryKey: queryKeys.genres.list(server?.id || ''),
-    select: useCallback(
-      (data: RawGenreListResponse | undefined) => api.normalize.genreList(data, server),
-      [server],
-    ),
     staleTime: 1000 * 60 * 60,
     ...options,
   });

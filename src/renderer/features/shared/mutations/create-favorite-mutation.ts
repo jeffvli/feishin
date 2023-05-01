@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { HTTPError } from 'ky';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -9,11 +9,12 @@ import {
   FavoriteResponse,
   LibraryItem,
 } from '/@/renderer/api/types';
-import { MutationHookArgs, queryClient } from '/@/renderer/lib/react-query';
+import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useSetAlbumListItemDataById, useSetQueueFavorite } from '/@/renderer/store';
 
-export const useCreateFavorite = (args?: MutationHookArgs) => {
+export const useCreateFavorite = (args: MutationHookArgs) => {
   const { options } = args || {};
+  const queryClient = useQueryClient();
   const setAlbumListData = useSetAlbumListItemDataById();
   const setQueueFavorite = useSetQueueFavorite();
 
@@ -30,6 +31,9 @@ export const useCreateFavorite = (args?: MutationHookArgs) => {
     },
     onSuccess: (_data, variables) => {
       const { serverId } = variables;
+
+      if (!serverId) return;
+
       for (const id of variables.query.id) {
         // Set the userFavorite property to true for the album in the album list data store
         if (variables.query.type === LibraryItem.ALBUM) {

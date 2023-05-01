@@ -1,23 +1,22 @@
-import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { useCurrentServer } from '/@/renderer/store';
-import { RawMusicFolderListResponse } from '/@/renderer/api/types';
+import { getServerById } from '/@/renderer/store';
+import { MusicFolderListQuery } from '../../../api/types';
+import { QueryHookArgs } from '../../../lib/react-query';
 
-export const useMusicFolders = () => {
-  const server = useCurrentServer();
+export const useMusicFolders = (args: QueryHookArgs<MusicFolderListQuery>) => {
+  const { options, serverId } = args || {};
+  const server = getServerById(serverId);
 
   const query = useQuery({
-    enabled: !!server?.id,
-    queryFn: ({ signal }) => api.controller.getMusicFolderList({ server, signal }),
+    enabled: !!server,
+    queryFn: ({ signal }) => {
+      if (!server) throw new Error('Server not found');
+      return api.controller.getMusicFolderList({ apiClientProps: { server, signal } });
+    },
     queryKey: queryKeys.musicFolders.list(server?.id || ''),
-    select: useCallback(
-      (data: RawMusicFolderListResponse | undefined) => {
-        return api.normalize.musicFolderList(data, server);
-      },
-      [server],
-    ),
+    ...options,
   });
 
   return query;

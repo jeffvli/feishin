@@ -13,7 +13,7 @@ export const useSongList = (args: QueryHookArgs<SongListQuery>) => {
     enabled: !!server?.id,
     queryFn: ({ signal }) => {
       if (!server) throw new Error('Server not found');
-      controller.getSongList({ apiClientProps: { server, signal }, query });
+      return controller.getSongList({ apiClientProps: { server, signal }, query });
     },
     queryKey: queryKeys.songs.list(server?.id || '', query),
     ...options,

@@ -13,7 +13,7 @@ export const useAlbumArtistList = (args: QueryHookArgs<AlbumArtistListQuery>) =>
     enabled: !!server?.id,
     queryFn: ({ signal }) => {
       if (!server) throw new Error('Server not found');
-      api.controller.getAlbumArtistList({ apiClientProps: { server, signal }, query });
+      return api.controller.getAlbumArtistList({ apiClientProps: { server, signal }, query });
     },
     queryKey: queryKeys.albumArtists.list(server?.id || '', query),
     ...options,

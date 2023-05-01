@@ -5,36 +5,31 @@ import { NDAlbumDetail, NDAlbumArtistDetail } from '/@/renderer/api/navidrome.ty
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { SSAlbumDetail, SSAlbumArtistDetail } from '/@/renderer/api/subsonic.types';
 import {
-  RawRatingResponse,
-  RatingArgs,
+  SetRatingArgs,
   Album,
   AlbumArtist,
   LibraryItem,
   AnyLibraryItems,
+  RatingResponse,
 } from '/@/renderer/api/types';
-import {
-  useCurrentServer,
-  useSetAlbumListItemDataById,
-  useSetQueueRating,
-  useAuthStore,
-} from '/@/renderer/store';
+import { useSetAlbumListItemDataById, useSetQueueRating, getServerById } from '/@/renderer/store';
 import { ServerType } from '/@/renderer/types';
 
 export const useUpdateRating = () => {
   const queryClient = useQueryClient();
-  const currentServer = useCurrentServer();
   const setAlbumListData = useSetAlbumListItemDataById();
   const setQueueRating = useSetQueueRating();
 
   return useMutation<
-    RawRatingResponse,
+    RatingResponse,
     HTTPError,
-    Omit<RatingArgs, 'server'>,
+    Omit<SetRatingArgs, 'server' | 'apiClientProps'>,
     { previous: { items: AnyLibraryItems } | undefined }
   >({
     mutationFn: (args) => {
-      const server = useAuthStore.getState().actions.getServer(args._serverId) || currentServer;
-      return api.controller.updateRating({ ...args, server });
+      const server = getServerById(args.serverId);
+      if (!server) throw new Error('Server not found');
+      return api.controller.updateRating({ ...args, apiClientProps: { server } });
     },
     onError: (_error, _variables, context) => {
       for (const item of context?.previous?.items || []) {
