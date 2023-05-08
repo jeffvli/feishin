@@ -79,8 +79,7 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
             { cacheTime: 1000 * 60 * 1 },
           );
 
-          const songs = api.normalize.songList(songsRes, server);
-          params.successCallback(songs?.items || [], songsRes?.totalRecordCount || 0);
+          params.successCallback(songsRes?.items || [], songsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };

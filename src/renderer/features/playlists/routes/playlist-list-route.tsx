@@ -5,9 +5,11 @@ import { PlaylistListContent } from '/@/renderer/features/playlists/components/p
 import { PlaylistListHeader } from '/@/renderer/features/playlists/components/playlist-list-header';
 import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
 import { AnimatedPage } from '/@/renderer/features/shared';
+import { useCurrentServer } from '/@/renderer/store';
 
 const PlaylistListRoute = () => {
   const tableRef = useRef<AgGridReactType | null>(null);
+  const server = useCurrentServer();
 
   const itemCountCheck = usePlaylistList({
     options: {
@@ -20,6 +22,7 @@ const PlaylistListRoute = () => {
       sortOrder: SortOrder.ASC,
       startIndex: 0,
     },
+    serverId: server?.id,
   });
 
   const itemCount =

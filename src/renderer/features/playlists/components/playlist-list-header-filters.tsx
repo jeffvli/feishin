@@ -97,8 +97,7 @@ export const PlaylistListHeaderFilters = ({ tableRef }: PlaylistListHeaderFilter
             { cacheTime: 1000 * 60 * 1 },
           );
 
-          const playlists = api.normalize.playlistList(playlistsRes, server);
-          params.successCallback(playlists?.items || [], playlistsRes?.totalRecordCount || 0);
+          params.successCallback(playlistsRes?.items || [], playlistsRes?.totalRecordCount || 0);
         },
         rowCount: undefined,
       };
