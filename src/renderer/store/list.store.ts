@@ -87,13 +87,13 @@ export const useListStore = create<ListSlice>()(
                 ...state.item.song.filter,
                 ...state.detail[args.key]?.filter,
                 _custom: {
-                  ...state.detail[args.key]?.filter._custom,
+                  ...state.detail[args.key]?.filter?._custom,
                   jellyfin: {
-                    ...state.detail[args.key]?.filter._custom.jellyfin,
+                    ...state.detail[args.key]?.filter?._custom?.jellyfin,
                     includeItemTypes: 'Audio',
                   },
                   navidrome: {
-                    ...state.detail[args.key]?.filter._custom.navidrome,
+                    ...state.detail[args.key]?.filter?._custom?.navidrome,
                   },
                 },
               };

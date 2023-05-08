@@ -386,16 +386,16 @@ export const AlbumListHeaderFilters = ({
   const isFilterApplied = useMemo(() => {
     const isNavidromeFilterApplied =
       server?.type === ServerType.NAVIDROME &&
-      filter?._custom.navidrome &&
-      Object.values(filter._custom.navidrome).some((value) => value !== undefined);
+      filter?._custom?.navidrome &&
+      Object.values(filter?._custom?.navidrome).some((value) => value !== undefined);
 
     const isJellyfinFilterApplied =
       server?.type === ServerType.JELLYFIN &&
-      filter?._custom.jellyfin &&
-      Object.values(filter._custom.jellyfin).some((value) => value !== undefined);
+      filter?._custom?.jellyfin &&
+      Object.values(filter?._custom?.jellyfin).some((value) => value !== undefined);
 
     return isNavidromeFilterApplied || isJellyfinFilterApplied;
-  }, [filter._custom.jellyfin, filter._custom.navidrome, server?.type]);
+  }, [filter?._custom?.jellyfin, filter?._custom?.navidrome, server?.type]);
 
   return (
     <Flex justify="space-between">
