@@ -129,8 +129,10 @@ export type AuthenticationResponse = {
 };
 
 export type Genre = {
+  albumCount?: number;
   id: string;
   name: string;
+  songCount?: number;
 };
 
 export type Album = {
