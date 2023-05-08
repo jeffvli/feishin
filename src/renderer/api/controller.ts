@@ -1,5 +1,5 @@
 import { useAuthStore } from '/@/renderer/store';
-import { toast } from '/@/renderer/components/toast';
+import { toast } from '/@/renderer/components/toast/index';
 import type {
   AlbumDetailArgs,
   AlbumListArgs,
@@ -44,11 +44,11 @@ import type {
   UpdatePlaylistResponse,
   UserListResponse,
 } from '/@/renderer/api/types';
-import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
 import { ServerListItem } from '/@/renderer/types';
 import { DeletePlaylistResponse } from './types';
 import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
 import { ssController } from '/@/renderer/api/subsonic/subsonic-controller';
+import { jfController } from '/@/renderer/api/jellyfin/jellyfin-controller';
 
 export type ControllerEndpoint = Partial<{
   addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
@@ -91,36 +91,36 @@ type ApiController = {
 
 const endpoints: ApiController = {
   jellyfin: {
-    addToPlaylist: jellyfinApi.addToPlaylist,
+    addToPlaylist: jfController.addToPlaylist,
     clearPlaylist: undefined,
-    createFavorite: jellyfinApi.createFavorite,
-    createPlaylist: jellyfinApi.createPlaylist,
-    deleteFavorite: jellyfinApi.deleteFavorite,
-    deletePlaylist: jellyfinApi.deletePlaylist,
-    getAlbumArtistDetail: jellyfinApi.getAlbumArtistDetail,
-    getAlbumArtistList: jellyfinApi.getAlbumArtistList,
-    getAlbumDetail: jellyfinApi.getAlbumDetail,
-    getAlbumList: jellyfinApi.getAlbumList,
+    createFavorite: jfController.createFavorite,
+    createPlaylist: jfController.createPlaylist,
+    deleteFavorite: jfController.deleteFavorite,
+    deletePlaylist: jfController.deletePlaylist,
+    getAlbumArtistDetail: jfController.getAlbumArtistDetail,
+    getAlbumArtistList: jfController.getAlbumArtistList,
+    getAlbumDetail: jfController.getAlbumDetail,
+    getAlbumList: jfController.getAlbumList,
     getArtistDetail: undefined,
     getArtistInfo: undefined,
-    getArtistList: jellyfinApi.getArtistList,
+    getArtistList: undefined,
     getFavoritesList: undefined,
     getFolderItemList: undefined,
     getFolderList: undefined,
     getFolderSongs: undefined,
-    getGenreList: jellyfinApi.getGenreList,
-    getMusicFolderList: jellyfinApi.getMusicFolderList,
-    getPlaylistDetail: jellyfinApi.getPlaylistDetail,
-    getPlaylistList: jellyfinApi.getPlaylistList,
-    getPlaylistSongList: jellyfinApi.getPlaylistSongList,
+    getGenreList: jfController.getGenreList,
+    getMusicFolderList: jfController.getMusicFolderList,
+    getPlaylistDetail: jfController.getPlaylistDetail,
+    getPlaylistList: jfController.getPlaylistList,
+    getPlaylistSongList: jfController.getPlaylistSongList,
     getSongDetail: undefined,
-    getSongList: jellyfinApi.getSongList,
-    getTopSongs: jellyfinApi.getTopSongList,
+    getSongList: jfController.getSongList,
+    getTopSongs: jfController.getTopSongList,
     getUserList: undefined,
-    removeFromPlaylist: jellyfinApi.removeFromPlaylist,
-    scrobble: jellyfinApi.scrobble,
+    removeFromPlaylist: jfController.removeFromPlaylist,
+    scrobble: jfController.scrobble,
     setRating: undefined,
-    updatePlaylist: jellyfinApi.updatePlaylist,
+    updatePlaylist: jfController.updatePlaylist,
   },
   navidrome: {
     addToPlaylist: ndController.addToPlaylist,
