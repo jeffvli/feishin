@@ -276,6 +276,7 @@ const getAlbumList = async (args: AlbumListArgs): Promise<AlbumListResponse> => 
       userId: apiClientProps.server?.userId,
     },
     query: {
+      AlbumArtistIds: query.artistIds ? formatCommaDelimitedString(query.artistIds) : undefined,
       IncludeItemTypes: 'MusicAlbum',
       Limit: query.limit,
       ParentId: query.musicFolderId,
