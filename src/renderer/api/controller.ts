@@ -223,95 +223,195 @@ const authenticate = async (
 };
 
 const getAlbumList = async (args: AlbumListArgs) => {
-  return (apiController('getAlbumList') as ControllerEndpoint['getAlbumList'])?.(args);
+  return (
+    apiController(
+      'getAlbumList',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getAlbumList']
+  )?.(args);
 };
 
 const getAlbumDetail = async (args: AlbumDetailArgs) => {
-  return (apiController('getAlbumDetail') as ControllerEndpoint['getAlbumDetail'])?.(args);
+  return (
+    apiController(
+      'getAlbumDetail',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getAlbumDetail']
+  )?.(args);
 };
 
 const getSongList = async (args: SongListArgs) => {
-  return (apiController('getSongList') as ControllerEndpoint['getSongList'])?.(args);
+  return (
+    apiController(
+      'getSongList',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getSongList']
+  )?.(args);
 };
 
 const getMusicFolderList = async (args: MusicFolderListArgs) => {
-  return (apiController('getMusicFolderList') as ControllerEndpoint['getMusicFolderList'])?.(args);
+  return (
+    apiController(
+      'getMusicFolderList',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getMusicFolderList']
+  )?.(args);
 };
 
 const getGenreList = async (args: GenreListArgs) => {
-  return (apiController('getGenreList') as ControllerEndpoint['getGenreList'])?.(args);
+  return (
+    apiController(
+      'getGenreList',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getGenreList']
+  )?.(args);
 };
 
 const getAlbumArtistDetail = async (args: AlbumArtistDetailArgs) => {
-  return (apiController('getAlbumArtistDetail') as ControllerEndpoint['getAlbumArtistDetail'])?.(
-    args,
-  );
+  return (
+    apiController(
+      'getAlbumArtistDetail',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getAlbumArtistDetail']
+  )?.(args);
 };
 
 const getAlbumArtistList = async (args: AlbumArtistListArgs) => {
-  return (apiController('getAlbumArtistList') as ControllerEndpoint['getAlbumArtistList'])?.(args);
+  return (
+    apiController(
+      'getAlbumArtistList',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getAlbumArtistList']
+  )?.(args);
 };
 
 const getArtistList = async (args: ArtistListArgs) => {
-  return (apiController('getArtistList') as ControllerEndpoint['getArtistList'])?.(args);
+  return (
+    apiController(
+      'getArtistList',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getArtistList']
+  )?.(args);
 };
 
 const getPlaylistList = async (args: PlaylistListArgs) => {
-  return (apiController('getPlaylistList') as ControllerEndpoint['getPlaylistList'])?.(args);
+  return (
+    apiController(
+      'getPlaylistList',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getPlaylistList']
+  )?.(args);
 };
 
 const createPlaylist = async (args: CreatePlaylistArgs) => {
-  return (apiController('createPlaylist') as ControllerEndpoint['createPlaylist'])?.(args);
+  return (
+    apiController(
+      'createPlaylist',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['createPlaylist']
+  )?.(args);
 };
 
 const updatePlaylist = async (args: UpdatePlaylistArgs) => {
-  return (apiController('updatePlaylist') as ControllerEndpoint['updatePlaylist'])?.(args);
+  return (
+    apiController(
+      'updatePlaylist',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['updatePlaylist']
+  )?.(args);
 };
 
 const deletePlaylist = async (args: DeletePlaylistArgs) => {
-  return (apiController('deletePlaylist') as ControllerEndpoint['deletePlaylist'])?.(args);
+  return (
+    apiController(
+      'deletePlaylist',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['deletePlaylist']
+  )?.(args);
 };
 
 const addToPlaylist = async (args: AddToPlaylistArgs) => {
-  return (apiController('addToPlaylist') as ControllerEndpoint['addToPlaylist'])?.(args);
+  return (
+    apiController(
+      'addToPlaylist',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['addToPlaylist']
+  )?.(args);
 };
 
 const removeFromPlaylist = async (args: RemoveFromPlaylistArgs) => {
-  return (apiController('removeFromPlaylist') as ControllerEndpoint['removeFromPlaylist'])?.(args);
+  return (
+    apiController(
+      'removeFromPlaylist',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['removeFromPlaylist']
+  )?.(args);
 };
 
 const getPlaylistDetail = async (args: PlaylistDetailArgs) => {
-  return (apiController('getPlaylistDetail') as ControllerEndpoint['getPlaylistDetail'])?.(args);
+  return (
+    apiController(
+      'getPlaylistDetail',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getPlaylistDetail']
+  )?.(args);
 };
 
 const getPlaylistSongList = async (args: PlaylistSongListArgs) => {
-  return (apiController('getPlaylistSongList') as ControllerEndpoint['getPlaylistSongList'])?.(
-    args,
-  );
+  return (
+    apiController(
+      'getPlaylistSongList',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getPlaylistSongList']
+  )?.(args);
 };
 
 const getUserList = async (args: UserListArgs) => {
-  return (apiController('getUserList') as ControllerEndpoint['getUserList'])?.(args);
+  return (
+    apiController(
+      'getUserList',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getUserList']
+  )?.(args);
 };
 
 const createFavorite = async (args: FavoriteArgs) => {
-  return (apiController('createFavorite') as ControllerEndpoint['createFavorite'])?.(args);
+  return (
+    apiController(
+      'createFavorite',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['createFavorite']
+  )?.(args);
 };
 
 const deleteFavorite = async (args: FavoriteArgs) => {
-  return (apiController('deleteFavorite') as ControllerEndpoint['deleteFavorite'])?.(args);
+  return (
+    apiController(
+      'deleteFavorite',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['deleteFavorite']
+  )?.(args);
 };
 
 const updateRating = async (args: SetRatingArgs) => {
-  return (apiController('setRating') as ControllerEndpoint['setRating'])?.(args);
+  return (
+    apiController('setRating', args.apiClientProps.server?.type) as ControllerEndpoint['setRating']
+  )?.(args);
 };
 
 const getTopSongList = async (args: TopSongListArgs) => {
-  return (apiController('getTopSongs') as ControllerEndpoint['getTopSongs'])?.(args);
+  return (
+    apiController(
+      'getTopSongs',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getTopSongs']
+  )?.(args);
 };
 
 const scrobble = async (args: ScrobbleArgs) => {
-  return (apiController('scrobble') as ControllerEndpoint['scrobble'])?.(args);
+  return (
+    apiController('scrobble', args.apiClientProps.server?.type) as ControllerEndpoint['scrobble']
+  )?.(args);
 };
 
 export const controller = {
