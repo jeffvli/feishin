@@ -1,5 +1,6 @@
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { Method, AxiosError, isAxiosError, AxiosResponse } from 'axios';
+import qs from 'qs';
 import { z } from 'zod';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
 import { ServerListItem } from '/@/renderer/api/types';
@@ -74,6 +75,10 @@ export const contract = c.router({
 });
 
 const axiosClient = axios.create({});
+
+axiosClient.defaults.paramsSerializer = (params) => {
+  return qs.stringify(params, { arrayFormat: 'repeat' });
+};
 
 axiosClient.interceptors.response.use(
   (response) => {
