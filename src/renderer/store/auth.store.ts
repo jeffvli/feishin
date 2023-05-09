@@ -18,7 +18,7 @@ export interface AuthSlice extends AuthState {
   actions: {
     addServer: (args: ServerListItem) => void;
     deleteServer: (id: string) => void;
-    getServer: (id: string) => ServerListItem | undefined;
+    getServer: (id: string) => ServerListItem | null;
     setCurrentServer: (server: ServerListItem | null) => void;
     updateServer: (id: string, args: Partial<ServerListItem>) => void;
   };
@@ -44,7 +44,9 @@ export const useAuthStore = create<AuthSlice>()(
             });
           },
           getServer: (id) => {
-            return get().serverList[id];
+            const server = get().serverList[id];
+            if (server) return server;
+            return null;
           },
           setCurrentServer: (server) => {
             set((state) => {
@@ -62,11 +64,13 @@ export const useAuthStore = create<AuthSlice>()(
           },
           updateServer: (id: string, args: Partial<ServerListItem>) => {
             set((state) => {
-              state.serverList[id] = { ...state.serverList[id], ...args };
+              const updatedServer = {
+                ...state.serverList[id],
+                ...args,
+              };
 
-              if (state.currentServer?.id === id) {
-                state.currentServer = { ...state.serverList[id], ...args };
-              }
+              state.serverList[id] = updatedServer;
+              state.currentServer = updatedServer;
             });
           },
         },
@@ -79,7 +83,7 @@ export const useAuthStore = create<AuthSlice>()(
     {
       merge: (persistedState, currentState) => merge(currentState, persistedState),
       name: 'store_authentication',
-      version: 1,
+      version: 2,
     },
   ),
 );
@@ -91,3 +95,11 @@ export const useCurrentServer = () => useAuthStore((state) => state.currentServe
 export const useServerList = () => useAuthStore((state) => state.serverList);
 
 export const useAuthStoreActions = () => useAuthStore((state) => state.actions);
+
+export const getServerById = (id?: string) => {
+  if (!id) {
+    return null;
+  }
+
+  return useAuthStore.getState().actions.getServer(id);
+};

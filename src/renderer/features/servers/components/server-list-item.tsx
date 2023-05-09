@@ -61,7 +61,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
       <Divider my="sm" />
       <TimeoutButton
         leftIcon={<RiDeleteBin2Line />}
-        timeoutProps={{ callback: handleDeleteServer, duration: 1500 }}
+        timeoutProps={{ callback: handleDeleteServer, duration: 1000 }}
         variant="subtle"
       >
         Remove server

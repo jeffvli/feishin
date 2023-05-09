@@ -192,8 +192,8 @@ axiosClient.interceptors.response.use(
         const serverId = currentServer.id;
         const token = currentServer.ndCredential;
         console.log(`token is expired: ${token}`);
-        useAuthStore.getState().actions.setCurrentServer(null);
         useAuthStore.getState().actions.updateServer(serverId, { ndCredential: undefined });
+        useAuthStore.getState().actions.setCurrentServer(null);
       }
     }
 

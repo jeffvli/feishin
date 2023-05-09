@@ -3,7 +3,6 @@ import { Checkbox, Stack, Group } from '@mantine/core';
 import { Button, PasswordInput, TextInput, toast } from '/@/renderer/components';
 import { useForm } from '@mantine/form';
 import { closeAllModals } from '@mantine/modals';
-import { nanoid } from 'nanoid/non-secure';
 import { RiInformationLine } from 'react-icons/ri';
 import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
 import { navidromeApi } from '/@/renderer/api/navidrome.api';
@@ -25,7 +24,7 @@ const AUTH_FUNCTIONS = {
 };
 
 export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormProps) => {
-  const { updateServer, setCurrentServer } = useAuthStoreActions();
+  const { updateServer } = useAuthStoreActions();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm({
@@ -61,7 +60,6 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
 
       const serverItem = {
         credential: data.credential,
-        id: nanoid(),
         name: values.name,
         ndCredential: data.ndCredential,
         type: values.type,
@@ -71,8 +69,6 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
       };
 
       updateServer(server.id, serverItem);
-      setCurrentServer(serverItem);
-
       toast.success({ message: 'Server has been updated' });
     } catch (err: any) {
       setIsLoading(false);
