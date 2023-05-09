@@ -265,7 +265,7 @@ const user = z.object({
 });
 
 const authenticateParameters = z.object({
-  Password: z.string(),
+  Pw: z.string(),
   Username: z.string(),
 });
 

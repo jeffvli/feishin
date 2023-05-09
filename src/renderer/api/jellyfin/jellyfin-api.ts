@@ -22,7 +22,7 @@ export const contract = c.router({
   authenticate: {
     body: jfType._parameters.authenticate,
     method: 'POST',
-    path: 'auth/login',
+    path: 'users/authenticatebyname',
     responses: {
       200: jfType._response.authenticate,
       400: jfType._response.error,

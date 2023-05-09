@@ -44,6 +44,7 @@ import {
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
 import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
+import packageJson from '../../../../package.json';
 
 const formatCommaDelimitedString = (value: string[]) => {
   return value.join(',');
@@ -60,8 +61,11 @@ const authenticate = async (
 
   const res = await jfApiClient({ server: null, url: cleanServerUrl }).authenticate({
     body: {
-      Password: body.password,
+      Pw: body.password,
       Username: body.username,
+    },
+    headers: {
+      'X-Emby-Authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="${packageJson.version}"`,
     },
   });
 
