@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { HTTPError } from 'ky';
+import { AxiosError } from 'axios';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import {
@@ -20,7 +20,7 @@ export const useCreateFavorite = (args: MutationHookArgs) => {
 
   return useMutation<
     FavoriteResponse,
-    HTTPError,
+    AxiosError,
     Omit<FavoriteArgs, 'server' | 'apiClientProps'>,
     null
   >({

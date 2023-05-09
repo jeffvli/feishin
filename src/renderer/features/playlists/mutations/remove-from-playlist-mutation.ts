@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { HTTPError } from 'ky';
+import { AxiosError } from 'axios';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { RemoveFromPlaylistResponse, RemoveFromPlaylistArgs } from '/@/renderer/api/types';
+import { RemoveFromPlaylistArgs, RemoveFromPlaylistResponse } from '/@/renderer/api/types';
 import { MutationOptions } from '/@/renderer/lib/react-query';
 import { getServerById } from '/@/renderer/store';
 
@@ -11,7 +11,7 @@ export const useRemoveFromPlaylist = (options?: MutationOptions) => {
 
   return useMutation<
     RemoveFromPlaylistResponse,
-    HTTPError,
+    AxiosError,
     Omit<RemoveFromPlaylistArgs, 'server' | 'apiClientProps'>,
     null
   >({

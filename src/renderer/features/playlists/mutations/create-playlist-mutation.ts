@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { HTTPError } from 'ky';
 import { api } from '/@/renderer/api';
 import { CreatePlaylistArgs, CreatePlaylistResponse } from '/@/renderer/api/types';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById } from '/@/renderer/store';
+import { AxiosError } from 'axios';
 import { queryKeys } from '../../../api/query-keys';
 
 export const useCreatePlaylist = (args: MutationHookArgs) => {
@@ -12,7 +12,7 @@ export const useCreatePlaylist = (args: MutationHookArgs) => {
 
   return useMutation<
     CreatePlaylistResponse,
-    HTTPError,
+    AxiosError,
     Omit<CreatePlaylistArgs, 'server' | 'apiClientProps'>,
     null
   >({

@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { HTTPError } from 'ky';
+import { AxiosError } from 'axios';
 import { api } from '/@/renderer/api';
 import { ScrobbleResponse, ScrobbleArgs } from '/@/renderer/api/types';
 import { MutationOptions } from '/@/renderer/lib/react-query';
@@ -10,7 +10,7 @@ export const useSendScrobble = (options?: MutationOptions) => {
 
   return useMutation<
     ScrobbleResponse,
-    HTTPError,
+    AxiosError,
     Omit<ScrobbleArgs, 'server' | 'apiClientProps'>,
     null
   >({

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { HTTPError } from 'ky';
+import { AxiosError } from 'axios';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { UpdatePlaylistArgs, UpdatePlaylistResponse } from '/@/renderer/api/types';
@@ -12,7 +12,7 @@ export const useUpdatePlaylist = (args: MutationHookArgs) => {
 
   return useMutation<
     UpdatePlaylistResponse,
-    HTTPError,
+    AxiosError,
     Omit<UpdatePlaylistArgs, 'server' | 'apiClientProps'>,
     null
   >({

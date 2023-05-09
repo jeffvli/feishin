@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { HTTPError } from 'ky';
+import { AxiosError } from 'axios';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import {
@@ -23,7 +23,7 @@ export const useSetRating = (args: MutationHookArgs) => {
 
   return useMutation<
     RatingResponse,
-    HTTPError,
+    AxiosError,
     Omit<SetRatingArgs, 'server' | 'apiClientProps'>,
     { previous: { items: AnyLibraryItems } | undefined }
   >({
