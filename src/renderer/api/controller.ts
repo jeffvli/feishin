@@ -43,8 +43,9 @@ import type {
   TopSongListResponse,
   UpdatePlaylistResponse,
   UserListResponse,
+  AuthenticationResponse,
 } from '/@/renderer/api/types';
-import { ServerListItem } from '/@/renderer/types';
+import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse } from './types';
 import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
 import { ssController } from '/@/renderer/api/subsonic/subsonic-controller';
@@ -52,6 +53,10 @@ import { jfController } from '/@/renderer/api/jellyfin/jellyfin-controller';
 
 export type ControllerEndpoint = Partial<{
   addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
+  authenticate: (
+    url: string,
+    body: { password: string; username: string },
+  ) => Promise<AuthenticationResponse>;
   clearPlaylist: () => void;
   createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
   createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse>;
@@ -92,6 +97,7 @@ type ApiController = {
 const endpoints: ApiController = {
   jellyfin: {
     addToPlaylist: jfController.addToPlaylist,
+    authenticate: jfController.authenticate,
     clearPlaylist: undefined,
     createFavorite: jfController.createFavorite,
     createPlaylist: jfController.createPlaylist,
@@ -124,6 +130,7 @@ const endpoints: ApiController = {
   },
   navidrome: {
     addToPlaylist: ndController.addToPlaylist,
+    authenticate: ndController.authenticate,
     clearPlaylist: undefined,
     createFavorite: ssController.createFavorite,
     createPlaylist: ndController.createPlaylist,
@@ -155,6 +162,7 @@ const endpoints: ApiController = {
     updatePlaylist: ndController.updatePlaylist,
   },
   subsonic: {
+    authenticate: ssController.authenticate,
     clearPlaylist: undefined,
     createFavorite: ssController.createFavorite,
     createPlaylist: undefined,
@@ -185,8 +193,8 @@ const endpoints: ApiController = {
   },
 };
 
-const apiController = (endpoint: keyof ControllerEndpoint, server?: ServerListItem | null) => {
-  const serverType = server?.type || useAuthStore.getState().currentServer?.type;
+const apiController = (endpoint: keyof ControllerEndpoint, type?: ServerType) => {
+  const serverType = type || useAuthStore.getState().currentServer?.type;
 
   if (!serverType) {
     toast.error({ message: 'No server selected', title: 'Unable to route request' });
@@ -204,6 +212,14 @@ const apiController = (endpoint: keyof ControllerEndpoint, server?: ServerListIt
   }
 
   return endpoints[serverType][endpoint];
+};
+
+const authenticate = async (
+  url: string,
+  body: { legacy?: boolean; password: string; username: string },
+  type: ServerType,
+) => {
+  return (apiController('authenticate', type) as ControllerEndpoint['authenticate'])?.(url, body);
 };
 
 const getAlbumList = async (args: AlbumListArgs) => {
@@ -300,6 +316,7 @@ const scrobble = async (args: ScrobbleArgs) => {
 
 export const controller = {
   addToPlaylist,
+  authenticate,
   createFavorite,
   createPlaylist,
   deleteFavorite,

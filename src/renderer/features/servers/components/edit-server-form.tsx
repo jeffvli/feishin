@@ -5,24 +5,16 @@ import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
 import { RiInformationLine } from 'react-icons/ri';
-import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
-import { navidromeApi } from '/@/renderer/api/navidrome.api';
-import { subsonicApi } from '/@/renderer/api/subsonic.api';
 import { AuthenticationResponse } from '/@/renderer/api/types';
 import { useAuthStoreActions } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
+import { api } from '/@/renderer/api';
 
 interface EditServerFormProps {
   isUpdate?: boolean;
   onCancel: () => void;
   server: ServerListItem;
 }
-
-const AUTH_FUNCTIONS = {
-  [ServerType.JELLYFIN]: jellyfinApi.authenticate,
-  [ServerType.NAVIDROME]: navidromeApi.authenticate,
-  [ServerType.SUBSONIC]: subsonicApi.authenticate,
-};
 
 const ModifiedFieldIndicator = () => {
   return (
@@ -53,7 +45,7 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
   const isSubsonic = form.values.type === ServerType.SUBSONIC;
 
   const handleSubmit = form.onSubmit(async (values) => {
-    const authFunction = AUTH_FUNCTIONS[values.type];
+    const authFunction = api.controller.authenticate;
 
     if (!authFunction) {
       return toast.error({ message: 'Selected server type is invalid' });
@@ -61,11 +53,19 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
 
     try {
       setIsLoading(true);
-      const data: AuthenticationResponse = await authFunction(values.url, {
-        legacy: values.legacyAuth,
-        password: values.password,
-        username: values.username,
-      });
+      const data: AuthenticationResponse | undefined = await authFunction(
+        values.url,
+        {
+          legacy: values.legacyAuth,
+          password: values.password,
+          username: values.username,
+        },
+        values.type,
+      );
+
+      if (!data) {
+        return toast.error({ message: 'Authentication failed' });
+      }
 
       const serverItem = {
         credential: data.credential,
