@@ -80,10 +80,6 @@ const getSongCoverArtUrl = (args: {
 }) => {
   const size = args.size ? args.size : 100;
 
-  if (!args.item.ImageTags?.Primary) {
-    return null;
-  }
-
   if (args.item.ImageTags.Primary) {
     return (
       `${args.baseUrl}/Items` +
@@ -94,18 +90,18 @@ const getSongCoverArtUrl = (args: {
     );
   }
 
-  if (!args.item?.AlbumPrimaryImageTag) {
-    return null;
+  if (args.item?.AlbumPrimaryImageTag) {
+    // Fall back to album art if no image embedded
+    return (
+      `${args.baseUrl}/Items` +
+      `/${args.item?.AlbumId}` +
+      '/Images/Primary' +
+      `?width=${size}&height=${size}` +
+      '&quality=96'
+    );
   }
 
-  // Fall back to album art if no image embedded
-  return (
-    `${args.baseUrl}/Items` +
-    `/${args.item?.AlbumId}` +
-    '/Images/Primary' +
-    `?width=${size}&height=${size}` +
-    '&quality=96'
-  );
+  return null;
 };
 
 const getPlaylistCoverArtUrl = (args: { baseUrl: string; item: JFPlaylist; size: number }) => {
