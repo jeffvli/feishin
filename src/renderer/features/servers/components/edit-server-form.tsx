@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Checkbox, Stack, Group } from '@mantine/core';
-import { Button, PasswordInput, TextInput, toast } from '/@/renderer/components';
+import { Button, PasswordInput, TextInput, toast, Tooltip } from '/@/renderer/components';
 import { useForm } from '@mantine/form';
+import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
 import { RiInformationLine } from 'react-icons/ri';
 import { jellyfinApi } from '/@/renderer/api/jellyfin.api';
@@ -23,8 +24,19 @@ const AUTH_FUNCTIONS = {
   [ServerType.SUBSONIC]: subsonicApi.authenticate,
 };
 
+const ModifiedFieldIndicator = () => {
+  return (
+    <Tooltip label="Field has been modified">
+      <span>
+        <RiInformationLine color="red" />
+      </span>
+    </Tooltip>
+  );
+};
+
 export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormProps) => {
   const { updateServer } = useAuthStoreActions();
+  const focusTrapRef = useFocusTrap();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm({
@@ -39,9 +51,6 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
   });
 
   const isSubsonic = form.values.type === ServerType.SUBSONIC;
-
-  const isSubmitDisabled =
-    !form.values.name || !form.values.url || !form.values.username || !form.values.password;
 
   const handleSubmit = form.onSubmit(async (values) => {
     const authFunction = AUTH_FUNCTIONS[values.type];
@@ -81,25 +90,28 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack>
+      <Stack ref={focusTrapRef}>
         <TextInput
           required
           label="Name"
-          rightSection={form.isDirty('name') && <RiInformationLine color="red" />}
+          rightSection={form.isDirty('name') && <ModifiedFieldIndicator />}
           {...form.getInputProps('name')}
         />
         <TextInput
           required
           label="Url"
-          rightSection={form.isDirty('url') && <RiInformationLine color="red" />}
+          rightSection={form.isDirty('url') && <ModifiedFieldIndicator />}
           {...form.getInputProps('url')}
         />
         <TextInput
+          required
           label="Username"
-          rightSection={form.isDirty('username') && <RiInformationLine color="red" />}
+          rightSection={form.isDirty('username') && <ModifiedFieldIndicator />}
           {...form.getInputProps('username')}
         />
         <PasswordInput
+          data-autofocus
+          required
           label="Password"
           {...form.getInputProps('password')}
         />
@@ -119,7 +131,6 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
             Cancel
           </Button>
           <Button
-            disabled={isSubmitDisabled}
             loading={isLoading}
             type="submit"
             variant="filled"
