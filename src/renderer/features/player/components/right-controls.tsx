@@ -44,6 +44,7 @@ export const RightControls = () => {
         id: [currentSong.id],
         type: LibraryItem.SONG,
       },
+      serverId: currentSong?.serverId,
     });
   };
 
@@ -79,6 +80,7 @@ export const RightControls = () => {
         id: [currentSong.id],
         type: LibraryItem.SONG,
       },
+      serverId: currentSong?.serverId,
     });
   };
 

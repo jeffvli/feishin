@@ -4,9 +4,10 @@ import { Stack } from '@mantine/core';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from './play-queue-list-controls';
 import { Song } from '/@/renderer/api/types';
-import { PageHeader, Paper, VirtualGridContainer } from '/@/renderer/components';
+import { PageHeader, Paper } from '/@/renderer/components';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
+import { VirtualGridContainer } from '/@/renderer/components/virtual-grid';
 
 export const SidebarPlayQueue = () => {
   const queueRef = useRef<{ grid: AgGridReactType<Song> } | null>(null);
