@@ -1,4 +1,7 @@
+import { Center, Stack } from '@mantine/core';
+import { RiAlbumFill, RiUserVoiceFill, RiPlayListFill } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router-dom';
+import { SimpleImg } from 'react-simple-img';
 import { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
 import { Album, AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
@@ -88,14 +91,6 @@ const ImageContainer = styled.div`
   }
 `;
 
-const Image = styled.img`
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-  border: 0;
-`;
-
 const DetailContainer = styled.div`
   margin-top: 0.5rem;
 `;
@@ -120,6 +115,26 @@ export const DefaultCard = ({
       }, {}),
     );
 
+    let Placeholder = RiAlbumFill;
+
+    switch (controls.itemType) {
+      case LibraryItem.ALBUM:
+        Placeholder = RiAlbumFill;
+        break;
+      case LibraryItem.ARTIST:
+        Placeholder = RiUserVoiceFill;
+        break;
+      case LibraryItem.ALBUM_ARTIST:
+        Placeholder = RiUserVoiceFill;
+        break;
+      case LibraryItem.PLAYLIST:
+        Placeholder = RiPlayListFill;
+        break;
+      default:
+        Placeholder = RiAlbumFill;
+        break;
+    }
+
     return (
       <DefaultCardContainer
         key={`card-${columnIndex}-${listChildProps.index}`}
@@ -127,10 +142,29 @@ export const DefaultCard = ({
       >
         <InnerCardContainer>
           <ImageContainer>
-            <Image
-              placeholder={data?.imagePlaceholderUrl || 'var(--placeholder-bg)'}
-              src={data?.imageUrl}
-            />
+            {data?.imageUrl ? (
+              <SimpleImg
+                imgStyle={{ objectFit: 'cover' }}
+                importance="auto"
+                placeholder={data?.imagePlaceholderUrl || 'var(--placeholder-bg)'}
+                src={data?.imageUrl}
+              />
+            ) : (
+              <Center
+                sx={{
+                  background: 'var(--placeholder-bg)',
+                  borderRadius: 'var(--card-default-radius)',
+                  height: '100%',
+                  width: '100%',
+                }}
+              >
+                <Placeholder
+                  color="var(--placeholder-fg)"
+                  size={35}
+                />
+              </Center>
+            )}
+
             <GridCardControls
               handleFavorite={controls.handleFavorite}
               handlePlayQueueAdd={controls.handlePlayQueueAdd}
@@ -161,6 +195,18 @@ export const DefaultCard = ({
             radius="sm"
           />
         </ImageContainer>
+        <DetailContainer>
+          <Stack spacing="sm">
+            {controls.cardRows.map((row) => (
+              <Skeleton
+                key={row.arrayProperty}
+                visible
+                height={14}
+                radius="sm"
+              />
+            ))}
+          </Stack>
+        </DetailContainer>
       </InnerCardContainer>
     </DefaultCardContainer>
   );
