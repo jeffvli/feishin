@@ -10,14 +10,16 @@ import {
   useCurrentSong,
   useFullScreenPlayerStore,
   useFullScreenPlayerStoreActions,
+  useWindowSettings,
 } from '/@/renderer/store';
 import { useFastAverageColor } from '../../../hooks/use-fast-average-color';
 import { FullScreenPlayerImage } from '/@/renderer/features/player/components/full-screen-player-image';
 import { FullScreenPlayerQueue } from '/@/renderer/features/player/components/full-screen-player-queue';
 import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
+import { Platform } from '/@/renderer/types';
 
 const Container = styled(motion.div)`
-  z-index: 100;
+  z-index: 200;
   display: flex;
   justify-content: center;
   padding: 2rem;
@@ -124,22 +126,25 @@ const Controls = () => {
 };
 
 const containerVariants: Variants = {
-  closed: {
-    height: 'calc(100vh - 90px)',
-    position: 'absolute',
-    top: '100vh',
-    transition: {
-      duration: 0.5,
-      ease: 'easeInOut',
-    },
-    width: '100vw',
-    y: -100,
+  closed: (custom) => {
+    const { windowBarStyle } = custom;
+    return {
+      height: windowBarStyle !== Platform.WEB ? 'calc(100vh - 120px)' : 'calc(100vh - 90px)',
+      position: 'absolute',
+      top: '100vh',
+      transition: {
+        duration: 0.5,
+        ease: 'easeInOut',
+      },
+      width: '100vw',
+      y: -100,
+    };
   },
   open: (custom) => {
-    const { dynamicBackground, background } = custom;
+    const { dynamicBackground, background, windowBarStyle } = custom;
     return {
       background: dynamicBackground ? background : 'var(--main-bg)',
-      height: 'calc(100vh - 90px)',
+      height: windowBarStyle !== Platform.WEB ? 'calc(100vh - 120px)' : 'calc(100vh - 90px)',
       left: 0,
       position: 'absolute',
       top: 0,
@@ -161,6 +166,7 @@ const containerVariants: Variants = {
 export const FullScreenPlayer = () => {
   const { dynamicBackground } = useFullScreenPlayerStore();
   const { setStore } = useFullScreenPlayerStoreActions();
+  const { windowBarStyle } = useWindowSettings();
 
   const location = useLocation();
   const isOpenedRef = useRef<boolean | null>(null);
@@ -179,7 +185,7 @@ export const FullScreenPlayer = () => {
   return (
     <Container
       animate="open"
-      custom={{ background, dynamicBackground }}
+      custom={{ background, dynamicBackground, windowBarStyle }}
       exit="closed"
       initial="closed"
       variants={containerVariants}
