@@ -39,9 +39,13 @@ const error = z.object({
 const baseParameters = z.object({
   AlbumArtistIds: z.string().optional(),
   ArtistIds: z.string().optional(),
+  ContributingArtistIds: z.string().optional(),
   EnableImageTypes: z.string().optional(),
   EnableTotalRecordCount: z.boolean().optional(),
   EnableUserData: z.boolean().optional(),
+  EnableUserDataTypes: z.boolean().optional(),
+  ExcludeArtistIds: z.string().optional(),
+  ExcludeItemIds: z.string().optional(),
   ExcludeItemTypes: z.string().optional(),
   Fields: z.string().optional(),
   ImageTypeLimit: z.number().optional(),
@@ -49,18 +53,20 @@ const baseParameters = z.object({
   IsFavorite: z.boolean().optional(),
   Limit: z.number().optional(),
   MediaTypes: z.string().optional(),
+  NameStartsWith: z.string().optional(),
   ParentId: z.string().optional(),
   Recursive: z.boolean().optional(),
   SearchTerm: z.string().optional(),
   SortBy: z.string().optional(),
   SortOrder: z.enum(sortOrderValues).optional(),
   StartIndex: z.number().optional(),
+  Tags: z.string().optional(),
   UserId: z.string().optional(),
+  Years: z.string().optional(),
 });
 
 const paginationParameters = z.object({
   Limit: z.number().optional(),
-  NameStartsWith: z.string().optional(),
   SortOrder: z.enum(sortOrderValues).optional(),
   StartIndex: z.number().optional(),
 });
@@ -76,9 +82,9 @@ const imageTags = z.object({
 });
 
 const imageBlurHashes = z.object({
-  Backdrop: z.string().optional(),
-  Logo: z.string().optional(),
-  Primary: z.string().optional(),
+  Backdrop: z.record(z.string(), z.string()).optional(),
+  Logo: z.record(z.string(), z.string()).optional(),
+  Primary: z.record(z.string(), z.string()).optional(),
 });
 
 const userData = z.object({
