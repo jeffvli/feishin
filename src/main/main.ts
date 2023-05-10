@@ -334,7 +334,7 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
   mpvInstance = new MpvAPI(
     {
       audio_only: true,
-      auto_restart: false,
+      auto_restart: true,
       binary: MPV_BINARY_PATH || '',
       time_update: 1,
     },
