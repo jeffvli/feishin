@@ -1,5 +1,6 @@
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { Method, AxiosError, isAxiosError, AxiosResponse } from 'axios';
+import omitBy from 'lodash/omitBy';
 import qs from 'qs';
 import { z } from 'zod';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
@@ -101,6 +102,18 @@ axiosClient.interceptors.response.use(
   },
 );
 
+const parsePath = (fullPath: string) => {
+  const [path, params] = fullPath.split('?');
+
+  const parsedParams = qs.parse(params);
+  const notNilParams = omitBy(parsedParams, (value) => value === 'undefined' || value === 'null');
+
+  return {
+    params: notNilParams,
+    path,
+  };
+};
+
 export const ssApiClient = (args: {
   server: ServerListItem | null;
   signal?: AbortSignal;
@@ -112,6 +125,8 @@ export const ssApiClient = (args: {
     api: async ({ path, method, headers, body }) => {
       let baseUrl: string | undefined;
       const authParams: Record<string, any> = {};
+
+      const { params, path: api } = parsePath(path);
 
       if (server) {
         baseUrl = `${server.url}/rest`;
@@ -139,9 +154,10 @@ export const ssApiClient = (args: {
             f: 'json',
             v: '1.13.0',
             ...authParams,
+            ...params,
           },
           signal,
-          url: `${baseUrl}/${path}`,
+          url: `${baseUrl}/${api}`,
         });
 
         return {
