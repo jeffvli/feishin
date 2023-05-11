@@ -231,6 +231,7 @@ const ndSongListSort = {
 
 const songListParameters = paginationParameters.extend({
   _sort: z.nativeEnum(ndSongListSort).optional(),
+  album_artist_id: z.array(z.string()).optional(),
   album_id: z.array(z.string()).optional(),
   artist_id: z.array(z.string()).optional(),
   genre_id: z.string().optional(),
