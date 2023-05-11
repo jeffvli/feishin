@@ -5,7 +5,6 @@ export * from './button';
 export * from './card';
 export * from './date-picker';
 export * from './dropdown-menu';
-export * from './dropzone';
 export * from './feature-carousel';
 export * from './grid-carousel';
 export * from './input';
