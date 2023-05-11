@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid/non-secure';
 import create from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import shallow from 'zustand/shallow';
+import { shallow } from 'zustand/shallow';
 import { QueueSong, Song } from '/@/renderer/api/types';
 import { PlayerStatus, PlayerRepeat, PlayerShuffle, Play } from '/@/renderer/types';
 
