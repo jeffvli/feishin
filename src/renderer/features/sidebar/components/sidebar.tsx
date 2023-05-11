@@ -13,8 +13,8 @@ import {
   RiDiscLine,
   RiFlag2Line,
   RiFolder3Line,
-  RiHome5Fill,
-  RiHome5Line,
+  RiHome6Fill,
+  RiHome6Line,
   RiListUnordered,
   RiMusic2Fill,
   RiMusic2Line,
@@ -54,6 +54,7 @@ const SidebarContainer = styled.div<{ windowBarStyle: Platform }>`
 const ImageContainer = styled(motion.div)<{ height: string }>`
   position: relative;
   height: ${(props) => props.height};
+  cursor: pointer;
 
   ${fadeIn};
   animation: fadein 0.2s ease-in-out;
@@ -141,9 +142,9 @@ export const Sidebar = () => {
             >
               <Group spacing="sm">
                 {location.pathname === AppRoute.HOME ? (
-                  <RiHome5Fill size="1.3em" />
+                  <RiHome6Fill size="1.3em" />
                 ) : (
-                  <RiHome5Line size="1.3em" />
+                  <RiHome6Line size="1.3em" />
                 )}
                 Home
               </Group>
@@ -305,7 +306,7 @@ export const Sidebar = () => {
                 opacity={0.8}
                 radius={100}
                 size="md"
-                sx={{ position: 'absolute', right: 5, top: 5 }}
+                sx={{ cursor: 'default', position: 'absolute', right: 5, top: 5 }}
                 tooltip={{ label: 'Collapse', openDelay: 500 }}
                 variant="default"
                 onClick={(e) => {

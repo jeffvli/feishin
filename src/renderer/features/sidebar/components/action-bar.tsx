@@ -27,7 +27,7 @@ export const ActionBar = () => {
       ref={cq.ref}
       gutter="sm"
     >
-      <Grid.Col span={cq.isSm ? 7 : 5}>
+      <Grid.Col span={cq.isSm ? 7 : 6}>
         <TextInput
           disabled
           readOnly
@@ -36,7 +36,7 @@ export const ActionBar = () => {
           size="md"
         />
       </Grid.Col>
-      <Grid.Col span={cq.isSm ? 5 : 7}>
+      <Grid.Col span={cq.isSm ? 5 : 6}>
         <Group
           grow
           noWrap

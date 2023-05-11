@@ -12,6 +12,7 @@ export enum AppRoute {
   LIBRARY_ARTISTS = '/library/artists',
   LIBRARY_ARTISTS_DETAIL = '/library/artists/:artistId',
   LIBRARY_FOLDERS = '/library/folders',
+  LIBRARY_GENRES = '/library/genres',
   LIBRARY_SONGS = '/library/songs',
   NOW_PLAYING = '/now-playing',
   PLAYING = '/playing',

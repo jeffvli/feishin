@@ -8,10 +8,10 @@ import { Button, Text } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
   useAppStoreActions,
-  useAppStore,
   useCurrentSong,
   useSetFullScreenPlayerStore,
   useFullScreenPlayerStore,
+  useSidebarStore,
 } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
 import { LibraryItem } from '/@/renderer/api/types';
@@ -45,6 +45,7 @@ const Image = styled(motion.div)`
   width: 60px;
   height: 60px;
   background-color: var(--placeholder-bg);
+  cursor: pointer;
   filter: drop-shadow(0 5px 6px rgb(0, 0, 0, 50%));
 
   ${fadeIn};
@@ -84,7 +85,9 @@ export const LeftControls = () => {
   const { setSideBar } = useAppStoreActions();
   const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
   const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
-  const hideImage = useAppStore((state) => state.sidebar.image);
+  // const hideImage = useAppStore((state) => state.sidebar.image);
+  const { image, collapsed } = useSidebarStore();
+  const hideImage = image && !collapsed;
   const currentSong = useCurrentSong();
   const title = currentSong?.name;
   const artists = currentSong?.artists;
@@ -144,22 +147,23 @@ export const LeftControls = () => {
                     </Center>
                   </>
                 )}
-
-                <Button
-                  compact
-                  opacity={0.8}
-                  radius={50}
-                  size="md"
-                  sx={{ position: 'absolute', right: 2, top: 2 }}
-                  tooltip={{ label: 'Expand', openDelay: 500 }}
-                  variant="default"
-                  onClick={handleToggleSidebarImage}
-                >
-                  <RiArrowUpSLine
-                    color="white"
-                    size={20}
-                  />
-                </Button>
+                {!collapsed && (
+                  <Button
+                    compact
+                    opacity={0.8}
+                    radius={50}
+                    size="md"
+                    sx={{ cursor: 'default', position: 'absolute', right: 2, top: 2 }}
+                    tooltip={{ label: 'Expand', openDelay: 500 }}
+                    variant="default"
+                    onClick={handleToggleSidebarImage}
+                  >
+                    <RiArrowUpSLine
+                      color="white"
+                      size={20}
+                    />
+                  </Button>
+                )}
               </Image>
             </ImageWrapper>
           )}

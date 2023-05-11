@@ -5,6 +5,7 @@ import { immer } from 'zustand/middleware/immer';
 import { Platform } from '/@/renderer/types';
 
 type SidebarProps = {
+  collapsed: boolean;
   expanded: string[];
   image: boolean;
   leftWidth: string;
@@ -20,13 +21,7 @@ type TitlebarProps = {
 export interface AppState {
   isReorderingQueue: boolean;
   platform: Platform;
-  sidebar: {
-    expanded: string[];
-    image: boolean;
-    leftWidth: string;
-    rightExpanded: boolean;
-    rightWidth: string;
-  };
+  sidebar: SidebarProps;
   titlebar: TitlebarProps;
 }
 
@@ -60,6 +55,7 @@ export const useAppStore = create<AppSlice>()(
         isReorderingQueue: false,
         platform: Platform.WINDOWS,
         sidebar: {
+          collapsed: false,
           expanded: [],
           image: false,
           leftWidth: '400px',
@@ -78,7 +74,7 @@ export const useAppStore = create<AppSlice>()(
         return merge(currentState, persistedState);
       },
       name: 'store_app',
-      version: 1,
+      version: 2,
     },
   ),
 );

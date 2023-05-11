@@ -8,25 +8,31 @@ import styled from 'styled-components';
 import { DrawerPlayQueue, SidebarPlayQueue } from '/@/renderer/features/now-playing';
 import { FullScreenPlayer } from '/@/renderer/features/player/components/full-screen-player';
 import { Sidebar } from '/@/renderer/features/sidebar/components/sidebar';
+import { CollapsedSidebar } from '../../features/sidebar/components/collapsed-sidebar';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAppStore, useAppStoreActions, useFullScreenPlayerStore } from '/@/renderer/store';
 import { useWindowSettings, useGeneralSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
 import { constrainSidebarWidth, constrainRightSidebarWidth } from '/@/renderer/utils';
 
+const MINIMUM_SIDEBAR_WIDTH = 260;
+
 const MainContentContainer = styled.div<{
   leftSidebarWidth: string;
   rightExpanded?: boolean;
   rightSidebarWidth?: string;
   shell?: boolean;
+  sidebarCollapsed?: boolean;
 }>`
   position: relative;
   display: ${(props) => (props.shell ? 'flex' : 'grid')};
   grid-area: main-content;
   grid-template-areas: 'sidebar . right-sidebar';
   grid-template-rows: 1fr;
-  grid-template-columns: ${(props) => props.leftSidebarWidth} 1fr ${(props) =>
-      props.rightExpanded && props.rightSidebarWidth};
+  grid-template-columns: ${(props) => (props.sidebarCollapsed ? '80px' : props.leftSidebarWidth)} 1fr ${(
+      props,
+    ) => props.rightExpanded && props.rightSidebarWidth};
+
   gap: 0;
   background: var(--main-bg);
 `;
@@ -56,14 +62,25 @@ const ResizeHandle = styled.div<{
   bottom: ${(props) => props.placement === 'bottom' && 0};
   left: ${(props) => props.placement === 'left' && 0};
   z-index: 90;
-  width: 2px;
+  width: 4px;
   height: 100%;
-  background-color: var(--sidebar-handle-bg);
   cursor: ew-resize;
   opacity: ${(props) => (props.isResizing ? 1 : 0)};
 
   &:hover {
-    opacity: 0.5;
+    opacity: 0.7;
+  }
+
+  &::before {
+    position: absolute;
+    top: ${(props) => props.placement === 'top' && 0};
+    right: ${(props) => props.placement === 'right' && 0};
+    bottom: ${(props) => props.placement === 'bottom' && 0};
+    left: ${(props) => props.placement === 'left' && 0};
+    width: 1px;
+    height: 100%;
+    background-color: var(--sidebar-handle-bg);
+    content: '';
   }
 `;
 
@@ -193,10 +210,15 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
   const resize = useCallback(
     (mouseMoveEvent: any) => {
       if (isResizing) {
-        const width = `${constrainSidebarWidth(mouseMoveEvent.clientX)}px`;
-        setSideBar({ leftWidth: width });
-      }
-      if (isResizingRight) {
+        const width = mouseMoveEvent.clientX;
+        const constrainedWidth = `${constrainSidebarWidth(width)}px`;
+
+        if (width < MINIMUM_SIDEBAR_WIDTH - 100) {
+          setSideBar({ collapsed: true });
+        } else {
+          setSideBar({ collapsed: false, leftWidth: constrainedWidth });
+        }
+      } else if (isResizingRight) {
         const start = Number(sidebar.rightWidth.split('px')[0]);
         const { left } = rightSidebarRef!.current!.getBoundingClientRect();
         const width = `${constrainRightSidebarWidth(start + left - mouseMoveEvent.clientX)}px`;
@@ -224,6 +246,7 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
       rightExpanded={showSideQueue && sideQueueType === 'sideQueue'}
       rightSidebarWidth={sidebar.rightWidth}
       shell={shell}
+      sidebarCollapsed={sidebar.collapsed}
     >
       {!shell && (
         <>
@@ -243,7 +266,7 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
                 startResizing('left');
               }}
             />
-            <Sidebar />
+            {sidebar.collapsed ? <CollapsedSidebar /> : <Sidebar />}
           </SidebarContainer>
           <AnimatePresence
             initial={false}
