@@ -32,3 +32,4 @@ export * from './query-builder';
 export * from './rating';
 export * from './hover-card';
 export * from './option';
+export * from './checkbox';
