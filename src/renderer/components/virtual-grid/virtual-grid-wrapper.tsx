@@ -57,13 +57,16 @@ export const VirtualGridWrapper = ({
   itemData,
   route,
   onScroll,
+  height,
+  width,
   ...rest
-}: Omit<FixedSizeListProps, 'ref' | 'itemSize' | 'children'> & {
+}: Omit<FixedSizeListProps, 'ref' | 'itemSize' | 'children' | 'height' | 'width'> & {
   cardRows: CardRow<Album | AlbumArtist | Artist>[];
   columnCount: number;
   display: ListDisplayType;
   handleFavorite?: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
+  height?: number;
   itemData: any[];
   itemGap: number;
   itemHeight: number;
@@ -72,6 +75,7 @@ export const VirtualGridWrapper = ({
   refInstance: Ref<any>;
   route?: CardRoute;
   rowCount: number;
+  width?: number;
 }) => {
   const memoizedItemData = createItemData(
     cardRows,
@@ -94,11 +98,13 @@ export const VirtualGridWrapper = ({
     <FixedSizeList
       ref={refInstance}
       {...rest}
+      height={(height && Number(height)) || 0}
       initialScrollOffset={initialScrollOffset}
       itemCount={rowCount}
       itemData={memoizedItemData}
       itemSize={itemHeight}
       overscanCount={5}
+      width={(width && Number(width)) || 0}
       onScroll={memoizedOnScroll}
     >
       {GridCard}

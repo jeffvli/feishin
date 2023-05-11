@@ -21,18 +21,21 @@ export type VirtualInfiniteGridRef = {
   setItemData: (data: any[]) => void;
 };
 
-interface VirtualGridProps extends Omit<FixedSizeListProps, 'children' | 'itemSize'> {
+interface VirtualGridProps
+  extends Omit<FixedSizeListProps, 'children' | 'itemSize' | 'height' | 'width'> {
   cardRows: CardRow<any>[];
   display?: ListDisplayType;
   fetchFn: (options: { columnCount: number; skip: number; take: number }) => Promise<any>;
   handleFavorite?: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
+  height?: number;
   itemGap: number;
   itemSize: number;
   itemType: LibraryItem;
   loading?: boolean;
   minimumBatchSize?: number;
   route?: CardRoute;
+  width?: number;
 }
 
 export const VirtualInfiniteGrid = forwardRef(

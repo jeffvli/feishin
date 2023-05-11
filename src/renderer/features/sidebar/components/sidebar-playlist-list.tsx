@@ -143,7 +143,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
       h="100%"
       {...hideScrollbarElementProps}
     >
-      <AutoSizer onResize={(e) => setRect(e)}>
+      <AutoSizer onResize={(e) => setRect(e as { height: number; width: number })}>
         {() => (
           <FixedSizeList
             className={isScrollbarHidden ? 'hide-scrollbar overlay-scrollbar' : 'overlay-scrollbar'}
