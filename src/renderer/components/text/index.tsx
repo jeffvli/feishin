@@ -23,7 +23,6 @@ const StyledText = styled(MantineText)<TextProps>`
   color: ${(props) => (props.$secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)')};
   font-family: ${(props) => props.font};
   cursor: ${(props) => props.$link && 'cursor'};
-  transition: color 0.2s ease-in-out;
   user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
   ${(props) => props.overflow === 'hidden' && !props.lineClamp && textEllipsis}
 
