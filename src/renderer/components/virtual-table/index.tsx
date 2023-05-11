@@ -10,6 +10,7 @@ import type {
   NewColumnsLoadedEvent,
   GridReadyEvent,
   GridSizeChangedEvent,
+  ModelUpdatedEvent,
 } from '@ag-grid-community/core';
 import type { AgGridReactProps } from '@ag-grid-community/react';
 import { AgGridReact } from '@ag-grid-community/react';
@@ -418,6 +419,14 @@ export const VirtualTable = forwardRef(
       [autoFitColumns, onGridSizeChanged],
     );
 
+    const handleModelUpdated = useCallback(
+      (e: ModelUpdatedEvent) => {
+        if (!e?.api) return;
+        if (autoFitColumns) e.api?.sizeColumnsToFit?.();
+      },
+      [autoFitColumns],
+    );
+
     return (
       <TableWrapper
         ref={deselectRef}
@@ -447,6 +456,7 @@ export const VirtualTable = forwardRef(
           onColumnMoved={handleColumnMoved}
           onGridReady={handleGridReady}
           onGridSizeChanged={handleGridSizeChanged}
+          onModelUpdated={handleModelUpdated}
           onNewColumnsLoaded={handleNewColumnsLoaded}
         />
       </TableWrapper>
