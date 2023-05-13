@@ -564,6 +564,14 @@ export const useCenterControls = (args: { playersRef: any }) => {
       mpvPlayerListener.rendererQuit(() => {
         handleQuit();
       });
+
+      mpvPlayerListener.rendererToggleShuffle(() => {
+        handleToggleShuffle();
+      });
+
+      mpvPlayerListener.rendererToggleRepeat(() => {
+        handleToggleRepeat();
+      });
     }
 
     return () => {
@@ -576,6 +584,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
       ipc?.removeAllListeners('renderer-player-current-time');
       ipc?.removeAllListeners('renderer-player-auto-next');
       ipc?.removeAllListeners('renderer-player-quit');
+      ipc?.removeAllListeners('renderer-player-toggle-shuffle');
+      ipc?.removeAllListeners('renderer-player-toggle-repeat');
     };
   }, [
     autoNext,
@@ -587,6 +597,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
     handlePrevTrack,
     handleQuit,
     handleStop,
+    handleToggleRepeat,
+    handleToggleShuffle,
     isMpvPlayer,
     next,
     pause,
@@ -684,6 +696,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
   return {
     handleNextTrack,
+    handlePause,
+    handlePlay,
     handlePlayPause,
     handlePrevTrack,
     handleSeekSlider,

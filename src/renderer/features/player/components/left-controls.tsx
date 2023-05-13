@@ -1,5 +1,6 @@
 import React, { MouseEvent } from 'react';
 import { Center, Group } from '@mantine/core';
+import { useHotkeys } from '@mantine/hooks';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { RiArrowUpSLine, RiDiscLine, RiMore2Fill } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
@@ -12,6 +13,7 @@ import {
   useSetFullScreenPlayerStore,
   useFullScreenPlayerStore,
   useSidebarStore,
+  useHotkeySettings,
 } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
 import { LibraryItem } from '/@/renderer/api/types';
@@ -91,6 +93,7 @@ export const LeftControls = () => {
   const currentSong = useCurrentSong();
   const title = currentSong?.name;
   const artists = currentSong?.artists;
+  const { bindings } = useHotkeySettings();
 
   const isSongDefined = Boolean(currentSong?.id);
 
@@ -99,15 +102,22 @@ export const LeftControls = () => {
     SONG_CONTEXT_MENU_ITEMS,
   );
 
-  const handleToggleFullScreenPlayer = (e: MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
+  const handleToggleFullScreenPlayer = (e?: MouseEvent<HTMLDivElement> | KeyboardEvent) => {
+    e?.stopPropagation();
     setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
   };
 
-  const handleToggleSidebarImage = (e: MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
+  const handleToggleSidebarImage = (e?: MouseEvent<HTMLButtonElement>) => {
+    e?.stopPropagation();
     setSideBar({ image: true });
   };
+
+  useHotkeys([
+    [
+      bindings.toggleFullscreenPlayer.allowGlobal ? '' : bindings.toggleFullscreenPlayer.hotkey,
+      handleToggleFullScreenPlayer,
+    ],
+  ]);
 
   return (
     <LeftControlsContainer>

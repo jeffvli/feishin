@@ -1,5 +1,6 @@
 import { MouseEvent } from 'react';
 import { Flex, Group } from '@mantine/core';
+import { useHotkeys } from '@mantine/hooks';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import {
   RiVolumeUpFill,
@@ -12,6 +13,7 @@ import {
   useAppStoreActions,
   useCurrentServer,
   useCurrentSong,
+  useHotkeySettings,
   useMuted,
   useSidebarStore,
   useVolume,
@@ -30,7 +32,9 @@ export const RightControls = () => {
   const currentSong = useCurrentSong();
   const { setSideBar } = useAppStoreActions();
   const { rightExpanded: isQueueExpanded } = useSidebarStore();
-  const { handleVolumeSlider, handleVolumeWheel, handleMute } = useRightControls();
+  const { bindings } = useHotkeySettings();
+  const { handleVolumeSlider, handleVolumeWheel, handleMute, handleVolumeDown, handleVolumeUp } =
+    useRightControls();
 
   const updateRatingMutation = useSetRating({});
   const addToFavoritesMutation = useCreateFavorite({});
@@ -94,8 +98,19 @@ export const RightControls = () => {
     }
   };
 
+  const handleToggleQueue = () => {
+    setSideBar({ rightExpanded: !isQueueExpanded });
+  };
+
   const isSongDefined = Boolean(currentSong?.id);
   const showRating = isSongDefined && server?.type === ServerType.NAVIDROME;
+
+  useHotkeys([
+    [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDown],
+    [bindings.volumeUp.isGlobal ? '' : bindings.volumeUp.hotkey, handleVolumeUp],
+    [bindings.volumeMute.isGlobal ? '' : bindings.volumeMute.hotkey, handleMute],
+    [bindings.toggleQueue.isGlobal ? '' : bindings.toggleQueue.hotkey, handleToggleQueue],
+  ]);
 
   return (
     <Flex
@@ -147,7 +162,7 @@ export const RightControls = () => {
           icon={<HiOutlineQueueList size="1.1rem" />}
           tooltip={{ label: 'View queue', openDelay: 500 }}
           variant="secondary"
-          onClick={() => setSideBar({ rightExpanded: !isQueueExpanded })}
+          onClick={handleToggleQueue}
         />
         <Group
           noWrap
