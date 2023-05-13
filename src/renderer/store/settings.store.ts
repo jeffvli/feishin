@@ -42,6 +42,26 @@ type MpvSettings = {
   replayGainPreampDB?: number;
 };
 
+export enum BindingActions {
+  GLOBAL_SEARCH = 'globalSearch',
+  LOCAL_SEARCH = 'localSearch',
+  MUTE = 'volumeMute',
+  NEXT = 'next',
+  PAUSE = 'pause',
+  PLAY = 'play',
+  PLAY_PAUSE = 'playPause',
+  PREVIOUS = 'previous',
+  SHUFFLE = 'toggleShuffle',
+  SKIP_BACKWARD = 'skipBackward',
+  SKIP_FORWARD = 'skipForward',
+  STOP = 'stop',
+  TOGGLE_FULLSCREEN_PLAYER = 'toggleFullscreenPlayer',
+  TOGGLE_QUEUE = 'toggleQueue',
+  TOGGLE_REPEAT = 'toggleRepeat',
+  VOLUME_DOWN = 'volumeDown',
+  VOLUME_UP = 'volumeUp',
+}
+
 export interface SettingsState {
   general: {
     followSystemTheme: boolean;
@@ -60,6 +80,7 @@ export interface SettingsState {
     volumeWheelStep: number;
   };
   hotkeys: {
+    bindings: Record<BindingActions, { allowGlobal: boolean; hotkey: string; isGlobal: boolean }>;
     globalMediaHotkeys: boolean;
   };
   playback: {
@@ -118,6 +139,25 @@ const initialState: SettingsState = {
     volumeWheelStep: 5,
   },
   hotkeys: {
+    bindings: {
+      globalSearch: { allowGlobal: false, hotkey: 'mod+k', isGlobal: false },
+      localSearch: { allowGlobal: false, hotkey: 'mod+f', isGlobal: false },
+      next: { allowGlobal: true, hotkey: '', isGlobal: false },
+      pause: { allowGlobal: true, hotkey: '', isGlobal: false },
+      play: { allowGlobal: true, hotkey: '', isGlobal: false },
+      playPause: { allowGlobal: true, hotkey: '', isGlobal: false },
+      previous: { allowGlobal: true, hotkey: '', isGlobal: false },
+      skipBackward: { allowGlobal: true, hotkey: '', isGlobal: false },
+      skipForward: { allowGlobal: true, hotkey: '', isGlobal: false },
+      stop: { allowGlobal: true, hotkey: '', isGlobal: false },
+      toggleFullscreenPlayer: { allowGlobal: false, hotkey: '', isGlobal: false },
+      toggleQueue: { allowGlobal: false, hotkey: '', isGlobal: false },
+      toggleRepeat: { allowGlobal: true, hotkey: '', isGlobal: false },
+      toggleShuffle: { allowGlobal: true, hotkey: '', isGlobal: false },
+      volumeDown: { allowGlobal: true, hotkey: '', isGlobal: false },
+      volumeMute: { allowGlobal: true, hotkey: '', isGlobal: false },
+      volumeUp: { allowGlobal: true, hotkey: '', isGlobal: false },
+    },
     globalMediaHotkeys: false,
   },
   playback: {

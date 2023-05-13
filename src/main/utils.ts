@@ -29,3 +29,24 @@ export const isWindows = () => {
 export const isLinux = () => {
   return process.platform === 'linux';
 };
+
+export const hotkeyToElectronAccelerator = (hotkey: string) => {
+  let accelerator = hotkey;
+
+  const replacements = {
+    mod: 'CmdOrCtrl',
+    numpad: 'num',
+    numpadadd: 'numadd',
+    numpaddecimal: 'numdec',
+    numpaddivide: 'numdiv',
+    numpadenter: 'numenter',
+    numpadmultiply: 'nummult',
+    numpadsubtract: 'numsub',
+  };
+
+  Object.keys(replacements).forEach((key) => {
+    accelerator = accelerator.replace(key, replacements[key as keyof typeof replacements]);
+  });
+
+  return accelerator;
+};
