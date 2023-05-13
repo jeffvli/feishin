@@ -1,6 +1,10 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { PlayerData } from '/@/renderer/store';
 
+const initialize = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
+  ipcRenderer.send('player-initialize', data);
+};
+
 const restart = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
   ipcRenderer.send('player-restart', data);
 };
@@ -98,6 +102,34 @@ const rendererStop = (cb: (event: IpcRendererEvent, data: PlayerData) => void) =
   ipcRenderer.on('renderer-player-stop', cb);
 };
 
+const rendererSkipForward = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
+  ipcRenderer.on('renderer-player-skip-forward', cb);
+};
+
+const rendererSkipBackward = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
+  ipcRenderer.on('renderer-player-skip-backward', cb);
+};
+
+const rendererVolumeUp = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
+  ipcRenderer.on('renderer-player-volume-up', cb);
+};
+
+const rendererVolumeDown = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
+  ipcRenderer.on('renderer-player-volume-down', cb);
+};
+
+const rendererVolumeMute = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
+  ipcRenderer.on('renderer-player-volume-mute', cb);
+};
+
+const rendererToggleRepeat = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
+  ipcRenderer.on('renderer-player-toggle-repeat', cb);
+};
+
+const rendererToggleShuffle = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
+  ipcRenderer.on('renderer-player-toggle-shuffle', cb);
+};
+
 const rendererQuit = (cb: (event: IpcRendererEvent) => void) => {
   ipcRenderer.on('renderer-player-quit', cb);
 };
@@ -105,6 +137,7 @@ const rendererQuit = (cb: (event: IpcRendererEvent) => void) => {
 export const mpvPlayer = {
   autoNext,
   currentTime,
+  initialize,
   mute,
   next,
   pause,
@@ -130,5 +163,12 @@ export const mpvPlayerListener = {
   rendererPlayPause,
   rendererPrevious,
   rendererQuit,
+  rendererSkipBackward,
+  rendererSkipForward,
   rendererStop,
+  rendererToggleRepeat,
+  rendererToggleShuffle,
+  rendererVolumeDown,
+  rendererVolumeMute,
+  rendererVolumeUp,
 };

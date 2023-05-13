@@ -8,7 +8,7 @@ import { initSimpleImg } from 'react-simple-img';
 import { BaseContextModal } from './components';
 import { useTheme } from './hooks';
 import { AppRouter } from './router/app-router';
-import { useSettingsStore } from './store/settings.store';
+import { useHotkeySettings, useSettingsStore } from './store/settings.store';
 import './styles/global.scss';
 import '@ag-grid-community/styles/ag-grid.css';
 import { ContextMenuProvider } from '/@/renderer/features/context-menu';
@@ -24,11 +24,12 @@ ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule
 initSimpleImg({ threshold: 0.05 }, true);
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+const ipc = isElectron() ? window.electron.ipc : null;
 
 export const App = () => {
   const theme = useTheme();
   const contentFont = useSettingsStore((state) => state.general.fontContent);
-
+  const { bindings } = useHotkeySettings();
   const handlePlayQueueAdd = useHandlePlayQueueAdd();
 
   useEffect(() => {
@@ -44,11 +45,21 @@ export const App = () => {
       volume: usePlayerStore.getState().volume,
     };
 
-    mpvPlayer?.restart({
+    mpvPlayer?.initialize({
       extraParameters,
       properties,
     });
+
+    return () => {
+      mpvPlayer?.quit();
+    };
   }, []);
+
+  useEffect(() => {
+    if (isElectron()) {
+      ipc?.send('set-global-shortcuts', bindings);
+    }
+  }, [bindings]);
 
   return (
     <MantineProvider

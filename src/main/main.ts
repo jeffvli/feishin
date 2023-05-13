@@ -27,7 +27,7 @@ import MpvAPI from 'node-mpv';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
-import { isLinux, isMacOS, isWindows, resolveHtmlPath } from './utils';
+import { hotkeyToElectronAccelerator, isLinux, isMacOS, isWindows, resolveHtmlPath } from './utils';
 import './features';
 
 declare module 'node-mpv';
@@ -97,7 +97,6 @@ export const getMainWindow = () => {
 
 const createWinThumbarButtons = () => {
   if (isWindows()) {
-    console.log('setting buttons');
     getMainWindow()?.setThumbarButtons([
       {
         click: () => getMainWindow()?.webContents.send('renderer-player-previous'),
@@ -308,7 +307,6 @@ const createWindow = async () => {
 app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
 
 const MPV_BINARY_PATH = store.get('mpv_path') as string | undefined;
-const MPV_PARAMETERS = store.get('mpv_parameters') as Array<string> | undefined;
 
 const prefetchPlaylistParams = [
   '--prefetch-playlist=no',
@@ -316,10 +314,10 @@ const prefetchPlaylistParams = [
   '--prefetch-playlist',
 ];
 
-const DEFAULT_MPV_PARAMETERS = () => {
+const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
   const parameters = [];
 
-  if (!MPV_PARAMETERS?.some((param) => prefetchPlaylistParams.includes(param))) {
+  if (!extraParameters?.some((param) => prefetchPlaylistParams.includes(param))) {
     parameters.push('--prefetch-playlist=yes');
   }
 
@@ -331,6 +329,8 @@ let mpvInstance: MpvAPI | null = null;
 const createMpv = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
   const { extraParameters, properties } = data;
 
+  const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
+
   mpvInstance = new MpvAPI(
     {
       audio_only: true,
@@ -338,9 +338,7 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
       binary: MPV_BINARY_PATH || '',
       time_update: 1,
     },
-    MPV_PARAMETERS || extraParameters
-      ? uniq([...DEFAULT_MPV_PARAMETERS(), ...(MPV_PARAMETERS || []), ...(extraParameters || [])])
-      : DEFAULT_MPV_PARAMETERS(),
+    params,
   );
 
   mpvInstance.setMultipleProperties(properties || {});
@@ -399,6 +397,91 @@ ipcMain.on(
   async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
     mpvInstance?.quit();
     createMpv(data);
+  },
+);
+
+ipcMain.on(
+  'player-initialize',
+  async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
+    createMpv(data);
+  },
+);
+
+// Must duplicate with the one in renderer process settings.store.ts
+enum BindingActions {
+  GLOBAL_SEARCH = 'globalSearch',
+  LOCAL_SEARCH = 'localSearch',
+  MUTE = 'volumeMute',
+  NEXT = 'next',
+  PAUSE = 'pause',
+  PLAY = 'play',
+  PLAY_PAUSE = 'playPause',
+  PREVIOUS = 'previous',
+  SHUFFLE = 'toggleShuffle',
+  SKIP_BACKWARD = 'skipBackward',
+  SKIP_FORWARD = 'skipForward',
+  STOP = 'stop',
+  TOGGLE_FULLSCREEN_PLAYER = 'toggleFullscreenPlayer',
+  TOGGLE_QUEUE = 'toggleQueue',
+  TOGGLE_REPEAT = 'toggleRepeat',
+  VOLUME_DOWN = 'volumeDown',
+  VOLUME_UP = 'volumeUp',
+}
+
+const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
+  [BindingActions.MUTE]: () => getMainWindow()?.webContents.send('renderer-player-volume-mute'),
+  [BindingActions.NEXT]: () => getMainWindow()?.webContents.send('renderer-player-next'),
+  [BindingActions.PAUSE]: () => getMainWindow()?.webContents.send('renderer-player-pause'),
+  [BindingActions.PLAY]: () => getMainWindow()?.webContents.send('renderer-player-play'),
+  [BindingActions.PLAY_PAUSE]: () =>
+    getMainWindow()?.webContents.send('renderer-player-play-pause'),
+  [BindingActions.PREVIOUS]: () => getMainWindow()?.webContents.send('renderer-player-previous'),
+  [BindingActions.SHUFFLE]: () =>
+    getMainWindow()?.webContents.send('renderer-player-toggle-shuffle'),
+  [BindingActions.SKIP_BACKWARD]: () =>
+    getMainWindow()?.webContents.send('renderer-player-skip-backward'),
+  [BindingActions.SKIP_FORWARD]: () =>
+    getMainWindow()?.webContents.send('renderer-player-skip-forward'),
+  [BindingActions.STOP]: () => getMainWindow()?.webContents.send('renderer-player-stop'),
+  [BindingActions.TOGGLE_REPEAT]: () =>
+    getMainWindow()?.webContents.send('renderer-player-toggle-repeat'),
+  [BindingActions.VOLUME_UP]: () => getMainWindow()?.webContents.send('renderer-player-volume-up'),
+  [BindingActions.VOLUME_DOWN]: () =>
+    getMainWindow()?.webContents.send('renderer-player-volume-down'),
+  [BindingActions.GLOBAL_SEARCH]: () => {},
+  [BindingActions.LOCAL_SEARCH]: () => {},
+  [BindingActions.TOGGLE_QUEUE]: () => {},
+  [BindingActions.TOGGLE_FULLSCREEN_PLAYER]: () => {},
+};
+
+ipcMain.on(
+  'set-global-shortcuts',
+  (
+    _event,
+    data: Record<BindingActions, { allowGlobal: boolean; hotkey: string; isGlobal: boolean }>,
+  ) => {
+    // Since we're not tracking the previous shortcuts, we need to unregister all of them
+    globalShortcut.unregisterAll();
+
+    for (const shortcut of Object.keys(data)) {
+      const isGlobalHotkey = data[shortcut as BindingActions].isGlobal;
+      const isValidHotkey =
+        data[shortcut as BindingActions].hotkey && data[shortcut as BindingActions].hotkey !== '';
+
+      if (isGlobalHotkey && isValidHotkey) {
+        const accelerator = hotkeyToElectronAccelerator(data[shortcut as BindingActions].hotkey);
+
+        globalShortcut.register(accelerator, () => {
+          HOTKEY_ACTIONS[shortcut as BindingActions]();
+        });
+      }
+    }
+
+    const globalMediaKeysEnabled = store.get('global_media_hotkeys') as boolean;
+
+    if (globalMediaKeysEnabled) {
+      enableMediaKeys(mainWindow);
+    }
   },
 );
 
