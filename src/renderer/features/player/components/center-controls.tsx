@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useHotkeys } from '@mantine/hooks';
 import formatDuration from 'format-duration';
 import isElectron from 'is-electron';
 import { IoIosPause } from 'react-icons/io';
@@ -25,7 +26,11 @@ import {
   useShuffleStatus,
   useCurrentTime,
 } from '/@/renderer/store';
-import { usePlayerType, useSettingsStore } from '/@/renderer/store/settings.store';
+import {
+  useHotkeySettings,
+  usePlayerType,
+  useSettingsStore,
+} from '/@/renderer/store/settings.store';
 import { PlayerStatus, PlaybackType, PlayerShuffle, PlayerRepeat } from '/@/renderer/types';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 
@@ -78,6 +83,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
   const setCurrentTime = useSetCurrentTime();
   const repeat = useRepeatStatus();
   const shuffle = useShuffleStatus();
+  const { bindings } = useHotkeySettings();
 
   const {
     handleNextTrack,
@@ -88,6 +94,9 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     handleSkipForward,
     handleToggleRepeat,
     handleToggleShuffle,
+    handleStop,
+    handlePause,
+    handlePlay,
   } = useCenterControls({ playersRef });
 
   const currentTime = useCurrentTime();
@@ -112,6 +121,25 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
   }, [currentPlayerRef, isSeeking, setCurrentTime, playerType, status]);
 
   const [seekValue, setSeekValue] = useState(0);
+
+  useHotkeys([
+    [bindings.playPause.isGlobal ? '' : bindings.playPause.hotkey, handlePlayPause],
+    [bindings.play.isGlobal ? '' : bindings.play.hotkey, handlePlay],
+    [bindings.pause.isGlobal ? '' : bindings.pause.hotkey, handlePause],
+    [bindings.stop.isGlobal ? '' : bindings.stop.hotkey, handleStop],
+    [bindings.next.isGlobal ? '' : bindings.next.hotkey, handleNextTrack],
+    [bindings.previous.isGlobal ? '' : bindings.previous.hotkey, handlePrevTrack],
+    [bindings.toggleRepeat.isGlobal ? '' : bindings.toggleRepeat.hotkey, handleToggleRepeat],
+    [bindings.toggleShuffle.isGlobal ? '' : bindings.toggleShuffle.hotkey, handleToggleShuffle],
+    [
+      bindings.skipBackward.isGlobal ? '' : bindings.skipBackward.hotkey,
+      () => handleSkipBackward(skip?.skipBackwardSeconds || 5),
+    ],
+    [
+      bindings.skipForward.isGlobal ? '' : bindings.skipForward.hotkey,
+      () => handleSkipForward(skip?.skipForwardSeconds || 5),
+    ],
+  ]);
 
   return (
     <>
