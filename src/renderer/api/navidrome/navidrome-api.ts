@@ -205,7 +205,21 @@ const parsePath = (fullPath: string) => {
   const [path, params] = fullPath.split('?');
 
   const parsedParams = qs.parse(params);
-  const notNilParams = omitBy(parsedParams, (value) => value === 'undefined' || value === 'null');
+
+  // Convert indexed object to array
+  const newParams: Record<string, any> = {};
+  Object.keys(parsedParams).forEach((key) => {
+    const isIndexedArrayObject =
+      typeof parsedParams[key] === 'object' && Object.keys(parsedParams[key] || {}).includes('0');
+
+    if (!isIndexedArrayObject) {
+      newParams[key] = parsedParams[key];
+    } else {
+      newParams[key] = Object.values(parsedParams[key] || {});
+    }
+  });
+
+  const notNilParams = omitBy(newParams, (value) => value === 'undefined' || value === 'null');
 
   return {
     params: notNilParams,
