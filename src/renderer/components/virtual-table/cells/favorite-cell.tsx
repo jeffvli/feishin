@@ -19,6 +19,7 @@ export const FavoriteCell = ({ value, data, node }: ICellRendererParams) => {
             id: [data.id],
             type: data.itemType,
           },
+          serverId: data.serverId,
         },
         {
           onSuccess: () => {
@@ -33,6 +34,7 @@ export const FavoriteCell = ({ value, data, node }: ICellRendererParams) => {
             id: [data.id],
             type: data.itemType,
           },
+          serverId: data.serverId,
         },
         {
           onSuccess: () => {

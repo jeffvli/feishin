@@ -271,6 +271,7 @@ export const AlbumArtistDetailContent = () => {
           id: [detailQuery.data.id],
           type: LibraryItem.ALBUM_ARTIST,
         },
+        serverId: detailQuery.data.serverId,
       });
     } else {
       createFavoriteMutation.mutate({
@@ -278,6 +279,7 @@ export const AlbumArtistDetailContent = () => {
           id: [detailQuery.data.id],
           type: LibraryItem.ALBUM_ARTIST,
         },
+        serverId: detailQuery.data.serverId,
       });
     }
   };

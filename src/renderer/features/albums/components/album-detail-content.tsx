@@ -241,6 +241,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
           id: [detailQuery.data.id],
           type: LibraryItem.ALBUM,
         },
+        serverId: detailQuery.data.serverId,
       });
     } else {
       createFavoriteMutation.mutate({
@@ -248,6 +249,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
           id: [detailQuery.data.id],
           type: LibraryItem.ALBUM,
         },
+        serverId: detailQuery.data.serverId,
       });
     }
   };

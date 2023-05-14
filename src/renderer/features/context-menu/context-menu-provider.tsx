@@ -25,7 +25,7 @@ import {
   RiStarFill,
   RiCloseCircleLine,
 } from 'react-icons/ri';
-import { AnyLibraryItems, LibraryItem, ServerType } from '/@/renderer/api/types';
+import { AnyLibraryItems, LibraryItem, ServerType, AnyLibraryItem } from '/@/renderer/api/types';
 import {
   ConfirmModal,
   ContextMenu,
@@ -241,75 +241,131 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const handleAddToFavorites = useCallback(() => {
     if (!ctx.dataNodes && !ctx.data) return;
 
-    let itemsToFavorite: AnyLibraryItems = [];
-    let nodesToFavorite: RowNode<any>[] = [];
-
     if (ctx.dataNodes) {
-      nodesToFavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
+      const nodesToFavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
+
+      const nodesByServerId = nodesToFavorite.reduce((acc, node) => {
+        if (!acc[node.data.serverId]) {
+          acc[node.data.serverId] = [];
+        }
+        acc[node.data.serverId].push(node);
+        return acc;
+      }, {} as Record<string, RowNode<any>[]>);
+
+      for (const serverId of Object.keys(nodesByServerId)) {
+        const nodes = nodesByServerId[serverId];
+        const items = nodes.map((node) => node.data);
+
+        createFavoriteMutation.mutate(
+          {
+            query: {
+              id: items.map((item) => item.id),
+              type: ctx.type,
+            },
+            serverId,
+          },
+          {
+            onError: (err) => {
+              toast.error({
+                message: err.message,
+                title: 'Error adding to favorites',
+              });
+            },
+            onSuccess: () => {
+              for (const node of nodes) {
+                node.setData({ ...node.data, userFavorite: true });
+              }
+            },
+          },
+        );
+      }
     } else {
-      itemsToFavorite = ctx.data.filter((item) => !item.userFavorite);
+      const itemsToFavorite = ctx.data.filter((item) => !item.userFavorite);
+      const itemsByServerId = (itemsToFavorite as any[]).reduce((acc, item) => {
+        if (!acc[item.serverId]) {
+          acc[item.serverId] = [];
+        }
+        acc[item.serverId].push(item);
+        return acc;
+      }, {} as Record<string, AnyLibraryItems>);
+
+      for (const serverId of Object.keys(itemsByServerId)) {
+        const items = itemsByServerId[serverId];
+
+        createFavoriteMutation.mutate(
+          {
+            query: {
+              id: items.map((item: AnyLibraryItem) => item.id),
+              type: ctx.type,
+            },
+            serverId,
+          },
+          {
+            onError: (err) => {
+              toast.error({
+                message: err.message,
+                title: 'Error adding to favorites',
+              });
+            },
+          },
+        );
+      }
     }
-
-    const idsToFavorite = nodesToFavorite
-      ? nodesToFavorite.map((node) => node.data.id)
-      : itemsToFavorite.map((item) => item.id);
-
-    createFavoriteMutation.mutate(
-      {
-        query: {
-          id: idsToFavorite,
-          type: ctx.type,
-        },
-      },
-      {
-        onError: (err) => {
-          toast.error({
-            message: err.message,
-            title: 'Error adding to favorites',
-          });
-        },
-        onSuccess: () => {
-          if (ctx.dataNodes) {
-            for (const node of nodesToFavorite) {
-              node.setData({ ...node.data, userFavorite: true });
-            }
-          }
-        },
-      },
-    );
   }, [createFavoriteMutation, ctx.data, ctx.dataNodes, ctx.type]);
 
   const handleRemoveFromFavorites = useCallback(() => {
     if (!ctx.dataNodes && !ctx.data) return;
 
-    let itemsToUnfavorite: AnyLibraryItems = [];
-    let nodesToUnfavorite: RowNode<any>[] = [];
-
     if (ctx.dataNodes) {
-      nodesToUnfavorite = ctx.dataNodes.filter((item) => item.data.userFavorite);
+      const nodesToUnfavorite = ctx.dataNodes.filter((item) => item.data.userFavorite);
+      const nodesByServerId = nodesToUnfavorite.reduce((acc, node) => {
+        if (!acc[node.data.serverId]) {
+          acc[node.data.serverId] = [];
+        }
+        acc[node.data.serverId].push(node);
+        return acc;
+      }, {} as Record<string, RowNode<any>[]>);
+
+      for (const serverId of Object.keys(nodesByServerId)) {
+        const idsToUnfavorite = nodesByServerId[serverId].map((node) => node.data.id);
+        deleteFavoriteMutation.mutate(
+          {
+            query: {
+              id: idsToUnfavorite,
+              type: ctx.type,
+            },
+            serverId,
+          },
+          {
+            onSuccess: () => {
+              for (const node of nodesToUnfavorite) {
+                node.setData({ ...node.data, userFavorite: false });
+              }
+            },
+          },
+        );
+      }
     } else {
-      itemsToUnfavorite = ctx.data.filter((item) => item.userFavorite);
+      const itemsToUnfavorite = ctx.data.filter((item) => item.userFavorite);
+      const itemsByServerId = (itemsToUnfavorite as any[]).reduce((acc, item) => {
+        if (!acc[item.serverId]) {
+          acc[item.serverId] = [];
+        }
+        acc[item.serverId].push(item);
+        return acc;
+      }, {} as Record<string, AnyLibraryItems>);
+
+      for (const serverId of Object.keys(itemsByServerId)) {
+        const idsToUnfavorite = itemsByServerId[serverId].map((item: AnyLibraryItem) => item.id);
+        deleteFavoriteMutation.mutate({
+          query: {
+            id: idsToUnfavorite,
+            type: ctx.type,
+          },
+          serverId,
+        });
+      }
     }
-
-    const idsToUnfavorite = nodesToUnfavorite
-      ? nodesToUnfavorite.map((node) => node.data.id)
-      : itemsToUnfavorite.map((item) => item.id);
-
-    deleteFavoriteMutation.mutate(
-      {
-        query: {
-          id: idsToUnfavorite,
-          type: ctx.type,
-        },
-      },
-      {
-        onSuccess: () => {
-          for (const node of nodesToUnfavorite) {
-            node.setData({ ...node.data, userFavorite: false });
-          }
-        },
-      },
-    );
   }, [ctx.data, ctx.dataNodes, ctx.type, deleteFavoriteMutation]);
 
   const handleAddToPlaylist = useCallback(() => {

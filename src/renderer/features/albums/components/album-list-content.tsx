@@ -296,6 +296,7 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
           id,
           type: itemType,
         },
+        serverId: server?.id,
       });
     } else {
       createFavoriteMutation.mutate({
@@ -303,6 +304,7 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
           id,
           type: itemType,
         },
+        serverId: server?.id,
       });
     }
   };
