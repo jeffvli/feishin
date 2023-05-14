@@ -208,9 +208,9 @@ export const PosterCard = ({
       </Skeleton>
       <DetailContainer>
         <Stack spacing="sm">
-          {controls.cardRows.map((row) => (
+          {controls.cardRows.map((row, index) => (
             <Skeleton
-              key={row.arrayProperty}
+              key={`${index}-${columnIndex}-${row.arrayProperty}`}
               visible
               height={14}
               radius="sm"
