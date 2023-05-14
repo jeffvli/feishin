@@ -44,7 +44,7 @@ const LinkContainer = styled.div`
   cursor: pointer;
 `;
 
-const ImageContainer = styled.div`
+const ImageContainer = styled.div<{ $isFavorite?: boolean }>`
   position: relative;
   display: flex;
   align-items: center;
@@ -66,6 +66,23 @@ const ImageContainer = styled.div`
     content: '';
     user-select: none;
   }
+
+  ${(props) =>
+    props.$isFavorite &&
+    `
+    &::after {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 80px;
+    height: 80px;
+    background-color: var(--primary-color);
+    box-shadow: 0 0 10px 8px rgba(0, 0, 0, 80%);
+    transform: rotate(-45deg);
+    content: '';
+    pointer-events: none;
+  }
+  `}
 
   &:hover {
     &::before {
@@ -138,7 +155,7 @@ export const PosterCard = ({
     return (
       <PosterCardContainer key={`card-${columnIndex}-${listChildProps.index}`}>
         <LinkContainer onClick={() => navigate(path)}>
-          <ImageContainer>
+          <ImageContainer $isFavorite={data?.userFavorite}>
             {data?.imageUrl ? (
               <Image
                 importance="auto"
