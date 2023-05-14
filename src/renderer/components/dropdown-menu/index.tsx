@@ -6,6 +6,7 @@ import type {
   MenuDropdownProps as MantineMenuDropdownProps,
 } from '@mantine/core';
 import { Menu as MantineMenu, createPolymorphicComponent } from '@mantine/core';
+import { RiArrowLeftSFill } from 'react-icons/ri';
 import styled from 'styled-components';
 
 type MenuProps = MantineMenuProps;
@@ -31,23 +32,6 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
   font-size: var(--dropdown-menu-item-font-size);
   font-family: var(--content-font-family);
 
-  ${(props) =>
-    props.$isActive &&
-    `
-      &::before {
-        content: ''; // ::before and ::after both require content
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: var(--dropdown-menu-bg-hover);
-        opacity: 0.5;
-        z-index: -1;
-      }
-
-  `}
-
   &:disabled {
     opacity: 0.6;
   }
@@ -60,6 +44,10 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
     margin-right: 2rem;
     margin-left: 1rem;
     color: ${(props) => (props.$danger ? 'var(--danger-color)' : 'var(--dropdown-menu-fg)')};
+  }
+
+  & .mantine-Menu-itemRightSection {
+    display: flex;
   }
 
   cursor: default;
@@ -114,7 +102,7 @@ const pMenuItem = ({ $isActive, $danger, children, ...props }: MenuItemProps) =>
     <StyledMenuItem
       $danger={$danger}
       $isActive={$isActive}
-      // rightSection={$isActive && <RiArrowLeftSFill size={20} />}
+      rightSection={$isActive && <RiArrowLeftSFill size={15} />}
       {...props}
     >
       {children}
