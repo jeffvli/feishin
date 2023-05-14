@@ -11,6 +11,8 @@ import {
   RiEdit2Line,
   RiSettings3Line,
   RiServerLine,
+  RiGithubLine,
+  RiExternalLinkLine,
 } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -26,6 +28,7 @@ import {
   useAppStoreActions,
 } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
+import packageJson from '../../../../../package.json';
 
 const browser = isElectron() ? window.electron.browser : null;
 
@@ -79,42 +82,6 @@ export const AppMenu = () => {
 
   return (
     <>
-      <DropdownMenu.Label>Select a server</DropdownMenu.Label>
-      {Object.keys(serverList).map((serverId) => {
-        const server = serverList[serverId];
-        const isNavidromeExpired = server.type === ServerType.NAVIDROME && !server.ndCredential;
-        const isJellyfinExpired = false;
-        const isSessionExpired = isNavidromeExpired || isJellyfinExpired;
-
-        return (
-          <DropdownMenu.Item
-            key={`server-${server.id}`}
-            $isActive={server.id === currentServer?.id}
-            icon={isSessionExpired ? <RiLockLine color="var(--danger-color)" /> : <RiServerLine />}
-            onClick={() => {
-              if (!isSessionExpired) return handleSetCurrentServer(server);
-              return handleCredentialsModal(server);
-            }}
-          >
-            <Group>{server.name}</Group>
-          </DropdownMenu.Item>
-        );
-      })}
-      <DropdownMenu.Divider />
-      <DropdownMenu.Item
-        icon={<RiEdit2Line />}
-        onClick={handleManageServersModal}
-      >
-        Manage servers
-      </DropdownMenu.Item>
-      <DropdownMenu.Item
-        component={Link}
-        icon={<RiSettings3Line />}
-        to={AppRoute.SETTINGS}
-      >
-        Settings
-      </DropdownMenu.Item>
-      <DropdownMenu.Divider />
       <DropdownMenu.Item
         icon={<RiArrowLeftSLine />}
         onClick={() => navigate(-1)}
@@ -142,6 +109,53 @@ export const AppMenu = () => {
           Collapse sidebar
         </DropdownMenu.Item>
       )}
+      <DropdownMenu.Divider />
+      <DropdownMenu.Item
+        component={Link}
+        icon={<RiSettings3Line />}
+        to={AppRoute.SETTINGS}
+      >
+        Settings
+      </DropdownMenu.Item>
+      <DropdownMenu.Item
+        icon={<RiEdit2Line />}
+        onClick={handleManageServersModal}
+      >
+        Manage servers
+      </DropdownMenu.Item>
+
+      <DropdownMenu.Divider />
+      <DropdownMenu.Label>Select a server</DropdownMenu.Label>
+      {Object.keys(serverList).map((serverId) => {
+        const server = serverList[serverId];
+        const isNavidromeExpired = server.type === ServerType.NAVIDROME && !server.ndCredential;
+        const isJellyfinExpired = false;
+        const isSessionExpired = isNavidromeExpired || isJellyfinExpired;
+
+        return (
+          <DropdownMenu.Item
+            key={`server-${server.id}`}
+            $isActive={server.id === currentServer?.id}
+            icon={isSessionExpired ? <RiLockLine color="var(--danger-color)" /> : <RiServerLine />}
+            onClick={() => {
+              if (!isSessionExpired) return handleSetCurrentServer(server);
+              return handleCredentialsModal(server);
+            }}
+          >
+            <Group>{server.name}</Group>
+          </DropdownMenu.Item>
+        );
+      })}
+      <DropdownMenu.Divider />
+      <DropdownMenu.Item
+        component="a"
+        href="https://github.com/jeffvli/feishin/releases"
+        icon={<RiGithubLine />}
+        rightSection={<RiExternalLinkLine />}
+        target="_blank"
+      >
+        Version {packageJson.version}
+      </DropdownMenu.Item>
       {showBrowserDevToolsButton && (
         <>
           <DropdownMenu.Divider />
