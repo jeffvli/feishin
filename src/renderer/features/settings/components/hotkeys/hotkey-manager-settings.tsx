@@ -1,9 +1,10 @@
-import { Group } from '@mantine/core';
 import { useCallback, useMemo, useState } from 'react';
+import { Group } from '@mantine/core';
+import isElectron from 'is-electron';
+import debounce from 'lodash/debounce';
 import { RiDeleteBinLine, RiEditLine, RiKeyboardBoxLine } from 'react-icons/ri';
 import styled from 'styled-components';
 import { Button, TextInput, Checkbox } from '/@/renderer/components';
-import isElectron from 'is-electron';
 import { BindingActions, useHotkeySettings, useSettingsStoreActions } from '/@/renderer/store';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 
@@ -46,7 +47,7 @@ export const HotkeyManagerSettings = () => {
   const { setSettings } = useSettingsStoreActions();
   const [selected, setSelected] = useState<BindingActions | null>(null);
 
-  const handleSetHotkey = useCallback(
+  const debouncedSetHotkey = debounce(
     (binding: BindingActions, e: React.KeyboardEvent<HTMLInputElement>) => {
       e.preventDefault();
       const IGNORED_KEYS = ['Control', 'Alt', 'Shift', 'Meta', ' ', 'Escape'];
@@ -85,8 +86,15 @@ export const HotkeyManagerSettings = () => {
 
       ipc?.send('set-global-shortcuts', updatedBindings);
     },
-    [bindings, globalMediaHotkeys, setSettings],
+    20,
   );
+
+  const handleSetHotkey = useCallback(debouncedSetHotkey, [
+    bindings,
+    globalMediaHotkeys,
+    setSettings,
+    debouncedSetHotkey,
+  ]);
 
   const handleSetGlobalHotkey = useCallback(
     (binding: BindingActions, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,8 +102,6 @@ export const HotkeyManagerSettings = () => {
         ...bindings,
         [binding]: { ...bindings[binding], isGlobal: e.currentTarget.checked },
       };
-
-      console.log('updatedBindings :>> ', updatedBindings);
 
       setSettings({
         hotkeys: {
