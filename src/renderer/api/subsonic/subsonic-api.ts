@@ -169,8 +169,8 @@ export const ssApiClient = (args: {
           const error = e as AxiosError;
           const response = error.response as AxiosResponse;
           return {
-            body: response.data,
-            status: response.status,
+            body: response?.data,
+            status: response?.status,
           };
         }
         throw e;
