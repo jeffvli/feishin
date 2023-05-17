@@ -12,6 +12,7 @@ import macMaxHover from './assets/max-mac-hover.png';
 import macMax from './assets/max-mac.png';
 import macMinHover from './assets/min-mac-hover.png';
 import macMin from './assets/min-mac.png';
+import macBlurred from './assets/blur-mac.png';
 
 const WindowsContainer = styled.div`
   display: flex;
@@ -59,6 +60,7 @@ const PlayerStatusContainer = styled.div`
 `;
 
 const browser = isElectron() ? window.electron.browser : null;
+const ipc = isElectron() ? window.electron.ipc : null;
 const close = () => browser.exit();
 const minimize = () => browser.minimize();
 const maximize = () => browser.maximize();
@@ -124,7 +126,7 @@ const MacOsContainer = styled.div`
 const MacOsButtonGroup = styled.div`
   position: absolute;
   top: 5px;
-  left: 0.5rem;
+  left: 1rem;
   display: grid;
   grid-template-columns: repeat(3, 20px);
   height: 100%;
@@ -146,8 +148,8 @@ export const MacOsButton = styled.div<{
   user-select: none;
 
   img {
-    width: 18px;
-    height: 18px;
+    width: 12px;
+    height: 12px;
   }
 `;
 
@@ -157,23 +159,27 @@ const MacOsControls = ({ controls, title }: WindowBarControlsProps) => {
   const [hoverMin, setHoverMin] = useState(false);
   const [hoverMax, setHoverMax] = useState(false);
   const [hoverClose, setHoverClose] = useState(false);
+  const [hasFocus, setHasFocus] = useState(true);
+
+  ipc?.on('window-blurred', () => {setHasFocus(false)})
+  ipc?.on('window-focused', () => {setHasFocus(true)})
 
   return (
     <MacOsContainer>
-      <MacOsButtonGroup>
+      <MacOsButtonGroup
+        onMouseLeave={() => {setHoverMin(false); setHoverMax(false); setHoverClose(false)}}
+        onMouseOver={() => {setHoverMin(true); setHoverMax(true); setHoverClose(true)}}>
         <MacOsButton
           minButton
           className="button"
           id="min-button"
           onClick={handleMinimize}
-          onMouseLeave={() => setHoverMin(false)}
-          onMouseOver={() => setHoverMin(true)}
         >
           <img
             alt=""
             className="icon"
             draggable="false"
-            src={hoverMin ? macMinHover : macMin}
+            src={hasFocus ? (hoverMin ? macMinHover : macMin) : macBlurred}
           />
         </MacOsButton>
         <MacOsButton
@@ -181,28 +187,24 @@ const MacOsControls = ({ controls, title }: WindowBarControlsProps) => {
           className="button"
           id="max-button"
           onClick={handleMaximize}
-          onMouseLeave={() => setHoverMax(false)}
-          onMouseOver={() => setHoverMax(true)}
         >
           <img
             alt=""
             className="icon"
             draggable="false"
-            src={hoverMax ? macMaxHover : macMax}
+            src={hasFocus ? (hoverMax ? macMaxHover : macMax) : macBlurred}
           />
         </MacOsButton>
         <MacOsButton
           className="button"
           id="close-button"
           onClick={handleClose}
-          onMouseLeave={() => setHoverClose(false)}
-          onMouseOver={() => setHoverClose(true)}
         >
           <img
             alt=""
             className="icon"
             draggable="false"
-            src={hoverClose ? macCloseHover : macClose}
+            src={hasFocus ? (hoverClose ? macCloseHover : macClose) : macBlurred}
           />
         </MacOsButton>
       </MacOsButtonGroup>

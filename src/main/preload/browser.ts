@@ -17,10 +17,22 @@ const devtools = () => {
   ipcRenderer.send('window-dev-tools');
 };
 
+var _hasFocus = true;
+ipcRenderer.on('window-focused', () => {
+  _hasFocus = true;
+})
+
+ipcRenderer.on('window-blurred', () => {
+  _hasFocus = false;
+})
+
+const hasFocus = () => {return _hasFocus}
+
 export const browser = {
   devtools,
   exit,
   maximize,
   minimize,
   unmaximize,
+  hasFocus,
 };

@@ -279,6 +279,21 @@ const createWindow = async () => {
     }
   });
 
+  mainWindow.on('blur', (event: any) => {
+    event.preventDefault();
+    if (mainWindow){
+      mainWindow.webContents.send('window-blurred', {});
+    }
+  })
+
+
+  mainWindow.on('focus', (event: any) => {
+    event.preventDefault();
+    if (mainWindow){
+      mainWindow.webContents.send('window-focused', {});
+    }
+  })
+
   if (isWindows()) {
     app.setAppUserModelId(process.execPath);
   }
