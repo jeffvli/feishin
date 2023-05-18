@@ -49,10 +49,6 @@ export const App = () => {
       extraParameters,
       properties,
     });
-
-    return () => {
-      mpvPlayer?.quit();
-    };
   }, []);
 
   useEffect(() => {
