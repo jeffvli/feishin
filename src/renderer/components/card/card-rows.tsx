@@ -21,7 +21,7 @@ const Row = styled.div<{ $secondary?: boolean }>`
 
 interface CardRowsProps {
   data: any;
-  rows: CardRow<Album | Artist | AlbumArtist>[];
+  rows: CardRow<Album>[] | CardRow<Artist>[] | CardRow<AlbumArtist>[];
 }
 
 export const CardRows = ({ data, rows }: CardRowsProps) => {

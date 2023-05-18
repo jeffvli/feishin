@@ -1,9 +1,8 @@
 import { Center, Stack } from '@mantine/core';
 import { RiAlbumFill, RiPlayListFill, RiUserVoiceFill } from 'react-icons/ri';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath, Link } from 'react-router-dom';
 import { SimpleImg } from 'react-simple-img';
-import { ListChildComponentProps } from 'react-window';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Album, AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
 import { CardRows } from '/@/renderer/components/card';
 import { Skeleton } from '/@/renderer/components/skeleton';
@@ -11,18 +10,21 @@ import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/
 import { CardRow, PlayQueueAddOptions, Play, CardRoute } from '/@/renderer/types';
 
 interface BaseGridCardProps {
-  columnIndex: number;
   controls: {
-    cardRows: CardRow<Album | AlbumArtist | Artist>[];
-    handleFavorite: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
-    handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
+    cardRows: CardRow<Album>[] | CardRow<Artist>[] | CardRow<AlbumArtist>[];
+    handleFavorite: (options: {
+      id: string[];
+      isFavorite: boolean;
+      itemType: LibraryItem;
+      serverId: string;
+    }) => void;
+    handlePlayQueueAdd: ((options: PlayQueueAddOptions) => void) | undefined;
     itemType: LibraryItem;
     playButtonBehavior: Play;
     route: CardRoute;
   };
   data: any;
-  isHidden?: boolean;
-  listChildProps: Omit<ListChildComponentProps, 'data' | 'style'>;
+  isLoading?: boolean;
 }
 
 const PosterCardContainer = styled.div<{ $isHidden?: boolean }>`
@@ -30,7 +32,6 @@ const PosterCardContainer = styled.div<{ $isHidden?: boolean }>`
   flex-direction: column;
   width: 100%;
   height: 100%;
-  margin: 1rem;
   overflow: hidden;
   opacity: ${({ $isHidden }) => ($isHidden ? 0 : 1)};
   pointer-events: auto;
@@ -40,11 +41,7 @@ const PosterCardContainer = styled.div<{ $isHidden?: boolean }>`
   }
 `;
 
-const LinkContainer = styled.div`
-  cursor: pointer;
-`;
-
-const ImageContainer = styled.div<{ $isFavorite?: boolean }>`
+const ImageContainerStyles = css`
   position: relative;
   display: flex;
   align-items: center;
@@ -67,23 +64,6 @@ const ImageContainer = styled.div<{ $isFavorite?: boolean }>`
     user-select: none;
   }
 
-  ${(props) =>
-    props.$isFavorite &&
-    `
-    &::after {
-    position: absolute;
-    top: -50px;
-    left: -50px;
-    width: 80px;
-    height: 80px;
-    background-color: var(--primary-color);
-    box-shadow: 0 0 10px 8px rgba(0, 0, 0, 80%);
-    transform: rotate(-45deg);
-    content: '';
-    pointer-events: none;
-  }
-  `}
-
   &:hover {
     &::before {
       opacity: 0.5;
@@ -93,6 +73,14 @@ const ImageContainer = styled.div<{ $isFavorite?: boolean }>`
   &:hover .card-controls {
     opacity: 1;
   }
+`;
+
+const ImageContainer = styled(Link)<{ $isFavorite?: boolean }>`
+  ${ImageContainerStyles}
+`;
+
+const ImageContainerSkeleton = styled.div`
+  ${ImageContainerStyles}
 `;
 
 const Image = styled(SimpleImg)`
@@ -113,15 +101,12 @@ const DetailContainer = styled.div`
 `;
 
 export const PosterCard = ({
-  listChildProps,
   data,
-  columnIndex,
   controls,
-  isHidden,
-}: BaseGridCardProps) => {
-  const navigate = useNavigate();
-
-  if (data) {
+  isLoading,
+  uniqueId,
+}: BaseGridCardProps & { uniqueId: string }) => {
+  if (!isLoading) {
     const path = generatePath(
       controls.route.route,
       controls.route.slugs?.reduce((acc, slug) => {
@@ -153,38 +138,39 @@ export const PosterCard = ({
     }
 
     return (
-      <PosterCardContainer key={`card-${columnIndex}-${listChildProps.index}`}>
-        <LinkContainer onClick={() => navigate(path)}>
-          <ImageContainer $isFavorite={data?.userFavorite}>
-            {data?.imageUrl ? (
-              <Image
-                importance="auto"
-                placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
-                src={data?.imageUrl}
-              />
-            ) : (
-              <Center
-                sx={{
-                  background: 'var(--placeholder-bg)',
-                  borderRadius: 'var(--card-default-radius)',
-                  height: '100%',
-                  width: '100%',
-                }}
-              >
-                <Placeholder
-                  color="var(--placeholder-fg)"
-                  size={35}
-                />
-              </Center>
-            )}
-            <GridCardControls
-              handleFavorite={controls.handleFavorite}
-              handlePlayQueueAdd={controls.handlePlayQueueAdd}
-              itemData={data}
-              itemType={controls.itemType}
+      <PosterCardContainer key={`${uniqueId}-${data.id}`}>
+        <ImageContainer
+          $isFavorite={data?.userFavorite}
+          to={path}
+        >
+          {data?.imageUrl ? (
+            <Image
+              importance="auto"
+              placeholder={data?.imagePlaceholderUrl || 'var(--card-default-bg)'}
+              src={data?.imageUrl}
             />
-          </ImageContainer>
-        </LinkContainer>
+          ) : (
+            <Center
+              sx={{
+                background: 'var(--placeholder-bg)',
+                borderRadius: 'var(--card-default-radius)',
+                height: '100%',
+                width: '100%',
+              }}
+            >
+              <Placeholder
+                color="var(--placeholder-fg)"
+                size={35}
+              />
+            </Center>
+          )}
+          <GridCardControls
+            handleFavorite={controls.handleFavorite}
+            handlePlayQueueAdd={controls.handlePlayQueueAdd}
+            itemData={data}
+            itemType={controls.itemType}
+          />
+        </ImageContainer>
         <DetailContainer>
           <CardRows
             data={data}
@@ -196,21 +182,18 @@ export const PosterCard = ({
   }
 
   return (
-    <PosterCardContainer
-      key={`card-${columnIndex}-${listChildProps.index}`}
-      $isHidden={isHidden}
-    >
+    <PosterCardContainer key={`placeholder-${uniqueId}-${data.id}`}>
       <Skeleton
         visible
         radius="sm"
       >
-        <ImageContainer />
+        <ImageContainerSkeleton />
       </Skeleton>
       <DetailContainer>
         <Stack spacing="sm">
           {controls.cardRows.map((row, index) => (
             <Skeleton
-              key={`${index}-${columnIndex}-${row.arrayProperty}`}
+              key={`${index}-${row.arrayProperty}`}
               visible
               height={14}
               radius="sm"

@@ -110,7 +110,7 @@ const ImageContainer = styled.div<{ $isFavorite?: boolean }>`
 const Image = styled(SimpleImg)`
   width: 100%;
   max-width: 100%;
-  height: 100%;
+  height: 100% !important;
   max-height: 100%;
   border: 0;
 

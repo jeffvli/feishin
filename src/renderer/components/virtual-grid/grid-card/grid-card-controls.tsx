@@ -1,5 +1,4 @@
-import type { MouseEvent } from 'react';
-import React from 'react';
+import React, { MouseEvent, useState } from 'react';
 import type { UnstyledButtonProps } from '@mantine/core';
 import { RiPlayFill, RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import styled from 'styled-components';
@@ -62,7 +61,7 @@ const SecondaryButton = styled(_Button)`
   }
 `;
 
-const GridCardControlsContainer = styled.div`
+const GridCardControlsContainer = styled.div<{ $isFavorite?: boolean }>`
   position: absolute;
   z-index: 100;
   display: flex;
@@ -71,6 +70,19 @@ const GridCardControlsContainer = styled.div`
   justify-content: center;
   width: 100%;
   height: 100%;
+`;
+
+const FavoriteBanner = styled.div`
+  position: absolute;
+  top: -50px;
+  left: -50px;
+  width: 80px;
+  height: 80px;
+  background-color: var(--primary-color);
+  box-shadow: 0 0 10px 8px rgba(0, 0, 0, 80%);
+  transform: rotate(-45deg);
+  content: '';
+  pointer-events: none;
 `;
 
 const ControlsRow = styled.div`
@@ -100,11 +112,17 @@ export const GridCardControls = ({
   handlePlayQueueAdd,
   handleFavorite,
 }: {
-  handleFavorite: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
+  handleFavorite: (options: {
+    id: string[];
+    isFavorite: boolean;
+    itemType: LibraryItem;
+    serverId: string;
+  }) => void;
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
   itemData: any;
   itemType: LibraryItem;
 }) => {
+  const [isFavorite, setIsFavorite] = useState(itemData?.userFavorite);
   const playButtonBehavior = usePlayButtonBehavior();
 
   const handlePlay = async (e: MouseEvent<HTMLButtonElement>, playType?: Play) => {
@@ -120,7 +138,7 @@ export const GridCardControls = ({
     });
   };
 
-  const handleFavorites = async (e: MouseEvent<HTMLButtonElement>) => {
+  const handleFavorites = async (e: MouseEvent<HTMLButtonElement>, serverId: string) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -128,7 +146,10 @@ export const GridCardControls = ({
       id: [itemData.id],
       isFavorite: itemData.userFavorite,
       itemType,
+      serverId,
     });
+
+    setIsFavorite(!isFavorite);
   };
 
   const handleContextMenu = useHandleGeneralContextMenu(
@@ -137,42 +158,48 @@ export const GridCardControls = ({
   );
 
   return (
-    <GridCardControlsContainer className="card-controls">
-      <PlayButton onClick={handlePlay}>
-        <RiPlayFill size={25} />
-      </PlayButton>
-      <BottomControls>
-        <SecondaryButton
-          p={5}
-          variant="subtle"
-          onClick={handleFavorites}
-        >
-          <FavoriteWrapper isFavorite={itemData?.isFavorite}>
-            {itemData?.userFavorite ? (
-              <RiHeartFill size={20} />
-            ) : (
-              <RiHeartLine
-                color="white"
-                size={20}
-              />
-            )}
-          </FavoriteWrapper>
-        </SecondaryButton>
-        <SecondaryButton
-          p={5}
-          variant="subtle"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleContextMenu(e, [itemData]);
-          }}
-        >
-          <RiMoreFill
-            color="white"
-            size={20}
-          />
-        </SecondaryButton>
-      </BottomControls>
-    </GridCardControlsContainer>
+    <>
+      {isFavorite ? <FavoriteBanner /> : null}
+      <GridCardControlsContainer
+        $isFavorite
+        className="card-controls"
+      >
+        <PlayButton onClick={handlePlay}>
+          <RiPlayFill size={25} />
+        </PlayButton>
+        <BottomControls>
+          <SecondaryButton
+            p={5}
+            variant="subtle"
+            onClick={(e) => handleFavorites(e, itemData?.serverId)}
+          >
+            <FavoriteWrapper isFavorite={itemData?.isFavorite}>
+              {isFavorite ? (
+                <RiHeartFill size={20} />
+              ) : (
+                <RiHeartLine
+                  color="white"
+                  size={20}
+                />
+              )}
+            </FavoriteWrapper>
+          </SecondaryButton>
+          <SecondaryButton
+            p={5}
+            variant="subtle"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleContextMenu(e, [itemData]);
+            }}
+          >
+            <RiMoreFill
+              color="white"
+              size={20}
+            />
+          </SecondaryButton>
+        </BottomControls>
+      </GridCardControlsContainer>
+    </>
   );
 };
