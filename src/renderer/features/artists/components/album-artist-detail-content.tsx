@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Button, GridCarousel, Text, TextTitle } from '/@/renderer/components';
+import { Button, Text, TextTitle } from '/@/renderer/components';
 import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { Box, Group, Stack } from '@mantine/core';
 import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
@@ -14,7 +14,7 @@ import {
   useHandleGeneralContextMenu,
   useHandleTableContextMenu,
 } from '/@/renderer/features/context-menu';
-import { Play, TableColumn } from '/@/renderer/types';
+import { CardRow, Play, TableColumn } from '/@/renderer/types';
 import {
   ARTIST_CONTEXT_MENU_ITEMS,
   SONG_CONTEXT_MENU_ITEMS,
@@ -22,6 +22,8 @@ import {
 import { PlayButton, useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import {
+  Album,
+  AlbumArtist,
   AlbumListSort,
   LibraryItem,
   QueueSong,
@@ -32,6 +34,7 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
 import { useTopSongsList } from '/@/renderer/features/artists/queries/top-songs-list-query';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
+import { SwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 
 const ContentContainer = styled.div`
   position: relative;
@@ -55,7 +58,6 @@ export const AlbumArtistDetailContent = () => {
   const cq = useContainerQuery();
   const handlePlayQueueAdd = usePlayQueueAdd();
   const server = useCurrentServer();
-  const itemsPerPage = cq.isXl ? 9 : cq.isLg ? 7 : cq.isMd ? 5 : cq.isSm ? 4 : 3;
 
   const detailQuery = useAlbumArtistDetail({ query: { id: albumArtistId }, serverId: server?.id });
 
@@ -77,7 +79,7 @@ export const AlbumArtistDetailContent = () => {
     query: {
       _custom: {
         jellyfin: {
-          ...(server?.type === ServerType.JELLYFIN ? { artistIds: albumArtistId } : undefined),
+          ...(server?.type === ServerType.JELLYFIN ? { ArtistIds: albumArtistId } : undefined),
         },
         navidrome: {
           ...(server?.type === ServerType.NAVIDROME
@@ -85,7 +87,7 @@ export const AlbumArtistDetailContent = () => {
             : undefined),
         },
       },
-      limit: itemsPerPage,
+      // limit: 10,
       sortBy: AlbumListSort.RELEASE_DATE,
       sortOrder: SortOrder.DESC,
       startIndex: 0,
@@ -98,7 +100,7 @@ export const AlbumArtistDetailContent = () => {
       _custom: {
         jellyfin: {
           ...(server?.type === ServerType.JELLYFIN
-            ? { contributingArtistIds: albumArtistId }
+            ? { ContributingArtistIds: albumArtistId }
             : undefined),
         },
         navidrome: {
@@ -107,7 +109,7 @@ export const AlbumArtistDetailContent = () => {
             : undefined),
         },
       },
-      limit: itemsPerPage,
+      // limit: 10,
       sortBy: AlbumListSort.RELEASE_DATE,
       sortOrder: SortOrder.DESC,
       startIndex: 0,
@@ -140,7 +142,7 @@ export const AlbumArtistDetailContent = () => {
     [],
   );
 
-  const cardRows = {
+  const cardRows: Record<string, CardRow<Album>[] | CardRow<AlbumArtist>[]> = {
     album: [
       {
         property: 'name',
@@ -169,17 +171,25 @@ export const AlbumArtistDetailContent = () => {
     ],
   };
 
+  const cardRoutes = {
+    album: {
+      route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+      slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
+    },
+    albumArtist: {
+      route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
+      slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
+    },
+  };
+
   const carousels = [
     {
       data: recentAlbumsQuery?.data?.items,
       isHidden: !recentAlbumsQuery?.data?.items?.length,
       itemType: LibraryItem.ALBUM,
       loading: recentAlbumsQuery?.isLoading || recentAlbumsQuery.isFetching,
-      pagination: {
-        itemsPerPage,
-      },
       title: (
-        <>
+        <Group align="flex-end">
           <TextTitle
             order={2}
             weight={700}
@@ -195,7 +205,7 @@ export const AlbumArtistDetailContent = () => {
           >
             View discography
           </Button>
-        </>
+        </Group>
       ),
       uniqueId: 'recentReleases',
     },
@@ -204,9 +214,6 @@ export const AlbumArtistDetailContent = () => {
       isHidden: !compilationAlbumsQuery?.data?.items?.length,
       itemType: LibraryItem.ALBUM,
       loading: compilationAlbumsQuery?.isLoading || compilationAlbumsQuery.isFetching,
-      pagination: {
-        itemsPerPage,
-      },
       title: (
         <TextTitle
           order={2}
@@ -218,13 +225,10 @@ export const AlbumArtistDetailContent = () => {
       uniqueId: 'compilationAlbums',
     },
     {
-      data: detailQuery?.data?.similarArtists?.slice(0, itemsPerPage),
+      data: detailQuery?.data?.similarArtists || [],
       isHidden: !detailQuery?.data?.similarArtists,
       itemType: LibraryItem.ALBUM_ARTIST,
       loading: detailQuery?.isLoading || detailQuery.isFetching,
-      pagination: {
-        itemsPerPage,
-      },
       title: (
         <TextTitle
           order={2}
@@ -446,18 +450,23 @@ export const AlbumArtistDetailContent = () => {
           {carousels
             .filter((c) => !c.isHidden)
             .map((carousel) => (
-              <GridCarousel
+              <SwiperGridCarousel
                 key={`carousel-${carousel.uniqueId}`}
                 cardRows={cardRows[carousel.itemType as keyof typeof cardRows]}
-                containerWidth={cq.width}
                 data={carousel.data}
+                isLoading={carousel.loading}
                 itemType={carousel.itemType}
-                loading={carousel.loading}
-                pagination={carousel.pagination}
+                route={cardRoutes[carousel.itemType as keyof typeof cardRoutes]}
+                swiperProps={{
+                  grid: {
+                    rows: 2,
+                  },
+                }}
+                title={{
+                  label: carousel.title,
+                }}
                 uniqueId={carousel.uniqueId}
-              >
-                <GridCarousel.Title>{carousel.title}</GridCarousel.Title>
-              </GridCarousel>
+              />
             ))}
         </Stack>
       </Box>

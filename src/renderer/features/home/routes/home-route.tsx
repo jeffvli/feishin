@@ -1,27 +1,22 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Box, Stack } from '@mantine/core';
-import { useSetState } from '@mantine/hooks';
 import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
-import { TextTitle, FeatureCarousel, GridCarousel, NativeScrollArea } from '/@/renderer/components';
+import { FeatureCarousel, NativeScrollArea } from '/@/renderer/components';
 import { useAlbumList } from '/@/renderer/features/albums';
 import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-played-query';
 import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServer, useWindowSettings } from '/@/renderer/store';
+import { SwiperGridCarousel } from '/@/renderer/components/grid-carousel';
+import { Platform } from '/@/renderer/types';
 
 const HomeRoute = () => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const server = useCurrentServer();
   const cq = useContainerQuery();
-  const itemsPerPage = cq.isXl ? 9 : cq.isLg ? 7 : cq.isMd ? 5 : cq.isSm ? 4 : 3;
-
-  const [pagination, setPagination] = useSetState({
-    mostPlayed: 0,
-    random: 0,
-    recentlyAdded: 0,
-    recentlyPlayed: 0,
-  });
+  const itemsPerPage = 25;
+  const { windowBarStyle } = useWindowSettings();
 
   const feature = useAlbumList({
     options: {
@@ -43,154 +38,85 @@ const HomeRoute = () => {
 
   const random = useAlbumList({
     options: {
-      cacheTime: 1000 * 60,
-      keepPreviousData: true,
-      staleTime: 1000 * 60,
+      staleTime: 1000 * 60 * 5,
     },
     query: {
       limit: itemsPerPage,
       sortBy: AlbumListSort.RANDOM,
       sortOrder: SortOrder.ASC,
-      startIndex: pagination.random * itemsPerPage,
+      startIndex: 0,
     },
     serverId: server?.id,
   });
 
   const recentlyPlayed = useRecentlyPlayed({
     options: {
-      keepPreviousData: true,
       staleTime: 0,
     },
     query: {
       limit: itemsPerPage,
       sortBy: AlbumListSort.RECENTLY_PLAYED,
       sortOrder: SortOrder.DESC,
-      startIndex: pagination.recentlyPlayed * itemsPerPage,
+      startIndex: 0,
     },
     serverId: server?.id,
   });
 
   const recentlyAdded = useAlbumList({
-    options: {
-      keepPreviousData: true,
-      staleTime: 1000 * 60,
-    },
     query: {
       limit: itemsPerPage,
       sortBy: AlbumListSort.RECENTLY_ADDED,
       sortOrder: SortOrder.DESC,
-      startIndex: pagination.recentlyAdded * itemsPerPage,
+      startIndex: 0,
     },
     serverId: server?.id,
   });
 
   const mostPlayed = useAlbumList({
     options: {
-      keepPreviousData: true,
-      staleTime: 1000 * 60 * 60,
+      staleTime: 1000 * 60 * 5,
     },
     query: {
       limit: itemsPerPage,
       sortBy: AlbumListSort.PLAY_COUNT,
       sortOrder: SortOrder.DESC,
-      startIndex: pagination.mostPlayed * itemsPerPage,
+      startIndex: 0,
     },
     serverId: server?.id,
   });
 
-  const handleNextPage = useCallback(
-    (key: 'mostPlayed' | 'random' | 'recentlyAdded' | 'recentlyPlayed') => {
-      setPagination({
-        [key]: pagination[key as keyof typeof pagination] + 1,
-      });
-    },
-    [pagination, setPagination],
-  );
-
-  const handlePreviousPage = useCallback(
-    (key: 'mostPlayed' | 'random' | 'recentlyAdded' | 'recentlyPlayed') => {
-      setPagination({
-        [key]: pagination[key as keyof typeof pagination] - 1,
-      });
-    },
-    [pagination, setPagination],
-  );
-
   const carousels = [
     {
       data: random?.data?.items,
-      loading: random?.isLoading || random.isFetching,
-      pagination: {
-        handleNextPage: () => handleNextPage('random'),
-        handlePreviousPage: () => handlePreviousPage('random'),
-        hasPreviousPage: pagination.random > 0,
-        itemsPerPage,
-      },
-      title: (
-        <TextTitle
-          order={2}
-          weight={700}
-        >
-          Explore from your library
-        </TextTitle>
-      ),
+      loading: random?.isLoading,
+      title: 'Explore from your library',
       uniqueId: 'random',
     },
     {
       data: recentlyPlayed?.data?.items,
-      loading: recentlyPlayed?.isLoading || recentlyPlayed.isFetching,
+      loading: recentlyPlayed?.isLoading,
       pagination: {
-        handleNextPage: () => handleNextPage('recentlyPlayed'),
-        handlePreviousPage: () => handlePreviousPage('recentlyPlayed'),
-        hasPreviousPage: pagination.recentlyPlayed > 0,
         itemsPerPage,
       },
-      title: (
-        <TextTitle
-          order={2}
-          weight={700}
-        >
-          Recently played
-        </TextTitle>
-      ),
+      title: 'Recently played',
       uniqueId: 'recentlyPlayed',
     },
     {
       data: recentlyAdded?.data?.items,
-      loading: recentlyAdded?.isLoading || recentlyAdded.isFetching,
+      loading: recentlyAdded?.isLoading,
       pagination: {
-        handleNextPage: () => handleNextPage('recentlyAdded'),
-        handlePreviousPage: () => handlePreviousPage('recentlyAdded'),
-        hasPreviousPage: pagination.recentlyAdded > 0,
         itemsPerPage,
       },
-      title: (
-        <TextTitle
-          order={2}
-          weight={700}
-        >
-          Newly added releases
-        </TextTitle>
-      ),
+      title: 'Newly added releases',
       uniqueId: 'recentlyAdded',
     },
     {
       data: mostPlayed?.data?.items,
-      loading: mostPlayed?.isLoading || mostPlayed.isFetching,
+      loading: mostPlayed?.isLoading,
       pagination: {
-        handleNextPage: () => handleNextPage('mostPlayed'),
-        handlePreviousPage: () => handlePreviousPage('mostPlayed'),
-        hasPreviousPage: pagination.mostPlayed > 0,
         itemsPerPage,
       },
-      title: (
-        <TextTitle
-          order={2}
-          weight={700}
-        >
-          Most played
-        </TextTitle>
-      ),
+      title: 'Most played',
       uniqueId: 'mostPlayed',
     },
   ];
@@ -211,12 +137,8 @@ const HomeRoute = () => {
       >
         <Box
           ref={cq.ref}
-          pt="3rem"
+          pt={windowBarStyle === Platform.WEB ? '5rem' : '3rem'}
           px="2rem"
-          sx={{
-            height: '100%',
-            width: '100%',
-          }}
         >
           <Stack spacing={35}>
             <FeatureCarousel data={featureItemsWithImage} />
@@ -231,9 +153,9 @@ const HomeRoute = () => {
 
                 return carousel;
               })
-              .map((carousel, index) => (
-                <GridCarousel
-                  key={`carousel-${carousel.uniqueId}-${index}`}
+              .map((carousel) => (
+                <SwiperGridCarousel
+                  key={`carousel-${carousel.uniqueId}`}
                   cardRows={[
                     {
                       property: 'name',
@@ -251,15 +173,16 @@ const HomeRoute = () => {
                       },
                     },
                   ]}
-                  containerWidth={cq.width}
                   data={carousel.data}
+                  isLoading={carousel.loading}
                   itemType={LibraryItem.ALBUM}
-                  loading={carousel.loading}
-                  pagination={carousel.pagination}
+                  route={{
+                    route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                    slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
+                  }}
+                  title={{ label: carousel.title }}
                   uniqueId={carousel.uniqueId}
-                >
-                  <GridCarousel.Title>{carousel.title}</GridCarousel.Title>
-                </GridCarousel>
+                />
               ))}
           </Stack>
         </Box>

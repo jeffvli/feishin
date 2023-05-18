@@ -1,5 +1,5 @@
 import { MutableRefObject, useCallback, useMemo } from 'react';
-import { Button, GridCarousel, Text, TextTitle } from '/@/renderer/components';
+import { Button, Text } from '/@/renderer/components';
 import { ColDef, RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
@@ -31,6 +31,7 @@ import {
   useFixedTableHeader,
   VirtualTable,
 } from '/@/renderer/components/virtual-table';
+import { SwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 
 const isFullWidthRow = (node: RowNode) => {
   return node.id?.includes('disc-');
@@ -174,13 +175,14 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     query: {
       _custom: {
         jellyfin: {
-          albumArtistIds: detailQuery?.data?.albumArtists[0]?.id,
+          AlbumArtistIds: detailQuery?.data?.albumArtists[0]?.id,
+          ExcludeItemIds: detailQuery?.data?.id,
         },
         navidrome: {
           artist_id: detailQuery?.data?.albumArtists[0]?.id,
         },
       },
-      limit: itemsPerPage,
+      limit: 10,
       sortBy: AlbumListSort.YEAR,
       sortOrder: SortOrder.DESC,
       startIndex: pagination.artist * itemsPerPage,
@@ -198,14 +200,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
         hasPreviousPage: pagination.artist > 0,
         itemsPerPage,
       },
-      title: (
-        <TextTitle
-          order={2}
-          weight={700}
-        >
-          More from this artist
-        </TextTitle>
-      ),
+      title: 'More from this artist',
       uniqueId: 'mostPlayed',
     },
   ];
@@ -325,7 +320,10 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
           </Group>
         </Box>
       )}
-      <Box ref={tableContainerRef}>
+      <Box
+        ref={tableContainerRef}
+        style={{ minHeight: '300px' }}
+      >
         <VirtualTable
           ref={tableRef}
           autoFitColumns
@@ -369,36 +367,45 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
         ref={cq.ref}
         mt="5rem"
       >
-        {carousels.map((carousel, index) => (
-          <GridCarousel
-            key={`carousel-${carousel.uniqueId}-${index}`}
-            cardRows={[
-              {
-                property: 'name',
-                route: {
-                  route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                  slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
-                },
-              },
-              {
-                arrayProperty: 'name',
-                property: 'albumArtists',
-                route: {
-                  route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
-                  slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
-                },
-              },
-            ]}
-            containerWidth={cq.width}
-            data={carousel.data}
-            itemType={LibraryItem.ALBUM}
-            loading={carousel.loading}
-            pagination={carousel.pagination}
-            uniqueId={carousel.uniqueId}
-          >
-            <GridCarousel.Title>{carousel.title}</GridCarousel.Title>
-          </GridCarousel>
-        ))}
+        <>
+          {cq.height || cq.width ? (
+            <>
+              {carousels.map((carousel, index) => (
+                <SwiperGridCarousel
+                  key={`carousel-${carousel.uniqueId}-${index}`}
+                  cardRows={[
+                    {
+                      property: 'name',
+                      route: {
+                        route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                        slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
+                      },
+                    },
+                    {
+                      arrayProperty: 'name',
+                      property: 'albumArtists',
+                      route: {
+                        route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
+                        slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
+                      },
+                    },
+                  ]}
+                  data={carousel.data}
+                  isLoading={carousel.loading}
+                  itemType={LibraryItem.ALBUM}
+                  route={{
+                    route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                    slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
+                  }}
+                  title={{
+                    label: carousel.title,
+                  }}
+                  uniqueId={carousel.uniqueId}
+                />
+              ))}
+            </>
+          ) : null}
+        </>
       </Stack>
     </ContentContainer>
   );
