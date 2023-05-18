@@ -196,6 +196,19 @@ export const SwiperGridCarousel = ({
     [slidesPerView],
   );
 
+  const handleOnZoomChange = useCallback(
+    (e: SwiperCore) => {
+      const { slides, isEnd, isBeginning } = e;
+      if (isEnd || isBeginning) return;
+
+      setPagination({
+        hasNextPage: slidesPerView < slides.length,
+        hasPreviousPage: slidesPerView < slides.length,
+      });
+    },
+    [slidesPerView],
+  );
+
   const handleOnReachEnd = useCallback(
     (e: SwiperCore) => {
       const { slides } = e;
@@ -246,10 +259,6 @@ export const SwiperGridCarousel = ({
             )}
             <Swiper
               ref={swiperRef}
-              grid={{
-                fill: 'column',
-                rows: 2,
-              }}
               modules={[Virtual]}
               slidesPerView={swiperProps?.slidesPerView || slidesPerView || 5}
               spaceBetween={20}
@@ -260,6 +269,7 @@ export const SwiperGridCarousel = ({
               onReachBeginning={handleOnReachBeginning}
               onReachEnd={handleOnReachEnd}
               onSlideChange={handleOnSlideChange}
+              onZoomChange={handleOnZoomChange}
               {...swiperProps}
             >
               {slides.map((slideContent, index) => {
