@@ -37,8 +37,8 @@ export const JellyfinAlbumFilters = ({
   }, [genreListQuery.data]);
 
   const selectedGenres = useMemo(() => {
-    return filter._custom?.jellyfin?.genreIds?.split(',');
-  }, [filter._custom?.jellyfin?.genreIds]);
+    return filter._custom?.jellyfin?.GenreIds?.split(',');
+  }, [filter._custom?.jellyfin?.GenreIds]);
 
   const toggleFilters = [
     {
@@ -50,7 +50,7 @@ export const JellyfinAlbumFilters = ({
               ...filter._custom,
               jellyfin: {
                 ...filter._custom?.jellyfin,
-                isFavorite: e.currentTarget.checked ? true : undefined,
+                IsFavorite: e.currentTarget.checked ? true : undefined,
               },
             },
           },
@@ -58,7 +58,7 @@ export const JellyfinAlbumFilters = ({
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
       },
-      value: filter._custom?.jellyfin?.isFavorite,
+      value: filter._custom?.jellyfin?.IsFavorite,
     },
   ];
 
@@ -104,7 +104,7 @@ export const JellyfinAlbumFilters = ({
           ...filter._custom,
           jellyfin: {
             ...filter._custom?.jellyfin,
-            genreIds: genreFilterString,
+            GenreIds: genreFilterString,
           },
         },
       },
@@ -145,7 +145,7 @@ export const JellyfinAlbumFilters = ({
           ...filter._custom,
           jellyfin: {
             ...filter._custom?.jellyfin,
-            albumArtistIds: albumArtistFilterString,
+            AlbumArtistIds: albumArtistFilterString,
           },
         },
       },
@@ -206,7 +206,7 @@ export const JellyfinAlbumFilters = ({
           clearable
           searchable
           data={selectableAlbumArtists}
-          defaultValue={filter._custom?.jellyfin?.albumArtistIds?.split(',')}
+          defaultValue={filter._custom?.jellyfin?.AlbumArtistIds?.split(',')}
           disabled={disableArtistFilter}
           label="Artist"
           limit={300}

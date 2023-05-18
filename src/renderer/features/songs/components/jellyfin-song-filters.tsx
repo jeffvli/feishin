@@ -33,8 +33,8 @@ export const JellyfinSongFilters = ({
   }, [genreListQuery.data]);
 
   const selectedGenres = useMemo(() => {
-    return filter._custom?.jellyfin?.genreIds?.split(',');
-  }, [filter._custom?.jellyfin?.genreIds]);
+    return filter._custom?.jellyfin?.GenreIds?.split(',');
+  }, [filter._custom?.jellyfin?.GenreIds]);
 
   const toggleFilters = [
     {
@@ -46,8 +46,8 @@ export const JellyfinSongFilters = ({
               ...filter._custom,
               jellyfin: {
                 ...filter._custom?.jellyfin,
-                includeItemTypes: 'Audio',
-                isFavorite: e.currentTarget.checked ? true : undefined,
+                IncludeItemTypes: 'Audio',
+                IsFavorite: e.currentTarget.checked ? true : undefined,
               },
             },
           },
@@ -55,7 +55,7 @@ export const JellyfinSongFilters = ({
         }) as SongListFilter;
         handleFilterChange(updatedFilters);
       },
-      value: filter._custom?.jellyfin?.isFavorite,
+      value: filter._custom?.jellyfin?.IsFavorite,
     },
   ];
 
@@ -67,7 +67,7 @@ export const JellyfinSongFilters = ({
           ...filter._custom,
           jellyfin: {
             ...filter._custom?.jellyfin,
-            includeItemTypes: 'Audio',
+            IncludeItemTypes: 'Audio',
             minYear: e === '' ? undefined : (e as number),
           },
         },
@@ -85,7 +85,7 @@ export const JellyfinSongFilters = ({
           ...filter._custom,
           jellyfin: {
             ...filter._custom?.jellyfin,
-            includeItemTypes: 'Audio',
+            IncludeItemTypes: 'Audio',
             maxYear: e === '' ? undefined : (e as number),
           },
         },
@@ -103,8 +103,8 @@ export const JellyfinSongFilters = ({
           ...filter._custom,
           jellyfin: {
             ...filter._custom?.jellyfin,
-            genreIds: genreFilterString,
-            includeItemTypes: 'Audio',
+            GenreIds: genreFilterString,
+            IncludeItemTypes: 'Audio',
           },
         },
       },

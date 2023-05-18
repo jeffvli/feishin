@@ -156,6 +156,7 @@ const albumListParameters = paginationParameters.extend({
   id: z.string().optional(),
   name: z.string().optional(),
   recently_added: z.boolean().optional(),
+  recently_played: z.boolean().optional(),
   starred: z.boolean().optional(),
   year: z.number().optional(),
 });
@@ -236,6 +237,8 @@ const songListParameters = paginationParameters.extend({
   artist_id: z.array(z.string()).optional(),
   genre_id: z.string().optional(),
   starred: z.boolean().optional(),
+  title: z.string().optional(),
+  year: z.number().optional(),
 });
 
 const playlist = z.object({

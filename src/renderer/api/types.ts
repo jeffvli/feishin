@@ -316,7 +316,10 @@ export enum AlbumListSort {
 
 export type AlbumListQuery = {
   _custom?: {
-    jellyfin?: Partial<z.infer<typeof jfType._parameters.albumList>>;
+    jellyfin?: Partial<z.infer<typeof jfType._parameters.albumList>> & {
+      maxYear?: number;
+      minYear?: number;
+    };
     navidrome?: Partial<z.infer<typeof ndType._parameters.albumList>>;
   };
   artistIds?: string[];
@@ -423,7 +426,10 @@ export enum SongListSort {
 
 export type SongListQuery = {
   _custom?: {
-    jellyfin?: Partial<z.infer<typeof jfType._parameters.songList>>;
+    jellyfin?: Partial<z.infer<typeof jfType._parameters.songList>> & {
+      maxYear?: number;
+      minYear?: number;
+    };
     navidrome?: Partial<z.infer<typeof ndType._parameters.songList>>;
   };
   albumIds?: string[];

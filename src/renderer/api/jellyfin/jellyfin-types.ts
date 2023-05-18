@@ -524,19 +524,21 @@ const jfSongListSort = {
   RELEASE_DATE: 'PremiereDate,AlbumArtist,Album,SortName',
 } as const;
 
-const songListParameters = baseParameters.extend({
-  AlbumArtistIds: z.string().optional(),
-  AlbumIds: z.string().optional(),
-  ArtistIds: z.string().optional(),
-  Filters: z.string().optional(),
-  GenreIds: z.string().optional(),
-  Genres: z.string().optional(),
-  IsFavorite: z.boolean().optional(),
-  SearchTerm: z.string().optional(),
-  SortBy: z.nativeEnum(jfSongListSort).optional(),
-  Tags: z.string().optional(),
-  Years: z.string().optional(),
-});
+const songListParameters = paginationParameters.merge(
+  baseParameters.extend({
+    AlbumArtistIds: z.string().optional(),
+    AlbumIds: z.string().optional(),
+    ArtistIds: z.string().optional(),
+    Filters: z.string().optional(),
+    GenreIds: z.string().optional(),
+    Genres: z.string().optional(),
+    IsFavorite: z.boolean().optional(),
+    SearchTerm: z.string().optional(),
+    SortBy: z.nativeEnum(jfSongListSort).optional(),
+    Tags: z.string().optional(),
+    Years: z.string().optional(),
+  }),
+);
 
 const songList = pagination.extend({
   Items: z.array(song),
