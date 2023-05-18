@@ -43,7 +43,7 @@ export const getMpvSetting = (
 export const getMpvProperties = (settings: SettingsState['playback']['mpvProperties']) => {
   const properties: Record<string, any> = {
     'audio-exclusive': settings.audioExclusiveMode || 'no',
-    'audio-samplerate': settings.audioSampleRateHz,
+    'audio-samplerate': settings.audioSampleRateHz === 0 ? undefined : settings.audioSampleRateHz,
     'gapless-audio': settings.gaplessAudio || 'weak',
     replaygain: settings.replayGainMode || 'no',
     'replaygain-clip': settings.replayGainClip || 'no',
@@ -182,17 +182,19 @@ export const MpvSettings = () => {
     {
       control: (
         <NumberInput
-          defaultValue={settings.mpvProperties.replayGainPreampDB}
+          defaultValue={settings.mpvProperties.audioSampleRateHz}
           width={100}
-          onBlur={(e) => handleSetMpvProperty('audioSampleRateHz', e.currentTarget.value)}
+          onBlur={(e) => {
+            const value = Number(e.currentTarget.value);
+            handleSetMpvProperty('audioSampleRateHz', value > 0 ? value : undefined);
+          }}
         />
       ),
       description:
-        'Select the output sample rate to be used (of course sound cards have limits on this). If the sample frequency selected is different from that of the current media',
+        'Select the output sample rate to be used if the sample frequency selected is different from that of the current media',
       isHidden: settings.type !== PlaybackType.LOCAL,
       title: 'Sample rate',
     },
-
     {
       control: (
         <Switch

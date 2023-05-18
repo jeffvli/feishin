@@ -127,7 +127,7 @@ const initialState: SettingsState = {
     fontContent: 'Poppins',
     playButtonBehavior: Play.NOW,
     showQueueDrawerButton: false,
-    sideQueueType: 'sideDrawerQueue',
+    sideQueueType: 'sideQueue',
     skipButtons: {
       enabled: false,
       skipBackwardSeconds: 5,
@@ -168,7 +168,7 @@ const initialState: SettingsState = {
     mpvProperties: {
       audioExclusiveMode: 'no',
       audioFormat: undefined,
-      audioSampleRateHz: undefined,
+      audioSampleRateHz: 0,
       gaplessAudio: 'weak',
       replayGainClip: true,
       replayGainFallbackDB: undefined,
@@ -309,7 +309,7 @@ const initialState: SettingsState = {
     disableAutoUpdate: false,
     exitToTray: false,
     minimizeToTray: false,
-    windowBarStyle: Platform.WEB,
+    windowBarStyle: isElectron() ? Platform.WINDOWS : Platform.WEB,
   },
 };
 
