@@ -18,7 +18,15 @@ type TitlebarProps = {
   outOfView: boolean;
 };
 
+type CommandPaletteProps = {
+  close: () => void;
+  open: () => void;
+  opened: boolean;
+  toggle: () => void;
+};
+
 export interface AppState {
+  commandPalette: CommandPaletteProps;
   isReorderingQueue: boolean;
   platform: Platform;
   sidebar: SidebarProps;
@@ -49,6 +57,24 @@ export const useAppStore = create<AppSlice>()(
           setTitleBar: (options) => {
             set((state) => {
               state.titlebar = { ...state.titlebar, ...options };
+            });
+          },
+        },
+        commandPalette: {
+          close: () => {
+            set((state) => {
+              state.commandPalette.opened = false;
+            });
+          },
+          open: () => {
+            set((state) => {
+              state.commandPalette.opened = true;
+            });
+          },
+          opened: false,
+          toggle: () => {
+            set((state) => {
+              state.commandPalette.opened = !state.commandPalette.opened;
             });
           },
         },
@@ -88,3 +114,5 @@ export const useSidebarRightExpanded = () => useAppStore((state) => state.sideba
 export const useSetTitlebar = () => useAppStore((state) => state.actions.setTitleBar);
 
 export const useTitlebarStore = () => useAppStore((state) => state.titlebar);
+
+export const useCommandPalette = () => useAppStore((state) => state.commandPalette);
