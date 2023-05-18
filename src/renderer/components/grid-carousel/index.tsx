@@ -1,227 +1,281 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import { Group, Stack } from '@mantine/core';
-import type { Variants } from 'framer-motion';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, ReactNode, useRef, useState, isValidElement } from 'react';
+import { Box, Group } from '@mantine/core';
+import { useElementSize } from '@mantine/hooks';
+import { AnimatePresence } from 'framer-motion';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
+import { Virtual, SwiperOptions } from 'swiper';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper as SwiperCore } from 'swiper/types';
+import { PosterCard } from '/@/renderer/components/card/poster-card';
+import { Album, AlbumArtist, Artist, LibraryItem, RelatedArtist } from '/@/renderer/api/types';
+import { CardRoute, CardRow } from '/@/renderer/types';
+import { TextTitle } from '/@/renderer/components/text-title';
 import { Button } from '/@/renderer/components/button';
-import { AppRoute } from '/@/renderer/router/routes';
-import type { CardRow } from '/@/renderer/types';
-import { Play } from '/@/renderer/types';
-import styled from 'styled-components';
-import { AlbumCard } from '/@/renderer/components/card';
-import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
-import { LibraryItem } from '/@/renderer/api/types';
-import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-
-interface GridCarouselProps {
-  cardRows: CardRow<any>[];
-  children: React.ReactElement;
-  containerWidth: number;
-  data: any[] | undefined;
-  itemType: LibraryItem;
-  loading?: boolean;
-  pagination?: {
-    handleNextPage?: () => void;
-    handlePreviousPage?: () => void;
-    hasNextPage?: boolean;
-    hasPreviousPage?: boolean;
-    itemsPerPage?: number;
-  };
-  uniqueId: string;
-}
-
-const GridCarouselContext = createContext<any>({});
-
-const GridContainer = styled(motion.div)<{ height: number; itemsPerPage: number }>`
-  display: grid;
-  grid-auto-rows: 0;
-  grid-gap: 18px;
-  grid-template-rows: 1fr;
-  grid-template-columns: repeat(${(props) => props.itemsPerPage || 4}, minmax(0, 1fr));
-  height: ${(props) => props.height}px;
-  overflow: hidden;
-`;
-
-const Wrapper = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-`;
-
-const variants: Variants = {
-  animate: (custom: { direction: number; loading: boolean }) => {
-    return {
-      opacity: custom.loading ? 0.5 : 1,
-      scale: custom.loading ? 0.95 : 1,
-      transition: {
-        opacity: { duration: 0.2 },
-        x: { damping: 30, stiffness: 300, type: 'spring' },
-      },
-      x: 0,
-    };
-  },
-  exit: (custom: { direction: number; loading: boolean }) => {
-    return {
-      opacity: 0,
-      transition: {
-        opacity: { duration: 0.2 },
-        x: { damping: 30, stiffness: 300, type: 'spring' },
-      },
-      x: custom.direction > 0 ? -1000 : 1000,
-    };
-  },
-  initial: (custom: { direction: number; loading: boolean }) => {
-    return {
-      opacity: 0,
-      x: custom.direction > 0 ? 1000 : -1000,
-    };
-  },
-};
-
-const Carousel = ({ data, cardRows }: any) => {
-  const { loading, pagination, gridHeight, imageSize, direction, uniqueId, itemType } =
-    useContext(GridCarouselContext);
-
-  const playButtonBehavior = usePlayButtonBehavior();
-
-  const handlePlayQueueAdd = usePlayQueueAdd();
-
-  return (
-    <Wrapper>
-      <AnimatePresence
-        custom={{ direction, loading }}
-        initial={false}
-        mode="popLayout"
-      >
-        <GridContainer
-          key={`carousel-${uniqueId}-${data[0]?.id}`}
-          animate="animate"
-          custom={{ direction, loading }}
-          exit="exit"
-          height={gridHeight}
-          initial="initial"
-          itemsPerPage={pagination.itemsPerPage}
-          variants={variants}
-        >
-          {data?.map((item: any, index: number) => (
-            <AlbumCard
-              key={`card-${uniqueId}-${index}`}
-              controls={{
-                cardRows,
-                itemType: itemType || LibraryItem.ALBUM,
-                playButtonBehavior: playButtonBehavior || Play.NOW,
-                route: cardRows[0]?.route || {
-                  route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                  slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
-                },
-              }}
-              data={item}
-              handlePlayQueueAdd={handlePlayQueueAdd}
-              size={imageSize}
-            />
-          ))}
-        </GridContainer>
-      </AnimatePresence>
-    </Wrapper>
-  );
-};
-
-export const GridCarousel = ({
-  data,
-  loading,
-  cardRows,
-  pagination,
-  children,
-  containerWidth,
-  uniqueId,
-  itemType,
-}: GridCarouselProps) => {
-  const [direction, setDirection] = useState(0);
-
-  const gridHeight = useMemo(
-    () => (containerWidth * 1.2 - 36) / (pagination?.itemsPerPage || 4),
-    [containerWidth, pagination?.itemsPerPage],
-  );
-
-  const imageSize = useMemo(() => gridHeight * 0.66, [gridHeight]);
-
-  const providerValue = useMemo(
-    () => ({
-      cardRows,
-      data,
-      direction,
-      gridHeight,
-      imageSize,
-      itemType,
-      loading,
-      pagination,
-      setDirection,
-      uniqueId,
-    }),
-    [cardRows, data, direction, gridHeight, imageSize, itemType, loading, pagination, uniqueId],
-  );
-
-  return (
-    <GridCarouselContext.Provider value={providerValue}>
-      <Stack>
-        {children}
-        {data && (
-          <Carousel
-            cardRows={cardRows}
-            data={data}
-          />
-        )}
-      </Stack>
-    </GridCarouselContext.Provider>
-  );
-};
+import { usePlayButtonBehavior } from '/@/renderer/store';
+import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { MotionStack } from '/@/renderer/components/motion';
+import 'swiper/css';
 
 interface TitleProps {
-  children?: React.ReactNode;
+  handleNext?: () => void;
+  handlePrev?: () => void;
+  label?: string | ReactNode;
+  pagination: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 }
 
-const Title = ({ children }: TitleProps) => {
-  const { pagination, setDirection } = useContext(GridCarouselContext);
-  const showPaginationButtons = pagination?.handleNextPage && pagination?.handlePreviousPage;
-
-  const handleNextPage = useCallback(() => {
-    setDirection(1);
-    pagination?.handleNextPage?.();
-  }, [pagination, setDirection]);
-
-  const handlePreviousPage = useCallback(() => {
-    setDirection(-1);
-    pagination?.handlePreviousPage?.();
-  }, [pagination, setDirection]);
-
+const Title = ({ label, handleNext, handlePrev, pagination }: TitleProps) => {
   return (
     <Group position="apart">
-      {children}
-      {showPaginationButtons && (
-        <Group spacing="sm">
-          <Button
-            compact
-            disabled={!pagination?.hasPreviousPage}
-            size="md"
-            variant="default"
-            onClick={handlePreviousPage}
-          >
-            <RiArrowLeftSLine size={15} />
-          </Button>
-          <Button
-            compact
-            size="md"
-            variant="default"
-            onClick={handleNextPage}
-          >
-            <RiArrowRightSLine size={15} />
-          </Button>
-        </Group>
+      {isValidElement(label) ? (
+        label
+      ) : (
+        <TextTitle
+          order={2}
+          weight={700}
+        >
+          {label}
+        </TextTitle>
       )}
+
+      <Group spacing="sm">
+        <Button
+          compact
+          disabled={!pagination.hasPreviousPage}
+          size="lg"
+          variant="default"
+          onClick={handlePrev}
+        >
+          <RiArrowLeftSLine />
+        </Button>
+        <Button
+          compact
+          disabled={!pagination.hasNextPage}
+          size="lg"
+          variant="default"
+          onClick={handleNext}
+        >
+          <RiArrowRightSLine />
+        </Button>
+      </Group>
     </Group>
   );
 };
 
-GridCarousel.Title = Title;
-GridCarousel.Carousel = Carousel;
+interface SwiperGridCarouselProps {
+  cardRows: CardRow<Album>[] | CardRow<Artist>[] | CardRow<AlbumArtist>[];
+  data: Album[] | AlbumArtist[] | Artist[] | RelatedArtist[] | undefined;
+  isLoading?: boolean;
+  itemType: LibraryItem;
+  route: CardRoute;
+  swiperProps?: SwiperOptions;
+  title?: {
+    children?: ReactNode;
+    hasPagination?: boolean;
+    icon?: ReactNode;
+    label: string | ReactNode;
+  };
+  uniqueId: string;
+}
+
+const variants = {
+  hidden: {
+    opacity: 0,
+  },
+  show: {
+    opacity: 1,
+  },
+};
+
+export const SwiperGridCarousel = ({
+  cardRows,
+  data,
+  itemType,
+  route,
+  swiperProps,
+  title,
+  isLoading,
+  uniqueId,
+}: SwiperGridCarouselProps) => {
+  const { ref, width } = useElementSize();
+  const swiperRef = useRef<SwiperCore | any>(null);
+  const playButtonBehavior = usePlayButtonBehavior();
+  const handlePlayQueueAdd = usePlayQueueAdd();
+
+  const slidesPerView = width > 1500 ? 9 : width > 1200 ? 6 : width > 768 ? 5 : width > 600 ? 3 : 2;
+
+  const [pagination, setPagination] = useState({
+    hasNextPage: (data?.length || 0) > Math.round(slidesPerView),
+    hasPreviousPage: false,
+  });
+
+  const createFavoriteMutation = useCreateFavorite({});
+  const deleteFavoriteMutation = useDeleteFavorite({});
+
+  const handleFavorite = useCallback(
+    (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem; serverId: string }) => {
+      const { id, itemType, isFavorite, serverId } = options;
+      if (isFavorite) {
+        deleteFavoriteMutation.mutate({
+          query: {
+            id,
+            type: itemType,
+          },
+          serverId,
+        });
+      } else {
+        createFavoriteMutation.mutate({
+          query: {
+            id,
+            type: itemType,
+          },
+          serverId,
+        });
+      }
+    },
+    [createFavoriteMutation, deleteFavoriteMutation],
+  );
+
+  const slides = data
+    ? data.map((el) => (
+        <PosterCard
+          controls={{
+            cardRows,
+            handleFavorite,
+            handlePlayQueueAdd,
+            itemType,
+            playButtonBehavior,
+            route,
+          }}
+          data={el}
+          isLoading={isLoading}
+          uniqueId={uniqueId}
+        />
+      ))
+    : Array.from(Array(10).keys()).map((el) => (
+        <PosterCard
+          controls={{
+            cardRows,
+            handleFavorite,
+            handlePlayQueueAdd,
+            itemType,
+            playButtonBehavior,
+            route,
+          }}
+          data={el}
+          isLoading={isLoading}
+          uniqueId={uniqueId}
+        />
+      ));
+
+  const handleNext = useCallback(() => {
+    const activeIndex = swiperRef?.current?.activeIndex || 0;
+    const slidesPerView = Math.round(Number(swiperProps?.slidesPerView || 5));
+    swiperRef?.current?.slideTo(activeIndex + slidesPerView);
+  }, [swiperProps?.slidesPerView]);
+
+  const handlePrev = useCallback(() => {
+    const activeIndex = swiperRef?.current?.activeIndex || 0;
+    const slidesPerView = Math.round(Number(swiperProps?.slidesPerView || 5));
+    swiperRef?.current?.slideTo(activeIndex - slidesPerView);
+  }, [swiperProps?.slidesPerView]);
+
+  const handleOnSlideChange = useCallback(
+    (e: SwiperCore) => {
+      const { slides, isEnd, isBeginning } = e;
+      if (isEnd || isBeginning) return;
+
+      setPagination({
+        hasNextPage: slidesPerView < slides.length,
+        hasPreviousPage: slidesPerView < slides.length,
+      });
+    },
+    [slidesPerView],
+  );
+
+  const handleOnReachEnd = useCallback(
+    (e: SwiperCore) => {
+      const { slides } = e;
+
+      setPagination({
+        hasNextPage: false,
+        hasPreviousPage: slidesPerView < slides.length,
+      });
+    },
+    [slidesPerView],
+  );
+
+  const handleOnReachBeginning = useCallback(
+    (e: SwiperCore) => {
+      const { slides } = e;
+
+      setPagination({
+        hasNextPage: slidesPerView < slides.length,
+        hasPreviousPage: false,
+      });
+    },
+    [slidesPerView],
+  );
+
+  return (
+    <AnimatePresence
+      initial
+      mode="sync"
+    >
+      <Box
+        ref={ref}
+        className="grid-carousel"
+      >
+        {width ? (
+          <MotionStack
+            animate="show"
+            initial="hidden"
+            spacing="md"
+            variants={variants}
+          >
+            {title && (
+              <Title
+                {...title}
+                handleNext={handleNext}
+                handlePrev={handlePrev}
+                pagination={pagination}
+              />
+            )}
+            <Swiper
+              ref={swiperRef}
+              grid={{
+                fill: 'column',
+                rows: 2,
+              }}
+              modules={[Virtual]}
+              slidesPerView={swiperProps?.slidesPerView || slidesPerView || 5}
+              spaceBetween={20}
+              style={{ height: '100%', width: '100%' }}
+              onBeforeInit={(swiper) => {
+                swiperRef.current = swiper;
+              }}
+              onReachBeginning={handleOnReachBeginning}
+              onReachEnd={handleOnReachEnd}
+              onSlideChange={handleOnSlideChange}
+              {...swiperProps}
+            >
+              {slides.map((slideContent, index) => {
+                return (
+                  <SwiperSlide
+                    key={`${uniqueId}-${slideContent?.props?.data?.id}-${index}`}
+                    virtualIndex={index}
+                  >
+                    {slideContent}
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+          </MotionStack>
+        ) : null}
+      </Box>
+    </AnimatePresence>
+  );
+};
