@@ -1,10 +1,11 @@
-import { Grid, Group, TextInput } from '@mantine/core';
+import { Grid, Group } from '@mantine/core';
 import { RiSearchLine, RiMenuFill, RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
-import { Button, DropdownMenu } from '/@/renderer/components';
+import { Button, DropdownMenu, TextInput } from '/@/renderer/components';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 import { useContainerQuery } from '/@/renderer/hooks';
+import { useCommandPalette } from '/@/renderer/store';
 
 const ActionsContainer = styled(Grid)`
   display: flex;
@@ -21,6 +22,7 @@ const ActionsContainer = styled(Grid)`
 export const ActionBar = () => {
   const cq = useContainerQuery({ sm: 300 });
   const navigate = useNavigate();
+  const { open } = useCommandPalette();
 
   return (
     <ActionsContainer
@@ -29,11 +31,16 @@ export const ActionBar = () => {
     >
       <Grid.Col span={cq.isSm ? 7 : 6}>
         <TextInput
-          disabled
           readOnly
           icon={<RiSearchLine />}
           placeholder="Search"
           size="md"
+          onClick={open}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              open();
+            }
+          }}
         />
       </Grid.Col>
       <Grid.Col span={cq.isSm ? 5 : 6}>

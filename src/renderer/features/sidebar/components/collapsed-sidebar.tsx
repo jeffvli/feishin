@@ -16,6 +16,8 @@ import {
   RiFlag2Fill,
   RiFolder3Fill,
   RiPlayListFill,
+  RiSearchLine,
+  RiSearchFill,
 } from 'react-icons/ri';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -24,7 +26,7 @@ import { DropdownMenu, ScrollArea } from '/@/renderer/components';
 import { CollapsedSidebarItem } from '/@/renderer/features/sidebar/components/collapsed-sidebar-item';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useWindowSettings } from '/@/renderer/store';
+import { useCommandPalette, useWindowSettings } from '/@/renderer/store';
 import { Platform } from '/@/renderer/types';
 
 const SidebarContainer = styled(motion.div)<{ windowBarStyle: Platform }>`
@@ -41,6 +43,7 @@ const SidebarContainer = styled(motion.div)<{ windowBarStyle: Platform }>`
 export const CollapsedSidebar = () => {
   const location = useLocation();
   const { windowBarStyle } = useWindowSettings();
+  const { open } = useCommandPalette();
 
   return (
     <SidebarContainer windowBarStyle={windowBarStyle}>
@@ -61,6 +64,12 @@ export const CollapsedSidebar = () => {
             <AppMenu />
           </DropdownMenu.Dropdown>
         </DropdownMenu>
+        <CollapsedSidebarItem
+          activeIcon={<RiSearchFill size="25" />}
+          icon={<RiSearchLine size="25" />}
+          label="Search"
+          onClick={open}
+        />
         <CollapsedSidebarItem
           active={location.pathname === AppRoute.HOME}
           activeIcon={<RiHome6Fill size="25" />}

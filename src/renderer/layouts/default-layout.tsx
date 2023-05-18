@@ -1,10 +1,17 @@
 import { lazy } from 'react';
 import isElectron from 'is-electron';
 import styled from 'styled-components';
-import { useWindowSettings, useSettingsStore } from '/@/renderer/store/settings.store';
+import {
+  useWindowSettings,
+  useSettingsStore,
+  useHotkeySettings,
+} from '/@/renderer/store/settings.store';
 import { Platform, PlaybackType } from '/@/renderer/types';
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
+import { useHotkeys } from '@mantine/hooks';
+import { CommandPalette } from '/@/renderer/features/search/components/command-palette';
+import { useCommandPalette } from '/@/renderer/store';
 
 if (!isElectron()) {
   useSettingsStore.getState().actions.setSettings({
@@ -42,6 +49,10 @@ interface DefaultLayoutProps {
 
 export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const { windowBarStyle } = useWindowSettings();
+  const { opened, ...handlers } = useCommandPalette();
+  const { bindings } = useHotkeySettings();
+
+  useHotkeys([[bindings.globalSearch.hotkey, () => handlers.open()]]);
 
   return (
     <>
@@ -53,6 +64,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
         <MainContent shell={shell} />
         <PlayerBar />
       </Layout>
+      <CommandPalette modalProps={{ handlers, opened }} />
     </>
   );
 };
