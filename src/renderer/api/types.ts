@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import {
   JFSortOrder,
   JFAlbumListSort,
@@ -15,6 +16,8 @@ import {
   NDSongListSort,
   NDUserListSort,
 } from '/@/renderer/api/navidrome.types';
+import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
+import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
 
 export enum LibraryItem {
   ALBUM = 'album',
@@ -313,28 +316,8 @@ export enum AlbumListSort {
 
 export type AlbumListQuery = {
   _custom?: {
-    jellyfin?: {
-      albumArtistIds?: string;
-      artistIds?: string;
-      contributingArtistIds?: string;
-      filters?: string;
-      genreIds?: string;
-      genres?: string;
-      isFavorite?: boolean;
-      maxYear?: number; // Parses to years
-      minYear?: number; // Parses to years
-      tags?: string;
-    };
-    navidrome?: {
-      artist_id?: string;
-      compilation?: boolean;
-      genre_id?: string;
-      has_rating?: boolean;
-      name?: string;
-      recently_played?: boolean;
-      starred?: boolean;
-      year?: number;
-    };
+    jellyfin?: Partial<z.infer<typeof jfType._parameters.albumList>>;
+    navidrome?: Partial<z.infer<typeof ndType._parameters.albumList>>;
   };
   artistIds?: string[];
   limit?: number;
@@ -440,29 +423,8 @@ export enum SongListSort {
 
 export type SongListQuery = {
   _custom?: {
-    jellyfin?: {
-      artistIds?: string;
-      contributingArtistIds?: string;
-      filters?: string;
-      genreIds?: string;
-      genres?: string;
-      includeItemTypes: 'Audio';
-      isFavorite?: boolean;
-      maxYear?: number; // Parses to years
-      minYear?: number; // Parses to years
-      sortBy?: JFSongListSort;
-      years?: string;
-    };
-    navidrome?: {
-      album_id?: string[];
-      artist_id?: string[];
-      compilation?: boolean;
-      genre_id?: string;
-      has_rating?: boolean;
-      starred?: boolean;
-      title?: string;
-      year?: number;
-    };
+    jellyfin?: Partial<z.infer<typeof jfType._parameters.songList>>;
+    navidrome?: Partial<z.infer<typeof ndType._parameters.songList>>;
   };
   albumIds?: string[];
   artistIds?: string[];
@@ -571,11 +533,8 @@ export enum AlbumArtistListSort {
 
 export type AlbumArtistListQuery = {
   _custom?: {
-    navidrome?: {
-      genre_id?: string;
-      name?: string;
-      starred?: boolean;
-    };
+    jellyfin?: Partial<z.infer<typeof jfType._parameters.albumArtistList>>;
+    navidrome?: Partial<z.infer<typeof ndType._parameters.albumArtistList>>;
   };
   limit?: number;
   musicFolderId?: string;
@@ -662,11 +621,8 @@ export enum ArtistListSort {
 
 export type ArtistListQuery = {
   _custom?: {
-    navidrome?: {
-      genre_id?: string;
-      name?: string;
-      starred?: boolean;
-    };
+    jellyfin?: Partial<z.infer<typeof jfType._parameters.albumArtistList>>;
+    navidrome?: Partial<z.infer<typeof ndType._parameters.albumArtistList>>;
   };
   limit?: number;
   musicFolderId?: string;
@@ -848,10 +804,8 @@ export enum PlaylistListSort {
 
 export type PlaylistListQuery = {
   _custom?: {
-    navidrome?: {
-      owner_id?: string;
-      smart?: boolean;
-    };
+    jellyfin?: Partial<z.infer<typeof jfType._parameters.playlistList>>;
+    navidrome?: Partial<z.infer<typeof ndType._parameters.playlistList>>;
   };
   limit?: number;
   searchTerm?: string;
