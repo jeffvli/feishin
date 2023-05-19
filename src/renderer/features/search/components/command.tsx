@@ -45,7 +45,7 @@ export const Command = styled(Cmdk)`
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    padding: 1rem 0.5rem;
+    padding: 0.5rem;
     color: var(--btn-default-fg);
     font-family: var(--content-font-family);
     background: var(--btn-default-bg);
