@@ -128,7 +128,7 @@ const endpoints: ApiController = {
     getUserList: undefined,
     removeFromPlaylist: jfController.removeFromPlaylist,
     scrobble: jfController.scrobble,
-    search: undefined,
+    search: jfController.search,
     setRating: undefined,
     updatePlaylist: jfController.updatePlaylist,
   },

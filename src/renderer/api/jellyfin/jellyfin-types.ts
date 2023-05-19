@@ -49,7 +49,12 @@ const baseParameters = z.object({
   ExcludeItemTypes: z.string().optional(),
   Fields: z.string().optional(),
   ImageTypeLimit: z.number().optional(),
+  IncludeArtists: z.boolean().optional(),
+  IncludeGenres: z.boolean().optional(),
   IncludeItemTypes: z.string().optional(),
+  IncludeMedia: z.boolean().optional(),
+  IncludePeople: z.boolean().optional(),
+  IncludeStudios: z.boolean().optional(),
   IsFavorite: z.boolean().optional(),
   Limit: z.number().optional(),
   MediaTypes: z.string().optional(),
@@ -622,6 +627,10 @@ const favorite = z.object({
 
 const favoriteParameters = z.object({});
 
+const searchParameters = paginationParameters.merge(baseParameters);
+
+const search = z.any();
+
 export const jfType = {
   _enum: {
     collection: jfCollection,
@@ -643,6 +652,7 @@ export const jfType = {
     playlistList: playlistListParameters,
     removeFromPlaylist: removeFromPlaylistParameters,
     scrobble: scrobbleParameters,
+    search: searchParameters,
     similarArtistList: similarArtistListParameters,
     songList: songListParameters,
     updatePlaylist: updatePlaylistParameters,
@@ -666,6 +676,7 @@ export const jfType = {
     playlistSongList,
     removeFromPlaylist,
     scrobble,
+    search,
     song,
     songList,
     topSongsList,

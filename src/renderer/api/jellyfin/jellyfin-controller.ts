@@ -40,11 +40,14 @@ import {
   RemoveFromPlaylistResponse,
   PlaylistDetailResponse,
   PlaylistListResponse,
+  SearchArgs,
+  SearchResponse,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
 import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
 import packageJson from '../../../../package.json';
+import { z } from 'zod';
 
 const formatCommaDelimitedString = (value: string[]) => {
   return value.join(',');
@@ -704,6 +707,97 @@ const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
   return null;
 };
 
+const search = async (args: SearchArgs): Promise<SearchResponse> => {
+  const { query, apiClientProps } = args;
+
+  if (!apiClientProps.server?.userId) {
+    throw new Error('No userId found');
+  }
+
+  let albums: z.infer<typeof jfType._response.albumList>['Items'] = [];
+  let albumArtists: z.infer<typeof jfType._response.albumArtistList>['Items'] = [];
+  let songs: z.infer<typeof jfType._response.songList>['Items'] = [];
+
+  if (query.albumLimit) {
+    const res = await jfApiClient(apiClientProps).getAlbumList({
+      params: {
+        userId: apiClientProps.server?.userId,
+      },
+      query: {
+        EnableTotalRecordCount: true,
+        ImageTypeLimit: 1,
+        IncludeItemTypes: 'MusicAlbum',
+        Limit: query.albumLimit,
+        Recursive: true,
+        SearchTerm: query.query,
+        SortBy: 'SortName',
+        SortOrder: 'Ascending',
+        StartIndex: query.albumStartIndex || 0,
+      },
+    });
+
+    if (res.status !== 200) {
+      throw new Error('Failed to get album list');
+    }
+
+    albums = res.body.Items;
+  }
+
+  if (query.albumArtistLimit) {
+    const res = await jfApiClient(apiClientProps).getAlbumArtistList({
+      query: {
+        EnableTotalRecordCount: true,
+        Fields: 'Genres, DateCreated, ExternalUrls, Overview',
+        ImageTypeLimit: 1,
+        IncludeArtists: true,
+        Limit: query.albumArtistLimit,
+        Recursive: true,
+        SearchTerm: query.query,
+        StartIndex: query.albumArtistStartIndex || 0,
+        UserId: apiClientProps.server?.userId,
+      },
+    });
+
+    if (res.status !== 200) {
+      throw new Error('Failed to get album artist list');
+    }
+
+    albumArtists = res.body.Items;
+  }
+
+  if (query.songLimit) {
+    const res = await jfApiClient(apiClientProps).getSongList({
+      params: {
+        userId: apiClientProps.server?.userId,
+      },
+      query: {
+        EnableTotalRecordCount: true,
+        Fields: 'Genres, DateCreated, MediaSources, ParentId',
+        IncludeItemTypes: 'Audio',
+        Limit: query.songLimit,
+        Recursive: true,
+        SearchTerm: query.query,
+        SortBy: 'Album,SortName',
+        SortOrder: 'Ascending',
+        StartIndex: query.songStartIndex || 0,
+        UserId: apiClientProps.server?.userId,
+      },
+    });
+
+    if (res.status !== 200) {
+      throw new Error('Failed to get song list');
+    }
+
+    songs = res.body.Items;
+  }
+
+  return {
+    albumArtists: albumArtists.map((item) => jfNormalize.albumArtist(item, apiClientProps.server)),
+    albums: albums.map((item) => jfNormalize.album(item, apiClientProps.server)),
+    songs: songs.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
+  };
+};
+
 export const jfController = {
   addToPlaylist,
   authenticate,
@@ -725,5 +819,6 @@ export const jfController = {
   getTopSongList,
   removeFromPlaylist,
   scrobble,
+  search,
   updatePlaylist,
 };

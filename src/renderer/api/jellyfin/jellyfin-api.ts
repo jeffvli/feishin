@@ -224,6 +224,15 @@ export const contract = c.router({
       400: jfType._response.error,
     },
   },
+  search: {
+    method: 'GET',
+    path: 'users/:userId/items',
+    query: jfType._parameters.search,
+    responses: {
+      200: jfType._response.search,
+      400: jfType._response.error,
+    },
+  },
   updatePlaylist: {
     body: jfType._parameters.updatePlaylist,
     method: 'PUT',
