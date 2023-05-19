@@ -37,8 +37,8 @@ export const HomeCommands = ({
 
   const handleSearch = useCallback(() => {
     navigate(AppRoute.SEARCH);
-    setQuery('');
     handleClose();
+    setQuery('');
   }, [handleClose, navigate, setQuery]);
 
   return (
@@ -47,6 +47,9 @@ export const HomeCommands = ({
         <Command.Item onSelect={handleCreatePlaylistModal}>Create playlist...</Command.Item>
         <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.GO_TO])}>
           Go to page...
+        </Command.Item>
+        <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.MANAGE_SERVERS])}>
+          Server commands...
         </Command.Item>
         {query !== '' && (
           <Command.Item
