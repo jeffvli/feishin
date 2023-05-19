@@ -18,7 +18,6 @@ export const Command = styled(Cmdk)`
     margin-bottom: 1rem;
     padding: 1.3rem 0.5rem;
     color: var(--input-fg);
-    font-size: 1.2rem;
     font-family: var(--content-font-family);
     background: var(--input-bg);
     border: none;
@@ -59,7 +58,7 @@ export const Command = styled(Cmdk)`
 
     &[data-selected] {
       color: var(--btn-default-fg-hover);
-      background: rgba(255, 255, 255, 10%);
+      background: var(--btn-default-bg-hover);
     }
   }
 
