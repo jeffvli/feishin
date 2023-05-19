@@ -1,12 +1,12 @@
 /* eslint-disable react/no-unknown-property */
-import { useCallback, useState } from 'react';
+import { useCallback, useState, Fragment } from 'react';
 import { Group, Kbd, ScrollArea } from '@mantine/core';
 import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
 import { generatePath, useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { GoToCommands } from './go-to-commands';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
-import { Modal, Paper, Spinner } from '/@/renderer/components';
+import { Button, Modal, Paper, Spinner } from '/@/renderer/components';
 import { HomeCommands } from './home-commands';
 import { ServerCommands } from '/@/renderer/features/search/components/server-commands';
 import { useSearch } from '/@/renderer/features/search/queries/search-query';
@@ -90,6 +90,23 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
       scrollAreaComponent={ScrollArea.Autosize}
       size="lg"
     >
+      <Group
+        mb="1rem"
+        spacing="sm"
+      >
+        {pages.map((page, index) => (
+          <Fragment key={page}>
+            {index > 0 && ' > '}
+            <Button
+              compact
+              disabled
+              variant="default"
+            >
+              {page?.toLocaleUpperCase()}
+            </Button>
+          </Fragment>
+        ))}
+      </Group>
       <Command
         filter={(value, search) => {
           if (value.includes(search)) return 1;
