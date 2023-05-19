@@ -22,12 +22,14 @@ const queryConfig: DefaultOptions = {
   queries: {
     cacheTime: 1000 * 60 * 3,
     onError: (err) => {
-      console.error(err);
+      console.error('react query error:', err);
     },
     refetchOnWindowFocus: false,
     retry: process.env.NODE_ENV === 'production',
     staleTime: 1000 * 5,
-    useErrorBoundary: true,
+    useErrorBoundary: (error: any) => {
+      return error?.response?.status >= 500;
+    },
   },
 };
 
