@@ -132,9 +132,11 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                 <Command.Item
                   key={`search-album-${album.id}`}
                   value={`search-${album.id}`}
-                  onSelect={() =>
-                    navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: album.id }))
-                  }
+                  onSelect={() => {
+                    navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: album.id }));
+                    modalProps.handlers.close();
+                    setQuery('');
+                  }}
                 >
                   <LibraryCommandItem
                     handlePlayQueueAdd={handlePlayQueueAdd}
@@ -154,13 +156,15 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                 <Command.Item
                   key={`artist-${artist.id}`}
                   value={`search-${artist.id}`}
-                  onSelect={() =>
+                  onSelect={() => {
                     navigate(
                       generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                         albumArtistId: artist.id,
                       }),
-                    )
-                  }
+                    );
+                    modalProps.handlers.close();
+                    setQuery('');
+                  }}
                 >
                   <LibraryCommandItem
                     handlePlayQueueAdd={handlePlayQueueAdd}
@@ -182,13 +186,15 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                 <Command.Item
                   key={`artist-${song.id}`}
                   value={`search-${song.id}`}
-                  onSelect={() =>
+                  onSelect={() => {
                     navigate(
                       generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
                         albumId: song.albumId,
                       }),
-                    )
-                  }
+                    );
+                    modalProps.handlers.close();
+                    setQuery('');
+                  }}
                 >
                   <LibraryCommandItem
                     handlePlayQueueAdd={handlePlayQueueAdd}
