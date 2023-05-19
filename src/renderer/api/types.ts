@@ -959,3 +959,24 @@ export type ScrobbleQuery = {
   position?: number;
   submission: boolean;
 };
+
+export type SearchQuery = {
+  albumArtistLimit?: number;
+  albumArtistStartIndex?: number;
+  albumLimit?: number;
+  albumStartIndex?: number;
+  musicFolderId?: string;
+  query?: string;
+  songLimit?: number;
+  songStartIndex?: number;
+};
+
+export type SearchArgs = {
+  query: SearchQuery;
+} & BaseEndpointArgs;
+
+export type SearchResponse = {
+  albumArtists: AlbumArtist[];
+  albums: Album[];
+  songs: Song[];
+};

@@ -65,6 +65,14 @@ export const contract = c.router({
       200: ssType._response.scrobble,
     },
   },
+  search3: {
+    method: 'GET',
+    path: 'search3.view',
+    query: ssType._parameters.search3,
+    responses: {
+      200: ssType._response.search3,
+    },
+  },
   setRating: {
     method: 'GET',
     path: 'setRating.view',
@@ -165,9 +173,14 @@ export const ssApiClient = (args: {
           status: result.status,
         };
       } catch (e: Error | AxiosError | any) {
+        console.log('CATCH ERR');
+
         if (isAxiosError(e)) {
           const error = e as AxiosError;
           const response = error.response as AxiosResponse;
+
+          console.log(response, 'response');
+
           return {
             body: response?.data,
             status: response?.status,

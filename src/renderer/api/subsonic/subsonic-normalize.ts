@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
-import { QueueSong, LibraryItem } from '/@/renderer/api/types';
+import { QueueSong, LibraryItem, AlbumArtist, Album } from '/@/renderer/api/types';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 
 const getCoverArtUrl = (args: {
@@ -10,7 +10,7 @@ const getCoverArtUrl = (args: {
   credential: string | undefined;
   size: number;
 }) => {
-  const size = args.size ? args.size : 150;
+  const size = args.size ? args.size : 250;
 
   if (!args.coverArtId || args.coverArtId.match('2a96cbd8b46e442fc41c2b86b821562f')) {
     return null;
@@ -98,6 +98,82 @@ const normalizeSong = (
   };
 };
 
+const normalizeAlbumArtist = (
+  item: z.infer<typeof ssType._response.albumArtist>,
+  server: ServerListItem | null,
+): AlbumArtist => {
+  const imageUrl =
+    getCoverArtUrl({
+      baseUrl: server?.url,
+      coverArtId: item.coverArt,
+      credential: server?.credential,
+      size: 100,
+    }) || null;
+
+  return {
+    albumCount: item.albumCount ? Number(item.albumCount) : 0,
+    backgroundImageUrl: null,
+    biography: null,
+    duration: null,
+    genres: [],
+    id: item.id,
+    imageUrl,
+    itemType: LibraryItem.ALBUM_ARTIST,
+    lastPlayedAt: null,
+    name: item.name,
+    playCount: null,
+    serverId: server?.id || 'unknown',
+    serverType: ServerType.SUBSONIC,
+    similarArtists: [],
+    songCount: null,
+    userFavorite: false,
+    userRating: null,
+  };
+};
+
+const normalizeAlbum = (
+  item: z.infer<typeof ssType._response.album>,
+  server: ServerListItem | null,
+): Album => {
+  const imageUrl =
+    getCoverArtUrl({
+      baseUrl: server?.url,
+      coverArtId: item.coverArt,
+      credential: server?.credential,
+      size: 300,
+    }) || null;
+
+  return {
+    albumArtists: item.artistId ? [{ id: item.artistId, imageUrl: null, name: item.artist }] : [],
+    artists: item.artistId ? [{ id: item.artistId, imageUrl: null, name: item.artist }] : [],
+    backdropImageUrl: null,
+    createdAt: item.created,
+    duration: item.duration,
+    genres: item.genre ? [{ id: item.genre, name: item.genre }] : [],
+    id: item.id,
+    imagePlaceholderUrl: null,
+    imageUrl,
+    isCompilation: null,
+    itemType: LibraryItem.ALBUM,
+    lastPlayedAt: null,
+    name: item.name,
+    playCount: null,
+    releaseDate: item.year ? new Date(item.year, 0, 1).toISOString() : null,
+    releaseYear: item.year ? Number(item.year) : null,
+    serverId: server?.id || 'unknown',
+    serverType: ServerType.SUBSONIC,
+    size: null,
+    songCount: item.songCount,
+    songs: [],
+    uniqueId: nanoid(),
+    updatedAt: item.created,
+    userFavorite: item.starred || false,
+    userRating: item.userRating || null,
+  };
+};
+
 export const ssNormalize = {
+  album: normalizeAlbum,
+  albumArtist: normalizeAlbumArtist,
   song: normalizeSong,
 };

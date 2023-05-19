@@ -173,6 +173,25 @@ const scrobbleParameters = z.object({
 
 const scrobble = z.null();
 
+const search3 = z.object({
+  searchResult3: z.object({
+    album: z.array(album),
+    artist: z.array(albumArtist),
+    song: z.array(song),
+  }),
+});
+
+const search3Parameters = z.object({
+  albumCount: z.number().optional(),
+  albumOffset: z.number().optional(),
+  artistCount: z.number().optional(),
+  artistOffset: z.number().optional(),
+  musicFolderId: z.string().optional(),
+  query: z.string().optional(),
+  songCount: z.number().optional(),
+  songOffset: z.number().optional(),
+});
+
 export const ssType = {
   _parameters: {
     albumList: albumListParameters,
@@ -181,10 +200,13 @@ export const ssType = {
     createFavorite: createFavoriteParameters,
     removeFavorite: removeFavoriteParameters,
     scrobble: scrobbleParameters,
+    search3: search3Parameters,
     setRating: setRatingParameters,
     topSongsList: topSongsListParameters,
   },
   _response: {
+    album,
+    albumArtist,
     albumArtistList,
     albumList,
     artistInfo,
@@ -194,6 +216,7 @@ export const ssType = {
     musicFolderList,
     removeFavorite,
     scrobble,
+    search3,
     setRating,
     song,
     topSongsList,
