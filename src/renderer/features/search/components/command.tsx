@@ -2,45 +2,55 @@ import { Command as Cmdk } from 'cmdk';
 import styled from 'styled-components';
 
 export enum CommandPalettePages {
-  GO_TO = 'go to',
+  GO_TO = 'go',
   HOME = 'home',
+  MANAGE_SERVERS = 'servers',
 }
 
 export const Command = styled(Cmdk)`
   [cmdk-root] {
-    font-family: var(--content-font-family);
     background-color: var(--background-color);
   }
 
   input[cmdk-input] {
     width: 100%;
-    height: 2rem;
+    height: 1.5rem;
     margin-bottom: 1rem;
-    padding: 0 0.5rem;
+    padding: 1.3rem 0.5rem;
     color: var(--input-fg);
-    font-size: 1.1rem;
-    background: transparent;
+    font-size: 1.2rem;
+    font-family: var(--content-font-family);
+    background: var(--input-bg);
     border: none;
+    border-radius: 5px;
 
     &::placeholder {
       color: var(--input-placeholder-fg);
     }
   }
 
-  div[cmdk-group-heading] {
+  [cmdk-group-heading] {
     margin: 1rem 0;
     font-size: 0.9rem;
     opacity: 0.8;
   }
 
-  div[cmdk-item] {
+  [cmdk-group-items] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  [cmdk-item] {
     display: flex;
     gap: 0.5rem;
     align-items: center;
     padding: 1rem 0.5rem;
-    color: var(--btn-subtle-fg);
-    background: var(--btn-subtle-bg);
+    color: var(--btn-default-fg);
+    font-family: var(--content-font-family);
+    background: var(--btn-default-bg);
     border-radius: 5px;
+    cursor: pointer;
 
     svg {
       width: 1.2rem;
@@ -48,12 +58,12 @@ export const Command = styled(Cmdk)`
     }
 
     &[data-selected] {
-      color: var(--btn-subtle-fg-hover);
+      color: var(--btn-default-fg-hover);
       background: rgba(255, 255, 255, 10%);
     }
   }
 
-  div[cmdk-separator] {
+  [cmdk-separator] {
     height: 1px;
     margin: 0 0 0.5rem;
     background: var(--generic-border-color);
