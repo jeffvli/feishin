@@ -17,6 +17,8 @@ import {
   ScrobbleResponse,
   SongListResponse,
   TopSongListArgs,
+  SearchArgs,
+  SearchResponse,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -305,6 +307,40 @@ const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
   return null;
 };
 
+const search3 = async (args: SearchArgs): Promise<SearchResponse> => {
+  const { query, apiClientProps } = args;
+
+  console.log('search api');
+
+  const res = await ssApiClient(apiClientProps).search3({
+    query: {
+      albumCount: query.albumLimit,
+      albumOffset: query.albumStartIndex,
+      artistCount: query.albumArtistLimit,
+      artistOffset: query.albumArtistStartIndex,
+      query: query.query,
+      songCount: query.songLimit,
+      songOffset: query.songStartIndex,
+    },
+  });
+
+  if (res.status !== 200) {
+    throw new Error('Failed to search');
+  }
+
+  return {
+    albumArtists: res.body.searchResult3?.artist?.map((artist) =>
+      ssNormalize.albumArtist(artist, apiClientProps.server),
+    ),
+    albums: res.body.searchResult3?.album?.map((album) =>
+      ssNormalize.album(album, apiClientProps.server),
+    ),
+    songs: res.body.searchResult3?.song?.map((song) =>
+      ssNormalize.song(song, apiClientProps.server, ''),
+    ),
+  };
+};
+
 export const ssController = {
   authenticate,
   createFavorite,
@@ -313,5 +349,6 @@ export const ssController = {
   getTopSongList,
   removeFavorite,
   scrobble,
+  search3,
   setRating,
 };

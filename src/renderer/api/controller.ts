@@ -44,6 +44,8 @@ import type {
   UpdatePlaylistResponse,
   UserListResponse,
   AuthenticationResponse,
+  SearchArgs,
+  SearchResponse,
 } from '/@/renderer/api/types';
 import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse } from './types';
@@ -84,6 +86,7 @@ export type ControllerEndpoint = Partial<{
   getUserList: (args: UserListArgs) => Promise<UserListResponse>;
   removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
   scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
+  search: (args: SearchArgs) => Promise<SearchResponse>;
   setRating: (args: SetRatingArgs) => Promise<RatingResponse>;
   updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
 }>;
@@ -125,6 +128,7 @@ const endpoints: ApiController = {
     getUserList: undefined,
     removeFromPlaylist: jfController.removeFromPlaylist,
     scrobble: jfController.scrobble,
+    search: undefined,
     setRating: undefined,
     updatePlaylist: jfController.updatePlaylist,
   },
@@ -158,6 +162,7 @@ const endpoints: ApiController = {
     getUserList: ndController.getUserList,
     removeFromPlaylist: ndController.removeFromPlaylist,
     scrobble: ssController.scrobble,
+    search: ssController.search3,
     setRating: ssController.setRating,
     updatePlaylist: ndController.updatePlaylist,
   },
@@ -188,6 +193,7 @@ const endpoints: ApiController = {
     getTopSongs: ssController.getTopSongList,
     getUserList: undefined,
     scrobble: ssController.scrobble,
+    search: ssController.search3,
     setRating: undefined,
     updatePlaylist: undefined,
   },
@@ -198,17 +204,18 @@ const apiController = (endpoint: keyof ControllerEndpoint, type?: ServerType) =>
 
   if (!serverType) {
     toast.error({ message: 'No server selected', title: 'Unable to route request' });
-    return () => undefined;
+    throw new Error(`No server selected`);
   }
 
-  const controllerFn = endpoints[serverType][endpoint];
+  const controllerFn = endpoints?.[serverType]?.[endpoint];
 
   if (typeof controllerFn !== 'function') {
     toast.error({
       message: `Endpoint ${endpoint} is not implemented for ${serverType}`,
       title: 'Unable to route request',
     });
-    return () => undefined;
+
+    throw new Error(`Endpoint ${endpoint} is not implemented for ${serverType}`);
   }
 
   return endpoints[serverType][endpoint];
@@ -414,6 +421,12 @@ const scrobble = async (args: ScrobbleArgs) => {
   )?.(args);
 };
 
+const search = async (args: SearchArgs) => {
+  return (
+    apiController('search', args.apiClientProps.server?.type) as ControllerEndpoint['search']
+  )?.(args);
+};
+
 export const controller = {
   addToPlaylist,
   authenticate,
@@ -436,6 +449,7 @@ export const controller = {
   getUserList,
   removeFromPlaylist,
   scrobble,
+  search,
   updatePlaylist,
   updateRating,
 };
