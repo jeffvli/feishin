@@ -315,7 +315,7 @@ const prefetchPlaylistParams = [
 ];
 
 const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
-  const parameters = [];
+  const parameters = ['--idle=yes'];
 
   if (!extraParameters?.some((param) => prefetchPlaylistParams.includes(param))) {
     parameters.push('--prefetch-playlist=yes');
@@ -330,6 +330,7 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
   const { extraParameters, properties } = data;
 
   const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
+  console.log('Setting mpv params: ', params);
 
   mpvInstance = new MpvAPI(
     {
@@ -341,6 +342,7 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
     params,
   );
 
+  console.log('Setting mpv properties: ', properties);
   mpvInstance.setMultipleProperties(properties || {});
 
   mpvInstance.start().catch((error) => {

@@ -42,7 +42,7 @@ export const App = () => {
     const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
     const properties = {
       ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
-      volume: usePlayerStore.getState().volume,
+      volume: usePlayerStore.getState().volume || 50,
     };
 
     mpvPlayer?.initialize({
