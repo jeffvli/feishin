@@ -357,7 +357,7 @@ export const AlbumArtistDetailContent = () => {
           </Group>
         </Group>
       </Box>
-      {showGenres && (
+      {showGenres ? (
         <Box component="section">
           <Group spacing="sm">
             {detailQuery?.data?.genres?.map((genre) => (
@@ -377,7 +377,7 @@ export const AlbumArtistDetailContent = () => {
             ))}
           </Group>
         </Box>
-      )}
+      ) : null}
       {showBiography ? (
         <Box
           component="section"
@@ -397,7 +397,7 @@ export const AlbumArtistDetailContent = () => {
           />
         </Box>
       ) : null}
-      {showTopSongs && (
+      {showTopSongs ? (
         <Box component="section">
           <Group
             noWrap
@@ -444,7 +444,7 @@ export const AlbumArtistDetailContent = () => {
             onRowDoubleClicked={handleRowDoubleClick}
           />
         </Box>
-      )}
+      ) : null}
       <Box component="section">
         <Stack spacing="xl">
           {carousels
