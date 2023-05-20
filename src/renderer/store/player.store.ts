@@ -6,7 +6,7 @@ import create from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
-import { QueueSong, Song } from '/@/renderer/api/types';
+import { QueueSong } from '/@/renderer/api/types';
 import { PlayerStatus, PlayerRepeat, PlayerShuffle, Play } from '/@/renderer/types';
 
 export interface PlayerState {
@@ -56,7 +56,7 @@ export interface QueueData {
 
 export interface PlayerSlice extends PlayerState {
   actions: {
-    addToQueue: (songs: Song[], type: Play) => PlayerData;
+    addToQueue: (songs: QueueSong[], type: Play) => PlayerData;
     autoNext: () => PlayerData;
     checkIsFirstTrack: () => boolean;
     checkIsLastTrack: () => boolean;
