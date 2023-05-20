@@ -154,7 +154,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
         id: [playlistId],
         type: LibraryItem.PLAYLIST,
       },
-      play: playType || playButtonBehavior,
+      playType: playType || playButtonBehavior,
     });
   };
 
@@ -203,7 +203,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     if (!e.data) return;
     handlePlayQueueAdd?.({
       byData: [e.data],
-      play: playButtonBehavior,
+      playType: playButtonBehavior,
     });
   };
 

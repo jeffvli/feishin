@@ -56,7 +56,7 @@ export interface QueueData {
 
 export interface PlayerSlice extends PlayerState {
   actions: {
-    addToQueue: (songs: QueueSong[], type: Play) => PlayerData;
+    addToQueue: (args: { initialIndex: number; playType: Play; songs: QueueSong[] }) => PlayerData;
     autoNext: () => PlayerData;
     checkIsFirstTrack: () => boolean;
     checkIsLastTrack: () => boolean;
@@ -95,7 +95,8 @@ export const usePlayerStore = create<PlayerSlice>()(
       devtools(
         immer((set, get) => ({
           actions: {
-            addToQueue: (songs, type) => {
+            addToQueue: (args) => {
+              const { playType, songs } = args;
               const { shuffledIndex } = get().current;
               const shuffledQueue = get().queue.shuffled;
               const queueSongs = map(songs, (song) => ({
@@ -103,7 +104,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                 uniqueId: nanoid(),
               }));
 
-              if (type === Play.NOW) {
+              if (playType === Play.NOW) {
                 if (get().shuffle === PlayerShuffle.TRACK) {
                   const shuffledSongs = shuffle(queueSongs);
                   const foundIndex = queueSongs.findIndex(
@@ -131,7 +132,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                     state.current.song = queueSongs[0];
                   });
                 }
-              } else if (type === Play.LAST) {
+              } else if (playType === Play.LAST) {
                 // Shuffle the queue after the current track
                 const shuffledQueueWithNewSongs =
                   get().shuffle === PlayerShuffle.TRACK
@@ -148,7 +149,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                   state.queue.default = [...get().queue.default, ...queueSongs];
                   state.queue.shuffled = shuffledQueueWithNewSongs;
                 });
-              } else if (type === Play.NEXT) {
+              } else if (playType === Play.NEXT) {
                 const queue = get().queue.default;
                 const currentIndex = get().current.index;
 

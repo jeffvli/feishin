@@ -134,7 +134,7 @@ export const GridCardControls = ({
         id: [itemData.id],
         type: itemType,
       },
-      play: playType || playButtonBehavior,
+      playType: playType || playButtonBehavior,
     });
   };
 

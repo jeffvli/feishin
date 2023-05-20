@@ -249,7 +249,7 @@ export const AlbumArtistDetailContent = () => {
         id: [albumArtistId],
         type: LibraryItem.ALBUM_ARTIST,
       },
-      play: playType || playButtonBehavior,
+      playType: playType || playButtonBehavior,
     });
   };
 
@@ -259,7 +259,7 @@ export const AlbumArtistDetailContent = () => {
     if (!e.data) return;
     handlePlayQueueAdd?.({
       byData: [e.data],
-      play: playButtonBehavior,
+      playType: playButtonBehavior,
     });
   };
 

@@ -119,13 +119,13 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
   const [debounced] = useDebouncedValue(rect, 25);
 
   const handlePlayPlaylist = useCallback(
-    (id: string, play: Play) => {
+    (id: string, playType: Play) => {
       handlePlayQueueAdd?.({
         byItemType: {
           id: [id],
           type: LibraryItem.PLAYLIST,
         },
-        play,
+        playType,
       });
     },
     [handlePlayQueueAdd],

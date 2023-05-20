@@ -294,7 +294,7 @@ export const AlbumListHeaderFilters = ({
 
   const handlePlayQueueAdd = usePlayQueueAdd();
 
-  const handlePlay = async (play: Play) => {
+  const handlePlay = async (playType: Play) => {
     if (!itemCount || itemCount === 0 || !server) return;
 
     const query = {
@@ -327,7 +327,7 @@ export const AlbumListHeaderFilters = ({
         id: albumIds,
         type: LibraryItem.ALBUM,
       },
-      play,
+      playType,
     });
   };
 

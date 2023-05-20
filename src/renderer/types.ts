@@ -154,7 +154,8 @@ export type PlayQueueAddOptions = {
     id: string[] | any;
     type: LibraryItem;
   };
-  play: Play;
+  initialIndex?: number;
+  playType: Play;
 };
 
 export type GridCardData = {

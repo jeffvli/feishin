@@ -261,7 +261,7 @@ export const SongListHeaderFilters = ({
     handleFilterChange(filter);
   };
 
-  const handlePlay = async (play: Play) => {
+  const handlePlay = async (playType: Play) => {
     if (!itemCount || itemCount === 0) return;
     const query: SongListQuery = { startIndex: 0, ...filter, ...customFilters };
 
@@ -270,7 +270,7 @@ export const SongListHeaderFilters = ({
         id: query,
         type: LibraryItem.SONG,
       },
-      play,
+      playType,
     });
   };
 

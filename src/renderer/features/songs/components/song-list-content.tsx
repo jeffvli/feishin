@@ -162,7 +162,7 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
     if (!e.data) return;
     handlePlayQueueAdd?.({
       byData: [e.data],
-      play: playButtonBehavior,
+      playType: playButtonBehavior,
     });
   };
 

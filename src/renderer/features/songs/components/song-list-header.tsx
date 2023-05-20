@@ -94,7 +94,7 @@ export const SongListHeader = ({
 
   const playButtonBehavior = usePlayButtonBehavior();
 
-  const handlePlay = async (play: Play) => {
+  const handlePlay = async (playType: Play) => {
     if (!itemCount || itemCount === 0) return;
     const query: SongListQuery = { startIndex: 0, ...filter, ...customFilters };
 
@@ -103,7 +103,7 @@ export const SongListHeader = ({
         id: query,
         type: LibraryItem.SONG,
       },
-      play,
+      playType,
     });
   };
 

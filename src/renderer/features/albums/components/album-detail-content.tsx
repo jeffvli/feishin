@@ -210,7 +210,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
   const handlePlay = async (playType?: Play) => {
     handlePlayQueueAdd?.({
       byData: detailQuery?.data?.songs,
-      play: playType || playButtonBehavior,
+      playType: playType || playButtonBehavior,
     });
   };
 
@@ -218,9 +218,16 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;
+
+    const rowData: QueueSong[] = [];
+    e.api.forEachNode((node) => {
+      if (!node.data) return;
+      rowData.push(node.data);
+    });
+
     handlePlayQueueAdd?.({
-      byData: [e.data],
-      play: playButtonBehavior,
+      byData: rowData,
+      playType: playButtonBehavior,
     });
   };
 

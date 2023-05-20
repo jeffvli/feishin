@@ -110,7 +110,7 @@ export const SearchContent = ({ tableRef, getDatasource }: SearchContentProps) =
       case LibraryItem.SONG:
         handlePlayQueueAdd?.({
           byData: [e.data],
-          play: playButtonBehavior,
+          playType: playButtonBehavior,
         });
         break;
     }

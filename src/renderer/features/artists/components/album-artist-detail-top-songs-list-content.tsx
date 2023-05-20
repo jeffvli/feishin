@@ -36,7 +36,7 @@ export const AlbumArtistDetailTopSongsListContent = ({
     if (!e.data) return;
     handlePlayQueueAdd?.({
       byData: [e.data],
-      play: playButtonBehavior,
+      playType: playButtonBehavior,
     });
   };
 

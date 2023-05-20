@@ -20,10 +20,10 @@ export const AlbumArtistDetailTopSongsListHeader = ({
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
 
-  const handlePlay = async (play: Play) => {
+  const handlePlay = async (playType: Play) => {
     handlePlayQueueAdd?.({
       byData: data,
-      play,
+      playType,
     });
   };
 
