@@ -10,8 +10,10 @@ import {
 } from 'react-icons/ri';
 import styled from 'styled-components';
 import { LibraryItem } from '/@/renderer/api/types';
-import { Button, MotionFlex, Text } from '/@/renderer/components';
+import { Button, Text } from '/@/renderer/components';
 import { Play, PlayQueueAddOptions } from '/@/renderer/types';
+
+const Item = styled(Flex)``;
 
 const ItemGrid = styled.div<{ height: number }>`
   display: grid;
@@ -46,6 +48,8 @@ const StyledImage = styled.img`
   object-fit: cover;
   border-radius: 4px;
 `;
+
+const ActionsContainer = styled(Flex)``;
 
 interface LibraryCommandItemProps {
   handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
@@ -99,7 +103,7 @@ export const LibraryCommandItem = ({
   );
 
   return (
-    <Flex
+    <Item
       gap="xl"
       justify="space-between"
       style={{ height: '40px', width: '100%' }}
@@ -141,7 +145,7 @@ export const LibraryCommandItem = ({
           </Text>
         </MetadataWrapper>
       </ItemGrid>
-      <MotionFlex
+      <ActionsContainer
         align="center"
         gap="sm"
         justify="flex-end"
@@ -173,7 +177,7 @@ export const LibraryCommandItem = ({
         >
           <RiAddCircleFill />
         </Button>
-      </MotionFlex>
-    </Flex>
+      </ActionsContainer>
+    </Item>
   );
 };

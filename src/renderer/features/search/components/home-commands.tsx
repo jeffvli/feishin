@@ -1,6 +1,9 @@
 import { openModal, closeAllModals } from '@mantine/modals';
+import { nanoid } from 'nanoid/non-secure';
 import { Dispatch, useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { generatePath, useNavigate } from 'react-router';
+import { createSearchParams } from 'react-router-dom';
+import { LibraryItem } from '/@/renderer/api/types';
 import { CreatePlaylistForm } from '/@/renderer/features/playlists';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -35,11 +38,23 @@ export const HomeCommands = ({
     });
   }, [handleClose, server?.type]);
 
-  const handleSearch = useCallback(() => {
-    navigate(AppRoute.SEARCH);
+  const handleSearch = () => {
+    navigate(
+      {
+        pathname: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
+        search: createSearchParams({
+          query,
+        }).toString(),
+      },
+      {
+        state: {
+          navigationId: nanoid(),
+        },
+      },
+    );
     handleClose();
     setQuery('');
-  }, [handleClose, navigate, setQuery]);
+  };
 
   return (
     <>
