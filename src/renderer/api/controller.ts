@@ -256,6 +256,15 @@ const getSongList = async (args: SongListArgs) => {
   )?.(args);
 };
 
+const getSongDetail = async (args: SongDetailArgs) => {
+  return (
+    apiController(
+      'getSongDetail',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getSongDetail']
+  )?.(args);
+};
+
 const getMusicFolderList = async (args: MusicFolderListArgs) => {
   return (
     apiController(
@@ -444,6 +453,7 @@ export const controller = {
   getPlaylistDetail,
   getPlaylistList,
   getPlaylistSongList,
+  getSongDetail,
   getSongList,
   getTopSongList,
   getUserList,

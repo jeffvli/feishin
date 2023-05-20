@@ -310,8 +310,6 @@ const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
 const search3 = async (args: SearchArgs): Promise<SearchResponse> => {
   const { query, apiClientProps } = args;
 
-  console.log('search api');
-
   const res = await ssApiClient(apiClientProps).search3({
     query: {
       albumCount: query.albumLimit,

@@ -11,6 +11,7 @@ import type {
   AlbumArtistDetailQuery,
   TopSongListQuery,
   SearchQuery,
+  SongDetailQuery,
 } from './types';
 
 export const queryKeys = {
@@ -88,6 +89,10 @@ export const queryKeys = {
     root: (serverId: string) => [serverId] as const,
   },
   songs: {
+    detail: (serverId: string, query?: SongDetailQuery) => {
+      if (query) return [serverId, 'songs', 'detail', query] as const;
+      return [serverId, 'songs', 'detail'] as const;
+    },
     list: (serverId: string, query?: SongListQuery) => {
       if (query) return [serverId, 'songs', 'list', query] as const;
       return [serverId, 'songs', 'list'] as const;

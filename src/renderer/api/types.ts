@@ -167,7 +167,7 @@ export type Album = {
 } & { songs?: Song[] };
 
 export type Song = {
-  album: string;
+  album: string | undefined;
   albumArtists: RelatedArtist[];
   albumId: string;
   artistName: string;
@@ -969,6 +969,27 @@ export type SearchQuery = {
   query?: string;
   songLimit?: number;
   songStartIndex?: number;
+};
+
+export type SearchSongsQuery = {
+  musicFolderId?: string;
+  query?: string;
+  songLimit?: number;
+  songStartIndex?: number;
+};
+
+export type SearchAlbumsQuery = {
+  albumLimit?: number;
+  albumStartIndex?: number;
+  musicFolderId?: string;
+  query?: string;
+};
+
+export type SearchAlbumArtistsQuery = {
+  albumArtistLimit?: number;
+  albumArtistStartIndex?: number;
+  musicFolderId?: string;
+  query?: string;
 };
 
 export type SearchArgs = {
