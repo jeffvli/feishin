@@ -16,6 +16,10 @@ export const useHandleTableContextMenu = (
     let selectedNodes = sortBy(e.api.getSelectedNodes(), ['rowIndex']);
     let selectedRows = selectedNodes.map((node) => node.data);
 
+    if (!e.data?.id) {
+      return;
+    }
+
     const shouldReplaceSelected = !selectedNodes.map((node) => node.data.id).includes(e.data.id);
 
     if (shouldReplaceSelected) {
