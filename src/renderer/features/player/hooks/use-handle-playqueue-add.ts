@@ -8,7 +8,7 @@ import { PlayQueueAddOptions, Play, PlaybackType } from '/@/renderer/types';
 import { toast } from '/@/renderer/components/toast/index';
 import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
-import { LibraryItem, SongListSort, SortOrder } from '/@/renderer/api/types';
+import { LibraryItem, SongListSort, SortOrder, Song } from '/@/renderer/api/types';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const utils = isElectron() ? window.electron.utils : null;
@@ -28,7 +28,7 @@ export const useHandlePlayQueueAdd = () => {
       // const fetchId = itemCount > 1 ? nanoid() : null;
 
       if (options.byItemType) {
-        let songsList;
+        let songsList: any;
         let queryFilter: any;
         let queryKey: any;
 
@@ -94,8 +94,8 @@ export const useHandlePlayQueueAdd = () => {
 
           queryKey = queryKeys.songs.list(server?.id, queryFilter);
         } else if (options.byItemType.type === LibraryItem.SONG) {
-          queryFilter = options.byItemType.id;
-          queryKey = queryKeys.songs.list(server?.id, queryFilter);
+          queryFilter = { id: options.byItemType.id };
+          queryKey = queryKeys.songs.detail(server?.id, queryFilter);
         }
 
         try {
@@ -115,6 +115,20 @@ export const useHandlePlayQueueAdd = () => {
                 staleTime: 1000 * 60,
               },
             );
+          } else if (options.byItemType?.type === LibraryItem.SONG) {
+            const song = (await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+              api.controller.getSongDetail({
+                apiClientProps: {
+                  server,
+                  signal,
+                },
+                query: queryFilter,
+              }),
+            )) as Song;
+
+            if (song) {
+              songsList = { items: [song], startIndex: 0, totalRecordCount: 1 };
+            }
           } else {
             songsList = await queryClient.fetchQuery(
               queryKey,
@@ -140,8 +154,7 @@ export const useHandlePlayQueueAdd = () => {
         }
 
         if (!songsList) return toast.warn({ message: 'No songs found' });
-
-        songs = songsList.items?.map((song) => ({ ...song, uniqueId: nanoid() }));
+        songs = songsList.items?.map((song: Song) => ({ ...song, uniqueId: nanoid() }));
       } else if (options.byData) {
         songs = options.byData.map((song) => ({ ...song, uniqueId: nanoid() }));
       }
