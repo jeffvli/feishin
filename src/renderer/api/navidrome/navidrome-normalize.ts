@@ -1,8 +1,9 @@
 import { nanoid } from 'nanoid';
-import { Song, LibraryItem, Album, AlbumArtist, Playlist, User } from '/@/renderer/api/types';
+import { Song, LibraryItem, Album, Playlist, User, AlbumArtist } from '/@/renderer/api/types';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import z from 'zod';
 import { ndType } from './navidrome-types';
+import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
 
 const getCoverArtUrl = (args: {
   baseUrl: string | undefined;
@@ -139,7 +140,9 @@ const normalizeAlbum = (
 };
 
 const normalizeAlbumArtist = (
-  item: z.infer<typeof ndType._response.albumArtist>,
+  item: z.infer<typeof ndType._response.albumArtist> & {
+    similarArtists?: z.infer<typeof ssType._response.artistInfo>['artistInfo']['similarArtist'];
+  },
   server: ServerListItem | null,
 ): AlbumArtist => {
   const imageUrl =
@@ -159,13 +162,12 @@ const normalizeAlbumArtist = (
     playCount: item.playCount,
     serverId: server?.id || 'unknown',
     serverType: ServerType.NAVIDROME,
-    similarArtists: null,
-    // similarArtists:
-    //   item.similarArtists?.map((artist) => ({
-    //     id: artist.id,
-    //     imageUrl: artist?.artistImageUrl || null,
-    //     name: artist.name,
-    //   })) || null,
+    similarArtists:
+      item.similarArtists?.map((artist) => ({
+        id: artist.id,
+        imageUrl: artist?.artistImageUrl || null,
+        name: artist.name,
+      })) || null,
     songCount: item.songCount,
     userFavorite: item.starred,
     userRating: item.rating,

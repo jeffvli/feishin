@@ -42,6 +42,7 @@ import {
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
 import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
+import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 
 const authenticate = async (
   url: string,
@@ -119,6 +120,13 @@ const getAlbumArtistDetail = async (
     },
   });
 
+  const artistInfoRes = await ssApiClient(apiClientProps).getArtistInfo({
+    query: {
+      count: 10,
+      id: query.id,
+    },
+  });
+
   if (res.status !== 200) {
     throw new Error('Failed to get album artist detail');
   }
@@ -127,7 +135,15 @@ const getAlbumArtistDetail = async (
     throw new Error('Server is required');
   }
 
-  return ndNormalize.albumArtist(res.body.data, apiClientProps.server);
+  return ndNormalize.albumArtist(
+    {
+      ...res.body.data,
+      ...(artistInfoRes.status === 200 && {
+        similarArtists: artistInfoRes.body.artistInfo.similarArtist,
+      }),
+    },
+    apiClientProps.server,
+  );
 };
 
 const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<AlbumArtistListResponse> => {

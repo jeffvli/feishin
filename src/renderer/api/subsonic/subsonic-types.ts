@@ -135,7 +135,7 @@ const artistInfoParameters = z.object({
 });
 
 const artistInfo = z.object({
-  artistInfo2: z.object({
+  artistInfo: z.object({
     biography: z.string().optional(),
     largeImageUrl: z.string().optional(),
     lastFmUrl: z.string().optional(),
