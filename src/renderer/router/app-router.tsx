@@ -60,6 +60,8 @@ const AlbumDetailRoute = lazy(
 
 const SettingsRoute = lazy(() => import('/@/renderer/features/settings/routes/settings-route'));
 
+const SearchRoute = lazy(() => import('/@/renderer/features/search/routes/search-route'));
+
 const RouteErrorBoundary = lazy(
   () => import('/@/renderer/features/action-required/components/route-error-boundary'),
 );
@@ -85,6 +87,11 @@ export const AppRouter = () => {
                 element={<HomeRoute />}
                 errorElement={<RouteErrorBoundary />}
                 path={AppRoute.HOME}
+              />
+              <Route
+                element={<SearchRoute />}
+                errorElement={<RouteErrorBoundary />}
+                path={AppRoute.SEARCH}
               />
               <Route
                 element={<SettingsRoute />}
