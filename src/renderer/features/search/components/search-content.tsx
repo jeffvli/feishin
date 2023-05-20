@@ -12,7 +12,11 @@ import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 import { VirtualTable, getColumnDefs } from '/@/renderer/components/virtual-table';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
-import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import {
+  ALBUM_CONTEXT_MENU_ITEMS,
+  ARTIST_CONTEXT_MENU_ITEMS,
+  SONG_CONTEXT_MENU_ITEMS,
+} from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { generatePath, useNavigate } from 'react-router';
 import { AppRoute } from '../../../router/routes';
@@ -79,7 +83,20 @@ export const SearchContent = ({ tableRef, getDatasource }: SearchContentProps) =
     }
   };
 
-  const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
+  const contextMenuItems = () => {
+    switch (itemType) {
+      case LibraryItem.ALBUM:
+        return ALBUM_CONTEXT_MENU_ITEMS;
+      case LibraryItem.ALBUM_ARTIST:
+        return ARTIST_CONTEXT_MENU_ITEMS;
+      case LibraryItem.SONG:
+        return SONG_CONTEXT_MENU_ITEMS;
+      default:
+        return [];
+    }
+  };
+
+  const handleContextMenu = useHandleTableContextMenu(itemType, contextMenuItems());
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;
