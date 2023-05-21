@@ -1,5 +1,5 @@
 import merge from 'lodash/merge';
-import create from 'zustand';
+import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { PlaylistListArgs, PlaylistListSort, SortOrder } from '/@/renderer/api/types';

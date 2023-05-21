@@ -2,7 +2,7 @@ import map from 'lodash/map';
 import merge from 'lodash/merge';
 import shuffle from 'lodash/shuffle';
 import { nanoid } from 'nanoid/non-secure';
-import create from 'zustand';
+import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
@@ -56,7 +56,7 @@ export interface QueueData {
 
 export interface PlayerSlice extends PlayerState {
   actions: {
-    addToQueue: (songs: QueueSong[], type: Play) => PlayerData;
+    addToQueue: (args: { initialIndex: number; playType: Play; songs: QueueSong[] }) => PlayerData;
     autoNext: () => PlayerData;
     checkIsFirstTrack: () => boolean;
     checkIsLastTrack: () => boolean;
@@ -95,7 +95,8 @@ export const usePlayerStore = create<PlayerSlice>()(
       devtools(
         immer((set, get) => ({
           actions: {
-            addToQueue: (songs, type) => {
+            addToQueue: (args) => {
+              const { initialIndex, playType, songs } = args;
               const { shuffledIndex } = get().current;
               const shuffledQueue = get().queue.shuffled;
               const queueSongs = map(songs, (song) => ({
@@ -103,35 +104,36 @@ export const usePlayerStore = create<PlayerSlice>()(
                 uniqueId: nanoid(),
               }));
 
-              if (type === Play.NOW) {
+              if (playType === Play.NOW) {
                 if (get().shuffle === PlayerShuffle.TRACK) {
                   const shuffledSongs = shuffle(queueSongs);
-                  const foundIndex = queueSongs.findIndex(
-                    (song) => song.uniqueId === shuffledSongs[0].uniqueId,
+                  const index = initialIndex || 0;
+                  const initialSongUniqueId = queueSongs[index].uniqueId;
+                  const initialSongIndex = shuffledSongs.findIndex(
+                    (song) => song.uniqueId === initialSongUniqueId,
                   );
-                  set((state) => {
-                    state.queue.shuffled = shuffledSongs.map((song) => song.uniqueId);
-                  });
 
                   set((state) => {
+                    state.queue.shuffled = shuffledSongs.map((song) => song.uniqueId);
                     state.queue.default = queueSongs;
                     state.current.time = 0;
                     state.current.player = 1;
-                    state.current.index = foundIndex;
+                    state.current.index = initialSongIndex;
                     state.current.shuffledIndex = 0;
-                    state.current.song = shuffledSongs[0];
+                    state.current.song = shuffledSongs[initialSongIndex];
                   });
                 } else {
+                  const index = initialIndex || 0;
                   set((state) => {
                     state.queue.default = queueSongs;
                     state.current.time = 0;
                     state.current.player = 1;
-                    state.current.index = 0;
+                    state.current.index = index;
                     state.current.shuffledIndex = 0;
-                    state.current.song = queueSongs[0];
+                    state.current.song = queueSongs[index];
                   });
                 }
-              } else if (type === Play.LAST) {
+              } else if (playType === Play.LAST) {
                 // Shuffle the queue after the current track
                 const shuffledQueueWithNewSongs =
                   get().shuffle === PlayerShuffle.TRACK
@@ -148,7 +150,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                   state.queue.default = [...get().queue.default, ...queueSongs];
                   state.queue.shuffled = shuffledQueueWithNewSongs;
                 });
-              } else if (type === Play.NEXT) {
+              } else if (playType === Play.NEXT) {
                 const queue = get().queue.default;
                 const currentIndex = get().current.index;
 

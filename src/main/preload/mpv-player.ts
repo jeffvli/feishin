@@ -42,6 +42,10 @@ const previous = () => {
   ipcRenderer.send('player-previous');
 };
 
+const restoreQueue = () => {
+  ipcRenderer.send('player-restore-data');
+};
+
 const saveQueue = (data: Record<string, any>) => {
   ipcRenderer.send('player-save-data', data);
 };
@@ -146,6 +150,10 @@ const rendererRestoreState = (cb: (event: IpcRendererEvent) => void) => {
   ipcRenderer.on('renderer-player-restore-queue', cb);
 };
 
+const rendererError = (cb: (event: IpcRendererEvent, data: string) => void) => {
+  ipcRenderer.on('renderer-player-error', cb);
+};
+
 export const mpvPlayer = {
   autoNext,
   currentTime,
@@ -157,6 +165,7 @@ export const mpvPlayer = {
   previous,
   quit,
   restart,
+  restoreQueue,
   saveQueue,
   seek,
   seekTo,
@@ -170,6 +179,7 @@ export const mpvPlayer = {
 export const mpvPlayerListener = {
   rendererAutoNext,
   rendererCurrentTime,
+  rendererError,
   rendererNext,
   rendererPause,
   rendererPlay,

@@ -191,6 +191,7 @@ const createWindow = async () => {
     minWidth: 640,
     show: false,
     webPreferences: {
+      allowRunningInsecureContent: !!store.get('ignore_ssl'),
       backgroundThrottling: false,
       contextIsolation: true,
       devTools: true,
@@ -198,7 +199,7 @@ const createWindow = async () => {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
-      webSecurity: store.get('ignore_cors') ? false : undefined,
+      webSecurity: !store.get('ignore_cors'),
     },
     width: 1440,
   });
@@ -240,25 +241,7 @@ const createWindow = async () => {
     disableMediaKeys();
   });
 
-  const globalMediaKeysEnabled = store.get('global_media_hotkeys') as boolean;
-
-  if (globalMediaKeysEnabled) {
-    enableMediaKeys(mainWindow);
-  }
-
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
-
-  mainWindow.on('ready-to-show', () => {
-    if (!mainWindow) {
-      throw new Error('"mainWindow" is not defined');
-    }
-    if (process.env.START_MINIMIZED) {
-      mainWindow.minimize();
-    } else {
-      mainWindow.show();
-      createWinThumbarButtons();
-    }
-
+  ipcMain.on('player-restore-data', () => {
     if (store.get('resume')) {
       const queueLocation = join(app.getPath('userData'), 'queue');
 
@@ -285,6 +268,26 @@ const createWindow = async () => {
           });
         });
       });
+    }
+  });
+
+  const globalMediaKeysEnabled = store.get('global_media_hotkeys') as boolean;
+
+  if (globalMediaKeysEnabled) {
+    enableMediaKeys(mainWindow);
+  }
+
+  mainWindow.loadURL(resolveHtmlPath('index.html'));
+
+  mainWindow.on('ready-to-show', () => {
+    if (!mainWindow) {
+      throw new Error('"mainWindow" is not defined');
+    }
+    if (process.env.START_MINIMIZED) {
+      mainWindow.minimize();
+    } else {
+      mainWindow.show();
+      createWinThumbarButtons();
     }
   });
 
@@ -411,15 +414,20 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
     params,
   );
 
-  console.log('Setting mpv properties: ', properties);
+  console.log('Setting MPV properties: ', properties);
   mpvInstance.setMultipleProperties(properties || {});
 
   mpvInstance.start().catch((error) => {
-    console.log('error starting mpv', error);
+    console.log('MPV Event: start error', error);
   });
 
-  mpvInstance.on('status', (status) => {
+  mpvInstance.on('status', (status, ...rest) => {
+    console.log('MPV Event: status', status.property, status.value, rest);
     if (status.property === 'playlist-pos') {
+      if (status.value === -1) {
+        mpvInstance?.stop();
+      }
+
       if (status.value !== 0) {
         getMainWindow()?.webContents.send('renderer-player-auto-next');
       }
@@ -428,22 +436,29 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
 
   // Automatically updates the play button when the player is playing
   mpvInstance.on('resumed', () => {
+    console.log('MPV Event: resumed');
     getMainWindow()?.webContents.send('renderer-player-play');
   });
 
   // Automatically updates the play button when the player is stopped
   mpvInstance.on('stopped', () => {
+    console.log('MPV Event: stopped');
     getMainWindow()?.webContents.send('renderer-player-stop');
   });
 
   // Automatically updates the play button when the player is paused
   mpvInstance.on('paused', () => {
+    console.log('MPV Event: paused');
     getMainWindow()?.webContents.send('renderer-player-pause');
   });
 
   // Event output every interval set by time_update, used to update the current time
   mpvInstance.on('timeposition', (time: number) => {
     getMainWindow()?.webContents.send('renderer-player-current-time', time);
+  });
+
+  mpvInstance.on('quit', () => {
+    console.log('MPV Event: quit');
   });
 };
 
@@ -477,6 +492,12 @@ ipcMain.on(
     createMpv(data);
   },
 );
+
+ipcMain.on('player-quit', async () => {
+  mpvInstance?.stop();
+  mpvInstance?.quit();
+  mpvInstance = null;
+});
 
 // Must duplicate with the one in renderer process settings.store.ts
 enum BindingActions {

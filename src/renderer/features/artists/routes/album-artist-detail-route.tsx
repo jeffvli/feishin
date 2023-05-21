@@ -28,7 +28,7 @@ const AlbumArtistDetailRoute = () => {
         id: [albumArtistId],
         type: LibraryItem.ALBUM_ARTIST,
       },
-      play: playButtonBehavior,
+      playType: playButtonBehavior,
     });
   };
 

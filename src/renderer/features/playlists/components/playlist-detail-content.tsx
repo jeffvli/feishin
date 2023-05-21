@@ -154,7 +154,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
         id: [playlistId],
         type: LibraryItem.PLAYLIST,
       },
-      play: playType || playButtonBehavior,
+      playType: playType || playButtonBehavior,
     });
   };
 
@@ -201,9 +201,14 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;
+
     handlePlayQueueAdd?.({
-      byData: [e.data],
-      play: playButtonBehavior,
+      byItemType: {
+        id: [playlistId],
+        type: LibraryItem.PLAYLIST,
+      },
+      initialSongId: e.data.id,
+      playType: playButtonBehavior,
     });
   };
 

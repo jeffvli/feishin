@@ -214,7 +214,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     if (!e.data) return;
     handlePlayQueueAdd?.({
       byData: [e.data],
-      play: playButtonBehavior,
+      playType: playButtonBehavior,
     });
   };
 

@@ -153,34 +153,34 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   });
 
   const handlePlay = useCallback(
-    (play: Play) => {
+    (playType: Play) => {
       switch (ctx.type) {
         case LibraryItem.ALBUM:
           handlePlayQueueAdd?.({
             byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
-            play,
+            playType,
           });
           break;
         case LibraryItem.ARTIST:
           handlePlayQueueAdd?.({
             byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
-            play,
+            playType,
           });
           break;
         case LibraryItem.ALBUM_ARTIST:
           handlePlayQueueAdd?.({
             byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
-            play,
+            playType,
           });
           break;
         case LibraryItem.SONG:
-          handlePlayQueueAdd?.({ byData: ctx.data, play });
+          handlePlayQueueAdd?.({ byData: ctx.data, playType });
           break;
         case LibraryItem.PLAYLIST:
           for (const item of ctx.data) {
             handlePlayQueueAdd?.({
               byItemType: { id: [item.id], type: ctx.type },
-              play,
+              playType,
             });
           }
 

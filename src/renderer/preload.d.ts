@@ -17,6 +17,7 @@ declare global {
         PLAYER_PAUSE(): void;
         PLAYER_PLAY(): void;
         PLAYER_PREVIOUS(): void;
+        PLAYER_RESTORE_DATA(): void;
         PLAYER_SAVE_QUEUE(data: PlayerState): void;
         PLAYER_SEEK(seconds: number): void;
         PLAYER_SEEK_TO(seconds: number): void;

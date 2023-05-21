@@ -165,7 +165,7 @@ export const AlbumListHeader = ({
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
 
-  const handlePlay = async (play: Play) => {
+  const handlePlay = async (playType: Play) => {
     if (!itemCount || itemCount === 0) return;
 
     const query = {
@@ -198,7 +198,7 @@ export const AlbumListHeader = ({
         id: albumIds,
         type: LibraryItem.ALBUM,
       },
-      play,
+      playType,
     });
   };
 

@@ -249,17 +249,19 @@ export const AlbumArtistDetailContent = () => {
         id: [albumArtistId],
         type: LibraryItem.ALBUM_ARTIST,
       },
-      play: playType || playButtonBehavior,
+      playType: playType || playButtonBehavior,
     });
   };
 
   const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
-    if (!e.data) return;
+    if (!e.data || !topSongsQuery?.data) return;
+
     handlePlayQueueAdd?.({
-      byData: [e.data],
-      play: playButtonBehavior,
+      byData: topSongsQuery?.data?.items || [],
+      initialSongId: e.data.id,
+      playType: playButtonBehavior,
     });
   };
 

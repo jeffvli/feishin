@@ -89,14 +89,14 @@ export const LibraryCommandItem = ({
   }
 
   const handlePlay = useCallback(
-    (e: MouseEvent, id: string, play: Play) => {
+    (e: MouseEvent, id: string, playType: Play) => {
       e.stopPropagation();
       handlePlayQueueAdd?.({
         byItemType: {
           id,
           type: itemType,
         },
-        play,
+        playType,
       });
     },
     [handlePlayQueueAdd, itemType],

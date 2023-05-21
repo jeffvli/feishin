@@ -30,7 +30,7 @@ const AlbumDetailRoute = () => {
         id: [albumId],
         type: LibraryItem.ALBUM,
       },
-      play: playButtonBehavior,
+      playType: playButtonBehavior,
     });
   };
 

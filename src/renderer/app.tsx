@@ -8,7 +8,7 @@ import { initSimpleImg } from 'react-simple-img';
 import { BaseContextModal } from './components';
 import { useTheme } from './hooks';
 import { AppRouter } from './router/app-router';
-import { useHotkeySettings, useSettingsStore } from './store/settings.store';
+import { useHotkeySettings, usePlaybackSettings, useSettingsStore } from './store/settings.store';
 import './styles/global.scss';
 import '@ag-grid-community/styles/ag-grid.css';
 import { ContextMenuProvider } from '/@/renderer/features/context-menu';
@@ -18,6 +18,7 @@ import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
 import isElectron from 'is-electron';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
 import { usePlayerStore } from '/@/renderer/store';
+import { PlaybackType } from '/@/renderer/types';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -29,6 +30,7 @@ const ipc = isElectron() ? window.electron.ipc : null;
 export const App = () => {
   const theme = useTheme();
   const contentFont = useSettingsStore((state) => state.general.fontContent);
+  const { type: playbackType } = usePlaybackSettings();
   const { bindings } = useHotkeySettings();
   const handlePlayQueueAdd = useHandlePlayQueueAdd();
 
@@ -39,17 +41,23 @@ export const App = () => {
 
   // Start the mpv instance on startup
   useEffect(() => {
-    const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
-    const properties = {
-      ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
-      volume: usePlayerStore.getState().volume || 50,
-    };
+    if (isElectron() && playbackType === PlaybackType.LOCAL) {
+      const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
+      const properties = {
+        ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
+        volume: usePlayerStore.getState().volume || 50,
+      };
 
-    mpvPlayer?.initialize({
-      extraParameters,
-      properties,
-    });
-  }, []);
+      mpvPlayer?.initialize({
+        extraParameters,
+        properties,
+      });
+    }
+
+    return () => {
+      mpvPlayer?.quit();
+    };
+  }, [playbackType]);
 
   useEffect(() => {
     if (isElectron()) {

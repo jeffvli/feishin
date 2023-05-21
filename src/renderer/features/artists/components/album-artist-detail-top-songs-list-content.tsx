@@ -34,9 +34,17 @@ export const AlbumArtistDetailTopSongsListContent = ({
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;
+
+    const rowData: QueueSong[] = [];
+    e.api.forEachNode((node) => {
+      if (!node.data) return;
+      rowData.push(node.data);
+    });
+
     handlePlayQueueAdd?.({
-      byData: [e.data],
-      play: playButtonBehavior,
+      byData: rowData,
+      initialSongId: e.data.id,
+      playType: playButtonBehavior,
     });
   };
 

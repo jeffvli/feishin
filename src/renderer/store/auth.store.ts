@@ -1,6 +1,6 @@
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid/non-secure';
-import create from 'zustand';
+import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { useAlbumArtistListDataStore } from '/@/renderer/store/album-artist-list-data.store';

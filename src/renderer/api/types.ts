@@ -167,7 +167,7 @@ export type Album = {
 } & { songs?: Song[] };
 
 export type Song = {
-  album: string | undefined;
+  album: string | null;
   albumArtists: RelatedArtist[];
   albumId: string;
   artistName: string;

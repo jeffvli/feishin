@@ -35,7 +35,7 @@ const PlaylistDetailRoute = () => {
         id: [playlistId],
         type: LibraryItem.PLAYLIST,
       },
-      play: playButtonBehavior,
+      playType: playButtonBehavior,
     });
   };
 

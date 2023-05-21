@@ -31,7 +31,7 @@ export const PlaylistDetailSongListHeader = ({
   const handlePlay = async (playType: Play) => {
     handlePlayQueueAdd?.({
       byItemType: { id: [playlistId], type: LibraryItem.PLAYLIST },
-      play: playType,
+      playType,
     });
   };
 
