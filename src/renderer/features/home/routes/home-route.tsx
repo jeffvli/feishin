@@ -137,10 +137,11 @@ const HomeRoute = () => {
       >
         <Box
           ref={cq.ref}
+          mb="5rem"
           pt={windowBarStyle === Platform.WEB ? '5rem' : '3rem'}
           px="2rem"
         >
-          <Stack spacing={35}>
+          <Stack spacing="lg">
             <FeatureCarousel data={featureItemsWithImage} />
             {carousels
               .filter((carousel) => {
