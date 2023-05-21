@@ -12,6 +12,7 @@ import {
   RiSkipBackFill,
   RiSkipForwardFill,
   RiSpeedFill,
+  RiStopFill,
 } from 'react-icons/ri';
 import styled from 'styled-components';
 import { Text } from '/@/renderer/components';
@@ -145,6 +146,15 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     <>
       <ControlsContainer>
         <ButtonsContainer>
+          <PlayerButton
+            icon={<RiStopFill size={15} />}
+            tooltip={{
+              label: 'Stop',
+              openDelay: 500,
+            }}
+            variant="tertiary"
+            onClick={handleStop}
+          />
           <PlayerButton
             $isActive={shuffle !== PlayerShuffle.NONE}
             icon={<RiShuffleFill size={15} />}

@@ -116,7 +116,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
     mprisUpdateSong({ status: PlayerStatus.PAUSED });
 
     if (isMpvPlayer) {
-      mpvPlayer.stop();
+      mpvPlayer.pause();
+      mpvPlayer.seekTo(0);
     } else {
       stopPlayback();
     }
