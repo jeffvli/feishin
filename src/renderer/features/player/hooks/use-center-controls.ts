@@ -4,7 +4,6 @@ import { useCallback, useEffect } from 'react';
 import isElectron from 'is-electron';
 import { PlaybackType, PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/renderer/types';
 import {
-  PlayerState,
   useCurrentPlayer,
   useCurrentStatus,
   useDefaultQueue,
@@ -531,18 +530,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
     mpvPlayer.quit();
   }, []);
 
-  const handleSave = useCallback(() => {
-    const { actions, ...rest } = usePlayerStore.getState();
-    mpvPlayer.saveQueue(rest);
-  }, []);
-
-  const handleRestore = useCallback((state: PlayerState) => {
-    // const { current, ...rest } = state;
-    usePlayerStore.setState(state);
-    const playerData = usePlayerStore.getState().actions.getPlayerData();
-    mpvPlayer.setQueue(playerData);
-  }, []);
-
   const handleError = useCallback(
     (message: string) => {
       toast.error({ id: 'mpv-error', message, title: 'An error occurred during playback' });
@@ -598,14 +585,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
         handleToggleRepeat();
       });
 
-      mpvPlayerListener.rendererSaveQueue(() => {
-        handleSave();
-      });
-
-      mpvPlayerListener.rendererRestoreQueue((_event: any, data: PlayerState) => {
-        handleRestore(data);
-      });
-
       mpvPlayerListener.rendererError((_event: any, message: string) => {
         handleError(message);
       });
@@ -621,8 +600,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
       ipc?.removeAllListeners('renderer-player-current-time');
       ipc?.removeAllListeners('renderer-player-auto-next');
       ipc?.removeAllListeners('renderer-player-quit');
-      ipc?.removeAllListeners('renderer-player-restore-queue');
-      ipc?.removeAllListeners('renderer-player-save-queue');
       ipc?.removeAllListeners('renderer-player-toggle-shuffle');
       ipc?.removeAllListeners('renderer-player-toggle-repeat');
       ipc?.removeAllListeners('renderer-player-error');
@@ -637,8 +614,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
     handlePlayPause,
     handlePrevTrack,
     handleQuit,
-    handleRestore,
-    handleSave,
     handleStop,
     handleToggleRepeat,
     handleToggleShuffle,
@@ -665,12 +640,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
     }
 
     return () => {};
-  }, []);
-
-  useEffect(() => {
-    if (isElectron()) {
-      mpvPlayer.restoreQueue();
-    }
   }, []);
 
   useEffect(() => {
