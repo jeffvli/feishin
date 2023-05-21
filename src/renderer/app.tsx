@@ -87,7 +87,6 @@ export const App = () => {
         const playerData = restoreQueue(data);
         if (playbackType === PlaybackType.LOCAL) {
           mpvPlayer.setQueue(playerData, true);
-          mpvPlayer.pause();
         }
       });
     }
