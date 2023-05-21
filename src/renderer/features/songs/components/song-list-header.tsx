@@ -113,10 +113,7 @@ export const SongListHeader = ({ title, itemCount, tableRef }: SongListHeaderPro
         </Flex>
       </PageHeader>
       <FilterBar>
-        <SongListHeaderFilters
-          itemCount={itemCount}
-          tableRef={tableRef}
-        />
+        <SongListHeaderFilters tableRef={tableRef} />
       </FilterBar>
     </Stack>
   );

@@ -17,9 +17,8 @@ import {
 } from 'react-icons/ri';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
+import { SongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { DropdownMenu, Button, Slider, MultiSelect, Switch, Text } from '/@/renderer/components';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useMusicFolders } from '/@/renderer/features/shared';
 import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jellyfin-song-filters';
 import { NavidromeSongFilters } from '/@/renderer/features/songs/components/navidrome-song-filters';
@@ -74,23 +73,16 @@ const ORDER = [
 ];
 
 interface SongListHeaderFiltersProps {
-  customFilters?: Partial<SongListFilter>;
-  itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SongListHeaderFilters = ({
-  customFilters,
-  itemCount,
-  tableRef,
-}: SongListHeaderFiltersProps) => {
+export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) => {
   const server = useCurrentServer();
-  const { id, pageKey } = useSongListContext();
+  const { id, pageKey, handlePlay } = useSongListContext();
   const { display, table } = useSongListStore({ id, key: pageKey });
   const { setFilter, setTable, setTablePagination, setDisplayType } = useListStoreActions();
   const filter = useSongListFilter({ id, key: pageKey });
 
-  const handlePlayQueueAdd = usePlayQueueAdd();
   const cq = useContainerQuery();
 
   const musicFoldersQuery = useMusicFolders({ query: null, serverId: server?.id });
@@ -117,7 +109,6 @@ export const SongListHeaderFilters = ({
             limit,
             startIndex,
             ...pageFilters,
-            ...customFilters,
           };
 
           const queryKey = queryKeys.songs.list(server?.id || '', query);
@@ -144,7 +135,7 @@ export const SongListHeaderFilters = ({
       tableRef.current?.api.ensureIndexVisible(0, 'top');
       setTablePagination({ data: { currentPage: 0 }, key: pageKey });
     },
-    [customFilters, filter, pageKey, server, setTablePagination, tableRef],
+    [filter, pageKey, server, setTablePagination, tableRef],
   );
 
   const handleSetSortBy = useCallback(
@@ -259,31 +250,6 @@ export const SongListHeaderFilters = ({
   const handleRefresh = () => {
     queryClient.invalidateQueries(queryKeys.songs.list(server?.id || ''));
     handleFilterChange(filter);
-  };
-
-  const handlePlay = async (playType: Play) => {
-    if (!itemCount || itemCount === 0) return;
-    const query: SongListQuery = { startIndex: 0, ...filter, ...customFilters };
-
-    if (id) {
-      handlePlayQueueAdd?.({
-        byItemType: {
-          id: [id],
-          type: LibraryItem.ALBUM_ARTIST,
-        },
-        playType,
-        query,
-      });
-    } else {
-      handlePlayQueueAdd?.({
-        byItemType: {
-          id: [],
-          type: LibraryItem.SONG,
-        },
-        playType,
-        query,
-      });
-    }
   };
 
   const handleOpenFiltersModal = () => {
@@ -415,19 +381,19 @@ export const SongListHeaderFilters = ({
           <DropdownMenu.Dropdown>
             <DropdownMenu.Item
               icon={<RiPlayFill />}
-              onClick={() => handlePlay(Play.NOW)}
+              onClick={() => handlePlay?.({ playType: Play.NOW })}
             >
               Play
             </DropdownMenu.Item>
             <DropdownMenu.Item
               icon={<RiAddBoxFill />}
-              onClick={() => handlePlay(Play.LAST)}
+              onClick={() => handlePlay?.({ playType: Play.LAST })}
             >
               Add to queue
             </DropdownMenu.Item>
             <DropdownMenu.Item
               icon={<RiAddCircleFill />}
-              onClick={() => handlePlay(Play.NEXT)}
+              onClick={() => handlePlay?.({ playType: Play.NEXT })}
             >
               Add to queue next
             </DropdownMenu.Item>
