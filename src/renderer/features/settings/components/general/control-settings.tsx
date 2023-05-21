@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { Group } from '@mantine/core';
 import { Select, Tooltip, NumberInput, Switch, Slider } from '/@/renderer/components';
 import { SettingsSection } from '/@/renderer/features/settings/components/settings-section';
@@ -7,6 +8,8 @@ import {
   useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
+
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const SIDE_QUEUE_OPTIONS = [
   { label: 'Fixed', value: 'sideQueue' },
@@ -169,6 +172,26 @@ export const ControlSettings = () => {
         'The amount of volume to change when scrolling the mouse wheel on the volume slider',
       isHidden: false,
       title: 'Volume wheel step',
+    },
+    {
+      control: (
+        <Switch
+          defaultChecked={settings.resume}
+          disabled={!isElectron()}
+          onChange={(e) => {
+            localSettings?.set('resume', e.target.checked);
+            setSettings({
+              general: {
+                ...settings,
+                resume: e.currentTarget.checked,
+              },
+            });
+          }}
+        />
+      ),
+      description: 'When exiting, save the current play queue and restore it when reopening',
+      isHidden: false,
+      title: 'Save queue state on close',
     },
   ];
 

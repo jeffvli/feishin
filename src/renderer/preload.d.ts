@@ -1,5 +1,5 @@
 import { IpcRendererEvent } from 'electron';
-import { PlayerData } from './store';
+import { PlayerData, PlayerState } from './store';
 
 declare global {
   interface Window {
@@ -17,6 +17,7 @@ declare global {
         PLAYER_PAUSE(): void;
         PLAYER_PLAY(): void;
         PLAYER_PREVIOUS(): void;
+        PLAYER_SAVE_QUEUE(data: PlayerState): void;
         PLAYER_SEEK(seconds: number): void;
         PLAYER_SEEK_TO(seconds: number): void;
         PLAYER_SET_QUEUE(data: PlayerData): void;
@@ -30,6 +31,8 @@ declare global {
         RENDERER_PLAYER_PLAY(cb: (event: IpcRendererEvent, data: any) => void): void;
         RENDERER_PLAYER_PLAY_PAUSE(cb: (event: IpcRendererEvent, data: any) => void): void;
         RENDERER_PLAYER_PREVIOUS(cb: (event: IpcRendererEvent, data: any) => void): void;
+        RENDERER_PLAYER_RESTORE_QUEUE(cb: (event: IpcRendererEvent, data: any) => void): void;
+        RENDERER_PLAYER_SAVE_QUEUE(cb: (event: IpcRendererEvent, data: any) => void): void;
         RENDERER_PLAYER_STOP(cb: (event: IpcRendererEvent, data: any) => void): void;
         SETTINGS_GET(data: { property: string }): any;
         SETTINGS_SET(data: { property: string; value: any }): void;
