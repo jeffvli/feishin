@@ -96,7 +96,7 @@ export const usePlayerStore = create<PlayerSlice>()(
         immer((set, get) => ({
           actions: {
             addToQueue: (args) => {
-              const { playType, songs } = args;
+              const { initialIndex, playType, songs } = args;
               const { shuffledIndex } = get().current;
               const shuffledQueue = get().queue.shuffled;
               const queueSongs = map(songs, (song) => ({
@@ -107,29 +107,30 @@ export const usePlayerStore = create<PlayerSlice>()(
               if (playType === Play.NOW) {
                 if (get().shuffle === PlayerShuffle.TRACK) {
                   const shuffledSongs = shuffle(queueSongs);
-                  const foundIndex = queueSongs.findIndex(
-                    (song) => song.uniqueId === shuffledSongs[0].uniqueId,
+                  const index = initialIndex || 0;
+                  const initialSongUniqueId = queueSongs[index].uniqueId;
+                  const initialSongIndex = shuffledSongs.findIndex(
+                    (song) => song.uniqueId === initialSongUniqueId,
                   );
-                  set((state) => {
-                    state.queue.shuffled = shuffledSongs.map((song) => song.uniqueId);
-                  });
 
                   set((state) => {
+                    state.queue.shuffled = shuffledSongs.map((song) => song.uniqueId);
                     state.queue.default = queueSongs;
                     state.current.time = 0;
                     state.current.player = 1;
-                    state.current.index = foundIndex;
+                    state.current.index = initialSongIndex;
                     state.current.shuffledIndex = 0;
-                    state.current.song = shuffledSongs[0];
+                    state.current.song = shuffledSongs[initialSongIndex];
                   });
                 } else {
+                  const index = initialIndex || 0;
                   set((state) => {
                     state.queue.default = queueSongs;
                     state.current.time = 0;
                     state.current.player = 1;
-                    state.current.index = 0;
+                    state.current.index = index;
                     state.current.shuffledIndex = 0;
-                    state.current.song = queueSongs[0];
+                    state.current.song = queueSongs[index];
                   });
                 }
               } else if (playType === Play.LAST) {
