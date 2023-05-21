@@ -62,7 +62,9 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
 
   & .mantine-Button-leftIcon {
     display: flex;
+    height: 100%;
     margin-right: 0.5rem;
+    transform: translateY(-0.1rem);
   }
 
   .mantine-Button-rightIcon {
