@@ -93,7 +93,7 @@ export const LibraryCommandItem = ({
       e.stopPropagation();
       handlePlayQueueAdd?.({
         byItemType: {
-          id,
+          id: [id],
           type: itemType,
         },
         playType,
