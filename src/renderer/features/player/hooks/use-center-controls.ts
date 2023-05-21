@@ -668,7 +668,9 @@ export const useCenterControls = (args: { playersRef: any }) => {
   }, []);
 
   useEffect(() => {
-    mpvPlayer.restoreQueue();
+    if (isElectron()) {
+      mpvPlayer.restoreQueue();
+    }
   }, []);
 
   useEffect(() => {
