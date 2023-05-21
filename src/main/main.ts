@@ -189,6 +189,7 @@ const createWindow = async () => {
     minWidth: 640,
     show: false,
     webPreferences: {
+      allowRunningInsecureContent: !!store.get('ignore_ssl'),
       backgroundThrottling: false,
       contextIsolation: true,
       devTools: true,
@@ -196,7 +197,7 @@ const createWindow = async () => {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
-      webSecurity: store.get('ignore_cors') ? false : undefined,
+      webSecurity: !store.get('ignore_cors'),
     },
     width: 1440,
   });
