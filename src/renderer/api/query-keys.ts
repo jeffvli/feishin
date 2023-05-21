@@ -1,3 +1,4 @@
+import { QueryFunctionContext } from '@tanstack/react-query';
 import type {
   AlbumListQuery,
   SongListQuery,
@@ -14,7 +15,10 @@ import type {
   SongDetailQuery,
 } from './types';
 
-export const queryKeys = {
+export const queryKeys: Record<
+  string,
+  Record<string, (...props: any) => QueryFunctionContext['queryKey']>
+> = {
   albumArtists: {
     detail: (serverId: string, query?: AlbumArtistDetailQuery) => {
       if (query) return [serverId, 'albumArtists', 'detail', query] as const;
