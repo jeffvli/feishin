@@ -93,6 +93,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     mprisUpdateSong({ status: PlayerStatus.PLAYING });
 
     if (isMpvPlayer) {
+      mpvPlayer?.volume(usePlayerStore.getState().volume);
       mpvPlayer.play();
     } else {
       currentPlayerRef.getInternalPlayer().play();

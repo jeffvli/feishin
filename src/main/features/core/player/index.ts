@@ -87,6 +87,8 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
 
   if (pause) {
     await getMpvInstance()?.pause();
+  } else {
+    await getMpvInstance()?.play();
   }
 });
 
