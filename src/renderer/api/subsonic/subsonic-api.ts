@@ -41,6 +41,14 @@ export const contract = c.router({
       200: ssType._response.musicFolderList,
     },
   },
+  getRandomSongList: {
+    method: 'GET',
+    path: 'getRandomSongs.view',
+    query: ssType._parameters.randomSongList,
+    responses: {
+      200: ssType._response.randomSongList,
+    },
+  },
   getTopSongsList: {
     method: 'GET',
     path: 'getTopSongs.view',

@@ -42,12 +42,15 @@ import {
   PlaylistListResponse,
   SearchArgs,
   SearchResponse,
+  RandomSongListResponse,
+  RandomSongListArgs,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
 import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
 import packageJson from '../../../../package.json';
 import { z } from 'zod';
+import { JFSongListSort, JFSortOrder } from '/@/renderer/api/jellyfin.types';
 
 const formatCommaDelimitedString = (value: string[]) => {
   return value.join(',');
@@ -798,6 +801,50 @@ const search = async (args: SearchArgs): Promise<SearchResponse> => {
   };
 };
 
+const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongListResponse> => {
+  const { query, apiClientProps } = args;
+
+  if (!apiClientProps.server?.userId) {
+    throw new Error('No userId found');
+  }
+
+  const yearsGroup = [];
+  if (query.minYear && query.maxYear) {
+    for (let i = Number(query.minYear); i <= Number(query.maxYear); i += 1) {
+      yearsGroup.push(String(i));
+    }
+  }
+
+  const yearsFilter = yearsGroup.length ? formatCommaDelimitedString(yearsGroup) : undefined;
+
+  const res = await jfApiClient(apiClientProps).getSongList({
+    params: {
+      userId: apiClientProps.server?.userId,
+    },
+    query: {
+      Fields: 'Genres, DateCreated, MediaSources, ParentId',
+      GenreIds: query.genre ? query.genre : undefined,
+      IncludeItemTypes: 'Audio',
+      Limit: query.limit,
+      ParentId: query.musicFolderId,
+      Recursive: true,
+      SortBy: JFSongListSort.RANDOM,
+      SortOrder: JFSortOrder.ASC,
+      StartIndex: 0,
+      Years: yearsFilter,
+    },
+  });
+
+  if (res.status !== 200) {
+    throw new Error('Failed to get random songs');
+  }
+
+  return {
+    items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
+    startIndex: 0,
+    totalRecordCount: res.body.Items.length || 0,
+  };
+};
 export const jfController = {
   addToPlaylist,
   authenticate,
@@ -815,6 +862,7 @@ export const jfController = {
   getPlaylistDetail,
   getPlaylistList,
   getPlaylistSongList,
+  getRandomSongList,
   getSongList,
   getTopSongList,
   removeFromPlaylist,

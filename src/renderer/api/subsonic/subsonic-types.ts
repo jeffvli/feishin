@@ -192,12 +192,27 @@ const search3Parameters = z.object({
   songOffset: z.number().optional(),
 });
 
+const randomSongListParameters = z.object({
+  fromYear: z.number().optional(),
+  genre: z.string().optional(),
+  musicFolderId: z.string().optional(),
+  size: z.number().optional(),
+  toYear: z.number().optional(),
+});
+
+const randomSongList = z.object({
+  randomSongs: z.object({
+    song: z.array(song),
+  }),
+});
+
 export const ssType = {
   _parameters: {
     albumList: albumListParameters,
     artistInfo: artistInfoParameters,
     authenticate: authenticateParameters,
     createFavorite: createFavoriteParameters,
+    randomSongList: randomSongListParameters,
     removeFavorite: removeFavoriteParameters,
     scrobble: scrobbleParameters,
     search3: search3Parameters,
@@ -214,6 +229,7 @@ export const ssType = {
     baseResponse,
     createFavorite,
     musicFolderList,
+    randomSongList,
     removeFavorite,
     scrobble,
     search3,

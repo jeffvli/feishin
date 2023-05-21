@@ -1002,6 +1002,20 @@ export type SearchResponse = {
   songs: Song[];
 };
 
+export type RandomSongListQuery = {
+  genre?: string;
+  limit?: number;
+  maxYear?: number;
+  minYear?: number;
+  musicFolderId?: string;
+};
+
+export type RandomSongListArgs = {
+  query: RandomSongListQuery;
+} & BaseEndpointArgs;
+
+export type RandomSongListResponse = SongListResponse;
+
 export const instanceOfCancellationError = (error: any) => {
   return 'revert' in error;
 };

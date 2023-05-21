@@ -13,6 +13,7 @@ import type {
   TopSongListQuery,
   SearchQuery,
   SongDetailQuery,
+  RandomSongListQuery,
 } from './types';
 
 export const queryKeys: Record<
@@ -76,8 +77,8 @@ export const queryKeys: Record<
       return [serverId, 'playlists', 'list'] as const;
     },
     root: (serverId: string) => [serverId, 'playlists'] as const,
-    songList: (serverId: string, id: string, query?: PlaylistSongListQuery) => {
-      if (query) return [serverId, 'playlists', id, 'songList', query] as const;
+    songList: (serverId: string, id?: string, query?: PlaylistSongListQuery) => {
+      if (query && id) return [serverId, 'playlists', id, 'songList', query] as const;
       if (id) return [serverId, 'playlists', id, 'songList'] as const;
       return [serverId, 'playlists', 'songList'] as const;
     },
@@ -100,6 +101,10 @@ export const queryKeys: Record<
     list: (serverId: string, query?: SongListQuery) => {
       if (query) return [serverId, 'songs', 'list', query] as const;
       return [serverId, 'songs', 'list'] as const;
+    },
+    randomSongList: (serverId: string, query?: RandomSongListQuery) => {
+      if (query) return [serverId, 'songs', 'randomSongList', query] as const;
+      return [serverId, 'songs', 'randomSongList'] as const;
     },
     root: (serverId: string) => [serverId, 'songs'] as const,
   },

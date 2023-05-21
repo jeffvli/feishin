@@ -19,6 +19,8 @@ import {
   TopSongListArgs,
   SearchArgs,
   SearchResponse,
+  RandomSongListResponse,
+  RandomSongListArgs,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -339,11 +341,40 @@ const search3 = async (args: SearchArgs): Promise<SearchResponse> => {
   };
 };
 
+const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongListResponse> => {
+  const { query, apiClientProps } = args;
+
+  const res = await ssApiClient(apiClientProps).getRandomSongList({
+    query: {
+      fromYear: query.minYear,
+      genre: query.genre,
+      musicFolderId: query.musicFolderId,
+      size: query.limit,
+      toYear: query.maxYear,
+    },
+  });
+
+  if (res.status !== 200) {
+    throw new Error('Failed to get random songs');
+  }
+
+  console.log('res', res);
+
+  return {
+    items: res.body.randomSongs?.song?.map((song) =>
+      ssNormalize.song(song, apiClientProps.server, ''),
+    ),
+    startIndex: 0,
+    totalRecordCount: res.body.randomSongs?.song?.length || 0,
+  };
+};
+
 export const ssController = {
   authenticate,
   createFavorite,
   getArtistInfo,
   getMusicFolderList,
+  getRandomSongList,
   getTopSongList,
   removeFavorite,
   scrobble,

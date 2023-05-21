@@ -48,7 +48,7 @@ import type {
   SearchResponse,
 } from '/@/renderer/api/types';
 import { ServerType } from '/@/renderer/types';
-import { DeletePlaylistResponse } from './types';
+import { DeletePlaylistResponse, RandomSongListArgs } from './types';
 import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
 import { ssController } from '/@/renderer/api/subsonic/subsonic-controller';
 import { jfController } from '/@/renderer/api/jellyfin/jellyfin-controller';
@@ -80,6 +80,7 @@ export type ControllerEndpoint = Partial<{
   getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
   getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
   getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
+  getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
   getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
   getSongList: (args: SongListArgs) => Promise<SongListResponse>;
   getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
@@ -122,6 +123,7 @@ const endpoints: ApiController = {
     getPlaylistDetail: jfController.getPlaylistDetail,
     getPlaylistList: jfController.getPlaylistList,
     getPlaylistSongList: jfController.getPlaylistSongList,
+    getRandomSongList: jfController.getRandomSongList,
     getSongDetail: undefined,
     getSongList: jfController.getSongList,
     getTopSongs: jfController.getTopSongList,
@@ -156,6 +158,7 @@ const endpoints: ApiController = {
     getPlaylistDetail: ndController.getPlaylistDetail,
     getPlaylistList: ndController.getPlaylistList,
     getPlaylistSongList: ndController.getPlaylistSongList,
+    getRandomSongList: ssController.getRandomSongList,
     getSongDetail: ndController.getSongDetail,
     getSongList: ndController.getSongList,
     getTopSongs: ssController.getTopSongList,
@@ -436,6 +439,15 @@ const search = async (args: SearchArgs) => {
   )?.(args);
 };
 
+const getRandomSongList = async (args: RandomSongListArgs) => {
+  return (
+    apiController(
+      'getRandomSongList',
+      args.apiClientProps.server?.type,
+    ) as ControllerEndpoint['getRandomSongList']
+  )?.(args);
+};
+
 export const controller = {
   addToPlaylist,
   authenticate,
@@ -453,6 +465,7 @@ export const controller = {
   getPlaylistDetail,
   getPlaylistList,
   getPlaylistSongList,
+  getRandomSongList,
   getSongDetail,
   getSongList,
   getTopSongList,
