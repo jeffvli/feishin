@@ -39,6 +39,7 @@ labels: 'bug'
 
 <!--- Include as many relevant details about the environment you experienced the bug in -->
 
-- Application version :
-- Operating System and version :
+- Application version (e.g. v0.1.0) :
+- Operating System and version (e.g. Windows 10) :
+- Server and version (e.g. Navidrome v0.48.0) :
 - Node version (if developing locally) :
