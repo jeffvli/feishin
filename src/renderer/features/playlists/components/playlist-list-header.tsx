@@ -1,10 +1,14 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Stack } from '@mantine/core';
+import { openModal, closeAllModals } from '@mantine/modals';
 import { MutableRefObject } from 'react';
-import { PageHeader, SpinnerIcon, Paper } from '/@/renderer/components';
+import { PageHeader, SpinnerIcon, Paper, Button } from '/@/renderer/components';
+import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { PlaylistListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-list-header-filters';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
+import { useCurrentServer } from '/@/renderer/store';
+import { ServerType } from '/@/renderer/types';
 
 interface PlaylistListHeaderProps {
   itemCount?: number;
@@ -13,6 +17,18 @@ interface PlaylistListHeaderProps {
 
 export const PlaylistListHeader = ({ itemCount, tableRef }: PlaylistListHeaderProps) => {
   const cq = useContainerQuery();
+  const server = useCurrentServer();
+
+  const handleCreatePlaylistModal = () => {
+    openModal({
+      children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
+      onClose: () => {
+        tableRef?.current?.api?.purgeInfiniteCache();
+      },
+      size: server?.type === ServerType?.NAVIDROME ? 'lg' : 'sm',
+      title: 'Create Playlist',
+    });
+  };
 
   return (
     <Stack
@@ -20,7 +36,11 @@ export const PlaylistListHeader = ({ itemCount, tableRef }: PlaylistListHeaderPr
       spacing={0}
     >
       <PageHeader backgroundColor="var(--titlebar-bg)">
-        <Flex justify="space-between">
+        <Flex
+          align="center"
+          justify="space-between"
+          w="100%"
+        >
           <LibraryHeaderBar>
             <LibraryHeaderBar.Title>Playlists</LibraryHeaderBar.Title>
             <Paper
@@ -32,6 +52,7 @@ export const PlaylistListHeader = ({ itemCount, tableRef }: PlaylistListHeaderPr
               {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
             </Paper>
           </LibraryHeaderBar>
+          <Button onClick={handleCreatePlaylistModal}>Create playlist</Button>
         </Flex>
       </PageHeader>
       <Paper p="1rem">
