@@ -72,8 +72,8 @@
   --btn-outline-bg-hover: transparent;
   --btn-outline-fg: rgb(220, 220, 220);
   --btn-outline-fg-hover: rgb(255, 255, 255);
-  --btn-outline-border: 1px rgba(140, 140, 140, 0.5) solid;
-  --btn-outline-radius: 1px;
+  --btn-outline-border: 2px rgba(140, 140, 140, 0.5) solid;
+  --btn-outline-radius: 12px;
 
   --input-bg: rgb(35, 35, 35);
   --input-fg: rgb(193, 193, 193);
@@ -104,9 +104,9 @@
 
   --modal-bg: var(--main-bg);
 
-  --badge-bg: rgb(0, 0, 0);
+  --badge-bg: rgb(80, 80, 80);
   --badge-fg: rgb(255, 255, 255);
-  --badge-radius: 0;
+  --badge-radius: 12px;
 
   --paper-bg: rgb(20, 20, 20);
 
