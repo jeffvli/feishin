@@ -88,7 +88,7 @@ body[data-theme='defaultLight'] {
 
   --modal-bg: rgb(255, 255, 255);
 
-  --paper-bg: rgb(235, 235, 235);
+  --paper-bg: rgb(240, 240, 240);
 
   --placeholder-bg: rgba(204, 204, 204, 0.5);
   --placeholder-fg: rgb(126, 126, 126);
@@ -107,8 +107,8 @@ body[data-theme='defaultLight'] {
   --table-bg: var(--main-bg);
   --table-alt-bg: var(--main-bg);
   --table-fg: rgb(179, 179, 179);
-  --table-row-hover-bg: rgba(100, 100, 100, 0.2);
-  --table-row-selected-bg: rgba(100, 100, 100, 0.4);
+  --table-row-hover-bg: rgba(150, 150, 150, 0.2);
+  --table-row-selected-bg: rgba(150, 150, 150, 0.3);
 
   .ag-theme-alpine-dark {
     --ag-font-family: var(--content-font-family);
