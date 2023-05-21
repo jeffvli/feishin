@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { getMpvInstance } from '../../../main';
+import { getMainWindow, getMpvInstance } from '../../../main';
 import { PlayerData } from '/@/renderer/store';
 
 declare module 'node-mpv';
@@ -60,21 +60,28 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData) => {
   }
 
   let complete = false;
+  let tryAttempts = 0;
 
   while (!complete) {
-    try {
-      if (data.queue.current) {
-        await getMpvInstance()?.load(data.queue.current.streamUrl, 'replace');
-      }
-
-      if (data.queue.next) {
-        await getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
-      }
-
+    if (tryAttempts > 3) {
+      getMainWindow()?.webContents.send('renderer-player-error', 'Failed to load song');
       complete = true;
-    } catch (err) {
-      console.error(err);
-      await wait(500);
+    } else {
+      try {
+        if (data.queue.current) {
+          await getMpvInstance()?.load(data.queue.current.streamUrl, 'replace');
+        }
+
+        if (data.queue.next) {
+          await getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
+        }
+
+        complete = true;
+      } catch (err) {
+        console.error(err);
+        tryAttempts += 1;
+        await wait(500);
+      }
     }
   }
 });

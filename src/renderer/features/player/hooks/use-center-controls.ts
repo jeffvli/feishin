@@ -15,6 +15,7 @@ import { usePlayerType, useSettingsStore } from '/@/renderer/store/settings.stor
 import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
 import debounce from 'lodash/debounce';
 import { QueueSong } from '/@/renderer/api/types';
+import { toast } from '/@/renderer/components';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
@@ -527,6 +528,15 @@ export const useCenterControls = (args: { playersRef: any }) => {
     mpvPlayer.quit();
   }, []);
 
+  const handleError = useCallback(
+    (message: string) => {
+      toast.error({ id: 'mpv-error', message, title: 'An error occurred during playback' });
+      pause();
+      mpvPlayer.pause();
+    },
+    [pause],
+  );
+
   useEffect(() => {
     if (isElectron()) {
       mpvPlayerListener.rendererPlayPause(() => {
@@ -572,6 +582,10 @@ export const useCenterControls = (args: { playersRef: any }) => {
       mpvPlayerListener.rendererToggleRepeat(() => {
         handleToggleRepeat();
       });
+
+      mpvPlayerListener.rendererError((_event: any, message: string) => {
+        handleError(message);
+      });
     }
 
     return () => {
@@ -586,10 +600,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
       ipc?.removeAllListeners('renderer-player-quit');
       ipc?.removeAllListeners('renderer-player-toggle-shuffle');
       ipc?.removeAllListeners('renderer-player-toggle-repeat');
+      ipc?.removeAllListeners('renderer-player-error');
     };
   }, [
     autoNext,
     handleAutoNext,
+    handleError,
     handleNextTrack,
     handlePause,
     handlePlay,

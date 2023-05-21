@@ -421,6 +421,12 @@ ipcMain.on(
   },
 );
 
+ipcMain.on('player-quit', async () => {
+  mpvInstance?.stop();
+  mpvInstance?.quit();
+  mpvInstance = null;
+});
+
 // Must duplicate with the one in renderer process settings.store.ts
 enum BindingActions {
   GLOBAL_SEARCH = 'globalSearch',

@@ -134,6 +134,10 @@ const rendererQuit = (cb: (event: IpcRendererEvent) => void) => {
   ipcRenderer.on('renderer-player-quit', cb);
 };
 
+const rendererError = (cb: (event: IpcRendererEvent, data: string) => void) => {
+  ipcRenderer.on('renderer-player-error', cb);
+};
+
 export const mpvPlayer = {
   autoNext,
   currentTime,
@@ -157,6 +161,7 @@ export const mpvPlayer = {
 export const mpvPlayerListener = {
   rendererAutoNext,
   rendererCurrentTime,
+  rendererError,
   rendererNext,
   rendererPause,
   rendererPlay,
