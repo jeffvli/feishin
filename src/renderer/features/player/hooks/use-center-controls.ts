@@ -184,8 +184,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
         if (isLastTrack) {
           const playerData = setCurrentIndex(0);
           mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PAUSED });
-          mpvPlayer.setQueue(playerData);
-          mpvPlayer.pause();
+          mpvPlayer.setQueue(playerData, true);
           pause();
         } else {
           const playerData = autoNext();
