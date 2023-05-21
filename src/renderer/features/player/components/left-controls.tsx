@@ -5,7 +5,7 @@ import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { RiArrowUpSLine, RiDiscLine, RiMore2Fill } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Button, Text } from '/@/renderer/components';
+import { Button, Text, Tooltip } from '/@/renderer/components';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
   useAppStoreActions,
@@ -28,6 +28,7 @@ const LeftControlsContainer = styled.div`
 `;
 
 const ImageWrapper = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,6 +45,7 @@ const MetadataStack = styled(motion.div)`
 `;
 
 const Image = styled(motion.div)`
+  position: relative;
   width: 60px;
   height: 60px;
   background-color: var(--placeholder-bg);
@@ -137,26 +139,32 @@ export const LeftControls = () => {
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 onClick={handleToggleFullScreenPlayer}
               >
-                {currentSong?.imageUrl ? (
-                  <PlayerbarImage
-                    loading="eager"
-                    src={currentSong?.imageUrl}
-                  />
-                ) : (
-                  <>
-                    <Center
-                      sx={{
-                        background: 'var(--placeholder-bg)',
-                        height: '100%',
-                      }}
-                    >
-                      <RiDiscLine
-                        color="var(--placeholder-fg)"
-                        size={50}
-                      />
-                    </Center>
-                  </>
-                )}
+                <Tooltip
+                  label="Open fullscreen player"
+                  openDelay={500}
+                >
+                  {currentSong?.imageUrl ? (
+                    <PlayerbarImage
+                      loading="eager"
+                      src={currentSong?.imageUrl}
+                    />
+                  ) : (
+                    <>
+                      <Center
+                        sx={{
+                          background: 'var(--placeholder-bg)',
+                          height: '100%',
+                        }}
+                      >
+                        <RiDiscLine
+                          color="var(--placeholder-fg)"
+                          size={50}
+                        />
+                      </Center>
+                    </>
+                  )}
+                </Tooltip>
+
                 {!collapsed && (
                   <Button
                     compact
