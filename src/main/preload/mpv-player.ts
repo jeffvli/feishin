@@ -43,11 +43,11 @@ const previous = () => {
 };
 
 const restoreQueue = () => {
-  ipcRenderer.send('player-restore-data');
+  ipcRenderer.send('player-restore-queue');
 };
 
 const saveQueue = (data: Record<string, any>) => {
-  ipcRenderer.send('player-save-data', data);
+  ipcRenderer.send('player-save-queue', data);
 };
 
 const seek = (seconds: number) => {

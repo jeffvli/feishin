@@ -241,7 +241,7 @@ const createWindow = async () => {
     disableMediaKeys();
   });
 
-  ipcMain.on('player-restore-data', () => {
+  ipcMain.on('player-restore-queue', () => {
     if (store.get('resume')) {
       const queueLocation = join(app.getPath('userData'), 'queue');
 
@@ -312,7 +312,7 @@ const createWindow = async () => {
 
       getMainWindow()?.webContents.send('renderer-player-save-queue');
 
-      ipcMain.once('player-save-data', async (_event, data: Record<string, any>) => {
+      ipcMain.once('player-save-queue', async (_event, data: Record<string, any>) => {
         const queueLocation = join(app.getPath('userData'), 'queue');
         const serialized = JSON.stringify(data);
 
