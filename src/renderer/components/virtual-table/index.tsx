@@ -320,6 +320,7 @@ export const getColumnDefs = (columns: PersistedTableColumn[]) => {
       columnDefs.push({
         ...presetColumn,
         initialWidth: column.width,
+        ...column.extraProps,
       });
     }
   }

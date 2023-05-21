@@ -1,5 +1,6 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { ColDef } from '@ag-grid-community/core';
 import isElectron from 'is-electron';
 import merge from 'lodash/merge';
 import create from 'zustand';
@@ -19,6 +20,7 @@ import {
 
 export type PersistedTableColumn = {
   column: TableColumn;
+  extraProps?: Partial<ColDef>;
   width: number;
 };
 
