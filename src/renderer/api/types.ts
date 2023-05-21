@@ -1001,3 +1001,7 @@ export type SearchResponse = {
   albums: Album[];
   songs: Song[];
 };
+
+export const instanceOfCancellationError = (error: any) => {
+  return 'revert' in error;
+};

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentServer, usePlayerControls, usePlayerStore } from '/@/renderer/store';
 import { usePlayerType } from '/@/renderer/store/settings.store';
@@ -6,7 +6,13 @@ import { PlayQueueAddOptions, Play, PlaybackType } from '/@/renderer/types';
 import { toast } from '/@/renderer/components/toast/index';
 import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
-import { LibraryItem, QueueSong, Song, SongListResponse } from '/@/renderer/api/types';
+import {
+  LibraryItem,
+  QueueSong,
+  Song,
+  SongListResponse,
+  instanceOfCancellationError,
+} from '/@/renderer/api/types';
 import {
   getPlaylistSongsById,
   getSongById,
@@ -14,6 +20,31 @@ import {
   getAlbumArtistSongsById,
   getSongsByQuery,
 } from '/@/renderer/features/player/utils';
+import { queryKeys } from '/@/renderer/api/query-keys';
+
+const getRootQueryKey = (itemType: LibraryItem, serverId: string) => {
+  let queryKey;
+
+  switch (itemType) {
+    case LibraryItem.ALBUM:
+      queryKey = queryKeys.songs.list(serverId);
+      break;
+    case LibraryItem.ALBUM_ARTIST:
+      queryKey = queryKeys.songs.list(serverId);
+      break;
+    case LibraryItem.PLAYLIST:
+      queryKey = queryKeys.playlists.songList(serverId);
+      break;
+    case LibraryItem.SONG:
+      queryKey = queryKeys.songs.list(serverId);
+      break;
+    default:
+      queryKey = queryKeys.songs.list(serverId);
+      break;
+  }
+
+  return queryKey;
+};
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const utils = isElectron() ? window.electron.utils : null;
@@ -26,6 +57,7 @@ export const useHandlePlayQueueAdd = () => {
   const playerType = usePlayerType();
   const server = useCurrentServer();
   const { play } = usePlayerControls();
+  const timeoutIds = useRef<Record<string, ReturnType<typeof setTimeout>> | null>({});
 
   const handlePlayQueueAdd = useCallback(
     async (options: PlayQueueAddOptions) => {
@@ -37,6 +69,25 @@ export const useHandlePlayQueueAdd = () => {
       if (byItemType) {
         let songList: SongListResponse | undefined;
         const { type: itemType, id } = byItemType;
+
+        const fetchId = nanoid();
+        timeoutIds.current = {
+          ...timeoutIds.current,
+          [fetchId]: setTimeout(() => {
+            toast.info({
+              autoClose: false,
+              id: fetchId,
+              message: 'This is taking a while... close the notification to cancel the request',
+              onClose: () => {
+                queryClient.cancelQueries({
+                  exact: false,
+                  queryKey: getRootQueryKey(itemType, server?.id),
+                });
+              },
+              title: 'Adding to queue',
+            });
+          }, 2000),
+        };
 
         try {
           if (itemType === LibraryItem.PLAYLIST) {
@@ -50,7 +101,15 @@ export const useHandlePlayQueueAdd = () => {
           } else {
             songList = await getSongById({ id: id?.[0], queryClient, server });
           }
+
+          clearTimeout(timeoutIds.current[fetchId] as ReturnType<typeof setTimeout>);
+          delete timeoutIds.current[fetchId];
+          toast.hide(fetchId);
         } catch (err: any) {
+          if (instanceOfCancellationError(err)) {
+            return null;
+          }
+
           return toast.error({
             message: err.message,
             title: 'Play queue add failed',
