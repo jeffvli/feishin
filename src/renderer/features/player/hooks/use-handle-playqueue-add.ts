@@ -97,9 +97,11 @@ export const useHandlePlayQueueAdd = () => {
           } else if (itemType === LibraryItem.ALBUM_ARTIST) {
             songList = await getAlbumArtistSongsById({ id, query, queryClient, server });
           } else if (itemType === LibraryItem.SONG) {
-            songList = await getSongsByQuery({ query, queryClient, server });
-          } else {
-            songList = await getSongById({ id: id?.[0], queryClient, server });
+            if (id?.length === 1) {
+              songList = await getSongById({ id: id?.[0], queryClient, server });
+            } else {
+              songList = await getSongsByQuery({ query, queryClient, server });
+            }
           }
 
           clearTimeout(timeoutIds.current[fetchId] as ReturnType<typeof setTimeout>);
