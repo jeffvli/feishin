@@ -17,7 +17,7 @@ import {
 } from 'react-icons/ri';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { SongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
+import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { DropdownMenu, Button, Slider, MultiSelect, Switch, Text } from '/@/renderer/components';
 import { useMusicFolders } from '/@/renderer/features/shared';
 import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jellyfin-song-filters';
@@ -151,6 +151,7 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
           sortBy: e.currentTarget.value as SongListSort,
           sortOrder: sortOrder || SortOrder.ASC,
         },
+        itemType: LibraryItem.SONG,
         key: pageKey,
       }) as SongListFilter;
 
@@ -167,11 +168,13 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
       if (e.currentTarget.value === String(filter.musicFolderId)) {
         updatedFilters = setFilter({
           data: { musicFolderId: undefined },
+          itemType: LibraryItem.SONG,
           key: pageKey,
         }) as SongListFilter;
       } else {
         updatedFilters = setFilter({
           data: { musicFolderId: e.currentTarget.value },
+          itemType: LibraryItem.SONG,
           key: pageKey,
         }) as SongListFilter;
       }
@@ -185,6 +188,7 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
     const newSortOrder = filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
     const updatedFilters = setFilter({
       data: { sortOrder: newSortOrder },
+      itemType: LibraryItem.SONG,
       key: pageKey,
     }) as SongListFilter;
     handleFilterChange(updatedFilters);

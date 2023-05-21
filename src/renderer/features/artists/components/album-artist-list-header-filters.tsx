@@ -14,7 +14,7 @@ import {
 } from 'react-icons/ri';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumArtistListSort, SortOrder } from '/@/renderer/api/types';
+import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { DropdownMenu, Text, Button, Slider, MultiSelect, Switch } from '/@/renderer/components';
 import { useMusicFolders } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -199,6 +199,7 @@ export const AlbumArtistListHeaderFilters = ({
           sortBy: e.currentTarget.value as AlbumArtistListSort,
           sortOrder: sortOrder || SortOrder.ASC,
         },
+        itemType: LibraryItem.ALBUM_ARTIST,
         key: pageKey,
       }) as AlbumArtistListFilter;
 
@@ -215,11 +216,13 @@ export const AlbumArtistListHeaderFilters = ({
       if (e.currentTarget.value === String(filter.musicFolderId)) {
         updatedFilters = setFilter({
           data: { musicFolderId: undefined },
+          itemType: LibraryItem.ALBUM_ARTIST,
           key: pageKey,
         }) as AlbumArtistListFilter;
       } else {
         updatedFilters = setFilter({
           data: { musicFolderId: e.currentTarget.value },
+          itemType: LibraryItem.ALBUM_ARTIST,
           key: pageKey,
         }) as AlbumArtistListFilter;
       }
@@ -233,6 +236,7 @@ export const AlbumArtistListHeaderFilters = ({
     const newSortOrder = filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
     const updatedFilters = setFilter({
       data: { sortOrder: newSortOrder },
+      itemType: LibraryItem.ALBUM_ARTIST,
       key: pageKey,
     }) as AlbumArtistListFilter;
     handleFilterChange(updatedFilters);

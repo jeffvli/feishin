@@ -5,7 +5,7 @@ import debounce from 'lodash/debounce';
 import { ChangeEvent, MutableRefObject, useCallback } from 'react';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { SongListQuery } from '/@/renderer/api/types';
+import { LibraryItem, SongListQuery } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { SongListHeaderFilters } from '/@/renderer/features/songs/components/song-list-header-filters';
@@ -78,7 +78,11 @@ export const SongListHeader = ({ title, itemCount, tableRef }: SongListHeaderPro
   const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
     const previousSearchTerm = filter.searchTerm;
     const searchTerm = e.target.value === '' ? undefined : e.target.value;
-    const updatedFilters = setFilter({ data: { searchTerm }, key: pageKey }) as SongListFilter;
+    const updatedFilters = setFilter({
+      data: { searchTerm },
+      itemType: LibraryItem.SONG,
+      key: pageKey,
+    }) as SongListFilter;
     if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
   }, 500);
 

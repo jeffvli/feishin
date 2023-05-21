@@ -253,6 +253,7 @@ export const AlbumListHeaderFilters = ({
           sortBy: e.currentTarget.value as AlbumListSort,
           sortOrder: sortOrder || SortOrder.ASC,
         },
+        itemType: LibraryItem.ALBUM,
         key: 'album',
       }) as AlbumListFilter;
 
@@ -269,11 +270,13 @@ export const AlbumListHeaderFilters = ({
       if (e.currentTarget.value === String(filter.musicFolderId)) {
         updatedFilters = setFilter({
           data: { musicFolderId: undefined },
+          itemType: LibraryItem.ALBUM,
           key: 'album',
         }) as AlbumListFilter;
       } else {
         updatedFilters = setFilter({
           data: { musicFolderId: e.currentTarget.value },
+          itemType: LibraryItem.ALBUM,
           key: 'album',
         }) as AlbumListFilter;
       }
@@ -287,6 +290,7 @@ export const AlbumListHeaderFilters = ({
     const newSortOrder = filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
     const updatedFilters = setFilter({
       data: { sortOrder: newSortOrder },
+      itemType: LibraryItem.ALBUM,
       key: 'album',
     }) as AlbumListFilter;
     handleFilterChange(updatedFilters);

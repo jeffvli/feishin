@@ -21,6 +21,7 @@ import { AlbumArtistListHeaderFilters } from '/@/renderer/features/artists/compo
 import { useAlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
 import { FilterBar } from '../../shared/components/filter-bar';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { LibraryItem } from '/@/renderer/api/types';
 
 interface AlbumArtistListHeaderProps {
   gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -136,6 +137,7 @@ export const AlbumArtistListHeader = ({
     const searchTerm = e.target.value === '' ? undefined : e.target.value;
     const updatedFilters = setFilter({
       data: { searchTerm },
+      itemType: LibraryItem.ALBUM_ARTIST,
       key: pageKey,
     }) as AlbumArtistListFilter;
     if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);

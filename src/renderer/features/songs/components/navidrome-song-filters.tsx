@@ -4,6 +4,7 @@ import { NumberInput, Select, Switch, Text } from '/@/renderer/components';
 import { SongListFilter, useListStoreActions, useSongListFilter } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
+import { LibraryItem } from '/@/renderer/api/types';
 
 interface NavidromeSongFiltersProps {
   handleFilterChange: (filters: SongListFilter) => void;
@@ -41,6 +42,7 @@ export const NavidromeSongFilters = ({
           },
         },
       },
+      itemType: LibraryItem.SONG,
       key: pageKey,
     }) as SongListFilter;
     handleFilterChange(updatedFilters);
@@ -59,6 +61,7 @@ export const NavidromeSongFilters = ({
               },
             },
           },
+          itemType: LibraryItem.SONG,
           key: pageKey,
         }) as SongListFilter;
 
@@ -78,6 +81,7 @@ export const NavidromeSongFilters = ({
           },
         },
       },
+      itemType: LibraryItem.SONG,
       key: pageKey,
     }) as SongListFilter;
 

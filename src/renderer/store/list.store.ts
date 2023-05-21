@@ -8,6 +8,7 @@ import {
   AlbumArtistListSort,
   AlbumListArgs,
   AlbumListSort,
+  LibraryItem,
   PlaylistListSort,
   SongListArgs,
   SongListSort,
@@ -61,10 +62,12 @@ type DeterministicArgs = { key: ListKey };
 
 export interface ListSlice extends ListState {
   _actions: {
-    getFilter: (args: { id?: string; key?: string }) => FilterType;
+    getFilter: (args: { id?: string; itemType: LibraryItem; key?: string }) => FilterType;
     resetFilter: () => void;
     setDisplayType: (args: { data: ListDisplayType } & DeterministicArgs) => void;
-    setFilter: (args: { data: Partial<FilterType> } & DeterministicArgs) => FilterType;
+    setFilter: (
+      args: { data: Partial<FilterType>; itemType: LibraryItem } & DeterministicArgs,
+    ) => FilterType;
     setGrid: (args: { data: Partial<ListGridProps> } & DeterministicArgs) => void;
     setStore: (data: Partial<ListSlice>) => void;
     setTable: (args: { data: Partial<ListTableProps> } & DeterministicArgs) => void;
@@ -90,7 +93,7 @@ export const useListStore = create<ListSlice>()(
                   ...state.detail[args.key]?.filter?._custom,
                   jellyfin: {
                     ...state.detail[args.key]?.filter?._custom?.jellyfin,
-                    includeItemTypes: 'Audio',
+                    includeItemTypes: args?.itemType === LibraryItem.ALBUM ? 'MusicAlbum' : 'Audio',
                   },
                   navidrome: {
                     ...state.detail[args.key]?.filter?._custom?.navidrome,
@@ -157,7 +160,7 @@ export const useListStore = create<ListSlice>()(
               }
             });
 
-            return get()._actions.getFilter({ id, key: args.key });
+            return get()._actions.getFilter({ id, itemType: args.itemType, key: args.key });
           },
           setGrid: (args) => {
             const [page, id] = args.key.split('_');
@@ -526,17 +529,29 @@ export const useSongListStore = (args?: { id?: string; key?: string }) =>
 
 export const useSongListFilter = (args: { id?: string; key?: string }) =>
   useListStore((state) => {
-    return state._actions.getFilter({ id: args.id, key: args.key }) as SongListFilter;
+    return state._actions.getFilter({
+      id: args.id,
+      itemType: LibraryItem.SONG,
+      key: args.key,
+    }) as SongListFilter;
   }, shallow);
 
 export const useAlbumListFilter = (args: { id?: string; key?: string }) =>
   useListStore((state) => {
-    return state._actions.getFilter({ id: args.id, key: args.key }) as AlbumListFilter;
+    return state._actions.getFilter({
+      id: args.id,
+      itemType: LibraryItem.ALBUM,
+      key: args.key,
+    }) as AlbumListFilter;
   }, shallow);
 
 export const useAlbumArtistListFilter = (args: { id?: string; key?: string }) =>
   useListStore((state) => {
-    return state._actions.getFilter({ id: args.id, key: args.key }) as AlbumArtistListFilter;
+    return state._actions.getFilter({
+      id: args.id,
+      itemType: LibraryItem.ALBUM_ARTIST,
+      key: args.key,
+    }) as AlbumArtistListFilter;
   }, shallow);
 
 export const useListDetail = (key: string) => useListStore((state) => state.detail[key], shallow);

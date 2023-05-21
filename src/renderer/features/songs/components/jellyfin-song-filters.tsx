@@ -4,6 +4,7 @@ import { MultiSelect, NumberInput, Switch, Text } from '/@/renderer/components';
 import { SongListFilter, useListStoreActions, useSongListFilter } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
+import { LibraryItem } from '/@/renderer/api/types';
 
 interface JellyfinSongFiltersProps {
   handleFilterChange: (filters: SongListFilter) => void;
@@ -51,6 +52,7 @@ export const JellyfinSongFilters = ({
               },
             },
           },
+          itemType: LibraryItem.SONG,
           key: pageKey,
         }) as SongListFilter;
         handleFilterChange(updatedFilters);
@@ -72,6 +74,7 @@ export const JellyfinSongFilters = ({
           },
         },
       },
+      itemType: LibraryItem.SONG,
       key: pageKey,
     }) as SongListFilter;
     handleFilterChange(updatedFilters);
@@ -90,6 +93,7 @@ export const JellyfinSongFilters = ({
           },
         },
       },
+      itemType: LibraryItem.SONG,
       key: pageKey,
     }) as SongListFilter;
     handleFilterChange(updatedFilters);
@@ -108,6 +112,7 @@ export const JellyfinSongFilters = ({
           },
         },
       },
+      itemType: LibraryItem.SONG,
       key: pageKey,
     }) as SongListFilter;
     handleFilterChange(updatedFilters);

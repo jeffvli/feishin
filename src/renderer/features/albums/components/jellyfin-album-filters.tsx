@@ -4,7 +4,7 @@ import { MultiSelect, NumberInput, SpinnerIcon, Switch, Text } from '/@/renderer
 import { AlbumListFilter, useAlbumListFilter, useListStoreActions } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
-import { AlbumArtistListSort, SortOrder } from '/@/renderer/api/types';
+import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 
 interface JellyfinAlbumFiltersProps {
@@ -54,6 +54,7 @@ export const JellyfinAlbumFilters = ({
               },
             },
           },
+          itemType: LibraryItem.ALBUM,
           key: pageKey,
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
@@ -74,6 +75,7 @@ export const JellyfinAlbumFilters = ({
           },
         },
       },
+      itemType: LibraryItem.ALBUM,
       key: pageKey,
     }) as AlbumListFilter;
     handleFilterChange(updatedFilters);
@@ -91,6 +93,7 @@ export const JellyfinAlbumFilters = ({
           },
         },
       },
+      itemType: LibraryItem.ALBUM,
       key: pageKey,
     }) as AlbumListFilter;
     handleFilterChange(updatedFilters);
@@ -108,6 +111,7 @@ export const JellyfinAlbumFilters = ({
           },
         },
       },
+      itemType: LibraryItem.ALBUM,
       key: pageKey,
     }) as AlbumListFilter;
     handleFilterChange(updatedFilters);
@@ -149,6 +153,7 @@ export const JellyfinAlbumFilters = ({
           },
         },
       },
+      itemType: LibraryItem.ALBUM,
       key: pageKey,
     }) as AlbumListFilter;
     handleFilterChange(updatedFilters);

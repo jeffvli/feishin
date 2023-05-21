@@ -5,7 +5,7 @@ import { AlbumListFilter, useAlbumListFilter, useListStoreActions } from '/@/ren
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
-import { AlbumArtistListSort, SortOrder } from '/@/renderer/api/types';
+import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 
 interface NavidromeAlbumFiltersProps {
   disableArtistFilter?: boolean;
@@ -46,6 +46,7 @@ export const NavidromeAlbumFilters = ({
           },
         },
       },
+      itemType: LibraryItem.ALBUM,
       key: 'album',
     }) as AlbumListFilter;
     handleFilterChange(updatedFilters);
@@ -65,6 +66,7 @@ export const NavidromeAlbumFilters = ({
               },
             },
           },
+          itemType: LibraryItem.ALBUM,
           key: pageKey,
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
@@ -85,6 +87,7 @@ export const NavidromeAlbumFilters = ({
               },
             },
           },
+          itemType: LibraryItem.ALBUM,
           key: pageKey,
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
@@ -104,6 +107,7 @@ export const NavidromeAlbumFilters = ({
               },
             },
           },
+          itemType: LibraryItem.ALBUM,
           key: pageKey,
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
@@ -123,6 +127,7 @@ export const NavidromeAlbumFilters = ({
               },
             },
           },
+          itemType: LibraryItem.ALBUM,
           key: pageKey,
         }) as AlbumListFilter;
         handleFilterChange(updatedFilters);
@@ -142,6 +147,7 @@ export const NavidromeAlbumFilters = ({
           ...filter._custom,
         },
       },
+      itemType: LibraryItem.ALBUM,
       key: pageKey,
     }) as AlbumListFilter;
     handleFilterChange(updatedFilters);
@@ -183,6 +189,7 @@ export const NavidromeAlbumFilters = ({
           },
         },
       },
+      itemType: LibraryItem.ALBUM,
       key: pageKey,
     }) as AlbumListFilter;
     handleFilterChange(updatedFilters);

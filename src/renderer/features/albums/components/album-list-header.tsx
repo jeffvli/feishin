@@ -158,7 +158,11 @@ export const AlbumListHeader = ({
   const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
     const previousSearchTerm = filter.searchTerm;
     const searchTerm = e.target.value === '' ? undefined : e.target.value;
-    const updatedFilters = setFilter({ data: { searchTerm }, key: 'album' }) as AlbumListFilter;
+    const updatedFilters = setFilter({
+      data: { searchTerm },
+      itemType: LibraryItem.ALBUM,
+      key: 'album',
+    }) as AlbumListFilter;
     if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
   }, 500);
 
