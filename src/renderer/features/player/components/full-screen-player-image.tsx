@@ -12,11 +12,19 @@ import { useFastAverageColor } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { PlayerData, usePlayerData, usePlayerStore } from '/@/renderer/store';
 
+const PlayerContainer = styled(Flex)`
+  flex: 0.5;
+  gap: '1rem';
+
+  @media screen and (min-width: 1080px) {
+    max-width: 60%;
+  }
+`;
+
 const Image = styled(motion.img)`
   position: absolute;
   width: 100%;
   max-width: 100%;
-  height: 100%;
   max-height: 100%;
   object-fit: cover;
   border-radius: 5px;
@@ -29,6 +37,7 @@ const ImageContainer = styled(motion.div)`
   align-items: center;
   height: 65%;
   aspect-ratio: 1/1;
+  max-width: 100%;
 `;
 
 const imageVariants: Variants = {
@@ -120,13 +129,12 @@ export const FullScreenPlayerImage = () => {
   }, [imageState, queue, setImageState]);
 
   return (
-    <Flex
+    <PlayerContainer
       align="center"
       className="full-screen-player-image-container"
       direction="column"
       justify="flex-start"
       p="1rem"
-      sx={{ flex: 0.5, gap: '1rem' }}
     >
       <ImageContainer>
         <AnimatePresence
@@ -171,6 +179,7 @@ export const FullScreenPlayerImage = () => {
       <Stack
         className="full-screen-player-image-metadata"
         spacing="sm"
+        sx={{ maxWidth: '100%' }}
       >
         <TextTitle
           align="center"
@@ -232,6 +241,6 @@ export const FullScreenPlayerImage = () => {
           {currentSong?.releaseYear && <Badge size="lg">{currentSong?.releaseYear}</Badge>}
         </Group>
       </Stack>
-    </Flex>
+    </PlayerContainer>
   );
 };

@@ -72,7 +72,10 @@ export const FullScreenPlayerQueue = () => {
         position="center"
       >
         {headerItems.map((item) => (
-          <Box pos="relative">
+          <Box
+            key={`tab-${item.label}`}
+            pos="relative"
+          >
             <Button
               fullWidth
               uppercase
