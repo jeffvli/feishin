@@ -52,7 +52,7 @@ ipcMain.on('player-seek-to', async (_event, time: number) => {
 });
 
 // Sets the queue in position 0 and 1 to the given data. Used when manually starting a song or using the next/prev buttons
-ipcMain.on('player-set-queue', async (_event, data: PlayerData) => {
+ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean) => {
   if (!data.queue.current && !data.queue.next) {
     await getMpvInstance()?.clearPlaylist();
     await getMpvInstance()?.pause();
@@ -70,6 +70,9 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData) => {
       try {
         if (data.queue.current) {
           await getMpvInstance()?.load(data.queue.current.streamUrl, 'replace');
+          if (pause) {
+            await getMpvInstance()?.pause();
+          }
         }
 
         if (data.queue.next) {
