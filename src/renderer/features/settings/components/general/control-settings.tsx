@@ -190,7 +190,7 @@ export const ControlSettings = () => {
       ),
       description: 'When exiting, save the current play queue and restore it when reopening',
       isHidden: !isElectron(),
-      title: 'Save queue state on close',
+      title: 'Save play queue',
     },
   ];
 
