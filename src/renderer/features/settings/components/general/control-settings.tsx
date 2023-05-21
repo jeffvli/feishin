@@ -177,7 +177,6 @@ export const ControlSettings = () => {
       control: (
         <Switch
           defaultChecked={settings.resume}
-          disabled={!isElectron()}
           onChange={(e) => {
             localSettings?.set('resume', e.target.checked);
             setSettings({
@@ -190,7 +189,7 @@ export const ControlSettings = () => {
         />
       ),
       description: 'When exiting, save the current play queue and restore it when reopening',
-      isHidden: false,
+      isHidden: !isElectron(),
       title: 'Save queue state on close',
     },
   ];
