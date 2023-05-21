@@ -151,10 +151,11 @@ export enum TableColumn {
 export type PlayQueueAddOptions = {
   byData?: QueueSong[];
   byItemType?: {
-    id: string[] | any;
+    id: string[];
     type: LibraryItem;
   };
   initialIndex?: number;
+  initialSongId?: string;
   playType: Play;
 };
 

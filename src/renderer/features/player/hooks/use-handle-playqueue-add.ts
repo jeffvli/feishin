@@ -29,8 +29,9 @@ export const useHandlePlayQueueAdd = () => {
   const handlePlayQueueAdd = useCallback(
     async (options: PlayQueueAddOptions) => {
       if (!server) return toast.error({ message: 'No server selected', type: 'error' });
-      const { initialIndex, playType, byData, byItemType } = options;
+      const { initialIndex, initialSongId, playType, byData, byItemType } = options;
       let songs: QueueSong[] | null = null;
+      let initialSongIndex = 0;
 
       if (byItemType) {
         let songList: SongListResponse | undefined;
@@ -38,13 +39,13 @@ export const useHandlePlayQueueAdd = () => {
 
         try {
           if (itemType === LibraryItem.PLAYLIST) {
-            songList = await getPlaylistSongsById({ id, queryClient, server });
+            songList = await getPlaylistSongsById({ id: id?.[0], queryClient, server });
           } else if (itemType === LibraryItem.ALBUM) {
             songList = await getAlbumSongsById({ id, queryClient, server });
           } else if (itemType === LibraryItem.ALBUM_ARTIST) {
             songList = await getAlbumArtistSongsById({ id, queryClient, server });
           } else {
-            songList = await getSongById({ id, queryClient, server });
+            songList = await getSongById({ id: id?.[0], queryClient, server });
           }
         } catch (err: any) {
           return toast.error({
@@ -60,7 +61,15 @@ export const useHandlePlayQueueAdd = () => {
 
       if (!songs) return toast.warn({ message: 'No songs found' });
 
-      const playerData = addToQueue({ initialIndex: initialIndex || 0, playType, songs });
+      // const index = initialIndex || initial songs.findIndex((song) => song.id === initialSongId);
+
+      if (initialIndex) {
+        initialSongIndex = initialIndex;
+      } else if (initialSongId) {
+        initialSongIndex = songs.findIndex((song) => song.id === initialSongId);
+      }
+
+      const playerData = addToQueue({ initialIndex: initialSongIndex, playType, songs });
 
       if (playerType === PlaybackType.LOCAL) {
         mpvPlayer?.volume(usePlayerStore.getState().volume);
