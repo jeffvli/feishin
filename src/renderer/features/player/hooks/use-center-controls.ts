@@ -598,11 +598,11 @@ export const useCenterControls = (args: { playersRef: any }) => {
         handleToggleRepeat();
       });
 
-      mpvPlayerListener.rendererSaveState(() => {
+      mpvPlayerListener.rendererSaveQueue(() => {
         handleSave();
       });
 
-      mpvPlayerListener.rendererRestoreState((_event: any, data: PlayerState) => {
+      mpvPlayerListener.rendererRestoreQueue((_event: any, data: PlayerState) => {
         handleRestore(data);
       });
 

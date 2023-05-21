@@ -142,11 +142,11 @@ const rendererQuit = (cb: (event: IpcRendererEvent) => void) => {
   ipcRenderer.on('renderer-player-quit', cb);
 };
 
-const rendererSaveState = (cb: (event: IpcRendererEvent) => void) => {
+const rendererSaveQueue = (cb: (event: IpcRendererEvent) => void) => {
   ipcRenderer.on('renderer-player-save-queue', cb);
 };
 
-const rendererRestoreState = (cb: (event: IpcRendererEvent) => void) => {
+const rendererRestoreQueue = (cb: (event: IpcRendererEvent) => void) => {
   ipcRenderer.on('renderer-player-restore-queue', cb);
 };
 
@@ -186,8 +186,8 @@ export const mpvPlayerListener = {
   rendererPlayPause,
   rendererPrevious,
   rendererQuit,
-  rendererRestoreState,
-  rendererSaveState,
+  rendererRestoreQueue,
+  rendererSaveQueue,
   rendererSkipBackward,
   rendererSkipForward,
   rendererStop,
