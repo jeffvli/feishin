@@ -117,7 +117,3 @@ ipcMain.on('player-volume', async (_event, value: number) => {
 ipcMain.on('player-mute', async () => {
   await getMpvInstance()?.mute();
 });
-
-ipcMain.on('player-quit', async () => {
-  await getMpvInstance()?.stop();
-});
