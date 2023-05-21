@@ -157,6 +157,7 @@ export type PlayQueueAddOptions = {
   initialIndex?: number;
   initialSongId?: string;
   playType: Play;
+  query?: Record<string, any>;
 };
 
 export type GridCardData = {

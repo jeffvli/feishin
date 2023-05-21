@@ -13,16 +13,18 @@ import { ServerListItem } from '/@/renderer/types';
 
 export const getPlaylistSongsById = async (args: {
   id: string;
+  query?: Partial<PlaylistSongListQuery>;
   queryClient: QueryClient;
   server: ServerListItem;
 }) => {
-  const { id, queryClient, server } = args;
+  const { id, queryClient, server, query } = args;
 
   const queryFilter: PlaylistSongListQuery = {
     id,
     sortBy: SongListSort.ID,
     sortOrder: SortOrder.ASC,
     startIndex: 0,
+    ...query,
   };
 
   const queryKey = queryKeys.playlists.songList(server?.id, id, queryFilter);
@@ -49,16 +51,18 @@ export const getPlaylistSongsById = async (args: {
 export const getAlbumSongsById = async (args: {
   id: string[];
   orderByIds?: boolean;
+  query?: Partial<SongListQuery>;
   queryClient: QueryClient;
   server: ServerListItem;
 }) => {
-  const { id, queryClient, server } = args;
+  const { id, queryClient, server, query } = args;
 
   const queryFilter: SongListQuery = {
     albumIds: id,
     sortBy: SongListSort.ALBUM,
     sortOrder: SortOrder.ASC,
     startIndex: 0,
+    ...query,
   };
 
   const queryKey = queryKeys.songs.list(server?.id, queryFilter);
@@ -85,16 +89,18 @@ export const getAlbumSongsById = async (args: {
 export const getAlbumArtistSongsById = async (args: {
   id: string[];
   orderByIds?: boolean;
+  query?: Partial<SongListQuery>;
   queryClient: QueryClient;
   server: ServerListItem;
 }) => {
-  const { id, queryClient, server } = args;
+  const { id, queryClient, server, query } = args;
 
   const queryFilter: SongListQuery = {
     artistIds: id || [],
     sortBy: SongListSort.ALBUM_ARTIST,
     sortOrder: SortOrder.ASC,
     startIndex: 0,
+    ...query,
   };
 
   const queryKey = queryKeys.songs.list(server?.id, queryFilter);

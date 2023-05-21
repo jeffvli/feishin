@@ -29,7 +29,7 @@ export const useHandlePlayQueueAdd = () => {
   const handlePlayQueueAdd = useCallback(
     async (options: PlayQueueAddOptions) => {
       if (!server) return toast.error({ message: 'No server selected', type: 'error' });
-      const { initialIndex, initialSongId, playType, byData, byItemType } = options;
+      const { initialIndex, initialSongId, playType, byData, byItemType, query } = options;
       let songs: QueueSong[] | null = null;
       let initialSongIndex = 0;
 
@@ -39,11 +39,11 @@ export const useHandlePlayQueueAdd = () => {
 
         try {
           if (itemType === LibraryItem.PLAYLIST) {
-            songList = await getPlaylistSongsById({ id: id?.[0], queryClient, server });
+            songList = await getPlaylistSongsById({ id: id?.[0], query, queryClient, server });
           } else if (itemType === LibraryItem.ALBUM) {
-            songList = await getAlbumSongsById({ id, queryClient, server });
+            songList = await getAlbumSongsById({ id, query, queryClient, server });
           } else if (itemType === LibraryItem.ALBUM_ARTIST) {
-            songList = await getAlbumArtistSongsById({ id, queryClient, server });
+            songList = await getAlbumArtistSongsById({ id, query, queryClient, server });
           } else {
             songList = await getSongById({ id: id?.[0], queryClient, server });
           }
