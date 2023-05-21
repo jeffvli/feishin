@@ -149,19 +149,17 @@ export const LeftControls = () => {
                       src={currentSong?.imageUrl}
                     />
                   ) : (
-                    <>
-                      <Center
-                        sx={{
-                          background: 'var(--placeholder-bg)',
-                          height: '100%',
-                        }}
-                      >
-                        <RiDiscLine
-                          color="var(--placeholder-fg)"
-                          size={50}
-                        />
-                      </Center>
-                    </>
+                    <Center
+                      sx={{
+                        background: 'var(--placeholder-bg)',
+                        height: '100%',
+                      }}
+                    >
+                      <RiDiscLine
+                        color="var(--placeholder-fg)"
+                        size={50}
+                      />
+                    </Center>
                   )}
                 </Tooltip>
 
