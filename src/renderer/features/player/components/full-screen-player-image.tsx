@@ -35,9 +35,10 @@ const ImageContainer = styled(motion.div)`
   position: relative;
   display: flex;
   align-items: center;
-  height: 65%;
-  aspect-ratio: 1/1;
   max-width: 100%;
+  aspect-ratio: 1/1;
+  height: 65%;
+  margin-bottom: 1rem;
 `;
 
 const imageVariants: Variants = {
