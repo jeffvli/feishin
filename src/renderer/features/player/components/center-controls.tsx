@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useHotkeys } from '@mantine/hooks';
+import { useQueryClient } from '@tanstack/react-query';
 import formatDuration from 'format-duration';
 import isElectron from 'is-electron';
 import { IoIosPause } from 'react-icons/io';
 import {
+  RiMenuAddFill,
   RiPlayFill,
   RiRepeat2Line,
   RiRepeatOneLine,
@@ -34,6 +36,8 @@ import {
 } from '/@/renderer/store/settings.store';
 import { PlayerStatus, PlaybackType, PlayerShuffle, PlayerRepeat } from '/@/renderer/types';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
+import { openShuffleAllModal } from './shuffle-all-modal';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 
 interface CenterControlsProps {
   playersRef: any;
@@ -72,6 +76,7 @@ const SliderWrapper = styled.div`
 `;
 
 export const CenterControls = ({ playersRef }: CenterControlsProps) => {
+  const queryClient = useQueryClient();
   const [isSeeking, setIsSeeking] = useState(false);
   const currentSong = useCurrentSong();
   const songDuration = currentSong?.duration;
@@ -99,6 +104,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     handlePause,
     handlePlay,
   } = useCenterControls({ playersRef });
+  const handlePlayQueueAdd = usePlayQueueAdd();
 
   const currentTime = useCurrentTime();
   const currentPlayerRef = player === 1 ? player1 : player2;
@@ -236,6 +242,21 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             }}
             variant="tertiary"
             onClick={handleToggleRepeat}
+          />
+
+          <PlayerButton
+            icon={<RiMenuAddFill size={15} />}
+            tooltip={{
+              label: 'Shuffle all',
+              openDelay: 500,
+            }}
+            variant="tertiary"
+            onClick={() =>
+              openShuffleAllModal({
+                handlePlayQueueAdd,
+                queryClient,
+              })
+            }
           />
         </ButtonsContainer>
       </ControlsContainer>

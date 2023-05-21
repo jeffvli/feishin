@@ -1,5 +1,5 @@
 /* stylelint-disable no-descending-specificity */
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import { ComponentPropsWithoutRef, forwardRef, ReactNode } from 'react';
 import type { TooltipProps, UnstyledButtonProps } from '@mantine/core';
 import { UnstyledButton } from '@mantine/core';
 import { motion } from 'framer-motion';
@@ -118,33 +118,41 @@ const StyledPlayerButton = styled(UnstyledButton)<StyledPlayerButtonProps>`
       : ButtonTertiaryVariant};
 `;
 
-export const PlayerButton = ({ tooltip, variant, icon, ...rest }: PlayerButtonProps) => {
-  if (tooltip) {
-    return (
-      <Tooltip {...tooltip}>
-        <MotionWrapper variant={variant}>
-          <StyledPlayerButton
+export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
+  ({ tooltip, variant, icon, ...rest }: PlayerButtonProps, ref) => {
+    if (tooltip) {
+      return (
+        <Tooltip {...tooltip}>
+          <MotionWrapper
+            ref={ref}
             variant={variant}
-            {...rest}
           >
-            {icon}
-          </StyledPlayerButton>
-        </MotionWrapper>
-      </Tooltip>
-    );
-  }
+            <StyledPlayerButton
+              variant={variant}
+              {...rest}
+            >
+              {icon}
+            </StyledPlayerButton>
+          </MotionWrapper>
+        </Tooltip>
+      );
+    }
 
-  return (
-    <MotionWrapper variant={variant}>
-      <StyledPlayerButton
+    return (
+      <MotionWrapper
+        ref={ref}
         variant={variant}
-        {...rest}
       >
-        {icon}
-      </StyledPlayerButton>
-    </MotionWrapper>
-  );
-};
+        <StyledPlayerButton
+          variant={variant}
+          {...rest}
+        >
+          {icon}
+        </StyledPlayerButton>
+      </MotionWrapper>
+    );
+  },
+);
 
 PlayerButton.defaultProps = {
   $isActive: false,
