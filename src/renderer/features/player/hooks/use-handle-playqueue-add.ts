@@ -118,10 +118,11 @@ export const useHandlePlayQueueAdd = () => {
 
         songs = songList?.items?.map((song: Song) => ({ ...song, uniqueId: nanoid() })) || null;
       } else if (byData) {
-        songs = byData.map((song) => ({ ...song, uniqueId: nanoid() }));
+        songs = byData.map((song) => ({ ...song, uniqueId: nanoid() })) || null;
       }
 
-      if (!songs) return toast.warn({ message: 'No songs found' });
+      if (!songs || songs?.length === 0)
+        return toast.warn({ message: 'The query returned no results', title: 'No tracks added' });
 
       if (initialIndex) {
         initialSongIndex = initialIndex;
