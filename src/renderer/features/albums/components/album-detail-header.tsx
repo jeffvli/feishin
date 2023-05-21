@@ -3,7 +3,7 @@ import { forwardRef, Fragment, Ref } from 'react';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
-import { Button, Rating, Text } from '/@/renderer/components';
+import { Rating, Text } from '/@/renderer/components';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
 import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -98,26 +98,27 @@ export const AlbumDetailHeader = forwardRef(
               )}
             </Group>
             <Group
-              spacing="sm"
+              spacing="md"
               sx={{
                 WebkitBoxOrient: 'vertical',
                 WebkitLineClamp: 2,
-                display: '-webkit-box',
                 overflow: 'hidden',
               }}
             >
               {detailQuery?.data?.albumArtists.map((artist) => (
-                <Button
+                <Text
                   key={`artist-${artist.id}`}
+                  $link
                   component={Link}
-                  size="sm"
+                  fw={600}
+                  size="md"
                   to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                     albumArtistId: artist.id,
                   })}
-                  variant="outline"
+                  variant="subtle"
                 >
                   {artist.name}
-                </Button>
+                </Text>
               ))}
             </Group>
           </Stack>
