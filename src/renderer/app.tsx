@@ -17,14 +17,15 @@ import { PlayQueueHandlerContext } from '/@/renderer/features/player';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
 import isElectron from 'is-electron';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
-import { usePlayerStore } from '/@/renderer/store';
-import { PlaybackType } from '/@/renderer/types';
+import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
+import { PlaybackType, PlayerStatus } from '/@/renderer/types';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
 initSimpleImg({ threshold: 0.05 }, true);
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
 const ipc = isElectron() ? window.electron.ipc : null;
 
 export const App = () => {
@@ -33,6 +34,7 @@ export const App = () => {
   const { type: playbackType } = usePlaybackSettings();
   const { bindings } = useHotkeySettings();
   const handlePlayQueueAdd = useHandlePlayQueueAdd();
+  const { restoreQueue } = useQueueControls();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -64,6 +66,36 @@ export const App = () => {
       ipc?.send('set-global-shortcuts', bindings);
     }
   }, [bindings]);
+
+  useEffect(() => {
+    if (isElectron()) {
+      mpvPlayer.restoreQueue();
+
+      mpvPlayerListener.rendererSaveQueue(() => {
+        const { current, queue } = usePlayerStore.getState();
+        const stateToSave: Partial<Pick<PlayerState, 'current' | 'queue'>> = {
+          current: {
+            ...current,
+            status: PlayerStatus.PAUSED,
+          },
+          queue,
+        };
+        mpvPlayer.saveQueue(stateToSave);
+      });
+
+      mpvPlayerListener.rendererRestoreQueue((_event: any, data: Partial<PlayerState>) => {
+        const playerData = restoreQueue(data);
+        if (playbackType === PlaybackType.LOCAL) {
+          mpvPlayer.setQueue(playerData, true);
+        }
+      });
+    }
+
+    return () => {
+      ipc?.removeAllListeners('renderer-player-restore-queue');
+      ipc?.removeAllListeners('renderer-player-save-queue');
+    };
+  }, [playbackType, restoreQueue]);
 
   return (
     <MantineProvider

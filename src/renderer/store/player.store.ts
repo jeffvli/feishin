@@ -74,6 +74,7 @@ export interface PlayerSlice extends PlayerState {
     previous: () => PlayerData;
     removeFromQueue: (uniqueIds: string[]) => PlayerData;
     reorderQueue: (rowUniqueIds: string[], afterUniqueId?: string) => PlayerData;
+    restoreQueue: (data: Partial<PlayerState>) => PlayerData;
     setCurrentIndex: (index: number) => PlayerData;
     setCurrentTime: (time: number) => void;
     setCurrentTrack: (uniqueId: string) => PlayerData;
@@ -615,6 +616,20 @@ export const usePlayerStore = create<PlayerSlice>()(
 
               return get().actions.getPlayerData();
             },
+            restoreQueue: (data) => {
+              set((state) => {
+                state.current = {
+                  ...state.current,
+                  ...data.current,
+                };
+                state.queue = {
+                  ...state.queue,
+                  ...data.queue,
+                };
+              });
+
+              return get().actions.getPlayerData();
+            },
             setCurrentIndex: (index) => {
               if (get().shuffle === PlayerShuffle.TRACK) {
                 const foundSong = get().queue.default.find(
@@ -874,6 +889,7 @@ export const useQueueControls = () =>
       moveToTopOfQueue: state.actions.moveToTopOfQueue,
       removeFromQueue: state.actions.removeFromQueue,
       reorderQueue: state.actions.reorderQueue,
+      restoreQueue: state.actions.restoreQueue,
       setCurrentIndex: state.actions.setCurrentIndex,
       setCurrentTrack: state.actions.setCurrentTrack,
       setShuffledIndex: state.actions.setShuffledIndex,

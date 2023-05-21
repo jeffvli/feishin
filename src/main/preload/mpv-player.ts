@@ -42,6 +42,14 @@ const previous = () => {
   ipcRenderer.send('player-previous');
 };
 
+const restoreQueue = () => {
+  ipcRenderer.send('player-restore-queue');
+};
+
+const saveQueue = (data: Record<string, any>) => {
+  ipcRenderer.send('player-save-queue', data);
+};
+
 const seek = (seconds: number) => {
   ipcRenderer.send('player-seek', seconds);
 };
@@ -50,8 +58,8 @@ const seekTo = (seconds: number) => {
   ipcRenderer.send('player-seek-to', seconds);
 };
 
-const setQueue = (data: PlayerData) => {
-  ipcRenderer.send('player-set-queue', data);
+const setQueue = (data: PlayerData, pause?: boolean) => {
+  ipcRenderer.send('player-set-queue', data, pause);
 };
 
 const setQueueNext = (data: PlayerData) => {
@@ -134,6 +142,14 @@ const rendererQuit = (cb: (event: IpcRendererEvent) => void) => {
   ipcRenderer.on('renderer-player-quit', cb);
 };
 
+const rendererSaveQueue = (cb: (event: IpcRendererEvent) => void) => {
+  ipcRenderer.on('renderer-player-save-queue', cb);
+};
+
+const rendererRestoreQueue = (cb: (event: IpcRendererEvent) => void) => {
+  ipcRenderer.on('renderer-player-restore-queue', cb);
+};
+
 const rendererError = (cb: (event: IpcRendererEvent, data: string) => void) => {
   ipcRenderer.on('renderer-player-error', cb);
 };
@@ -149,6 +165,8 @@ export const mpvPlayer = {
   previous,
   quit,
   restart,
+  restoreQueue,
+  saveQueue,
   seek,
   seekTo,
   setProperties,
@@ -168,6 +186,8 @@ export const mpvPlayerListener = {
   rendererPlayPause,
   rendererPrevious,
   rendererQuit,
+  rendererRestoreQueue,
+  rendererSaveQueue,
   rendererSkipBackward,
   rendererSkipForward,
   rendererStop,

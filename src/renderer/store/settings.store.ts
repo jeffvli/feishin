@@ -69,6 +69,7 @@ export interface SettingsState {
     followSystemTheme: boolean;
     fontContent: string;
     playButtonBehavior: Play;
+    resume: boolean;
     showQueueDrawerButton: boolean;
     sideQueueType: SideQueueType;
     skipButtons: {
@@ -128,6 +129,7 @@ const initialState: SettingsState = {
     followSystemTheme: false,
     fontContent: 'Poppins',
     playButtonBehavior: Play.NOW,
+    resume: false,
     showQueueDrawerButton: false,
     sideQueueType: 'sideQueue',
     skipButtons: {
