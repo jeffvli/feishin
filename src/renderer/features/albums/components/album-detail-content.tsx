@@ -4,7 +4,7 @@ import { ColDef, RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-gri
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
-import { RiDiscFill, RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
+import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
 import { Link } from 'react-router-dom';
@@ -32,9 +32,10 @@ import {
   VirtualTable,
 } from '/@/renderer/components/virtual-table';
 import { SwiperGridCarousel } from '/@/renderer/components/grid-carousel';
+import { FullWidthDiscCell } from '/@/renderer/components/virtual-table/cells/full-width-disc-cell';
 
 const isFullWidthRow = (node: RowNode) => {
-  return node.id?.includes('disc-');
+  return node.id?.startsWith('disc-');
 };
 
 const ContentContainer = styled.div`
@@ -125,16 +126,11 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     }
 
     const uniqueDiscNumbers = new Set(detailQuery.data?.songs.map((s) => s.discNumber));
-
-    if (uniqueDiscNumbers.size === 1) {
-      return detailQuery.data?.songs;
-    }
-
     const rowData: (QueueSong | { id: string; name: string })[] = [];
 
     for (const discNumber of uniqueDiscNumbers.values()) {
       const songsByDiscNumber = detailQuery.data?.songs.filter((s) => s.discNumber === discNumber);
-      rowData.push({ id: `disc-${discNumber}`, name: `DISC ${discNumber}` });
+      rowData.push({ id: `disc-${discNumber}`, name: `Disc ${discNumber}`.toLocaleUpperCase() });
       rowData.push(...songsByDiscNumber);
     }
 
@@ -335,26 +331,13 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
           ref={tableRef}
           autoFitColumns
           autoHeight
-          deselectOnClickOutside
           suppressCellFocus
           suppressHorizontalScroll
           suppressLoadingOverlay
           suppressRowDrag
           columnDefs={columnDefs}
           enableCellChangeFlash={false}
-          fullWidthCellRenderer={(data: any) => {
-            if (!data.data) return null;
-            return (
-              <Group
-                align="center"
-                h="100%"
-                spacing="sm"
-              >
-                <RiDiscFill />
-                <Text>{data.data.name}</Text>
-              </Group>
-            );
-          }}
+          fullWidthCellRenderer={FullWidthDiscCell}
           getRowHeight={getRowHeight}
           getRowId={(data) => data.data.id}
           isFullWidthRow={(data) => {

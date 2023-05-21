@@ -37,6 +37,7 @@ export * from './table-config-dropdown';
 export * from './table-pagination';
 export * from './hooks/use-fixed-table-header';
 export * from './hooks/use-click-outside-deselect';
+export * from './utils';
 
 const TableWrapper = styled.div`
   display: flex;
