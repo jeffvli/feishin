@@ -2,7 +2,7 @@ import map from 'lodash/map';
 import merge from 'lodash/merge';
 import shuffle from 'lodash/shuffle';
 import { nanoid } from 'nanoid/non-secure';
-import create from 'zustand';
+import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
