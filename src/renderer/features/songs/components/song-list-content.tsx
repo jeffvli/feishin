@@ -25,7 +25,6 @@ import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem, QueueSong, SongListQuery } from '/@/renderer/api/types';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useSongListContext } from '/@/renderer/features/songs/context/song-list-context';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 import { getColumnDefs, VirtualTable, TablePagination } from '/@/renderer/components/virtual-table';
@@ -39,12 +38,11 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
   const queryClient = useQueryClient();
   const server = useCurrentServer();
 
-  const { id, pageKey } = useSongListContext();
+  const { id, pageKey, handlePlay } = useSongListContext();
   const filter = useSongListFilter({ id, key: pageKey });
   const { display, table } = useSongListStore({ id, key: pageKey });
 
   const { setTable, setTablePagination } = useListStoreActions();
-  const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
 
   const isPaginationEnabled = display === ListDisplayType.TABLE_PAGINATED;
@@ -160,10 +158,7 @@ export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) =
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;
-    handlePlayQueueAdd?.({
-      byData: [e.data],
-      playType: playButtonBehavior,
-    });
+    handlePlay?.({ initialSongId: e.data.id, playType: playButtonBehavior });
   };
 
   return (

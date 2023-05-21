@@ -1,5 +1,6 @@
 import { useCallback, useMemo, ChangeEvent, MutableRefObject, MouseEvent } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
 import {
@@ -24,7 +25,6 @@ import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jelly
 import { NavidromeSongFilters } from '/@/renderer/features/songs/components/navidrome-song-filters';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { queryClient } from '/@/renderer/lib/react-query';
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import {
   SongListFilter,
   useCurrentServer,
@@ -265,13 +265,25 @@ export const SongListHeaderFilters = ({
     if (!itemCount || itemCount === 0) return;
     const query: SongListQuery = { startIndex: 0, ...filter, ...customFilters };
 
-    handlePlayQueueAdd?.({
-      byItemType: {
-        id: query,
-        type: LibraryItem.SONG,
-      },
-      playType,
-    });
+    if (id) {
+      handlePlayQueueAdd?.({
+        byItemType: {
+          id: [id],
+          type: LibraryItem.ALBUM_ARTIST,
+        },
+        playType,
+        query,
+      });
+    } else {
+      handlePlayQueueAdd?.({
+        byItemType: {
+          id: [],
+          type: LibraryItem.SONG,
+        },
+        playType,
+        query,
+      });
+    }
   };
 
   const handleOpenFiltersModal = () => {

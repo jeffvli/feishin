@@ -5,9 +5,8 @@ import debounce from 'lodash/debounce';
 import { ChangeEvent, MutableRefObject, useCallback } from 'react';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { LibraryItem, SongListQuery } from '/@/renderer/api/types';
+import { SongListQuery } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { SongListHeaderFilters } from '/@/renderer/features/songs/components/song-list-header-filters';
 import { useSongListContext } from '/@/renderer/features/songs/context/song-list-context';
@@ -20,26 +19,18 @@ import {
   useSongListFilter,
 } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { Play } from '/@/renderer/types';
 
 interface SongListHeaderProps {
-  customFilters?: Partial<SongListFilter>;
   itemCount?: number;
   tableRef: MutableRefObject<AgGridReactType | null>;
   title?: string;
 }
 
-export const SongListHeader = ({
-  customFilters,
-  title,
-  itemCount,
-  tableRef,
-}: SongListHeaderProps) => {
+export const SongListHeader = ({ title, itemCount, tableRef }: SongListHeaderProps) => {
   const server = useCurrentServer();
-  const { id, pageKey } = useSongListContext();
+  const { id, pageKey, handlePlay } = useSongListContext();
   const filter = useSongListFilter({ id, key: pageKey });
   const { setFilter, setTablePagination } = useListStoreActions();
-  const handlePlayQueueAdd = usePlayQueueAdd();
   const cq = useContainerQuery();
 
   const handleFilterChange = useCallback(
@@ -55,7 +46,6 @@ export const SongListHeader = ({
             limit,
             startIndex,
             ...pageFilters,
-            ...customFilters,
           };
 
           const queryKey = queryKeys.songs.list(server?.id || '', query);
@@ -82,7 +72,7 @@ export const SongListHeader = ({
       tableRef.current?.api.ensureIndexVisible(0, 'top');
       setTablePagination({ data: { currentPage: 0 }, key: pageKey });
     },
-    [customFilters, filter, pageKey, server, setTablePagination, tableRef],
+    [filter, pageKey, server, setTablePagination, tableRef],
   );
 
   const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
@@ -93,19 +83,6 @@ export const SongListHeader = ({
   }, 500);
 
   const playButtonBehavior = usePlayButtonBehavior();
-
-  const handlePlay = async (playType: Play) => {
-    if (!itemCount || itemCount === 0) return;
-    const query: SongListQuery = { startIndex: 0, ...filter, ...customFilters };
-
-    handlePlayQueueAdd?.({
-      byItemType: {
-        id: query,
-        type: LibraryItem.SONG,
-      },
-      playType,
-    });
-  };
 
   return (
     <Stack
@@ -118,7 +95,9 @@ export const SongListHeader = ({
           w="100%"
         >
           <LibraryHeaderBar>
-            <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+            <LibraryHeaderBar.PlayButton
+              onClick={() => handlePlay?.({ playType: playButtonBehavior })}
+            />
             <LibraryHeaderBar.Title>{title || 'Tracks'}</LibraryHeaderBar.Title>
             <LibraryHeaderBar.Badge isLoading={itemCount === null || itemCount === undefined}>
               {itemCount}
@@ -135,7 +114,6 @@ export const SongListHeader = ({
       </PageHeader>
       <FilterBar>
         <SongListHeaderFilters
-          customFilters={customFilters}
           itemCount={itemCount}
           tableRef={tableRef}
         />

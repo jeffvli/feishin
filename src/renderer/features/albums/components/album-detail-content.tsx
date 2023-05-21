@@ -1,5 +1,5 @@
 import { MutableRefObject, useCallback, useMemo } from 'react';
-import { Button, Text } from '/@/renderer/components';
+import { Button } from '/@/renderer/components';
 import { ColDef, RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
@@ -213,16 +213,17 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
   const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
-    if (!e.data) return;
+    if (!e.data || e.node.isFullWidthCell()) return;
 
     const rowData: QueueSong[] = [];
     e.api.forEachNode((node) => {
-      if (!node.data) return;
+      if (!node.data || node.isFullWidthCell()) return;
       rowData.push(node.data);
     });
 
     handlePlayQueueAdd?.({
       byData: rowData,
+      initialSongId: e.data.id,
       playType: playButtonBehavior,
     });
   };

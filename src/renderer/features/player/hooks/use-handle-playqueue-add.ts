@@ -12,6 +12,7 @@ import {
   getSongById,
   getAlbumSongsById,
   getAlbumArtistSongsById,
+  getSongsByQuery,
 } from '/@/renderer/features/player/utils';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
@@ -44,6 +45,8 @@ export const useHandlePlayQueueAdd = () => {
             songList = await getAlbumSongsById({ id, query, queryClient, server });
           } else if (itemType === LibraryItem.ALBUM_ARTIST) {
             songList = await getAlbumArtistSongsById({ id, query, queryClient, server });
+          } else if (itemType === LibraryItem.SONG) {
+            songList = await getSongsByQuery({ query, queryClient, server });
           } else {
             songList = await getSongById({ id: id?.[0], queryClient, server });
           }
@@ -60,8 +63,6 @@ export const useHandlePlayQueueAdd = () => {
       }
 
       if (!songs) return toast.warn({ message: 'No songs found' });
-
-      // const index = initialIndex || initial songs.findIndex((song) => song.id === initialSongId);
 
       if (initialIndex) {
         initialSongIndex = initialIndex;
