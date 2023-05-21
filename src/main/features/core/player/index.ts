@@ -70,9 +70,6 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
       try {
         if (data.queue.current) {
           await getMpvInstance()?.load(data.queue.current.streamUrl, 'replace');
-          if (pause) {
-            await getMpvInstance()?.pause();
-          }
         }
 
         if (data.queue.next) {
@@ -86,6 +83,10 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
         await wait(500);
       }
     }
+  }
+
+  if (pause) {
+    await getMpvInstance()?.pause();
   }
 });
 
