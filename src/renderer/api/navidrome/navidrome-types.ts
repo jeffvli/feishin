@@ -314,7 +314,7 @@ const removeFromPlaylist = z.object({
 });
 
 const removeFromPlaylistParameters = z.object({
-  ids: z.array(z.string()),
+  id: z.array(z.string()),
 });
 
 export const ndType = {

@@ -431,7 +431,7 @@ const removeFromPlaylist = async (
       id: query.id,
     },
     query: {
-      ids: query.songId,
+      id: query.songId,
     },
   });
 
