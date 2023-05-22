@@ -66,6 +66,8 @@ const SearchRoute = () => {
                 lastRow = startIndex + numOfItems;
               }
 
+              console.log('lastRow', lastRow);
+
               params.successCallback(items, lastRow);
             },
           };
@@ -111,6 +113,8 @@ const SearchRoute = () => {
                 lastRow = startIndex + numOfItems;
               }
 
+              console.log('lastRow', lastRow);
+
               params.successCallback(items, lastRow);
             },
           };
@@ -155,6 +159,9 @@ const SearchRoute = () => {
               if (numOfItems < limit) {
                 lastRow = startIndex + numOfItems;
               }
+              console.log('items', items);
+              console.log('numOfItems :>> ', numOfItems);
+              console.log('lastRow', lastRow);
 
               params.successCallback(items, lastRow);
             },

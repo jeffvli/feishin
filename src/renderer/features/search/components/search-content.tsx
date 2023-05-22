@@ -1,3 +1,4 @@
+import { MutableRefObject, useMemo, useCallback } from 'react';
 import {
   ColDef,
   GridReadyEvent,
@@ -6,7 +7,7 @@ import {
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Stack } from '@mantine/core';
-import { MutableRefObject, useMemo, useCallback } from 'react';
+import { generatePath, useNavigate } from 'react-router';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
@@ -18,7 +19,6 @@ import {
   SONG_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { generatePath, useNavigate } from 'react-router';
 import { AppRoute } from '../../../router/routes';
 import {
   useCurrentServer,
@@ -43,8 +43,6 @@ export const SearchContent = ({ tableRef, getDatasource }: SearchContentProps) =
   const albumArtistListStore = useAlbumArtistListStore();
   const handlePlayQueueAdd = usePlayQueueAdd();
   const playButtonBehavior = usePlayButtonBehavior();
-
-  const isPaginationEnabled = true;
 
   const getTable = useCallback(
     (itemType: string) => {
@@ -139,17 +137,11 @@ export const SearchContent = ({ tableRef, getDatasource }: SearchContentProps) =
           }}
           getRowId={(data) => data.data.id}
           infiniteInitialRowCount={25}
-          pagination={isPaginationEnabled}
-          paginationAutoPageSize={isPaginationEnabled}
-          paginationPageSize={table.pagination.itemsPerPage || 100}
           rowBuffer={20}
           rowHeight={table.rowHeight || 40}
           rowModelType="infinite"
           rowSelection="multiple"
-          // onBodyScrollEnd={handleScroll}
           onCellContextMenu={handleContextMenu}
-          // onColumnMoved={handleColumnChange}
-          // onColumnResized={debouncedColumnChange}
           onGridReady={onGridReady}
           onGridSizeChanged={handleGridSizeChange}
           onRowDoubleClicked={handleRowDoubleClick}
