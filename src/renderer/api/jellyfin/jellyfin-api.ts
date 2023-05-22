@@ -6,16 +6,18 @@ import qs from 'qs';
 import { toast } from '/@/renderer/components';
 import { ServerListItem } from '/@/renderer/types';
 import omitBy from 'lodash/omitBy';
+import { z } from 'zod';
 
 const c = initContract();
 
 export const contract = c.router({
   addToPlaylist: {
-    body: jfType._parameters.addToPlaylist,
+    body: z.null(),
     method: 'POST',
     path: 'playlists/:id/items',
+    query: jfType._parameters.addToPlaylist,
     responses: {
-      200: jfType._response.addToPlaylist,
+      204: jfType._response.addToPlaylist,
       400: jfType._response.error,
     },
   },
@@ -190,7 +192,7 @@ export const contract = c.router({
   removeFromPlaylist: {
     body: null,
     method: 'DELETE',
-    path: 'items/:id',
+    path: 'playlists/:id/items',
     query: jfType._parameters.removeFromPlaylist,
     responses: {
       200: jfType._response.removeFromPlaylist,

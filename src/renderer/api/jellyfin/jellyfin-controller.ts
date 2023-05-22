@@ -403,16 +403,17 @@ const addToPlaylist = async (args: AddToPlaylistArgs): Promise<AddToPlaylistResp
   }
 
   const res = await jfApiClient(apiClientProps).addToPlaylist({
-    body: {
-      Ids: body.songId,
-      UserId: apiClientProps?.server?.userId,
-    },
+    body: null,
     params: {
       id: query.id,
     },
+    query: {
+      Ids: body.songId,
+      UserId: apiClientProps.server?.userId,
+    },
   });
 
-  if (res.status !== 200) {
+  if (res.status !== 204) {
     throw new Error('Failed to add to playlist');
   }
 
@@ -434,7 +435,7 @@ const removeFromPlaylist = async (
     },
   });
 
-  if (res.status !== 200) {
+  if (res.status !== 204) {
     throw new Error('Failed to remove from playlist');
   }
 
