@@ -45,7 +45,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
   }, []);
 
   const { data, isLoading } = useSearch({
-    options: { enabled: debouncedQuery !== '' && query !== '' },
+    options: { enabled: isHome && debouncedQuery !== '' && query !== '' },
     query: {
       albumArtistLimit: 4,
       albumArtistStartIndex: 0,
@@ -58,9 +58,9 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
     serverId: server?.id,
   });
 
-  const showAlbumGroup = Boolean(query && data && data?.albums?.length > 0);
-  const showArtistGroup = Boolean(query && data && data?.albumArtists?.length > 0);
-  const showTrackGroup = Boolean(query && data && data?.songs?.length > 0);
+  const showAlbumGroup = isHome && Boolean(query && data && data?.albums?.length > 0);
+  const showArtistGroup = isHome && Boolean(query && data && data?.albumArtists?.length > 0);
+  const showTrackGroup = isHome && Boolean(query && data && data?.songs?.length > 0);
 
   const handlePlayQueueAdd = usePlayQueueAdd();
 
@@ -238,7 +238,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
         p="0.5rem"
       >
         <Group position="apart">
-          <Command.Loading>{isLoading && query !== '' && <Spinner />}</Command.Loading>
+          <Command.Loading>{isHome && isLoading && query !== '' && <Spinner />}</Command.Loading>
           <Group spacing="sm">
             <Kbd size="md">ESC</Kbd>
             <Kbd size="md">↑</Kbd>
