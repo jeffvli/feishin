@@ -162,7 +162,7 @@ const initialState: SettingsState = {
       volumeMute: { allowGlobal: true, hotkey: '', isGlobal: false },
       volumeUp: { allowGlobal: true, hotkey: '', isGlobal: false },
     },
-    globalMediaHotkeys: false,
+    globalMediaHotkeys: true,
   },
   playback: {
     audioDeviceId: undefined,
