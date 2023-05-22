@@ -11,6 +11,8 @@ const Container = styled(Flex)<{ $active?: boolean; $disabled?: boolean }>`
   border-right: var(--sidebar-border);
   cursor: ${(props) => (props.$disabled ? 'default' : 'pointer')};
   opacity: ${(props) => props.$disabled && 0.6};
+  user-select: ${(props) => (props.$disabled ? 'none' : 'initial')};
+  pointer-events: ${(props) => (props.$disabled ? 'none' : 'all')};
 
   svg {
     fill: ${(props) => (props.$active ? 'var(--primary-color)' : 'var(--sidebar-fg)')};
