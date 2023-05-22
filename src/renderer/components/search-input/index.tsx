@@ -1,7 +1,7 @@
 import { ChangeEvent, KeyboardEvent } from 'react';
-import { TextInputProps } from '@mantine/core';
+import { ActionIcon, TextInputProps } from '@mantine/core';
 import { useFocusWithin, useHotkeys, useMergedRef } from '@mantine/hooks';
-import { RiSearchLine } from 'react-icons/ri';
+import { RiCloseFill, RiSearchLine } from 'react-icons/ri';
 import { TextInput } from '/@/renderer/components/input';
 import { useSettingsStore } from '/@/renderer/store';
 import { shallow } from 'zustand/shallow';
@@ -40,6 +40,18 @@ export const SearchInput = ({
       ref={mergedRef}
       {...props}
       icon={showIcon && <RiSearchLine />}
+      rightSection={
+        isOpened ? (
+          <ActionIcon
+            onClick={() => {
+              ref.current.value = '';
+              ref.current.focus();
+            }}
+          >
+            <RiCloseFill />
+          </ActionIcon>
+        ) : null
+      }
       size="md"
       styles={{
         icon: { svg: { fill: 'var(--titlebar-fg)' } },

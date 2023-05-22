@@ -1,12 +1,13 @@
 /* eslint-disable react/no-unknown-property */
-import { useCallback, useState, Fragment } from 'react';
-import { Group, Kbd, ScrollArea } from '@mantine/core';
+import { useCallback, useState, Fragment, useRef } from 'react';
+import { ActionIcon, Group, Kbd, ScrollArea } from '@mantine/core';
 import { useDisclosure, useDebouncedValue } from '@mantine/hooks';
+import { RiSearchLine, RiCloseFill } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { GoToCommands } from './go-to-commands';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
-import { Button, Modal, Paper, Spinner } from '/@/renderer/components';
+import { Button, Modal, Paper, Spinner, TextInput } from '/@/renderer/components';
 import { HomeCommands } from './home-commands';
 import { ServerCommands } from '/@/renderer/features/search/components/server-commands';
 import { useSearch } from '/@/renderer/features/search/queries/search-query';
@@ -35,6 +36,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
   const [pages, setPages] = useState<CommandPalettePages[]>([CommandPalettePages.HOME]);
   const activePage = pages[pages.length - 1];
   const isHome = activePage === CommandPalettePages.HOME;
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const popPage = useCallback(() => {
     setPages((pages) => {
@@ -117,11 +119,22 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
         value={value}
         onValueChange={setValue}
       >
-        <Command.Input
-          autoFocus
-          placeholder="Enter search..."
+        <TextInput
+          ref={searchInputRef}
+          icon={<RiSearchLine />}
+          rightSection={
+            <ActionIcon
+              onClick={() => {
+                setQuery('');
+                searchInputRef.current?.focus();
+              }}
+            >
+              <RiCloseFill />
+            </ActionIcon>
+          }
+          size="lg"
           value={query}
-          onValueChange={setQuery}
+          onChange={(e) => setQuery(e.currentTarget.value)}
         />
         <Command.Separator />
         <Command.List>
