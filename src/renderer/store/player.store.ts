@@ -107,21 +107,31 @@ export const usePlayerStore = create<PlayerSlice>()(
 
               if (playType === Play.NOW) {
                 if (get().shuffle === PlayerShuffle.TRACK) {
-                  const shuffledSongs = shuffle(queueSongs);
                   const index = initialIndex || 0;
-                  const initialSongUniqueId = queueSongs[index].uniqueId;
-                  const initialSongIndex = shuffledSongs.findIndex(
-                    (song) => song.uniqueId === initialSongUniqueId,
+                  const initialSong = queueSongs[index];
+                  const queueCopy = [...queueSongs];
+
+                  // Splice the initial song from the queue
+                  queueCopy.splice(index, 1);
+
+                  const shuffledSongIndicesWithoutInitial = shuffle(queueCopy).map(
+                    (song) => song.uniqueId,
                   );
 
+                  // Add the initial song to the start of the shuffled queue
+                  const shuffledSongIndices = [
+                    initialSong.uniqueId,
+                    ...shuffledSongIndicesWithoutInitial,
+                  ];
+
                   set((state) => {
-                    state.queue.shuffled = shuffledSongs.map((song) => song.uniqueId);
+                    state.queue.shuffled = shuffledSongIndices;
                     state.queue.default = queueSongs;
                     state.current.time = 0;
                     state.current.player = 1;
-                    state.current.index = initialSongIndex;
+                    state.current.index = 0;
                     state.current.shuffledIndex = 0;
-                    state.current.song = shuffledSongs[initialSongIndex];
+                    state.current.song = initialSong;
                   });
                 } else {
                   const index = initialIndex || 0;
@@ -849,7 +859,7 @@ export const usePlayerStore = create<PlayerSlice>()(
         },
         name: 'store_player',
         partialize: (state) => {
-          const notPersisted = ['queue', 'current'];
+          const notPersisted = ['queue', 'current', 'entry'];
           return Object.fromEntries(
             Object.entries(state).filter(([key]) => !notPersisted.includes(key)),
           );
