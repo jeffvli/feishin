@@ -112,6 +112,10 @@ export const useHandlePlayQueueAdd = () => {
             return null;
           }
 
+          clearTimeout(timeoutIds.current[fetchId] as ReturnType<typeof setTimeout>);
+          delete timeoutIds.current[fetchId];
+          toast.hide(fetchId);
+
           return toast.error({
             message: err.message,
             title: 'Play queue add failed',
