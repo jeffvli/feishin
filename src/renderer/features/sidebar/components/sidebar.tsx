@@ -2,7 +2,7 @@ import { MouseEvent } from 'react';
 import { Stack, Accordion, Center, Group, Divider, Box } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button, MotionStack, Spinner } from '/@/renderer/components';
+import { Button, MotionStack, Spinner, Tooltip } from '/@/renderer/components';
 import {
   RiAddFill,
   RiAlbumFill,
@@ -288,19 +288,24 @@ export const Sidebar = () => {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               onClick={expandFullScreenPlayer}
             >
-              {upsizedImageUrl ? (
-                <SidebarImage
-                  loading="eager"
-                  src={upsizedImageUrl}
-                />
-              ) : (
-                <Center sx={{ background: 'var(--placeholder-bg)', height: '100%' }}>
-                  <RiDiscLine
-                    color="var(--placeholder-fg)"
-                    size={50}
+              <Tooltip
+                label="Toggle fullscreen player"
+                openDelay={500}
+              >
+                {upsizedImageUrl ? (
+                  <SidebarImage
+                    loading="eager"
+                    src={upsizedImageUrl}
                   />
-                </Center>
-              )}
+                ) : (
+                  <Center sx={{ background: 'var(--placeholder-bg)', height: '100%' }}>
+                    <RiDiscLine
+                      color="var(--placeholder-fg)"
+                      size={50}
+                    />
+                  </Center>
+                )}
+              </Tooltip>
               <Button
                 compact
                 opacity={0.8}

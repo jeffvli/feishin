@@ -140,7 +140,7 @@ export const LeftControls = () => {
                 onClick={handleToggleFullScreenPlayer}
               >
                 <Tooltip
-                  label="Open fullscreen player"
+                  label="Toggle fullscreen player"
                   openDelay={500}
                 >
                   {currentSong?.imageUrl ? (
