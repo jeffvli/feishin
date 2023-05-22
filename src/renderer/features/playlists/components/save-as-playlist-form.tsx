@@ -9,9 +9,15 @@ interface SaveAsPlaylistFormProps {
   body: Partial<CreatePlaylistBody>;
   onCancel: () => void;
   onSuccess: (data: CreatePlaylistResponse) => void;
+  serverId: string | undefined;
 }
 
-export const SaveAsPlaylistForm = ({ body, onSuccess, onCancel }: SaveAsPlaylistFormProps) => {
+export const SaveAsPlaylistForm = ({
+  body,
+  serverId,
+  onSuccess,
+  onCancel,
+}: SaveAsPlaylistFormProps) => {
   const mutation = useCreatePlaylist({});
   const server = useCurrentServer();
 
@@ -31,7 +37,7 @@ export const SaveAsPlaylistForm = ({ body, onSuccess, onCancel }: SaveAsPlaylist
 
   const handleSubmit = form.onSubmit((values) => {
     mutation.mutate(
-      { body: values },
+      { body: values, serverId },
       {
         onError: (err) => {
           toast.error({ message: err.message, title: 'Error creating playlist' });

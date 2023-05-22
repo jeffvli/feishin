@@ -213,7 +213,11 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;
     handlePlayQueueAdd?.({
-      byData: [e.data],
+      byItemType: {
+        id: [playlistId],
+        type: LibraryItem.PLAYLIST,
+      },
+      initialSongId: e.data.id,
       playType: playButtonBehavior,
     });
   };

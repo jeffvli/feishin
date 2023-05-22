@@ -2,6 +2,7 @@ import { useCallback, ChangeEvent, MutableRefObject, MouseEvent } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
+import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   RiSortAsc,
@@ -18,7 +19,16 @@ import {
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { LibraryItem, PlaylistSongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
-import { DropdownMenu, Button, Slider, MultiSelect, Switch, Text } from '/@/renderer/components';
+import {
+  DropdownMenu,
+  Button,
+  Slider,
+  MultiSelect,
+  Switch,
+  Text,
+  ConfirmModal,
+  toast,
+} from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
@@ -34,6 +44,8 @@ import { ListDisplayType, ServerType, Play, TableColumn } from '/@/renderer/type
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { useParams } from 'react-router';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
+import { openUpdatePlaylistModal } from '/@/renderer/features/playlists/components/update-playlist-form';
+import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
 
 const FILTERS = {
   jellyfin: [
@@ -238,6 +250,40 @@ export const PlaylistDetailSongListHeaderFilters = ({
     });
   };
 
+  const deletePlaylistMutation = useDeletePlaylist({});
+
+  const handleDeletePlaylist = useCallback(() => {
+    if (!detailQuery.data) return;
+    deletePlaylistMutation?.mutate(
+      { query: { id: detailQuery.data.id }, serverId: detailQuery.data.id },
+      {
+        onError: (err) => {
+          toast.error({
+            message: err.message,
+            title: 'Error deleting playlist',
+          });
+        },
+        onSuccess: () => {
+          toast.success({
+            message: `Playlist has been deleted`,
+          });
+        },
+      },
+    );
+    closeAllModals();
+  }, [deletePlaylistMutation, detailQuery.data]);
+
+  const openDeletePlaylistModal = () => {
+    openModal({
+      children: (
+        <ConfirmModal onConfirm={handleDeletePlaylist}>
+          <Text>Are you sure you want to delete this playlist?</Text>
+        </ConfirmModal>
+      ),
+      title: 'Delete playlist(s)',
+    });
+  };
+
   return (
     <Flex justify="space-between">
       <Group
@@ -320,16 +366,20 @@ export const PlaylistDetailSongListHeaderFilters = ({
             </DropdownMenu.Item>
             <DropdownMenu.Divider />
             <DropdownMenu.Item
-              disabled
               icon={<RiEditFill />}
-              onClick={() => handlePlay(Play.LAST)}
+              onClick={() =>
+                openUpdatePlaylistModal({
+                  playlist: detailQuery.data!,
+                  server: server!,
+                })
+              }
             >
               Edit playlist
             </DropdownMenu.Item>
             <DropdownMenu.Item
               disabled
               icon={<RiDeleteBinFill />}
-              onClick={() => handlePlay(Play.LAST)}
+              onClick={openDeletePlaylistModal}
             >
               Delete playlist
             </DropdownMenu.Item>

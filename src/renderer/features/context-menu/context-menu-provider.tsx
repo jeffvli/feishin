@@ -195,7 +195,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const handleDeletePlaylist = useCallback(() => {
     for (const item of ctx.data) {
       deletePlaylistMutation?.mutate(
-        { query: { id: item.id } },
+        { query: { id: item.id }, serverId: item.serverId },
         {
           onError: (err) => {
             toast.error({
@@ -432,6 +432,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             id: ctx.context.playlistId,
             songId,
           },
+          serverId: ctx.data?.[0]?.serverId,
         },
         {
           onError: (err) => {
@@ -465,6 +466,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   }, [
     ctx.context?.playlistId,
     ctx.context?.tableRef,
+    ctx.data,
     ctx.dataNodes,
     removeFromPlaylistMutation,
     serverType,

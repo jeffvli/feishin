@@ -57,6 +57,7 @@ const PlaylistDetailSongListRoute = () => {
           comment: detailQuery?.data?.description || '',
           name: detailQuery?.data?.name,
         },
+        serverId: detailQuery?.data?.serverId,
       },
       {
         onSuccess: (data) => {
@@ -64,13 +65,19 @@ const PlaylistDetailSongListRoute = () => {
           navigate(generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data?.id || '' }), {
             replace: true,
           });
-          deletePlaylistMutation.mutate({ query: { id: playlistId } });
+          deletePlaylistMutation.mutate({
+            query: { id: playlistId },
+            serverId: detailQuery?.data?.serverId,
+          });
         },
       },
     );
   };
 
-  const handleSaveAs = (filter: Record<string, any>) => {
+  const handleSaveAs = (
+    filter: Record<string, any>,
+    extraFilters: { limit?: number; sortBy?: string; sortOrder?: string },
+  ) => {
     openModal({
       children: (
         <SaveAsPlaylistForm
@@ -82,8 +89,9 @@ const PlaylistDetailSongListRoute = () => {
                 public: detailQuery?.data?.public || false,
                 rules: {
                   ...filter,
-                  order: 'desc',
-                  sort: 'year',
+                  limit: extraFilters.limit || undefined,
+                  order: extraFilters.sortOrder || 'desc',
+                  sort: extraFilters.sortBy || 'dateAdded',
                 },
                 sync: detailQuery?.data?.sync || false,
               },
@@ -91,6 +99,7 @@ const PlaylistDetailSongListRoute = () => {
             comment: detailQuery?.data?.description || '',
             name: detailQuery?.data?.name,
           }}
+          serverId={detailQuery?.data?.serverId}
           onCancel={closeAllModals}
           onSuccess={(data) =>
             navigate(generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data?.id || '' }))

@@ -184,6 +184,10 @@ export const PlaylistListHeaderFilters = ({ tableRef }: PlaylistListHeaderFilter
     setTable({ rowHeight: e });
   };
 
+  const handleRefresh = () => {
+    tableRef?.current?.api?.purgeInfiniteCache();
+  };
+
   return (
     <Flex justify="space-between">
       <Group
@@ -246,7 +250,12 @@ export const PlaylistListHeaderFilters = ({ tableRef }: PlaylistListHeaderFilter
             </Button>
           </DropdownMenu.Target>
           <DropdownMenu.Dropdown>
-            <DropdownMenu.Item icon={<RiRefreshLine />}>Refresh</DropdownMenu.Item>
+            <DropdownMenu.Item
+              icon={<RiRefreshLine />}
+              onClick={handleRefresh}
+            >
+              Refresh
+            </DropdownMenu.Item>
           </DropdownMenu.Dropdown>
         </DropdownMenu>
       </Group>
