@@ -25,7 +25,7 @@ export const PlaylistListHeader = ({ itemCount, tableRef }: PlaylistListHeaderPr
       onClose: () => {
         tableRef?.current?.api?.purgeInfiniteCache();
       },
-      size: server?.type === ServerType?.NAVIDROME ? 'lg' : 'sm',
+      size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
       title: 'Create Playlist',
     });
   };

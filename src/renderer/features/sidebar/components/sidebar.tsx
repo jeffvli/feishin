@@ -95,7 +95,7 @@ export const Sidebar = () => {
 
     openModal({
       children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
-      size: server?.type === ServerType?.NAVIDROME ? 'lg' : 'sm',
+      size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
       title: 'Create Playlist',
     });
   };
