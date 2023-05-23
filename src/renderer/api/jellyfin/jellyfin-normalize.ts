@@ -155,6 +155,7 @@ const normalizeSong = (
     imageUrl: getSongCoverArtUrl({ baseUrl: server?.url || '', item, size: imageSize || 100 }),
     itemType: LibraryItem.SONG,
     lastPlayedAt: null,
+    lyrics: null,
     name: item.Name,
     path: (item.MediaSources && item.MediaSources[0]?.Path) || null,
     playCount: (item.UserData && item.UserData.PlayCount) || 0,
