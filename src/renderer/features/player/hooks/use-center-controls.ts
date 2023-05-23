@@ -24,6 +24,7 @@ const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : nul
 const ipc = isElectron() ? window.electron.ipc : null;
 const utils = isElectron() ? window.electron.utils : null;
 const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
+const mediaSession = !isElectron() ? navigator.mediaSession : null;
 
 export const useCenterControls = (args: { playersRef: any }) => {
   const { playersRef } = args;
@@ -77,16 +78,50 @@ export const useCenterControls = (args: { playersRef: any }) => {
     status?: PlayerStatus;
   }) => {
     const { song, currentTime, status } = args || {};
+
+    const time = currentTime || usePlayerStore.getState().current.time;
+    const playStatus = status || usePlayerStore.getState().current.status;
+    const track = song || usePlayerStore.getState().current.song;
+
     mpris?.updateSong({
-      currentTime: currentTime || usePlayerStore.getState().current.time,
+      currentTime: time,
       repeat: usePlayerStore.getState().repeat,
       shuffle: usePlayerStore.getState().shuffle,
-      song: song || usePlayerStore.getState().current.song,
-      status:
-        (status || usePlayerStore.getState().current.status) === PlayerStatus.PLAYING
-          ? 'Playing'
-          : 'Paused',
+      song: track,
+      status: playStatus === PlayerStatus.PLAYING ? 'Playing' : 'Paused',
     });
+
+    if (mediaSession) {
+      mediaSession.playbackState = playStatus === PlayerStatus.PLAYING ? 'playing' : 'paused';
+
+      let metadata: MediaMetadata;
+
+      if (track) {
+        let artwork: MediaImage[];
+
+        if (track.imageUrl) {
+          const image300 = track.imageUrl
+            ?.replace(/&size=\d+/, '&size=300')
+            .replace(/\?width=\d+/, '?width=300')
+            .replace(/&height=\d+/, '&height=300');
+
+          artwork = [{ sizes: '300x300', src: image300, type: 'image/png' }];
+        } else {
+          artwork = [];
+        }
+
+        metadata = new MediaMetadata({
+          album: track.album ?? '',
+          artist: track.artistName,
+          artwork,
+          title: track.name,
+        });
+      } else {
+        metadata = new MediaMetadata();
+      }
+
+      mediaSession.metadata = metadata;
+    }
   };
 
   const handlePlay = useCallback(() => {
@@ -627,6 +662,57 @@ export const useCenterControls = (args: { playersRef: any }) => {
   ]);
 
   useEffect(() => {
+    if (!isElectron() && mediaSession) {
+      mediaSession.setActionHandler('nexttrack', () => {
+        handleNextTrack();
+      });
+
+      mediaSession.setActionHandler('pause', () => {
+        handlePause();
+      });
+
+      mediaSession.setActionHandler('play', () => {
+        handlePlay();
+      });
+
+      mediaSession.setActionHandler('previoustrack', () => {
+        handlePrevTrack();
+      });
+
+      mediaSession.setActionHandler('seekto', (evt) => {
+        const time = evt.seekTime;
+
+        if (time !== undefined) {
+          handleSeekSlider(time);
+        }
+      });
+
+      mediaSession.setActionHandler('stop', () => {
+        handleStop();
+      });
+
+      return () => {
+        mediaSession.setActionHandler('nexttrack', null);
+        mediaSession.setActionHandler('pause', null);
+        mediaSession.setActionHandler('play', null);
+        mediaSession.setActionHandler('previoustrack', null);
+        mediaSession.setActionHandler('seekto', null);
+        mediaSession.setActionHandler('stop', null);
+      };
+    }
+
+    return () => {};
+  }, [
+    handleNextTrack,
+    handlePause,
+    handlePlay,
+    handlePrevTrack,
+    handleSeekSlider,
+    handleStop,
+    setCurrentTime,
+  ]);
+
+  useEffect(() => {
     if (utils?.isLinux()) {
       const unsubCurrentTime = usePlayerStore.subscribe(
         (state) => state.current.time,
@@ -668,10 +754,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
       });
 
       mpris.requestVolume((_e: any, data: { volume: number }) => {
-        const currentVolume = usePlayerStore.getState().volume;
-        const resultingVolume = data.volume + currentVolume;
+        let newVolume = data.volume * 100;
 
-        let newVolume = resultingVolume;
         if (newVolume > 100) {
           newVolume = 100;
         } else if (newVolume < 0) {

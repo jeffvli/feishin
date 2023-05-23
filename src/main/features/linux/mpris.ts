@@ -130,7 +130,7 @@ ipcMain.on(
       }
 
       if (shuffle) {
-        mprisPlayer.shuffle = shuffle;
+        mprisPlayer.shuffle = shuffle !== 'none';
       }
 
       if (!song) return;

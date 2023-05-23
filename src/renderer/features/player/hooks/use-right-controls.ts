@@ -6,6 +6,8 @@ import { useGeneralSettings } from '/@/renderer/store/settings.store';
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
 const ipc = isElectron() ? window.electron.ipc : null;
+const utils = isElectron() ? window.electron.utils : null;
+const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
 
 const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {
   let volumeToSet;
@@ -41,6 +43,7 @@ export const useRightControls = () => {
   useEffect(() => {
     if (isElectron()) {
       mpvPlayer.volume(volume);
+      mpris?.updateVolume(volume / 100);
 
       if (muted) {
         mpvPlayer.mute();
@@ -52,22 +55,26 @@ export const useRightControls = () => {
 
   const handleVolumeSlider = (e: number) => {
     mpvPlayer?.volume(e);
+    mpris?.updateVolume(e / 100);
     setVolume(e);
   };
 
   const handleVolumeSliderState = (e: number) => {
+    mpris?.updateVolume(e / 100);
     setVolume(e);
   };
 
   const handleVolumeDown = useCallback(() => {
     const volumeToSet = calculateVolumeDown(volume, volumeWheelStep);
     mpvPlayer?.volume(volumeToSet);
+    mpris?.updateVolume(volumeToSet / 100);
     setVolume(volumeToSet);
   }, [setVolume, volume, volumeWheelStep]);
 
   const handleVolumeUp = useCallback(() => {
     const volumeToSet = calculateVolumeUp(volume, volumeWheelStep);
     mpvPlayer?.volume(volumeToSet);
+    mpris?.updateVolume(volumeToSet / 100);
     setVolume(volumeToSet);
   }, [setVolume, volume, volumeWheelStep]);
 
@@ -81,6 +88,7 @@ export const useRightControls = () => {
       }
 
       mpvPlayer?.volume(volumeToSet);
+      mpris?.updateVolume(volumeToSet / 100);
       setVolume(volumeToSet);
     },
     [setVolume, volume, volumeWheelStep],
