@@ -74,6 +74,7 @@ const normalizeSong = (
     imageUrl,
     itemType: LibraryItem.SONG,
     lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
+    lyrics: item.lyrics ? item.lyrics : null,
     name: item.title,
     path: item.path,
     playCount: item.playCount,

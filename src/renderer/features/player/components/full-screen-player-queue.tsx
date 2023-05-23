@@ -9,6 +9,7 @@ import {
   useFullScreenPlayerStore,
   useFullScreenPlayerStoreActions,
 } from '/@/renderer/store/full-screen-player.store';
+import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 
 const QueueContainer = styled.div`
   position: relative;
@@ -24,6 +25,12 @@ const QueueContainer = styled.div`
   .ag-header {
     display: none !important;
   }
+`;
+
+const LyricsContainer = styled.div`
+  height: 100%;
+  overflow: scroll;
+  text-align: center;
 `;
 
 const ActiveTabIndicator = styled(motion.div)`
@@ -115,17 +122,9 @@ export const FullScreenPlayerQueue = () => {
           </Group>
         </Center>
       ) : activeTab === 'lyrics' ? (
-        <Center>
-          <Group>
-            <RiInformationFill size="2rem" />
-            <TextTitle
-              order={3}
-              weight={700}
-            >
-              COMING SOON
-            </TextTitle>
-          </Group>
-        </Center>
+        <LyricsContainer>
+          <Lyrics />
+        </LyricsContainer>
       ) : null}
     </Stack>
   );

@@ -187,6 +187,7 @@ export type Song = {
   imageUrl: string | null;
   itemType: LibraryItem.SONG;
   lastPlayedAt: string | null;
+  lyrics: string | null;
   name: string;
   path: string | null;
   playCount: number;
