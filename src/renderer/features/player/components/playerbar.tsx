@@ -7,6 +7,7 @@ import { AudioPlayer } from '/@/renderer/components';
 import {
   useCurrentPlayer,
   useCurrentStatus,
+  useMuted,
   usePlayer1Data,
   usePlayer2Data,
   usePlayerControls,
@@ -62,6 +63,7 @@ export const Playerbar = () => {
   const player2 = usePlayer2Data();
   const status = useCurrentStatus();
   const player = useCurrentPlayer();
+  const muted = useMuted();
   const { autoNext } = usePlayerControls();
 
   const autoNextFn = useCallback(() => {
@@ -92,7 +94,7 @@ export const Playerbar = () => {
           crossfadeDuration={settings.crossfadeDuration}
           crossfadeStyle={settings.crossfadeStyle}
           currentPlayer={player}
-          muted={settings.muted}
+          muted={muted}
           playbackStyle={settings.style}
           player1={player1}
           player2={player2}
