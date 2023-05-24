@@ -13,16 +13,17 @@ export const SidebarPlayQueue = () => {
   const queueRef = useRef<{ grid: AgGridReactType<Song> } | null>(null);
   const { windowBarStyle } = useWindowSettings();
 
+  const webOrNative = windowBarStyle === Platform.WEB || windowBarStyle === Platform.LINUX;
   return (
     <VirtualGridContainer>
-      {windowBarStyle === Platform.WEB && (
-        <Stack mr={windowBarStyle === Platform.WEB ? '130px' : undefined}>
+      {webOrNative && (
+        <Stack mr={webOrNative ? '130px' : undefined}>
           <PageHeader backgroundColor="var(--titlebar-bg)" />
         </Stack>
       )}
       <Paper
-        display={windowBarStyle !== Platform.WEB ? 'flex' : undefined}
-        h={windowBarStyle !== Platform.WEB ? '65px' : undefined}
+        display={!webOrNative ? 'flex' : undefined}
+        h={!webOrNative ? '65px' : undefined}
       >
         <PlayQueueListControls
           tableRef={queueRef}

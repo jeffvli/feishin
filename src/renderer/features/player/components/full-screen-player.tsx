@@ -129,7 +129,10 @@ const containerVariants: Variants = {
   closed: (custom) => {
     const { windowBarStyle } = custom;
     return {
-      height: windowBarStyle !== Platform.WEB ? 'calc(100vh - 120px)' : 'calc(100vh - 90px)',
+      height:
+        windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS
+          ? 'calc(100vh - 120px)'
+          : 'calc(100vh - 90px)',
       position: 'absolute',
       top: '100vh',
       transition: {
@@ -144,7 +147,10 @@ const containerVariants: Variants = {
     const { dynamicBackground, background, windowBarStyle } = custom;
     return {
       background: dynamicBackground ? background : 'var(--main-bg)',
-      height: windowBarStyle !== Platform.WEB ? 'calc(100vh - 120px)' : 'calc(100vh - 90px)',
+      height:
+        windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS
+          ? 'calc(100vh - 120px)'
+          : 'calc(100vh - 90px)',
       left: 0,
       position: 'absolute',
       top: 0,

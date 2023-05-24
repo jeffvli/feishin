@@ -5,12 +5,13 @@ import {
   SettingsSection,
   SettingOption,
 } from '/@/renderer/features/settings/components/settings-section';
-import { Select, Switch } from '/@/renderer/components';
+import { Select, Switch, toast } from '/@/renderer/components';
 
 const WINDOW_BAR_OPTIONS = [
   { label: 'Web (hidden)', value: Platform.WEB },
   { label: 'Windows', value: Platform.WINDOWS },
   { label: 'macOS', value: Platform.MACOS },
+  { label: 'Native', value: Platform.LINUX },
 ];
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
@@ -28,6 +29,26 @@ export const WindowSettings = () => {
           value={settings.windowBarStyle}
           onChange={(e) => {
             if (!e) return;
+
+            // warn that a restart is required
+            if (
+              (localSettings?.get('window_has_frame') && e !== Platform.LINUX) ||
+              (!localSettings?.get('window_has_frame') && e === Platform.LINUX)
+            ) {
+              toast.info({
+                autoClose: false,
+                id: 'restart-toast',
+                message: 'Restart to apply changes... close the notification to restart Feishin',
+                onClose: () => {
+                  window.electron.ipc.send('app-restart');
+                },
+                title: 'Restart required',
+              });
+            } else {
+              toast.update({ autoClose: 0, id: 'restart-toast', message: '', onClose: () => {} }); // clean old toasts
+            }
+
+            localSettings?.set('window_window_bar_style', e as Platform);
             setSettings({
               window: {
                 ...settings,

@@ -219,6 +219,7 @@ export const WindowBar = () => {
   const statusString = playerStatus === PlayerStatus.PAUSED ? '(Paused) ' : '';
   const queueString = length ? `(${index + 1} / ${length}) ` : '';
   const title = length ? `${statusString}${queueString}${currentSong?.name}` : 'Feishin';
+  document.title = title;
 
   const [max, setMax] = useState(false);
 
@@ -237,12 +238,13 @@ export const WindowBar = () => {
 
   return (
     <>
-      {windowBarStyle === Platform.WINDOWS ? (
+      {windowBarStyle === Platform.WINDOWS && (
         <WindowsControls
           controls={{ handleClose, handleMaximize, handleMinimize }}
           title={title}
         />
-      ) : (
+      )}
+      {windowBarStyle === Platform.MACOS && (
         <MacOsControls
           controls={{ handleClose, handleMaximize, handleMinimize }}
           title={title}
