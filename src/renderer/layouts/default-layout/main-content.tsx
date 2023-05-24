@@ -104,7 +104,10 @@ const QueueDrawerArea = styled(motion.div)`
 
 const queueDrawerVariants: Variants = {
   closed: (windowBarStyle) => ({
-    height: windowBarStyle !== Platform.WEB ? 'calc(100vh - 205px)' : 'calc(100vh - 175px)',
+    height:
+      windowBarStyle === Platform.WINDOWS || Platform.MACOS
+        ? 'calc(100vh - 205px)'
+        : 'calc(100vh - 175px)',
     position: 'absolute',
     right: 0,
     top: '75px',
@@ -117,7 +120,10 @@ const queueDrawerVariants: Variants = {
   }),
   open: (windowBarStyle) => ({
     boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.8)',
-    height: windowBarStyle !== Platform.WEB ? 'calc(100vh - 205px)' : 'calc(100vh - 175px)',
+    height:
+      windowBarStyle === Platform.WINDOWS || Platform.MACOS
+        ? 'calc(100vh - 205px)'
+        : 'calc(100vh - 175px)',
     position: 'absolute',
     right: '20px',
     top: '75px',

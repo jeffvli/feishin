@@ -29,7 +29,7 @@ const Layout = styled.div<{ windowBarStyle: Platform }>`
     'main-content'
     'player';
   grid-template-rows: ${(props) =>
-    props.windowBarStyle !== Platform.WEB
+    props.windowBarStyle === Platform.WINDOWS || props.windowBarStyle === Platform.MACOS
       ? '30px calc(100vh - 120px) 90px'
       : '0px calc(100vh - 90px) 90px'};
   grid-template-columns: 1fr;

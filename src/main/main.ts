@@ -183,8 +183,12 @@ const createWindow = async () => {
     await installExtensions();
   }
 
+  const nativeFrame = store.get('window_window_bar_style') === 'linux';
+  store.set('window_has_frame', nativeFrame);
+
   mainWindow = new BrowserWindow({
-    frame: false,
+    autoHideMenuBar: nativeFrame,
+    frame: nativeFrame,
     height: 900,
     icon: getAssetPath('icon.png'),
     minHeight: 600,
@@ -229,8 +233,18 @@ const createWindow = async () => {
   });
 
   ipcMain.on('app-restart', () => {
-    app.relaunch();
-    app.exit(0);
+    // Fix for .AppImage
+    if (process.env.APPIMAGE) {
+      app.exit();
+      app.relaunch({
+        args: process.argv.slice(1).concat(['--appimage-extract-and-run']),
+        execPath: process.env.APPIMAGE,
+      });
+      app.exit(0);
+    } else {
+      app.relaunch();
+      app.exit(0);
+    }
   });
 
   ipcMain.on('global-media-keys-enable', () => {

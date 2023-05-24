@@ -9,7 +9,10 @@ export const useFixedTableHeader = () => {
   const { windowBarStyle } = useWindowSettings();
 
   const isNotPastTableIntersection = useInView(intersectRef, {
-    margin: windowBarStyle === Platform.WEB ? '-68px 0px 0px 0px' : '-98px 0px 0px 0px',
+    margin:
+      windowBarStyle === Platform.WEB || windowBarStyle === Platform.LINUX
+        ? '-68px 0px 0px 0px'
+        : '-98px 0px 0px 0px',
   });
 
   const tableInView = useInView(tableContainerRef, {
@@ -21,13 +24,13 @@ export const useFixedTableHeader = () => {
     const root = document.querySelector('main .ag-root');
 
     if (isNotPastTableIntersection || !tableInView) {
-      if (windowBarStyle !== Platform.WEB) {
+      if (windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS) {
         header?.classList.remove('window-frame');
       }
       header?.classList.remove('ag-header-fixed');
       root?.classList.remove('ag-header-fixed-margin');
     } else {
-      if (windowBarStyle !== Platform.WEB) {
+      if (windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS) {
         header?.classList.add('window-frame');
       }
       header?.classList.add('ag-header-fixed');

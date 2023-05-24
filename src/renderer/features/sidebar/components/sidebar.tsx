@@ -45,7 +45,7 @@ import { useWindowSettings } from '../../../store/settings.store';
 const SidebarContainer = styled.div<{ windowBarStyle: Platform }>`
   height: 100%;
   max-height: ${(props) =>
-    props.windowBarStyle === Platform.WEB
+    props.windowBarStyle === Platform.WEB || props.windowBarStyle === Platform.LINUX
       ? 'calc(100vh - 149px)'
       : 'calc(100vh - 179px)'}; // Playerbar (90px), titlebar (65px), windowbar (30px)
   user-select: none;
