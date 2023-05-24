@@ -754,7 +754,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
       });
 
       mpris.requestVolume((_e: any, data: { volume: number }) => {
-        let newVolume = data.volume * 100;
+        let newVolume = Math.round(data.volume * 100);
 
         if (newVolume > 100) {
           newVolume = 100;
@@ -763,6 +763,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
         }
 
         usePlayerStore.getState().actions.setVolume(newVolume);
+        mpris.updateVolume(data.volume);
 
         if (isMpvPlayer) {
           mpvPlayer.volume(newVolume);
