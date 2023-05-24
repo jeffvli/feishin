@@ -173,9 +173,13 @@ axiosClient.interceptors.response.use(
     const serverId = useAuthStore.getState().currentServer?.id;
 
     if (serverId) {
-      useAuthStore.getState().actions.updateServer(serverId, {
-        ndCredential: response.headers['x-nd-authorization'] as string,
-      });
+      const headerCredential = response.headers['x-nd-authorization'] as string | undefined;
+
+      if (headerCredential) {
+        useAuthStore.getState().actions.updateServer(serverId, {
+          ndCredential: headerCredential,
+        });
+      }
     }
 
     return response;
