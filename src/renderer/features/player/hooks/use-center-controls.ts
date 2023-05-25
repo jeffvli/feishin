@@ -24,7 +24,7 @@ const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : nul
 const ipc = isElectron() ? window.electron.ipc : null;
 const utils = isElectron() ? window.electron.utils : null;
 const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
-const mediaSession = !isElectron() ? navigator.mediaSession : null;
+const mediaSession = !isElectron() || !utils?.isLinux() ? navigator.mediaSession : null;
 
 export const useCenterControls = (args: { playersRef: any }) => {
   const { playersRef } = args;
