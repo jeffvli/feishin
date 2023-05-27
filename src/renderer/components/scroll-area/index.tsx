@@ -34,14 +34,18 @@ const StyledNativeScrollArea = styled.div<{ scrollBarOffset?: string; windowBarS
 
   &::-webkit-scrollbar-track {
     margin-top: ${(props) =>
-      props.windowBarStyle === Platform.WINDOWS || props.windowBarStyle === Platform.MACOS
+      props.windowBarStyle === Platform.WINDOWS ||
+      props.windowBarStyle === Platform.MACOS ||
+      props.windowBarStyle === Platform.LINUX
         ? '0px'
         : props.scrollBarOffset || '65px'};
   }
 
   &::-webkit-scrollbar-thumb {
     margin-top: ${(props) =>
-      props.windowBarStyle === Platform.WINDOWS || props.windowBarStyle === Platform.MACOS
+      props.windowBarStyle === Platform.WINDOWS ||
+      props.windowBarStyle === Platform.MACOS ||
+      props.windowBarStyle === Platform.LINUX
         ? '0px'
         : props.scrollBarOffset || '65px'};
   }
