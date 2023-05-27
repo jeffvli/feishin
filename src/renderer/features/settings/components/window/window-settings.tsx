@@ -30,11 +30,14 @@ export const WindowSettings = () => {
           onChange={(e) => {
             if (!e) return;
 
-            // warn that a restart is required
-            if (
-              (localSettings?.get('window_has_frame') && e !== Platform.LINUX) ||
-              (!localSettings?.get('window_has_frame') && e === Platform.LINUX)
-            ) {
+            // Platform.LINUX is used as the native frame option regardless of the actual platform
+            const hasFrame = localSettings?.get('window_has_frame') as boolean | undefined;
+            const isSwitchingToFrame = !hasFrame && e === Platform.LINUX;
+            const isSwitchingToNoFrame = hasFrame && e !== Platform.LINUX;
+
+            const requireRestart = isSwitchingToFrame || isSwitchingToNoFrame;
+
+            if (requireRestart) {
               toast.info({
                 autoClose: false,
                 id: 'restart-toast',
