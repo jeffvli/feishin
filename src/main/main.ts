@@ -20,6 +20,7 @@ import {
   Tray,
   Menu,
   nativeImage,
+  BrowserWindowConstructorOptions,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log';
@@ -186,9 +187,26 @@ const createWindow = async () => {
   const nativeFrame = store.get('window_window_bar_style') === 'linux';
   store.set('window_has_frame', nativeFrame);
 
+  const nativeFrameConfig: Record<string, BrowserWindowConstructorOptions> = {
+    linux: {
+      autoHideMenuBar: true,
+      frame: true,
+    },
+    macOS: {
+      autoHideMenuBar: true,
+      frame: false,
+      titleBarStyle: 'hidden',
+      trafficLightPosition: { x: 10, y: 10 },
+    },
+    windows: {
+      autoHideMenuBar: true,
+      frame: true,
+    },
+  };
+
   mainWindow = new BrowserWindow({
-    autoHideMenuBar: nativeFrame,
-    frame: nativeFrame,
+    autoHideMenuBar: true,
+    frame: false,
     height: 900,
     icon: getAssetPath('icon.png'),
     minHeight: 600,
@@ -206,6 +224,9 @@ const createWindow = async () => {
       webSecurity: !store.get('ignore_cors'),
     },
     width: 1440,
+    ...(nativeFrame && isLinux() && nativeFrameConfig.linux),
+    ...(nativeFrame && isMacOS() && nativeFrameConfig.macOS),
+    ...(nativeFrame && isWindows() && nativeFrameConfig.windows),
   });
 
   electronLocalShortcut.register(mainWindow, 'Ctrl+Shift+I', () => {
