@@ -138,9 +138,7 @@ const HomeRoute = () => {
         <Box
           ref={cq.ref}
           mb="5rem"
-          pt={
-            windowBarStyle === Platform.WEB || windowBarStyle === Platform.LINUX ? '5rem' : '3rem'
-          }
+          pt={windowBarStyle === Platform.WEB ? '5rem' : '3rem'}
           px="2rem"
         >
           <Stack spacing="lg">
