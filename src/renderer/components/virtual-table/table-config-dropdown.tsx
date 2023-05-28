@@ -2,7 +2,11 @@ import type { ChangeEvent } from 'react';
 import { MultiSelect } from '/@/renderer/components/select';
 import { Slider } from '/@/renderer/components/slider';
 import { Switch } from '/@/renderer/components/switch';
-import { useSettingsStoreActions, useSettingsStore } from '/@/renderer/store/settings.store';
+import {
+  useSettingsStoreActions,
+  useSettingsStore,
+  useLyricsSettings,
+} from '/@/renderer/store/settings.store';
 import { TableColumn, TableType } from '/@/renderer/types';
 import { Option } from '/@/renderer/components/option';
 
@@ -82,6 +86,7 @@ interface TableConfigDropdownProps {
 export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
   const { setSettings } = useSettingsStoreActions();
   const tableConfig = useSettingsStore((state) => state.tables);
+  const lyricConfig = useLyricsSettings();
 
   const handleAddOrRemoveColumns = (values: TableColumn[]) => {
     const existingColumns = tableConfig[type].columns;
@@ -166,6 +171,15 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
     });
   };
 
+  const handleLyricFollow = (e: ChangeEvent<HTMLInputElement>) => {
+    setSettings({
+      lyrics: {
+        ...useSettingsStore.getState().lyrics,
+        follow: e.currentTarget.checked,
+      },
+    });
+  };
+
   return (
     <>
       <Option>
@@ -183,6 +197,15 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
           <Switch
             defaultChecked={tableConfig[type]?.followCurrentSong}
             onChange={handleUpdateFollow}
+          />
+        </Option.Control>
+      </Option>
+      <Option>
+        <Option.Label>Follow current lyrics</Option.Label>
+        <Option.Control>
+          <Switch
+            defaultChecked={lyricConfig.follow}
+            onChange={handleLyricFollow}
           />
         </Option.Control>
       </Option>

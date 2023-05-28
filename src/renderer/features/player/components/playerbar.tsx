@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import isElectron from 'is-electron';
 import styled from 'styled-components';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
@@ -16,6 +16,7 @@ import {
 import { CenterControls } from './center-controls';
 import { LeftControls } from './left-controls';
 import { RightControls } from './right-controls';
+import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 
 const PlayerbarContainer = styled.div`
   width: 100%;
@@ -56,7 +57,7 @@ const utils = isElectron() ? window.electron.utils : null;
 const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
 
 export const Playerbar = () => {
-  const playersRef = useRef<any>();
+  const playersRef = PlayersRef;
   const settings = useSettingsStore((state) => state.playback);
   const volume = useVolume();
   const player1 = usePlayer1Data();

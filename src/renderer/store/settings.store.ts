@@ -19,6 +19,7 @@ import {
   PlaybackType,
   TableType,
   Platform,
+  LyricSource,
 } from '/@/renderer/types';
 
 export type SidebarItemType = {
@@ -121,6 +122,11 @@ export interface SettingsState {
     bindings: Record<BindingActions, { allowGlobal: boolean; hotkey: string; isGlobal: boolean }>;
     globalMediaHotkeys: boolean;
   };
+  lyrics: {
+    fetch: boolean;
+    follow: boolean;
+    sources: LyricSource[];
+  };
   playback: {
     audioDeviceId?: string | null;
     crossfadeDuration: number;
@@ -201,6 +207,11 @@ const initialState: SettingsState = {
       volumeUp: { allowGlobal: true, hotkey: '', isGlobal: false },
     },
     globalMediaHotkeys: true,
+  },
+  lyrics: {
+    fetch: false,
+    follow: true,
+    sources: [],
   },
   playback: {
     audioDeviceId: undefined,
@@ -416,3 +427,5 @@ export const useHotkeySettings = () => useSettingsStore((state) => state.hotkeys
 
 export const useMpvSettings = () =>
   useSettingsStore((state) => state.playback.mpvProperties, shallow);
+
+export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics, shallow);

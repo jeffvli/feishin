@@ -15,6 +15,7 @@ export interface PlayerState {
     nextIndex: number;
     player: 1 | 2;
     previousIndex: number;
+    seek: boolean;
     shuffledIndex: number;
     song?: QueueSong;
     status: PlayerStatus;
@@ -76,7 +77,7 @@ export interface PlayerSlice extends PlayerState {
     reorderQueue: (rowUniqueIds: string[], afterUniqueId?: string) => PlayerData;
     restoreQueue: (data: Partial<PlayerState>) => PlayerData;
     setCurrentIndex: (index: number) => PlayerData;
-    setCurrentTime: (time: number) => void;
+    setCurrentTime: (time: number, seek?: boolean) => void;
     setCurrentTrack: (uniqueId: string) => PlayerData;
     setFavorite: (ids: string[], favorite: boolean) => string[];
     setMuted: (muted: boolean) => void;
@@ -668,8 +669,9 @@ export const usePlayerStore = create<PlayerSlice>()(
 
               return get().actions.getPlayerData();
             },
-            setCurrentTime: (time) => {
+            setCurrentTime: (time, seek = false) => {
               set((state) => {
+                state.current.seek = seek;
                 state.current.time = time;
               });
             },
@@ -834,6 +836,7 @@ export const usePlayerStore = create<PlayerSlice>()(
             nextIndex: 0,
             player: 1,
             previousIndex: 0,
+            seek: false,
             shuffledIndex: 0,
             song: {} as QueueSong,
             status: PlayerStatus.PAUSED,
@@ -943,6 +946,8 @@ export const useRepeatStatus = () => usePlayerStore((state) => state.repeat);
 export const useShuffleStatus = () => usePlayerStore((state) => state.shuffle);
 
 export const useCurrentTime = () => usePlayerStore((state) => state.current.time);
+
+export const useSeeked = () => usePlayerStore((state) => state.current.seek);
 
 export const useVolume = () => usePlayerStore((state) => state.volume);
 

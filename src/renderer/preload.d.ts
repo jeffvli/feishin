@@ -1,5 +1,6 @@
 import { IpcRendererEvent } from 'electron';
 import { PlayerData, PlayerState } from './store';
+import { QueueSong } from '/@/renderer/api/types';
 
 declare global {
   interface Window {
@@ -8,8 +9,11 @@ declare global {
       ipc: any;
       ipcRenderer: {
         APP_RESTART(): void;
+        LYRIC_FETCH(data: QueueSong): void;
+        LYRIC_GET(event: IpcRendererEvent, songName: string, source: string, lyric: string): void;
         PLAYER_AUTO_NEXT(data: PlayerData): void;
         PLAYER_CURRENT_TIME(): void;
+        PLAYER_GET_TIME(): number | undefined;
         PLAYER_MEDIA_KEYS_DISABLE(): void;
         PLAYER_MEDIA_KEYS_ENABLE(): void;
         PLAYER_MUTE(): void;
@@ -44,6 +48,7 @@ declare global {
         windowUnmaximize(): void;
       };
       localSettings: any;
+      lyrics: any;
       mpris: any;
       mpvPlayer: any;
       mpvPlayerListener: any;
