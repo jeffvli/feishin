@@ -78,6 +78,10 @@ const quit = () => {
   ipcRenderer.send('player-quit');
 };
 
+const getCurrentTime = async () => {
+  return ipcRenderer.invoke('player-get-time');
+};
+
 const rendererAutoNext = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
   ipcRenderer.on('renderer-player-auto-next', cb);
 };
@@ -157,6 +161,7 @@ const rendererError = (cb: (event: IpcRendererEvent, data: string) => void) => {
 export const mpvPlayer = {
   autoNext,
   currentTime,
+  getCurrentTime,
   initialize,
   mute,
   next,

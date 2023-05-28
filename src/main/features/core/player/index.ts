@@ -128,3 +128,7 @@ ipcMain.on('player-volume', async (_event, value: number) => {
 ipcMain.on('player-mute', async () => {
   await getMpvInstance()?.mute();
 });
+
+ipcMain.handle('player-get-time', async (): Promise<number | undefined> => {
+  return getMpvInstance()?.getTimePosition();
+});

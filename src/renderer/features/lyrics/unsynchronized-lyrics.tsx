@@ -15,9 +15,8 @@ export const UnsynchronizedLyrics = ({ lyrics }: UnsynchronizedLyricsProps) => {
       {lines.map((text, idx) => (
         <LyricLine
           key={idx}
-          active={false}
           id={`lyric-${idx}`}
-          lyric={text}
+          text={text}
         />
       ))}
     </div>

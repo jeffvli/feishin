@@ -60,8 +60,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
   const resetNextPlayer = useCallback(() => {
     currentPlayerRef.getInternalPlayer().volume = 0.1;
-    nextPlayerRef.getInternalPlayer().currentTime = 0;
-    nextPlayerRef.getInternalPlayer().pause();
+
+    const nextPlayer = nextPlayerRef.getInternalPlayer();
+    if (nextPlayer) {
+      nextPlayer.currentTime = 0;
+      nextPlayer.pause();
+    }
   }, [currentPlayerRef, nextPlayerRef]);
 
   const stopPlayback = useCallback(() => {
@@ -380,7 +384,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
     // Reset the current track more than 10 seconds have elapsed
     if (currentTime >= 10) {
-      setCurrentTime(0);
+      setCurrentTime(0, true);
       handleScrobbleFromSongRestart(currentTime);
       mpris?.updateSeek(0);
       if (isMpvPlayer) {
@@ -509,7 +513,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
     const evaluatedTime = currentTime - seconds;
     const newTime = evaluatedTime < 0 ? 0 : evaluatedTime;
-    setCurrentTime(newTime);
+    setCurrentTime(newTime, true);
     mpris?.updateSeek(newTime);
 
     if (isMpvPlayer) {
@@ -529,7 +533,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
       const newTime = currentTime + seconds;
       mpvPlayer.seek(seconds);
       mpris?.updateSeek(newTime);
-      setCurrentTime(newTime);
+      setCurrentTime(newTime, true);
     } else {
       const checkNewTime = currentTime + seconds;
       const songDuration = currentPlayerRef.player.player.duration;
@@ -538,7 +542,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
       mpris?.updateSeek(newTime);
 
       resetNextPlayer();
-      setCurrentTime(newTime);
+      setCurrentTime(newTime, true);
       currentPlayerRef.seekTo(newTime);
     }
   };
@@ -553,7 +557,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
   const handleSeekSlider = useCallback(
     (e: number | any) => {
-      setCurrentTime(e);
+      setCurrentTime(e, true);
       handleScrobbleFromSeek(e);
       debouncedSeek(e);
 

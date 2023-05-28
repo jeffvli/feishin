@@ -1,23 +1,66 @@
-import { useMemo } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import isElectron from 'is-electron';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '/@/renderer/features/action-required';
-import { useCurrentSong } from '/@/renderer/store';
+import { useCurrentServer, useCurrentSong } from '/@/renderer/store';
 import { SynchronizedLyricsArray, SynchronizedLyrics } from './synchronized-lyrics';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
+import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
+
+const lyrics = isElectron() ? window.electron.lyrics : null;
+
+const ipc = isElectron() ? window.electron.ipc : null;
 
 // use by https://github.com/ustbhuangyi/lyric-parser
-
 const timeExp = /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?]([^\n]+)\n/g;
 
 export const Lyrics = () => {
+  const currentServer = useCurrentServer();
   const currentSong = useCurrentSong();
 
-  const lyrics = useMemo(() => {
-    if (currentSong?.lyrics) {
-      const originalText = currentSong.lyrics;
-      console.log(originalText);
+  const [override, setOverride] = useState<string | null>(null);
+  const [source, setSource] = useState<string | null>(null);
+  const [songLyrics, setSongLyrics] = useState<SynchronizedLyricsArray | string | null>(null);
 
-      const synchronizedLines = originalText.matchAll(timeExp);
+  const songRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    lyrics?.getLyrics((_event: any, songName: string, lyricSource: string, lyric: string) => {
+      if (songName === songRef.current) {
+        setSource(lyricSource);
+        setOverride(lyric);
+      }
+    });
+
+    return () => {
+      ipc?.removeAllListeners('lyric-get');
+    };
+  }, []);
+
+  useEffect(() => {
+    if (currentSong && !currentSong.lyrics) {
+      lyrics?.fetchLyrics(currentSong);
+    }
+
+    songRef.current = currentSong?.name ?? null;
+
+    setOverride(null);
+    setSource(null);
+  }, [currentSong]);
+
+  useEffect(() => {
+    let lyrics: string | null = null;
+
+    if (currentSong?.lyrics) {
+      lyrics = currentSong.lyrics;
+
+      setSource(currentServer?.name ?? 'music server');
+    } else if (override) {
+      lyrics = override;
+    }
+
+    if (lyrics) {
+      const synchronizedLines = lyrics.matchAll(timeExp);
 
       const synchronizedTimes: SynchronizedLyricsArray = [];
 
@@ -32,21 +75,30 @@ export const Lyrics = () => {
       }
 
       if (synchronizedTimes.length === 0) {
-        return originalText;
+        setSongLyrics(lyrics);
+      } else {
+        setSongLyrics(synchronizedTimes);
       }
-      return synchronizedTimes;
+    } else {
+      setSongLyrics(null);
     }
-    return null;
-  }, [currentSong?.lyrics]);
+  }, [currentServer?.name, currentSong, override]);
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      {lyrics &&
-        (Array.isArray(lyrics) ? (
-          <SynchronizedLyrics lyrics={lyrics} />
+      {songLyrics &&
+        (Array.isArray(songLyrics) ? (
+          <SynchronizedLyrics lyrics={songLyrics} />
         ) : (
-          <UnsynchronizedLyrics lyrics={lyrics} />
+          <UnsynchronizedLyrics lyrics={songLyrics} />
         ))}
+      {source && (
+        <LyricLine
+          key="provided-by"
+          className="credit"
+          text={`Provided by: ${source}`}
+        />
+      )}
     </ErrorBoundary>
   );
 };

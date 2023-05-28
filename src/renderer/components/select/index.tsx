@@ -10,7 +10,7 @@ interface SelectProps extends MantineSelectProps {
   width?: number | string;
 }
 
-interface MultiSelectProps extends MantineMultiSelectProps {
+export interface MultiSelectProps extends MantineMultiSelectProps {
   maxWidth?: number | string;
   width?: number | string;
 }
