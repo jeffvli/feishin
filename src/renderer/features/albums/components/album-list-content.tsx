@@ -103,8 +103,9 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
         rowCount: undefined,
       };
       params.api.setDatasource(dataSource);
+      params.api.ensureIndexVisible(table.scrollOffset || 0, 'top');
     },
-    [filter, queryClient, server],
+    [filter, queryClient, server, table.scrollOffset],
   );
 
   const onTablePaginationChanged = useCallback(
@@ -207,6 +208,7 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
 
   const handleGridScroll = useCallback(
     (e: ListOnScrollProps) => {
+      console.log('e', e.scrollOffset);
       setGrid({ data: { scrollOffset: e.scrollOffset }, key: pageKey });
     },
     [pageKey, setGrid],
