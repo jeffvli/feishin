@@ -88,13 +88,13 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
         />
         <Select
           data={userList || []}
-          {...form.getInputProps('ndParams.ownerId')}
+          {...form.getInputProps('_custom.navidrome.ownerId')}
           label="Owner"
         />
         {isPublicDisplayed && (
           <Switch
             label="Is Public?"
-            {...form.getInputProps('public')}
+            {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
           />
         )}
         <Group position="right">
@@ -137,6 +137,8 @@ export const openUpdatePlaylistModal = async (args: {
       api.controller.getUserList({ apiClientProps: { server, signal }, query }),
     queryKey: queryKeys.users.list(server?.id || '', query),
   });
+
+  console.log('playlist', playlist);
 
   openModal({
     children: (

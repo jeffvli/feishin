@@ -97,7 +97,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
           {isPublicDisplayed && (
             <Switch
               label="Is public?"
-              {...form.getInputProps('ndParams.public')}
+              {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
             />
           )}
           {server?.type === ServerType.NAVIDROME && (

@@ -70,7 +70,7 @@ export const SaveAsPlaylistForm = ({
         {isPublicDisplayed && (
           <Switch
             label="Is Public?"
-            {...form.getInputProps('public')}
+            {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
           />
         )}
         <Group position="right">

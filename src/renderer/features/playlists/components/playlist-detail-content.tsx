@@ -2,21 +2,12 @@ import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
-import { useQueryClient } from '@tanstack/react-query';
 import { MutableRefObject, useMemo, useRef } from 'react';
 import { RiMoreFill } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { api } from '/@/renderer/api';
-import { queryKeys } from '/@/renderer/api/query-keys';
-import {
-  LibraryItem,
-  QueueSong,
-  SortOrder,
-  UserListQuery,
-  UserListSort,
-} from '/@/renderer/api/types';
+import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { Button, ConfirmModal, DropdownMenu, MotionGroup, toast } from '/@/renderer/components';
 import {
   getColumnDefs,
@@ -29,7 +20,7 @@ import {
   SMART_PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { UpdatePlaylistForm } from '/@/renderer/features/playlists/components/update-playlist-form';
+import { openUpdatePlaylistModal } from '/@/renderer/features/playlists/components/update-playlist-form';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { usePlaylistSongListInfinite } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
@@ -67,7 +58,6 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
   const server = useCurrentServer();
   const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
   const playButtonBehavior = usePlayButtonBehavior();
-  const queryClient = useQueryClient();
 
   const playlistSongsQueryInfinite = usePlaylistSongListInfinite({
     options: {
@@ -158,47 +148,6 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     });
   };
 
-  const openUpdatePlaylistModal = async () => {
-    const query: UserListQuery = {
-      sortBy: UserListSort.NAME,
-      sortOrder: SortOrder.ASC,
-      startIndex: 0,
-    };
-
-    if (!server) return;
-
-    const users = await queryClient.fetchQuery({
-      queryFn: ({ signal }) =>
-        api.controller.getUserList({ apiClientProps: { server, signal }, query }),
-      queryKey: queryKeys.users.list(server?.id || '', query),
-    });
-
-    openModal({
-      children: (
-        <UpdatePlaylistForm
-          body={{
-            _custom: {
-              navidrome: {
-                owner: detailQuery?.data?.owner || undefined,
-                ownerId: detailQuery?.data?.ownerId || undefined,
-                public: detailQuery?.data?.public || false,
-                rules: detailQuery?.data?.rules || undefined,
-                sync: detailQuery?.data?.sync || undefined,
-              },
-            },
-            comment: detailQuery?.data?.description || undefined,
-            genres: detailQuery?.data?.genres,
-            name: detailQuery?.data?.name,
-          }}
-          query={{ id: playlistId }}
-          users={users?.items}
-          onCancel={closeAllModals}
-        />
-      ),
-      title: 'Edit playlist',
-    });
-  };
-
   const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
     if (!e.data) return;
 
@@ -242,7 +191,14 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                 </DropdownMenu.Item>
               ))}
               <DropdownMenu.Divider />
-              <DropdownMenu.Item onClick={openUpdatePlaylistModal}>Edit playlist</DropdownMenu.Item>
+              <DropdownMenu.Item
+                onClick={() => {
+                  if (!detailQuery.data || !server) return;
+                  openUpdatePlaylistModal({ playlist: detailQuery.data, server });
+                }}
+              >
+                Edit playlist
+              </DropdownMenu.Item>
               <DropdownMenu.Item onClick={openDeletePlaylist}>Delete playlist</DropdownMenu.Item>
             </DropdownMenu.Dropdown>
           </DropdownMenu>
