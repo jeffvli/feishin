@@ -6,20 +6,22 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { Link, generatePath } from 'react-router-dom';
 import styled from 'styled-components';
-import type { Album } from '/@/renderer/api/types';
+import { Album, LibraryItem } from '/@/renderer/api/types';
 import { Button } from '/@/renderer/components/button';
 import { TextTitle } from '/@/renderer/components/text-title';
 import { Badge } from '/@/renderer/components/badge';
 import { AppRoute } from '/@/renderer/router/routes';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { Play } from '/@/renderer/types';
 
 const Carousel = styled(motion.div)`
   position: relative;
-  height: 30vh;
+  height: 35vh;
   min-height: 250px;
-
   padding: 2rem;
   overflow: hidden;
   background: linear-gradient(180deg, var(--main-bg), rgba(25, 26, 28, 60%));
+  border-radius: 1rem;
 `;
 
 const Grid = styled.div`
@@ -27,7 +29,7 @@ const Grid = styled.div`
   grid-auto-columns: 1fr;
   grid-template-areas: 'image info';
   grid-template-rows: 1fr;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 200px minmax(0, 1fr);
   width: 100%;
   max-width: 100%;
   height: 100%;
@@ -46,6 +48,7 @@ const InfoColumn = styled.div`
   grid-area: info;
   align-items: flex-end;
   width: 100%;
+  max-width: 100%;
   padding-left: 1rem;
 `;
 
@@ -106,6 +109,7 @@ interface FeatureCarouselProps {
 }
 
 export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
+  const handlePlayQueueAdd = usePlayQueueAdd();
   const [itemIndex, setItemIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
@@ -114,12 +118,22 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
   const handleNext = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setDirection(1);
+    if (itemIndex === (data?.length || 0) - 1 || 0) {
+      setItemIndex(0);
+      return;
+    }
+
     setItemIndex((prev) => prev + 1);
   };
 
   const handlePrevious = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setDirection(-1);
+    if (itemIndex === 0) {
+      setItemIndex((data?.length || 0) - 1);
+      return;
+    }
+
     setItemIndex((prev) => prev - 1);
   };
 
@@ -144,7 +158,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                 <Image
                   height={225}
                   placeholder="var(--card-default-bg)"
-                  radius="sm"
+                  radius="md"
                   src={data[itemIndex]?.imageUrl}
                   sx={{ objectFit: 'cover' }}
                   width={225}
@@ -157,9 +171,9 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                 >
                   <TitleWrapper>
                     <TextTitle
-                      lh="4rem"
-                      lineClamp={2}
+                      lh="5rem"
                       order={1}
+                      overflow="hidden"
                       sx={{ fontSize: '4rem' }}
                       weight={900}
                     >
@@ -167,7 +181,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                     </TextTitle>
                   </TitleWrapper>
                   <TitleWrapper>
-                    {currentItem?.albumArtists.map((artist) => (
+                    {currentItem?.albumArtists.slice(0, 1).map((artist) => (
                       <TextTitle
                         key={`carousel-artist-${artist.id}`}
                         order={2}
@@ -178,7 +192,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                     ))}
                   </TitleWrapper>
                   <Group>
-                    {currentItem?.genres?.map((genre) => (
+                    {currentItem?.genres?.slice(0, 1).map((genre) => (
                       <Badge
                         key={`carousel-genre-${genre.id}`}
                         size="lg"
@@ -201,26 +215,44 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
         )}
       </AnimatePresence>
       <Group
-        spacing="xs"
-        sx={{ bottom: '1rem', position: 'absolute', right: 0, zIndex: 20 }}
+        spacing="sm"
+        sx={{ bottom: '1rem', position: 'absolute', right: '1rem', zIndex: 20 }}
       >
         <Button
-          disabled={itemIndex === 0}
-          radius={100}
+          radius="lg"
           size="md"
-          variant="default"
+          variant="outline"
           onClick={handlePrevious}
         >
           <RiArrowLeftSLine size="2rem" />
         </Button>
         <Button
-          disabled={itemIndex === (data?.length || 1) - 1}
-          radius={100}
+          radius="lg"
           size="md"
-          variant="default"
+          variant="outline"
           onClick={handleNext}
         >
           <RiArrowRightSLine size="2rem" />
+        </Button>
+        <Button
+          radius="lg"
+          size="md"
+          variant="outline"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!currentItem) return;
+
+            handlePlayQueueAdd?.({
+              byItemType: {
+                id: [currentItem.id],
+                type: LibraryItem.ALBUM,
+              },
+              playType: Play.NOW,
+            });
+          }}
+        >
+          Play
         </Button>
       </Group>
     </Wrapper>
