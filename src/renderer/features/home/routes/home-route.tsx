@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { Center, Stack } from '@mantine/core';
+import { Stack } from '@mantine/core';
 import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
 import { FeatureCarousel, NativeScrollArea, Spinner } from '/@/renderer/components';
 import { useAlbumList } from '/@/renderer/features/albums';
@@ -93,14 +93,7 @@ const HomeRoute = () => {
     mostPlayed.isFetching;
 
   if (isLoading) {
-    return (
-      <Center
-        h="100%"
-        w="100%"
-      >
-        <Spinner />
-      </Center>
-    );
+    return <Spinner container />;
   }
 
   const carousels = [

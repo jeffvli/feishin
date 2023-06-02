@@ -9,7 +9,6 @@ import { constrainSidebarWidth, constrainRightSidebarWidth } from '/@/renderer/u
 import { LeftSidebar } from '/@/renderer/layouts/default-layout/left-sidebar';
 import { FullScreenOverlay } from '/@/renderer/layouts/default-layout/full-screen-overlay';
 import { RightSidebar } from '/@/renderer/layouts/default-layout/right-sidebar';
-import { Center } from '@mantine/core';
 import { Spinner } from '/@/renderer/components';
 
 const SideDrawerQueue = lazy(() =>
@@ -118,16 +117,7 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
           />
         </>
       )}
-      <Suspense
-        fallback={
-          <Center
-            h="100%"
-            w="100%"
-          >
-            <Spinner />
-          </Center>
-        }
-      >
+      <Suspense fallback={<Spinner container />}>
         <Outlet />
       </Suspense>
     </MainContentContainer>
