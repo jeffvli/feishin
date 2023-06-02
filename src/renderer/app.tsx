@@ -143,14 +143,6 @@ export const App = () => {
         headings: {
           fontFamily: 'var(--content-font-family)',
           fontWeight: 700,
-          sizes: {
-            h1: '6rem',
-            h2: '4rem',
-            h3: '3rem',
-            h4: '1.5rem',
-            h5: '1.2rem',
-            h6: '1rem',
-          },
         },
         other: {},
         spacing: {
