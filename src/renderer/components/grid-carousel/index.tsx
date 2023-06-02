@@ -221,11 +221,13 @@ export const SwiperGridCarousel = ({
     });
   }, []);
 
-  const handleOnResize = throttle((e: SwiperCore) => {
+  const handleOnResize = useCallback((e: SwiperCore) => {
     const { width } = e;
     const slidesPerView = getSlidesPerView(width);
     e.params.slidesPerView = slidesPerView;
-  }, 200);
+  }, []);
+
+  const throttledOnResize = throttle(handleOnResize, 200);
 
   return (
     <CarouselContainer
@@ -250,9 +252,10 @@ export const SwiperGridCarousel = ({
         onBeforeInit={(swiper) => {
           swiperRef.current = swiper;
         }}
+        onBeforeResize={handleOnResize}
         onReachBeginning={handleOnReachBeginning}
         onReachEnd={handleOnReachEnd}
-        onResize={handleOnResize}
+        onResize={throttledOnResize}
         onSlideChange={handleOnSlideChange}
         onZoomChange={handleOnZoomChange}
         {...swiperProps}
