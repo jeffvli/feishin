@@ -109,7 +109,7 @@ export const PageHeader = ({
         $isHidden={isHidden}
         $padRight={padRight}
       >
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {!isHidden && (
             <TitleWrapper
               animate="animate"
