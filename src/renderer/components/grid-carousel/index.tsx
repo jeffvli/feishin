@@ -1,21 +1,35 @@
-import { useCallback, ReactNode, useRef, useState, isValidElement } from 'react';
-import { Box, Group } from '@mantine/core';
-import { useElementSize } from '@mantine/hooks';
-import { AnimatePresence } from 'framer-motion';
+import { isValidElement, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { Group, Stack } from '@mantine/core';
+import throttle from 'lodash/throttle';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
-import { Virtual, SwiperOptions } from 'swiper';
+import styled from 'styled-components';
+import { SwiperOptions, Virtual } from 'swiper';
+import 'swiper/css';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Swiper as SwiperCore } from 'swiper/types';
-import { PosterCard } from '/@/renderer/components/card/poster-card';
 import { Album, AlbumArtist, Artist, LibraryItem, RelatedArtist } from '/@/renderer/api/types';
-import { CardRoute, CardRow } from '/@/renderer/types';
-import { TextTitle } from '/@/renderer/components/text-title';
 import { Button } from '/@/renderer/components/button';
-import { usePlayButtonBehavior } from '/@/renderer/store';
-import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { PosterCard } from '/@/renderer/components/card/poster-card';
+import { TextTitle } from '/@/renderer/components/text-title';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { MotionStack } from '/@/renderer/components/motion';
-import 'swiper/css';
+import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { usePlayButtonBehavior } from '/@/renderer/store';
+import { CardRoute, CardRow } from '/@/renderer/types';
+
+const getSlidesPerView = (windowWidth: number) => {
+  if (windowWidth < 400) return 2;
+  if (windowWidth < 700) return 3;
+  if (windowWidth < 900) return 4;
+  if (windowWidth < 1100) return 5;
+  if (windowWidth < 1300) return 6;
+  if (windowWidth < 1500) return 7;
+  if (windowWidth < 1920) return 8;
+  return 10;
+};
+
+const CarouselContainer = styled(Stack)`
+  container-type: inline-size;
+`;
 
 interface TitleProps {
   handleNext?: () => void;
@@ -81,15 +95,6 @@ interface SwiperGridCarouselProps {
   uniqueId: string;
 }
 
-const variants = {
-  hidden: {
-    opacity: 0,
-  },
-  show: {
-    opacity: 1,
-  },
-};
-
 export const SwiperGridCarousel = ({
   cardRows,
   data,
@@ -100,15 +105,12 @@ export const SwiperGridCarousel = ({
   isLoading,
   uniqueId,
 }: SwiperGridCarouselProps) => {
-  const { ref, width } = useElementSize();
   const swiperRef = useRef<SwiperCore | any>(null);
   const playButtonBehavior = usePlayButtonBehavior();
   const handlePlayQueueAdd = usePlayQueueAdd();
 
-  const slidesPerView = width > 1500 ? 9 : width > 1200 ? 6 : width > 768 ? 5 : width > 600 ? 3 : 2;
-
   const [pagination, setPagination] = useState({
-    hasNextPage: (data?.length || 0) > Math.round(slidesPerView),
+    hasNextPage: (data?.length || 0) > Math.round(3),
     hasPreviousPage: false,
   });
 
@@ -139,37 +141,35 @@ export const SwiperGridCarousel = ({
     [createFavoriteMutation, deleteFavoriteMutation],
   );
 
-  const slides = data
-    ? data.map((el) => (
-        <PosterCard
-          controls={{
-            cardRows,
-            handleFavorite,
-            handlePlayQueueAdd,
-            itemType,
-            playButtonBehavior,
-            route,
-          }}
-          data={el}
-          isLoading={isLoading}
-          uniqueId={uniqueId}
-        />
-      ))
-    : Array.from(Array(10).keys()).map((el) => (
-        <PosterCard
-          controls={{
-            cardRows,
-            handleFavorite,
-            handlePlayQueueAdd,
-            itemType,
-            playButtonBehavior,
-            route,
-          }}
-          data={el}
-          isLoading={isLoading}
-          uniqueId={uniqueId}
-        />
-      ));
+  const slides = useMemo(() => {
+    if (!data) return [];
+
+    return data.map((el) => (
+      <PosterCard
+        controls={{
+          cardRows,
+          handleFavorite,
+          handlePlayQueueAdd,
+          itemType,
+          playButtonBehavior,
+          route,
+        }}
+        data={el}
+        isLoading={isLoading}
+        uniqueId={uniqueId}
+      />
+    ));
+  }, [
+    cardRows,
+    data,
+    handleFavorite,
+    handlePlayQueueAdd,
+    isLoading,
+    itemType,
+    playButtonBehavior,
+    route,
+    uniqueId,
+  ]);
 
   const handleNext = useCallback(() => {
     const activeIndex = swiperRef?.current?.activeIndex || 0;
@@ -183,109 +183,91 @@ export const SwiperGridCarousel = ({
     swiperRef?.current?.slideTo(activeIndex - slidesPerView);
   }, [swiperProps?.slidesPerView]);
 
-  const handleOnSlideChange = useCallback(
-    (e: SwiperCore) => {
-      const { slides, isEnd, isBeginning } = e;
-      if (isEnd || isBeginning) return;
+  const handleOnSlideChange = useCallback((e: SwiperCore) => {
+    const { slides, isEnd, isBeginning, params } = e;
+    if (isEnd || isBeginning) return;
 
-      setPagination({
-        hasNextPage: slidesPerView < slides.length,
-        hasPreviousPage: slidesPerView < slides.length,
-      });
-    },
-    [slidesPerView],
-  );
+    setPagination({
+      hasNextPage: (params?.slidesPerView || 3) < slides.length,
+      hasPreviousPage: (params?.slidesPerView || 3) < slides.length,
+    });
+  }, []);
 
-  const handleOnZoomChange = useCallback(
-    (e: SwiperCore) => {
-      const { slides, isEnd, isBeginning } = e;
-      if (isEnd || isBeginning) return;
+  const handleOnZoomChange = useCallback((e: SwiperCore) => {
+    const { slides, isEnd, isBeginning, params } = e;
+    if (isEnd || isBeginning) return;
 
-      setPagination({
-        hasNextPage: slidesPerView < slides.length,
-        hasPreviousPage: slidesPerView < slides.length,
-      });
-    },
-    [slidesPerView],
-  );
+    setPagination({
+      hasNextPage: (params.slidesPerView || 3) < slides.length,
+      hasPreviousPage: (params.slidesPerView || 3) < slides.length,
+    });
+  }, []);
 
-  const handleOnReachEnd = useCallback(
-    (e: SwiperCore) => {
-      const { slides } = e;
+  const handleOnReachEnd = useCallback((e: SwiperCore) => {
+    const { slides, params } = e;
 
-      setPagination({
-        hasNextPage: false,
-        hasPreviousPage: slidesPerView < slides.length,
-      });
-    },
-    [slidesPerView],
-  );
+    setPagination({
+      hasNextPage: false,
+      hasPreviousPage: (params.slidesPerView || 3) < slides.length,
+    });
+  }, []);
 
-  const handleOnReachBeginning = useCallback(
-    (e: SwiperCore) => {
-      const { slides } = e;
+  const handleOnReachBeginning = useCallback((e: SwiperCore) => {
+    const { slides, params } = e;
 
-      setPagination({
-        hasNextPage: slidesPerView < slides.length,
-        hasPreviousPage: false,
-      });
-    },
-    [slidesPerView],
-  );
+    setPagination({
+      hasNextPage: (params.slidesPerView || 3) < slides.length,
+      hasPreviousPage: false,
+    });
+  }, []);
+
+  const handleOnResize = throttle((e: SwiperCore) => {
+    const { width } = e;
+    const slidesPerView = getSlidesPerView(width);
+    e.params.slidesPerView = slidesPerView;
+  }, 200);
 
   return (
-    <AnimatePresence
-      initial
-      mode="sync"
+    <CarouselContainer
+      className="grid-carousel"
+      spacing="md"
     >
-      <Box
-        ref={ref}
-        className="grid-carousel"
+      {title ? (
+        <Title
+          {...title}
+          handleNext={handleNext}
+          handlePrev={handlePrev}
+          pagination={pagination}
+        />
+      ) : null}
+      <Swiper
+        ref={swiperRef}
+        resizeObserver
+        modules={[Virtual]}
+        slidesPerView={4}
+        spaceBetween={20}
+        style={{ height: '100%', width: '100%' }}
+        onBeforeInit={(swiper) => {
+          swiperRef.current = swiper;
+        }}
+        onReachBeginning={handleOnReachBeginning}
+        onReachEnd={handleOnReachEnd}
+        onResize={handleOnResize}
+        onSlideChange={handleOnSlideChange}
+        onZoomChange={handleOnZoomChange}
+        {...swiperProps}
       >
-        {width ? (
-          <MotionStack
-            animate="show"
-            initial="hidden"
-            spacing="md"
-            variants={variants}
-          >
-            {title && (
-              <Title
-                {...title}
-                handleNext={handleNext}
-                handlePrev={handlePrev}
-                pagination={pagination}
-              />
-            )}
-            <Swiper
-              ref={swiperRef}
-              modules={[Virtual]}
-              slidesPerView={swiperProps?.slidesPerView || slidesPerView || 5}
-              spaceBetween={20}
-              style={{ height: '100%', width: '100%' }}
-              onBeforeInit={(swiper) => {
-                swiperRef.current = swiper;
-              }}
-              onReachBeginning={handleOnReachBeginning}
-              onReachEnd={handleOnReachEnd}
-              onSlideChange={handleOnSlideChange}
-              onZoomChange={handleOnZoomChange}
-              {...swiperProps}
+        {slides.map((slideContent, index) => {
+          return (
+            <SwiperSlide
+              key={`${uniqueId}-${slideContent?.props?.data?.id}-${index}`}
+              virtualIndex={index}
             >
-              {slides.map((slideContent, index) => {
-                return (
-                  <SwiperSlide
-                    key={`${uniqueId}-${slideContent?.props?.data?.id}-${index}`}
-                    virtualIndex={index}
-                  >
-                    {slideContent}
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-          </MotionStack>
-        ) : null}
-      </Box>
-    </AnimatePresence>
+              {slideContent}
+            </SwiperSlide>
+          );
+        })}
+      </Swiper>
+    </CarouselContainer>
   );
 };
