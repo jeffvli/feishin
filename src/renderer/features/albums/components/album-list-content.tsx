@@ -208,7 +208,6 @@ export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListCont
 
   const handleGridScroll = useCallback(
     (e: ListOnScrollProps) => {
-      console.log('e', e.scrollOffset);
       setGrid({ data: { scrollOffset: e.scrollOffset }, key: pageKey });
     },
     [pageKey, setGrid],
