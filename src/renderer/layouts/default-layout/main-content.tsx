@@ -9,6 +9,8 @@ import { constrainSidebarWidth, constrainRightSidebarWidth } from '/@/renderer/u
 import { LeftSidebar } from '/@/renderer/layouts/default-layout/left-sidebar';
 import { FullScreenOverlay } from '/@/renderer/layouts/default-layout/full-screen-overlay';
 import { RightSidebar } from '/@/renderer/layouts/default-layout/right-sidebar';
+import { Center } from '@mantine/core';
+import { Spinner } from '/@/renderer/components';
 
 const SideDrawerQueue = lazy(() =>
   import('/@/renderer/layouts/default-layout/side-drawer-queue').then((module) => ({
@@ -102,8 +104,8 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
       sidebarCollapsed={collapsed}
     >
       {!shell && (
-        <Suspense fallback={<></>}>
-          {showQueueDrawerButton && <SideDrawerQueue />}
+        <>
+          <Suspense fallback={<></>}>{showQueueDrawerButton && <SideDrawerQueue />}</Suspense>
           <FullScreenOverlay />
           <LeftSidebar
             isResizing={isResizing}
@@ -114,9 +116,18 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
             isResizing={isResizingRight}
             startResizing={startResizing}
           />
-        </Suspense>
+        </>
       )}
-      <Suspense fallback={<></>}>
+      <Suspense
+        fallback={
+          <Center
+            h="100%"
+            w="100%"
+          >
+            <Spinner />
+          </Center>
+        }
+      >
         <Outlet />
       </Suspense>
     </MainContentContainer>

@@ -19,8 +19,7 @@ import {
   RiSearchLine,
   RiSearchFill,
 } from 'react-icons/ri';
-import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { DropdownMenu, ScrollArea } from '/@/renderer/components';
 import { CollapsedSidebarItem } from '/@/renderer/features/sidebar/components/collapsed-sidebar-item';
@@ -41,7 +40,6 @@ const SidebarContainer = styled(motion.div)<{ windowBarStyle: Platform }>`
 `;
 
 export const CollapsedSidebar = () => {
-  const location = useLocation();
   const { windowBarStyle } = useWindowSettings();
   const { open } = useCommandPalette();
 
@@ -71,41 +69,41 @@ export const CollapsedSidebar = () => {
           onClick={open}
         />
         <CollapsedSidebarItem
-          active={location.pathname === AppRoute.HOME}
           activeIcon={<RiHome6Fill size="25" />}
-          component={Link}
+          component={NavLink}
           icon={<RiHome6Line size="25" />}
           label="Home"
+          route={AppRoute.HOME}
           to={AppRoute.HOME}
         />
         <CollapsedSidebarItem
-          active={location.pathname === AppRoute.LIBRARY_ALBUMS}
           activeIcon={<RiAlbumFill size="25" />}
-          component={Link}
+          component={NavLink}
           icon={<RiAlbumLine size="25" />}
           label="Albums"
+          route={AppRoute.LIBRARY_ALBUMS}
           to={AppRoute.LIBRARY_ALBUMS}
         />
         <CollapsedSidebarItem
-          active={location.pathname === AppRoute.LIBRARY_SONGS}
           activeIcon={<RiMusic2Fill size="25" />}
-          component={Link}
+          component={NavLink}
           icon={<RiMusic2Line size="25" />}
           label="Tracks"
+          route={AppRoute.LIBRARY_SONGS}
           to={AppRoute.LIBRARY_SONGS}
         />
         <CollapsedSidebarItem
-          active={location.pathname === AppRoute.LIBRARY_ALBUM_ARTISTS}
           activeIcon={<RiUserVoiceFill size="25" />}
-          component={Link}
+          component={NavLink}
           icon={<RiUserVoiceLine size="25" />}
           label="Artists"
+          route={AppRoute.LIBRARY_ALBUM_ARTISTS}
           to={AppRoute.LIBRARY_ALBUM_ARTISTS}
         />
         <CollapsedSidebarItem
           disabled
           activeIcon={<RiFlag2Fill size="25" />}
-          component={Link}
+          component={NavLink}
           icon={<RiFlag2Line size="25" />}
           label="Genres"
           to={AppRoute.LIBRARY_GENRES}
@@ -113,17 +111,17 @@ export const CollapsedSidebar = () => {
         <CollapsedSidebarItem
           disabled
           activeIcon={<RiFolder3Fill size="25" />}
-          component={Link}
+          component={NavLink}
           icon={<RiFolder3Line size="25" />}
           label="Folders"
           to={AppRoute.LIBRARY_FOLDERS}
         />
         <CollapsedSidebarItem
-          active={location.pathname === AppRoute.PLAYLISTS}
           activeIcon={<RiPlayListFill size="25" />}
-          component={Link}
+          component={NavLink}
           icon={<RiPlayListLine size="25" />}
           label="Playlists"
+          route={AppRoute.PLAYLISTS}
           to={AppRoute.PLAYLISTS}
         />
       </ScrollArea>

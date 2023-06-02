@@ -1,6 +1,7 @@
 import { createPolymorphicComponent, Flex } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { forwardRef } from 'react';
+import { useMatch } from 'react-router';
 import styled from 'styled-components';
 import { Text } from '/@/renderer/components';
 
@@ -62,29 +63,32 @@ const ActiveTabIndicator = styled(motion.div)`
 `;
 
 interface CollapsedSidebarItemProps {
-  active?: boolean;
   activeIcon: React.ReactNode;
   disabled?: boolean;
   icon: React.ReactNode;
   label: string;
+  route?: string;
 }
 
 const _CollapsedSidebarItem = forwardRef<HTMLDivElement, CollapsedSidebarItemProps>(
-  ({ active, activeIcon, icon, label, disabled, ...props }: CollapsedSidebarItemProps, ref) => {
+  ({ route, activeIcon, icon, label, disabled, ...props }: CollapsedSidebarItemProps, ref) => {
+    const match = useMatch(route || '/null');
+    const isMatch = Boolean(match);
+
     return (
       <Container
         ref={ref}
-        $active={active}
+        $active={Boolean(match)}
         $disabled={disabled}
         align="center"
         direction="column"
         {...props}
       >
-        {active && <ActiveTabIndicator layoutId="active-tab-indicator" />}
-        {active ? activeIcon : icon}
+        {isMatch ? <ActiveTabIndicator /> : null}
+        {isMatch ? activeIcon : icon}
         <TextWrapper>
           <Text
-            $secondary={!active}
+            $secondary={!isMatch}
             fw="600"
             overflow="hidden"
             size="xs"
