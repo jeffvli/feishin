@@ -178,6 +178,7 @@ export const ssApiClient = (args: {
 
         return {
           body: result.data['subsonic-response'],
+          headers: result.headers as any,
           status: result.status,
         };
       } catch (e: Error | AxiosError | any) {
@@ -187,10 +188,9 @@ export const ssApiClient = (args: {
           const error = e as AxiosError;
           const response = error.response as AxiosResponse;
 
-          console.log(response, 'response');
-
           return {
             body: response?.data,
+            headers: response.headers as any,
             status: response?.status,
           };
         }

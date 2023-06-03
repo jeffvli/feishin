@@ -71,7 +71,7 @@ const authenticate = async (
       Username: body.username,
     },
     headers: {
-      'X-Emby-Authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="${packageJson.version}"`,
+      'x-emby-authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="${packageJson.version}"`,
     },
   });
 

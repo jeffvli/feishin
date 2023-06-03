@@ -263,7 +263,7 @@
     "@mantine/utils": "^6.0.13",
     "@tanstack/react-query": "^4.29.5",
     "@tanstack/react-query-devtools": "^4.29.6",
-    "@ts-rest/core": "^3.22.0",
+    "@ts-rest/core": "^3.23.0",
     "axios": "^1.4.0",
     "cmdk": "^0.2.0",
     "dayjs": "^1.11.6",

@@ -23,6 +23,9 @@ export const contract = c.router({
   },
   authenticate: {
     body: jfType._parameters.authenticate,
+    headers: z.object({
+      'X-Emby-Authorization': z.string(),
+    }),
     method: 'POST',
     path: 'users/authenticatebyname',
     responses: {
@@ -324,6 +327,7 @@ export const jfApiClient = (args: {
         });
         return {
           body: result.data,
+          headers: result.headers as any,
           status: result.status,
         };
       } catch (e: Error | AxiosError | any) {
@@ -331,7 +335,8 @@ export const jfApiClient = (args: {
           const error = e as AxiosError;
           const response = error.response as AxiosResponse;
           return {
-            body: response.data,
+            body: response?.data,
+            headers: response?.headers as any,
             status: response.status,
           };
         }
