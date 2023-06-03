@@ -46,6 +46,8 @@ import type {
   AuthenticationResponse,
   SearchArgs,
   SearchResponse,
+  LyricsArgs,
+  SynchronizedLyricsArray,
 } from '/@/renderer/api/types';
 import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
@@ -76,6 +78,7 @@ export type ControllerEndpoint = Partial<{
   getFolderList: () => void;
   getFolderSongs: () => void;
   getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
+  getLyrics: (args: LyricsArgs) => Promise<SynchronizedLyricsArray>;
   getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
   getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
   getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
@@ -119,6 +122,7 @@ const endpoints: ApiController = {
     getFolderList: undefined,
     getFolderSongs: undefined,
     getGenreList: jfController.getGenreList,
+    getLyrics: jfController.getLyrics,
     getMusicFolderList: jfController.getMusicFolderList,
     getPlaylistDetail: jfController.getPlaylistDetail,
     getPlaylistList: jfController.getPlaylistList,
@@ -154,6 +158,7 @@ const endpoints: ApiController = {
     getFolderList: undefined,
     getFolderSongs: undefined,
     getGenreList: ndController.getGenreList,
+    getLyrics: undefined,
     getMusicFolderList: ssController.getMusicFolderList,
     getPlaylistDetail: ndController.getPlaylistDetail,
     getPlaylistList: ndController.getPlaylistList,
@@ -188,6 +193,7 @@ const endpoints: ApiController = {
     getFolderList: undefined,
     getFolderSongs: undefined,
     getGenreList: undefined,
+    getLyrics: undefined,
     getMusicFolderList: ssController.getMusicFolderList,
     getPlaylistDetail: undefined,
     getPlaylistList: undefined,
@@ -448,6 +454,12 @@ const getRandomSongList = async (args: RandomSongListArgs) => {
   )?.(args);
 };
 
+const getLyrics = async (args: LyricsArgs) => {
+  return (
+    apiController('getLyrics', args.apiClientProps.server?.type) as ControllerEndpoint['getLyrics']
+  )?.(args);
+};
+
 export const controller = {
   addToPlaylist,
   authenticate,
@@ -461,6 +473,7 @@ export const controller = {
   getAlbumList,
   getArtistList,
   getGenreList,
+  getLyrics,
   getMusicFolderList,
   getPlaylistDetail,
   getPlaylistList,

@@ -10,10 +10,9 @@ import { PlaybackType, PlayerStatus } from '/@/renderer/types';
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import isElectron from 'is-electron';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
+import { SynchronizedLyricsArray } from '/@/renderer/api/types';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-
-export type SynchronizedLyricsArray = Array<[number, string]>;
 
 interface SynchronizedLyricsProps {
   lyrics: SynchronizedLyricsArray;
@@ -40,7 +39,12 @@ export const SynchronizedLyrics = ({ lyrics }: SynchronizedLyricsProps) => {
   // whether to proceed or stop
   const timerEpoch = useRef(0);
 
-  const followRef = useRef<boolean>(settings.follow);
+  const delayMsRef = useRef(settings.delayMs);
+  const followRef = useRef(settings.follow);
+
+  useEffect(() => {
+    delayMsRef.current = settings.delayMs;
+  }, [settings.delayMs]);
 
   useEffect(() => {
     // Copy the follow settings into a ref that can be accessed in the timeout
@@ -127,7 +131,7 @@ export const SynchronizedLyrics = ({ lyrics }: SynchronizedLyricsProps) => {
     }
 
     if (index !== lyricRef.current!.length - 1) {
-      const [nextTime] = lyricRef.current![index + 1];
+      const nextTime = lyricRef.current![index + 1][0];
 
       const elapsed = performance.now() - start;
 
@@ -149,7 +153,7 @@ export const SynchronizedLyrics = ({ lyrics }: SynchronizedLyricsProps) => {
             return false;
           }
 
-          setCurrentLyric(timeInSec * 1000);
+          setCurrentLyric(timeInSec * 1000 + delayMsRef.current);
 
           return true;
         })
@@ -185,7 +189,7 @@ export const SynchronizedLyrics = ({ lyrics }: SynchronizedLyricsProps) => {
       clearTimeout(lyricTimer.current);
     }
 
-    setCurrentLyric(now * 1000);
+    setCurrentLyric(now * 1000 + delayMsRef.current);
   }, [now, seeked, setCurrentLyric, status]);
 
   useEffect(() => {

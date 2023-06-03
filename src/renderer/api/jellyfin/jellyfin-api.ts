@@ -174,6 +174,14 @@ export const contract = c.router({
       400: jfType._response.error,
     },
   },
+  getSongLyrics: {
+    method: 'GET',
+    path: 'users/:userId/Items/:id/Lyrics',
+    responses: {
+      200: jfType._response.lyrics,
+      404: jfType._response.error,
+    },
+  },
   getTopSongsList: {
     method: 'GET',
     path: 'users/:userId/items',

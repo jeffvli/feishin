@@ -123,6 +123,7 @@ export interface SettingsState {
     globalMediaHotkeys: boolean;
   };
   lyrics: {
+    delayMs: number;
     fetch: boolean;
     follow: boolean;
     sources: LyricSource[];
@@ -209,6 +210,7 @@ const initialState: SettingsState = {
     globalMediaHotkeys: true,
   },
   lyrics: {
+    delayMs: 0,
     fetch: false,
     follow: true,
     sources: [],

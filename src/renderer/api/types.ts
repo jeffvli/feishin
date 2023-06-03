@@ -1017,6 +1017,16 @@ export type RandomSongListArgs = {
 
 export type RandomSongListResponse = SongListResponse;
 
+export type LyricsQuery = {
+  songId: string;
+};
+
+export type LyricsArgs = {
+  query: LyricsQuery;
+} & BaseEndpointArgs;
+
+export type SynchronizedLyricsArray = Array<[number, string]>;
+
 export const instanceOfCancellationError = (error: any) => {
   return 'revert' in error;
 };

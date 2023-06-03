@@ -631,6 +631,15 @@ const searchParameters = paginationParameters.merge(baseParameters);
 
 const search = z.any();
 
+const lyricText = z.object({
+  Start: z.number(),
+  Text: z.string(),
+});
+
+const lyrics = z.object({
+  Lyrics: z.array(lyricText),
+});
+
 export const jfType = {
   _enum: {
     collection: jfCollection,
@@ -670,6 +679,7 @@ export const jfType = {
     favorite,
     genre,
     genreList,
+    lyrics,
     musicFolderList,
     playlist,
     playlistList,
