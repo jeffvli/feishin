@@ -59,6 +59,12 @@ export const HomeCommands = ({
   return (
     <>
       <Command.Group heading="Commands">
+        <Command.Item
+          value="Search"
+          onSelect={handleSearch}
+        >
+          {query ? `Search for "${query}"...` : 'Search...'}
+        </Command.Item>
         <Command.Item onSelect={handleCreatePlaylistModal}>Create playlist...</Command.Item>
         <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.GO_TO])}>
           Go to page...
@@ -66,14 +72,6 @@ export const HomeCommands = ({
         <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.MANAGE_SERVERS])}>
           Server commands...
         </Command.Item>
-        {query !== '' && (
-          <Command.Item
-            value="Search"
-            onSelect={handleSearch}
-          >
-            {query ? `Search for "${query}"...` : 'Search...'}
-          </Command.Item>
-        )}
       </Command.Group>
     </>
   );
