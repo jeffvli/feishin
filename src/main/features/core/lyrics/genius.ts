@@ -2,12 +2,14 @@ import axios, { AxiosResponse } from 'axios';
 import { load } from 'cheerio';
 import type { QueueSong } from '/@/renderer/api/types';
 
-const search_url = 'https://genius.com/api/search/song';
+const SEARCH_URL = 'https://genius.com/api/search/song';
+
+// Adapted from https://github.com/NyaomiDEV/Sunamu/blob/master/src/main/lyricproviders/genius.ts
 
 async function getSongURL(metadata: QueueSong) {
   let result: AxiosResponse<any, any>;
   try {
-    result = await axios.get(search_url, {
+    result = await axios.get(SEARCH_URL, {
       params: {
         per_page: '1',
         q: `${metadata.artistName} ${metadata.name}`,
