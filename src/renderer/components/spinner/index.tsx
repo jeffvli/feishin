@@ -22,7 +22,10 @@ export const Spinner = ({ ...props }: SpinnerProps) => {
         h="100%"
         w="100%"
       >
-        <SpinnerIcon {...props} />
+        <SpinnerIcon
+          color={props.color}
+          size={props.size}
+        />
       </Center>
     );
   }
