@@ -22,7 +22,7 @@ const StyledTabs = styled(MantineTabs)`
     padding: 1.5rem 0.5rem;
   }
 
-  button {
+  & .mantine-Tabs-tab {
     padding: 1rem;
     color: var(--btn-subtle-fg);
     border-radius: 0;
