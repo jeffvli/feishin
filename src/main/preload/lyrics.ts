@@ -5,7 +5,7 @@ const fetchRemoteLyrics = (song: QueueSong) => {
   ipcRenderer.send('lyric-fetch', song);
 };
 
-const retrieveRemoteLyrics = (
+const remoteLyricsListener = (
   cb: (event: IpcRendererEvent, songName: string, source: string, lyric: string) => void,
 ) => {
   ipcRenderer.on('lyric-get', cb);
@@ -13,5 +13,5 @@ const retrieveRemoteLyrics = (
 
 export const lyrics = {
   fetchRemoteLyrics,
-  retrieveRemoteLyrics,
+  remoteLyricsListener,
 };
