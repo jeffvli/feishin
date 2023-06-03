@@ -3,9 +3,14 @@ import isElectron from 'is-electron';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import { useCurrentServer, useCurrentSong } from '/@/renderer/store';
-import { SynchronizedLyricsArray, SynchronizedLyrics } from './synchronized-lyrics';
+import { SynchronizedLyrics } from './synchronized-lyrics';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
+import { Center, Group } from '@mantine/core';
+import { RiInformationFill } from 'react-icons/ri';
+import { TextTitle } from '/@/renderer/components';
+import { SynchronizedLyricsArray } from '/@/renderer/api/types';
+import { useSongLyrics } from '/@/renderer/features/lyrics/queries/lyric-query';
 
 const lyrics = isElectron() ? window.electron.lyrics : null;
 
@@ -21,6 +26,11 @@ export const Lyrics = () => {
   const [override, setOverride] = useState<string | null>(null);
   const [source, setSource] = useState<string | null>(null);
   const [songLyrics, setSongLyrics] = useState<SynchronizedLyricsArray | string | null>(null);
+
+  const remoteLyrics = useSongLyrics({
+    query: { songId: currentSong?.id ?? '' },
+    serverId: currentServer?.id,
+  });
 
   const songRef = useRef<string | null>(null);
 
@@ -38,7 +48,7 @@ export const Lyrics = () => {
   }, []);
 
   useEffect(() => {
-    if (currentSong && !currentSong.lyrics) {
+    if (currentSong && !currentSong.lyrics && !remoteLyrics.isLoading && !remoteLyrics.isSuccess) {
       lyrics?.fetchLyrics(currentSong);
     }
 
@@ -46,7 +56,7 @@ export const Lyrics = () => {
 
     setOverride(null);
     setSource(null);
-  }, [currentSong]);
+  }, [currentSong, remoteLyrics.isLoading, remoteLyrics.isSuccess]);
 
   useEffect(() => {
     let lyrics: string | null = null;
@@ -57,6 +67,10 @@ export const Lyrics = () => {
       setSource(currentServer?.name ?? 'music server');
     } else if (override) {
       lyrics = override;
+    } else if (remoteLyrics.isSuccess) {
+      setSource(currentServer?.name ?? 'music server');
+      setSongLyrics(remoteLyrics.data!);
+      return;
     }
 
     if (lyrics) {
@@ -82,16 +96,23 @@ export const Lyrics = () => {
     } else {
       setSongLyrics(null);
     }
-  }, [currentServer?.name, currentSong, override]);
+  }, [currentServer?.name, currentSong, override, remoteLyrics.data, remoteLyrics.isSuccess]);
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      {songLyrics &&
-        (Array.isArray(songLyrics) ? (
-          <SynchronizedLyrics lyrics={songLyrics} />
-        ) : (
-          <UnsynchronizedLyrics lyrics={songLyrics} />
-        ))}
+      {!songLyrics && (
+        <Center>
+          <Group>
+            <RiInformationFill size="2rem" />
+            <TextTitle
+              order={3}
+              weight={700}
+            >
+              No lyrics found
+            </TextTitle>
+          </Group>
+        </Center>
+      )}
       {source && (
         <LyricLine
           key="provided-by"
@@ -99,6 +120,12 @@ export const Lyrics = () => {
           text={`Provided by: ${source}`}
         />
       )}
+      {songLyrics &&
+        (Array.isArray(songLyrics) ? (
+          <SynchronizedLyrics lyrics={songLyrics} />
+        ) : (
+          <UnsynchronizedLyrics lyrics={songLyrics} />
+        ))}
     </ErrorBoundary>
   );
 };

@@ -1,4 +1,4 @@
-import { Switch } from '@mantine/core';
+import { NumberInput, Switch } from '@mantine/core';
 import {
   SettingOption,
   SettingsSection,
@@ -81,6 +81,28 @@ export const LyricSettings = () => {
       description: 'List of lyric fetchers (in order of preference)',
       isHidden: !isElectron(),
       title: 'Providers to fetch music',
+    },
+    {
+      control: (
+        <NumberInput
+          defaultValue={settings.delayMs}
+          step={10}
+          width={100}
+          onBlur={(e) => {
+            const value = Number(e.currentTarget.value);
+            setSettings({
+              lyrics: {
+                ...settings,
+                delayMs: value,
+              },
+            });
+          }}
+        />
+      ),
+      description:
+        'Lyric offset (in milliseconds). Positive values mean that lyrics are shown later, and negative mean that lyrics are shown earlier',
+      isHidden: !isElectron(),
+      title: 'Lyric offset',
     },
   ];
 

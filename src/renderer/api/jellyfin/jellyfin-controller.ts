@@ -44,6 +44,8 @@ import {
   SearchResponse,
   RandomSongListResponse,
   RandomSongListArgs,
+  LyricsArgs,
+  SynchronizedLyricsArray,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -846,6 +848,28 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
     totalRecordCount: res.body.Items.length || 0,
   };
 };
+
+const getLyrics = async (args: LyricsArgs): Promise<SynchronizedLyricsArray> => {
+  const { query, apiClientProps } = args;
+
+  if (!apiClientProps.server?.userId) {
+    throw new Error('No userId found');
+  }
+
+  const res = await jfApiClient(apiClientProps).getSongLyrics({
+    params: {
+      id: query.songId,
+      userId: apiClientProps.server?.userId,
+    },
+  });
+
+  if (res.status !== 200) {
+    throw new Error('Failed to get lyrics');
+  }
+
+  return res.body.Lyrics.map((lyric) => [lyric.Start / 1e4, lyric.Text]);
+};
+
 export const jfController = {
   addToPlaylist,
   authenticate,
@@ -859,6 +883,7 @@ export const jfController = {
   getAlbumList,
   getArtistList,
   getGenreList,
+  getLyrics,
   getMusicFolderList,
   getPlaylistDetail,
   getPlaylistList,

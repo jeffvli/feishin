@@ -14,6 +14,7 @@ import type {
   SearchQuery,
   SongDetailQuery,
   RandomSongListQuery,
+  LyricsQuery,
 } from './types';
 
 export const queryKeys: Record<
@@ -101,6 +102,10 @@ export const queryKeys: Record<
     list: (serverId: string, query?: SongListQuery) => {
       if (query) return [serverId, 'songs', 'list', query] as const;
       return [serverId, 'songs', 'list'] as const;
+    },
+    lyrics: (serverId: string, query?: LyricsQuery) => {
+      if (query) return [serverId, 'song', 'lyrics', query] as const;
+      return [serverId, 'song', 'lyrics'] as const;
     },
     randomSongList: (serverId: string, query?: RandomSongListQuery) => {
       if (query) return [serverId, 'songs', 'randomSongList', query] as const;
