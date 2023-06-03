@@ -35,7 +35,7 @@ export const Lyrics = () => {
   const songRef = useRef<string | null>(null);
 
   useEffect(() => {
-    lyrics?.retrieveRemoteLyrics(
+    lyrics?.remoteLyricsListener(
       (_event: any, songName: string, lyricSource: string, lyric: string) => {
         if (songName === songRef.current) {
           setSource(lyricSource);
