@@ -43,10 +43,9 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
   const location = useLocation();
   const { collapsed, leftWidth, rightWidth, rightExpanded } = useSidebarStore();
   const { setSideBar } = useAppStoreActions();
-  const { sideQueueType } = useGeneralSettings();
+  const { sideQueueType, showQueueDrawerButton } = useGeneralSettings();
   const [isResizing, setIsResizing] = useState(false);
   const [isResizingRight, setIsResizingRight] = useState(false);
-  const { showQueueDrawerButton } = useGeneralSettings();
 
   const showSideQueue = rightExpanded && location.pathname !== AppRoute.NOW_PLAYING;
   const rightSidebarRef = useRef<HTMLDivElement | null>(null);
