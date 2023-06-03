@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import isElectron from 'is-electron';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '/@/renderer/features/action-required';
-import { getServerById, useCurrentServer, useCurrentSong } from '/@/renderer/store';
+import { getServerById, useCurrentSong } from '/@/renderer/store';
 import { SynchronizedLyrics } from './synchronized-lyrics';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
@@ -28,6 +28,7 @@ export const Lyrics = () => {
   const [songLyrics, setSongLyrics] = useState<LyricsResponse | null>(null);
 
   const remoteLyrics = useSongLyrics({
+    options: { enabled: !!currentSong },
     query: { songId: currentSong?.id ?? '' },
     serverId: currentServer?.id,
   });
