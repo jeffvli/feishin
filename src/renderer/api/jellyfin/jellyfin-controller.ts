@@ -45,7 +45,7 @@ import {
   RandomSongListResponse,
   RandomSongListArgs,
   LyricsArgs,
-  SynchronizedLyricsArray,
+  LyricsResponse,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -849,7 +849,7 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
   };
 };
 
-const getLyrics = async (args: LyricsArgs): Promise<SynchronizedLyricsArray> => {
+const getLyrics = async (args: LyricsArgs): Promise<LyricsResponse> => {
   const { query, apiClientProps } = args;
 
   if (!apiClientProps.server?.userId) {
@@ -867,7 +867,11 @@ const getLyrics = async (args: LyricsArgs): Promise<SynchronizedLyricsArray> => 
     throw new Error('Failed to get lyrics');
   }
 
-  return res.body.Lyrics.map((lyric) => [lyric.Start / 1e4, lyric.Text]);
+  if (res.body.Lyrics.length > 0 && res.body.Lyrics[0].Start === undefined) {
+    return res.body.Lyrics[0].Text;
+  }
+
+  return res.body.Lyrics.map((lyric) => [lyric.Start! / 1e4, lyric.Text]);
 };
 
 export const jfController = {

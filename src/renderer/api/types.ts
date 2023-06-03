@@ -1027,6 +1027,8 @@ export type LyricsArgs = {
 
 export type SynchronizedLyricsArray = Array<[number, string]>;
 
+export type LyricsResponse = SynchronizedLyricsArray | string;
+
 export const instanceOfCancellationError = (error: any) => {
   return 'revert' in error;
 };

@@ -47,7 +47,7 @@ import type {
   SearchArgs,
   SearchResponse,
   LyricsArgs,
-  SynchronizedLyricsArray,
+  LyricsResponse,
 } from '/@/renderer/api/types';
 import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
@@ -78,7 +78,7 @@ export type ControllerEndpoint = Partial<{
   getFolderList: () => void;
   getFolderSongs: () => void;
   getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
-  getLyrics: (args: LyricsArgs) => Promise<SynchronizedLyricsArray>;
+  getLyrics: (args: LyricsArgs) => Promise<LyricsResponse>;
   getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
   getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
   getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;

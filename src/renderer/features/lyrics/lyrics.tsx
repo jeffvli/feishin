@@ -9,7 +9,7 @@ import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import { Center, Group } from '@mantine/core';
 import { RiInformationFill } from 'react-icons/ri';
 import { TextTitle } from '/@/renderer/components';
-import { SynchronizedLyricsArray } from '/@/renderer/api/types';
+import { LyricsResponse, SynchronizedLyricsArray } from '/@/renderer/api/types';
 import { useSongLyrics } from '/@/renderer/features/lyrics/queries/lyric-query';
 
 const lyrics = isElectron() ? window.electron.lyrics : null;
@@ -25,7 +25,7 @@ export const Lyrics = () => {
 
   const [override, setOverride] = useState<string | null>(null);
   const [source, setSource] = useState<string | null>(null);
-  const [songLyrics, setSongLyrics] = useState<SynchronizedLyricsArray | string | null>(null);
+  const [songLyrics, setSongLyrics] = useState<LyricsResponse | null>(null);
 
   const remoteLyrics = useSongLyrics({
     query: { songId: currentSong?.id ?? '' },
@@ -48,7 +48,7 @@ export const Lyrics = () => {
   }, []);
 
   useEffect(() => {
-    if (currentSong && !currentSong.lyrics && !remoteLyrics.isLoading && !remoteLyrics.isSuccess) {
+    if (currentSong && !currentSong.lyrics && !remoteLyrics.isLoading && !remoteLyrics.data) {
       lyrics?.fetchLyrics(currentSong);
     }
 
@@ -56,7 +56,7 @@ export const Lyrics = () => {
 
     setOverride(null);
     setSource(null);
-  }, [currentSong, remoteLyrics.isLoading, remoteLyrics.isSuccess]);
+  }, [currentSong, remoteLyrics.isLoading, remoteLyrics.data]);
 
   useEffect(() => {
     let lyrics: string | null = null;
@@ -67,9 +67,10 @@ export const Lyrics = () => {
       setSource(currentServer?.name ?? 'music server');
     } else if (override) {
       lyrics = override;
-    } else if (remoteLyrics.isSuccess) {
+    } else if (remoteLyrics.data) {
+      console.log(remoteLyrics.data);
       setSource(currentServer?.name ?? 'music server');
-      setSongLyrics(remoteLyrics.data!);
+      setSongLyrics(remoteLyrics.data);
       return;
     }
 
@@ -96,7 +97,7 @@ export const Lyrics = () => {
     } else {
       setSongLyrics(null);
     }
-  }, [currentServer?.name, currentSong, override, remoteLyrics.data, remoteLyrics.isSuccess]);
+  }, [currentServer?.name, currentSong, override, remoteLyrics.data]);
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
