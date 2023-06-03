@@ -7,6 +7,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
+import { AppRoute } from '/@/renderer/router/routes';
 import { AppTheme } from '/@/renderer/themes/types';
 import {
   TableColumn,
@@ -17,6 +18,28 @@ import {
   TableType,
   Platform,
 } from '/@/renderer/types';
+
+export type SidebarItemType = {
+  disabled: boolean;
+  id: string;
+  label: string;
+  route: AppRoute;
+};
+
+export const sidebarItems = [
+  { disabled: false, id: 'Home', label: 'Home', route: AppRoute.HOME },
+  { disabled: false, id: 'Albums', label: 'Albums', route: AppRoute.LIBRARY_ALBUMS },
+  { disabled: false, id: 'Tracks', label: 'Tracks', route: AppRoute.LIBRARY_SONGS },
+  {
+    disabled: false,
+    id: 'Album Artists',
+    label: 'Album Artists',
+    route: AppRoute.LIBRARY_ALBUM_ARTISTS,
+  },
+  { disabled: false, id: 'Genres', label: 'Genres', route: AppRoute.LIBRARY_GENRES },
+  { disabled: false, id: 'Folders', label: 'Folders', route: AppRoute.LIBRARY_FOLDERS },
+  { disabled: false, id: 'Playlists', label: 'Playlists', route: AppRoute.PLAYLISTS },
+];
 
 export type PersistedTableColumn = {
   column: TableColumn;
@@ -72,6 +95,8 @@ export interface SettingsState {
     resume: boolean;
     showQueueDrawerButton: boolean;
     sideQueueType: SideQueueType;
+    sidebarItems: SidebarItemType[];
+    sidebarPlaylistList: boolean;
     skipButtons: {
       enabled: boolean;
       skipBackwardSeconds: number;
@@ -121,6 +146,7 @@ export interface SettingsSlice extends SettingsState {
   actions: {
     reset: () => void;
     setSettings: (data: Partial<SettingsState>) => void;
+    setSidebarItems: (items: SidebarItemType[]) => void;
   };
 }
 
@@ -132,6 +158,8 @@ const initialState: SettingsState = {
     resume: false,
     showQueueDrawerButton: false,
     sideQueueType: 'sideQueue',
+    sidebarItems,
+    sidebarPlaylistList: true,
     skipButtons: {
       enabled: false,
       skipBackwardSeconds: 5,
@@ -338,6 +366,11 @@ export const useSettingsStore = create<SettingsSlice>()(
           setSettings: (data) => {
             set({ ...get(), ...data });
           },
+          setSidebarItems: (items: SidebarItemType[]) => {
+            set((state) => {
+              state.general.sidebarItems = items;
+            });
+          },
         },
         ...initialState,
       })),
@@ -373,3 +406,12 @@ export const useHotkeySettings = () => useSettingsStore((state) => state.hotkeys
 
 export const useMpvSettings = () =>
   useSettingsStore((state) => state.playback.mpvProperties, shallow);
+
+export const useMainSettings = () =>
+  useSettingsStore(
+    (state) => ({
+      showQueueDrawerButton: state.general.showQueueDrawerButton,
+      sideQueueType: state.general.sideQueueType,
+    }),
+    shallow,
+  );
