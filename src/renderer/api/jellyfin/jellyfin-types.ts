@@ -632,7 +632,7 @@ const searchParameters = paginationParameters.merge(baseParameters);
 const search = z.any();
 
 const lyricText = z.object({
-  Start: z.number(),
+  Start: z.number().optional(),
   Text: z.string(),
 });
 
