@@ -1,10 +1,9 @@
-import { NumberInput, Switch } from '@mantine/core';
 import {
   SettingOption,
   SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useLyricsSettings, useSettingsStoreActions } from '/@/renderer/store';
-import { MultiSelect, MultiSelectProps } from '/@/renderer/components';
+import { MultiSelect, MultiSelectProps, NumberInput, Switch } from '/@/renderer/components';
 import isElectron from 'is-electron';
 import styled from 'styled-components';
 import { LyricSource } from '/@/renderer/types';

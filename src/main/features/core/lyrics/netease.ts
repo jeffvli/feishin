@@ -4,6 +4,8 @@ import type { QueueSong } from '/@/renderer/api/types';
 const SEARCH_URL = 'https://music.163.com/api/search/get';
 const LYRICS_URL = 'https://music.163.com/api/song/lyric';
 
+// Adapted from https://github.com/NyaomiDEV/Sunamu/blob/master/src/main/lyricproviders/netease.ts
+
 async function getSongId(metadata: QueueSong) {
   let result: AxiosResponse<any, any>;
   try {

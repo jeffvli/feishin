@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import isElectron from 'is-electron';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '/@/renderer/features/action-required';
-import { useCurrentServer, useCurrentSong } from '/@/renderer/store';
+import { getServerById, useCurrentServer, useCurrentSong } from '/@/renderer/store';
 import { SynchronizedLyrics } from './synchronized-lyrics';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
@@ -20,8 +20,8 @@ const ipc = isElectron() ? window.electron.ipc : null;
 const timeExp = /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?]([^\n]+)\n/g;
 
 export const Lyrics = () => {
-  const currentServer = useCurrentServer();
   const currentSong = useCurrentSong();
+  const currentServer = getServerById(currentSong?.serverId);
 
   const [override, setOverride] = useState<string | null>(null);
   const [source, setSource] = useState<string | null>(null);
@@ -35,12 +35,14 @@ export const Lyrics = () => {
   const songRef = useRef<string | null>(null);
 
   useEffect(() => {
-    lyrics?.getLyrics((_event: any, songName: string, lyricSource: string, lyric: string) => {
-      if (songName === songRef.current) {
-        setSource(lyricSource);
-        setOverride(lyric);
-      }
-    });
+    lyrics?.retrieveRemoteLyrics(
+      (_event: any, songName: string, lyricSource: string, lyric: string) => {
+        if (songName === songRef.current) {
+          setSource(lyricSource);
+          setOverride(lyric);
+        }
+      },
+    );
 
     return () => {
       ipc?.removeAllListeners('lyric-get');
@@ -48,15 +50,19 @@ export const Lyrics = () => {
   }, []);
 
   useEffect(() => {
-    if (currentSong && !currentSong.lyrics && !remoteLyrics.isLoading && !remoteLyrics.data) {
-      lyrics?.fetchLyrics(currentSong);
+    const hasTaggedLyrics = currentSong && currentSong.lyrics;
+    const hasLyricsResponse =
+      !remoteLyrics.isLoading && remoteLyrics?.isSuccess && remoteLyrics?.data !== null;
+
+    if (!hasTaggedLyrics && !hasLyricsResponse) {
+      lyrics?.fetchRemoteLyrics(currentSong);
     }
 
     songRef.current = currentSong?.name ?? null;
 
     setOverride(null);
     setSource(null);
-  }, [currentSong, remoteLyrics.isLoading, remoteLyrics.data]);
+  }, [currentSong, remoteLyrics.isLoading, remoteLyrics?.data, remoteLyrics?.isSuccess]);
 
   useEffect(() => {
     let lyrics: string | null = null;
@@ -64,11 +70,10 @@ export const Lyrics = () => {
     if (currentSong?.lyrics) {
       lyrics = currentSong.lyrics;
 
-      setSource(currentServer?.name ?? 'music server');
+      setSource(currentSong?.name ?? 'music server');
     } else if (override) {
       lyrics = override;
     } else if (remoteLyrics.data) {
-      console.log(remoteLyrics.data);
       setSource(currentServer?.name ?? 'music server');
       setSongLyrics(remoteLyrics.data);
       return;
