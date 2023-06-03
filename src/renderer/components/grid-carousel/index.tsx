@@ -173,13 +173,13 @@ export const SwiperGridCarousel = ({
 
   const handleNext = useCallback(() => {
     const activeIndex = swiperRef?.current?.activeIndex || 0;
-    const slidesPerView = Math.round(Number(swiperProps?.slidesPerView || 5));
+    const slidesPerView = Math.round(Number(swiperProps?.slidesPerView || 4));
     swiperRef?.current?.slideTo(activeIndex + slidesPerView);
   }, [swiperProps?.slidesPerView]);
 
   const handlePrev = useCallback(() => {
     const activeIndex = swiperRef?.current?.activeIndex || 0;
-    const slidesPerView = Math.round(Number(swiperProps?.slidesPerView || 5));
+    const slidesPerView = Math.round(Number(swiperProps?.slidesPerView || 4));
     swiperRef?.current?.slideTo(activeIndex - slidesPerView);
   }, [swiperProps?.slidesPerView]);
 
@@ -188,8 +188,8 @@ export const SwiperGridCarousel = ({
     if (isEnd || isBeginning) return;
 
     setPagination({
-      hasNextPage: (params?.slidesPerView || 3) < slides.length,
-      hasPreviousPage: (params?.slidesPerView || 3) < slides.length,
+      hasNextPage: (params?.slidesPerView || 4) < slides.length,
+      hasPreviousPage: (params?.slidesPerView || 4) < slides.length,
     });
   }, []);
 
@@ -198,8 +198,8 @@ export const SwiperGridCarousel = ({
     if (isEnd || isBeginning) return;
 
     setPagination({
-      hasNextPage: (params.slidesPerView || 3) < slides.length,
-      hasPreviousPage: (params.slidesPerView || 3) < slides.length,
+      hasNextPage: (params.slidesPerView || 4) < slides.length,
+      hasPreviousPage: (params.slidesPerView || 4) < slides.length,
     });
   }, []);
 
@@ -208,7 +208,7 @@ export const SwiperGridCarousel = ({
 
     setPagination({
       hasNextPage: false,
-      hasPreviousPage: (params.slidesPerView || 3) < slides.length,
+      hasPreviousPage: (params.slidesPerView || 4) < slides.length,
     });
   }, []);
 
@@ -216,14 +216,16 @@ export const SwiperGridCarousel = ({
     const { slides, params } = e;
 
     setPagination({
-      hasNextPage: (params.slidesPerView || 3) < slides.length,
+      hasNextPage: (params.slidesPerView || 4) < slides.length,
       hasPreviousPage: false,
     });
   }, []);
 
   const handleOnResize = useCallback((e: SwiperCore) => {
+    if (!e) return;
     const { width } = e;
     const slidesPerView = getSlidesPerView(width);
+    if (!e.params) return;
     e.params.slidesPerView = slidesPerView;
   }, []);
 
