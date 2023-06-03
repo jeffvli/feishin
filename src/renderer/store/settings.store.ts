@@ -406,12 +406,3 @@ export const useHotkeySettings = () => useSettingsStore((state) => state.hotkeys
 
 export const useMpvSettings = () =>
   useSettingsStore((state) => state.playback.mpvProperties, shallow);
-
-export const useMainSettings = () =>
-  useSettingsStore(
-    (state) => ({
-      showQueueDrawerButton: state.general.showQueueDrawerButton,
-      sideQueueType: state.general.sideQueueType,
-    }),
-    shallow,
-  );
