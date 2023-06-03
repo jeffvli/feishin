@@ -3,10 +3,12 @@
 import { ColDef } from '@ag-grid-community/core';
 import isElectron from 'is-electron';
 import merge from 'lodash/merge';
+import { generatePath } from 'react-router';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
+import { LibraryItem } from '/@/renderer/api/types';
 import { AppRoute } from '/@/renderer/router/routes';
 import { AppTheme } from '/@/renderer/themes/types';
 import {
@@ -23,22 +25,30 @@ export type SidebarItemType = {
   disabled: boolean;
   id: string;
   label: string;
-  route: AppRoute;
+  route: AppRoute | string;
 };
 
 export const sidebarItems = [
+  { disabled: true, id: 'Now Playing', label: 'Now Playing', route: AppRoute.NOW_PLAYING },
+  {
+    disabled: true,
+    id: 'Search',
+    label: 'Search',
+    route: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
+  },
   { disabled: false, id: 'Home', label: 'Home', route: AppRoute.HOME },
   { disabled: false, id: 'Albums', label: 'Albums', route: AppRoute.LIBRARY_ALBUMS },
   { disabled: false, id: 'Tracks', label: 'Tracks', route: AppRoute.LIBRARY_SONGS },
   {
     disabled: false,
-    id: 'Album Artists',
-    label: 'Album Artists',
+    id: 'Artists',
+    label: 'Artists',
     route: AppRoute.LIBRARY_ALBUM_ARTISTS,
   },
   { disabled: false, id: 'Genres', label: 'Genres', route: AppRoute.LIBRARY_GENRES },
-  { disabled: false, id: 'Folders', label: 'Folders', route: AppRoute.LIBRARY_FOLDERS },
-  { disabled: false, id: 'Playlists', label: 'Playlists', route: AppRoute.PLAYLISTS },
+  { disabled: true, id: 'Folders', label: 'Folders', route: AppRoute.LIBRARY_FOLDERS },
+  { disabled: true, id: 'Playlists', label: 'Playlists', route: AppRoute.PLAYLISTS },
+  { disabled: true, id: 'Settings', label: 'Settings', route: AppRoute.SETTINGS },
 ];
 
 export type PersistedTableColumn = {
@@ -381,7 +391,7 @@ export const useSettingsStore = create<SettingsSlice>()(
         return merge(currentState, persistedState);
       },
       name: 'store_settings',
-      version: 5,
+      version: 6,
     },
   ),
 );
