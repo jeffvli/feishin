@@ -35,6 +35,7 @@ const Layout = styled.div<{ windowBarStyle: Platform }>`
   grid-template-columns: 1fr;
   gap: 0;
   height: 100%;
+  overflow: hidden;
 `;
 
 const WindowBar = lazy(() =>
