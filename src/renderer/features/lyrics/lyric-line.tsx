@@ -20,6 +20,10 @@ const StyledText = styled(TextTitle)`
     opacity: 1;
   }
 
+  &.active.unsynchronized {
+    opacity: 0.8;
+  }
+
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 `;
 
