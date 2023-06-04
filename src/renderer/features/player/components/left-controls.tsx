@@ -20,13 +20,6 @@ import { LibraryItem } from '/@/renderer/api/types';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 
-const LeftControlsContainer = styled.div`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  padding-left: 1rem;
-`;
-
 const ImageWrapper = styled.div`
   position: relative;
   display: flex;
@@ -85,11 +78,23 @@ const LineItem = styled.div<{ $secondary?: boolean }>`
   }
 `;
 
+const LeftControlsContainer = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding-left: 1rem;
+
+  @media (max-width: 640px) {
+    ${ImageWrapper} {
+      display: none;
+    }
+  }
+`;
+
 export const LeftControls = () => {
   const { setSideBar } = useAppStoreActions();
   const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
   const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
-  // const hideImage = useAppStore((state) => state.sidebar.image);
   const { image, collapsed } = useSidebarStore();
   const hideImage = image && !collapsed;
   const currentSong = useCurrentSong();

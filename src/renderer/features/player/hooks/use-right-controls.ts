@@ -79,7 +79,7 @@ export const useRightControls = () => {
   }, [setVolume, volume, volumeWheelStep]);
 
   const handleVolumeWheel = useCallback(
-    (e: WheelEvent<HTMLDivElement>) => {
+    (e: WheelEvent<HTMLDivElement | HTMLButtonElement>) => {
       let volumeToSet;
       if (e.deltaY > 0) {
         volumeToSet = calculateVolumeDown(volume, volumeWheelStep);

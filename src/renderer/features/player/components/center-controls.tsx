@@ -43,13 +43,6 @@ interface CenterControlsProps {
   playersRef: any;
 }
 
-const ControlsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 35px;
-`;
-
 const ButtonsContainer = styled.div`
   display: flex;
   gap: 0.5rem;
@@ -58,14 +51,20 @@ const ButtonsContainer = styled.div`
 
 const SliderContainer = styled.div`
   display: flex;
+  width: 95%;
   height: 20px;
 `;
 
 const SliderValueWrapper = styled.div<{ position: 'left' | 'right' }>`
+  display: flex;
   flex: 1;
-  align-self: center;
+  align-self: flex-end;
+  justify-content: center;
   max-width: 50px;
-  text-align: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const SliderWrapper = styled.div`
@@ -73,6 +72,23 @@ const SliderWrapper = styled.div`
   flex: 6;
   align-items: center;
   height: 100%;
+`;
+
+const ControlsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+
+  @media (max-width: 768px) {
+    ${ButtonsContainer} {
+      gap: 0;
+    }
+
+    ${SliderValueWrapper} {
+      display: none;
+    }
+  }
 `;
 
 export const CenterControls = ({ playersRef }: CenterControlsProps) => {
