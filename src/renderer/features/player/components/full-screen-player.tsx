@@ -35,9 +35,9 @@ const ResponsiveContainer = styled.div`
   margin-top: 5rem;
 
   @media screen and (max-width: 768px) {
-    flex-direction: row;
     grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr);
+    margin-top: 0;
   }
 `;
 
