@@ -7,16 +7,20 @@ interface LyricLineProps extends ComponentPropsWithoutRef<'div'> {
 }
 
 const StyledText = styled(TextTitle)`
-  font-size: 2rem;
+  color: var(--main-fg);
   font-weight: 100;
-  line-height: 3.5rem;
+  font-size: 2vmax;
+  line-height: 3.5vmax;
+  opacity: 0.5;
 
-  &.active,
-  &.credit {
-    font-size: 2.5rem;
+  &.active {
     font-weight: 800;
-    line-height: 4rem;
+    font-size: 2.5vmax;
+    line-height: 4vmax;
+    opacity: 1;
   }
+
+  transition: opacity 0.3s ease-in-out, font-size 0.3s ease-in-out;
 `;
 
 export const LyricLine = ({ text, ...props }: LyricLineProps) => {

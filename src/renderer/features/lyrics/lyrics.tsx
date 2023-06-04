@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
+import { Center, Group } from '@mantine/core';
 import isElectron from 'is-electron';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import { getServerById, useCurrentSong } from '/@/renderer/store';
-import { SynchronizedLyrics } from './synchronized-lyrics';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
-import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
-import { Center, Group } from '@mantine/core';
 import { RiInformationFill } from 'react-icons/ri';
 import { TextTitle } from '/@/renderer/components';
 import { LyricsResponse, SynchronizedLyricsArray } from '/@/renderer/api/types';
 import { useSongLyrics } from '/@/renderer/features/lyrics/queries/lyric-query';
+import { SynchronizedLyrics } from './synchronized-lyrics';
 
 const lyrics = isElectron() ? window.electron.lyrics : null;
 
@@ -120,18 +119,17 @@ export const Lyrics = () => {
           </Group>
         </Center>
       )}
-      {source && (
-        <LyricLine
-          key="provided-by"
-          className="credit"
-          text={`Provided by: ${source}`}
-        />
-      )}
       {songLyrics &&
         (Array.isArray(songLyrics) ? (
-          <SynchronizedLyrics lyrics={songLyrics} />
+          <SynchronizedLyrics
+            lyrics={songLyrics}
+            source={source}
+          />
         ) : (
-          <UnsynchronizedLyrics lyrics={songLyrics} />
+          <UnsynchronizedLyrics
+            lyrics={songLyrics}
+            source={source}
+          />
         ))}
     </ErrorBoundary>
   );
