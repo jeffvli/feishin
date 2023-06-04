@@ -23,6 +23,10 @@ const Container = styled(motion.div)`
   display: flex;
   justify-content: center;
   padding: 2rem;
+
+  @media screen and (max-width: 768px) {
+    padding: 2rem 2rem 1rem;
+  }
 `;
 
 const ResponsiveContainer = styled.div`
