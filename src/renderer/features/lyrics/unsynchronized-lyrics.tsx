@@ -14,7 +14,7 @@ export const UnsynchronizedLyrics = ({ lyrics, source }: UnsynchronizedLyricsPro
 
   return (
     <div className="unsynchronized-lyrics">
-      {source && <Text $noSelect>Lyrics provided by: {source}</Text>}
+      {source && <Text $noSelect>Lyrics provided by {source}</Text>}
       {lines.map((text, idx) => (
         <LyricLine
           key={idx}

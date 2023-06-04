@@ -1,4 +1,4 @@
-import { Stack, Group, Center, Box } from '@mantine/core';
+import { Stack, Group, Center } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import { RiFileMusicLine, RiFileTextLine, RiInformationFill } from 'react-icons/ri';
@@ -28,7 +28,9 @@ const QueueContainer = styled.div`
 `;
 
 const LyricsContainer = styled(ScrollArea)`
+  z-index: 1;
   text-align: center;
+  transform: translateY(-2rem);
 
   mask-image: linear-gradient(
     180deg,
@@ -46,6 +48,11 @@ const ActiveTabIndicator = styled(motion.div)`
   width: 100%;
   height: 2px;
   background: var(--main-fg);
+`;
+
+const HeaderItemWrapper = styled.div`
+  position: relative;
+  z-index: 2;
 `;
 
 export const FullScreenPlayerQueue = () => {
@@ -81,10 +88,7 @@ export const FullScreenPlayerQueue = () => {
         position="center"
       >
         {headerItems.map((item) => (
-          <Box
-            key={`tab-${item.label}`}
-            pos="relative"
-          >
+          <HeaderItemWrapper key={`tab-${item.label}`}>
             <Button
               fullWidth
               uppercase
@@ -104,7 +108,7 @@ export const FullScreenPlayerQueue = () => {
               {item.label}
             </Button>
             {item.active ? <ActiveTabIndicator layoutId="underline" /> : null}
-          </Box>
+          </HeaderItemWrapper>
         ))}
       </Group>
       {activeTab === 'queue' ? (

@@ -178,6 +178,6 @@ export type GridCardData = {
 };
 
 export enum LyricSource {
-  GENIUS = 'genius',
-  NETEASE = 'netease',
+  GENIUS = 'Genius',
+  NETEASE = 'NetEase',
 }

@@ -12,12 +12,11 @@ import isElectron from 'is-electron';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 import { SynchronizedLyricsArray } from '/@/renderer/api/types';
 import styled from 'styled-components';
-import { Text } from '/@/renderer/components';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 const SynchronizedLyricsContainer = styled.div`
-  padding: 3rem 0 10rem;
+  padding: 5rem 0;
 `;
 
 interface SynchronizedLyricsProps {
@@ -211,7 +210,12 @@ export const SynchronizedLyrics = ({ lyrics, source }: SynchronizedLyricsProps) 
 
   return (
     <SynchronizedLyricsContainer className="synchronized-lyrics">
-      {source && <Text $noSelect>Lyrics provided by: {source}</Text>}
+      {source && (
+        <LyricLine
+          className="lyric-credit"
+          text={`Lyrics provided by ${source}`}
+        />
+      )}
       {lyrics.map(([, text], idx) => (
         <LyricLine
           key={idx}
