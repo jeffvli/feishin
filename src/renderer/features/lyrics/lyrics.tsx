@@ -88,7 +88,7 @@ export const Lyrics = () => {
         const [, minute, sec, ms, text] = line;
         const minutes = parseInt(minute, 10);
         const seconds = parseInt(sec, 10);
-        const milis = ms.length === 3 ? parseInt(ms, 10) : parseInt(ms, 10) * 10;
+        const milis = ms?.length === 3 ? parseInt(ms, 10) : parseInt(ms, 10) * 10;
 
         const timeInMilis = (minutes * 60 + seconds) * 1000 + milis;
         synchronizedTimes.push([timeInMilis, text]);
@@ -106,8 +106,8 @@ export const Lyrics = () => {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      {!songLyrics && (
-        <Center>
+      {!songLyrics ? (
+        <Center p="2rem">
           <Group>
             <RiInformationFill size="2rem" />
             <TextTitle
@@ -118,19 +118,21 @@ export const Lyrics = () => {
             </TextTitle>
           </Group>
         </Center>
+      ) : (
+        <>
+          {Array.isArray(songLyrics) ? (
+            <SynchronizedLyrics
+              lyrics={songLyrics}
+              source={source}
+            />
+          ) : (
+            <UnsynchronizedLyrics
+              lyrics={songLyrics}
+              source={source}
+            />
+          )}
+        </>
       )}
-      {songLyrics &&
-        (Array.isArray(songLyrics) ? (
-          <SynchronizedLyrics
-            lyrics={songLyrics}
-            source={source}
-          />
-        ) : (
-          <UnsynchronizedLyrics
-            lyrics={songLyrics}
-            source={source}
-          />
-        ))}
     </ErrorBoundary>
   );
 };
