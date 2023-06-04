@@ -209,8 +209,8 @@ const createWindow = async () => {
     frame: false,
     height: 900,
     icon: getAssetPath('icon.png'),
-    minHeight: 600,
-    minWidth: 640,
+    minHeight: 640,
+    minWidth: 480,
     show: false,
     webPreferences: {
       allowRunningInsecureContent: !!store.get('ignore_ssl'),

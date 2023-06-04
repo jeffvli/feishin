@@ -19,7 +19,7 @@ import { RightControls } from './right-controls';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 
 const PlayerbarContainer = styled.div`
-  width: 100%;
+  width: 100vw;
   height: 100%;
   border-top: var(--playerbar-border-top);
 `;
