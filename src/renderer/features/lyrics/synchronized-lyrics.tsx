@@ -11,14 +11,21 @@ import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import isElectron from 'is-electron';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 import { SynchronizedLyricsArray } from '/@/renderer/api/types';
+import styled from 'styled-components';
+import { Text } from '/@/renderer/components';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
+const SynchronizedLyricsContainer = styled.div`
+  padding: 3rem 0 10rem;
+`;
+
 interface SynchronizedLyricsProps {
   lyrics: SynchronizedLyricsArray;
+  source: string | null;
 }
 
-export const SynchronizedLyrics = ({ lyrics }: SynchronizedLyricsProps) => {
+export const SynchronizedLyrics = ({ lyrics, source }: SynchronizedLyricsProps) => {
   const playersRef = PlayersRef;
   const status = useCurrentStatus();
   const playerType = usePlayerType();
@@ -203,7 +210,8 @@ export const SynchronizedLyrics = ({ lyrics }: SynchronizedLyricsProps) => {
   }, []);
 
   return (
-    <div className="synchronized-lyrics">
+    <SynchronizedLyricsContainer className="synchronized-lyrics">
+      {source && <Text $noSelect>Lyrics provided by: {source}</Text>}
       {lyrics.map(([, text], idx) => (
         <LyricLine
           key={idx}
@@ -211,6 +219,6 @@ export const SynchronizedLyrics = ({ lyrics }: SynchronizedLyricsProps) => {
           text={text}
         />
       ))}
-    </div>
+    </SynchronizedLyricsContainer>
   );
 };

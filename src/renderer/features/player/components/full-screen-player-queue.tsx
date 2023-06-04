@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import { RiFileMusicLine, RiFileTextLine, RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
-import { Button, TextTitle } from '/@/renderer/components';
+import { Button, ScrollArea, TextTitle } from '/@/renderer/components';
 import { PlayQueue } from '/@/renderer/features/now-playing';
 import {
   useFullScreenPlayerStore,
@@ -27,10 +27,16 @@ const QueueContainer = styled.div`
   }
 `;
 
-const LyricsContainer = styled.div`
-  height: 100%;
-  overflow: scroll;
+const LyricsContainer = styled(ScrollArea)`
   text-align: center;
+
+  mask-image: linear-gradient(
+    180deg,
+    transparent 5%,
+    rgba(0, 0, 0, 100%) 20%,
+    rgba(0, 0, 0, 100%) 85%,
+    transparent 95%
+  );
 `;
 
 const ActiveTabIndicator = styled(motion.div)`
@@ -118,7 +124,7 @@ export const FullScreenPlayerQueue = () => {
           </Group>
         </Center>
       ) : activeTab === 'lyrics' ? (
-        <LyricsContainer>
+        <LyricsContainer scrollHideDelay={0}>
           <Lyrics />
         </LyricsContainer>
       ) : null}
