@@ -25,20 +25,25 @@ const PlayerbarContainer = styled.div`
 `;
 
 const PlayerbarControlsGrid = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: 1rem;
   height: 100%;
+
+  @media (max-width: 768px) {
+    grid-template-columns: minmax(0, 0.5fr) minmax(0, 1fr) minmax(0, 0.5fr);
+  }
 `;
 
 const RightGridItem = styled.div`
   align-self: center;
-  width: calc(100% / 3);
+  width: 100%;
   height: 100%;
   overflow: hidden;
 `;
 
 const LeftGridItem = styled.div`
-  width: calc(100% / 3);
+  width: 100%;
   height: 100%;
   overflow: hidden;
 `;
@@ -47,8 +52,9 @@ const CenterGridItem = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  align-items: center;
   justify-content: center;
-  width: calc(100% / 3);
+  width: 100%;
   height: 100%;
   overflow: hidden;
 `;

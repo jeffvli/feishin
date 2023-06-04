@@ -1,6 +1,6 @@
 import { MouseEvent } from 'react';
 import { Flex, Group } from '@mantine/core';
-import { useHotkeys } from '@mantine/hooks';
+import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import {
   RiVolumeUpFill,
@@ -26,6 +26,7 @@ import { Rating } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 
 export const RightControls = () => {
+  const isMinWidth = useMediaQuery('(max-width: 480px)');
   const volume = useVolume();
   const muted = useMuted();
   const server = useCurrentServer();
@@ -181,16 +182,19 @@ export const RightControls = () => {
             tooltip={{ label: muted ? 'Muted' : volume, openDelay: 500 }}
             variant="secondary"
             onClick={handleMute}
-          />
-          <PlayerbarSlider
-            max={100}
-            min={0}
-            size={6}
-            value={volume}
-            w="60px"
-            onChange={handleVolumeSlider}
             onWheel={handleVolumeWheel}
           />
+          {!isMinWidth ? (
+            <PlayerbarSlider
+              max={100}
+              min={0}
+              size={6}
+              value={volume}
+              w="60px"
+              onChange={handleVolumeSlider}
+              onWheel={handleVolumeWheel}
+            />
+          ) : null}
         </Group>
       </Group>
       <Group h="calc(100% / 3)" />
