@@ -12,21 +12,12 @@ import { useFastAverageColor } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { PlayerData, usePlayerData, usePlayerStore } from '/@/renderer/store';
 
-const PlayerContainer = styled(Flex)`
-  flex: 0.5;
-  gap: '1rem';
-
-  @media screen and (min-width: 1080px) {
-    max-width: 60%;
-  }
-`;
-
 const Image = styled(motion.img)`
   position: absolute;
   width: 100%;
-  max-width: 100%;
-  max-height: 100%;
+  height: 100%;
   object-fit: cover;
+  object-position: 50% 50%;
   border-radius: 5px;
   box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 40%);
 `;
@@ -34,11 +25,32 @@ const Image = styled(motion.img)`
 const ImageContainer = styled(motion.div)`
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   max-width: 100%;
   aspect-ratio: 1/1;
   height: 65%;
   margin-bottom: 1rem;
+`;
+
+const MetadataContainer = styled(Stack)`
+  h1 {
+    font-size: 3.5vh;
+  }
+`;
+
+const PlayerContainer = styled(Flex)`
+  @media screen and (max-height: 640px) {
+    .full-screen-player-image-metadata {
+      display: none;
+      height: 100%;
+      margin-bottom: 0;
+    }
+
+    ${ImageContainer} {
+      height: 100%;
+      margin-bottom: 0;
+    }
+  }
 `;
 
 const imageVariants: Variants = {
@@ -66,9 +78,9 @@ const imageVariants: Variants = {
 
 const scaleImageUrl = (url?: string | null) => {
   return url
-    ?.replace(/&size=\d+/, '&size=800')
-    .replace(/\?width=\d+/, '?width=800')
-    .replace(/&height=\d+/, '&height=800');
+    ?.replace(/&size=\d+/, '&size=500')
+    .replace(/\?width=\d+/, '?width=500')
+    .replace(/&height=\d+/, '&height=500');
 };
 
 const ImageWithPlaceholder = ({ ...props }: HTMLMotionProps<'img'>) => {
@@ -177,10 +189,10 @@ export const FullScreenPlayerImage = () => {
           )}
         </AnimatePresence>
       </ImageContainer>
-      <Stack
+      <MetadataContainer
         className="full-screen-player-image-metadata"
-        spacing="sm"
-        sx={{ maxWidth: '100%' }}
+        maw="100%"
+        spacing="xs"
       >
         <TextTitle
           align="center"
@@ -193,6 +205,7 @@ export const FullScreenPlayerImage = () => {
         </TextTitle>
         <TextTitle
           $link
+          $secondary
           align="center"
           component={Link}
           order={2}
@@ -208,6 +221,7 @@ export const FullScreenPlayerImage = () => {
         {currentSong?.artists?.map((artist, index) => (
           <TextTitle
             key={`fs-artist-${artist.id}`}
+            $secondary
             align="center"
             order={4}
           >
@@ -223,6 +237,7 @@ export const FullScreenPlayerImage = () => {
             )}
             <Text
               $link
+              $secondary
               component={Link}
               to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                 albumArtistId: artist.id,
@@ -241,7 +256,7 @@ export const FullScreenPlayerImage = () => {
           )}
           {currentSong?.releaseYear && <Badge size="lg">{currentSong?.releaseYear}</Badge>}
         </Group>
-      </Stack>
+      </MetadataContainer>
     </PlayerContainer>
   );
 };

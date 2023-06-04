@@ -68,11 +68,7 @@ export const FullScreenPlayerQueue = () => {
   ];
 
   return (
-    <Stack
-      className="full-screen-player-queue-container"
-      maw="100%"
-      sx={{ flex: 0.5 }}
-    >
+    <Stack className="full-screen-player-queue-container">
       <Group
         grow
         align="center"

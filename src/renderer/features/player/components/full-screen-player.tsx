@@ -26,29 +26,18 @@ const Container = styled(motion.div)`
 `;
 
 const ResponsiveContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2rem 2rem;
   width: 100%;
   max-width: 2560px;
-  margin-top: 70px;
+  margin-top: 5rem;
 
-  .full-screen-player-image {
-    max-height: calc(35vh - 90px);
-  }
-
-  @media screen and (min-width: 1080px) {
+  @media screen and (max-width: 768px) {
     flex-direction: row;
-
-    .full-screen-player-image {
-      max-height: calc(70vh - 90px);
-    }
-  }
-
-  @media screen and (max-height: 800px) and (min-width: 1080px) {
-    .full-screen-player-image {
-      max-height: calc(50vh - 90px);
-    }
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 `;
 
@@ -156,7 +145,7 @@ const containerVariants: Variants = {
       top: 0,
       transition: {
         background: {
-          duration: 1,
+          duration: 0.5,
           ease: 'easeInOut',
         },
         delay: 0.1,
