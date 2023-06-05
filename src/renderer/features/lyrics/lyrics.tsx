@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Center, Group } from '@mantine/core';
 import isElectron from 'is-electron';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -7,7 +7,12 @@ import { getServerById, useCurrentSong } from '/@/renderer/store';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
 import { RiInformationFill } from 'react-icons/ri';
 import { TextTitle } from '/@/renderer/components';
-import { LyricsResponse, SynchronizedLyricsArray } from '/@/renderer/api/types';
+import {
+  InternetProviderLyricResponse,
+  LyricOverride,
+  LyricsResponse,
+  SynchronizedLyricsArray,
+} from '/@/renderer/api/types';
 import { useSongLyrics } from '/@/renderer/features/lyrics/queries/lyric-query';
 import { SynchronizedLyrics } from './synchronized-lyrics';
 
@@ -22,7 +27,8 @@ export const Lyrics = () => {
   const currentSong = useCurrentSong();
   const currentServer = getServerById(currentSong?.serverId);
 
-  const [override, setOverride] = useState<string | null>(null);
+  const [overrideLyrics, setOverrideLyrics] = useState<string | null>(null);
+  const [overrideData, setOverrideData] = useState<LyricOverride | null>(null);
   const [source, setSource] = useState<string | null>(null);
   const [songLyrics, setSongLyrics] = useState<LyricsResponse | null>(null);
 
@@ -36,10 +42,18 @@ export const Lyrics = () => {
 
   useEffect(() => {
     lyrics?.remoteLyricsListener(
-      (_event: any, songName: string, lyricSource: string, lyric: string) => {
+      (
+        _event: any,
+        songName: string,
+        lyricSource: string,
+        lyric: InternetProviderLyricResponse,
+      ) => {
         if (songName === songRef.current) {
+          const { lyrics, ...rest } = lyric;
           setSource(lyricSource);
-          setOverride(lyric);
+
+          setOverrideData(rest);
+          setOverrideLyrics(lyrics);
         }
       },
     );
@@ -60,7 +74,8 @@ export const Lyrics = () => {
 
     songRef.current = currentSong?.name ?? null;
 
-    setOverride(null);
+    setOverrideData(null);
+    setOverrideLyrics(null);
     setSource(null);
   }, [currentSong, remoteLyrics.isLoading, remoteLyrics?.data, remoteLyrics?.isSuccess]);
 
@@ -70,9 +85,9 @@ export const Lyrics = () => {
     if (currentSong?.lyrics) {
       lyrics = currentSong.lyrics;
 
-      setSource(currentSong?.name ?? 'music server');
-    } else if (override) {
-      lyrics = override;
+      setSource(currentServer?.name ?? 'music server');
+    } else if (overrideLyrics) {
+      lyrics = overrideLyrics;
     } else if (remoteLyrics.data) {
       setSource(currentServer?.name ?? 'music server');
       setSongLyrics(remoteLyrics.data);
@@ -102,7 +117,12 @@ export const Lyrics = () => {
     } else {
       setSongLyrics(null);
     }
-  }, [currentServer?.name, currentSong, override, remoteLyrics.data]);
+  }, [currentServer?.name, currentSong, overrideLyrics, remoteLyrics.data]);
+
+  const clearOverride = useCallback(() => {
+    setOverrideData(null);
+    setOverrideLyrics(null);
+  }, []);
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -123,12 +143,16 @@ export const Lyrics = () => {
           {Array.isArray(songLyrics) ? (
             <SynchronizedLyrics
               lyrics={songLyrics}
+              override={overrideData}
               source={source}
+              onRemoveLyric={clearOverride}
             />
           ) : (
             <UnsynchronizedLyrics
               lyrics={songLyrics}
+              override={overrideData}
               source={source}
+              onRemoveLyric={clearOverride}
             />
           )}
         </>

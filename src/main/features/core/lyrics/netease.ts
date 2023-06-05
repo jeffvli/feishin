@@ -1,12 +1,18 @@
 import axios, { AxiosResponse } from 'axios';
-import type { QueueSong } from '/@/renderer/api/types';
+import type { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
 
 const SEARCH_URL = 'https://music.163.com/api/search/get';
 const LYRICS_URL = 'https://music.163.com/api/song/lyric';
 
 // Adapted from https://github.com/NyaomiDEV/Sunamu/blob/master/src/main/lyricproviders/netease.ts
 
-async function getSongId(metadata: QueueSong) {
+interface NetEaseResponse {
+  artist: string;
+  id: string;
+  title: string;
+}
+
+async function getSongId(metadata: QueueSong): Promise<NetEaseResponse | undefined> {
   let result: AxiosResponse<any, any>;
   try {
     result = await axios.get(SEARCH_URL, {
@@ -22,10 +28,20 @@ async function getSongId(metadata: QueueSong) {
     return undefined;
   }
 
-  return result?.data.result?.songs?.[0].id;
+  const song = result?.data.result?.songs?.[0];
+
+  if (!song) return undefined;
+
+  const artist = song.artists ? song.artists.map((artist: any) => artist.name).join(', ') : '';
+
+  return {
+    artist,
+    id: song.id,
+    title: song.name,
+  };
 }
 
-async function getLyricsFromSongId(songId: string) {
+async function getLyricsFromSongId(songId: string): Promise<string | undefined> {
   let result: AxiosResponse<any, any>;
   try {
     result = await axios.get(LYRICS_URL, {
@@ -43,18 +59,22 @@ async function getLyricsFromSongId(songId: string) {
   return result.data.klyric?.lyric || result.data.lrc?.lyric;
 }
 
-export async function query(metadata: QueueSong): Promise<string | null> {
-  const songId = await getSongId(metadata);
-  if (!songId) {
+export async function query(metadata: QueueSong): Promise<InternetProviderLyricResponse | null> {
+  const response = await getSongId(metadata);
+  if (!response) {
     console.error('Could not find the song on NetEase!');
     return null;
   }
 
-  const lyrics = await getLyricsFromSongId(songId);
+  const lyrics = await getLyricsFromSongId(response.id);
   if (!lyrics) {
     console.error('Could not get lyrics on NetEase!');
     return null;
   }
 
-  return lyrics;
+  return {
+    artist: response.artist,
+    lyrics,
+    title: response.title,
+  };
 }
