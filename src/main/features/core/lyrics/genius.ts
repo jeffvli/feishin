@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { load } from 'cheerio';
 import type { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
+import { LyricSource } from '../../../../renderer/types';
 
 const SEARCH_URL = 'https://genius.com/api/search/song';
 
@@ -8,7 +9,7 @@ const SEARCH_URL = 'https://genius.com/api/search/song';
 
 interface GeniusResponse {
   artist: string;
-  title: string;
+  name: string;
   url: string;
 }
 
@@ -34,7 +35,7 @@ async function getSongURL(metadata: QueueSong): Promise<GeniusResponse | undefin
 
   return {
     artist: hit.artist_names,
-    title: hit.full_title,
+    name: hit.full_title,
     url: hit.url,
   };
 }
@@ -76,6 +77,7 @@ export async function query(metadata: QueueSong): Promise<InternetProviderLyricR
   return {
     artist: response.artist,
     lyrics,
-    title: response.title,
+    name: response.name,
+    source: LyricSource.GENIUS,
   };
 }

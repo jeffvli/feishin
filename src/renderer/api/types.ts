@@ -1032,7 +1032,8 @@ export type LyricsResponse = SynchronizedLyricsArray | string;
 export type InternetProviderLyricResponse = {
   artist: string;
   lyrics: string;
-  title: string;
+  name: string;
+  source: string;
 };
 
 export type LyricOverride = Omit<InternetProviderLyricResponse, 'lyrics'>;
