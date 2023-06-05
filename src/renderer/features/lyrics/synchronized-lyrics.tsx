@@ -279,7 +279,7 @@ export const SynchronizedLyrics = ({
         <>
           <LyricLine
             className="lyric-credit"
-            text={`(Matched as ${override.title} by ${override.artist})`}
+            text={`(Matched as ${override.name} by ${override.artist})`}
           />
           <LyricSkip onClick={removeLyric} />
         </>

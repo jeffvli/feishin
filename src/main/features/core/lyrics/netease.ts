@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import type { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
+import { LyricSource } from '../../../../renderer/types';
 
 const SEARCH_URL = 'https://music.163.com/api/search/get';
 const LYRICS_URL = 'https://music.163.com/api/song/lyric';
@@ -9,7 +10,7 @@ const LYRICS_URL = 'https://music.163.com/api/song/lyric';
 interface NetEaseResponse {
   artist: string;
   id: string;
-  title: string;
+  name: string;
 }
 
 async function getSongId(metadata: QueueSong): Promise<NetEaseResponse | undefined> {
@@ -37,7 +38,7 @@ async function getSongId(metadata: QueueSong): Promise<NetEaseResponse | undefin
   return {
     artist,
     id: song.id,
-    title: song.name,
+    name: song.name,
   };
 }
 
@@ -75,6 +76,7 @@ export async function query(metadata: QueueSong): Promise<InternetProviderLyricR
   return {
     artist: response.artist,
     lyrics,
-    title: response.title,
+    name: response.name,
+    source: LyricSource.NETEASE,
   };
 }
