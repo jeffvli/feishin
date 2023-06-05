@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import { RiFileMusicLine, RiFileTextLine, RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
-import { Button, ScrollArea, TextTitle } from '/@/renderer/components';
+import { Button, TextTitle } from '/@/renderer/components';
 import { PlayQueue } from '/@/renderer/features/now-playing';
 import {
   useFullScreenPlayerStore,
@@ -24,32 +24,6 @@ const QueueContainer = styled.div`
 
   .ag-header {
     display: none !important;
-  }
-`;
-
-const LyricsContainer = styled(ScrollArea)`
-  z-index: 1;
-  text-align: center;
-  transform: translateY(-2rem);
-
-  mask-image: linear-gradient(
-    180deg,
-    transparent 5%,
-    rgba(0, 0, 0, 100%) 20%,
-    rgba(0, 0, 0, 100%) 85%,
-    transparent 95%
-  );
-
-  &.mantine-ScrollArea-root {
-    height: 100%;
-  }
-
-  & .mantine-ScrollArea-viewport {
-    height: 100% !important;
-  }
-
-  & .mantine-ScrollArea-viewport > div {
-    height: 100%;
   }
 `;
 
@@ -140,9 +114,7 @@ export const FullScreenPlayerQueue = () => {
           </Group>
         </Center>
       ) : activeTab === 'lyrics' ? (
-        <LyricsContainer scrollHideDelay={0}>
-          <Lyrics />
-        </LyricsContainer>
+        <Lyrics />
       ) : null}
     </Stack>
   );
