@@ -39,6 +39,18 @@ const LyricsContainer = styled(ScrollArea)`
     rgba(0, 0, 0, 100%) 85%,
     transparent 95%
   );
+
+  &.mantine-ScrollArea-root {
+    height: 100%;
+  }
+
+  & .mantine-ScrollArea-viewport {
+    height: 100% !important;
+  }
+
+  & .mantine-ScrollArea-viewport > div {
+    height: 100%;
+  }
 `;
 
 const ActiveTabIndicator = styled(motion.div)`
