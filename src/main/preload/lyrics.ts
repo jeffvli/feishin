@@ -1,12 +1,17 @@
 import { IpcRendererEvent, ipcRenderer } from 'electron';
-import { QueueSong } from '/@/renderer/api/types';
+import { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
 
 const fetchRemoteLyrics = (song: QueueSong) => {
   ipcRenderer.send('lyric-fetch', song);
 };
 
 const remoteLyricsListener = (
-  cb: (event: IpcRendererEvent, songName: string, source: string, lyric: string) => void,
+  cb: (
+    event: IpcRendererEvent,
+    songName: string,
+    source: string,
+    lyric: InternetProviderLyricResponse,
+  ) => void,
 ) => {
   ipcRenderer.on('lyric-get', cb);
 };

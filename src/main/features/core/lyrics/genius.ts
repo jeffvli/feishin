@@ -1,12 +1,18 @@
 import axios, { AxiosResponse } from 'axios';
 import { load } from 'cheerio';
-import type { QueueSong } from '/@/renderer/api/types';
+import type { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
 
 const SEARCH_URL = 'https://genius.com/api/search/song';
 
 // Adapted from https://github.com/NyaomiDEV/Sunamu/blob/master/src/main/lyricproviders/genius.ts
 
-async function getSongURL(metadata: QueueSong) {
+interface GeniusResponse {
+  artist: string;
+  title: string;
+  url: string;
+}
+
+async function getSongURL(metadata: QueueSong): Promise<GeniusResponse | undefined> {
   let result: AxiosResponse<any, any>;
   try {
     result = await axios.get(SEARCH_URL, {
@@ -20,7 +26,17 @@ async function getSongURL(metadata: QueueSong) {
     return undefined;
   }
 
-  return result.data.response?.sections?.[0]?.hits?.[0]?.result?.url;
+  const hit = result.data.response?.sections?.[0]?.hits?.[0]?.result;
+
+  if (!hit) {
+    return undefined;
+  }
+
+  return {
+    artist: hit.artist_names,
+    title: hit.full_title,
+    url: hit.url,
+  };
 }
 
 async function getLyricsFromGenius(url: string): Promise<string | null> {
@@ -44,18 +60,22 @@ async function getLyricsFromGenius(url: string): Promise<string | null> {
   return lyricSections;
 }
 
-export async function query(metadata: QueueSong): Promise<string | null> {
-  const songId = await getSongURL(metadata);
-  if (!songId) {
+export async function query(metadata: QueueSong): Promise<InternetProviderLyricResponse | null> {
+  const response = await getSongURL(metadata);
+  if (!response) {
     console.error('Could not find the song on Genius!');
     return null;
   }
 
-  const lyrics = await getLyricsFromGenius(songId);
+  const lyrics = await getLyricsFromGenius(response.url);
   if (!lyrics) {
     console.error('Could not get lyrics on Genius!');
     return null;
   }
 
-  return lyrics;
+  return {
+    artist: response.artist,
+    lyrics,
+    title: response.title,
+  };
 }

@@ -1,6 +1,6 @@
 import { IpcRendererEvent } from 'electron';
 import { PlayerData, PlayerState } from './store';
-import { QueueSong } from '/@/renderer/api/types';
+import { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
 
 declare global {
   interface Window {
@@ -10,7 +10,12 @@ declare global {
       ipcRenderer: {
         APP_RESTART(): void;
         LYRIC_FETCH(data: QueueSong): void;
-        LYRIC_GET(event: IpcRendererEvent, songName: string, source: string, lyric: string): void;
+        LYRIC_GET(
+          event: IpcRendererEvent,
+          songName: string,
+          source: string,
+          lyric: InternetProviderLyricResponse,
+        ): void;
         PLAYER_AUTO_NEXT(data: PlayerData): void;
         PLAYER_CURRENT_TIME(): void;
         PLAYER_GET_TIME(): number | undefined;
