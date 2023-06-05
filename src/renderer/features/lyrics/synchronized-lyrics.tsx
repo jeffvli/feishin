@@ -10,7 +10,7 @@ import { PlaybackType, PlayerStatus } from '/@/renderer/types';
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import isElectron from 'is-electron';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
-import { LyricOverride, SynchronizedLyricsArray } from '/@/renderer/api/types';
+import { FullLyricsMetadata, SynchronizedLyricsArray } from '/@/renderer/api/types';
 import styled from 'styled-components';
 import { LyricSkip } from '/@/renderer/features/lyrics/lyric-skip';
 
@@ -20,17 +20,17 @@ const SynchronizedLyricsContainer = styled.div`
   padding: 5rem 0;
 `;
 
-interface SynchronizedLyricsProps {
+interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
   lyrics: SynchronizedLyricsArray;
   onRemoveLyric: () => void;
-  override: LyricOverride | null;
-  source: string | null;
 }
 
 export const SynchronizedLyrics = ({
+  artist,
   lyrics,
+  name,
   onRemoveLyric,
-  override,
+  remote,
   source,
 }: SynchronizedLyricsProps) => {
   const playersRef = PlayersRef;
@@ -275,11 +275,11 @@ export const SynchronizedLyrics = ({
           text={`Lyrics provided by ${source}`}
         />
       )}
-      {override && (
+      {remote && (
         <>
           <LyricLine
             className="lyric-credit"
-            text={`(Matched as ${override.name} by ${override.artist})`}
+            text={`(Matched as ${artist} by ${name})`}
           />
           <LyricSkip onClick={removeLyric} />
         </>

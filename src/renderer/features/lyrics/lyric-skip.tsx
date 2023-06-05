@@ -6,10 +6,10 @@ const LyricClearButton = styled(Button)`
   position: absolute;
   right: 10px;
   z-index: 999;
-  top: 7vh;
+  bottom: 6vh;
 
   @media (max-width: 768px) {
-    top: 5vh;
+    bottom: 3vh;
   }
 `;
 
@@ -22,7 +22,7 @@ export const LyricSkip = ({ onClick }: LyricSkipProps) => {
     <LyricClearButton
       leftIcon={<RiCloseFill />}
       size="xl"
-      tooltip={{ label: 'Remove incorrect lyrics', position: 'bottom' }}
+      tooltip={{ label: 'Remove incorrect lyrics', position: 'top' }}
       variant="default"
       onClick={onClick}
     >

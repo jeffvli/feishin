@@ -1,9 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { UseQueryResult, useQuery } from '@tanstack/react-query';
 import {
   LyricsQuery,
   QueueSong,
   SynchronizedLyricsArray,
   InternetProviderLyricResponse,
+  FullLyricsMetadata,
 } from '/@/renderer/api/types';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useLyricsSettings } from '/@/renderer/store';
@@ -37,7 +38,9 @@ const formatLyrics = (lyrics: string) => {
   return formattedLyrics;
 };
 
-export const useServerLyrics = (args: QueryHookArgs<LyricsQuery>) => {
+export const useServerLyrics = (
+  args: QueryHookArgs<LyricsQuery>,
+): UseQueryResult<string | null> => {
   const { query, serverId } = args;
   const server = getServerById(serverId);
 
@@ -55,7 +58,10 @@ export const useServerLyrics = (args: QueryHookArgs<LyricsQuery>) => {
   });
 };
 
-export const useSongLyrics = (args: QueryHookArgs<LyricsQuery>, song: QueueSong | undefined) => {
+export const useSongLyrics = (
+  args: QueryHookArgs<LyricsQuery>,
+  song: QueueSong | undefined,
+): UseQueryResult<FullLyricsMetadata> => {
   const { query } = args;
   const { fetch } = useLyricsSettings();
   const server = getServerById(song?.serverId);
@@ -73,6 +79,7 @@ export const useSongLyrics = (args: QueryHookArgs<LyricsQuery>, song: QueueSong 
           artist: song.artists?.[0]?.name,
           lyrics: formatLyrics(song.lyrics),
           name: song.name,
+          remote: false,
           source: server?.name ?? 'music server',
         };
       }
@@ -88,6 +95,7 @@ export const useSongLyrics = (args: QueryHookArgs<LyricsQuery>, song: QueueSong 
             artist: song.artists?.[0]?.name,
             lyrics: jfLyrics,
             name: song.name,
+            remote: false,
             source: server?.name ?? 'music server',
           };
         }
@@ -101,6 +109,7 @@ export const useSongLyrics = (args: QueryHookArgs<LyricsQuery>, song: QueueSong 
           return {
             ...remoteLyricsResult,
             lyrics: formatLyrics(remoteLyricsResult.lyrics),
+            remote: true,
           };
         }
       }

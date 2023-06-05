@@ -1036,6 +1036,18 @@ export type InternetProviderLyricResponse = {
   source: string;
 };
 
+export type SynchronizedLyricMetadata = {
+  lyrics: SynchronizedLyricsArray;
+  remote: boolean;
+} & Omit<InternetProviderLyricResponse, 'lyrics'>;
+
+export type UnsyhchronizedLyricMetadata = {
+  lyrics: string;
+  remote: boolean;
+} & Omit<InternetProviderLyricResponse, 'lyrics'>;
+
+export type FullLyricsMetadata = SynchronizedLyricMetadata | UnsyhchronizedLyricMetadata;
+
 export type LyricOverride = Omit<InternetProviderLyricResponse, 'lyrics'>;
 
 export const instanceOfCancellationError = (error: any) => {
