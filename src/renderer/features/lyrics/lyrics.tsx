@@ -1,4 +1,5 @@
 import { Center, Group } from '@mantine/core';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
@@ -9,7 +10,7 @@ import { ErrorFallback } from '/@/renderer/features/action-required';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
 import { getServerById, useCurrentSong } from '/@/renderer/store';
 
-const LyricsScrollContainer = styled(ScrollArea)`
+const LyricsScrollContainer = styled(motion(ScrollArea))`
   z-index: 1;
   text-align: center;
   transform: translateY(-2rem);
@@ -67,23 +68,29 @@ export const Lyrics = () => {
           </Group>
         </Center>
       ) : (
-        <LyricsScrollContainer>
-          {Array.isArray(data.lyrics) ? (
-            <SynchronizedLyrics
-              lyrics={data.lyrics}
-              override={null}
-              source={data.source}
-              onRemoveLyric={() => {}}
-            />
-          ) : (
-            <UnsynchronizedLyrics
-              lyrics={data.lyrics}
-              override={null}
-              source={data.source}
-              onRemoveLyric={() => {}}
-            />
-          )}
-        </LyricsScrollContainer>
+        <AnimatePresence mode="sync">
+          <LyricsScrollContainer
+            animate={{ opacity: 1 }}
+            initial={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {Array.isArray(data.lyrics) ? (
+              <SynchronizedLyrics
+                lyrics={data.lyrics}
+                override={null}
+                source={data.source}
+                onRemoveLyric={() => {}}
+              />
+            ) : (
+              <UnsynchronizedLyrics
+                lyrics={data.lyrics}
+                override={null}
+                source={data.source}
+                onRemoveLyric={() => {}}
+              />
+            )}
+          </LyricsScrollContainer>
+        </AnimatePresence>
       )}
     </ErrorBoundary>
   );
