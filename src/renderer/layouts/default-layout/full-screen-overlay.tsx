@@ -7,10 +7,7 @@ export const FullScreenOverlay = () => {
 
   return (
     <>
-      <AnimatePresence
-        initial={false}
-        mode="wait"
-      >
+      <AnimatePresence initial={false}>
         {isFullScreenPlayerExpanded && <FullScreenPlayer />}
       </AnimatePresence>
     </>
