@@ -130,6 +130,7 @@ export const CollapsedSidebar = () => {
         </DropdownMenu>
         {sidebarItemsWithRoute.map((item) => (
           <CollapsedSidebarItem
+            key={item.id}
             activeIcon={<item.activeIcon size="25" />}
             component={NavLink}
             icon={<item.icon size="25" />}
