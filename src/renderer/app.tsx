@@ -34,7 +34,7 @@ export const App = () => {
   const { type: playbackType } = usePlaybackSettings();
   const { bindings } = useHotkeySettings();
   const handlePlayQueueAdd = useHandlePlayQueueAdd();
-  const { restoreQueue } = useQueueControls();
+  const { clearQueue, restoreQueue } = useQueueControls();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -43,24 +43,34 @@ export const App = () => {
 
   // Start the mpv instance on startup
   useEffect(() => {
+    const initializeMpv = async () => {
+      const isRunning: boolean | undefined = await mpvPlayer?.isRunning();
+
+      if (!isRunning) {
+        const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
+        const properties = {
+          ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
+        };
+
+        mpvPlayer?.initialize({
+          extraParameters,
+          properties,
+        });
+
+        mpvPlayer?.volume(properties.volume);
+      }
+    };
+
     if (isElectron() && playbackType === PlaybackType.LOCAL) {
-      const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
-      const properties = {
-        ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
-      };
-
-      mpvPlayer?.initialize({
-        extraParameters,
-        properties,
-      });
-
-      mpvPlayer?.volume(properties.volume);
+      initializeMpv();
     }
 
     return () => {
-      mpvPlayer?.quit();
+      clearQueue();
+      mpvPlayer?.stop();
+      mpvPlayer?.cleanup();
     };
-  }, [playbackType]);
+  }, [clearQueue, playbackType]);
 
   useEffect(() => {
     if (isElectron()) {

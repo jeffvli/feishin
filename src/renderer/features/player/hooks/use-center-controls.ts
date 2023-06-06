@@ -613,10 +613,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
         handleAutoNext();
       });
 
-      mpvPlayerListener.rendererQuit(() => {
-        handleQuit();
-      });
-
       mpvPlayerListener.rendererToggleShuffle(() => {
         handleToggleShuffle();
       });
@@ -639,7 +635,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
       ipc?.removeAllListeners('renderer-player-stop');
       ipc?.removeAllListeners('renderer-player-current-time');
       ipc?.removeAllListeners('renderer-player-auto-next');
-      ipc?.removeAllListeners('renderer-player-quit');
       ipc?.removeAllListeners('renderer-player-toggle-shuffle');
       ipc?.removeAllListeners('renderer-player-toggle-repeat');
       ipc?.removeAllListeners('renderer-player-error');
