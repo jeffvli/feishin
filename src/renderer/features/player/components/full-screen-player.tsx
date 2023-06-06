@@ -19,6 +19,9 @@ import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 import { Platform } from '/@/renderer/types';
 
 const Container = styled(motion.div)`
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 200;
   display: flex;
   justify-content: center;
@@ -187,6 +190,7 @@ export const FullScreenPlayer = () => {
       custom={{ background, dynamicBackground, windowBarStyle }}
       exit="closed"
       initial="closed"
+      transition={{ duration: 2 }}
       variants={containerVariants}
     >
       <Controls />
