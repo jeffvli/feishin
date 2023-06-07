@@ -9,6 +9,14 @@ const restart = (data: { extraParameters?: string[]; properties?: Record<string,
   ipcRenderer.send('player-restart', data);
 };
 
+const isRunning = () => {
+  return ipcRenderer.invoke('player-is-running');
+};
+
+const cleanup = () => {
+  return ipcRenderer.invoke('player-clean-up');
+};
+
 const setProperties = (data: Record<string, any>) => {
   console.log('Setting property :>>', data);
   ipcRenderer.send('player-set-properties', data);
@@ -160,9 +168,11 @@ const rendererError = (cb: (event: IpcRendererEvent, data: string) => void) => {
 
 export const mpvPlayer = {
   autoNext,
+  cleanup,
   currentTime,
   getCurrentTime,
   initialize,
+  isRunning,
   mute,
   next,
   pause,

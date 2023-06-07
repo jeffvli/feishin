@@ -439,10 +439,10 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
   const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
   console.log('Setting mpv params: ', params);
 
-  mpvInstance = new MpvAPI(
+  const mpv = new MpvAPI(
     {
       audio_only: true,
-      auto_restart: true,
+      auto_restart: false,
       binary: MPV_BINARY_PATH || '',
       time_update: 1,
     },
@@ -450,17 +450,17 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
   );
 
   console.log('Setting MPV properties: ', properties);
-  mpvInstance.setMultipleProperties(properties || {});
+  mpv.setMultipleProperties(properties || {});
 
-  mpvInstance.start().catch((error) => {
-    console.log('MPV Event: start error', error);
+  mpv.start().catch((error) => {
+    console.log('MPV failed to start', error);
   });
 
-  mpvInstance.on('status', (status, ...rest) => {
+  mpv.on('status', (status, ...rest) => {
     console.log('MPV Event: status', status.property, status.value, rest);
     if (status.property === 'playlist-pos') {
       if (status.value === -1) {
-        mpvInstance?.stop();
+        mpv?.stop();
       }
 
       if (status.value !== 0) {
@@ -470,31 +470,33 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
   });
 
   // Automatically updates the play button when the player is playing
-  mpvInstance.on('resumed', () => {
+  mpv.on('resumed', () => {
     console.log('MPV Event: resumed');
     getMainWindow()?.webContents.send('renderer-player-play');
   });
 
   // Automatically updates the play button when the player is stopped
-  mpvInstance.on('stopped', () => {
+  mpv.on('stopped', () => {
     console.log('MPV Event: stopped');
     getMainWindow()?.webContents.send('renderer-player-stop');
   });
 
   // Automatically updates the play button when the player is paused
-  mpvInstance.on('paused', () => {
+  mpv.on('paused', () => {
     console.log('MPV Event: paused');
     getMainWindow()?.webContents.send('renderer-player-pause');
   });
 
   // Event output every interval set by time_update, used to update the current time
-  mpvInstance.on('timeposition', (time: number) => {
+  mpv.on('timeposition', (time: number) => {
     getMainWindow()?.webContents.send('renderer-player-current-time', time);
   });
 
-  mpvInstance.on('quit', () => {
+  mpv.on('quit', () => {
     console.log('MPV Event: quit');
   });
+
+  return mpv;
 };
 
 export const getMpvInstance = () => {
@@ -517,14 +519,15 @@ ipcMain.on(
   'player-restart',
   async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
     mpvInstance?.quit();
-    createMpv(data);
+    mpvInstance = createMpv(data);
   },
 );
 
 ipcMain.on(
   'player-initialize',
   async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-    createMpv(data);
+    console.log('Initializing MPV with data: ', data);
+    mpvInstance = createMpv(data);
   },
 );
 
@@ -614,6 +617,7 @@ ipcMain.on(
 
 app.on('before-quit', () => {
   getMpvInstance()?.stop();
+  getMpvInstance()?.quit();
 });
 
 app.on('window-all-closed', () => {
