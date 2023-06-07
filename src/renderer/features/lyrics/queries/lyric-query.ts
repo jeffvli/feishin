@@ -85,10 +85,12 @@ export const useSongLyrics = (
       }
 
       if (server.type === ServerType.JELLYFIN) {
-        const jfLyrics = await api.controller.getLyrics({
-          apiClientProps: { server, signal },
-          query: { songId: song.id },
-        });
+        const jfLyrics = await api.controller
+          .getLyrics({
+            apiClientProps: { server, signal },
+            query: { songId: song.id },
+          })
+          .catch((err) => console.log(err));
 
         if (jfLyrics) {
           return {
