@@ -4,15 +4,19 @@ import { Button, PasswordInput, TextInput, toast, Tooltip } from '/@/renderer/co
 import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
+import isElectron from 'is-electron';
 import { RiInformationLine } from 'react-icons/ri';
 import { AuthenticationResponse } from '/@/renderer/api/types';
-import { useAuthStoreActions } from '/@/renderer/store';
+import { useAuthStoreActions, useGeneralSettings } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
+
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 interface EditServerFormProps {
   isUpdate?: boolean;
   onCancel: () => void;
+  password?: string;
   server: ServerListItem;
 }
 
@@ -26,7 +30,8 @@ const ModifiedFieldIndicator = () => {
   );
 };
 
-export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormProps) => {
+export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditServerFormProps) => {
+  const settings = useGeneralSettings();
   const { updateServer } = useAuthStoreActions();
   const focusTrapRef = useFocusTrap();
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +40,7 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
     initialValues: {
       legacyAuth: false,
       name: server?.name,
-      password: '',
+      password: password || '',
       type: server?.type,
       url: server?.url,
       username: server?.username,
@@ -79,6 +84,13 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
 
       updateServer(server.id, serverItem);
       toast.success({ message: 'Server has been updated' });
+
+      if (localSettings && settings.savePassword) {
+        const saved = await localSettings.passwordSet(values.password, server.id);
+        if (!saved) {
+          toast.error({ message: 'Could not save password' });
+        }
+      }
     } catch (err: any) {
       setIsLoading(false);
       return toast.error({ message: err?.message });

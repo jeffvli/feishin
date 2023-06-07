@@ -26,16 +26,19 @@ import {
   useAuthStoreActions,
   useSidebarStore,
   useAppStoreActions,
+  useGeneralSettings,
 } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import packageJson from '../../../../../package.json';
 
 const browser = isElectron() ? window.electron.browser : null;
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const AppMenu = () => {
   const navigate = useNavigate();
   const currentServer = useCurrentServer();
   const serverList = useServerList();
+  const settings = useGeneralSettings();
   const { setCurrentServer } = useAuthStoreActions();
   const { collapsed } = useSidebarStore();
   const { setSideBar } = useAppStoreActions();
@@ -45,11 +48,21 @@ export const AppMenu = () => {
     setCurrentServer(server);
   };
 
-  const handleCredentialsModal = (server: ServerListItem) => {
+  const handleCredentialsModal = async (server: ServerListItem) => {
+    let password: string | undefined;
+
+    try {
+      if (localSettings && settings.savePassword) {
+        password = await localSettings.passwordGet(server.id);
+      }
+    } catch (error) {
+      console.error(error);
+    }
     openModal({
       children: server && (
         <EditServerForm
           isUpdate
+          password={password}
           server={server}
           onCancel={closeAllModals}
         />

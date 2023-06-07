@@ -11,6 +11,10 @@ declare global {
         APP_RESTART(): void;
         LYRIC_FETCH(data: QueueSong): void;
         LYRIC_GET(event: IpcRendererEvent, songName: string, source: string, lyric: string): void;
+        PASSWORD_CLEAR(): void;
+        PASSWORD_GET(server: string): Promise<string | null>;
+        PASSWORD_REMOVE(server: string): void;
+        PASSWORD_SET(password: string, server: string): Promise<boolean>;
         PLAYER_AUTO_NEXT(data: PlayerData): void;
         PLAYER_CURRENT_TIME(): void;
         PLAYER_GET_TIME(): number | undefined;

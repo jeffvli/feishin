@@ -192,6 +192,28 @@ export const ControlSettings = () => {
       isHidden: !isElectron(),
       title: 'Save play queue',
     },
+    {
+      control: (
+        <Switch
+          defaultChecked={settings.savePassword}
+          onChange={(e) => {
+            if (!e.currentTarget.checked) {
+              localSettings?.passwordClear();
+            }
+            setSettings({
+              general: {
+                ...settings,
+                savePassword: e.currentTarget.checked,
+              },
+            });
+          }}
+        />
+      ),
+      description:
+        'Save server passwords (encrypted by OS). Deselecting this will immediately remove any saved passwords',
+      isHidden: !isElectron(),
+      title: 'Save passwords',
+    },
   ];
 
   return <SettingsSection options={controlOptions} />;

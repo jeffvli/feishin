@@ -4,11 +4,14 @@ import { Button, PasswordInput, SegmentedControl, TextInput, toast } from '/@/re
 import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
+import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
 import { AuthenticationResponse } from '/@/renderer/api/types';
-import { useAuthStore, useAuthStoreActions } from '/@/renderer/store';
+import { useAuthStore, useAuthStoreActions, useGeneralSettings } from '/@/renderer/store';
 import { ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
+
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const SERVER_TYPES = [
   { label: 'Jellyfin', value: ServerType.JELLYFIN },
@@ -21,6 +24,7 @@ interface AddServerFormProps {
 }
 
 export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
+  const settings = useGeneralSettings();
   const focusTrapRef = useFocusTrap(true);
   const [isLoading, setIsLoading] = useState(false);
   const { addServer, setCurrentServer } = useAuthStoreActions();
@@ -82,6 +86,13 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         setTimeout(() => window.location.reload(), 2000);
       } else {
         toast.success({ message: 'Server has been added' });
+      }
+
+      if (localSettings && settings.savePassword) {
+        const saved = await localSettings.passwordSet(values.password, serverItem.id);
+        if (!saved) {
+          toast.error({ message: 'Could not save password' });
+        }
       }
     } catch (err: any) {
       setIsLoading(false);
