@@ -1,5 +1,8 @@
 import { AxiosHeaders } from 'axios';
 import { z } from 'zod';
+import { toast } from '/@/renderer/components';
+import { useAuthStore } from '/@/renderer/store';
+import { ServerListItem } from '/@/renderer/types';
 
 // Since ts-rest client returns a strict response type, we need to add the headers to the body object
 export const resultWithHeaders = <ItemType extends z.ZodTypeAny>(itemSchema: ItemType) => {
@@ -20,4 +23,18 @@ export const resultSubsonicBaseResponse = <ItemType extends z.ZodRawShape>(
       })
       .extend(itemSchema),
   });
+};
+
+export const authenticationFailure = (currentServer: ServerListItem | null) => {
+  toast.error({
+    message: 'Your session has expired.',
+  });
+
+  if (currentServer) {
+    const serverId = currentServer.id;
+    const token = currentServer.ndCredential;
+    console.log(`token is expired: ${token}`);
+    useAuthStore.getState().actions.updateServer(serverId, { ndCredential: undefined });
+    useAuthStore.getState().actions.setCurrentServer(null);
+  }
 };

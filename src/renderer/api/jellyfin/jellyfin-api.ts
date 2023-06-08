@@ -1,12 +1,16 @@
-import { useAuthStore } from '/@/renderer/store';
+import { useAuthStore, useSettingsStore } from '/@/renderer/store';
 import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { AxiosError, AxiosResponse, isAxiosError, Method } from 'axios';
 import qs from 'qs';
-import { toast } from '/@/renderer/components';
 import { ServerListItem } from '/@/renderer/types';
 import omitBy from 'lodash/omitBy';
+import packageJson from '../../../../package.json';
 import { z } from 'zod';
+import isElectron from 'is-electron';
+import { authenticationFailure } from '/@/renderer/api/utils';
+
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const c = initContract();
 
@@ -269,19 +273,52 @@ axiosClient.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      toast.error({
-        message: 'Your session has expired.',
-      });
-
       const currentServer = useAuthStore.getState().currentServer;
 
-      if (currentServer) {
-        const serverId = currentServer.id;
-        const token = currentServer.credential;
-        console.log(`token is expired: ${token}`);
-        useAuthStore.getState().actions.setCurrentServer(null);
-        useAuthStore.getState().actions.updateServer(serverId, { credential: undefined });
+      if (useSettingsStore.getState().general.savePassword && localSettings && currentServer) {
+        return localSettings
+          .passwordGet(currentServer.id)
+          .then(async (password: string | null) => {
+            if (password === null) {
+              throw error;
+            }
+
+            // Do not use axiosClient. Instead, manually make a post
+            const response = await axios.post(
+              `${currentServer.url}/users/authenticatebyname`,
+              {
+                Pw: password,
+                Username: currentServer.username,
+              },
+              {
+                headers: {
+                  'x-emby-authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="${packageJson.version}"`,
+                },
+              },
+            );
+
+            if (response.status !== 200) {
+              throw new Error('Failed to authenticate');
+            }
+
+            const newCredential = response.data.AccessToken;
+            console.log(response.data);
+
+            const token = currentServer.credential;
+            useAuthStore
+              .getState()
+              .actions.updateServer(currentServer.id, { credential: newCredential });
+
+            error.config.headers['X-MediaBrowser-Token'] = token;
+
+            return axiosClient.request(error.config);
+          })
+          .catch((newError: any) => {
+            console.error('Error when trying to reauthenticate: ', newError);
+            authenticationFailure(currentServer);
+          });
       }
+      authenticationFailure(currentServer);
     }
 
     return Promise.reject(error);

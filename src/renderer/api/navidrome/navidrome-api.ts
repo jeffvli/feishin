@@ -1,12 +1,14 @@
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { Method, AxiosError, AxiosResponse, isAxiosError } from 'axios';
+import isElectron from 'is-electron';
 import omitBy from 'lodash/omitBy';
 import qs from 'qs';
 import { ndType } from './navidrome-types';
-import { resultWithHeaders } from '/@/renderer/api/utils';
-import { toast } from '/@/renderer/components/toast/index';
-import { useAuthStore } from '/@/renderer/store';
+import { authenticationFailure, resultWithHeaders } from '/@/renderer/api/utils';
+import { useAuthStore, useSettingsStore } from '/@/renderer/store';
 import { ServerListItem } from '/@/renderer/types';
+
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const c = initContract();
 
@@ -168,43 +170,6 @@ axiosClient.defaults.paramsSerializer = (params) => {
   return qs.stringify(params, { arrayFormat: 'repeat' });
 };
 
-axiosClient.interceptors.response.use(
-  (response) => {
-    const serverId = useAuthStore.getState().currentServer?.id;
-
-    if (serverId) {
-      const headerCredential = response.headers['x-nd-authorization'] as string | undefined;
-
-      if (headerCredential) {
-        useAuthStore.getState().actions.updateServer(serverId, {
-          ndCredential: headerCredential,
-        });
-      }
-    }
-
-    return response;
-  },
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      toast.error({
-        message: 'Your session has expired.',
-      });
-
-      const currentServer = useAuthStore.getState().currentServer;
-
-      if (currentServer) {
-        const serverId = currentServer.id;
-        const token = currentServer.ndCredential;
-        console.log(`token is expired: ${token}`);
-        useAuthStore.getState().actions.updateServer(serverId, { ndCredential: undefined });
-        useAuthStore.getState().actions.setCurrentServer(null);
-      }
-    }
-
-    return Promise.reject(error);
-  },
-);
-
 const parsePath = (fullPath: string) => {
   const [path, params] = fullPath.split('?');
 
@@ -240,6 +205,7 @@ export const ndApiClient = (args: {
 
   return initClient(contract, {
     api: async ({ path, method, headers, body }) => {
+      console.log(headers);
       let baseUrl: string | undefined;
       let token: string | undefined;
 
@@ -289,3 +255,67 @@ export const ndApiClient = (args: {
     jsonQuery: false,
   });
 };
+
+axiosClient.interceptors.response.use(
+  (response) => {
+    const serverId = useAuthStore.getState().currentServer?.id;
+
+    if (serverId) {
+      const headerCredential = response.headers['x-nd-authorization'] as string | undefined;
+
+      if (headerCredential) {
+        useAuthStore.getState().actions.updateServer(serverId, {
+          ndCredential: headerCredential,
+        });
+      }
+    }
+
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      const currentServer = useAuthStore.getState().currentServer;
+
+      if (useSettingsStore.getState().general.savePassword && localSettings && currentServer) {
+        // eslint-disable-next-line promise/no-promise-in-callback
+        return localSettings
+          .passwordGet(currentServer.id)
+          .then(async (password: string | null) => {
+            if (password === null) {
+              throw error;
+            }
+
+            // Do not use axiosClient. Instead, manually make a post
+            const res = await axios.post(`${currentServer.url}/auth/login`, {
+              password,
+              username: currentServer.username,
+            });
+
+            if (res.status !== 200) {
+              throw new Error('Failed to authenticate');
+            }
+
+            const newCredential = res.data.token;
+            const subsonicCredential = `u=${currentServer.username}&s=${res.data.subsonicSalt}&t=${res.data.subsonicToken}`;
+
+            useAuthStore.getState().actions.updateServer(currentServer.id, {
+              credential: subsonicCredential,
+              ndCredential: newCredential,
+            });
+
+            error.config.headers['x-nd-authorization'] = `Bearer ${newCredential}`;
+
+            return axiosClient.request(error.config);
+          })
+          .catch((newError: any) => {
+            console.error('Error when trying to reauthenticate: ', newError);
+            authenticationFailure(currentServer);
+          });
+      }
+
+      authenticationFailure(currentServer);
+    }
+
+    return Promise.reject(error);
+  },
+);
