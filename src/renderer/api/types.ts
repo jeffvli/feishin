@@ -1036,6 +1036,13 @@ export type InternetProviderLyricResponse = {
   source: string;
 };
 
+export type InternetProviderLyricSearchResponse = {
+  artist: string;
+  id: string;
+  name: string;
+  source: string;
+};
+
 export type SynchronizedLyricMetadata = {
   lyrics: SynchronizedLyricsArray;
   remote: boolean;
@@ -1052,4 +1059,9 @@ export type LyricOverride = Omit<InternetProviderLyricResponse, 'lyrics'>;
 
 export const instanceOfCancellationError = (error: any) => {
   return 'revert' in error;
+};
+
+export type LyricSearchQuery = {
+  artist: string;
+  name: string;
 };
