@@ -11,8 +11,40 @@ import { ErrorFallback } from '/@/renderer/features/action-required';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
 import { getServerById, useCurrentSong } from '/@/renderer/store';
 import { FullLyricsMetadata, SynchronizedLyricMetadata } from '/@/renderer/api/types';
+import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 
-const LyricsScrollContainer = styled(motion(ScrollArea))`
+const ActionsContainer = styled.div`
+  position: absolute;
+  bottom: 4rem;
+  left: 0;
+  z-index: 50;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+
+  &:hover {
+    opacity: 1 !important;
+  }
+`;
+
+const LyricsContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  &:hover {
+    ${ActionsContainer} {
+      opacity: 0.5;
+    }
+  }
+`;
+
+const ScrollContainer = styled(motion(ScrollArea))`
+  position: relative;
   z-index: 1;
   text-align: center;
   transform: translateY(-2rem);
@@ -50,7 +82,7 @@ export const Lyrics = () => {
 
   const [clear, setClear] = useState(false);
 
-  const { data, isLoading } = useSongLyrics(
+  const { data, isInitialLoading } = useSongLyrics(
     {
       query: { songId: currentSong?.id || '' },
       serverId: currentServer?.id,
@@ -65,42 +97,51 @@ export const Lyrics = () => {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      {isLoading ? (
+      {isInitialLoading ? (
         <Spinner
           container
           size={25}
         />
-      ) : !data?.lyrics || clear ? (
-        <Center>
-          <Group>
-            <RiInformationFill size="2rem" />
-            <TextTitle
-              order={3}
-              weight={700}
-            >
-              No lyrics found
-            </TextTitle>
-          </Group>
-        </Center>
       ) : (
         <AnimatePresence mode="sync">
-          <LyricsScrollContainer
-            animate={{ opacity: 1 }}
-            initial={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {isSynchronized(data) ? (
-              <SynchronizedLyrics
-                {...data}
-                onRemoveLyric={() => setClear(true)}
-              />
+          <LyricsContainer>
+            {!data?.lyrics || clear ? (
+              <Center>
+                <Group>
+                  <RiInformationFill size="2rem" />
+                  <TextTitle
+                    order={3}
+                    weight={700}
+                  >
+                    No lyrics found
+                  </TextTitle>
+                </Group>
+              </Center>
             ) : (
-              <UnsynchronizedLyrics
-                {...data}
-                onRemoveLyric={() => setClear(true)}
-              />
+              <ScrollContainer
+                animate={{ opacity: 1 }}
+                initial={{ opacity: 0 }}
+                scrollHideDelay={0}
+                transition={{ duration: 0.5 }}
+              >
+                {isSynchronized(data) ? (
+                  <SynchronizedLyrics
+                    {...data}
+                    onRemoveLyric={() => setClear(true)}
+                  />
+                ) : (
+                  <UnsynchronizedLyrics
+                    {...data}
+                    onRemoveLyric={() => setClear(true)}
+                  />
+                )}
+              </ScrollContainer>
             )}
-          </LyricsScrollContainer>
+
+            <ActionsContainer>
+              <LyricsActions />
+            </ActionsContainer>
+          </LyricsContainer>
         </AnimatePresence>
       )}
     </ErrorBoundary>
