@@ -1,6 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
-import type { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
 import { LyricSource } from '../../../../renderer/types';
+import type {
+  InternetProviderLyricResponse,
+  InternetProviderLyricSearchResponse,
+  LyricSearchQuery,
+} from '/@/renderer/api/types';
 
 const SEARCH_URL = 'https://music.163.com/api/search/get';
 const LYRICS_URL = 'https://music.163.com/api/song/lyric';
@@ -13,30 +17,48 @@ interface NetEaseResponse {
   name: string;
 }
 
-async function getSongId(metadata: QueueSong): Promise<NetEaseResponse | undefined> {
+export async function getSearchResults(
+  params: LyricSearchQuery,
+): Promise<InternetProviderLyricSearchResponse[] | null> {
   let result: AxiosResponse<any, any>;
   try {
     result = await axios.get(SEARCH_URL, {
       params: {
-        limit: 10,
+        limit: 5,
         offset: 0,
-        s: `${metadata.artistName} ${metadata.name}`,
+        s: `${params.artist} ${params.name}`,
         type: '1',
       },
     });
   } catch (e) {
     console.error('NetEase search request got an error!', e);
-    return undefined;
+    return null;
   }
 
-  const song = result?.data.result?.songs?.[0];
+  const songs = result?.data.result?.songs;
+
+  if (!songs) return null;
+
+  return songs.map((song: any) => {
+    const artist = song.artists ? song.artists.map((artist: any) => artist.name).join(', ') : '';
+
+    return {
+      artist,
+      id: song.id,
+      name: song.name,
+      source: LyricSource.NETEASE,
+    };
+  });
+}
+
+async function getSongId(params: LyricSearchQuery): Promise<NetEaseResponse | undefined> {
+  const results = await getSearchResults(params);
+  const song = results?.[0];
 
   if (!song) return undefined;
 
-  const artist = song.artists ? song.artists.map((artist: any) => artist.name).join(', ') : '';
-
   return {
-    artist,
+    artist: song.artist,
     id: song.id,
     name: song.name,
   };
@@ -60,8 +82,10 @@ async function getLyricsFromSongId(songId: string): Promise<string | undefined> 
   return result.data.klyric?.lyric || result.data.lrc?.lyric;
 }
 
-export async function query(metadata: QueueSong): Promise<InternetProviderLyricResponse | null> {
-  const response = await getSongId(metadata);
+export async function query(
+  params: LyricSearchQuery,
+): Promise<InternetProviderLyricResponse | null> {
+  const response = await getSongId(params);
   if (!response) {
     console.error('Could not find the song on NetEase!');
     return null;
