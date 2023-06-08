@@ -196,6 +196,111 @@ const parsePath = (fullPath: string) => {
   };
 };
 
+let authSuccess = true;
+let shouldDelay = false;
+
+const RETRY_DELAY_MS = 1000;
+const MAX_RETRIES = 5;
+
+const waitForResult = async (count = 0): Promise<void> => {
+  return new Promise((resolve) => {
+    if (count === MAX_RETRIES || !shouldDelay) resolve();
+
+    setTimeout(() => {
+      waitForResult(count + 1)
+        .then(resolve)
+        .catch(resolve);
+    }, RETRY_DELAY_MS);
+  });
+};
+
+axiosClient.interceptors.response.use(
+  (response) => {
+    const serverId = useAuthStore.getState().currentServer?.id;
+
+    if (serverId) {
+      const headerCredential = response.headers['x-nd-authorization'] as string | undefined;
+
+      if (headerCredential) {
+        useAuthStore.getState().actions.updateServer(serverId, {
+          ndCredential: headerCredential,
+        });
+      }
+    }
+
+    authSuccess = true;
+
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      const currentServer = useAuthStore.getState().currentServer;
+
+      if (useSettingsStore.getState().general.savePassword && localSettings && currentServer) {
+        // eslint-disable-next-line promise/no-promise-in-callback
+        return localSettings
+          .passwordGet(currentServer.id)
+          .then(async (password: string | null) => {
+            authSuccess = false;
+
+            if (password === null) {
+              throw error;
+            }
+
+            if (shouldDelay) {
+              await waitForResult();
+
+              // Hopefully the delay was sufficient for authentication.
+              // Otherwise, it will require manual intervention
+              if (authSuccess) {
+                return axiosClient.request(error.config);
+              }
+
+              throw error;
+            }
+
+            shouldDelay = true;
+
+            // Do not use axiosClient. Instead, manually make a post
+            const res = await axios.post(`${currentServer.url}/auth/login`, {
+              password,
+              username: currentServer.username,
+            });
+
+            if (res.status !== 200) {
+              throw new Error('Failed to authenticate');
+            }
+
+            const newCredential = res.data.token;
+            const subsonicCredential = `u=${currentServer.username}&s=${res.data.subsonicSalt}&t=${res.data.subsonicToken}`;
+
+            useAuthStore.getState().actions.updateServer(currentServer.id, {
+              credential: subsonicCredential,
+              ndCredential: newCredential,
+            });
+
+            error.config.headers['x-nd-authorization'] = `Bearer ${newCredential}`;
+
+            authSuccess = true;
+
+            return axiosClient.request(error.config);
+          })
+          .catch((newError: any) => {
+            console.error('Error when trying to reauthenticate: ', newError);
+            authenticationFailure(currentServer);
+          })
+          .finally(() => {
+            shouldDelay = false;
+          });
+      }
+
+      authenticationFailure(currentServer);
+    }
+
+    return Promise.reject(error);
+  },
+);
+
 export const ndApiClient = (args: {
   server: ServerListItem | null;
   signal?: AbortSignal;
@@ -205,7 +310,6 @@ export const ndApiClient = (args: {
 
   return initClient(contract, {
     api: async ({ path, method, headers, body }) => {
-      console.log(headers);
       let baseUrl: string | undefined;
       let token: string | undefined;
 
@@ -219,6 +323,8 @@ export const ndApiClient = (args: {
       }
 
       try {
+        if (shouldDelay) await waitForResult();
+
         const result = await axiosClient.request({
           data: body,
           headers: {
@@ -255,67 +361,3 @@ export const ndApiClient = (args: {
     jsonQuery: false,
   });
 };
-
-axiosClient.interceptors.response.use(
-  (response) => {
-    const serverId = useAuthStore.getState().currentServer?.id;
-
-    if (serverId) {
-      const headerCredential = response.headers['x-nd-authorization'] as string | undefined;
-
-      if (headerCredential) {
-        useAuthStore.getState().actions.updateServer(serverId, {
-          ndCredential: headerCredential,
-        });
-      }
-    }
-
-    return response;
-  },
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      const currentServer = useAuthStore.getState().currentServer;
-
-      if (useSettingsStore.getState().general.savePassword && localSettings && currentServer) {
-        // eslint-disable-next-line promise/no-promise-in-callback
-        return localSettings
-          .passwordGet(currentServer.id)
-          .then(async (password: string | null) => {
-            if (password === null) {
-              throw error;
-            }
-
-            // Do not use axiosClient. Instead, manually make a post
-            const res = await axios.post(`${currentServer.url}/auth/login`, {
-              password,
-              username: currentServer.username,
-            });
-
-            if (res.status !== 200) {
-              throw new Error('Failed to authenticate');
-            }
-
-            const newCredential = res.data.token;
-            const subsonicCredential = `u=${currentServer.username}&s=${res.data.subsonicSalt}&t=${res.data.subsonicToken}`;
-
-            useAuthStore.getState().actions.updateServer(currentServer.id, {
-              credential: subsonicCredential,
-              ndCredential: newCredential,
-            });
-
-            error.config.headers['x-nd-authorization'] = `Bearer ${newCredential}`;
-
-            return axiosClient.request(error.config);
-          })
-          .catch((newError: any) => {
-            console.error('Error when trying to reauthenticate: ', newError);
-            authenticationFailure(currentServer);
-          });
-      }
-
-      authenticationFailure(currentServer);
-    }
-
-    return Promise.reject(error);
-  },
-);

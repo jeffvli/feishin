@@ -267,8 +267,27 @@ axiosClient.defaults.paramsSerializer = (params) => {
   return qs.stringify(params, { arrayFormat: 'repeat' });
 };
 
+let authSuccess = true;
+let shouldDelay = false;
+
+const RETRY_DELAY_MS = 1000;
+const MAX_RETRIES = 5;
+
+const waitForResult = async (count = 0): Promise<void> => {
+  return new Promise((resolve) => {
+    if (count === MAX_RETRIES || !shouldDelay) resolve();
+
+    setTimeout(() => {
+      waitForResult(count + 1)
+        .then(resolve)
+        .catch(resolve);
+    }, RETRY_DELAY_MS);
+  });
+};
+
 axiosClient.interceptors.response.use(
   (response) => {
+    authSuccess = true;
     return response;
   },
   (error) => {
@@ -276,12 +295,29 @@ axiosClient.interceptors.response.use(
       const currentServer = useAuthStore.getState().currentServer;
 
       if (useSettingsStore.getState().general.savePassword && localSettings && currentServer) {
+        // eslint-disable-next-line promise/no-promise-in-callback
         return localSettings
           .passwordGet(currentServer.id)
           .then(async (password: string | null) => {
+            authSuccess = false;
+
             if (password === null) {
               throw error;
             }
+
+            if (shouldDelay) {
+              await waitForResult();
+
+              // Hopefully the delay was sufficient for authentication.
+              // Otherwise, it will require manual intervention
+              if (authSuccess) {
+                return axiosClient.request(error.config);
+              }
+
+              throw error;
+            }
+
+            shouldDelay = true;
 
             // Do not use axiosClient. Instead, manually make a post
             const response = await axios.post(
@@ -302,20 +338,23 @@ axiosClient.interceptors.response.use(
             }
 
             const newCredential = response.data.AccessToken;
-            console.log(response.data);
 
-            const token = currentServer.credential;
             useAuthStore
               .getState()
               .actions.updateServer(currentServer.id, { credential: newCredential });
 
-            error.config.headers['X-MediaBrowser-Token'] = token;
+            error.config.headers['X-MediaBrowser-Token'] = newCredential;
+
+            authSuccess = true;
 
             return axiosClient.request(error.config);
           })
           .catch((newError: any) => {
             console.error('Error when trying to reauthenticate: ', newError);
             authenticationFailure(currentServer);
+          })
+          .finally(() => {
+            shouldDelay = false;
           });
       }
       authenticationFailure(currentServer);
