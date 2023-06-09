@@ -9,7 +9,7 @@ import { SynchronizedLyrics } from './synchronized-lyrics';
 import { ScrollArea, Spinner, TextTitle } from '/@/renderer/components';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
-import { getServerById, useCurrentSong } from '/@/renderer/store';
+import { getServerById, useCurrentSong, usePlayerStore } from '/@/renderer/store';
 import {
   FullLyricsMetadata,
   LyricsOverride,
@@ -20,7 +20,7 @@ import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 
 const ActionsContainer = styled.div`
   position: absolute;
-  bottom: 4rem;
+  bottom: 0;
   left: 0;
   z-index: 50;
   display: flex;
@@ -42,6 +42,7 @@ const ActionsContainer = styled.div`
 
 const LyricsContainer = styled.div`
   position: relative;
+  display: flex;
   width: 100%;
   height: 100%;
 
@@ -67,6 +68,7 @@ const ScrollContainer = styled(motion(ScrollArea))`
   );
 
   &.mantine-ScrollArea-root {
+    width: 100%;
     height: 100%;
   }
 
@@ -154,16 +156,16 @@ export const Lyrics = () => {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      {isLoadingLyrics ? (
-        <Spinner
-          container
-          size={25}
-        />
-      ) : (
-        <AnimatePresence mode="sync">
-          <LyricsContainer>
+      <LyricsContainer>
+        {isLoadingLyrics ? (
+          <Spinner
+            container
+            size={25}
+          />
+        ) : (
+          <AnimatePresence mode="sync">
             {!data?.lyrics || clear ? (
-              <Center>
+              <Center w="100%">
                 <Group>
                   <RiInformationFill size="2rem" />
                   <TextTitle
@@ -182,25 +184,21 @@ export const Lyrics = () => {
                 transition={{ duration: 0.5 }}
               >
                 {isSynchronizedLyrics ? (
-                  <SynchronizedLyrics
-                    {...lyricsMetadata}
-                    onRemoveLyric={() => setClear(true)}
-                  />
+                  <SynchronizedLyrics {...lyricsMetadata} />
                 ) : (
-                  <UnsynchronizedLyrics
-                    {...(lyricsMetadata as UnsynchronizedLyricMetadata)}
-                    onRemoveLyric={() => setClear(true)}
-                  />
+                  <UnsynchronizedLyrics {...(lyricsMetadata as UnsynchronizedLyricMetadata)} />
                 )}
               </ScrollContainer>
             )}
-
-            <ActionsContainer>
-              <LyricsActions onSearchOverride={handleOnSearchOverride} />
-            </ActionsContainer>
-          </LyricsContainer>
-        </AnimatePresence>
-      )}
+          </AnimatePresence>
+        )}
+        <ActionsContainer>
+          <LyricsActions
+            onRemoveLyric={() => setClear(true)}
+            onSearchOverride={handleOnSearchOverride}
+          />
+        </ActionsContainer>
+      </LyricsContainer>
     </ErrorBoundary>
   );
 };

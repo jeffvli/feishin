@@ -2,11 +2,9 @@ import { useMemo } from 'react';
 import styled from 'styled-components';
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import { FullLyricsMetadata } from '/@/renderer/api/types';
-import { LyricSkip } from '/@/renderer/features/lyrics/lyric-skip';
 
 interface UnsynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
   lyrics: string;
-  onRemoveLyric: () => void;
 }
 
 const UnsynchronizedLyricsContainer = styled.div`
@@ -17,7 +15,6 @@ export const UnsynchronizedLyrics = ({
   artist,
   lyrics,
   name,
-  onRemoveLyric,
   remote,
   source,
 }: UnsynchronizedLyricsProps) => {
@@ -34,13 +31,10 @@ export const UnsynchronizedLyrics = ({
         />
       )}
       {remote && (
-        <>
-          <LyricLine
-            className="lyric-credit"
-            text={`(Matched as ${artist} by ${name})`}
-          />
-          <LyricSkip onClick={onRemoveLyric} />
-        </>
+        <LyricLine
+          className="lyric-credit"
+          text={`(Matched as ${artist} by ${name})`}
+        />
       )}
       {lines.map((text, idx) => (
         <LyricLine
