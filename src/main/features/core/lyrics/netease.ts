@@ -21,12 +21,19 @@ export async function getSearchResults(
   params: LyricSearchQuery,
 ): Promise<InternetProviderLyricSearchResponse[] | null> {
   let result: AxiosResponse<any, any>;
+
+  const searchQuery = [params.artist, params.name].join(' ');
+
+  if (!searchQuery) {
+    return null;
+  }
+
   try {
     result = await axios.get(SEARCH_URL, {
       params: {
         limit: 5,
         offset: 0,
-        s: `${params.artist} ${params.name}`,
+        s: searchQuery,
         type: '1',
       },
     });

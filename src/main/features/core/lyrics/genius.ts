@@ -64,11 +64,18 @@ export async function getSearchResults(
   params: LyricSearchQuery,
 ): Promise<InternetProviderLyricSearchResponse[] | null> {
   let result: AxiosResponse<GeniusSearchResponse>;
+
+  const searchQuery = [params.artist, params.name].join(' ');
+
+  if (!searchQuery) {
+    return null;
+  }
+
   try {
     result = await axios.get(SEARCH_URL, {
       params: {
         per_page: '5',
-        q: `${params.artist} ${params.name}`,
+        q: searchQuery,
       },
     });
   } catch (e) {

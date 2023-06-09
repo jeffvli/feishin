@@ -15,6 +15,7 @@ export const useLyricSearch = (args: Omit<QueryHookArgs<LyricSearchQuery>, 'serv
 
   return useQuery<Record<LyricSource, InternetProviderLyricSearchResponse[]>>({
     cacheTime: 1000 * 60 * 1,
+    enabled: !!query.artist || !!query.name,
     queryFn: () => lyricsIpc?.searchRemoteLyrics(query),
     queryKey: queryKeys.songs.lyricsSearch(query),
     staleTime: 1000 * 60 * 1,

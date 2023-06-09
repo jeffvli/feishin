@@ -1062,8 +1062,8 @@ export const instanceOfCancellationError = (error: any) => {
 };
 
 export type LyricSearchQuery = {
-  artist: string;
-  name: string;
+  artist?: string;
+  name?: string;
 };
 
 export type LyricGetQuery = {
