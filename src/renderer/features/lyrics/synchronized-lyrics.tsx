@@ -16,7 +16,19 @@ import styled from 'styled-components';
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 const SynchronizedLyricsContainer = styled.div`
+  width: 100%;
+  height: 100%;
   padding: 5rem 0;
+  overflow: scroll;
+  transform: translateY(-2rem);
+
+  mask-image: linear-gradient(
+    180deg,
+    transparent 5%,
+    rgba(0, 0, 0, 100%) 20%,
+    rgba(0, 0, 0, 100%) 85%,
+    transparent 95%
+  );
 `;
 
 interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
@@ -120,7 +132,10 @@ export const SynchronizedLyrics = ({
       return;
     }
 
-    const currentLyric = document.querySelector(`#lyric-${index}`);
+    const doc = document.getElementById('sychronized-lyrics-scroll-container') as HTMLElement;
+    const currentLyric = document.querySelector(`#lyric-${index}`) as HTMLElement;
+    const offsetTop = currentLyric?.offsetTop - doc?.clientHeight / 2 ?? 0;
+
     if (currentLyric === null) {
       lyricRef.current = undefined;
       return;
@@ -129,7 +144,7 @@ export const SynchronizedLyrics = ({
     currentLyric.classList.add('active');
 
     if (followRef.current) {
-      currentLyric.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      doc?.scroll({ behavior: 'smooth', top: offsetTop });
     }
 
     if (index !== lyricRef.current!.length - 1) {
@@ -254,8 +269,23 @@ export const SynchronizedLyrics = ({
     timerEpoch.current += 1;
   }, []);
 
+  const hideScrollbar = () => {
+    const doc = document.getElementById('sychronized-lyrics-scroll-container') as HTMLElement;
+    doc.classList.add('hide-scrollbar');
+  };
+
+  const showScrollbar = () => {
+    const doc = document.getElementById('sychronized-lyrics-scroll-container') as HTMLElement;
+    doc.classList.remove('hide-scrollbar');
+  };
+
   return (
-    <SynchronizedLyricsContainer className="synchronized-lyrics">
+    <SynchronizedLyricsContainer
+      className="synchronized-lyrics overlay-scrollbar"
+      id="sychronized-lyrics-scroll-container"
+      onMouseEnter={showScrollbar}
+      onMouseLeave={hideScrollbar}
+    >
       {source && (
         <LyricLine
           className="lyric-credit"
