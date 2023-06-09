@@ -1,16 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Center, Group } from '@mantine/core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
-import { useSongLyrics } from './queries/lyric-query';
+import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
 import { SynchronizedLyrics } from './synchronized-lyrics';
 import { ScrollArea, Spinner, TextTitle } from '/@/renderer/components';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
 import { getServerById, useCurrentSong } from '/@/renderer/store';
-import { FullLyricsMetadata, SynchronizedLyricMetadata } from '/@/renderer/api/types';
+import {
+  FullLyricsMetadata,
+  LyricsOverride,
+  SynchronizedLyricMetadata,
+  UnsynchronizedLyricMetadata,
+} from '/@/renderer/api/types';
 import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 
 const ActionsContainer = styled.div`
@@ -70,9 +75,12 @@ const ScrollContainer = styled(motion(ScrollArea))`
   }
 `;
 
-function isSynchronized(data: FullLyricsMetadata): data is SynchronizedLyricMetadata {
+function isSynchronized(
+  data: Partial<FullLyricsMetadata> | undefined,
+): data is SynchronizedLyricMetadata {
   // Type magic. The only difference between Synchronized and Unsynchhronized is
   // the datatype of lyrics. This makes Typescript happier later...
+  if (!data) return false;
   return Array.isArray(data.lyrics);
 }
 
@@ -82,7 +90,7 @@ export const Lyrics = () => {
 
   const [clear, setClear] = useState(false);
 
-  const { data, isInitialLoading } = useSongLyrics(
+  const { data, isInitialLoading } = useSongLyricsBySong(
     {
       query: { songId: currentSong?.id || '' },
       serverId: currentServer?.id,
@@ -90,14 +98,48 @@ export const Lyrics = () => {
     currentSong,
   );
 
+  const [override, setOverride] = useState<LyricsOverride | undefined>(undefined);
+
+  const handleOnSearchOverride = useCallback((params: LyricsOverride) => {
+    setOverride(params);
+  }, []);
+
+  const { data: overrideLyrics, isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
+    options: {
+      enabled: !!override,
+    },
+    query: {
+      remoteSongId: override?.id,
+      remoteSource: override?.source,
+    },
+    serverId: currentServer?.id,
+  });
+
   useEffect(() => {
     // We want to reset the clear flag whenever a song changes
     setClear(false);
   }, [currentSong]);
 
+  const isLoadingLyrics = isInitialLoading || isOverrideLoading;
+
+  const lyricsMetadata:
+    | Partial<SynchronizedLyricMetadata>
+    | Partial<UnsynchronizedLyricMetadata>
+    | undefined = overrideLyrics
+    ? {
+        artist: override?.artist,
+        lyrics: overrideLyrics,
+        name: override?.name,
+        remote: true,
+        source: override?.source,
+      }
+    : data;
+
+  const isSynchronizedLyrics = isSynchronized(lyricsMetadata);
+
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      {isInitialLoading ? (
+      {isLoadingLyrics ? (
         <Spinner
           container
           size={25}
@@ -124,14 +166,14 @@ export const Lyrics = () => {
                 scrollHideDelay={0}
                 transition={{ duration: 0.5 }}
               >
-                {isSynchronized(data) ? (
+                {isSynchronizedLyrics ? (
                   <SynchronizedLyrics
-                    {...data}
+                    {...lyricsMetadata}
                     onRemoveLyric={() => setClear(true)}
                   />
                 ) : (
                   <UnsynchronizedLyrics
-                    {...data}
+                    {...(lyricsMetadata as UnsynchronizedLyricMetadata)}
                     onRemoveLyric={() => setClear(true)}
                   />
                 )}
@@ -139,7 +181,7 @@ export const Lyrics = () => {
             )}
 
             <ActionsContainer>
-              <LyricsActions />
+              <LyricsActions onSearchOverride={handleOnSearchOverride} />
             </ActionsContainer>
           </LyricsContainer>
         </AnimatePresence>

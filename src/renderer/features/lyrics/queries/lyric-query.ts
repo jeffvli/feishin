@@ -5,6 +5,7 @@ import {
   SynchronizedLyricsArray,
   InternetProviderLyricResponse,
   FullLyricsMetadata,
+  LyricGetQuery,
 } from '/@/renderer/api/types';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useLyricsSettings } from '/@/renderer/store';
@@ -43,7 +44,10 @@ const formatLyrics = (lyrics: string) => {
   const alternateSynchronizedLines = lyrics.matchAll(alternateTimeExp);
   for (const line of alternateSynchronizedLines) {
     const [, timeInMilis, , text] = line;
-    const cleanText = text.replaceAll(/\(\d+,\d+\)/g, '');
+    const cleanText = text
+      .replaceAll(/\(\d+,\d+\)/g, '')
+      .replaceAll(/\s,/g, ',')
+      .replaceAll(/\s\./g, '.');
     formattedLyrics.push([Number(timeInMilis), cleanText]);
   }
 
@@ -73,7 +77,7 @@ export const useServerLyrics = (
   });
 };
 
-export const useSongLyrics = (
+export const useSongLyricsBySong = (
   args: QueryHookArgs<LyricsQuery>,
   song: QueueSong | undefined,
 ): UseQueryResult<FullLyricsMetadata> => {
@@ -120,7 +124,7 @@ export const useSongLyrics = (
 
       if (fetch) {
         const remoteLyricsResult: InternetProviderLyricResponse | null =
-          await lyricsIpc?.fetchRemoteLyrics(song);
+          await lyricsIpc?.getRemoteLyricsBySong(song);
 
         if (remoteLyricsResult) {
           return {
@@ -135,5 +139,28 @@ export const useSongLyrics = (
     },
     queryKey: queryKeys.songs.lyrics(server?.id || '', query),
     staleTime: 1000 * 60 * 2,
+  });
+};
+
+export const useSongLyricsByRemoteId = (
+  args: QueryHookArgs<Partial<LyricGetQuery>>,
+): UseQueryResult<string | null> => {
+  const { query } = args;
+
+  return useQuery({
+    cacheTime: 1000 * 60 * 10,
+    enabled: !!query.remoteSongId && !!query.remoteSource,
+    onError: () => {},
+    queryFn: async () => {
+      const remoteLyricsResult: string | null = await lyricsIpc?.getRemoteLyricsByRemoteId(query);
+
+      if (remoteLyricsResult) {
+        return formatLyrics(remoteLyricsResult);
+      }
+
+      return null;
+    },
+    queryKey: queryKeys.songs.lyricsByRemoteId(query),
+    staleTime: 1000 * 60 * 5,
   });
 };
