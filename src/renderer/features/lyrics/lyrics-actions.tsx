@@ -1,7 +1,7 @@
 import isElectron from 'is-electron';
 import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
 import { LyricsOverride } from '/@/renderer/api/types';
-import { Button, NumberInput } from '/@/renderer/components';
+import { Button, NumberInput, Tooltip } from '/@/renderer/components';
 import { openLyricSearchModal } from '/@/renderer/features/lyrics/components/lyrics-search-form';
 import {
   useCurrentSong,
@@ -57,13 +57,18 @@ export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActions
       >
         <RiSubtractFill />
       </Button>
-      <NumberInput
-        aria-label="Lyric offset"
-        styles={{ input: { textAlign: 'center' } }}
-        value={delayMs || 0}
-        width={55}
-        onChange={handleLyricOffset}
-      />
+      <Tooltip
+        label="Offset (ms)"
+        openDelay={500}
+      >
+        <NumberInput
+          aria-label="Lyric offset"
+          styles={{ input: { textAlign: 'center' } }}
+          value={delayMs || 0}
+          width={55}
+          onChange={handleLyricOffset}
+        />
+      </Tooltip>
       <Button
         aria-label="Increase lyric offset"
         variant="subtle"
