@@ -18,7 +18,7 @@ const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const SynchronizedLyricsContainer = styled.div`
   width: 100%;
   height: 100%;
-  padding: 5rem 0;
+  padding: 10vh 0 6vh;
   overflow: scroll;
   transform: translateY(-2rem);
 
@@ -29,6 +29,10 @@ const SynchronizedLyricsContainer = styled.div`
     rgba(0, 0, 0, 100%) 85%,
     transparent 95%
   );
+
+  @media screen and (max-width: 768px) {
+    padding: 5vh 0;
+  }
 `;
 
 interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
