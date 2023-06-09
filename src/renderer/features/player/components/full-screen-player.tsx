@@ -69,55 +69,53 @@ const Controls = () => {
   useHotkeys([['Escape', handleToggleFullScreenPlayer]]);
 
   return (
-    <>
-      <Group
-        p="1rem"
-        pos="absolute"
-        spacing="sm"
-        sx={{
-          left: 0,
-          top: 10,
-        }}
+    <Group
+      p="1rem"
+      pos="absolute"
+      spacing="sm"
+      sx={{
+        left: 0,
+        top: 10,
+      }}
+    >
+      <Button
+        compact
+        size="sm"
+        tooltip={{ label: 'Minimize' }}
+        variant="subtle"
+        onClick={handleToggleFullScreenPlayer}
       >
-        <Button
-          compact
-          size="sm"
-          tooltip={{ label: 'Minimize' }}
-          variant="subtle"
-          onClick={handleToggleFullScreenPlayer}
-        >
-          <RiArrowDownSLine size="2rem" />
-        </Button>
-        <Popover position="bottom-start">
-          <Popover.Target>
-            <Button
-              compact
-              size="sm"
-              tooltip={{ label: 'Configure' }}
-              variant="subtle"
-            >
-              <RiSettings3Line size="1.5rem" />
-            </Button>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <Option>
-              <Option.Label>Dynamic Background</Option.Label>
-              <Option.Control>
-                <Switch
-                  defaultChecked={dynamicBackground}
-                  onChange={(e) =>
-                    setStore({
-                      dynamicBackground: e.target.checked,
-                    })
-                  }
-                />
-              </Option.Control>
-            </Option>
-            <TableConfigDropdown type="fullScreen" />
-          </Popover.Dropdown>
-        </Popover>
-      </Group>
-    </>
+        <RiArrowDownSLine size="2rem" />
+      </Button>
+      <Popover position="bottom-start">
+        <Popover.Target>
+          <Button
+            compact
+            size="sm"
+            tooltip={{ label: 'Configure' }}
+            variant="subtle"
+          >
+            <RiSettings3Line size="1.5rem" />
+          </Button>
+        </Popover.Target>
+        <Popover.Dropdown>
+          <Option>
+            <Option.Label>Dynamic Background</Option.Label>
+            <Option.Control>
+              <Switch
+                defaultChecked={dynamicBackground}
+                onChange={(e) =>
+                  setStore({
+                    dynamicBackground: e.target.checked,
+                  })
+                }
+              />
+            </Option.Control>
+          </Option>
+          <TableConfigDropdown type="fullScreen" />
+        </Popover.Dropdown>
+      </Popover>
+    </Group>
   );
 };
 
