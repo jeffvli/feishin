@@ -8,7 +8,7 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
-import { LibraryItem } from '/@/renderer/api/types';
+import { LibraryItem, LyricSource } from '/@/renderer/api/types';
 import { AppRoute } from '/@/renderer/router/routes';
 import { AppTheme } from '/@/renderer/themes/types';
 import {
@@ -19,7 +19,6 @@ import {
   PlaybackType,
   TableType,
   Platform,
-  LyricSource,
 } from '/@/renderer/types';
 
 export type SidebarItemType = {

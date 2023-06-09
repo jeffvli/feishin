@@ -3,10 +3,19 @@ import {
   InternetProviderLyricSearchResponse,
   LyricSearchQuery,
   QueueSong,
+  LyricGetQuery,
+  LyricSource,
 } from '/@/renderer/api/types';
-import { query as queryGenius, getSearchResults as searchGenius } from './genius';
-import { query as queryNetease, getSearchResults as searchNetease } from './netease';
-import { LyricSource } from '../../../../renderer/types';
+import {
+  query as queryGenius,
+  getSearchResults as searchGenius,
+  getLyricsByURL as getGenius,
+} from './genius';
+import {
+  query as queryNetease,
+  getSearchResults as searchNetease,
+  getLyricsBySongId as getNetease,
+} from './netease';
 import { ipcMain } from 'electron';
 import { store } from '../settings/index';
 
@@ -14,6 +23,7 @@ type SongFetcher = (params: LyricSearchQuery) => Promise<InternetProviderLyricRe
 type SearchFetcher = (
   params: LyricSearchQuery,
 ) => Promise<InternetProviderLyricSearchResponse[] | null>;
+type GetFetcher = (id: string) => Promise<string | null>;
 
 type CachedLyrics = Record<LyricSource, InternetProviderLyricResponse>;
 
@@ -25,6 +35,11 @@ const FETCHERS: Record<LyricSource, SongFetcher> = {
 const SEARCH_FETCHERS: Record<LyricSource, SearchFetcher> = {
   [LyricSource.GENIUS]: searchGenius,
   [LyricSource.NETEASE]: searchNetease,
+};
+
+const GET_FETCHERS: Record<LyricSource, GetFetcher> = {
+  [LyricSource.GENIUS]: getGenius,
+  [LyricSource.NETEASE]: getNetease,
 };
 
 const MAX_CACHED_ITEMS = 10;
@@ -93,12 +108,28 @@ const searchRemoteLyrics = async (params: LyricSearchQuery) => {
   return results;
 };
 
-ipcMain.handle('lyric-fetch-manual', async (_event, song: QueueSong) => {
+const getRemoteLyricsById = async (params: LyricGetQuery): Promise<string | null> => {
+  const { remoteSongId, remoteSource } = params;
+  const response = await GET_FETCHERS[remoteSource](remoteSongId);
+
+  if (!response) {
+    return null;
+  }
+
+  return response;
+};
+
+ipcMain.handle('lyric-by-song', async (_event, song: QueueSong) => {
   const lyric = await getRemoteLyrics(song);
   return lyric;
 });
 
 ipcMain.handle('lyric-search', async (_event, params: LyricSearchQuery) => {
   const lyricResults = await searchRemoteLyrics(params);
+  return lyricResults;
+});
+
+ipcMain.handle('lyric-by-remote-id', async (_event, params: LyricGetQuery) => {
+  const lyricResults = await getRemoteLyricsById(params);
   return lyricResults;
 });

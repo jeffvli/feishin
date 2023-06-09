@@ -1033,14 +1033,14 @@ export type InternetProviderLyricResponse = {
   artist: string;
   lyrics: string;
   name: string;
-  source: string;
+  source: LyricSource;
 };
 
 export type InternetProviderLyricSearchResponse = {
   artist: string;
   id: string;
   name: string;
-  source: string;
+  source: LyricSource;
 };
 
 export type SynchronizedLyricMetadata = {
@@ -1048,12 +1048,12 @@ export type SynchronizedLyricMetadata = {
   remote: boolean;
 } & Omit<InternetProviderLyricResponse, 'lyrics'>;
 
-export type UnsyhchronizedLyricMetadata = {
+export type UnsynchronizedLyricMetadata = {
   lyrics: string;
   remote: boolean;
 } & Omit<InternetProviderLyricResponse, 'lyrics'>;
 
-export type FullLyricsMetadata = SynchronizedLyricMetadata | UnsyhchronizedLyricMetadata;
+export type FullLyricsMetadata = SynchronizedLyricMetadata | UnsynchronizedLyricMetadata;
 
 export type LyricOverride = Omit<InternetProviderLyricResponse, 'lyrics'>;
 
@@ -1065,3 +1065,15 @@ export type LyricSearchQuery = {
   artist: string;
   name: string;
 };
+
+export type LyricGetQuery = {
+  remoteSongId: string;
+  remoteSource: LyricSource;
+};
+
+export enum LyricSource {
+  GENIUS = 'Genius',
+  NETEASE = 'NetEase',
+}
+
+export type LyricsOverride = Omit<FullLyricsMetadata, 'lyrics'> & { id: string };
