@@ -119,13 +119,12 @@ export const App = () => {
             styles: {
               body: { background: 'var(--modal-bg)', padding: '1rem !important' },
               close: { marginRight: '0.5rem' },
-              content: { borderRadius: '10px' },
+              content: { borderRadius: '5px' },
               header: {
-                background: 'var(--modal-bg)',
-                borderBottom: '1px solid var(--generic-border-color)',
+                background: 'var(--modal-header-bg)',
                 paddingBottom: '1rem',
               },
-              title: { fontSize: 'medium', fontWeight: 'bold' },
+              title: { fontSize: 'medium', fontWeight: 500 },
             },
           },
         },
@@ -170,7 +169,7 @@ export const App = () => {
           transitionProps: {
             duration: 300,
             exitDuration: 300,
-            transition: 'slide-down',
+            transition: 'fade',
           },
         }}
         modals={{ addToPlaylist: AddToPlaylistContextModal, base: BaseContextModal }}
