@@ -96,12 +96,12 @@ export async function getSearchResults(
 
   if (!rawSongsResult) return null;
 
-  const songResults: InternetProviderLyricSearchResponse[] = rawSongsResult.map((song: any) => {
-    const artist = song.artists ? song.artists.map((artist: any) => artist.name).join(', ') : '';
+  const songResults: InternetProviderLyricSearchResponse[] = rawSongsResult.map((song) => {
+    const artist = song.artists ? song.artists.map((artist) => artist.name).join(', ') : '';
 
     return {
       artist,
-      id: song.id,
+      id: String(song.id),
       name: song.name,
       source: LyricSource.NETEASE,
     };
@@ -114,8 +114,6 @@ async function getMatchedLyrics(
   params: LyricSearchQuery,
 ): Promise<Omit<InternetProviderLyricResponse, 'lyrics'> | null> {
   const results = await getSearchResults(params);
-
-  console.log('results', results);
 
   const firstMatch = results?.[0];
 

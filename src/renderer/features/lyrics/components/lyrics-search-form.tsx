@@ -40,9 +40,7 @@ const SearchResult = ({ data, onClick }: SearchResultProps) => {
   }, [score]);
 
   const cleanId =
-    source === LyricSource.GENIUS
-      ? String(id).replace(/^((http[s]?|ftp):\/)?\/?([^:/\s]+)/g, '')
-      : id;
+    source === LyricSource.GENIUS ? id.replace(/^((http[s]?|ftp):\/)?\/?([^:/\s]+)/g, '') : id;
 
   return (
     <SearchItem onClick={onClick}>
