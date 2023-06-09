@@ -34,6 +34,10 @@ const ActionsContainer = styled.div`
   &:hover {
     opacity: 1 !important;
   }
+
+  &:focus-within {
+    opacity: 1 !important;
+  }
 `;
 
 const LyricsContainer = styled.div`
@@ -43,7 +47,7 @@ const LyricsContainer = styled.div`
 
   &:hover {
     ${ActionsContainer} {
-      opacity: 0.5;
+      opacity: 0.6;
     }
   }
 `;
