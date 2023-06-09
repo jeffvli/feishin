@@ -106,6 +106,7 @@ export const Lyrics = () => {
 
   const handleOnSearchOverride = useCallback((params: LyricsOverride) => {
     setOverride(params);
+    setClear(false);
   }, []);
 
   const { data: overrideLyrics, isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
@@ -120,9 +121,19 @@ export const Lyrics = () => {
   });
 
   useEffect(() => {
-    // We want to reset the clear flag whenever a song changes
-    setClear(false);
-  }, [currentSong]);
+    const unsubSongChange = usePlayerStore.subscribe(
+      (state) => state.current.song,
+      () => {
+        setOverride(undefined);
+        setClear(false);
+      },
+      { equalityFn: (a, b) => a?.id === b?.id },
+    );
+
+    return () => {
+      unsubSongChange();
+    };
+  }, []);
 
   const isLoadingLyrics = isInitialLoading || isOverrideLoading;
 
