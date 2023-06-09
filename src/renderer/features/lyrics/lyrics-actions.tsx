@@ -2,14 +2,31 @@ import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
 import { LyricsOverride } from '/@/renderer/api/types';
 import { Button, NumberInput } from '/@/renderer/components';
 import { openLyricSearchModal } from '/@/renderer/features/lyrics/components/lyrics-search-form';
-import { useCurrentSong } from '/@/renderer/store';
+import {
+  useCurrentSong,
+  useLyricsSettings,
+  useSettingsStore,
+  useSettingsStoreActions,
+} from '/@/renderer/store';
 
 interface LyricsActionsProps {
-  onSearchOverride?: (params: LyricsOverride) => void;
+  onRemoveLyric: () => void;
+  onSearchOverride: (params: LyricsOverride) => void;
 }
 
-export const LyricsActions = ({ onSearchOverride }: LyricsActionsProps) => {
+export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActionsProps) => {
   const currentSong = useCurrentSong();
+  const { setSettings } = useSettingsStoreActions();
+  const { delayMs } = useLyricsSettings();
+
+  const handleLyricOffset = (e: number) => {
+    setSettings({
+      lyrics: {
+        ...useSettingsStore.getState().lyrics,
+        delayMs: e,
+      },
+    });
+  };
 
   return (
     <>
@@ -27,30 +44,30 @@ export const LyricsActions = ({ onSearchOverride }: LyricsActionsProps) => {
         Search
       </Button>
       <Button
-        tooltip={{ label: 'Decrease offset', openDelay: 500 }}
+        aria-label="Decrease lyric offset"
         variant="subtle"
+        onClick={() => handleLyricOffset(delayMs - 50)}
       >
         <RiSubtractFill />
       </Button>
       <NumberInput
+        aria-label="Lyric offset"
         styles={{ input: { textAlign: 'center' } }}
+        value={delayMs || 0}
         width={55}
+        onChange={handleLyricOffset}
       />
       <Button
-        tooltip={{ label: 'Increase offset', openDelay: 500 }}
+        aria-label="Increase lyric offset"
         variant="subtle"
+        onClick={() => handleLyricOffset(delayMs + 50)}
       >
         <RiAddFill />
       </Button>
       <Button
         uppercase
         variant="subtle"
-        onClick={() =>
-          openLyricSearchModal({
-            artist: currentSong?.artistName,
-            name: currentSong?.name,
-          })
-        }
+        onClick={onRemoveLyric}
       >
         Clear
       </Button>

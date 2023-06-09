@@ -12,7 +12,6 @@ import isElectron from 'is-electron';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 import { FullLyricsMetadata, SynchronizedLyricsArray } from '/@/renderer/api/types';
 import styled from 'styled-components';
-import { LyricSkip } from '/@/renderer/features/lyrics/lyric-skip';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
@@ -22,14 +21,12 @@ const SynchronizedLyricsContainer = styled.div`
 
 interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
   lyrics: SynchronizedLyricsArray;
-  onRemoveLyric: () => void;
 }
 
 export const SynchronizedLyrics = ({
   artist,
   lyrics,
   name,
-  onRemoveLyric,
   remote,
   source,
 }: SynchronizedLyricsProps) => {
@@ -145,16 +142,6 @@ export const SynchronizedLyrics = ({
       }, nextTime - timeInMs - elapsed);
     }
   }, []);
-
-  const removeLyric = useCallback(() => {
-    onRemoveLyric();
-
-    if (lyricTimer.current) {
-      clearTimeout(lyricTimer.current);
-    }
-
-    timerEpoch.current += 1;
-  }, [onRemoveLyric]);
 
   useEffect(() => {
     // Copy the follow settings into a ref that can be accessed in the timeout
@@ -276,13 +263,10 @@ export const SynchronizedLyrics = ({
         />
       )}
       {remote && (
-        <>
-          <LyricLine
-            className="lyric-credit"
-            text={`(Matched as ${artist} by ${name})`}
-          />
-          <LyricSkip onClick={removeLyric} />
-        </>
+        <LyricLine
+          className="lyric-credit"
+          text={`(Matched as ${artist} by ${name})`}
+        />
       )}
       {lyrics.map(([, text], idx) => (
         <LyricLine
