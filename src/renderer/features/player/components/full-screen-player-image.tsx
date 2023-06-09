@@ -152,7 +152,7 @@ export const FullScreenPlayerImage = () => {
       <ImageContainer>
         <AnimatePresence
           initial={false}
-          mode="popLayout"
+          mode="sync"
         >
           {imageState.current === 0 && (
             <ImageWithPlaceholder
@@ -168,11 +168,7 @@ export const FullScreenPlayerImage = () => {
               variants={imageVariants}
             />
           )}
-        </AnimatePresence>
-        <AnimatePresence
-          initial={false}
-          mode="popLayout"
-        >
+
           {imageState.current === 1 && (
             <ImageWithPlaceholder
               key={imageKey}
