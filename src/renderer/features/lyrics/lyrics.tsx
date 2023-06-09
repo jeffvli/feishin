@@ -139,6 +139,8 @@ export const Lyrics = () => {
 
   const isLoadingLyrics = isInitialLoading || isOverrideLoading;
 
+  const hasNoLyrics = (!data?.lyrics && !overrideLyrics) || clear;
+
   const lyricsMetadata:
     | Partial<SynchronizedLyricMetadata>
     | Partial<UnsynchronizedLyricMetadata>
@@ -164,7 +166,7 @@ export const Lyrics = () => {
           />
         ) : (
           <AnimatePresence mode="sync">
-            {!data?.lyrics || clear ? (
+            {hasNoLyrics ? (
               <Center w="100%">
                 <Group>
                   <RiInformationFill size="2rem" />
