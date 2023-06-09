@@ -1,4 +1,4 @@
-import { Stack, Group, Center } from '@mantine/core';
+import { Group, Center } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import { RiFileMusicLine, RiFileTextLine, RiInformationFill } from 'react-icons/ri';
@@ -41,6 +41,12 @@ const HeaderItemWrapper = styled.div`
   z-index: 2;
 `;
 
+const GridContainer = styled.div`
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: 1fr;
+`;
+
 export const FullScreenPlayerQueue = () => {
   const { activeTab } = useFullScreenPlayerStore();
   const { setStore } = useFullScreenPlayerStoreActions();
@@ -67,7 +73,7 @@ export const FullScreenPlayerQueue = () => {
   ];
 
   return (
-    <Stack className="full-screen-player-queue-container">
+    <GridContainer className="full-screen-player-queue-container">
       <Group
         grow
         align="center"
@@ -116,6 +122,6 @@ export const FullScreenPlayerQueue = () => {
       ) : activeTab === 'lyrics' ? (
         <Lyrics />
       ) : null}
-    </Stack>
+    </GridContainer>
   );
 };
