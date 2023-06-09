@@ -1,19 +1,26 @@
 import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
+import { LyricsOverride } from '/@/renderer/api/types';
 import { Button, NumberInput } from '/@/renderer/components';
 import { openLyricSearchModal } from '/@/renderer/features/lyrics/components/lyrics-search-form';
 import { useCurrentSong } from '/@/renderer/store';
 
-export const LyricsActions = () => {
+interface LyricsActionsProps {
+  onSearchOverride?: (params: LyricsOverride) => void;
+}
+
+export const LyricsActions = ({ onSearchOverride }: LyricsActionsProps) => {
   const currentSong = useCurrentSong();
 
   return (
     <>
       <Button
-        variant="default"
+        uppercase
+        variant="subtle"
         onClick={() =>
           openLyricSearchModal({
             artist: currentSong?.artistName,
             name: currentSong?.name,
+            onSearchOverride,
           })
         }
       >
@@ -21,7 +28,7 @@ export const LyricsActions = () => {
       </Button>
       <Button
         tooltip={{ label: 'Decrease offset', openDelay: 500 }}
-        variant="default"
+        variant="subtle"
       >
         <RiSubtractFill />
       </Button>
@@ -31,12 +38,13 @@ export const LyricsActions = () => {
       />
       <Button
         tooltip={{ label: 'Increase offset', openDelay: 500 }}
-        variant="default"
+        variant="subtle"
       >
         <RiAddFill />
       </Button>
       <Button
-        variant="default"
+        uppercase
+        variant="subtle"
         onClick={() =>
           openLyricSearchModal({
             artist: currentSong?.artistName,

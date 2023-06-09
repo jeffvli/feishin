@@ -1,32 +1,40 @@
 import { useMemo } from 'react';
-import { Divider, Group, Stack, UnstyledButton } from '@mantine/core';
+import { Divider, Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDebouncedValue } from '@mantine/hooks';
 import { openModal } from '@mantine/modals';
 import styled from 'styled-components';
-import { InternetProviderLyricSearchResponse } from '../../../api/types';
+import {
+  InternetProviderLyricSearchResponse,
+  LyricSource,
+  LyricsOverride,
+} from '../../../api/types';
 import { useLyricSearch } from '../queries/lyric-search-query';
 import { Badge, ScrollArea, Spinner, Text, TextInput } from '/@/renderer/components';
 
-const SearchItem = styled(UnstyledButton)`
+const SearchItem = styled.button`
+  all: unset;
+  box-sizing: border-box !important;
+  padding: 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+
   &:hover,
   &:focus-visible {
     color: var(--btn-default-fg-hover);
     background: var(--btn-default-bg-hover);
   }
-
-  padding: 0.5rem;
-  border-radius: 5px;
 `;
 
 interface SearchResultProps {
   artist?: string;
   name?: string;
+  onClick?: () => void;
   source?: string;
 }
-const SearchResult = ({ name, artist, source }: SearchResultProps) => {
+const SearchResult = ({ name, artist, source, onClick }: SearchResultProps) => {
   return (
-    <SearchItem>
+    <SearchItem onClick={onClick}>
       <Group
         noWrap
         position="apart"
@@ -35,7 +43,12 @@ const SearchResult = ({ name, artist, source }: SearchResultProps) => {
           maw="65%"
           spacing={0}
         >
-          <Text size="md">{name}</Text>
+          <Text
+            size="md"
+            weight={600}
+          >
+            {name}
+          </Text>
           <Text $secondary>{artist}</Text>
         </Stack>
         <Badge size="lg">{source}</Badge>
@@ -47,10 +60,10 @@ const SearchResult = ({ name, artist, source }: SearchResultProps) => {
 interface LyricSearchFormProps {
   artist?: string;
   name?: string;
-  onSelect?: (lyrics: InternetProviderLyricSearchResponse) => void;
+  onSearchOverride?: (params: LyricsOverride) => void;
 }
 
-export const LyricsSearchForm = ({ artist, name }: LyricSearchFormProps) => {
+export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearchFormProps) => {
   const form = useForm({
     initialValues: {
       artist: artist || '',
@@ -68,8 +81,6 @@ export const LyricsSearchForm = ({ artist, name }: LyricSearchFormProps) => {
 
   const searchResults = useMemo(() => {
     if (!data) return [];
-
-    console.log('data', data);
 
     const results: InternetProviderLyricSearchResponse[] = [];
     Object.keys(data).forEach((key) => {
@@ -102,7 +113,7 @@ export const LyricsSearchForm = ({ artist, name }: LyricSearchFormProps) => {
       ) : (
         <ScrollArea
           offsetScrollbars
-          h={500}
+          h={350}
           pr="1rem"
         >
           <Stack spacing="md">
@@ -112,6 +123,15 @@ export const LyricsSearchForm = ({ artist, name }: LyricSearchFormProps) => {
                 artist={result.artist}
                 name={result.name}
                 source={result.source}
+                onClick={() => {
+                  onSearchOverride?.({
+                    artist: result.artist,
+                    id: result.id,
+                    name: result.name,
+                    remote: true,
+                    source: result.source as LyricSource,
+                  });
+                }}
               />
             ))}
           </Stack>
@@ -121,12 +141,13 @@ export const LyricsSearchForm = ({ artist, name }: LyricSearchFormProps) => {
   );
 };
 
-export const openLyricSearchModal = ({ artist, name }: LyricSearchFormProps) => {
+export const openLyricSearchModal = ({ artist, name, onSearchOverride }: LyricSearchFormProps) => {
   openModal({
     children: (
       <LyricsSearchForm
         artist={artist}
         name={name}
+        onSearchOverride={onSearchOverride}
       />
     ),
     size: 'lg',

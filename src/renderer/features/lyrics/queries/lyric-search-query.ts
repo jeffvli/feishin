@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import isElectron from 'is-electron';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { InternetProviderLyricSearchResponse, LyricSearchQuery } from '/@/renderer/api/types';
+import {
+  InternetProviderLyricSearchResponse,
+  LyricSearchQuery,
+  LyricSource,
+} from '/@/renderer/api/types';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
-import { LyricSource } from '/@/renderer/types';
 
 const lyricsIpc = isElectron() ? window.electron.lyrics : null;
 
