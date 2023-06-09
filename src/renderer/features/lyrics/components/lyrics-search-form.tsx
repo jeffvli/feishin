@@ -3,6 +3,7 @@ import { Divider, Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDebouncedValue } from '@mantine/hooks';
 import { openModal } from '@mantine/modals';
+import orderBy from 'lodash/orderBy';
 import styled from 'styled-components';
 import {
   InternetProviderLyricSearchResponse,
@@ -10,7 +11,7 @@ import {
   LyricsOverride,
 } from '../../../api/types';
 import { useLyricSearch } from '../queries/lyric-search-query';
-import { Badge, ScrollArea, Spinner, Text, TextInput } from '/@/renderer/components';
+import { ScrollArea, Spinner, Text, TextInput } from '/@/renderer/components';
 
 const SearchItem = styled.button`
   all: unset;
@@ -27,12 +28,22 @@ const SearchItem = styled.button`
 `;
 
 interface SearchResultProps {
-  artist?: string;
-  name?: string;
+  data: InternetProviderLyricSearchResponse;
   onClick?: () => void;
-  source?: string;
 }
-const SearchResult = ({ name, artist, source, onClick }: SearchResultProps) => {
+const SearchResult = ({ data, onClick }: SearchResultProps) => {
+  const { artist, name, source, score, id } = data;
+
+  const percentageScore = useMemo(() => {
+    if (!score) return 0;
+    return ((1 - score) * 100).toFixed(2);
+  }, [score]);
+
+  const cleanId =
+    source === LyricSource.GENIUS
+      ? String(id).replace(/^((http[s]?|ftp):\/)?\/?([^:/\s]+)/g, '')
+      : id;
+
   return (
     <SearchItem onClick={onClick}>
       <Group
@@ -50,8 +61,19 @@ const SearchResult = ({ name, artist, source, onClick }: SearchResultProps) => {
             {name}
           </Text>
           <Text $secondary>{artist}</Text>
+          <Group
+            noWrap
+            spacing="sm"
+          >
+            <Text
+              $secondary
+              size="sm"
+            >
+              {[source, cleanId].join(' — ')}
+            </Text>
+          </Group>
         </Stack>
-        <Badge size="lg">{source}</Badge>
+        <Text>{percentageScore}%</Text>
       </Group>
     </SearchItem>
   );
@@ -86,21 +108,21 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
       (data[key as keyof typeof data] || []).forEach((result) => results.push(result));
     });
 
-    return results;
+    const scoredResults = orderBy(results, ['score'], ['asc']);
+
+    return scoredResults;
   }, [data]);
 
   return (
-    <Stack h={400}>
+    <Stack w="100%">
       <form>
         <Group grow>
           <TextInput
             data-autofocus
-            required
             label="Name"
             {...form.getInputProps('name')}
           />
           <TextInput
-            required
             label="Artist"
             {...form.getInputProps('artist')}
           />
@@ -112,15 +134,16 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
       ) : (
         <ScrollArea
           offsetScrollbars
+          h={400}
           pr="1rem"
+          type="auto"
+          w="100%"
         >
           <Stack spacing="md">
             {searchResults.map((result) => (
               <SearchResult
                 key={`${result.source}-${result.id}`}
-                artist={result.artist}
-                name={result.name}
-                source={result.source}
+                data={result}
                 onClick={() => {
                   onSearchOverride?.({
                     artist: result.artist,
@@ -149,6 +172,6 @@ export const openLyricSearchModal = ({ artist, name, onSearchOverride }: LyricSe
       />
     ),
     size: 'lg',
-    title: 'Search for lyrics',
+    title: 'Lyrics Search',
   });
 };

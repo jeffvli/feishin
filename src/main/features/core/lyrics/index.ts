@@ -1,3 +1,4 @@
+import { ipcMain } from 'electron';
 import {
   InternetProviderLyricResponse,
   InternetProviderLyricSearchResponse,
@@ -5,19 +6,18 @@ import {
   QueueSong,
   LyricGetQuery,
   LyricSource,
-} from '/@/renderer/api/types';
+} from '../../../../renderer/api/types';
+import { store } from '../settings/index';
 import {
   query as queryGenius,
   getSearchResults as searchGenius,
-  getLyricsByURL as getGenius,
+  getLyricsBySongId as getGenius,
 } from './genius';
 import {
   query as queryNetease,
   getSearchResults as searchNetease,
   getLyricsBySongId as getNetease,
 } from './netease';
-import { ipcMain } from 'electron';
-import { store } from '../settings/index';
 
 type SongFetcher = (params: LyricSearchQuery) => Promise<InternetProviderLyricResponse | null>;
 type SearchFetcher = (

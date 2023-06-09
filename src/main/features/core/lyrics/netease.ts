@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { LyricSource } from '../../../../renderer/api/types';
+import { orderSearchResults } from './shared';
 import type {
   InternetProviderLyricResponse,
   InternetProviderLyricSearchResponse,
@@ -11,16 +12,65 @@ const LYRICS_URL = 'https://music.163.com/api/song/lyric';
 
 // Adapted from https://github.com/NyaomiDEV/Sunamu/blob/master/src/main/lyricproviders/netease.ts
 
-interface NetEaseResponse {
-  artist: string;
-  id: string;
+export interface NetEaseResponse {
+  code: number;
+  result: Result;
+}
+
+export interface Result {
+  hasMore: boolean;
+  songCount: number;
+  songs: Song[];
+}
+
+export interface Song {
+  album: Album;
+  alias: string[];
+  artists: Artist[];
+  copyrightId: number;
+  duration: number;
+  fee: number;
+  ftype: number;
+  id: number;
+  mark: number;
+  mvid: number;
   name: string;
+  rUrl: null;
+  rtype: number;
+  status: number;
+  transNames?: string[];
+}
+
+export interface Album {
+  artist: Artist;
+  copyrightId: number;
+  id: number;
+  mark: number;
+  name: string;
+  picId: number;
+  publishTime: number;
+  size: number;
+  status: number;
+  transNames?: string[];
+}
+
+export interface Artist {
+  albumSize: number;
+  alias: any[];
+  fansGroup: null;
+  id: number;
+  img1v1: number;
+  img1v1Url: string;
+  name: string;
+  picId: number;
+  picUrl: null;
+  trans: null;
 }
 
 export async function getSearchResults(
   params: LyricSearchQuery,
 ): Promise<InternetProviderLyricSearchResponse[] | null> {
-  let result: AxiosResponse<any, any>;
+  let result: AxiosResponse<NetEaseResponse>;
 
   const searchQuery = [params.artist, params.name].join(' ');
 
@@ -42,11 +92,11 @@ export async function getSearchResults(
     return null;
   }
 
-  const songs = result?.data.result?.songs;
+  const rawSongsResult = result?.data.result?.songs;
 
-  if (!songs) return null;
+  if (!rawSongsResult) return null;
 
-  return songs.map((song: any) => {
+  const songResults: InternetProviderLyricSearchResponse[] = rawSongsResult.map((song: any) => {
     const artist = song.artists ? song.artists.map((artist: any) => artist.name).join(', ') : '';
 
     return {
@@ -56,19 +106,24 @@ export async function getSearchResults(
       source: LyricSource.NETEASE,
     };
   });
+
+  return orderSearchResults({ params, results: songResults });
 }
 
-async function getSongId(params: LyricSearchQuery): Promise<NetEaseResponse | undefined> {
+async function getMatchedLyrics(
+  params: LyricSearchQuery,
+): Promise<Omit<InternetProviderLyricResponse, 'lyrics'> | null> {
   const results = await getSearchResults(params);
-  const song = results?.[0];
 
-  if (!song) return undefined;
+  console.log('results', results);
 
-  return {
-    artist: song.artist,
-    id: song.id,
-    name: song.name,
-  };
+  const firstMatch = results?.[0];
+
+  if (!firstMatch || (firstMatch?.score && firstMatch.score > 0.5)) {
+    return null;
+  }
+
+  return firstMatch;
 }
 
 export async function getLyricsBySongId(songId: string): Promise<string | null> {
@@ -92,22 +147,23 @@ export async function getLyricsBySongId(songId: string): Promise<string | null> 
 export async function query(
   params: LyricSearchQuery,
 ): Promise<InternetProviderLyricResponse | null> {
-  const response = await getSongId(params);
-  if (!response) {
+  const lyricsMatch = await getMatchedLyrics(params);
+  if (!lyricsMatch) {
     console.error('Could not find the song on NetEase!');
     return null;
   }
 
-  const lyrics = await getLyricsBySongId(response.id);
+  const lyrics = await getLyricsBySongId(lyricsMatch.id);
   if (!lyrics) {
     console.error('Could not get lyrics on NetEase!');
     return null;
   }
 
   return {
-    artist: response.artist,
+    artist: lyricsMatch.artist,
+    id: lyricsMatch.id,
     lyrics,
-    name: response.name,
+    name: lyricsMatch.name,
     source: LyricSource.NETEASE,
   };
 }
