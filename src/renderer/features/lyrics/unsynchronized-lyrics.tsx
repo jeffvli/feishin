@@ -45,7 +45,7 @@ export const UnsynchronizedLyrics = ({
       {lines.map((text, idx) => (
         <LyricLine
           key={idx}
-          className="unsynchronized active"
+          className="lyric-line"
           id={`lyric-${idx}`}
           text={text}
         />

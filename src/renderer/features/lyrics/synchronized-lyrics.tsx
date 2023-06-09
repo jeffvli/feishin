@@ -287,6 +287,7 @@ export const SynchronizedLyrics = ({
       {lyrics.map(([, text], idx) => (
         <LyricLine
           key={idx}
+          className="lyric-line synchronized"
           id={`lyric-${idx}`}
           text={text}
         />
