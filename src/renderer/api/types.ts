@@ -6,7 +6,8 @@ import {
   JFAlbumArtistListSort,
   JFArtistListSort,
   JFPlaylistListSort,
-} from '/@/renderer/api/jellyfin.types';
+} from './jellyfin.types';
+import { jfType } from './jellyfin/jellyfin-types';
 import {
   NDSortOrder,
   NDOrder,
@@ -15,9 +16,8 @@ import {
   NDPlaylistListSort,
   NDSongListSort,
   NDUserListSort,
-} from '/@/renderer/api/navidrome.types';
-import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
-import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
+} from './navidrome.types';
+import { ndType } from './navidrome/navidrome-types';
 
 export enum LibraryItem {
   ALBUM = 'album',
@@ -1031,6 +1031,7 @@ export type LyricsResponse = SynchronizedLyricsArray | string;
 
 export type InternetProviderLyricResponse = {
   artist: string;
+  id: string;
   lyrics: string;
   name: string;
   source: LyricSource;
@@ -1040,6 +1041,7 @@ export type InternetProviderLyricSearchResponse = {
   artist: string;
   id: string;
   name: string;
+  score?: number;
   source: LyricSource;
 };
 
