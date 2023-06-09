@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
 import { LyricsOverride } from '/@/renderer/api/types';
 import { Button, NumberInput } from '/@/renderer/components';
@@ -29,23 +30,26 @@ export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActions
   };
 
   const isActionsDisabled = !currentSong;
+  const isDesktop = isElectron();
 
   return (
     <>
-      <Button
-        uppercase
-        disabled={isActionsDisabled}
-        variant="subtle"
-        onClick={() =>
-          openLyricSearchModal({
-            artist: currentSong?.artistName,
-            name: currentSong?.name,
-            onSearchOverride,
-          })
-        }
-      >
-        Search
-      </Button>
+      {isDesktop ? (
+        <Button
+          uppercase
+          disabled={isActionsDisabled}
+          variant="subtle"
+          onClick={() =>
+            openLyricSearchModal({
+              artist: currentSong?.artistName,
+              name: currentSong?.name,
+              onSearchOverride,
+            })
+          }
+        >
+          Search
+        </Button>
+      ) : null}
       <Button
         aria-label="Decrease lyric offset"
         variant="subtle"
@@ -67,14 +71,16 @@ export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActions
       >
         <RiAddFill />
       </Button>
-      <Button
-        uppercase
-        disabled={isActionsDisabled}
-        variant="subtle"
-        onClick={onRemoveLyric}
-      >
-        Clear
-      </Button>
+      {isDesktop ? (
+        <Button
+          uppercase
+          disabled={isActionsDisabled}
+          variant="subtle"
+          onClick={onRemoveLyric}
+        >
+          Clear
+        </Button>
+      ) : null}
     </>
   );
 };
