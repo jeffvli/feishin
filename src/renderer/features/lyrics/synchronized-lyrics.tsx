@@ -259,13 +259,13 @@ export const SynchronizedLyrics = ({
       {source && (
         <LyricLine
           className="lyric-credit"
-          text={`Lyrics provided by ${source}`}
+          text={`Provided by ${source}`}
         />
       )}
       {remote && (
         <LyricLine
           className="lyric-credit"
-          text={`(Matched as ${artist} by ${name})`}
+          text={`"${name} by ${artist}"`}
         />
       )}
       {lyrics.map(([, text], idx) => (
