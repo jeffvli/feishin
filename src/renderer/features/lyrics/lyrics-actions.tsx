@@ -28,10 +28,13 @@ export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActions
     });
   };
 
+  const isActionsDisabled = !currentSong;
+
   return (
     <>
       <Button
         uppercase
+        disabled={isActionsDisabled}
         variant="subtle"
         onClick={() =>
           openLyricSearchModal({
@@ -66,6 +69,7 @@ export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActions
       </Button>
       <Button
         uppercase
+        disabled={isActionsDisabled}
         variant="subtle"
         onClick={onRemoveLyric}
       >
