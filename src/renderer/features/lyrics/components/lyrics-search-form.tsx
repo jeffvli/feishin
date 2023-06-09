@@ -74,8 +74,7 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
   const [debouncedArtist] = useDebouncedValue(form.values.artist, 500);
   const [debouncedName] = useDebouncedValue(form.values.name, 500);
 
-  const { data, isLoading } = useLyricSearch({
-    options: { enabled: Boolean(form.values.artist && form.values.name) },
+  const { data, isInitialLoading } = useLyricSearch({
     query: { artist: debouncedArtist, name: debouncedName },
   });
 
@@ -91,7 +90,7 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
   }, [data]);
 
   return (
-    <Stack>
+    <Stack h={400}>
       <form>
         <Group grow>
           <TextInput
@@ -108,12 +107,11 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
         </Group>
       </form>
       <Divider />
-      {isLoading ? (
+      {isInitialLoading ? (
         <Spinner container />
       ) : (
         <ScrollArea
           offsetScrollbars
-          h={350}
           pr="1rem"
         >
           <Stack spacing="md">
