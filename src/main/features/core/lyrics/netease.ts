@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { LyricSource } from '../../../../renderer/types';
+import { LyricSource } from '../../../../renderer/api/types';
 import type {
   InternetProviderLyricResponse,
   InternetProviderLyricSearchResponse,
@@ -64,7 +64,7 @@ async function getSongId(params: LyricSearchQuery): Promise<NetEaseResponse | un
   };
 }
 
-async function getLyricsFromSongId(songId: string): Promise<string | undefined> {
+export async function getLyricsBySongId(songId: string): Promise<string | null> {
   let result: AxiosResponse<any, any>;
   try {
     result = await axios.get(LYRICS_URL, {
@@ -76,7 +76,7 @@ async function getLyricsFromSongId(songId: string): Promise<string | undefined> 
     });
   } catch (e) {
     console.error('NetEase lyrics request got an error!', e);
-    return undefined;
+    return null;
   }
 
   return result.data.klyric?.lyric || result.data.lrc?.lyric;
@@ -91,7 +91,7 @@ export async function query(
     return null;
   }
 
-  const lyrics = await getLyricsFromSongId(response.id);
+  const lyrics = await getLyricsBySongId(response.id);
   if (!lyrics) {
     console.error('Could not get lyrics on NetEase!');
     return null;

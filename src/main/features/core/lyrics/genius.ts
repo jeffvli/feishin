@@ -5,7 +5,7 @@ import type {
   InternetProviderLyricSearchResponse,
   LyricSearchQuery,
 } from '/@/renderer/api/types';
-import { LyricSource } from '../../../../renderer/types';
+import { LyricSource } from '../../../../renderer/api/types';
 
 const SEARCH_URL = 'https://genius.com/api/search/song';
 
@@ -117,7 +117,7 @@ async function getSongURL(params: LyricSearchQuery): Promise<GeniusResponse | un
   };
 }
 
-async function getLyricsFromGenius(url: string): Promise<string | null> {
+export async function getLyricsByURL(url: string): Promise<string | null> {
   let result: AxiosResponse<string, any>;
   try {
     result = await axios.get<string>(url, { responseType: 'text' });
@@ -147,7 +147,7 @@ export async function query(
     return null;
   }
 
-  const lyrics = await getLyricsFromGenius(response.url);
+  const lyrics = await getLyricsByURL(response.url);
   if (!lyrics) {
     console.error('Could not get lyrics on Genius!');
     return null;
