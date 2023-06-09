@@ -6,7 +6,7 @@ import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
 import { SynchronizedLyrics } from './synchronized-lyrics';
-import { ScrollArea, Spinner, TextTitle } from '/@/renderer/components';
+import { Spinner, TextTitle } from '/@/renderer/components';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
 import { getServerById, useCurrentSong, usePlayerStore } from '/@/renderer/store';
@@ -53,11 +53,12 @@ const LyricsContainer = styled.div`
   }
 `;
 
-const ScrollContainer = styled(motion(ScrollArea))`
+const ScrollContainer = styled(motion.div)`
   position: relative;
   z-index: 1;
+  width: 100%;
+  height: 100%;
   text-align: center;
-  transform: translateY(-2rem);
 
   mask-image: linear-gradient(
     180deg,
@@ -182,7 +183,6 @@ export const Lyrics = () => {
               <ScrollContainer
                 animate={{ opacity: 1 }}
                 initial={{ opacity: 0 }}
-                scrollHideDelay={0}
                 transition={{ duration: 0.5 }}
               >
                 {isSynchronizedLyrics ? (
