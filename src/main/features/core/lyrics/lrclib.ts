@@ -60,7 +60,7 @@ export async function getSearchResults(
   const songResults: InternetProviderLyricSearchResponse[] = result.data.map((song) => {
     return {
       artist: song.artistName,
-      id: song.id.toString(),
+      id: String(song.id),
       name: song.name,
       source: LyricSource.LRCLIB,
     };
@@ -111,7 +111,7 @@ export async function query(
 
   return {
     artist: result.data.artistName,
-    id: result.data.id.toString(),
+    id: String(result.data.id),
     lyrics,
     name: result.data.name,
     source: LyricSource.LRCLIB,
