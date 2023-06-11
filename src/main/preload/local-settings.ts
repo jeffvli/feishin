@@ -33,10 +33,10 @@ const passwordRemove = (server: string) => {
 
 const passwordSet = async (password: string, server: string): Promise<boolean> => {
   return ipcRenderer.invoke('password-set', password, server);
+};
 
 const setZoomFactor = (zoomFactor: number) => {
   webFrame.setZoomFactor(zoomFactor / 100);
-
 };
 
 export const localSettings = {
