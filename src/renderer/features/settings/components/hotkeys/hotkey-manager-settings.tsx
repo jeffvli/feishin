@@ -28,6 +28,8 @@ const BINDINGS_MAP: Record<BindingActions, string> = {
   volumeDown: 'Volume down',
   volumeMute: 'Volume mute',
   volumeUp: 'Volume up',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
 };
 
 const HotkeysContainer = styled.div`

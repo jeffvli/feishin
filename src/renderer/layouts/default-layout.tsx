@@ -5,6 +5,8 @@ import {
   useWindowSettings,
   useSettingsStore,
   useHotkeySettings,
+  useGeneralSettings,
+  useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { Platform, PlaybackType } from '/@/renderer/types';
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
@@ -52,7 +54,26 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const { windowBarStyle } = useWindowSettings();
   const { opened, ...handlers } = useCommandPalette();
   const { bindings } = useHotkeySettings();
+  const localSettings = isElectron() ? window.electron.localSettings : null;
+  const settings = useGeneralSettings();
+  const { setSettings } = useSettingsStoreActions();
 
+  const updateZoom = (increase: number) => {
+    const newVal = settings.zoomFactor + increase;
+    if (newVal > 300 || newVal < 50 || !isElectron()) return;
+    setSettings({
+      general: {
+        ...settings,
+        zoomFactor: newVal,
+      },
+    });
+    console.log(settings.zoomFactor);
+    localSettings?.setZoomFactor(settings.zoomFactor);
+  };
+  localSettings?.setZoomFactor(settings.zoomFactor);
+
+  useHotkeys([[bindings.zoomIn.hotkey, () => updateZoom(5)]]);
+  useHotkeys([[bindings.zoomOut.hotkey, () => updateZoom(-5)]]);
   useHotkeys([[bindings.globalSearch.hotkey, () => handlers.open()]]);
 
   return (
