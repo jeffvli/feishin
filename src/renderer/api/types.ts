@@ -1064,7 +1064,9 @@ export const instanceOfCancellationError = (error: any) => {
 };
 
 export type LyricSearchQuery = {
+  album?: string;
   artist?: string;
+  duration?: number;
   name?: string;
 };
 
@@ -1075,6 +1077,7 @@ export type LyricGetQuery = {
 
 export enum LyricSource {
   GENIUS = 'Genius',
+  LRCLIB = 'lrclib.net',
   NETEASE = 'NetEase',
 }
 
