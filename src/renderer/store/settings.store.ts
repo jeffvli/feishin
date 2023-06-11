@@ -95,6 +95,8 @@ export enum BindingActions {
   TOGGLE_REPEAT = 'toggleRepeat',
   VOLUME_DOWN = 'volumeDown',
   VOLUME_UP = 'volumeUp',
+  ZOOM_IN = 'zoomIn',
+  ZOOM_OUT = 'zoomOut',
 }
 
 export interface SettingsState {
@@ -116,6 +118,7 @@ export interface SettingsState {
     themeDark: AppTheme;
     themeLight: AppTheme;
     volumeWheelStep: number;
+    zoomFactor: number;
   };
   hotkeys: {
     bindings: Record<BindingActions, { allowGlobal: boolean; hotkey: string; isGlobal: boolean }>;
@@ -185,6 +188,7 @@ const initialState: SettingsState = {
     themeDark: AppTheme.DEFAULT_DARK,
     themeLight: AppTheme.DEFAULT_LIGHT,
     volumeWheelStep: 5,
+    zoomFactor: 100,
   },
   hotkeys: {
     bindings: {
@@ -205,6 +209,8 @@ const initialState: SettingsState = {
       volumeDown: { allowGlobal: true, hotkey: '', isGlobal: false },
       volumeMute: { allowGlobal: true, hotkey: '', isGlobal: false },
       volumeUp: { allowGlobal: true, hotkey: '', isGlobal: false },
+      zoomIn: { allowGlobal: true, hotkey: '', isGlobal: false },
+      zoomOut: { allowGlobal: true, hotkey: '', isGlobal: false },
     },
     globalMediaHotkeys: true,
   },

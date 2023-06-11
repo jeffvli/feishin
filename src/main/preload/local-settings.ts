@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, webFrame } from 'electron';
 import Store from 'electron-store';
 
 const store = new Store();
@@ -23,10 +23,15 @@ const disableMediaKeys = () => {
   ipcRenderer.send('global-media-keys-disable');
 };
 
+const setZoomFactor = (zoomFactor: number) => {
+  webFrame.setZoomFactor(zoomFactor / 100);
+};
+
 export const localSettings = {
   disableMediaKeys,
   enableMediaKeys,
   get,
   restart,
   set,
+  setZoomFactor,
 };

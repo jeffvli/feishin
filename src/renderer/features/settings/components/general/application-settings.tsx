@@ -1,9 +1,12 @@
-import { Select } from '/@/renderer/components';
+import isElectron from 'is-electron';
+import { NumberInput, Select } from '/@/renderer/components';
 import {
   SettingsSection,
   SettingOption,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const FONT_OPTIONS = [
   { label: 'Archivo', value: 'Archivo' },
@@ -52,6 +55,32 @@ export const ApplicationSettings = () => {
       description: 'Sets the application content font',
       isHidden: false,
       title: 'Font (Content)',
+    },
+    {
+      control: (
+        <NumberInput
+          disabled={!isElectron()}
+          max={300}
+          min={50}
+          value={settings.zoomFactor}
+          onBlur={(e) => {
+            if (!e) return;
+            const newVal = e.currentTarget.value
+              ? Math.min(Math.max(Number(e.currentTarget.value), 50), 300)
+              : settings.zoomFactor;
+            setSettings({
+              general: {
+                ...settings,
+                zoomFactor: newVal,
+              },
+            });
+            localSettings.setZoomFactor(newVal);
+          }}
+        />
+      ),
+      description: 'Sets the application zoom factor in percent',
+      isHidden: false,
+      title: 'Zoom factor',
     },
   ];
 
