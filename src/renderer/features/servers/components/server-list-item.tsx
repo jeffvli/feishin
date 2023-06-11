@@ -6,7 +6,7 @@ import isElectron from 'is-electron';
 import { RiDeleteBin2Line, RiEdit2Fill } from 'react-icons/ri';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { ServerSection } from '/@/renderer/features/servers/components/server-section';
-import { useAuthStoreActions, useGeneralSettings } from '/@/renderer/store';
+import { useAuthStoreActions } from '/@/renderer/store';
 import { ServerListItem as ServerItem } from '/@/renderer/types';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
@@ -16,7 +16,6 @@ interface ServerListItemProps {
 }
 
 export const ServerListItem = ({ server }: ServerListItemProps) => {
-  const settings = useGeneralSettings();
   const [edit, editHandlers] = useDisclosure(false);
   const [savedPassword, setSavedPassword] = useState('');
   const { deleteServer } = useAuthStoreActions();
@@ -27,7 +26,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
   };
 
   const handleEdit = useCallback(() => {
-    if (!edit && localSettings && settings.savePassword) {
+    if (!edit && localSettings && server.savePassword) {
       localSettings
         .passwordGet(server.id)
         .then((password: string | null) => {
@@ -48,7 +47,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
       setSavedPassword('');
       editHandlers.open();
     }
-  }, [edit, editHandlers, server.id, settings.savePassword]);
+  }, [edit, editHandlers, server.id, server.savePassword]);
 
   return (
     <Stack>

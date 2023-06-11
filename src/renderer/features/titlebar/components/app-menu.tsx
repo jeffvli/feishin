@@ -26,7 +26,6 @@ import {
   useAuthStoreActions,
   useSidebarStore,
   useAppStoreActions,
-  useGeneralSettings,
 } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import packageJson from '../../../../../package.json';
@@ -38,7 +37,6 @@ export const AppMenu = () => {
   const navigate = useNavigate();
   const currentServer = useCurrentServer();
   const serverList = useServerList();
-  const settings = useGeneralSettings();
   const { setCurrentServer } = useAuthStoreActions();
   const { collapsed } = useSidebarStore();
   const { setSideBar } = useAppStoreActions();
@@ -52,7 +50,7 @@ export const AppMenu = () => {
     let password: string | undefined;
 
     try {
-      if (localSettings && settings.savePassword) {
+      if (localSettings && server.savePassword) {
         password = await localSettings.passwordGet(server.id);
       }
     } catch (error) {

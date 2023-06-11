@@ -236,7 +236,7 @@ axiosClient.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       const currentServer = useAuthStore.getState().currentServer;
 
-      if (useSettingsStore.getState().general.savePassword && localSettings && currentServer) {
+      if (localSettings && currentServer?.savePassword) {
         // eslint-disable-next-line promise/no-promise-in-callback
         return localSettings
           .passwordGet(currentServer.id)

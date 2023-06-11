@@ -1,5 +1,5 @@
-import Store from 'electron-store';
 import { ipcMain, safeStorage } from 'electron';
+import Store from 'electron-store';
 
 export const store = new Store();
 
@@ -9,10 +9,6 @@ ipcMain.handle('settings-get', (_event, data: { property: string }) => {
 
 ipcMain.on('settings-set', (__event, data: { property: string; value: any }) => {
   store.set(`${data.property}`, data.value);
-});
-
-ipcMain.on('password-clear', () => {
-  store.delete('server');
 });
 
 ipcMain.handle('password-get', (_event, server: string): string | null => {

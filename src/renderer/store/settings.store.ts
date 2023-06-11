@@ -104,7 +104,6 @@ export interface SettingsState {
     fontContent: string;
     playButtonBehavior: Play;
     resume: boolean;
-    savePassword: boolean;
     showQueueDrawerButton: boolean;
     sideQueueType: SideQueueType;
     sidebarItems: SidebarItemType[];
@@ -174,7 +173,6 @@ const initialState: SettingsState = {
     fontContent: 'Poppins',
     playButtonBehavior: Play.NOW,
     resume: false,
-    savePassword: false,
     showQueueDrawerButton: false,
     sideQueueType: 'sideQueue',
     sidebarItems,

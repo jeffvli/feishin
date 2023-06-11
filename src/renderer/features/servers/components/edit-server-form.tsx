@@ -41,6 +41,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
       legacyAuth: false,
       name: server?.name,
       password: password || '',
+      savePassword: server.savePassword || false,
       type: server?.type,
       url: server?.url,
       username: server?.username,
@@ -48,6 +49,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
   });
 
   const isSubsonic = form.values.type === ServerType.SUBSONIC;
+  const isNavidrome = form.values.type === ServerType.NAVIDROME;
 
   const handleSubmit = form.onSubmit(async (values) => {
     const authFunction = api.controller.authenticate;
@@ -76,6 +78,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
         credential: data.credential,
         name: values.name,
         ndCredential: data.ndCredential,
+        savePassword: values.savePassword,
         type: values.type,
         url: values.url,
         userId: data.userId,
@@ -85,10 +88,14 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
       updateServer(server.id, serverItem);
       toast.success({ message: 'Server has been updated' });
 
-      if (localSettings && settings.savePassword) {
-        const saved = await localSettings.passwordSet(values.password, server.id);
-        if (!saved) {
-          toast.error({ message: 'Could not save password' });
+      if (localSettings) {
+        if (values.savePassword) {
+          const saved = await localSettings.passwordSet(values.password, server.id);
+          if (!saved) {
+            toast.error({ message: 'Could not save password' });
+          }
+        } else {
+          localSettings.passwordRemove(server.id);
         }
       }
     } catch (err: any) {
@@ -127,6 +134,14 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
           label="Password"
           {...form.getInputProps('password')}
         />
+        {localSettings && isNavidrome && (
+          <Checkbox
+            label="Save password"
+            {...form.getInputProps('savePassword', {
+              type: 'checkbox',
+            })}
+          />
+        )}
         {isSubsonic && (
           <Checkbox
             label="Enable legacy authentication"

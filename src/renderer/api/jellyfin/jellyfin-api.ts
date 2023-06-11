@@ -1,16 +1,12 @@
-import { useAuthStore, useSettingsStore } from '/@/renderer/store';
+import { useAuthStore } from '/@/renderer/store';
 import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { AxiosError, AxiosResponse, isAxiosError, Method } from 'axios';
 import qs from 'qs';
 import { ServerListItem } from '/@/renderer/types';
 import omitBy from 'lodash/omitBy';
-import packageJson from '../../../../package.json';
 import { z } from 'zod';
-import isElectron from 'is-electron';
 import { authenticationFailure } from '/@/renderer/api/utils';
-
-const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const c = initContract();
 
@@ -267,96 +263,14 @@ axiosClient.defaults.paramsSerializer = (params) => {
   return qs.stringify(params, { arrayFormat: 'repeat' });
 };
 
-let authSuccess = true;
-let shouldDelay = false;
-
-const RETRY_DELAY_MS = 1000;
-const MAX_RETRIES = 5;
-
-const waitForResult = async (count = 0): Promise<void> => {
-  return new Promise((resolve) => {
-    if (count === MAX_RETRIES || !shouldDelay) resolve();
-
-    setTimeout(() => {
-      waitForResult(count + 1)
-        .then(resolve)
-        .catch(resolve);
-    }, RETRY_DELAY_MS);
-  });
-};
-
 axiosClient.interceptors.response.use(
   (response) => {
-    authSuccess = true;
     return response;
   },
   (error) => {
     if (error.response && error.response.status === 401) {
       const currentServer = useAuthStore.getState().currentServer;
 
-      if (useSettingsStore.getState().general.savePassword && localSettings && currentServer) {
-        // eslint-disable-next-line promise/no-promise-in-callback
-        return localSettings
-          .passwordGet(currentServer.id)
-          .then(async (password: string | null) => {
-            authSuccess = false;
-
-            if (password === null) {
-              throw error;
-            }
-
-            if (shouldDelay) {
-              await waitForResult();
-
-              // Hopefully the delay was sufficient for authentication.
-              // Otherwise, it will require manual intervention
-              if (authSuccess) {
-                return axiosClient.request(error.config);
-              }
-
-              throw error;
-            }
-
-            shouldDelay = true;
-
-            // Do not use axiosClient. Instead, manually make a post
-            const response = await axios.post(
-              `${currentServer.url}/users/authenticatebyname`,
-              {
-                Pw: password,
-                Username: currentServer.username,
-              },
-              {
-                headers: {
-                  'x-emby-authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="Feishin", Version="${packageJson.version}"`,
-                },
-              },
-            );
-
-            if (response.status !== 200) {
-              throw new Error('Failed to authenticate');
-            }
-
-            const newCredential = response.data.AccessToken;
-
-            useAuthStore
-              .getState()
-              .actions.updateServer(currentServer.id, { credential: newCredential });
-
-            error.config.headers['X-MediaBrowser-Token'] = newCredential;
-
-            authSuccess = true;
-
-            return axiosClient.request(error.config);
-          })
-          .catch((newError: any) => {
-            console.error('Error when trying to reauthenticate: ', newError);
-            authenticationFailure(currentServer);
-          })
-          .finally(() => {
-            shouldDelay = false;
-          });
-      }
       authenticationFailure(currentServer);
     }
 
