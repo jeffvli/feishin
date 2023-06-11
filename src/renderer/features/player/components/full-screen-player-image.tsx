@@ -10,16 +10,21 @@ import { QueueSong } from '/@/renderer/api/types';
 import { Badge, Text, TextTitle } from '/@/renderer/components';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
-import { PlayerData, usePlayerData, usePlayerStore } from '/@/renderer/store';
+import {
+  PlayerData,
+  useFullScreenPlayerStore,
+  usePlayerData,
+  usePlayerStore,
+} from '/@/renderer/store';
 
-const Image = styled(motion.img)`
+const Image = styled(motion.img)<{ $useAspectRatio: boolean }>`
   position: absolute;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: ${({ $useAspectRatio }) => ($useAspectRatio ? 'contain' : 'cover')}};
   object-position: 50% 50%;
   border-radius: 5px;
-  box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 40%);
+  filter: drop-shadow(0 0 5px black) drop-shadow(0 0 5px rgba(0, 0, 0, 40%));
 `;
 
 const ImageContainer = styled(motion.div)`
@@ -83,7 +88,10 @@ const scaleImageUrl = (url?: string | null) => {
     .replace(/&height=\d+/, '&height=500');
 };
 
-const ImageWithPlaceholder = ({ ...props }: HTMLMotionProps<'img'>) => {
+const ImageWithPlaceholder = ({
+  useAspectRatio,
+  ...props
+}: HTMLMotionProps<'img'> & { useAspectRatio: boolean }) => {
   if (!props.src) {
     return (
       <Center
@@ -102,11 +110,17 @@ const ImageWithPlaceholder = ({ ...props }: HTMLMotionProps<'img'>) => {
     );
   }
 
-  return <Image {...props} />;
+  return (
+    <Image
+      $useAspectRatio={useAspectRatio}
+      {...props}
+    />
+  );
 };
 
 export const FullScreenPlayerImage = () => {
   const { queue } = usePlayerData();
+  const useImageAspectRatio = useFullScreenPlayerStore((state) => state.useImageAspectRatio);
   const currentSong = queue.current;
   const background = useFastAverageColor(queue.current?.imageUrl, true, 'dominant');
   const imageKey = `image-${background}`;
@@ -165,6 +179,7 @@ export const FullScreenPlayerImage = () => {
               initial="closed"
               placeholder="var(--placeholder-bg)"
               src={imageState.topImage || ''}
+              useAspectRatio={useImageAspectRatio}
               variants={imageVariants}
             />
           )}
@@ -180,6 +195,7 @@ export const FullScreenPlayerImage = () => {
               initial="closed"
               placeholder="var(--placeholder-bg)"
               src={imageState.bottomImage || ''}
+              useAspectRatio={useImageAspectRatio}
               variants={imageVariants}
             />
           )}

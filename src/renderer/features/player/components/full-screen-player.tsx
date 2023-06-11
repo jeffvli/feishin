@@ -59,7 +59,7 @@ const BackgroundImageOverlay = styled.div`
 `;
 
 const Controls = () => {
-  const { dynamicBackground, expanded } = useFullScreenPlayerStore();
+  const { dynamicBackground, expanded, useImageAspectRatio } = useFullScreenPlayerStore();
   const { setStore } = useFullScreenPlayerStoreActions();
 
   const handleToggleFullScreenPlayer = () => {
@@ -107,6 +107,19 @@ const Controls = () => {
                 onChange={(e) =>
                   setStore({
                     dynamicBackground: e.target.checked,
+                  })
+                }
+              />
+            </Option.Control>
+          </Option>
+          <Option>
+            <Option.Label>Use image aspect ratio</Option.Label>
+            <Option.Control>
+              <Switch
+                defaultChecked={useImageAspectRatio}
+                onChange={(e) =>
+                  setStore({
+                    useImageAspectRatio: e.target.checked,
                   })
                 }
               />
