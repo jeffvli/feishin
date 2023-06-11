@@ -18,7 +18,7 @@ interface LyricsActionsProps {
 export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActionsProps) => {
   const currentSong = useCurrentSong();
   const { setSettings } = useSettingsStoreActions();
-  const { delayMs } = useLyricsSettings();
+  const { delayMs, sources } = useLyricsSettings();
 
   const handleLyricOffset = (e: number) => {
     setSettings({
@@ -34,7 +34,7 @@ export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActions
 
   return (
     <>
-      {isDesktop ? (
+      {isDesktop && sources.length ? (
         <Button
           uppercase
           disabled={isActionsDisabled}
@@ -76,7 +76,7 @@ export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActions
       >
         <RiAddFill />
       </Button>
-      {isDesktop ? (
+      {isDesktop && sources.length ? (
         <Button
           uppercase
           disabled={isActionsDisabled}

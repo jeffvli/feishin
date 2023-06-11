@@ -121,7 +121,7 @@ export async function getSearchResults(
 
   if (!rawSongsResult) return null;
 
-  const songResults: InternetProviderLyricSearchResponse[] = rawSongsResult.map((song: any) => {
+  const songResults: InternetProviderLyricSearchResponse[] = rawSongsResult.map((song) => {
     return {
       artist: song.artist_names,
       id: song.url,

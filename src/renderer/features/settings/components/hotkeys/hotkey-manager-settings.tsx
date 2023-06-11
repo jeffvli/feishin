@@ -28,6 +28,8 @@ const BINDINGS_MAP: Record<BindingActions, string> = {
   volumeDown: 'Volume down',
   volumeMute: 'Volume mute',
   volumeUp: 'Volume up',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
 };
 
 const HotkeysContainer = styled.div`
@@ -65,6 +67,8 @@ export const HotkeyManagerSettings = () => {
           else if (e.key === '/') keys.push('numpaddivide');
           else if (e.key === '.') keys.push('numpaddecimal');
           else keys.push(`numpad${e.key}`.toLowerCase());
+        } else if (e.key === '+') {
+          keys.push('equal');
         } else {
           keys.push(e.key?.toLowerCase());
         }

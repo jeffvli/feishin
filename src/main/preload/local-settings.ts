@@ -1,4 +1,4 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, webFrame } from 'electron';
 import Store from 'electron-store';
 
 const store = new Store();
@@ -33,6 +33,10 @@ const passwordRemove = (server: string) => {
 
 const passwordSet = async (password: string, server: string): Promise<boolean> => {
   return ipcRenderer.invoke('password-set', password, server);
+
+const setZoomFactor = (zoomFactor: number) => {
+  webFrame.setZoomFactor(zoomFactor / 100);
+
 };
 
 export const localSettings = {
@@ -44,4 +48,5 @@ export const localSettings = {
   passwordSet,
   restart,
   set,
+  setZoomFactor,
 };

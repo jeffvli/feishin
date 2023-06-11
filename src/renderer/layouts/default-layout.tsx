@@ -5,11 +5,13 @@ import {
   useWindowSettings,
   useSettingsStore,
   useHotkeySettings,
+  useGeneralSettings,
+  useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { Platform, PlaybackType } from '/@/renderer/types';
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
-import { useHotkeys } from '@mantine/hooks';
+import { HotkeyItem, useHotkeys } from '@mantine/hooks';
 import { CommandPalette } from '/@/renderer/features/search/components/command-palette';
 import { useCommandPalette } from '/@/renderer/store';
 
@@ -52,8 +54,32 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
   const { windowBarStyle } = useWindowSettings();
   const { opened, ...handlers } = useCommandPalette();
   const { bindings } = useHotkeySettings();
+  const localSettings = isElectron() ? window.electron.localSettings : null;
+  const settings = useGeneralSettings();
+  const { setSettings } = useSettingsStoreActions();
 
-  useHotkeys([[bindings.globalSearch.hotkey, () => handlers.open()]]);
+  const updateZoom = (increase: number) => {
+    const newVal = settings.zoomFactor + increase;
+    if (newVal > 300 || newVal < 50 || !isElectron()) return;
+    setSettings({
+      general: {
+        ...settings,
+        zoomFactor: newVal,
+      },
+    });
+    localSettings?.setZoomFactor(settings.zoomFactor);
+  };
+  localSettings?.setZoomFactor(settings.zoomFactor);
+
+  const zoomHotkeys: HotkeyItem[] = [
+    [bindings.zoomIn.hotkey, () => updateZoom(5)],
+    [bindings.zoomOut.hotkey, () => updateZoom(-5)],
+  ];
+
+  useHotkeys([
+    [bindings.globalSearch.hotkey, () => handlers.open()],
+    ...(isElectron() ? zoomHotkeys : []),
+  ]);
 
   return (
     <>

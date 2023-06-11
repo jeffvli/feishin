@@ -14,6 +14,11 @@ import {
   getLyricsBySongId as getGenius,
 } from './genius';
 import {
+  query as queryLrclib,
+  getSearchResults as searchLrcLib,
+  getLyricsBySongId as getLrcLib,
+} from './lrclib';
+import {
   query as queryNetease,
   getSearchResults as searchNetease,
   getLyricsBySongId as getNetease,
@@ -29,16 +34,19 @@ type CachedLyrics = Record<LyricSource, InternetProviderLyricResponse>;
 
 const FETCHERS: Record<LyricSource, SongFetcher> = {
   [LyricSource.GENIUS]: queryGenius,
+  [LyricSource.LRCLIB]: queryLrclib,
   [LyricSource.NETEASE]: queryNetease,
 };
 
 const SEARCH_FETCHERS: Record<LyricSource, SearchFetcher> = {
   [LyricSource.GENIUS]: searchGenius,
+  [LyricSource.LRCLIB]: searchLrcLib,
   [LyricSource.NETEASE]: searchNetease,
 };
 
 const GET_FETCHERS: Record<LyricSource, GetFetcher> = {
   [LyricSource.GENIUS]: getGenius,
+  [LyricSource.LRCLIB]: getLrcLib,
   [LyricSource.NETEASE]: getNetease,
 };
 
@@ -61,7 +69,12 @@ const getRemoteLyrics = async (song: QueueSong) => {
   let lyricsFromSource = null;
 
   for (const source of sources) {
-    const params = { artist: song.artistName, name: song.name };
+    const params = {
+      album: song.album || song.name,
+      artist: song.artistName,
+      duration: song.duration,
+      name: song.name,
+    };
     const response = await FETCHERS[source](params);
 
     if (response) {
@@ -92,6 +105,7 @@ const searchRemoteLyrics = async (params: LyricSearchQuery) => {
 
   const results: Record<LyricSource, InternetProviderLyricSearchResponse[]> = {
     [LyricSource.GENIUS]: [],
+    [LyricSource.LRCLIB]: [],
     [LyricSource.NETEASE]: [],
   };
 
