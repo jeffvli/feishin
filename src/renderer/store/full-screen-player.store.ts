@@ -7,6 +7,7 @@ interface FullScreenPlayerState {
   activeTab: string | 'queue' | 'related' | 'lyrics';
   dynamicBackground?: boolean;
   expanded: boolean;
+  useImageAspectRatio: boolean;
 }
 
 export interface FullScreenPlayerSlice extends FullScreenPlayerState {
@@ -25,7 +26,9 @@ export const useFullScreenPlayerStore = create<FullScreenPlayerSlice>()(
           },
         },
         activeTab: 'queue',
+        dynamicBackground: true,
         expanded: false,
+        useImageAspectRatio: false,
       })),
       { name: 'store_full_screen_player' },
     ),
@@ -34,7 +37,7 @@ export const useFullScreenPlayerStore = create<FullScreenPlayerSlice>()(
         return merge(currentState, persistedState);
       },
       name: 'store_full_screen_player',
-      version: 1,
+      version: 2,
     },
   ),
 );
