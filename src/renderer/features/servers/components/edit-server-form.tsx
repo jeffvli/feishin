@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Checkbox, Stack, Group } from '@mantine/core';
-import { Button, PasswordInput, TextInput, toast, Tooltip } from '/@/renderer/components';
+import { Stack, Group } from '@mantine/core';
+import { Button, Checkbox, PasswordInput, TextInput, toast, Tooltip } from '/@/renderer/components';
 import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { RiInformationLine } from 'react-icons/ri';
 import { AuthenticationResponse } from '/@/renderer/api/types';
-import { useAuthStoreActions, useGeneralSettings } from '/@/renderer/store';
+import { useAuthStoreActions } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
 
@@ -31,7 +31,6 @@ const ModifiedFieldIndicator = () => {
 };
 
 export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditServerFormProps) => {
-  const settings = useGeneralSettings();
   const { updateServer } = useAuthStoreActions();
   const focusTrapRef = useFocusTrap();
   const [isLoading, setIsLoading] = useState(false);
