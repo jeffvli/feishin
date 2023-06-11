@@ -67,6 +67,8 @@ export const HotkeyManagerSettings = () => {
           else if (e.key === '/') keys.push('numpaddivide');
           else if (e.key === '.') keys.push('numpaddecimal');
           else keys.push(`numpad${e.key}`.toLowerCase());
+        } else if (e.key === '+') {
+          keys.push('equal');
         } else {
           keys.push(e.key?.toLowerCase());
         }

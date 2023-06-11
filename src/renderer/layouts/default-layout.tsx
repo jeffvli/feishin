@@ -11,7 +11,7 @@ import {
 import { Platform, PlaybackType } from '/@/renderer/types';
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
-import { useHotkeys } from '@mantine/hooks';
+import { HotkeyItem, useHotkeys } from '@mantine/hooks';
 import { CommandPalette } from '/@/renderer/features/search/components/command-palette';
 import { useCommandPalette } from '/@/renderer/store';
 
@@ -67,14 +67,19 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
         zoomFactor: newVal,
       },
     });
-    console.log(settings.zoomFactor);
     localSettings?.setZoomFactor(settings.zoomFactor);
   };
   localSettings?.setZoomFactor(settings.zoomFactor);
 
-  useHotkeys([[bindings.zoomIn.hotkey, () => updateZoom(5)]]);
-  useHotkeys([[bindings.zoomOut.hotkey, () => updateZoom(-5)]]);
-  useHotkeys([[bindings.globalSearch.hotkey, () => handlers.open()]]);
+  const zoomHotkeys: HotkeyItem[] = [
+    [bindings.zoomIn.hotkey, () => updateZoom(5)],
+    [bindings.zoomOut.hotkey, () => updateZoom(-5)],
+  ];
+
+  useHotkeys([
+    [bindings.globalSearch.hotkey, () => handlers.open()],
+    ...(isElectron() ? zoomHotkeys : []),
+  ]);
 
   return (
     <>

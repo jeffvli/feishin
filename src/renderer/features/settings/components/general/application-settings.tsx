@@ -63,16 +63,18 @@ export const ApplicationSettings = () => {
           max={300}
           min={50}
           value={settings.zoomFactor}
-          onChange={(e) => {
-            console.log(e);
+          onBlur={(e) => {
             if (!e) return;
+            const newVal = e.currentTarget.value
+              ? Math.min(Math.max(Number(e.currentTarget.value), 50), 300)
+              : settings.zoomFactor;
             setSettings({
               general: {
                 ...settings,
-                zoomFactor: e,
+                zoomFactor: newVal,
               },
             });
-            localSettings.setZoomFactor(e);
+            localSettings.setZoomFactor(newVal);
           }}
         />
       ),
