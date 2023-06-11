@@ -177,8 +177,3 @@ export type GridCardData = {
   playButtonBehavior: Play;
   route: CardRoute;
 };
-
-export enum LyricSource {
-  GENIUS = 'Genius',
-  NETEASE = 'NetEase',
-}

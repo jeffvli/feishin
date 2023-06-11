@@ -1,17 +1,23 @@
-import { IpcRendererEvent, ipcRenderer } from 'electron';
-import { QueueSong } from '/@/renderer/api/types';
+import { ipcRenderer } from 'electron';
+import { LyricSearchQuery, QueueSong } from '/@/renderer/api/types';
 
-const fetchRemoteLyrics = (song: QueueSong) => {
-  ipcRenderer.send('lyric-fetch', song);
+const getRemoteLyricsBySong = (song: QueueSong) => {
+  const result = ipcRenderer.invoke('lyric-by-song', song);
+  return result;
 };
 
-const remoteLyricsListener = (
-  cb: (event: IpcRendererEvent, songName: string, source: string, lyric: string) => void,
-) => {
-  ipcRenderer.on('lyric-get', cb);
+const searchRemoteLyrics = (params: LyricSearchQuery) => {
+  const result = ipcRenderer.invoke('lyric-search', params);
+  return result;
+};
+
+const getRemoteLyricsByRemoteId = (id: string) => {
+  const result = ipcRenderer.invoke('lyric-by-remote-id', id);
+  return result;
 };
 
 export const lyrics = {
-  fetchRemoteLyrics,
-  remoteLyricsListener,
+  getRemoteLyricsByRemoteId,
+  getRemoteLyricsBySong,
+  searchRemoteLyrics,
 };

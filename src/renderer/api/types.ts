@@ -6,7 +6,8 @@ import {
   JFAlbumArtistListSort,
   JFArtistListSort,
   JFPlaylistListSort,
-} from '/@/renderer/api/jellyfin.types';
+} from './jellyfin.types';
+import { jfType } from './jellyfin/jellyfin-types';
 import {
   NDSortOrder,
   NDOrder,
@@ -15,9 +16,8 @@ import {
   NDPlaylistListSort,
   NDSongListSort,
   NDUserListSort,
-} from '/@/renderer/api/navidrome.types';
-import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
-import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
+} from './navidrome.types';
+import { ndType } from './navidrome/navidrome-types';
 
 export enum LibraryItem {
   ALBUM = 'album',
@@ -1029,6 +1029,53 @@ export type SynchronizedLyricsArray = Array<[number, string]>;
 
 export type LyricsResponse = SynchronizedLyricsArray | string;
 
+export type InternetProviderLyricResponse = {
+  artist: string;
+  id: string;
+  lyrics: string;
+  name: string;
+  source: LyricSource;
+};
+
+export type InternetProviderLyricSearchResponse = {
+  artist: string;
+  id: string;
+  name: string;
+  score?: number;
+  source: LyricSource;
+};
+
+export type SynchronizedLyricMetadata = {
+  lyrics: SynchronizedLyricsArray;
+  remote: boolean;
+} & Omit<InternetProviderLyricResponse, 'lyrics'>;
+
+export type UnsynchronizedLyricMetadata = {
+  lyrics: string;
+  remote: boolean;
+} & Omit<InternetProviderLyricResponse, 'lyrics'>;
+
+export type FullLyricsMetadata = SynchronizedLyricMetadata | UnsynchronizedLyricMetadata;
+
+export type LyricOverride = Omit<InternetProviderLyricResponse, 'lyrics'>;
+
 export const instanceOfCancellationError = (error: any) => {
   return 'revert' in error;
 };
+
+export type LyricSearchQuery = {
+  artist?: string;
+  name?: string;
+};
+
+export type LyricGetQuery = {
+  remoteSongId: string;
+  remoteSource: LyricSource;
+};
+
+export enum LyricSource {
+  GENIUS = 'Genius',
+  NETEASE = 'NetEase',
+}
+
+export type LyricsOverride = Omit<FullLyricsMetadata, 'lyrics'> & { id: string };

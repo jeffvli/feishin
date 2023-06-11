@@ -121,7 +121,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
       >
         <TextInput
           ref={searchInputRef}
-          data-autoFocus
+          data-autofocus
           icon={<RiSearchLine />}
           rightSection={
             <ActionIcon

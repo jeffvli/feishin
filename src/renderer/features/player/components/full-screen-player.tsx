@@ -19,6 +19,9 @@ import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 import { Platform } from '/@/renderer/types';
 
 const Container = styled(motion.div)`
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 200;
   display: flex;
   justify-content: center;
@@ -56,7 +59,7 @@ const BackgroundImageOverlay = styled.div`
 `;
 
 const Controls = () => {
-  const { dynamicBackground, expanded } = useFullScreenPlayerStore();
+  const { dynamicBackground, expanded, useImageAspectRatio } = useFullScreenPlayerStore();
   const { setStore } = useFullScreenPlayerStoreActions();
 
   const handleToggleFullScreenPlayer = () => {
@@ -66,55 +69,66 @@ const Controls = () => {
   useHotkeys([['Escape', handleToggleFullScreenPlayer]]);
 
   return (
-    <>
-      <Group
-        p="1rem"
-        pos="absolute"
-        spacing="sm"
-        sx={{
-          left: 0,
-          top: 10,
-        }}
+    <Group
+      p="1rem"
+      pos="absolute"
+      spacing="sm"
+      sx={{
+        left: 0,
+        top: 10,
+      }}
+    >
+      <Button
+        compact
+        size="sm"
+        tooltip={{ label: 'Minimize' }}
+        variant="subtle"
+        onClick={handleToggleFullScreenPlayer}
       >
-        <Button
-          compact
-          size="sm"
-          tooltip={{ label: 'Minimize' }}
-          variant="subtle"
-          onClick={handleToggleFullScreenPlayer}
-        >
-          <RiArrowDownSLine size="2rem" />
-        </Button>
-        <Popover position="bottom-start">
-          <Popover.Target>
-            <Button
-              compact
-              size="sm"
-              tooltip={{ label: 'Configure' }}
-              variant="subtle"
-            >
-              <RiSettings3Line size="1.5rem" />
-            </Button>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <Option>
-              <Option.Label>Dynamic Background</Option.Label>
-              <Option.Control>
-                <Switch
-                  defaultChecked={dynamicBackground}
-                  onChange={(e) =>
-                    setStore({
-                      dynamicBackground: e.target.checked,
-                    })
-                  }
-                />
-              </Option.Control>
-            </Option>
-            <TableConfigDropdown type="fullScreen" />
-          </Popover.Dropdown>
-        </Popover>
-      </Group>
-    </>
+        <RiArrowDownSLine size="2rem" />
+      </Button>
+      <Popover position="bottom-start">
+        <Popover.Target>
+          <Button
+            compact
+            size="sm"
+            tooltip={{ label: 'Configure' }}
+            variant="subtle"
+          >
+            <RiSettings3Line size="1.5rem" />
+          </Button>
+        </Popover.Target>
+        <Popover.Dropdown>
+          <Option>
+            <Option.Label>Dynamic Background</Option.Label>
+            <Option.Control>
+              <Switch
+                defaultChecked={dynamicBackground}
+                onChange={(e) =>
+                  setStore({
+                    dynamicBackground: e.target.checked,
+                  })
+                }
+              />
+            </Option.Control>
+          </Option>
+          <Option>
+            <Option.Label>Use image aspect ratio</Option.Label>
+            <Option.Control>
+              <Switch
+                defaultChecked={useImageAspectRatio}
+                onChange={(e) =>
+                  setStore({
+                    useImageAspectRatio: e.target.checked,
+                  })
+                }
+              />
+            </Option.Control>
+          </Option>
+          <TableConfigDropdown type="fullScreen" />
+        </Popover.Dropdown>
+      </Popover>
+    </Group>
   );
 };
 
@@ -187,6 +201,7 @@ export const FullScreenPlayer = () => {
       custom={{ background, dynamicBackground, windowBarStyle }}
       exit="closed"
       initial="closed"
+      transition={{ duration: 2 }}
       variants={containerVariants}
     >
       <Controls />

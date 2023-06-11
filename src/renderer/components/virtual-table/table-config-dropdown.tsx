@@ -9,6 +9,7 @@ import {
 } from '/@/renderer/store/settings.store';
 import { TableColumn, TableType } from '/@/renderer/types';
 import { Option } from '/@/renderer/components/option';
+import { NumberInput } from '/@/renderer/components/input';
 
 export const SONG_TABLE_COLUMNS = [
   { label: 'Row Index', value: TableColumn.ROW_INDEX },
@@ -180,6 +181,15 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
     });
   };
 
+  const handleLyricOffset = (e: ChangeEvent<HTMLInputElement>) => {
+    setSettings({
+      lyrics: {
+        ...useSettingsStore.getState().lyrics,
+        delayMs: Number(e.currentTarget.value),
+      },
+    });
+  };
+
   return (
     <>
       <Option>
@@ -206,6 +216,16 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
           <Switch
             defaultChecked={lyricConfig.follow}
             onChange={handleLyricFollow}
+          />
+        </Option.Control>
+      </Option>
+      <Option>
+        <Option.Label>Lyric offset (ms)</Option.Label>
+        <Option.Control>
+          <NumberInput
+            defaultValue={lyricConfig.delayMs}
+            step={10}
+            onBlur={handleLyricOffset}
           />
         </Option.Control>
       </Option>

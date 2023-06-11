@@ -1,6 +1,6 @@
 import { IpcRendererEvent } from 'electron';
 import { PlayerData, PlayerState } from './store';
-import { QueueSong } from '/@/renderer/api/types';
+import { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
 
 declare global {
   interface Window {
@@ -10,8 +10,12 @@ declare global {
       ipcRenderer: {
         APP_RESTART(): void;
         LYRIC_FETCH(data: QueueSong): void;
-        LYRIC_GET(event: IpcRendererEvent, songName: string, source: string, lyric: string): void;
-        PASSWORD_CLEAR(): void;
+        LYRIC_GET(
+          event: IpcRendererEvent,
+          songName: string,
+          source: string,
+          lyric: InternetProviderLyricResponse,
+        ): void;
         PASSWORD_GET(server: string): Promise<string | null>;
         PASSWORD_REMOVE(server: string): void;
         PASSWORD_SET(password: string, server: string): Promise<boolean>;

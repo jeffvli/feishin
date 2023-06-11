@@ -6,13 +6,8 @@ export const FullScreenOverlay = () => {
   const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
 
   return (
-    <>
-      <AnimatePresence
-        initial={false}
-        mode="wait"
-      >
-        {isFullScreenPlayerExpanded && <FullScreenPlayer />}
-      </AnimatePresence>
-    </>
+    <AnimatePresence initial={false}>
+      {isFullScreenPlayerExpanded && <FullScreenPlayer />}
+    </AnimatePresence>
   );
 };

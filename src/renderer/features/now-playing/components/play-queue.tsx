@@ -80,6 +80,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
     if (playerType === PlaybackType.LOCAL) {
       mpvPlayer.setQueue(playerData);
+      mpvPlayer.play();
     }
 
     play();

@@ -1,138 +1,206 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Center, Group } from '@mantine/core';
-import isElectron from 'is-electron';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ErrorFallback } from '/@/renderer/features/action-required';
-import { getServerById, useCurrentSong } from '/@/renderer/store';
-import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
 import { RiInformationFill } from 'react-icons/ri';
-import { TextTitle } from '/@/renderer/components';
-import { LyricsResponse, SynchronizedLyricsArray } from '/@/renderer/api/types';
-import { useSongLyrics } from '/@/renderer/features/lyrics/queries/lyric-query';
+import styled from 'styled-components';
+import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
 import { SynchronizedLyrics } from './synchronized-lyrics';
+import { Spinner, TextTitle } from '/@/renderer/components';
+import { ErrorFallback } from '/@/renderer/features/action-required';
+import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
+import { getServerById, useCurrentSong, usePlayerStore } from '/@/renderer/store';
+import {
+  FullLyricsMetadata,
+  LyricsOverride,
+  SynchronizedLyricMetadata,
+  UnsynchronizedLyricMetadata,
+} from '/@/renderer/api/types';
+import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 
-const lyrics = isElectron() ? window.electron.lyrics : null;
+const ActionsContainer = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
 
-const ipc = isElectron() ? window.electron.ipc : null;
+  &:hover {
+    opacity: 1 !important;
+  }
 
-// use by https://github.com/ustbhuangyi/lyric-parser
-const timeExp = /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?]([^\n]+)\n/g;
+  &:focus-within {
+    opacity: 1 !important;
+  }
+`;
+
+const LyricsContainer = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+
+  &:hover {
+    ${ActionsContainer} {
+      opacity: 0.6;
+    }
+  }
+`;
+
+const ScrollContainer = styled(motion.div)`
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+
+  mask-image: linear-gradient(
+    180deg,
+    transparent 5%,
+    rgba(0, 0, 0, 100%) 20%,
+    rgba(0, 0, 0, 100%) 85%,
+    transparent 95%
+  );
+
+  &.mantine-ScrollArea-root {
+    width: 100%;
+    height: 100%;
+  }
+
+  & .mantine-ScrollArea-viewport {
+    height: 100% !important;
+  }
+
+  & .mantine-ScrollArea-viewport > div {
+    height: 100%;
+  }
+`;
+
+function isSynchronized(
+  data: Partial<FullLyricsMetadata> | undefined,
+): data is SynchronizedLyricMetadata {
+  // Type magic. The only difference between Synchronized and Unsynchhronized is
+  // the datatype of lyrics. This makes Typescript happier later...
+  if (!data) return false;
+  return Array.isArray(data.lyrics);
+}
 
 export const Lyrics = () => {
   const currentSong = useCurrentSong();
   const currentServer = getServerById(currentSong?.serverId);
 
-  const [override, setOverride] = useState<string | null>(null);
-  const [source, setSource] = useState<string | null>(null);
-  const [songLyrics, setSongLyrics] = useState<LyricsResponse | null>(null);
+  const [clear, setClear] = useState(false);
 
-  const remoteLyrics = useSongLyrics({
-    options: { enabled: !!currentSong },
-    query: { songId: currentSong?.id ?? '' },
+  const { data, isInitialLoading } = useSongLyricsBySong(
+    {
+      query: { songId: currentSong?.id || '' },
+      serverId: currentServer?.id,
+    },
+    currentSong,
+  );
+
+  const [override, setOverride] = useState<LyricsOverride | undefined>(undefined);
+
+  const handleOnSearchOverride = useCallback((params: LyricsOverride) => {
+    setOverride(params);
+    setClear(false);
+  }, []);
+
+  const { data: overrideLyrics, isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
+    options: {
+      enabled: !!override,
+    },
+    query: {
+      remoteSongId: override?.id,
+      remoteSource: override?.source,
+    },
     serverId: currentServer?.id,
   });
 
-  const songRef = useRef<string | null>(null);
-
   useEffect(() => {
-    lyrics?.remoteLyricsListener(
-      (_event: any, songName: string, lyricSource: string, lyric: string) => {
-        if (songName === songRef.current) {
-          setSource(lyricSource);
-          setOverride(lyric);
-        }
+    const unsubSongChange = usePlayerStore.subscribe(
+      (state) => state.current.song,
+      () => {
+        setOverride(undefined);
+        setClear(false);
       },
+      { equalityFn: (a, b) => a?.id === b?.id },
     );
 
     return () => {
-      ipc?.removeAllListeners('lyric-get');
+      unsubSongChange();
     };
   }, []);
 
-  useEffect(() => {
-    const hasTaggedLyrics = currentSong && currentSong.lyrics;
-    const hasLyricsResponse =
-      !remoteLyrics.isLoading && remoteLyrics?.isSuccess && remoteLyrics?.data !== null;
+  const isLoadingLyrics = isInitialLoading || isOverrideLoading;
 
-    if (!hasTaggedLyrics && !hasLyricsResponse) {
-      lyrics?.fetchRemoteLyrics(currentSong);
-    }
+  const hasNoLyrics = (!data?.lyrics && !overrideLyrics) || clear;
 
-    songRef.current = currentSong?.name ?? null;
-
-    setOverride(null);
-    setSource(null);
-  }, [currentSong, remoteLyrics.isLoading, remoteLyrics?.data, remoteLyrics?.isSuccess]);
-
-  useEffect(() => {
-    let lyrics: string | null = null;
-
-    if (currentSong?.lyrics) {
-      lyrics = currentSong.lyrics;
-
-      setSource(currentSong?.name ?? 'music server');
-    } else if (override) {
-      lyrics = override;
-    } else if (remoteLyrics.data) {
-      setSource(currentServer?.name ?? 'music server');
-      setSongLyrics(remoteLyrics.data);
-      return;
-    }
-
-    if (lyrics) {
-      const synchronizedLines = lyrics.matchAll(timeExp);
-
-      const synchronizedTimes: SynchronizedLyricsArray = [];
-
-      for (const line of synchronizedLines) {
-        const [, minute, sec, ms, text] = line;
-        const minutes = parseInt(minute, 10);
-        const seconds = parseInt(sec, 10);
-        const milis = ms?.length === 3 ? parseInt(ms, 10) : parseInt(ms, 10) * 10;
-
-        const timeInMilis = (minutes * 60 + seconds) * 1000 + milis;
-        synchronizedTimes.push([timeInMilis, text]);
+  const lyricsMetadata:
+    | Partial<SynchronizedLyricMetadata>
+    | Partial<UnsynchronizedLyricMetadata>
+    | undefined = overrideLyrics
+    ? {
+        artist: override?.artist,
+        lyrics: overrideLyrics,
+        name: override?.name,
+        remote: true,
+        source: override?.source,
       }
+    : data;
 
-      if (synchronizedTimes.length === 0) {
-        setSongLyrics(lyrics);
-      } else {
-        setSongLyrics(synchronizedTimes);
-      }
-    } else {
-      setSongLyrics(null);
-    }
-  }, [currentServer?.name, currentSong, override, remoteLyrics.data]);
+  const isSynchronizedLyrics = isSynchronized(lyricsMetadata);
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      {!songLyrics ? (
-        <Center p="2rem">
-          <Group>
-            <RiInformationFill size="2rem" />
-            <TextTitle
-              order={3}
-              weight={700}
-            >
-              No lyrics found
-            </TextTitle>
-          </Group>
-        </Center>
-      ) : (
-        <>
-          {Array.isArray(songLyrics) ? (
-            <SynchronizedLyrics
-              lyrics={songLyrics}
-              source={source}
-            />
-          ) : (
-            <UnsynchronizedLyrics
-              lyrics={songLyrics}
-              source={source}
-            />
-          )}
-        </>
-      )}
+      <LyricsContainer>
+        {isLoadingLyrics ? (
+          <Spinner
+            container
+            size={25}
+          />
+        ) : (
+          <AnimatePresence mode="sync">
+            {hasNoLyrics ? (
+              <Center w="100%">
+                <Group>
+                  <RiInformationFill size="2rem" />
+                  <TextTitle
+                    order={3}
+                    weight={700}
+                  >
+                    No lyrics found
+                  </TextTitle>
+                </Group>
+              </Center>
+            ) : (
+              <ScrollContainer
+                animate={{ opacity: 1 }}
+                initial={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                {isSynchronizedLyrics ? (
+                  <SynchronizedLyrics {...lyricsMetadata} />
+                ) : (
+                  <UnsynchronizedLyrics {...(lyricsMetadata as UnsynchronizedLyricMetadata)} />
+                )}
+              </ScrollContainer>
+            )}
+          </AnimatePresence>
+        )}
+        <ActionsContainer>
+          <LyricsActions
+            onRemoveLyric={() => setClear(true)}
+            onSearchOverride={handleOnSearchOverride}
+          />
+        </ActionsContainer>
+      </LyricsContainer>
     </ErrorBoundary>
   );
 };

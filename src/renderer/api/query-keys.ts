@@ -1,4 +1,5 @@
 import { QueryFunctionContext } from '@tanstack/react-query';
+import { LyricSource } from './types';
 import type {
   AlbumListQuery,
   SongListQuery,
@@ -15,6 +16,7 @@ import type {
   SongDetailQuery,
   RandomSongListQuery,
   LyricsQuery,
+  LyricSearchQuery,
 } from './types';
 
 export const queryKeys: Record<
@@ -106,6 +108,13 @@ export const queryKeys: Record<
     lyrics: (serverId: string, query?: LyricsQuery) => {
       if (query) return [serverId, 'song', 'lyrics', query] as const;
       return [serverId, 'song', 'lyrics'] as const;
+    },
+    lyricsByRemoteId: (searchQuery: { remoteSongId: string; remoteSource: LyricSource }) => {
+      return ['song', 'lyrics', 'remote', searchQuery] as const;
+    },
+    lyricsSearch: (query?: LyricSearchQuery) => {
+      if (query) return ['lyrics', 'search', query] as const;
+      return ['lyrics', 'search'] as const;
     },
     randomSongList: (serverId: string, query?: RandomSongListQuery) => {
       if (query) return [serverId, 'songs', 'randomSongList', query] as const;

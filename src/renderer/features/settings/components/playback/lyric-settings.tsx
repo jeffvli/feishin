@@ -6,7 +6,7 @@ import { useLyricsSettings, useSettingsStoreActions } from '/@/renderer/store';
 import { MultiSelect, MultiSelectProps, NumberInput, Switch } from '/@/renderer/components';
 import isElectron from 'is-electron';
 import styled from 'styled-components';
-import { LyricSource } from '/@/renderer/types';
+import { LyricSource } from '/@/renderer/api/types';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
