@@ -38,18 +38,28 @@ export const ArtistCell = ({ value, data }: ICellRendererParams) => {
                 ,
               </Text>
             )}{' '}
-            <Text
-              $link
-              $secondary
-              component={Link}
-              overflow="hidden"
-              size="md"
-              to={generatePath(AppRoute.LIBRARY_ARTISTS_DETAIL, {
-                artistId: item.id,
-              })}
-            >
-              {item.name || '—'}
-            </Text>
+            {item.id ? (
+              <Text
+                $link
+                $secondary
+                component={Link}
+                overflow="hidden"
+                size="md"
+                to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                  albumArtistId: item.id,
+                })}
+              >
+                {item.name || '—'}
+              </Text>
+            ) : (
+              <Text
+                $secondary
+                overflow="hidden"
+                size="md"
+              >
+                {item.name || '—'}
+              </Text>
+            )}
           </React.Fragment>
         ))}
       </Text>
