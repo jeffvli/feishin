@@ -118,8 +118,8 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
                 {index > 0 ? ', ' : null}
                 {artist.id ? (
                   <Text
+                    $link
                     $secondary
-                    $link={artist.id !== undefined}
                     component={Link}
                     overflow="hidden"
                     size="md"
