@@ -140,6 +140,15 @@ const getAlbumArtistDetail = async (
       ...res.body.data,
       ...(artistInfoRes.status === 200 && {
         similarArtists: artistInfoRes.body.artistInfo.similarArtist,
+        ...(!res.body.data.largeImageUrl && {
+          largeImageUrl: artistInfoRes.body.artistInfo.largeImageUrl,
+        }),
+        ...(!res.body.data.mediumImageUrl && {
+          largeImageUrl: artistInfoRes.body.artistInfo.mediumImageUrl,
+        }),
+        ...(!res.body.data.smallImageUrl && {
+          largeImageUrl: artistInfoRes.body.artistInfo.smallImageUrl,
+        }),
       }),
     },
     apiClientProps.server,
