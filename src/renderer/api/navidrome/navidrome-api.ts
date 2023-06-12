@@ -5,7 +5,7 @@ import omitBy from 'lodash/omitBy';
 import qs from 'qs';
 import { ndType } from './navidrome-types';
 import { authenticationFailure, resultWithHeaders } from '/@/renderer/api/utils';
-import { useAuthStore, useSettingsStore } from '/@/renderer/store';
+import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem } from '/@/renderer/types';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
