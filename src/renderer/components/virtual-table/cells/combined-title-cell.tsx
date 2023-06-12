@@ -116,19 +116,30 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
             artists.map((artist: Artist | AlbumArtist, index: number) => (
               <React.Fragment key={`queue-${rowIndex}-artist-${artist.id}`}>
                 {index > 0 ? ', ' : null}
-                <Text
-                  $link
-                  $secondary
-                  component={Link}
-                  overflow="hidden"
-                  size="md"
-                  sx={{ width: 'fit-content' }}
-                  to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
-                    albumArtistId: artist.id,
-                  })}
-                >
-                  {artist.name}
-                </Text>
+                {artist.id ? (
+                  <Text
+                    $secondary
+                    $link={artist.id !== undefined}
+                    component={Link}
+                    overflow="hidden"
+                    size="md"
+                    sx={{ width: 'fit-content' }}
+                    to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                      albumArtistId: artist.id,
+                    })}
+                  >
+                    {artist.name}
+                  </Text>
+                ) : (
+                  <Text
+                    $secondary
+                    overflow="hidden"
+                    size="md"
+                    sx={{ width: 'fit-content' }}
+                  >
+                    {artist.name}
+                  </Text>
+                )}
               </React.Fragment>
             ))
           ) : (
