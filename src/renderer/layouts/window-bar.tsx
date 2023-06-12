@@ -17,6 +17,7 @@ const WindowsContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100vw;
   color: var(--window-bar-fg);
   background-color: var(--window-bar-bg);
   -webkit-app-region: drag;
@@ -116,6 +117,7 @@ const MacOsContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100vw;
   -webkit-app-region: drag;
   color: var(--window-bar-fg);
   background-color: var(--window-bar-bg);
