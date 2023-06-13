@@ -23,6 +23,18 @@ const disableMediaKeys = () => {
   ipcRenderer.send('global-media-keys-disable');
 };
 
+const passwordGet = async (server: string): Promise<string | null> => {
+  return ipcRenderer.invoke('password-get', server);
+};
+
+const passwordRemove = (server: string) => {
+  ipcRenderer.send('password-remove', server);
+};
+
+const passwordSet = async (password: string, server: string): Promise<boolean> => {
+  return ipcRenderer.invoke('password-set', password, server);
+};
+
 const setZoomFactor = (zoomFactor: number) => {
   webFrame.setZoomFactor(zoomFactor / 100);
 };
@@ -31,6 +43,9 @@ export const localSettings = {
   disableMediaKeys,
   enableMediaKeys,
   get,
+  passwordGet,
+  passwordRemove,
+  passwordSet,
   restart,
   set,
   setZoomFactor,

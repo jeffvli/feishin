@@ -3,10 +3,10 @@ import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { AxiosError, AxiosResponse, isAxiosError, Method } from 'axios';
 import qs from 'qs';
-import { toast } from '/@/renderer/components';
 import { ServerListItem } from '/@/renderer/types';
 import omitBy from 'lodash/omitBy';
 import { z } from 'zod';
+import { authenticationFailure } from '/@/renderer/api/utils';
 
 const c = initContract();
 
@@ -269,19 +269,9 @@ axiosClient.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      toast.error({
-        message: 'Your session has expired.',
-      });
-
       const currentServer = useAuthStore.getState().currentServer;
 
-      if (currentServer) {
-        const serverId = currentServer.id;
-        const token = currentServer.credential;
-        console.log(`token is expired: ${token}`);
-        useAuthStore.getState().actions.setCurrentServer(null);
-        useAuthStore.getState().actions.updateServer(serverId, { credential: undefined });
-      }
+      authenticationFailure(currentServer);
     }
 
     return Promise.reject(error);

@@ -1,18 +1,22 @@
 import { useState } from 'react';
-import { Checkbox, Stack, Group } from '@mantine/core';
-import { Button, PasswordInput, TextInput, toast, Tooltip } from '/@/renderer/components';
+import { Stack, Group } from '@mantine/core';
+import { Button, Checkbox, PasswordInput, TextInput, toast, Tooltip } from '/@/renderer/components';
 import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
+import isElectron from 'is-electron';
 import { RiInformationLine } from 'react-icons/ri';
 import { AuthenticationResponse } from '/@/renderer/api/types';
 import { useAuthStoreActions } from '/@/renderer/store';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
 
+const localSettings = isElectron() ? window.electron.localSettings : null;
+
 interface EditServerFormProps {
   isUpdate?: boolean;
   onCancel: () => void;
+  password?: string;
   server: ServerListItem;
 }
 
@@ -26,7 +30,7 @@ const ModifiedFieldIndicator = () => {
   );
 };
 
-export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormProps) => {
+export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditServerFormProps) => {
   const { updateServer } = useAuthStoreActions();
   const focusTrapRef = useFocusTrap();
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +39,8 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
     initialValues: {
       legacyAuth: false,
       name: server?.name,
-      password: '',
+      password: password || '',
+      savePassword: server.savePassword || false,
       type: server?.type,
       url: server?.url,
       username: server?.username,
@@ -43,6 +48,7 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
   });
 
   const isSubsonic = form.values.type === ServerType.SUBSONIC;
+  const isNavidrome = form.values.type === ServerType.NAVIDROME;
 
   const handleSubmit = form.onSubmit(async (values) => {
     const authFunction = api.controller.authenticate;
@@ -71,6 +77,7 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
         credential: data.credential,
         name: values.name,
         ndCredential: data.ndCredential,
+        savePassword: values.savePassword,
         type: values.type,
         url: values.url,
         userId: data.userId,
@@ -79,6 +86,17 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
 
       updateServer(server.id, serverItem);
       toast.success({ message: 'Server has been updated' });
+
+      if (localSettings) {
+        if (values.savePassword) {
+          const saved = await localSettings.passwordSet(values.password, server.id);
+          if (!saved) {
+            toast.error({ message: 'Could not save password' });
+          }
+        } else {
+          localSettings.passwordRemove(server.id);
+        }
+      }
     } catch (err: any) {
       setIsLoading(false);
       return toast.error({ message: err?.message });
@@ -115,6 +133,14 @@ export const EditServerForm = ({ isUpdate, server, onCancel }: EditServerFormPro
           label="Password"
           {...form.getInputProps('password')}
         />
+        {localSettings && isNavidrome && (
+          <Checkbox
+            label="Save password"
+            {...form.getInputProps('savePassword', {
+              type: 'checkbox',
+            })}
+          />
+        )}
         {isSubsonic && (
           <Checkbox
             label="Enable legacy authentication"

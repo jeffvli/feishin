@@ -166,6 +166,10 @@ export const App = () => {
       <ModalsProvider
         modalProps={{
           centered: true,
+          styles: {
+            body: { position: 'relative' },
+            content: { overflow: 'auto' },
+          },
           transitionProps: {
             duration: 300,
             exitDuration: 300,

@@ -4,11 +4,14 @@ import { Button, PasswordInput, SegmentedControl, TextInput, toast } from '/@/re
 import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
+import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
 import { AuthenticationResponse } from '/@/renderer/api/types';
 import { useAuthStore, useAuthStoreActions } from '/@/renderer/store';
 import { ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
+
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const SERVER_TYPES = [
   { label: 'Jellyfin', value: ServerType.JELLYFIN },
@@ -31,6 +34,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
       legacyAuth: false,
       name: '',
       password: '',
+      savePassword: false,
       type: ServerType.JELLYFIN,
       url: 'http://',
       username: '',
@@ -83,6 +87,13 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
       } else {
         toast.success({ message: 'Server has been added' });
       }
+
+      if (localSettings && values.savePassword) {
+        const saved = await localSettings.passwordSet(values.password, serverItem.id);
+        if (!saved) {
+          toast.error({ message: 'Could not save password' });
+        }
+      }
     } catch (err: any) {
       setIsLoading(false);
       return toast.error({ message: err?.message });
@@ -120,6 +131,14 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
           label="Password"
           {...form.getInputProps('password')}
         />
+        {localSettings && form.values.type === ServerType.NAVIDROME && (
+          <Checkbox
+            label="Save password"
+            {...form.getInputProps('savePassword', {
+              type: 'checkbox',
+            })}
+          />
+        )}
         {form.values.type === ServerType.SUBSONIC && (
           <Checkbox
             label="Enable legacy authentication"

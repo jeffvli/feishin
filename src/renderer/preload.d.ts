@@ -16,6 +16,9 @@ declare global {
           source: string,
           lyric: InternetProviderLyricResponse,
         ): void;
+        PASSWORD_GET(server: string): Promise<string | null>;
+        PASSWORD_REMOVE(server: string): void;
+        PASSWORD_SET(password: string, server: string): Promise<boolean>;
         PLAYER_AUTO_NEXT(data: PlayerData): void;
         PLAYER_CURRENT_TIME(): void;
         PLAYER_GET_TIME(): number | undefined;
