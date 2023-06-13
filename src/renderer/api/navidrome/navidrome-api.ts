@@ -1,12 +1,14 @@
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { Method, AxiosError, AxiosResponse, isAxiosError } from 'axios';
 import isElectron from 'is-electron';
+import { debounce } from 'lodash';
 import omitBy from 'lodash/omitBy';
 import qs from 'qs';
 import { ndType } from './navidrome-types';
 import { authenticationFailure, resultWithHeaders } from '/@/renderer/api/utils';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem } from '/@/renderer/types';
+import { toast } from '/@/renderer/components';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -214,6 +216,9 @@ const waitForResult = async (count = 0): Promise<void> => {
   });
 };
 
+const limitedFail = debounce(authenticationFailure, RETRY_DELAY_MS);
+const TIMEOUT_ERROR = Error();
+
 axiosClient.interceptors.response.use(
   (response) => {
     const serverId = useAuthStore.getState().currentServer?.id;
@@ -267,6 +272,21 @@ axiosClient.interceptors.response.use(
               username: currentServer.username,
             });
 
+            if (res.status === 429) {
+              toast.error({
+                message:
+                  'you have exceeded the number of allowed login requests. Please wait before logging, or consider tweaking AuthRequestLimit',
+                title: 'Your session has expired.',
+              });
+
+              const serverId = currentServer.id;
+              useAuthStore.getState().actions.updateServer(serverId, { ndCredential: undefined });
+              useAuthStore.getState().actions.setCurrentServer(null);
+
+              // special error to prevent sending a second message, and stop other messages that could be enqueued
+              limitedFail.cancel();
+              throw TIMEOUT_ERROR;
+            }
             if (res.status !== 200) {
               throw new Error('Failed to authenticate');
             }
@@ -286,15 +306,20 @@ axiosClient.interceptors.response.use(
             return axiosClient.request(error.config);
           })
           .catch((newError: any) => {
-            console.error('Error when trying to reauthenticate: ', newError);
-            authenticationFailure(currentServer);
+            if (newError !== TIMEOUT_ERROR) {
+              console.error('Error when trying to reauthenticate: ', newError);
+              limitedFail(currentServer);
+            }
+
+            // make sure to pass the error so axios will error later on
+            throw newError;
           })
           .finally(() => {
             shouldDelay = false;
           });
       }
 
-      authenticationFailure(currentServer);
+      limitedFail(currentServer);
     }
 
     return Promise.reject(error);
