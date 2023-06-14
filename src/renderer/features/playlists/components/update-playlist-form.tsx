@@ -138,8 +138,6 @@ export const openUpdatePlaylistModal = async (args: {
     queryKey: queryKeys.users.list(server?.id || '', query),
   });
 
-  console.log('playlist', playlist);
-
   openModal({
     children: (
       <UpdatePlaylistForm

@@ -76,7 +76,6 @@ export const NavidromeAlbumFilters = ({
     {
       label: 'Is favorited',
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
-        console.log('e.currentTarget.checked :>> ', e.currentTarget.checked);
         const updatedFilters = setFilter({
           data: {
             _custom: {

@@ -136,7 +136,6 @@ export const ShuffleAllModal = ({
       />
       <Group grow>
         <NumberInput
-          disabled={!enableMinYear}
           label="From year"
           max={2050}
           min={1850}
@@ -152,7 +151,6 @@ export const ShuffleAllModal = ({
         />
 
         <NumberInput
-          disabled={!enableMaxYear}
           label="To year"
           max={2050}
           min={1850}
@@ -180,7 +178,6 @@ export const ShuffleAllModal = ({
         label="Music folder"
         value={musicFolderId}
         onChange={(e) => {
-          console.log('e :>> ', e);
           setStore({ musicFolderId: e ? String(e) : '' });
         }}
       />

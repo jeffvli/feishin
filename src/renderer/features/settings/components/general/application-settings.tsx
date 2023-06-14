@@ -59,7 +59,6 @@ export const ApplicationSettings = () => {
     {
       control: (
         <NumberInput
-          disabled={!isElectron()}
           max={300}
           min={50}
           value={settings.zoomFactor}
@@ -79,7 +78,7 @@ export const ApplicationSettings = () => {
         />
       ),
       description: 'Sets the application zoom factor in percent',
-      isHidden: false,
+      isHidden: !isElectron(),
       title: 'Zoom factor',
     },
   ];

@@ -53,8 +53,6 @@ const ActionRequiredRoute = () => {
     },
   ];
 
-  console.log(checks);
-
   const canReturnHome = checks.every((c) => c.valid);
   const displayedCheck = checks.find((c) => !c.valid);
 

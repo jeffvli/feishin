@@ -358,8 +358,6 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
     throw new Error('Failed to get random songs');
   }
 
-  console.log('res', res);
-
   return {
     items: res.body.randomSongs?.song?.map((song) =>
       ssNormalize.song(song, apiClientProps.server, ''),
