@@ -171,10 +171,10 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                 >
                   <TitleWrapper>
                     <TextTitle
-                      lh="5rem"
+                      lh="3.5rem"
                       order={1}
                       overflow="hidden"
-                      sx={{ fontSize: '4rem' }}
+                      sx={{ fontSize: '3.5rem' }}
                       weight={900}
                     >
                       {currentItem?.name}
@@ -203,6 +203,46 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                     <Badge size="lg">{currentItem?.releaseYear}</Badge>
                     <Badge size="lg">{currentItem?.songCount} tracks</Badge>
                   </Group>
+                  <Group position="apart">
+                    <Button
+                      size="lg"
+                      style={{ borderRadius: '5rem' }}
+                      variant="outline"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!currentItem) return;
+
+                        handlePlayQueueAdd?.({
+                          byItemType: {
+                            id: [currentItem.id],
+                            type: LibraryItem.ALBUM,
+                          },
+                          playType: Play.NOW,
+                        });
+                      }}
+                    >
+                      Play
+                    </Button>
+                    <Group spacing="sm">
+                      <Button
+                        radius="lg"
+                        size="sm"
+                        variant="outline"
+                        onClick={handlePrevious}
+                      >
+                        <RiArrowLeftSLine size="2rem" />
+                      </Button>
+                      <Button
+                        radius="lg"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleNext}
+                      >
+                        <RiArrowRightSLine size="2rem" />
+                      </Button>
+                    </Group>
+                  </Group>
                 </Stack>
               </InfoColumn>
             </Grid>
@@ -214,47 +254,6 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
           </Carousel>
         )}
       </AnimatePresence>
-      <Group
-        spacing="sm"
-        sx={{ bottom: '1rem', position: 'absolute', right: '1rem', zIndex: 20 }}
-      >
-        <Button
-          radius="lg"
-          size="md"
-          variant="outline"
-          onClick={handlePrevious}
-        >
-          <RiArrowLeftSLine size="2rem" />
-        </Button>
-        <Button
-          radius="lg"
-          size="md"
-          variant="outline"
-          onClick={handleNext}
-        >
-          <RiArrowRightSLine size="2rem" />
-        </Button>
-        <Button
-          radius="lg"
-          size="md"
-          variant="outline"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!currentItem) return;
-
-            handlePlayQueueAdd?.({
-              byItemType: {
-                id: [currentItem.id],
-                type: LibraryItem.ALBUM,
-              },
-              playType: Play.NOW,
-            });
-          }}
-        >
-          Play
-        </Button>
-      </Group>
     </Wrapper>
   );
 };
