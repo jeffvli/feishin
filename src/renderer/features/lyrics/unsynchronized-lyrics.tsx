@@ -8,6 +8,9 @@ interface UnsynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
 }
 
 const UnsynchronizedLyricsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   width: 100%;
   height: 100%;
   padding: 10vh 0 6vh;

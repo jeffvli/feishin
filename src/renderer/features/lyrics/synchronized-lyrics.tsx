@@ -16,6 +16,9 @@ import styled from 'styled-components';
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
 const SynchronizedLyricsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   width: 100%;
   height: 100%;
   padding: 10vh 0 6vh;

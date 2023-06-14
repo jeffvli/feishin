@@ -10,7 +10,6 @@ const StyledText = styled(TextTitle)`
   color: var(--main-fg);
   font-weight: 400;
   font-size: 2.5vmax;
-  line-height: 1.5;
   transform: scale(0.95);
   opacity: 0.5;
 
