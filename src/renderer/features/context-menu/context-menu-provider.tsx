@@ -44,7 +44,12 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useDeletePlaylist } from '/@/renderer/features/playlists';
 import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
-import { useAuthStore, useCurrentServer, useQueueControls } from '/@/renderer/store';
+import {
+  useAuthStore,
+  useCurrentServer,
+  usePlayerStore,
+  useQueueControls,
+} from '/@/renderer/store';
 import { usePlayerType } from '/@/renderer/store/settings.store';
 import { Play, PlaybackType } from '/@/renderer/types';
 
@@ -558,10 +563,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
     if (!uniqueIds?.length) return;
 
+    const currentSong = usePlayerStore.getState().current.song;
     const playerData = removeFromQueue(uniqueIds);
+    const isCurrentSongRemoved = currentSong && uniqueIds.includes(currentSong?.uniqueId);
 
     if (playerType === PlaybackType.LOCAL) {
-      mpvPlayer.setQueueNext(playerData);
+      if (isCurrentSongRemoved) {
+        mpvPlayer.setQueue(playerData);
+      } else {
+        mpvPlayer.setQueueNext(playerData);
+      }
     }
   }, [ctx.dataNodes, playerType, removeFromQueue]);
 

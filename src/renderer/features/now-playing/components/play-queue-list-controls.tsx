@@ -15,7 +15,7 @@ import { Song } from '/@/renderer/api/types';
 import { usePlayerControls, useQueueControls } from '/@/renderer/store';
 import { PlaybackType, TableType } from '/@/renderer/types';
 import { usePlayerType } from '/@/renderer/store/settings.store';
-import { useSetCurrentTime } from '../../../store/player.store';
+import { usePlayerStore, useSetCurrentTime } from '../../../store/player.store';
 import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
@@ -63,10 +63,16 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
     const uniqueIds = selectedRows?.map((row) => row.uniqueId);
     if (!uniqueIds?.length) return;
 
+    const currentSong = usePlayerStore.getState().current.song;
     const playerData = removeFromQueue(uniqueIds);
+    const isCurrentSongRemoved = currentSong && uniqueIds.includes(currentSong.uniqueId);
 
     if (playerType === PlaybackType.LOCAL) {
-      mpvPlayer.setQueueNext(playerData);
+      if (isCurrentSongRemoved) {
+        mpvPlayer.setQueue(playerData);
+      } else {
+        mpvPlayer.setQueueNext(playerData);
+      }
     }
   };
 

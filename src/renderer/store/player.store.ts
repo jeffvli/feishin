@@ -60,7 +60,7 @@ export interface PlayerSlice extends PlayerState {
     addToQueue: (args: { initialIndex: number; playType: Play; songs: QueueSong[] }) => PlayerData;
     autoNext: () => PlayerData;
     checkIsFirstTrack: () => boolean;
-    checkIsLastTrack: () => boolean;
+    checkIsLastTrack: (type?: 'next' | 'prev') => boolean;
     clearQueue: () => PlayerData;
     getPlayerData: () => PlayerData;
     getQueueData: () => QueueData;
@@ -101,7 +101,7 @@ export const usePlayerStore = create<PlayerSlice>()(
               const { initialIndex, playType, songs } = args;
               const { shuffledIndex } = get().current;
               const shuffledQueue = get().queue.shuffled;
-              const queueSongs = map(songs, (song) => ({
+              const songsToAddToQueue = map(songs, (song) => ({
                 ...song,
                 uniqueId: nanoid(),
               }));
@@ -109,8 +109,8 @@ export const usePlayerStore = create<PlayerSlice>()(
               if (playType === Play.NOW) {
                 if (get().shuffle === PlayerShuffle.TRACK) {
                   const index = initialIndex || 0;
-                  const initialSong = queueSongs[index];
-                  const queueCopy = [...queueSongs];
+                  const initialSong = songsToAddToQueue[index];
+                  const queueCopy = [...songsToAddToQueue];
 
                   // Splice the initial song from the queue
                   queueCopy.splice(index, 1);
@@ -127,7 +127,7 @@ export const usePlayerStore = create<PlayerSlice>()(
 
                   set((state) => {
                     state.queue.shuffled = shuffledSongIndices;
-                    state.queue.default = queueSongs;
+                    state.queue.default = songsToAddToQueue;
                     state.current.time = 0;
                     state.current.player = 1;
                     state.current.index = 0;
@@ -137,12 +137,12 @@ export const usePlayerStore = create<PlayerSlice>()(
                 } else {
                   const index = initialIndex || 0;
                   set((state) => {
-                    state.queue.default = queueSongs;
+                    state.queue.default = songsToAddToQueue;
                     state.current.time = 0;
                     state.current.player = 1;
                     state.current.index = index;
                     state.current.shuffledIndex = 0;
-                    state.current.song = queueSongs[index];
+                    state.current.song = songsToAddToQueue[index];
                   });
                 }
               } else if (playType === Play.LAST) {
@@ -152,40 +152,49 @@ export const usePlayerStore = create<PlayerSlice>()(
                     ? [
                         ...shuffledQueue.slice(0, shuffledIndex + 1),
                         ...shuffle([
-                          ...queueSongs.map((song) => song.uniqueId),
+                          ...songsToAddToQueue.map((song) => song.uniqueId),
                           ...shuffledQueue.slice(shuffledIndex + 1),
                         ]),
                       ]
                     : [];
 
                 set((state) => {
-                  state.queue.default = [...get().queue.default, ...queueSongs];
+                  state.queue.default = [...get().queue.default, ...songsToAddToQueue];
                   state.queue.shuffled = shuffledQueueWithNewSongs;
                 });
               } else if (playType === Play.NEXT) {
                 const queue = get().queue.default;
                 const currentIndex = get().current.index;
 
-                // Shuffle the queue after the current track
-                const shuffledQueueWithNewSongs =
-                  get().shuffle === PlayerShuffle.TRACK
-                    ? [
-                        ...shuffledQueue.slice(0, shuffledIndex + 1),
-                        ...shuffle([
-                          ...queueSongs.map((song) => song.uniqueId),
-                          ...shuffledQueue.slice(shuffledIndex + 1),
-                        ]),
-                      ]
-                    : [];
+                if (get().shuffle === PlayerShuffle.TRACK) {
+                  const shuffledIndex = get().current.shuffledIndex;
+                  const shuffledQueue = get().queue.shuffled;
 
-                set((state) => {
-                  state.queue.default = [
-                    ...queue.slice(0, currentIndex + 1),
-                    ...queueSongs,
-                    ...queue.slice(currentIndex + 1),
+                  // Shuffle the queue after the current track
+                  const shuffledQueueWithNewSongs = [
+                    ...shuffledQueue.slice(0, shuffledIndex + 1),
+                    ...shuffle(songsToAddToQueue.map((song) => song.uniqueId)),
+                    ...shuffledQueue.slice(shuffledIndex + 1),
                   ];
-                  state.queue.shuffled = shuffledQueueWithNewSongs;
-                });
+
+                  set((state) => {
+                    state.queue.default = [
+                      ...queue.slice(0, currentIndex + 1),
+                      ...songsToAddToQueue,
+                      ...queue.slice(currentIndex + 1),
+                    ];
+                    state.queue.shuffled = shuffledQueueWithNewSongs;
+                  });
+                } else {
+                  set((state) => {
+                    state.queue.default = [
+                      ...queue.slice(0, currentIndex + 1),
+                      ...songsToAddToQueue,
+                      ...queue.slice(currentIndex + 1),
+                    ];
+                    state.queue.shuffled = [];
+                  });
+                }
               }
 
               return get().actions.getPlayerData();
@@ -223,6 +232,10 @@ export const usePlayerStore = create<PlayerSlice>()(
                   state.current.player = state.current.player === 1 ? 2 : 1;
                   state.current.song = nextSong!;
                   state.queue.previousNode = get().current.song;
+
+                  if (isLastTrack) {
+                    state.queue.shuffled = shuffle(get().queue.shuffled);
+                  }
                 });
               } else {
                 const nextIndex = isLastTrack ? 0 : get().current.index + 1;
@@ -246,13 +259,17 @@ export const usePlayerStore = create<PlayerSlice>()(
 
               return currentIndex === 0;
             },
-            checkIsLastTrack: () => {
-              const currentIndex =
-                get().shuffle === PlayerShuffle.TRACK
-                  ? get().current.shuffledIndex
-                  : get().current.index;
+            checkIsLastTrack: (type) => {
+              const isShuffled = get().shuffle === PlayerShuffle.TRACK;
+              const queueLength = get().queue.default.length - 1;
+              const modifier = type === 'next' ? 1 : type === 'prev' ? -1 : 0;
 
-              return currentIndex === get().queue.default.length - 1;
+              if (isShuffled) {
+                const currentIndex = get().current.shuffledIndex + modifier;
+                return currentIndex === queueLength;
+              }
+
+              return get().current.index + modifier === queueLength;
             },
             clearQueue: () => {
               set((state) => {
@@ -496,15 +513,18 @@ export const usePlayerStore = create<PlayerSlice>()(
                   state.current.song = nextSong!;
                   state.queue.previousNode = get().current.song;
                 });
+
+                if (isLastTrack) {
+                  get().actions.setShuffle(PlayerShuffle.TRACK);
+                }
               } else {
-                const nextIndex =
-                  repeat === PlayerRepeat.ALL
-                    ? isLastTrack
-                      ? 0
-                      : get().current.index + 1
-                    : isLastTrack
-                    ? get().current.index
-                    : get().current.index + 1;
+                let nextIndex = 0;
+
+                if (repeat === PlayerRepeat.ALL) {
+                  nextIndex = isLastTrack ? 0 : get().current.index + 1;
+                } else {
+                  nextIndex = isLastTrack ? get().current.index : get().current.index + 1;
+                }
 
                 set((state) => {
                   state.current.time = 0;
@@ -579,11 +599,22 @@ export const usePlayerStore = create<PlayerSlice>()(
             },
             removeFromQueue: (uniqueIds) => {
               const queue = get().queue.default;
+              const currentSong = get().current.song;
 
               const newQueue = queue.filter((song) => !uniqueIds.includes(song.uniqueId));
+              const newShuffledQueue = get().queue.shuffled.filter(
+                (uniqueId) => !uniqueIds.includes(uniqueId),
+              );
+
+              const isCurrentSongRemoved = currentSong && uniqueIds.includes(currentSong?.uniqueId);
 
               set((state) => {
                 state.queue.default = newQueue;
+                state.queue.shuffled = newShuffledQueue;
+                if (isCurrentSongRemoved) {
+                  state.current.song = newQueue[0];
+                  state.current.index = 0;
+                }
               });
 
               return get().actions.getPlayerData();
