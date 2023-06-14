@@ -136,6 +136,7 @@ export const Sidebar = () => {
   const sidebar = useSidebarStore();
   const { setSideBar } = useAppStoreActions();
   const { windowBarStyle } = useWindowSettings();
+  const { sidebarPlaylistList } = useGeneralSettings();
   const imageUrl = useCurrentSong()?.imageUrl;
   const server = useCurrentServer();
 
@@ -229,44 +230,48 @@ export const Sidebar = () => {
             mx="1rem"
             my="0.5rem"
           />
-          <Group
-            position="apart"
-            pt="1rem"
-            px="1.5rem"
-          >
-            <Group>
-              <Box
-                fw="600"
-                sx={{ fontSize: '1.2rem' }}
+          {sidebarPlaylistList && (
+            <>
+              <Group
+                position="apart"
+                pt="1rem"
+                px="1.5rem"
               >
-                Playlists
-              </Box>
-              {playlistsQuery.isLoading && <Spinner />}
-            </Group>
-            <Group spacing="sm">
-              <Button
-                compact
-                size="md"
-                tooltip={{ label: 'Create playlist', openDelay: 500 }}
-                variant="default"
-                onClick={handleCreatePlaylistModal}
-              >
-                <RiAddFill size="1em" />
-              </Button>
-              <Button
-                compact
-                component={Link}
-                size="md"
-                to={AppRoute.PLAYLISTS}
-                tooltip={{ label: 'Playlist list', openDelay: 500 }}
-                variant="default"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <RiListUnordered size="1em" />
-              </Button>
-            </Group>
-          </Group>
-          <SidebarPlaylistList data={playlistsQuery.data} />
+                <Group>
+                  <Box
+                    fw="600"
+                    sx={{ fontSize: '1.2rem' }}
+                  >
+                    Playlists
+                  </Box>
+                  {playlistsQuery.isLoading && <Spinner />}
+                </Group>
+                <Group spacing="sm">
+                  <Button
+                    compact
+                    size="md"
+                    tooltip={{ label: 'Create playlist', openDelay: 500 }}
+                    variant="default"
+                    onClick={handleCreatePlaylistModal}
+                  >
+                    <RiAddFill size="1em" />
+                  </Button>
+                  <Button
+                    compact
+                    component={Link}
+                    size="md"
+                    to={AppRoute.PLAYLISTS}
+                    tooltip={{ label: 'Playlist list', openDelay: 500 }}
+                    variant="default"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <RiListUnordered size="1em" />
+                  </Button>
+                </Group>
+              </Group>
+              <SidebarPlaylistList data={playlistsQuery.data} />
+            </>
+          )}
         </MotionStack>
         <AnimatePresence
           initial={false}

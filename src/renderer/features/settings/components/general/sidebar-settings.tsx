@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { ChangeEvent, useCallback, useState } from 'react';
 import { Group } from '@mantine/core';
 import { Reorder, useDragControls } from 'framer-motion';
 import isEqual from 'lodash/isEqual';
@@ -54,10 +54,10 @@ const DraggableSidebarItem = ({ item, handleChangeDisabled }: DraggableSidebarIt
 };
 
 export const SidebarSettings = () => {
-  const { sidebarItems } = useGeneralSettings();
-  const { setSidebarItems } = useSettingsStoreActions();
+  const settings = useGeneralSettings();
+  const { setSidebarItems, setSettings } = useSettingsStoreActions();
 
-  const [localSidebarItems, setLocalSidebarItems] = useState(sidebarItems);
+  const [localSidebarItems, setLocalSidebarItems] = useState(settings.sidebarItems);
 
   const handleSave = () => {
     setSidebarItems(localSidebarItems);
@@ -78,12 +78,26 @@ export const SidebarSettings = () => {
     );
   }, []);
 
-  const isSaveButtonDisabled = isEqual(sidebarItems, localSidebarItems);
+  const handleSetSidebarPlaylistList = (e: ChangeEvent<HTMLInputElement>) => {
+    setSettings({
+      general: {
+        ...settings,
+        sidebarPlaylistList: e.target.checked,
+      },
+    });
+  };
+
+  const isSaveButtonDisabled = isEqual(settings.sidebarItems, localSidebarItems);
 
   return (
     <>
       <SettingsOptions
-        control={<Switch />}
+        control={
+          <Switch
+            checked={settings.sidebarPlaylistList}
+            onChange={handleSetSidebarPlaylistList}
+          />
+        }
         description="Show playlist list in sidebar"
         title="Sidebar playlist list"
       />
