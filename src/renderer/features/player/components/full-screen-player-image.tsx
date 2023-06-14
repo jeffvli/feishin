@@ -22,7 +22,7 @@ const Image = styled(motion.img)<{ $useAspectRatio: boolean }>`
   width: 100%;
   height: 100%;
   object-fit: ${({ $useAspectRatio }) => ($useAspectRatio ? 'contain' : 'cover')}};
-  object-position: 50% 50%;
+  object-position: 50% 100%;
   border-radius: 5px;
   filter: drop-shadow(0 0 5px rgba(0, 0, 0, 40%)) drop-shadow(0 0 5px rgba(0, 0, 0, 40%));
 `;
