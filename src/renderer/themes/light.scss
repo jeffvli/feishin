@@ -58,8 +58,9 @@ body[data-theme='defaultLight'] {
   --btn-outline-bg-hover: transparent;
   --btn-outline-fg: rgb(60, 60, 60);
   --btn-outline-fg-hover: rgb(0, 0, 0);
-  --btn-outline-border: 2px rgba(140, 140, 140, 0.5) solid;
-  --btn-outline-radius: 12px;
+  --btn-outline-border: 1px rgba(140, 140, 140, 0.5) solid;
+  --btn-outline-border-hover: 1px rgba(255, 255, 255, 0.5) solid;
+  --btn-outline-radius: 5rem;
 
   --input-bg: rgb(240, 241, 242);
   --input-fg: rgb(0, 0, 0);

@@ -72,8 +72,9 @@
   --btn-outline-bg-hover: transparent;
   --btn-outline-fg: rgb(220, 220, 220);
   --btn-outline-fg-hover: rgb(255, 255, 255);
-  --btn-outline-border: 2px rgba(140, 140, 140, 0.5) solid;
-  --btn-outline-radius: 12px;
+  --btn-outline-border: 1px rgba(140, 140, 140, 0.5) solid;
+  --btn-outline-border-hover: 1px rgba(255, 255, 255, 0.5) solid;
+  --btn-outline-radius: 5rem;
 
   --input-bg: rgb(35, 35, 35);
   --input-fg: rgb(193, 193, 193);
