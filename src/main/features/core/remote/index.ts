@@ -158,11 +158,11 @@ async function serveFile(
 
   const ifMatch = req.headers['if-none-match'];
 
-  const fileInfo = cache.get(file);
+  const fileInfo = cache.get(fileName);
   let cached = fileInfo?.get(selectedEncoding);
 
   if (cached && cached[0] !== stats.mtimeMs) {
-    cache.get(file)!.delete(selectedEncoding);
+    cache.get(fileName)!.delete(selectedEncoding);
     cached = undefined;
   }
 
@@ -196,7 +196,7 @@ async function serveFile(
             if (fileInfo) {
               fileInfo.set(selectedEncoding, newEntry);
             } else {
-              cache.set(file, new Map([[selectedEncoding, newEntry]]));
+              cache.set(fileName, new Map([[selectedEncoding, newEntry]]));
             }
 
             setOk(res, stats.mtimeMs, extension, selectedEncoding, result);
@@ -217,7 +217,7 @@ async function serveFile(
             if (fileInfo) {
               fileInfo.set(selectedEncoding, newEntry);
             } else {
-              cache.set(file, new Map([[selectedEncoding, newEntry]]));
+              cache.set(fileName, new Map([[selectedEncoding, newEntry]]));
             }
 
             setOk(res, stats.mtimeMs, extension, selectedEncoding, result);
@@ -230,7 +230,7 @@ async function serveFile(
         if (fileInfo) {
           fileInfo.set(selectedEncoding, newEntry);
         } else {
-          cache.set(file, new Map([[selectedEncoding, newEntry]]));
+          cache.set(fileName, new Map([[selectedEncoding, newEntry]]));
         }
 
         setOk(res, stats.mtimeMs, extension, selectedEncoding, content);
