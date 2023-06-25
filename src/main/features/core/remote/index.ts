@@ -335,7 +335,7 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                   })
                   .catch((error) => {
                     if (ws.readyState === WebSocket.OPEN) {
-                      ws.send(JSON.stringify({ error: error.message, event: 'error' }));
+                      ws.send(JSON.stringify({ data: error.message, event: 'error' }));
                     }
                   });
 
