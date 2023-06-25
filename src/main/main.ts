@@ -11,6 +11,11 @@
 import { access, constants, readFile, writeFile } from 'fs';
 import path, { join } from 'path';
 import { deflate, inflate } from 'zlib';
+import electronLocalShortcut from 'electron-localshortcut';
+import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+import uniq from 'lodash/uniq';
+import MpvAPI from 'node-mpv';
 import {
   app,
   BrowserWindow,
@@ -22,11 +27,6 @@ import {
   nativeImage,
   BrowserWindowConstructorOptions,
 } from 'electron';
-import electronLocalShortcut from 'electron-localshortcut';
-import log from 'electron-log';
-import { autoUpdater } from 'electron-updater';
-import uniq from 'lodash/uniq';
-import MpvAPI from 'node-mpv';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';

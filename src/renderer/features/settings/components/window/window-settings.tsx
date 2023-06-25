@@ -43,7 +43,7 @@ export const WindowSettings = () => {
                 id: 'restart-toast',
                 message: 'Restart to apply changes... close the notification to restart Feishin',
                 onClose: () => {
-                  window.electron.ipc.send('app-restart');
+                  window.electron.ipc?.send('app-restart');
                 },
                 title: 'Restart required',
               });

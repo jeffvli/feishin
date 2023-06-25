@@ -36,7 +36,7 @@ export const getMpvSetting = (
     case 'replayGainPreampDB':
       return { 'replaygain-preamp': value || 0 };
     default:
-      return key;
+      return { 'audio-format': value };
   }
 };
 
@@ -65,12 +65,12 @@ export const MpvSettings = () => {
   const [mpvPath, setMpvPath] = useState('');
 
   const handleSetMpvPath = (e: File) => {
-    localSettings.set('mpv_path', e.path);
+    localSettings?.set('mpv_path', e.path);
   };
 
   useEffect(() => {
     const getMpvPath = async () => {
-      if (!isElectron()) return setMpvPath('');
+      if (!localSettings) return setMpvPath('');
       const mpvPath = (await localSettings.get('mpv_path')) as string;
       return setMpvPath(mpvPath);
     };

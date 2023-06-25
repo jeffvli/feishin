@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron';
 import Player from 'mpris-service';
-import { QueueSong, RelatedArtist } from '../../../renderer/api/types';
+import { RelatedArtist } from '../../../renderer/api/types';
+import { PlayerRepeat, PlayerStatus, SongUpdate } from '../../../renderer/types';
 import { getMainWindow } from '../../main';
-import { PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/renderer/types';
 
 const mprisPlayer = Player({
   identity: 'Feishin',
@@ -59,9 +59,17 @@ mprisPlayer.on('previous', () => {
   }
 });
 
-mprisPlayer.on('volume', (event: any) => {
-  getMainWindow()?.webContents.send('mpris-request-volume', {
-    volume: event,
+mprisPlayer.on('volume', (vol: number) => {
+  let volume = Math.round(vol * 100);
+
+  if (volume > 100) {
+    volume = 100;
+  } else if (volume < 0) {
+    volume = 0;
+  }
+
+  getMainWindow()?.webContents.send('request-volume', {
+    volume,
   });
 });
 
@@ -76,13 +84,13 @@ mprisPlayer.on('loopStatus', (event: string) => {
 });
 
 mprisPlayer.on('position', (event: any) => {
-  getMainWindow()?.webContents.send('mpris-request-position', {
+  getMainWindow()?.webContents.send('request-position', {
     position: event.position / 1e6,
   });
 });
 
 mprisPlayer.on('seek', (event: number) => {
-  getMainWindow()?.webContents.send('mpris-request-seek', {
+  getMainWindow()?.webContents.send('request-seek', {
     offset: event / 1e6,
   });
 });
@@ -95,74 +103,67 @@ ipcMain.on('mpris-update-seek', (_event, arg) => {
   mprisPlayer.seeked(arg * 1e6);
 });
 
-ipcMain.on('mpris-update-volume', (_event, arg) => {
-  mprisPlayer.volume = Number(arg);
+ipcMain.on('update-volume', (_event, volume) => {
+  mprisPlayer.volume = Number(volume) / 100;
 });
 
-ipcMain.on('mpris-update-repeat', (_event, arg) => {
-  mprisPlayer.loopStatus = arg;
+const REPEAT_TO_MPRIS: Record<PlayerRepeat, string> = {
+  [PlayerRepeat.ALL]: 'Playlist',
+  [PlayerRepeat.ONE]: 'Track',
+  [PlayerRepeat.NONE]: 'None',
+};
+
+ipcMain.on('update-repeat', (_event, arg: PlayerRepeat) => {
+  mprisPlayer.loopStatus = REPEAT_TO_MPRIS[arg];
 });
 
-ipcMain.on('mpris-update-shuffle', (_event, arg) => {
-  mprisPlayer.shuffle = arg;
+ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
+  mprisPlayer.shuffle = shuffle;
 });
 
-ipcMain.on(
-  'mpris-update-song',
-  (
-    _event,
-    args: {
-      currentTime: number;
-      repeat: PlayerRepeat;
-      shuffle: PlayerShuffle;
-      song: QueueSong;
-      status: PlayerStatus;
-    },
-  ) => {
-    const { song, status, repeat, shuffle } = args || {};
+ipcMain.on('update-song', (_event, args: SongUpdate) => {
+  const { song, status, repeat, shuffle } = args || {};
 
-    try {
-      mprisPlayer.playbackStatus = status;
+  try {
+    mprisPlayer.playbackStatus = status === PlayerStatus.PLAYING ? 'Playing' : 'Paused';
 
-      if (repeat) {
-        mprisPlayer.loopStatus =
-          repeat === 'all' ? 'Playlist' : repeat === 'one' ? 'Track' : 'None';
-      }
-
-      if (shuffle) {
-        mprisPlayer.shuffle = shuffle !== 'none';
-      }
-
-      if (!song) return;
-
-      const upsizedImageUrl = song.imageUrl
-        ? song.imageUrl
-            ?.replace(/&size=\d+/, '&size=300')
-            .replace(/\?width=\d+/, '?width=300')
-            .replace(/&height=\d+/, '&height=300')
-        : null;
-
-      mprisPlayer.metadata = {
-        'mpris:artUrl': upsizedImageUrl,
-        'mpris:length': song.duration ? Math.round((song.duration || 0) * 1e6) : null,
-        'mpris:trackid': song?.id
-          ? mprisPlayer.objectPath(`track/${song.id?.replace('-', '')}`)
-          : '',
-        'xesam:album': song.album || null,
-        'xesam:albumArtist': song.albumArtists?.length ? song.albumArtists[0].name : null,
-        'xesam:artist':
-          song.artists?.length !== 0
-            ? song.artists?.map((artist: RelatedArtist) => artist.name)
-            : null,
-        'xesam:discNumber': song.discNumber ? song.discNumber : null,
-        'xesam:genre': song.genres?.length ? song.genres.map((genre: any) => genre.name) : null,
-        'xesam:title': song.name || null,
-        'xesam:trackNumber': song.trackNumber ? song.trackNumber : null,
-        'xesam:useCount':
-          song.playCount !== null && song.playCount !== undefined ? song.playCount : null,
-      };
-    } catch (err) {
-      console.log(err);
+    if (repeat) {
+      mprisPlayer.loopStatus = REPEAT_TO_MPRIS[repeat];
     }
-  },
-);
+
+    if (shuffle) {
+      mprisPlayer.shuffle = shuffle;
+    }
+
+    if (!song) return;
+
+    const upsizedImageUrl = song.imageUrl
+      ? song.imageUrl
+          ?.replace(/&size=\d+/, '&size=300')
+          .replace(/\?width=\d+/, '?width=300')
+          .replace(/&height=\d+/, '&height=300')
+      : null;
+
+    mprisPlayer.metadata = {
+      'mpris:artUrl': upsizedImageUrl,
+      'mpris:length': song.duration ? Math.round((song.duration || 0) * 1e6) : null,
+      'mpris:trackid': song?.id ? mprisPlayer.objectPath(`track/${song.id?.replace('-', '')}`) : '',
+      'xesam:album': song.album || null,
+      'xesam:albumArtist': song.albumArtists?.length ? song.albumArtists[0].name : null,
+      'xesam:artist':
+        song.artists?.length !== 0
+          ? song.artists?.map((artist: RelatedArtist) => artist.name)
+          : null,
+      'xesam:discNumber': song.discNumber ? song.discNumber : null,
+      'xesam:genre': song.genres?.length ? song.genres.map((genre: any) => genre.name) : null,
+      'xesam:title': song.name || null,
+      'xesam:trackNumber': song.trackNumber ? song.trackNumber : null,
+      'xesam:useCount':
+        song.playCount !== null && song.playCount !== undefined ? song.playCount : null,
+    };
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+export { mprisPlayer };

@@ -1,12 +1,19 @@
 import { IpcRendererEvent } from 'electron';
 import { PlayerData, PlayerState } from './store';
 import { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
+import { Remote } from '/@/main/preload/remote';
+import { Mpris } from '/@/main/preload/mpris';
+import { MpvPLayer, MpvPlayerListener } from '/@/main/preload/mpv-player';
+import { Lyrics } from '/@/main/preload/lyrics';
+import { Utils } from '/@/main/preload/utils';
+import { LocalSettings } from '/@/main/preload/local-settings';
+import { Ipc } from '/@/main/preload/ipc';
 
 declare global {
   interface Window {
     electron: {
       browser: any;
-      ipc: any;
+      ipc?: Ipc;
       ipcRenderer: {
         APP_RESTART(): void;
         LYRIC_FETCH(data: QueueSong): void;
@@ -37,6 +44,8 @@ declare global {
         PLAYER_SET_QUEUE_NEXT(data: PlayerData): void;
         PLAYER_STOP(): void;
         PLAYER_VOLUME(value: number): void;
+        REMOTE_ENABLE(enabled: boolean): Promise<string | null>;
+        REMOTE_PORT(port: number): Promise<string | null>;
         RENDERER_PLAYER_AUTO_NEXT(cb: (event: IpcRendererEvent, data: any) => void): void;
         RENDERER_PLAYER_CURRENT_TIME(cb: (event: IpcRendererEvent, data: any) => void): void;
         RENDERER_PLAYER_NEXT(cb: (event: IpcRendererEvent, data: any) => void): void;
@@ -55,12 +64,13 @@ declare global {
         windowMinimize(): void;
         windowUnmaximize(): void;
       };
-      localSettings: any;
-      lyrics: any;
-      mpris: any;
-      mpvPlayer: any;
-      mpvPlayerListener: any;
-      utils: any;
+      localSettings: LocalSettings;
+      lyrics?: Lyrics;
+      mpris?: Mpris;
+      mpvPlayer?: MpvPLayer;
+      mpvPlayerListener?: MpvPlayerListener;
+      remote?: Remote;
+      utils?: Utils;
     };
   }
 }

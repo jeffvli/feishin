@@ -1,5 +1,5 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
-import { PlayerData } from '/@/renderer/store';
+import { PlayerData, PlayerState } from '/@/renderer/store';
 
 const initialize = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
   ipcRenderer.send('player-initialize', data);
@@ -30,8 +30,8 @@ const currentTime = () => {
   ipcRenderer.send('player-current-time');
 };
 
-const mute = () => {
-  ipcRenderer.send('player-mute');
+const mute = (mute: boolean) => {
+  ipcRenderer.send('player-mute', mute);
 };
 
 const next = () => {
@@ -158,7 +158,9 @@ const rendererSaveQueue = (cb: (event: IpcRendererEvent) => void) => {
   ipcRenderer.on('renderer-player-save-queue', cb);
 };
 
-const rendererRestoreQueue = (cb: (event: IpcRendererEvent) => void) => {
+const rendererRestoreQueue = (
+  cb: (event: IpcRendererEvent, data: Partial<PlayerState>) => void,
+) => {
   ipcRenderer.on('renderer-player-restore-queue', cb);
 };
 
@@ -212,3 +214,6 @@ export const mpvPlayerListener = {
   rendererVolumeMute,
   rendererVolumeUp,
 };
+
+export type MpvPLayer = typeof mpvPlayer;
+export type MpvPlayerListener = typeof mpvPlayerListener;

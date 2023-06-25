@@ -5,10 +5,15 @@ import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { initSimpleImg } from 'react-simple-img';
-import { BaseContextModal } from './components';
+import { BaseContextModal, toast } from './components';
 import { useTheme } from './hooks';
 import { AppRouter } from './router/app-router';
-import { useHotkeySettings, usePlaybackSettings, useSettingsStore } from './store/settings.store';
+import {
+  useHotkeySettings,
+  usePlaybackSettings,
+  useRemoteSettings,
+  useSettingsStore,
+} from './store/settings.store';
 import './styles/global.scss';
 import '@ag-grid-community/styles/ag-grid.css';
 import { ContextMenuProvider } from '/@/renderer/features/context-menu';
@@ -27,6 +32,7 @@ initSimpleImg({ threshold: 0.05 }, true);
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
 const ipc = isElectron() ? window.electron.ipc : null;
+const remote = isElectron() ? window.electron.remote : null;
 
 export const App = () => {
   const theme = useTheme();
@@ -35,6 +41,7 @@ export const App = () => {
   const { bindings } = useHotkeySettings();
   const handlePlayQueueAdd = useHandlePlayQueueAdd();
   const { clearQueue, restoreQueue } = useQueueControls();
+  const { enabled } = useRemoteSettings();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -80,9 +87,9 @@ export const App = () => {
 
   useEffect(() => {
     if (isElectron()) {
-      mpvPlayer.restoreQueue();
+      mpvPlayer!.restoreQueue();
 
-      mpvPlayerListener.rendererSaveQueue(() => {
+      mpvPlayerListener!.rendererSaveQueue(() => {
         const { current, queue } = usePlayerStore.getState();
         const stateToSave: Partial<Pick<PlayerState, 'current' | 'queue'>> = {
           current: {
@@ -91,13 +98,13 @@ export const App = () => {
           },
           queue,
         };
-        mpvPlayer.saveQueue(stateToSave);
+        mpvPlayer!.saveQueue(stateToSave);
       });
 
-      mpvPlayerListener.rendererRestoreQueue((_event: any, data: Partial<PlayerState>) => {
+      mpvPlayerListener!.rendererRestoreQueue((_event: any, data) => {
         const playerData = restoreQueue(data);
         if (playbackType === PlaybackType.LOCAL) {
-          mpvPlayer.setQueue(playerData, true);
+          mpvPlayer!.setQueue(playerData, true);
         }
       });
     }
@@ -107,6 +114,16 @@ export const App = () => {
       ipc?.removeAllListeners('renderer-player-save-queue');
     };
   }, [playbackType, restoreQueue]);
+
+  useEffect(() => {
+    if (isElectron() && enabled) {
+      remote?.setRemoteEnabled(true).catch((error) => {
+        toast.warn({ message: error, title: 'Failed to enable remote' });
+      });
+    }
+    // We only want to fire this once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <MantineProvider

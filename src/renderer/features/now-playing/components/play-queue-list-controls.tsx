@@ -19,6 +19,7 @@ import { usePlayerStore, useSetCurrentTime } from '../../../store/player.store';
 import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+const remote = isElectron() ? window.electron.remote : null;
 
 interface PlayQueueListOptionsProps {
   tableRef: MutableRefObject<{ grid: AgGridReactType<Song> } | null>;
@@ -42,7 +43,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
     const playerData = moveToBottomOfQueue(uniqueIds);
 
     if (playerType === PlaybackType.LOCAL) {
-      mpvPlayer.setQueueNext(playerData);
+      mpvPlayer!.setQueueNext(playerData);
     }
   };
 
@@ -54,7 +55,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
     const playerData = moveToTopOfQueue(uniqueIds);
 
     if (playerType === PlaybackType.LOCAL) {
-      mpvPlayer.setQueueNext(playerData);
+      mpvPlayer!.setQueueNext(playerData);
     }
   };
 
@@ -69,10 +70,14 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
 
     if (playerType === PlaybackType.LOCAL) {
       if (isCurrentSongRemoved) {
-        mpvPlayer.setQueue(playerData);
+        mpvPlayer!.setQueue(playerData);
       } else {
-        mpvPlayer.setQueueNext(playerData);
+        mpvPlayer!.setQueueNext(playerData);
       }
+    }
+
+    if (isCurrentSongRemoved) {
+      remote?.updateSong({ song: playerData.current.song });
     }
   };
 
@@ -80,9 +85,11 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
     const playerData = clearQueue();
 
     if (playerType === PlaybackType.LOCAL) {
-      mpvPlayer.setQueue(playerData);
-      mpvPlayer.pause();
+      mpvPlayer!.setQueue(playerData);
+      mpvPlayer!.pause();
     }
+
+    remote?.updateSong({ song: undefined });
 
     setCurrentTime(0);
     pause();
@@ -92,7 +99,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
     const playerData = shuffleQueue();
 
     if (playerType === PlaybackType.LOCAL) {
-      mpvPlayer.setQueueNext(playerData);
+      mpvPlayer!.setQueueNext(playerData);
     }
   };
 

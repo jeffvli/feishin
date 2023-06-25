@@ -80,6 +80,7 @@ const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating'];
 // const SUBSONIC_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+const remote = isElectron() ? window.electron.remote : null;
 
 export interface ContextMenuProviderProps {
   children: React.ReactNode;
@@ -544,7 +545,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const playerData = moveToBottomOfQueue(uniqueIds);
 
     if (playerType === PlaybackType.LOCAL) {
-      mpvPlayer.setQueueNext(playerData);
+      mpvPlayer!.setQueueNext(playerData);
     }
   }, [ctx.dataNodes, moveToBottomOfQueue, playerType]);
 
@@ -555,7 +556,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const playerData = moveToTopOfQueue(uniqueIds);
 
     if (playerType === PlaybackType.LOCAL) {
-      mpvPlayer.setQueueNext(playerData);
+      mpvPlayer!.setQueueNext(playerData);
     }
   }, [ctx.dataNodes, moveToTopOfQueue, playerType]);
 
@@ -569,10 +570,14 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
     if (playerType === PlaybackType.LOCAL) {
       if (isCurrentSongRemoved) {
-        mpvPlayer.setQueue(playerData);
+        mpvPlayer!.setQueue(playerData);
       } else {
-        mpvPlayer.setQueueNext(playerData);
+        mpvPlayer!.setQueueNext(playerData);
       }
+    }
+
+    if (isCurrentSongRemoved) {
+      remote?.updateSong({ song: playerData.current.song });
     }
   }, [ctx.dataNodes, playerType, removeFromQueue]);
 

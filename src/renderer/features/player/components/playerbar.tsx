@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import isElectron from 'is-electron';
 import styled from 'styled-components';
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { useRemoteSettings, useSettingsStore } from '/@/renderer/store/settings.store';
 import { PlaybackType } from '/@/renderer/types';
 import { AudioPlayer } from '/@/renderer/components';
 import {
@@ -60,7 +60,7 @@ const CenterGridItem = styled.div`
 `;
 
 const utils = isElectron() ? window.electron.utils : null;
-const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
+const remote = isElectron() ? window.electron.remote : null;
 
 export const Playerbar = () => {
   const playersRef = PlayersRef;
@@ -72,14 +72,17 @@ export const Playerbar = () => {
   const player = useCurrentPlayer();
   const muted = useMuted();
   const { autoNext } = usePlayerControls();
+  const { enabled } = useRemoteSettings();
 
   const autoNextFn = useCallback(() => {
     const playerData = autoNext();
-    mpris?.updateSong({
-      currentTime: 0,
-      song: playerData.current.song,
-    });
-  }, [autoNext]);
+    if (enabled || utils?.isLinux()) {
+      remote?.updateSong({
+        currentTime: 0,
+        song: playerData.current.song,
+      });
+    }
+  }, [autoNext, enabled]);
 
   return (
     <PlayerbarContainer>

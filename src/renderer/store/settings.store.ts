@@ -145,6 +145,10 @@ export interface SettingsState {
     style: PlaybackStyle;
     type: PlaybackType;
   };
+  remote: {
+    enabled: boolean;
+    port: number;
+  };
   tab: 'general' | 'playback' | 'window' | 'hotkeys' | string;
   tables: {
     fullScreen: DataTableProps;
@@ -243,6 +247,10 @@ const initialState: SettingsState = {
     },
     style: PlaybackStyle.GAPLESS,
     type: PlaybackType.LOCAL,
+  },
+  remote: {
+    enabled: false,
+    port: 4333,
   },
   tab: 'general',
   tables: {
@@ -436,3 +444,5 @@ export const useMpvSettings = () =>
   useSettingsStore((state) => state.playback.mpvProperties, shallow);
 
 export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics, shallow);
+
+export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);

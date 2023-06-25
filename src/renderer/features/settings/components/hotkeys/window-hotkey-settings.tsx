@@ -23,12 +23,12 @@ export const WindowHotkeySettings = () => {
                 globalMediaHotkeys: e.currentTarget.checked,
               },
             });
-            localSettings.set('global_media_hotkeys', e.currentTarget.checked);
+            localSettings!.set('global_media_hotkeys', e.currentTarget.checked);
 
             if (e.currentTarget.checked) {
-              localSettings.enableMediaKeys();
+              localSettings!.enableMediaKeys();
             } else {
-              localSettings.disableMediaKeys();
+              localSettings!.disableMediaKeys();
             }
           }}
         />

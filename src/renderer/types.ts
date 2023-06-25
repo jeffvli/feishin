@@ -177,3 +177,13 @@ export type GridCardData = {
   playButtonBehavior: Play;
   route: CardRoute;
 };
+
+export type SongUpdate = {
+  currentTime?: number;
+  repeat?: PlayerRepeat;
+  shuffle?: boolean;
+  song?: QueueSong;
+  status?: PlayerStatus;
+  /** This volume is in range 0-100 */
+  volume?: number;
+};
