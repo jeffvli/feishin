@@ -4,7 +4,7 @@ import merge from 'lodash/merge';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import type { SongUpdate } from '/@/renderer/types';
+import { ClientEvent, ServerEvent, SongUpdateSocket } from '/@/remote/types';
 
 interface StatefulWebSocket extends WebSocket {
   natural: boolean;
@@ -12,7 +12,7 @@ interface StatefulWebSocket extends WebSocket {
 
 interface SettingsState {
   connected: boolean;
-  info: Omit<SongUpdate, 'currentTime'>;
+  info: Omit<SongUpdateSocket, 'currentTime'>;
   isDark: boolean;
   showImage: boolean;
   socket?: StatefulWebSocket;
@@ -21,7 +21,7 @@ interface SettingsState {
 export interface SettingsSlice extends SettingsState {
   actions: {
     reconnect: () => void;
-    send: (event: string, ...data: any[]) => void;
+    send: (data: ClientEvent) => void;
     toggleIsDark: () => void;
     toggleShowImage: () => void;
   };
@@ -108,17 +108,33 @@ export const useRemoteStore = create<SettingsSlice>()(
               socket.natural = false;
 
               socket.addEventListener('message', (message) => {
-                const { event, data } = JSON.parse(message.data);
+                const { event, data } = JSON.parse(message.data) as ServerEvent;
 
                 switch (event) {
                   case 'error': {
                     toast.error({ message: data, title: 'Socket error' });
                     break;
                   }
+                  case 'favorite': {
+                    set((state) => {
+                      if (state.info.song?.id === data.id) {
+                        state.info.song.userFavorite = data.favorite;
+                      }
+                    });
+                    break;
+                  }
                   case 'proxy': {
                     set((state) => {
                       if (state.info.song) {
                         state.info.song.imageUrl = `data:image/jpeg;base64,${data}`;
+                      }
+                    });
+                    break;
+                  }
+                  case 'rating': {
+                    set((state) => {
+                      if (state.info.song?.id === data.id) {
+                        state.info.song.userRating = data.rating;
                       }
                     });
                     break;
@@ -156,8 +172,8 @@ export const useRemoteStore = create<SettingsSlice>()(
               state.socket = socket;
             });
           },
-          send: (event, ...data) => {
-            get().socket?.send(JSON.stringify([event, ...data]));
+          send: (data: ClientEvent) => {
+            get().socket?.send(JSON.stringify(data));
           },
           toggleIsDark: () => {
             set((state) => {

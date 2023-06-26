@@ -1,8 +1,11 @@
-import { Container, Group, Image, Text, Title } from '@mantine/core';
+import { useCallback } from 'react';
+import { Group, Image, Rating, Text, Title } from '@mantine/core';
 import { useInfo, useSend, useShowImage } from '/@/remote/store';
 import { RemoteButton } from '/@/remote/components/buttons/remote-button';
 import formatDuration from 'format-duration';
+import { debounce } from 'lodash';
 import {
+  RiHeartLine,
   RiPauseFill,
   RiPlayFill,
   RiRepeat2Line,
@@ -14,11 +17,23 @@ import {
 } from 'react-icons/ri';
 import { PlayerRepeat, PlayerStatus } from '/@/renderer/types';
 import { WrapperSlider } from '/@/remote/components/wrapped-slider';
+import { Tooltip } from '/@/renderer/components/tooltip';
 
 export const RemoteContainer = () => {
   const { repeat, shuffle, song, status, volume } = useInfo();
   const send = useSend();
   const showImage = useShowImage();
+
+  const id = song?.id;
+
+  const setRating = useCallback(
+    (rating: number) => {
+      send({ event: 'rating', id: id!, rating });
+    },
+    [send, id],
+  );
+
+  const debouncedSetRating = debounce(setRating, 400);
 
   return (
     <>
@@ -32,9 +47,7 @@ export const RemoteContainer = () => {
           <Group position="apart">
             <Title order={3}>Duration: {formatDuration(song.duration * 1000)}</Title>
             {song.releaseDate && (
-              <Title order={3}>
-                Released at: {new Date(song.releaseDate).toLocaleDateString()}
-              </Title>
+              <Title order={3}>Released: {new Date(song.releaseDate).toLocaleDateString()}</Title>
             )}
             <Title order={3}>Plays: {song.playCount}</Title>
           </Group>
@@ -47,7 +60,7 @@ export const RemoteContainer = () => {
         <RemoteButton
           tooltip="Previous track"
           variant="default"
-          onClick={() => send('previous')}
+          onClick={() => send({ event: 'previous' })}
         >
           <RiSkipBackFill size={25} />
         </RemoteButton>
@@ -56,9 +69,9 @@ export const RemoteContainer = () => {
           variant="default"
           onClick={() => {
             if (status === PlayerStatus.PLAYING) {
-              send('pause');
+              send({ event: 'pause' });
             } else if (status === PlayerStatus.PAUSED) {
-              send('play');
+              send({ event: 'play' });
             }
           }}
         >
@@ -67,7 +80,7 @@ export const RemoteContainer = () => {
         <RemoteButton
           tooltip="Next track"
           variant="default"
-          onClick={() => send('next')}
+          onClick={() => send({ event: 'next' })}
         >
           <RiSkipForwardFill size={25} />
         </RemoteButton>
@@ -80,7 +93,7 @@ export const RemoteContainer = () => {
           $active={shuffle || false}
           tooltip={shuffle ? 'Shuffle tracks' : 'Shuffle disabled'}
           variant="default"
-          onClick={() => send('shuffle')}
+          onClick={() => send({ event: 'shuffle' })}
         >
           <RiShuffleFill size={25} />
         </RemoteButton>
@@ -90,7 +103,7 @@ export const RemoteContainer = () => {
             repeat === PlayerRepeat.ONE ? 'One' : repeat === PlayerRepeat.ALL ? 'all' : 'none'
           }`}
           variant="default"
-          onClick={() => send('repeat')}
+          onClick={() => send({ event: 'repeat' })}
         >
           {repeat === undefined || repeat === PlayerRepeat.ONE ? (
             <RiRepeatOneLine size={25} />
@@ -98,6 +111,34 @@ export const RemoteContainer = () => {
             <RiRepeat2Line size={25} />
           )}
         </RemoteButton>
+        <RemoteButton
+          $active={song?.userFavorite}
+          disabled={!song}
+          tooltip={song?.userFavorite ? 'Unfavorite' : 'Favorite'}
+          variant="default"
+          onClick={() => {
+            if (!id) return;
+
+            send({ event: 'favorite', favorite: !song.userFavorite, id });
+          }}
+        >
+          <RiHeartLine size={25} />
+        </RemoteButton>
+        {(song?.serverType === 'navidrome' || song?.serverType === 'subsonic') && (
+          <div style={{ margin: 'auto' }}>
+            <Tooltip
+              label="Double click to clear"
+              openDelay={1000}
+            >
+              <Rating
+                sx={{ margin: 'auto' }}
+                value={song.userRating ?? 0}
+                onChange={debouncedSetRating}
+                onDoubleClick={() => debouncedSetRating(0)}
+              />
+            </Tooltip>
+          </div>
+        )}
       </Group>
       <WrapperSlider
         leftLabel={<RiVolumeUpFill size={20} />}
@@ -111,12 +152,12 @@ export const RemoteContainer = () => {
           </Text>
         }
         value={volume ?? 0}
-        onChangeEnd={(e) => send('volume', e)}
+        onChangeEnd={(e) => send({ event: 'volume', volume: e })}
       />
       {showImage && (
         <Image
           src={song?.imageUrl?.replaceAll(/&(size|width|height=\d+)/g, '')}
-          onError={() => send('proxy')}
+          onError={() => send({ event: 'proxy' })}
         />
       )}
     </>

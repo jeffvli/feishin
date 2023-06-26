@@ -1,8 +1,20 @@
 import { IpcRendererEvent, ipcRenderer } from 'electron';
 import { SongUpdate } from '/@/renderer/types';
 
+const requestFavorite = (
+  cb: (event: IpcRendererEvent, data: { favorite: boolean; id: string; serverId: string }) => void,
+) => {
+  ipcRenderer.on('request-favorite', cb);
+};
+
 const requestPosition = (cb: (event: IpcRendererEvent, data: { position: number }) => void) => {
   ipcRenderer.on('request-position', cb);
+};
+
+const requestRating = (
+  cb: (event: IpcRendererEvent, data: { id: string; rating: number; serverId: string }) => void,
+) => {
+  ipcRenderer.on('request-rating', cb);
 };
 
 const requestSeek = (cb: (event: IpcRendererEvent, data: { offset: number }) => void) => {
@@ -23,6 +35,14 @@ const setRemotePort = (port: number): Promise<string | null> => {
   return result;
 };
 
+const updateFavorite = (favorite: boolean, serverId: string, ids: string[]) => {
+  ipcRenderer.send('update-favorite', favorite, serverId, ids);
+};
+
+const updateRating = (rating: number, serverId: string, ids: string[]) => {
+  ipcRenderer.send('update-rating', rating, serverId, ids);
+};
+
 const updateRepeat = (repeat: string) => {
   ipcRenderer.send('update-repeat', repeat);
 };
@@ -40,11 +60,15 @@ const updateVolume = (volume: number) => {
 };
 
 export const remote = {
+  requestFavorite,
   requestPosition,
+  requestRating,
   requestSeek,
   requestVolume,
   setRemoteEnabled,
   setRemotePort,
+  updateFavorite,
+  updateRating,
   updateRepeat,
   updateShuffle,
   updateSong,

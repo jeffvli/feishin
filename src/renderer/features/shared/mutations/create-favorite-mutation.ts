@@ -11,6 +11,9 @@ import {
 } from '/@/renderer/api/types';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useSetAlbumListItemDataById, useSetQueueFavorite } from '/@/renderer/store';
+import isElectron from 'is-electron';
+
+const remote = isElectron() ? window.electron.remote : null;
 
 export const useCreateFavorite = (args: MutationHookArgs) => {
   const { options } = args || {};
@@ -42,6 +45,7 @@ export const useCreateFavorite = (args: MutationHookArgs) => {
       }
 
       if (variables.query.type === LibraryItem.SONG) {
+        remote?.updateFavorite(true, serverId, variables.query.id);
         setQueueFavorite(variables.query.id, true);
       }
 

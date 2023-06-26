@@ -6,7 +6,7 @@ import { deflate, gzip } from 'zlib';
 import axios from 'axios';
 import { app, ipcMain } from 'electron';
 import { Server as WsServer, WebSocketServer, WebSocket } from 'ws';
-import { QueueSong } from '../../../../renderer/api/types';
+import { ClientEvent, ServerEvent } from '../../../../remote/types';
 import { PlayerRepeat, SongUpdate } from '../../../../renderer/types';
 import { getMainWindow } from '../../../main';
 import { isLinux } from '../../../utils';
@@ -38,17 +38,23 @@ interface StatefulWebSocket extends WebSocket {
 let server: Server | undefined;
 let wsServer: WsServer<StatefulWebSocket> | undefined;
 
-interface SongUpdateSocket extends Omit<SongUpdate, 'song'> {
-  song?: QueueSong | null;
-}
-
-function broadcast(event: string, data: SongUpdateSocket): void {
+function broadcast({ event, data }: ServerEvent): void {
   if (wsServer) {
     for (const client of wsServer.clients) {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify({ data, event }));
       }
     }
+  }
+}
+
+type SendData = ServerEvent & {
+  client: StatefulWebSocket;
+};
+
+function send({ client, event, data }: SendData): void {
+  if (client.readyState === WebSocket.OPEN) {
+    client.send(JSON.stringify({ data, event }));
   }
 }
 
@@ -292,8 +298,8 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
 
         ws.on('message', (data) => {
           try {
-            const json = JSON.parse(data.toString());
-            const event = json[0];
+            const json = JSON.parse(data.toString()) as ClientEvent;
+            const event = json.event;
 
             switch (event) {
               case 'pause': {
@@ -324,18 +330,17 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                   .get(toFetch, { responseType: 'arraybuffer' })
                   .then((resp) => {
                     if (ws.readyState === WebSocket.OPEN) {
-                      ws.send(
-                        JSON.stringify({
-                          data: Buffer.from(resp.data, 'binary').toString('base64'),
-                          event: 'proxy',
-                        }),
-                      );
+                      send({
+                        client: ws,
+                        data: Buffer.from(resp.data, 'binary').toString('base64'),
+                        event: 'proxy',
+                      });
                     }
                     return null;
                   })
                   .catch((error) => {
                     if (ws.readyState === WebSocket.OPEN) {
-                      ws.send(JSON.stringify({ data: error.message, event: 'error' }));
+                      send({ client: ws, data: error.message, event: 'error' });
                     }
                   });
 
@@ -350,7 +355,7 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                 break;
               }
               case 'volume': {
-                let volume = Number(json[1]);
+                let volume = Number(json.volume);
 
                 if (volume > 100) {
                   volume = 100;
@@ -360,13 +365,35 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
 
                 currentSong.volume = volume;
 
-                broadcast('song', { volume });
+                broadcast({ data: { volume }, event: 'song' });
                 getMainWindow()?.webContents.send('request-volume', {
                   volume,
                 });
 
                 if (mprisPlayer) {
                   mprisPlayer.volume = volume / 100;
+                }
+                break;
+              }
+              case 'favorite': {
+                const { favorite, id } = json;
+                if (id && json.id === currentSong.song?.id) {
+                  getMainWindow()?.webContents.send('request-favorite', {
+                    favorite,
+                    id,
+                    serverId: currentSong.song.serverId,
+                  });
+                }
+                break;
+              }
+              case 'rating': {
+                const { rating, id } = json;
+                if (id && json.id === currentSong.song?.id) {
+                  getMainWindow()?.webContents.send('request-rating', {
+                    id,
+                    rating,
+                    serverId: currentSong.song.serverId,
+                  });
                 }
                 break;
               }
@@ -437,14 +464,42 @@ ipcMain.handle('remote-port', async (_event, port: number) => {
   return null;
 });
 
+ipcMain.on('update-favorite', (_event, favorite: boolean, serverId: string, ids: string[]) => {
+  if (currentSong.song?.serverId !== serverId) return;
+
+  const id = currentSong.song.id;
+
+  for (const songId of ids) {
+    if (songId === id) {
+      currentSong.song.userFavorite = favorite;
+      broadcast({ data: { favorite, id: songId }, event: 'favorite' });
+      return;
+    }
+  }
+});
+
+ipcMain.on('update-rating', (_event, rating: number, serverId: string, ids: string[]) => {
+  if (currentSong.song?.serverId !== serverId) return;
+
+  const id = currentSong.song.id;
+
+  for (const songId of ids) {
+    if (songId === id) {
+      currentSong.song.userRating = rating;
+      broadcast({ data: { id: songId, rating }, event: 'rating' });
+      return;
+    }
+  }
+});
+
 ipcMain.on('update-repeat', (_event, repeat: PlayerRepeat) => {
   currentSong.repeat = repeat;
-  broadcast('song', { repeat });
+  broadcast({ data: { repeat }, event: 'song' });
 });
 
 ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
   currentSong.shuffle = shuffle;
-  broadcast('song', { shuffle });
+  broadcast({ data: { shuffle }, event: 'song' });
 });
 
 ipcMain.on('update-song', (_event, data: SongUpdate) => {
@@ -465,15 +520,15 @@ ipcMain.on('update-song', (_event, data: SongUpdate) => {
   }
 
   if (songChanged) {
-    broadcast('song', { ...rest, song: song || null });
+    broadcast({ data: { ...rest, song: song || null }, event: 'song' });
   } else {
-    broadcast('song', rest);
+    broadcast({ data: rest, event: 'song' });
   }
 });
 
 ipcMain.on('update-volume', (_event, volume: number) => {
   currentSong.volume = volume;
-  broadcast('song', { volume });
+  broadcast({ data: { volume }, event: 'song' });
 });
 
 if (mprisPlayer) {
@@ -486,12 +541,12 @@ if (mprisPlayer) {
         : PlayerRepeat.NONE;
 
     currentSong.repeat = repeat;
-    broadcast('song', { repeat });
+    broadcast({ data: { repeat }, event: 'song' });
   });
 
   mprisPlayer.on('shuffle', (shuffle: boolean) => {
     currentSong.shuffle = shuffle;
-    broadcast('song', { shuffle });
+    broadcast({ data: { shuffle }, event: 'song' });
   });
 
   mprisPlayer.on('volume', (vol: number) => {
@@ -503,6 +558,6 @@ if (mprisPlayer) {
       volume = 0;
     }
     currentSong.volume = volume;
-    broadcast('song', { volume });
+    broadcast({ data: { volume }, event: 'song' });
   });
 }

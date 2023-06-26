@@ -1,6 +1,7 @@
-import { MouseEvent } from 'react';
+import { MouseEvent, useEffect } from 'react';
 import { Flex, Group } from '@mantine/core';
 import { useHotkeys, useMediaQuery } from '@mantine/hooks';
+import isElectron from 'is-electron';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import {
   RiVolumeUpFill,
@@ -20,10 +21,13 @@ import {
 } from '/@/renderer/store';
 import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';
-import { LibraryItem, ServerType } from '/@/renderer/api/types';
+import { LibraryItem, ServerType, Song } from '/@/renderer/api/types';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
 import { Rating } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
+
+const ipc = isElectron() ? window.electron.ipc : null;
+const remote = isElectron() ? window.electron.remote : null;
 
 export const RightControls = () => {
   const isMinWidth = useMediaQuery('(max-width: 480px)');
@@ -112,6 +116,44 @@ export const RightControls = () => {
     [bindings.volumeMute.isGlobal ? '' : bindings.volumeMute.hotkey, handleMute],
     [bindings.toggleQueue.isGlobal ? '' : bindings.toggleQueue.hotkey, handleToggleQueue],
   ]);
+
+  useEffect(() => {
+    if (remote) {
+      remote.requestFavorite((_event, { favorite, id, serverId }) => {
+        const mutator = favorite ? addToFavoritesMutation : removeFromFavoritesMutation;
+        mutator.mutate({
+          query: {
+            id: [id],
+            type: LibraryItem.SONG,
+          },
+          serverId,
+        });
+      });
+
+      remote.requestRating((_event, { id, rating, serverId }) => {
+        updateRatingMutation.mutate({
+          query: {
+            item: [
+              {
+                id,
+                itemType: LibraryItem.SONG,
+                serverId,
+              } as Song, // This is not a type-safe cast, but it works because those are all the prop
+            ],
+            rating,
+          },
+          serverId,
+        });
+      });
+
+      return () => {
+        ipc?.removeAllListeners('request-favorite');
+        ipc?.removeAllListeners('request-rating');
+      };
+    }
+
+    return () => {};
+  }, [addToFavoritesMutation, removeFromFavoritesMutation, updateRatingMutation]);
 
   return (
     <Flex
