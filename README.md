@@ -55,6 +55,15 @@ If you're using an M1 macOS device, [check here](https://github.com/jeffvli/feis
 
 - **Navidrome** - For the best experience, select "Save password" when creating the server and configure the `SessionTimeout` setting in your Navidrome config to a larger value (e.g. 72h).
 
+## Docker
+
+```bash
+docker build -t feishin .
+docker run -p 4343:4343 feishin
+```
+
+Go to http://localhost:4343
+
 ## FAQ
 
 ### What music servers does Feishin support?

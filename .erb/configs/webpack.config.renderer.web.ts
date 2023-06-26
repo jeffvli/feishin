@@ -122,6 +122,7 @@ const configuration: webpack.Configuration = {
 
   devServer: {
     port,
+    allowedHosts: 'all',
     compress: true,
     hot: true,
     headers: { 'Access-Control-Allow-Origin': '*' },
