@@ -84,6 +84,10 @@ const singleInstance = app.requestSingleInstanceLock();
 
 if (!singleInstance) {
   app.quit();
+} else {
+  app.on('second-instance', (_event, _argv, _workingDirectory) => {
+    mainWindow?.show();
+  });
 }
 
 const RESOURCES_PATH = app.isPackaged
