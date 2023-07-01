@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useCurrentStatus, useQueueStatus } from '/@/renderer/store';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform, PlayerStatus } from '/@/renderer/types';
-import appIcon from '../../../assets/icon.svg';
+import appIcon from '../../../assets/icons/32x32.png';
 import macCloseHover from './assets/close-mac-hover.png';
 import macClose from './assets/close-mac.png';
 import macMaxHover from './assets/max-mac-hover.png';
