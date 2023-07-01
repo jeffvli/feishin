@@ -21,6 +21,8 @@ import {
   Platform,
 } from '/@/renderer/types';
 
+const utils = isElectron() ? window.electron.utils : null;
+
 export type SidebarItemType = {
   disabled: boolean;
   id: string;
@@ -168,6 +170,13 @@ export interface SettingsSlice extends SettingsState {
     setSidebarItems: (items: SidebarItemType[]) => void;
   };
 }
+
+// Determines the default/initial windowBarStyle value based on the current platform.
+const getPlatformDefaultWindowBarStyle = (): Platform => {
+  return isElectron() ? (utils.isMacOS() ? Platform.MACOS : Platform.WINDOWS) : Platform.WEB;
+};
+
+const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
   general: {
@@ -369,7 +378,7 @@ const initialState: SettingsState = {
     disableAutoUpdate: false,
     exitToTray: false,
     minimizeToTray: false,
-    windowBarStyle: isElectron() ? Platform.WINDOWS : Platform.WEB,
+    windowBarStyle: platformDefaultWindowBarStyle,
   },
 };
 
