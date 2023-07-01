@@ -26,7 +26,7 @@ const StyledDatePicker = styled(MantineDatePicker)<DatePickerProps>`
   }
 
   & .mantine-DatePicker-label {
-    font-family: var(--label-font-faimly);
+    font-family: var(--label-font-family);
   }
 
   & .mantine-DateRangePicker-disabled {
