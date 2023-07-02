@@ -15,91 +15,91 @@ import { useCurrentServer } from '/@/renderer/store';
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const ActionRequiredRoute = () => {
-  const currentServer = useCurrentServer();
-  const [isMpvRequired, setIsMpvRequired] = useState(false);
-  const isServerRequired = !currentServer;
-  const isCredentialRequired = false;
+    const currentServer = useCurrentServer();
+    const [isMpvRequired, setIsMpvRequired] = useState(false);
+    const isServerRequired = !currentServer;
+    const isCredentialRequired = false;
 
-  useEffect(() => {
-    const getMpvPath = async () => {
-      if (!localSettings) return setIsMpvRequired(false);
-      const mpvPath = await localSettings.get('mpv_path');
+    useEffect(() => {
+        const getMpvPath = async () => {
+            if (!localSettings) return setIsMpvRequired(false);
+            const mpvPath = await localSettings.get('mpv_path');
 
-      if (mpvPath) {
-        return setIsMpvRequired(false);
-      }
+            if (mpvPath) {
+                return setIsMpvRequired(false);
+            }
 
-      return setIsMpvRequired(true);
-    };
+            return setIsMpvRequired(true);
+        };
 
-    getMpvPath();
-  }, []);
+        getMpvPath();
+    }, []);
 
-  const checks = [
-    {
-      component: <MpvRequired />,
-      title: 'MPV required',
-      valid: !isMpvRequired,
-    },
-    {
-      component: <ServerCredentialRequired />,
-      title: 'Credentials required',
-      valid: !isCredentialRequired,
-    },
-    {
-      component: <ServerRequired />,
-      title: 'Server required',
-      valid: !isServerRequired,
-    },
-  ];
+    const checks = [
+        {
+            component: <MpvRequired />,
+            title: 'MPV required',
+            valid: !isMpvRequired,
+        },
+        {
+            component: <ServerCredentialRequired />,
+            title: 'Credentials required',
+            valid: !isCredentialRequired,
+        },
+        {
+            component: <ServerRequired />,
+            title: 'Server required',
+            valid: !isServerRequired,
+        },
+    ];
 
-  const canReturnHome = checks.every((c) => c.valid);
-  const displayedCheck = checks.find((c) => !c.valid);
+    const canReturnHome = checks.every((c) => c.valid);
+    const displayedCheck = checks.find((c) => !c.valid);
 
-  return (
-    <AnimatedPage>
-      <PageHeader />
-      <Center sx={{ height: '100%', width: '100vw' }}>
-        <Stack
-          spacing="xl"
-          sx={{ maxWidth: '50%' }}
-        >
-          <Group noWrap>
-            {displayedCheck && (
-              <ActionRequiredContainer title={displayedCheck.title}>
-                {displayedCheck?.component}
-              </ActionRequiredContainer>
-            )}
-          </Group>
-          <Stack mt="2rem">
-            {canReturnHome && (
-              <>
-                <Navigate to={AppRoute.HOME} />
-                <Group
-                  noWrap
-                  position="center"
+    return (
+        <AnimatedPage>
+            <PageHeader />
+            <Center sx={{ height: '100%', width: '100vw' }}>
+                <Stack
+                    spacing="xl"
+                    sx={{ maxWidth: '50%' }}
                 >
-                  <RiCheckFill
-                    color="var(--success-color)"
-                    size={30}
-                  />
-                  <Text size="xl">No issues found</Text>
-                </Group>
-                <Button
-                  component={Link}
-                  disabled={!canReturnHome}
-                  to={AppRoute.HOME}
-                  variant="filled"
-                >
-                  Go back
-                </Button>
-              </>
-            )}
-          </Stack>
-        </Stack>
-      </Center>
-    </AnimatedPage>
-  );
+                    <Group noWrap>
+                        {displayedCheck && (
+                            <ActionRequiredContainer title={displayedCheck.title}>
+                                {displayedCheck?.component}
+                            </ActionRequiredContainer>
+                        )}
+                    </Group>
+                    <Stack mt="2rem">
+                        {canReturnHome && (
+                            <>
+                                <Navigate to={AppRoute.HOME} />
+                                <Group
+                                    noWrap
+                                    position="center"
+                                >
+                                    <RiCheckFill
+                                        color="var(--success-color)"
+                                        size={30}
+                                    />
+                                    <Text size="xl">No issues found</Text>
+                                </Group>
+                                <Button
+                                    component={Link}
+                                    disabled={!canReturnHome}
+                                    to={AppRoute.HOME}
+                                    variant="filled"
+                                >
+                                    Go back
+                                </Button>
+                            </>
+                        )}
+                    </Stack>
+                </Stack>
+            </Center>
+        </AnimatedPage>
+    );
 };
 
 export default ActionRequiredRoute;

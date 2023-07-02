@@ -5,67 +5,67 @@ import { PlayButton as PlayBtn } from '/@/renderer/features/shared/components/pl
 import styled from 'styled-components';
 
 interface LibraryHeaderBarProps {
-  children: ReactNode;
+    children: ReactNode;
 }
 
 const HeaderContainer = styled.div`
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 1rem;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  padding: 0 1rem;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 1rem;
 `;
 
 export const LibraryHeaderBar = ({ children }: LibraryHeaderBarProps) => {
-  return <HeaderContainer>{children}</HeaderContainer>;
+    return <HeaderContainer>{children}</HeaderContainer>;
 };
 
 interface TitleProps {
-  children: ReactNode;
+    children: ReactNode;
 }
 
 const Title = ({ children }: TitleProps) => {
-  return (
-    <TextTitle
-      order={1}
-      overflow="hidden"
-      weight={700}
-    >
-      {children}
-    </TextTitle>
-  );
+    return (
+        <TextTitle
+            order={1}
+            overflow="hidden"
+            weight={700}
+        >
+            {children}
+        </TextTitle>
+    );
 };
 
 interface PlayButtonProps {
-  onClick: () => void;
+    onClick: () => void;
 }
 
 const PlayButton = ({ onClick }: PlayButtonProps) => {
-  return (
-    <Box>
-      <PlayBtn
-        h="45px"
-        w="45px"
-        onClick={onClick}
-      />
-    </Box>
-  );
+    return (
+        <Box>
+            <PlayBtn
+                h="45px"
+                w="45px"
+                onClick={onClick}
+            />
+        </Box>
+    );
 };
 
 const Badge = styled(Paper)`
-  padding: 0.3rem 1rem;
-  font-weight: 600;
-  border-radius: 0.3rem;
+    padding: 0.3rem 1rem;
+    font-weight: 600;
+    border-radius: 0.3rem;
 `;
 
 interface HeaderBadgeProps extends PaperProps {
-  isLoading?: boolean;
+    isLoading?: boolean;
 }
 
 const HeaderBadge = ({ children, isLoading, ...props }: HeaderBadgeProps) => {
-  return <Badge {...props}>{isLoading ? <SpinnerIcon /> : children}</Badge>;
+    return <Badge {...props}>{isLoading ? <SpinnerIcon /> : children}</Badge>;
 };
 
 LibraryHeaderBar.Title = Title;

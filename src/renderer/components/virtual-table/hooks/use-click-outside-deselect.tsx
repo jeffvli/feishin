@@ -3,13 +3,13 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { useClickOutside } from '@mantine/hooks';
 
 export const useClickOutsideDeselect = (tableRef: MutableRefObject<AgGridReactType | null>) => {
-  const handleDeselect = () => {
-    if (tableRef.current) {
-      tableRef.current.api.deselectAll();
-    }
-  };
+    const handleDeselect = () => {
+        if (tableRef.current) {
+            tableRef.current.api.deselectAll();
+        }
+    };
 
-  const ref = useClickOutside(handleDeselect);
+    const ref = useClickOutside(handleDeselect);
 
-  return ref;
+    return ref;
 };

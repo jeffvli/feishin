@@ -12,211 +12,212 @@ import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer } from '/@/renderer/store';
 
 export const AddToPlaylistContextModal = ({
-  id,
-  innerProps,
+    id,
+    innerProps,
 }: ContextModalProps<{
-  albumId?: string[];
-  artistId?: string[];
-  songId?: string[];
+    albumId?: string[];
+    artistId?: string[];
+    songId?: string[];
 }>) => {
-  const { albumId, artistId, songId } = innerProps;
-  const server = useCurrentServer();
-  const [isLoading, setIsLoading] = useState(false);
+    const { albumId, artistId, songId } = innerProps;
+    const server = useCurrentServer();
+    const [isLoading, setIsLoading] = useState(false);
 
-  const addToPlaylistMutation = useAddToPlaylist({});
+    const addToPlaylistMutation = useAddToPlaylist({});
 
-  const playlistList = usePlaylistList({
-    query: {
-      _custom: {
-        navidrome: {
-          smart: false,
+    const playlistList = usePlaylistList({
+        query: {
+            _custom: {
+                navidrome: {
+                    smart: false,
+                },
+            },
+            sortBy: PlaylistListSort.NAME,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
         },
-      },
-      sortBy: PlaylistListSort.NAME,
-      sortOrder: SortOrder.ASC,
-      startIndex: 0,
-    },
-    serverId: server?.id,
-  });
-
-  const playlistSelect = useMemo(() => {
-    return (
-      playlistList.data?.items?.map((playlist) => ({
-        label: playlist.name,
-        value: playlist.id,
-      })) || []
-    );
-  }, [playlistList.data]);
-
-  const form = useForm({
-    initialValues: {
-      playlistId: [],
-      skipDuplicates: true,
-    },
-  });
-
-  const getSongsByAlbum = async (albumId: string) => {
-    const query: SongListQuery = {
-      albumIds: [albumId],
-      sortBy: SongListSort.ALBUM,
-      sortOrder: SortOrder.ASC,
-      startIndex: 0,
-    };
-
-    const queryKey = queryKeys.songs.list(server?.id || '', query);
-
-    const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
-      if (!server) throw new Error('No server');
-      return api.controller.getSongList({ apiClientProps: { server, signal }, query });
+        serverId: server?.id,
     });
 
-    return songsRes;
-  };
+    const playlistSelect = useMemo(() => {
+        return (
+            playlistList.data?.items?.map((playlist) => ({
+                label: playlist.name,
+                value: playlist.id,
+            })) || []
+        );
+    }, [playlistList.data]);
 
-  const getSongsByArtist = async (artistId: string) => {
-    const query: SongListQuery = {
-      artistIds: [artistId],
-      sortBy: SongListSort.ARTIST,
-      sortOrder: SortOrder.ASC,
-      startIndex: 0,
-    };
-
-    const queryKey = queryKeys.songs.list(server?.id || '', query);
-
-    const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
-      if (!server) throw new Error('No server');
-      return api.controller.getSongList({ apiClientProps: { server, signal }, query });
+    const form = useForm({
+        initialValues: {
+            playlistId: [],
+            skipDuplicates: true,
+        },
     });
 
-    return songsRes;
-  };
-
-  const isSubmitDisabled = form.values.playlistId.length === 0 || addToPlaylistMutation.isLoading;
-
-  const handleSubmit = form.onSubmit(async (values) => {
-    setIsLoading(true);
-    const allSongIds: string[] = [];
-    const uniqueSongIds: string[] = [];
-
-    if (albumId && albumId.length > 0) {
-      for (const id of albumId) {
-        const songs = await getSongsByAlbum(id);
-        allSongIds.push(...(songs?.items?.map((song) => song.id) || []));
-      }
-    }
-
-    if (artistId && artistId.length > 0) {
-      for (const id of artistId) {
-        const songs = await getSongsByArtist(id);
-        allSongIds.push(...(songs?.items?.map((song) => song.id) || []));
-      }
-    }
-
-    if (songId && songId.length > 0) {
-      allSongIds.push(...songId);
-    }
-
-    for (const playlistId of values.playlistId) {
-      if (values.skipDuplicates) {
-        const query = {
-          id: playlistId,
-          startIndex: 0,
+    const getSongsByAlbum = async (albumId: string) => {
+        const query: SongListQuery = {
+            albumIds: [albumId],
+            sortBy: SongListSort.ALBUM,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
         };
 
-        const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, query);
+        const queryKey = queryKeys.songs.list(server?.id || '', query);
 
-        const playlistSongsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
-          if (!server) throw new Error('No server');
-          return api.controller.getPlaylistSongList({
-            apiClientProps: {
-              server,
-              signal,
-            },
-            query: { id: playlistId, startIndex: 0 },
-          });
+        const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
+            if (!server) throw new Error('No server');
+            return api.controller.getSongList({ apiClientProps: { server, signal }, query });
         });
 
-        const playlistSongIds = playlistSongsRes?.items?.map((song) => song.id);
+        return songsRes;
+    };
 
-        for (const songId of allSongIds) {
-          if (!playlistSongIds?.includes(songId)) {
-            uniqueSongIds.push(songId);
-          }
+    const getSongsByArtist = async (artistId: string) => {
+        const query: SongListQuery = {
+            artistIds: [artistId],
+            sortBy: SongListSort.ARTIST,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+        };
+
+        const queryKey = queryKeys.songs.list(server?.id || '', query);
+
+        const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
+            if (!server) throw new Error('No server');
+            return api.controller.getSongList({ apiClientProps: { server, signal }, query });
+        });
+
+        return songsRes;
+    };
+
+    const isSubmitDisabled = form.values.playlistId.length === 0 || addToPlaylistMutation.isLoading;
+
+    const handleSubmit = form.onSubmit(async (values) => {
+        setIsLoading(true);
+        const allSongIds: string[] = [];
+        const uniqueSongIds: string[] = [];
+
+        if (albumId && albumId.length > 0) {
+            for (const id of albumId) {
+                const songs = await getSongsByAlbum(id);
+                allSongIds.push(...(songs?.items?.map((song) => song.id) || []));
+            }
         }
-      }
 
-      if (values.skipDuplicates ? uniqueSongIds.length > 0 : allSongIds.length > 0) {
-        if (!server) return null;
-        addToPlaylistMutation.mutate(
-          {
-            body: { songId: values.skipDuplicates ? uniqueSongIds : allSongIds },
-            query: { id: playlistId },
-            serverId: server?.id,
-          },
-          {
-            onError: (err) => {
-              toast.error({
-                message: `[${
-                  playlistSelect.find((playlist) => playlist.value === playlistId)?.label
-                }] ${err.message}`,
-                title: 'Failed to add songs to playlist',
-              });
-            },
-          },
-        );
-      }
-    }
+        if (artistId && artistId.length > 0) {
+            for (const id of artistId) {
+                const songs = await getSongsByArtist(id);
+                allSongIds.push(...(songs?.items?.map((song) => song.id) || []));
+            }
+        }
 
-    setIsLoading(false);
-    toast.success({
-      message: `Added ${
-        values.skipDuplicates ? uniqueSongIds.length : allSongIds.length
-      } songs to ${values.playlistId.length} playlist(s)`,
+        if (songId && songId.length > 0) {
+            allSongIds.push(...songId);
+        }
+
+        for (const playlistId of values.playlistId) {
+            if (values.skipDuplicates) {
+                const query = {
+                    id: playlistId,
+                    startIndex: 0,
+                };
+
+                const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, query);
+
+                const playlistSongsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
+                    if (!server) throw new Error('No server');
+                    return api.controller.getPlaylistSongList({
+                        apiClientProps: {
+                            server,
+                            signal,
+                        },
+                        query: { id: playlistId, startIndex: 0 },
+                    });
+                });
+
+                const playlistSongIds = playlistSongsRes?.items?.map((song) => song.id);
+
+                for (const songId of allSongIds) {
+                    if (!playlistSongIds?.includes(songId)) {
+                        uniqueSongIds.push(songId);
+                    }
+                }
+            }
+
+            if (values.skipDuplicates ? uniqueSongIds.length > 0 : allSongIds.length > 0) {
+                if (!server) return null;
+                addToPlaylistMutation.mutate(
+                    {
+                        body: { songId: values.skipDuplicates ? uniqueSongIds : allSongIds },
+                        query: { id: playlistId },
+                        serverId: server?.id,
+                    },
+                    {
+                        onError: (err) => {
+                            toast.error({
+                                message: `[${
+                                    playlistSelect.find((playlist) => playlist.value === playlistId)
+                                        ?.label
+                                }] ${err.message}`,
+                                title: 'Failed to add songs to playlist',
+                            });
+                        },
+                    },
+                );
+            }
+        }
+
+        setIsLoading(false);
+        toast.success({
+            message: `Added ${
+                values.skipDuplicates ? uniqueSongIds.length : allSongIds.length
+            } songs to ${values.playlistId.length} playlist(s)`,
+        });
+        closeModal(id);
+        return null;
     });
-    closeModal(id);
-    return null;
-  });
 
-  return (
-    <Box p="1rem">
-      <form onSubmit={handleSubmit}>
-        <Stack>
-          <MultiSelect
-            clearable
-            searchable
-            data={playlistSelect}
-            disabled={playlistList.isLoading}
-            label="Playlists"
-            size="md"
-            {...form.getInputProps('playlistId')}
-          />
-          <Switch
-            label="Skip duplicates"
-            {...form.getInputProps('skipDuplicates', { type: 'checkbox' })}
-          />
-          <Group position="right">
-            <Group>
-              <Button
-                disabled={addToPlaylistMutation.isLoading}
-                size="md"
-                variant="subtle"
-                onClick={() => closeModal(id)}
-              >
-                Cancel
-              </Button>
-              <Button
-                disabled={isSubmitDisabled}
-                loading={isLoading}
-                size="md"
-                type="submit"
-                variant="filled"
-              >
-                Add
-              </Button>
-            </Group>
-          </Group>
-        </Stack>
-      </form>
-    </Box>
-  );
+    return (
+        <Box p="1rem">
+            <form onSubmit={handleSubmit}>
+                <Stack>
+                    <MultiSelect
+                        clearable
+                        searchable
+                        data={playlistSelect}
+                        disabled={playlistList.isLoading}
+                        label="Playlists"
+                        size="md"
+                        {...form.getInputProps('playlistId')}
+                    />
+                    <Switch
+                        label="Skip duplicates"
+                        {...form.getInputProps('skipDuplicates', { type: 'checkbox' })}
+                    />
+                    <Group position="right">
+                        <Group>
+                            <Button
+                                disabled={addToPlaylistMutation.isLoading}
+                                size="md"
+                                variant="subtle"
+                                onClick={() => closeModal(id)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                disabled={isSubmitDisabled}
+                                loading={isLoading}
+                                size="md"
+                                type="submit"
+                                variant="filled"
+                            >
+                                Add
+                            </Button>
+                        </Group>
+                    </Group>
+                </Stack>
+            </form>
+        </Box>
+    );
 };

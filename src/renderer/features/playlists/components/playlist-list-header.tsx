@@ -11,53 +11,57 @@ import { useCurrentServer } from '/@/renderer/store';
 import { ServerType } from '/@/renderer/types';
 
 interface PlaylistListHeaderProps {
-  itemCount?: number;
-  tableRef: MutableRefObject<AgGridReactType | null>;
+    itemCount?: number;
+    tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const PlaylistListHeader = ({ itemCount, tableRef }: PlaylistListHeaderProps) => {
-  const cq = useContainerQuery();
-  const server = useCurrentServer();
+    const cq = useContainerQuery();
+    const server = useCurrentServer();
 
-  const handleCreatePlaylistModal = () => {
-    openModal({
-      children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
-      onClose: () => {
-        tableRef?.current?.api?.purgeInfiniteCache();
-      },
-      size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
-      title: 'Create Playlist',
-    });
-  };
+    const handleCreatePlaylistModal = () => {
+        openModal({
+            children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
+            onClose: () => {
+                tableRef?.current?.api?.purgeInfiniteCache();
+            },
+            size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
+            title: 'Create Playlist',
+        });
+    };
 
-  return (
-    <Stack
-      ref={cq.ref}
-      spacing={0}
-    >
-      <PageHeader backgroundColor="var(--titlebar-bg)">
-        <Flex
-          align="center"
-          justify="space-between"
-          w="100%"
+    return (
+        <Stack
+            ref={cq.ref}
+            spacing={0}
         >
-          <LibraryHeaderBar>
-            <LibraryHeaderBar.Title>Playlists</LibraryHeaderBar.Title>
-            <Paper
-              fw="600"
-              px="1rem"
-              py="0.3rem"
-              radius="sm"
-            >
-              {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
+            <PageHeader backgroundColor="var(--titlebar-bg)">
+                <Flex
+                    align="center"
+                    justify="space-between"
+                    w="100%"
+                >
+                    <LibraryHeaderBar>
+                        <LibraryHeaderBar.Title>Playlists</LibraryHeaderBar.Title>
+                        <Paper
+                            fw="600"
+                            px="1rem"
+                            py="0.3rem"
+                            radius="sm"
+                        >
+                            {itemCount === null || itemCount === undefined ? (
+                                <SpinnerIcon />
+                            ) : (
+                                itemCount
+                            )}
+                        </Paper>
+                    </LibraryHeaderBar>
+                    <Button onClick={handleCreatePlaylistModal}>Create playlist</Button>
+                </Flex>
+            </PageHeader>
+            <Paper p="1rem">
+                <PlaylistListHeaderFilters tableRef={tableRef} />
             </Paper>
-          </LibraryHeaderBar>
-          <Button onClick={handleCreatePlaylistModal}>Create playlist</Button>
-        </Flex>
-      </PageHeader>
-      <Paper p="1rem">
-        <PlaylistListHeaderFilters tableRef={tableRef} />
-      </Paper>
-    </Stack>
-  );
+        </Stack>
+    );
 };

@@ -6,61 +6,61 @@ import { CellContainer } from '/@/renderer/components/virtual-table/cells/generi
 import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 
 export const FavoriteCell = ({ value, data, node }: ICellRendererParams) => {
-  const createMutation = useCreateFavorite({});
-  const deleteMutation = useDeleteFavorite({});
+    const createMutation = useCreateFavorite({});
+    const deleteMutation = useDeleteFavorite({});
 
-  const handleToggleFavorite = () => {
-    const newFavoriteValue = !value;
+    const handleToggleFavorite = () => {
+        const newFavoriteValue = !value;
 
-    if (newFavoriteValue) {
-      createMutation.mutate(
-        {
-          query: {
-            id: [data.id],
-            type: data.itemType,
-          },
-          serverId: data.serverId,
-        },
-        {
-          onSuccess: () => {
-            node.setData({ ...data, userFavorite: newFavoriteValue });
-          },
-        },
-      );
-    } else {
-      deleteMutation.mutate(
-        {
-          query: {
-            id: [data.id],
-            type: data.itemType,
-          },
-          serverId: data.serverId,
-        },
-        {
-          onSuccess: () => {
-            node.setData({ ...data, userFavorite: newFavoriteValue });
-          },
-        },
-      );
-    }
-  };
+        if (newFavoriteValue) {
+            createMutation.mutate(
+                {
+                    query: {
+                        id: [data.id],
+                        type: data.itemType,
+                    },
+                    serverId: data.serverId,
+                },
+                {
+                    onSuccess: () => {
+                        node.setData({ ...data, userFavorite: newFavoriteValue });
+                    },
+                },
+            );
+        } else {
+            deleteMutation.mutate(
+                {
+                    query: {
+                        id: [data.id],
+                        type: data.itemType,
+                    },
+                    serverId: data.serverId,
+                },
+                {
+                    onSuccess: () => {
+                        node.setData({ ...data, userFavorite: newFavoriteValue });
+                    },
+                },
+            );
+        }
+    };
 
-  return (
-    <CellContainer position="center">
-      <Button
-        compact
-        sx={{
-          svg: {
-            fill: !value
-              ? 'var(--main-fg-secondary) !important'
-              : 'var(--primary-color) !important',
-          },
-        }}
-        variant="subtle"
-        onClick={handleToggleFavorite}
-      >
-        {!value ? <RiHeartLine size="1.3em" /> : <RiHeartFill size="1.3em" />}
-      </Button>
-    </CellContainer>
-  );
+    return (
+        <CellContainer position="center">
+            <Button
+                compact
+                sx={{
+                    svg: {
+                        fill: !value
+                            ? 'var(--main-fg-secondary) !important'
+                            : 'var(--primary-color) !important',
+                    },
+                }}
+                variant="subtle"
+                onClick={handleToggleFavorite}
+            >
+                {!value ? <RiHeartLine size="1.3em" /> : <RiHeartFill size="1.3em" />}
+            </Button>
+        </CellContainer>
+    );
 };

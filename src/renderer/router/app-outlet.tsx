@@ -7,32 +7,32 @@ import { useCurrentServer } from '/@/renderer/store';
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const AppOutlet = () => {
-  const currentServer = useCurrentServer();
+    const currentServer = useCurrentServer();
 
-  const isActionsRequired = useMemo(() => {
-    const isMpvRequired = () => {
-      if (!localSettings) return false;
-      const mpvPath = localSettings.get('mpv_path');
-      if (mpvPath) return false;
-      return true;
-    };
+    const isActionsRequired = useMemo(() => {
+        const isMpvRequired = () => {
+            if (!localSettings) return false;
+            const mpvPath = localSettings.get('mpv_path');
+            if (mpvPath) return false;
+            return true;
+        };
 
-    const isServerRequired = !currentServer;
+        const isServerRequired = !currentServer;
 
-    const actions = [isServerRequired, isMpvRequired()];
-    const isActionRequired = actions.some((c) => c);
+        const actions = [isServerRequired, isMpvRequired()];
+        const isActionRequired = actions.some((c) => c);
 
-    return isActionRequired;
-  }, [currentServer]);
+        return isActionRequired;
+    }, [currentServer]);
 
-  if (isActionsRequired) {
-    return (
-      <Navigate
-        replace
-        to={AppRoute.ACTION_REQUIRED}
-      />
-    );
-  }
+    if (isActionsRequired) {
+        return (
+            <Navigate
+                replace
+                to={AppRoute.ACTION_REQUIRED}
+            />
+        );
+    }
 
-  return <Outlet />;
+    return <Outlet />;
 };

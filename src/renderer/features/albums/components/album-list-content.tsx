@@ -7,40 +7,40 @@ import { useAlbumListStore } from '/@/renderer/store';
 import { ListDisplayType } from '/@/renderer/types';
 
 const AlbumListGridView = lazy(() =>
-  import('/@/renderer/features/albums/components/album-list-grid-view').then((module) => ({
-    default: module.AlbumListGridView,
-  })),
+    import('/@/renderer/features/albums/components/album-list-grid-view').then((module) => ({
+        default: module.AlbumListGridView,
+    })),
 );
 
 const AlbumListTableView = lazy(() =>
-  import('/@/renderer/features/albums/components/album-list-table-view').then((module) => ({
-    default: module.AlbumListTableView,
-  })),
+    import('/@/renderer/features/albums/components/album-list-table-view').then((module) => ({
+        default: module.AlbumListTableView,
+    })),
 );
 
 interface AlbumListContentProps {
-  gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
-  itemCount?: number;
-  tableRef: MutableRefObject<AgGridReactType | null>;
+    gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+    itemCount?: number;
+    tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListContentProps) => {
-  const { id, pageKey } = useAlbumListContext();
-  const { display } = useAlbumListStore({ id, key: pageKey });
+    const { id, pageKey } = useAlbumListContext();
+    const { display } = useAlbumListStore({ id, key: pageKey });
 
-  return (
-    <Suspense fallback={<Spinner container />}>
-      {display === ListDisplayType.CARD || display === ListDisplayType.POSTER ? (
-        <AlbumListGridView
-          gridRef={gridRef}
-          itemCount={itemCount}
-        />
-      ) : (
-        <AlbumListTableView
-          itemCount={itemCount}
-          tableRef={tableRef}
-        />
-      )}
-    </Suspense>
-  );
+    return (
+        <Suspense fallback={<Spinner container />}>
+            {display === ListDisplayType.CARD || display === ListDisplayType.POSTER ? (
+                <AlbumListGridView
+                    gridRef={gridRef}
+                    itemCount={itemCount}
+                />
+            ) : (
+                <AlbumListTableView
+                    itemCount={itemCount}
+                    tableRef={tableRef}
+                />
+            )}
+        </Suspense>
+    );
 };

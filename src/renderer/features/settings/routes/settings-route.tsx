@@ -4,18 +4,18 @@ import { SettingsHeader } from '/@/renderer/features/settings/components/setting
 import { AnimatedPage } from '/@/renderer/features/shared';
 
 const SettingsRoute = () => {
-  return (
-    <AnimatedPage>
-      <Flex
-        direction="column"
-        h="100%"
-        w="100%"
-      >
-        <SettingsHeader />
-        <SettingsContent />
-      </Flex>
-    </AnimatedPage>
-  );
+    return (
+        <AnimatedPage>
+            <Flex
+                direction="column"
+                h="100%"
+                w="100%"
+            >
+                <SettingsHeader />
+                <SettingsContent />
+            </Flex>
+        </AnimatedPage>
+    );
 };
 
 export default SettingsRoute;

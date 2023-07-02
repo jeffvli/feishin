@@ -13,56 +13,60 @@ import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
 
 interface PlaylistDetailHeaderProps {
-  handleToggleShowQueryBuilder: () => void;
-  itemCount?: number;
-  tableRef: MutableRefObject<AgGridReactType | null>;
+    handleToggleShowQueryBuilder: () => void;
+    itemCount?: number;
+    tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const PlaylistDetailSongListHeader = ({
-  tableRef,
-  itemCount,
-  handleToggleShowQueryBuilder,
+    tableRef,
+    itemCount,
+    handleToggleShowQueryBuilder,
 }: PlaylistDetailHeaderProps) => {
-  const { playlistId } = useParams() as { playlistId: string };
-  const server = useCurrentServer();
-  const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
-  const handlePlayQueueAdd = usePlayQueueAdd();
+    const { playlistId } = useParams() as { playlistId: string };
+    const server = useCurrentServer();
+    const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
+    const handlePlayQueueAdd = usePlayQueueAdd();
 
-  const handlePlay = async (playType: Play) => {
-    handlePlayQueueAdd?.({
-      byItemType: { id: [playlistId], type: LibraryItem.PLAYLIST },
-      playType,
-    });
-  };
+    const handlePlay = async (playType: Play) => {
+        handlePlayQueueAdd?.({
+            byItemType: { id: [playlistId], type: LibraryItem.PLAYLIST },
+            playType,
+        });
+    };
 
-  const playButtonBehavior = usePlayButtonBehavior();
+    const playButtonBehavior = usePlayButtonBehavior();
 
-  if (detailQuery.isLoading) return null;
-  const isSmartPlaylist = detailQuery?.data?.rules;
+    if (detailQuery.isLoading) return null;
+    const isSmartPlaylist = detailQuery?.data?.rules;
 
-  return (
-    <Stack spacing={0}>
-      <PageHeader backgroundColor="var(--titlebar-bg)">
-        <LibraryHeaderBar>
-          <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-          <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
-          <Paper
-            fw="600"
-            px="1rem"
-            py="0.3rem"
-            radius="sm"
-          >
-            {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
-          </Paper>
-          {isSmartPlaylist && <Badge size="lg">Smart playlist</Badge>}
-        </LibraryHeaderBar>
-      </PageHeader>
-      <Paper p="1rem">
-        <PlaylistDetailSongListHeaderFilters
-          handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
-          tableRef={tableRef}
-        />
-      </Paper>
-    </Stack>
-  );
+    return (
+        <Stack spacing={0}>
+            <PageHeader backgroundColor="var(--titlebar-bg)">
+                <LibraryHeaderBar>
+                    <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+                    <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
+                    <Paper
+                        fw="600"
+                        px="1rem"
+                        py="0.3rem"
+                        radius="sm"
+                    >
+                        {itemCount === null || itemCount === undefined ? (
+                            <SpinnerIcon />
+                        ) : (
+                            itemCount
+                        )}
+                    </Paper>
+                    {isSmartPlaylist && <Badge size="lg">Smart playlist</Badge>}
+                </LibraryHeaderBar>
+            </PageHeader>
+            <Paper p="1rem">
+                <PlaylistDetailSongListHeaderFilters
+                    handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
+                    tableRef={tableRef}
+                />
+            </Paper>
+        </Stack>
+    );
 };

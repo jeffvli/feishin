@@ -7,50 +7,50 @@ import { textEllipsis } from '/@/renderer/styles';
 type MantineTextTitleDivProps = MantineTitleProps & ComponentPropsWithoutRef<'div'>;
 
 interface TextTitleProps extends MantineTextTitleDivProps {
-  $link?: boolean;
-  $noSelect?: boolean;
-  $secondary?: boolean;
-  children?: ReactNode;
-  overflow?: 'hidden' | 'visible';
-  to?: string;
-  weight?: number;
+    $link?: boolean;
+    $noSelect?: boolean;
+    $secondary?: boolean;
+    children?: ReactNode;
+    overflow?: 'hidden' | 'visible';
+    to?: string;
+    weight?: number;
 }
 
 const StyledTextTitle = styled(MantineHeader)<TextTitleProps>`
-  overflow: ${(props) => props.overflow};
-  color: ${(props) => (props.$secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)')};
-  cursor: ${(props) => props.$link && 'cursor'};
-  transition: color 0.2s ease-in-out;
-  user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
-  ${(props) => props.overflow === 'hidden' && !props.lineClamp && textEllipsis}
+    overflow: ${(props) => props.overflow};
+    color: ${(props) => (props.$secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)')};
+    cursor: ${(props) => props.$link && 'cursor'};
+    transition: color 0.2s ease-in-out;
+    user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
+    ${(props) => props.overflow === 'hidden' && !props.lineClamp && textEllipsis}
 
-  &:hover {
-    color: ${(props) => props.$link && 'var(--main-fg)'};
-    text-decoration: ${(props) => (props.$link ? 'underline' : 'none')};
-  }
+    &:hover {
+        color: ${(props) => props.$link && 'var(--main-fg)'};
+        text-decoration: ${(props) => (props.$link ? 'underline' : 'none')};
+    }
 `;
 
 const _TextTitle = ({ children, $secondary, overflow, $noSelect, ...rest }: TextTitleProps) => {
-  return (
-    <StyledTextTitle
-      $noSelect={$noSelect}
-      $secondary={$secondary}
-      overflow={overflow}
-      {...rest}
-    >
-      {children}
-    </StyledTextTitle>
-  );
+    return (
+        <StyledTextTitle
+            $noSelect={$noSelect}
+            $secondary={$secondary}
+            overflow={overflow}
+            {...rest}
+        >
+            {children}
+        </StyledTextTitle>
+    );
 };
 
 export const TextTitle = createPolymorphicComponent<'div', TextTitleProps>(_TextTitle);
 
 _TextTitle.defaultProps = {
-  $link: false,
-  $noSelect: false,
-  $secondary: false,
-  font: undefined,
-  overflow: 'visible',
-  to: '',
-  weight: 400,
+    $link: false,
+    $noSelect: false,
+    $secondary: false,
+    font: undefined,
+    overflow: 'visible',
+    to: '',
+    weight: 400,
 };

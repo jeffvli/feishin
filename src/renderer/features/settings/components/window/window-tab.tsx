@@ -3,11 +3,11 @@ import { UpdateSettings } from '/@/renderer/features/settings/components/window/
 import { WindowSettings } from '/@/renderer/features/settings/components/window/window-settings';
 
 export const WindowTab = () => {
-  return (
-    <Stack spacing="md">
-      <WindowSettings />
-      <Divider />
-      <UpdateSettings />
-    </Stack>
-  );
+    return (
+        <Stack spacing="md">
+            <WindowSettings />
+            <Divider />
+            <UpdateSettings />
+        </Stack>
+    );
 };

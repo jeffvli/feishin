@@ -5,23 +5,23 @@ import { AppTheme } from '/@/renderer/themes/types';
 import { useEffect } from 'react';
 
 export const ThemeButton = () => {
-  const isDark = useIsDark();
-  const toggleDark = useToggleDark();
+    const isDark = useIsDark();
+    const toggleDark = useToggleDark();
 
-  useEffect(() => {
-    const targetTheme: AppTheme = isDark ? AppTheme.DEFAULT_DARK : AppTheme.DEFAULT_LIGHT;
-    document.body.setAttribute('data-theme', targetTheme);
-  }, [isDark]);
+    useEffect(() => {
+        const targetTheme: AppTheme = isDark ? AppTheme.DEFAULT_DARK : AppTheme.DEFAULT_LIGHT;
+        document.body.setAttribute('data-theme', targetTheme);
+    }, [isDark]);
 
-  return (
-    <RemoteButton
-      mr={5}
-      size="xl"
-      tooltip="Toggle Theme"
-      variant="default"
-      onClick={() => toggleDark()}
-    >
-      {isDark ? <RiSunLine size={30} /> : <RiMoonLine size={30} />}
-    </RemoteButton>
-  );
+    return (
+        <RemoteButton
+            mr={5}
+            size="xl"
+            tooltip="Toggle Theme"
+            variant="default"
+            onClick={() => toggleDark()}
+        >
+            {isDark ? <RiSunLine size={30} /> : <RiMoonLine size={30} />}
+        </RemoteButton>
+    );
 };

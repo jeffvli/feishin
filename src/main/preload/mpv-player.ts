@@ -2,217 +2,217 @@ import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { PlayerData, PlayerState } from '/@/renderer/store';
 
 const initialize = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-  ipcRenderer.send('player-initialize', data);
+    ipcRenderer.send('player-initialize', data);
 };
 
 const restart = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-  ipcRenderer.send('player-restart', data);
+    ipcRenderer.send('player-restart', data);
 };
 
 const isRunning = () => {
-  return ipcRenderer.invoke('player-is-running');
+    return ipcRenderer.invoke('player-is-running');
 };
 
 const cleanup = () => {
-  return ipcRenderer.invoke('player-clean-up');
+    return ipcRenderer.invoke('player-clean-up');
 };
 
 const setProperties = (data: Record<string, any>) => {
-  console.log('Setting property :>>', data);
-  ipcRenderer.send('player-set-properties', data);
+    console.log('Setting property :>>', data);
+    ipcRenderer.send('player-set-properties', data);
 };
 
 const autoNext = (data: PlayerData) => {
-  ipcRenderer.send('player-auto-next', data);
+    ipcRenderer.send('player-auto-next', data);
 };
 
 const currentTime = () => {
-  ipcRenderer.send('player-current-time');
+    ipcRenderer.send('player-current-time');
 };
 
 const mute = (mute: boolean) => {
-  ipcRenderer.send('player-mute', mute);
+    ipcRenderer.send('player-mute', mute);
 };
 
 const next = () => {
-  ipcRenderer.send('player-next');
+    ipcRenderer.send('player-next');
 };
 
 const pause = () => {
-  ipcRenderer.send('player-pause');
+    ipcRenderer.send('player-pause');
 };
 
 const play = () => {
-  ipcRenderer.send('player-play');
+    ipcRenderer.send('player-play');
 };
 
 const previous = () => {
-  ipcRenderer.send('player-previous');
+    ipcRenderer.send('player-previous');
 };
 
 const restoreQueue = () => {
-  ipcRenderer.send('player-restore-queue');
+    ipcRenderer.send('player-restore-queue');
 };
 
 const saveQueue = (data: Record<string, any>) => {
-  ipcRenderer.send('player-save-queue', data);
+    ipcRenderer.send('player-save-queue', data);
 };
 
 const seek = (seconds: number) => {
-  ipcRenderer.send('player-seek', seconds);
+    ipcRenderer.send('player-seek', seconds);
 };
 
 const seekTo = (seconds: number) => {
-  ipcRenderer.send('player-seek-to', seconds);
+    ipcRenderer.send('player-seek-to', seconds);
 };
 
 const setQueue = (data: PlayerData, pause?: boolean) => {
-  ipcRenderer.send('player-set-queue', data, pause);
+    ipcRenderer.send('player-set-queue', data, pause);
 };
 
 const setQueueNext = (data: PlayerData) => {
-  ipcRenderer.send('player-set-queue-next', data);
+    ipcRenderer.send('player-set-queue-next', data);
 };
 
 const stop = () => {
-  ipcRenderer.send('player-stop');
+    ipcRenderer.send('player-stop');
 };
 
 const volume = (value: number) => {
-  ipcRenderer.send('player-volume', value);
+    ipcRenderer.send('player-volume', value);
 };
 
 const quit = () => {
-  ipcRenderer.send('player-quit');
+    ipcRenderer.send('player-quit');
 };
 
 const getCurrentTime = async () => {
-  return ipcRenderer.invoke('player-get-time');
+    return ipcRenderer.invoke('player-get-time');
 };
 
 const rendererAutoNext = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-auto-next', cb);
+    ipcRenderer.on('renderer-player-auto-next', cb);
 };
 
 const rendererCurrentTime = (cb: (event: IpcRendererEvent, data: number) => void) => {
-  ipcRenderer.on('renderer-player-current-time', cb);
+    ipcRenderer.on('renderer-player-current-time', cb);
 };
 
 const rendererNext = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-next', cb);
+    ipcRenderer.on('renderer-player-next', cb);
 };
 
 const rendererPause = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-pause', cb);
+    ipcRenderer.on('renderer-player-pause', cb);
 };
 
 const rendererPlay = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-play', cb);
+    ipcRenderer.on('renderer-player-play', cb);
 };
 
 const rendererPlayPause = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-play-pause', cb);
+    ipcRenderer.on('renderer-player-play-pause', cb);
 };
 
 const rendererPrevious = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-previous', cb);
+    ipcRenderer.on('renderer-player-previous', cb);
 };
 
 const rendererStop = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-stop', cb);
+    ipcRenderer.on('renderer-player-stop', cb);
 };
 
 const rendererSkipForward = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-skip-forward', cb);
+    ipcRenderer.on('renderer-player-skip-forward', cb);
 };
 
 const rendererSkipBackward = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-skip-backward', cb);
+    ipcRenderer.on('renderer-player-skip-backward', cb);
 };
 
 const rendererVolumeUp = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-volume-up', cb);
+    ipcRenderer.on('renderer-player-volume-up', cb);
 };
 
 const rendererVolumeDown = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-volume-down', cb);
+    ipcRenderer.on('renderer-player-volume-down', cb);
 };
 
 const rendererVolumeMute = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-volume-mute', cb);
+    ipcRenderer.on('renderer-player-volume-mute', cb);
 };
 
 const rendererToggleRepeat = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-toggle-repeat', cb);
+    ipcRenderer.on('renderer-player-toggle-repeat', cb);
 };
 
 const rendererToggleShuffle = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-  ipcRenderer.on('renderer-player-toggle-shuffle', cb);
+    ipcRenderer.on('renderer-player-toggle-shuffle', cb);
 };
 
 const rendererQuit = (cb: (event: IpcRendererEvent) => void) => {
-  ipcRenderer.on('renderer-player-quit', cb);
+    ipcRenderer.on('renderer-player-quit', cb);
 };
 
 const rendererSaveQueue = (cb: (event: IpcRendererEvent) => void) => {
-  ipcRenderer.on('renderer-player-save-queue', cb);
+    ipcRenderer.on('renderer-player-save-queue', cb);
 };
 
 const rendererRestoreQueue = (
-  cb: (event: IpcRendererEvent, data: Partial<PlayerState>) => void,
+    cb: (event: IpcRendererEvent, data: Partial<PlayerState>) => void,
 ) => {
-  ipcRenderer.on('renderer-player-restore-queue', cb);
+    ipcRenderer.on('renderer-player-restore-queue', cb);
 };
 
 const rendererError = (cb: (event: IpcRendererEvent, data: string) => void) => {
-  ipcRenderer.on('renderer-player-error', cb);
+    ipcRenderer.on('renderer-player-error', cb);
 };
 
 export const mpvPlayer = {
-  autoNext,
-  cleanup,
-  currentTime,
-  getCurrentTime,
-  initialize,
-  isRunning,
-  mute,
-  next,
-  pause,
-  play,
-  previous,
-  quit,
-  restart,
-  restoreQueue,
-  saveQueue,
-  seek,
-  seekTo,
-  setProperties,
-  setQueue,
-  setQueueNext,
-  stop,
-  volume,
+    autoNext,
+    cleanup,
+    currentTime,
+    getCurrentTime,
+    initialize,
+    isRunning,
+    mute,
+    next,
+    pause,
+    play,
+    previous,
+    quit,
+    restart,
+    restoreQueue,
+    saveQueue,
+    seek,
+    seekTo,
+    setProperties,
+    setQueue,
+    setQueueNext,
+    stop,
+    volume,
 };
 
 export const mpvPlayerListener = {
-  rendererAutoNext,
-  rendererCurrentTime,
-  rendererError,
-  rendererNext,
-  rendererPause,
-  rendererPlay,
-  rendererPlayPause,
-  rendererPrevious,
-  rendererQuit,
-  rendererRestoreQueue,
-  rendererSaveQueue,
-  rendererSkipBackward,
-  rendererSkipForward,
-  rendererStop,
-  rendererToggleRepeat,
-  rendererToggleShuffle,
-  rendererVolumeDown,
-  rendererVolumeMute,
-  rendererVolumeUp,
+    rendererAutoNext,
+    rendererCurrentTime,
+    rendererError,
+    rendererNext,
+    rendererPause,
+    rendererPlay,
+    rendererPlayPause,
+    rendererPrevious,
+    rendererQuit,
+    rendererRestoreQueue,
+    rendererSaveQueue,
+    rendererSkipBackward,
+    rendererSkipForward,
+    rendererStop,
+    rendererToggleRepeat,
+    rendererToggleShuffle,
+    rendererVolumeDown,
+    rendererVolumeMute,
+    rendererVolumeUp,
 };
 
 export type MpvPLayer = typeof mpvPlayer;

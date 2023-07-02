@@ -6,11 +6,11 @@ const container = document.getElementById('root')! as HTMLElement;
 const root = createRoot(container);
 
 root.render(
-  <>
-    <Notifications
-      containerWidth="300px"
-      position="bottom-center"
-    />
-    <App />
-  </>,
+    <>
+        <Notifications
+            containerWidth="300px"
+            position="bottom-center"
+        />
+        <App />
+    </>,
 );

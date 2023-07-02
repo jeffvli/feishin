@@ -15,549 +15,555 @@ import { store } from '../settings/index';
 let mprisPlayer: any | undefined;
 
 if (isLinux()) {
-  // eslint-disable-next-line global-require
-  mprisPlayer = require('../../linux/mpris').mprisPlayer;
+    // eslint-disable-next-line global-require
+    mprisPlayer = require('../../linux/mpris').mprisPlayer;
 }
 
 interface RemoteConfig {
-  enabled: boolean;
-  port: number;
+    enabled: boolean;
+    port: number;
 }
 
 interface MimeType {
-  css: string;
-  html: string;
-  ico: string;
-  js: string;
+    css: string;
+    html: string;
+    ico: string;
+    js: string;
 }
 
 interface StatefulWebSocket extends WebSocket {
-  alive: boolean;
+    alive: boolean;
 }
 
 let server: Server | undefined;
 let wsServer: WsServer<StatefulWebSocket> | undefined;
 
 function broadcast({ event, data }: ServerEvent): void {
-  if (wsServer) {
-    for (const client of wsServer.clients) {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ data, event }));
-      }
+    if (wsServer) {
+        for (const client of wsServer.clients) {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(JSON.stringify({ data, event }));
+            }
+        }
     }
-  }
 }
 
 type SendData = ServerEvent & {
-  client: StatefulWebSocket;
+    client: StatefulWebSocket;
 };
 
 function send({ client, event, data }: SendData): void {
-  if (client.readyState === WebSocket.OPEN) {
-    client.send(JSON.stringify({ data, event }));
-  }
+    if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ data, event }));
+    }
 }
 
 const shutdownServer = () => {
-  if (wsServer) {
-    wsServer.clients.forEach((client) => client.close(4000));
-    wsServer.close();
-    wsServer = undefined;
-  }
+    if (wsServer) {
+        wsServer.clients.forEach((client) => client.close(4000));
+        wsServer.close();
+        wsServer = undefined;
+    }
 
-  if (server) {
-    server.close();
-    server = undefined;
-  }
+    if (server) {
+        server.close();
+        server = undefined;
+    }
 };
 
 const MIME_TYPES: MimeType = {
-  css: 'text/css',
-  html: 'text/html; charset=UTF-8',
-  ico: 'image/x-icon',
-  js: 'application/javascript',
+    css: 'text/css',
+    html: 'text/html; charset=UTF-8',
+    ico: 'image/x-icon',
+    js: 'application/javascript',
 };
 
 const PING_TIMEOUT_MS = 10000;
 const UP_TIMEOUT_MS = 5000;
 
 enum Encoding {
-  GZIP = 'gzip',
-  NONE = 'none',
-  ZLIB = 'deflate',
+    GZIP = 'gzip',
+    NONE = 'none',
+    ZLIB = 'deflate',
 }
 
 const GZIP_REGEX = /\bgzip\b/;
 const ZLIB_REGEX = /bdeflate\b/;
 
 let currentSong: SongUpdate = {
-  currentTime: 0,
+    currentTime: 0,
 };
 
 const getEncoding = (encoding: string | string[]): Encoding => {
-  const encodingArray = Array.isArray(encoding) ? encoding : [encoding];
+    const encodingArray = Array.isArray(encoding) ? encoding : [encoding];
 
-  for (const code of encodingArray) {
-    if (code.match(GZIP_REGEX)) {
-      return Encoding.GZIP;
+    for (const code of encodingArray) {
+        if (code.match(GZIP_REGEX)) {
+            return Encoding.GZIP;
+        }
+        if (code.match(ZLIB_REGEX)) {
+            return Encoding.ZLIB;
+        }
     }
-    if (code.match(ZLIB_REGEX)) {
-      return Encoding.ZLIB;
-    }
-  }
 
-  return Encoding.NONE;
+    return Encoding.NONE;
 };
 
 const cache = new Map<string, Map<Encoding, [number, Buffer]>>();
 
 function setOk(
-  res: ServerResponse,
-  mtimeMs: number,
-  extension: keyof MimeType,
-  encoding: Encoding,
-  data?: Buffer,
+    res: ServerResponse,
+    mtimeMs: number,
+    extension: keyof MimeType,
+    encoding: Encoding,
+    data?: Buffer,
 ) {
-  res.statusCode = data ? 200 : 304;
+    res.statusCode = data ? 200 : 304;
 
-  res.setHeader('Content-Type', MIME_TYPES[extension]);
-  res.setHeader('ETag', `"${mtimeMs}"`);
-  res.setHeader('Cache-Control', 'public');
+    res.setHeader('Content-Type', MIME_TYPES[extension]);
+    res.setHeader('ETag', `"${mtimeMs}"`);
+    res.setHeader('Cache-Control', 'public');
 
-  if (encoding !== 'none') res.setHeader('Content-Encoding', encoding);
-  res.end(data);
+    if (encoding !== 'none') res.setHeader('Content-Encoding', encoding);
+    res.end(data);
 }
 
 async function serveFile(
-  req: IncomingMessage,
-  file: string,
-  extension: keyof MimeType,
-  res: ServerResponse,
+    req: IncomingMessage,
+    file: string,
+    extension: keyof MimeType,
+    res: ServerResponse,
 ): Promise<void> {
-  const fileName = `${file}.${extension}`;
-  let path: string;
+    const fileName = `${file}.${extension}`;
+    let path: string;
 
-  if (extension === 'ico') {
-    path = app.isPackaged
-      ? join(process.resourcesPath, 'assets', fileName)
-      : join(__dirname, '../../../../../assets', fileName);
-  } else {
-    path = app.isPackaged
-      ? join(__dirname, '../remote', fileName)
-      : join(__dirname, '../../../../../.erb/dll', fileName);
-  }
-
-  let stats: Stats;
-
-  try {
-    stats = await promises.stat(path);
-  } catch (error) {
-    res.statusCode = 404;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end((error as Error).message);
-    // This is a resolve, even though it is an error, because we want specific (non 500) status
-    return Promise.resolve();
-  }
-
-  const encodings = req.headers['accept-encoding'] ?? '';
-  const selectedEncoding = getEncoding(encodings);
-
-  const ifMatch = req.headers['if-none-match'];
-
-  const fileInfo = cache.get(fileName);
-  let cached = fileInfo?.get(selectedEncoding);
-
-  if (cached && cached[0] !== stats.mtimeMs) {
-    cache.get(fileName)!.delete(selectedEncoding);
-    cached = undefined;
-  }
-
-  if (ifMatch && cached) {
-    const options = ifMatch.split(',');
-
-    for (const option of options) {
-      const mTime = Number(option.replaceAll('"', '').trim());
-
-      if (cached[0] === mTime) {
-        setOk(res, cached[0], extension, selectedEncoding);
-        return Promise.resolve();
-      }
+    if (extension === 'ico') {
+        path = app.isPackaged
+            ? join(process.resourcesPath, 'assets', fileName)
+            : join(__dirname, '../../../../../assets', fileName);
+    } else {
+        path = app.isPackaged
+            ? join(__dirname, '../remote', fileName)
+            : join(__dirname, '../../../../../.erb/dll', fileName);
     }
-  }
 
-  if (!cached || cached[0] !== stats.mtimeMs) {
-    const content = await readFile(path);
+    let stats: Stats;
 
-    switch (selectedEncoding) {
-      case Encoding.GZIP:
-        return new Promise((resolve, reject) => {
-          gzip(content, (error, result) => {
-            if (error) {
-              reject(error);
-              return;
+    try {
+        stats = await promises.stat(path);
+    } catch (error) {
+        res.statusCode = 404;
+        res.setHeader('Content-Type', 'text/plain');
+        res.end((error as Error).message);
+        // This is a resolve, even though it is an error, because we want specific (non 500) status
+        return Promise.resolve();
+    }
+
+    const encodings = req.headers['accept-encoding'] ?? '';
+    const selectedEncoding = getEncoding(encodings);
+
+    const ifMatch = req.headers['if-none-match'];
+
+    const fileInfo = cache.get(fileName);
+    let cached = fileInfo?.get(selectedEncoding);
+
+    if (cached && cached[0] !== stats.mtimeMs) {
+        cache.get(fileName)!.delete(selectedEncoding);
+        cached = undefined;
+    }
+
+    if (ifMatch && cached) {
+        const options = ifMatch.split(',');
+
+        for (const option of options) {
+            const mTime = Number(option.replaceAll('"', '').trim());
+
+            if (cached[0] === mTime) {
+                setOk(res, cached[0], extension, selectedEncoding);
+                return Promise.resolve();
             }
-
-            const newEntry: [number, Buffer] = [stats.mtimeMs, result];
-
-            if (fileInfo) {
-              fileInfo.set(selectedEncoding, newEntry);
-            } else {
-              cache.set(fileName, new Map([[selectedEncoding, newEntry]]));
-            }
-
-            setOk(res, stats.mtimeMs, extension, selectedEncoding, result);
-            resolve();
-          });
-        });
-
-      case Encoding.ZLIB:
-        return new Promise((resolve, reject) => {
-          deflate(content, (error, result) => {
-            if (error) {
-              reject(error);
-              return;
-            }
-
-            const newEntry: [number, Buffer] = [stats.mtimeMs, result];
-
-            if (fileInfo) {
-              fileInfo.set(selectedEncoding, newEntry);
-            } else {
-              cache.set(fileName, new Map([[selectedEncoding, newEntry]]));
-            }
-
-            setOk(res, stats.mtimeMs, extension, selectedEncoding, result);
-            resolve();
-          });
-        });
-      default: {
-        const newEntry: [number, Buffer] = [stats.mtimeMs, content];
-
-        if (fileInfo) {
-          fileInfo.set(selectedEncoding, newEntry);
-        } else {
-          cache.set(fileName, new Map([[selectedEncoding, newEntry]]));
         }
-
-        setOk(res, stats.mtimeMs, extension, selectedEncoding, content);
-        return Promise.resolve();
-      }
     }
-  }
 
-  setOk(res, cached[0], extension, selectedEncoding, cached[1]);
+    if (!cached || cached[0] !== stats.mtimeMs) {
+        const content = await readFile(path);
 
-  return Promise.resolve();
+        switch (selectedEncoding) {
+            case Encoding.GZIP:
+                return new Promise((resolve, reject) => {
+                    gzip(content, (error, result) => {
+                        if (error) {
+                            reject(error);
+                            return;
+                        }
+
+                        const newEntry: [number, Buffer] = [stats.mtimeMs, result];
+
+                        if (fileInfo) {
+                            fileInfo.set(selectedEncoding, newEntry);
+                        } else {
+                            cache.set(fileName, new Map([[selectedEncoding, newEntry]]));
+                        }
+
+                        setOk(res, stats.mtimeMs, extension, selectedEncoding, result);
+                        resolve();
+                    });
+                });
+
+            case Encoding.ZLIB:
+                return new Promise((resolve, reject) => {
+                    deflate(content, (error, result) => {
+                        if (error) {
+                            reject(error);
+                            return;
+                        }
+
+                        const newEntry: [number, Buffer] = [stats.mtimeMs, result];
+
+                        if (fileInfo) {
+                            fileInfo.set(selectedEncoding, newEntry);
+                        } else {
+                            cache.set(fileName, new Map([[selectedEncoding, newEntry]]));
+                        }
+
+                        setOk(res, stats.mtimeMs, extension, selectedEncoding, result);
+                        resolve();
+                    });
+                });
+            default: {
+                const newEntry: [number, Buffer] = [stats.mtimeMs, content];
+
+                if (fileInfo) {
+                    fileInfo.set(selectedEncoding, newEntry);
+                } else {
+                    cache.set(fileName, new Map([[selectedEncoding, newEntry]]));
+                }
+
+                setOk(res, stats.mtimeMs, extension, selectedEncoding, content);
+                return Promise.resolve();
+            }
+        }
+    }
+
+    setOk(res, cached[0], extension, selectedEncoding, cached[1]);
+
+    return Promise.resolve();
 }
 
 const enableServer = (config: RemoteConfig): Promise<void> => {
-  return new Promise<void>((resolve, reject) => {
-    try {
-      if (server) {
-        server.close();
-      }
-
-      server = createServer({}, async (req, res) => {
+    return new Promise<void>((resolve, reject) => {
         try {
-          switch (req.url) {
-            case '/': {
-              await serveFile(req, 'index', 'html', res);
-              break;
+            if (server) {
+                server.close();
             }
-            case '/favicon.ico': {
-              await serveFile(req, 'icon', 'ico', res);
-              break;
-            }
-            case '/remote.css': {
-              await serveFile(req, 'remote', 'css', res);
-              break;
-            }
-            case '/remote.js': {
-              await serveFile(req, 'remote', 'js', res);
-              break;
-            }
-            default: {
-              res.statusCode = 404;
-              res.setHeader('Content-Type', 'text/plain');
-              res.end('Not FOund');
-            }
-          }
-        } catch (error) {
-          res.statusCode = 500;
-          res.setHeader('Content-Type', 'text/plain');
-          res.end((error as Error).message);
-        }
-      });
-      server.listen(config.port, resolve);
-      wsServer = new WebSocketServer({ server });
 
-      wsServer.on('connection', (ws) => {
-        ws.alive = true;
-
-        ws.on('error', console.error);
-
-        ws.on('message', (data) => {
-          try {
-            const json = JSON.parse(data.toString()) as ClientEvent;
-            const event = json.event;
-
-            switch (event) {
-              case 'pause': {
-                getMainWindow()?.webContents.send('renderer-player-pause');
-                break;
-              }
-              case 'play': {
-                getMainWindow()?.webContents.send('renderer-player-play');
-                break;
-              }
-              case 'next': {
-                getMainWindow()?.webContents.send('renderer-player-next');
-                break;
-              }
-              case 'previous': {
-                getMainWindow()?.webContents.send('renderer-player-previous');
-                break;
-              }
-              case 'proxy': {
-                const toFetch = currentSong.song?.imageUrl?.replaceAll(
-                  /&(size|width|height=\d+)/g,
-                  '',
-                );
-
-                if (!toFetch) return;
-
-                axios
-                  .get(toFetch, { responseType: 'arraybuffer' })
-                  .then((resp) => {
-                    if (ws.readyState === WebSocket.OPEN) {
-                      send({
-                        client: ws,
-                        data: Buffer.from(resp.data, 'binary').toString('base64'),
-                        event: 'proxy',
-                      });
+            server = createServer({}, async (req, res) => {
+                try {
+                    switch (req.url) {
+                        case '/': {
+                            await serveFile(req, 'index', 'html', res);
+                            break;
+                        }
+                        case '/favicon.ico': {
+                            await serveFile(req, 'icon', 'ico', res);
+                            break;
+                        }
+                        case '/remote.css': {
+                            await serveFile(req, 'remote', 'css', res);
+                            break;
+                        }
+                        case '/remote.js': {
+                            await serveFile(req, 'remote', 'js', res);
+                            break;
+                        }
+                        default: {
+                            res.statusCode = 404;
+                            res.setHeader('Content-Type', 'text/plain');
+                            res.end('Not FOund');
+                        }
                     }
-                    return null;
-                  })
-                  .catch((error) => {
-                    if (ws.readyState === WebSocket.OPEN) {
-                      send({ client: ws, data: error.message, event: 'error' });
-                    }
-                  });
-
-                break;
-              }
-              case 'repeat': {
-                getMainWindow()?.webContents.send('renderer-player-toggle-repeat');
-                break;
-              }
-              case 'shuffle': {
-                getMainWindow()?.webContents.send('renderer-player-toggle-shuffle');
-                break;
-              }
-              case 'volume': {
-                let volume = Number(json.volume);
-
-                if (volume > 100) {
-                  volume = 100;
-                } else if (volume < 0) {
-                  volume = 0;
+                } catch (error) {
+                    res.statusCode = 500;
+                    res.setHeader('Content-Type', 'text/plain');
+                    res.end((error as Error).message);
                 }
+            });
+            server.listen(config.port, resolve);
+            wsServer = new WebSocketServer({ server });
 
-                currentSong.volume = volume;
+            wsServer.on('connection', (ws) => {
+                ws.alive = true;
 
-                broadcast({ data: { volume }, event: 'song' });
-                getMainWindow()?.webContents.send('request-volume', {
-                  volume,
+                ws.on('error', console.error);
+
+                ws.on('message', (data) => {
+                    try {
+                        const json = JSON.parse(data.toString()) as ClientEvent;
+                        const event = json.event;
+
+                        switch (event) {
+                            case 'pause': {
+                                getMainWindow()?.webContents.send('renderer-player-pause');
+                                break;
+                            }
+                            case 'play': {
+                                getMainWindow()?.webContents.send('renderer-player-play');
+                                break;
+                            }
+                            case 'next': {
+                                getMainWindow()?.webContents.send('renderer-player-next');
+                                break;
+                            }
+                            case 'previous': {
+                                getMainWindow()?.webContents.send('renderer-player-previous');
+                                break;
+                            }
+                            case 'proxy': {
+                                const toFetch = currentSong.song?.imageUrl?.replaceAll(
+                                    /&(size|width|height=\d+)/g,
+                                    '',
+                                );
+
+                                if (!toFetch) return;
+
+                                axios
+                                    .get(toFetch, { responseType: 'arraybuffer' })
+                                    .then((resp) => {
+                                        if (ws.readyState === WebSocket.OPEN) {
+                                            send({
+                                                client: ws,
+                                                data: Buffer.from(resp.data, 'binary').toString(
+                                                    'base64',
+                                                ),
+                                                event: 'proxy',
+                                            });
+                                        }
+                                        return null;
+                                    })
+                                    .catch((error) => {
+                                        if (ws.readyState === WebSocket.OPEN) {
+                                            send({
+                                                client: ws,
+                                                data: error.message,
+                                                event: 'error',
+                                            });
+                                        }
+                                    });
+
+                                break;
+                            }
+                            case 'repeat': {
+                                getMainWindow()?.webContents.send('renderer-player-toggle-repeat');
+                                break;
+                            }
+                            case 'shuffle': {
+                                getMainWindow()?.webContents.send('renderer-player-toggle-shuffle');
+                                break;
+                            }
+                            case 'volume': {
+                                let volume = Number(json.volume);
+
+                                if (volume > 100) {
+                                    volume = 100;
+                                } else if (volume < 0) {
+                                    volume = 0;
+                                }
+
+                                currentSong.volume = volume;
+
+                                broadcast({ data: { volume }, event: 'song' });
+                                getMainWindow()?.webContents.send('request-volume', {
+                                    volume,
+                                });
+
+                                if (mprisPlayer) {
+                                    mprisPlayer.volume = volume / 100;
+                                }
+                                break;
+                            }
+                            case 'favorite': {
+                                const { favorite, id } = json;
+                                if (id && json.id === currentSong.song?.id) {
+                                    getMainWindow()?.webContents.send('request-favorite', {
+                                        favorite,
+                                        id,
+                                        serverId: currentSong.song.serverId,
+                                    });
+                                }
+                                break;
+                            }
+                            case 'rating': {
+                                const { rating, id } = json;
+                                if (id && json.id === currentSong.song?.id) {
+                                    getMainWindow()?.webContents.send('request-rating', {
+                                        id,
+                                        rating,
+                                        serverId: currentSong.song.serverId,
+                                    });
+                                }
+                                break;
+                            }
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
                 });
 
-                if (mprisPlayer) {
-                  mprisPlayer.volume = volume / 100;
-                }
-                break;
-              }
-              case 'favorite': {
-                const { favorite, id } = json;
-                if (id && json.id === currentSong.song?.id) {
-                  getMainWindow()?.webContents.send('request-favorite', {
-                    favorite,
-                    id,
-                    serverId: currentSong.song.serverId,
-                  });
-                }
-                break;
-              }
-              case 'rating': {
-                const { rating, id } = json;
-                if (id && json.id === currentSong.song?.id) {
-                  getMainWindow()?.webContents.send('request-rating', {
-                    id,
-                    rating,
-                    serverId: currentSong.song.serverId,
-                  });
-                }
-                break;
-              }
-            }
-          } catch (error) {
-            console.error(error);
-          }
-        });
+                ws.on('pong', () => {
+                    ws.alive = true;
+                });
 
-        ws.on('pong', () => {
-          ws.alive = true;
-        });
+                ws.send(JSON.stringify({ data: currentSong, event: 'song' }));
+            });
 
-        ws.send(JSON.stringify({ data: currentSong, event: 'song' }));
-      });
+            const heartBeat = setInterval(() => {
+                wsServer?.clients.forEach((ws) => {
+                    if (!ws.alive) {
+                        ws.terminate();
+                        return;
+                    }
 
-      const heartBeat = setInterval(() => {
-        wsServer?.clients.forEach((ws) => {
-          if (!ws.alive) {
-            ws.terminate();
-            return;
-          }
+                    ws.alive = false;
+                    ws.ping();
+                });
+            }, PING_TIMEOUT_MS);
 
-          ws.alive = false;
-          ws.ping();
-        });
-      }, PING_TIMEOUT_MS);
+            wsServer.on('close', () => {
+                clearInterval(heartBeat);
+            });
 
-      wsServer.on('close', () => {
-        clearInterval(heartBeat);
-      });
-
-      setTimeout(() => {
-        reject(new Error('Server did not come up'));
-      }, UP_TIMEOUT_MS);
-    } catch (error) {
-      reject(error);
-      shutdownServer();
-    }
-  });
+            setTimeout(() => {
+                reject(new Error('Server did not come up'));
+            }, UP_TIMEOUT_MS);
+        } catch (error) {
+            reject(error);
+            shutdownServer();
+        }
+    });
 };
 
 const DEFAULT_CONFIG = { enabled: false, port: 4333 };
 
 ipcMain.handle('remote-enable', async (_event, enabled: boolean) => {
-  const settings = store.get('remote', DEFAULT_CONFIG) as RemoteConfig;
-  settings.enabled = enabled;
+    const settings = store.get('remote', DEFAULT_CONFIG) as RemoteConfig;
+    settings.enabled = enabled;
 
-  if (enabled) {
-    try {
-      await enableServer(settings);
-    } catch (error) {
-      return (error as Error).message;
+    if (enabled) {
+        try {
+            await enableServer(settings);
+        } catch (error) {
+            return (error as Error).message;
+        }
+    } else {
+        shutdownServer();
     }
-  } else {
-    shutdownServer();
-  }
 
-  store.set('remote', settings);
-  return null;
+    store.set('remote', settings);
+    return null;
 });
 
 ipcMain.handle('remote-port', async (_event, port: number) => {
-  const settings = store.get('remote', DEFAULT_CONFIG) as RemoteConfig;
-  settings.port = port;
-  store.set('remote', settings);
+    const settings = store.get('remote', DEFAULT_CONFIG) as RemoteConfig;
+    settings.port = port;
+    store.set('remote', settings);
 
-  return null;
+    return null;
 });
 
 ipcMain.on('update-favorite', (_event, favorite: boolean, serverId: string, ids: string[]) => {
-  if (currentSong.song?.serverId !== serverId) return;
+    if (currentSong.song?.serverId !== serverId) return;
 
-  const id = currentSong.song.id;
+    const id = currentSong.song.id;
 
-  for (const songId of ids) {
-    if (songId === id) {
-      currentSong.song.userFavorite = favorite;
-      broadcast({ data: { favorite, id: songId }, event: 'favorite' });
-      return;
+    for (const songId of ids) {
+        if (songId === id) {
+            currentSong.song.userFavorite = favorite;
+            broadcast({ data: { favorite, id: songId }, event: 'favorite' });
+            return;
+        }
     }
-  }
 });
 
 ipcMain.on('update-rating', (_event, rating: number, serverId: string, ids: string[]) => {
-  if (currentSong.song?.serverId !== serverId) return;
+    if (currentSong.song?.serverId !== serverId) return;
 
-  const id = currentSong.song.id;
+    const id = currentSong.song.id;
 
-  for (const songId of ids) {
-    if (songId === id) {
-      currentSong.song.userRating = rating;
-      broadcast({ data: { id: songId, rating }, event: 'rating' });
-      return;
+    for (const songId of ids) {
+        if (songId === id) {
+            currentSong.song.userRating = rating;
+            broadcast({ data: { id: songId, rating }, event: 'rating' });
+            return;
+        }
     }
-  }
 });
 
 ipcMain.on('update-repeat', (_event, repeat: PlayerRepeat) => {
-  currentSong.repeat = repeat;
-  broadcast({ data: { repeat }, event: 'song' });
+    currentSong.repeat = repeat;
+    broadcast({ data: { repeat }, event: 'song' });
 });
 
 ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
-  currentSong.shuffle = shuffle;
-  broadcast({ data: { shuffle }, event: 'song' });
+    currentSong.shuffle = shuffle;
+    broadcast({ data: { shuffle }, event: 'song' });
 });
 
 ipcMain.on('update-song', (_event, data: SongUpdate) => {
-  const { song, ...rest } = data;
-  const songChanged = song?.id !== currentSong.song?.id;
+    const { song, ...rest } = data;
+    const songChanged = song?.id !== currentSong.song?.id;
 
-  if (!song?.id) {
-    currentSong = {
-      ...currentSong,
-      ...data,
-      song: undefined,
-    };
-  } else {
-    currentSong = {
-      ...currentSong,
-      ...data,
-    };
-  }
+    if (!song?.id) {
+        currentSong = {
+            ...currentSong,
+            ...data,
+            song: undefined,
+        };
+    } else {
+        currentSong = {
+            ...currentSong,
+            ...data,
+        };
+    }
 
-  if (songChanged) {
-    broadcast({ data: { ...rest, song: song || null }, event: 'song' });
-  } else {
-    broadcast({ data: rest, event: 'song' });
-  }
+    if (songChanged) {
+        broadcast({ data: { ...rest, song: song || null }, event: 'song' });
+    } else {
+        broadcast({ data: rest, event: 'song' });
+    }
 });
 
 ipcMain.on('update-volume', (_event, volume: number) => {
-  currentSong.volume = volume;
-  broadcast({ data: { volume }, event: 'song' });
+    currentSong.volume = volume;
+    broadcast({ data: { volume }, event: 'song' });
 });
 
 if (mprisPlayer) {
-  mprisPlayer.on('loopStatus', (event: string) => {
-    const repeat =
-      event === 'Playlist'
-        ? PlayerRepeat.ALL
-        : event === 'Track'
-        ? PlayerRepeat.ONE
-        : PlayerRepeat.NONE;
+    mprisPlayer.on('loopStatus', (event: string) => {
+        const repeat =
+            event === 'Playlist'
+                ? PlayerRepeat.ALL
+                : event === 'Track'
+                ? PlayerRepeat.ONE
+                : PlayerRepeat.NONE;
 
-    currentSong.repeat = repeat;
-    broadcast({ data: { repeat }, event: 'song' });
-  });
+        currentSong.repeat = repeat;
+        broadcast({ data: { repeat }, event: 'song' });
+    });
 
-  mprisPlayer.on('shuffle', (shuffle: boolean) => {
-    currentSong.shuffle = shuffle;
-    broadcast({ data: { shuffle }, event: 'song' });
-  });
+    mprisPlayer.on('shuffle', (shuffle: boolean) => {
+        currentSong.shuffle = shuffle;
+        broadcast({ data: { shuffle }, event: 'song' });
+    });
 
-  mprisPlayer.on('volume', (vol: number) => {
-    let volume = Math.round(vol * 100);
+    mprisPlayer.on('volume', (vol: number) => {
+        let volume = Math.round(vol * 100);
 
-    if (volume > 100) {
-      volume = 100;
-    } else if (volume < 0) {
-      volume = 0;
-    }
-    currentSong.volume = volume;
-    broadcast({ data: { volume }, event: 'song' });
-  });
+        if (volume > 100) {
+            volume = 100;
+        } else if (volume < 0) {
+            volume = 0;
+        }
+        currentSong.volume = volume;
+        broadcast({ data: { volume }, event: 'song' });
+    });
 }

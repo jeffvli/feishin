@@ -9,25 +9,25 @@ import { PlayQueueListControls } from '/@/renderer/features/now-playing/componen
 import { VirtualGridContainer } from '/@/renderer/components/virtual-grid';
 
 const NowPlayingRoute = () => {
-  const queueRef = useRef<{ grid: AgGridReactType<Song> } | null>(null);
+    const queueRef = useRef<{ grid: AgGridReactType<Song> } | null>(null);
 
-  return (
-    <AnimatedPage>
-      <VirtualGridContainer>
-        <NowPlayingHeader />
-        <Paper sx={{ borderTop: '1px solid var(--generic-border-color)' }}>
-          <PlayQueueListControls
-            tableRef={queueRef}
-            type="nowPlaying"
-          />
-        </Paper>
-        <PlayQueue
-          ref={queueRef}
-          type="nowPlaying"
-        />
-      </VirtualGridContainer>
-    </AnimatedPage>
-  );
+    return (
+        <AnimatedPage>
+            <VirtualGridContainer>
+                <NowPlayingHeader />
+                <Paper sx={{ borderTop: '1px solid var(--generic-border-color)' }}>
+                    <PlayQueueListControls
+                        tableRef={queueRef}
+                        type="nowPlaying"
+                    />
+                </Paper>
+                <PlayQueue
+                    ref={queueRef}
+                    type="nowPlaying"
+                />
+            </VirtualGridContainer>
+        </AnimatedPage>
+    );
 };
 
 export default NowPlayingRoute;

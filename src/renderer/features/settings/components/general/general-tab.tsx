@@ -6,17 +6,17 @@ import { ThemeSettings } from '/@/renderer/features/settings/components/general/
 import { RemoteSettings } from '/@/renderer/features/settings/components/general/remote-settings';
 
 export const GeneralTab = () => {
-  return (
-    <Stack spacing="md">
-      <ApplicationSettings />
-      <Divider />
-      <ThemeSettings />
-      <Divider />
-      <ControlSettings />
-      <Divider />
-      <SidebarSettings />
-      <Divider />
-      <RemoteSettings />
-    </Stack>
-  );
+    return (
+        <Stack spacing="md">
+            <ApplicationSettings />
+            <Divider />
+            <ThemeSettings />
+            <Divider />
+            <ControlSettings />
+            <Divider />
+            <SidebarSettings />
+            <Divider />
+            <RemoteSettings />
+        </Stack>
+    );
 };

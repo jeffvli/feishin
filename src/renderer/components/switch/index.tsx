@@ -5,24 +5,24 @@ import styled from 'styled-components';
 type SwitchProps = MantineSwitchProps;
 
 const StyledSwitch = styled(MantineSwitch)`
-  display: flex;
+    display: flex;
 
-  & .mantine-Switch-track {
-    background-color: var(--switch-track-bg);
-    border: none;
-  }
-
-  & .mantine-Switch-input {
-    &:checked + .mantine-Switch-track {
-      background-color: var(--switch-track-enabled-bg);
+    & .mantine-Switch-track {
+        background-color: var(--switch-track-bg);
+        border: none;
     }
-  }
 
-  & .mantine-Switch-thumb {
-    background-color: var(--switch-thumb-bg);
-  }
+    & .mantine-Switch-input {
+        &:checked + .mantine-Switch-track {
+            background-color: var(--switch-track-enabled-bg);
+        }
+    }
+
+    & .mantine-Switch-thumb {
+        background-color: var(--switch-thumb-bg);
+    }
 `;
 
 export const Switch = ({ ...props }: SwitchProps) => {
-  return <StyledSwitch {...props} />;
+    return <StyledSwitch {...props} />;
 };

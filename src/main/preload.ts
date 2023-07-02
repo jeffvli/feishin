@@ -9,13 +9,13 @@ import { remote } from './preload/remote';
 import { utils } from './preload/utils';
 
 contextBridge.exposeInMainWorld('electron', {
-  browser,
-  ipc,
-  localSettings,
-  lyrics,
-  mpris,
-  mpvPlayer,
-  mpvPlayerListener,
-  remote,
-  utils,
+    browser,
+    ipc,
+    localSettings,
+    lyrics,
+    mpris,
+    mpvPlayer,
+    mpvPlayerListener,
+    remote,
+    utils,
 });
