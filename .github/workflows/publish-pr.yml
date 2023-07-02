@@ -1,60 +1,60 @@
 name: Publish (PR)
 
 on:
-  pull_request:
-    branches:
-      - development
+    pull_request:
+        branches:
+            - development
 
 jobs:
-  publish:
-    runs-on: ${{ matrix.os }}
+    publish:
+        runs-on: ${{ matrix.os }}
 
-    strategy:
-      matrix:
-        os: [macos-latest]
+        strategy:
+            matrix:
+                os: [macos-latest]
 
-    steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v3
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v3
 
-      - name: Install Node and NPM
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: npm
+            - name: Install Node and NPM
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16
+                  cache: npm
 
-      - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps
+            - name: Install dependencies
+              run: |
+                  npm install --legacy-peer-deps
 
-      - name: Build releases
-        uses: nick-invision/retry@v2.8.2
-        with:
-          timeout_minutes: 30
-          max_attempts: 3
-          retry_on: error
-          command: |
-            npm run postinstall
-            npm run build
-            npm run package:pr
-          on_retry_command: npm cache clean --force
+            - name: Build releases
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      npm run postinstall
+                      npm run build
+                      npm run package:pr
+                  on_retry_command: npm cache clean --force
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: windows-binaries
-          path: |
-            release/build/*.exe
+            - uses: actions/upload-artifact@v3
+              with:
+                  name: windows-binaries
+                  path: |
+                      release/build/*.exe
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: linux-binaries
-          path: |
-            release/build/*.AppImage
-            release/build/*.deb
-            release/build/*.rpm
+            - uses: actions/upload-artifact@v3
+              with:
+                  name: linux-binaries
+                  path: |
+                      release/build/*.AppImage
+                      release/build/*.deb
+                      release/build/*.rpm
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: macos-binaries
-          path: |
-            release/build/*.dmg
+            - uses: actions/upload-artifact@v3
+              with:
+                  name: macos-binaries
+                  path: |
+                      release/build/*.dmg

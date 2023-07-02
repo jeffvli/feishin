@@ -9,84 +9,84 @@ import { _Text } from '/@/renderer/components/text';
 type Presets = 'duration' | 'rowIndex' | 'userFavorite' | 'userRating';
 
 type Options = {
-  children?: ReactNode;
-  position?: 'left' | 'center' | 'right';
-  preset?: Presets;
+    children?: ReactNode;
+    position?: 'left' | 'center' | 'right';
+    preset?: Presets;
 };
 
 const HeaderWrapper = styled.div<{ position: Options['position'] }>`
-  display: flex;
-  justify-content: ${(props) =>
-    props.position === 'right'
-      ? 'flex-end'
-      : props.position === 'center'
-      ? 'center'
-      : 'flex-start'};
-  width: 100%;
-  font-family: var(--content-font-family);
-  text-transform: uppercase;
+    display: flex;
+    justify-content: ${(props) =>
+        props.position === 'right'
+            ? 'flex-end'
+            : props.position === 'center'
+            ? 'center'
+            : 'flex-start'};
+    width: 100%;
+    font-family: var(--content-font-family);
+    text-transform: uppercase;
 `;
 
 const TextHeaderWrapper = styled(_Text)<{ position: Options['position'] }>`
-  width: 100%;
-  color: var(--ag-header-foreground-color);
-  font-weight: 500;
-  text-align: ${(props) =>
-    props.position === 'right'
-      ? 'flex-end'
-      : props.position === 'center'
-      ? 'center'
-      : 'flex-start'};
-  text-transform: uppercase;
+    width: 100%;
+    color: var(--ag-header-foreground-color);
+    font-weight: 500;
+    text-align: ${(props) =>
+        props.position === 'right'
+            ? 'flex-end'
+            : props.position === 'center'
+            ? 'center'
+            : 'flex-start'};
+    text-transform: uppercase;
 `;
 
 const headerPresets = {
-  duration: (
-    <FiClock
-      color="var(--ag-header-foreground-color)"
-      size="1em"
-    />
-  ),
-  rowIndex: (
-    <AiOutlineNumber
-      color="var(--ag-header-foreground-color)"
-      size="1em"
-    />
-  ),
-  userFavorite: (
-    <RiHeartLine
-      color="var(--ag-header-foreground-color)"
-      size="1em"
-    />
-  ),
-  userRating: (
-    <RiStarLine
-      color="var(--ag-header-foreground-color)"
-      size="1em"
-    />
-  ),
+    duration: (
+        <FiClock
+            color="var(--ag-header-foreground-color)"
+            size="1em"
+        />
+    ),
+    rowIndex: (
+        <AiOutlineNumber
+            color="var(--ag-header-foreground-color)"
+            size="1em"
+        />
+    ),
+    userFavorite: (
+        <RiHeartLine
+            color="var(--ag-header-foreground-color)"
+            size="1em"
+        />
+    ),
+    userRating: (
+        <RiStarLine
+            color="var(--ag-header-foreground-color)"
+            size="1em"
+        />
+    ),
 };
 
 export const GenericTableHeader = (
-  { displayName }: IHeaderParams,
-  { preset, children, position }: Options,
+    { displayName }: IHeaderParams,
+    { preset, children, position }: Options,
 ) => {
-  if (preset) {
-    return <HeaderWrapper position={position}>{headerPresets[preset]}</HeaderWrapper>;
-  }
+    if (preset) {
+        return <HeaderWrapper position={position}>{headerPresets[preset]}</HeaderWrapper>;
+    }
 
-  return (
-    <TextHeaderWrapper
-      overflow="hidden"
-      position={position}
-      weight={500}
-    >
-      {children || displayName}
-    </TextHeaderWrapper>
-  );
+    return (
+        <TextHeaderWrapper
+            overflow="hidden"
+            position={position}
+            weight={500}
+        >
+            {children || displayName}
+        </TextHeaderWrapper>
+    );
 };
 
 GenericTableHeader.defaultProps = {
-  position: 'left',
-  preset: undefined,
+    position: 'left',
+    preset: undefined,
 };

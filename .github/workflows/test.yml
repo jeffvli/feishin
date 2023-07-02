@@ -3,32 +3,32 @@ name: Test
 on: [push, pull_request]
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
+    release:
+        runs-on: ${{ matrix.os }}
 
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        strategy:
+            matrix:
+                os: [macos-latest, windows-latest, ubuntu-latest]
 
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v1
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v1
 
-      - name: Install Node.js and NPM
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          cache: npm
+            - name: Install Node.js and NPM
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 16
+                  cache: npm
 
-      - name: npm install
-        run: |
-          npm install --legacy-peer-deps
+            - name: npm install
+              run: |
+                  npm install --legacy-peer-deps
 
-      - name: npm test
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm run package
-          npm run lint
-          npm exec tsc
-          npm test
+            - name: npm test
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  npm run lint
+                  npm run package
+                  npm exec tsc
+                  npm test

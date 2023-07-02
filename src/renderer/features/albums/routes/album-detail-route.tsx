@@ -13,52 +13,54 @@ import { LibraryItem } from '/@/renderer/api/types';
 import { useCurrentServer } from '/@/renderer/store';
 
 const AlbumDetailRoute = () => {
-  const tableRef = useRef<AgGridReactType | null>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
+    const tableRef = useRef<AgGridReactType | null>(null);
+    const scrollAreaRef = useRef<HTMLDivElement>(null);
+    const headerRef = useRef<HTMLDivElement>(null);
 
-  const { albumId } = useParams() as { albumId: string };
-  const server = useCurrentServer();
-  const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
-  const background = useFastAverageColor(detailQuery.data?.imageUrl, !detailQuery.isLoading);
-  const handlePlayQueueAdd = usePlayQueueAdd();
-  const playButtonBehavior = usePlayButtonBehavior();
+    const { albumId } = useParams() as { albumId: string };
+    const server = useCurrentServer();
+    const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
+    const background = useFastAverageColor(detailQuery.data?.imageUrl, !detailQuery.isLoading);
+    const handlePlayQueueAdd = usePlayQueueAdd();
+    const playButtonBehavior = usePlayButtonBehavior();
 
-  const handlePlay = () => {
-    handlePlayQueueAdd?.({
-      byItemType: {
-        id: [albumId],
-        type: LibraryItem.ALBUM,
-      },
-      playType: playButtonBehavior,
-    });
-  };
+    const handlePlay = () => {
+        handlePlayQueueAdd?.({
+            byItemType: {
+                id: [albumId],
+                type: LibraryItem.ALBUM,
+            },
+            playType: playButtonBehavior,
+        });
+    };
 
-  if (!background) return null;
+    if (!background) return null;
 
-  return (
-    <AnimatedPage key={`album-detail-${albumId}`}>
-      <NativeScrollArea
-        ref={scrollAreaRef}
-        pageHeaderProps={{
-          backgroundColor: background,
-          children: (
-            <LibraryHeaderBar>
-              <LibraryHeaderBar.PlayButton onClick={handlePlay} />
-              <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
-            </LibraryHeaderBar>
-          ),
-          target: headerRef,
-        }}
-      >
-        <AlbumDetailHeader
-          ref={headerRef}
-          background={background}
-        />
-        <AlbumDetailContent tableRef={tableRef} />
-      </NativeScrollArea>
-    </AnimatedPage>
-  );
+    return (
+        <AnimatedPage key={`album-detail-${albumId}`}>
+            <NativeScrollArea
+                ref={scrollAreaRef}
+                pageHeaderProps={{
+                    backgroundColor: background,
+                    children: (
+                        <LibraryHeaderBar>
+                            <LibraryHeaderBar.PlayButton onClick={handlePlay} />
+                            <LibraryHeaderBar.Title>
+                                {detailQuery?.data?.name}
+                            </LibraryHeaderBar.Title>
+                        </LibraryHeaderBar>
+                    ),
+                    target: headerRef,
+                }}
+            >
+                <AlbumDetailHeader
+                    ref={headerRef}
+                    background={background}
+                />
+                <AlbumDetailContent tableRef={tableRef} />
+            </NativeScrollArea>
+        </AnimatedPage>
+    );
 };
 
 export default AlbumDetailRoute;

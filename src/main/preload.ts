@@ -8,12 +8,12 @@ import { mpvPlayer, mpvPlayerListener } from './preload/mpv-player';
 import { utils } from './preload/utils';
 
 contextBridge.exposeInMainWorld('electron', {
-  browser,
-  ipc,
-  localSettings,
-  lyrics,
-  mpris,
-  mpvPlayer,
-  mpvPlayerListener,
-  utils,
+    browser,
+    ipc,
+    localSettings,
+    lyrics,
+    mpris,
+    mpvPlayer,
+    mpvPlayerListener,
+    utils,
 });

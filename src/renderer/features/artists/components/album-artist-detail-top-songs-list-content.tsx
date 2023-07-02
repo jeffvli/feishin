@@ -11,72 +11,72 @@ import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-gr
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 
 interface AlbumArtistSongListContentProps {
-  data: QueueSong[];
-  tableRef: MutableRefObject<AgGridReactType | null>;
+    data: QueueSong[];
+    tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const AlbumArtistDetailTopSongsListContent = ({
-  tableRef,
-  data,
+    tableRef,
+    data,
 }: AlbumArtistSongListContentProps) => {
-  const server = useCurrentServer();
-  const page = useSongListStore();
+    const server = useCurrentServer();
+    const page = useSongListStore();
 
-  const handlePlayQueueAdd = usePlayQueueAdd();
-  const playButtonBehavior = usePlayButtonBehavior();
+    const handlePlayQueueAdd = usePlayQueueAdd();
+    const playButtonBehavior = usePlayButtonBehavior();
 
-  const columnDefs: ColDef[] = useMemo(
-    () => getColumnDefs(page.table.columns),
-    [page.table.columns],
-  );
+    const columnDefs: ColDef[] = useMemo(
+        () => getColumnDefs(page.table.columns),
+        [page.table.columns],
+    );
 
-  const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
+    const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
-  const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
-    if (!e.data) return;
+    const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
+        if (!e.data) return;
 
-    const rowData: QueueSong[] = [];
-    e.api.forEachNode((node) => {
-      if (!node.data) return;
-      rowData.push(node.data);
-    });
+        const rowData: QueueSong[] = [];
+        e.api.forEachNode((node) => {
+            if (!node.data) return;
+            rowData.push(node.data);
+        });
 
-    handlePlayQueueAdd?.({
-      byData: rowData,
-      initialSongId: e.data.id,
-      playType: playButtonBehavior,
-    });
-  };
+        handlePlayQueueAdd?.({
+            byData: rowData,
+            initialSongId: e.data.id,
+            playType: playButtonBehavior,
+        });
+    };
 
-  return (
-    <>
-      <VirtualGridAutoSizerContainer>
-        <VirtualTable
-          // https://github.com/ag-grid/ag-grid/issues/5284
-          // Key is used to force remount of table when display, rowHeight, or server changes
-          key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
-          ref={tableRef}
-          alwaysShowHorizontalScroll
-          animateRows
-          maintainColumnOrder
-          suppressCopyRowsToClipboard
-          suppressMoveWhenRowDragging
-          suppressPaginationPanel
-          suppressRowDrag
-          suppressScrollOnNewData
-          autoFitColumns={page.table.autoFit}
-          columnDefs={columnDefs}
-          enableCellChangeFlash={false}
-          getRowId={(data) => data.data.uniqueId}
-          rowBuffer={20}
-          rowData={data}
-          rowHeight={page.table.rowHeight || 40}
-          rowModelType="clientSide"
-          rowSelection="multiple"
-          onCellContextMenu={handleContextMenu}
-          onRowDoubleClicked={handleRowDoubleClick}
-        />
-      </VirtualGridAutoSizerContainer>
-    </>
-  );
+    return (
+        <>
+            <VirtualGridAutoSizerContainer>
+                <VirtualTable
+                    // https://github.com/ag-grid/ag-grid/issues/5284
+                    // Key is used to force remount of table when display, rowHeight, or server changes
+                    key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
+                    ref={tableRef}
+                    alwaysShowHorizontalScroll
+                    animateRows
+                    maintainColumnOrder
+                    suppressCopyRowsToClipboard
+                    suppressMoveWhenRowDragging
+                    suppressPaginationPanel
+                    suppressRowDrag
+                    suppressScrollOnNewData
+                    autoFitColumns={page.table.autoFit}
+                    columnDefs={columnDefs}
+                    enableCellChangeFlash={false}
+                    getRowId={(data) => data.data.uniqueId}
+                    rowBuffer={20}
+                    rowData={data}
+                    rowHeight={page.table.rowHeight || 40}
+                    rowModelType="clientSide"
+                    rowSelection="multiple"
+                    onCellContextMenu={handleContextMenu}
+                    onRowDoubleClicked={handleRowDoubleClick}
+                />
+            </VirtualGridAutoSizerContainer>
+        </>
+    );
 };

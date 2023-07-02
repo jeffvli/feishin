@@ -5,15 +5,15 @@ import { SidebarSettings } from '/@/renderer/features/settings/components/genera
 import { ThemeSettings } from '/@/renderer/features/settings/components/general/theme-settings';
 
 export const GeneralTab = () => {
-  return (
-    <Stack spacing="md">
-      <ApplicationSettings />
-      <Divider />
-      <ThemeSettings />
-      <Divider />
-      <ControlSettings />
-      <Divider />
-      <SidebarSettings />
-    </Stack>
-  );
+    return (
+        <Stack spacing="md">
+            <ApplicationSettings />
+            <Divider />
+            <ThemeSettings />
+            <Divider />
+            <ControlSettings />
+            <Divider />
+            <SidebarSettings />
+        </Stack>
+    );
 };

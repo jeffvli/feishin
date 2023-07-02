@@ -10,46 +10,46 @@ import { useCurrentServer } from '../../../store/auth.store';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 
 const AlbumArtistListRoute = () => {
-  const gridRef = useRef<VirtualInfiniteGridRef | null>(null);
-  const tableRef = useRef<AgGridReactType | null>(null);
-  const pageKey = generatePageKey('albumArtist', undefined);
-  const server = useCurrentServer();
+    const gridRef = useRef<VirtualInfiniteGridRef | null>(null);
+    const tableRef = useRef<AgGridReactType | null>(null);
+    const pageKey = generatePageKey('albumArtist', undefined);
+    const server = useCurrentServer();
 
-  const albumArtistListFilter = useAlbumArtistListFilter({ id: undefined, key: pageKey });
+    const albumArtistListFilter = useAlbumArtistListFilter({ id: undefined, key: pageKey });
 
-  const itemCountCheck = useAlbumArtistList({
-    options: {
-      cacheTime: 1000 * 60,
-      staleTime: 1000 * 60,
-    },
-    query: {
-      limit: 1,
-      startIndex: 0,
-      ...albumArtistListFilter,
-    },
-    serverId: server?.id,
-  });
+    const itemCountCheck = useAlbumArtistList({
+        options: {
+            cacheTime: 1000 * 60,
+            staleTime: 1000 * 60,
+        },
+        query: {
+            limit: 1,
+            startIndex: 0,
+            ...albumArtistListFilter,
+        },
+        serverId: server?.id,
+    });
 
-  const itemCount =
-    itemCountCheck.data?.totalRecordCount === null
-      ? undefined
-      : itemCountCheck.data?.totalRecordCount;
+    const itemCount =
+        itemCountCheck.data?.totalRecordCount === null
+            ? undefined
+            : itemCountCheck.data?.totalRecordCount;
 
-  return (
-    <AnimatedPage>
-      <AlbumArtistListContext.Provider value={{ id: undefined, pageKey }}>
-        <AlbumArtistListHeader
-          gridRef={gridRef}
-          itemCount={itemCount}
-          tableRef={tableRef}
-        />
-        <AlbumArtistListContent
-          gridRef={gridRef}
-          tableRef={tableRef}
-        />
-      </AlbumArtistListContext.Provider>
-    </AnimatedPage>
-  );
+    return (
+        <AnimatedPage>
+            <AlbumArtistListContext.Provider value={{ id: undefined, pageKey }}>
+                <AlbumArtistListHeader
+                    gridRef={gridRef}
+                    itemCount={itemCount}
+                    tableRef={tableRef}
+                />
+                <AlbumArtistListContent
+                    gridRef={gridRef}
+                    tableRef={tableRef}
+                />
+            </AlbumArtistListContext.Provider>
+        </AnimatedPage>
+    );
 };
 
 export default AlbumArtistListRoute;

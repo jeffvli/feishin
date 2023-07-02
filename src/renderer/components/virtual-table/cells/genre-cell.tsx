@@ -6,37 +6,37 @@ import { Text } from '/@/renderer/components/text';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 
 export const GenreCell = ({ value, data }: ICellRendererParams) => {
-  return (
-    <CellContainer position="left">
-      <Text
-        $secondary
-        overflow="hidden"
-        size="md"
-      >
-        {value?.map((item: Artist | AlbumArtist, index: number) => (
-          <React.Fragment key={`row-${item.id}-${data.uniqueId}`}>
-            {index > 0 && (
-              <Text
-                $secondary
-                size="md"
-                style={{ display: 'inline-block' }}
-              >
-                ,
-              </Text>
-            )}{' '}
+    return (
+        <CellContainer position="left">
             <Text
-              $link
-              $secondary
-              component={Link}
-              overflow="hidden"
-              size="md"
-              to="/"
+                $secondary
+                overflow="hidden"
+                size="md"
             >
-              {item.name || '—'}
+                {value?.map((item: Artist | AlbumArtist, index: number) => (
+                    <React.Fragment key={`row-${item.id}-${data.uniqueId}`}>
+                        {index > 0 && (
+                            <Text
+                                $secondary
+                                size="md"
+                                style={{ display: 'inline-block' }}
+                            >
+                                ,
+                            </Text>
+                        )}{' '}
+                        <Text
+                            $link
+                            $secondary
+                            component={Link}
+                            overflow="hidden"
+                            size="md"
+                            to="/"
+                        >
+                            {item.name || '—'}
+                        </Text>
+                    </React.Fragment>
+                ))}
             </Text>
-          </React.Fragment>
-        ))}
-      </Text>
-    </CellContainer>
-  );
+        </CellContainer>
+    );
 };

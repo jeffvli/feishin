@@ -5,17 +5,17 @@ import styled from 'styled-components';
 type AccordionProps = MantineAccordionProps;
 
 const StyledAccordion = styled(MantineAccordion)`
-  & .mantine-Accordion-panel {
-    background: var(--paper-bg);
-  }
+    & .mantine-Accordion-panel {
+        background: var(--paper-bg);
+    }
 
-  .mantine-Accordion-control {
-    background: var(--paper-bg);
-  }
+    .mantine-Accordion-control {
+        background: var(--paper-bg);
+    }
 `;
 
 export const Accordion = ({ children, ...props }: AccordionProps) => {
-  return <StyledAccordion {...props}>{children}</StyledAccordion>;
+    return <StyledAccordion {...props}>{children}</StyledAccordion>;
 };
 
 Accordion.Control = StyledAccordion.Control;

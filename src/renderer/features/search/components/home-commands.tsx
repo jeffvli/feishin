@@ -11,68 +11,70 @@ import { useCurrentServer } from '/@/renderer/store';
 import { ServerType } from '/@/renderer/types';
 
 interface HomeCommandsProps {
-  handleClose: () => void;
-  pages: CommandPalettePages[];
-  query: string;
-  setPages: Dispatch<CommandPalettePages[]>;
-  setQuery: Dispatch<string>;
+    handleClose: () => void;
+    pages: CommandPalettePages[];
+    query: string;
+    setPages: Dispatch<CommandPalettePages[]>;
+    setQuery: Dispatch<string>;
 }
 
 export const HomeCommands = ({
-  query,
-  setQuery,
-  pages,
-  setPages,
-  handleClose,
+    query,
+    setQuery,
+    pages,
+    setPages,
+    handleClose,
 }: HomeCommandsProps) => {
-  const navigate = useNavigate();
-  const server = useCurrentServer();
+    const navigate = useNavigate();
+    const server = useCurrentServer();
 
-  const handleCreatePlaylistModal = useCallback(() => {
-    handleClose();
+    const handleCreatePlaylistModal = useCallback(() => {
+        handleClose();
 
-    openModal({
-      children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
-      size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
-      title: 'Create Playlist',
-    });
-  }, [handleClose, server?.type]);
+        openModal({
+            children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
+            size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
+            title: 'Create Playlist',
+        });
+    }, [handleClose, server?.type]);
 
-  const handleSearch = () => {
-    navigate(
-      {
-        pathname: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
-        search: createSearchParams({
-          query,
-        }).toString(),
-      },
-      {
-        state: {
-          navigationId: nanoid(),
-        },
-      },
+    const handleSearch = () => {
+        navigate(
+            {
+                pathname: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
+                search: createSearchParams({
+                    query,
+                }).toString(),
+            },
+            {
+                state: {
+                    navigationId: nanoid(),
+                },
+            },
+        );
+        handleClose();
+        setQuery('');
+    };
+
+    return (
+        <>
+            <Command.Group heading="Commands">
+                <Command.Item
+                    value="Search"
+                    onSelect={handleSearch}
+                >
+                    {query ? `Search for "${query}"...` : 'Search...'}
+                </Command.Item>
+                <Command.Item onSelect={handleCreatePlaylistModal}>Create playlist...</Command.Item>
+                <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.GO_TO])}>
+                    Go to page...
+                </Command.Item>
+                <Command.Item
+                    onSelect={() => setPages([...pages, CommandPalettePages.MANAGE_SERVERS])}
+                >
+                    Server commands...
+                </Command.Item>
+            </Command.Group>
+        </>
     );
-    handleClose();
-    setQuery('');
-  };
-
-  return (
-    <>
-      <Command.Group heading="Commands">
-        <Command.Item
-          value="Search"
-          onSelect={handleSearch}
-        >
-          {query ? `Search for "${query}"...` : 'Search...'}
-        </Command.Item>
-        <Command.Item onSelect={handleCreatePlaylistModal}>Create playlist...</Command.Item>
-        <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.GO_TO])}>
-          Go to page...
-        </Command.Item>
-        <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.MANAGE_SERVERS])}>
-          Server commands...
-        </Command.Item>
-      </Command.Group>
-    </>
-  );
 };

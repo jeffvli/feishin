@@ -6,90 +6,90 @@ import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/crea
 import { useCurrentServer } from '/@/renderer/store';
 
 interface SaveAsPlaylistFormProps {
-  body: Partial<CreatePlaylistBody>;
-  onCancel: () => void;
-  onSuccess: (data: CreatePlaylistResponse) => void;
-  serverId: string | undefined;
+    body: Partial<CreatePlaylistBody>;
+    onCancel: () => void;
+    onSuccess: (data: CreatePlaylistResponse) => void;
+    serverId: string | undefined;
 }
 
 export const SaveAsPlaylistForm = ({
-  body,
-  serverId,
-  onSuccess,
-  onCancel,
+    body,
+    serverId,
+    onSuccess,
+    onCancel,
 }: SaveAsPlaylistFormProps) => {
-  const mutation = useCreatePlaylist({});
-  const server = useCurrentServer();
+    const mutation = useCreatePlaylist({});
+    const server = useCurrentServer();
 
-  const form = useForm<CreatePlaylistBody>({
-    initialValues: {
-      _custom: {
-        navidrome: {
-          public: false,
-          rules: undefined,
-          ...body?._custom?.navidrome,
+    const form = useForm<CreatePlaylistBody>({
+        initialValues: {
+            _custom: {
+                navidrome: {
+                    public: false,
+                    rules: undefined,
+                    ...body?._custom?.navidrome,
+                },
+            },
+            comment: body.comment || '',
+            name: body.name || '',
         },
-      },
-      comment: body.comment || '',
-      name: body.name || '',
-    },
-  });
+    });
 
-  const handleSubmit = form.onSubmit((values) => {
-    mutation.mutate(
-      { body: values, serverId },
-      {
-        onError: (err) => {
-          toast.error({ message: err.message, title: 'Error creating playlist' });
-        },
-        onSuccess: (data) => {
-          toast.success({ message: `Playlist has been created` });
-          onSuccess(data);
-          onCancel();
-        },
-      },
+    const handleSubmit = form.onSubmit((values) => {
+        mutation.mutate(
+            { body: values, serverId },
+            {
+                onError: (err) => {
+                    toast.error({ message: err.message, title: 'Error creating playlist' });
+                },
+                onSuccess: (data) => {
+                    toast.success({ message: `Playlist has been created` });
+                    onSuccess(data);
+                    onCancel();
+                },
+            },
+        );
+    });
+
+    const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
+    const isSubmitDisabled = !form.values.name || mutation.isLoading;
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <Stack>
+                <TextInput
+                    data-autofocus
+                    required
+                    label="Name"
+                    {...form.getInputProps('name')}
+                />
+                <TextInput
+                    label="Description"
+                    {...form.getInputProps('comment')}
+                />
+                {isPublicDisplayed && (
+                    <Switch
+                        label="Is Public?"
+                        {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
+                    />
+                )}
+                <Group position="right">
+                    <Button
+                        variant="subtle"
+                        onClick={onCancel}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        disabled={isSubmitDisabled}
+                        loading={mutation.isLoading}
+                        type="submit"
+                        variant="filled"
+                    >
+                        Save
+                    </Button>
+                </Group>
+            </Stack>
+        </form>
     );
-  });
-
-  const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
-  const isSubmitDisabled = !form.values.name || mutation.isLoading;
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <Stack>
-        <TextInput
-          data-autofocus
-          required
-          label="Name"
-          {...form.getInputProps('name')}
-        />
-        <TextInput
-          label="Description"
-          {...form.getInputProps('comment')}
-        />
-        {isPublicDisplayed && (
-          <Switch
-            label="Is Public?"
-            {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
-          />
-        )}
-        <Group position="right">
-          <Button
-            variant="subtle"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
-          <Button
-            disabled={isSubmitDisabled}
-            loading={mutation.isLoading}
-            type="submit"
-            variant="filled"
-          >
-            Save
-          </Button>
-        </Group>
-      </Stack>
-    </form>
-  );
 };

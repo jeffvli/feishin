@@ -15,149 +15,153 @@ import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useHideScrollbar } from '/@/renderer/hooks';
 
 interface SidebarPlaylistListProps {
-  data: ReturnType<typeof usePlaylistList>['data'];
+    data: ReturnType<typeof usePlaylistList>['data'];
 }
 
 const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
-  return (
-    <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
-      <Group
-        noWrap
-        className="sidebar-playlist-item"
-        pos="relative"
-        position="apart"
-        sx={{
-          '&:hover': {
-            '.sidebar-playlist-controls': {
-              display: 'flex',
-            },
-            '.sidebar-playlist-name': {
-              color: 'var(--sidebar-fg-hover) !important',
-            },
-          },
-        }}
-      >
-        <Text
-          className="sidebar-playlist-name"
-          component={Link}
-          overflow="hidden"
-          size="md"
-          sx={{
-            color: 'var(--sidebar-fg) !important',
-            cursor: 'default',
-            width: '100%',
-          }}
-          to={
-            data?.items[index].id
-              ? generatePath(AppRoute.PLAYLISTS_DETAIL, {
-                  playlistId: data?.items[index].id,
-                })
-              : undefined
-          }
-        >
-          {data?.items[index].name}
-        </Text>
-        <Group
-          noWrap
-          className="sidebar-playlist-controls"
-          display="none"
-          pos="absolute"
-          right="0"
-          spacing="sm"
-        >
-          <Button
-            compact
-            size="md"
-            tooltip={{ label: 'Play', openDelay: 500 }}
-            variant="default"
-            onClick={() => {
-              if (!data?.items?.[index].id) return;
-              data.handlePlay(data?.items[index].id, Play.NOW);
-            }}
-          >
-            <RiPlayFill />
-          </Button>
-          <Button
-            compact
-            size="md"
-            tooltip={{ label: 'Add to queue', openDelay: 500 }}
-            variant="default"
-            onClick={() => {
-              if (!data?.items?.[index].id) return;
-              data.handlePlay(data?.items[index].id, Play.LAST);
-            }}
-          >
-            <RiAddBoxFill />
-          </Button>
-          <Button
-            compact
-            size="md"
-            tooltip={{ label: 'Add to queue next', openDelay: 500 }}
-            variant="default"
-            onClick={() => {
-              if (!data?.items?.[index].id) return;
-              data.handlePlay(data?.items[index].id, Play.NEXT);
-            }}
-          >
-            <RiAddCircleFill />
-          </Button>
-        </Group>
-      </Group>
-    </div>
-  );
+    return (
+        <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
+            <Group
+                noWrap
+                className="sidebar-playlist-item"
+                pos="relative"
+                position="apart"
+                sx={{
+                    '&:hover': {
+                        '.sidebar-playlist-controls': {
+                            display: 'flex',
+                        },
+                        '.sidebar-playlist-name': {
+                            color: 'var(--sidebar-fg-hover) !important',
+                        },
+                    },
+                }}
+            >
+                <Text
+                    className="sidebar-playlist-name"
+                    component={Link}
+                    overflow="hidden"
+                    size="md"
+                    sx={{
+                        color: 'var(--sidebar-fg) !important',
+                        cursor: 'default',
+                        width: '100%',
+                    }}
+                    to={
+                        data?.items[index].id
+                            ? generatePath(AppRoute.PLAYLISTS_DETAIL, {
+                                  playlistId: data?.items[index].id,
+                              })
+                            : undefined
+                    }
+                >
+                    {data?.items[index].name}
+                </Text>
+                <Group
+                    noWrap
+                    className="sidebar-playlist-controls"
+                    display="none"
+                    pos="absolute"
+                    right="0"
+                    spacing="sm"
+                >
+                    <Button
+                        compact
+                        size="md"
+                        tooltip={{ label: 'Play', openDelay: 500 }}
+                        variant="default"
+                        onClick={() => {
+                            if (!data?.items?.[index].id) return;
+                            data.handlePlay(data?.items[index].id, Play.NOW);
+                        }}
+                    >
+                        <RiPlayFill />
+                    </Button>
+                    <Button
+                        compact
+                        size="md"
+                        tooltip={{ label: 'Add to queue', openDelay: 500 }}
+                        variant="default"
+                        onClick={() => {
+                            if (!data?.items?.[index].id) return;
+                            data.handlePlay(data?.items[index].id, Play.LAST);
+                        }}
+                    >
+                        <RiAddBoxFill />
+                    </Button>
+                    <Button
+                        compact
+                        size="md"
+                        tooltip={{ label: 'Add to queue next', openDelay: 500 }}
+                        variant="default"
+                        onClick={() => {
+                            if (!data?.items?.[index].id) return;
+                            data.handlePlay(data?.items[index].id, Play.NEXT);
+                        }}
+                    >
+                        <RiAddCircleFill />
+                    </Button>
+                </Group>
+            </Group>
+        </div>
+    );
 };
 
 export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
-  const { isScrollbarHidden, hideScrollbarElementProps } = useHideScrollbar(0);
-  const handlePlayQueueAdd = usePlayQueueAdd();
+    const { isScrollbarHidden, hideScrollbarElementProps } = useHideScrollbar(0);
+    const handlePlayQueueAdd = usePlayQueueAdd();
 
-  const [rect, setRect] = useState({
-    height: 0,
-    width: 0,
-  });
+    const [rect, setRect] = useState({
+        height: 0,
+        width: 0,
+    });
 
-  const [debounced] = useDebouncedValue(rect, 25);
+    const [debounced] = useDebouncedValue(rect, 25);
 
-  const handlePlayPlaylist = useCallback(
-    (id: string, playType: Play) => {
-      handlePlayQueueAdd?.({
-        byItemType: {
-          id: [id],
-          type: LibraryItem.PLAYLIST,
+    const handlePlayPlaylist = useCallback(
+        (id: string, playType: Play) => {
+            handlePlayQueueAdd?.({
+                byItemType: {
+                    id: [id],
+                    type: LibraryItem.PLAYLIST,
+                },
+                playType,
+            });
         },
-        playType,
-      });
-    },
-    [handlePlayQueueAdd],
-  );
+        [handlePlayQueueAdd],
+    );
 
-  const memoizedItemData = useMemo(() => {
-    return {
-      handlePlay: handlePlayPlaylist,
-      items: data?.items,
-    };
-  }, [data?.items, handlePlayPlaylist]);
+    const memoizedItemData = useMemo(() => {
+        return {
+            handlePlay: handlePlayPlaylist,
+            items: data?.items,
+        };
+    }, [data?.items, handlePlayPlaylist]);
 
-  return (
-    <Flex
-      h="100%"
-      {...hideScrollbarElementProps}
-    >
-      <AutoSizer onResize={(e) => setRect(e as { height: number; width: number })}>
-        {() => (
-          <FixedSizeList
-            className={isScrollbarHidden ? 'hide-scrollbar overlay-scrollbar' : 'overlay-scrollbar'}
-            height={debounced.height}
-            itemCount={data?.items?.length || 0}
-            itemData={memoizedItemData}
-            itemSize={25}
-            overscanCount={20}
-            width={debounced.width}
-          >
-            {PlaylistRow}
-          </FixedSizeList>
-        )}
-      </AutoSizer>
-    </Flex>
-  );
+    return (
+        <Flex
+            h="100%"
+            {...hideScrollbarElementProps}
+        >
+            <AutoSizer onResize={(e) => setRect(e as { height: number; width: number })}>
+                {() => (
+                    <FixedSizeList
+                        className={
+                            isScrollbarHidden
+                                ? 'hide-scrollbar overlay-scrollbar'
+                                : 'overlay-scrollbar'
+                        }
+                        height={debounced.height}
+                        itemCount={data?.items?.length || 0}
+                        itemData={memoizedItemData}
+                        itemSize={25}
+                        overscanCount={20}
+                        width={debounced.width}
+                    >
+                        {PlaylistRow}
+                    </FixedSizeList>
+                )}
+            </AutoSizer>
+        </Flex>
+    );
 };

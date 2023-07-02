@@ -5,29 +5,29 @@ import styled from 'styled-components';
 import { Tooltip } from '/@/renderer/components/tooltip';
 
 interface RatingProps extends Omit<MantineRatingProps, 'onClick'> {
-  onClick: (e: MouseEvent<HTMLDivElement>, value: number | undefined) => void;
+    onClick: (e: MouseEvent<HTMLDivElement>, value: number | undefined) => void;
 }
 
 const StyledRating = styled(MantineRating)`
-  & .mantine-Rating-symbolBody {
-    svg {
-      stroke: var(--main-fg-secondary);
+    & .mantine-Rating-symbolBody {
+        svg {
+            stroke: var(--main-fg-secondary);
+        }
     }
-  }
 `;
 
 export const Rating = ({ onClick, ...props }: RatingProps) => {
-  // const debouncedOnClick = debounce(onClick, 100);
+    // const debouncedOnClick = debounce(onClick, 100);
 
-  return (
-    <Tooltip
-      label="Double click to clear"
-      openDelay={1000}
-    >
-      <StyledRating
-        {...props}
-        onDoubleClick={(e) => onClick(e, props.value)}
-      />
-    </Tooltip>
-  );
+    return (
+        <Tooltip
+            label="Double click to clear"
+            openDelay={1000}
+        >
+            <StyledRating
+                {...props}
+                onDoubleClick={(e) => onClick(e, props.value)}
+            />
+        </Tooltip>
+    );
 };

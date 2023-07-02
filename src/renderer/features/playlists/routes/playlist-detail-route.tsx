@@ -13,59 +13,61 @@ import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { useCurrentServer } from '../../../store/auth.store';
 
 const PlaylistDetailRoute = () => {
-  const tableRef = useRef<AgGridReactType | null>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const { playlistId } = useParams() as { playlistId: string };
-  const server = useCurrentServer();
+    const tableRef = useRef<AgGridReactType | null>(null);
+    const scrollAreaRef = useRef<HTMLDivElement>(null);
+    const headerRef = useRef<HTMLDivElement>(null);
+    const { playlistId } = useParams() as { playlistId: string };
+    const server = useCurrentServer();
 
-  const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
-  const background = useFastAverageColor(
-    detailQuery?.data?.imageUrl,
-    !detailQuery?.isLoading,
-    'sqrt',
-  );
+    const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
+    const background = useFastAverageColor(
+        detailQuery?.data?.imageUrl,
+        !detailQuery?.isLoading,
+        'sqrt',
+    );
 
-  const handlePlayQueueAdd = usePlayQueueAdd();
-  const playButtonBehavior = usePlayButtonBehavior();
+    const handlePlayQueueAdd = usePlayQueueAdd();
+    const playButtonBehavior = usePlayButtonBehavior();
 
-  const handlePlay = () => {
-    handlePlayQueueAdd?.({
-      byItemType: {
-        id: [playlistId],
-        type: LibraryItem.PLAYLIST,
-      },
-      playType: playButtonBehavior,
-    });
-  };
+    const handlePlay = () => {
+        handlePlayQueueAdd?.({
+            byItemType: {
+                id: [playlistId],
+                type: LibraryItem.PLAYLIST,
+            },
+            playType: playButtonBehavior,
+        });
+    };
 
-  if (!background) return null;
+    if (!background) return null;
 
-  return (
-    <AnimatedPage key={`playlist-detail-${playlistId}`}>
-      <NativeScrollArea
-        ref={scrollAreaRef}
-        pageHeaderProps={{
-          backgroundColor: background,
-          children: (
-            <LibraryHeaderBar>
-              <LibraryHeaderBar.PlayButton onClick={handlePlay} />
-              <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
-            </LibraryHeaderBar>
-          ),
-          target: headerRef,
-        }}
-      >
-        <PlaylistDetailHeader
-          ref={headerRef}
-          background={background}
-          imagePlaceholderUrl={detailQuery?.data?.imageUrl}
-          imageUrl={detailQuery?.data?.imageUrl}
-        />
-        <PlaylistDetailContent tableRef={tableRef} />
-      </NativeScrollArea>
-    </AnimatedPage>
-  );
+    return (
+        <AnimatedPage key={`playlist-detail-${playlistId}`}>
+            <NativeScrollArea
+                ref={scrollAreaRef}
+                pageHeaderProps={{
+                    backgroundColor: background,
+                    children: (
+                        <LibraryHeaderBar>
+                            <LibraryHeaderBar.PlayButton onClick={handlePlay} />
+                            <LibraryHeaderBar.Title>
+                                {detailQuery?.data?.name}
+                            </LibraryHeaderBar.Title>
+                        </LibraryHeaderBar>
+                    ),
+                    target: headerRef,
+                }}
+            >
+                <PlaylistDetailHeader
+                    ref={headerRef}
+                    background={background}
+                    imagePlaceholderUrl={detailQuery?.data?.imageUrl}
+                    imageUrl={detailQuery?.data?.imageUrl}
+                />
+                <PlaylistDetailContent tableRef={tableRef} />
+            </NativeScrollArea>
+        </AnimatedPage>
+    );
 };
 
 export default PlaylistDetailRoute;

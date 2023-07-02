@@ -1,9 +1,9 @@
 import { MutableRefObject, useMemo, useCallback } from 'react';
 import {
-  ColDef,
-  GridReadyEvent,
-  RowDoubleClickedEvent,
-  IDatasource,
+    ColDef,
+    GridReadyEvent,
+    RowDoubleClickedEvent,
+    IDatasource,
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Stack } from '@mantine/core';
@@ -14,139 +14,143 @@ import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-gr
 import { VirtualTable, getColumnDefs } from '/@/renderer/components/virtual-table';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import {
-  ALBUM_CONTEXT_MENU_ITEMS,
-  ARTIST_CONTEXT_MENU_ITEMS,
-  SONG_CONTEXT_MENU_ITEMS,
+    ALBUM_CONTEXT_MENU_ITEMS,
+    ARTIST_CONTEXT_MENU_ITEMS,
+    SONG_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { AppRoute } from '../../../router/routes';
 import {
-  useCurrentServer,
-  useSongListStore,
-  usePlayButtonBehavior,
-  useAlbumListStore,
-  useAlbumArtistListStore,
+    useCurrentServer,
+    useSongListStore,
+    usePlayButtonBehavior,
+    useAlbumListStore,
+    useAlbumArtistListStore,
 } from '/@/renderer/store';
 
 interface SearchContentProps {
-  getDatasource: (searchQuery: string, itemType: LibraryItem) => IDatasource | undefined;
-  tableRef: MutableRefObject<AgGridReactType | null>;
+    getDatasource: (searchQuery: string, itemType: LibraryItem) => IDatasource | undefined;
+    tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const SearchContent = ({ tableRef, getDatasource }: SearchContentProps) => {
-  const navigate = useNavigate();
-  const server = useCurrentServer();
-  const { itemType } = useParams() as { itemType: LibraryItem };
-  const [searchParams] = useSearchParams();
-  const songListStore = useSongListStore();
-  const albumListStore = useAlbumListStore();
-  const albumArtistListStore = useAlbumArtistListStore();
-  const handlePlayQueueAdd = usePlayQueueAdd();
-  const playButtonBehavior = usePlayButtonBehavior();
+    const navigate = useNavigate();
+    const server = useCurrentServer();
+    const { itemType } = useParams() as { itemType: LibraryItem };
+    const [searchParams] = useSearchParams();
+    const songListStore = useSongListStore();
+    const albumListStore = useAlbumListStore();
+    const albumArtistListStore = useAlbumArtistListStore();
+    const handlePlayQueueAdd = usePlayQueueAdd();
+    const playButtonBehavior = usePlayButtonBehavior();
 
-  const getTable = useCallback(
-    (itemType: string) => {
-      switch (itemType) {
-        case LibraryItem.SONG:
-          return songListStore.table;
-        case LibraryItem.ALBUM:
-          return albumListStore.table;
-        case LibraryItem.ALBUM_ARTIST:
-          return albumArtistListStore.table;
-        default:
-          return undefined;
-      }
-    },
-    [albumArtistListStore.table, albumListStore.table, songListStore.table],
-  );
+    const getTable = useCallback(
+        (itemType: string) => {
+            switch (itemType) {
+                case LibraryItem.SONG:
+                    return songListStore.table;
+                case LibraryItem.ALBUM:
+                    return albumListStore.table;
+                case LibraryItem.ALBUM_ARTIST:
+                    return albumArtistListStore.table;
+                default:
+                    return undefined;
+            }
+        },
+        [albumArtistListStore.table, albumListStore.table, songListStore.table],
+    );
 
-  const table = getTable(itemType)!;
+    const table = getTable(itemType)!;
 
-  const columnDefs: ColDef[] = useMemo(() => getColumnDefs(table.columns), [table.columns]);
+    const columnDefs: ColDef[] = useMemo(() => getColumnDefs(table.columns), [table.columns]);
 
-  const onGridReady = useCallback(
-    (params: GridReadyEvent) => {
-      const datasource = getDatasource(searchParams.get('query') || '', itemType);
-      if (!datasource) return;
+    const onGridReady = useCallback(
+        (params: GridReadyEvent) => {
+            const datasource = getDatasource(searchParams.get('query') || '', itemType);
+            if (!datasource) return;
 
-      params.api.setDatasource(datasource);
-      params.api.ensureIndexVisible(table.scrollOffset, 'top');
-    },
-    [getDatasource, itemType, searchParams, table.scrollOffset],
-  );
+            params.api.setDatasource(datasource);
+            params.api.ensureIndexVisible(table.scrollOffset, 'top');
+        },
+        [getDatasource, itemType, searchParams, table.scrollOffset],
+    );
 
-  const handleGridSizeChange = () => {
-    if (table.autoFit) {
-      tableRef?.current?.api.sizeColumnsToFit();
-    }
-  };
+    const handleGridSizeChange = () => {
+        if (table.autoFit) {
+            tableRef?.current?.api.sizeColumnsToFit();
+        }
+    };
 
-  const contextMenuItems = () => {
-    switch (itemType) {
-      case LibraryItem.ALBUM:
-        return ALBUM_CONTEXT_MENU_ITEMS;
-      case LibraryItem.ALBUM_ARTIST:
-        return ARTIST_CONTEXT_MENU_ITEMS;
-      case LibraryItem.SONG:
-        return SONG_CONTEXT_MENU_ITEMS;
-      default:
-        return [];
-    }
-  };
+    const contextMenuItems = () => {
+        switch (itemType) {
+            case LibraryItem.ALBUM:
+                return ALBUM_CONTEXT_MENU_ITEMS;
+            case LibraryItem.ALBUM_ARTIST:
+                return ARTIST_CONTEXT_MENU_ITEMS;
+            case LibraryItem.SONG:
+                return SONG_CONTEXT_MENU_ITEMS;
+            default:
+                return [];
+        }
+    };
 
-  const handleContextMenu = useHandleTableContextMenu(itemType, contextMenuItems());
+    const handleContextMenu = useHandleTableContextMenu(itemType, contextMenuItems());
 
-  const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
-    if (!e.data) return;
-    switch (itemType) {
-      case LibraryItem.ALBUM:
-        navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: e.data.id }));
-        break;
-      case LibraryItem.ALBUM_ARTIST:
-        navigate(generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, { albumArtistId: e.data.id }));
-        break;
-      case LibraryItem.SONG:
-        handlePlayQueueAdd?.({
-          byData: [e.data],
-          playType: playButtonBehavior,
-        });
-        break;
-    }
-  };
+    const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
+        if (!e.data) return;
+        switch (itemType) {
+            case LibraryItem.ALBUM:
+                navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: e.data.id }));
+                break;
+            case LibraryItem.ALBUM_ARTIST:
+                navigate(
+                    generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                        albumArtistId: e.data.id,
+                    }),
+                );
+                break;
+            case LibraryItem.SONG:
+                handlePlayQueueAdd?.({
+                    byData: [e.data],
+                    playType: playButtonBehavior,
+                });
+                break;
+        }
+    };
 
-  return (
-    <Stack
-      h="100%"
-      spacing={0}
-    >
-      <VirtualGridAutoSizerContainer>
-        <VirtualTable
-          // https://github.com/ag-grid/ag-grid/issues/5284
-          // Key is used to force remount of table when display, rowHeight, or server changes
-          key={`table-${itemType}-${table.rowHeight}-${server?.id}`}
-          ref={tableRef}
-          alwaysShowHorizontalScroll
-          suppressRowDrag
-          autoFitColumns={table.autoFit}
-          blockLoadDebounceMillis={200}
-          cacheBlockSize={25}
-          cacheOverflowSize={1}
-          columnDefs={columnDefs}
-          context={{
-            query: searchParams.get('query'),
-          }}
-          getRowId={(data) => data.data.id}
-          infiniteInitialRowCount={25}
-          rowBuffer={20}
-          rowHeight={table.rowHeight || 40}
-          rowModelType="infinite"
-          rowSelection="multiple"
-          onCellContextMenu={handleContextMenu}
-          onGridReady={onGridReady}
-          onGridSizeChanged={handleGridSizeChange}
-          onRowDoubleClicked={handleRowDoubleClick}
-        />
-      </VirtualGridAutoSizerContainer>
-    </Stack>
-  );
+    return (
+        <Stack
+            h="100%"
+            spacing={0}
+        >
+            <VirtualGridAutoSizerContainer>
+                <VirtualTable
+                    // https://github.com/ag-grid/ag-grid/issues/5284
+                    // Key is used to force remount of table when display, rowHeight, or server changes
+                    key={`table-${itemType}-${table.rowHeight}-${server?.id}`}
+                    ref={tableRef}
+                    alwaysShowHorizontalScroll
+                    suppressRowDrag
+                    autoFitColumns={table.autoFit}
+                    blockLoadDebounceMillis={200}
+                    cacheBlockSize={25}
+                    cacheOverflowSize={1}
+                    columnDefs={columnDefs}
+                    context={{
+                        query: searchParams.get('query'),
+                    }}
+                    getRowId={(data) => data.data.id}
+                    infiniteInitialRowCount={25}
+                    rowBuffer={20}
+                    rowHeight={table.rowHeight || 40}
+                    rowModelType="infinite"
+                    rowSelection="multiple"
+                    onCellContextMenu={handleContextMenu}
+                    onGridReady={onGridReady}
+                    onGridSizeChanged={handleGridSizeChange}
+                    onRowDoubleClicked={handleRowDoubleClick}
+                />
+            </VirtualGridAutoSizerContainer>
+        </Stack>
+    );
 };

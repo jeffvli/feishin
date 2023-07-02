@@ -15,140 +15,144 @@ import { TablePagination as TablePaginationType } from '/@/renderer/types';
 import { ListKey } from '/@/renderer/store';
 
 interface TablePaginationProps {
-  pageKey: ListKey;
-  pagination: TablePaginationType;
-  setIdPagination?: (id: string, pagination: Partial<TablePaginationType>) => void;
-  setPagination?: (args: { data: Partial<TablePaginationType>; key: ListKey }) => void;
-  tableRef: MutableRefObject<AgGridReactType | null>;
+    pageKey: ListKey;
+    pagination: TablePaginationType;
+    setIdPagination?: (id: string, pagination: Partial<TablePaginationType>) => void;
+    setPagination?: (args: { data: Partial<TablePaginationType>; key: ListKey }) => void;
+    tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const TablePagination = ({
-  pageKey,
-  tableRef,
-  pagination,
-  setPagination,
-  setIdPagination,
+    pageKey,
+    tableRef,
+    pagination,
+    setPagination,
+    setIdPagination,
 }: TablePaginationProps) => {
-  const [isGoToPageOpen, handlers] = useDisclosure(false);
-  const containerQuery = useContainerQuery();
+    const [isGoToPageOpen, handlers] = useDisclosure(false);
+    const containerQuery = useContainerQuery();
 
-  const goToForm = useForm({
-    initialValues: {
-      pageNumber: undefined,
-    },
-  });
+    const goToForm = useForm({
+        initialValues: {
+            pageNumber: undefined,
+        },
+    });
 
-  const handlePagination = (index: number) => {
-    const newPage = index - 1;
-    tableRef.current?.api.paginationGoToPage(newPage);
-    setPagination?.({ data: { currentPage: newPage }, key: pageKey });
-    setIdPagination?.(pageKey || '', { currentPage: newPage });
-  };
+    const handlePagination = (index: number) => {
+        const newPage = index - 1;
+        tableRef.current?.api.paginationGoToPage(newPage);
+        setPagination?.({ data: { currentPage: newPage }, key: pageKey });
+        setIdPagination?.(pageKey || '', { currentPage: newPage });
+    };
 
-  const handleGoSubmit = goToForm.onSubmit((values) => {
-    handlers.close();
-    if (!values.pageNumber || values.pageNumber < 1 || values.pageNumber > pagination.totalPages) {
-      return;
-    }
+    const handleGoSubmit = goToForm.onSubmit((values) => {
+        handlers.close();
+        if (
+            !values.pageNumber ||
+            values.pageNumber < 1 ||
+            values.pageNumber > pagination.totalPages
+        ) {
+            return;
+        }
 
-    const newPage = values.pageNumber - 1;
-    tableRef.current?.api.paginationGoToPage(newPage);
-    setPagination?.({ data: { currentPage: newPage }, key: pageKey });
-    setIdPagination?.(pageKey || '', { currentPage: newPage });
-  });
+        const newPage = values.pageNumber - 1;
+        tableRef.current?.api.paginationGoToPage(newPage);
+        setPagination?.({ data: { currentPage: newPage }, key: pageKey });
+        setIdPagination?.(pageKey || '', { currentPage: newPage });
+    });
 
-  const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage + 1;
-  const currentPageMaxIndex = (pagination.currentPage + 1) * pagination.itemsPerPage;
-  const currentPageStopIndex =
-    currentPageMaxIndex > pagination.totalItems ? pagination.totalItems : currentPageMaxIndex;
+    const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage + 1;
+    const currentPageMaxIndex = (pagination.currentPage + 1) * pagination.itemsPerPage;
+    const currentPageStopIndex =
+        currentPageMaxIndex > pagination.totalItems ? pagination.totalItems : currentPageMaxIndex;
 
-  return (
-    <MotionFlex
-      ref={containerQuery.ref}
-      layout
-      align="center"
-      animate={{ y: 0 }}
-      exit={{ y: 50 }}
-      initial={{ y: 50 }}
-      justify="space-between"
-      p="1rem"
-      sx={{ borderTop: '1px solid var(--generic-border-color)' }}
-    >
-      <Text
-        $secondary
-        size="md"
-      >
-        {containerQuery.isMd ? (
-          <>
-            Showing <b>{currentPageStartIndex}</b> - <b>{currentPageStopIndex}</b> of{' '}
-            <b>{pagination.totalItems}</b> items
-          </>
-        ) : containerQuery.isSm ? (
-          <>
-            <b>{currentPageStartIndex}</b> - <b>{currentPageStopIndex}</b> of{' '}
-            <b>{pagination.totalItems}</b> items
-          </>
-        ) : (
-          <>
-            <b>{currentPageStartIndex}</b> - <b>{currentPageStopIndex}</b> of{' '}
-            <b>{pagination.totalItems}</b>
-          </>
-        )}
-      </Text>
-      <Group
-        ref={containerQuery.ref}
-        noWrap
-        spacing="sm"
-      >
-        <Popover
-          trapFocus
-          opened={isGoToPageOpen}
-          position="bottom-start"
-          onClose={() => handlers.close()}
+    return (
+        <MotionFlex
+            ref={containerQuery.ref}
+            layout
+            align="center"
+            animate={{ y: 0 }}
+            exit={{ y: 50 }}
+            initial={{ y: 50 }}
+            justify="space-between"
+            p="1rem"
+            sx={{ borderTop: '1px solid var(--generic-border-color)' }}
         >
-          <Popover.Target>
-            <Button
-              radius="sm"
-              size="sm"
-              sx={{ height: '26px', padding: '0', width: '26px' }}
-              tooltip={{ label: 'Go to page' }}
-              variant="default"
-              onClick={() => handlers.toggle()}
+            <Text
+                $secondary
+                size="md"
             >
-              <RiHashtag size={15} />
-            </Button>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <form onSubmit={handleGoSubmit}>
-              <Group>
-                <NumberInput
-                  {...goToForm.getInputProps('pageNumber')}
-                  hideControls={false}
-                  max={pagination.totalPages}
-                  min={1}
-                  width={70}
-                />
-                <Button
-                  type="submit"
-                  variant="filled"
+                {containerQuery.isMd ? (
+                    <>
+                        Showing <b>{currentPageStartIndex}</b> - <b>{currentPageStopIndex}</b> of{' '}
+                        <b>{pagination.totalItems}</b> items
+                    </>
+                ) : containerQuery.isSm ? (
+                    <>
+                        <b>{currentPageStartIndex}</b> - <b>{currentPageStopIndex}</b> of{' '}
+                        <b>{pagination.totalItems}</b> items
+                    </>
+                ) : (
+                    <>
+                        <b>{currentPageStartIndex}</b> - <b>{currentPageStopIndex}</b> of{' '}
+                        <b>{pagination.totalItems}</b>
+                    </>
+                )}
+            </Text>
+            <Group
+                ref={containerQuery.ref}
+                noWrap
+                spacing="sm"
+            >
+                <Popover
+                    trapFocus
+                    opened={isGoToPageOpen}
+                    position="bottom-start"
+                    onClose={() => handlers.close()}
                 >
-                  Go
-                </Button>
-              </Group>
-            </form>
-          </Popover.Dropdown>
-        </Popover>
-        <Pagination
-          noWrap
-          $hideDividers={!containerQuery.isSm}
-          boundaries={1}
-          radius="sm"
-          siblings={containerQuery.isMd ? 2 : containerQuery.isSm ? 1 : 0}
-          total={pagination.totalPages - 1}
-          value={pagination.currentPage + 1}
-          onChange={handlePagination}
-        />
-      </Group>
-    </MotionFlex>
-  );
+                    <Popover.Target>
+                        <Button
+                            radius="sm"
+                            size="sm"
+                            sx={{ height: '26px', padding: '0', width: '26px' }}
+                            tooltip={{ label: 'Go to page' }}
+                            variant="default"
+                            onClick={() => handlers.toggle()}
+                        >
+                            <RiHashtag size={15} />
+                        </Button>
+                    </Popover.Target>
+                    <Popover.Dropdown>
+                        <form onSubmit={handleGoSubmit}>
+                            <Group>
+                                <NumberInput
+                                    {...goToForm.getInputProps('pageNumber')}
+                                    hideControls={false}
+                                    max={pagination.totalPages}
+                                    min={1}
+                                    width={70}
+                                />
+                                <Button
+                                    type="submit"
+                                    variant="filled"
+                                >
+                                    Go
+                                </Button>
+                            </Group>
+                        </form>
+                    </Popover.Dropdown>
+                </Popover>
+                <Pagination
+                    noWrap
+                    $hideDividers={!containerQuery.isSm}
+                    boundaries={1}
+                    radius="sm"
+                    siblings={containerQuery.isMd ? 2 : containerQuery.isSm ? 1 : 0}
+                    total={pagination.totalPages - 1}
+                    value={pagination.currentPage + 1}
+                    onChange={handlePagination}
+                />
+            </Group>
+        </MotionFlex>
+    );
 };

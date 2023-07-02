@@ -6,54 +6,54 @@ import { CellContainer } from '/@/renderer/components/virtual-table/cells/generi
 import { useSetRating } from '/@/renderer/features/shared';
 
 export const RatingCell = ({ value, node }: ICellRendererParams) => {
-  const updateRatingMutation = useSetRating({});
+    const updateRatingMutation = useSetRating({});
 
-  const handleUpdateRating = (rating: number) => {
-    if (!value) return;
+    const handleUpdateRating = (rating: number) => {
+        if (!value) return;
 
-    updateRatingMutation.mutate(
-      {
-        query: {
-          item: [value],
-          rating,
-        },
-        serverId: value?.serverId,
-      },
-      {
-        onSuccess: () => {
-          node.setData({ ...node.data, userRating: rating });
-        },
-      },
+        updateRatingMutation.mutate(
+            {
+                query: {
+                    item: [value],
+                    rating,
+                },
+                serverId: value?.serverId,
+            },
+            {
+                onSuccess: () => {
+                    node.setData({ ...node.data, userRating: rating });
+                },
+            },
+        );
+    };
+
+    const handleClearRating = (e: MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        updateRatingMutation.mutate(
+            {
+                query: {
+                    item: [value],
+                    rating: 0,
+                },
+                serverId: value?.serverId,
+            },
+            {
+                onSuccess: () => {
+                    node.setData({ ...node.data, userRating: 0 });
+                },
+            },
+        );
+    };
+
+    return (
+        <CellContainer position="center">
+            <Rating
+                size="xs"
+                value={value?.userRating}
+                onChange={handleUpdateRating}
+                onClick={handleClearRating}
+            />
+        </CellContainer>
     );
-  };
-
-  const handleClearRating = (e: MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    updateRatingMutation.mutate(
-      {
-        query: {
-          item: [value],
-          rating: 0,
-        },
-        serverId: value?.serverId,
-      },
-      {
-        onSuccess: () => {
-          node.setData({ ...node.data, userRating: 0 });
-        },
-      },
-    );
-  };
-
-  return (
-    <CellContainer position="center">
-      <Rating
-        size="xs"
-        value={value?.userRating}
-        onChange={handleUpdateRating}
-        onClick={handleClearRating}
-      />
-    </CellContainer>
-  );
 };

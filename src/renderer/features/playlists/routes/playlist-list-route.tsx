@@ -8,37 +8,37 @@ import { AnimatedPage } from '/@/renderer/features/shared';
 import { useCurrentServer } from '/@/renderer/store';
 
 const PlaylistListRoute = () => {
-  const tableRef = useRef<AgGridReactType | null>(null);
-  const server = useCurrentServer();
+    const tableRef = useRef<AgGridReactType | null>(null);
+    const server = useCurrentServer();
 
-  const itemCountCheck = usePlaylistList({
-    options: {
-      cacheTime: 1000 * 60 * 60 * 2,
-      staleTime: 1000 * 60 * 60 * 2,
-    },
-    query: {
-      limit: 1,
-      sortBy: PlaylistListSort.NAME,
-      sortOrder: SortOrder.ASC,
-      startIndex: 0,
-    },
-    serverId: server?.id,
-  });
+    const itemCountCheck = usePlaylistList({
+        options: {
+            cacheTime: 1000 * 60 * 60 * 2,
+            staleTime: 1000 * 60 * 60 * 2,
+        },
+        query: {
+            limit: 1,
+            sortBy: PlaylistListSort.NAME,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+        },
+        serverId: server?.id,
+    });
 
-  const itemCount =
-    itemCountCheck.data?.totalRecordCount === null
-      ? undefined
-      : itemCountCheck.data?.totalRecordCount;
+    const itemCount =
+        itemCountCheck.data?.totalRecordCount === null
+            ? undefined
+            : itemCountCheck.data?.totalRecordCount;
 
-  return (
-    <AnimatedPage>
-      <PlaylistListHeader
-        itemCount={itemCount}
-        tableRef={tableRef}
-      />
-      <PlaylistListContent tableRef={tableRef} />
-    </AnimatedPage>
-  );
+    return (
+        <AnimatedPage>
+            <PlaylistListHeader
+                itemCount={itemCount}
+                tableRef={tableRef}
+            />
+            <PlaylistListContent tableRef={tableRef} />
+        </AnimatedPage>
+    );
 };
 
 export default PlaylistListRoute;

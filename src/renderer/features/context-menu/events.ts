@@ -3,47 +3,47 @@ import { createUseExternalEvents } from '@mantine/utils';
 import { LibraryItem } from '/@/renderer/api/types';
 
 export type OpenContextMenuProps = {
-  context?: any;
-  data: any[];
-  dataNodes?: RowNode[];
-  menuItems: SetContextMenuItems;
-  tableApi?: GridOptions['api'];
-  type: LibraryItem;
-  xPos: number;
-  yPos: number;
+    context?: any;
+    data: any[];
+    dataNodes?: RowNode[];
+    menuItems: SetContextMenuItems;
+    tableApi?: GridOptions['api'];
+    type: LibraryItem;
+    xPos: number;
+    yPos: number;
 };
 
 export type ContextMenuEvents = {
-  closeContextMenu: () => void;
-  openContextMenu: (args: OpenContextMenuProps) => void;
+    closeContextMenu: () => void;
+    openContextMenu: (args: OpenContextMenuProps) => void;
 };
 
 export type ContextMenuItemType =
-  | 'play'
-  | 'playLast'
-  | 'playNext'
-  | 'addToPlaylist'
-  | 'removeFromPlaylist'
-  | 'addToFavorites'
-  | 'removeFromFavorites'
-  | 'setRating'
-  | 'deletePlaylist'
-  | 'createPlaylist'
-  | 'moveToBottomOfQueue'
-  | 'moveToTopOfQueue'
-  | 'removeFromQueue'
-  | 'deselectAll';
+    | 'play'
+    | 'playLast'
+    | 'playNext'
+    | 'addToPlaylist'
+    | 'removeFromPlaylist'
+    | 'addToFavorites'
+    | 'removeFromFavorites'
+    | 'setRating'
+    | 'deletePlaylist'
+    | 'createPlaylist'
+    | 'moveToBottomOfQueue'
+    | 'moveToTopOfQueue'
+    | 'removeFromQueue'
+    | 'deselectAll';
 
 export type SetContextMenuItems = {
-  children?: boolean;
-  disabled?: boolean;
-  divider?: boolean;
-  id: ContextMenuItemType;
-  onClick?: () => void;
+    children?: boolean;
+    disabled?: boolean;
+    divider?: boolean;
+    id: ContextMenuItemType;
+    onClick?: () => void;
 }[];
 
 export const [useContextMenuEvents, createEvent] =
-  createUseExternalEvents<ContextMenuEvents>('context-menu');
+    createUseExternalEvents<ContextMenuEvents>('context-menu');
 
 export const openContextMenu = createEvent('openContextMenu');
 export const closeContextMenu = createEvent('closeContextMenu');

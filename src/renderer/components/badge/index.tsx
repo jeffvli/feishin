@@ -5,30 +5,30 @@ import styled from 'styled-components';
 export type BadgeProps = MantineBadgeProps;
 
 const StyledBadge = styled(MantineBadge)<BadgeProps>`
-  border-radius: var(--badge-radius);
+    border-radius: var(--badge-radius);
 
-  .mantine-Badge-root {
-    color: var(--badge-fg);
-  }
+    .mantine-Badge-root {
+        color: var(--badge-fg);
+    }
 
-  .mantine-Badge-inner {
-    color: var(--badge-fg);
-  }
+    .mantine-Badge-inner {
+        color: var(--badge-fg);
+    }
 `;
 
 const _Badge = ({ children, ...props }: BadgeProps) => {
-  return (
-    <StyledBadge
-      radius="md"
-      size="sm"
-      styles={{
-        root: { background: 'var(--badge-bg)' },
-      }}
-      {...props}
-    >
-      {children}
-    </StyledBadge>
-  );
+    return (
+        <StyledBadge
+            radius="md"
+            size="sm"
+            styles={{
+                root: { background: 'var(--badge-bg)' },
+            }}
+            {...props}
+        >
+            {children}
+        </StyledBadge>
+    );
 };
 
 export const Badge = createPolymorphicComponent<'button', BadgeProps>(_Badge);

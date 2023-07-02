@@ -13,106 +13,106 @@ import { titleCase } from '/@/renderer/utils';
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const ServerList = () => {
-  const serverListQuery = useServerList();
+    const serverListQuery = useServerList();
 
-  const handleAddServerModal = () => {
-    openContextModal({
-      innerProps: {
-        modalBody: (vars: ContextModalVars) => (
-          <AddServerForm onCancel={() => vars.context.closeModal(vars.id)} />
-        ),
-      },
-      modal: 'base',
-      title: 'Add server',
+    const handleAddServerModal = () => {
+        openContextModal({
+            innerProps: {
+                modalBody: (vars: ContextModalVars) => (
+                    <AddServerForm onCancel={() => vars.context.closeModal(vars.id)} />
+                ),
+            },
+            modal: 'base',
+            title: 'Add server',
+        });
+    };
+
+    const [ignoreCORS, setIgnoreCORS] = useLocalStorage({
+        defaultValue: 'false',
+        key: 'ignore_cors',
     });
-  };
 
-  const [ignoreCORS, setIgnoreCORS] = useLocalStorage({
-    defaultValue: 'false',
-    key: 'ignore_cors',
-  });
+    const [ignoreSSL, setIgnoreSSL] = useLocalStorage({
+        defaultValue: 'false',
+        key: 'ignore_ssl',
+    });
 
-  const [ignoreSSL, setIgnoreSSL] = useLocalStorage({
-    defaultValue: 'false',
-    key: 'ignore_ssl',
-  });
+    const handleUpdateIgnoreCORS = (e: ChangeEvent<HTMLInputElement>) => {
+        setIgnoreCORS(String(e.currentTarget.checked));
 
-  const handleUpdateIgnoreCORS = (e: ChangeEvent<HTMLInputElement>) => {
-    setIgnoreCORS(String(e.currentTarget.checked));
+        if (isElectron()) {
+            localSettings?.set('ignore_cors', e.currentTarget.checked);
+        }
+    };
 
-    if (isElectron()) {
-      localSettings?.set('ignore_cors', e.currentTarget.checked);
-    }
-  };
+    const handleUpdateIgnoreSSL = (e: ChangeEvent<HTMLInputElement>) => {
+        setIgnoreSSL(String(e.currentTarget.checked));
 
-  const handleUpdateIgnoreSSL = (e: ChangeEvent<HTMLInputElement>) => {
-    setIgnoreSSL(String(e.currentTarget.checked));
+        if (isElectron()) {
+            localSettings?.set('ignore_ssl', e.currentTarget.checked);
+        }
+    };
 
-    if (isElectron()) {
-      localSettings?.set('ignore_ssl', e.currentTarget.checked);
-    }
-  };
-
-  return (
-    <>
-      <Group
-        mb={10}
-        position="right"
-        sx={{
-          position: 'absolute',
-          right: 55,
-          transform: 'translateY(-3.5rem)',
-          zIndex: 2000,
-        }}
-      >
-        <Button
-          autoFocus
-          compact
-          leftIcon={<RiAddFill size={15} />}
-          size="sm"
-          variant="filled"
-          onClick={handleAddServerModal}
-        >
-          Add server
-        </Button>
-      </Group>
-      <Stack>
-        <Accordion variant="separated">
-          {Object.keys(serverListQuery)?.map((serverId) => {
-            const server = serverListQuery[serverId];
-            return (
-              <Accordion.Item
-                key={server.id}
-                value={server.name}
-              >
-                <Accordion.Control icon={<RiServerFill size={15} />}>
-                  <Group position="apart">
-                    {titleCase(server?.type)} - {server?.name}
-                  </Group>
-                </Accordion.Control>
-                <Accordion.Panel>
-                  <ServerListItem server={server} />
-                </Accordion.Panel>
-              </Accordion.Item>
-            );
-          })}
-        </Accordion>
-        <Divider />
-        <Group>
-          <Switch
-            checked={ignoreCORS === 'true'}
-            label="Ignore CORS (requires restart)"
-            onChange={handleUpdateIgnoreCORS}
-          />
-        </Group>
-        <Group>
-          <Switch
-            checked={ignoreSSL === 'true'}
-            label="Ignore SSL (requires restart)"
-            onChange={handleUpdateIgnoreSSL}
-          />
-        </Group>
-      </Stack>
-    </>
-  );
+    return (
+        <>
+            <Group
+                mb={10}
+                position="right"
+                sx={{
+                    position: 'absolute',
+                    right: 55,
+                    transform: 'translateY(-3.5rem)',
+                    zIndex: 2000,
+                }}
+            >
+                <Button
+                    autoFocus
+                    compact
+                    leftIcon={<RiAddFill size={15} />}
+                    size="sm"
+                    variant="filled"
+                    onClick={handleAddServerModal}
+                >
+                    Add server
+                </Button>
+            </Group>
+            <Stack>
+                <Accordion variant="separated">
+                    {Object.keys(serverListQuery)?.map((serverId) => {
+                        const server = serverListQuery[serverId];
+                        return (
+                            <Accordion.Item
+                                key={server.id}
+                                value={server.name}
+                            >
+                                <Accordion.Control icon={<RiServerFill size={15} />}>
+                                    <Group position="apart">
+                                        {titleCase(server?.type)} - {server?.name}
+                                    </Group>
+                                </Accordion.Control>
+                                <Accordion.Panel>
+                                    <ServerListItem server={server} />
+                                </Accordion.Panel>
+                            </Accordion.Item>
+                        );
+                    })}
+                </Accordion>
+                <Divider />
+                <Group>
+                    <Switch
+                        checked={ignoreCORS === 'true'}
+                        label="Ignore CORS (requires restart)"
+                        onChange={handleUpdateIgnoreCORS}
+                    />
+                </Group>
+                <Group>
+                    <Switch
+                        checked={ignoreSSL === 'true'}
+                        label="Ignore SSL (requires restart)"
+                        onChange={handleUpdateIgnoreSSL}
+                    />
+                </Group>
+            </Stack>
+        </>
+    );
 };

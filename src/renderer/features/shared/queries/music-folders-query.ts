@@ -6,18 +6,18 @@ import { MusicFolderListQuery } from '../../../api/types';
 import { QueryHookArgs } from '../../../lib/react-query';
 
 export const useMusicFolders = (args: QueryHookArgs<MusicFolderListQuery>) => {
-  const { options, serverId } = args || {};
-  const server = getServerById(serverId);
+    const { options, serverId } = args || {};
+    const server = getServerById(serverId);
 
-  const query = useQuery({
-    enabled: !!server,
-    queryFn: ({ signal }) => {
-      if (!server) throw new Error('Server not found');
-      return api.controller.getMusicFolderList({ apiClientProps: { server, signal } });
-    },
-    queryKey: queryKeys.musicFolders.list(server?.id || ''),
-    ...options,
-  });
+    const query = useQuery({
+        enabled: !!server,
+        queryFn: ({ signal }) => {
+            if (!server) throw new Error('Server not found');
+            return api.controller.getMusicFolderList({ apiClientProps: { server, signal } });
+        },
+        queryKey: queryKeys.musicFolders.list(server?.id || ''),
+        ...options,
+    });
 
-  return query;
+    return query;
 };

@@ -6,16 +6,16 @@ import { getServerById } from '/@/renderer/store';
 import type { QueryHookArgs } from '/@/renderer/lib/react-query';
 
 export const useSongList = (args: QueryHookArgs<SongListQuery>) => {
-  const { query, options, serverId } = args || {};
-  const server = getServerById(serverId);
+    const { query, options, serverId } = args || {};
+    const server = getServerById(serverId);
 
-  return useQuery({
-    enabled: !!server?.id,
-    queryFn: ({ signal }) => {
-      if (!server) throw new Error('Server not found');
-      return controller.getSongList({ apiClientProps: { server, signal }, query });
-    },
-    queryKey: queryKeys.songs.list(server?.id || '', query),
-    ...options,
-  });
+    return useQuery({
+        enabled: !!server?.id,
+        queryFn: ({ signal }) => {
+            if (!server) throw new Error('Server not found');
+            return controller.getSongList({ apiClientProps: { server, signal }, query });
+        },
+        queryKey: queryKeys.songs.list(server?.id || '', query),
+        ...options,
+    });
 };
