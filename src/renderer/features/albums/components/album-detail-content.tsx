@@ -191,20 +191,22 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
         serverId: server?.id,
     });
 
-    const carousels = [
-        {
-            data: artistQuery?.data?.items,
-            loading: artistQuery?.isLoading || artistQuery.isFetching,
-            pagination: {
-                handleNextPage: () => handleNextPage('artist'),
-                handlePreviousPage: () => handlePreviousPage('artist'),
-                hasPreviousPage: pagination.artist > 0,
-                itemsPerPage,
-            },
-            title: 'More from this artist',
-            uniqueId: 'mostPlayed',
-        },
-    ];
+    const carousels = artistQuery?.data?.items.length
+        ? [
+              {
+                  data: artistQuery?.data?.items,
+                  loading: artistQuery?.isLoading || artistQuery.isFetching,
+                  pagination: {
+                      handleNextPage: () => handleNextPage('artist'),
+                      handlePreviousPage: () => handlePreviousPage('artist'),
+                      hasPreviousPage: pagination.artist > 0,
+                      itemsPerPage,
+                  },
+                  title: 'More from this artist',
+                  uniqueId: 'mostPlayed',
+              },
+          ]
+        : [];
 
     const playButtonBehavior = usePlayButtonBehavior();
 
