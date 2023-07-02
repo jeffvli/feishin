@@ -3,37 +3,37 @@ name: Publish Linux (Manual)
 on: workflow_dispatch
 
 jobs:
-  publish:
-    runs-on: ${{ matrix.os }}
+    publish:
+        runs-on: ${{ matrix.os }}
 
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
+        strategy:
+            matrix:
+                os: [ubuntu-latest]
 
-    steps:
-      - name: Checkout git repo
-        uses: actions/checkout@v1
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v1
 
-      - name: Install Node and NPM
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16
-          cache: npm
+            - name: Install Node and NPM
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 16
+                  cache: npm
 
-      - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps
+            - name: Install dependencies
+              run: |
+                  npm install --legacy-peer-deps
 
-      - name: Publish releases
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: nick-invision/retry@v2.8.2
-        with:
-          timeout_minutes: 30
-          max_attempts: 3
-          retry_on: error
-          command: |
-            npm run postinstall
-            npm run build
-            npm exec electron-builder -- --publish always --linux
-          on_retry_command: npm cache clean --force
+            - name: Publish releases
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      npm run postinstall
+                      npm run build
+                      npm exec electron-builder -- --publish always --linux
+                  on_retry_command: npm cache clean --force

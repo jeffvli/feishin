@@ -77,7 +77,7 @@ const StyledTextInput = styled(MantineTextInput)<TextInputProps>`
 
     & .mantine-TextInput-label {
         margin-bottom: 0.5rem;
-        font-family: var(--label-font-faimly);
+        font-family: var(--label-font-family);
     }
 
     & .mantine-TextInput-disabled {
@@ -129,7 +129,7 @@ const StyledNumberInput = styled(MantineNumberInput)<NumberInputProps>`
 
     & .mantine-NumberInput-label {
         margin-bottom: 0.5rem;
-        font-family: var(--label-font-faimly);
+        font-family: var(--label-font-family);
     }
 
     & .mantine-NumberInput-disabled {
@@ -163,7 +163,7 @@ const StyledPasswordInput = styled(MantinePasswordInput)<PasswordInputProps>`
 
     & .mantine-PasswordInput-label {
         margin-bottom: 0.5rem;
-        font-family: var(--label-font-faimly);
+        font-family: var(--label-font-family);
     }
 
     & .mantine-PasswordInput-disabled {
@@ -197,7 +197,7 @@ const StyledFileInput = styled(MantineFileInput)<FileInputProps>`
 
     & .mantine-FileInput-label {
         margin-bottom: 0.5rem;
-        font-family: var(--label-font-faimly);
+        font-family: var(--label-font-family);
     }
 
     & .mantine-FileInput-disabled {
@@ -231,7 +231,7 @@ const StyledJsonInput = styled(MantineJsonInput)<JsonInputProps>`
 
     & .mantine-JsonInput-label {
         margin-bottom: 0.5rem;
-        font-family: var(--label-font-faimly);
+        font-family: var(--label-font-family);
     }
 
     & .mantine-JsonInput-disabled {
@@ -261,7 +261,7 @@ const StyledTextarea = styled(MantineTextarea)<TextareaProps>`
 
     & .mantine-Textarea-label {
         margin-bottom: 0.5rem;
-        font-family: var(--label-font-faimly);
+        font-family: var(--label-font-family);
     }
 
     & .mantine-Textarea-disabled {

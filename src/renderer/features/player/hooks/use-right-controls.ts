@@ -6,7 +6,6 @@ import { useGeneralSettings } from '/@/renderer/store/settings.store';
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
 const ipc = isElectron() ? window.electron.ipc : null;
-const utils = isElectron() ? window.electron.utils : null;
 const remote = isElectron() ? window.electron.remote : null;
 
 const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {

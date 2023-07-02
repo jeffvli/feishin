@@ -84,6 +84,10 @@ const singleInstance = app.requestSingleInstanceLock();
 
 if (!singleInstance) {
     app.quit();
+} else {
+    app.on('second-instance', () => {
+        mainWindow?.show();
+    });
 }
 
 const RESOURCES_PATH = app.isPackaged
@@ -407,7 +411,7 @@ const createWindow = async () => {
 
     if (store.get('disable_auto_updates') !== true) {
         // eslint-disable-next-line
-    new AppUpdater();
+        new AppUpdater();
     }
 };
 
