@@ -10,7 +10,6 @@
     { "directory": "./server", "changeProcessCWD": true }
   ],
   "typescript.tsserver.experimental.enableProjectDiagnostics": true,
-  "editor.tabSize": 2,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true,
     "source.fixAll.stylelint": false
