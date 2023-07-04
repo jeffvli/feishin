@@ -191,23 +191,25 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
         serverId: server?.id,
     });
 
-    const carousels = artistQuery?.data?.items.length
-        ? [
-              {
-                  data: artistQuery?.data?.items,
-                  loading: artistQuery?.isLoading || artistQuery.isFetching,
-                  pagination: {
-                      handleNextPage: () => handleNextPage('artist'),
-                      handlePreviousPage: () => handlePreviousPage('artist'),
-                      hasPreviousPage: pagination.artist > 0,
-                      itemsPerPage,
-                  },
-                  title: 'More from this artist',
-                  uniqueId: 'mostPlayed',
-              },
-          ]
-        : [];
-
+    const carousels = [
+        ...[
+            artistQuery?.data?.items.length
+                ? {
+                      data: artistQuery?.data?.items,
+                      loading: artistQuery?.isLoading || artistQuery.isFetching,
+                      pagination: {
+                          handleNextPage: () => handleNextPage('artist'),
+                          handlePreviousPage: () => handlePreviousPage('artist'),
+                          hasPreviousPage: pagination.artist > 0,
+                          itemsPerPage,
+                      },
+                      title: 'More from this artist',
+                      uniqueId: 'mostPlayed',
+                  }
+                : {},
+        ],
+    ];
+    console.log(carousels);
     const playButtonBehavior = usePlayButtonBehavior();
 
     const handlePlay = async (playType?: Play) => {
@@ -409,7 +411,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
                                     title={{
                                         label: carousel.title,
                                     }}
-                                    uniqueId={carousel.uniqueId}
+                                    uniqueId={carousel.uniqueId!}
                                 />
                             ))}
                         </>
