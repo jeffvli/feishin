@@ -7,6 +7,7 @@
         "stylelint-config-rational-order"
     ],
     "rules": {
+        "indentation": 4,
         "color-function-notation": ["legacy"],
         "declaration-empty-line-before": null,
         "order/properties-order": [],
