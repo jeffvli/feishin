@@ -33,10 +33,16 @@ type DetailProps = {
     table: DetailTableProps;
 };
 
+type ListGridProps = {
+    itemsPerRow?: number;
+    scrollOffset?: number;
+};
+
 export type PlaylistListFilter = Omit<PlaylistListArgs['query'], 'startIndex' | 'limit'>;
 
 interface PlaylistState {
     detail: DetailProps;
+    grid: ListGridProps;
     list: ListProps<PlaylistListFilter>;
 }
 
@@ -46,6 +52,7 @@ export interface PlaylistSlice extends PlaylistState {
         setDetailTable: (data: Partial<DetailTableProps>) => void;
         setDetailTablePagination: (id: string, data: Partial<DetailPaginationProps>) => void;
         setFilters: (data: Partial<PlaylistListFilter>) => PlaylistListFilter;
+        setGrid: (args: { data: Partial<ListGridProps> }) => void;
         setStore: (data: Partial<PlaylistSlice>) => void;
         setTable: (data: Partial<TableProps>) => void;
         setTablePagination: (args: { data: Partial<TablePagination> }) => void;
@@ -90,6 +97,14 @@ export const usePlaylistStore = create<PlaylistSlice>()(
 
                         return get().list.filter;
                     },
+                    setGrid: (args) => {
+                        set((state) => {
+                            state.grid = {
+                                ...state.grid,
+                                ...args.data,
+                            };
+                        });
+                    },
                     setStore: (data) => {
                         set({ ...get(), ...data });
                     },
@@ -132,6 +147,10 @@ export const usePlaylistStore = create<PlaylistSlice>()(
                         id: {},
                         rowHeight: 60,
                     },
+                },
+                grid: {
+                    itemsPerRow: 5,
+                    scrollOffset: 0,
                 },
                 list: {
                     display: ListDisplayType.TABLE,
@@ -188,6 +207,8 @@ export const useSetPlaylistFilters = () => usePlaylistStore((state) => state.act
 export const usePlaylistFilters = () => {
     return usePlaylistStore((state) => [state.list.filter, state.actions.setFilters]);
 };
+
+export const usePlaylistGridStore = () => usePlaylistStore((state) => state.grid);
 
 export const usePlaylistListStore = () => usePlaylistStore((state) => state.list);
 
