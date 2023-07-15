@@ -192,24 +192,20 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
     });
 
     const carousels = [
-        ...[
-            artistQuery?.data?.items.length
-                ? {
-                      data: artistQuery?.data?.items,
-                      loading: artistQuery?.isLoading || artistQuery.isFetching,
-                      pagination: {
-                          handleNextPage: () => handleNextPage('artist'),
-                          handlePreviousPage: () => handlePreviousPage('artist'),
-                          hasPreviousPage: pagination.artist > 0,
-                          itemsPerPage,
-                      },
-                      title: 'More from this artist',
-                      uniqueId: 'mostPlayed',
-                  }
-                : {},
-        ],
+        {
+            data: artistQuery?.data?.items,
+            isHidden: !artistQuery?.data?.items.length,
+            loading: artistQuery?.isLoading || artistQuery.isFetching,
+            pagination: {
+                handleNextPage: () => handleNextPage('artist'),
+                handlePreviousPage: () => handlePreviousPage('artist'),
+                hasPreviousPage: pagination.artist > 0,
+                itemsPerPage,
+            },
+            title: 'More from this artist',
+            uniqueId: 'mostPlayed',
+        },
     ];
-    console.log(carousels);
     const playButtonBehavior = usePlayButtonBehavior();
 
     const handlePlay = async (playType?: Play) => {
@@ -374,46 +370,51 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
                 <>
                     {cq.height || cq.width ? (
                         <>
-                            {carousels.map((carousel, index) => (
-                                <SwiperGridCarousel
-                                    key={`carousel-${carousel.uniqueId}-${index}`}
-                                    cardRows={[
-                                        {
-                                            property: 'name',
-                                            route: {
-                                                route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                                                slugs: [
-                                                    { idProperty: 'id', slugProperty: 'albumId' },
-                                                ],
+                            {carousels
+                                .filter((c) => !c.isHidden)
+                                .map((carousel, index) => (
+                                    <SwiperGridCarousel
+                                        key={`carousel-${carousel.uniqueId}-${index}`}
+                                        cardRows={[
+                                            {
+                                                property: 'name',
+                                                route: {
+                                                    route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                                                    slugs: [
+                                                        {
+                                                            idProperty: 'id',
+                                                            slugProperty: 'albumId',
+                                                        },
+                                                    ],
+                                                },
                                             },
-                                        },
-                                        {
-                                            arrayProperty: 'name',
-                                            property: 'albumArtists',
-                                            route: {
-                                                route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
-                                                slugs: [
-                                                    {
-                                                        idProperty: 'id',
-                                                        slugProperty: 'albumArtistId',
-                                                    },
-                                                ],
+                                            {
+                                                arrayProperty: 'name',
+                                                property: 'albumArtists',
+                                                route: {
+                                                    route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
+                                                    slugs: [
+                                                        {
+                                                            idProperty: 'id',
+                                                            slugProperty: 'albumArtistId',
+                                                        },
+                                                    ],
+                                                },
                                             },
-                                        },
-                                    ]}
-                                    data={carousel.data}
-                                    isLoading={carousel.loading}
-                                    itemType={LibraryItem.ALBUM}
-                                    route={{
-                                        route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                                        slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
-                                    }}
-                                    title={{
-                                        label: carousel.title,
-                                    }}
-                                    uniqueId={carousel.uniqueId!}
-                                />
-                            ))}
+                                        ]}
+                                        data={carousel.data}
+                                        isLoading={carousel.loading}
+                                        itemType={LibraryItem.ALBUM}
+                                        route={{
+                                            route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                                            slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
+                                        }}
+                                        title={{
+                                            label: carousel.title,
+                                        }}
+                                        uniqueId={carousel.uniqueId}
+                                    />
+                                ))}
                         </>
                     ) : null}
                 </>
