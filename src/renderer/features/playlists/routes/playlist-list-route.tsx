@@ -36,7 +36,10 @@ const PlaylistListRoute = () => {
                 itemCount={itemCount}
                 tableRef={tableRef}
             />
-            <PlaylistListContent tableRef={tableRef} />
+            <PlaylistListContent
+                itemCount={itemCount}
+                tableRef={tableRef}
+            />
         </AnimatedPage>
     );
 };
