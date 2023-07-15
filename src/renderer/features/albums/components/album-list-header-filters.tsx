@@ -115,6 +115,8 @@ export const AlbumListHeaderFilters = ({
 
     const sortOrderLabel = ORDER.find((o) => o.value === filter.sortOrder)?.name || 'Unknown';
 
+    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
+
     const fetch = useCallback(
         async (skip: number, take: number, filters: AlbumListFilter) => {
             const query: AlbumListQuery = {
@@ -156,7 +158,18 @@ export const AlbumListHeaderFilters = ({
 
     const handleFilterChange = useCallback(
         async (filters: AlbumListFilter) => {
-            if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
+            if (isGrid) {
+                gridRef.current?.scrollTo(0);
+                gridRef.current?.resetLoadMoreItemsCache();
+
+                // Refetching within the virtualized grid may be inconsistent due to it refetching
+                // using an outdated set of filters. To avoid this, we fetch using the updated filters
+                // and then set the grid's data here.
+                const data = await fetch(0, 200, filters);
+
+                if (!data?.items) return;
+                gridRef.current?.setItemData(data.items);
+            } else {
                 const dataSource: IDatasource = {
                     getRows: async (params) => {
                         const limit = params.endRow - params.startRow;
@@ -208,20 +221,19 @@ export const AlbumListHeaderFilters = ({
                 if (display === ListDisplayType.TABLE_PAGINATED) {
                     setTablePagination({ data: { currentPage: 0 }, key: 'album' });
                 }
-            } else {
-                gridRef.current?.scrollTo(0);
-                gridRef.current?.resetLoadMoreItemsCache();
-
-                // Refetching within the virtualized grid may be inconsistent due to it refetching
-                // using an outdated set of filters. To avoid this, we fetch using the updated filters
-                // and then set the grid's data here.
-                const data = await fetch(0, 200, filters);
-
-                if (!data?.items) return;
-                gridRef.current?.setItemData(data.items);
             }
         },
-        [display, tableRef, customFilters, server, queryClient, setTablePagination, gridRef, fetch],
+        [
+            isGrid,
+            gridRef,
+            fetch,
+            tableRef,
+            display,
+            customFilters,
+            server,
+            queryClient,
+            setTablePagination,
+        ],
     );
 
     const handleOpenFiltersModal = () => {
@@ -352,10 +364,10 @@ export const AlbumListHeaderFilters = ({
     };
 
     const handleItemSize = (e: number) => {
-        if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
-            setTable({ data: { rowHeight: e }, key: 'album' });
-        } else {
+        if (isGrid) {
             setGrid({ data: { itemsPerRow: e }, key: 'album' });
+        } else {
+            setTable({ data: { rowHeight: e }, key: 'album' });
         }
     };
 
@@ -593,21 +605,13 @@ export const AlbumListHeaderFilters = ({
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Label>
-                            {display === ListDisplayType.CARD || display === ListDisplayType.POSTER
-                                ? 'Items per row'
-                                : 'Item size'}
+                            {isGrid ? 'Items per row' : 'Item size'}
                         </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
-                                defaultValue={
-                                    display === ListDisplayType.CARD ||
-                                    display === ListDisplayType.POSTER
-                                        ? grid?.itemsPerRow || 0
-                                        : table.rowHeight
-                                }
-                                label={null}
-                                max={14}
-                                min={2}
+                                defaultValue={isGrid ? grid?.itemsPerRow || 0 : table.rowHeight}
+                                max={isGrid ? 14 : 100}
+                                min={isGrid ? 2 : 25}
                                 onChange={debouncedHandleItemSize}
                             />
                         </DropdownMenu.Item>
