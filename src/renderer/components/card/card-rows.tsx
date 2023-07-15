@@ -2,7 +2,7 @@ import React from 'react';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Album, AlbumArtist, Artist } from '/@/renderer/api/types';
+import { Album, AlbumArtist, Artist, Playlist } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components/text';
 import { AppRoute } from '/@/renderer/router/routes';
 import { CardRow } from '/@/renderer/types';
@@ -210,6 +210,31 @@ export const ALBUMARTIST_CARD_ROWS: { [key: string]: CardRow<AlbumArtist> } = {
         property: 'userRating',
     },
     songCount: {
+        property: 'songCount',
+    },
+};
+
+export const PLAYLIST_CARD_ROWS: { [key: string]: CardRow<Playlist> } = {
+    duration: {
+        property: 'duration',
+    },
+    name: {
+        property: 'name',
+        route: {
+            route: AppRoute.PLAYLISTS_DETAIL,
+            slugs: [{ idProperty: 'id', slugProperty: 'playlistId' }],
+        },
+    },
+    owner: {
+        property: 'owner',
+    },
+    public: {
+        property: 'public',
+    },
+    songCount: {
+        property: 'songCount',
+    },
+    updatedAt: {
         property: 'songCount',
     },
 };

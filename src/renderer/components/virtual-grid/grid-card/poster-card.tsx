@@ -4,7 +4,7 @@ import { generatePath, useNavigate } from 'react-router-dom';
 import { SimpleImg } from 'react-simple-img';
 import { ListChildComponentProps } from 'react-window';
 import styled from 'styled-components';
-import { Album, AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
+import { Album, AlbumArtist, Artist, LibraryItem, Playlist } from '/@/renderer/api/types';
 import { CardRows } from '/@/renderer/components/card';
 import { Skeleton } from '/@/renderer/components/skeleton';
 import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
@@ -13,7 +13,7 @@ import { CardRow, PlayQueueAddOptions, Play, CardRoute } from '/@/renderer/types
 interface BaseGridCardProps {
     columnIndex: number;
     controls: {
-        cardRows: CardRow<Album | AlbumArtist | Artist>[];
+        cardRows: CardRow<Album | AlbumArtist | Artist | Playlist>[];
         handleFavorite: (options: {
             id: string[];
             isFavorite: boolean;
