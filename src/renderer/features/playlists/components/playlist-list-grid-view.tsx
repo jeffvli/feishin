@@ -15,7 +15,7 @@ import {
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, usePlaylistListStore } from '/@/renderer/store';
+import { useCurrentServer, useGeneralSettings, usePlaylistListStore } from '/@/renderer/store';
 import { CardRow, ListDisplayType } from '/@/renderer/types';
 
 interface PlaylistListGridViewProps {
@@ -31,6 +31,7 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
     const grid = usePlaylistGridStore();
     const { setGrid } = usePlaylistStoreActions();
     const page = usePlaylistListStore();
+    const { defaultFullPlaylist } = useGeneralSettings();
 
     const createFavoriteMutation = useCreateFavorite({});
     const deleteFavoriteMutation = useDeleteFavorite({});
@@ -61,7 +62,9 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
     };
 
     const cardRows = useMemo(() => {
-        const rows: CardRow<Playlist>[] = [PLAYLIST_CARD_ROWS.name];
+        const rows: CardRow<Playlist>[] = defaultFullPlaylist
+            ? [PLAYLIST_CARD_ROWS.nameFull]
+            : [PLAYLIST_CARD_ROWS.name];
 
         switch (page.filter.sortBy) {
             case PlaylistListSort.DURATION:
@@ -84,7 +87,7 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
         }
 
         return rows;
-    }, [page.filter.sortBy]);
+    }, [defaultFullPlaylist, page.filter.sortBy]);
 
     const handleGridScroll = useCallback(
         (e: ListOnScrollProps) => {
@@ -144,7 +147,9 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
                         loading={itemCount === undefined || itemCount === null}
                         minimumBatchSize={40}
                         route={{
-                            route: AppRoute.PLAYLISTS_DETAIL,
+                            route: defaultFullPlaylist
+                                ? AppRoute.PLAYLISTS_DETAIL_SONGS
+                                : AppRoute.PLAYLISTS_DETAIL,
                             slugs: [{ idProperty: 'id', slugProperty: 'playlistId' }],
                         }}
                         width={width}

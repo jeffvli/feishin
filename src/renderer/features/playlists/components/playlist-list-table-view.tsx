@@ -27,6 +27,7 @@ import {
     useSetPlaylistTable,
     useCurrentServer,
     usePlaylistListStore,
+    useGeneralSettings,
 } from '/@/renderer/store';
 import { ListDisplayType } from '/@/renderer/types';
 
@@ -43,6 +44,7 @@ export const PlaylistListTableView = ({ tableRef, itemCount }: PlaylistListTable
     const pagination = usePlaylistTablePagination();
     const setPagination = useSetPlaylistTablePagination();
     const setTable = useSetPlaylistTable();
+    const { defaultFullPlaylist } = useGeneralSettings();
 
     const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
 
@@ -171,7 +173,11 @@ export const PlaylistListTableView = ({ tableRef, itemCount }: PlaylistListTable
 
     const handleRowDoubleClick = (e: RowDoubleClickedEvent) => {
         if (!e.data) return;
-        navigate(generatePath(AppRoute.PLAYLISTS_DETAIL, { playlistId: e.data.id }));
+        if (defaultFullPlaylist) {
+            navigate(generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: e.data.id }));
+        } else {
+            navigate(generatePath(AppRoute.PLAYLISTS_DETAIL, { playlistId: e.data.id }));
+        }
     };
 
     return (
