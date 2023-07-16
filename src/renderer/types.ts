@@ -1,4 +1,12 @@
-import { Album, AlbumArtist, Artist, LibraryItem, QueueSong } from '/@/renderer/api/types';
+import {
+    Album,
+    AlbumArtist,
+    Artist,
+    LibraryItem,
+    Playlist,
+    QueueSong,
+    Song,
+} from '/@/renderer/api/types';
 import { AppRoute } from '/@/renderer/router/routes';
 
 export type TablePagination = {
@@ -163,7 +171,7 @@ export type PlayQueueAddOptions = {
 
 export type GridCardData = {
     cardControls: any;
-    cardRows: CardRow<Album | AlbumArtist | Artist>[];
+    cardRows: CardRow<Album | AlbumArtist | Artist | Playlist | Song>[];
     columnCount: number;
     display: ListDisplayType;
     handleFavorite: (options: { id: string[]; isFavorite: boolean; itemType: LibraryItem }) => void;
