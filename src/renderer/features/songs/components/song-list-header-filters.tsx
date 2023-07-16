@@ -1,11 +1,9 @@
 import { useCallback, useMemo, ChangeEvent, MutableRefObject, MouseEvent } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Flex, Group, Stack } from '@mantine/core';
+import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
 import {
-    RiSortAsc,
-    RiSortDesc,
     RiFolder2Line,
     RiMoreFill,
     RiSettings3Fill,
@@ -19,7 +17,7 @@ import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { DropdownMenu, Button, Slider, MultiSelect, Switch, Text } from '/@/renderer/components';
-import { useMusicFolders } from '/@/renderer/features/shared';
+import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
 import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jellyfin-song-filters';
 import { NavidromeSongFilters } from '/@/renderer/features/songs/components/navidrome-song-filters';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -79,11 +77,6 @@ const FILTERS = {
     ],
 };
 
-const ORDER = [
-    { name: 'Ascending', value: SortOrder.ASC },
-    { name: 'Descending', value: SortOrder.DESC },
-];
-
 interface SongListHeaderFiltersProps {
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
@@ -105,8 +98,6 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                 FILTERS[server.type as keyof typeof FILTERS] as { name: string; value: string }[]
             ).find((f) => f.value === filter.sortBy)?.name) ||
         'Unknown';
-
-    const sortOrderLabel = ORDER.find((s) => s.value === filter.sortOrder)?.name;
 
     const handleFilterChange = useCallback(
         async (filters?: SongListFilter) => {
@@ -340,51 +331,56 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                         ))}
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
+                <Divider orientation="vertical" />
+                <OrderToggleButton
+                    sortOrder={filter.sortOrder}
+                    onToggle={handleToggleSortOrder}
+                />
+                {server?.type === ServerType.JELLYFIN && (
+                    <>
+                        <Divider orientation="vertical" />
+                        <DropdownMenu position="bottom-start">
+                            <DropdownMenu.Target>
+                                <Button
+                                    compact
+                                    fw="600"
+                                    size="md"
+                                    variant="subtle"
+                                >
+                                    {cq.isSm ? 'Folder' : <RiFolder2Line size="1.3rem" />}
+                                </Button>
+                            </DropdownMenu.Target>
+                            <DropdownMenu.Dropdown>
+                                {musicFoldersQuery.data?.items.map((folder) => (
+                                    <DropdownMenu.Item
+                                        key={`musicFolder-${folder.id}`}
+                                        $isActive={filter.musicFolderId === folder.id}
+                                        value={folder.id}
+                                        onClick={handleSetMusicFolder}
+                                    >
+                                        {folder.name}
+                                    </DropdownMenu.Item>
+                                ))}
+                            </DropdownMenu.Dropdown>
+                        </DropdownMenu>
+                    </>
+                )}
+                <Divider orientation="vertical" />
                 <Button
                     compact
-                    fw="600"
                     size="md"
+                    sx={{
+                        svg: {
+                            fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
+                        },
+                    }}
+                    tooltip={{ label: 'Filters' }}
                     variant="subtle"
-                    onClick={handleToggleSortOrder}
+                    onClick={handleOpenFiltersModal}
                 >
-                    {cq.isSm ? (
-                        sortOrderLabel
-                    ) : (
-                        <>
-                            {filter.sortOrder === SortOrder.ASC ? (
-                                <RiSortAsc size="1.3rem" />
-                            ) : (
-                                <RiSortDesc size="1.3rem" />
-                            )}
-                        </>
-                    )}
+                    <RiFilterFill size="1.3rem" />
                 </Button>
-                {server?.type === ServerType.JELLYFIN && (
-                    <DropdownMenu position="bottom-start">
-                        <DropdownMenu.Target>
-                            <Button
-                                compact
-                                fw="600"
-                                size="md"
-                                variant="subtle"
-                            >
-                                {cq.isSm ? 'Folder' : <RiFolder2Line size="1.3rem" />}
-                            </Button>
-                        </DropdownMenu.Target>
-                        <DropdownMenu.Dropdown>
-                            {musicFoldersQuery.data?.items.map((folder) => (
-                                <DropdownMenu.Item
-                                    key={`musicFolder-${folder.id}`}
-                                    $isActive={filter.musicFolderId === folder.id}
-                                    value={folder.id}
-                                    onClick={handleSetMusicFolder}
-                                >
-                                    {folder.name}
-                                </DropdownMenu.Item>
-                            ))}
-                        </DropdownMenu.Dropdown>
-                    </DropdownMenu>
-                )}
+                <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
@@ -429,20 +425,6 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                 noWrap
                 spacing="sm"
             >
-                <Button
-                    compact
-                    size="md"
-                    sx={{
-                        svg: {
-                            fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
-                        },
-                    }}
-                    tooltip={{ label: 'Filters' }}
-                    variant="subtle"
-                    onClick={handleOpenFiltersModal}
-                >
-                    <RiFilterFill size="1.3rem" />
-                </Button>
                 <DropdownMenu position="bottom-end">
                     <DropdownMenu.Target>
                         <Button

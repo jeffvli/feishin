@@ -402,7 +402,7 @@ export type AlbumDetailQuery = { id: string };
 export type AlbumDetailArgs = { query: AlbumDetailQuery } & BaseEndpointArgs;
 
 // Song List
-export type SongListResponse = BasePaginatedResponse<Song[]>;
+export type SongListResponse = BasePaginatedResponse<Song[]> | null | undefined;
 
 export enum SongListSort {
     ALBUM = 'album',
