@@ -184,7 +184,7 @@ const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle
 
 const initialState: SettingsState = {
     general: {
-        defaultFullPlaylist: false,
+        defaultFullPlaylist: true,
         followSystemTheme: false,
         fontContent: 'Poppins',
         playButtonBehavior: Play.NOW,
