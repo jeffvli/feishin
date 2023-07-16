@@ -522,7 +522,7 @@ export type SongDetailQuery = { id: string };
 export type SongDetailArgs = { query: SongDetailQuery } & BaseEndpointArgs;
 
 // Album Artist List
-export type AlbumArtistListResponse = BasePaginatedResponse<AlbumArtist[]> | null;
+export type AlbumArtistListResponse = BasePaginatedResponse<AlbumArtist[]> | null | undefined;
 
 export enum AlbumArtistListSort {
     ALBUM = 'album',
@@ -610,7 +610,7 @@ export type AlbumArtistDetailQuery = { id: string };
 export type AlbumArtistDetailArgs = { query: AlbumArtistDetailQuery } & BaseEndpointArgs;
 
 // Artist List
-export type ArtistListResponse = BasePaginatedResponse<Artist[]>;
+export type ArtistListResponse = BasePaginatedResponse<Artist[]> | null | undefined;
 
 export enum ArtistListSort {
     ALBUM = 'album',
@@ -866,7 +866,7 @@ export type PlaylistDetailQuery = {
 export type PlaylistDetailArgs = { query: PlaylistDetailQuery } & BaseEndpointArgs;
 
 // Playlist Songs
-export type PlaylistSongListResponse = BasePaginatedResponse<Song[]>;
+export type PlaylistSongListResponse = BasePaginatedResponse<Song[]> | null | undefined;
 
 export type PlaylistSongListQuery = {
     id: string;
@@ -879,7 +879,7 @@ export type PlaylistSongListQuery = {
 export type PlaylistSongListArgs = { query: PlaylistSongListQuery } & BaseEndpointArgs;
 
 // Music Folder List
-export type MusicFolderListResponse = BasePaginatedResponse<MusicFolder[]>;
+export type MusicFolderListResponse = BasePaginatedResponse<MusicFolder[]> | null | undefined;
 
 export type MusicFolderListQuery = null;
 
@@ -887,7 +887,7 @@ export type MusicFolderListArgs = BaseEndpointArgs;
 
 // User list
 // Playlist List
-export type UserListResponse = BasePaginatedResponse<User[]>;
+export type UserListResponse = BasePaginatedResponse<User[]> | null | undefined;
 
 export enum UserListSort {
     NAME = 'name',
@@ -927,7 +927,7 @@ export const userListSortMap: UserListSortMap = {
 };
 
 // Top Songs List
-export type TopSongListResponse = BasePaginatedResponse<Song[]>;
+export type TopSongListResponse = BasePaginatedResponse<Song[]> | null | undefined;
 
 export type TopSongListQuery = {
     artist: string;
