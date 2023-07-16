@@ -337,14 +337,14 @@ export const getColumnDef = (column: TableColumn) => {
     return tableColumns[column as keyof typeof tableColumns];
 };
 
-export const getColumnDefs = (columns: PersistedTableColumn[]) => {
+export const getColumnDefs = (columns: PersistedTableColumn[], useWidth?: boolean) => {
     const columnDefs: ColDef[] = [];
     for (const column of columns) {
         const presetColumn = tableColumns[column.column as keyof typeof tableColumns];
         if (presetColumn) {
             columnDefs.push({
                 ...presetColumn,
-                initialWidth: column.width,
+                [useWidth ? 'width' : 'initialWidth']: column.width,
                 ...column.extraProps,
             });
         }

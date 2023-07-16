@@ -60,7 +60,7 @@ export const useVirtualTable = <TResponse, TFilter>({
     const isPaginationEnabled = properties.display === ListDisplayType.TABLE_PAGINATED;
 
     const columnDefs: ColDef[] = useMemo(() => {
-        return getColumnDefs(properties.table.columns);
+        return getColumnDefs(properties.table.columns, true);
     }, [properties.table.columns]);
 
     const defaultColumnDefs: ColDef = useMemo(() => {

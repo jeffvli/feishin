@@ -251,10 +251,10 @@ export const useListStore = create<ListSlice>()(
                     },
                     setTableColumns: (args) => {
                         set((state) => {
-                            state.item[args.key as keyof ListState['item']].table.columns = {
+                            state.item[args.key as keyof ListState['item']].table.columns = [
                                 ...state.item[args.key as keyof ListState['item']].table.columns,
                                 ...args.data,
-                            };
+                            ];
                         });
                     },
                     setTablePagination: (args) => {
