@@ -86,7 +86,6 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
                 column: TableColumn.TITLE_COMBINED,
                 width: 0,
             },
-
             {
                 column: TableColumn.DURATION,
                 width: 0,
