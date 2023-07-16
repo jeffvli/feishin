@@ -1,34 +1,27 @@
-import { useCallback, ChangeEvent, MutableRefObject, MouseEvent } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Group, Stack, Flex } from '@mantine/core';
+import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import {
-    RiSortAsc,
-    RiSortDesc,
-    RiFolder2Line,
-    RiMoreFill,
-    RiRefreshLine,
-    RiSettings3Fill,
-} from 'react-icons/ri';
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
+import { RiFolder2Line, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
+import { useAlbumArtistListContext } from '../context/album-artist-list-context';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
-import { DropdownMenu, Text, Button, Slider, MultiSelect, Switch } from '/@/renderer/components';
-import { useMusicFolders } from '/@/renderer/features/shared';
-import { useContainerQuery } from '/@/renderer/hooks';
-import {
-    useCurrentServer,
-    useAlbumArtistListStore,
-    AlbumArtistListFilter,
-    useListStoreActions,
-    useAlbumArtistListFilter,
-} from '/@/renderer/store';
-import { ListDisplayType, TableColumn, ServerType } from '/@/renderer/types';
-import { useAlbumArtistListContext } from '../context/album-artist-list-context';
+import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
+import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
+import { useContainerQuery } from '/@/renderer/hooks';
+import {
+    AlbumArtistListFilter,
+    useAlbumArtistListFilter,
+    useAlbumArtistListStore,
+    useCurrentServer,
+    useListStoreActions,
+} from '/@/renderer/store';
+import { ListDisplayType, ServerType, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
     jellyfin: [
@@ -61,11 +54,6 @@ const FILTERS = {
     ],
 };
 
-const ORDER = [
-    { name: 'Ascending', value: SortOrder.ASC },
-    { name: 'Descending', value: SortOrder.DESC },
-];
-
 interface AlbumArtistListHeaderFiltersProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
     tableRef: MutableRefObject<AgGridReactType | null>;
@@ -84,6 +72,7 @@ export const AlbumArtistListHeaderFilters = ({
     const filter = useAlbumArtistListFilter({ key: pageKey });
     const cq = useContainerQuery();
 
+    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
     const musicFoldersQuery = useMusicFolders({ query: null, serverId: server?.id });
 
     const sortByLabel =
@@ -91,8 +80,6 @@ export const AlbumArtistListHeaderFilters = ({
             FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filter.sortBy)
                 ?.name) ||
         'Unknown';
-
-    const sortOrderLabel = ORDER.find((o) => o.value === filter.sortOrder)?.name || 'Unknown';
 
     const handleItemSize = (e: number) => {
         if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
@@ -332,51 +319,41 @@ export const AlbumArtistListHeaderFilters = ({
                         ))}
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
-                <Button
-                    compact
-                    fw="600"
-                    size="md"
-                    variant="subtle"
-                    onClick={handleToggleSortOrder}
-                >
-                    {cq.isMd ? (
-                        sortOrderLabel
-                    ) : (
-                        <>
-                            {filter.sortOrder === SortOrder.ASC ? (
-                                <RiSortAsc size={15} />
-                            ) : (
-                                <RiSortDesc size={15} />
-                            )}
-                        </>
-                    )}
-                </Button>
+                <Divider orientation="vertical" />
+                <OrderToggleButton
+                    sortOrder={filter.sortOrder}
+                    onToggle={handleToggleSortOrder}
+                />
                 {server?.type === ServerType.JELLYFIN && (
-                    <DropdownMenu position="bottom-start">
-                        <DropdownMenu.Target>
-                            <Button
-                                compact
-                                fw="600"
-                                size="md"
-                                variant="subtle"
-                            >
-                                {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}
-                            </Button>
-                        </DropdownMenu.Target>
-                        <DropdownMenu.Dropdown>
-                            {musicFoldersQuery.data?.items.map((folder) => (
-                                <DropdownMenu.Item
-                                    key={`musicFolder-${folder.id}`}
-                                    $isActive={filter.musicFolderId === folder.id}
-                                    value={folder.id}
-                                    onClick={handleSetMusicFolder}
+                    <>
+                        <Divider orientation="vertical" />
+                        <DropdownMenu position="bottom-start">
+                            <DropdownMenu.Target>
+                                <Button
+                                    compact
+                                    fw="600"
+                                    size="md"
+                                    variant="subtle"
                                 >
-                                    {folder.name}
-                                </DropdownMenu.Item>
-                            ))}
-                        </DropdownMenu.Dropdown>
-                    </DropdownMenu>
+                                    {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}
+                                </Button>
+                            </DropdownMenu.Target>
+                            <DropdownMenu.Dropdown>
+                                {musicFoldersQuery.data?.items.map((folder) => (
+                                    <DropdownMenu.Item
+                                        key={`musicFolder-${folder.id}`}
+                                        $isActive={filter.musicFolderId === folder.id}
+                                        value={folder.id}
+                                        onClick={handleSetMusicFolder}
+                                    >
+                                        {folder.name}
+                                    </DropdownMenu.Item>
+                                ))}
+                            </DropdownMenu.Dropdown>
+                        </DropdownMenu>
+                    </>
                 )}
+                <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
@@ -460,8 +437,7 @@ export const AlbumArtistListHeaderFilters = ({
                                 />
                             )}
                         </DropdownMenu.Item>
-                        {(display === ListDisplayType.TABLE ||
-                            display === ListDisplayType.TABLE_PAGINATED) && (
+                        {!isGrid && (
                             <>
                                 <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
                                 <DropdownMenu.Item
