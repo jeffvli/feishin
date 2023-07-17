@@ -45,6 +45,7 @@ const AlbumArtistListRoute = () => {
                 />
                 <AlbumArtistListContent
                     gridRef={gridRef}
+                    itemCount={itemCount}
                     tableRef={tableRef}
                 />
             </AlbumArtistListContext.Provider>

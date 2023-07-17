@@ -86,6 +86,9 @@ export const DropdownMenu = ({ children, ...props }: MenuProps) => {
                     filter: 'drop-shadow(0 0 5px rgb(0, 0, 0, 50%))',
                 },
             }}
+            transitionProps={{
+                transition: 'pop',
+            }}
             {...props}
         >
             {children}

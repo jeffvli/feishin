@@ -29,17 +29,17 @@ export type ListKey = keyof ListState['item'] | string;
 
 type FilterType = AlbumListFilter | SongListFilter | AlbumArtistListFilter;
 
-type ListTableProps = {
+export type ListTableProps = {
     pagination: TablePagination;
     scrollOffset: number;
 } & DataTableProps;
 
-type ListGridProps = {
+export type ListGridProps = {
     itemsPerRow?: number;
     scrollOffset?: number;
 };
 
-type ItemProps<TFilter = any> = {
+export type ListItemProps<TFilter = any> = {
     display: ListDisplayType;
     filter: TFilter;
     grid?: ListGridProps;
@@ -48,31 +48,33 @@ type ItemProps<TFilter = any> = {
 
 export interface ListState {
     detail: {
-        [key: string]: Omit<ItemProps<any>, 'display'>;
+        [key: string]: Omit<ListItemProps<any>, 'display'>;
     };
     item: {
-        album: ItemProps<AlbumListFilter>;
-        albumArtist: ItemProps<AlbumArtistListFilter>;
-        albumDetail: ItemProps<any>;
-        song: ItemProps<SongListFilter>;
+        album: ListItemProps<AlbumListFilter>;
+        albumArtist: ListItemProps<AlbumArtistListFilter>;
+        albumDetail: ListItemProps<any>;
+        song: ListItemProps<SongListFilter>;
     };
 }
 
-type DeterministicArgs = { key: ListKey };
+export type ListDeterministicArgs = { key: ListKey };
 
 export interface ListSlice extends ListState {
     _actions: {
         getFilter: (args: { id?: string; itemType: LibraryItem; key?: string }) => FilterType;
         resetFilter: () => void;
-        setDisplayType: (args: { data: ListDisplayType } & DeterministicArgs) => void;
+        setDisplayType: (args: { data: ListDisplayType } & ListDeterministicArgs) => void;
         setFilter: (
-            args: { data: Partial<FilterType>; itemType: LibraryItem } & DeterministicArgs,
+            args: { data: Partial<FilterType>; itemType: LibraryItem } & ListDeterministicArgs,
         ) => FilterType;
-        setGrid: (args: { data: Partial<ListGridProps> } & DeterministicArgs) => void;
+        setGrid: (args: { data: Partial<ListGridProps> } & ListDeterministicArgs) => void;
         setStore: (data: Partial<ListSlice>) => void;
-        setTable: (args: { data: Partial<ListTableProps> } & DeterministicArgs) => void;
-        setTableColumns: (args: { data: PersistedTableColumn[] } & DeterministicArgs) => void;
-        setTablePagination: (args: { data: Partial<TablePagination> } & DeterministicArgs) => void;
+        setTable: (args: { data: Partial<ListTableProps> } & ListDeterministicArgs) => void;
+        setTableColumns: (args: { data: PersistedTableColumn[] } & ListDeterministicArgs) => void;
+        setTablePagination: (
+            args: { data: Partial<TablePagination> } & ListDeterministicArgs,
+        ) => void;
     };
 }
 
@@ -249,10 +251,10 @@ export const useListStore = create<ListSlice>()(
                     },
                     setTableColumns: (args) => {
                         set((state) => {
-                            state.item[args.key as keyof ListState['item']].table.columns = {
+                            state.item[args.key as keyof ListState['item']].table.columns = [
                                 ...state.item[args.key as keyof ListState['item']].table.columns,
                                 ...args.data,
-                            };
+                            ];
                         });
                     },
                     setTablePagination: (args) => {

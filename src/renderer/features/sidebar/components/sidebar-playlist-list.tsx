@@ -13,12 +13,21 @@ import { Play } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useHideScrollbar } from '/@/renderer/hooks';
+import { useGeneralSettings } from '/@/renderer/store';
 
 interface SidebarPlaylistListProps {
     data: ReturnType<typeof usePlaylistList>['data'];
 }
 
 const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
+    const path = data?.items[index].id
+        ? data.defaultFullPlaylist
+            ? generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data.items[index].id })
+            : generatePath(AppRoute.PLAYLISTS_DETAIL, {
+                  playlistId: data?.items[index].id,
+              })
+        : undefined;
+
     return (
         <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
             <Group
@@ -47,13 +56,7 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                         cursor: 'default',
                         width: '100%',
                     }}
-                    to={
-                        data?.items[index].id
-                            ? generatePath(AppRoute.PLAYLISTS_DETAIL, {
-                                  playlistId: data?.items[index].id,
-                              })
-                            : undefined
-                    }
+                    to={path}
                 >
                     {data?.items[index].name}
                 </Text>
@@ -110,6 +113,7 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
 export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
     const { isScrollbarHidden, hideScrollbarElementProps } = useHideScrollbar(0);
     const handlePlayQueueAdd = usePlayQueueAdd();
+    const { defaultFullPlaylist } = useGeneralSettings();
 
     const [rect, setRect] = useState({
         height: 0,
@@ -133,10 +137,11 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
 
     const memoizedItemData = useMemo(() => {
         return {
+            defaultFullPlaylist,
             handlePlay: handlePlayPlaylist,
             items: data?.items,
         };
-    }, [data?.items, handlePlayPlaylist]);
+    }, [data?.items, defaultFullPlaylist, handlePlayPlaylist]);
 
     return (
         <Flex

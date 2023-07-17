@@ -1,13 +1,10 @@
 import { MutableRefObject, useCallback, MouseEvent, ChangeEvent, useMemo } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Flex, Group, Stack } from '@mantine/core';
+import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
-import debounce from 'lodash/debounce';
 import {
-    RiSortAsc,
-    RiSortDesc,
     RiFolder2Line,
     RiMoreFill,
     RiAddBoxFill,
@@ -29,7 +26,7 @@ import {
     useListStoreActions,
 } from '/@/renderer/store';
 import { ServerType, Play, ListDisplayType, TableColumn } from '/@/renderer/types';
-import { useMusicFolders } from '/@/renderer/features/shared';
+import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
 import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
@@ -79,11 +76,6 @@ const FILTERS = {
     ],
 };
 
-const ORDER = [
-    { name: 'Ascending', value: SortOrder.ASC },
-    { name: 'Descending', value: SortOrder.DESC },
-];
-
 interface AlbumListHeaderFiltersProps {
     customFilters?: Partial<AlbumListFilter>;
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -100,7 +92,7 @@ export const AlbumListHeaderFilters = ({
     const queryClient = useQueryClient();
     const { id, pageKey } = useAlbumListContext();
     const server = useCurrentServer();
-    const { setFilter, setTablePagination, setTable, setGrid, setDisplayType, setTableColumns } =
+    const { setFilter, setTablePagination, setTable, setGrid, setDisplayType } =
         useListStoreActions();
     const { display, filter, table, grid } = useAlbumListStore({ id, key: pageKey });
     const cq = useContainerQuery();
@@ -113,7 +105,7 @@ export const AlbumListHeaderFilters = ({
                 ?.name) ||
         'Unknown';
 
-    const sortOrderLabel = ORDER.find((o) => o.value === filter.sortOrder)?.name || 'Unknown';
+    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
 
     const fetch = useCallback(
         async (skip: number, take: number, filters: AlbumListFilter) => {
@@ -156,7 +148,18 @@ export const AlbumListHeaderFilters = ({
 
     const handleFilterChange = useCallback(
         async (filters: AlbumListFilter) => {
-            if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
+            if (isGrid) {
+                gridRef.current?.scrollTo(0);
+                gridRef.current?.resetLoadMoreItemsCache();
+
+                // Refetching within the virtualized grid may be inconsistent due to it refetching
+                // using an outdated set of filters. To avoid this, we fetch using the updated filters
+                // and then set the grid's data here.
+                const data = await fetch(0, 200, filters);
+
+                if (!data?.items) return;
+                gridRef.current?.setItemData(data.items);
+            } else {
                 const dataSource: IDatasource = {
                     getRows: async (params) => {
                         const limit = params.endRow - params.startRow;
@@ -208,20 +211,19 @@ export const AlbumListHeaderFilters = ({
                 if (display === ListDisplayType.TABLE_PAGINATED) {
                     setTablePagination({ data: { currentPage: 0 }, key: 'album' });
                 }
-            } else {
-                gridRef.current?.scrollTo(0);
-                gridRef.current?.resetLoadMoreItemsCache();
-
-                // Refetching within the virtualized grid may be inconsistent due to it refetching
-                // using an outdated set of filters. To avoid this, we fetch using the updated filters
-                // and then set the grid's data here.
-                const data = await fetch(0, 200, filters);
-
-                if (!data?.items) return;
-                gridRef.current?.setItemData(data.items);
             }
         },
-        [display, tableRef, customFilters, server, queryClient, setTablePagination, gridRef, fetch],
+        [
+            isGrid,
+            gridRef,
+            fetch,
+            tableRef,
+            display,
+            customFilters,
+            server,
+            queryClient,
+            setTablePagination,
+        ],
     );
 
     const handleOpenFiltersModal = () => {
@@ -352,14 +354,12 @@ export const AlbumListHeaderFilters = ({
     };
 
     const handleItemSize = (e: number) => {
-        if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
-            setTable({ data: { rowHeight: e }, key: 'album' });
-        } else {
+        if (isGrid) {
             setGrid({ data: { itemsPerRow: e }, key: 'album' });
+        } else {
+            setTable({ data: { rowHeight: e }, key: 'album' });
         }
     };
-
-    const debouncedHandleItemSize = debounce(handleItemSize, 20);
 
     const handleSetViewType = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
@@ -373,8 +373,8 @@ export const AlbumListHeaderFilters = ({
         const existingColumns = table.columns;
 
         if (values.length === 0) {
-            return setTableColumns({
-                data: [],
+            return setTable({
+                data: { columns: [] },
                 key: 'album',
             });
         }
@@ -383,13 +383,13 @@ export const AlbumListHeaderFilters = ({
         if (values.length > existingColumns.length) {
             const newColumn = { column: values[values.length - 1], width: 100 };
 
-            setTableColumns({ data: [...existingColumns, newColumn], key: 'album' });
+            setTable({ data: { columns: [...existingColumns, newColumn] }, key: 'album' });
         } else {
             // If removing a column
             const removed = existingColumns.filter((column) => !values.includes(column.column));
             const newColumns = existingColumns.filter((column) => !removed.includes(column));
 
-            setTableColumns({ data: newColumns, key: 'album' });
+            setTable({ data: { columns: newColumns }, key: 'album' });
         }
 
         return tableRef.current?.api.sizeColumnsToFit();
@@ -448,51 +448,56 @@ export const AlbumListHeaderFilters = ({
                         ))}
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
+                <Divider orientation="vertical" />
+                <OrderToggleButton
+                    sortOrder={filter.sortOrder}
+                    onToggle={handleToggleSortOrder}
+                />
+                {server?.type === ServerType.JELLYFIN && (
+                    <>
+                        <Divider orientation="vertical" />
+                        <DropdownMenu position="bottom-start">
+                            <DropdownMenu.Target>
+                                <Button
+                                    compact
+                                    fw={600}
+                                    size="md"
+                                    variant="subtle"
+                                >
+                                    {cq.isSm ? 'Folder' : <RiFolder2Line size="1.3rem" />}
+                                </Button>
+                            </DropdownMenu.Target>
+                            <DropdownMenu.Dropdown>
+                                {musicFoldersQuery.data?.items.map((folder) => (
+                                    <DropdownMenu.Item
+                                        key={`musicFolder-${folder.id}`}
+                                        $isActive={filter.musicFolderId === folder.id}
+                                        value={folder.id}
+                                        onClick={handleSetMusicFolder}
+                                    >
+                                        {folder.name}
+                                    </DropdownMenu.Item>
+                                ))}
+                            </DropdownMenu.Dropdown>
+                        </DropdownMenu>
+                    </>
+                )}
+                <Divider orientation="vertical" />
                 <Button
                     compact
-                    fw={600}
                     size="md"
+                    sx={{
+                        svg: {
+                            fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
+                        },
+                    }}
+                    tooltip={{ label: 'Filters' }}
                     variant="subtle"
-                    onClick={handleToggleSortOrder}
+                    onClick={handleOpenFiltersModal}
                 >
-                    {cq.isSm ? (
-                        sortOrderLabel
-                    ) : (
-                        <>
-                            {filter.sortOrder === SortOrder.ASC ? (
-                                <RiSortAsc size={15} />
-                            ) : (
-                                <RiSortDesc size={15} />
-                            )}
-                        </>
-                    )}
+                    <RiFilterFill size="1.3rem" />
                 </Button>
-                {server?.type === ServerType.JELLYFIN && (
-                    <DropdownMenu position="bottom-start">
-                        <DropdownMenu.Target>
-                            <Button
-                                compact
-                                fw={600}
-                                size="md"
-                                variant="subtle"
-                            >
-                                {cq.isSm ? 'Folder' : <RiFolder2Line size="1.3rem" />}
-                            </Button>
-                        </DropdownMenu.Target>
-                        <DropdownMenu.Dropdown>
-                            {musicFoldersQuery.data?.items.map((folder) => (
-                                <DropdownMenu.Item
-                                    key={`musicFolder-${folder.id}`}
-                                    $isActive={filter.musicFolderId === folder.id}
-                                    value={folder.id}
-                                    onClick={handleSetMusicFolder}
-                                >
-                                    {folder.name}
-                                </DropdownMenu.Item>
-                            ))}
-                        </DropdownMenu.Dropdown>
-                    </DropdownMenu>
-                )}
+                <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
@@ -536,20 +541,6 @@ export const AlbumListHeaderFilters = ({
                 noWrap
                 spacing="sm"
             >
-                <Button
-                    compact
-                    size="md"
-                    sx={{
-                        svg: {
-                            fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
-                        },
-                    }}
-                    tooltip={{ label: 'Filters' }}
-                    variant="subtle"
-                    onClick={handleOpenFiltersModal}
-                >
-                    <RiFilterFill size="1.3rem" />
-                </Button>
                 <DropdownMenu position="bottom-end">
                     <DropdownMenu.Target>
                         <Button
@@ -593,22 +584,14 @@ export const AlbumListHeaderFilters = ({
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Label>
-                            {display === ListDisplayType.CARD || display === ListDisplayType.POSTER
-                                ? 'Items per row'
-                                : 'Item size'}
+                            {isGrid ? 'Items per row' : 'Item size'}
                         </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
-                                defaultValue={
-                                    display === ListDisplayType.CARD ||
-                                    display === ListDisplayType.POSTER
-                                        ? grid?.itemsPerRow || 0
-                                        : table.rowHeight
-                                }
-                                label={null}
-                                max={14}
-                                min={2}
-                                onChange={debouncedHandleItemSize}
+                                defaultValue={isGrid ? grid?.itemsPerRow || 0 : table.rowHeight}
+                                max={isGrid ? 14 : 100}
+                                min={isGrid ? 2 : 25}
+                                onChangeEnd={handleItemSize}
                             />
                         </DropdownMenu.Item>
                         {(display === ListDisplayType.TABLE ||

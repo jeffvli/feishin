@@ -3,6 +3,7 @@ import { Flex, Stack } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
 import { MutableRefObject } from 'react';
 import { PageHeader, SpinnerIcon, Paper, Button } from '/@/renderer/components';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { PlaylistListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-list-header-filters';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
@@ -11,11 +12,12 @@ import { useCurrentServer } from '/@/renderer/store';
 import { ServerType } from '/@/renderer/types';
 
 interface PlaylistListHeaderProps {
+    gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
     itemCount?: number;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const PlaylistListHeader = ({ itemCount, tableRef }: PlaylistListHeaderProps) => {
+export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistListHeaderProps) => {
     const cq = useContainerQuery();
     const server = useCurrentServer();
 
@@ -56,11 +58,19 @@ export const PlaylistListHeader = ({ itemCount, tableRef }: PlaylistListHeaderPr
                             )}
                         </Paper>
                     </LibraryHeaderBar>
-                    <Button onClick={handleCreatePlaylistModal}>Create playlist</Button>
+                    <Button
+                        variant="filled"
+                        onClick={handleCreatePlaylistModal}
+                    >
+                        Create
+                    </Button>
                 </Flex>
             </PageHeader>
             <Paper p="1rem">
-                <PlaylistListHeaderFilters tableRef={tableRef} />
+                <PlaylistListHeaderFilters
+                    gridRef={gridRef}
+                    tableRef={tableRef}
+                />
             </Paper>
         </Stack>
     );

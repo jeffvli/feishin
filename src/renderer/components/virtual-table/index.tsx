@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { Ref, forwardRef, useRef, useEffect, useCallback, useMemo } from 'react';
 import type {
     ICellRendererParams,
@@ -19,6 +18,7 @@ import { useClickOutside, useMergedRef } from '@mantine/hooks';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import formatDuration from 'format-duration';
+import { AnimatePresence } from 'framer-motion';
 import { generatePath } from 'react-router';
 import styled from 'styled-components';
 import { AlbumArtistCell } from '/@/renderer/components/virtual-table/cells/album-artist-cell';
@@ -29,9 +29,10 @@ import { GenreCell } from '/@/renderer/components/virtual-table/cells/genre-cell
 import { GenericTableHeader } from '/@/renderer/components/virtual-table/headers/generic-table-header';
 import { AppRoute } from '/@/renderer/router/routes';
 import { PersistedTableColumn } from '/@/renderer/store/settings.store';
-import { TableColumn } from '/@/renderer/types';
+import { TableColumn, TablePagination as TablePaginationType } from '/@/renderer/types';
 import { FavoriteCell } from '/@/renderer/components/virtual-table/cells/favorite-cell';
 import { RatingCell } from '/@/renderer/components/virtual-table/cells/rating-cell';
+import { TablePagination } from '/@/renderer/components/virtual-table/table-pagination';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -336,14 +337,14 @@ export const getColumnDef = (column: TableColumn) => {
     return tableColumns[column as keyof typeof tableColumns];
 };
 
-export const getColumnDefs = (columns: PersistedTableColumn[]) => {
+export const getColumnDefs = (columns: PersistedTableColumn[], useWidth?: boolean) => {
     const columnDefs: ColDef[] = [];
     for (const column of columns) {
         const presetColumn = tableColumns[column.column as keyof typeof tableColumns];
         if (presetColumn) {
             columnDefs.push({
                 ...presetColumn,
-                initialWidth: column.width,
+                [useWidth ? 'width' : 'initialWidth']: column.width,
                 ...column.extraProps,
             });
         }
@@ -352,10 +353,15 @@ export const getColumnDefs = (columns: PersistedTableColumn[]) => {
     return columnDefs;
 };
 
-interface VirtualTableProps extends AgGridReactProps {
+export interface VirtualTableProps extends AgGridReactProps {
     autoFitColumns?: boolean;
     autoHeight?: boolean;
     deselectOnClickOutside?: boolean;
+    paginationProps?: {
+        pageKey: string;
+        pagination: TablePaginationType;
+        setPagination: any;
+    };
     transparentHeader?: boolean;
 }
 
@@ -370,6 +376,7 @@ export const VirtualTable = forwardRef(
             onNewColumnsLoaded,
             onGridReady,
             onGridSizeChanged,
+            paginationProps,
             ...rest
         }: VirtualTableProps,
         ref: Ref<AgGridReactType | null>,
@@ -453,40 +460,54 @@ export const VirtualTable = forwardRef(
         );
 
         return (
-            <TableWrapper
-                ref={deselectRef}
-                className={
-                    transparentHeader
-                        ? 'ag-header-transparent ag-theme-alpine-dark'
-                        : 'ag-theme-alpine-dark'
-                }
-            >
-                <AgGridReact
-                    ref={mergedRef}
-                    animateRows
-                    maintainColumnOrder
-                    suppressAsyncEvents
-                    suppressContextMenu
-                    suppressCopyRowsToClipboard
-                    suppressMoveWhenRowDragging
-                    suppressPaginationPanel
-                    suppressScrollOnNewData
-                    blockLoadDebounceMillis={200}
-                    cacheBlockSize={300}
-                    cacheOverflowSize={1}
-                    defaultColDef={defaultColumnDefs}
-                    enableCellChangeFlash={false}
-                    headerHeight={36}
-                    rowBuffer={30}
-                    rowSelection="multiple"
-                    {...rest}
-                    onColumnMoved={handleColumnMoved}
-                    onGridReady={handleGridReady}
-                    onGridSizeChanged={handleGridSizeChanged}
-                    onModelUpdated={handleModelUpdated}
-                    onNewColumnsLoaded={handleNewColumnsLoaded}
-                />
-            </TableWrapper>
+            <>
+                <TableWrapper
+                    ref={deselectRef}
+                    className={
+                        transparentHeader
+                            ? 'ag-header-transparent ag-theme-alpine-dark'
+                            : 'ag-theme-alpine-dark'
+                    }
+                >
+                    <AgGridReact
+                        ref={mergedRef}
+                        animateRows
+                        maintainColumnOrder
+                        suppressAsyncEvents
+                        suppressContextMenu
+                        suppressCopyRowsToClipboard
+                        suppressMoveWhenRowDragging
+                        suppressPaginationPanel
+                        suppressScrollOnNewData
+                        blockLoadDebounceMillis={200}
+                        cacheBlockSize={300}
+                        cacheOverflowSize={1}
+                        defaultColDef={defaultColumnDefs}
+                        enableCellChangeFlash={false}
+                        headerHeight={36}
+                        rowBuffer={30}
+                        rowSelection="multiple"
+                        {...rest}
+                        onColumnMoved={handleColumnMoved}
+                        onGridReady={handleGridReady}
+                        onGridSizeChanged={handleGridSizeChanged}
+                        onModelUpdated={handleModelUpdated}
+                        onNewColumnsLoaded={handleNewColumnsLoaded}
+                    />
+                    {paginationProps && (
+                        <AnimatePresence
+                            presenceAffectsLayout
+                            initial={false}
+                            mode="wait"
+                        >
+                            <TablePagination
+                                {...paginationProps}
+                                tableRef={tableRef}
+                            />
+                        </AnimatePresence>
+                    )}
+                </TableWrapper>
+            </>
         );
     },
 );

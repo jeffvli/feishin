@@ -9,9 +9,10 @@ import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem } from '/@/renderer/api/types';
 import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 import {
+    PLAYLIST_CONTEXT_MENU_ITEMS,
     ALBUM_CONTEXT_MENU_ITEMS,
     ARTIST_CONTEXT_MENU_ITEMS,
-} from '/@/renderer/features/context-menu/context-menu-items';
+} from '../../../features/context-menu/context-menu-items';
 
 type PlayButtonType = UnstyledButtonProps & React.ComponentPropsWithoutRef<'button'>;
 
@@ -154,7 +155,11 @@ export const GridCardControls = ({
 
     const handleContextMenu = useHandleGeneralContextMenu(
         itemType,
-        itemType === LibraryItem.ALBUM ? ALBUM_CONTEXT_MENU_ITEMS : ARTIST_CONTEXT_MENU_ITEMS,
+        itemType === LibraryItem.ALBUM
+            ? ALBUM_CONTEXT_MENU_ITEMS
+            : itemType === LibraryItem.PLAYLIST
+            ? PLAYLIST_CONTEXT_MENU_ITEMS
+            : ARTIST_CONTEXT_MENU_ITEMS,
     );
 
     return (
@@ -168,22 +173,25 @@ export const GridCardControls = ({
                     <RiPlayFill size={25} />
                 </PlayButton>
                 <BottomControls>
-                    <SecondaryButton
-                        p={5}
-                        variant="subtle"
-                        onClick={(e) => handleFavorites(e, itemData?.serverId)}
-                    >
-                        <FavoriteWrapper isFavorite={itemData?.isFavorite}>
-                            {isFavorite ? (
-                                <RiHeartFill size={20} />
-                            ) : (
-                                <RiHeartLine
-                                    color="white"
-                                    size={20}
-                                />
-                            )}
-                        </FavoriteWrapper>
-                    </SecondaryButton>
+                    {itemType !== LibraryItem.PLAYLIST && (
+                        <SecondaryButton
+                            p={5}
+                            variant="subtle"
+                            onClick={(e) => handleFavorites(e, itemData?.serverId)}
+                        >
+                            <FavoriteWrapper isFavorite={itemData?.isFavorite}>
+                                {isFavorite ? (
+                                    <RiHeartFill size={20} />
+                                ) : (
+                                    <RiHeartLine
+                                        color="white"
+                                        size={20}
+                                    />
+                                )}
+                            </FavoriteWrapper>
+                        </SecondaryButton>
+                    )}
+
                     <SecondaryButton
                         p={5}
                         variant="subtle"

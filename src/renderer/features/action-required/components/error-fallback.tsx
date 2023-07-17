@@ -23,7 +23,7 @@ export const ErrorFallback = ({ resetErrorBoundary }: FallbackProps) => {
                         />
                         <Text size="lg">Something went wrong</Text>
                     </Group>
-                    <Text>{error.message}</Text>
+                    <Text>{error?.message}</Text>
                     <Button
                         variant="filled"
                         onClick={resetErrorBoundary}

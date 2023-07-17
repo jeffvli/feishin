@@ -1,35 +1,44 @@
-import { useCallback } from 'react';
+import { MutableRefObject, useCallback } from 'react';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumListQuery, AlbumListResponse, LibraryItem } from '/@/renderer/api/types';
-import { VirtualTable } from '/@/renderer/components/virtual-table';
-import { useAlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { AlbumArtistListQuery, AlbumArtistListResponse, LibraryItem } from '/@/renderer/api/types';
 import {
-    useCurrentServer,
-    useAlbumListFilter,
-    useListStoreActions,
-    useAlbumListStore,
-} from '/@/renderer/store';
-import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
-import {
-    useVirtualTable,
     AgGridFetchFn,
-} from '../../../components/virtual-table/hooks/use-virtual-table';
+    useVirtualTable,
+} from '/@/renderer/components/virtual-table/hooks/use-virtual-table';
+import { useAlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
+import { ARTIST_CONTEXT_MENU_ITEMS } from '../../context-menu/context-menu-items';
+import {
+    useAlbumArtistListFilter,
+    useAlbumArtistListStore,
+    useCurrentServer,
+    useListStoreActions,
+} from '/@/renderer/store';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
+import { VirtualTable } from '/@/renderer/components/virtual-table';
 
-export const AlbumListTableView = ({ tableRef, itemCount }: any) => {
+interface AlbumArtistListTableViewProps {
+    itemCount?: number;
+    tableRef: MutableRefObject<AgGridReactType | null>;
+}
+
+export const AlbumArtistListTableView = ({
+    itemCount,
+    tableRef,
+}: AlbumArtistListTableViewProps) => {
     const server = useCurrentServer();
-    const { id, pageKey } = useAlbumListContext();
-    const filter = useAlbumListFilter({ id, key: pageKey });
+    const { id, pageKey } = useAlbumArtistListContext();
+    const filter = useAlbumArtistListFilter({ id, key: pageKey });
+    const listProperties = useAlbumArtistListStore();
     const { setTable, setTablePagination } = useListStoreActions();
-    const listProperties = useAlbumListStore({ id, key: pageKey });
 
     const fetchFn: AgGridFetchFn<
-        AlbumListResponse,
-        Omit<AlbumListQuery, 'startIndex'>
+        AlbumArtistListResponse,
+        Omit<AlbumArtistListQuery, 'startIndex'>
     > = useCallback(
         async ({ filter, limit, startIndex }, signal) => {
-            const res = api.controller.getAlbumList({
+            const res = api.controller.getAlbumArtistList({
                 apiClientProps: {
                     server,
                     signal,
@@ -48,8 +57,11 @@ export const AlbumListTableView = ({ tableRef, itemCount }: any) => {
         [server],
     );
 
-    const tableProps = useVirtualTable<AlbumListResponse, Omit<AlbumListQuery, 'startIndex'>>({
-        contextMenu: ALBUM_CONTEXT_MENU_ITEMS,
+    const tableProps = useVirtualTable<
+        AlbumArtistListResponse,
+        Omit<AlbumArtistListQuery, 'startIndex'>
+    >({
+        contextMenu: ARTIST_CONTEXT_MENU_ITEMS,
         fetch: {
             filter,
             fn: fetchFn,
@@ -58,7 +70,7 @@ export const AlbumListTableView = ({ tableRef, itemCount }: any) => {
             server,
         },
         itemCount,
-        itemType: LibraryItem.ALBUM,
+        itemType: LibraryItem.SONG,
         pageKey,
         properties: listProperties,
         setTable,

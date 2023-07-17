@@ -103,6 +103,7 @@ export enum BindingActions {
 
 export interface SettingsState {
     general: {
+        defaultFullPlaylist: boolean;
         followSystemTheme: boolean;
         fontContent: string;
         playButtonBehavior: Play;
@@ -187,6 +188,7 @@ const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle
 
 const initialState: SettingsState = {
     general: {
+        defaultFullPlaylist: false,
         followSystemTheme: false,
         fontContent: 'Poppins',
         playButtonBehavior: Play.NOW,

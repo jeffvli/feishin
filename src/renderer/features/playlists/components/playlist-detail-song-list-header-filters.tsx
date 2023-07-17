@@ -42,10 +42,11 @@ import {
 } from '/@/renderer/store';
 import { ListDisplayType, ServerType, Play, TableColumn } from '/@/renderer/types';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { openUpdatePlaylistModal } from '/@/renderer/features/playlists/components/update-playlist-form';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
+import { AppRoute } from '/@/renderer/router/routes';
 
 const FILTERS = {
     jellyfin: [
@@ -107,6 +108,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
     handleToggleShowQueryBuilder,
 }: PlaylistDetailSongListHeaderFiltersProps) => {
     const { playlistId } = useParams() as { playlistId: string };
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const server = useCurrentServer();
     const setPage = useSetPlaylistStore();
@@ -280,11 +282,12 @@ export const PlaylistDetailSongListHeaderFilters = ({
                     toast.success({
                         message: `Playlist has been deleted`,
                     });
+                    navigate(AppRoute.PLAYLISTS, { replace: true });
                 },
             },
         );
         closeAllModals();
-    }, [deletePlaylistMutation, detailQuery.data]);
+    }, [deletePlaylistMutation, detailQuery.data, navigate]);
 
     const openDeletePlaylistModal = () => {
         openModal({
@@ -390,7 +393,6 @@ export const PlaylistDetailSongListHeaderFilters = ({
                             Edit playlist
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            disabled
                             icon={<RiDeleteBinFill />}
                             onClick={openDeletePlaylistModal}
                         >

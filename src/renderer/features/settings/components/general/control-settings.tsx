@@ -195,6 +195,26 @@ export const ControlSettings = () => {
             isHidden: !isElectron(),
             title: 'Save play queue',
         },
+        {
+            control: (
+                <Switch
+                    aria-label="Go to playlist songs page by default"
+                    defaultChecked={settings.defaultFullPlaylist}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                defaultFullPlaylist: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description:
+                'When navigating to a playlist, go to the playlist song list page instead of the default page',
+            isHidden: false,
+            title: 'Go to playlist songs page by default',
+        },
     ];
 
     return <SettingsSection options={controlOptions} />;
