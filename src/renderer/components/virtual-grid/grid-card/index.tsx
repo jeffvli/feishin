@@ -20,8 +20,6 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
         resetInfiniteLoaderCache,
     } = data as GridCardData;
 
-    console.log('data', data);
-
     const cards = [];
     const startIndex = index * columnCount;
     const stopIndex = Math.min(itemCount - 1, startIndex + columnCount - 1);
