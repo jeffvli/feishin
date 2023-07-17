@@ -57,7 +57,9 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                                 isSmartPlaylist && smartPlaylist?.filters
                                     ? {
                                           ...convertQueryGroupToNDQuery(smartPlaylist.filters),
-                                          ...smartPlaylist.extraFilters,
+                                          limit: smartPlaylist.extraFilters.limit,
+                                          order: smartPlaylist.extraFilters.sortOrder,
+                                          sort: smartPlaylist.extraFilters.sortBy,
                                       }
                                     : undefined,
                         },
