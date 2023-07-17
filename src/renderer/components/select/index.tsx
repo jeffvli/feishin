@@ -25,6 +25,11 @@ const StyledSelect = styled(MantineSelect)`
         opacity: 0.6;
     }
 
+    & .mantine-Select-label {
+        margin-bottom: 0.5rem;
+        font-family: var(--label-font-family);
+    }
+
     & .mantine-Select-itemsWrapper {
         & .mantine-Select-item {
             padding: 40px;
