@@ -38,16 +38,6 @@ interface StatefulWebSocket extends WebSocket {
 let server: Server | undefined;
 let wsServer: WsServer<StatefulWebSocket> | undefined;
 
-function broadcast({ event, data }: ServerEvent): void {
-    if (wsServer) {
-        for (const client of wsServer.clients) {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({ data, event }));
-            }
-        }
-    }
-}
-
 type SendData = ServerEvent & {
     client: StatefulWebSocket;
 };
@@ -55,6 +45,14 @@ type SendData = ServerEvent & {
 function send({ client, event, data }: SendData): void {
     if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify({ data, event }));
+    }
+}
+
+function broadcast(message: ServerEvent): void {
+    if (wsServer) {
+        for (const client of wsServer.clients) {
+            send({ client, ...message });
+        }
     }
 }
 
@@ -383,7 +381,7 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                             }
                             case 'favorite': {
                                 const { favorite, id } = json;
-                                if (id && json.id === currentSong.song?.id) {
+                                if (id && id === currentSong.song?.id) {
                                     getMainWindow()?.webContents.send('request-favorite', {
                                         favorite,
                                         id,
@@ -394,7 +392,7 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                             }
                             case 'rating': {
                                 const { rating, id } = json;
-                                if (id && json.id === currentSong.song?.id) {
+                                if (id && id === currentSong.song?.id) {
                                     getMainWindow()?.webContents.send('request-rating', {
                                         id,
                                         rating,

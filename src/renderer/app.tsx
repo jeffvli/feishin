@@ -41,7 +41,7 @@ export const App = () => {
     const { bindings } = useHotkeySettings();
     const handlePlayQueueAdd = useHandlePlayQueueAdd();
     const { clearQueue, restoreQueue } = useQueueControls();
-    const { enabled } = useRemoteSettings();
+    const { enabled: remoteEnabled } = useRemoteSettings();
 
     useEffect(() => {
         const root = document.documentElement;
@@ -116,7 +116,7 @@ export const App = () => {
     }, [playbackType, restoreQueue]);
 
     useEffect(() => {
-        if (isElectron() && enabled) {
+        if (isElectron() && remoteEnabled) {
             remote?.setRemoteEnabled(true).catch((error) => {
                 toast.warn({ message: error, title: 'Failed to enable remote' });
             });

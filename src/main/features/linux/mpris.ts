@@ -147,15 +147,14 @@ ipcMain.on('update-song', (_event, args: SongUpdate) => {
         mprisPlayer.metadata = {
             'mpris:artUrl': upsizedImageUrl,
             'mpris:length': song.duration ? Math.round((song.duration || 0) * 1e6) : null,
-            'mpris:trackid': song?.id
+            'mpris:trackid': song.id
                 ? mprisPlayer.objectPath(`track/${song.id?.replace('-', '')}`)
                 : '',
             'xesam:album': song.album || null,
-            'xesam:albumArtist': song.albumArtists?.length ? song.albumArtists[0].name : null,
-            'xesam:artist':
-                song.artists?.length !== 0
-                    ? song.artists?.map((artist: RelatedArtist) => artist.name)
-                    : null,
+            'xesam:albumArtist': song.albumArtists?.length
+                ? song.albumArtists.map((artist) => artist.name)
+                : null,
+            'xesam:artist': song.artists?.length ? song.artists.map((artist) => artist.name) : null,
             'xesam:discNumber': song.discNumber ? song.discNumber : null,
             'xesam:genre': song.genres?.length ? song.genres.map((genre: any) => genre.name) : null,
             'xesam:title': song.name || null,

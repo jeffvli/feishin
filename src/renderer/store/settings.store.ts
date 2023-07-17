@@ -181,7 +181,7 @@ export interface SettingsSlice extends SettingsState {
 
 // Determines the default/initial windowBarStyle value based on the current platform.
 const getPlatformDefaultWindowBarStyle = (): Platform => {
-    return isElectron() ? (utils.isMacOS() ? Platform.MACOS : Platform.WINDOWS) : Platform.WEB;
+    return utils ? (utils.isMacOS() ? Platform.MACOS : Platform.WINDOWS) : Platform.WEB;
 };
 
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
