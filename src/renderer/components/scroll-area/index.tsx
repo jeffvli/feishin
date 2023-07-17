@@ -30,7 +30,7 @@ const StyledScrollArea = styled(MantineScrollArea)`
 
 const StyledNativeScrollArea = styled.div<{ scrollBarOffset?: string; windowBarStyle?: Platform }>`
     height: 100%;
-    overflow-y: overlay !important;
+    overflow-y: auto;
 
     &::-webkit-scrollbar-track {
         margin-top: ${(props) =>
