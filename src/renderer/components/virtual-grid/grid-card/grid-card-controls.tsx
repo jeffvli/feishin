@@ -7,7 +7,7 @@ import type { PlayQueueAddOptions } from '/@/renderer/types';
 import { Play } from '/@/renderer/types';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem } from '/@/renderer/api/types';
-import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
+import { useHandleGridContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 import {
     PLAYLIST_CONTEXT_MENU_ITEMS,
     ALBUM_CONTEXT_MENU_ITEMS,
@@ -112,6 +112,7 @@ export const GridCardControls = ({
     itemType,
     handlePlayQueueAdd,
     handleFavorite,
+    resetInfiniteLoaderCache,
 }: {
     handleFavorite: (options: {
         id: string[];
@@ -122,6 +123,7 @@ export const GridCardControls = ({
     handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
     itemData: any;
     itemType: LibraryItem;
+    resetInfiniteLoaderCache: () => void;
 }) => {
     const [isFavorite, setIsFavorite] = useState(itemData?.userFavorite);
     const playButtonBehavior = usePlayButtonBehavior();
@@ -153,13 +155,14 @@ export const GridCardControls = ({
         setIsFavorite(!isFavorite);
     };
 
-    const handleContextMenu = useHandleGeneralContextMenu(
+    const handleContextMenu = useHandleGridContextMenu(
         itemType,
         itemType === LibraryItem.ALBUM
             ? ALBUM_CONTEXT_MENU_ITEMS
             : itemType === LibraryItem.PLAYLIST
             ? PLAYLIST_CONTEXT_MENU_ITEMS
             : ARTIST_CONTEXT_MENU_ITEMS,
+        resetInfiniteLoaderCache,
     );
 
     return (

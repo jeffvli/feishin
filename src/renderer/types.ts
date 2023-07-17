@@ -183,5 +183,6 @@ export type GridCardData = {
     itemType: LibraryItem;
     itemWidth: number;
     playButtonBehavior: Play;
+    resetInfiniteLoaderCache: () => void;
     route: CardRoute;
 };

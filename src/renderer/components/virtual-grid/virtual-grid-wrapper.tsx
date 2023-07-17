@@ -22,6 +22,7 @@ const createItemData = memoize(
         route,
         handlePlayQueueAdd,
         handleFavorite,
+        resetInfiniteLoaderCache,
     ) => ({
         cardRows,
         columnCount,
@@ -34,6 +35,7 @@ const createItemData = memoize(
         itemHeight,
         itemType,
         itemWidth,
+        resetInfiniteLoaderCache,
         route,
     }),
 );
@@ -59,6 +61,7 @@ export const VirtualGridWrapper = ({
     onScroll,
     height,
     width,
+    resetInfiniteLoaderCache,
     ...rest
 }: Omit<FixedSizeListProps, 'ref' | 'itemSize' | 'children' | 'height' | 'width'> & {
     cardRows: CardRow<Album | AlbumArtist | Artist>[];
@@ -77,6 +80,7 @@ export const VirtualGridWrapper = ({
     itemType: LibraryItem;
     itemWidth: number;
     refInstance: Ref<any>;
+    resetInfiniteLoaderCache: () => void;
     route?: CardRoute;
     rowCount: number;
     width?: number;
@@ -94,6 +98,7 @@ export const VirtualGridWrapper = ({
         route,
         handlePlayQueueAdd,
         handleFavorite,
+        resetInfiniteLoaderCache,
     );
 
     const memoizedOnScroll = createScrollHandler(onScroll);

@@ -7,6 +7,7 @@ export type OpenContextMenuProps = {
     data: any[];
     dataNodes?: RowNode[];
     menuItems: SetContextMenuItems;
+    resetGridCache?: () => void;
     tableApi?: GridOptions['api'];
     type: LibraryItem;
     xPos: number;

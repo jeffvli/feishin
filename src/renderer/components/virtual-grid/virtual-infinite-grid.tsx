@@ -166,6 +166,12 @@ export const VirtualInfiniteGrid = forwardRef(
                                 infiniteLoaderRef(list);
                                 listRef.current = list;
                             }}
+                            resetInfiniteLoaderCache={() => {
+                                if (loader.current) {
+                                    loader.current.resetloadMoreItemsCache(false);
+                                    setItemData([]);
+                                }
+                            }}
                             route={route}
                             rowCount={rowCount}
                             width={width}

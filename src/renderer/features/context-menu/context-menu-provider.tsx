@@ -97,6 +97,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         data: [],
         dataNodes: [],
         menuItems: [],
+        resetGridCache: undefined,
         tableApi: undefined,
         type: LibraryItem.SONG,
         xPos: 0,
@@ -106,7 +107,8 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const handlePlayQueueAdd = usePlayQueueAdd();
 
     const openContextMenu = (args: OpenContextMenuProps) => {
-        const { xPos, yPos, menuItems, data, type, tableApi, dataNodes, context } = args;
+        const { xPos, yPos, menuItems, data, type, tableApi, dataNodes, context, resetGridCache } =
+            args;
 
         const serverType = data[0]?.serverType || useAuthStore.getState().currentServer?.type;
         let validMenuItems = menuItems;
@@ -133,6 +135,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             data,
             dataNodes,
             menuItems: validMenuItems,
+            resetGridCache,
             tableApi,
             type,
             xPos: calculatedXPos,
@@ -214,12 +217,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                         toast.success({
                             message: `Playlist has been deleted`,
                         });
+
+                        ctx.tableApi?.refreshInfiniteCache();
+                        ctx.resetGridCache?.();
                     },
                 },
             );
         }
+
         closeAllModals();
-    }, [ctx.data, deletePlaylistMutation]);
+    }, [ctx, deletePlaylistMutation]);
 
     const openDeletePlaylistModal = useCallback(() => {
         openModal({

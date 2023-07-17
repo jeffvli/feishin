@@ -72,3 +72,32 @@ export const useHandleGeneralContextMenu = (
 
     return handleContextMenu;
 };
+
+export const useHandleGridContextMenu = (
+    itemType: LibraryItem,
+    contextMenuItems: SetContextMenuItems,
+    resetGridCache: () => void,
+    context?: any,
+) => {
+    const handleContextMenu = (
+        e: any,
+        data: Song[] | QueueSong[] | AlbumArtist[] | Artist[] | Album[],
+    ) => {
+        if (!e) return;
+        const clickEvent = e as MouseEvent;
+        clickEvent.preventDefault();
+
+        openContextMenu({
+            context,
+            data,
+            dataNodes: undefined,
+            menuItems: contextMenuItems,
+            resetGridCache,
+            type: itemType,
+            xPos: clickEvent.clientX + 15,
+            yPos: clickEvent.clientY + 5,
+        });
+    };
+
+    return handleContextMenu;
+};

@@ -22,6 +22,7 @@ interface BaseGridCardProps {
         handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
         itemType: LibraryItem;
         playButtonBehavior: Play;
+        resetInfiniteLoaderCache: () => void;
         route: CardRoute;
     };
     data: any;
@@ -186,6 +187,7 @@ export const PosterCard = ({
                             handlePlayQueueAdd={controls.handlePlayQueueAdd}
                             itemData={data}
                             itemType={controls.itemType}
+                            resetInfiniteLoaderCache={controls.resetInfiniteLoaderCache}
                         />
                     </ImageContainer>
                 </LinkContainer>

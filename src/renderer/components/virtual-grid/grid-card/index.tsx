@@ -17,7 +17,10 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
         handleFavorite,
         route,
         display,
+        resetInfiniteLoaderCache,
     } = data as GridCardData;
+
+    console.log('data', data);
 
     const cards = [];
     const startIndex = index * columnCount;
@@ -41,6 +44,7 @@ export const GridCard = memo(({ data, index, style }: ListChildComponentProps) =
                     handlePlayQueueAdd,
                     itemType,
                     playButtonBehavior,
+                    resetInfiniteLoaderCache,
                     route,
                 }}
                 data={itemData[i]}
