@@ -1,8 +1,7 @@
 import { useRef, useState } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Group } from '@mantine/core';
+import { Box, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { PlaylistDetailSongListContent } from '../components/playlist-detail-song-list-content';
@@ -119,28 +118,6 @@ const PlaylistDetailSongListRoute = () => {
         });
     };
 
-    const smartPlaylistVariants: Variants = {
-        animate: (custom: { isQueryBuilderExpanded: boolean }) => {
-            return {
-                maxHeight: custom.isQueryBuilderExpanded ? '35vh' : '3.5em',
-                opacity: 1,
-                transition: {
-                    duration: 0.3,
-                    ease: 'easeInOut',
-                },
-                y: 0,
-            };
-        },
-        exit: {
-            opacity: 0,
-            y: -25,
-        },
-        initial: {
-            opacity: 0,
-            y: -25,
-        },
-    };
-
     const isSmartPlaylist =
         !detailQuery?.isLoading &&
         detailQuery?.data?.rules &&
@@ -190,55 +167,45 @@ const PlaylistDetailSongListRoute = () => {
                 itemCount={itemCount}
                 tableRef={tableRef}
             />
-            <AnimatePresence
-                custom={{ isQueryBuilderExpanded }}
-                initial={false}
-            >
-                {(isSmartPlaylist || showQueryBuilder) && (
-                    <motion.div
-                        animate="animate"
-                        custom={{ isQueryBuilderExpanded }}
-                        exit="exit"
-                        initial="initial"
-                        transition={{ duration: 0.2, ease: 'easeInOut' }}
-                        variants={smartPlaylistVariants}
+
+            {(isSmartPlaylist || showQueryBuilder) && (
+                <Box>
+                    <Paper
+                        h="100%"
+                        mah="35vh"
+                        w="100%"
                     >
-                        <Paper
-                            h="100%"
-                            pos="relative"
-                            w="100%"
-                        >
-                            <Group
-                                pt="1rem"
-                                px="1rem"
+                        <Group p="1rem">
+                            <Button
+                                compact
+                                variant="default"
+                                onClick={handleToggleExpand}
                             >
-                                <Button
-                                    compact
-                                    variant="default"
-                                    onClick={handleToggleExpand}
-                                >
-                                    {isQueryBuilderExpanded ? (
-                                        <RiArrowUpSLine size={20} />
-                                    ) : (
-                                        <RiArrowDownSLine size={20} />
-                                    )}
-                                </Button>
-                                <Text>Query Editor</Text>
-                            </Group>
-                            <PlaylistQueryBuilder
-                                key={JSON.stringify(detailQuery?.data?.rules)}
-                                isSaving={createPlaylistMutation?.isLoading}
-                                limit={detailQuery?.data?.rules?.limit}
-                                query={detailQuery?.data?.rules}
-                                sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
-                                sortOrder={detailQuery?.data?.rules?.order || 'asc'}
-                                onSave={handleSave}
-                                onSaveAs={handleSaveAs}
-                            />
-                        </Paper>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                                {isQueryBuilderExpanded ? (
+                                    <RiArrowUpSLine size={20} />
+                                ) : (
+                                    <RiArrowDownSLine size={20} />
+                                )}
+                            </Button>
+                            <Text>Query Editor</Text>
+                        </Group>
+                        <Box>
+                            {isQueryBuilderExpanded && (
+                                <PlaylistQueryBuilder
+                                    key={JSON.stringify(detailQuery?.data?.rules)}
+                                    isSaving={createPlaylistMutation?.isLoading}
+                                    limit={detailQuery?.data?.rules?.limit}
+                                    query={detailQuery?.data?.rules}
+                                    sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
+                                    sortOrder={detailQuery?.data?.rules?.order || 'asc'}
+                                    onSave={handleSave}
+                                    onSaveAs={handleSaveAs}
+                                />
+                            )}
+                        </Box>
+                    </Paper>
+                </Box>
+            )}
             <PlaylistDetailSongListContent tableRef={tableRef} />
         </AnimatedPage>
     );
