@@ -41,7 +41,7 @@ export const App = () => {
     const { bindings } = useHotkeySettings();
     const handlePlayQueueAdd = useHandlePlayQueueAdd();
     const { clearQueue, restoreQueue } = useQueueControls();
-    const { enabled: remoteEnabled } = useRemoteSettings();
+    const remoteSettings = useRemoteSettings();
 
     useEffect(() => {
         const root = document.documentElement;
@@ -116,10 +116,17 @@ export const App = () => {
     }, [playbackType, restoreQueue]);
 
     useEffect(() => {
-        if (isElectron() && remoteEnabled) {
-            remote?.setRemoteEnabled(true).catch((error) => {
-                toast.warn({ message: error, title: 'Failed to enable remote' });
-            });
+        if (remote) {
+            remote
+                ?.updateSetting(
+                    remoteSettings.enabled,
+                    remoteSettings.port,
+                    remoteSettings.username,
+                    remoteSettings.password,
+                )
+                .catch((error) => {
+                    toast.warn({ message: error, title: 'Failed to enable remote' });
+                });
         }
         // We only want to fire this once
         // eslint-disable-next-line react-hooks/exhaustive-deps

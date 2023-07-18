@@ -10,7 +10,6 @@ import { ClientEvent, ServerEvent } from '../../../../remote/types';
 import { PlayerRepeat, SongUpdate } from '../../../../renderer/types';
 import { getMainWindow } from '../../../main';
 import { isLinux } from '../../../utils';
-import { store } from '../settings/index';
 
 let mprisPlayer: any | undefined;
 
@@ -21,7 +20,9 @@ if (isLinux()) {
 
 interface RemoteConfig {
     enabled: boolean;
+    password: string;
     port: number;
+    username: string;
 }
 
 interface MimeType {
@@ -37,6 +38,13 @@ interface StatefulWebSocket extends WebSocket {
 
 let server: Server | undefined;
 let wsServer: WsServer<StatefulWebSocket> | undefined;
+
+const settings: RemoteConfig = {
+    enabled: false,
+    password: '',
+    port: 4333,
+    username: '',
+};
 
 type SendData = ServerEvent & {
     client: StatefulWebSocket;
@@ -248,6 +256,19 @@ async function serveFile(
     return Promise.resolve();
 }
 
+function authorize(req: IncomingMessage): boolean {
+    if (settings.username || settings.password) {
+        // https://stackoverflow.com/questions/23616371/basic-http-authentication-with-node-and-express-4
+
+        const authorization = req.headers.authorization?.split(' ')[1] || '';
+        const [login, password] = Buffer.from(authorization, 'base64').toString().split(':');
+
+        return login === settings.username && password === settings.password;
+    }
+
+    return true;
+}
+
 const enableServer = (config: RemoteConfig): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
         try {
@@ -256,6 +277,13 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
             }
 
             server = createServer({}, async (req, res) => {
+                if (!authorize(req)) {
+                    res.statusCode = 401;
+                    res.setHeader('WWW-Authenticate', 'Basic realm="401"');
+                    res.end('Authorization required');
+                    return;
+                }
+
                 try {
                     switch (req.url) {
                         case '/': {
@@ -286,10 +314,16 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                     res.end((error as Error).message);
                 }
             });
+
             server.listen(config.port, resolve);
             wsServer = new WebSocketServer({ server });
 
-            wsServer.on('connection', (ws) => {
+            wsServer.on('connection', (ws, req) => {
+                if (!authorize(req)) {
+                    ws.close(4003);
+                    return;
+                }
+
                 ws.alive = true;
 
                 ws.on('error', console.error);
@@ -440,10 +474,7 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
     });
 };
 
-const DEFAULT_CONFIG = { enabled: false, port: 4333 };
-
 ipcMain.handle('remote-enable', async (_event, enabled: boolean) => {
-    const settings = store.get('remote', DEFAULT_CONFIG) as RemoteConfig;
     settings.enabled = enabled;
 
     if (enabled) {
@@ -456,16 +487,43 @@ ipcMain.handle('remote-enable', async (_event, enabled: boolean) => {
         shutdownServer();
     }
 
-    store.set('remote', settings);
     return null;
 });
 
 ipcMain.handle('remote-port', async (_event, port: number) => {
-    const settings = store.get('remote', DEFAULT_CONFIG) as RemoteConfig;
     settings.port = port;
-    store.set('remote', settings);
+});
 
-    return null;
+ipcMain.on('remote-password', (_event, password: string) => {
+    settings.password = password;
+    wsServer?.clients.forEach((client) => client.close(4002));
+});
+
+ipcMain.handle(
+    'remote-settings',
+    async (_event, enabled: boolean, port: number, username: string, password: string) => {
+        settings.enabled = enabled;
+        settings.password = password;
+        settings.port = port;
+        settings.username = username;
+
+        if (enabled) {
+            try {
+                await enableServer(settings);
+            } catch (error) {
+                return (error as Error).message;
+            }
+        } else {
+            shutdownServer();
+        }
+
+        return null;
+    },
+);
+
+ipcMain.on('remote-username', (_event, username: string) => {
+    settings.username = username;
+    wsServer?.clients.forEach((client) => client.close(4002));
 });
 
 ipcMain.on('update-favorite', (_event, favorite: boolean, serverId: string, ids: string[]) => {

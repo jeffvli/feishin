@@ -20,6 +20,7 @@ import {
     TableType,
     Platform,
 } from '/@/renderer/types';
+import { randomString } from '/@/renderer/utils';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -153,7 +154,9 @@ export interface SettingsState {
     };
     remote: {
         enabled: boolean;
+        password: string;
         port: number;
+        username: string;
     };
     tab: 'general' | 'playback' | 'window' | 'hotkeys' | string;
     tables: {
@@ -264,7 +267,9 @@ const initialState: SettingsState = {
     },
     remote: {
         enabled: false,
+        password: randomString(8),
         port: 4333,
+        username: 'feishin',
     },
     tab: 'general',
     tables: {

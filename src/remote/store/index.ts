@@ -152,7 +152,10 @@ export const useRemoteStore = create<SettingsSlice>()(
                             });
 
                             socket.addEventListener('close', (reason) => {
-                                if (reason.code === 4000) {
+                                if (reason.code === 4002 || reason.code === 4003) {
+                                    // eslint-disable-next-line no-restricted-globals
+                                    location.reload();
+                                } else if (reason.code === 4000) {
                                     toast.warn({
                                         message: 'Feishin remote server is down',
                                         title: 'Connection closed',

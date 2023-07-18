@@ -42,6 +42,19 @@ const updateFavorite = (favorite: boolean, serverId: string, ids: string[]) => {
     ipcRenderer.send('update-favorite', favorite, serverId, ids);
 };
 
+const updatePassword = (password: string) => {
+    ipcRenderer.send('remote-password', password);
+};
+
+const updateSetting = (
+    enabled: boolean,
+    port: number,
+    username: string,
+    password: string,
+): Promise<string | null> => {
+    return ipcRenderer.invoke('remote-settings', enabled, port, username, password);
+};
+
 const updateRating = (rating: number, serverId: string, ids: string[]) => {
     ipcRenderer.send('update-rating', rating, serverId, ids);
 };
@@ -58,6 +71,10 @@ const updateSong = (args: SongUpdate) => {
     ipcRenderer.send('update-song', args);
 };
 
+const updateUsername = (username: string) => {
+    ipcRenderer.send('remote-username', username);
+};
+
 const updateVolume = (volume: number) => {
     ipcRenderer.send('update-volume', volume);
 };
@@ -71,10 +88,13 @@ export const remote = {
     setRemoteEnabled,
     setRemotePort,
     updateFavorite,
+    updatePassword,
     updateRating,
     updateRepeat,
+    updateSetting,
     updateShuffle,
     updateSong,
+    updateUsername,
     updateVolume,
 };
 
