@@ -1,7 +1,7 @@
+import { MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Stack } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
-import { MutableRefObject } from 'react';
 import { PageHeader, SpinnerIcon, Paper, Button } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
@@ -10,6 +10,7 @@ import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useCurrentServer } from '/@/renderer/store';
 import { ServerType } from '/@/renderer/types';
+import { RiFileAddFill } from 'react-icons/ri';
 
 interface PlaylistListHeaderProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -57,13 +58,14 @@ export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistLis
                                 itemCount
                             )}
                         </Paper>
+                        <Button
+                            tooltip={{ label: 'Create playlist', openDelay: 500 }}
+                            variant="filled"
+                            onClick={handleCreatePlaylistModal}
+                        >
+                            <RiFileAddFill />
+                        </Button>
                     </LibraryHeaderBar>
-                    <Button
-                        variant="filled"
-                        onClick={handleCreatePlaylistModal}
-                    >
-                        Create
-                    </Button>
                 </Flex>
             </PageHeader>
             <Paper p="1rem">

@@ -107,7 +107,6 @@ export const PlaylistListHeaderFilters = ({
     const handleFilterChange = useCallback(
         async (filters?: PlaylistListFilter) => {
             if (isGrid) {
-                console.log('filter change', filters);
                 gridRef.current?.scrollTo(0);
                 gridRef.current?.resetLoadMoreItemsCache();
                 const data = await fetch(0, 200, filters || page.filter);

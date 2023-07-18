@@ -1,12 +1,10 @@
 import { useCallback, ChangeEvent, MutableRefObject, MouseEvent } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Flex, Group, Stack } from '@mantine/core';
+import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-    RiSortAsc,
-    RiSortDesc,
     RiMoreFill,
     RiSettings3Fill,
     RiPlayFill,
@@ -47,6 +45,7 @@ import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { openUpdatePlaylistModal } from '/@/renderer/features/playlists/components/update-playlist-form';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
 import { AppRoute } from '/@/renderer/router/routes';
+import { OrderToggleButton } from '/@/renderer/features/shared';
 
 const FILTERS = {
     jellyfin: [
@@ -93,11 +92,6 @@ const FILTERS = {
     ],
 };
 
-const ORDER = [
-    { name: 'Ascending', value: SortOrder.ASC },
-    { name: 'Descending', value: SortOrder.DESC },
-];
-
 interface PlaylistDetailSongListHeaderFiltersProps {
     handleToggleShowQueryBuilder: () => void;
     tableRef: MutableRefObject<AgGridReactType | null>;
@@ -134,8 +128,6 @@ export const PlaylistDetailSongListHeaderFilters = ({
             FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filters.sortBy)
                 ?.name) ||
         'Unknown';
-
-    const sortOrderLabel = ORDER.find((o) => o.value === filters.sortOrder)?.name || 'Unknown';
 
     const handleItemSize = (e: number) => {
         setTable({ rowHeight: e });
@@ -331,25 +323,12 @@ export const PlaylistDetailSongListHeaderFilters = ({
                         ))}
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
-                <Button
-                    compact
-                    fw="600"
-                    size="md"
-                    variant="subtle"
-                    onClick={handleToggleSortOrder}
-                >
-                    {cq.isSm ? (
-                        sortOrderLabel
-                    ) : (
-                        <>
-                            {filters.sortOrder === SortOrder.ASC ? (
-                                <RiSortAsc size="1.3rem" />
-                            ) : (
-                                <RiSortDesc size="1.3rem" />
-                            )}
-                        </>
-                    )}
-                </Button>
+                <Divider orientation="vertical" />
+                <OrderToggleButton
+                    sortOrder={filters.sortOrder || SortOrder.ASC}
+                    onToggle={handleToggleSortOrder}
+                />
+                <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
