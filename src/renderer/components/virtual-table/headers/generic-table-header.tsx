@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 import type { IHeaderParams } from '@ag-grid-community/core';
 import { AiOutlineNumber } from 'react-icons/ai';
 import { FiClock } from 'react-icons/fi';
-import { RiHeartLine, RiStarLine } from 'react-icons/ri';
+import { RiHeartLine, RiMoreFill, RiStarLine } from 'react-icons/ri';
 import styled from 'styled-components';
 import { _Text } from '/@/renderer/components/text';
 
-type Presets = 'duration' | 'rowIndex' | 'userFavorite' | 'userRating';
+type Presets = 'duration' | 'rowIndex' | 'userFavorite' | 'userRating' | 'actions';
 
 type Options = {
     children?: ReactNode;
@@ -41,6 +41,12 @@ const TextHeaderWrapper = styled(_Text)<{ position: Options['position'] }>`
 `;
 
 const headerPresets = {
+    actions: (
+        <RiMoreFill
+            color="var(--ag-header-foreground-color)"
+            size="1em"
+        />
+    ),
     duration: (
         <FiClock
             color="var(--ag-header-foreground-color)"

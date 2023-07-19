@@ -35,6 +35,7 @@ export const SONG_TABLE_COLUMNS = [
     { label: 'Size', value: TableColumn.SIZE },
     { label: 'Favorite', value: TableColumn.USER_FAVORITE },
     { label: 'Rating', value: TableColumn.USER_RATING },
+    { label: 'Actions', value: TableColumn.ACTIONS },
     // { label: 'Skip', value: TableColumn.SKIP },
 ];
 
@@ -53,6 +54,7 @@ export const ALBUM_TABLE_COLUMNS = [
     { label: 'Plays', value: TableColumn.PLAY_COUNT },
     { label: 'Favorite', value: TableColumn.USER_FAVORITE },
     { label: 'Rating', value: TableColumn.USER_RATING },
+    { label: 'Actions', value: TableColumn.ACTIONS },
 ];
 
 export const ALBUMARTIST_TABLE_COLUMNS = [
@@ -68,6 +70,7 @@ export const ALBUMARTIST_TABLE_COLUMNS = [
     { label: 'Song Count', value: TableColumn.SONG_COUNT },
     { label: 'Favorite', value: TableColumn.USER_FAVORITE },
     { label: 'Rating', value: TableColumn.USER_RATING },
+    { label: 'Actions', value: TableColumn.ACTIONS },
 ];
 
 export const PLAYLIST_TABLE_COLUMNS = [
@@ -78,6 +81,7 @@ export const PLAYLIST_TABLE_COLUMNS = [
     { label: 'Owner', value: TableColumn.OWNER },
     // { label: 'Genre', value: TableColumn.GENRE },
     { label: 'Song Count', value: TableColumn.SONG_COUNT },
+    { label: 'Actions', value: TableColumn.ACTIONS },
 ];
 
 interface TableConfigDropdownProps {

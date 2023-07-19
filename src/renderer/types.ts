@@ -127,6 +127,7 @@ export type QueryBuilderGroup = {
 };
 
 export enum TableColumn {
+    ACTIONS = 'actions',
     ALBUM = 'album',
     ALBUM_ARTIST = 'albumArtist',
     ALBUM_COUNT = 'albumCount',

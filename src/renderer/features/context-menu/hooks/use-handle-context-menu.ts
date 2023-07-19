@@ -1,4 +1,4 @@
-import { CellContextMenuEvent } from '@ag-grid-community/core';
+import { CellContextMenuEvent, GridApi } from '@ag-grid-community/core';
 import sortBy from 'lodash/sortBy';
 import { Album, AlbumArtist, Artist, LibraryItem, QueueSong, Song } from '/@/renderer/api/types';
 import { openContextMenu, SetContextMenuItems } from '/@/renderer/features/context-menu/events';
@@ -8,27 +8,40 @@ export const useHandleTableContextMenu = (
     contextMenuItems: SetContextMenuItems,
     context?: any,
 ) => {
-    const handleContextMenu = (e: CellContextMenuEvent) => {
-        if (!e.event) return;
-        const clickEvent = e.event as MouseEvent;
-        clickEvent.preventDefault();
-
-        let selectedNodes = sortBy(e.api.getSelectedNodes(), ['rowIndex']);
-        let selectedRows = selectedNodes.map((node) => node.data);
-
-        if (!e.data?.id) {
-            return;
+    const handleContextMenu = (
+        e?: CellContextMenuEvent,
+        gridApi?: GridApi<any>,
+        click?: MouseEvent,
+    ) => {
+        let clickEvent: MouseEvent | undefined = click;
+        if (e) {
+            if (!e?.event) return;
+            clickEvent = e?.event as MouseEvent;
+            clickEvent.preventDefault();
         }
 
-        const shouldReplaceSelected = !selectedNodes
-            .map((node) => node.data.id)
-            .includes(e.data.id);
+        const api = gridApi || e?.api;
 
-        if (shouldReplaceSelected) {
-            e.api.deselectAll();
-            e.node.setSelected(true);
-            selectedRows = [e.data];
-            selectedNodes = e.api.getSelectedNodes();
+        console.log('api :>> ', api);
+
+        if (!api) return;
+
+        let selectedNodes = sortBy(api.getSelectedNodes(), ['rowIndex']);
+        let selectedRows = selectedNodes.map((node) => node.data);
+
+        if (e) {
+            if (!e.data?.id) return;
+
+            const shouldReplaceSelected = !selectedNodes
+                .map((node) => node.data.id)
+                .includes(e.data.id);
+
+            if (shouldReplaceSelected) {
+                e.api.deselectAll();
+                e.node.setSelected(true);
+                selectedRows = [e.data];
+                selectedNodes = e.api.getSelectedNodes();
+            }
         }
 
         openContextMenu({
@@ -36,10 +49,10 @@ export const useHandleTableContextMenu = (
             data: selectedRows,
             dataNodes: selectedNodes,
             menuItems: contextMenuItems,
-            tableApi: e.api,
+            tableApi: api,
             type: itemType,
-            xPos: clickEvent.clientX,
-            yPos: clickEvent.clientY,
+            xPos: clickEvent?.clientX || 0,
+            yPos: clickEvent?.clientY || 0,
         });
     };
 

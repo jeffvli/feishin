@@ -33,6 +33,7 @@ import { TableColumn, TablePagination as TablePaginationType } from '/@/renderer
 import { FavoriteCell } from '/@/renderer/components/virtual-table/cells/favorite-cell';
 import { RatingCell } from '/@/renderer/components/virtual-table/cells/rating-cell';
 import { TablePagination } from '/@/renderer/components/virtual-table/table-pagination';
+import { ActionsCell } from '/@/renderer/components/virtual-table/cells/actions-cell';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -50,6 +51,14 @@ const TableWrapper = styled.div`
 dayjs.extend(relativeTime);
 
 const tableColumns: { [key: string]: ColDef } = {
+    actions: {
+        cellClass: 'ag-cell-favorite',
+        cellRenderer: (params: ICellRendererParams) => ActionsCell(params),
+        colId: TableColumn.ACTIONS,
+        headerComponent: () => <></>,
+        suppressSizeToFit: true,
+        width: 25,
+    },
     album: {
         cellRenderer: (params: ICellRendererParams) =>
             GenericCell(params, { isLink: true, position: 'left' }),
