@@ -1,16 +1,25 @@
-import { MutableRefObject } from 'react';
+import { ChangeEvent, MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Flex, Stack } from '@mantine/core';
+import { Flex, Group, Stack } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
-import { PageHeader, SpinnerIcon, Paper, Button } from '/@/renderer/components';
+import { PageHeader, SpinnerIcon, Paper, Button, SearchInput } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { PlaylistListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-list-header-filters';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { useCurrentServer } from '/@/renderer/store';
-import { ServerType } from '/@/renderer/types';
+import {
+    PlaylistListFilter,
+    useCurrentServer,
+    useListStoreActions,
+    usePlaylistListFilter,
+    usePlaylistListStore,
+} from '/@/renderer/store';
+import { ListDisplayType, ServerType } from '/@/renderer/types';
+import debounce from 'lodash/debounce';
 import { RiFileAddFill } from 'react-icons/ri';
+import { LibraryItem } from '/@/renderer/api/types';
+import { useListFilterRefresh } from '../../../hooks/use-list-filter-refresh';
 
 interface PlaylistListHeaderProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -19,8 +28,12 @@ interface PlaylistListHeaderProps {
 }
 
 export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistListHeaderProps) => {
+    const pageKey = 'playlist';
     const cq = useContainerQuery();
     const server = useCurrentServer();
+    const { setFilter, setTablePagination } = useListStoreActions();
+    const filter = usePlaylistListFilter({ key: pageKey });
+    const { display } = usePlaylistListStore({ key: pageKey });
 
     const handleCreatePlaylistModal = () => {
         openModal({
@@ -32,6 +45,27 @@ export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistLis
             title: 'Create Playlist',
         });
     };
+
+    const { handleRefreshGrid, handleRefreshTable } = useListFilterRefresh({
+        itemType: LibraryItem.PLAYLIST,
+        server,
+    });
+
+    const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
+        const searchTerm = e.target.value === '' ? undefined : e.target.value;
+        const updatedFilters = setFilter({
+            data: { searchTerm },
+            itemType: LibraryItem.PLAYLIST,
+            key: pageKey,
+        }) as PlaylistListFilter;
+
+        if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
+            handleRefreshTable(tableRef, updatedFilters);
+            setTablePagination({ data: { currentPage: 0 }, key: pageKey });
+        } else {
+            handleRefreshGrid(gridRef, updatedFilters);
+        }
+    }, 500);
 
     return (
         <Stack
@@ -66,6 +100,13 @@ export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistLis
                             <RiFileAddFill />
                         </Button>
                     </LibraryHeaderBar>
+                    <Group>
+                        <SearchInput
+                            defaultValue={filter.searchTerm}
+                            openedWidth={cq.isMd ? 250 : cq.isSm ? 200 : 150}
+                            onChange={handleSearch}
+                        />
+                    </Group>
                 </Flex>
             </PageHeader>
             <Paper p="1rem">
