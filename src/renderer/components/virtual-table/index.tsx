@@ -34,6 +34,7 @@ import { FavoriteCell } from '/@/renderer/components/virtual-table/cells/favorit
 import { RatingCell } from '/@/renderer/components/virtual-table/cells/rating-cell';
 import { TablePagination } from '/@/renderer/components/virtual-table/table-pagination';
 import { ActionsCell } from '/@/renderer/components/virtual-table/cells/actions-cell';
+import { TitleCell } from '/@/renderer/components/virtual-table/cells/title-cell';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -274,8 +275,7 @@ const tableColumns: { [key: string]: ColDef } = {
         width: 80,
     },
     title: {
-        cellRenderer: (params: ICellRendererParams) =>
-            GenericCell(params, { position: 'left', primary: true }),
+        cellRenderer: TitleCell,
         colId: TableColumn.TITLE,
         field: 'name',
         headerName: 'Title',

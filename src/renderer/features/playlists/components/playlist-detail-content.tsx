@@ -14,6 +14,7 @@ import {
     useFixedTableHeader,
     VirtualTable,
 } from '/@/renderer/components/virtual-table';
+import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import {
     PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
@@ -163,6 +164,8 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
         });
     };
 
+    const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
+
     const loadMoreRef = useRef<HTMLButtonElement | null>(null);
 
     return (
@@ -234,6 +237,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                         // It's possible that there are duplicate song ids in a playlist
                         return `${data.data.id}-${data.data.pageIndex}`;
                     }}
+                    rowClassRules={rowClassRules}
                     rowData={playlistSongData}
                     rowHeight={60}
                     rowSelection="multiple"

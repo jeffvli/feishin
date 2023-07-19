@@ -6,6 +6,7 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { LibraryItem, QueueSong, SongListQuery, SongListResponse } from '/@/renderer/api/types';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 import { VirtualTable } from '/@/renderer/components/virtual-table';
+import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 import {
     AgGridFetchFn,
     useVirtualTable,
@@ -54,6 +55,8 @@ export const SongListTableView = ({ tableRef, itemCount }: SongListTableViewProp
         [server],
     );
 
+    const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
+
     const tableProps = useVirtualTable<SongListResponse, Omit<SongListQuery, 'startIndex'>>({
         contextMenu: SONG_CONTEXT_MENU_ITEMS,
         fetch: {
@@ -86,6 +89,7 @@ export const SongListTableView = ({ tableRef, itemCount }: SongListTableViewProp
                 key={`table-${listProperties.display}-${listProperties.table.rowHeight}-${server?.id}`}
                 ref={tableRef}
                 {...tableProps}
+                rowClassRules={rowClassRules}
                 onRowDoubleClicked={handleRowDoubleClick}
             />
         </VirtualGridAutoSizerContainer>

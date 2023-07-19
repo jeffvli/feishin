@@ -9,6 +9,7 @@ import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
+import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 
 interface AlbumArtistSongListContentProps {
     data: QueueSong[];
@@ -48,6 +49,8 @@ export const AlbumArtistDetailTopSongsListContent = ({
         });
     };
 
+    const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
+
     return (
         <>
             <VirtualGridAutoSizerContainer>
@@ -69,6 +72,7 @@ export const AlbumArtistDetailTopSongsListContent = ({
                     enableCellChangeFlash={false}
                     getRowId={(data) => data.data.uniqueId}
                     rowBuffer={20}
+                    rowClassRules={rowClassRules}
                     rowData={data}
                     rowHeight={page.table.rowHeight || 40}
                     rowModelType="clientSide"

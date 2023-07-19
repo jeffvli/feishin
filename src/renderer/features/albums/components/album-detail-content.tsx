@@ -33,6 +33,7 @@ import {
 } from '/@/renderer/components/virtual-table';
 import { SwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import { FullWidthDiscCell } from '/@/renderer/components/virtual-table/cells/full-width-disc-cell';
+import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 
 const isFullWidthRow = (node: RowNode) => {
     return node.id?.startsWith('disc-');
@@ -266,6 +267,8 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
         ALBUM_CONTEXT_MENU_ITEMS,
     );
 
+    const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
+
     return (
         <ContentContainer>
             <Box component="section">
@@ -356,6 +359,7 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
                         if (isFullWidthRow(data.data)) return false;
                         return true;
                     }}
+                    rowClassRules={rowClassRules}
                     rowData={songsRowData}
                     rowSelection="multiple"
                     onCellContextMenu={handleContextMenu}

@@ -22,8 +22,6 @@ export const useHandleTableContextMenu = (
 
         const api = gridApi || e?.api;
 
-        console.log('api :>> ', api);
-
         if (!api) return;
 
         let selectedNodes = sortBy(api.getSelectedNodes(), ['rowIndex']);

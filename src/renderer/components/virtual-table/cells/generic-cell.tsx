@@ -1,20 +1,10 @@
 import type { ICellRendererParams } from '@ag-grid-community/core';
-import { motion, Variants } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Skeleton } from '/@/renderer/components/skeleton';
 import { Text } from '/@/renderer/components/text';
 
-export const CELL_VARIANTS: Variants = {
-    animate: {
-        opacity: 1,
-    },
-    initial: {
-        opacity: 0,
-    },
-};
-
-export const CellContainer = styled(motion.div)<{ position?: 'left' | 'center' | 'right' }>`
+export const CellContainer = styled.div<{ position?: 'left' | 'center' | 'right' }>`
     display: flex;
     align-items: center;
     justify-content: ${(props) =>

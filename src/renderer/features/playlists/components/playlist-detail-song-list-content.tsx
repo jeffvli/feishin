@@ -40,6 +40,7 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 import { getColumnDefs, VirtualTable, TablePagination } from '/@/renderer/components/virtual-table';
+import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 
 interface PlaylistDetailContentProps {
     tableRef: MutableRefObject<AgGridReactType | null>;
@@ -224,6 +225,8 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
         });
     };
 
+    const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
+
     return (
         <>
             <VirtualGridAutoSizerContainer>
@@ -240,6 +243,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     pagination={isPaginationEnabled}
                     paginationAutoPageSize={isPaginationEnabled}
                     paginationPageSize={pagination.itemsPerPage || 100}
+                    rowClassRules={rowClassRules}
                     rowHeight={page.table.rowHeight || 40}
                     rowModelType="infinite"
                     onBodyScrollEnd={handleScroll}

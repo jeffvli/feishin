@@ -102,6 +102,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
             </ImageWrapper>
             <MetadataWrapper>
                 <Text
+                    className="current-song-child"
                     overflow="hidden"
                     size="md"
                 >
