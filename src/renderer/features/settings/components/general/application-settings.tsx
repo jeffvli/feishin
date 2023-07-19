@@ -11,6 +11,7 @@ const localSettings = isElectron() ? window.electron.localSettings : null;
 const FONT_OPTIONS = [
     { label: 'Archivo', value: 'Archivo' },
     { label: 'Fredoka', value: 'Fredoka' },
+    { label: 'Inter', value: 'Inter' },
     { label: 'League Spartan', value: 'League Spartan' },
     { label: 'Lexend', value: 'Lexend' },
     { label: 'Poppins', value: 'Poppins' },

@@ -186,7 +186,7 @@ const initialState: SettingsState = {
     general: {
         defaultFullPlaylist: true,
         followSystemTheme: false,
-        fontContent: 'Poppins',
+        fontContent: 'Inter',
         playButtonBehavior: Play.NOW,
         resume: false,
         showQueueDrawerButton: false,

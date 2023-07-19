@@ -26,3 +26,8 @@ export const fontEpilogue = (weight?: number) => css`
     font-weight: ${weight || 400};
     font-family: Epilogue, sans-serif;
 `;
+
+export const fontRoboto = (weight?: number) => css`
+    font-weight: ${weight || 400};
+    font-family: Roboto, sans-serif;
+`;
