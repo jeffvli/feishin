@@ -2,8 +2,8 @@ import merge from 'lodash/merge';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { PlaylistListArgs, PlaylistListSort, SortOrder } from '/@/renderer/api/types';
-import { SongListFilter } from '/@/renderer/store/list.store';
+import { PlaylistListSort, SortOrder } from '/@/renderer/api/types';
+import { PlaylistListFilter, SongListFilter } from '/@/renderer/store/list.store';
 import { DataTableProps } from '/@/renderer/store/settings.store';
 import { ListDisplayType, TableColumn, TablePagination } from '/@/renderer/types';
 
@@ -37,8 +37,6 @@ type ListGridProps = {
     itemsPerRow?: number;
     scrollOffset?: number;
 };
-
-export type PlaylistListFilter = Omit<PlaylistListArgs['query'], 'startIndex' | 'limit'>;
 
 interface PlaylistState {
     detail: DetailProps;

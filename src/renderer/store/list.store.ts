@@ -9,6 +9,7 @@ import {
     AlbumListArgs,
     AlbumListSort,
     LibraryItem,
+    PlaylistListArgs,
     PlaylistListSort,
     SongListArgs,
     SongListSort,
@@ -24,10 +25,11 @@ export const generatePageKey = (page: string, id?: string) => {
 export type AlbumListFilter = Omit<AlbumListArgs['query'], 'startIndex' | 'limit'>;
 export type SongListFilter = Omit<SongListArgs['query'], 'startIndex' | 'limit'>;
 export type AlbumArtistListFilter = Omit<AlbumArtistListArgs['query'], 'startIndex' | 'limit'>;
+export type PlaylistListFilter = Omit<PlaylistListArgs['query'], 'startIndex' | 'limit'>;
 
 export type ListKey = keyof ListState['item'] | string;
 
-type FilterType = AlbumListFilter | SongListFilter | AlbumArtistListFilter;
+type FilterType = AlbumListFilter | SongListFilter | AlbumArtistListFilter | PlaylistListFilter;
 
 export type ListTableProps = {
     pagination: TablePagination;
@@ -54,6 +56,7 @@ export interface ListState {
         album: ListItemProps<AlbumListFilter>;
         albumArtist: ListItemProps<AlbumArtistListFilter>;
         albumDetail: ListItemProps<any>;
+        playlist: ListItemProps<PlaylistListFilter>;
         song: ListItemProps<SongListFilter>;
     };
 }
@@ -399,16 +402,12 @@ export const useListStore = create<ListSlice>()(
                                     width: 50,
                                 },
                                 {
-                                    column: TableColumn.TITLE_COMBINED,
+                                    column: TableColumn.TITLE,
                                     width: 500,
                                 },
                                 {
-                                    column: TableColumn.DURATION,
+                                    column: TableColumn.SONG_COUNT,
                                     width: 100,
-                                },
-                                {
-                                    column: TableColumn.ALBUM,
-                                    width: 500,
                                 },
                             ],
                             pagination: {
@@ -422,7 +421,7 @@ export const useListStore = create<ListSlice>()(
                         },
                     },
                     song: {
-                        display: ListDisplayType.POSTER,
+                        display: ListDisplayType.TABLE,
                         filter: {
                             sortBy: SongListSort.RECENTLY_ADDED,
                             sortOrder: SortOrder.DESC,
@@ -540,6 +539,27 @@ export const useSongListStore = (args?: { id?: string; key?: string }) =>
         };
     }, shallow);
 
+export const usePlaylistListStore = (args?: { key?: string }) =>
+    useListStore((state) => {
+        const detail = args?.key ? state.detail[args.key] : undefined;
+
+        return {
+            ...state.item.playlist,
+            filter: {
+                ...state.item.playlist.filter,
+                ...detail?.filter,
+            },
+            grid: {
+                ...state.item.playlist.grid,
+                ...detail?.grid,
+            },
+            table: {
+                ...state.item.playlist.table,
+                ...detail?.table,
+            },
+        };
+    }, shallow);
+
 export const useSongListFilter = (args: { id?: string; key?: string }) =>
     useListStore((state) => {
         return state._actions.getFilter({
@@ -565,6 +585,15 @@ export const useAlbumArtistListFilter = (args: { id?: string; key?: string }) =>
             itemType: LibraryItem.ALBUM_ARTIST,
             key: args.key,
         }) as AlbumArtistListFilter;
+    }, shallow);
+
+export const usePlaylistListFilter = (args: { id?: string; key?: string }) =>
+    useListStore((state) => {
+        return state._actions.getFilter({
+            id: args.id,
+            itemType: LibraryItem.PLAYLIST,
+            key: args.key,
+        }) as PlaylistListFilter;
     }, shallow);
 
 export const useListDetail = (key: string) => useListStore((state) => state.detail[key], shallow);

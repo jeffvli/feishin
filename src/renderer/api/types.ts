@@ -798,7 +798,7 @@ export type DeletePlaylistArgs = {
 } & BaseEndpointArgs;
 
 // Playlist List
-export type PlaylistListResponse = BasePaginatedResponse<Playlist[]>;
+export type PlaylistListResponse = BasePaginatedResponse<Playlist[]> | null | undefined;
 
 export enum PlaylistListSort {
     DURATION = 'duration',

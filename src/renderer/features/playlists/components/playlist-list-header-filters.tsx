@@ -1,29 +1,24 @@
-import { ChangeEvent, MutableRefObject, useCallback, MouseEvent } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Flex, Stack, Group, Divider } from '@mantine/core';
+import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { SortOrder, PlaylistListSort, PlaylistListQuery } from '/@/renderer/api/types';
-import { DropdownMenu, Text, Button, Slider, MultiSelect, Switch } from '/@/renderer/components';
+import { LibraryItem, PlaylistListQuery, PlaylistListSort, SortOrder } from '/@/renderer/api/types';
+import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { PLAYLIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
+import { OrderToggleButton } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
     PlaylistListFilter,
     useCurrentServer,
-    usePlaylistGridStore,
+    useListStoreActions,
     usePlaylistListStore,
-    usePlaylistStoreActions,
-    useSetPlaylistFilters,
-    useSetPlaylistStore,
-    useSetPlaylistTable,
-    useSetPlaylistTablePagination,
 } from '/@/renderer/store';
 import { ListDisplayType, TableColumn } from '/@/renderer/types';
-import { PLAYLIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
-import { OrderToggleButton } from '/@/renderer/features/shared';
 
 const FILTERS = {
     jellyfin: [
@@ -50,16 +45,12 @@ export const PlaylistListHeaderFilters = ({
     gridRef,
     tableRef,
 }: PlaylistListHeaderFiltersProps) => {
+    const pageKey = 'playlist';
     const queryClient = useQueryClient();
     const server = useCurrentServer();
-    const page = usePlaylistListStore();
-    const setPage = useSetPlaylistStore();
-    const setFilter = useSetPlaylistFilters();
-    const setTable = useSetPlaylistTable();
-    const setPagination = useSetPlaylistTablePagination();
-    const grid = usePlaylistGridStore();
-    const { setGrid } = usePlaylistStoreActions();
-    const { display } = usePlaylistListStore();
+    const { setFilter, setTable, setTablePagination, setGrid, setDisplayType } =
+        useListStoreActions();
+    const { display, filter, table, grid } = usePlaylistListStore({ key: pageKey });
     const cq = useContainerQuery();
 
     const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
@@ -68,7 +59,7 @@ export const PlaylistListHeaderFilters = ({
         (server?.type &&
             (
                 FILTERS[server.type as keyof typeof FILTERS] as { name: string; value: string }[]
-            ).find((f) => f.value === page.filter.sortBy)?.name) ||
+            ).find((f) => f.value === filter.sortBy)?.name) ||
         'Unknown';
 
     const fetch = useCallback(
@@ -109,7 +100,7 @@ export const PlaylistListHeaderFilters = ({
             if (isGrid) {
                 gridRef.current?.scrollTo(0);
                 gridRef.current?.resetLoadMoreItemsCache();
-                const data = await fetch(0, 200, filters || page.filter);
+                const data = await fetch(0, 200, filters || filter);
                 if (!data?.items) return;
                 gridRef.current?.setItemData(data.items);
             } else {
@@ -118,7 +109,7 @@ export const PlaylistListHeaderFilters = ({
                         const limit = params.endRow - params.startRow;
                         const startIndex = params.startRow;
 
-                        const pageFilters = filters || page.filter;
+                        const pageFilters = filters || filter;
 
                         const queryKey = queryKeys.playlists.list(server?.id || '', {
                             limit,
@@ -152,10 +143,10 @@ export const PlaylistListHeaderFilters = ({
                 tableRef.current?.api.setDatasource(dataSource);
                 tableRef.current?.api.purgeInfiniteCache();
                 tableRef.current?.api.ensureIndexVisible(0, 'top');
-                setPagination({ data: { currentPage: 0 } });
+                setTablePagination({ data: { currentPage: 0 }, key: pageKey });
             }
         },
-        [fetch, gridRef, isGrid, page.filter, queryClient, server, setPagination, tableRef],
+        [isGrid, gridRef, fetch, filter, tableRef, setTablePagination, server, queryClient],
     );
 
     const handleSetSortBy = useCallback(
@@ -167,9 +158,13 @@ export const PlaylistListHeaderFilters = ({
             )?.defaultOrder;
 
             const updatedFilters = setFilter({
-                sortBy: e.currentTarget.value as PlaylistListSort,
-                sortOrder: sortOrder || SortOrder.ASC,
-            });
+                data: {
+                    sortBy: e.currentTarget.value as PlaylistListSort,
+                    sortOrder: sortOrder || SortOrder.ASC,
+                },
+                itemType: LibraryItem.PLAYLIST,
+                key: pageKey,
+            }) as PlaylistListFilter;
 
             handleFilterChange(updatedFilters);
         },
@@ -177,36 +172,30 @@ export const PlaylistListHeaderFilters = ({
     );
 
     const handleToggleSortOrder = useCallback(() => {
-        const newSortOrder =
-            page.filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
-        const updatedFilters = setFilter({ sortOrder: newSortOrder });
+        const newSortOrder = filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
+        const updatedFilters = setFilter({
+            data: { sortOrder: newSortOrder },
+            itemType: LibraryItem.PLAYLIST,
+            key: pageKey,
+        }) as PlaylistListFilter;
         handleFilterChange(updatedFilters);
-    }, [page.filter.sortOrder, handleFilterChange, setFilter]);
+    }, [filter.sortOrder, handleFilterChange, setFilter]);
 
     const handleSetViewType = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
             if (!e.currentTarget?.value) return;
-            const display = e.currentTarget.value as ListDisplayType;
-            setPage({ list: { ...page, display: e.currentTarget.value as ListDisplayType } });
-
-            if (display === ListDisplayType.TABLE) {
-                tableRef.current?.api.paginationSetPageSize(
-                    tableRef.current.props.infiniteInitialRowCount,
-                );
-                setPagination({ data: { currentPage: 0 } });
-            } else if (display === ListDisplayType.TABLE_PAGINATED) {
-                setPagination({ data: { currentPage: 0 } });
-            }
+            setDisplayType({ data: e.currentTarget.value as ListDisplayType, key: pageKey });
         },
-        [page, setPage, setPagination, tableRef],
+        [setDisplayType],
     );
 
     const handleTableColumns = (values: TableColumn[]) => {
-        const existingColumns = page.table.columns;
+        const existingColumns = table.columns;
 
         if (values.length === 0) {
             return setTable({
-                columns: [],
+                data: { columns: [] },
+                key: pageKey,
             });
         }
 
@@ -214,18 +203,18 @@ export const PlaylistListHeaderFilters = ({
         if (values.length > existingColumns.length) {
             const newColumn = { column: values[values.length - 1], width: 100 };
 
-            return setTable({ columns: [...existingColumns, newColumn] });
+            return setTable({ data: { columns: [...existingColumns, newColumn] }, key: pageKey });
         }
 
         // If removing a column
         const removed = existingColumns.filter((column) => !values.includes(column.column));
         const newColumns = existingColumns.filter((column) => !removed.includes(column));
 
-        return setTable({ columns: newColumns });
+        return setTable({ data: { columns: newColumns }, key: pageKey });
     };
 
     const handleAutoFitColumns = (e: ChangeEvent<HTMLInputElement>) => {
-        setTable({ autoFit: e.currentTarget.checked });
+        setTable({ data: { autoFit: e.currentTarget.checked }, key: pageKey });
 
         if (e.currentTarget.checked) {
             tableRef.current?.api.sizeColumnsToFit();
@@ -234,15 +223,15 @@ export const PlaylistListHeaderFilters = ({
 
     const handleItemSize = (e: number) => {
         if (isGrid) {
-            setGrid({ data: { itemsPerRow: e } });
+            setGrid({ data: { itemsPerRow: e }, key: pageKey });
         } else {
-            setTable({ rowHeight: e });
+            setTable({ data: { rowHeight: e }, key: pageKey });
         }
     };
 
     const handleRefresh = () => {
-        queryClient.invalidateQueries(queryKeys.playlists.list(server?.id || '', page.filter));
-        handleFilterChange(page.filter);
+        queryClient.invalidateQueries(queryKeys.playlists.list(server?.id || '', filter));
+        handleFilterChange(filter);
     };
 
     return (
@@ -264,21 +253,21 @@ export const PlaylistListHeaderFilters = ({
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
+                        {FILTERS[server?.type as keyof typeof FILTERS].map((f) => (
                             <DropdownMenu.Item
-                                key={`filter-${filter.name}`}
-                                $isActive={filter.value === page.filter.sortBy}
-                                value={filter.value}
+                                key={`filter-${f.name}`}
+                                $isActive={f.value === filter.sortBy}
+                                value={f.value}
                                 onClick={handleSetSortBy}
                             >
-                                {filter.name}
+                                {f.name}
                             </DropdownMenu.Item>
                         ))}
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
                 <Divider orientation="vertical" />
                 <OrderToggleButton
-                    sortOrder={page.filter.sortOrder}
+                    sortOrder={filter.sortOrder}
                     onToggle={handleToggleSortOrder}
                 />
                 <Divider orientation="vertical" />
@@ -317,28 +306,28 @@ export const PlaylistListHeaderFilters = ({
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Label>Display type</DropdownMenu.Label>
                         <DropdownMenu.Item
-                            $isActive={page.display === ListDisplayType.CARD}
+                            $isActive={display === ListDisplayType.CARD}
                             value={ListDisplayType.CARD}
                             onClick={handleSetViewType}
                         >
                             Card
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            $isActive={page.display === ListDisplayType.POSTER}
+                            $isActive={display === ListDisplayType.POSTER}
                             value={ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                         >
                             Poster
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            $isActive={page.display === ListDisplayType.TABLE}
+                            $isActive={display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                         >
                             Table
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            $isActive={page.display === ListDisplayType.TABLE_PAGINATED}
+                            $isActive={display === ListDisplayType.TABLE_PAGINATED}
                             value={ListDisplayType.TABLE_PAGINATED}
                             onClick={handleSetViewType}
                         >
@@ -350,9 +339,7 @@ export const PlaylistListHeaderFilters = ({
                         </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
-                                defaultValue={
-                                    isGrid ? grid?.itemsPerRow || 0 : page.table.rowHeight
-                                }
+                                defaultValue={isGrid ? grid?.itemsPerRow || 0 : table.rowHeight}
                                 max={isGrid ? 14 : 100}
                                 min={isGrid ? 2 : 25}
                                 onChangeEnd={handleItemSize}
@@ -370,7 +357,7 @@ export const PlaylistListHeaderFilters = ({
                                         <MultiSelect
                                             clearable
                                             data={PLAYLIST_TABLE_COLUMNS}
-                                            defaultValue={page.table?.columns.map(
+                                            defaultValue={table?.columns.map(
                                                 (column) => column.column,
                                             )}
                                             width={300}
@@ -379,7 +366,7 @@ export const PlaylistListHeaderFilters = ({
                                         <Group position="apart">
                                             <Text>Auto Fit Columns</Text>
                                             <Switch
-                                                defaultChecked={page.table.autoFit}
+                                                defaultChecked={table.autoFit}
                                                 onChange={handleAutoFitColumns}
                                             />
                                         </Group>

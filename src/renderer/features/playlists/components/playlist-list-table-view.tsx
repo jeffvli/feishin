@@ -1,35 +1,25 @@
-import {
-    ColDef,
-    GridReadyEvent,
-    IDatasource,
-    PaginationChangedEvent,
-    BodyScrollEvent,
-    RowDoubleClickedEvent,
-} from '@ag-grid-community/core';
+import { RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Stack } from '@mantine/core';
-import { useQueryClient } from '@tanstack/react-query';
-import { AnimatePresence } from 'framer-motion';
-import debounce from 'lodash/debounce';
-import { useMemo, useCallback } from 'react';
+import { useCallback } from 'react';
 import { generatePath, useNavigate } from 'react-router';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { LibraryItem } from '/@/renderer/api/types';
+import { LibraryItem, PlaylistListQuery, PlaylistListResponse } from '/@/renderer/api/types';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
-import { getColumnDefs, TablePagination, VirtualTable } from '/@/renderer/components/virtual-table';
-import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
+import { VirtualTable } from '/@/renderer/components/virtual-table';
+import {
+    AgGridFetchFn,
+    useVirtualTable,
+} from '/@/renderer/components/virtual-table/hooks/use-virtual-table';
 import { PLAYLIST_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
-    usePlaylistTablePagination,
-    useSetPlaylistTablePagination,
-    useSetPlaylistTable,
     useCurrentServer,
-    usePlaylistListStore,
     useGeneralSettings,
+    useListStoreActions,
+    usePlaylistListFilter,
+    usePlaylistListStore,
 } from '/@/renderer/store';
-import { ListDisplayType } from '/@/renderer/types';
 
 interface PlaylistListTableViewProps {
     itemCount?: number;
@@ -37,138 +27,38 @@ interface PlaylistListTableViewProps {
 }
 
 export const PlaylistListTableView = ({ tableRef, itemCount }: PlaylistListTableViewProps) => {
-    const queryClient = useQueryClient();
     const navigate = useNavigate();
     const server = useCurrentServer();
-    const page = usePlaylistListStore();
-    const pagination = usePlaylistTablePagination();
-    const setPagination = useSetPlaylistTablePagination();
-    const setTable = useSetPlaylistTable();
     const { defaultFullPlaylist } = useGeneralSettings();
+    const { setTable, setTablePagination } = useListStoreActions();
+    const pageKey = 'playlist';
+    const filter = usePlaylistListFilter({ key: pageKey });
+    const listProperties = usePlaylistListStore({ key: pageKey });
 
-    const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
+    console.log('listProperties :>> ', listProperties);
 
-    const columnDefs: ColDef[] = useMemo(
-        () => getColumnDefs(page.table.columns),
-        [page.table.columns],
-    );
-
-    const defaultColumnDefs: ColDef = useMemo(() => {
-        return {
-            lockPinned: true,
-            lockVisible: true,
-            resizable: true,
-        };
-    }, []);
-
-    const onGridReady = useCallback(
-        (params: GridReadyEvent) => {
-            const dataSource: IDatasource = {
-                getRows: async (params) => {
-                    const limit = params.endRow - params.startRow;
-                    const startIndex = params.startRow;
-
-                    const queryKey = queryKeys.playlists.list(server?.id || '', {
-                        limit,
-                        startIndex,
-                        ...page.filter,
-                    });
-
-                    const playlistsRes = await queryClient.fetchQuery(
-                        queryKey,
-                        async ({ signal }) =>
-                            api.controller.getPlaylistList({
-                                apiClientProps: {
-                                    server,
-                                    signal,
-                                },
-                                query: {
-                                    limit,
-                                    startIndex,
-                                    ...page.filter,
-                                },
-                            }),
-                        { cacheTime: 1000 * 60 * 1 },
-                    );
-
-                    params.successCallback(
-                        playlistsRes?.items || [],
-                        playlistsRes?.totalRecordCount || 0,
-                    );
+    const fetchFn: AgGridFetchFn<
+        PlaylistListResponse,
+        Omit<PlaylistListQuery, 'startIndex'>
+    > = useCallback(
+        async ({ filter, limit, startIndex }, signal) => {
+            const res = api.controller.getPlaylistList({
+                apiClientProps: {
+                    server,
+                    signal,
                 },
-                rowCount: undefined,
-            };
-            params.api.setDatasource(dataSource);
-            params.api.ensureIndexVisible(page.table.scrollOffset, 'top');
-        },
-        [page.filter, page.table.scrollOffset, queryClient, server],
-    );
-
-    const onPaginationChanged = useCallback(
-        (event: PaginationChangedEvent) => {
-            if (!isPaginationEnabled || !event.api) return;
-
-            try {
-                // Scroll to top of page on pagination change
-                const currentPageStartIndex = pagination.currentPage * pagination.itemsPerPage;
-                event.api?.ensureIndexVisible(currentPageStartIndex, 'top');
-            } catch (err) {
-                console.log(err);
-            }
-
-            setPagination({
-                data: {
-                    itemsPerPage: event.api.paginationGetPageSize(),
-                    totalItems: event.api.paginationGetRowCount(),
-                    totalPages: event.api.paginationGetTotalPages() + 1,
+                query: {
+                    ...filter,
+                    limit,
+                    sortBy: filter.sortBy,
+                    sortOrder: filter.sortOrder,
+                    startIndex,
                 },
             });
+
+            return res;
         },
-        [isPaginationEnabled, pagination.currentPage, pagination.itemsPerPage, setPagination],
-    );
-
-    const handleGridSizeChange = () => {
-        if (page.table.autoFit) {
-            tableRef?.current?.api.sizeColumnsToFit();
-        }
-    };
-
-    const handleColumnChange = useCallback(() => {
-        const { columnApi } = tableRef?.current || {};
-        const columnsOrder = columnApi?.getAllGridColumns();
-
-        if (!columnsOrder) return;
-
-        const columnsInSettings = page.table.columns;
-        const updatedColumns = [];
-        for (const column of columnsOrder) {
-            const columnInSettings = columnsInSettings.find(
-                (c) => c.column === column.getColDef().colId,
-            );
-
-            if (columnInSettings) {
-                updatedColumns.push({
-                    ...columnInSettings,
-                    ...(!page.table.autoFit && {
-                        width: column.getActualWidth(),
-                    }),
-                });
-            }
-        }
-
-        setTable({ columns: updatedColumns });
-    }, [page.table.autoFit, page.table.columns, setTable, tableRef]);
-
-    const debouncedColumnChange = debounce(handleColumnChange, 200);
-
-    const handleScroll = (e: BodyScrollEvent) => {
-        const scrollOffset = Number((e.top / page.table.rowHeight).toFixed(0));
-        setTable({ scrollOffset });
-    };
-
-    const handleContextMenu = useHandleTableContextMenu(
-        LibraryItem.PLAYLIST,
-        PLAYLIST_CONTEXT_MENU_ITEMS,
+        [server],
     );
 
     const handleRowDoubleClick = (e: RowDoubleClickedEvent) => {
@@ -180,59 +70,34 @@ export const PlaylistListTableView = ({ tableRef, itemCount }: PlaylistListTable
         }
     };
 
+    const tableProps = useVirtualTable<PlaylistListResponse, Omit<PlaylistListQuery, 'startIndex'>>(
+        {
+            contextMenu: PLAYLIST_CONTEXT_MENU_ITEMS,
+            fetch: {
+                filter,
+                fn: fetchFn,
+                itemCount,
+                queryKey: queryKeys.playlists.list,
+                server,
+            },
+            itemCount,
+            itemType: LibraryItem.PLAYLIST,
+            pageKey,
+            properties: listProperties,
+            setTable,
+            setTablePagination,
+            tableRef,
+        },
+    );
+
     return (
-        <Stack
-            h="100%"
-            spacing={0}
-        >
-            <VirtualGridAutoSizerContainer>
-                <VirtualTable
-                    // https://github.com/ag-grid/ag-grid/issues/5284
-                    // Key is used to force remount of table when display, rowHeight, or server changes
-                    key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
-                    ref={tableRef}
-                    alwaysShowHorizontalScroll
-                    suppressRowDrag
-                    autoFitColumns={page.table.autoFit}
-                    blockLoadDebounceMillis={200}
-                    cacheBlockSize={200}
-                    cacheOverflowSize={1}
-                    columnDefs={columnDefs}
-                    defaultColDef={defaultColumnDefs}
-                    enableCellChangeFlash={false}
-                    getRowId={(data) => data.data.id}
-                    infiniteInitialRowCount={itemCount || 100}
-                    pagination={isPaginationEnabled}
-                    paginationAutoPageSize={isPaginationEnabled}
-                    paginationPageSize={page.table.pagination.itemsPerPage || 100}
-                    rowBuffer={20}
-                    rowHeight={page.table.rowHeight || 40}
-                    rowModelType="infinite"
-                    rowSelection="multiple"
-                    onBodyScrollEnd={handleScroll}
-                    onCellContextMenu={handleContextMenu}
-                    onColumnMoved={handleColumnChange}
-                    onColumnResized={debouncedColumnChange}
-                    onGridReady={onGridReady}
-                    onGridSizeChanged={handleGridSizeChange}
-                    onPaginationChanged={onPaginationChanged}
-                    onRowDoubleClicked={handleRowDoubleClick}
-                />
-            </VirtualGridAutoSizerContainer>
-            <AnimatePresence
-                presenceAffectsLayout
-                initial={false}
-                mode="wait"
-            >
-                {page.display === ListDisplayType.TABLE_PAGINATED && (
-                    <TablePagination
-                        pageKey=""
-                        pagination={pagination}
-                        setPagination={setPagination}
-                        tableRef={tableRef}
-                    />
-                )}
-            </AnimatePresence>
-        </Stack>
+        <VirtualGridAutoSizerContainer>
+            <VirtualTable
+                key={`table-${tableProps.rowHeight}-${server?.id}`}
+                ref={tableRef}
+                {...tableProps}
+                onRowDoubleClicked={handleRowDoubleClick}
+            />
+        </VirtualGridAutoSizerContainer>
     );
 };
