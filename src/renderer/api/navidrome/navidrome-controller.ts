@@ -351,6 +351,7 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
             _order: sortOrderMap.navidrome[query.sortOrder],
             _sort: query.sortBy ? playlistListSortMap.navidrome[query.sortBy] : undefined,
             _start: query.startIndex,
+            q: query.searchTerm,
             ...query._custom?.navidrome,
         },
     });

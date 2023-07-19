@@ -523,6 +523,7 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
             Limit: query.limit,
             MediaTypes: 'Audio',
             Recursive: true,
+            SearchTerm: query.searchTerm,
             SortBy: playlistListSortMap.jellyfin[query.sortBy],
             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
             StartIndex: query.startIndex,

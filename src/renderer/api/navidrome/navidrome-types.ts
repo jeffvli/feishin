@@ -273,6 +273,7 @@ const ndPlaylistListSort = {
 const playlistListParameters = paginationParameters.extend({
     _sort: z.nativeEnum(ndPlaylistListSort).optional(),
     owner_id: z.string().optional(),
+    q: z.string().optional(),
     smart: z.boolean().optional(),
 });
 
