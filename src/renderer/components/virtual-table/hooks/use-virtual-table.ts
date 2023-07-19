@@ -186,6 +186,10 @@ export const useVirtualTable = <TResponse, TFilter>({
 
     const onCellContextMenu = useHandleTableContextMenu(itemType, contextMenu);
 
+    const context = {
+        onCellContextMenu,
+    };
+
     const defaultTableProps: Partial<VirtualTableProps> = useMemo(() => {
         return {
             alwaysShowHorizontalScroll: true,
@@ -241,6 +245,7 @@ export const useVirtualTable = <TResponse, TFilter>({
 
     return {
         columnDefs,
+        context,
         defaultColumnDefs,
         onBodyScrollEnd,
         onCellContextMenu,
