@@ -65,11 +65,20 @@ export type ListDeterministicArgs = { key: ListKey };
 
 export interface ListSlice extends ListState {
     _actions: {
-        getFilter: (args: { id?: string; itemType: LibraryItem; key?: string }) => FilterType;
+        getFilter: (args: {
+            customFilters?: Record<any, any>;
+            id?: string;
+            itemType: LibraryItem;
+            key?: string;
+        }) => FilterType;
         resetFilter: () => void;
         setDisplayType: (args: { data: ListDisplayType } & ListDeterministicArgs) => void;
         setFilter: (
-            args: { data: Partial<FilterType>; itemType: LibraryItem } & ListDeterministicArgs,
+            args: {
+                customFilters?: Record<any, any>;
+                data: Partial<FilterType>;
+                itemType: LibraryItem;
+            } & ListDeterministicArgs,
         ) => FilterType;
         setGrid: (args: { data: Partial<ListGridProps> } & ListDeterministicArgs) => void;
         setStore: (data: Partial<ListSlice>) => void;
@@ -168,11 +177,14 @@ export const useListStore = create<ListSlice>()(
                             }
                         });
 
-                        return get()._actions.getFilter({
-                            id,
-                            itemType: args.itemType,
-                            key: args.key,
-                        });
+                        return {
+                            ...get()._actions.getFilter({
+                                id,
+                                itemType: args.itemType,
+                                key: args.key,
+                            }),
+                            ...args.customFilters,
+                        };
                     },
                     setGrid: (args) => {
                         const [page, id] = args.key.split('_');
@@ -493,6 +505,31 @@ export const useListStore = create<ListSlice>()(
 );
 
 export const useListStoreActions = () => useListStore((state) => state._actions);
+
+export const useListStoreByKey = <TFilter>(args: { filter?: Partial<TFilter>; key: string }) => {
+    const key = args.key as keyof ListState['item'];
+    return useListStore(
+        (state) => ({
+            ...state.item[key],
+            filter: {
+                ...state.item[key].filter,
+                ...args.filter,
+            },
+        }),
+        shallow,
+    );
+};
+
+export const useListFilterByKey = <TFilter>(args: { filter?: Partial<TFilter>; key: string }) => {
+    const key = args.key as keyof ListState['item'];
+    return useListStore(
+        (state) => ({
+            ...state.item[key].filter,
+            ...args.filter,
+        }),
+        shallow,
+    );
+};
 
 export const useAlbumListStore = (args?: { id?: string; key?: string }) =>
     useListStore((state) => {

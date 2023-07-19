@@ -1,3 +1,4 @@
+import { MutableRefObject, useCallback, useMemo } from 'react';
 import {
     BodyScrollEvent,
     ColDef,
@@ -11,51 +12,45 @@ import {
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { QueryKey, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { MutableRefObject, useCallback, useMemo } from 'react';
 import { generatePath, useNavigate } from 'react-router';
+import { api } from '/@/renderer/api';
+import { QueryPagination, queryKeys } from '/@/renderer/api/query-keys';
 import { BasePaginatedResponse, LibraryItem } from '/@/renderer/api/types';
 import { getColumnDefs, VirtualTableProps } from '/@/renderer/components/virtual-table';
 import { SetContextMenuItems, useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { AppRoute } from '/@/renderer/router/routes';
-import { ListDeterministicArgs, ListItemProps, ListTableProps } from '/@/renderer/store';
-import { ListDisplayType, ServerListItem, TablePagination } from '/@/renderer/types';
+import { useListStoreActions } from '/@/renderer/store';
+import { ListDisplayType, ServerListItem } from '/@/renderer/types';
+import { useListStoreByKey } from '../../../store/list.store';
 
 export type AgGridFetchFn<TResponse, TFilter> = (
     args: { filter: TFilter; limit: number; startIndex: number },
     signal?: AbortSignal,
 ) => Promise<TResponse>;
 
-interface UseAgGridProps<TResponse, TFilter> {
+interface UseAgGridProps<TFilter> {
     contextMenu: SetContextMenuItems;
-    fetch: {
-        filter: TFilter;
-        fn: AgGridFetchFn<TResponse, TFilter>;
-        itemCount?: number;
-        queryKey: (id: string, query?: Record<any, any>) => QueryKey;
-        server: ServerListItem | null;
-    };
+    customFilters?: Partial<TFilter>;
     itemCount?: number;
     itemType: LibraryItem;
     pageKey: string;
-    properties: ListItemProps<any>;
-    setTable: (args: { data: Partial<ListTableProps> } & ListDeterministicArgs) => void;
-    setTablePagination: (args: { data: Partial<TablePagination> } & ListDeterministicArgs) => void;
+    server: ServerListItem | null;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const useVirtualTable = <TResponse, TFilter>({
-    fetch,
+export const useVirtualTable = <TFilter>({
+    server,
     tableRef,
-    properties,
-    setTable,
-    setTablePagination,
     pageKey,
     itemType,
     contextMenu,
     itemCount,
-}: UseAgGridProps<TResponse, TFilter>) => {
+    customFilters,
+}: UseAgGridProps<TFilter>) => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
+    const { setTable, setTablePagination } = useListStoreActions();
+    const properties = useListStoreByKey({ filter: customFilters, key: pageKey });
 
     const isPaginationEnabled = properties.display === ListDisplayType.TABLE_PAGINATED;
 
@@ -77,6 +72,43 @@ export const useVirtualTable = <TResponse, TFilter>({
         }
     };
 
+    const queryKeyFn:
+        | ((serverId: string, query: Record<any, any>, pagination: QueryPagination) => QueryKey)
+        | null = useMemo(() => {
+        if (itemType === LibraryItem.ALBUM) {
+            return queryKeys.albums.list;
+        }
+        if (itemType === LibraryItem.ALBUM_ARTIST) {
+            return queryKeys.albumArtists.list;
+        }
+        if (itemType === LibraryItem.PLAYLIST) {
+            return queryKeys.playlists.list;
+        }
+        if (itemType === LibraryItem.SONG) {
+            return queryKeys.songs.list;
+        }
+
+        return null;
+    }, [itemType]);
+
+    const queryFn: ((args: any) => Promise<BasePaginatedResponse<any> | null | undefined>) | null =
+        useMemo(() => {
+            if (itemType === LibraryItem.ALBUM) {
+                return api.controller.getAlbumList;
+            }
+            if (itemType === LibraryItem.ALBUM_ARTIST) {
+                return api.controller.getAlbumArtistList;
+            }
+            if (itemType === LibraryItem.PLAYLIST) {
+                return api.controller.getPlaylistList;
+            }
+            if (itemType === LibraryItem.SONG) {
+                return api.controller.getSongList;
+            }
+
+            return null;
+        }, [itemType]);
+
     const onGridReady = useCallback(
         (params: GridReadyEvent) => {
             const dataSource: IDatasource = {
@@ -84,29 +116,32 @@ export const useVirtualTable = <TResponse, TFilter>({
                     const limit = params.endRow - params.startRow;
                     const startIndex = params.startRow;
 
-                    const queryKey = fetch.queryKey(fetch.server?.id || '', {
-                        limit,
-                        startIndex,
-                        ...fetch.filter,
-                    });
-
-                    const results = (await queryClient.fetchQuery(
-                        queryKey,
-                        async ({ signal }) => {
-                            const res = await fetch.fn(
-                                {
-                                    filter: fetch.filter,
-                                    limit,
-                                    startIndex,
-                                },
-                                signal,
-                            );
-
-                            return res;
+                    const queryKey = queryKeyFn!(
+                        server?.id || '',
+                        {
+                            ...(properties.filter as any),
                         },
+                        {
+                            limit,
+                            startIndex,
+                        },
+                    );
 
-                        { cacheTime: 1000 * 60 * 1 },
-                    )) as BasePaginatedResponse<any>;
+                    const results = (await queryClient.fetchQuery(queryKey, async ({ signal }) => {
+                        const res = await queryFn!({
+                            apiClientProps: {
+                                server,
+                                signal,
+                            },
+                            query: {
+                                ...properties.filter,
+                                limit,
+                                startIndex,
+                            },
+                        });
+
+                        return res;
+                    })) as BasePaginatedResponse<any>;
 
                     params.successCallback(results?.items || [], results?.totalRecordCount || 0);
                 },
@@ -116,7 +151,14 @@ export const useVirtualTable = <TResponse, TFilter>({
             params.api.setDatasource(dataSource);
             params.api.ensureIndexVisible(properties.table.scrollOffset || 0, 'top');
         },
-        [fetch, properties.table.scrollOffset, queryClient],
+        [
+            properties.table.scrollOffset,
+            properties.filter,
+            queryKeyFn,
+            server,
+            queryClient,
+            queryFn,
+        ],
     );
 
     const onPaginationChanged = useCallback(
@@ -227,6 +269,13 @@ export const useVirtualTable = <TResponse, TFilter>({
             switch (itemType) {
                 case LibraryItem.ALBUM:
                     navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: e.data.id }));
+                    break;
+                case LibraryItem.ALBUM_ARTIST:
+                    navigate(
+                        generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                            albumArtistId: e.data.id,
+                        }),
+                    );
                     break;
                 case LibraryItem.ARTIST:
                     navigate(
