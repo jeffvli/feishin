@@ -46,6 +46,7 @@ export const SearchInput = ({
                         onClick={() => {
                             ref.current.value = '';
                             ref.current.focus();
+                            onChange?.({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
                         }}
                     >
                         <RiCloseFill />
