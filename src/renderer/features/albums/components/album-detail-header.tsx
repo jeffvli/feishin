@@ -102,6 +102,7 @@ export const AlbumDetailHeader = forwardRef(
                             )}
                         </Group>
                         <Group
+                            mah="4rem"
                             spacing="md"
                             sx={{
                                 WebkitBoxOrient: 'vertical',
