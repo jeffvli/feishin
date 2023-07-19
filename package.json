@@ -291,7 +291,7 @@
         "react-dom": "^18.2.0",
         "react-error-boundary": "^3.1.4",
         "react-i18next": "^11.16.7",
-        "react-icons": "^4.8.0",
+        "react-icons": "^4.10.1",
         "react-player": "^2.11.0",
         "react-router": "^6.5.0",
         "react-router-dom": "^6.5.0",
