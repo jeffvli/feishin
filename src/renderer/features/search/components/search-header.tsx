@@ -1,32 +1,36 @@
-import { ChangeEvent, MutableRefObject } from 'react';
-import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Stack, Flex, Group } from '@mantine/core';
+import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
+import { ChangeEvent, MutableRefObject } from 'react';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router-dom';
+import { useCurrentServer } from '../../../store/auth.store';
 import { LibraryItem } from '/@/renderer/api/types';
 import { Button, PageHeader, SearchInput } from '/@/renderer/components';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
+import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
 import { AppRoute } from '/@/renderer/router/routes';
 
 interface SearchHeaderProps {
-    getDatasource: (searchQuery: string, itemType: LibraryItem) => IDatasource | undefined;
     navigationId: string;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SearchHeader = ({ tableRef, getDatasource, navigationId }: SearchHeaderProps) => {
+export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
     const { itemType } = useParams() as { itemType: LibraryItem };
     const [searchParams, setSearchParams] = useSearchParams();
     const cq = useContainerQuery();
+    const server = useCurrentServer();
+
+    const { handleRefreshTable } = useListFilterRefresh({
+        itemType,
+        server,
+    });
 
     const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
         if (!e.target.value) return;
         setSearchParams({ query: e.target.value }, { replace: true, state: { navigationId } });
-        const datasource = getDatasource(e.target.value, itemType);
-        if (!datasource) return;
-        tableRef.current?.api.setDatasource(datasource);
+        handleRefreshTable(tableRef, { searchTerm: e.target.value });
     }, 200);
 
     return (
@@ -44,7 +48,6 @@ export const SearchHeader = ({ tableRef, getDatasource, navigationId }: SearchHe
                     </LibraryHeaderBar>
                     <Group>
                         <SearchInput
-                            // key={`search-input-${initialQuery}`}
                             defaultValue={searchParams.get('query') || ''}
                             openedWidth={cq.isMd ? 250 : cq.isSm ? 200 : 150}
                             onChange={handleSearch}
