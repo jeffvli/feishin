@@ -5,6 +5,19 @@ import z from 'zod';
 import { ndType } from './navidrome-types';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
 
+const getImageUrl = (args: { url: string | null }) => {
+    const { url } = args;
+    if (url === '/app/artist-placeholder.webp') {
+        return null;
+    }
+
+    if (url?.match('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9')) {
+        return null;
+    }
+
+    return url;
+};
+
 const getCoverArtUrl = (args: {
     baseUrl: string | undefined;
     coverArtId: string;
@@ -146,8 +159,7 @@ const normalizeAlbumArtist = (
     },
     server: ServerListItem | null,
 ): AlbumArtist => {
-    const imageUrl =
-        item.largeImageUrl === '/app/artist-placeholder.webp' ? null : item.largeImageUrl;
+    const imageUrl = getImageUrl({ url: item?.largeImageUrl || null });
 
     return {
         albumCount: item.albumCount,
@@ -166,7 +178,7 @@ const normalizeAlbumArtist = (
         similarArtists:
             item.similarArtists?.map((artist) => ({
                 id: artist.id,
-                imageUrl: artist?.artistImageUrl || null,
+                imageUrl: getImageUrl({ url: artist?.artistImageUrl || null }),
                 name: artist.name,
             })) || null,
         songCount: item.songCount,
