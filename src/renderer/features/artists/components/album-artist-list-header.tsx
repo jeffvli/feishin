@@ -1,27 +1,19 @@
-import type { ChangeEvent, MutableRefObject } from 'react';
-import { useCallback } from 'react';
-import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
-import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { api } from '/@/renderer/api';
-import { queryKeys } from '/@/renderer/api/query-keys';
+import type { ChangeEvent, MutableRefObject } from 'react';
+import { useListContext } from '../../../context/list-context';
+import { useListStoreByKey } from '../../../store/list.store';
+import { FilterBar } from '../../shared/components/filter-bar';
+import { LibraryItem } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { AlbumArtistListHeaderFilters } from '/@/renderer/features/artists/components/album-artist-list-header-filters';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
-import {
-    AlbumArtistListFilter,
-    useAlbumArtistListStore,
-    useCurrentServer,
-    useListStoreActions,
-} from '/@/renderer/store';
+import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
+import { AlbumArtistListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { ListDisplayType } from '/@/renderer/types';
-import { AlbumArtistListHeaderFilters } from '/@/renderer/features/artists/components/album-artist-list-header-filters';
-import { useAlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
-import { FilterBar } from '../../shared/components/filter-bar';
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
-import { LibraryItem } from '/@/renderer/api/types';
 
 interface AlbumArtistListHeaderProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -34,113 +26,31 @@ export const AlbumArtistListHeader = ({
     gridRef,
     tableRef,
 }: AlbumArtistListHeaderProps) => {
-    const queryClient = useQueryClient();
     const server = useCurrentServer();
-    const { pageKey } = useAlbumArtistListContext();
-    const { display, filter } = useAlbumArtistListStore();
+    const { pageKey } = useListContext();
+    const { display, filter } = useListStoreByKey({ key: pageKey });
     const { setFilter, setTablePagination } = useListStoreActions();
     const cq = useContainerQuery();
 
-    const fetch = useCallback(
-        async (startIndex: number, limit: number, filters: AlbumArtistListFilter) => {
-            const queryKey = queryKeys.albumArtists.list(server?.id || '', {
-                limit,
-                startIndex,
-                ...filters,
-            });
-
-            const albums = await queryClient.fetchQuery(
-                queryKey,
-                async ({ signal }) =>
-                    api.controller.getAlbumArtistList({
-                        apiClientProps: {
-                            server,
-                            signal,
-                        },
-                        query: {
-                            limit,
-                            startIndex,
-                            ...filters,
-                        },
-                    }),
-                { cacheTime: 1000 * 60 * 1 },
-            );
-
-            return albums;
-        },
-        [queryClient, server],
-    );
-
-    const handleFilterChange = useCallback(
-        async (filters: AlbumArtistListFilter) => {
-            if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
-                const dataSource: IDatasource = {
-                    getRows: async (params) => {
-                        const limit = params.endRow - params.startRow;
-                        const startIndex = params.startRow;
-
-                        const queryKey = queryKeys.albumArtists.list(server?.id || '', {
-                            limit,
-                            startIndex,
-                            ...filters,
-                        });
-
-                        const albumArtistsRes = await queryClient.fetchQuery(
-                            queryKey,
-                            async ({ signal }) =>
-                                api.controller.getAlbumArtistList({
-                                    apiClientProps: {
-                                        server,
-                                        signal,
-                                    },
-                                    query: {
-                                        limit,
-                                        startIndex,
-                                        ...filters,
-                                    },
-                                }),
-                            { cacheTime: 1000 * 60 * 1 },
-                        );
-
-                        params.successCallback(
-                            albumArtistsRes?.items || [],
-                            albumArtistsRes?.totalRecordCount || 0,
-                        );
-                    },
-                    rowCount: undefined,
-                };
-                tableRef.current?.api.setDatasource(dataSource);
-                tableRef.current?.api.purgeInfiniteCache();
-                tableRef.current?.api.ensureIndexVisible(0, 'top');
-
-                if (display === ListDisplayType.TABLE_PAGINATED) {
-                    setTablePagination({ data: { currentPage: 0 }, key: pageKey });
-                }
-            } else {
-                gridRef.current?.scrollTo(0);
-                gridRef.current?.resetLoadMoreItemsCache();
-
-                // Refetching within the virtualized grid may be inconsistent due to it refetching
-                // using an outdated set of filters. To avoid this, we fetch using the updated filters
-                // and then set the grid's data here.
-                const data = await fetch(0, 200, filters);
-
-                if (!data?.items) return;
-                gridRef.current?.setItemData(data.items);
-            }
-        },
-        [display, tableRef, server, queryClient, setTablePagination, pageKey, gridRef, fetch],
-    );
+    const { handleRefreshGrid, handleRefreshTable } = useListFilterRefresh({
+        itemType: LibraryItem.ALBUM_ARTIST,
+        server,
+    });
 
     const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-        const previousSearchTerm = filter.searchTerm;
         const searchTerm = e.target.value === '' ? undefined : e.target.value;
         const updatedFilters = setFilter({
             data: { searchTerm },
             itemType: LibraryItem.ALBUM_ARTIST,
             key: pageKey,
         }) as AlbumArtistListFilter;
-        if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
+
+        if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
+            handleRefreshTable(tableRef, updatedFilters);
+            setTablePagination({ data: { currentPage: 0 }, key: pageKey });
+        } else {
+            handleRefreshGrid(gridRef, updatedFilters);
+        }
     }, 500);
 
     return (

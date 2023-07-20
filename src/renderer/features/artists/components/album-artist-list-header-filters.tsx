@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { RiFolder2Line, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
-import { useAlbumArtistListContext } from '../context/album-artist-list-context';
+import { useListContext } from '../../../context/list-context';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
@@ -16,10 +16,9 @@ import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared'
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
     AlbumArtistListFilter,
-    useAlbumArtistListFilter,
-    useAlbumArtistListStore,
     useCurrentServer,
     useListStoreActions,
+    useListStoreByKey,
 } from '/@/renderer/store';
 import { ListDisplayType, ServerType, TableColumn } from '/@/renderer/types';
 
@@ -65,11 +64,10 @@ export const AlbumArtistListHeaderFilters = ({
 }: AlbumArtistListHeaderFiltersProps) => {
     const queryClient = useQueryClient();
     const server = useCurrentServer();
-    const { pageKey } = useAlbumArtistListContext();
-    const { display, table, grid } = useAlbumArtistListStore();
+    const { pageKey } = useListContext();
+    const { display, table, grid, filter } = useListStoreByKey({ key: pageKey });
     const { setFilter, setTable, setTablePagination, setDisplayType, setGrid } =
         useListStoreActions();
-    const filter = useAlbumArtistListFilter({ key: pageKey });
     const cq = useContainerQuery();
 
     const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;

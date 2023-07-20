@@ -1,15 +1,16 @@
-import { MutableRefObject, useMemo } from 'react';
-import type { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
+import type { RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { useCurrentServer, useSongListStore } from '/@/renderer/store';
-import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
-import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { LibraryItem, QueueSong } from '/@/renderer/api/types';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { MutableRefObject } from 'react';
+import { useListContext } from '../../../context/list-context';
+import { LibraryItem, QueueSong, SongListQuery } from '/@/renderer/api/types';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
-import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
+import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
+import { useVirtualTable } from '/@/renderer/components/virtual-table/hooks/use-virtual-table';
+import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { useCurrentServer } from '/@/renderer/store';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 
 interface AlbumArtistSongListContentProps {
     data: QueueSong[];
@@ -21,17 +22,10 @@ export const AlbumArtistDetailTopSongsListContent = ({
     data,
 }: AlbumArtistSongListContentProps) => {
     const server = useCurrentServer();
-    const page = useSongListStore();
+    const { id, pageKey } = useListContext();
 
     const handlePlayQueueAdd = usePlayQueueAdd();
     const playButtonBehavior = usePlayButtonBehavior();
-
-    const columnDefs: ColDef[] = useMemo(
-        () => getColumnDefs(page.table.columns),
-        [page.table.columns],
-    );
-
-    const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
     const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
         if (!e.data) return;
@@ -49,35 +43,33 @@ export const AlbumArtistDetailTopSongsListContent = ({
         });
     };
 
+    const customFilters: Partial<SongListQuery> = {
+        ...(id && { artistIds: [id] }),
+    };
+
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
+
+    const tableProps = useVirtualTable({
+        contextMenu: SONG_CONTEXT_MENU_ITEMS,
+        customFilters,
+        itemType: LibraryItem.SONG,
+        pageKey,
+        server,
+        tableRef,
+    });
 
     return (
         <>
             <VirtualGridAutoSizerContainer>
                 <VirtualTable
-                    // https://github.com/ag-grid/ag-grid/issues/5284
-                    // Key is used to force remount of table when display, rowHeight, or server changes
-                    key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
+                    key={`table-${tableProps.rowHeight}-${server?.id}`}
                     ref={tableRef}
-                    alwaysShowHorizontalScroll
-                    animateRows
-                    maintainColumnOrder
-                    suppressCopyRowsToClipboard
-                    suppressMoveWhenRowDragging
-                    suppressPaginationPanel
-                    suppressRowDrag
-                    suppressScrollOnNewData
-                    autoFitColumns={page.table.autoFit}
-                    columnDefs={columnDefs}
-                    enableCellChangeFlash={false}
+                    {...tableProps}
                     getRowId={(data) => data.data.uniqueId}
-                    rowBuffer={20}
                     rowClassRules={rowClassRules}
                     rowData={data}
-                    rowHeight={page.table.rowHeight || 40}
                     rowModelType="clientSide"
                     rowSelection="multiple"
-                    onCellContextMenu={handleContextMenu}
                     onRowDoubleClicked={handleRowDoubleClick}
                 />
             </VirtualGridAutoSizerContainer>

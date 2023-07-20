@@ -1,21 +1,22 @@
-import { AlbumArtistListHeader } from '/@/renderer/features/artists/components/album-artist-list-header';
-import { AnimatedPage } from '/@/renderer/features/shared';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useRef } from 'react';
-import { AlbumArtistListContent } from '/@/renderer/features/artists/components/album-artist-list-content';
-import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
-import { generatePageKey, useAlbumArtistListFilter } from '/@/renderer/store';
-import { AlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
 import { useCurrentServer } from '../../../store/auth.store';
+import { useListFilterByKey } from '../../../store/list.store';
+import { LibraryItem } from '/@/renderer/api/types';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { ListContext } from '/@/renderer/context/list-context';
+import { AlbumArtistListContent } from '/@/renderer/features/artists/components/album-artist-list-content';
+import { AlbumArtistListHeader } from '/@/renderer/features/artists/components/album-artist-list-header';
+import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
+import { AnimatedPage } from '/@/renderer/features/shared';
 
 const AlbumArtistListRoute = () => {
     const gridRef = useRef<VirtualInfiniteGridRef | null>(null);
     const tableRef = useRef<AgGridReactType | null>(null);
-    const pageKey = generatePageKey('albumArtist', undefined);
+    const pageKey = LibraryItem.ALBUM_ARTIST;
     const server = useCurrentServer();
 
-    const albumArtistListFilter = useAlbumArtistListFilter({ id: undefined, key: pageKey });
+    const albumArtistListFilter = useListFilterByKey({ key: pageKey });
 
     const itemCountCheck = useAlbumArtistList({
         options: {
@@ -37,7 +38,7 @@ const AlbumArtistListRoute = () => {
 
     return (
         <AnimatedPage>
-            <AlbumArtistListContext.Provider value={{ id: undefined, pageKey }}>
+            <ListContext.Provider value={{ id: undefined, pageKey }}>
                 <AlbumArtistListHeader
                     gridRef={gridRef}
                     itemCount={itemCount}
@@ -48,7 +49,7 @@ const AlbumArtistListRoute = () => {
                     itemCount={itemCount}
                     tableRef={tableRef}
                 />
-            </AlbumArtistListContext.Provider>
+            </ListContext.Provider>
         </AnimatedPage>
     );
 };

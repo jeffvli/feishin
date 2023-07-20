@@ -1,22 +1,24 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryKey, useQueryClient } from '@tanstack/react-query';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { ListOnScrollProps } from 'react-window';
 import { VirtualGridAutoSizerContainer } from '../../../components/virtual-grid/virtual-grid-wrapper';
+import { useListStoreByKey } from '../../../store/list.store';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumArtist, AlbumArtistListSort, LibraryItem } from '/@/renderer/api/types';
+import {
+    AlbumArtist,
+    AlbumArtistListQuery,
+    AlbumArtistListResponse,
+    AlbumArtistListSort,
+    LibraryItem,
+} from '/@/renderer/api/types';
 import { ALBUMARTIST_CARD_ROWS } from '/@/renderer/components';
 import { VirtualInfiniteGrid, VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
-import { useAlbumArtistListContext } from '/@/renderer/features/artists/context/album-artist-list-context';
+import { useListContext } from '/@/renderer/context/list-context';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { AppRoute } from '/@/renderer/router/routes';
-import {
-    useAlbumArtistListFilter,
-    useAlbumArtistListStore,
-    useCurrentServer,
-    useListStoreActions,
-} from '/@/renderer/store';
+import { useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { CardRow, ListDisplayType } from '/@/renderer/types';
 
 interface AlbumArtistListGridViewProps {
@@ -29,18 +31,55 @@ export const AlbumArtistListGridView = ({ itemCount, gridRef }: AlbumArtistListG
     const server = useCurrentServer();
     const handlePlayQueueAdd = usePlayQueueAdd();
 
-    const { id, pageKey } = useAlbumArtistListContext();
-    const filter = useAlbumArtistListFilter({ id, key: pageKey });
-    const { grid, display } = useAlbumArtistListStore();
+    const { pageKey } = useListContext();
+    const { grid, display, filter } = useListStoreByKey({ key: pageKey });
     const { setGrid } = useListStoreActions();
+
+    const fetchInitialData = useCallback(() => {
+        const query: Omit<AlbumArtistListQuery, 'startIndex' | 'limit'> = {
+            ...filter,
+        };
+
+        const queriesFromCache: [QueryKey, AlbumArtistListResponse][] = queryClient.getQueriesData({
+            exact: false,
+            fetchStatus: 'idle',
+            queryKey: queryKeys.albumArtists.list(server?.id || '', query),
+            stale: false,
+        });
+
+        const itemData = [];
+
+        for (const [, data] of queriesFromCache) {
+            const { items, startIndex } = data || {};
+
+            if (items && startIndex !== undefined) {
+                let itemIndex = 0;
+                for (
+                    let rowIndex = startIndex;
+                    rowIndex < startIndex + items.length;
+                    rowIndex += 1
+                ) {
+                    itemData[rowIndex] = items[itemIndex];
+                    itemIndex += 1;
+                }
+            }
+        }
+
+        return itemData;
+    }, [filter, queryClient, server?.id]);
 
     const fetch = useCallback(
         async ({ skip: startIndex, take: limit }: { skip: number; take: number }) => {
-            const queryKey = queryKeys.albumArtists.list(server?.id || '', {
-                limit,
-                startIndex,
-                ...filter,
-            });
+            const queryKey = queryKeys.albumArtists.list(
+                server?.id || '',
+                {
+                    ...filter,
+                },
+                {
+                    limit,
+                    startIndex,
+                },
+            );
 
             const albumArtistsRes = await queryClient.fetchQuery(
                 queryKey,
@@ -114,6 +153,7 @@ export const AlbumArtistListGridView = ({ itemCount, gridRef }: AlbumArtistListG
                         cardRows={cardRows}
                         display={display || ListDisplayType.CARD}
                         fetchFn={fetch}
+                        fetchInitialData={fetchInitialData}
                         handlePlayQueueAdd={handlePlayQueueAdd}
                         height={height}
                         initialScrollOffset={grid?.scrollOffset || 0}

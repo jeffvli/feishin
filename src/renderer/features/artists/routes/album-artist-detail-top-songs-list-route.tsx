@@ -6,12 +6,15 @@ import { AlbumArtistDetailTopSongsListHeader } from '/@/renderer/features/artist
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
 import { useTopSongsList } from '/@/renderer/features/artists/queries/top-songs-list-query';
 import { AnimatedPage } from '/@/renderer/features/shared';
+import { LibraryItem } from '../../../api/types';
 import { useCurrentServer } from '../../../store/auth.store';
+import { ListContext } from '/@/renderer/context/list-context';
 
 const AlbumArtistDetailTopSongsListRoute = () => {
     const tableRef = useRef<AgGridReactType | null>(null);
     const { albumArtistId } = useParams() as { albumArtistId: string };
     const server = useCurrentServer();
+    const pageKey = LibraryItem.SONG;
 
     const detailQuery = useAlbumArtistDetail({
         query: { id: albumArtistId },
@@ -30,15 +33,17 @@ const AlbumArtistDetailTopSongsListRoute = () => {
 
     return (
         <AnimatedPage>
-            <AlbumArtistDetailTopSongsListHeader
-                data={topSongsQuery?.data?.items || []}
-                itemCount={itemCount}
-                title={detailQuery?.data?.name || 'Unknown'}
-            />
-            <AlbumArtistDetailTopSongsListContent
-                data={topSongsQuery?.data?.items || []}
-                tableRef={tableRef}
-            />
+            <ListContext.Provider value={{ id: albumArtistId, pageKey }}>
+                <AlbumArtistDetailTopSongsListHeader
+                    data={topSongsQuery?.data?.items || []}
+                    itemCount={itemCount}
+                    title={detailQuery?.data?.name || 'Unknown'}
+                />
+                <AlbumArtistDetailTopSongsListContent
+                    data={topSongsQuery?.data?.items || []}
+                    tableRef={tableRef}
+                />
+            </ListContext.Provider>
         </AnimatedPage>
     );
 };
