@@ -39,7 +39,7 @@ const Title = ({ children }: TitleProps) => {
 };
 
 interface PlayButtonProps {
-    onClick: () => void;
+    onClick: (args: any) => void;
 }
 
 const PlayButton = ({ onClick }: PlayButtonProps) => {
