@@ -1,14 +1,14 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useCallback, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { SongListQuery, LibraryItem } from '/@/renderer/api/types';
+import { LibraryItem, SongListQuery } from '/@/renderer/api/types';
+import { ListContext } from '/@/renderer/context/list-context';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { SongListContent } from '/@/renderer/features/songs/components/song-list-content';
 import { SongListHeader } from '/@/renderer/features/songs/components/song-list-header';
-import { SongListContext } from '/@/renderer/features/songs/context/song-list-context';
 import { useSongList } from '/@/renderer/features/songs/queries/song-list-query';
-import { generatePageKey, useCurrentServer, useSongListFilter } from '/@/renderer/store';
+import { useCurrentServer, useListFilterByKey } from '/@/renderer/store';
 import { Play } from '/@/renderer/types';
 
 const TrackListRoute = () => {
@@ -16,13 +16,18 @@ const TrackListRoute = () => {
     const server = useCurrentServer();
     const [searchParams] = useSearchParams();
     const { albumArtistId } = useParams();
-    const pageKey = generatePageKey(
-        'song',
-        albumArtistId ? `${albumArtistId}_${server?.id}` : undefined,
-    );
+    const pageKey = albumArtistId ? `albumArtistSong` : 'song';
+
+    const customFilters = {
+        ...(albumArtistId && { artistIds: [albumArtistId] }),
+    };
 
     const handlePlayQueueAdd = usePlayQueueAdd();
-    const songListFilter = useSongListFilter({ id: albumArtistId, key: pageKey });
+    const songListFilter = useListFilterByKey<SongListQuery>({
+        filter: customFilters,
+        key: pageKey,
+    });
+
     const itemCountCheck = useSongList({
         options: {
             cacheTime: 1000 * 60,
@@ -74,7 +79,7 @@ const TrackListRoute = () => {
 
     return (
         <AnimatedPage>
-            <SongListContext.Provider value={{ handlePlay, id: albumArtistId, pageKey }}>
+            <ListContext.Provider value={{ customFilters, handlePlay, id: albumArtistId, pageKey }}>
                 <SongListHeader
                     itemCount={itemCount}
                     tableRef={tableRef}
@@ -84,7 +89,7 @@ const TrackListRoute = () => {
                     itemCount={itemCount}
                     tableRef={tableRef}
                 />
-            </SongListContext.Provider>
+            </ListContext.Provider>
         </AnimatedPage>
     );
 };

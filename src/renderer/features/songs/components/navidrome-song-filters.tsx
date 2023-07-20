@@ -1,26 +1,26 @@
-import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
-import { NumberInput, Select, Switch, Text } from '/@/renderer/components';
-import { SongListFilter, useListStoreActions, useSongListFilter } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
-import { useGenreList } from '/@/renderer/features/genres';
+import { ChangeEvent, useMemo } from 'react';
 import { LibraryItem } from '/@/renderer/api/types';
+import { NumberInput, Select, Switch, Text } from '/@/renderer/components';
+import { useGenreList } from '/@/renderer/features/genres';
+import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
 
 interface NavidromeSongFiltersProps {
-    handleFilterChange: (filters: SongListFilter) => void;
-    id?: string;
+    customFilters?: Partial<SongListFilter>;
+    onFilterChange: (filters: SongListFilter) => void;
     pageKey: string;
     serverId?: string;
 }
 
 export const NavidromeSongFilters = ({
-    handleFilterChange,
+    customFilters,
+    onFilterChange,
     pageKey,
-    id,
     serverId,
 }: NavidromeSongFiltersProps) => {
     const { setFilter } = useListStoreActions();
-    const filter = useSongListFilter({ id, key: pageKey });
+    const filter = useListFilterByKey({ key: pageKey });
 
     const genreListQuery = useGenreList({ query: null, serverId });
 
@@ -34,6 +34,7 @@ export const NavidromeSongFilters = ({
 
     const handleGenresFilter = debounce((e: string | null) => {
         const updatedFilters = setFilter({
+            customFilters,
             data: {
                 _custom: {
                     ...filter._custom,
@@ -45,7 +46,8 @@ export const NavidromeSongFilters = ({
             itemType: LibraryItem.SONG,
             key: pageKey,
         }) as SongListFilter;
-        handleFilterChange(updatedFilters);
+
+        onFilterChange(updatedFilters);
     }, 250);
 
     const toggleFilters = [
@@ -53,6 +55,7 @@ export const NavidromeSongFilters = ({
             label: 'Is favorited',
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
+                    customFilters,
                     data: {
                         _custom: {
                             ...filter._custom,
@@ -65,7 +68,7 @@ export const NavidromeSongFilters = ({
                     key: pageKey,
                 }) as SongListFilter;
 
-                handleFilterChange(updatedFilters);
+                onFilterChange(updatedFilters);
             },
             value: filter._custom?.navidrome?.starred,
         },
@@ -73,6 +76,7 @@ export const NavidromeSongFilters = ({
 
     const handleYearFilter = debounce((e: number | string) => {
         const updatedFilters = setFilter({
+            customFilters,
             data: {
                 _custom: {
                     ...filter._custom,
@@ -85,7 +89,7 @@ export const NavidromeSongFilters = ({
             key: pageKey,
         }) as SongListFilter;
 
-        handleFilterChange(updatedFilters);
+        onFilterChange(updatedFilters);
     }, 500);
 
     return (

@@ -1,37 +1,31 @@
-import { useCallback, useMemo, ChangeEvent, MutableRefObject, MouseEvent } from 'react';
-import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import {
-    RiFolder2Line,
-    RiMoreFill,
-    RiSettings3Fill,
-    RiPlayFill,
     RiAddBoxFill,
     RiAddCircleFill,
-    RiRefreshLine,
     RiFilterFill,
+    RiFolder2Line,
+    RiMoreFill,
+    RiPlayFill,
+    RiRefreshLine,
+    RiSettings3Fill,
 } from 'react-icons/ri';
-import { api } from '/@/renderer/api';
+import { useListStoreByKey } from '../../../store/list.store';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
-import { DropdownMenu, Button, Slider, MultiSelect, Switch, Text } from '/@/renderer/components';
+import { LibraryItem, SongListSort, SortOrder } from '/@/renderer/api/types';
+import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
+import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
+import { useListContext } from '/@/renderer/context/list-context';
 import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
 import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jellyfin-song-filters';
 import { NavidromeSongFilters } from '/@/renderer/features/songs/components/navidrome-song-filters';
 import { useContainerQuery } from '/@/renderer/hooks';
+import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
 import { queryClient } from '/@/renderer/lib/react-query';
-import {
-    SongListFilter,
-    useCurrentServer,
-    useListStoreActions,
-    useSongListFilter,
-    useSongListStore,
-} from '/@/renderer/store';
-import { ListDisplayType, ServerType, Play, TableColumn } from '/@/renderer/types';
-import { useSongListContext } from '/@/renderer/features/songs/context/song-list-context';
-import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
+import { SongListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
+import { ListDisplayType, Play, ServerType, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
     jellyfin: [
@@ -83,10 +77,14 @@ interface SongListHeaderFiltersProps {
 
 export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) => {
     const server = useCurrentServer();
-    const { id, pageKey, handlePlay } = useSongListContext();
-    const { display, table } = useSongListStore({ id, key: pageKey });
+    const { pageKey, handlePlay, customFilters } = useListContext();
+    const { display, table, filter } = useListStoreByKey({ key: pageKey });
     const { setFilter, setTable, setTablePagination, setDisplayType } = useListStoreActions();
-    const filter = useSongListFilter({ id, key: pageKey });
+
+    const { handleRefreshTable } = useListFilterRefresh({
+        itemType: LibraryItem.SONG,
+        server,
+    });
 
     const cq = useContainerQuery();
 
@@ -99,48 +97,6 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
             ).find((f) => f.value === filter.sortBy)?.name) ||
         'Unknown';
 
-    const handleFilterChange = useCallback(
-        async (filters?: SongListFilter) => {
-            const dataSource: IDatasource = {
-                getRows: async (params) => {
-                    const limit = params.endRow - params.startRow;
-                    const startIndex = params.startRow;
-
-                    const pageFilters = filters || filter;
-
-                    const query: SongListQuery = {
-                        limit,
-                        startIndex,
-                        ...pageFilters,
-                    };
-
-                    const queryKey = queryKeys.songs.list(server?.id || '', query);
-
-                    const songsRes = await queryClient.fetchQuery(
-                        queryKey,
-                        async ({ signal }) =>
-                            api.controller.getSongList({
-                                apiClientProps: {
-                                    server,
-                                    signal,
-                                },
-                                query,
-                            }),
-                        { cacheTime: 1000 * 60 * 1 },
-                    );
-
-                    params.successCallback(songsRes?.items || [], songsRes?.totalRecordCount || 0);
-                },
-                rowCount: undefined,
-            };
-            tableRef.current?.api.setDatasource(dataSource);
-            tableRef.current?.api.purgeInfiniteCache();
-            tableRef.current?.api.ensureIndexVisible(0, 'top');
-            setTablePagination({ data: { currentPage: 0 }, key: pageKey });
-        },
-        [filter, pageKey, server, setTablePagination, tableRef],
-    );
-
     const handleSetSortBy = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
             if (!e.currentTarget?.value || !server?.type) return;
@@ -150,6 +106,7 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
             )?.defaultOrder;
 
             const updatedFilters = setFilter({
+                customFilters,
                 data: {
                     sortBy: e.currentTarget.value as SongListSort,
                     sortOrder: sortOrder || SortOrder.ASC,
@@ -158,9 +115,9 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                 key: pageKey,
             }) as SongListFilter;
 
-            handleFilterChange(updatedFilters);
+            handleRefreshTable(tableRef, updatedFilters);
         },
-        [handleFilterChange, pageKey, server?.type, setFilter],
+        [customFilters, handleRefreshTable, pageKey, server?.type, setFilter, tableRef],
     );
 
     const handleSetMusicFolder = useCallback(
@@ -170,32 +127,35 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
             let updatedFilters = null;
             if (e.currentTarget.value === String(filter.musicFolderId)) {
                 updatedFilters = setFilter({
+                    customFilters,
                     data: { musicFolderId: undefined },
                     itemType: LibraryItem.SONG,
                     key: pageKey,
                 }) as SongListFilter;
             } else {
                 updatedFilters = setFilter({
+                    customFilters,
                     data: { musicFolderId: e.currentTarget.value },
                     itemType: LibraryItem.SONG,
                     key: pageKey,
                 }) as SongListFilter;
             }
 
-            handleFilterChange(updatedFilters);
+            handleRefreshTable(tableRef, updatedFilters);
         },
-        [filter.musicFolderId, handleFilterChange, setFilter, pageKey],
+        [filter.musicFolderId, handleRefreshTable, tableRef, setFilter, customFilters, pageKey],
     );
 
     const handleToggleSortOrder = useCallback(() => {
         const newSortOrder = filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
         const updatedFilters = setFilter({
+            customFilters,
             data: { sortOrder: newSortOrder },
             itemType: LibraryItem.SONG,
             key: pageKey,
         }) as SongListFilter;
-        handleFilterChange(updatedFilters);
-    }, [filter.sortOrder, handleFilterChange, pageKey, setFilter]);
+        handleRefreshTable(tableRef, updatedFilters);
+    }, [customFilters, filter.sortOrder, handleRefreshTable, pageKey, setFilter, tableRef]);
 
     const handleSetViewType = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
@@ -258,7 +218,14 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
 
     const handleRefresh = () => {
         queryClient.invalidateQueries(queryKeys.songs.list(server?.id || ''));
-        handleFilterChange(filter);
+        handleRefreshTable(tableRef, filter);
+    };
+
+    const onFilterChange = (filter: SongListFilter) => {
+        handleRefreshTable(tableRef, {
+            ...filter,
+            ...customFilters,
+        });
     };
 
     const handleOpenFiltersModal = () => {
@@ -267,15 +234,15 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                 <>
                     {server?.type === ServerType.NAVIDROME ? (
                         <NavidromeSongFilters
-                            handleFilterChange={handleFilterChange}
-                            id={id}
+                            customFilters={customFilters}
                             pageKey={pageKey}
+                            onFilterChange={onFilterChange}
                         />
                     ) : (
                         <JellyfinSongFilters
-                            handleFilterChange={handleFilterChange}
-                            id={id}
+                            customFilters={customFilters}
                             pageKey={pageKey}
+                            onFilterChange={onFilterChange}
                         />
                     )}
                 </>

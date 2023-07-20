@@ -1,8 +1,8 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { lazy, MutableRefObject, Suspense } from 'react';
 import { Spinner } from '/@/renderer/components';
-import { useSongListContext } from '/@/renderer/features/songs/context/song-list-context';
-import { useSongListStore } from '/@/renderer/store';
+import { useListContext } from '/@/renderer/context/list-context';
+import { useListStoreByKey } from '/@/renderer/store';
 import { ListDisplayType } from '/@/renderer/types';
 
 const SongListTableView = lazy(() =>
@@ -17,8 +17,8 @@ interface SongListContentProps {
 }
 
 export const SongListContent = ({ itemCount, tableRef }: SongListContentProps) => {
-    const { id, pageKey } = useSongListContext();
-    const { display } = useSongListStore({ id, key: pageKey });
+    const { pageKey } = useListContext();
+    const { display } = useListStoreByKey({ key: pageKey });
 
     const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
 

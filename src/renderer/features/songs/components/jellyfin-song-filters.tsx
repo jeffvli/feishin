@@ -1,26 +1,27 @@
-import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
-import { MultiSelect, NumberInput, Switch, Text } from '/@/renderer/components';
-import { SongListFilter, useListStoreActions, useSongListFilter } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
-import { useGenreList } from '/@/renderer/features/genres';
+import { ChangeEvent, useMemo } from 'react';
+import { useListFilterByKey } from '../../../store/list.store';
 import { LibraryItem } from '/@/renderer/api/types';
+import { MultiSelect, NumberInput, Switch, Text } from '/@/renderer/components';
+import { useGenreList } from '/@/renderer/features/genres';
+import { SongListFilter, useListStoreActions } from '/@/renderer/store';
 
 interface JellyfinSongFiltersProps {
-    handleFilterChange: (filters: SongListFilter) => void;
-    id?: string;
+    customFilters?: Partial<SongListFilter>;
+    onFilterChange: (filters: SongListFilter) => void;
     pageKey: string;
     serverId?: string;
 }
 
 export const JellyfinSongFilters = ({
-    id,
+    customFilters,
     pageKey,
-    handleFilterChange,
+    onFilterChange,
     serverId,
 }: JellyfinSongFiltersProps) => {
     const { setFilter } = useListStoreActions();
-    const filter = useSongListFilter({ id, key: pageKey });
+    const { filter } = useListFilterByKey({ key: pageKey });
 
     // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
     const genreListQuery = useGenreList({ query: null, serverId });
@@ -42,6 +43,7 @@ export const JellyfinSongFilters = ({
             label: 'Is favorited',
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
+                    customFilters,
                     data: {
                         _custom: {
                             ...filter._custom,
@@ -55,7 +57,7 @@ export const JellyfinSongFilters = ({
                     itemType: LibraryItem.SONG,
                     key: pageKey,
                 }) as SongListFilter;
-                handleFilterChange(updatedFilters);
+                onFilterChange(updatedFilters);
             },
             value: filter._custom?.jellyfin?.IsFavorite,
         },
@@ -64,6 +66,7 @@ export const JellyfinSongFilters = ({
     const handleMinYearFilter = debounce((e: number | string) => {
         if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
         const updatedFilters = setFilter({
+            customFilters,
             data: {
                 _custom: {
                     ...filter._custom,
@@ -77,12 +80,13 @@ export const JellyfinSongFilters = ({
             itemType: LibraryItem.SONG,
             key: pageKey,
         }) as SongListFilter;
-        handleFilterChange(updatedFilters);
+        onFilterChange(updatedFilters);
     }, 500);
 
     const handleMaxYearFilter = debounce((e: number | string) => {
         if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
         const updatedFilters = setFilter({
+            customFilters,
             data: {
                 _custom: {
                     ...filter._custom,
@@ -96,12 +100,13 @@ export const JellyfinSongFilters = ({
             itemType: LibraryItem.SONG,
             key: pageKey,
         }) as SongListFilter;
-        handleFilterChange(updatedFilters);
+        onFilterChange(updatedFilters);
     }, 500);
 
     const handleGenresFilter = debounce((e: string[] | undefined) => {
         const genreFilterString = e?.length ? e.join(',') : undefined;
         const updatedFilters = setFilter({
+            customFilters,
             data: {
                 _custom: {
                     ...filter._custom,
@@ -115,7 +120,7 @@ export const JellyfinSongFilters = ({
             itemType: LibraryItem.SONG,
             key: pageKey,
         }) as SongListFilter;
-        handleFilterChange(updatedFilters);
+        onFilterChange(updatedFilters);
     }, 250);
 
     return (

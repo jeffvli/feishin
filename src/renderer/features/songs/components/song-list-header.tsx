@@ -1,24 +1,18 @@
-import type { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, MutableRefObject, useCallback } from 'react';
-import { api } from '/@/renderer/api';
-import { queryKeys } from '/@/renderer/api/query-keys';
-import { LibraryItem, SongListQuery } from '/@/renderer/api/types';
+import { ChangeEvent, MutableRefObject } from 'react';
+import { useListStoreByKey } from '../../../store/list.store';
+import { LibraryItem } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
+import { useListContext } from '/@/renderer/context/list-context';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { SongListHeaderFilters } from '/@/renderer/features/songs/components/song-list-header-filters';
-import { useSongListContext } from '/@/renderer/features/songs/context/song-list-context';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { queryClient } from '/@/renderer/lib/react-query';
-import {
-    SongListFilter,
-    useCurrentServer,
-    useListStoreActions,
-    useSongListFilter,
-} from '/@/renderer/store';
+import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
+import { SongListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { ListDisplayType } from '/@/renderer/types';
 
 interface SongListHeaderProps {
     itemCount?: number;
@@ -28,62 +22,35 @@ interface SongListHeaderProps {
 
 export const SongListHeader = ({ title, itemCount, tableRef }: SongListHeaderProps) => {
     const server = useCurrentServer();
-    const { id, pageKey, handlePlay } = useSongListContext();
-    const filter = useSongListFilter({ id, key: pageKey });
+    const { pageKey, handlePlay, customFilters } = useListContext();
     const { setFilter, setTablePagination } = useListStoreActions();
+    const { display, filter } = useListStoreByKey({ key: pageKey });
     const cq = useContainerQuery();
 
-    const handleFilterChange = useCallback(
-        async (filters?: SongListFilter) => {
-            const dataSource: IDatasource = {
-                getRows: async (params) => {
-                    const limit = params.endRow - params.startRow;
-                    const startIndex = params.startRow;
-
-                    const pageFilters = filters || filter;
-
-                    const query: SongListQuery = {
-                        limit,
-                        startIndex,
-                        ...pageFilters,
-                    };
-
-                    const queryKey = queryKeys.songs.list(server?.id || '', query);
-
-                    const songsRes = await queryClient.fetchQuery(
-                        queryKey,
-                        async ({ signal }) =>
-                            api.controller.getSongList({
-                                apiClientProps: {
-                                    server,
-                                    signal,
-                                },
-                                query,
-                            }),
-                        { cacheTime: 1000 * 60 * 1 },
-                    );
-
-                    params.successCallback(songsRes?.items || [], songsRes?.totalRecordCount || 0);
-                },
-                rowCount: undefined,
-            };
-            tableRef.current?.api.setDatasource(dataSource);
-            tableRef.current?.api.purgeInfiniteCache();
-            tableRef.current?.api.ensureIndexVisible(0, 'top');
-            setTablePagination({ data: { currentPage: 0 }, key: pageKey });
-        },
-        [filter, pageKey, server, setTablePagination, tableRef],
-    );
+    const { handleRefreshTable } = useListFilterRefresh({
+        itemType: LibraryItem.SONG,
+        server,
+    });
 
     const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-        const previousSearchTerm = filter.searchTerm;
         const searchTerm = e.target.value === '' ? undefined : e.target.value;
         const updatedFilters = setFilter({
             data: { searchTerm },
             itemType: LibraryItem.SONG,
             key: pageKey,
         }) as SongListFilter;
-        if (previousSearchTerm !== searchTerm) handleFilterChange(updatedFilters);
+
+        const filterWithCustom = {
+            ...updatedFilters,
+            ...customFilters,
+        };
+
+        if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
+            handleRefreshTable(tableRef, filterWithCustom);
+            setTablePagination({ data: { currentPage: 0 }, key: pageKey });
+        } else {
+            // handleRefreshGrid(gridRef, filterWithCustom);
+        }
     }, 500);
 
     const playButtonBehavior = usePlayButtonBehavior();
