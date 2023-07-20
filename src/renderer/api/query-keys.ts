@@ -22,7 +22,7 @@ import type {
 export const splitPaginatedQuery = (key: any) => {
     const { startIndex, limit, ...filter } = key;
 
-    if (startIndex === undefined || limit === undefined) {
+    if (startIndex !== undefined || limit !== undefined) {
         return {
             filter,
             pagination: {
