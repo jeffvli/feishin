@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { ListOnScrollProps } from 'react-window';
 import { controller } from '/@/renderer/api/controller';
-import { queryKeys, splitPaginatedQuery } from '/@/renderer/api/query-keys';
+import { queryKeys } from '/@/renderer/api/query-keys';
 import {
     Album,
     AlbumListQuery,
@@ -169,16 +169,14 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
                 return [];
             }
 
-            const listQuery: AlbumListQuery = {
+            const query: AlbumListQuery = {
                 limit: take,
                 startIndex: skip,
                 ...filter,
                 ...customFilters,
             };
 
-            const { query, pagination } = splitPaginatedQuery(listQuery);
-
-            const queryKey = queryKeys.albums.list(server?.id || '', query, pagination);
+            const queryKey = queryKeys.albums.list(server?.id || '', query);
 
             const albums = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
                 controller.getAlbumList({
@@ -186,7 +184,7 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
                         server,
                         signal,
                     },
-                    query: listQuery,
+                    query,
                 }),
             );
 
