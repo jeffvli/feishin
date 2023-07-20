@@ -26,6 +26,7 @@ interface VirtualGridProps
     cardRows: CardRow<any>[];
     display?: ListDisplayType;
     fetchFn: (options: { columnCount: number; skip: number; take: number }) => Promise<any>;
+    fetchInitialData?: () => any;
     handleFavorite?: (options: {
         id: string[];
         isFavorite: boolean;
@@ -56,6 +57,7 @@ export const VirtualInfiniteGrid = forwardRef(
             handlePlayQueueAdd,
             minimumBatchSize,
             fetchFn,
+            fetchInitialData,
             loading,
             initialScrollOffset,
             handleFavorite,
@@ -67,7 +69,7 @@ export const VirtualInfiniteGrid = forwardRef(
         const listRef = useRef<any>(null);
         const loader = useRef<InfiniteLoader>(null);
 
-        const [itemData, setItemData] = useState<any[]>([]);
+        const [itemData, setItemData] = useState<any[]>(fetchInitialData?.() || []);
 
         const { itemHeight, rowCount, columnCount } = useMemo(() => {
             const itemsPerRow = itemSize;
