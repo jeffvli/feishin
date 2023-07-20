@@ -1,35 +1,35 @@
+import { QueryKey, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { ListOnScrollProps } from 'react-window';
 import { controller } from '/@/renderer/api/controller';
-import { queryKeys } from '/@/renderer/api/query-keys';
-import { Album, AlbumListQuery, AlbumListSort, LibraryItem } from '/@/renderer/api/types';
+import { queryKeys, splitPaginatedQuery } from '/@/renderer/api/query-keys';
+import {
+    Album,
+    AlbumListQuery,
+    AlbumListResponse,
+    AlbumListSort,
+    LibraryItem,
+} from '/@/renderer/api/types';
 import { ALBUM_CARD_ROWS } from '/@/renderer/components';
 import {
     VirtualGridAutoSizerContainer,
     VirtualInfiniteGrid,
 } from '/@/renderer/components/virtual-grid';
-import { useAlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
+import { useListContext } from '/@/renderer/context/list-context';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { AppRoute } from '/@/renderer/router/routes';
-import {
-    useAlbumListFilter,
-    useAlbumListStore,
-    useCurrentServer,
-    useListStoreActions,
-} from '/@/renderer/store';
-import { CardRow, ListDisplayType } from '/@/renderer/types';
 import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { AppRoute } from '/@/renderer/router/routes';
+import { useCurrentServer, useListStoreActions, useListStoreByKey } from '/@/renderer/store';
+import { CardRow, ListDisplayType } from '/@/renderer/types';
 
 export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
     const queryClient = useQueryClient();
     const server = useCurrentServer();
     const handlePlayQueueAdd = usePlayQueueAdd();
-    const { id, pageKey } = useAlbumListContext();
-    const { grid, display } = useAlbumListStore({ id, key: pageKey });
+    const { pageKey, customFilters } = useListContext();
+    const { grid, display, filter } = useListStoreByKey({ key: pageKey });
     const { setGrid } = useListStoreActions();
-    const filter = useAlbumListFilter({ id, key: pageKey });
 
     const createFavoriteMutation = useCreateFavorite({});
     const deleteFavoriteMutation = useDeleteFavorite({});
@@ -129,27 +129,56 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
         [pageKey, setGrid],
     );
 
+    const fetchInitialData = useCallback(() => {
+        const query: Omit<AlbumListQuery, 'startIndex' | 'limit'> = {
+            ...filter,
+            ...customFilters,
+        };
+
+        const queriesFromCache: [QueryKey, AlbumListResponse][] = queryClient.getQueriesData({
+            exact: false,
+            fetchStatus: 'idle',
+            queryKey: queryKeys.albums.list(server?.id || '', query),
+            stale: false,
+        });
+
+        const itemData = [];
+
+        for (const [, data] of queriesFromCache) {
+            const { items, startIndex } = data || {};
+
+            if (items && startIndex !== undefined) {
+                let itemIndex = 0;
+                for (
+                    let rowIndex = startIndex;
+                    rowIndex < startIndex + items.length;
+                    rowIndex += 1
+                ) {
+                    itemData[rowIndex] = items[itemIndex];
+                    itemIndex += 1;
+                }
+            }
+        }
+
+        return itemData;
+    }, [customFilters, filter, queryClient, server?.id]);
+
     const fetch = useCallback(
         async ({ skip, take }: { skip: number; take: number }) => {
             if (!server) {
                 return [];
             }
 
-            const query: AlbumListQuery = {
+            const listQuery: AlbumListQuery = {
                 limit: take,
                 startIndex: skip,
                 ...filter,
-                _custom: {
-                    jellyfin: {
-                        ...filter._custom?.jellyfin,
-                    },
-                    navidrome: {
-                        ...filter._custom?.navidrome,
-                    },
-                },
+                ...customFilters,
             };
 
-            const queryKey = queryKeys.albums.list(server?.id || '', query);
+            const { query, pagination } = splitPaginatedQuery(listQuery);
+
+            const queryKey = queryKeys.albums.list(server?.id || '', query, pagination);
 
             const albums = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
                 controller.getAlbumList({
@@ -157,13 +186,13 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
                         server,
                         signal,
                     },
-                    query,
+                    query: listQuery,
                 }),
             );
 
             return albums;
         },
-        [filter, queryClient, server],
+        [customFilters, filter, queryClient, server],
     );
 
     return (
@@ -176,6 +205,7 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
                         cardRows={cardRows}
                         display={display || ListDisplayType.CARD}
                         fetchFn={fetch}
+                        fetchInitialData={fetchInitialData}
                         handleFavorite={handleFavorite}
                         handlePlayQueueAdd={handlePlayQueueAdd}
                         height={height}

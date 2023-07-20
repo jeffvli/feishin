@@ -1,38 +1,36 @@
-import { MutableRefObject, useCallback, MouseEvent, ChangeEvent, useMemo } from 'react';
-import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import {
+    RiAddBoxFill,
+    RiAddCircleFill,
+    RiFilterFill,
     RiFolder2Line,
     RiMoreFill,
-    RiAddBoxFill,
     RiPlayFill,
-    RiAddCircleFill,
     RiRefreshLine,
     RiSettings3Fill,
-    RiFilterFill,
 } from 'react-icons/ri';
-import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumListQuery, AlbumListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { AlbumListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
-import { useContainerQuery } from '/@/renderer/hooks';
-import {
-    AlbumListFilter,
-    useAlbumListStore,
-    useCurrentServer,
-    useListStoreActions,
-} from '/@/renderer/store';
-import { ServerType, Play, ListDisplayType, TableColumn } from '/@/renderer/types';
-import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
-import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
-import { useAlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUM_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
+import { useListContext } from '/@/renderer/context/list-context';
+import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
+import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
+import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
+import { useContainerQuery } from '/@/renderer/hooks';
+import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
+import {
+    AlbumListFilter,
+    useCurrentServer,
+    useListStoreActions,
+    useListStoreByKey,
+} from '/@/renderer/store';
+import { ListDisplayType, Play, ServerType, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
     jellyfin: [
@@ -77,25 +75,22 @@ const FILTERS = {
 };
 
 interface AlbumListHeaderFiltersProps {
-    customFilters?: Partial<AlbumListFilter>;
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
-    itemCount?: number;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const AlbumListHeaderFilters = ({
-    customFilters,
-    gridRef,
-    tableRef,
-    itemCount,
-}: AlbumListHeaderFiltersProps) => {
+export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFiltersProps) => {
     const queryClient = useQueryClient();
-    const { id, pageKey } = useAlbumListContext();
+    const { pageKey, customFilters, handlePlay } = useListContext();
     const server = useCurrentServer();
-    const { setFilter, setTablePagination, setTable, setGrid, setDisplayType } =
-        useListStoreActions();
-    const { display, filter, table, grid } = useAlbumListStore({ id, key: pageKey });
+    const { setFilter, setTable, setGrid, setDisplayType } = useListStoreActions();
+    const { display, filter, table, grid } = useListStoreByKey({ key: pageKey });
     const cq = useContainerQuery();
+
+    const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
+        itemType: LibraryItem.ALBUM,
+        server,
+    });
 
     const musicFoldersQuery = useMusicFolders({ query: null, serverId: server?.id });
 
@@ -107,123 +102,21 @@ export const AlbumListHeaderFilters = ({
 
     const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
 
-    const fetch = useCallback(
-        async (skip: number, take: number, filters: AlbumListFilter) => {
-            const query: AlbumListQuery = {
-                limit: take,
-                startIndex: skip,
-                ...filters,
-                _custom: {
-                    jellyfin: {
-                        ...filters._custom?.jellyfin,
-                        ...customFilters?._custom?.jellyfin,
-                    },
-                    navidrome: {
-                        ...filters._custom?.navidrome,
-                        ...customFilters?._custom?.navidrome,
-                    },
-                },
-                ...customFilters,
-            };
-
-            const queryKey = queryKeys.albums.list(server?.id || '', query);
-
-            const albums = await queryClient.fetchQuery(
-                queryKey,
-                async ({ signal }) =>
-                    api.controller.getAlbumList({
-                        apiClientProps: {
-                            server,
-                            signal,
-                        },
-                        query,
-                    }),
-                { cacheTime: 1000 * 60 * 1 },
-            );
-
-            return albums;
-        },
-        [customFilters, queryClient, server],
-    );
-
-    const handleFilterChange = useCallback(
-        async (filters: AlbumListFilter) => {
+    const onFilterChange = useCallback(
+        (filter: AlbumListFilter) => {
             if (isGrid) {
-                gridRef.current?.scrollTo(0);
-                gridRef.current?.resetLoadMoreItemsCache();
-
-                // Refetching within the virtualized grid may be inconsistent due to it refetching
-                // using an outdated set of filters. To avoid this, we fetch using the updated filters
-                // and then set the grid's data here.
-                const data = await fetch(0, 200, filters);
-
-                if (!data?.items) return;
-                gridRef.current?.setItemData(data.items);
-            } else {
-                const dataSource: IDatasource = {
-                    getRows: async (params) => {
-                        const limit = params.endRow - params.startRow;
-                        const startIndex = params.startRow;
-
-                        const query: AlbumListQuery = {
-                            limit,
-                            startIndex,
-                            ...filters,
-                            ...customFilters,
-                            _custom: {
-                                jellyfin: {
-                                    ...filters._custom?.jellyfin,
-                                    ...customFilters?._custom?.jellyfin,
-                                },
-                                navidrome: {
-                                    ...filters._custom?.navidrome,
-                                    ...customFilters?._custom?.navidrome,
-                                },
-                            },
-                        };
-
-                        const queryKey = queryKeys.albums.list(server?.id || '', query);
-
-                        const albumsRes = await queryClient.fetchQuery(
-                            queryKey,
-                            async ({ signal }) =>
-                                api.controller.getAlbumList({
-                                    apiClientProps: {
-                                        server,
-                                        signal,
-                                    },
-                                    query,
-                                }),
-                            { cacheTime: 1000 * 60 * 1 },
-                        );
-
-                        return params.successCallback(
-                            albumsRes?.items || [],
-                            albumsRes?.totalRecordCount || 0,
-                        );
-                    },
-                    rowCount: undefined,
-                };
-                tableRef.current?.api.setDatasource(dataSource);
-                tableRef.current?.api.purgeInfiniteCache();
-                tableRef.current?.api.ensureIndexVisible(0, 'top');
-
-                if (display === ListDisplayType.TABLE_PAGINATED) {
-                    setTablePagination({ data: { currentPage: 0 }, key: 'album' });
-                }
+                handleRefreshGrid(gridRef, {
+                    ...filter,
+                    ...customFilters,
+                });
             }
+
+            handleRefreshTable(tableRef, {
+                ...filter,
+                ...customFilters,
+            });
         },
-        [
-            isGrid,
-            gridRef,
-            fetch,
-            tableRef,
-            display,
-            customFilters,
-            server,
-            queryClient,
-            setTablePagination,
-        ],
+        [customFilters, gridRef, handleRefreshGrid, handleRefreshTable, isGrid, tableRef],
     );
 
     const handleOpenFiltersModal = () => {
@@ -232,19 +125,19 @@ export const AlbumListHeaderFilters = ({
                 <>
                     {server?.type === ServerType.NAVIDROME ? (
                         <NavidromeAlbumFilters
+                            customFilters={customFilters}
                             disableArtistFilter={!!customFilters}
-                            handleFilterChange={handleFilterChange}
-                            id={id}
                             pageKey={pageKey}
                             serverId={server?.id}
+                            onFilterChange={onFilterChange}
                         />
                     ) : (
                         <JellyfinAlbumFilters
+                            customFilters={customFilters}
                             disableArtistFilter={!!customFilters}
-                            handleFilterChange={handleFilterChange}
-                            id={id}
                             pageKey={pageKey}
                             serverId={server?.id}
+                            onFilterChange={onFilterChange}
                         />
                     )}
                 </>
@@ -255,8 +148,8 @@ export const AlbumListHeaderFilters = ({
 
     const handleRefresh = useCallback(() => {
         queryClient.invalidateQueries(queryKeys.albums.list(server?.id || ''));
-        handleFilterChange(filter);
-    }, [filter, handleFilterChange, queryClient, server?.id]);
+        onFilterChange(filter);
+    }, [filter, onFilterChange, queryClient, server?.id]);
 
     const handleSetSortBy = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
@@ -267,17 +160,18 @@ export const AlbumListHeaderFilters = ({
             )?.defaultOrder;
 
             const updatedFilters = setFilter({
+                customFilters,
                 data: {
                     sortBy: e.currentTarget.value as AlbumListSort,
                     sortOrder: sortOrder || SortOrder.ASC,
                 },
                 itemType: LibraryItem.ALBUM,
-                key: 'album',
+                key: pageKey,
             }) as AlbumListFilter;
 
-            handleFilterChange(updatedFilters);
+            onFilterChange(updatedFilters);
         },
-        [handleFilterChange, server?.type, setFilter],
+        [customFilters, onFilterChange, pageKey, server?.type, setFilter],
     );
 
     const handleSetMusicFolder = useCallback(
@@ -287,86 +181,50 @@ export const AlbumListHeaderFilters = ({
             let updatedFilters = null;
             if (e.currentTarget.value === String(filter.musicFolderId)) {
                 updatedFilters = setFilter({
+                    customFilters,
                     data: { musicFolderId: undefined },
                     itemType: LibraryItem.ALBUM,
-                    key: 'album',
+                    key: pageKey,
                 }) as AlbumListFilter;
             } else {
                 updatedFilters = setFilter({
+                    customFilters,
                     data: { musicFolderId: e.currentTarget.value },
                     itemType: LibraryItem.ALBUM,
-                    key: 'album',
+                    key: pageKey,
                 }) as AlbumListFilter;
             }
 
-            handleFilterChange(updatedFilters);
+            onFilterChange(updatedFilters);
         },
-        [handleFilterChange, filter.musicFolderId, setFilter],
+        [filter.musicFolderId, onFilterChange, setFilter, customFilters, pageKey],
     );
 
     const handleToggleSortOrder = useCallback(() => {
         const newSortOrder = filter.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
         const updatedFilters = setFilter({
+            customFilters,
             data: { sortOrder: newSortOrder },
             itemType: LibraryItem.ALBUM,
-            key: 'album',
+            key: pageKey,
         }) as AlbumListFilter;
-        handleFilterChange(updatedFilters);
-    }, [filter.sortOrder, handleFilterChange, setFilter]);
-
-    const handlePlayQueueAdd = usePlayQueueAdd();
-
-    const handlePlay = async (playType: Play) => {
-        if (!itemCount || itemCount === 0 || !server) return;
-
-        const query = {
-            startIndex: 0,
-            ...filter,
-            ...customFilters,
-            _custom: {
-                jellyfin: {
-                    ...filter._custom?.jellyfin,
-                    ...customFilters?._custom?.jellyfin,
-                },
-                navidrome: {
-                    ...filter._custom?.navidrome,
-                    ...customFilters?._custom?.navidrome,
-                },
-            },
-        };
-        const queryKey = queryKeys.albums.list(server?.id || '', query);
-
-        const albumListRes = await queryClient.fetchQuery({
-            queryFn: ({ signal }) =>
-                api.controller.getAlbumList({ apiClientProps: { server, signal }, query }),
-            queryKey,
-        });
-
-        const albumIds = albumListRes?.items?.map((a) => a.id) || [];
-
-        handlePlayQueueAdd?.({
-            byItemType: {
-                id: albumIds,
-                type: LibraryItem.ALBUM,
-            },
-            playType,
-        });
-    };
+        onFilterChange(updatedFilters);
+    }, [customFilters, filter.sortOrder, onFilterChange, pageKey, setFilter]);
 
     const handleItemSize = (e: number) => {
         if (isGrid) {
-            setGrid({ data: { itemsPerRow: e }, key: 'album' });
+            setGrid({ data: { itemsPerRow: e }, key: pageKey });
         } else {
-            setTable({ data: { rowHeight: e }, key: 'album' });
+            setTable({ data: { rowHeight: e }, key: pageKey });
         }
     };
 
     const handleSetViewType = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
             if (!e.currentTarget?.value) return;
-            setDisplayType({ data: e.currentTarget.value as ListDisplayType, key: 'album' });
+            setDisplayType({ data: e.currentTarget.value as ListDisplayType, key: pageKey });
         },
-        [setDisplayType],
+        [pageKey, setDisplayType],
     );
 
     const handleTableColumns = (values: TableColumn[]) => {
@@ -375,7 +233,7 @@ export const AlbumListHeaderFilters = ({
         if (values.length === 0) {
             return setTable({
                 data: { columns: [] },
-                key: 'album',
+                key: pageKey,
             });
         }
 
@@ -383,20 +241,20 @@ export const AlbumListHeaderFilters = ({
         if (values.length > existingColumns.length) {
             const newColumn = { column: values[values.length - 1], width: 100 };
 
-            setTable({ data: { columns: [...existingColumns, newColumn] }, key: 'album' });
+            setTable({ data: { columns: [...existingColumns, newColumn] }, key: pageKey });
         } else {
             // If removing a column
             const removed = existingColumns.filter((column) => !values.includes(column.column));
             const newColumns = existingColumns.filter((column) => !removed.includes(column));
 
-            setTable({ data: { columns: newColumns }, key: 'album' });
+            setTable({ data: { columns: newColumns }, key: pageKey });
         }
 
         return tableRef.current?.api.sizeColumnsToFit();
     };
 
     const handleAutoFitColumns = (e: ChangeEvent<HTMLInputElement>) => {
-        setTable({ data: { autoFit: e.currentTarget.checked }, key: 'album' });
+        setTable({ data: { autoFit: e.currentTarget.checked }, key: pageKey });
 
         if (e.currentTarget.checked) {
             tableRef.current?.api.sizeColumnsToFit();
@@ -511,19 +369,19 @@ export const AlbumListHeaderFilters = ({
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
                             icon={<RiPlayFill />}
-                            onClick={() => handlePlay(Play.NOW)}
+                            onClick={() => handlePlay?.({ playType: Play.NOW })}
                         >
                             Play
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddBoxFill />}
-                            onClick={() => handlePlay(Play.LAST)}
+                            onClick={() => handlePlay?.({ playType: Play.LAST })}
                         >
                             Add to queue
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddCircleFill />}
-                            onClick={() => handlePlay(Play.NEXT)}
+                            onClick={() => handlePlay?.({ playType: Play.NEXT })}
                         >
                             Add to queue next
                         </DropdownMenu.Item>

@@ -55,6 +55,7 @@ export interface ListState {
     item: {
         album: ListItemProps<AlbumListFilter>;
         albumArtist: ListItemProps<AlbumArtistListFilter>;
+        albumArtistAlbum: ListItemProps<AlbumListFilter>;
         albumArtistSong: ListItemProps<SongListFilter>;
         albumDetail: ListItemProps<any>;
         playlist: ListItemProps<PlaylistListFilter>;
@@ -380,6 +381,47 @@ export const useListStore = create<ListSlice>()(
                             scrollOffset: 0,
                         },
                     },
+                    albumArtistAlbum: {
+                        display: ListDisplayType.POSTER,
+                        filter: {
+                            sortBy: AlbumListSort.RECENTLY_ADDED,
+                            sortOrder: SortOrder.DESC,
+                        },
+                        grid: { itemsPerRow: 5, scrollOffset: 0 },
+                        table: {
+                            autoFit: true,
+                            columns: [
+                                {
+                                    column: TableColumn.ROW_INDEX,
+                                    width: 50,
+                                },
+                                {
+                                    column: TableColumn.TITLE_COMBINED,
+                                    width: 500,
+                                },
+                                {
+                                    column: TableColumn.DURATION,
+                                    width: 100,
+                                },
+                                {
+                                    column: TableColumn.ALBUM_ARTIST,
+                                    width: 300,
+                                },
+                                {
+                                    column: TableColumn.YEAR,
+                                    width: 100,
+                                },
+                            ],
+                            pagination: {
+                                currentPage: 1,
+                                itemsPerPage: 100,
+                                totalItems: 1,
+                                totalPages: 1,
+                            },
+                            rowHeight: 60,
+                            scrollOffset: 0,
+                        },
+                    },
                     albumArtistSong: {
                         display: ListDisplayType.TABLE,
                         filter: {
@@ -552,69 +594,6 @@ export const useListFilterByKey = <TFilter>(args: { filter?: Partial<TFilter>; k
         shallow,
     );
 };
-
-export const useAlbumListStore = (args?: { id?: string; key?: string }) =>
-    useListStore((state) => {
-        const detail = args?.key ? state.detail[args.key] : undefined;
-
-        return {
-            ...state.item.album,
-            filter: {
-                ...state.item.album.filter,
-                ...detail?.filter,
-            },
-            grid: {
-                ...state.item.album.grid,
-                ...detail?.grid,
-            },
-            table: {
-                ...state.item.album.table,
-                ...detail?.table,
-            },
-        };
-    }, shallow);
-
-export const useSongListStore = (args?: { id?: string; key?: string }) =>
-    useListStore((state) => {
-        const detail = args?.key ? state.detail[args.key] : undefined;
-
-        return {
-            ...state.item.song,
-            filter: {
-                ...state.item.song.filter,
-                ...detail?.filter,
-            },
-            grid: {
-                ...state.item.song.grid,
-                ...detail?.grid,
-            },
-            table: {
-                ...state.item.song.table,
-                ...detail?.table,
-            },
-        };
-    }, shallow);
-
-export const usePlaylistListStore = (args?: { key?: string }) =>
-    useListStore((state) => {
-        const detail = args?.key ? state.detail[args.key] : undefined;
-
-        return {
-            ...state.item.playlist,
-            filter: {
-                ...state.item.playlist.filter,
-                ...detail?.filter,
-            },
-            grid: {
-                ...state.item.playlist.grid,
-                ...detail?.grid,
-            },
-            table: {
-                ...state.item.playlist.table,
-                ...detail?.table,
-            },
-        };
-    }, shallow);
 
 export const useAlbumListFilter = (args: { id?: string; key?: string }) =>
     useListStore((state) => {

@@ -1,28 +1,28 @@
 import { ChangeEvent, useMemo, useState } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import { NumberInput, Switch, Text, Select, SpinnerIcon } from '/@/renderer/components';
-import { AlbumListFilter, useAlbumListFilter, useListStoreActions } from '/@/renderer/store';
+import { AlbumListFilter, useListStoreActions, useListStoreByKey } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 
 interface NavidromeAlbumFiltersProps {
+    customFilters?: Partial<AlbumListFilter>;
     disableArtistFilter?: boolean;
-    handleFilterChange: (filters: AlbumListFilter) => void;
-    id?: string;
+    onFilterChange: (filters: AlbumListFilter) => void;
     pageKey: string;
     serverId?: string;
 }
 
 export const NavidromeAlbumFilters = ({
-    handleFilterChange,
+    customFilters,
+    onFilterChange,
     disableArtistFilter,
     pageKey,
-    id,
     serverId,
 }: NavidromeAlbumFiltersProps) => {
-    const filter = useAlbumListFilter({ id, key: pageKey });
+    const { filter } = useListStoreByKey({ key: pageKey });
     const { setFilter } = useListStoreActions();
 
     const genreListQuery = useGenreList({ query: null, serverId });
@@ -37,6 +37,7 @@ export const NavidromeAlbumFilters = ({
 
     const handleGenresFilter = debounce((e: string | null) => {
         const updatedFilters = setFilter({
+            customFilters,
             data: {
                 _custom: {
                     ...filter._custom,
@@ -47,9 +48,9 @@ export const NavidromeAlbumFilters = ({
                 },
             },
             itemType: LibraryItem.ALBUM,
-            key: 'album',
+            key: pageKey,
         }) as AlbumListFilter;
-        handleFilterChange(updatedFilters);
+        onFilterChange(updatedFilters);
     }, 250);
 
     const toggleFilters = [
@@ -57,6 +58,7 @@ export const NavidromeAlbumFilters = ({
             label: 'Is rated',
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
+                    customFilters,
                     data: {
                         _custom: {
                             ...filter._custom,
@@ -69,7 +71,7 @@ export const NavidromeAlbumFilters = ({
                     itemType: LibraryItem.ALBUM,
                     key: pageKey,
                 }) as AlbumListFilter;
-                handleFilterChange(updatedFilters);
+                onFilterChange(updatedFilters);
             },
             value: filter._custom?.navidrome?.has_rating,
         },
@@ -77,6 +79,7 @@ export const NavidromeAlbumFilters = ({
             label: 'Is favorited',
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
+                    customFilters,
                     data: {
                         _custom: {
                             ...filter._custom,
@@ -89,7 +92,7 @@ export const NavidromeAlbumFilters = ({
                     itemType: LibraryItem.ALBUM,
                     key: pageKey,
                 }) as AlbumListFilter;
-                handleFilterChange(updatedFilters);
+                onFilterChange(updatedFilters);
             },
             value: filter._custom?.navidrome?.starred,
         },
@@ -97,6 +100,7 @@ export const NavidromeAlbumFilters = ({
             label: 'Is compilation',
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
+                    customFilters,
                     data: {
                         _custom: {
                             ...filter._custom,
@@ -109,7 +113,7 @@ export const NavidromeAlbumFilters = ({
                     itemType: LibraryItem.ALBUM,
                     key: pageKey,
                 }) as AlbumListFilter;
-                handleFilterChange(updatedFilters);
+                onFilterChange(updatedFilters);
             },
             value: filter._custom?.navidrome?.compilation,
         },
@@ -117,6 +121,7 @@ export const NavidromeAlbumFilters = ({
             label: 'Is recently played',
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
+                    customFilters,
                     data: {
                         _custom: {
                             ...filter._custom,
@@ -129,7 +134,7 @@ export const NavidromeAlbumFilters = ({
                     itemType: LibraryItem.ALBUM,
                     key: pageKey,
                 }) as AlbumListFilter;
-                handleFilterChange(updatedFilters);
+                onFilterChange(updatedFilters);
             },
             value: filter._custom?.navidrome?.recently_played,
         },
@@ -137,6 +142,7 @@ export const NavidromeAlbumFilters = ({
 
     const handleYearFilter = debounce((e: number | string) => {
         const updatedFilters = setFilter({
+            customFilters,
             data: {
                 _custom: {
                     navidrome: {
@@ -149,7 +155,7 @@ export const NavidromeAlbumFilters = ({
             itemType: LibraryItem.ALBUM,
             key: pageKey,
         }) as AlbumListFilter;
-        handleFilterChange(updatedFilters);
+        onFilterChange(updatedFilters);
     }, 500);
 
     const [albumArtistSearchTerm, setAlbumArtistSearchTerm] = useState<string>('');
@@ -191,7 +197,7 @@ export const NavidromeAlbumFilters = ({
             itemType: LibraryItem.ALBUM,
             key: pageKey,
         }) as AlbumListFilter;
-        handleFilterChange(updatedFilters);
+        onFilterChange(updatedFilters);
     };
 
     return (

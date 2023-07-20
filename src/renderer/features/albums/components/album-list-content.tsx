@@ -2,8 +2,8 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { lazy, MutableRefObject, Suspense } from 'react';
 import { Spinner } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
-import { useAlbumListContext } from '/@/renderer/features/albums/context/album-list-context';
-import { useAlbumListStore } from '/@/renderer/store';
+import { useListContext } from '/@/renderer/context/list-context';
+import { useListStoreByKey } from '/@/renderer/store';
 import { ListDisplayType } from '/@/renderer/types';
 
 const AlbumListGridView = lazy(() =>
@@ -25,8 +25,8 @@ interface AlbumListContentProps {
 }
 
 export const AlbumListContent = ({ itemCount, gridRef, tableRef }: AlbumListContentProps) => {
-    const { id, pageKey } = useAlbumListContext();
-    const { display } = useAlbumListStore({ id, key: pageKey });
+    const { pageKey } = useListContext();
+    const { display } = useListStoreByKey({ key: pageKey });
 
     return (
         <Suspense fallback={<Spinner container />}>
