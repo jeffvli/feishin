@@ -1,8 +1,8 @@
+import { MutableRefObject, useMemo, useRef } from 'react';
 import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
-import { MutableRefObject, useMemo, useRef } from 'react';
 import { RiMoreFill } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -27,9 +27,10 @@ import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playli
 import { usePlaylistSongListInfinite } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
 import { PlayButton, PLAY_TYPES } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useSongListStore } from '/@/renderer/store';
+import { useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
+import { useListStoreByKey } from '../../../store/list.store';
 
 const ContentContainer = styled.div`
     position: relative;
@@ -54,7 +55,7 @@ interface PlaylistDetailContentProps {
 export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) => {
     const navigate = useNavigate();
     const { playlistId } = useParams() as { playlistId: string };
-    const page = useSongListStore();
+    const { table } = useListStoreByKey({ key: LibraryItem.SONG });
     const handlePlayQueueAdd = usePlayQueueAdd();
     const server = useCurrentServer();
     const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
@@ -79,10 +80,8 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
 
     const columnDefs: ColDef[] = useMemo(
         () =>
-            getColumnDefs(page.table.columns).filter(
-                (c) => c.colId !== 'album' && c.colId !== 'artist',
-            ),
-        [page.table.columns],
+            getColumnDefs(table.columns).filter((c) => c.colId !== 'album' && c.colId !== 'artist'),
+        [table.columns],
     );
 
     const contextMenuItems = useMemo(() => {

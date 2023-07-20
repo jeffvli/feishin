@@ -4,6 +4,8 @@ import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
+import { useListContext } from '../../../context/list-context';
+import { useListStoreByKey } from '../../../store/list.store';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { LibraryItem, PlaylistListQuery, PlaylistListSort, SortOrder } from '/@/renderer/api/types';
@@ -12,12 +14,7 @@ import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { PLAYLIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { OrderToggleButton } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
-import {
-    PlaylistListFilter,
-    useCurrentServer,
-    useListStoreActions,
-    usePlaylistListStore,
-} from '/@/renderer/store';
+import { PlaylistListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { ListDisplayType, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
@@ -45,12 +42,12 @@ export const PlaylistListHeaderFilters = ({
     gridRef,
     tableRef,
 }: PlaylistListHeaderFiltersProps) => {
-    const pageKey = 'playlist';
+    const { pageKey } = useListContext();
     const queryClient = useQueryClient();
     const server = useCurrentServer();
     const { setFilter, setTable, setTablePagination, setGrid, setDisplayType } =
         useListStoreActions();
-    const { display, filter, table, grid } = usePlaylistListStore({ key: pageKey });
+    const { display, filter, table, grid } = useListStoreByKey({ key: pageKey });
     const cq = useContainerQuery();
 
     const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
@@ -146,7 +143,17 @@ export const PlaylistListHeaderFilters = ({
                 setTablePagination({ data: { currentPage: 0 }, key: pageKey });
             }
         },
-        [isGrid, gridRef, fetch, filter, tableRef, setTablePagination, server, queryClient],
+        [
+            isGrid,
+            gridRef,
+            fetch,
+            filter,
+            tableRef,
+            setTablePagination,
+            pageKey,
+            server,
+            queryClient,
+        ],
     );
 
     const handleSetSortBy = useCallback(
@@ -168,7 +175,7 @@ export const PlaylistListHeaderFilters = ({
 
             handleFilterChange(updatedFilters);
         },
-        [handleFilterChange, server?.type, setFilter],
+        [handleFilterChange, pageKey, server?.type, setFilter],
     );
 
     const handleToggleSortOrder = useCallback(() => {
@@ -179,14 +186,14 @@ export const PlaylistListHeaderFilters = ({
             key: pageKey,
         }) as PlaylistListFilter;
         handleFilterChange(updatedFilters);
-    }, [filter.sortOrder, handleFilterChange, setFilter]);
+    }, [filter.sortOrder, handleFilterChange, pageKey, setFilter]);
 
     const handleSetViewType = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
             if (!e.currentTarget?.value) return;
             setDisplayType({ data: e.currentTarget.value as ListDisplayType, key: pageKey });
         },
-        [setDisplayType],
+        [pageKey, setDisplayType],
     );
 
     const handleTableColumns = (values: TableColumn[]) => {

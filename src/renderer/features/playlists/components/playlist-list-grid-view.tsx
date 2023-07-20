@@ -2,7 +2,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { ListOnScrollProps } from 'react-window';
-import { usePlaylistGridStore, usePlaylistStoreActions } from '../../../store/playlist.store';
+import { useListContext } from '../../../context/list-context';
+import { useListStoreActions } from '../../../store/list.store';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { LibraryItem, Playlist, PlaylistListQuery, PlaylistListSort } from '/@/renderer/api/types';
@@ -15,7 +16,7 @@ import {
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useGeneralSettings, usePlaylistListStore } from '/@/renderer/store';
+import { useCurrentServer, useGeneralSettings, useListStoreByKey } from '/@/renderer/store';
 import { CardRow, ListDisplayType } from '/@/renderer/types';
 
 interface PlaylistListGridViewProps {
@@ -24,13 +25,12 @@ interface PlaylistListGridViewProps {
 }
 
 export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridViewProps) => {
+    const { pageKey } = useListContext();
     const queryClient = useQueryClient();
     const server = useCurrentServer();
     const handlePlayQueueAdd = usePlayQueueAdd();
-    const { display } = usePlaylistListStore();
-    const grid = usePlaylistGridStore();
-    const { setGrid } = usePlaylistStoreActions();
-    const page = usePlaylistListStore();
+    const { display, grid, filter } = useListStoreByKey({ key: pageKey });
+    const { setGrid } = useListStoreActions();
     const { defaultFullPlaylist } = useGeneralSettings();
 
     const createFavoriteMutation = useCreateFavorite({});
@@ -66,7 +66,7 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
             ? [PLAYLIST_CARD_ROWS.nameFull]
             : [PLAYLIST_CARD_ROWS.name];
 
-        switch (page.filter.sortBy) {
+        switch (filter.sortBy) {
             case PlaylistListSort.DURATION:
                 rows.push(PLAYLIST_CARD_ROWS.duration);
                 break;
@@ -87,13 +87,13 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
         }
 
         return rows;
-    }, [defaultFullPlaylist, page.filter.sortBy]);
+    }, [defaultFullPlaylist, filter.sortBy]);
 
     const handleGridScroll = useCallback(
         (e: ListOnScrollProps) => {
-            setGrid({ data: { scrollOffset: e.scrollOffset } });
+            setGrid({ data: { scrollOffset: e.scrollOffset }, key: pageKey });
         },
-        [setGrid],
+        [pageKey, setGrid],
     );
 
     const fetch = useCallback(
@@ -105,7 +105,7 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
             const query: PlaylistListQuery = {
                 limit: take,
                 startIndex: skip,
-                ...page.filter,
+                ...filter,
                 _custom: {},
             };
 
@@ -123,7 +123,7 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
 
             return playlists;
         },
-        [page.filter, queryClient, server],
+        [filter, queryClient, server],
     );
 
     return (

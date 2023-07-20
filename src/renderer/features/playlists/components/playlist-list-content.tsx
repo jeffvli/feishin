@@ -1,9 +1,10 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { lazy, MutableRefObject, Suspense } from 'react';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Spinner } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
-import { usePlaylistListStore } from '/@/renderer/store';
 import { ListDisplayType } from '/@/renderer/types';
+import { useListContext } from '../../../context/list-context';
+import { useListStoreByKey } from '../../../store/list.store';
 
 const PlaylistListTableView = lazy(() =>
     import('/@/renderer/features/playlists/components/playlist-list-table-view').then((module) => ({
@@ -24,7 +25,8 @@ interface PlaylistListContentProps {
 }
 
 export const PlaylistListContent = ({ gridRef, tableRef, itemCount }: PlaylistListContentProps) => {
-    const { display } = usePlaylistListStore();
+    const { pageKey } = useListContext();
+    const { display } = useListStoreByKey({ key: pageKey });
 
     return (
         <Suspense fallback={<Spinner container />}>

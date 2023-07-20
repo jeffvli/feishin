@@ -8,18 +8,14 @@ import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/cr
 import { PlaylistListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-list-header-filters';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
-import {
-    PlaylistListFilter,
-    useCurrentServer,
-    useListStoreActions,
-    usePlaylistListFilter,
-    usePlaylistListStore,
-} from '/@/renderer/store';
+import { PlaylistListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { ListDisplayType, ServerType } from '/@/renderer/types';
 import debounce from 'lodash/debounce';
 import { RiFileAddFill } from 'react-icons/ri';
 import { LibraryItem } from '/@/renderer/api/types';
 import { useListFilterRefresh } from '../../../hooks/use-list-filter-refresh';
+import { useListContext } from '/@/renderer/context/list-context';
+import { useListStoreByKey } from '../../../store/list.store';
 
 interface PlaylistListHeaderProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -28,12 +24,11 @@ interface PlaylistListHeaderProps {
 }
 
 export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistListHeaderProps) => {
-    const pageKey = 'playlist';
+    const { pageKey } = useListContext();
     const cq = useContainerQuery();
     const server = useCurrentServer();
     const { setFilter, setTablePagination } = useListStoreActions();
-    const filter = usePlaylistListFilter({ key: pageKey });
-    const { display } = usePlaylistListStore({ key: pageKey });
+    const { display, filter } = useListStoreByKey({ key: pageKey });
 
     const handleCreatePlaylistModal = () => {
         openModal({

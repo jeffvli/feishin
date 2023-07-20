@@ -624,13 +624,4 @@ export const useAlbumArtistListFilter = (args: { id?: string; key?: string }) =>
         }) as AlbumArtistListFilter;
     }, shallow);
 
-export const usePlaylistListFilter = (args: { id?: string; key?: string }) =>
-    useListStore((state) => {
-        return state._actions.getFilter({
-            id: args.id,
-            itemType: LibraryItem.PLAYLIST,
-            key: args.key,
-        }) as PlaylistListFilter;
-    }, shallow);
-
 export const useListDetail = (key: string) => useListStore((state) => state.detail[key], shallow);
