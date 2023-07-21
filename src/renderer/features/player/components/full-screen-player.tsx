@@ -55,7 +55,7 @@ const BackgroundImageOverlay = styled.div`
     z-index: -1;
     width: 100%;
     height: 100%;
-    background: linear-gradient(180deg, rgba(20, 21, 23, 40%), var(--main-bg));
+    background: var(--bg-header-overlay);
 `;
 
 const Controls = () => {

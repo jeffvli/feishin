@@ -34,6 +34,7 @@ import {
 import { SwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import { FullWidthDiscCell } from '/@/renderer/components/virtual-table/cells/full-width-disc-cell';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
+import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 
 const isFullWidthRow = (node: RowNode) => {
     return node.id?.startsWith('disc-');
@@ -41,6 +42,10 @@ const isFullWidthRow = (node: RowNode) => {
 
 const ContentContainer = styled.div`
     position: relative;
+    z-index: 0;
+`;
+
+const DetailContainer = styled.div`
     display: flex;
     flex-direction: column;
     padding: 1rem 2rem 5rem;
@@ -49,17 +54,14 @@ const ContentContainer = styled.div`
     .ag-theme-alpine-dark {
         --ag-header-background-color: rgba(0, 0, 0, 0%) !important;
     }
-
-    .ag-header {
-        margin-bottom: 0.5rem;
-    }
 `;
 
 interface AlbumDetailContentProps {
+    background?: string;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
+export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentProps) => {
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();
     const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
@@ -271,157 +273,165 @@ export const AlbumDetailContent = ({ tableRef }: AlbumDetailContentProps) => {
 
     return (
         <ContentContainer>
-            <Box component="section">
-                <Group
-                    ref={showGenres ? null : intersectRef}
-                    className="test"
-                    py="1rem"
-                    spacing="md"
-                >
-                    <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-                    <Group spacing="xs">
-                        <Button
-                            compact
-                            loading={
-                                createFavoriteMutation.isLoading || deleteFavoriteMutation.isLoading
-                            }
-                            variant="subtle"
-                            onClick={handleFavorite}
-                        >
-                            {detailQuery?.data?.userFavorite ? (
-                                <RiHeartFill
-                                    color="red"
-                                    size={20}
-                                />
-                            ) : (
-                                <RiHeartLine size={20} />
-                            )}
-                        </Button>
-                        <Button
-                            compact
-                            variant="subtle"
-                            onClick={(e) => {
-                                if (!detailQuery?.data) return;
-                                handleGeneralContextMenu(e, [detailQuery.data!]);
-                            }}
-                        >
-                            <RiMoreFill size={20} />
-                        </Button>
-                    </Group>
-                </Group>
-            </Box>
-            {showGenres && (
-                <Box
-                    ref={showGenres ? intersectRef : null}
-                    component="section"
-                    py="1rem"
-                >
-                    <Group spacing="sm">
-                        {detailQuery?.data?.genres?.map((genre) => (
+            <LibraryBackgroundOverlay backgroundColor={background} />
+            <DetailContainer>
+                <Box component="section">
+                    <Group
+                        ref={showGenres ? null : intersectRef}
+                        py="1rem"
+                        spacing="md"
+                    >
+                        <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+                        <Group spacing="xs">
                             <Button
-                                key={`genre-${genre.id}`}
                                 compact
-                                component={Link}
-                                radius={0}
-                                size="md"
-                                to={generatePath(`${AppRoute.LIBRARY_ALBUMS}?genre=${genre.id}`, {
-                                    albumId,
-                                })}
-                                variant="outline"
+                                loading={
+                                    createFavoriteMutation.isLoading ||
+                                    deleteFavoriteMutation.isLoading
+                                }
+                                variant="subtle"
+                                onClick={handleFavorite}
                             >
-                                {genre.name}
+                                {detailQuery?.data?.userFavorite ? (
+                                    <RiHeartFill
+                                        color="red"
+                                        size={20}
+                                    />
+                                ) : (
+                                    <RiHeartLine size={20} />
+                                )}
                             </Button>
-                        ))}
+                            <Button
+                                compact
+                                variant="subtle"
+                                onClick={(e) => {
+                                    if (!detailQuery?.data) return;
+                                    handleGeneralContextMenu(e, [detailQuery.data!]);
+                                }}
+                            >
+                                <RiMoreFill size={20} />
+                            </Button>
+                        </Group>
                     </Group>
                 </Box>
-            )}
-            <Box
-                ref={tableContainerRef}
-                style={{ minHeight: '300px' }}
-            >
-                <VirtualTable
-                    ref={tableRef}
-                    autoFitColumns
-                    autoHeight
-                    suppressCellFocus
-                    suppressHorizontalScroll
-                    suppressLoadingOverlay
-                    suppressRowDrag
-                    columnDefs={columnDefs}
-                    enableCellChangeFlash={false}
-                    fullWidthCellRenderer={FullWidthDiscCell}
-                    getRowHeight={getRowHeight}
-                    getRowId={(data) => data.data.id}
-                    isFullWidthRow={(data) => {
-                        return isFullWidthRow(data.rowNode) || false;
-                    }}
-                    isRowSelectable={(data) => {
-                        if (isFullWidthRow(data.data)) return false;
-                        return true;
-                    }}
-                    rowClassRules={rowClassRules}
-                    rowData={songsRowData}
-                    rowSelection="multiple"
-                    onCellContextMenu={handleContextMenu}
-                    onRowDoubleClicked={handleRowDoubleClick}
-                />
-            </Box>
-            <Stack
-                ref={cq.ref}
-                mt="5rem"
-            >
-                <>
-                    {cq.height || cq.width ? (
-                        <>
-                            {carousels
-                                .filter((c) => !c.isHidden)
-                                .map((carousel, index) => (
-                                    <SwiperGridCarousel
-                                        key={`carousel-${carousel.uniqueId}-${index}`}
-                                        cardRows={[
-                                            {
-                                                property: 'name',
-                                                route: {
-                                                    route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                                                    slugs: [
-                                                        {
-                                                            idProperty: 'id',
-                                                            slugProperty: 'albumId',
-                                                        },
-                                                    ],
+                {showGenres && (
+                    <Box
+                        ref={showGenres ? intersectRef : null}
+                        component="section"
+                        py="1rem"
+                    >
+                        <Group spacing="sm">
+                            {detailQuery?.data?.genres?.map((genre) => (
+                                <Button
+                                    key={`genre-${genre.id}`}
+                                    compact
+                                    component={Link}
+                                    radius={0}
+                                    size="md"
+                                    to={generatePath(
+                                        `${AppRoute.LIBRARY_ALBUMS}?genre=${genre.id}`,
+                                        {
+                                            albumId,
+                                        },
+                                    )}
+                                    variant="outline"
+                                >
+                                    {genre.name}
+                                </Button>
+                            ))}
+                        </Group>
+                    </Box>
+                )}
+                <Box
+                    ref={tableContainerRef}
+                    style={{ minHeight: '300px' }}
+                >
+                    <VirtualTable
+                        ref={tableRef}
+                        autoFitColumns
+                        autoHeight
+                        suppressCellFocus
+                        suppressHorizontalScroll
+                        suppressLoadingOverlay
+                        suppressRowDrag
+                        columnDefs={columnDefs}
+                        enableCellChangeFlash={false}
+                        fullWidthCellRenderer={FullWidthDiscCell}
+                        getRowHeight={getRowHeight}
+                        getRowId={(data) => data.data.id}
+                        isFullWidthRow={(data) => {
+                            return isFullWidthRow(data.rowNode) || false;
+                        }}
+                        isRowSelectable={(data) => {
+                            if (isFullWidthRow(data.data)) return false;
+                            return true;
+                        }}
+                        rowClassRules={rowClassRules}
+                        rowData={songsRowData}
+                        rowSelection="multiple"
+                        onCellContextMenu={handleContextMenu}
+                        onRowDoubleClicked={handleRowDoubleClick}
+                    />
+                </Box>
+                <Stack
+                    ref={cq.ref}
+                    mt="5rem"
+                >
+                    <>
+                        {cq.height || cq.width ? (
+                            <>
+                                {carousels
+                                    .filter((c) => !c.isHidden)
+                                    .map((carousel, index) => (
+                                        <SwiperGridCarousel
+                                            key={`carousel-${carousel.uniqueId}-${index}`}
+                                            cardRows={[
+                                                {
+                                                    property: 'name',
+                                                    route: {
+                                                        route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                                                        slugs: [
+                                                            {
+                                                                idProperty: 'id',
+                                                                slugProperty: 'albumId',
+                                                            },
+                                                        ],
+                                                    },
                                                 },
-                                            },
-                                            {
-                                                arrayProperty: 'name',
-                                                property: 'albumArtists',
-                                                route: {
-                                                    route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
-                                                    slugs: [
-                                                        {
-                                                            idProperty: 'id',
-                                                            slugProperty: 'albumArtistId',
-                                                        },
-                                                    ],
+                                                {
+                                                    arrayProperty: 'name',
+                                                    property: 'albumArtists',
+                                                    route: {
+                                                        route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
+                                                        slugs: [
+                                                            {
+                                                                idProperty: 'id',
+                                                                slugProperty: 'albumArtistId',
+                                                            },
+                                                        ],
+                                                    },
                                                 },
-                                            },
-                                        ]}
-                                        data={carousel.data}
-                                        isLoading={carousel.loading}
-                                        itemType={LibraryItem.ALBUM}
-                                        route={{
-                                            route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                                            slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
-                                        }}
-                                        title={{
-                                            label: carousel.title,
-                                        }}
-                                        uniqueId={carousel.uniqueId}
-                                    />
-                                ))}
-                        </>
-                    ) : null}
-                </>
-            </Stack>
+                                            ]}
+                                            data={carousel.data}
+                                            isLoading={carousel.loading}
+                                            itemType={LibraryItem.ALBUM}
+                                            route={{
+                                                route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                                                slugs: [
+                                                    { idProperty: 'id', slugProperty: 'albumId' },
+                                                ],
+                                            }}
+                                            title={{
+                                                label: carousel.title,
+                                            }}
+                                            uniqueId={carousel.uniqueId}
+                                        />
+                                    ))}
+                            </>
+                        ) : null}
+                    </>
+                </Stack>
+            </DetailContainer>
         </ContentContainer>
     );
 };

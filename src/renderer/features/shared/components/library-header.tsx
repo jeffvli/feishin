@@ -1,6 +1,6 @@
+import { forwardRef, ReactNode, Ref } from 'react';
 import { Center, Group } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
-import { forwardRef, ReactNode, Ref } from 'react';
 import { RiAlbumFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { SimpleImg } from 'react-simple-img';
@@ -57,6 +57,7 @@ const BackgroundImage = styled.div<{ background: string }>`
     width: 100%;
     height: 100%;
     background: ${(props) => props.background};
+    opacity: 0.9;
 `;
 
 const BackgroundImageOverlay = styled.div`
@@ -66,8 +67,7 @@ const BackgroundImageOverlay = styled.div`
     z-index: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(180deg, rgba(25, 26, 28, 5%), var(--main-bg)),
-        var(--background-noise);
+    background: var(--bg-header-overlay);
 `;
 
 interface LibraryHeaderProps {

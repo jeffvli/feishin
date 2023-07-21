@@ -35,9 +35,14 @@ import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album
 import { useTopSongsList } from '/@/renderer/features/artists/queries/top-songs-list-query';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { SwiperGridCarousel } from '/@/renderer/components/grid-carousel';
+import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 
 const ContentContainer = styled.div`
     position: relative;
+    z-index: 0;
+`;
+
+const DetailContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 3rem;
@@ -47,13 +52,13 @@ const ContentContainer = styled.div`
     .ag-theme-alpine-dark {
         --ag-header-background-color: rgba(0, 0, 0, 0%) !important;
     }
-
-    .ag-header {
-        margin-bottom: 0.5rem;
-    }
 `;
 
-export const AlbumArtistDetailContent = () => {
+interface AlbumArtistDetailContentProps {
+    background?: string;
+}
+
+export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailContentProps) => {
     const { albumArtistId } = useParams() as { albumArtistId: string };
     const cq = useContainerQuery();
     const handlePlayQueueAdd = usePlayQueueAdd();
@@ -318,174 +323,181 @@ export const AlbumArtistDetailContent = () => {
 
     return (
         <ContentContainer ref={cq.ref}>
-            <Box component="section">
-                <Group spacing="md">
-                    <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-                    <Group spacing="xs">
-                        <Button
-                            compact
-                            loading={
-                                createFavoriteMutation.isLoading || deleteFavoriteMutation.isLoading
-                            }
-                            variant="subtle"
-                            onClick={handleFavorite}
-                        >
-                            {detailQuery?.data?.userFavorite ? (
-                                <RiHeartFill
-                                    color="red"
-                                    size={20}
-                                />
-                            ) : (
-                                <RiHeartLine size={20} />
-                            )}
-                        </Button>
-                        <Button
-                            compact
-                            variant="subtle"
-                            onClick={(e) => {
-                                if (!detailQuery?.data) return;
-                                handleGeneralContextMenu(e, [detailQuery.data!]);
-                            }}
-                        >
-                            <RiMoreFill size={20} />
-                        </Button>
-                        <Button
-                            compact
-                            uppercase
-                            component={Link}
-                            to={artistDiscographyLink}
-                            variant="subtle"
-                        >
-                            View discography
-                        </Button>
-                        <Button
-                            compact
-                            uppercase
-                            component={Link}
-                            to={artistSongsLink}
-                            variant="subtle"
-                        >
-                            View all songs
-                        </Button>
-                    </Group>
-                </Group>
-            </Box>
-            {showGenres ? (
+            <LibraryBackgroundOverlay backgroundColor={background} />
+            <DetailContainer>
                 <Box component="section">
-                    <Group spacing="sm">
-                        {detailQuery?.data?.genres?.map((genre) => (
+                    <Group spacing="md">
+                        <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+                        <Group spacing="xs">
                             <Button
-                                key={`genre-${genre.id}`}
                                 compact
-                                component={Link}
-                                radius="md"
-                                size="md"
-                                to={generatePath(
-                                    `${AppRoute.LIBRARY_ALBUM_ARTISTS}?genre=${genre.id}`,
-                                    {
-                                        albumArtistId,
-                                    },
+                                loading={
+                                    createFavoriteMutation.isLoading ||
+                                    deleteFavoriteMutation.isLoading
+                                }
+                                variant="subtle"
+                                onClick={handleFavorite}
+                            >
+                                {detailQuery?.data?.userFavorite ? (
+                                    <RiHeartFill
+                                        color="red"
+                                        size={20}
+                                    />
+                                ) : (
+                                    <RiHeartLine size={20} />
                                 )}
-                                variant="outline"
-                            >
-                                {genre.name}
                             </Button>
-                        ))}
-                    </Group>
-                </Box>
-            ) : null}
-            {showBiography ? (
-                <Box
-                    component="section"
-                    maw="1280px"
-                >
-                    <TextTitle
-                        order={2}
-                        weight={700}
-                    >
-                        About {detailQuery?.data?.name}
-                    </TextTitle>
-                    <Text
-                        $secondary
-                        component="p"
-                        dangerouslySetInnerHTML={{ __html: detailQuery?.data?.biography || '' }}
-                        sx={{ textAlign: 'justify' }}
-                    />
-                </Box>
-            ) : null}
-            {showTopSongs ? (
-                <Box component="section">
-                    <Group
-                        noWrap
-                        position="apart"
-                    >
-                        <Group
-                            noWrap
-                            align="flex-end"
-                        >
-                            <TextTitle
-                                order={2}
-                                weight={700}
+                            <Button
+                                compact
+                                variant="subtle"
+                                onClick={(e) => {
+                                    if (!detailQuery?.data) return;
+                                    handleGeneralContextMenu(e, [detailQuery.data!]);
+                                }}
                             >
-                                Top Songs
-                            </TextTitle>
+                                <RiMoreFill size={20} />
+                            </Button>
                             <Button
                                 compact
                                 uppercase
                                 component={Link}
-                                to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS, {
-                                    albumArtistId,
-                                })}
+                                to={artistDiscographyLink}
                                 variant="subtle"
                             >
-                                View all
+                                View discography
+                            </Button>
+                            <Button
+                                compact
+                                uppercase
+                                component={Link}
+                                to={artistSongsLink}
+                                variant="subtle"
+                            >
+                                View all songs
                             </Button>
                         </Group>
                     </Group>
-                    <VirtualTable
-                        autoFitColumns
-                        autoHeight
-                        deselectOnClickOutside
-                        suppressCellFocus
-                        suppressHorizontalScroll
-                        suppressLoadingOverlay
-                        suppressRowDrag
-                        columnDefs={topSongsColumnDefs}
-                        enableCellChangeFlash={false}
-                        getRowId={(data) => data.data.uniqueId}
-                        rowData={topSongs}
-                        rowHeight={60}
-                        rowSelection="multiple"
-                        onCellContextMenu={handleContextMenu}
-                        onRowDoubleClicked={handleRowDoubleClick}
-                    />
                 </Box>
-            ) : null}
-            <Box component="section">
-                <Stack spacing="xl">
-                    {carousels
-                        .filter((c) => !c.isHidden)
-                        .map((carousel) => (
-                            <SwiperGridCarousel
-                                key={`carousel-${carousel.uniqueId}`}
-                                cardRows={cardRows[carousel.itemType as keyof typeof cardRows]}
-                                data={carousel.data}
-                                isLoading={carousel.loading}
-                                itemType={carousel.itemType}
-                                route={cardRoutes[carousel.itemType as keyof typeof cardRoutes]}
-                                swiperProps={{
-                                    grid: {
-                                        rows: 2,
-                                    },
-                                }}
-                                title={{
-                                    label: carousel.title,
-                                }}
-                                uniqueId={carousel.uniqueId}
-                            />
-                        ))}
-                </Stack>
-            </Box>
+                {showGenres ? (
+                    <Box component="section">
+                        <Group spacing="sm">
+                            {detailQuery?.data?.genres?.map((genre) => (
+                                <Button
+                                    key={`genre-${genre.id}`}
+                                    compact
+                                    component={Link}
+                                    radius="md"
+                                    size="md"
+                                    to={generatePath(
+                                        `${AppRoute.LIBRARY_ALBUM_ARTISTS}?genre=${genre.id}`,
+                                        {
+                                            albumArtistId,
+                                        },
+                                    )}
+                                    variant="outline"
+                                >
+                                    {genre.name}
+                                </Button>
+                            ))}
+                        </Group>
+                    </Box>
+                ) : null}
+                {showBiography ? (
+                    <Box
+                        component="section"
+                        maw="1280px"
+                    >
+                        <TextTitle
+                            order={2}
+                            weight={700}
+                        >
+                            About {detailQuery?.data?.name}
+                        </TextTitle>
+                        <Text
+                            $secondary
+                            component="p"
+                            dangerouslySetInnerHTML={{ __html: detailQuery?.data?.biography || '' }}
+                            sx={{ textAlign: 'justify' }}
+                        />
+                    </Box>
+                ) : null}
+                {showTopSongs ? (
+                    <Box component="section">
+                        <Group
+                            noWrap
+                            position="apart"
+                        >
+                            <Group
+                                noWrap
+                                align="flex-end"
+                            >
+                                <TextTitle
+                                    order={2}
+                                    weight={700}
+                                >
+                                    Top Songs
+                                </TextTitle>
+                                <Button
+                                    compact
+                                    uppercase
+                                    component={Link}
+                                    to={generatePath(
+                                        AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS,
+                                        {
+                                            albumArtistId,
+                                        },
+                                    )}
+                                    variant="subtle"
+                                >
+                                    View all
+                                </Button>
+                            </Group>
+                        </Group>
+                        <VirtualTable
+                            autoFitColumns
+                            autoHeight
+                            deselectOnClickOutside
+                            suppressCellFocus
+                            suppressHorizontalScroll
+                            suppressLoadingOverlay
+                            suppressRowDrag
+                            columnDefs={topSongsColumnDefs}
+                            enableCellChangeFlash={false}
+                            getRowId={(data) => data.data.uniqueId}
+                            rowData={topSongs}
+                            rowHeight={60}
+                            rowSelection="multiple"
+                            onCellContextMenu={handleContextMenu}
+                            onRowDoubleClicked={handleRowDoubleClick}
+                        />
+                    </Box>
+                ) : null}
+                <Box component="section">
+                    <Stack spacing="xl">
+                        {carousels
+                            .filter((c) => !c.isHidden)
+                            .map((carousel) => (
+                                <SwiperGridCarousel
+                                    key={`carousel-${carousel.uniqueId}`}
+                                    cardRows={cardRows[carousel.itemType as keyof typeof cardRows]}
+                                    data={carousel.data}
+                                    isLoading={carousel.loading}
+                                    itemType={carousel.itemType}
+                                    route={cardRoutes[carousel.itemType as keyof typeof cardRoutes]}
+                                    swiperProps={{
+                                        grid: {
+                                            rows: 2,
+                                        },
+                                    }}
+                                    title={{
+                                        label: carousel.title,
+                                    }}
+                                    uniqueId={carousel.uniqueId}
+                                />
+                            ))}
+                    </Stack>
+                </Box>
+            </DetailContainer>
         </ContentContainer>
     );
 };

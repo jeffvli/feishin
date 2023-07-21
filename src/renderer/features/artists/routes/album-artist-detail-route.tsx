@@ -58,7 +58,7 @@ const AlbumArtistDetailRoute = () => {
                     ref={headerRef}
                     background={background}
                 />
-                <AlbumArtistDetailContent />
+                <AlbumArtistDetailContent background={background} />
             </NativeScrollArea>
         </AnimatedPage>
     );

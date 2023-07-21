@@ -35,7 +35,7 @@ export const AlbumDetailHeader = forwardRef(
             },
             {
                 id: 'duration',
-                secondary: true,
+                secondary: false,
                 value:
                     detailQuery?.data?.duration && formatDurationString(detailQuery.data.duration),
             },

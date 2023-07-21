@@ -42,10 +42,6 @@ const ContentContainer = styled.div`
     .ag-theme-alpine-dark {
         --ag-header-background-color: rgba(0, 0, 0, 0%) !important;
     }
-
-    .ag-header {
-        margin-bottom: 0.5rem;
-    }
 `;
 
 interface PlaylistDetailContentProps {

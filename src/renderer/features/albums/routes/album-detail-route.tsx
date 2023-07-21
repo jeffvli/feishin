@@ -57,7 +57,10 @@ const AlbumDetailRoute = () => {
                     ref={headerRef}
                     background={background}
                 />
-                <AlbumDetailContent tableRef={tableRef} />
+                <AlbumDetailContent
+                    background={background}
+                    tableRef={tableRef}
+                />
             </NativeScrollArea>
         </AnimatedPage>
     );
