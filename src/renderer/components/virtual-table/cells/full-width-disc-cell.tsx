@@ -8,6 +8,8 @@ import { Paper } from '/@/renderer/components/paper';
 import { getNodesByDiscNumber, setNodeSelection } from '../utils';
 
 const Container = styled(Paper)`
+    display: flex;
+    height: 100%;
     padding: 0.5rem 1rem;
     border: 1px solid transparent;
 `;
