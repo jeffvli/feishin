@@ -1,4 +1,3 @@
-import { MutableRefObject, useCallback, useMemo } from 'react';
 import type {
     BodyScrollEvent,
     ColDef,
@@ -8,23 +7,13 @@ import type {
     RowDoubleClickedEvent,
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import {
-    useCurrentServer,
-    usePlaylistDetailStore,
-    usePlaylistDetailTablePagination,
-    useSetPlaylistDetailTable,
-    useSetPlaylistDetailTablePagination,
-} from '/@/renderer/store';
-import { ListDisplayType } from '/@/renderer/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
-import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
-import {
-    PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
-    SMART_PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
-} from '/@/renderer/features/context-menu/context-menu-items';
-import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { MutableRefObject, useCallback, useMemo } from 'react';
+import { useParams } from 'react-router';
+import { api } from '/@/renderer/api';
+import { queryKeys } from '/@/renderer/api/query-keys';
 import {
     LibraryItem,
     PlaylistSongListQuery,
@@ -32,15 +21,26 @@ import {
     SongListSort,
     SortOrder,
 } from '/@/renderer/api/types';
-import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
-import { useParams } from 'react-router';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { api } from '/@/renderer/api';
-import { queryKeys } from '/@/renderer/api/query-keys';
-import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
-import { getColumnDefs, VirtualTable, TablePagination } from '/@/renderer/components/virtual-table';
+import { getColumnDefs, TablePagination, VirtualTable } from '/@/renderer/components/virtual-table';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
+import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
+import {
+    PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
+    SMART_PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
+} from '/@/renderer/features/context-menu/context-menu-items';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
+import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
+import {
+    useCurrentServer,
+    usePlaylistDetailStore,
+    usePlaylistDetailTablePagination,
+    useSetPlaylistDetailTable,
+    useSetPlaylistDetailTablePagination,
+} from '/@/renderer/store';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { ListDisplayType } from '/@/renderer/types';
 
 interface PlaylistDetailContentProps {
     tableRef: MutableRefObject<AgGridReactType | null>;
@@ -97,31 +97,29 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     const limit = params.endRow - params.startRow;
                     const startIndex = params.startRow;
 
-                    const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, {
+                    const query: PlaylistSongListQuery = {
                         id: playlistId,
                         limit,
                         startIndex,
                         ...filters,
-                    });
+                    };
+
+                    const queryKey = queryKeys.playlists.songList(
+                        server?.id || '',
+                        playlistId,
+                        query,
+                    );
 
                     if (!server) return;
 
-                    const songsRes = await queryClient.fetchQuery(
-                        queryKey,
-                        async ({ signal }) =>
-                            api.controller.getPlaylistSongList({
-                                apiClientProps: {
-                                    server,
-                                    signal,
-                                },
-                                query: {
-                                    id: playlistId,
-                                    limit,
-                                    startIndex,
-                                    ...filters,
-                                },
-                            }),
-                        { cacheTime: 1000 * 60 * 1 },
+                    const songsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
+                        api.controller.getPlaylistSongList({
+                            apiClientProps: {
+                                server,
+                                signal,
+                            },
+                            query,
+                        }),
                     );
 
                     params.successCallback(songsRes?.items || [], songsRes?.totalRecordCount || 0);

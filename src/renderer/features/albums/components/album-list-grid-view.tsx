@@ -130,7 +130,7 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
     );
 
     const fetchInitialData = useCallback(() => {
-        const query: Omit<AlbumListQuery, 'startIndex' | 'limit'> = {
+        const query: AlbumListQuery = {
             ...filter,
             ...customFilters,
         };
