@@ -20,7 +20,7 @@ import type {
 } from './types';
 
 export const splitPaginatedQuery = (key: any) => {
-    const { startIndex, limit, ...filter } = key;
+    const { startIndex, limit, ...filter } = key || {};
 
     if (startIndex !== undefined || limit !== undefined) {
         return {
