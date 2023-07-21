@@ -15,11 +15,11 @@ export const useFastAverageColor = (
             fac.getColorAsync(src, {
                 algorithm: aglorithm || 'dominant',
                 ignoredColor: [
-                    [255, 255, 255, 255, 55], // White
-                    [0, 0, 0, 255, 20], // Black
-                    [0, 0, 0, 0, 20], // Transparent
+                    [255, 255, 255, 255, 90], // White
+                    [0, 0, 0, 255, 30], // Black
+                    [0, 0, 0, 0, 40], // Transparent
                 ],
-                mode: 'speed',
+                mode: 'precision',
             })
                 .then((color) => {
                     return setColor(color.rgb);
