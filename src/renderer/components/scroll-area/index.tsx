@@ -1,8 +1,9 @@
-import { forwardRef, Ref, useEffect, useRef, useState } from 'react';
 import type { ScrollAreaProps as MantineScrollAreaProps } from '@mantine/core';
 import { ScrollArea as MantineScrollArea } from '@mantine/core';
-import { useMergedRef, useTimeout } from '@mantine/hooks';
-import { motion, useScroll } from 'framer-motion';
+import { useMergedRef } from '@mantine/hooks';
+import { useInView } from 'framer-motion';
+import { useOverlayScrollbars } from 'overlayscrollbars-react';
+import { forwardRef, Ref, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { PageHeader, PageHeaderProps } from '/@/renderer/components/page-header';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
@@ -30,25 +31,6 @@ const StyledScrollArea = styled(MantineScrollArea)`
 
 const StyledNativeScrollArea = styled.div<{ scrollBarOffset?: string; windowBarStyle?: Platform }>`
     height: 100%;
-    overflow-y: auto;
-
-    &::-webkit-scrollbar-track {
-        margin-top: ${(props) =>
-            props.windowBarStyle === Platform.WINDOWS ||
-            props.windowBarStyle === Platform.MACOS ||
-            props.windowBarStyle === Platform.LINUX
-                ? '0px'
-                : props.scrollBarOffset || '65px'};
-    }
-
-    &::-webkit-scrollbar-thumb {
-        margin-top: ${(props) =>
-            props.windowBarStyle === Platform.WINDOWS ||
-            props.windowBarStyle === Platform.MACOS ||
-            props.windowBarStyle === Platform.LINUX
-                ? '0px'
-                : props.scrollBarOffset || '65px'};
-    }
 `;
 
 export const ScrollArea = forwardRef(({ children, ...props }: ScrollAreaProps, ref: Ref<any>) => {
@@ -87,90 +69,84 @@ export const NativeScrollArea = forwardRef(
         ref: Ref<HTMLDivElement>,
     ) => {
         const { windowBarStyle } = useWindowSettings();
-        const [hideScrollbar, setHideScrollbar] = useState(false);
-        const [hideHeader, setHideHeader] = useState(true);
-        const { start, clear } = useTimeout(
-            () => setHideScrollbar(true),
-            scrollHideDelay !== undefined ? scrollHideDelay * 1000 : 0,
-        );
-
         const containerRef = useRef(null);
-        const mergedRef = useMergedRef(ref, containerRef);
+        const [isPastOffset, setIsPastOffset] = useState(false);
 
-        const { scrollYProgress } = useScroll({
-            container: containerRef,
-            offset: pageHeaderProps?.offset || ['center start', 'end start'],
-            target: pageHeaderProps?.target,
+        // useInView initializes as false, so we need to track this to properly render the header
+        const isInViewInitializedRef = useRef<boolean | null>(null);
+
+        const isInView = useInView({
+            current: pageHeaderProps?.target?.current,
         });
 
-        // Automatically hide the scrollbar after the timeout duration
         useEffect(() => {
-            start();
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, []);
+            if (!isInViewInitializedRef.current && isInView) {
+                isInViewInitializedRef.current = true;
+            }
+        }, [isInView]);
+
+        const [initialize] = useOverlayScrollbars({
+            defer: true,
+
+            events: {
+                scroll: (_instance, e) => {
+                    if (!pageHeaderProps?.offset) {
+                        return;
+                    }
+
+                    const offset = pageHeaderProps?.offset;
+                    const scrollTop = (e?.target as HTMLDivElement)?.scrollTop;
+
+                    if (scrollTop > offset && isPastOffset === false) {
+                        setIsPastOffset(true);
+                    } else if (scrollTop <= offset && isPastOffset === true) {
+                        setIsPastOffset(false);
+                    }
+                },
+            },
+            options: {
+                overflow: { x: 'hidden', y: 'scroll' },
+                scrollbars: {
+                    autoHide: 'move',
+                    autoHideDelay: 500,
+                    pointers: ['mouse', 'pen', 'touch'],
+                    theme: 'feishin',
+                    visibility: 'visible',
+                },
+            },
+        });
 
         useEffect(() => {
-            const setHeaderVisibility = (v: number) => {
-                if (v === 1) {
-                    return setHideHeader(false);
-                }
+            if (containerRef.current) {
+                initialize(containerRef.current as HTMLDivElement);
+            }
+        }, [initialize]);
 
-                if (hideHeader === false) {
-                    return setHideHeader(true);
-                }
+        // console.log('isPastOffsetRef.current', isPastOffsetRef.current);
 
-                return undefined;
-            };
+        const mergedRef = useMergedRef(ref, containerRef);
 
-            const unsubscribe = scrollYProgress.on('change', setHeaderVisibility);
-
-            return () => {
-                unsubscribe();
-            };
-        }, [hideHeader, scrollYProgress]);
+        const shouldShowHeader =
+            !noHeader && (isPastOffset || (isInViewInitializedRef.current && !isInView));
 
         return (
             <>
-                {!noHeader && (
+                {shouldShowHeader && (
                     <PageHeader
-                        isHidden={hideHeader}
+                        animated
+                        isHidden={false}
                         position="absolute"
-                        style={{ opacity: scrollYProgress as any }}
                         {...pageHeaderProps}
                     />
                 )}
                 <StyledNativeScrollArea
                     ref={mergedRef}
-                    className={hideScrollbar ? 'hide-scrollbar' : undefined}
                     scrollBarOffset={scrollBarOffset}
                     windowBarStyle={windowBarStyle}
-                    onMouseEnter={() => {
-                        setHideScrollbar(false);
-                        clear();
-                    }}
-                    onMouseLeave={() => {
-                        start();
-                    }}
                     {...props}
                 >
                     {children}
                 </StyledNativeScrollArea>
-                {debugScrollPosition && (
-                    <motion.div
-                        style={{
-                            background: 'red',
-                            height: '10px',
-                            left: 0,
-                            position: 'fixed',
-                            right: 0,
-                            scaleX: scrollYProgress,
-                            top: 0,
-                            transformOrigin: '0%',
-                            width: '100%',
-                            zIndex: 5000,
-                        }}
-                    />
-                )}
             </>
         );
     },

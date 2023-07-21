@@ -1,6 +1,6 @@
-import { useRef } from 'react';
 import { Flex, FlexProps } from '@mantine/core';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { useRef } from 'react';
 import styled from 'styled-components';
 import { useShouldPadTitlebar, useTheme } from '/@/renderer/hooks';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
@@ -64,6 +64,7 @@ const BackgroundImageOverlay = styled.div<{ theme: 'light' | 'dark' }>`
 
 export interface PageHeaderProps
     extends Omit<FlexProps, 'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'> {
+    animated?: boolean;
     backgroundColor?: string;
     children?: React.ReactNode;
     height?: string;
@@ -79,12 +80,19 @@ const TitleWrapper = styled(motion.div)`
 `;
 
 const variants: Variants = {
-    animate: { opacity: 1 },
+    animate: {
+        opacity: 1,
+        transition: {
+            duration: 0.3,
+            ease: 'easeIn',
+        },
+    },
     exit: { opacity: 0 },
     initial: { opacity: 0 },
 };
 
 export const PageHeader = ({
+    animated,
     position,
     height,
     backgroundColor,
@@ -109,17 +117,15 @@ export const PageHeader = ({
                 $isHidden={isHidden}
                 $padRight={padRight}
             >
-                <AnimatePresence initial={false}>
-                    {!isHidden && (
-                        <TitleWrapper
-                            animate="animate"
-                            exit="exit"
-                            initial="initial"
-                            variants={variants}
-                        >
-                            {children}
-                        </TitleWrapper>
-                    )}
+                <AnimatePresence initial={animated ?? false}>
+                    <TitleWrapper
+                        animate="animate"
+                        exit="exit"
+                        initial="initial"
+                        variants={variants}
+                    >
+                        {children}
+                    </TitleWrapper>
                 </AnimatePresence>
             </Header>
             {backgroundColor && (

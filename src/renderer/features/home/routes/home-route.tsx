@@ -139,7 +139,7 @@ const HomeRoute = () => {
                             <LibraryHeaderBar.Title>Home</LibraryHeaderBar.Title>
                         </LibraryHeaderBar>
                     ),
-                    offset: ['0px', '200px'],
+                    offset: 200,
                 }}
             >
                 <Stack

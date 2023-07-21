@@ -50,10 +50,6 @@ const DetailContainer = styled.div`
     flex-direction: column;
     padding: 1rem 2rem 5rem;
     overflow: hidden;
-
-    .ag-theme-alpine-dark {
-        --ag-header-background-color: rgba(0, 0, 0, 0%) !important;
-    }
 `;
 
 interface AlbumDetailContentProps {
