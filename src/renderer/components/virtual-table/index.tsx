@@ -446,9 +446,8 @@ export const VirtualTable = forwardRef(
                 if (!e?.api) return;
                 onGridReady?.(e);
                 if (autoHeight) e.api.setDomLayout('autoHeight');
-                if (autoFitColumns) e.api?.sizeColumnsToFit?.();
             },
-            [autoHeight, autoFitColumns, onGridReady],
+            [autoHeight, onGridReady],
         );
 
         const handleGridSizeChanged = useCallback(
