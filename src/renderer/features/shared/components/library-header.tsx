@@ -19,7 +19,7 @@ const HeaderContainer = styled.div<{ imageSize: number }>`
     gap: 0.5rem;
     width: 100%;
     max-width: 100%;
-    height: 35vh;
+    height: 30vh;
     min-height: 340px;
     max-height: 500px;
     padding: 5rem 2rem 2rem;
