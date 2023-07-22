@@ -254,8 +254,6 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
 
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
 
-    const { intersectRef, tableContainerRef } = useFixedTableHeader();
-
     const handleGeneralContextMenu = useHandleGeneralContextMenu(
         LibraryItem.ALBUM,
         ALBUM_CONTEXT_MENU_ITEMS,
@@ -269,7 +267,6 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
             <DetailContainer>
                 <Box component="section">
                     <Group
-                        ref={showGenres ? null : intersectRef}
                         py="1rem"
                         spacing="md"
                     >
@@ -308,7 +305,6 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 </Box>
                 {showGenres && (
                     <Box
-                        ref={showGenres ? intersectRef : null}
                         component="section"
                         py="1rem"
                     >
@@ -334,14 +330,12 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         </Group>
                     </Box>
                 )}
-                <Box
-                    ref={tableContainerRef}
-                    style={{ minHeight: '300px' }}
-                >
+                <Box style={{ minHeight: '300px' }}>
                     <VirtualTable
                         ref={tableRef}
                         autoFitColumns
                         autoHeight
+                        stickyHeader
                         suppressCellFocus
                         suppressHorizontalScroll
                         suppressLoadingOverlay

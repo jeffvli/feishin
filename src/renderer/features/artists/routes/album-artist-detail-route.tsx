@@ -51,6 +51,7 @@ const AlbumArtistDetailRoute = () => {
                             </LibraryHeaderBar.Title>
                         </LibraryHeaderBar>
                     ),
+                    offset: 200,
                     target: headerRef,
                 }}
             >
