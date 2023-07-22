@@ -130,7 +130,13 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
     const handleGridScroll = useCallback(
         (e: ListOnScrollProps) => {
             if (id) {
-                setSearchParams({ scrollOffset: String(e.scrollOffset) });
+                setSearchParams(
+                    (params) => {
+                        params.set('scrollOffset', String(e.scrollOffset));
+                        return params;
+                    },
+                    { replace: true },
+                );
             } else {
                 setGrid({ data: { scrollOffset: e.scrollOffset }, key: pageKey });
             }

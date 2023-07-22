@@ -176,11 +176,12 @@ export const useVirtualTable = <TFilter>({
             const { data } = args;
 
             setSearchParams(
-                {
-                    ...(data.currentPage && { currentPage: String(data.currentPage) }),
-                    ...(data.itemsPerPage && { itemsPerPage: String(data.itemsPerPage) }),
-                    ...(data.totalItems && { totalItems: String(data.totalItems) }),
-                    ...(data.totalPages && { totalPages: String(data.totalPages) }),
+                (params) => {
+                    if (data.currentPage) params.set('currentPage', String(data.currentPage));
+                    if (data.itemsPerPage) params.set('itemsPerPage', String(data.itemsPerPage));
+                    if (data.totalItems) params.set('totalItems', String(data.totalItems));
+                    if (data.totalPages) params.set('totalPages', String(data.totalPages));
+                    return params;
                 },
                 { replace: true },
             );
@@ -204,10 +205,12 @@ export const useVirtualTable = <TFilter>({
 
             if (isSearchParams) {
                 setSearchParams(
-                    {
-                        itemsPerPage: String(event.api.paginationGetPageSize()),
-                        totalItems: String(event.api.paginationGetRowCount()),
-                        totalPages: String(event.api.paginationGetTotalPages() + 1),
+                    (params) => {
+                        params.set('currentPage', String(event.api?.paginationGetCurrentPage()));
+                        params.set('itemsPerPage', String(event.api?.paginationGetPageSize()));
+                        params.set('totalItems', String(event.api?.paginationGetRowCount()));
+                        params.set('totalPages', String(event.api?.paginationGetTotalPages() + 1));
+                        return params;
                     },
                     { replace: true },
                 );
