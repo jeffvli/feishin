@@ -1,4 +1,4 @@
-import { NativeScrollArea } from '/@/renderer/components';
+import { NativeScrollArea, Spinner } from '/@/renderer/components';
 import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useRef } from 'react';
 import { useParams } from 'react-router';
@@ -23,7 +23,11 @@ const AlbumArtistDetailRoute = () => {
         query: { id: albumArtistId },
         serverId: server?.id,
     });
-    const background = useFastAverageColor(detailQuery.data?.imageUrl, !detailQuery.isLoading);
+    const { color, colorId } = useFastAverageColor({
+        id: albumArtistId,
+        src: detailQuery.data?.imageUrl,
+        srcLoaded: !detailQuery.isLoading,
+    });
 
     const handlePlay = () => {
         handlePlayQueueAdd?.({
@@ -35,14 +39,16 @@ const AlbumArtistDetailRoute = () => {
         });
     };
 
-    if (detailQuery.isLoading || !background) return null;
+    if (detailQuery.isLoading || !color || colorId !== albumArtistId) {
+        return <Spinner container />;
+    }
 
     return (
         <AnimatedPage key={`album-artist-detail-${albumArtistId}`}>
             <NativeScrollArea
                 ref={scrollAreaRef}
                 pageHeaderProps={{
-                    backgroundColor: background,
+                    backgroundColor: color,
                     children: (
                         <LibraryHeaderBar>
                             <LibraryHeaderBar.PlayButton onClick={handlePlay} />
@@ -57,9 +63,9 @@ const AlbumArtistDetailRoute = () => {
             >
                 <AlbumArtistDetailHeader
                     ref={headerRef}
-                    background={background}
+                    background={color}
                 />
-                <AlbumArtistDetailContent background={background} />
+                <AlbumArtistDetailContent background={color} />
             </NativeScrollArea>
         </AnimatedPage>
     );

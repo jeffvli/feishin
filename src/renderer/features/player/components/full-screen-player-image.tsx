@@ -122,7 +122,11 @@ export const FullScreenPlayerImage = () => {
     const { queue } = usePlayerData();
     const useImageAspectRatio = useFullScreenPlayerStore((state) => state.useImageAspectRatio);
     const currentSong = queue.current;
-    const background = useFastAverageColor(queue.current?.imageUrl, true, 'dominant');
+    const { color: background } = useFastAverageColor({
+        algorithm: 'dominant',
+        src: queue.current?.imageUrl,
+        srcLoaded: true,
+    });
     const imageKey = `image-${background}`;
 
     const [imageState, setImageState] = useSetState({

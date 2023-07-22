@@ -1,4 +1,4 @@
-import { NativeScrollArea } from '/@/renderer/components';
+import { NativeScrollArea, Spinner } from '/@/renderer/components';
 import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useRef } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
@@ -20,7 +20,11 @@ const AlbumDetailRoute = () => {
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();
     const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
-    const background = useFastAverageColor(detailQuery.data?.imageUrl, !detailQuery.isLoading);
+    const { color: background, colorId } = useFastAverageColor({
+        id: albumId,
+        src: detailQuery.data?.imageUrl,
+        srcLoaded: !detailQuery.isLoading,
+    });
     const handlePlayQueueAdd = usePlayQueueAdd();
     const playButtonBehavior = usePlayButtonBehavior();
 
@@ -34,7 +38,9 @@ const AlbumDetailRoute = () => {
         });
     };
 
-    if (!background) return null;
+    if (!background || colorId !== albumId) {
+        return <Spinner container />;
+    }
 
     return (
         <AnimatedPage key={`album-detail-${albumId}`}>

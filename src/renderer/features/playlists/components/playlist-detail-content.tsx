@@ -1,19 +1,16 @@
-import { MutableRefObject, useMemo, useRef } from 'react';
 import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
+import { MutableRefObject, useMemo, useRef } from 'react';
 import { RiMoreFill } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { useListStoreByKey } from '../../../store/list.store';
 import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { Button, ConfirmModal, DropdownMenu, MotionGroup, toast } from '/@/renderer/components';
-import {
-    getColumnDefs,
-    useFixedTableHeader,
-    VirtualTable,
-} from '/@/renderer/components/virtual-table';
+import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import {
@@ -30,7 +27,6 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
-import { useListStoreByKey } from '../../../store/list.store';
 
 const ContentContainer = styled.div`
     position: relative;
@@ -96,8 +92,6 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
         () => playlistSongsQueryInfinite.data?.pages.flatMap((p) => p?.items),
         [playlistSongsQueryInfinite.data?.pages],
     );
-
-    const { intersectRef, tableContainerRef } = useFixedTableHeader();
 
     const deletePlaylistMutation = useDeletePlaylist({});
 
@@ -166,7 +160,6 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     return (
         <ContentContainer>
             <Group
-                ref={intersectRef}
                 p="1rem"
                 position="apart"
             >
@@ -217,12 +210,13 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                     </Button>
                 </Group>
             </Group>
-            <Box ref={tableContainerRef}>
+            <Box>
                 <VirtualTable
                     ref={tableRef}
                     autoFitColumns
                     autoHeight
                     deselectOnClickOutside
+                    stickyHeader
                     suppressCellFocus
                     suppressHorizontalScroll
                     suppressLoadingOverlay

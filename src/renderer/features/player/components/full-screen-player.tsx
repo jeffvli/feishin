@@ -193,7 +193,11 @@ export const FullScreenPlayer = () => {
     }, [location, setStore]);
 
     const currentSong = useCurrentSong();
-    const background = useFastAverageColor(currentSong?.imageUrl, true, 'dominant');
+    const { color: background } = useFastAverageColor({
+        algorithm: 'dominant',
+        src: currentSong?.imageUrl,
+        srcLoaded: true,
+    });
 
     return (
         <Container
