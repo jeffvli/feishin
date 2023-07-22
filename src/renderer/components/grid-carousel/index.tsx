@@ -1,4 +1,4 @@
-import { isValidElement, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { isValidElement, memo, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { Group, Stack } from '@mantine/core';
 import throttle from 'lodash/throttle';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
@@ -79,7 +79,7 @@ const Title = ({ label, handleNext, handlePrev, pagination }: TitleProps) => {
     );
 };
 
-interface SwiperGridCarouselProps {
+export interface SwiperGridCarouselProps {
     cardRows: CardRow<Album>[] | CardRow<Artist>[] | CardRow<AlbumArtist>[];
     data: Album[] | AlbumArtist[] | Artist[] | RelatedArtist[] | undefined;
     isLoading?: boolean;
@@ -281,3 +281,14 @@ export const SwiperGridCarousel = ({
         </CarouselContainer>
     );
 };
+
+export const MemoizedSwiperGridCarousel = memo(
+    function Carousel(props: SwiperGridCarouselProps) {
+        return <SwiperGridCarousel {...props} />;
+    },
+    (oldProps, newProps) => {
+        const uniqueIdIsEqual = oldProps.uniqueId === newProps.uniqueId;
+        const dataIsEqual = oldProps.data === newProps.data;
+        return uniqueIdIsEqual && dataIsEqual;
+    },
+);
