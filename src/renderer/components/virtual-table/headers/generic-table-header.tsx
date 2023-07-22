@@ -14,7 +14,7 @@ type Options = {
     preset?: Presets;
 };
 
-const HeaderWrapper = styled.div<{ position: Options['position'] }>`
+export const HeaderWrapper = styled.div<{ position: Options['position'] }>`
     display: flex;
     justify-content: ${(props) =>
         props.position === 'right'
@@ -27,10 +27,12 @@ const HeaderWrapper = styled.div<{ position: Options['position'] }>`
     text-transform: uppercase;
 `;
 
-const TextHeaderWrapper = styled(_Text)<{ position: Options['position'] }>`
+const HeaderText = styled(_Text)<{ position: Options['position'] }>`
     width: 100%;
+    height: 100%;
     color: var(--ag-header-foreground-color);
     font-weight: 500;
+    line-height: inherit;
     text-align: ${(props) =>
         props.position === 'right'
             ? 'flex-end'
@@ -82,13 +84,15 @@ export const GenericTableHeader = (
     }
 
     return (
-        <TextHeaderWrapper
-            overflow="hidden"
-            position={position}
-            weight={500}
-        >
-            {children || displayName}
-        </TextHeaderWrapper>
+        <HeaderWrapper position={position}>
+            <HeaderText
+                overflow="hidden"
+                position={position}
+                weight={500}
+            >
+                {children || displayName}
+            </HeaderText>
+        </HeaderWrapper>
     );
 };
 
