@@ -1,26 +1,10 @@
-import { useMemo } from 'react';
-import { Button, Text, TextTitle } from '/@/renderer/components';
 import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { Box, Group, Stack } from '@mantine/core';
+import { useMemo } from 'react';
 import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
-import { useCurrentServer } from '/@/renderer/store';
 import { createSearchParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { AppRoute } from '/@/renderer/router/routes';
-import { useContainerQuery } from '/@/renderer/hooks';
-import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import {
-    useHandleGeneralContextMenu,
-    useHandleTableContextMenu,
-} from '/@/renderer/features/context-menu';
-import { CardRow, Play, TableColumn } from '/@/renderer/types';
-import {
-    ARTIST_CONTEXT_MENU_ITEMS,
-    SONG_CONTEXT_MENU_ITEMS,
-} from '/@/renderer/features/context-menu/context-menu-items';
-import { PlayButton, useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
-import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import {
     Album,
     AlbumArtist,
@@ -30,12 +14,28 @@ import {
     ServerType,
     SortOrder,
 } from '/@/renderer/api/types';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { Button, Text, TextTitle } from '/@/renderer/components';
+import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
+import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
+import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
 import { useTopSongsList } from '/@/renderer/features/artists/queries/top-songs-list-query';
-import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
-import { SwiperGridCarousel } from '/@/renderer/components/grid-carousel';
+import {
+    useHandleGeneralContextMenu,
+    useHandleTableContextMenu,
+} from '/@/renderer/features/context-menu';
+import {
+    ARTIST_CONTEXT_MENU_ITEMS,
+    SONG_CONTEXT_MENU_ITEMS,
+} from '/@/renderer/features/context-menu/context-menu-items';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { PlayButton, useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
+import { useContainerQuery } from '/@/renderer/hooks';
+import { AppRoute } from '/@/renderer/router/routes';
+import { useCurrentServer } from '/@/renderer/store';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { CardRow, Play, TableColumn } from '/@/renderer/types';
 
 const ContentContainer = styled.div`
     position: relative;
@@ -195,64 +195,74 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         },
     };
 
-    const carousels = [
-        {
-            data: recentAlbumsQuery?.data?.items,
-            isHidden: !recentAlbumsQuery?.data?.items?.length,
-            itemType: LibraryItem.ALBUM,
-            loading: recentAlbumsQuery?.isLoading || recentAlbumsQuery.isFetching,
-            title: (
-                <Group align="flex-end">
+    const carousels = useMemo(() => {
+        return [
+            {
+                data: recentAlbumsQuery?.data?.items,
+                isHidden: !recentAlbumsQuery?.data?.items?.length,
+                itemType: LibraryItem.ALBUM,
+                loading: recentAlbumsQuery?.isLoading || recentAlbumsQuery.isFetching,
+                title: (
+                    <Group align="flex-end">
+                        <TextTitle
+                            order={2}
+                            weight={700}
+                        >
+                            Recent releases
+                        </TextTitle>
+                        <Button
+                            compact
+                            uppercase
+                            component={Link}
+                            to={artistDiscographyLink}
+                            variant="subtle"
+                        >
+                            View discography
+                        </Button>
+                    </Group>
+                ),
+                uniqueId: 'recentReleases',
+            },
+            {
+                data: compilationAlbumsQuery?.data?.items,
+                isHidden: !compilationAlbumsQuery?.data?.items?.length,
+                itemType: LibraryItem.ALBUM,
+                loading: compilationAlbumsQuery?.isLoading || compilationAlbumsQuery.isFetching,
+                title: (
                     <TextTitle
                         order={2}
                         weight={700}
                     >
-                        Recent releases
+                        Appears on
                     </TextTitle>
-                    <Button
-                        compact
-                        uppercase
-                        component={Link}
-                        to={artistDiscographyLink}
-                        variant="subtle"
+                ),
+                uniqueId: 'compilationAlbums',
+            },
+            {
+                data: detailQuery?.data?.similarArtists || [],
+                isHidden: !detailQuery?.data?.similarArtists,
+                itemType: LibraryItem.ALBUM_ARTIST,
+                title: (
+                    <TextTitle
+                        order={2}
+                        weight={700}
                     >
-                        View discography
-                    </Button>
-                </Group>
-            ),
-            uniqueId: 'recentReleases',
-        },
-        {
-            data: compilationAlbumsQuery?.data?.items,
-            isHidden: !compilationAlbumsQuery?.data?.items?.length,
-            itemType: LibraryItem.ALBUM,
-            loading: compilationAlbumsQuery?.isLoading || compilationAlbumsQuery.isFetching,
-            title: (
-                <TextTitle
-                    order={2}
-                    weight={700}
-                >
-                    Appears on
-                </TextTitle>
-            ),
-            uniqueId: 'compilationAlbums',
-        },
-        {
-            data: detailQuery?.data?.similarArtists || [],
-            isHidden: !detailQuery?.data?.similarArtists,
-            itemType: LibraryItem.ALBUM_ARTIST,
-            loading: detailQuery?.isLoading || detailQuery.isFetching,
-            title: (
-                <TextTitle
-                    order={2}
-                    weight={700}
-                >
-                    Related artists
-                </TextTitle>
-            ),
-            uniqueId: 'similarArtists',
-        },
-    ];
+                        Related artists
+                    </TextTitle>
+                ),
+                uniqueId: 'similarArtists',
+            },
+        ];
+    }, [
+        artistDiscographyLink,
+        compilationAlbumsQuery?.data?.items,
+        compilationAlbumsQuery.isFetching,
+        compilationAlbumsQuery?.isLoading,
+        detailQuery?.data?.similarArtists,
+        recentAlbumsQuery?.data?.items,
+        recentAlbumsQuery.isFetching,
+        recentAlbumsQuery?.isLoading,
+    ]);
 
     const playButtonBehavior = usePlayButtonBehavior();
 
@@ -457,6 +467,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             autoFitColumns
                             autoHeight
                             deselectOnClickOutside
+                            stickyHeader
                             suppressCellFocus
                             suppressHorizontalScroll
                             suppressLoadingOverlay
@@ -477,7 +488,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         {carousels
                             .filter((c) => !c.isHidden)
                             .map((carousel) => (
-                                <SwiperGridCarousel
+                                <MemoizedSwiperGridCarousel
                                     key={`carousel-${carousel.uniqueId}`}
                                     cardRows={cardRows[carousel.itemType as keyof typeof cardRows]}
                                     data={carousel.data}

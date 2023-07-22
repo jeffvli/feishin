@@ -7,7 +7,7 @@ import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-pl
 import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useWindowSettings } from '/@/renderer/store';
-import { SwiperGridCarousel } from '/@/renderer/components/grid-carousel';
+import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import { Platform } from '/@/renderer/types';
 
 const HomeRoute = () => {
@@ -161,7 +161,7 @@ const HomeRoute = () => {
                             return carousel;
                         })
                         .map((carousel) => (
-                            <SwiperGridCarousel
+                            <MemoizedSwiperGridCarousel
                                 key={`carousel-${carousel.uniqueId}`}
                                 cardRows={[
                                     {
