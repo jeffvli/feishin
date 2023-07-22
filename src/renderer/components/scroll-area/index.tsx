@@ -49,7 +49,7 @@ interface NativeScrollAreaProps {
     children: React.ReactNode;
     debugScrollPosition?: boolean;
     noHeader?: boolean;
-    pageHeaderProps?: PageHeaderProps & { offset?: any; target?: any };
+    pageHeaderProps?: PageHeaderProps & { offset: number; target?: any };
     scrollBarOffset?: string;
     scrollHideDelay?: number;
     style?: React.CSSProperties;
@@ -72,36 +72,34 @@ export const NativeScrollArea = forwardRef(
         const containerRef = useRef(null);
         const [isPastOffset, setIsPastOffset] = useState(false);
 
-        // useInView initializes as false, so we need to track this to properly render the header
-        const isInViewInitializedRef = useRef<boolean | null>(null);
-
         const isInView = useInView({
             current: pageHeaderProps?.target?.current,
         });
 
-        useEffect(() => {
-            if (!isInViewInitializedRef.current && isInView) {
-                isInViewInitializedRef.current = true;
-            }
-        }, [isInView]);
-
         const [initialize] = useOverlayScrollbars({
-            defer: true,
-
+            defer: false,
             events: {
                 scroll: (_instance, e) => {
-                    if (!pageHeaderProps?.offset) {
-                        return;
+                    if (noHeader) {
+                        return setIsPastOffset(true);
+                    }
+
+                    if (pageHeaderProps?.target || !pageHeaderProps?.offset) {
+                        return setIsPastOffset(true);
                     }
 
                     const offset = pageHeaderProps?.offset;
                     const scrollTop = (e?.target as HTMLDivElement)?.scrollTop;
 
                     if (scrollTop > offset && isPastOffset === false) {
-                        setIsPastOffset(true);
-                    } else if (scrollTop <= offset && isPastOffset === true) {
-                        setIsPastOffset(false);
+                        return setIsPastOffset(true);
                     }
+
+                    if (scrollTop <= offset && isPastOffset === true) {
+                        return setIsPastOffset(false);
+                    }
+
+                    return null;
                 },
             },
             options: {
@@ -122,12 +120,9 @@ export const NativeScrollArea = forwardRef(
             }
         }, [initialize]);
 
-        // console.log('isPastOffsetRef.current', isPastOffsetRef.current);
-
         const mergedRef = useMergedRef(ref, containerRef);
 
-        const shouldShowHeader =
-            !noHeader && (isPastOffset || (isInViewInitializedRef.current && !isInView));
+        const shouldShowHeader = !noHeader && isPastOffset && !isInView;
 
         return (
             <>
