@@ -35,6 +35,7 @@ import { RatingCell } from '/@/renderer/components/virtual-table/cells/rating-ce
 import { TablePagination } from '/@/renderer/components/virtual-table/table-pagination';
 import { ActionsCell } from '/@/renderer/components/virtual-table/cells/actions-cell';
 import { TitleCell } from '/@/renderer/components/virtual-table/cells/title-cell';
+import { useFixedTableHeader } from '/@/renderer/components/virtual-table/hooks/use-fixed-table-header';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -43,10 +44,16 @@ export * from './hooks/use-click-outside-deselect';
 export * from './utils';
 
 const TableWrapper = styled.div`
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 100%;
+`;
+
+const DummyHeader = styled.div<{ height?: number }>`
+    position: absolute;
+    height: ${({ height }) => height || 36}px};
 `;
 
 dayjs.extend(relativeTime);
@@ -371,6 +378,7 @@ export interface VirtualTableProps extends AgGridReactProps {
         pagination: TablePaginationType;
         setPagination: any;
     };
+    stickyHeader?: boolean;
     transparentHeader?: boolean;
 }
 
@@ -380,6 +388,7 @@ export const VirtualTable = forwardRef(
             autoFitColumns,
             deselectOnClickOutside,
             autoHeight,
+            stickyHeader,
             transparentHeader,
             onColumnMoved,
             onNewColumnsLoaded,
@@ -467,55 +476,60 @@ export const VirtualTable = forwardRef(
             [autoFitColumns],
         );
 
+        const { tableHeaderRef, tableContainerRef } = useFixedTableHeader({
+            enabled: stickyHeader || false,
+        });
+
+        const mergedWrapperRef = useMergedRef(deselectRef, tableContainerRef);
+
         return (
-            <>
-                <TableWrapper
-                    ref={deselectRef}
-                    className={
-                        transparentHeader
-                            ? 'ag-header-transparent ag-theme-alpine-dark'
-                            : 'ag-theme-alpine-dark'
-                    }
-                >
-                    <AgGridReact
-                        ref={mergedRef}
-                        animateRows
-                        maintainColumnOrder
-                        suppressAsyncEvents
-                        suppressContextMenu
-                        suppressCopyRowsToClipboard
-                        suppressMoveWhenRowDragging
-                        suppressPaginationPanel
-                        suppressScrollOnNewData
-                        blockLoadDebounceMillis={200}
-                        cacheBlockSize={300}
-                        cacheOverflowSize={1}
-                        defaultColDef={defaultColumnDefs}
-                        enableCellChangeFlash={false}
-                        headerHeight={36}
-                        rowBuffer={30}
-                        rowSelection="multiple"
-                        {...rest}
-                        onColumnMoved={handleColumnMoved}
-                        onGridReady={handleGridReady}
-                        onGridSizeChanged={handleGridSizeChanged}
-                        onModelUpdated={handleModelUpdated}
-                        onNewColumnsLoaded={handleNewColumnsLoaded}
-                    />
-                    {paginationProps && (
-                        <AnimatePresence
-                            presenceAffectsLayout
-                            initial={false}
-                            mode="wait"
-                        >
-                            <TablePagination
-                                {...paginationProps}
-                                tableRef={tableRef}
-                            />
-                        </AnimatePresence>
-                    )}
-                </TableWrapper>
-            </>
+            <TableWrapper
+                ref={mergedWrapperRef}
+                className={
+                    transparentHeader
+                        ? 'ag-theme-alpine-dark ag-header-transparent'
+                        : 'ag-theme-alpine-dark'
+                }
+            >
+                <DummyHeader ref={tableHeaderRef} />
+                <AgGridReact
+                    ref={mergedRef}
+                    animateRows
+                    maintainColumnOrder
+                    suppressAsyncEvents
+                    suppressContextMenu
+                    suppressCopyRowsToClipboard
+                    suppressMoveWhenRowDragging
+                    suppressPaginationPanel
+                    suppressScrollOnNewData
+                    blockLoadDebounceMillis={200}
+                    cacheBlockSize={300}
+                    cacheOverflowSize={1}
+                    defaultColDef={defaultColumnDefs}
+                    enableCellChangeFlash={false}
+                    headerHeight={36}
+                    rowBuffer={30}
+                    rowSelection="multiple"
+                    {...rest}
+                    onColumnMoved={handleColumnMoved}
+                    onGridReady={handleGridReady}
+                    onGridSizeChanged={handleGridSizeChanged}
+                    onModelUpdated={handleModelUpdated}
+                    onNewColumnsLoaded={handleNewColumnsLoaded}
+                />
+                {paginationProps && (
+                    <AnimatePresence
+                        presenceAffectsLayout
+                        initial={false}
+                        mode="wait"
+                    >
+                        <TablePagination
+                            {...paginationProps}
+                            tableRef={tableRef}
+                        />
+                    </AnimatePresence>
+                )}
+            </TableWrapper>
         );
     },
 );
