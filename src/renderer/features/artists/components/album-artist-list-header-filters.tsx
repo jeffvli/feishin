@@ -373,7 +373,10 @@ export const AlbumArtistListHeaderFilters = ({
                 </DropdownMenu>
             </Group>
             <Group>
-                <DropdownMenu position="bottom-end">
+                <DropdownMenu
+                    position="bottom-end"
+                    width={425}
+                >
                     <DropdownMenu.Target>
                         <Button
                             compact
@@ -406,13 +409,13 @@ export const AlbumArtistListHeaderFilters = ({
                         >
                             Table
                         </DropdownMenu.Item>
-                        <DropdownMenu.Item
+                        {/* <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE_PAGINATED}
                             value={ListDisplayType.TABLE_PAGINATED}
                             onClick={handleSetViewType}
                         >
                             Table (paginated)
-                        </DropdownMenu.Item>
+                        </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
                         <DropdownMenu.Label>Item size</DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>

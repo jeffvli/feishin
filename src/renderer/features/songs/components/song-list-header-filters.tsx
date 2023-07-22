@@ -392,7 +392,10 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                 noWrap
                 spacing="sm"
             >
-                <DropdownMenu position="bottom-end">
+                <DropdownMenu
+                    position="bottom-end"
+                    width={425}
+                >
                     <DropdownMenu.Target>
                         <Button
                             compact
@@ -411,13 +414,13 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                         >
                             Table
                         </DropdownMenu.Item>
-                        <DropdownMenu.Item
+                        {/* <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE_PAGINATED}
                             value={ListDisplayType.TABLE_PAGINATED}
                             onClick={handleSetViewType}
                         >
                             Table (paginated)
-                        </DropdownMenu.Item>
+                        </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
                         <DropdownMenu.Label>Item Size</DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>

@@ -300,7 +300,10 @@ export const PlaylistListHeaderFilters = ({
                 </DropdownMenu>
             </Group>
             <Group>
-                <DropdownMenu position="bottom-end">
+                <DropdownMenu
+                    position="bottom-end"
+                    width={425}
+                >
                     <DropdownMenu.Target>
                         <Button
                             compact
@@ -333,13 +336,13 @@ export const PlaylistListHeaderFilters = ({
                         >
                             Table
                         </DropdownMenu.Item>
-                        <DropdownMenu.Item
+                        {/* <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE_PAGINATED}
                             value={ListDisplayType.TABLE_PAGINATED}
                             onClick={handleSetViewType}
                         >
                             Table (paginated)
-                        </DropdownMenu.Item>
+                        </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
                         <DropdownMenu.Label>
                             {isGrid ? 'Items per row' : 'Item size'}
