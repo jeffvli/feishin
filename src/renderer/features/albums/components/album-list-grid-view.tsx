@@ -1,5 +1,6 @@
 import { QueryKey, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { ListOnScrollProps } from 'react-window';
 import { controller } from '/@/renderer/api/controller';
@@ -27,9 +28,13 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
     const queryClient = useQueryClient();
     const server = useCurrentServer();
     const handlePlayQueueAdd = usePlayQueueAdd();
-    const { pageKey, customFilters } = useListContext();
+    const { pageKey, customFilters, id } = useListContext();
     const { grid, display, filter } = useListStoreByKey({ key: pageKey });
     const { setGrid } = useListStoreActions();
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const scrollOffset = searchParams.get('scrollOffset');
+    const initialScrollOffset = Number(id ? scrollOffset : grid?.scrollOffset) || 0;
 
     const createFavoriteMutation = useCreateFavorite({});
     const deleteFavoriteMutation = useDeleteFavorite({});
@@ -124,9 +129,13 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
 
     const handleGridScroll = useCallback(
         (e: ListOnScrollProps) => {
-            setGrid({ data: { scrollOffset: e.scrollOffset }, key: pageKey });
+            if (id) {
+                setSearchParams({ scrollOffset: String(e.scrollOffset) });
+            } else {
+                setGrid({ data: { scrollOffset: e.scrollOffset }, key: pageKey });
+            }
         },
-        [pageKey, setGrid],
+        [id, pageKey, setGrid, setSearchParams],
     );
 
     const fetchInitialData = useCallback(() => {
@@ -207,7 +216,7 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
                         handleFavorite={handleFavorite}
                         handlePlayQueueAdd={handlePlayQueueAdd}
                         height={height}
-                        initialScrollOffset={grid?.scrollOffset || 0}
+                        initialScrollOffset={initialScrollOffset}
                         itemCount={itemCount || 0}
                         itemGap={20}
                         itemSize={grid?.itemsPerRow || 5}

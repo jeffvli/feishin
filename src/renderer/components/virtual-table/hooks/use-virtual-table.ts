@@ -20,8 +20,9 @@ import { getColumnDefs, VirtualTableProps } from '/@/renderer/components/virtual
 import { SetContextMenuItems, useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useListStoreActions } from '/@/renderer/store';
-import { ListDisplayType, ServerListItem } from '/@/renderer/types';
-import { useListStoreByKey } from '../../../store/list.store';
+import { ListDisplayType, ServerListItem, TablePagination } from '/@/renderer/types';
+import { useSearchParams } from 'react-router-dom';
+import { ListKey, useListStoreByKey } from '../../../store/list.store';
 
 export type AgGridFetchFn<TResponse, TFilter> = (
     args: { filter: TFilter; limit: number; startIndex: number },
@@ -31,6 +32,7 @@ export type AgGridFetchFn<TResponse, TFilter> = (
 interface UseAgGridProps<TFilter> {
     contextMenu: SetContextMenuItems;
     customFilters?: Partial<TFilter>;
+    isSearchParams?: boolean;
     itemCount?: number;
     itemType: LibraryItem;
     pageKey: string;
@@ -46,11 +48,26 @@ export const useVirtualTable = <TFilter>({
     contextMenu,
     itemCount,
     customFilters,
+    isSearchParams,
 }: UseAgGridProps<TFilter>) => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const { setTable, setTablePagination } = useListStoreActions();
     const properties = useListStoreByKey({ filter: customFilters, key: pageKey });
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const scrollOffset = searchParams.get('scrollOffset');
+    const pagination = useMemo(() => {
+        return {
+            currentPage: Number(searchParams.get('currentPage')),
+            itemsPerPage: Number(searchParams.get('itemsPerPage')),
+            totalItems: Number(searchParams.get('totalItems')),
+            totalPages: Number(searchParams.get('totalPages')),
+        };
+    }, [searchParams]);
+
+    const initialTableIndex =
+        Number(isSearchParams ? scrollOffset : properties.table.scrollOffset) || 0;
 
     const isPaginationEnabled = properties.display === ListDisplayType.TABLE_PAGINATED;
 
@@ -149,16 +166,26 @@ export const useVirtualTable = <TFilter>({
             };
 
             params.api.setDatasource(dataSource);
-            params.api.ensureIndexVisible(properties.table.scrollOffset || 0, 'top');
+            params.api.ensureIndexVisible(initialTableIndex, 'top');
         },
-        [
-            properties.table.scrollOffset,
-            properties.filter,
-            queryKeyFn,
-            server,
-            queryClient,
-            queryFn,
-        ],
+        [initialTableIndex, queryKeyFn, server, properties.filter, queryClient, queryFn],
+    );
+
+    const setParamsTablePagination = useCallback(
+        (args: { data: Partial<TablePagination>; key: ListKey }) => {
+            const { data } = args;
+
+            setSearchParams(
+                {
+                    ...(data.currentPage && { currentPage: String(data.currentPage) }),
+                    ...(data.itemsPerPage && { itemsPerPage: String(data.itemsPerPage) }),
+                    ...(data.totalItems && { totalItems: String(data.totalItems) }),
+                    ...(data.totalPages && { totalPages: String(data.totalPages) }),
+                },
+                { replace: true },
+            );
+        },
+        [setSearchParams],
     );
 
     const onPaginationChanged = useCallback(
@@ -175,21 +202,34 @@ export const useVirtualTable = <TFilter>({
                 console.log(err);
             }
 
-            setTablePagination({
-                data: {
-                    itemsPerPage: event.api.paginationGetPageSize(),
-                    totalItems: event.api.paginationGetRowCount(),
-                    totalPages: event.api.paginationGetTotalPages() + 1,
-                },
-                key: pageKey,
-            });
+            if (isSearchParams) {
+                setSearchParams(
+                    {
+                        itemsPerPage: String(event.api.paginationGetPageSize()),
+                        totalItems: String(event.api.paginationGetRowCount()),
+                        totalPages: String(event.api.paginationGetTotalPages() + 1),
+                    },
+                    { replace: true },
+                );
+            } else {
+                setTablePagination({
+                    data: {
+                        itemsPerPage: event.api.paginationGetPageSize(),
+                        totalItems: event.api.paginationGetRowCount(),
+                        totalPages: event.api.paginationGetTotalPages() + 1,
+                    },
+                    key: pageKey,
+                });
+            }
         },
         [
             isPaginationEnabled,
-            setTablePagination,
-            pageKey,
+            isSearchParams,
             properties.table.pagination.currentPage,
             properties.table.pagination.itemsPerPage,
+            setSearchParams,
+            setTablePagination,
+            pageKey,
         ],
     );
 
@@ -223,7 +263,12 @@ export const useVirtualTable = <TFilter>({
 
     const onBodyScrollEnd = (e: BodyScrollEvent) => {
         const scrollOffset = Number((e.top / properties.table.rowHeight).toFixed(0));
-        setTable({ data: { scrollOffset }, key: pageKey });
+
+        if (isSearchParams) {
+            setSearchParams({ scrollOffset: String(scrollOffset) }, { replace: true });
+        } else {
+            setTable({ data: { scrollOffset }, key: pageKey });
+        }
     };
 
     const onCellContextMenu = useHandleTableContextMenu(itemType, contextMenu);
@@ -245,8 +290,8 @@ export const useVirtualTable = <TFilter>({
             paginationProps: isPaginationEnabled
                 ? {
                       pageKey,
-                      pagination: properties.table.pagination,
-                      setPagination: setTablePagination,
+                      pagination: isSearchParams ? pagination : properties.table.pagination,
+                      setPagination: isSearchParams ? setParamsTablePagination : setTablePagination,
                   }
                 : undefined,
             rowBuffer: 20,
@@ -256,11 +301,14 @@ export const useVirtualTable = <TFilter>({
         };
     }, [
         isPaginationEnabled,
+        isSearchParams,
         itemCount,
         pageKey,
+        pagination,
         properties.table.autoFit,
         properties.table.pagination,
         properties.table.rowHeight,
+        setParamsTablePagination,
         setTablePagination,
     ]);
 

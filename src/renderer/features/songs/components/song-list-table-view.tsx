@@ -17,13 +17,14 @@ interface SongListTableViewProps {
 
 export const SongListTableView = ({ tableRef, itemCount }: SongListTableViewProps) => {
     const server = useCurrentServer();
-    const { pageKey, handlePlay, customFilters } = useListContext();
+    const { pageKey, id, handlePlay, customFilters } = useListContext();
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
     const tableProps = useVirtualTable<SongListQuery>({
         contextMenu: SONG_CONTEXT_MENU_ITEMS,
         customFilters,
+        isSearchParams: Boolean(id),
         itemCount,
         itemType: LibraryItem.SONG,
         pageKey,

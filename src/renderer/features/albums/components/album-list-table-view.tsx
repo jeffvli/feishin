@@ -8,11 +8,12 @@ import { useCurrentServer } from '/@/renderer/store';
 
 export const AlbumListTableView = ({ tableRef, itemCount }: any) => {
     const server = useCurrentServer();
-    const { pageKey, customFilters } = useListContext();
+    const { pageKey, customFilters, id } = useListContext();
 
     const tableProps = useVirtualTable({
         contextMenu: ALBUM_CONTEXT_MENU_ITEMS,
         customFilters,
+        isSearchParams: Boolean(id),
         itemCount,
         itemType: LibraryItem.ALBUM,
         pageKey,
