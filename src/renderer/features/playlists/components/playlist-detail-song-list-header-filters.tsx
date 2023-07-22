@@ -262,7 +262,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
     const handleDeletePlaylist = useCallback(() => {
         if (!detailQuery.data) return;
         deletePlaylistMutation?.mutate(
-            { query: { id: detailQuery.data.id }, serverId: detailQuery.data.id },
+            { query: { id: detailQuery.data.id }, serverId: detailQuery.data.serverId },
             {
                 onError: (err) => {
                     toast.error({
