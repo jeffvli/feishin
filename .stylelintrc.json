@@ -1,9 +1,7 @@
 {
-    "processors": ["stylelint-processor-styled-components"],
-    "customSyntax": "postcss-scss",
     "extends": [
         "stylelint-config-standard-scss",
-        "stylelint-config-styled-components",
+        "stylelint-config-css-modules",
         "stylelint-config-rational-order"
     ],
     "rules": {
