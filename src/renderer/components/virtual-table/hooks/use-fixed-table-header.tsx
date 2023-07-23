@@ -10,8 +10,8 @@ export const useFixedTableHeader = ({ enabled }: { enabled: boolean }) => {
 
     const topMargin =
         windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS
-            ? '-128px'
-            : '-98px';
+            ? '-130px'
+            : '-100px';
 
     const isTableHeaderInView = useInView(tableHeaderRef, {
         margin: `${topMargin} 0px 0px 0px`,
@@ -30,21 +30,12 @@ export const useFixedTableHeader = ({ enabled }: { enabled: boolean }) => {
         const root = document.querySelector('main .ag-root');
 
         if (!isTableHeaderInView && isTableInView) {
-            if (windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS) {
-                header?.classList.add('window-frame');
-            }
             header?.classList.add('ag-header-fixed');
             root?.classList.add('ag-header-fixed-margin');
         } else if (!isTableInView) {
-            if (windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS) {
-                header?.classList.remove('window-frame');
-            }
             header?.classList.remove('ag-header-fixed');
             root?.classList.remove('ag-header-fixed-margin');
         } else if (isTableHeaderInView) {
-            if (windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS) {
-                header?.classList.remove('window-frame');
-            }
             header?.classList.remove('ag-header-fixed');
             root?.classList.remove('ag-header-fixed-margin');
         }

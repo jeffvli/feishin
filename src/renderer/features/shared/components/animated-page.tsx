@@ -1,20 +1,11 @@
 import type { ReactNode, Ref } from 'react';
 import { forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import styled from 'styled-components';
+import styles from './animated-page.module.scss';
 
 interface AnimatedPageProps {
     children: ReactNode;
 }
-
-const StyledAnimatedPage = styled(motion.main)`
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-`;
 
 const variants = {
     animate: { opacity: 1 },
@@ -25,16 +16,17 @@ const variants = {
 export const AnimatedPage = forwardRef(
     ({ children }: AnimatedPageProps, ref: Ref<HTMLDivElement>) => {
         return (
-            <StyledAnimatedPage
+            <motion.main
                 ref={ref}
                 animate="animate"
+                className={styles.animatedPage}
                 exit="exit"
                 initial="initial"
                 transition={{ duration: 0.3, ease: 'easeIn' }}
                 variants={variants}
             >
                 {children}
-            </StyledAnimatedPage>
+            </motion.main>
         );
     },
 );
