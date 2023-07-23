@@ -2,7 +2,7 @@ import isElectron from 'is-electron';
 import { SettingsSection } from '/@/renderer/features/settings/components/settings-section';
 import { useRemoteSettings, useSettingsStoreActions } from '/@/renderer/store';
 import { NumberInput, Switch, Text, TextInput, toast } from '/@/renderer/components';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 
 const remote = isElectron() ? window.electron.remote : null;
 

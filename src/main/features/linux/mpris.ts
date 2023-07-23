@@ -1,6 +1,5 @@
 import { ipcMain } from 'electron';
 import Player from 'mpris-service';
-import { RelatedArtist } from '../../../renderer/api/types';
 import { PlayerRepeat, PlayerStatus, SongUpdate } from '../../../renderer/types';
 import { getMainWindow } from '../../main';
 

@@ -3,7 +3,7 @@ import { Group, Image, Rating, Text, Title } from '@mantine/core';
 import { useInfo, useSend, useShowImage } from '/@/remote/store';
 import { RemoteButton } from '/@/remote/components/buttons/remote-button';
 import formatDuration from 'format-duration';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import {
     RiHeartLine,
     RiPauseFill,

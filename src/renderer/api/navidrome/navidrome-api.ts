@@ -1,7 +1,7 @@
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { Method, AxiosError, AxiosResponse, isAxiosError } from 'axios';
 import isElectron from 'is-electron';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import omitBy from 'lodash/omitBy';
 import qs from 'qs';
 import { ndType } from './navidrome-types';
