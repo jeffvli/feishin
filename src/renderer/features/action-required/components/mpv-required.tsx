@@ -7,12 +7,12 @@ const localSettings = isElectron() ? window.electron.localSettings : null;
 export const MpvRequired = () => {
     const [mpvPath, setMpvPath] = useState('');
     const handleSetMpvPath = (e: File) => {
-        localSettings.set('mpv_path', e.path);
+        localSettings?.set('mpv_path', e.path);
     };
 
     useEffect(() => {
         const getMpvPath = async () => {
-            if (!isElectron()) return setMpvPath('');
+            if (!localSettings) return setMpvPath('');
             const mpvPath = localSettings.get('mpv_path') as string;
             return setMpvPath(mpvPath);
         };
@@ -37,7 +37,7 @@ export const MpvRequired = () => {
                 placeholder={mpvPath}
                 onChange={handleSetMpvPath}
             />
-            <Button onClick={() => localSettings.restart()}>Restart</Button>
+            <Button onClick={() => localSettings?.restart()}>Restart</Button>
         </>
     );
 };

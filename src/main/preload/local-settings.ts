@@ -1,5 +1,5 @@
-import { ipcRenderer, webFrame } from 'electron';
 import Store from 'electron-store';
+import { ipcRenderer, webFrame } from 'electron';
 
 const store = new Store();
 
@@ -50,3 +50,5 @@ export const localSettings = {
     set,
     setZoomFactor,
 };
+
+export type LocalSettings = typeof localSettings;

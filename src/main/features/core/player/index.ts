@@ -207,9 +207,9 @@ ipcMain.on('player-volume', async (_event, value: number) => {
 });
 
 // Toggles the mute status
-ipcMain.on('player-mute', async () => {
+ipcMain.on('player-mute', async (_event, mute: boolean) => {
     await getMpvInstance()
-        ?.mute()
+        ?.mute(mute)
         .catch((err) => {
             console.log('MPV failed to toggle mute', err);
         });

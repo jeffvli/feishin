@@ -74,7 +74,7 @@ export const ApplicationSettings = () => {
                                 zoomFactor: newVal,
                             },
                         });
-                        localSettings.setZoomFactor(newVal);
+                        localSettings!.setZoomFactor(newVal);
                     }}
                 />
             ),

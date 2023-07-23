@@ -59,8 +59,7 @@ const CenterGridItem = styled.div`
     overflow: hidden;
 `;
 
-const utils = isElectron() ? window.electron.utils : null;
-const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
+const remote = isElectron() ? window.electron.remote : null;
 
 export const Playerbar = () => {
     const playersRef = PlayersRef;
@@ -74,11 +73,13 @@ export const Playerbar = () => {
     const { autoNext } = usePlayerControls();
 
     const autoNextFn = useCallback(() => {
-        const playerData = autoNext();
-        mpris?.updateSong({
-            currentTime: 0,
-            song: playerData.current.song,
-        });
+        if (remote) {
+            const playerData = autoNext();
+            remote.updateSong({
+                currentTime: 0,
+                song: playerData.current.song,
+            });
+        }
     }, [autoNext]);
 
     return (

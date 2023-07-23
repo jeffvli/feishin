@@ -6,8 +6,7 @@ import { useGeneralSettings } from '/@/renderer/store/settings.store';
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
 const ipc = isElectron() ? window.electron.ipc : null;
-const utils = isElectron() ? window.electron.utils : null;
-const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
+const remote = isElectron() ? window.electron.remote : null;
 
 const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {
     let volumeToSet;
@@ -41,12 +40,13 @@ export const useRightControls = () => {
 
     // Ensure that the mpv player volume is set on startup
     useEffect(() => {
-        if (isElectron()) {
+        remote?.updateVolume(volume);
+
+        if (mpvPlayer) {
             mpvPlayer.volume(volume);
-            mpris?.updateVolume(volume / 100);
 
             if (muted) {
-                mpvPlayer.mute();
+                mpvPlayer.mute(muted);
             }
         }
 
@@ -55,26 +55,26 @@ export const useRightControls = () => {
 
     const handleVolumeSlider = (e: number) => {
         mpvPlayer?.volume(e);
-        mpris?.updateVolume(e / 100);
+        remote?.updateVolume(e);
         setVolume(e);
     };
 
     const handleVolumeSliderState = (e: number) => {
-        mpris?.updateVolume(e / 100);
+        remote?.updateVolume(e);
         setVolume(e);
     };
 
     const handleVolumeDown = useCallback(() => {
         const volumeToSet = calculateVolumeDown(volume, volumeWheelStep);
         mpvPlayer?.volume(volumeToSet);
-        mpris?.updateVolume(volumeToSet / 100);
+        remote?.updateVolume(volumeToSet);
         setVolume(volumeToSet);
     }, [setVolume, volume, volumeWheelStep]);
 
     const handleVolumeUp = useCallback(() => {
         const volumeToSet = calculateVolumeUp(volume, volumeWheelStep);
         mpvPlayer?.volume(volumeToSet);
-        mpris?.updateVolume(volumeToSet / 100);
+        remote?.updateVolume(volumeToSet);
         setVolume(volumeToSet);
     }, [setVolume, volume, volumeWheelStep]);
 
@@ -88,7 +88,7 @@ export const useRightControls = () => {
             }
 
             mpvPlayer?.volume(volumeToSet);
-            mpris?.updateVolume(volumeToSet / 100);
+            remote?.updateVolume(volumeToSet);
             setVolume(volumeToSet);
         },
         [setVolume, volume, volumeWheelStep],
@@ -96,7 +96,7 @@ export const useRightControls = () => {
 
     const handleMute = useCallback(() => {
         setMuted(!muted);
-        mpvPlayer?.mute();
+        mpvPlayer?.mute(!muted);
     }, [muted, setMuted]);
 
     useEffect(() => {

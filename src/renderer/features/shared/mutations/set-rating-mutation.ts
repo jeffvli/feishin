@@ -14,6 +14,9 @@ import {
 } from '/@/renderer/api/types';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useSetAlbumListItemDataById, useSetQueueRating } from '/@/renderer/store';
+import isElectron from 'is-electron';
+
+const remote = isElectron() ? window.electron.remote : null;
 
 export const useSetRating = (args: MutationHookArgs) => {
     const { options } = args || {};
@@ -54,6 +57,11 @@ export const useSetRating = (args: MutationHookArgs) => {
                         setQueueRating([item.id], variables.query.rating);
                         break;
                 }
+            }
+
+            if (remote) {
+                const ids = variables.query.item.map((item) => item.id);
+                remote.updateRating(variables.query.rating, variables.query.item[0].serverId, ids);
             }
 
             return { previous: { items: variables.query.item } };

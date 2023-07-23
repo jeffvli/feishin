@@ -47,7 +47,7 @@ export const AppMenu = () => {
     };
 
     const handleCredentialsModal = async (server: ServerListItem) => {
-        let password: string | undefined;
+        let password: string | null = null;
 
         try {
             if (localSettings && server.savePassword) {

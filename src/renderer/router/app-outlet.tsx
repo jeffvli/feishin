@@ -11,7 +11,7 @@ export const AppOutlet = () => {
 
     const isActionsRequired = useMemo(() => {
         const isMpvRequired = () => {
-            if (!isElectron()) return false;
+            if (!localSettings) return false;
             const mpvPath = localSettings.get('mpv_path');
             if (mpvPath) return false;
             return true;

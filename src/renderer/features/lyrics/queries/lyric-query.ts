@@ -152,8 +152,8 @@ export const useSongLyricsByRemoteId = (
         enabled: !!query.remoteSongId && !!query.remoteSource,
         onError: () => {},
         queryFn: async () => {
-            const remoteLyricsResult: string | null = await lyricsIpc?.getRemoteLyricsByRemoteId(
-                query,
+            const remoteLyricsResult = await lyricsIpc?.getRemoteLyricsByRemoteId(
+                query as LyricGetQuery,
             );
 
             if (remoteLyricsResult) {

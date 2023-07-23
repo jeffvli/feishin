@@ -28,15 +28,14 @@ import debounce from 'lodash/debounce';
 import { ErrorBoundary } from 'react-error-boundary';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required';
-import { PlaybackType, TableType } from '/@/renderer/types';
+import { PlaybackType, PlayerStatus, TableType } from '/@/renderer/types';
 import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const utils = isElectron() ? window.electron.utils : null;
-const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
+const remote = isElectron() ? window.electron.remote : null;
 
 type QueueProps = {
     type: TableType;
@@ -72,15 +71,15 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
     const handleDoubleClick = (e: CellDoubleClickedEvent) => {
         const playerData = setCurrentTrack(e.data.uniqueId);
-        mpris?.updateSong({
+        remote?.updateSong({
             currentTime: 0,
             song: playerData.current.song,
-            status: 'Playing',
+            status: PlayerStatus.PLAYING,
         });
 
         if (playerType === PlaybackType.LOCAL) {
-            mpvPlayer.setQueue(playerData);
-            mpvPlayer.play();
+            mpvPlayer!.setQueue(playerData);
+            mpvPlayer!.play();
         }
 
         play();
@@ -102,7 +101,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
         const playerData = reorderQueue(selectedUniqueIds as string[], e.overNode?.data?.uniqueId);
 
         if (playerType === PlaybackType.LOCAL) {
-            mpvPlayer.setQueueNext(playerData);
+            mpvPlayer!.setQueueNext(playerData);
         }
 
         if (type === 'sideDrawerQueue') {

@@ -5,3 +5,5 @@ export const utils = {
     isMacOS,
     isWindows,
 };
+
+export type Utils = typeof utils;

@@ -20,6 +20,7 @@ import {
     TableType,
     Platform,
 } from '/@/renderer/types';
+import { randomString } from '/@/renderer/utils';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -151,6 +152,12 @@ export interface SettingsState {
         style: PlaybackStyle;
         type: PlaybackType;
     };
+    remote: {
+        enabled: boolean;
+        password: string;
+        port: number;
+        username: string;
+    };
     tab: 'general' | 'playback' | 'window' | 'hotkeys' | string;
     tables: {
         fullScreen: DataTableProps;
@@ -177,7 +184,7 @@ export interface SettingsSlice extends SettingsState {
 
 // Determines the default/initial windowBarStyle value based on the current platform.
 const getPlatformDefaultWindowBarStyle = (): Platform => {
-    return isElectron() ? (utils.isMacOS() ? Platform.MACOS : Platform.WINDOWS) : Platform.WEB;
+    return utils ? (utils.isMacOS() ? Platform.MACOS : Platform.WINDOWS) : Platform.WEB;
 };
 
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
@@ -257,6 +264,12 @@ const initialState: SettingsState = {
         },
         style: PlaybackStyle.GAPLESS,
         type: PlaybackType.LOCAL,
+    },
+    remote: {
+        enabled: false,
+        password: randomString(8),
+        port: 4333,
+        username: 'feishin',
     },
     tab: 'general',
     tables: {
@@ -450,3 +463,5 @@ export const useMpvSettings = () =>
     useSettingsStore((state) => state.playback.mpvProperties, shallow);
 
 export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics, shallow);
+
+export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);

@@ -56,7 +56,7 @@ export const AudioSettings = () => {
                         setSettings({ playback: { ...settings, type: e as PlaybackType } });
                         if (isElectron() && e === PlaybackType.LOCAL) {
                             const queueData = usePlayerStore.getState().actions.getPlayerData();
-                            mpvPlayer.setQueue(queueData);
+                            mpvPlayer!.setQueue(queueData);
                         }
                     }}
                 />

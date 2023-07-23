@@ -16,7 +16,7 @@ const localSettings = isElectron() ? window.electron.localSettings : null;
 interface EditServerFormProps {
     isUpdate?: boolean;
     onCancel: () => void;
-    password?: string;
+    password: string | null;
     server: ServerListItem;
 }
 

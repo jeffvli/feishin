@@ -3,6 +3,7 @@ import { ApplicationSettings } from '/@/renderer/features/settings/components/ge
 import { ControlSettings } from '/@/renderer/features/settings/components/general/control-settings';
 import { SidebarSettings } from '/@/renderer/features/settings/components/general/sidebar-settings';
 import { ThemeSettings } from '/@/renderer/features/settings/components/general/theme-settings';
+import { RemoteSettings } from '/@/renderer/features/settings/components/general/remote-settings';
 
 export const GeneralTab = () => {
     return (
@@ -14,6 +15,8 @@ export const GeneralTab = () => {
             <ControlSettings />
             <Divider />
             <SidebarSettings />
+            <Divider />
+            <RemoteSettings />
         </Stack>
     );
 };

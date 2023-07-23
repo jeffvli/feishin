@@ -2,7 +2,13 @@ import { useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentServer, usePlayerControls, usePlayerStore } from '/@/renderer/store';
 import { usePlayerType } from '/@/renderer/store/settings.store';
-import { PlayQueueAddOptions, Play, PlaybackType } from '/@/renderer/types';
+import {
+    PlayQueueAddOptions,
+    Play,
+    PlaybackType,
+    PlayerStatus,
+    PlayerShuffle,
+} from '/@/renderer/types';
 import { toast } from '/@/renderer/components/toast/index';
 import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
@@ -47,8 +53,7 @@ const getRootQueryKey = (itemType: LibraryItem, serverId: string) => {
 };
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const utils = isElectron() ? window.electron.utils : null;
-const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
+const remote = isElectron() ? window.electron.remote : null;
 
 const addToQueue = usePlayerStore.getState().actions.addToQueue;
 
@@ -154,26 +159,26 @@ export const useHandlePlayQueueAdd = () => {
             const playerData = addToQueue({ initialIndex: initialSongIndex, playType, songs });
 
             if (playerType === PlaybackType.LOCAL) {
-                mpvPlayer?.volume(usePlayerStore.getState().volume);
+                mpvPlayer!.volume(usePlayerStore.getState().volume);
 
                 if (playType === Play.NEXT || playType === Play.LAST) {
-                    mpvPlayer?.setQueueNext(playerData);
+                    mpvPlayer!.setQueueNext(playerData);
                 }
 
                 if (playType === Play.NOW) {
-                    mpvPlayer?.setQueue(playerData);
-                    mpvPlayer?.play();
+                    mpvPlayer!.setQueue(playerData);
+                    mpvPlayer!.play();
                 }
             }
 
             play();
 
-            mpris?.updateSong({
+            remote?.updateSong({
                 currentTime: usePlayerStore.getState().current.time,
                 repeat: usePlayerStore.getState().repeat,
-                shuffle: usePlayerStore.getState().shuffle,
+                shuffle: usePlayerStore.getState().shuffle !== PlayerShuffle.NONE,
                 song: playerData.current.song,
-                status: 'Playing',
+                status: PlayerStatus.PLAYING,
             });
 
             return null;

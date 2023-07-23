@@ -12,3 +12,5 @@ export const ipc = {
     removeAllListeners,
     send,
 };
+
+export type Ipc = typeof ipc;

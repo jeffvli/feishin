@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
-    "mpris-service": "^2.1.2"
+    "mpris-service": "^2.1.2",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "electron": "22.3.1"
