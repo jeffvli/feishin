@@ -16,12 +16,12 @@ module.exports = {
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-shadow': ['off'],
+        '@typescript-eslint/no-unused-vars': ['error'],
         'default-case': 'off',
         'import/extensions': 'off',
         'import/no-absolute-path': 'off',
         // A temporary hack related to IDE not resolving correct package.json
         'import/no-extraneous-dependencies': 'off',
-
         'import/no-unresolved': 'error',
         'import/order': [
             'error',
@@ -50,8 +50,13 @@ module.exports = {
         'no-console': 'off',
         'no-nested-ternary': 'off',
         'no-restricted-syntax': 'off',
+        'no-shadow': 'off',
         'no-underscore-dangle': 'off',
+        'no-unused-vars': 'off',
         'prefer-destructuring': 'off',
+        'react/function-component-definition': 'off',
+        'react/jsx-filename-extension': [2, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
+        'react/jsx-no-useless-fragment': 'off',
         'react/jsx-props-no-spreading': 'off',
         'react/jsx-sort-props': [
             'error',
