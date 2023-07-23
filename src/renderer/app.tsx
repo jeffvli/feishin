@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
@@ -23,6 +23,7 @@ import isElectron from 'is-electron';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
 import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
 import { PlaybackType, PlayerStatus } from '/@/renderer/types';
+import '@ag-grid-community/styles/ag-grid.css';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -46,6 +47,10 @@ export const App = () => {
         const root = document.documentElement;
         root.style.setProperty('--content-font-family', contentFont);
     }, [contentFont]);
+
+    const providerValue = useMemo(() => {
+        return { handlePlayQueueAdd };
+    }, [handlePlayQueueAdd]);
 
     // Start the mpv instance on startup
     useEffect(() => {
@@ -201,7 +206,7 @@ export const App = () => {
                 }}
                 modals={{ addToPlaylist: AddToPlaylistContextModal, base: BaseContextModal }}
             >
-                <PlayQueueHandlerContext.Provider value={{ handlePlayQueueAdd }}>
+                <PlayQueueHandlerContext.Provider value={providerValue}>
                     <ContextMenuProvider>
                         <AppRouter />
                     </ContextMenuProvider>

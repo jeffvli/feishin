@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { MantineProvider } from '@mantine/core';
 import './styles/global.scss';
-import '@ag-grid-community/styles/ag-grid.css';
 import { useIsDark, useReconnect } from '/@/remote/store';
 import { Shell } from '/@/remote/components/shell';
 
