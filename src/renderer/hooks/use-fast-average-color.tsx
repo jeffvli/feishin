@@ -35,6 +35,7 @@ export const useFastAverageColor = (args: {
                     return setColor('rgba(0, 0, 0, 0)');
                 });
         } else if (srcLoaded) {
+            idRef.current = id;
             return setColor('var(--placeholder-bg)');
         }
 
