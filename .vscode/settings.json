@@ -19,8 +19,8 @@
     "css.validate": true,
     "less.validate": false,
     "scss.validate": true,
-    "scss.lint.unknownAtRules": "warn",
-    "scss.lint.unknownProperties": "warn",
+    "scss.lint.unknownAtRules": "warning",
+    "scss.lint.unknownProperties": "warning",
     "javascript.validate.enable": false,
     "javascript.format.enable": false,
     "typescript.format.enable": false,
@@ -42,5 +42,31 @@
     "typescript.updateImportsOnFileMove.enabled": "always",
     "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
     "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true
+    "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
+    "folderTemplates.structures": [
+        {
+            "name": "TypeScript Feature Component With CSS Modules",
+            "omitParentDirectory": true,
+            "structure": [
+                {
+                    "fileName": "<FTName | kebabcase>.tsx",
+                    "template": "Functional Component with CSS Modules"
+                },
+                {
+                    "fileName": "<FTName | kebabcase>.module.scss"
+                }
+            ]
+        }
+    ],
+    "folderTemplates.fileTemplates": {
+        "Functional Component with CSS Modules": [
+            "import styles from './<FTName | kebabcase>.module.scss';",
+            "",
+            "interface <FTName | pascalcase>Props {}",
+            "",
+            "export const <FTName | pascalcase> = ({}: <FTName | pascalcase>Props) => {",
+            "  return <div></div>;",
+            "};"
+        ]
+    }
 }
