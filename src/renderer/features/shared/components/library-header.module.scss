@@ -1,0 +1,126 @@
+.library-header {
+    position: relative;
+    display: grid;
+    grid-template-areas: 'image info';
+    grid-template-rows: 100%;
+    grid-template-columns: 175px minmax(0, 1fr);
+    gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    height: 30vh;
+    min-height: 340px;
+    max-height: 500px;
+    padding: 5rem 2rem 2rem;
+
+    @container (min-width: 600px) {
+        grid-template-columns: 175px minmax(0, 1fr);
+
+        h1 {
+            font-size: 3rem;
+        }
+
+        .image {
+            img {
+                width: 175px !important;
+                height: 175px;
+            }
+        }
+    }
+
+    @container (min-width: 600px) {
+        grid-template-columns: 200px minmax(0, 1fr);
+
+        h1 {
+            font-size: 4.5rem;
+        }
+
+        .image {
+            img {
+                width: 200px !important;
+                height: 200px;
+            }
+        }
+    }
+
+    @container (min-width: 768px) {
+        grid-template-columns: 225px minmax(0, 1fr);
+
+        h1 {
+            font-size: 5rem;
+        }
+
+        .image {
+            img {
+                width: 225px !important;
+                height: 225px;
+            }
+        }
+    }
+
+    @container (min-width: 1200px) {
+        grid-template-columns: 250px minmax(0, 1fr);
+
+        h1 {
+            font-size: 5.5rem;
+        }
+
+        .image {
+            img {
+                width: 250px !important;
+                height: 250px;
+            }
+        }
+    }
+}
+
+.image-section {
+    z-index: 15;
+    display: flex;
+    grid-area: image;
+    align-items: flex-end;
+    justify-content: center;
+    height: 100%;
+    filter: drop-shadow(0 0 8px rgb(0, 0, 0, 50%));
+}
+
+.metadata-section {
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    grid-area: info;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.image {
+    img {
+        object-fit: cover;
+    }
+}
+
+.background {
+    position: absolute;
+    top: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.9;
+}
+
+.background-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-header-overlay);
+}
+
+.title {
+    overflow: hidden;
+    color: var(--main-fg);
+    line-height: 1.15;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
