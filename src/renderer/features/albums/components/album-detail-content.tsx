@@ -187,8 +187,9 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
 
     const carousels = [
         {
-            data: artistQuery?.data?.items,
-            isHidden: !artistQuery?.data?.items.length,
+            data: artistQuery?.data?.items.filter((a) => a.id !== detailQuery?.data?.id),
+            isHidden: !artistQuery?.data?.items.filter((a) => a.id !== detailQuery?.data?.id)
+                .length,
             loading: artistQuery?.isLoading || artistQuery.isFetching,
             pagination: {
                 handleNextPage: () => handleNextPage('artist'),
