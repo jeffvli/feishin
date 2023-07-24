@@ -12,11 +12,16 @@
     max-height: 500px;
     padding: 5rem 2rem 2rem;
 
+    :global(.item-image-placeholder) {
+        width: 175px !important;
+        height: 175px;
+    }
+
     @container (min-width: 600px) {
         grid-template-columns: 175px minmax(0, 1fr);
 
         h1 {
-            font-size: 3rem;
+            font-size: 4.5rem;
         }
 
         .image {
@@ -25,13 +30,18 @@
                 height: 175px;
             }
         }
+
+        :global(.item-image-placeholder) {
+            width: 175px !important;
+            height: 175px;
+        }
     }
 
     @container (min-width: 600px) {
         grid-template-columns: 200px minmax(0, 1fr);
 
         h1 {
-            font-size: 4.5rem;
+            font-size: 5rem;
         }
 
         .image {
@@ -40,13 +50,18 @@
                 height: 200px;
             }
         }
+
+        :global(.item-image-placeholder) {
+            width: 200px !important;
+            height: 200px;
+        }
     }
 
     @container (min-width: 768px) {
         grid-template-columns: 225px minmax(0, 1fr);
 
         h1 {
-            font-size: 5rem;
+            font-size: 6rem;
         }
 
         .image {
@@ -55,13 +70,18 @@
                 height: 225px;
             }
         }
+
+        :global(.item-image-placeholder) {
+            width: 225px !important;
+            height: 225px;
+        }
     }
 
     @container (min-width: 1200px) {
         grid-template-columns: 250px minmax(0, 1fr);
 
         h1 {
-            font-size: 5.5rem;
+            font-size: 6.5rem;
         }
 
         .image {
@@ -69,6 +89,17 @@
                 width: 250px !important;
                 height: 250px;
             }
+        }
+
+        :global(.item-image-placeholder) {
+            width: 250px !important;
+            height: 250px;
+        }
+    }
+
+    @container (min-width: 1500px) {
+        h1 {
+            font-size: 7rem;
         }
     }
 }
@@ -120,6 +151,7 @@
 .title {
     overflow: hidden;
     color: var(--main-fg);
+    font-size: 3.5rem;
     line-height: 1.15;
     white-space: nowrap;
     text-overflow: ellipsis;

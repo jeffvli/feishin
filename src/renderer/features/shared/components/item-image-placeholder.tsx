@@ -1,4 +1,5 @@
 import { Center } from '@mantine/core';
+import clsx from 'clsx';
 import { memo } from 'react';
 import { RiAlbumFill, RiPlayListFill, RiUserVoiceFill } from 'react-icons/ri';
 import styles from './item-image-placeholder.module.scss';
@@ -25,7 +26,7 @@ const Image = memo(function Image(props: ItemImagePlaceholderProps) {
 
 export const ItemImagePlaceholder = ({ itemType }: ItemImagePlaceholderProps) => {
     return (
-        <Center className={styles.imagePlaceholder}>
+        <Center className={clsx(styles.imagePlaceholder, 'item-image-placeholder')}>
             <Image itemType={itemType} />
         </Center>
     );
