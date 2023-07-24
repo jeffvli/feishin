@@ -83,7 +83,7 @@ const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const remote = isElectron() ? window.electron.remote : null;
 
 export interface ContextMenuProviderProps {
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
@@ -107,45 +107,57 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
     const handlePlayQueueAdd = usePlayQueueAdd();
 
-    const openContextMenu = (args: OpenContextMenuProps) => {
-        const { xPos, yPos, menuItems, data, type, tableApi, dataNodes, context, resetGridCache } =
-            args;
+    const openContextMenu = useCallback(
+        (args: OpenContextMenuProps) => {
+            const {
+                xPos,
+                yPos,
+                menuItems,
+                data,
+                type,
+                tableApi,
+                dataNodes,
+                context,
+                resetGridCache,
+            } = args;
 
-        const serverType = data[0]?.serverType || useAuthStore.getState().currentServer?.type;
-        let validMenuItems = menuItems;
+            const serverType = data[0]?.serverType || useAuthStore.getState().currentServer?.type;
+            let validMenuItems = menuItems;
 
-        if (serverType === ServerType.JELLYFIN) {
-            validMenuItems = menuItems.filter(
-                (item) => !JELLYFIN_IGNORED_MENU_ITEMS.includes(item.id),
-            );
-        }
+            if (serverType === ServerType.JELLYFIN) {
+                validMenuItems = menuItems.filter(
+                    (item) => !JELLYFIN_IGNORED_MENU_ITEMS.includes(item.id),
+                );
+            }
 
-        // If the context menu dimension can't be automatically calculated, calculate it manually
-        // This is a hacky way since resize observer may not automatically recalculate when not rendered
-        const menuHeight = menuRect.height || (menuItems.length + 1) * 50;
-        const menuWidth = menuRect.width || 220;
+            // If the context menu dimension can't be automatically calculated, calculate it manually
+            // This is a hacky way since resize observer may not automatically recalculate when not rendered
+            const menuHeight = menuRect.height || (menuItems.length + 1) * 50;
+            const menuWidth = menuRect.width || 220;
 
-        const shouldReverseY = yPos + menuHeight > viewport.height;
-        const shouldReverseX = xPos + menuWidth > viewport.width;
+            const shouldReverseY = yPos + menuHeight > viewport.height;
+            const shouldReverseX = xPos + menuWidth > viewport.width;
 
-        const calculatedXPos = shouldReverseX ? xPos - menuWidth : xPos;
-        const calculatedYPos = shouldReverseY ? yPos - menuHeight : yPos;
+            const calculatedXPos = shouldReverseX ? xPos - menuWidth : xPos;
+            const calculatedYPos = shouldReverseY ? yPos - menuHeight : yPos;
 
-        setCtx({
-            context,
-            data,
-            dataNodes,
-            menuItems: validMenuItems,
-            resetGridCache,
-            tableApi,
-            type,
-            xPos: calculatedXPos,
-            yPos: calculatedYPos,
-        });
-        setOpened(true);
-    };
+            setCtx({
+                context,
+                data,
+                dataNodes,
+                menuItems: validMenuItems,
+                resetGridCache,
+                tableApi,
+                type,
+                xPos: calculatedXPos,
+                yPos: calculatedYPos,
+            });
+            setOpened(true);
+        },
+        [menuRect.height, menuRect.width, setCtx, viewport.height, viewport.width],
+    );
 
-    const closeContextMenu = () => {
+    const closeContextMenu = useCallback(() => {
         setOpened(false);
         setCtx({
             data: [],
@@ -156,7 +168,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             xPos: 0,
             yPos: 0,
         });
-    };
+    }, [setCtx]);
 
     useContextMenuEvents({
         closeContextMenu,
@@ -763,13 +775,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
     const mergedRef = useMergedRef(ref, clickOutsideRef);
 
+    const providerValue = useMemo(
+        () => ({
+            closeContextMenu,
+            openContextMenu,
+        }),
+        [closeContextMenu, openContextMenu],
+    );
+
     return (
-        <ContextMenuContext.Provider
-            value={{
-                closeContextMenu,
-                openContextMenu,
-            }}
-        >
+        <ContextMenuContext.Provider value={providerValue}>
             <Portal>
                 <AnimatePresence>
                     {opened && (
