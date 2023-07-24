@@ -5,7 +5,6 @@ import { LibraryItem, ServerType } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
 import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
-import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { formatDurationString } from '/@/renderer/utils';
 import { useCurrentServer } from '../../../store/auth.store';
@@ -22,7 +21,6 @@ export const AlbumArtistDetailHeader = forwardRef(
             query: { id: albumArtistId },
             serverId: server?.id,
         });
-        const cq = useContainerQuery();
 
         const metadataItems = [
             {
@@ -75,50 +73,39 @@ export const AlbumArtistDetailHeader = forwardRef(
         const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
 
         return (
-            <Stack ref={cq.ref}>
-                <LibraryHeader
-                    ref={ref}
-                    background={background}
-                    imageUrl={detailQuery?.data?.imageUrl}
-                    item={{ route: AppRoute.LIBRARY_ALBUM_ARTISTS, type: LibraryItem.ALBUM_ARTIST }}
-                    title={detailQuery?.data?.name || ''}
-                >
-                    <Stack>
-                        <Group>
-                            {metadataItems
-                                .filter((i) => i.value)
-                                .map((item, index) => (
-                                    <Fragment key={`item-${item.id}-${index}`}>
-                                        {index > 0 && <Text $noSelect>•</Text>}
-                                        <Text $secondary={item.secondary}>{item.value}</Text>
-                                    </Fragment>
-                                ))}
-                            {showRating && (
-                                <>
-                                    <Text $noSelect>•</Text>
-                                    <Rating
-                                        readOnly={
-                                            detailQuery?.isFetching ||
-                                            updateRatingMutation.isLoading
-                                        }
-                                        value={detailQuery?.data?.userRating || 0}
-                                        onChange={handleUpdateRating}
-                                        onClick={handleClearRating}
-                                    />
-                                </>
-                            )}
-                        </Group>
-                        <Group
-                            sx={{
-                                WebkitBoxOrient: 'vertical',
-                                WebkitLineClamp: 2,
-                                display: '-webkit-box',
-                                overflow: 'hidden',
-                            }}
-                        />
-                    </Stack>
-                </LibraryHeader>
-            </Stack>
+            <LibraryHeader
+                ref={ref}
+                background={background}
+                imageUrl={detailQuery?.data?.imageUrl}
+                item={{ route: AppRoute.LIBRARY_ALBUM_ARTISTS, type: LibraryItem.ALBUM_ARTIST }}
+                title={detailQuery?.data?.name || ''}
+            >
+                <Stack>
+                    <Group>
+                        {metadataItems
+                            .filter((i) => i.value)
+                            .map((item, index) => (
+                                <Fragment key={`item-${item.id}-${index}`}>
+                                    {index > 0 && <Text $noSelect>•</Text>}
+                                    <Text $secondary={item.secondary}>{item.value}</Text>
+                                </Fragment>
+                            ))}
+                        {showRating && (
+                            <>
+                                <Text $noSelect>•</Text>
+                                <Rating
+                                    readOnly={
+                                        detailQuery?.isFetching || updateRatingMutation.isLoading
+                                    }
+                                    value={detailQuery?.data?.userRating || 0}
+                                    onChange={handleUpdateRating}
+                                    onClick={handleClearRating}
+                                />
+                            </>
+                        )}
+                    </Group>
+                </Stack>
+            </LibraryHeader>
         );
     },
 );

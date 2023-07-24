@@ -1,15 +1,15 @@
-import { NativeScrollArea, Spinner } from '/@/renderer/components';
-import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useRef } from 'react';
 import { useParams } from 'react-router';
-import { useFastAverageColor } from '/@/renderer/hooks';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem } from '/@/renderer/api/types';
-import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
-import { AlbumArtistDetailHeader } from '/@/renderer/features/artists/components/album-artist-detail-header';
+import { NativeScrollArea, Spinner } from '/@/renderer/components';
 import { AlbumArtistDetailContent } from '/@/renderer/features/artists/components/album-artist-detail-content';
+import { AlbumArtistDetailHeader } from '/@/renderer/features/artists/components/album-artist-detail-header';
+import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
+import { useFastAverageColor } from '/@/renderer/hooks';
 import { useCurrentServer } from '/@/renderer/store';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 
 const AlbumArtistDetailRoute = () => {
     const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -23,7 +23,7 @@ const AlbumArtistDetailRoute = () => {
         query: { id: albumArtistId },
         serverId: server?.id,
     });
-    const { color, colorId } = useFastAverageColor({
+    const { color: background, colorId } = useFastAverageColor({
         id: albumArtistId,
         src: detailQuery.data?.imageUrl,
         srcLoaded: !detailQuery.isLoading,
@@ -39,7 +39,7 @@ const AlbumArtistDetailRoute = () => {
         });
     };
 
-    if (detailQuery.isLoading || !color || colorId !== albumArtistId) {
+    if (!background || colorId !== albumArtistId) {
         return <Spinner container />;
     }
 
@@ -48,7 +48,7 @@ const AlbumArtistDetailRoute = () => {
             <NativeScrollArea
                 ref={scrollAreaRef}
                 pageHeaderProps={{
-                    backgroundColor: color,
+                    backgroundColor: background,
                     children: (
                         <LibraryHeaderBar>
                             <LibraryHeaderBar.PlayButton onClick={handlePlay} />
@@ -63,9 +63,9 @@ const AlbumArtistDetailRoute = () => {
             >
                 <AlbumArtistDetailHeader
                     ref={headerRef}
-                    background={color}
+                    background={background}
                 />
-                <AlbumArtistDetailContent background={color} />
+                <AlbumArtistDetailContent background={background} />
             </NativeScrollArea>
         </AnimatedPage>
     );

@@ -335,7 +335,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         <ContentContainer ref={cq.ref}>
             <LibraryBackgroundOverlay backgroundColor={background} />
             <DetailContainer>
-                <Box component="section">
+                <Stack spacing="lg">
                     <Group spacing="md">
                         <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
                         <Group spacing="xs">
@@ -367,27 +367,29 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             >
                                 <RiMoreFill size={20} />
                             </Button>
-                            <Button
-                                compact
-                                uppercase
-                                component={Link}
-                                to={artistDiscographyLink}
-                                variant="subtle"
-                            >
-                                View discography
-                            </Button>
-                            <Button
-                                compact
-                                uppercase
-                                component={Link}
-                                to={artistSongsLink}
-                                variant="subtle"
-                            >
-                                View all songs
-                            </Button>
                         </Group>
                     </Group>
-                </Box>
+                    <Group spacing="md">
+                        <Button
+                            compact
+                            uppercase
+                            component={Link}
+                            to={artistDiscographyLink}
+                            variant="subtle"
+                        >
+                            View discography
+                        </Button>
+                        <Button
+                            compact
+                            uppercase
+                            component={Link}
+                            to={artistSongsLink}
+                            variant="subtle"
+                        >
+                            View all songs
+                        </Button>
+                    </Group>
+                </Stack>
                 {showGenres ? (
                     <Box component="section">
                         <Group spacing="sm">
