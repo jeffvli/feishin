@@ -201,7 +201,7 @@ const normalizeAlbum = (
         })),
         backdropImageUrl: null,
         createdAt: item.DateCreated,
-        duration: item.RunTimeTicks / 10000,
+        duration: item.RunTimeTicks / 10000000,
         genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
         id: item.Id,
         imagePlaceholderUrl: null,
