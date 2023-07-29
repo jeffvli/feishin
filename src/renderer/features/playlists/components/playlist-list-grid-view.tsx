@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { MutableRefObject, useCallback, useMemo } from 'react';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 import { ListOnScrollProps } from 'react-window';
 import { useListContext } from '../../../context/list-context';
 import { useListStoreActions } from '../../../store/list.store';
@@ -129,7 +129,7 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
     return (
         <VirtualGridAutoSizerContainer>
             <AutoSizer>
-                {({ height, width }) => (
+                {({ height, width }: Size) => (
                     <VirtualInfiniteGrid
                         key={`playlist-list-${server?.id}`}
                         ref={gridRef}

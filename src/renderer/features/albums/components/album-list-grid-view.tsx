@@ -1,7 +1,7 @@
 import { QueryKey, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 import { ListOnScrollProps } from 'react-window';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -211,7 +211,7 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
     return (
         <VirtualGridAutoSizerContainer>
             <AutoSizer>
-                {({ height, width }) => (
+                {({ height, width }: Size) => (
                     <VirtualInfiniteGrid
                         key={`album-list-${server?.id}-${display}`}
                         ref={gridRef}
