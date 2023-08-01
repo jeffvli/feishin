@@ -10,14 +10,13 @@ export const useGenreList = (args: QueryHookArgs<GenreListQuery>) => {
     const server = getServerById(serverId);
 
     return useQuery({
-        cacheTime: 1000 * 60 * 60 * 2,
         enabled: !!server,
         queryFn: ({ signal }) => {
             if (!server) throw new Error('Server not found');
             return api.controller.getGenreList({ apiClientProps: { server, signal }, query });
         },
-        queryKey: queryKeys.genres.list(server?.id || ''),
-        staleTime: 1000 * 60 * 60,
+        queryKey: queryKeys.genres.list(server?.id || '', query),
+        staleTime: 1000 * 60,
         ...options,
     });
 };
