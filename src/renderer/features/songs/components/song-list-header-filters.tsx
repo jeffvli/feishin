@@ -236,12 +236,14 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                         <NavidromeSongFilters
                             customFilters={customFilters}
                             pageKey={pageKey}
+                            serverId={server?.id}
                             onFilterChange={onFilterChange}
                         />
                     ) : (
                         <JellyfinSongFilters
                             customFilters={customFilters}
                             pageKey={pageKey}
+                            serverId={server?.id}
                             onFilterChange={onFilterChange}
                         />
                     )}
