@@ -108,6 +108,7 @@ export const contract = c.router({
     getGenreList: {
         method: 'GET',
         path: 'genres',
+        query: jfType._parameters.genreList,
         responses: {
             200: jfType._response.genreList,
             400: jfType._response.error,

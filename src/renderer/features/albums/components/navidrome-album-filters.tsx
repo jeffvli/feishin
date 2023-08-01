@@ -5,7 +5,7 @@ import { AlbumListFilter, useListStoreActions, useListStoreByKey } from '/@/rend
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
-import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { AlbumArtistListSort, GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 
 interface NavidromeAlbumFiltersProps {
     customFilters?: Partial<AlbumListFilter>;
@@ -25,7 +25,14 @@ export const NavidromeAlbumFilters = ({
     const { filter } = useListStoreByKey({ key: pageKey });
     const { setFilter } = useListStoreActions();
 
-    const genreListQuery = useGenreList({ query: null, serverId });
+    const genreListQuery = useGenreList({
+        query: {
+            sortBy: GenreListSort.NAME,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+        },
+        serverId,
+    });
 
     const genreList = useMemo(() => {
         if (!genreListQuery?.data) return [];

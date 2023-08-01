@@ -1,18 +1,24 @@
+import { MutableRefObject, useCallback, useMemo } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { QueryKey, useQueryClient } from '@tanstack/react-query';
-import { MutableRefObject, useCallback, useMemo } from 'react';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { BasePaginatedResponse, LibraryItem, ServerListItem } from '/@/renderer/api/types';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import orderBy from 'lodash/orderBy';
 
 interface UseHandleListFilterChangeProps {
+    isClientSideSort?: boolean;
     itemType: LibraryItem;
     server: ServerListItem | null;
 }
 
-export const useListFilterRefresh = ({ server, itemType }: UseHandleListFilterChangeProps) => {
+export const useListFilterRefresh = ({
+    server,
+    itemType,
+    isClientSideSort,
+}: UseHandleListFilterChangeProps) => {
     const queryClient = useQueryClient();
 
     const queryKeyFn: ((serverId: string, query: Record<any, any>) => QueryKey) | null =
@@ -28,6 +34,9 @@ export const useListFilterRefresh = ({ server, itemType }: UseHandleListFilterCh
             }
             if (itemType === LibraryItem.SONG) {
                 return queryKeys.songs.list;
+            }
+            if (itemType === LibraryItem.GENRE) {
+                return queryKeys.genres.list;
             }
 
             return null;
@@ -46,6 +55,9 @@ export const useListFilterRefresh = ({ server, itemType }: UseHandleListFilterCh
             }
             if (itemType === LibraryItem.SONG) {
                 return api.controller.getSongList;
+            }
+            if (itemType === LibraryItem.GENRE) {
+                return api.controller.getGenreList;
             }
 
             return null;
@@ -79,6 +91,17 @@ export const useListFilterRefresh = ({ server, itemType }: UseHandleListFilterCh
                         queryKey,
                     });
 
+                    if (isClientSideSort && res?.items) {
+                        const sortedResults = orderBy(
+                            res.items,
+                            [(item) => String(item[filter.sortBy]).toLowerCase()],
+                            filter.sortOrder === 'DESC' ? ['desc'] : ['asc'],
+                        );
+
+                        params.successCallback(sortedResults || [], res?.totalRecordCount || 0);
+                        return;
+                    }
+
                     params.successCallback(res?.items || [], res?.totalRecordCount || 0);
                 },
 
@@ -89,7 +112,7 @@ export const useListFilterRefresh = ({ server, itemType }: UseHandleListFilterCh
             tableRef.current?.api.purgeInfiniteCache();
             tableRef.current?.api.ensureIndexVisible(0, 'top');
         },
-        [queryClient, queryFn, queryKeyFn, server],
+        [isClientSideSort, queryClient, queryFn, queryKeyFn, server],
     );
 
     const handleRefreshGrid = useCallback(

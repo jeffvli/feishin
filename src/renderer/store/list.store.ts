@@ -8,6 +8,8 @@ import {
     AlbumArtistListSort,
     AlbumListArgs,
     AlbumListSort,
+    GenreListArgs,
+    GenreListSort,
     LibraryItem,
     PlaylistListArgs,
     PlaylistListSort,
@@ -26,10 +28,14 @@ export type AlbumListFilter = Omit<AlbumListArgs['query'], 'startIndex' | 'limit
 export type SongListFilter = Omit<SongListArgs['query'], 'startIndex' | 'limit'>;
 export type AlbumArtistListFilter = Omit<AlbumArtistListArgs['query'], 'startIndex' | 'limit'>;
 export type PlaylistListFilter = Omit<PlaylistListArgs['query'], 'startIndex' | 'limit'>;
+export type GenreListFilter = Omit<GenreListArgs['query'], 'startIndex' | 'limit'>;
 
-export type ListKey = keyof ListState['item'] | string;
-
-type FilterType = AlbumListFilter | SongListFilter | AlbumArtistListFilter | PlaylistListFilter;
+type FilterType =
+    | AlbumListFilter
+    | SongListFilter
+    | AlbumArtistListFilter
+    | PlaylistListFilter
+    | GenreListFilter;
 
 export type ListTableProps = {
     pagination: TablePagination;
@@ -58,10 +64,13 @@ export interface ListState {
         albumArtistAlbum: ListItemProps<AlbumListFilter>;
         albumArtistSong: ListItemProps<SongListFilter>;
         albumDetail: ListItemProps<any>;
+        genre: ListItemProps<GenreListFilter>;
         playlist: ListItemProps<PlaylistListFilter>;
         song: ListItemProps<SongListFilter>;
     };
 }
+
+export type ListKey = keyof ListState['item'] | string;
 
 export type ListDeterministicArgs = { key: ListKey };
 
@@ -476,6 +485,35 @@ export const useListStore = create<ListSlice>()(
                                 totalPages: 1,
                             },
                             rowHeight: 60,
+                            scrollOffset: 0,
+                        },
+                    },
+                    genre: {
+                        display: ListDisplayType.TABLE,
+                        filter: {
+                            sortBy: GenreListSort.NAME,
+                            sortOrder: SortOrder.ASC,
+                        },
+                        grid: { itemsPerRow: 5, scrollOffset: 0 },
+                        table: {
+                            autoFit: true,
+                            columns: [
+                                {
+                                    column: TableColumn.ROW_INDEX,
+                                    width: 50,
+                                },
+                                {
+                                    column: TableColumn.TITLE,
+                                    width: 500,
+                                },
+                            ],
+                            pagination: {
+                                currentPage: 1,
+                                itemsPerPage: 100,
+                                totalItems: 1,
+                                totalPages: 1,
+                            },
+                            rowHeight: 30,
                             scrollOffset: 0,
                         },
                     },

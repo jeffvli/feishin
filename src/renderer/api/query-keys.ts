@@ -17,6 +17,7 @@ import type {
     RandomSongListQuery,
     LyricsQuery,
     LyricSearchQuery,
+    GenreListQuery,
 } from './types';
 
 export const splitPaginatedQuery = (key: any) => {
@@ -106,7 +107,18 @@ export const queryKeys: Record<
         root: (serverId: string) => [serverId, 'artists'] as const,
     },
     genres: {
-        list: (serverId: string) => [serverId, 'genres', 'list'] as const,
+        list: (serverId: string, query?: GenreListQuery) => {
+            const { pagination, filter } = splitPaginatedQuery(query);
+            if (query && pagination) {
+                return [serverId, 'genres', 'list', filter, pagination] as const;
+            }
+
+            if (query) {
+                return [serverId, 'genres', 'list', filter] as const;
+            }
+
+            return [serverId, 'genres', 'list'] as const;
+        },
         root: (serverId: string) => [serverId, 'genres'] as const,
     },
     musicFolders: {

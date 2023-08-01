@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { controller } from '/@/renderer/api/controller';
+import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import type { GenreListQuery } from '/@/renderer/api/types';
 import type { QueryHookArgs } from '/@/renderer/lib/react-query';
@@ -14,7 +14,7 @@ export const useGenreList = (args: QueryHookArgs<GenreListQuery>) => {
         enabled: !!server,
         queryFn: ({ signal }) => {
             if (!server) throw new Error('Server not found');
-            return controller.getGenreList({ apiClientProps: { server, signal }, query });
+            return api.controller.getGenreList({ apiClientProps: { server, signal }, query });
         },
         queryKey: queryKeys.genres.list(server?.id || ''),
         staleTime: 1000 * 60 * 60,

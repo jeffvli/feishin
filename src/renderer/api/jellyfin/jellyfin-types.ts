@@ -304,9 +304,20 @@ const genre = z.object({
     Type: z.string(),
 });
 
-const genreList = z.object({
+const genreList = pagination.extend({
     Items: z.array(genre),
 });
+
+const genreListSort = {
+    NAME: 'Name,SortName',
+} as const;
+
+const genreListParameters = paginationParameters.merge(
+    baseParameters.extend({
+        SearchTerm: z.string().optional(),
+        SortBy: z.nativeEnum(genreListSort).optional(),
+    }),
+);
 
 const musicFolder = z.object({
     BackdropImageTags: z.array(z.string()),
@@ -352,7 +363,7 @@ const playlist = z.object({
     UserData: userData,
 });
 
-const jfPlaylistListSort = {
+const playlistListSort = {
     ALBUM_ARTIST: 'AlbumArtist,SortName',
     DURATION: 'Runtime',
     NAME: 'SortName',
@@ -363,7 +374,7 @@ const jfPlaylistListSort = {
 const playlistListParameters = paginationParameters.merge(
     baseParameters.extend({
         IncludeItemTypes: z.literal('Playlist'),
-        SortBy: z.nativeEnum(jfPlaylistListSort).optional(),
+        SortBy: z.nativeEnum(playlistListSort).optional(),
     }),
 );
 
@@ -461,7 +472,7 @@ const album = z.object({
     UserData: userData.optional(),
 });
 
-const jfAlbumListSort = {
+const albumListSort = {
     ALBUM_ARTIST: 'AlbumArtist,SortName',
     COMMUNITY_RATING: 'CommunityRating,SortName',
     CRITIC_RATING: 'CriticRating,SortName',
@@ -479,7 +490,7 @@ const albumListParameters = paginationParameters.merge(
         IncludeItemTypes: z.literal('MusicAlbum'),
         IsFavorite: z.boolean().optional(),
         SearchTerm: z.string().optional(),
-        SortBy: z.nativeEnum(jfAlbumListSort).optional(),
+        SortBy: z.nativeEnum(albumListSort).optional(),
         Tags: z.string().optional(),
         Years: z.string().optional(),
     }),
@@ -489,7 +500,7 @@ const albumList = pagination.extend({
     Items: z.array(album),
 });
 
-const jfAlbumArtistListSort = {
+const albumArtistListSort = {
     ALBUM: 'Album,SortName',
     DURATION: 'Runtime,AlbumArtist,Album,SortName',
     NAME: 'Name,SortName',
@@ -502,7 +513,7 @@ const albumArtistListParameters = paginationParameters.merge(
     baseParameters.extend({
         Filters: z.string().optional(),
         Genres: z.string().optional(),
-        SortBy: z.nativeEnum(jfAlbumArtistListSort).optional(),
+        SortBy: z.nativeEnum(albumArtistListSort).optional(),
         Years: z.string().optional(),
     }),
 );
@@ -515,7 +526,7 @@ const similarArtistListParameters = baseParameters.extend({
     Limit: z.number().optional(),
 });
 
-const jfSongListSort = {
+const songListSort = {
     ALBUM: 'Album,SortName',
     ALBUM_ARTIST: 'AlbumArtist,Album,SortName',
     ARTIST: 'Artist,Album,SortName',
@@ -539,7 +550,7 @@ const songListParameters = paginationParameters.merge(
         Genres: z.string().optional(),
         IsFavorite: z.boolean().optional(),
         SearchTerm: z.string().optional(),
-        SortBy: z.nativeEnum(jfSongListSort).optional(),
+        SortBy: z.nativeEnum(songListSort).optional(),
         Tags: z.string().optional(),
         Years: z.string().optional(),
     }),
@@ -642,9 +653,14 @@ const lyrics = z.object({
 
 export const jfType = {
     _enum: {
+        albumArtistList: albumArtistListSort,
+        albumList: albumListSort,
         collection: jfCollection,
         external: jfExternal,
+        genreList: genreListSort,
         image: jfImage,
+        playlistList: playlistListSort,
+        songList: songListSort,
     },
     _parameters: {
         addToPlaylist: addToPlaylistParameters,
@@ -656,6 +672,7 @@ export const jfType = {
         createPlaylist: createPlaylistParameters,
         deletePlaylist: deletePlaylistParameters,
         favorite: favoriteParameters,
+        genreList: genreListParameters,
         musicFolderList: musicFolderListParameters,
         playlistDetail: playlistDetailParameters,
         playlistList: playlistListParameters,

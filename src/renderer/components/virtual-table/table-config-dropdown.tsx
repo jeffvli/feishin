@@ -84,6 +84,12 @@ export const PLAYLIST_TABLE_COLUMNS = [
     { label: 'Actions', value: TableColumn.ACTIONS },
 ];
 
+export const GENRE_TABLE_COLUMNS = [
+    { label: 'Row Index', value: TableColumn.ROW_INDEX },
+    { label: 'Title', value: TableColumn.TITLE },
+    { label: 'Actions', value: TableColumn.ACTIONS },
+];
+
 interface TableConfigDropdownProps {
     type: TableType;
 }

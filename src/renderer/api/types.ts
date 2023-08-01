@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { jfType } from './jellyfin/jellyfin-types';
 import {
     JFSortOrder,
     JFAlbumListSort,
@@ -6,8 +7,9 @@ import {
     JFAlbumArtistListSort,
     JFArtistListSort,
     JFPlaylistListSort,
+    JFGenreListSort,
 } from './jellyfin.types';
-import { jfType } from './jellyfin/jellyfin-types';
+import { ndType } from './navidrome/navidrome-types';
 import {
     NDSortOrder,
     NDOrder,
@@ -16,13 +18,14 @@ import {
     NDPlaylistListSort,
     NDSongListSort,
     NDUserListSort,
+    NDGenreListSort,
 } from './navidrome.types';
-import { ndType } from './navidrome/navidrome-types';
 
 export enum LibraryItem {
     ALBUM = 'album',
     ALBUM_ARTIST = 'albumArtist',
     ARTIST = 'artist',
+    GENRE = 'genre',
     PLAYLIST = 'playlist',
     SONG = 'song',
 }
@@ -292,7 +295,40 @@ export type GenreListResponse = BasePaginatedResponse<Genre[]> | null | undefine
 
 export type GenreListArgs = { query: GenreListQuery } & BaseEndpointArgs;
 
-export type GenreListQuery = null;
+export enum GenreListSort {
+    NAME = 'name',
+}
+
+export type GenreListQuery = {
+    _custom?: {
+        jellyfin?: null;
+        navidrome?: null;
+    };
+    limit?: number;
+    musicFolderId?: string;
+    searchTerm?: string;
+    sortBy: GenreListSort;
+    sortOrder: SortOrder;
+    startIndex: number;
+};
+
+type GenreListSortMap = {
+    jellyfin: Record<GenreListSort, JFGenreListSort | undefined>;
+    navidrome: Record<GenreListSort, NDGenreListSort | undefined>;
+    subsonic: Record<UserListSort, undefined>;
+};
+
+export const genreListSortMap: GenreListSortMap = {
+    jellyfin: {
+        name: JFGenreListSort.NAME,
+    },
+    navidrome: {
+        name: NDGenreListSort.NAME,
+    },
+    subsonic: {
+        name: undefined,
+    },
+};
 
 // Album List
 export type AlbumListResponse = BasePaginatedResponse<Album[]> | null | undefined;

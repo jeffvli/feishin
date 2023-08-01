@@ -12,6 +12,7 @@ import {
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { QueryKey, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
+import orderBy from 'lodash/orderBy';
 import { generatePath, useNavigate } from 'react-router';
 import { api } from '/@/renderer/api';
 import { QueryPagination, queryKeys } from '/@/renderer/api/query-keys';
@@ -32,6 +33,7 @@ export type AgGridFetchFn<TResponse, TFilter> = (
 interface UseAgGridProps<TFilter> {
     contextMenu: SetContextMenuItems;
     customFilters?: Partial<TFilter>;
+    isClientSideSort?: boolean;
     isSearchParams?: boolean;
     itemCount?: number;
     itemType: LibraryItem;
@@ -49,6 +51,7 @@ export const useVirtualTable = <TFilter>({
     itemCount,
     customFilters,
     isSearchParams,
+    isClientSideSort,
 }: UseAgGridProps<TFilter>) => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -104,6 +107,9 @@ export const useVirtualTable = <TFilter>({
         if (itemType === LibraryItem.SONG) {
             return queryKeys.songs.list;
         }
+        if (itemType === LibraryItem.GENRE) {
+            return queryKeys.genres.list;
+        }
 
         return null;
     }, [itemType]);
@@ -121,6 +127,9 @@ export const useVirtualTable = <TFilter>({
             }
             if (itemType === LibraryItem.SONG) {
                 return api.controller.getSongList;
+            }
+            if (itemType === LibraryItem.GENRE) {
+                return api.controller.getGenreList;
             }
 
             return null;
@@ -160,6 +169,17 @@ export const useVirtualTable = <TFilter>({
                         return res;
                     })) as BasePaginatedResponse<any>;
 
+                    if (isClientSideSort && results?.items) {
+                        const sortedResults = orderBy(
+                            results.items,
+                            [(item) => String(item[properties.filter.sortBy]).toLowerCase()],
+                            properties.filter.sortOrder === 'DESC' ? ['desc'] : ['asc'],
+                        );
+
+                        params.successCallback(sortedResults || [], results?.totalRecordCount || 0);
+                        return;
+                    }
+
                     params.successCallback(results?.items || [], results?.totalRecordCount || 0);
                 },
                 rowCount: undefined,
@@ -168,7 +188,15 @@ export const useVirtualTable = <TFilter>({
             params.api.setDatasource(dataSource);
             params.api.ensureIndexVisible(initialTableIndex, 'top');
         },
-        [initialTableIndex, queryKeyFn, server, properties.filter, queryClient, queryFn],
+        [
+            initialTableIndex,
+            queryKeyFn,
+            server,
+            properties.filter,
+            queryClient,
+            isClientSideSort,
+            queryFn,
+        ],
     );
 
     const setParamsTablePagination = useCallback(
@@ -206,10 +234,10 @@ export const useVirtualTable = <TFilter>({
             if (isSearchParams) {
                 setSearchParams(
                     (params) => {
-                        params.set('currentPage', String(event.api?.paginationGetCurrentPage()));
-                        params.set('itemsPerPage', String(event.api?.paginationGetPageSize()));
-                        params.set('totalItems', String(event.api?.paginationGetRowCount()));
-                        params.set('totalPages', String(event.api?.paginationGetTotalPages() + 1));
+                        params.set('currentPage', String(event.api.paginationGetCurrentPage()));
+                        params.set('itemsPerPage', String(event.api.paginationGetPageSize()));
+                        params.set('totalItems', String(event.api.paginationGetRowCount()));
+                        params.set('totalPages', String(event.api.paginationGetTotalPages() + 1));
                         return params;
                     },
                     { replace: true },

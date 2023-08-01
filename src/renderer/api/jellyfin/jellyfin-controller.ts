@@ -46,6 +46,7 @@ import {
     RandomSongListArgs,
     LyricsArgs,
     LyricsResponse,
+    genreListSortMap,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -116,9 +117,16 @@ const getMusicFolderList = async (args: MusicFolderListArgs): Promise<MusicFolde
 };
 
 const getGenreList = async (args: GenreListArgs): Promise<GenreListResponse> => {
-    const { apiClientProps } = args;
+    const { apiClientProps, query } = args;
 
-    const res = await jfApiClient(apiClientProps).getGenreList();
+    const res = await jfApiClient(apiClientProps).getGenreList({
+        query: {
+            SearchTerm: query?.searchTerm,
+            SortBy: genreListSortMap.jellyfin[query.sortBy] || 'Name,SortName',
+            SortOrder: sortOrderMap.jellyfin[query.sortOrder],
+            StartIndex: query.startIndex,
+        },
+    });
 
     if (res.status !== 200) {
         throw new Error('Failed to get genre list');
@@ -126,8 +134,8 @@ const getGenreList = async (args: GenreListArgs): Promise<GenreListResponse> => 
 
     return {
         items: res.body.Items.map(jfNormalize.genre),
-        startIndex: 0,
-        totalRecordCount: res.body?.Items?.length || 0,
+        startIndex: query.startIndex || 0,
+        totalRecordCount: res.body?.TotalRecordCount || 0,
     };
 };
 

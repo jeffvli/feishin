@@ -52,6 +52,16 @@ const genre = z.object({
     name: z.string(),
 });
 
+const genreListSort = {
+    NAME: 'name',
+    SONG_COUNT: 'songCount',
+} as const;
+
+const genreListParameters = paginationParameters.extend({
+    _sort: z.nativeEnum(genreListSort).optional(),
+    name: z.string().optional(),
+});
+
 const genreList = z.array(genre);
 
 const albumArtist = z.object({
@@ -322,6 +332,7 @@ export const ndType = {
     _enum: {
         albumArtistList: ndAlbumArtistListSort,
         albumList: ndAlbumListSort,
+        genreList: genreListSort,
         playlistList: ndPlaylistListSort,
         songList: ndSongListSort,
         userList: ndUserListSort,
@@ -332,6 +343,7 @@ export const ndType = {
         albumList: albumListParameters,
         authenticate: authenticateParameters,
         createPlaylist: createPlaylistParameters,
+        genreList: genreListParameters,
         playlistList: playlistListParameters,
         removeFromPlaylist: removeFromPlaylistParameters,
         songList: songListParameters,

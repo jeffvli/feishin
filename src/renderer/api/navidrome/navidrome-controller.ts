@@ -38,6 +38,7 @@ import {
     PlaylistSongListResponse,
     RemoveFromPlaylistResponse,
     RemoveFromPlaylistArgs,
+    genreListSortMap,
 } from '../types';
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
@@ -94,9 +95,17 @@ const getUserList = async (args: UserListArgs): Promise<UserListResponse> => {
 };
 
 const getGenreList = async (args: GenreListArgs): Promise<GenreListResponse> => {
-    const { apiClientProps } = args;
+    const { query, apiClientProps } = args;
 
-    const res = await ndApiClient(apiClientProps).getGenreList({});
+    const res = await ndApiClient(apiClientProps).getGenreList({
+        query: {
+            _end: query.startIndex + (query.limit || 0),
+            _order: sortOrderMap.navidrome[query.sortOrder],
+            _sort: genreListSortMap.navidrome[query.sortBy],
+            _start: query.startIndex,
+            name: query.searchTerm,
+        },
+    });
 
     if (res.status !== 200) {
         throw new Error('Failed to get genre list');
@@ -104,7 +113,7 @@ const getGenreList = async (args: GenreListArgs): Promise<GenreListResponse> => 
 
     return {
         items: res.body.data,
-        startIndex: 0,
+        startIndex: query.startIndex || 0,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };
 };

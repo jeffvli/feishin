@@ -1,7 +1,7 @@
 import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, useMemo } from 'react';
-import { LibraryItem } from '/@/renderer/api/types';
+import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { NumberInput, Select, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
@@ -22,7 +22,14 @@ export const NavidromeSongFilters = ({
     const { setFilter } = useListStoreActions();
     const filter = useListFilterByKey({ key: pageKey });
 
-    const genreListQuery = useGenreList({ query: null, serverId });
+    const genreListQuery = useGenreList({
+        query: {
+            sortBy: GenreListSort.NAME,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+        },
+        serverId,
+    });
 
     const genreList = useMemo(() => {
         if (!genreListQuery?.data) return [];

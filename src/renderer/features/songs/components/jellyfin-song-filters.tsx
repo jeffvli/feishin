@@ -2,7 +2,7 @@ import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, useMemo } from 'react';
 import { useListFilterByKey } from '../../../store/list.store';
-import { LibraryItem } from '/@/renderer/api/types';
+import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { MultiSelect, NumberInput, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
 import { SongListFilter, useListStoreActions } from '/@/renderer/store';
@@ -24,7 +24,14 @@ export const JellyfinSongFilters = ({
     const { filter } = useListFilterByKey({ key: pageKey });
 
     // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
-    const genreListQuery = useGenreList({ query: null, serverId });
+    const genreListQuery = useGenreList({
+        query: {
+            sortBy: GenreListSort.NAME,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+        },
+        serverId,
+    });
 
     const genreList = useMemo(() => {
         if (!genreListQuery?.data) return [];

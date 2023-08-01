@@ -88,6 +88,7 @@ export const contract = c.router({
     getGenreList: {
         method: 'GET',
         path: 'genre',
+        query: ndType._parameters.genreList,
         responses: {
             200: resultWithHeaders(ndType._response.genreList),
             500: resultWithHeaders(ndType._response.error),
