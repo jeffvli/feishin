@@ -22,6 +22,8 @@ export const NavidromeSongFilters = ({
     const { setFilter } = useListStoreActions();
     const filter = useListFilterByKey({ key: pageKey });
 
+    const isGenrePage = customFilters?._custom?.navidrome?.genre_id !== undefined;
+
     const genreListQuery = useGenreList({
         query: {
             sortBy: GenreListSort.NAME,
@@ -124,15 +126,17 @@ export const NavidromeSongFilters = ({
                     width={50}
                     onChange={(e) => handleYearFilter(e)}
                 />
-                <Select
-                    clearable
-                    searchable
-                    data={genreList}
-                    defaultValue={filter._custom?.navidrome?.genre_id}
-                    label="Genre"
-                    width={150}
-                    onChange={handleGenresFilter}
-                />
+                {!isGenrePage && (
+                    <Select
+                        clearable
+                        searchable
+                        data={genreList}
+                        defaultValue={filter._custom?.navidrome?.genre_id}
+                        label="Genre"
+                        width={150}
+                        onChange={handleGenresFilter}
+                    />
+                )}
             </Group>
         </Stack>
     );

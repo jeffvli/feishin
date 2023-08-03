@@ -6,7 +6,10 @@ import { useVirtualTable } from '/@/renderer/components/virtual-table/hooks/use-
 import { useListContext } from '/@/renderer/context/list-context';
 import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { useCurrentServer } from '/@/renderer/store';
-import { MutableRefObject } from 'react';
+import { MutableRefObject, useCallback } from 'react';
+import { RowDoubleClickedEvent } from '@ag-grid-community/core';
+import { generatePath, useNavigate } from 'react-router';
+import { AppRoute } from '/@/renderer/router/routes';
 
 interface GenreListTableViewProps {
     itemCount?: number;
@@ -16,6 +19,7 @@ interface GenreListTableViewProps {
 export const GenreListTableView = ({ tableRef, itemCount }: GenreListTableViewProps) => {
     const server = useCurrentServer();
     const { pageKey, customFilters } = useListContext();
+    const navigate = useNavigate();
 
     const tableProps = useVirtualTable({
         contextMenu: ALBUM_CONTEXT_MENU_ITEMS,
@@ -27,6 +31,16 @@ export const GenreListTableView = ({ tableRef, itemCount }: GenreListTableViewPr
         tableRef,
     });
 
+    const onRowDoubleClicked = useCallback(
+        (e: RowDoubleClickedEvent) => {
+            const { data } = e;
+            if (!data) return;
+
+            navigate(generatePath(AppRoute.LIBRARY_GENRES_SONGS, { genreId: data.id }));
+        },
+        [navigate],
+    );
+
     return (
         <VirtualGridAutoSizerContainer>
             <VirtualTable
@@ -35,6 +49,7 @@ export const GenreListTableView = ({ tableRef, itemCount }: GenreListTableViewPr
                 key={`table-${tableProps.rowHeight}-${server?.id}`}
                 ref={tableRef}
                 {...tableProps}
+                onRowDoubleClicked={onRowDoubleClicked}
             />
         </VirtualGridAutoSizerContainer>
     );

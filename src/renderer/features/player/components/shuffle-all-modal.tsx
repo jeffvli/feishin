@@ -13,6 +13,8 @@ import {
     RandomSongListQuery,
     MusicFolderListResponse,
     ServerType,
+    GenreListSort,
+    SortOrder,
 } from '/@/renderer/api/types';
 import { api } from '/@/renderer/api';
 import { useAuthStore } from '/@/renderer/store';
@@ -225,7 +227,11 @@ export const openShuffleAllModal = async (
                     server,
                     signal,
                 },
-                query: null,
+                query: {
+                    sortBy: GenreListSort.NAME,
+                    sortOrder: SortOrder.ASC,
+                    startIndex: 0,
+                },
             }),
         queryKey: queryKeys.genres.list(server?.id),
         staleTime: 1000 * 60 * 5,

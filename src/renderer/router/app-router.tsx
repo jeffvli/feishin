@@ -105,11 +105,21 @@ export const AppRouter = () => {
                                 errorElement={<RouteErrorBoundary />}
                                 path={AppRoute.NOW_PLAYING}
                             />
-                            <Route
-                                element={<GenreListRoute />}
-                                errorElement={<RouteErrorBoundary />}
-                                path={AppRoute.LIBRARY_GENRES}
-                            />
+                            <Route path={AppRoute.LIBRARY_GENRES}>
+                                <Route
+                                    index
+                                    element={<GenreListRoute />}
+                                    errorElement={<RouteErrorBoundary />}
+                                />
+                                <Route
+                                    element={<AlbumListRoute />}
+                                    path={AppRoute.LIBRARY_GENRES_ALBUMS}
+                                />
+                                <Route
+                                    element={<SongListRoute />}
+                                    path={AppRoute.LIBRARY_GENRES_SONGS}
+                                />
+                            </Route>
                             <Route
                                 element={<AlbumListRoute />}
                                 errorElement={<RouteErrorBoundary />}

@@ -23,6 +23,8 @@ export const JellyfinSongFilters = ({
     const { setFilter } = useListStoreActions();
     const { filter } = useListFilterByKey({ key: pageKey });
 
+    const isGenrePage = customFilters?._custom?.jellyfin?.GenreIds !== undefined;
+
     // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
     const genreListQuery = useGenreList({
         query: {
@@ -162,17 +164,19 @@ export const JellyfinSongFilters = ({
                     onChange={handleMaxYearFilter}
                 />
             </Group>
-            <Group grow>
-                <MultiSelect
-                    clearable
-                    searchable
-                    data={genreList}
-                    defaultValue={selectedGenres}
-                    label="Genres"
-                    width={250}
-                    onChange={handleGenresFilter}
-                />
-            </Group>
+            {!isGenrePage && (
+                <Group grow>
+                    <MultiSelect
+                        clearable
+                        searchable
+                        data={genreList}
+                        defaultValue={selectedGenres}
+                        label="Genres"
+                        width={250}
+                        onChange={handleGenresFilter}
+                    />
+                </Group>
+            )}
         </Stack>
     );
 };
