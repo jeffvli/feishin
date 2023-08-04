@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Center, Group } from '@mantine/core';
 import { AnimatePresence, motion } from 'framer-motion';
-import { clear } from 'idb-keyval';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
@@ -162,7 +161,7 @@ export const Lyrics = () => {
 
     const isLoadingLyrics = isInitialLoading || isOverrideLoading;
 
-    const hasNoLyrics = !data?.lyrics || clear;
+    const hasNoLyrics = !data?.lyrics;
 
     const lyricsMetadata:
         | Partial<SynchronizedLyricMetadata>

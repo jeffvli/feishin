@@ -413,7 +413,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         if (ctx.dataNodes) {
             for (const node of ctx.dataNodes) {
-                console.log('node.data.itemType :>> ', node.data.itemType);
                 switch (node.data.itemType) {
                     case LibraryItem.ALBUM:
                         albumId.push(node.data.id);
@@ -447,8 +446,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 }
             }
         }
-
-        console.log('genreId', genreId);
 
         openContextModal({
             innerProps: {

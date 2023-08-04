@@ -93,8 +93,6 @@ export const useSongLyricsBySong = (
             if (!server) throw new Error('Server not found');
             if (!song) return null;
 
-            console.log('refetching song lyrics');
-
             if (song.lyrics) {
                 return {
                     artist: song.artists?.[0]?.name,
@@ -165,11 +163,6 @@ export const useSongLyricsByRemoteId = (
                 remote: false,
                 source: query.remoteSource,
             };
-
-            console.log(
-                'queryKeys.songs.lyrics(serverId, { songId: query.song.id }) :>> ',
-                queryKeys.songs.lyrics(serverId, { songId: query.song.id }),
-            );
 
             queryClient.setQueryData(
                 queryKeys.songs.lyrics(serverId, { songId: query.song.id }),
