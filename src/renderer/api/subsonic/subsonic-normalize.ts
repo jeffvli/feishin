@@ -72,6 +72,8 @@ const normalizeSong = (
             ? [
                   {
                       id: item.genre,
+                      imageUrl: null,
+                      itemType: LibraryItem.GENRE,
                       name: item.genre,
                   },
               ]
@@ -152,7 +154,16 @@ const normalizeAlbum = (
         backdropImageUrl: null,
         createdAt: item.created,
         duration: item.duration,
-        genres: item.genre ? [{ id: item.genre, name: item.genre }] : [],
+        genres: item.genre
+            ? [
+                  {
+                      id: item.genre,
+                      imageUrl: null,
+                      itemType: LibraryItem.GENRE,
+                      name: item.genre,
+                  },
+              ]
+            : [],
         id: item.id,
         imagePlaceholderUrl: null,
         imageUrl,
