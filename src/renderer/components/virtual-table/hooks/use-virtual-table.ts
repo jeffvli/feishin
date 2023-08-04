@@ -166,8 +166,6 @@ export const useVirtualTable = <TFilter>({
                             },
                         });
 
-                        console.log('res', res);
-
                         return res;
                     })) as BasePaginatedResponse<any>;
 
