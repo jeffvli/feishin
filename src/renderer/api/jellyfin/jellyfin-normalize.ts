@@ -151,7 +151,7 @@ const normalizeSong = (
         createdAt: item.DateCreated,
         discNumber: (item.ParentIndexNumber && item.ParentIndexNumber) || 1,
         duration: item.RunTimeTicks / 10000000,
-        genres: item.GenreItems.map((entry) => ({
+        genres: item.GenreItems?.map((entry) => ({
             id: entry.Id,
             imageUrl: null,
             itemType: LibraryItem.GENRE,
@@ -209,7 +209,7 @@ const normalizeAlbum = (
         backdropImageUrl: null,
         createdAt: item.DateCreated,
         duration: item.RunTimeTicks / 10000000,
-        genres: item.GenreItems.map((entry) => ({
+        genres: item.GenreItems?.map((entry) => ({
             id: entry.Id,
             imageUrl: null,
             itemType: LibraryItem.GENRE,
@@ -266,7 +266,7 @@ const normalizeAlbumArtist = (
         backgroundImageUrl: null,
         biography: item.Overview || null,
         duration: item.RunTimeTicks / 10000,
-        genres: item.GenreItems.map((entry) => ({
+        genres: item.GenreItems?.map((entry) => ({
             id: entry.Id,
             imageUrl: null,
             itemType: LibraryItem.GENRE,
@@ -307,7 +307,7 @@ const normalizePlaylist = (
     return {
         description: item.Overview || null,
         duration: item.RunTimeTicks / 10000,
-        genres: item.GenreItems.map((entry) => ({
+        genres: item.GenreItems?.map((entry) => ({
             id: entry.Id,
             imageUrl: null,
             itemType: LibraryItem.GENRE,
