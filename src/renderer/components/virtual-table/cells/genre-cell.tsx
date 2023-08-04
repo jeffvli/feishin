@@ -1,9 +1,10 @@
 import React from 'react';
 import type { ICellRendererParams } from '@ag-grid-community/core';
-import { Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router-dom';
 import type { AlbumArtist, Artist } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components/text';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
+import { AppRoute } from '/@/renderer/router/routes';
 
 export const GenreCell = ({ value, data }: ICellRendererParams) => {
     return (
@@ -30,7 +31,9 @@ export const GenreCell = ({ value, data }: ICellRendererParams) => {
                             component={Link}
                             overflow="hidden"
                             size="md"
-                            to="/"
+                            to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
+                                genreId: item.id,
+                            })}
                         >
                             {item.name || '—'}
                         </Text>
