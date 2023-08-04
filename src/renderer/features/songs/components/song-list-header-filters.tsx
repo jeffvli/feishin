@@ -6,7 +6,7 @@ import {
     RiAddBoxFill,
     RiAddCircleFill,
     RiFilterFill,
-    RiFolder2Line,
+    RiFolder2Fill,
     RiMoreFill,
     RiPlayFill,
     RiRefreshLine,
@@ -268,6 +268,10 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
         return isNavidromeFilterApplied || isJellyfinFilterApplied;
     }, [filter?._custom?.jellyfin, filter?._custom?.navidrome, server?.type]);
 
+    const isFolderFilterApplied = useMemo(() => {
+        return filter.musicFolderId !== undefined;
+    }, [filter.musicFolderId]);
+
     return (
         <Flex justify="space-between">
             <Group
@@ -313,9 +317,16 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                                     compact
                                     fw="600"
                                     size="md"
+                                    sx={{
+                                        svg: {
+                                            fill: isFolderFilterApplied
+                                                ? 'var(--primary-color) !important'
+                                                : undefined,
+                                        },
+                                    }}
                                     variant="subtle"
                                 >
-                                    {cq.isSm ? 'Folder' : <RiFolder2Line size="1.3rem" />}
+                                    <RiFolder2Fill size="1.3rem" />
                                 </Button>
                             </DropdownMenu.Target>
                             <DropdownMenu.Dropdown>
