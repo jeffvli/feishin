@@ -137,6 +137,8 @@ export type AuthenticationResponse = {
 export type Genre = {
     albumCount?: number;
     id: string;
+    imageUrl: string | null;
+    itemType: LibraryItem.GENRE;
     name: string;
     songCount?: number;
 };

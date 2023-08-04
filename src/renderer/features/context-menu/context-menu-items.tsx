@@ -52,6 +52,13 @@ export const ALBUM_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { children: true, disabled: false, id: 'setRating' },
 ];
 
+export const GENRE_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
+    { id: 'play' },
+    { id: 'playLast' },
+    { divider: true, id: 'playNext' },
+    { divider: true, id: 'addToPlaylist' },
+];
+
 export const ARTIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { id: 'play' },
     { id: 'playLast' },

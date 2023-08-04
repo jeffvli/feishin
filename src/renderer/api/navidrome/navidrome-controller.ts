@@ -112,7 +112,7 @@ const getGenreList = async (args: GenreListArgs): Promise<GenreListResponse> => 
     }
 
     return {
-        items: res.body.data,
+        items: res.body.data.map((genre) => ndNormalize.genre(genre)),
         startIndex: query.startIndex || 0,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };

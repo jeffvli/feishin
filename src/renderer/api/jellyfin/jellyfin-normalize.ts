@@ -140,7 +140,9 @@ const normalizeSong = (
             imageUrl: null,
             name: entry.Name,
         })),
-        bitRate: item.MediaSources && Number(Math.trunc(item.MediaSources[0]?.Bitrate / 1000)),
+        bitRate:
+            item.MediaSources?.[0].Bitrate &&
+            Number(Math.trunc(item.MediaSources[0].Bitrate / 1000)),
         bpm: null,
         channels: null,
         comment: null,
@@ -149,7 +151,12 @@ const normalizeSong = (
         createdAt: item.DateCreated,
         discNumber: (item.ParentIndexNumber && item.ParentIndexNumber) || 1,
         duration: item.RunTimeTicks / 10000000,
-        genres: item.GenreItems.map((entry: any) => ({ id: entry.Id, name: entry.Name })),
+        genres: item.GenreItems.map((entry) => ({
+            id: entry.Id,
+            imageUrl: null,
+            itemType: LibraryItem.GENRE,
+            name: entry.Name,
+        })),
         id: item.Id,
         imagePlaceholderUrl: null,
         imageUrl: getSongCoverArtUrl({ baseUrl: server?.url || '', item, size: imageSize || 100 }),
@@ -202,7 +209,12 @@ const normalizeAlbum = (
         backdropImageUrl: null,
         createdAt: item.DateCreated,
         duration: item.RunTimeTicks / 10000000,
-        genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
+        genres: item.GenreItems.map((entry) => ({
+            id: entry.Id,
+            imageUrl: null,
+            itemType: LibraryItem.GENRE,
+            name: entry.Name,
+        })),
         id: item.Id,
         imagePlaceholderUrl: null,
         imageUrl: getAlbumCoverArtUrl({
@@ -254,7 +266,12 @@ const normalizeAlbumArtist = (
         backgroundImageUrl: null,
         biography: item.Overview || null,
         duration: item.RunTimeTicks / 10000,
-        genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
+        genres: item.GenreItems.map((entry) => ({
+            id: entry.Id,
+            imageUrl: null,
+            itemType: LibraryItem.GENRE,
+            name: entry.Name,
+        })),
         id: item.Id,
         imageUrl: getAlbumArtistCoverArtUrl({
             baseUrl: server?.url || '',
@@ -290,7 +307,12 @@ const normalizePlaylist = (
     return {
         description: item.Overview || null,
         duration: item.RunTimeTicks / 10000,
-        genres: item.GenreItems?.map((entry) => ({ id: entry.Id, name: entry.Name })),
+        genres: item.GenreItems.map((entry) => ({
+            id: entry.Id,
+            imageUrl: null,
+            itemType: LibraryItem.GENRE,
+            name: entry.Name,
+        })),
         id: item.Id,
         imagePlaceholderUrl,
         imageUrl: imageUrl || null,
@@ -339,6 +361,8 @@ const normalizeGenre = (item: JFGenre): Genre => {
     return {
         albumCount: undefined,
         id: item.Id,
+        imageUrl: null,
+        itemType: LibraryItem.GENRE,
         name: item.Name,
         songCount: undefined,
     };

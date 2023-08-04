@@ -9,7 +9,7 @@ import {
     SongListSort,
     SortOrder,
 } from '/@/renderer/api/types';
-import { ServerListItem } from '/@/renderer/types';
+import { ServerListItem, ServerType } from '/@/renderer/types';
 
 export const getPlaylistSongsById = async (args: {
     id: string;
@@ -84,6 +84,65 @@ export const getAlbumSongsById = async (args: {
     );
 
     return res;
+};
+
+export const getGenreSongsById = async (args: {
+    id: string[];
+    orderByIds?: boolean;
+    query?: Partial<SongListQuery>;
+    queryClient: QueryClient;
+    server: ServerListItem | null;
+}) => {
+    const { id, queryClient, server, query } = args;
+
+    const data: SongListResponse = {
+        items: [],
+        startIndex: 0,
+        totalRecordCount: 0,
+    };
+    for (const genreId of id) {
+        const queryFilter: SongListQuery = {
+            _custom: {
+                ...(server?.type === ServerType.JELLYFIN && {
+                    jellyfin: {
+                        GenreIds: genreId,
+                    },
+                }),
+                ...(server?.type === ServerType.NAVIDROME && {
+                    navidrome: {
+                        genre_id: genreId,
+                    },
+                }),
+            },
+            sortBy: SongListSort.GENRE,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+            ...query,
+        };
+
+        const queryKey = queryKeys.songs.list(server?.id, queryFilter);
+
+        const res = await queryClient.fetchQuery(
+            queryKey,
+            async ({ signal }) =>
+                api.controller.getSongList({
+                    apiClientProps: {
+                        server,
+                        signal,
+                    },
+                    query: queryFilter,
+                }),
+            {
+                cacheTime: 1000 * 60,
+                staleTime: 1000 * 60,
+            },
+        );
+
+        data.items.push(...res!.items);
+        data.totalRecordCount += res!.totalRecordCount;
+    }
+
+    return data;
 };
 
 export const getAlbumArtistSongsById = async (args: {

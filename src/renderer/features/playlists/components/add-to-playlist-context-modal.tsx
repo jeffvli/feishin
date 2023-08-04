@@ -6,6 +6,7 @@ import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { PlaylistListSort, SongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { Button, MultiSelect, Switch, toast } from '/@/renderer/components';
+import { getGenreSongsById } from '/@/renderer/features/player';
 import { useAddToPlaylist } from '/@/renderer/features/playlists/mutations/add-to-playlist-mutation';
 import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
 import { queryClient } from '/@/renderer/lib/react-query';
@@ -17,9 +18,10 @@ export const AddToPlaylistContextModal = ({
 }: ContextModalProps<{
     albumId?: string[];
     artistId?: string[];
+    genreId?: string[];
     songId?: string[];
 }>) => {
-    const { albumId, artistId, songId } = innerProps;
+    const { albumId, artistId, genreId, songId } = innerProps;
     const server = useCurrentServer();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -110,6 +112,16 @@ export const AddToPlaylistContextModal = ({
                 const songs = await getSongsByArtist(id);
                 allSongIds.push(...(songs?.items?.map((song) => song.id) || []));
             }
+        }
+
+        if (genreId && genreId.length > 0) {
+            const songs = await getGenreSongsById({
+                id: genreId,
+                queryClient,
+                server,
+            });
+
+            allSongIds.push(...(songs?.items?.map((song) => song.id) || []));
         }
 
         if (songId && songId.length > 0) {

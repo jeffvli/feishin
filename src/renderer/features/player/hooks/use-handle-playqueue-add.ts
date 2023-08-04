@@ -25,6 +25,7 @@ import {
     getAlbumSongsById,
     getAlbumArtistSongsById,
     getSongsByQuery,
+    getGenreSongsById,
 } from '/@/renderer/features/player/utils';
 import { queryKeys } from '/@/renderer/api/query-keys';
 
@@ -36,6 +37,9 @@ const getRootQueryKey = (itemType: LibraryItem, serverId: string) => {
             queryKey = queryKeys.songs.list(serverId);
             break;
         case LibraryItem.ALBUM_ARTIST:
+            queryKey = queryKeys.songs.list(serverId);
+            break;
+        case LibraryItem.GENRE:
             queryKey = queryKeys.songs.list(serverId);
             break;
         case LibraryItem.PLAYLIST:
@@ -112,6 +116,8 @@ export const useHandlePlayQueueAdd = () => {
                             queryClient,
                             server,
                         });
+                    } else if (itemType === LibraryItem.GENRE) {
+                        songList = await getGenreSongsById({ id, query, queryClient, server });
                     } else if (itemType === LibraryItem.SONG) {
                         if (id?.length === 1) {
                             songList = await getSongById({ id: id?.[0], queryClient, server });

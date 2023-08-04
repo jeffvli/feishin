@@ -1,9 +1,18 @@
 import { nanoid } from 'nanoid';
-import { Song, LibraryItem, Album, Playlist, User, AlbumArtist } from '/@/renderer/api/types';
+import {
+    Song,
+    LibraryItem,
+    Album,
+    Playlist,
+    User,
+    AlbumArtist,
+    Genre,
+} from '/@/renderer/api/types';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import z from 'zod';
 import { ndType } from './navidrome-types';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
+import { NDGenre } from '/@/renderer/api/navidrome.types';
 
 const getImageUrl = (args: { url: string | null }) => {
     const { url } = args;
@@ -81,7 +90,12 @@ const normalizeSong = (
         createdAt: item.createdAt.split('T')[0],
         discNumber: item.discNumber,
         duration: item.duration,
-        genres: item.genres,
+        genres: item.genres?.map((genre) => ({
+            id: genre.id,
+            imageUrl: null,
+            itemType: LibraryItem.GENRE,
+            name: genre.name,
+        })),
         id,
         imagePlaceholderUrl,
         imageUrl,
@@ -130,7 +144,12 @@ const normalizeAlbum = (
         backdropImageUrl: imageBackdropUrl,
         createdAt: item.createdAt.split('T')[0],
         duration: item.duration * 1000 || null,
-        genres: item.genres,
+        genres: item.genres?.map((genre) => ({
+            id: genre.id,
+            imageUrl: null,
+            itemType: LibraryItem.GENRE,
+            name: genre.name,
+        })),
         id: item.id,
         imagePlaceholderUrl,
         imageUrl,
@@ -166,7 +185,12 @@ const normalizeAlbumArtist = (
         backgroundImageUrl: null,
         biography: item.biography || null,
         duration: null,
-        genres: item.genres,
+        genres: item.genres?.map((genre) => ({
+            id: genre.id,
+            imageUrl: null,
+            itemType: LibraryItem.GENRE,
+            name: genre.name,
+        })),
         id: item.id,
         imageUrl: imageUrl || null,
         itemType: LibraryItem.ALBUM_ARTIST,
@@ -222,6 +246,17 @@ const normalizePlaylist = (
     };
 };
 
+const normalizeGenre = (item: NDGenre): Genre => {
+    return {
+        albumCount: undefined,
+        id: item.id,
+        imageUrl: null,
+        itemType: LibraryItem.GENRE,
+        name: item.name,
+        songCount: undefined,
+    };
+};
+
 const normalizeUser = (item: z.infer<typeof ndType._response.user>): User => {
     return {
         createdAt: item.createdAt,
@@ -237,6 +272,7 @@ const normalizeUser = (item: z.infer<typeof ndType._response.user>): User => {
 export const ndNormalize = {
     album: normalizeAlbum,
     albumArtist: normalizeAlbumArtist,
+    genre: normalizeGenre,
     playlist: normalizePlaylist,
     song: normalizeSong,
     user: normalizeUser,

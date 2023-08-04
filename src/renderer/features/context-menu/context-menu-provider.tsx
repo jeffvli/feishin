@@ -196,6 +196,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                         playType,
                     });
                     break;
+                case LibraryItem.GENRE:
+                    handlePlayQueueAdd?.({
+                        byItemType: { id: ctx.data.map((item) => item.id), type: ctx.type },
+                        playType,
+                    });
+                    break;
                 case LibraryItem.SONG:
                     handlePlayQueueAdd?.({ byData: ctx.data, playType });
                     break;
@@ -403,15 +409,20 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         const albumId: string[] = [];
         const artistId: string[] = [];
         const songId: string[] = [];
+        const genreId: string[] = [];
 
         if (ctx.dataNodes) {
             for (const node of ctx.dataNodes) {
+                console.log('node.data.itemType :>> ', node.data.itemType);
                 switch (node.data.itemType) {
                     case LibraryItem.ALBUM:
                         albumId.push(node.data.id);
                         break;
                     case LibraryItem.ARTIST:
                         artistId.push(node.data.id);
+                        break;
+                    case LibraryItem.GENRE:
+                        genreId.push(node.data.id);
                         break;
                     case LibraryItem.SONG:
                         songId.push(node.data.id);
@@ -427,6 +438,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     case LibraryItem.ARTIST:
                         artistId.push(item.id);
                         break;
+                    case LibraryItem.GENRE:
+                        genreId.push(item.id);
+                        break;
                     case LibraryItem.SONG:
                         songId.push(item.id);
                         break;
@@ -434,10 +448,13 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             }
         }
 
+        console.log('genreId', genreId);
+
         openContextModal({
             innerProps: {
                 albumId: albumId.length > 0 ? albumId : undefined,
                 artistId: artistId.length > 0 ? artistId : undefined,
+                genreId: genreId.length > 0 ? genreId : undefined,
                 songId: songId.length > 0 ? songId : undefined,
             },
             modal: 'addToPlaylist',

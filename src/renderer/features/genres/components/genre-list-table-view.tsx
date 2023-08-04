@@ -4,7 +4,7 @@ import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-gr
 import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { useVirtualTable } from '/@/renderer/components/virtual-table/hooks/use-virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
-import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import { GENRE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { useCurrentServer } from '/@/renderer/store';
 import { MutableRefObject, useCallback } from 'react';
 import { RowDoubleClickedEvent } from '@ag-grid-community/core';
@@ -22,7 +22,7 @@ export const GenreListTableView = ({ tableRef, itemCount }: GenreListTableViewPr
     const navigate = useNavigate();
 
     const tableProps = useVirtualTable({
-        contextMenu: ALBUM_CONTEXT_MENU_ITEMS,
+        contextMenu: GENRE_CONTEXT_MENU_ITEMS,
         customFilters,
         itemCount,
         itemType: LibraryItem.GENRE,
