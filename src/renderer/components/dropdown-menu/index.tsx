@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import type {
     MenuProps as MantineMenuProps,
     MenuItemProps as MantineMenuItemProps,
@@ -14,7 +15,7 @@ type MenuLabelProps = MantineMenuLabelProps;
 interface MenuItemProps extends MantineMenuItemProps {
     $danger?: boolean;
     $isActive?: boolean;
-    children: React.ReactNode;
+    children: ReactNode;
 }
 type MenuDividerProps = MantineMenuDividerProps;
 type MenuDropdownProps = MantineMenuDropdownProps;
@@ -87,7 +88,7 @@ export const DropdownMenu = ({ children, ...props }: MenuProps) => {
                 },
             }}
             transitionProps={{
-                transition: 'pop',
+                transition: 'fade',
             }}
             {...props}
         >
