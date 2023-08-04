@@ -86,7 +86,7 @@ export const useSongLyricsBySong = (
     const server = getServerById(song?.serverId);
 
     return useQuery({
-        cacheTime: 1000 * 60 * 10,
+        cacheTime: Infinity,
         enabled: !!song && !!server,
         onError: () => {},
         queryFn: async ({ signal }) => {
@@ -138,7 +138,7 @@ export const useSongLyricsBySong = (
             return null;
         },
         queryKey: queryKeys.songs.lyrics(server?.id || '', query),
-        staleTime: 1000 * 60 * 2,
+        staleTime: Infinity,
     });
 };
 

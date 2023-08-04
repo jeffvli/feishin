@@ -146,7 +146,7 @@ export const SynchronizedLyrics = ({
                 'sychronized-lyrics-scroll-container',
             ) as HTMLElement;
             const currentLyric = document.querySelector(`#lyric-${index}`) as HTMLElement;
-            const offsetTop = currentLyric?.offsetTop - doc?.clientHeight / 2 ?? 0;
+            const offsetTop = currentLyric.offsetTop - doc.clientHeight / 2 ?? 0;
 
             if (currentLyric === null) {
                 lyricRef.current = undefined;

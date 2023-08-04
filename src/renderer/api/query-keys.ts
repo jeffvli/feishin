@@ -208,7 +208,7 @@ export const queryKeys: Record<
             return [serverId, 'songs', 'list'] as const;
         },
         lyrics: (serverId: string, query?: LyricsQuery) => {
-            if (query) return [serverId, 'song', 'lyrics', query] as const;
+            if (query) return [serverId, 'song', 'lyrics', 'select', query] as const;
             return [serverId, 'song', 'lyrics'] as const;
         },
         lyricsByRemoteId: (searchQuery: { remoteSongId: string; remoteSource: LyricSource }) => {
