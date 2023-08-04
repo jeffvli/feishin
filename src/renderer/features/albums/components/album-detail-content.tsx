@@ -317,12 +317,9 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                                     component={Link}
                                     radius={0}
                                     size="md"
-                                    to={generatePath(
-                                        `${AppRoute.LIBRARY_ALBUMS}?genre=${genre.id}`,
-                                        {
-                                            albumId,
-                                        },
-                                    )}
+                                    to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
+                                        genreId: genre.id,
+                                    })}
                                     variant="outline"
                                 >
                                     {genre.name}

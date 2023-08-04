@@ -400,12 +400,9 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     component={Link}
                                     radius="md"
                                     size="md"
-                                    to={generatePath(
-                                        `${AppRoute.LIBRARY_ALBUM_ARTISTS}?genre=${genre.id}`,
-                                        {
-                                            albumArtistId,
-                                        },
-                                    )}
+                                    to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
+                                        genreId: genre.id,
+                                    })}
                                     variant="outline"
                                 >
                                     {genre.name}
