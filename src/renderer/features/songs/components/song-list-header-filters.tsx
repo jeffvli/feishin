@@ -1,7 +1,7 @@
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import {
     RiAddBoxFill,
     RiAddCircleFill,
@@ -224,7 +224,6 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
     const onFilterChange = (filter: SongListFilter) => {
         handleRefreshTable(tableRef, {
             ...filter,
-            ...customFilters,
         });
     };
 

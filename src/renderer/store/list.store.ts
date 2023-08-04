@@ -188,14 +188,30 @@ export const useListStore = create<ListSlice>()(
                             }
                         });
 
-                        return {
-                            ...get()._actions.getFilter({
-                                id,
-                                itemType: args.itemType,
-                                key: args.key,
-                            }),
+                        const filter = get()._actions.getFilter({
+                            id,
+                            itemType: args.itemType,
+                            key: args.key,
+                        });
+
+                        const mergedFilters = {
+                            ...filter,
                             ...args.customFilters,
+                            _custom: {
+                                ...filter._custom,
+                                ...args.customFilters?._custom,
+                                jellyfin: {
+                                    ...filter._custom?.jellyfin,
+                                    ...args.customFilters?._custom?.jellyfin,
+                                },
+                                navidrome: {
+                                    ...filter._custom?.navidrome,
+                                    ...args.customFilters?._custom?.navidrome,
+                                },
+                            },
                         };
+
+                        return mergedFilters;
                     },
                     setGrid: (args) => {
                         const [page, id] = args.key.split('_');
@@ -622,13 +638,33 @@ export const useListStoreByKey = <TFilter>(args: { filter?: Partial<TFilter>; ke
     );
 };
 
-export const useListFilterByKey = <TFilter>(args: { filter?: Partial<TFilter>; key: string }) => {
+export const useListFilterByKey = <TFilter>(args: {
+    filter?: Partial<TFilter> | any;
+    key: string;
+}) => {
     const key = args.key as keyof ListState['item'];
     return useListStore(
-        (state) => ({
-            ...state.item[key].filter,
-            ...args.filter,
-        }),
+        (state) => {
+            return {
+                ...state.item[key].filter,
+                ...(args.filter && {
+                    ...args.filter,
+                    _custom: {
+                        ...state.item[key].filter._custom,
+                        ...args.filter?._custom,
+                        jellyfin: {
+                            ...state.item[key].filter._custom?.jellyfin,
+                            ...args.filter?._custom?.jellyfin,
+                        },
+                        navidrome: {
+                            ...state.item[key].filter._custom?.navidrome,
+                            ...args.filter?._custom?.navidrome,
+                        },
+                    },
+                }),
+            };
+        },
+
         shallow,
     );
 };
