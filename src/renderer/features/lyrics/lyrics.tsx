@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Center, Group } from '@mantine/core';
 import { AnimatePresence, motion } from 'framer-motion';
+import { clear } from 'idb-keyval';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
@@ -9,7 +10,7 @@ import { SynchronizedLyrics } from './synchronized-lyrics';
 import { Spinner, TextTitle } from '/@/renderer/components';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
-import { getServerById, useCurrentSong, usePlayerStore } from '/@/renderer/store';
+import { useCurrentSong, usePlayerStore } from '/@/renderer/store';
 import {
     FullLyricsMetadata,
     LyricsOverride,
@@ -17,6 +18,8 @@ import {
     UnsynchronizedLyricMetadata,
 } from '/@/renderer/api/types';
 import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
+import { queryKeys } from '/@/renderer/api/query-keys';
+import { queryClient } from '/@/renderer/lib/react-query';
 
 const ActionsContainer = styled.div`
     position: absolute;
@@ -93,14 +96,11 @@ function isSynchronized(
 
 export const Lyrics = () => {
     const currentSong = useCurrentSong();
-    const currentServer = getServerById(currentSong?.serverId);
-
-    const [clear, setClear] = useState(false);
 
     const { data, isInitialLoading } = useSongLyricsBySong(
         {
             query: { songId: currentSong?.id || '' },
-            serverId: currentServer?.id,
+            serverId: currentSong?.serverId || '',
         },
         currentSong,
     );
@@ -109,18 +109,41 @@ export const Lyrics = () => {
 
     const handleOnSearchOverride = useCallback((params: LyricsOverride) => {
         setOverride(params);
-        setClear(false);
     }, []);
 
-    const { data: overrideLyrics, isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
+    const handleOnResetLyric = useCallback(() => {
+        queryClient.resetQueries({
+            exact: true,
+            queryKey: queryKeys.songs.lyrics(currentSong?.serverId, { songId: currentSong?.id }),
+        });
+    }, [currentSong?.id, currentSong?.serverId]);
+
+    const handleOnRemoveLyric = useCallback(() => {
+        queryClient.setQueryData(
+            queryKeys.songs.lyrics(currentSong?.serverId, { songId: currentSong?.id }),
+            (prev: FullLyricsMetadata | undefined) => {
+                if (!prev) {
+                    return undefined;
+                }
+
+                return {
+                    ...prev,
+                    lyrics: '',
+                };
+            },
+        );
+    }, [currentSong?.id, currentSong?.serverId]);
+
+    const { isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
         options: {
             enabled: !!override,
         },
         query: {
             remoteSongId: override?.id,
             remoteSource: override?.source,
+            song: currentSong,
         },
-        serverId: currentServer?.id,
+        serverId: currentSong?.serverId,
     });
 
     useEffect(() => {
@@ -128,7 +151,6 @@ export const Lyrics = () => {
             (state) => state.current.song,
             () => {
                 setOverride(undefined);
-                setClear(false);
             },
             { equalityFn: (a, b) => a?.id === b?.id },
         );
@@ -140,20 +162,12 @@ export const Lyrics = () => {
 
     const isLoadingLyrics = isInitialLoading || isOverrideLoading;
 
-    const hasNoLyrics = (!data?.lyrics && !overrideLyrics) || clear;
+    const hasNoLyrics = !data?.lyrics || clear;
 
     const lyricsMetadata:
         | Partial<SynchronizedLyricMetadata>
         | Partial<UnsynchronizedLyricMetadata>
-        | undefined = overrideLyrics
-        ? {
-              artist: override?.artist,
-              lyrics: overrideLyrics,
-              name: override?.name,
-              remote: true,
-              source: override?.source,
-          }
-        : data;
+        | undefined = data;
 
     const isSynchronizedLyrics = isSynchronized(lyricsMetadata);
 
@@ -198,7 +212,8 @@ export const Lyrics = () => {
                 )}
                 <ActionsContainer>
                     <LyricsActions
-                        onRemoveLyric={() => setClear(true)}
+                        onRemoveLyric={handleOnRemoveLyric}
+                        onResetLyric={handleOnResetLyric}
                         onSearchOverride={handleOnSearchOverride}
                     />
                 </ActionsContainer>

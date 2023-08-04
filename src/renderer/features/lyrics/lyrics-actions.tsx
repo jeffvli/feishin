@@ -1,3 +1,4 @@
+import { Box, Group } from '@mantine/core';
 import isElectron from 'is-electron';
 import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
 import { LyricsOverride } from '/@/renderer/api/types';
@@ -12,10 +13,15 @@ import {
 
 interface LyricsActionsProps {
     onRemoveLyric: () => void;
+    onResetLyric: () => void;
     onSearchOverride: (params: LyricsOverride) => void;
 }
 
-export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActionsProps) => {
+export const LyricsActions = ({
+    onRemoveLyric,
+    onResetLyric,
+    onSearchOverride,
+}: LyricsActionsProps) => {
     const currentSong = useCurrentSong();
     const { setSettings } = useSettingsStoreActions();
     const { delayMs, sources } = useLyricsSettings();
@@ -33,59 +39,75 @@ export const LyricsActions = ({ onRemoveLyric, onSearchOverride }: LyricsActions
     const isDesktop = isElectron();
 
     return (
-        <>
-            {isDesktop && sources.length ? (
+        <Box style={{ position: 'relative', width: '100%' }}>
+            <Group position="center">
+                {isDesktop && sources.length ? (
+                    <Button
+                        uppercase
+                        disabled={isActionsDisabled}
+                        variant="subtle"
+                        onClick={() =>
+                            openLyricSearchModal({
+                                artist: currentSong?.artistName,
+                                name: currentSong?.name,
+                                onSearchOverride,
+                            })
+                        }
+                    >
+                        Search
+                    </Button>
+                ) : null}
                 <Button
-                    uppercase
-                    disabled={isActionsDisabled}
+                    aria-label="Decrease lyric offset"
                     variant="subtle"
-                    onClick={() =>
-                        openLyricSearchModal({
-                            artist: currentSong?.artistName,
-                            name: currentSong?.name,
-                            onSearchOverride,
-                        })
-                    }
+                    onClick={() => handleLyricOffset(delayMs - 50)}
                 >
-                    Search
+                    <RiSubtractFill />
                 </Button>
-            ) : null}
-            <Button
-                aria-label="Decrease lyric offset"
-                variant="subtle"
-                onClick={() => handleLyricOffset(delayMs - 50)}
-            >
-                <RiSubtractFill />
-            </Button>
-            <Tooltip
-                label="Offset (ms)"
-                openDelay={500}
-            >
-                <NumberInput
-                    aria-label="Lyric offset"
-                    styles={{ input: { textAlign: 'center' } }}
-                    value={delayMs || 0}
-                    width={55}
-                    onChange={handleLyricOffset}
-                />
-            </Tooltip>
-            <Button
-                aria-label="Increase lyric offset"
-                variant="subtle"
-                onClick={() => handleLyricOffset(delayMs + 50)}
-            >
-                <RiAddFill />
-            </Button>
-            {isDesktop && sources.length ? (
+                <Tooltip
+                    label="Offset (ms)"
+                    openDelay={500}
+                >
+                    <NumberInput
+                        aria-label="Lyric offset"
+                        styles={{ input: { textAlign: 'center' } }}
+                        value={delayMs || 0}
+                        width={55}
+                        onChange={handleLyricOffset}
+                    />
+                </Tooltip>
                 <Button
-                    uppercase
-                    disabled={isActionsDisabled}
+                    aria-label="Increase lyric offset"
                     variant="subtle"
-                    onClick={onRemoveLyric}
+                    onClick={() => handleLyricOffset(delayMs + 50)}
                 >
-                    Clear
+                    <RiAddFill />
                 </Button>
-            ) : null}
-        </>
+                {isDesktop && sources.length ? (
+                    <Button
+                        uppercase
+                        disabled={isActionsDisabled}
+                        variant="subtle"
+                        onClick={onResetLyric}
+                    >
+                        Reset
+                    </Button>
+                ) : null}
+            </Group>
+
+            <Box style={{ position: 'absolute', right: 0, top: 0 }}>
+                {isDesktop && sources.length ? (
+                    <Button
+                        uppercase
+                        color="red"
+                        disabled={isActionsDisabled}
+                        variant="subtle"
+                        onClick={onRemoveLyric}
+                    >
+                        Clear
+                    </Button>
+                ) : null}
+            </Box>
+        </Box>
     );
 };

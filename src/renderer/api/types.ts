@@ -1111,6 +1111,7 @@ export type LyricSearchQuery = {
 export type LyricGetQuery = {
     remoteSongId: string;
     remoteSource: LyricSource;
+    song: Song;
 };
 
 export enum LyricSource {

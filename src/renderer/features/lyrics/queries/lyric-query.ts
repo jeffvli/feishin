@@ -1,4 +1,4 @@
-import { UseQueryResult, useQuery } from '@tanstack/react-query';
+import { UseQueryResult, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     LyricsQuery,
     QueueSong,
@@ -93,6 +93,8 @@ export const useSongLyricsBySong = (
             if (!server) throw new Error('Server not found');
             if (!song) return null;
 
+            console.log('refetching song lyrics');
+
             if (song.lyrics) {
                 return {
                     artist: song.artists?.[0]?.name,
@@ -145,12 +147,35 @@ export const useSongLyricsBySong = (
 export const useSongLyricsByRemoteId = (
     args: QueryHookArgs<Partial<LyricGetQuery>>,
 ): UseQueryResult<string | null> => {
-    const { query } = args;
+    const queryClient = useQueryClient();
+    const { query, serverId } = args;
 
     return useQuery({
-        cacheTime: 1000 * 60 * 10,
         enabled: !!query.remoteSongId && !!query.remoteSource,
         onError: () => {},
+        onSuccess: (data) => {
+            if (!data || !query.song) {
+                return;
+            }
+
+            const lyricsResult = {
+                artist: query.song.artists?.[0]?.name,
+                lyrics: data,
+                name: query.song.name,
+                remote: false,
+                source: query.remoteSource,
+            };
+
+            console.log(
+                'queryKeys.songs.lyrics(serverId, { songId: query.song.id }) :>> ',
+                queryKeys.songs.lyrics(serverId, { songId: query.song.id }),
+            );
+
+            queryClient.setQueryData(
+                queryKeys.songs.lyrics(serverId, { songId: query.song.id }),
+                lyricsResult,
+            );
+        },
         queryFn: async () => {
             const remoteLyricsResult = await lyricsIpc?.getRemoteLyricsByRemoteId(
                 query as LyricGetQuery,
@@ -163,6 +188,5 @@ export const useSongLyricsByRemoteId = (
             return null;
         },
         queryKey: queryKeys.songs.lyricsByRemoteId(query),
-        staleTime: 1000 * 60 * 5,
     });
 };
