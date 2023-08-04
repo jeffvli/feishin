@@ -3,14 +3,14 @@ import { ScrollArea as MantineScrollArea } from '@mantine/core';
 import { useMergedRef } from '@mantine/hooks';
 import { useInView } from 'framer-motion';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
-import { forwardRef, Ref, useEffect, useRef, useState } from 'react';
+import { CSSProperties, forwardRef, ReactNode, Ref, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { PageHeader, PageHeaderProps } from '/@/renderer/components/page-header';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
 
 interface ScrollAreaProps extends MantineScrollAreaProps {
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 const StyledScrollArea = styled(MantineScrollArea)`
@@ -46,13 +46,13 @@ export const ScrollArea = forwardRef(({ children, ...props }: ScrollAreaProps, r
 });
 
 interface NativeScrollAreaProps {
-    children: React.ReactNode;
+    children: ReactNode;
     debugScrollPosition?: boolean;
     noHeader?: boolean;
     pageHeaderProps?: PageHeaderProps & { offset: number; target?: any };
     scrollBarOffset?: string;
     scrollHideDelay?: number;
-    style?: React.CSSProperties;
+    style?: CSSProperties;
 }
 
 export const NativeScrollArea = forwardRef(
@@ -60,7 +60,6 @@ export const NativeScrollArea = forwardRef(
         {
             children,
             pageHeaderProps,
-            debugScrollPosition,
             scrollBarOffset,
             scrollHideDelay,
             noHeader,
@@ -105,8 +104,8 @@ export const NativeScrollArea = forwardRef(
             options: {
                 overflow: { x: 'hidden', y: 'scroll' },
                 scrollbars: {
-                    autoHide: 'move',
-                    autoHideDelay: 500,
+                    autoHide: 'leave',
+                    autoHideDelay: scrollHideDelay || 500,
                     pointers: ['mouse', 'pen', 'touch'],
                     theme: 'feishin',
                     visibility: 'visible',
