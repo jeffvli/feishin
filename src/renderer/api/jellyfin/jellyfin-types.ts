@@ -529,6 +529,7 @@ const similarArtistListParameters = baseParameters.extend({
 const songListSort = {
     ALBUM: 'Album,SortName',
     ALBUM_ARTIST: 'AlbumArtist,Album,SortName',
+    ALBUM_DETAIL: 'ParentIndexNumber,IndexNumber,SortName',
     ARTIST: 'Artist,Album,SortName',
     COMMUNITY_RATING: 'CommunityRating,SortName',
     DURATION: 'Runtime,AlbumArtist,Album,SortName',

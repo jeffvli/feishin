@@ -256,7 +256,7 @@ const getAlbumDetail = async (args: AlbumDetailArgs): Promise<AlbumDetailRespons
             Fields: 'Genres, DateCreated, MediaSources, ParentId',
             IncludeItemTypes: 'Audio',
             ParentId: query.id,
-            SortBy: 'Album,SortName',
+            SortBy: 'ParentIndexNumber,IndexNumber,SortName',
         },
     });
 
