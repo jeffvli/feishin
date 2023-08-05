@@ -132,9 +132,16 @@ export interface SettingsState {
         globalMediaHotkeys: boolean;
     };
     lyrics: {
+        alignment: 'left' | 'center' | 'right';
         delayMs: number;
         fetch: boolean;
         follow: boolean;
+        fontSize: number;
+        fontSizeUnsync: number;
+        gap: number;
+        gapUnsync: number;
+        showMatch: boolean;
+        showProvider: boolean;
         sources: LyricSource[];
     };
     playback: {
@@ -236,9 +243,16 @@ const initialState: SettingsState = {
         globalMediaHotkeys: true,
     },
     lyrics: {
+        alignment: 'center',
         delayMs: 0,
         fetch: false,
         follow: true,
+        fontSize: 46,
+        fontSizeUnsync: 20,
+        gap: 5,
+        gapUnsync: 0,
+        showMatch: true,
+        showProvider: true,
         sources: [],
     },
     playback: {

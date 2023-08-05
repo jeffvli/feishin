@@ -2,15 +2,16 @@ import { useMemo } from 'react';
 import styled from 'styled-components';
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import { FullLyricsMetadata } from '/@/renderer/api/types';
+import { useLyricsSettings } from '/@/renderer/store';
 
 interface UnsynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: string;
 }
 
-const UnsynchronizedLyricsContainer = styled.div`
+const UnsynchronizedLyricsContainer = styled.div<{ $gap: number }>`
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: ${(props) => props.$gap || 5}px;
     width: 100%;
     height: 100%;
     padding: 10vh 0 6vh;
@@ -37,28 +38,38 @@ export const UnsynchronizedLyrics = ({
     remote,
     source,
 }: UnsynchronizedLyricsProps) => {
+    const settings = useLyricsSettings();
     const lines = useMemo(() => {
         return lyrics.split('\n');
     }, [lyrics]);
 
     return (
-        <UnsynchronizedLyricsContainer className="unsynchronized-lyrics">
+        <UnsynchronizedLyricsContainer
+            $gap={settings.gapUnsync}
+            className="unsynchronized-lyrics"
+        >
             {source && (
                 <LyricLine
+                    alignment={settings.alignment}
                     className="lyric-credit"
+                    fontSize={settings.fontSizeUnsync}
                     text={`Provided by ${source}`}
                 />
             )}
             {remote && (
                 <LyricLine
+                    alignment={settings.alignment}
                     className="lyric-credit"
+                    fontSize={settings.fontSizeUnsync}
                     text={`"${name} by ${artist}"`}
                 />
             )}
             {lines.map((text, idx) => (
                 <LyricLine
                     key={idx}
-                    className="lyric-line"
+                    alignment={settings.alignment}
+                    className="lyric-line unsynchronized"
+                    fontSize={settings.fontSizeUnsync}
                     id={`lyric-${idx}`}
                     text={text}
                 />

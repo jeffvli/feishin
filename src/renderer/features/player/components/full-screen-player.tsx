@@ -1,15 +1,26 @@
 import { useLayoutEffect, useRef } from 'react';
-import { Group } from '@mantine/core';
+import { Divider, Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { Variants, motion } from 'framer-motion';
 import { RiArrowDownSLine, RiSettings3Line } from 'react-icons/ri';
 import { useLocation } from 'react-router';
 import styled from 'styled-components';
-import { Button, Option, Popover, Switch } from '/@/renderer/components';
+import {
+    Button,
+    NumberInput,
+    Option,
+    Popover,
+    Select,
+    Slider,
+    Switch,
+} from '/@/renderer/components';
 import {
     useCurrentSong,
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
+    useLyricsSettings,
+    useSettingsStore,
+    useSettingsStoreActions,
     useWindowSettings,
 } from '/@/renderer/store';
 import { useFastAverageColor } from '../../../hooks/use-fast-average-color';
@@ -61,9 +72,20 @@ const BackgroundImageOverlay = styled.div`
 const Controls = () => {
     const { dynamicBackground, expanded, useImageAspectRatio } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
+    const { setSettings } = useSettingsStoreActions();
+    const lyricConfig = useLyricsSettings();
 
     const handleToggleFullScreenPlayer = () => {
         setStore({ expanded: !expanded });
+    };
+
+    const handleLyricsSettings = (property: string, value: any) => {
+        setSettings({
+            lyrics: {
+                ...useSettingsStore.getState().lyrics,
+                [property]: value,
+            },
+        });
     };
 
     useHotkeys([['Escape', handleToggleFullScreenPlayer]]);
@@ -116,7 +138,7 @@ const Controls = () => {
                         <Option.Label>Use image aspect ratio</Option.Label>
                         <Option.Control>
                             <Switch
-                                defaultChecked={useImageAspectRatio}
+                                checked={useImageAspectRatio}
                                 onChange={(e) =>
                                     setStore({
                                         useImageAspectRatio: e.target.checked,
@@ -125,6 +147,124 @@ const Controls = () => {
                             />
                         </Option.Control>
                     </Option>
+                    <Divider my="sm" />
+                    <Option>
+                        <Option.Label>Follow current lyrics</Option.Label>
+                        <Option.Control>
+                            <Switch
+                                checked={lyricConfig.follow}
+                                onChange={(e) =>
+                                    handleLyricsSettings('follow', e.currentTarget.checked)
+                                }
+                            />
+                        </Option.Control>
+                    </Option>
+                    <Option>
+                        <Option.Label>Show lyrics provider</Option.Label>
+                        <Option.Control>
+                            <Switch
+                                checked={lyricConfig.showProvider}
+                                onChange={(e) =>
+                                    handleLyricsSettings('showProvider', e.currentTarget.checked)
+                                }
+                            />
+                        </Option.Control>
+                    </Option>
+                    <Option>
+                        <Option.Label>Show lyrics match</Option.Label>
+                        <Option.Control>
+                            <Switch
+                                checked={lyricConfig.showMatch}
+                                onChange={(e) =>
+                                    handleLyricsSettings('showMatch', e.currentTarget.checked)
+                                }
+                            />
+                        </Option.Control>
+                    </Option>
+                    <Option>
+                        <Option.Label>Lyrics size</Option.Label>
+                        <Option.Control>
+                            <Group
+                                noWrap
+                                w="100%"
+                            >
+                                <Slider
+                                    defaultValue={lyricConfig.fontSize}
+                                    label={(e) => `Synchronized: ${e}px`}
+                                    max={72}
+                                    min={8}
+                                    w="100%"
+                                    onChangeEnd={(e) => handleLyricsSettings('fontSize', Number(e))}
+                                />
+                                <Slider
+                                    defaultValue={lyricConfig.fontSize}
+                                    label={(e) => `Unsynchronized: ${e}px`}
+                                    max={72}
+                                    min={8}
+                                    w="100%"
+                                    onChangeEnd={(e) =>
+                                        handleLyricsSettings('fontSizeUnsync', Number(e))
+                                    }
+                                />
+                            </Group>
+                        </Option.Control>
+                    </Option>
+                    <Option>
+                        <Option.Label>Lyrics gap</Option.Label>
+                        <Option.Control>
+                            <Group
+                                noWrap
+                                w="100%"
+                            >
+                                <Slider
+                                    defaultValue={lyricConfig.gap}
+                                    label={(e) => `Synchronized: ${e}px`}
+                                    max={50}
+                                    min={0}
+                                    w="100%"
+                                    onChangeEnd={(e) => handleLyricsSettings('gap', Number(e))}
+                                />
+                                <Slider
+                                    defaultValue={lyricConfig.gap}
+                                    label={(e) => `Unsynchronized: ${e}px`}
+                                    max={50}
+                                    min={0}
+                                    w="100%"
+                                    onChangeEnd={(e) =>
+                                        handleLyricsSettings('gapUnsync', Number(e))
+                                    }
+                                />
+                            </Group>
+                        </Option.Control>
+                    </Option>
+                    <Option>
+                        <Option.Label>Lyrics alignment</Option.Label>
+                        <Option.Control>
+                            <Select
+                                data={[
+                                    { label: 'Left', value: 'left' },
+                                    { label: 'Center', value: 'center' },
+                                    { label: 'Right', value: 'right' },
+                                ]}
+                                value={lyricConfig.alignment}
+                                onChange={(e) => handleLyricsSettings('alignment', e)}
+                            />
+                        </Option.Control>
+                    </Option>
+                    <Option>
+                        <Option.Label>Lyrics offset (ms)</Option.Label>
+                        <Option.Control>
+                            <NumberInput
+                                defaultValue={lyricConfig.delayMs}
+                                hideControls={false}
+                                step={10}
+                                onBlur={(e) =>
+                                    handleLyricsSettings('delayMs', Number(e.currentTarget.value))
+                                }
+                            />
+                        </Option.Control>
+                    </Option>
+                    <Divider my="sm" />
                     <TableConfigDropdown type="fullScreen" />
                 </Popover.Dropdown>
             </Popover>

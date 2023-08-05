@@ -15,10 +15,10 @@ import styled from 'styled-components';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
-const SynchronizedLyricsContainer = styled.div`
+const SynchronizedLyricsContainer = styled.div<{ $gap: number }>`
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: ${(props) => props.$gap || 5}px;
     width: 100%;
     height: 100%;
     padding: 10vh 0 6vh;
@@ -146,7 +146,8 @@ export const SynchronizedLyrics = ({
                 'sychronized-lyrics-scroll-container',
             ) as HTMLElement;
             const currentLyric = document.querySelector(`#lyric-${index}`) as HTMLElement;
-            const offsetTop = currentLyric.offsetTop - doc.clientHeight / 2 ?? 0;
+            // eslint-disable-next-line no-unsafe-optional-chaining
+            const offsetTop = currentLyric?.offsetTop - doc?.clientHeight / 2 ?? 0;
 
             if (currentLyric === null) {
                 lyricRef.current = undefined;
@@ -295,27 +296,34 @@ export const SynchronizedLyrics = ({
 
     return (
         <SynchronizedLyricsContainer
+            $gap={settings.gap}
             className="synchronized-lyrics overlay-scrollbar"
             id="sychronized-lyrics-scroll-container"
             onMouseEnter={showScrollbar}
             onMouseLeave={hideScrollbar}
         >
-            {source && (
+            {settings.showProvider && source && (
                 <LyricLine
+                    alignment={settings.alignment}
                     className="lyric-credit"
+                    fontSize={settings.fontSize}
                     text={`Provided by ${source}`}
                 />
             )}
-            {remote && (
+            {settings.showMatch && remote && (
                 <LyricLine
+                    alignment={settings.alignment}
                     className="lyric-credit"
+                    fontSize={settings.fontSize}
                     text={`"${name} by ${artist}"`}
                 />
             )}
             {lyrics.map(([, text], idx) => (
                 <LyricLine
                     key={idx}
+                    alignment={settings.alignment}
                     className="lyric-line synchronized"
+                    fontSize={settings.fontSize}
                     id={`lyric-${idx}`}
                     text={text}
                 />
