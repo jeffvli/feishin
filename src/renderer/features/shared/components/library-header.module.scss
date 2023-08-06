@@ -25,10 +25,8 @@
         }
 
         .image {
-            img {
-                width: 175px !important;
-                height: 175px;
-            }
+            width: 175px !important;
+            height: 175px;
         }
 
         :global(.item-image-placeholder) {
@@ -45,10 +43,8 @@
         }
 
         .image {
-            img {
-                width: 200px !important;
-                height: 200px;
-            }
+            width: 200px !important;
+            height: 200px;
         }
 
         :global(.item-image-placeholder) {
@@ -65,10 +61,8 @@
         }
 
         .image {
-            img {
-                width: 225px !important;
-                height: 225px;
-            }
+            width: 225px !important;
+            height: 225px;
         }
 
         :global(.item-image-placeholder) {
@@ -85,10 +79,8 @@
         }
 
         .image {
-            img {
-                width: 250px !important;
-                height: 250px;
-            }
+            width: 250px !important;
+            height: 250px;
         }
 
         :global(.item-image-placeholder) {
@@ -124,9 +116,8 @@
 }
 
 .image {
-    img {
-        object-fit: cover;
-    }
+    object-fit: cover;
+    border-radius: 5px;
 }
 
 .background {

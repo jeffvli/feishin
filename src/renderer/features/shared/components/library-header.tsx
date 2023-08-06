@@ -1,7 +1,6 @@
 import { Group } from '@mantine/core';
 import { forwardRef, ReactNode, Ref } from 'react';
 import { Link } from 'react-router-dom';
-import { SimpleImg } from 'react-simple-img';
 import styles from './library-header.module.scss';
 import { LibraryItem } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components';
@@ -33,7 +32,7 @@ export const LibraryHeader = forwardRef(
                 <div className={styles.backgroundOverlay} />
                 <div className={styles.imageSection}>
                     {imageUrl ? (
-                        <SimpleImg
+                        <img
                             alt="cover"
                             className={styles.image}
                             placeholder={imagePlaceholderUrl || 'var(--placeholder-bg)'}
