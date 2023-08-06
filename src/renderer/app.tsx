@@ -57,6 +57,9 @@ export const App = () => {
         const initializeMpv = async () => {
             const isRunning: boolean | undefined = await mpvPlayer?.isRunning();
 
+            mpvPlayer?.pause();
+            mpvPlayer?.stop();
+
             if (!isRunning) {
                 const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
                 const properties = {

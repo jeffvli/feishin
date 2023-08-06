@@ -172,6 +172,7 @@ export const useHandlePlayQueueAdd = () => {
                 }
 
                 if (playType === Play.NOW) {
+                    mpvPlayer!.cleanup();
                     mpvPlayer!.setQueue(playerData);
                     mpvPlayer!.play();
                 }

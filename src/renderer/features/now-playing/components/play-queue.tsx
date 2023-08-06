@@ -15,6 +15,7 @@ import {
     usePlayerControls,
     usePreviousSong,
     useQueueControls,
+    useVolume,
 } from '/@/renderer/store';
 import {
     usePlayerType,
@@ -54,6 +55,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     const [gridApi, setGridApi] = useState<AgGridReactType | undefined>();
     const playerType = usePlayerType();
     const { play } = usePlayerControls();
+    const volume = useVolume();
 
     useEffect(() => {
         if (tableRef.current) {
@@ -78,6 +80,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
         });
 
         if (playerType === PlaybackType.LOCAL) {
+            mpvPlayer!.volume(volume);
             mpvPlayer!.setQueue(playerData);
             mpvPlayer!.play();
         }
