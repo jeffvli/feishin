@@ -57,10 +57,14 @@ import { Platform } from '/@/renderer/types';
 
 const SidebarContainer = styled.div<{ windowBarStyle: Platform }>`
     height: 100%;
-    max-height: ${(props) =>
-        props.windowBarStyle === Platform.WEB || props.windowBarStyle === Platform.LINUX
-            ? 'calc(100vh - 149px)'
-            : 'calc(100vh - 179px)'}; // Playerbar (90px), titlebar (65px), windowbar (30px)
+    max-height: ${
+        (props) =>
+            props.windowBarStyle === Platform.WEB || props.windowBarStyle === Platform.LINUX
+                ? 'calc(100vh - 160px)' // Playerbar (90px) & ActionBar (70px)
+                : 'calc(100vh - 190px)' // plus windowbar (30px) if the windowBarStyle is Windows/Mac
+        // We use the height of the SidebarContainer to keep the Stack below the ActionBar at the correct height
+        // ActionBar uses height: 100%; so it has the full height of its parent
+    };
     user-select: none;
 `;
 
