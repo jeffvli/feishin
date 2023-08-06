@@ -1,88 +1,74 @@
 :root {
     --root-font-size: 13px;
     --icon-color: rgb(255, 255, 255);
-
     --primary-color: rgb(53, 116, 252);
     --secondary-color: rgb(255, 120, 120);
     --success-color: green;
     --warning-color: orange;
     --danger-color: rgb(204, 50, 50);
-    --generic-border-color: rgba(50, 50, 50, 0.3);
-
+    --generic-border-color: rgba(50, 50, 50, 30%);
     --main-bg: rgb(18, 18, 18);
     --main-fg: rgb(225, 225, 225);
     --main-fg-secondary: rgb(150, 150, 150);
-
-    --window-bar-bg: rgb(24, 24, 24);
+    --window-bar-bg: rgb(16, 16, 16);
     --window-bar-fg: rgb(255, 255, 255);
-
     --titlebar-fg: rgb(255, 255, 255);
     --titlebar-bg: rgb(12, 12, 12);
-    --titlebar-controls-bg: rgba(0, 0, 0, 0);
-
+    --titlebar-controls-bg: rgba(0, 0, 0, 0%);
     --sidebar-bg: rgb(0, 0, 0);
     --sidebar-bg-hover: rgb(50, 50, 50);
     --sidebar-fg: rgb(230, 230, 230);
     --sidebar-fg-hover: rgb(255, 255, 255);
     --sidebar-handle-bg: #4d4d4d;
-    --sidebar-border: 2px rgba(18, 18, 18, 0.7) solid;
-
-    --playerbar-bg: rgb(24, 24, 24);
+    --sidebar-border: 2px rgba(18, 18, 18, 70%) solid;
+    --playerbar-bg: rgb(16, 16, 16);
     --playerbar-btn-main-fg: rgb(0, 0, 0);
     --playerbar-btn-main-fg-hover: rgb(0, 0, 0);
     --playerbar-btn-main-bg: rgb(230, 230, 230);
     --playerbar-btn-main-bg-hover: rgb(255, 255, 255);
-    --playerbar-btn-fg: rgba(200, 200, 200, 0.8);
-    --playerbar-btn-fg-hover: rgba(255, 255, 255, 1);
+    --playerbar-btn-fg: rgba(200, 200, 200, 80%);
+    --playerbar-btn-fg-hover: rgba(255, 255, 255, 100%);
     --playerbar-btn-bg: #c5c5c5;
     --playerbar-btn-bg-hover: transparent;
-    --playerbar-border-top: 1px rgba(50, 50, 50, 0.7) solid;
+    --playerbar-border-top: 1px rgba(50, 50, 50, 30%) solid;
     --playerbar-slider-track-bg: #3c3f43;
-    --playerbar-slider-track-progress-bg: #cccccc;
-
-    --tooltip-bg: #ffffff;
-    --tooltip-fg: #000000;
-
+    --playerbar-slider-track-progress-bg: #ccc;
+    --tooltip-bg: #fff;
+    --tooltip-fg: #000;
     --scrollbar-size: 12px;
     --scrollbar-track-bg: transparent;
-    --scrollbar-thumb-bg: rgba(160, 160, 160, 0.3);
-    --scrollbar-thumb-bg-hover: rgba(160, 160, 160, 0.6);
-
+    --scrollbar-thumb-bg: rgba(160, 160, 160, 30%);
+    --scrollbar-thumb-bg-hover: rgba(160, 160, 160, 60%);
     --btn-filled-bg: var(--primary-color);
     --btn-filled-bg-hover: rgb(34, 96, 255);
-    --btn-filled-fg: #ffffff;
-    --btn-filled-fg-hover: #ffffff;
+    --btn-filled-fg: #fff;
+    --btn-filled-fg-hover: #fff;
     --btn-filled-border: none;
     --btn-filled-radius: 4px;
-
     --btn-default-bg: rgb(31, 31, 32);
     --btn-default-bg-hover: rgb(63, 63, 63);
     --btn-default-fg: rgb(193, 193, 193);
     --btn-default-fg-hover: rgb(193, 193, 193);
     --btn-default-border: none;
     --btn-default-radius: 2px;
-
     --btn-subtle-bg: transparent;
     --btn-subtle-bg-hover: transparent;
     --btn-subtle-fg: rgb(220, 220, 220);
     --btn-subtle-fg-hover: rgb(255, 255, 255);
     --btn-subtle-border: none;
     --btn-subtle-radius: 4px;
-
     --btn-outline-bg: transparent;
     --btn-outline-bg-hover: transparent;
     --btn-outline-fg: rgb(220, 220, 220);
     --btn-outline-fg-hover: rgb(255, 255, 255);
-    --btn-outline-border: 1px rgba(140, 140, 140, 0.5) solid;
-    --btn-outline-border-hover: 1px rgba(255, 255, 255, 0.5) solid;
+    --btn-outline-border: 1px rgba(140, 140, 140, 50%) solid;
+    --btn-outline-border-hover: 1px rgba(255, 255, 255, 50%) solid;
     --btn-outline-radius: 5rem;
-
     --input-bg: rgb(35, 35, 35);
     --input-fg: rgb(193, 193, 193);
     --input-placeholder-fg: rgb(107, 108, 109);
     --input-active-fg: rgb(193, 193, 193);
-    --input-active-bg: rgba(255, 255, 255, 0.1);
-
+    --input-active-bg: rgba(255, 255, 255, 10%);
     --dropdown-menu-bg: rgb(32, 32, 32);
     --dropdown-menu-fg: rgb(235, 235, 235);
     --dropdown-menu-item-padding: 0.8rem;
@@ -90,71 +76,55 @@
     --dropdown-menu-bg-hover: rgb(62, 62, 62);
     --dropdown-menu-border: 1px var(--generic-border-color) solid;
     --dropdown-menu-border-radius: 4px;
-
     --switch-track-bg: rgb(50, 50, 50);
     --switch-track-enabled-bg: var(--primary-color);
     --switch-thumb-bg: rgb(255, 255, 255);
-
     --slider-track-bg: rgb(50, 50, 50);
     --slider-thumb-bg: rgb(255, 255, 255);
-
     --skeleton-bg: rgba(255, 255, 255, 8%);
-
     --toast-title-fg: rgb(255, 255, 255);
     --toast-description-fg: rgb(193, 194, 197);
     --toast-bg: rgb(16, 16, 16);
-
     --modal-bg: var(--main-bg);
     --modal-header-bg: var(--paper-bg);
-
     --badge-bg: rgb(80, 80, 80);
     --badge-fg: rgb(255, 255, 255);
     --badge-radius: 12px;
-
     --paper-bg: rgb(20, 20, 20);
-
-    --placeholder-bg: rgba(53, 53, 53, 1);
+    --placeholder-bg: rgba(53, 53, 53, 100%);
     --placeholder-fg: rgba(126, 126, 126);
-
     --card-default-bg: rgb(32, 32, 32);
     --card-default-bg-hover: rgb(44, 44, 44);
     --card-default-radius: 5px;
     --card-poster-bg: transparent;
     --card-poster-bg-hover: transparent;
     --card-poster-radius: 3px;
-
     --background-noise: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1IiBkPSJNMCAwaDMwMHYzMDBIMHoiLz48L3N2Zz4=');
     --bg-header-overlay: linear-gradient(transparent 0%, rgba(0, 0, 0, 50%) 100%),
         var(--background-noise);
     --bg-subheader-overlay: linear-gradient(180deg, rgba(0, 0, 0, 5%) 0%, var(--main-bg) 100%),
         var(--background-noise);
-
     --table-header-bg: rgb(24, 24, 24);
     --table-header-fg: rgb(179, 179, 179);
     --table-border: none;
-    --table-border-color: hsla(0, 0%, 100%, 0.1);
+    --table-border-color: hsla(0deg, 0%, 100%, 10%);
     --table-bg: var(--main-bg);
     --table-alt-bg: var(--main-bg);
     --table-fg: rgb(179, 179, 179);
-    --table-row-hover-bg: rgba(100, 100, 100, 0.2);
-    --table-row-selected-bg: rgba(100, 100, 100, 0.4);
+    --table-row-hover-bg: rgba(100, 100, 100, 20%);
+    --table-row-selected-bg: rgba(100, 100, 100, 40%);
 
     .ag-theme-alpine-dark {
         --ag-font-family: var(--content-font-family);
-
         --ag-borders: var(--table-border);
         --ag-border-color: var(--table-border-color);
-
         --ag-header-background-color: var(--table-header-bg);
         --ag-header-foreground-color: var(--table-header-fg);
-
         --ag-background-color: var(--table-bg);
         --ag-odd-row-background-color: var(--table-alt-bg);
         --ag-foreground-color: var(--table-fg);
-
         --ag-row-hover-color: var(--table-row-hover-bg);
         --ag-selected-row-background-color: var(--table-row-selected-bg);
-
         --ag-cell-horizontal-padding: 0.5rem;
     }
 
@@ -163,20 +133,20 @@
     }
 
     .ag-ltr .ag-header-cell-resize {
-        right: 0px;
+        right: 0;
     }
 
     .ag-header:hover .ag-header-cell-resize {
         position: absolute;
         top: 25%;
-        border: 1px var(--table-border-color) solid;
-        height: 50%;
         width: 0.2em;
+        height: 50%;
+        border: 1px var(--table-border-color) solid;
     }
 
     .ag-header-cell-label {
-        font-family: var(--content-font-family);
         font-weight: 500;
+        font-family: var(--content-font-family);
         text-transform: uppercase;
     }
 
@@ -207,6 +177,7 @@
             display: block;
         }
     }
+
     .ag-cell-focus {
         border: 1px var(--table-border-color) solid !important;
     }
