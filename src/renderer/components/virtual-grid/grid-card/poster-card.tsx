@@ -20,6 +20,7 @@ interface BaseGridCardProps {
             itemType: LibraryItem;
         }) => void;
         handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
+        itemGap: number;
         itemType: LibraryItem;
         playButtonBehavior: Play;
         resetInfiniteLoaderCache: () => void;
@@ -30,12 +31,12 @@ interface BaseGridCardProps {
     listChildProps: Omit<ListChildComponentProps, 'data' | 'style'>;
 }
 
-const PosterCardContainer = styled.div<{ $isHidden?: boolean }>`
+const PosterCardContainer = styled.div<{ $isHidden?: boolean; $itemGap: number }>`
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 100%;
-    margin: 1rem;
+    margin: ${({ $itemGap }) => $itemGap}px;
     overflow: hidden;
     opacity: ${({ $isHidden }) => ($isHidden ? 0 : 1)};
     pointer-events: auto;
@@ -158,7 +159,10 @@ export const PosterCard = ({
         }
 
         return (
-            <PosterCardContainer key={`card-${columnIndex}-${listChildProps.index}`}>
+            <PosterCardContainer
+                key={`card-${columnIndex}-${listChildProps.index}`}
+                $itemGap={controls.itemGap}
+            >
                 <LinkContainer onClick={() => navigate(path)}>
                     <ImageContainer $isFavorite={data?.userFavorite}>
                         {data?.imageUrl ? (
@@ -205,6 +209,7 @@ export const PosterCard = ({
         <PosterCardContainer
             key={`card-${columnIndex}-${listChildProps.index}`}
             $isHidden={isHidden}
+            $itemGap={controls.itemGap}
         >
             <Skeleton
                 visible

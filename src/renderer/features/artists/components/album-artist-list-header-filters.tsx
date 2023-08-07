@@ -83,8 +83,12 @@ export const AlbumArtistListHeaderFilters = ({
         if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
             setTable({ data: { rowHeight: e }, key: pageKey });
         } else {
-            setGrid({ data: { itemsPerRow: e }, key: pageKey });
+            setGrid({ data: { itemSize: e }, key: pageKey });
         }
+    };
+
+    const handleItemGap = (e: number) => {
+        setGrid({ data: { itemGap: e }, key: pageKey });
     };
 
     const debouncedHandleItemSize = debounce(handleItemSize, 20);
@@ -422,22 +426,33 @@ export const AlbumArtistListHeaderFilters = ({
                             {display === ListDisplayType.CARD ||
                             display === ListDisplayType.POSTER ? (
                                 <Slider
-                                    defaultValue={grid?.itemsPerRow}
-                                    label={null}
-                                    max={10}
-                                    min={2}
+                                    defaultValue={grid?.itemSize}
+                                    max={300}
+                                    min={150}
                                     onChange={debouncedHandleItemSize}
                                 />
                             ) : (
                                 <Slider
                                     defaultValue={table.rowHeight}
-                                    label={null}
                                     max={100}
                                     min={30}
                                     onChange={debouncedHandleItemSize}
                                 />
                             )}
                         </DropdownMenu.Item>
+                        {isGrid && (
+                            <>
+                                <DropdownMenu.Label>Item gap</DropdownMenu.Label>
+                                <DropdownMenu.Item closeMenuOnClick={false}>
+                                    <Slider
+                                        defaultValue={grid?.itemGap || 0}
+                                        max={30}
+                                        min={0}
+                                        onChangeEnd={handleItemGap}
+                                    />
+                                </DropdownMenu.Item>
+                            </>
+                        )}
                         {!isGrid && (
                             <>
                                 <DropdownMenu.Label>Table Columns</DropdownMenu.Label>

@@ -20,6 +20,7 @@ interface BaseGridCardProps {
             itemType: LibraryItem;
         }) => void;
         handlePlayQueueAdd: (options: PlayQueueAddOptions) => void;
+        itemGap: number;
         itemType: LibraryItem;
         playButtonBehavior: Play;
         resetInfiniteLoaderCache: () => void;
@@ -30,12 +31,12 @@ interface BaseGridCardProps {
     listChildProps: Omit<ListChildComponentProps, 'data' | 'style'>;
 }
 
-const DefaultCardContainer = styled.div<{ $isHidden?: boolean }>`
+const DefaultCardContainer = styled.div<{ $isHidden?: boolean; $itemGap: number }>`
     display: flex;
     flex-direction: column;
     width: 100%;
     height: calc(100% - 2rem);
-    margin: 0.5rem;
+    margin: ${({ $itemGap }) => $itemGap}px;
     overflow: hidden;
     background: var(--card-default-bg);
     border-radius: var(--card-default-radius);
@@ -172,6 +173,7 @@ export const DefaultCard = ({
         return (
             <DefaultCardContainer
                 key={`card-${columnIndex}-${listChildProps.index}`}
+                $itemGap={controls.itemGap}
                 onClick={() => navigate(path)}
             >
                 <InnerCardContainer>
@@ -221,6 +223,7 @@ export const DefaultCard = ({
         <DefaultCardContainer
             key={`card-${columnIndex}-${listChildProps.index}`}
             $isHidden={isHidden}
+            $itemGap={controls.itemGap}
         >
             <InnerCardContainer>
                 <ImageContainer>

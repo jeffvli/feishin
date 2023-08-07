@@ -109,10 +109,14 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
 
     const handleItemSize = (e: number) => {
         if (isGrid) {
-            setGrid({ data: { itemsPerRow: e }, key: pageKey });
+            setGrid({ data: { itemSize: e }, key: pageKey });
         } else {
             setTable({ data: { rowHeight: e }, key: pageKey });
         }
+    };
+
+    const handleItemGap = (e: number) => {
+        setGrid({ data: { itemGap: e }, key: pageKey });
     };
 
     const handleSetViewType = useCallback(
@@ -256,17 +260,28 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                             Table
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>
-                            {isGrid ? 'Items per row' : 'Item size'}
-                        </DropdownMenu.Label>
+                        <DropdownMenu.Label>Item size</DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
-                                defaultValue={isGrid ? grid?.itemsPerRow || 0 : table.rowHeight}
-                                max={isGrid ? 14 : 100}
-                                min={isGrid ? 2 : 25}
+                                defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
+                                max={isGrid ? 300 : 100}
+                                min={isGrid ? 150 : 25}
                                 onChangeEnd={handleItemSize}
                             />
                         </DropdownMenu.Item>
+                        {isGrid && (
+                            <>
+                                <DropdownMenu.Label>Item gap</DropdownMenu.Label>
+                                <DropdownMenu.Item closeMenuOnClick={false}>
+                                    <Slider
+                                        defaultValue={grid?.itemGap || 0}
+                                        max={30}
+                                        min={0}
+                                        onChangeEnd={handleItemGap}
+                                    />
+                                </DropdownMenu.Item>
+                            </>
+                        )}
                         {(display === ListDisplayType.TABLE ||
                             display === ListDisplayType.TABLE_PAGINATED) && (
                             <>

@@ -87,7 +87,7 @@ export const useHandleGeneralContextMenu = (
 export const useHandleGridContextMenu = (
     itemType: LibraryItem,
     contextMenuItems: SetContextMenuItems,
-    resetGridCache: () => void,
+    resetGridCache?: () => void,
     context?: any,
 ) => {
     const handleContextMenu = (

@@ -43,6 +43,8 @@ export type ListTableProps = {
 } & DataTableProps;
 
 export type ListGridProps = {
+    itemGap?: number;
+    itemSize?: number;
     itemsPerRow?: number;
     scrollOffset?: number;
 };
@@ -222,9 +224,12 @@ export const useListStore = create<ListSlice>()(
                                     state.detail[args.key] = {
                                         filter: {} as FilterType,
                                         grid: {
-                                            itemsPerRow:
+                                            itemGap:
                                                 state.item[page as keyof ListState['item']].grid
-                                                    ?.itemsPerRow || 5,
+                                                    ?.itemGap || 10,
+                                            itemSize:
+                                                state.item[page as keyof ListState['item']].grid
+                                                    ?.itemSize || 5,
                                             scrollOffset: 0,
                                         },
                                         table: {
@@ -342,7 +347,7 @@ export const useListStore = create<ListSlice>()(
                             sortBy: AlbumListSort.RECENTLY_ADDED,
                             sortOrder: SortOrder.DESC,
                         },
-                        grid: { itemsPerRow: 5, scrollOffset: 0 },
+                        grid: { itemGap: 10, itemSize: 200, scrollOffset: 0 },
                         table: {
                             autoFit: true,
                             columns: [
@@ -383,7 +388,7 @@ export const useListStore = create<ListSlice>()(
                             sortBy: AlbumArtistListSort.NAME,
                             sortOrder: SortOrder.DESC,
                         },
-                        grid: { itemsPerRow: 5, scrollOffset: 0 },
+                        grid: { itemGap: 10, itemSize: 200, scrollOffset: 0 },
                         table: {
                             autoFit: true,
                             columns: [
@@ -412,7 +417,7 @@ export const useListStore = create<ListSlice>()(
                             sortBy: AlbumListSort.RECENTLY_ADDED,
                             sortOrder: SortOrder.DESC,
                         },
-                        grid: { itemsPerRow: 5, scrollOffset: 0 },
+                        grid: { itemGap: 10, itemSize: 200, scrollOffset: 0 },
                         table: {
                             autoFit: true,
                             columns: [
@@ -453,7 +458,7 @@ export const useListStore = create<ListSlice>()(
                             sortBy: SongListSort.RECENTLY_ADDED,
                             sortOrder: SortOrder.DESC,
                         },
-                        grid: { itemsPerRow: 5, scrollOffset: 0 },
+                        grid: { itemGap: 10, itemSize: 200, scrollOffset: 0 },
                         table: {
                             autoFit: true,
                             columns: [
@@ -510,7 +515,7 @@ export const useListStore = create<ListSlice>()(
                             sortBy: GenreListSort.NAME,
                             sortOrder: SortOrder.ASC,
                         },
-                        grid: { itemsPerRow: 5, scrollOffset: 0 },
+                        grid: { itemGap: 10, itemSize: 200, scrollOffset: 0 },
                         table: {
                             autoFit: true,
                             columns: [
@@ -539,7 +544,7 @@ export const useListStore = create<ListSlice>()(
                             sortBy: PlaylistListSort.NAME,
                             sortOrder: SortOrder.DESC,
                         },
-                        grid: { scrollOffset: 0, size: 0 },
+                        grid: { itemGap: 10, itemSize: 200, scrollOffset: 0 },
                         table: {
                             autoFit: true,
                             columns: [
@@ -572,7 +577,7 @@ export const useListStore = create<ListSlice>()(
                             sortBy: SongListSort.RECENTLY_ADDED,
                             sortOrder: SortOrder.DESC,
                         },
-                        grid: { itemsPerRow: 5, scrollOffset: 0 },
+                        grid: { itemGap: 10, itemSize: 200, scrollOffset: 0 },
                         table: {
                             autoFit: true,
                             columns: [

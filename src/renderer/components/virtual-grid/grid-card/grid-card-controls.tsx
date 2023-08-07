@@ -123,7 +123,7 @@ export const GridCardControls = ({
     handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
     itemData: any;
     itemType: LibraryItem;
-    resetInfiniteLoaderCache: () => void;
+    resetInfiniteLoaderCache?: () => void;
 }) => {
     const [isFavorite, setIsFavorite] = useState(itemData?.userFavorite);
     const playButtonBehavior = usePlayButtonBehavior();

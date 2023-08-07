@@ -141,8 +141,8 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
                         height={height}
                         initialScrollOffset={grid?.scrollOffset || 0}
                         itemCount={itemCount || 0}
-                        itemGap={20}
-                        itemSize={grid?.itemsPerRow || 5}
+                        itemGap={grid?.itemGap ?? 10}
+                        itemSize={grid?.itemSize || 200}
                         itemType={LibraryItem.PLAYLIST}
                         loading={itemCount === undefined || itemCount === null}
                         minimumBatchSize={40}
