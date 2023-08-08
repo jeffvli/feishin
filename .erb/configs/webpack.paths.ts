@@ -19,6 +19,7 @@ const distPath = path.join(appPath, 'dist');
 const distMainPath = path.join(distPath, 'main');
 const distRemotePath = path.join(distPath, 'remote');
 const distRendererPath = path.join(distPath, 'renderer');
+const distWebPath = path.join(distPath, 'web');
 
 const buildPath = path.join(releasePath, 'build');
 
@@ -38,5 +39,6 @@ export default {
   distMainPath,
   distRemotePath,
   distRendererPath,
+  distWebPath,
   buildPath,
 };
