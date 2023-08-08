@@ -17,6 +17,11 @@
         height: 175px;
     }
 
+    .image {
+        width: 175px !important;
+        height: 175px;
+    }
+
     @container (min-width: 600px) {
         grid-template-columns: 175px minmax(0, 1fr);
 
