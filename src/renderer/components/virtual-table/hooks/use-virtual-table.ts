@@ -296,7 +296,13 @@ export const useVirtualTable = <TFilter>({
         const scrollOffset = Number((e.top / properties.table.rowHeight).toFixed(0));
 
         if (isSearchParams) {
-            setSearchParams({ scrollOffset: String(scrollOffset) }, { replace: true });
+            setSearchParams(
+                (params) => {
+                    params.set('scrollOffset', String(scrollOffset));
+                    return params;
+                },
+                { replace: true },
+            );
         } else {
             setTable({ data: { scrollOffset }, key: pageKey });
         }
