@@ -78,7 +78,7 @@ interface SongListHeaderFiltersProps {
 export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) => {
     const server = useCurrentServer();
     const { pageKey, handlePlay, customFilters } = useListContext();
-    const { display, table, filter } = useListStoreByKey({ key: pageKey });
+    const { display, table, filter } = useListStoreByKey({ filter: customFilters, key: pageKey });
     const { setFilter, setTable, setTablePagination, setDisplayType } = useListStoreActions();
 
     const { handleRefreshTable } = useListFilterRefresh({

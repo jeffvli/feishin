@@ -84,7 +84,10 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
     const { pageKey, customFilters, handlePlay } = useListContext();
     const server = useCurrentServer();
     const { setFilter, setTable, setGrid, setDisplayType } = useListStoreActions();
-    const { display, filter, table, grid } = useListStoreByKey({ key: pageKey });
+    const { display, filter, table, grid } = useListStoreByKey({
+        filter: customFilters,
+        key: pageKey,
+    });
     const cq = useContainerQuery();
 
     const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
