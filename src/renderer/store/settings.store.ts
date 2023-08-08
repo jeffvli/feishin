@@ -167,6 +167,7 @@ export interface SettingsState {
     };
     tab: 'general' | 'playback' | 'window' | 'hotkeys' | string;
     tables: {
+        albumDetail: DataTableProps;
         fullScreen: DataTableProps;
         nowPlaying: DataTableProps;
         sideDrawerQueue: DataTableProps;
@@ -287,6 +288,40 @@ const initialState: SettingsState = {
     },
     tab: 'general',
     tables: {
+        albumDetail: {
+            autoFit: true,
+            columns: [
+                {
+                    column: TableColumn.TRACK_NUMBER,
+                    width: 50,
+                },
+                {
+                    column: TableColumn.TITLE_COMBINED,
+                    width: 500,
+                },
+                {
+                    column: TableColumn.DURATION,
+                    width: 100,
+                },
+                {
+                    column: TableColumn.BIT_RATE,
+                    width: 300,
+                },
+                {
+                    column: TableColumn.PLAY_COUNT,
+                    width: 100,
+                },
+                {
+                    column: TableColumn.LAST_PLAYED,
+                    width: 100,
+                },
+                {
+                    column: TableColumn.USER_FAVORITE,
+                    width: 100,
+                },
+            ],
+            rowHeight: 60,
+        },
         fullScreen: {
             autoFit: true,
             columns: [

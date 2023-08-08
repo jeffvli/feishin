@@ -1,17 +1,21 @@
-import { ColDef, RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
+import { RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { MutableRefObject, useCallback, useMemo } from 'react';
-import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
+import { RiHeartFill, RiHeartLine, RiMoreFill, RiSettings2Fill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
-import { Button } from '/@/renderer/components';
+import { Button, Popover } from '/@/renderer/components';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
-import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
+import {
+    getColumnDefs,
+    TableConfigDropdown,
+    VirtualTable,
+} from '/@/renderer/components/virtual-table';
 import { FullWidthDiscCell } from '/@/renderer/components/virtual-table/cells/full-width-disc-cell';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
@@ -30,8 +34,8 @@ import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { PersistedTableColumn, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { Play, ServerType, TableColumn } from '/@/renderer/types';
+import { usePlayButtonBehavior, useTableSettings } from '/@/renderer/store/settings.store';
+import { Play } from '/@/renderer/types';
 
 const isFullWidthRow = (node: RowNode) => {
     return node.id?.startsWith('disc-');
@@ -60,52 +64,11 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
     const cq = useContainerQuery();
     const handlePlayQueueAdd = usePlayQueueAdd();
+    const tableConfig = useTableSettings('albumDetail');
 
-    // TODO: Make this customizable
-    const columnDefs: ColDef[] = useMemo(() => {
-        const userRatingColumn =
-            detailQuery?.data?.serverType !== ServerType.JELLYFIN
-                ? [
-                      {
-                          column: TableColumn.USER_RATING,
-                          width: 0,
-                      },
-                  ]
-                : [];
+    console.log('tableConfig :>> ', tableConfig);
 
-        const cols: PersistedTableColumn[] = [
-            {
-                column: TableColumn.TRACK_NUMBER,
-                width: 0,
-            },
-            {
-                column: TableColumn.TITLE_COMBINED,
-                width: 0,
-            },
-            {
-                column: TableColumn.DURATION,
-                width: 0,
-            },
-            {
-                column: TableColumn.BIT_RATE,
-                width: 0,
-            },
-            {
-                column: TableColumn.PLAY_COUNT,
-                width: 0,
-            },
-            {
-                column: TableColumn.LAST_PLAYED,
-                width: 0,
-            },
-            ...userRatingColumn,
-            {
-                column: TableColumn.USER_FAVORITE,
-                width: 0,
-            },
-        ];
-        return getColumnDefs(cols).filter((c) => c.colId !== 'album' && c.colId !== 'artist');
-    }, [detailQuery?.data?.serverType]);
+    const columnDefs = useMemo(() => getColumnDefs(tableConfig.columns), [tableConfig.columns]);
 
     const getRowHeight = useCallback((params: RowHeightParams) => {
         if (isFullWidthRow(params.node)) {
@@ -307,11 +270,12 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
             <DetailContainer>
                 <Box component="section">
                     <Group
+                        position="apart"
                         py="1rem"
-                        spacing="md"
+                        spacing="sm"
                     >
-                        <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-                        <Group spacing="xs">
+                        <Group>
+                            <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
                             <Button
                                 compact
                                 loading={
@@ -341,6 +305,21 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                                 <RiMoreFill size={20} />
                             </Button>
                         </Group>
+
+                        <Popover position="bottom-end">
+                            <Popover.Target>
+                                <Button
+                                    compact
+                                    size="md"
+                                    variant="subtle"
+                                >
+                                    <RiSettings2Fill size={20} />
+                                </Button>
+                            </Popover.Target>
+                            <Popover.Dropdown>
+                                <TableConfigDropdown type="albumDetail" />
+                            </Popover.Dropdown>
+                        </Popover>
                     </Group>
                 </Box>
                 {showGenres && (
@@ -370,13 +349,12 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 <Box style={{ minHeight: '300px' }}>
                     <VirtualTable
                         ref={tableRef}
-                        autoFitColumns
                         autoHeight
                         stickyHeader
                         suppressCellFocus
-                        suppressHorizontalScroll
                         suppressLoadingOverlay
                         suppressRowDrag
+                        autoFitColumns={tableConfig.autoFit}
                         columnDefs={columnDefs}
                         enableCellChangeFlash={false}
                         fullWidthCellRenderer={FullWidthDiscCell}

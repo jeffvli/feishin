@@ -26,7 +26,13 @@ export type CardRoute = {
     slugs?: RouteSlug[];
 };
 
-export type TableType = 'nowPlaying' | 'sideQueue' | 'sideDrawerQueue' | 'songs' | 'fullScreen';
+export type TableType =
+    | 'nowPlaying'
+    | 'sideQueue'
+    | 'sideDrawerQueue'
+    | 'songs'
+    | 'fullScreen'
+    | 'albumDetail';
 
 export type CardRow<T> = {
     arrayProperty?: string;

@@ -187,15 +187,17 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
                     />
                 </Option.Control>
             </Option>
-            <Option>
-                <Option.Label>Follow current song</Option.Label>
-                <Option.Control>
-                    <Switch
-                        defaultChecked={tableConfig[type]?.followCurrentSong}
-                        onChange={handleUpdateFollow}
-                    />
-                </Option.Control>
-            </Option>
+            {type !== 'albumDetail' && (
+                <Option>
+                    <Option.Label>Follow current song</Option.Label>
+                    <Option.Control>
+                        <Switch
+                            defaultChecked={tableConfig[type]?.followCurrentSong}
+                            onChange={handleUpdateFollow}
+                        />
+                    </Option.Control>
+                </Option>
+            )}
             <Option>
                 <Option.Control>
                     <Slider
