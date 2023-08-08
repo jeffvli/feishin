@@ -1,14 +1,5 @@
 import { ipcMain } from 'electron';
 import {
-    InternetProviderLyricResponse,
-    InternetProviderLyricSearchResponse,
-    LyricSearchQuery,
-    QueueSong,
-    LyricGetQuery,
-    LyricSource,
-} from '../../../../renderer/api/types';
-import { store } from '../settings/index';
-import {
     query as queryGenius,
     getSearchResults as searchGenius,
     getLyricsBySongId as getGenius,
@@ -23,6 +14,15 @@ import {
     getSearchResults as searchNetease,
     getLyricsBySongId as getNetease,
 } from './netease';
+import {
+    InternetProviderLyricResponse,
+    InternetProviderLyricSearchResponse,
+    LyricSearchQuery,
+    QueueSong,
+    LyricGetQuery,
+    LyricSource,
+} from '../../../../renderer/api/types';
+import { store } from '../settings/index';
 
 type SongFetcher = (params: LyricSearchQuery) => Promise<InternetProviderLyricResponse | null>;
 type SearchFetcher = (

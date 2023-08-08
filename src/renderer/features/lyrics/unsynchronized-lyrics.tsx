@@ -48,7 +48,7 @@ export const UnsynchronizedLyrics = ({
             $gap={settings.gapUnsync}
             className="unsynchronized-lyrics"
         >
-            {source && (
+            {settings.showProvider && source && (
                 <LyricLine
                     alignment={settings.alignment}
                     className="lyric-credit"
@@ -56,7 +56,7 @@ export const UnsynchronizedLyrics = ({
                     text={`Provided by ${source}`}
                 />
             )}
-            {remote && (
+            {settings.showMatch && remote && (
                 <LyricLine
                     alignment={settings.alignment}
                     className="lyric-credit"

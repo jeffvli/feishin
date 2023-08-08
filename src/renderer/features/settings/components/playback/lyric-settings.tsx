@@ -77,9 +77,10 @@ export const LyricSettings = () => {
                     }}
                 />
             ),
-            description: 'List of lyric fetchers (in order of preference)',
+            description:
+                'Lyric fetchers should be added in order of preference. This is the order in which they will be queried.',
             isHidden: !isElectron(),
-            title: 'Providers to fetch music',
+            title: 'Providers to fetch lyrics',
         },
         {
             control: (

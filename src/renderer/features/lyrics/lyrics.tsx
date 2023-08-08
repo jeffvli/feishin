@@ -111,7 +111,7 @@ export const Lyrics = () => {
     }, []);
 
     const handleOnResetLyric = useCallback(() => {
-        queryClient.resetQueries({
+        queryClient.invalidateQueries({
             exact: true,
             queryKey: queryKeys.songs.lyrics(currentSong?.serverId, { songId: currentSong?.id }),
         });
