@@ -58,7 +58,7 @@ const SliderContainer = styled.div`
 const SliderValueWrapper = styled.div<{ position: 'left' | 'right' }>`
     display: flex;
     flex: 1;
-    align-self: flex-end;
+    align-self: center;
     justify-content: center;
     max-width: 50px;
 
