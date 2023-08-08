@@ -4,7 +4,7 @@
     "description": "Feishin music server",
     "version": "0.2.0",
     "scripts": {
-        "build": "concurrently \"npm run build:main\" \"npm run build:renderer\" \"npm run build:remote\" \"npm run build:web\"",
+        "build": "concurrently \"npm run build:main\" \"npm run build:renderer\" \"npm run build:remote\"",
         "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
         "build:remote": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.remote.prod.ts",
         "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
