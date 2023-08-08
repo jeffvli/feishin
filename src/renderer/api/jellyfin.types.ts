@@ -16,7 +16,7 @@ export interface JFGenreListResponse extends JFBasePaginatedResponse {
 export type JFGenreList = JFGenreListResponse;
 
 export enum JFGenreListSort {
-    NAME = 'Name,SortName',
+    NAME = 'SortName',
 }
 
 export type JFAlbumArtistDetailResponse = JFAlbumArtist;

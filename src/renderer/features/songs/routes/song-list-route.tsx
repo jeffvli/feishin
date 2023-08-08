@@ -1,5 +1,6 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useCallback, useMemo, useRef } from 'react';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import isEmpty from 'lodash/isEmpty';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { GenreListSort, LibraryItem, SongListQuery, SortOrder } from '/@/renderer/api/types';
 import { ListContext } from '/@/renderer/context/list-context';
@@ -21,8 +22,8 @@ const TrackListRoute = () => {
 
     const pageKey = albumArtistId ? `albumArtistSong` : 'song';
 
-    const customFilters: Partial<SongListQuery> = useMemo(() => {
-        return {
+    const customFilters = useMemo(() => {
+        const value = {
             ...(albumArtistId && { artistIds: [albumArtistId] }),
             ...(genreId && {
                 _custom: {
@@ -35,6 +36,12 @@ const TrackListRoute = () => {
                 },
             }),
         };
+
+        if (isEmpty(value)) {
+            return undefined;
+        }
+
+        return value;
     }, [albumArtistId, genreId]);
 
     const handlePlayQueueAdd = usePlayQueueAdd();

@@ -16,7 +16,7 @@ export const useGenreList = (args: QueryHookArgs<GenreListQuery>) => {
             return api.controller.getGenreList({ apiClientProps: { server, signal }, query });
         },
         queryKey: queryKeys.genres.list(server?.id || '', query),
-        staleTime: 1000 * 60,
+        staleTime: 1000 * 5,
         ...options,
     });
 };

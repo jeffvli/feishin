@@ -357,11 +357,31 @@ const normalizeMusicFolder = (item: JFMusicFolder): MusicFolder => {
 //   };
 // };
 
-const normalizeGenre = (item: JFGenre): Genre => {
+const getGenreCoverArtUrl = (args: {
+    baseUrl: string;
+    item: z.infer<typeof jfType._response.genre>;
+    size: number;
+}) => {
+    const size = args.size ? args.size : 300;
+
+    if (!args.item.ImageTags?.Primary) {
+        return null;
+    }
+
+    return (
+        `${args.baseUrl}/Items` +
+        `/${args.item.Id}` +
+        '/Images/Primary' +
+        `?width=${size}&height=${size}` +
+        '&quality=96'
+    );
+};
+
+const normalizeGenre = (item: JFGenre, server: ServerListItem | null): Genre => {
     return {
         albumCount: undefined,
         id: item.Id,
-        imageUrl: null,
+        imageUrl: getGenreCoverArtUrl({ baseUrl: server?.url || '', item, size: 200 }),
         itemType: LibraryItem.GENRE,
         name: item.Name,
         songCount: undefined,

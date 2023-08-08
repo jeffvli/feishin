@@ -1,15 +1,15 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
-import { RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
+import { RiFolder2Fill, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { GENRE_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
-import { OrderToggleButton } from '/@/renderer/features/shared';
+import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
 import {
@@ -18,7 +18,7 @@ import {
     useListStoreActions,
     useListStoreByKey,
 } from '/@/renderer/store';
-import { ListDisplayType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, ServerType, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
     jellyfin: [{ defaultOrder: SortOrder.ASC, name: 'Name', value: GenreListSort.NAME }],
@@ -42,6 +42,8 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
         itemType: LibraryItem.GENRE,
         server,
     });
+
+    const musicFoldersQuery = useMusicFolders({ query: null, serverId: server?.id });
 
     const sortByLabel =
         (server?.type &&
@@ -94,6 +96,32 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
             onFilterChange(updatedFilters);
         },
         [customFilters, onFilterChange, pageKey, server?.type, setFilter],
+    );
+
+    const handleSetMusicFolder = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            if (!e.currentTarget?.value) return;
+
+            let updatedFilters = null;
+            if (e.currentTarget.value === String(filter.musicFolderId)) {
+                updatedFilters = setFilter({
+                    customFilters,
+                    data: { musicFolderId: undefined },
+                    itemType: LibraryItem.GENRE,
+                    key: pageKey,
+                }) as GenreListFilter;
+            } else {
+                updatedFilters = setFilter({
+                    customFilters,
+                    data: { musicFolderId: e.currentTarget.value },
+                    itemType: LibraryItem.GENRE,
+                    key: pageKey,
+                }) as GenreListFilter;
+            }
+
+            onFilterChange(updatedFilters);
+        },
+        [filter.musicFolderId, onFilterChange, setFilter, customFilters, pageKey],
     );
 
     const handleToggleSortOrder = useCallback(() => {
@@ -161,6 +189,10 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
         }
     };
 
+    const isFolderFilterApplied = useMemo(() => {
+        return filter.musicFolderId !== undefined;
+    }, [filter.musicFolderId]);
+
     return (
         <Flex justify="space-between">
             <Group
@@ -197,6 +229,42 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                     sortOrder={filter.sortOrder}
                     onToggle={handleToggleSortOrder}
                 />
+                {server?.type === ServerType.JELLYFIN && (
+                    <>
+                        <Divider orientation="vertical" />
+                        <DropdownMenu position="bottom-start">
+                            <DropdownMenu.Target>
+                                <Button
+                                    compact
+                                    fw={600}
+                                    size="md"
+                                    sx={{
+                                        svg: {
+                                            fill: isFolderFilterApplied
+                                                ? 'var(--primary-color) !important'
+                                                : undefined,
+                                        },
+                                    }}
+                                    variant="subtle"
+                                >
+                                    <RiFolder2Fill size="1.3rem" />
+                                </Button>
+                            </DropdownMenu.Target>
+                            <DropdownMenu.Dropdown>
+                                {musicFoldersQuery.data?.items.map((folder) => (
+                                    <DropdownMenu.Item
+                                        key={`musicFolder-${folder.id}`}
+                                        $isActive={filter.musicFolderId === folder.id}
+                                        value={folder.id}
+                                        onClick={handleSetMusicFolder}
+                                    >
+                                        {folder.name}
+                                    </DropdownMenu.Item>
+                                ))}
+                            </DropdownMenu.Dropdown>
+                        </DropdownMenu>
+                    </>
+                )}
                 <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>

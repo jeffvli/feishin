@@ -309,7 +309,7 @@ const genreList = pagination.extend({
 });
 
 const genreListSort = {
-    NAME: 'Name,SortName',
+    NAME: 'SortName',
 } as const;
 
 const genreListParameters = paginationParameters.merge(

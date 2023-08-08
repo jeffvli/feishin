@@ -1,6 +1,5 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useMemo, useRef } from 'react';
-import { GenreListSort, SortOrder } from '/@/renderer/api/types';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ListContext } from '/@/renderer/context/list-context';
 import { GenreListContent } from '/@/renderer/features/genres/components/genre-list-content';
@@ -8,19 +7,20 @@ import { GenreListHeader } from '/@/renderer/features/genres/components/genre-li
 import { useGenreList } from '/@/renderer/features/genres/queries/genre-list-query';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { useCurrentServer } from '/@/renderer/store';
+import { useListStoreByKey } from '../../../store/list.store';
 
 const GenreListRoute = () => {
     const gridRef = useRef<VirtualInfiniteGridRef | null>(null);
     const tableRef = useRef<AgGridReactType | null>(null);
     const server = useCurrentServer();
     const pageKey = 'genre';
+    const { filter } = useListStoreByKey({ key: pageKey });
 
     const itemCountCheck = useGenreList({
         query: {
             limit: 1,
-            sortBy: GenreListSort.NAME,
-            sortOrder: SortOrder.ASC,
             startIndex: 0,
+            ...filter,
         },
         serverId: server?.id,
     });

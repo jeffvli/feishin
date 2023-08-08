@@ -1,5 +1,6 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useCallback, useMemo, useRef } from 'react';
+import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import isEmpty from 'lodash/isEmpty';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -25,9 +26,15 @@ const AlbumListRoute = () => {
     const handlePlayQueueAdd = usePlayQueueAdd();
 
     const customFilters = useMemo(() => {
-        return {
+        const value = {
             ...(albumArtistId && { artistIds: [albumArtistId] }),
         };
+
+        if (isEmpty(value)) {
+            return undefined;
+        }
+
+        return value;
     }, [albumArtistId]);
 
     const albumListFilter = useListFilterByKey({

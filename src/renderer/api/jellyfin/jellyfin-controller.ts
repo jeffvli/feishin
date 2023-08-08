@@ -119,12 +119,20 @@ const getMusicFolderList = async (args: MusicFolderListArgs): Promise<MusicFolde
 const getGenreList = async (args: GenreListArgs): Promise<GenreListResponse> => {
     const { apiClientProps, query } = args;
 
+    if (!apiClientProps.server?.userId) {
+        throw new Error('No userId found');
+    }
+
     const res = await jfApiClient(apiClientProps).getGenreList({
         query: {
+            Fields: 'ItemCounts',
+            ParentId: query?.musicFolderId,
+            Recursive: true,
             SearchTerm: query?.searchTerm,
-            SortBy: genreListSortMap.jellyfin[query.sortBy] || 'Name,SortName',
+            SortBy: genreListSortMap.jellyfin[query.sortBy] || 'SortName',
             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
             StartIndex: query.startIndex,
+            UserId: apiClientProps.server?.userId,
         },
     });
 
@@ -133,7 +141,7 @@ const getGenreList = async (args: GenreListArgs): Promise<GenreListResponse> => 
     }
 
     return {
-        items: res.body.Items.map(jfNormalize.genre),
+        items: res.body.Items.map((item) => jfNormalize.genre(item, apiClientProps.server)),
         startIndex: query.startIndex || 0,
         totalRecordCount: res.body?.TotalRecordCount || 0,
     };
