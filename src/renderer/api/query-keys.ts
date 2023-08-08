@@ -95,6 +95,13 @@ export const queryKeys: Record<
 
             return [serverId, 'albums', 'list'] as const;
         },
+        related: (serverId: string, id: string, query?: AlbumDetailQuery) => {
+            if (query) {
+                return [serverId, 'albums', id, 'related', query] as const;
+            }
+
+            return [serverId, 'albums', id, 'related'] as const;
+        },
         root: (serverId: string) => [serverId, 'albums'],
         serverRoot: (serverId: string) => [serverId, 'albums'],
         songs: (serverId: string, query: SongListQuery) =>

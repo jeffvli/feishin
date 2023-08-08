@@ -7,6 +7,7 @@ import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
 import { Button } from '/@/renderer/components';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
@@ -158,8 +159,6 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
         [pagination, setPagination],
     );
 
-    const itemsPerPage = cq.isXl ? 9 : cq.isLg ? 7 : cq.isMd ? 5 : cq.isSm ? 4 : 3;
-
     const artistQuery = useAlbumList({
         options: {
             cacheTime: 1000 * 60,
@@ -177,11 +176,41 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                     artist_id: detailQuery?.data?.albumArtists[0]?.id,
                 },
             },
-            limit: 10,
+            limit: 15,
             sortBy: AlbumListSort.YEAR,
             sortOrder: SortOrder.DESC,
-            startIndex: pagination.artist * itemsPerPage,
+            startIndex: 0,
         },
+        serverId: server?.id,
+    });
+
+    const relatedAlbumGenresRequest = {
+        _custom: {
+            jellyfin: {
+                GenreIds: detailQuery?.data?.genres?.[0]?.id,
+            },
+            navidrome: {
+                genre_id: detailQuery?.data?.genres?.[0]?.id,
+            },
+        },
+        limit: 15,
+        sortBy: AlbumListSort.RANDOM,
+        sortOrder: SortOrder.ASC,
+        startIndex: 0,
+    };
+
+    const relatedAlbumGenresQuery = useAlbumList({
+        options: {
+            cacheTime: 1000 * 60,
+            enabled: !!detailQuery?.data?.genres?.[0],
+            queryKey: queryKeys.albums.related(
+                server?.id || '',
+                albumId,
+                relatedAlbumGenresRequest,
+            ),
+            staleTime: 1000 * 60,
+        },
+        query: relatedAlbumGenresRequest,
         serverId: server?.id,
     });
 
@@ -195,10 +224,20 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 handleNextPage: () => handleNextPage('artist'),
                 handlePreviousPage: () => handlePreviousPage('artist'),
                 hasPreviousPage: pagination.artist > 0,
-                itemsPerPage,
             },
             title: 'More from this artist',
             uniqueId: 'mostPlayed',
+        },
+        {
+            data: relatedAlbumGenresQuery?.data?.items.filter(
+                (a) => a.id !== detailQuery?.data?.id,
+            ),
+            isHidden: !relatedAlbumGenresQuery?.data?.items.filter(
+                (a) => a.id !== detailQuery?.data?.id,
+            ).length,
+            loading: relatedAlbumGenresQuery?.isLoading || relatedAlbumGenresQuery.isFetching,
+            title: `More from ${detailQuery?.data?.genres?.[0]?.name}`,
+            uniqueId: 'relatedGenres',
         },
     ];
     const playButtonBehavior = usePlayButtonBehavior();
@@ -359,7 +398,8 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 </Box>
                 <Stack
                     ref={cq.ref}
-                    mt="5rem"
+                    mt="3rem"
+                    spacing="lg"
                 >
                     {cq.height || cq.width ? (
                         <>
