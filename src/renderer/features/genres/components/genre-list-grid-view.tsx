@@ -137,8 +137,8 @@ export const GenreListGridView = ({ gridRef, itemCount }: any) => {
                         loading={itemCount === undefined || itemCount === null}
                         minimumBatchSize={40}
                         route={{
-                            route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                            slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
+                            route: AppRoute.LIBRARY_GENRES_SONGS,
+                            slugs: [{ idProperty: 'id', slugProperty: 'genreId' }],
                         }}
                         width={width}
                         onScroll={handleGridScroll}
