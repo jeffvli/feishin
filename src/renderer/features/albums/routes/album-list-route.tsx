@@ -87,9 +87,18 @@ const AlbumListRoute = () => {
         [albumListFilter, customFilters, handlePlayQueueAdd, itemCount, server],
     );
 
+    const providerValue = useMemo(() => {
+        return {
+            customFilters,
+            handlePlay,
+            id: albumArtistId ?? undefined,
+            pageKey,
+        };
+    }, [albumArtistId, customFilters, handlePlay, pageKey]);
+
     return (
         <AnimatedPage>
-            <ListContext.Provider value={{ customFilters, handlePlay, id: albumArtistId, pageKey }}>
+            <ListContext.Provider value={providerValue}>
                 <AlbumListHeader
                     gridRef={gridRef}
                     itemCount={itemCount}

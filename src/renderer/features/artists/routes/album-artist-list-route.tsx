@@ -1,5 +1,5 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useCurrentServer } from '../../../store/auth.store';
 import { useListFilterByKey } from '../../../store/list.store';
 import { LibraryItem } from '/@/renderer/api/types';
@@ -36,9 +36,16 @@ const AlbumArtistListRoute = () => {
             ? undefined
             : itemCountCheck.data?.totalRecordCount;
 
+    const providerValue = useMemo(() => {
+        return {
+            id: undefined,
+            pageKey,
+        };
+    }, [pageKey]);
+
     return (
         <AnimatedPage>
-            <ListContext.Provider value={{ id: undefined, pageKey }}>
+            <ListContext.Provider value={providerValue}>
                 <AlbumArtistListHeader
                     gridRef={gridRef}
                     itemCount={itemCount}

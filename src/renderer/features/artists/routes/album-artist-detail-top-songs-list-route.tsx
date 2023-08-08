@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useParams } from 'react-router';
 import { AlbumArtistDetailTopSongsListContent } from '/@/renderer/features/artists/components/album-artist-detail-top-songs-list-content';
@@ -29,11 +29,16 @@ const AlbumArtistDetailTopSongsListRoute = () => {
 
     const itemCount = topSongsQuery?.data?.items?.length || 0;
 
-    if (detailQuery.isLoading || topSongsQuery?.isLoading) return null;
+    const providerValue = useMemo(() => {
+        return {
+            id: albumArtistId,
+            pageKey,
+        };
+    }, [albumArtistId, pageKey]);
 
     return (
         <AnimatedPage>
-            <ListContext.Provider value={{ id: albumArtistId, pageKey }}>
+            <ListContext.Provider value={providerValue}>
                 <AlbumArtistDetailTopSongsListHeader
                     data={topSongsQuery?.data?.items || []}
                     itemCount={itemCount}

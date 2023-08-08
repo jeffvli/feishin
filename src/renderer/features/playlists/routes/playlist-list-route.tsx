@@ -1,5 +1,5 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
 import { PlaylistListSort, SortOrder } from '/@/renderer/api/types';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
@@ -38,9 +38,16 @@ const PlaylistListRoute = () => {
             ? undefined
             : itemCountCheck.data?.totalRecordCount;
 
+    const providerValue = useMemo(() => {
+        return {
+            id: playlistId,
+            pageKey,
+        };
+    }, [playlistId]);
+
     return (
         <AnimatedPage>
-            <ListContext.Provider value={{ id: playlistId, pageKey }}>
+            <ListContext.Provider value={providerValue}>
                 <PlaylistListHeader
                     gridRef={gridRef}
                     itemCount={itemCount}
