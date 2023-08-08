@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
-import { Stack } from '@mantine/core';
+import { ActionIcon, Group, Stack } from '@mantine/core';
 import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
-import { FeatureCarousel, NativeScrollArea, Spinner } from '/@/renderer/components';
+import { FeatureCarousel, NativeScrollArea, Spinner, TextTitle } from '/@/renderer/components';
 import { useAlbumList } from '/@/renderer/features/albums';
 import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-played-query';
 import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
@@ -9,8 +9,12 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useWindowSettings } from '/@/renderer/store';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import { Platform } from '/@/renderer/types';
+import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '/@/renderer/api/query-keys';
+import { RiRefreshLine } from 'react-icons/ri';
 
 const HomeRoute = () => {
+    const queryClient = useQueryClient();
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const server = useCurrentServer();
     const itemsPerPage = 15;
@@ -62,7 +66,7 @@ const HomeRoute = () => {
 
     const recentlyAdded = useAlbumList({
         options: {
-            staleTime: 0,
+            staleTime: 1000 * 60 * 5,
         },
         query: {
             limit: itemsPerPage,
@@ -75,7 +79,7 @@ const HomeRoute = () => {
 
     const mostPlayed = useAlbumList({
         options: {
-            staleTime: 0,
+            staleTime: 1000 * 60 * 5,
         },
         query: {
             limit: itemsPerPage,
@@ -87,10 +91,10 @@ const HomeRoute = () => {
     });
 
     const isLoading =
-        random.isFetching ||
-        recentlyPlayed.isFetching ||
-        recentlyAdded.isFetching ||
-        mostPlayed.isFetching;
+        random.isLoading ||
+        recentlyPlayed.isLoading ||
+        recentlyAdded.isLoading ||
+        mostPlayed.isLoading;
 
     if (isLoading) {
         return <Spinner container />;
@@ -99,7 +103,32 @@ const HomeRoute = () => {
     const carousels = [
         {
             data: random?.data?.items,
-            title: 'Explore from your library',
+            title: (
+                <Group>
+                    <TextTitle
+                        order={2}
+                        weight={700}
+                    >
+                        Explore from your library
+                    </TextTitle>
+
+                    <ActionIcon
+                        onClick={() =>
+                            queryClient.invalidateQueries({
+                                exact: false,
+                                queryKey: queryKeys.albums.list(server?.id, {
+                                    limit: itemsPerPage,
+                                    sortBy: AlbumListSort.RANDOM,
+                                    sortOrder: SortOrder.ASC,
+                                    startIndex: 0,
+                                }),
+                            })
+                        }
+                    >
+                        <RiRefreshLine />
+                    </ActionIcon>
+                </Group>
+            ),
             uniqueId: 'random',
         },
         {
@@ -177,7 +206,10 @@ const HomeRoute = () => {
                                         route: {
                                             route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
                                             slugs: [
-                                                { idProperty: 'id', slugProperty: 'albumArtistId' },
+                                                {
+                                                    idProperty: 'id',
+                                                    slugProperty: 'albumArtistId',
+                                                },
                                             ],
                                         },
                                     },
