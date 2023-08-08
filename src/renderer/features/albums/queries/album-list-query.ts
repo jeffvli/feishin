@@ -22,7 +22,11 @@ export const useAlbumList = (args: QueryHookArgs<AlbumListQuery>) => {
                 query,
             });
         },
-        queryKey: queryKeys.albums.list(serverId || '', query),
+        queryKey: queryKeys.albums.list(
+            serverId || '',
+            query,
+            query?.artistIds?.length === 1 ? query?.artistIds[0] : undefined,
+        ),
         ...options,
     });
 };

@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryKey, useQueryClient } from '@tanstack/react-query';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 import { ListOnScrollProps } from 'react-window';
@@ -6,7 +6,13 @@ import { useListContext } from '../../../context/list-context';
 import { useListStoreActions } from '../../../store/list.store';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { LibraryItem, Playlist, PlaylistListQuery, PlaylistListSort } from '/@/renderer/api/types';
+import {
+    LibraryItem,
+    Playlist,
+    PlaylistListQuery,
+    PlaylistListResponse,
+    PlaylistListSort,
+} from '/@/renderer/api/types';
 import { PLAYLIST_CARD_ROWS } from '/@/renderer/components';
 import {
     VirtualGridAutoSizerContainer,
@@ -96,6 +102,39 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
         [pageKey, setGrid],
     );
 
+    const fetchInitialData = useCallback(() => {
+        const query: Omit<PlaylistListQuery, 'startIndex' | 'limit'> = {
+            ...filter,
+        };
+
+        const queriesFromCache: [QueryKey, PlaylistListResponse][] = queryClient.getQueriesData({
+            exact: false,
+            fetchStatus: 'idle',
+            queryKey: queryKeys.playlists.list(server?.id || '', query),
+            stale: false,
+        });
+
+        const itemData = [];
+
+        for (const [, data] of queriesFromCache) {
+            const { items, startIndex } = data || {};
+
+            if (items && items.length !== 1 && startIndex !== undefined) {
+                let itemIndex = 0;
+                for (
+                    let rowIndex = startIndex;
+                    rowIndex < startIndex + items.length;
+                    rowIndex += 1
+                ) {
+                    itemData[rowIndex] = items[itemIndex];
+                    itemIndex += 1;
+                }
+            }
+        }
+
+        return itemData;
+    }, [filter, queryClient, server?.id]);
+
     const fetch = useCallback(
         async ({ skip, take }: { skip: number; take: number }) => {
             if (!server) {
@@ -136,6 +175,7 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
                         cardRows={cardRows}
                         display={display || ListDisplayType.CARD}
                         fetchFn={fetch}
+                        fetchInitialData={fetchInitialData}
                         handleFavorite={handleFavorite}
                         handlePlayQueueAdd={handlePlayQueueAdd}
                         height={height}

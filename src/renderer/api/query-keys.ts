@@ -74,10 +74,19 @@ export const queryKeys: Record<
     albums: {
         detail: (serverId: string, query?: AlbumDetailQuery) =>
             [serverId, 'albums', 'detail', query] as const,
-        list: (serverId: string, query?: AlbumListQuery) => {
+        list: (serverId: string, query?: AlbumListQuery, artistId?: string) => {
             const { pagination, filter } = splitPaginatedQuery(query);
+
+            if (query && pagination && artistId) {
+                return [serverId, 'albums', 'list', artistId, filter, pagination] as const;
+            }
+
             if (query && pagination) {
                 return [serverId, 'albums', 'list', filter, pagination] as const;
+            }
+
+            if (query && artistId) {
+                return [serverId, 'albums', 'list', artistId, filter] as const;
             }
 
             if (query) {

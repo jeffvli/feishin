@@ -150,10 +150,12 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
             ...customFilters,
         };
 
+        const queryKey = queryKeys.albums.list(server?.id || '', query, id);
+
         const queriesFromCache: [QueryKey, AlbumListResponse][] = queryClient.getQueriesData({
             exact: false,
             fetchStatus: 'idle',
-            queryKey: queryKeys.albums.list(server?.id || '', query),
+            queryKey,
             stale: false,
         });
 
@@ -162,7 +164,7 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
         for (const [, data] of queriesFromCache) {
             const { items, startIndex } = data || {};
 
-            if (items && startIndex !== undefined) {
+            if (items && items.length !== 1 && startIndex !== undefined) {
                 let itemIndex = 0;
                 for (
                     let rowIndex = startIndex;
@@ -176,7 +178,7 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
         }
 
         return itemData;
-    }, [customFilters, filter, queryClient, server?.id]);
+    }, [customFilters, filter, id, queryClient, server?.id]);
 
     const fetch = useCallback(
         async ({ skip, take }: { skip: number; take: number }) => {
@@ -191,7 +193,7 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
                 ...customFilters,
             };
 
-            const queryKey = queryKeys.albums.list(server?.id || '', query);
+            const queryKey = queryKeys.albums.list(server?.id || '', query, id);
 
             const albums = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
                 controller.getAlbumList({
@@ -205,7 +207,7 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
 
             return albums;
         },
-        [customFilters, filter, queryClient, server],
+        [customFilters, filter, id, queryClient, server],
     );
 
     return (

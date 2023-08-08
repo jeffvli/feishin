@@ -1,11 +1,11 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryKey, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 import { ListOnScrollProps } from 'react-window';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { Album, GenreListQuery, LibraryItem } from '/@/renderer/api/types';
+import { Album, GenreListQuery, GenreListResponse, LibraryItem } from '/@/renderer/api/types';
 import { ALBUM_CARD_ROWS } from '/@/renderer/components';
 import {
     VirtualGridAutoSizerContainer,
@@ -51,6 +51,39 @@ export const GenreListGridView = ({ gridRef, itemCount }: any) => {
         [id, pageKey, setGrid, setSearchParams],
     );
 
+    const fetchInitialData = useCallback(() => {
+        const query: Omit<GenreListQuery, 'startIndex' | 'limit'> = {
+            ...filter,
+        };
+
+        const queriesFromCache: [QueryKey, GenreListResponse][] = queryClient.getQueriesData({
+            exact: false,
+            fetchStatus: 'idle',
+            queryKey: queryKeys.genres.list(server?.id || '', query),
+            stale: false,
+        });
+
+        const itemData = [];
+
+        for (const [, data] of queriesFromCache) {
+            const { items, startIndex } = data || {};
+
+            if (items && items.length !== 1 && startIndex !== undefined) {
+                let itemIndex = 0;
+                for (
+                    let rowIndex = startIndex;
+                    rowIndex < startIndex + items.length;
+                    rowIndex += 1
+                ) {
+                    itemData[rowIndex] = items[itemIndex];
+                    itemIndex += 1;
+                }
+            }
+        }
+
+        return itemData;
+    }, [filter, queryClient, server?.id]);
+
     const fetch = useCallback(
         async ({ skip, take }: { skip: number; take: number }) => {
             if (!server) {
@@ -93,6 +126,7 @@ export const GenreListGridView = ({ gridRef, itemCount }: any) => {
                         cardRows={cardRows}
                         display={display || ListDisplayType.CARD}
                         fetchFn={fetch}
+                        fetchInitialData={fetchInitialData}
                         handlePlayQueueAdd={handlePlayQueueAdd}
                         height={height}
                         initialScrollOffset={initialScrollOffset}

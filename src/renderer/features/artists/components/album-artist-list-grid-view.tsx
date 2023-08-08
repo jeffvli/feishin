@@ -52,7 +52,7 @@ export const AlbumArtistListGridView = ({ itemCount, gridRef }: AlbumArtistListG
         for (const [, data] of queriesFromCache) {
             const { items, startIndex } = data || {};
 
-            if (items && startIndex !== undefined) {
+            if (items && items.length !== 1 && startIndex !== undefined) {
                 let itemIndex = 0;
                 for (
                     let rowIndex = startIndex;
