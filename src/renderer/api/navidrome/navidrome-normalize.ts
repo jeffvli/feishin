@@ -202,7 +202,7 @@ const normalizeAlbumArtist = (
         similarArtists:
             item.similarArtists?.map((artist) => ({
                 id: artist.id,
-                imageUrl: getImageUrl({ url: artist?.artistImageUrl || null }),
+                imageUrl: artist?.artistImageUrl || null,
                 name: artist.name,
             })) || null,
         songCount: item.songCount,
