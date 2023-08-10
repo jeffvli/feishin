@@ -199,7 +199,7 @@ const createWindow = async () => {
         macOS: {
             autoHideMenuBar: true,
             frame: true,
-            titleBarStyle: 'hidden',
+            titleBarStyle: 'default',
             trafficLightPosition: { x: 10, y: 10 },
         },
         windows: {
