@@ -701,6 +701,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 state.current = {
                                     ...state.current,
                                     ...data.current,
+                                    time: 0,
                                 };
                                 state.queue = {
                                     ...state.queue,

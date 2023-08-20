@@ -11,11 +11,6 @@
 import { access, constants, readFile, writeFile } from 'fs';
 import path, { join } from 'path';
 import { deflate, inflate } from 'zlib';
-import electronLocalShortcut from 'electron-localshortcut';
-import log from 'electron-log';
-import { autoUpdater } from 'electron-updater';
-import uniq from 'lodash/uniq';
-import MpvAPI from 'node-mpv';
 import {
     app,
     BrowserWindow,
@@ -27,6 +22,11 @@ import {
     nativeImage,
     BrowserWindowConstructorOptions,
 } from 'electron';
+import electronLocalShortcut from 'electron-localshortcut';
+import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+import uniq from 'lodash/uniq';
+import MpvAPI from 'node-mpv';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
@@ -453,12 +453,15 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
         params,
     );
 
-    console.log('Setting MPV properties: ', properties);
-    mpv.setMultipleProperties(properties || {});
-
-    mpv.start().catch((error) => {
-        console.log('MPV failed to start', error);
-    });
+    // eslint-disable-next-line promise/catch-or-return
+    mpv.start()
+        .catch((error) => {
+            console.log('MPV failed to start', error);
+        })
+        .finally(() => {
+            console.log('Setting MPV properties: ', properties);
+            mpv.setMultipleProperties(properties || {});
+        });
 
     mpv.on('status', (status, ...rest) => {
         console.log('MPV Event: status', status.property, status.value, rest);
