@@ -141,7 +141,7 @@ export const AppMenu = () => {
                 const server = serverList[serverId];
                 const isNavidromeExpired =
                     server.type === ServerType.NAVIDROME && !server.ndCredential;
-                const isJellyfinExpired = false;
+                const isJellyfinExpired = server.type === ServerType.JELLYFIN && !server.credential;
                 const isSessionExpired = isNavidromeExpired || isJellyfinExpired;
 
                 return (

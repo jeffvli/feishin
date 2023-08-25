@@ -272,6 +272,12 @@ axiosClient.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             const currentServer = useAuthStore.getState().currentServer;
 
+            if (currentServer) {
+                useAuthStore
+                    .getState()
+                    .actions.updateServer(currentServer.id, { credential: undefined });
+            }
+
             authenticationFailure(currentServer);
         }
 
