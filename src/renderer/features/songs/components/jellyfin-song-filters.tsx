@@ -1,11 +1,10 @@
 import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, useMemo } from 'react';
-import { useListFilterByKey } from '../../../store/list.store';
 import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { MultiSelect, NumberInput, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
-import { SongListFilter, useListStoreActions } from '/@/renderer/store';
+import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
 
 interface JellyfinSongFiltersProps {
     customFilters?: Partial<SongListFilter>;
@@ -21,7 +20,7 @@ export const JellyfinSongFilters = ({
     serverId,
 }: JellyfinSongFiltersProps) => {
     const { setFilter } = useListStoreActions();
-    const { filter } = useListFilterByKey({ key: pageKey });
+    const filter = useListFilterByKey({ key: pageKey });
 
     const isGenrePage = customFilters?._custom?.jellyfin?.GenreIds !== undefined;
 
