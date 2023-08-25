@@ -73,6 +73,7 @@ export const App = () => {
 
                 mpvPlayer?.volume(properties.volume);
             }
+            mpvPlayer?.restoreQueue();
         };
 
         if (isElectron() && playbackType === PlaybackType.LOCAL) {
@@ -94,8 +95,6 @@ export const App = () => {
 
     useEffect(() => {
         if (isElectron()) {
-            mpvPlayer!.restoreQueue();
-
             mpvPlayerListener!.rendererSaveQueue(() => {
                 const { current, queue } = usePlayerStore.getState();
                 const stateToSave: Partial<Pick<PlayerState, 'current' | 'queue'>> = {
