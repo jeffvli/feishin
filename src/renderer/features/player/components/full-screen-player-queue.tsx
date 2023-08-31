@@ -41,14 +41,19 @@ const HeaderItemWrapper = styled.div`
     z-index: 2;
 `;
 
-const GridContainer = styled.div`
+interface TransparendGridContainerProps {
+    opacity: number;
+}
+
+const GridContainer = styled.div<TransparendGridContainerProps>`
+    background: rgba(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-columns: 1fr;
 `;
 
 export const FullScreenPlayerQueue = () => {
-    const { activeTab } = useFullScreenPlayerStore();
+    const { activeTab, opacity } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
 
     const headerItems = [
@@ -73,7 +78,10 @@ export const FullScreenPlayerQueue = () => {
     ];
 
     return (
-        <GridContainer className="full-screen-player-queue-container">
+        <GridContainer
+            className="full-screen-player-queue-container"
+            opacity={opacity}
+        >
             <Group
                 grow
                 align="center"
