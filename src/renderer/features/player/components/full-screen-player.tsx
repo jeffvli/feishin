@@ -143,7 +143,7 @@ const Controls = () => {
                                     defaultValue={opacity}
                                     label={(e) => `${e} %`}
                                     max={100}
-                                    min={0}
+                                    min={1}
                                     w="100%"
                                     onChangeEnd={(e) => setStore({ opacity: Number(e) })}
                                 />

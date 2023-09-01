@@ -37,7 +37,14 @@ const ImageContainer = styled(motion.div)`
     margin-bottom: 1rem;
 `;
 
-const MetadataContainer = styled(Stack)`
+interface TransparentMetadataContainer {
+    opacity: number;
+}
+
+const MetadataContainer = styled(Stack)<TransparentMetadataContainer>`
+    background: rgba(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
+    padding: 2px;
+
     h1 {
         font-size: 3.5vh;
     }
@@ -120,7 +127,7 @@ const ImageWithPlaceholder = ({
 
 export const FullScreenPlayerImage = () => {
     const { queue } = usePlayerData();
-    const useImageAspectRatio = useFullScreenPlayerStore((state) => state.useImageAspectRatio);
+    const { opacity, useImageAspectRatio } = useFullScreenPlayerStore();
     const currentSong = queue.current;
     const { color: background } = useFastAverageColor({
         algorithm: 'dominant',
@@ -208,6 +215,7 @@ export const FullScreenPlayerImage = () => {
             <MetadataContainer
                 className="full-screen-player-image-metadata"
                 maw="100%"
+                opacity={opacity}
                 spacing="xs"
             >
                 <TextTitle
