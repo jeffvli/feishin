@@ -1121,3 +1121,13 @@ export enum LyricSource {
 }
 
 export type LyricsOverride = Omit<FullLyricsMetadata, 'lyrics'> & { id: string };
+
+export type SaveQueueQuery = {
+    current?: string;
+    positionMs?: number;
+    songs: string[];
+};
+
+export type SaveQueueArgs = {
+    query: SaveQueueQuery;
+} & BaseEndpointArgs;

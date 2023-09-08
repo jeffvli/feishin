@@ -1,4 +1,4 @@
-import { MouseEvent, useEffect } from 'react';
+import { MouseEvent, useCallback, useEffect } from 'react';
 import { Flex, Group } from '@mantine/core';
 import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import isElectron from 'is-electron';
@@ -9,6 +9,7 @@ import {
     RiVolumeMuteFill,
     RiHeartLine,
     RiHeartFill,
+    RiUploadCloud2Line,
 } from 'react-icons/ri';
 import {
     useAppStoreActions,
@@ -16,15 +17,17 @@ import {
     useCurrentSong,
     useHotkeySettings,
     useMuted,
+    usePlayerStore,
     useSidebarStore,
     useVolume,
 } from '/@/renderer/store';
 import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';
-import { LibraryItem, ServerType, Song } from '/@/renderer/api/types';
+import { LibraryItem, QueueSong, ServerType, Song } from '/@/renderer/api/types';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
 import { Rating } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
+import { api } from '/@/renderer/api';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
@@ -109,6 +112,34 @@ export const RightControls = () => {
 
     const isSongDefined = Boolean(currentSong?.id);
     const showRating = isSongDefined && server?.type === ServerType.NAVIDROME;
+
+    const handleSaveQueue = useCallback(() => {
+        if (server === null || server.type === ServerType.JELLYFIN) return;
+
+        const { current, queue } = usePlayerStore.getState();
+        let songIds: string[] = [];
+
+        if (queue.shuffled.length > 0) {
+            const queueMapping: Record<string, QueueSong> = {};
+            for (const song of queue.default) {
+                queueMapping[song.uniqueId] = song;
+            }
+            for (const shuffledId of queue.shuffled) {
+                songIds.push(queueMapping[shuffledId].id);
+            }
+        } else {
+            songIds = queue.default.map((song) => song.id);
+        }
+
+        api.controller.savePlayQueue({
+            apiClientProps: { server },
+            query: {
+                current: current.song?.id,
+                positionMs: current.song ? current.time * 1000 : undefined,
+                songs: songIds,
+            },
+        });
+    }, [server]);
 
     useHotkeys([
         [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDown],
@@ -209,6 +240,14 @@ export const RightControls = () => {
                     variant="secondary"
                     onClick={handleToggleQueue}
                 />
+                {server && server.type !== ServerType.JELLYFIN && (
+                    <PlayerButton
+                        icon={<RiUploadCloud2Line size="1.1rem" />}
+                        tooltip={{ label: 'Save queue', openDelay: 500 }}
+                        variant="secondary"
+                        onClick={handleSaveQueue}
+                    />
+                )}
                 <Group
                     noWrap
                     spacing="xs"

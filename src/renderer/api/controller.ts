@@ -48,6 +48,7 @@ import type {
     SearchResponse,
     LyricsArgs,
     LyricsResponse,
+    SaveQueueArgs,
 } from '/@/renderer/api/types';
 import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
@@ -89,6 +90,7 @@ export type ControllerEndpoint = Partial<{
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getUserList: (args: UserListArgs) => Promise<UserListResponse>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
+    savePlayQueue: (args: SaveQueueArgs) => Promise<void>;
     scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
     search: (args: SearchArgs) => Promise<SearchResponse>;
     setRating: (args: SetRatingArgs) => Promise<RatingResponse>;
@@ -133,6 +135,7 @@ const endpoints: ApiController = {
         getTopSongs: jfController.getTopSongList,
         getUserList: undefined,
         removeFromPlaylist: jfController.removeFromPlaylist,
+        savePlayQueue: undefined,
         scrobble: jfController.scrobble,
         search: jfController.search,
         setRating: undefined,
@@ -169,6 +172,7 @@ const endpoints: ApiController = {
         getTopSongs: ssController.getTopSongList,
         getUserList: ndController.getUserList,
         removeFromPlaylist: ndController.removeFromPlaylist,
+        savePlayQueue: ssController.savePlayQueue,
         scrobble: ssController.scrobble,
         search: ssController.search3,
         setRating: ssController.setRating,
@@ -201,6 +205,7 @@ const endpoints: ApiController = {
         getSongList: undefined,
         getTopSongs: ssController.getTopSongList,
         getUserList: undefined,
+        savePlayQueue: ssController.savePlayQueue,
         scrobble: ssController.scrobble,
         search: ssController.search3,
         setRating: undefined,
@@ -469,6 +474,15 @@ const getLyrics = async (args: LyricsArgs) => {
     )?.(args);
 };
 
+const savePlayQueue = async (args: SaveQueueArgs) => {
+    return (
+        apiController(
+            'savePlayQueue',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['savePlayQueue']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -493,6 +507,7 @@ export const controller = {
     getTopSongList,
     getUserList,
     removeFromPlaylist,
+    savePlayQueue,
     scrobble,
     search,
     updatePlaylist,

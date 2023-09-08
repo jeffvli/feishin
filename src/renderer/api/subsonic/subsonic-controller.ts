@@ -21,6 +21,7 @@ import {
     SearchResponse,
     RandomSongListResponse,
     RandomSongListArgs,
+    SaveQueueArgs,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -368,6 +369,23 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
     };
 };
 
+const savePlayQueue = async (args: SaveQueueArgs): Promise<void> => {
+    const { query, apiClientProps } = args;
+    console.log('subsonic-controller', query.songs);
+
+    const res = await ssApiClient(apiClientProps).savePlayQueue({
+        query: {
+            current: query.current,
+            id: query.songs,
+            position: query.positionMs,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to save play queue');
+    }
+};
+
 export const ssController = {
     authenticate,
     createFavorite,
@@ -376,6 +394,7 @@ export const ssController = {
     getRandomSongList,
     getTopSongList,
     removeFavorite,
+    savePlayQueue,
     scrobble,
     search3,
     setRating,
