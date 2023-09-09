@@ -22,6 +22,9 @@ import {
     RandomSongListResponse,
     RandomSongListArgs,
     SaveQueueArgs,
+    GetQueueArgs,
+    GetQueueResponse,
+    QueueSong,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -227,7 +230,9 @@ const removeFavorite = async (args: FavoriteArgs): Promise<FavoriteResponse> => 
         },
     });
 
-    if (res.status !== 200) {
+    if (res.status === 414) {
+        throw new Error('Play queue too large to save');
+    } else if (res.status !== 200) {
         throw new Error('Failed to delete favorite');
     }
 
@@ -371,7 +376,6 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
 
 const savePlayQueue = async (args: SaveQueueArgs): Promise<void> => {
     const { query, apiClientProps } = args;
-    console.log('subsonic-controller', query.songs);
 
     const res = await ssApiClient(apiClientProps).savePlayQueue({
         query: {
@@ -386,11 +390,48 @@ const savePlayQueue = async (args: SaveQueueArgs): Promise<void> => {
     }
 };
 
+const getPlayQueue = async (args: GetQueueArgs): Promise<GetQueueResponse> => {
+    const { apiClientProps } = args;
+
+    const res = await ssApiClient(apiClientProps).getPlayQueue();
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get random songs');
+    }
+
+    const { changed, changedBy, current, entry, position, username } = res.body.playQueue;
+
+    let currentIndex = 0;
+    let entries: QueueSong[] = [];
+
+    if (current !== undefined) {
+        entries = entry.map((song, currIndx) => {
+            if (song.id === current) {
+                currentIndex = currIndx;
+            }
+
+            return ssNormalize.song(song, apiClientProps.server, '');
+        });
+    } else {
+        entries = entry.map((song) => ssNormalize.song(song, apiClientProps.server, ''));
+    }
+
+    return {
+        changed,
+        changedBy,
+        currentIndex,
+        entry: entries,
+        position,
+        username,
+    };
+};
+
 export const ssController = {
     authenticate,
     createFavorite,
     getArtistInfo,
     getMusicFolderList,
+    getPlayQueue,
     getRandomSongList,
     getTopSongList,
     removeFavorite,

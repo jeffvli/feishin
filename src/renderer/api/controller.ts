@@ -49,6 +49,8 @@ import type {
     LyricsArgs,
     LyricsResponse,
     SaveQueueArgs,
+    GetQueueArgs,
+    GetQueueResponse,
 } from '/@/renderer/api/types';
 import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
@@ -81,6 +83,7 @@ export type ControllerEndpoint = Partial<{
     getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
     getLyrics: (args: LyricsArgs) => Promise<LyricsResponse>;
     getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
+    getPlayQueue: (args: GetQueueArgs) => Promise<GetQueueResponse>;
     getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
     getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
     getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
@@ -126,6 +129,7 @@ const endpoints: ApiController = {
         getGenreList: jfController.getGenreList,
         getLyrics: jfController.getLyrics,
         getMusicFolderList: jfController.getMusicFolderList,
+        getPlayQueue: undefined,
         getPlaylistDetail: jfController.getPlaylistDetail,
         getPlaylistList: jfController.getPlaylistList,
         getPlaylistSongList: jfController.getPlaylistSongList,
@@ -163,6 +167,7 @@ const endpoints: ApiController = {
         getGenreList: ndController.getGenreList,
         getLyrics: undefined,
         getMusicFolderList: ssController.getMusicFolderList,
+        getPlayQueue: ndController.getPlayQueue,
         getPlaylistDetail: ndController.getPlaylistDetail,
         getPlaylistList: ndController.getPlaylistList,
         getPlaylistSongList: ndController.getPlaylistSongList,
@@ -199,6 +204,8 @@ const endpoints: ApiController = {
         getGenreList: undefined,
         getLyrics: undefined,
         getMusicFolderList: ssController.getMusicFolderList,
+        // NOTE: this does not include rating/favorite
+        getPlayQueue: ssController.getPlayQueue,
         getPlaylistDetail: undefined,
         getPlaylistList: undefined,
         getSongDetail: undefined,
@@ -483,6 +490,15 @@ const savePlayQueue = async (args: SaveQueueArgs) => {
     )?.(args);
 };
 
+const getPlayQueue = async (args: GetQueueArgs) => {
+    return (
+        apiController(
+            'getPlayQueue',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getPlayQueue']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -498,6 +514,7 @@ export const controller = {
     getGenreList,
     getLyrics,
     getMusicFolderList,
+    getPlayQueue,
     getPlaylistDetail,
     getPlaylistList,
     getPlaylistSongList,

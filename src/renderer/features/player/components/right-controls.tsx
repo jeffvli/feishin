@@ -10,6 +10,7 @@ import {
     RiHeartLine,
     RiHeartFill,
     RiUploadCloud2Line,
+    RiDownloadCloud2Line,
 } from 'react-icons/ri';
 import {
     useAppStoreActions,
@@ -28,6 +29,8 @@ import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/
 import { Rating } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { api } from '/@/renderer/api';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { Play } from '/@/renderer/types';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
@@ -47,6 +50,7 @@ export const RightControls = () => {
     const updateRatingMutation = useSetRating({});
     const addToFavoritesMutation = useCreateFavorite({});
     const removeFromFavoritesMutation = useDeleteFavorite({});
+    const handlePlayQueueAdd = usePlayQueueAdd();
 
     const handleAddToFavorites = () => {
         if (!currentSong) return;
@@ -135,11 +139,22 @@ export const RightControls = () => {
             apiClientProps: { server },
             query: {
                 current: current.song?.id,
-                positionMs: current.song ? current.time * 1000 : undefined,
+                positionMs: current.song ? Math.round(current.time * 1000) : undefined,
                 songs: songIds,
             },
         });
     }, [server]);
+
+    const handleRestoreQueue = useCallback(async () => {
+        if (server === null || server.type === ServerType.JELLYFIN) return;
+
+        const queue = await api.controller.getPlayQueue({ apiClientProps: { server } });
+        handlePlayQueueAdd?.({
+            byData: queue?.entry,
+            initialIndex: queue?.currentIndex,
+            playType: Play.NOW,
+        });
+    }, [handlePlayQueueAdd, server]);
 
     useHotkeys([
         [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDown],
@@ -241,12 +256,20 @@ export const RightControls = () => {
                     onClick={handleToggleQueue}
                 />
                 {server && server.type !== ServerType.JELLYFIN && (
-                    <PlayerButton
-                        icon={<RiUploadCloud2Line size="1.1rem" />}
-                        tooltip={{ label: 'Save queue', openDelay: 500 }}
-                        variant="secondary"
-                        onClick={handleSaveQueue}
-                    />
+                    <>
+                        <PlayerButton
+                            icon={<RiUploadCloud2Line size="1.1rem" />}
+                            tooltip={{ label: 'Save queue', openDelay: 500 }}
+                            variant="secondary"
+                            onClick={handleSaveQueue}
+                        />
+                        <PlayerButton
+                            icon={<RiDownloadCloud2Line size="1.1rem" />}
+                            tooltip={{ label: 'Restore queue', openDelay: 500 }}
+                            variant="secondary"
+                            onClick={handleRestoreQueue}
+                        />
+                    </>
                 )}
                 <Group
                     noWrap

@@ -39,6 +39,9 @@ import {
     RemoveFromPlaylistResponse,
     RemoveFromPlaylistArgs,
     genreListSortMap,
+    QueueSong,
+    GetQueueArgs,
+    GetQueueResponse,
 } from '../types';
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
@@ -463,6 +466,60 @@ const removeFromPlaylist = async (
     return null;
 };
 
+const getPlayQueue = async (args: GetQueueArgs): Promise<GetQueueResponse> => {
+    const { apiClientProps } = args;
+
+    const res = await ssApiClient(apiClientProps).getPlayQueue();
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get play queue');
+    }
+
+    const songsData = await ndApiClient(apiClientProps).getSongList({
+        query: {
+            _order: 'ASC',
+            _start: 0,
+        },
+    });
+
+    if (songsData.status !== 200) {
+        throw new Error('Failed to query songs via Navidrome API');
+    }
+
+    const songMapping = new Map<string, QueueSong>(
+        songsData.body.data.map((song): [string, QueueSong] => [
+            song.id,
+            ndNormalize.song(song, apiClientProps.server, ''),
+        ]),
+    );
+
+    const { changed, changedBy, current, entry, position, username } = res.body.playQueue;
+
+    let currentIndex = 0;
+    let entries: QueueSong[] = [];
+
+    if (current !== undefined) {
+        entries = entry.map((song, currIndx) => {
+            if (song.id === current) {
+                currentIndex = currIndx;
+            }
+
+            return songMapping.get(song.id)!;
+        });
+    } else {
+        entries = entry.map((song) => songMapping.get(song.id)!);
+    }
+
+    return {
+        changed,
+        changedBy,
+        currentIndex,
+        entry: entries,
+        position,
+        username,
+    };
+};
+
 export const ndController = {
     addToPlaylist,
     authenticate,
@@ -473,6 +530,7 @@ export const ndController = {
     getAlbumDetail,
     getAlbumList,
     getGenreList,
+    getPlayQueue,
     getPlaylistDetail,
     getPlaylistList,
     getPlaylistSongList,

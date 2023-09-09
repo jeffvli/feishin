@@ -41,6 +41,13 @@ export const contract = c.router({
             200: ssType._response.musicFolderList,
         },
     },
+    getPlayQueue: {
+        method: 'GET',
+        path: 'getPlayQueue.view',
+        responses: {
+            200: ssType._response.playQueue,
+        },
+    },
     getRandomSongList: {
         method: 'GET',
         path: 'getRandomSongs.view',
@@ -102,7 +109,6 @@ export const contract = c.router({
 const axiosClient = axios.create({});
 
 axiosClient.defaults.paramsSerializer = (params) => {
-    console.log(params);
     return qs.stringify(params, { arrayFormat: 'repeat' });
 };
 
@@ -130,7 +136,9 @@ axiosClient.interceptors.response.use(
 const parsePath = (fullPath: string) => {
     const [path, params] = fullPath.split('?');
 
-    const parsedParams = qs.parse(params);
+    const parsedParams = qs.parse(params, {
+        arrayLimit: 999999,
+    });
     const notNilParams = omitBy(parsedParams, (value) => value === 'undefined' || value === 'null');
 
     return {
@@ -152,7 +160,6 @@ export const ssApiClient = (args: {
             const authParams: Record<string, any> = {};
 
             const { params, path: api } = parsePath(path);
-            console.log(params, api, path);
 
             if (server) {
                 baseUrl = `${server.url}/rest`;
@@ -168,12 +175,6 @@ export const ssApiClient = (args: {
                 }
             } else {
                 baseUrl = url;
-            }
-
-            // I don't know why, but it looks like ts-core will convert arrays of > 20
-            // elements to objects, which will break subsonic. This converts it back...
-            if (api === 'savePlayQueue.view' && typeof params.id === 'object') {
-                params.id = Object.values(params.id) as string[];
             }
 
             try {

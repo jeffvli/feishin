@@ -1131,3 +1131,14 @@ export type SaveQueueQuery = {
 export type SaveQueueArgs = {
     query: SaveQueueQuery;
 } & BaseEndpointArgs;
+
+export type GetQueueArgs = BaseEndpointArgs;
+
+export type GetQueueResponse = {
+    changed: string;
+    changedBy: string;
+    currentIndex: number;
+    entry: QueueSong[];
+    position?: number;
+    username: string;
+};

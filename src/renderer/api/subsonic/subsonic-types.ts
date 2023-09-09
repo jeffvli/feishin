@@ -214,6 +214,17 @@ const saveQueueParameters = z.object({
 
 const saveQueue = z.null();
 
+const playQueue = z.object({
+    playQueue: z.object({
+        changed: z.string(),
+        changedBy: z.string(),
+        current: z.string().optional(),
+        entry: song.array(),
+        position: z.number().optional(),
+        username: z.string(),
+    }),
+});
+
 export const ssType = {
     _parameters: {
         albumList: albumListParameters,
@@ -238,6 +249,7 @@ export const ssType = {
         baseResponse,
         createFavorite,
         musicFolderList,
+        playQueue,
         randomSongList,
         removeFavorite,
         saveQueue,
