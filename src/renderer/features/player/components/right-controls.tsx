@@ -26,7 +26,7 @@ import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';
 import { LibraryItem, QueueSong, ServerType, Song } from '/@/renderer/api/types';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
-import { Rating } from '/@/renderer/components';
+import { Rating, toast } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { api } from '/@/renderer/api';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
@@ -135,14 +135,25 @@ export const RightControls = () => {
             songIds = queue.default.map((song) => song.id);
         }
 
-        api.controller.savePlayQueue({
-            apiClientProps: { server },
-            query: {
-                current: current.song?.id,
-                positionMs: current.song ? Math.round(current.time * 1000) : undefined,
-                songs: songIds,
-            },
-        });
+        api.controller
+            .savePlayQueue({
+                apiClientProps: { server },
+                query: {
+                    current: current.song?.id,
+                    positionMs: current.song ? Math.round(current.time * 1000) : undefined,
+                    songs: songIds,
+                },
+            })
+            .then(() => {
+                return toast.success({ message: '', title: 'Saved play queue' });
+            })
+            .catch((error) => {
+                toast.error({
+                    message: 'This is most likely because your queue is too large (> 1000 tracks)',
+                    title: 'Failed to save play queue',
+                });
+                console.error(error);
+            });
     }, [server]);
 
     const handleRestoreQueue = useCallback(async () => {

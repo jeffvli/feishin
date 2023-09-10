@@ -136,8 +136,11 @@ axiosClient.interceptors.response.use(
 const parsePath = (fullPath: string) => {
     const [path, params] = fullPath.split('?');
 
+    // override the number of parameters (useful for save queue).
+    // Practically speaking, exceeding the default limits of 1000 will almost certainly fail
     const parsedParams = qs.parse(params, {
-        arrayLimit: 999999,
+        arrayLimit: 99999,
+        parameterLimit: 99999,
     });
     const notNilParams = omitBy(parsedParams, (value) => value === 'undefined' || value === 'null');
 
@@ -209,7 +212,7 @@ export const ssApiClient = (args: {
 
                     return {
                         body: response?.data,
-                        headers: response.headers as any,
+                        headers: response?.headers as any,
                         status: response?.status,
                     };
                 }
