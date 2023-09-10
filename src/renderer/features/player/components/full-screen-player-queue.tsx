@@ -46,10 +46,12 @@ interface TransparendGridContainerProps {
 }
 
 const GridContainer = styled.div<TransparendGridContainerProps>`
+    padding: 1rem;
     background: rgba(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-columns: 1fr;
+    border-radius: 5px;
 `;
 
 export const FullScreenPlayerQueue = () => {

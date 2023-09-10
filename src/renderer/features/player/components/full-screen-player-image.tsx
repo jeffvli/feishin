@@ -43,7 +43,8 @@ interface TransparentMetadataContainer {
 
 const MetadataContainer = styled(Stack)<TransparentMetadataContainer>`
     background: rgba(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
-    padding: 2px;
+    padding: 1rem;
+    border-radius: 5px;
 
     h1 {
         font-size: 3.5vh;

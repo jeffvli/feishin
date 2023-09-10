@@ -15,6 +15,7 @@ const StyledText = styled(TextTitle)<TitleProps & { $alignment: string; $fontSiz
     text-align: ${(props) => props.$alignment};
     font-size: ${(props) => props.$fontSize}px;
     opacity: 0.5;
+    padding: 0 1rem;
 
     &.active {
         font-weight: 800;
