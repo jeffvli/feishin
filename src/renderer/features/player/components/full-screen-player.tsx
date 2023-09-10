@@ -70,7 +70,8 @@ const BackgroundImageOverlay = styled.div`
 `;
 
 const Controls = () => {
-    const { dynamicBackground, expanded, useImageAspectRatio } = useFullScreenPlayerStore();
+    const { dynamicBackground, expanded, opacity, useImageAspectRatio } =
+        useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { setSettings } = useSettingsStoreActions();
     const lyricConfig = useLyricsSettings();
@@ -134,6 +135,21 @@ const Controls = () => {
                             />
                         </Option.Control>
                     </Option>
+                    {dynamicBackground && (
+                        <Option>
+                            <Option.Label>Opacity</Option.Label>
+                            <Option.Control>
+                                <Slider
+                                    defaultValue={opacity}
+                                    label={(e) => `${e} %`}
+                                    max={100}
+                                    min={1}
+                                    w="100%"
+                                    onChangeEnd={(e) => setStore({ opacity: Number(e) })}
+                                />
+                            </Option.Control>
+                        </Option>
+                    )}
                     <Option>
                         <Option.Label>Use image aspect ratio</Option.Label>
                         <Option.Control>
