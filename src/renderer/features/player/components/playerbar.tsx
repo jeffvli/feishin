@@ -73,8 +73,9 @@ export const Playerbar = () => {
     const { autoNext } = usePlayerControls();
 
     const autoNextFn = useCallback(() => {
+        const playerData = autoNext();
+
         if (remote) {
-            const playerData = autoNext();
             remote.updateSong({
                 currentTime: 0,
                 song: playerData.current.song,
