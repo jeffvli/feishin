@@ -45,7 +45,7 @@ Rewrite of [Sonixd](https://github.com/jeffvli/sonixd).
 
 Download the [latest desktop client](https://github.com/jeffvli/feishin/releases).
 
-If you're using an M1 macOS device, [check here](https://github.com/jeffvli/feishin/issues/104#issuecomment-1553914730) for instructions on how to remove the app from quarantine.
+If you're using a device running macOS 12 (Monterey) or higher, [check here](https://github.com/jeffvli/feishin/issues/104#issuecomment-1553914730) for instructions on how to remove the app from quarantine.
 
 ### Configuration
 
