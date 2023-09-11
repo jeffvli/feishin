@@ -74,7 +74,6 @@ const normalizeSong = (
     });
 
     const imagePlaceholderUrl = null;
-
     return {
         album: item.album,
         albumArtists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
@@ -90,6 +89,10 @@ const normalizeSong = (
         createdAt: item.createdAt.split('T')[0],
         discNumber: item.discNumber,
         duration: item.duration,
+        gain:
+            item.rgAlbumGain || item.rgTrackGain
+                ? { album: item.rgAlbumGain, track: item.rgTrackGain }
+                : null,
         genres: item.genres?.map((genre) => ({
             id: genre.id,
             imageUrl: null,
@@ -104,6 +107,10 @@ const normalizeSong = (
         lyrics: item.lyrics ? item.lyrics : null,
         name: item.title,
         path: item.path,
+        peak:
+            item.rgAlbumPeak || item.rgTrackPeak
+                ? { album: item.rgAlbumPeak, track: item.rgTrackPeak }
+                : null,
         playCount: item.playCount,
         playlistItemId,
         releaseDate: new Date(item.year, 0, 1).toISOString(),

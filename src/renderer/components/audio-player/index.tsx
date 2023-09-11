@@ -1,7 +1,7 @@
 import { useImperativeHandle, forwardRef, useRef, useState, useCallback, useEffect } from 'react';
 import isElectron from 'is-electron';
 import type { ReactPlayerProps } from 'react-player';
-import ReactPlayer from 'react-player';
+import ReactPlayer from 'react-player/lazy';
 import type { Song } from '/@/renderer/api/types';
 import {
     crossfadeHandler,
@@ -33,6 +33,11 @@ const getDuration = (ref: any) => {
     return ref.current?.player?.player?.player?.duration;
 };
 
+type WebAudio = {
+    context: AudioContext;
+    gain: GainNode;
+};
+
 export const AudioPlayer = forwardRef(
     (
         {
@@ -49,10 +54,86 @@ export const AudioPlayer = forwardRef(
         }: AudioPlayerProps,
         ref: any,
     ) => {
-        const player1Ref = useRef<any>(null);
-        const player2Ref = useRef<any>(null);
+        const player1Ref = useRef<ReactPlayer>(null);
+        const player2Ref = useRef<ReactPlayer>(null);
         const [isTransitioning, setIsTransitioning] = useState(false);
         const audioDeviceId = useSettingsStore((state) => state.playback.audioDeviceId);
+        const playback = useSettingsStore((state) => state.playback.mpvProperties);
+
+        const [webAudio, setWebAudio] = useState<WebAudio | null>(null);
+        const [player1Source, setPlayer1Source] = useState<MediaElementAudioSourceNode | null>(
+            null,
+        );
+        const [player2Source, setPlayer2Source] = useState<MediaElementAudioSourceNode | null>(
+            null,
+        );
+        const calculateReplayGain = useCallback(
+            (song: Song): number => {
+                if (playback.replayGainMode === 'no') {
+                    return 1;
+                }
+
+                let gain: number | undefined;
+                let peak: number | undefined;
+
+                if (playback.replayGainMode === 'track') {
+                    gain = song.gain?.track ?? song.gain?.album;
+                    peak = song.peak?.track ?? song.peak?.album;
+                } else {
+                    gain = song.gain?.album ?? song.gain?.track;
+                    peak = song.peak?.album ?? song.peak?.track;
+                }
+
+                if (gain === undefined) {
+                    gain = playback.replayGainFallbackDB;
+
+                    if (!gain) {
+                        return 1;
+                    }
+                }
+
+                if (peak === undefined) {
+                    peak = 1;
+                }
+
+                const preAmp = playback.replayGainPreampDB ?? 0;
+
+                // https://wiki.hydrogenaud.io/index.php?title=ReplayGain_1.0_specification&section=19
+                // Normalized to max gain
+                const expectedGain = 10 ** ((gain + preAmp) / 20);
+
+                if (playback.replayGainClip) {
+                    return Math.min(expectedGain, 1 / peak);
+                }
+                return expectedGain;
+            },
+            [
+                playback.replayGainClip,
+                playback.replayGainFallbackDB,
+                playback.replayGainMode,
+                playback.replayGainPreampDB,
+            ],
+        );
+
+        useEffect(() => {
+            if ('AudioContext' in window) {
+                const context = new AudioContext({
+                    latencyHint: 'playback',
+                    sampleRate: playback.audioSampleRateHz || undefined,
+                });
+                const gain = context.createGain();
+                gain.connect(context.destination);
+
+                setWebAudio({ context, gain });
+
+                return () => {
+                    return context.close();
+                };
+            }
+            return () => {};
+            // Intentionally ignore the sample rate dependency, as it makes things really messy
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, []);
 
         useImperativeHandle(ref, () => ({
             get player1() {
@@ -159,10 +240,65 @@ export const AudioPlayer = forwardRef(
             }
         }, [audioDeviceId]);
 
+        useEffect(() => {
+            if (webAudio && player1Source) {
+                if (player1 === undefined) {
+                    player1Source.disconnect();
+                    setPlayer1Source(null);
+                } else {
+                    webAudio.gain.gain.setValueAtTime(calculateReplayGain(player1), 0);
+                }
+            }
+        }, [calculateReplayGain, player1, player1Source, webAudio]);
+
+        useEffect(() => {
+            if (webAudio && player2Source) {
+                if (player2 === undefined) {
+                    player2Source.disconnect();
+                    setPlayer2Source(null);
+                } else {
+                    webAudio.gain.gain.setValueAtTime(calculateReplayGain(player2), 0);
+                }
+            }
+        }, [calculateReplayGain, player2, player2Source, webAudio]);
+
+        const handlePlayer1Start = useCallback(
+            (player: ReactPlayer) => {
+                if (!webAudio || player1Source) return;
+
+                const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
+                if (internal) {
+                    const { context, gain } = webAudio;
+                    const source = context.createMediaElementSource(internal);
+                    source.connect(gain);
+                    setPlayer1Source(source);
+                }
+            },
+            [player1Source, webAudio],
+        );
+
+        const handlePlayer2Start = useCallback(
+            (player: ReactPlayer) => {
+                if (!webAudio || player2Source) return;
+
+                const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
+                if (internal) {
+                    const { context, gain } = webAudio;
+                    const source = context.createMediaElementSource(internal);
+                    source.connect(gain);
+                    setPlayer2Source(source);
+                }
+            },
+            [player2Source, webAudio],
+        );
+
         return (
             <>
                 <ReactPlayer
                     ref={player1Ref}
+                    config={{
+                        file: { attributes: { crossOrigin: 'anonymous' }, forceAudio: true },
+                    }}
                     height={0}
                     muted={muted}
                     playing={currentPlayer === 1 && status === PlayerStatus.PLAYING}
@@ -174,9 +310,13 @@ export const AudioPlayer = forwardRef(
                     onProgress={
                         playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1
                     }
+                    onReady={handlePlayer1Start}
                 />
                 <ReactPlayer
                     ref={player2Ref}
+                    config={{
+                        file: { attributes: { crossOrigin: 'anonymous' }, forceAudio: true },
+                    }}
                     height={0}
                     muted={muted}
                     playing={currentPlayer === 2 && status === PlayerStatus.PLAYING}
@@ -188,6 +328,7 @@ export const AudioPlayer = forwardRef(
                     onProgress={
                         playbackStyle === PlaybackStyle.GAPLESS ? handleGapless2 : handleCrossfade2
                     }
+                    onReady={handlePlayer2Start}
                 />
             </>
         );

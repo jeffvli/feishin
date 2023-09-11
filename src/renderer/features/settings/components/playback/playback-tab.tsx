@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { Divider, Stack } from '@mantine/core';
 import { AudioSettings } from '/@/renderer/features/settings/components/playback/audio-settings';
 import { ScrobbleSettings } from '/@/renderer/features/settings/components/playback/scrobble-settings';
@@ -12,13 +12,20 @@ const MpvSettings = lazy(() =>
 );
 
 export const PlaybackTab = () => {
+    const hasFancyAudio = useMemo(() => {
+        return isElectron() || 'AudioContext' in window;
+    }, []);
     return (
         <Stack spacing="md">
             <AudioSettings />
-            <Suspense fallback={<></>}>{isElectron() && <MpvSettings />}</Suspense>
+            <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
             <Divider />
-            <ScrobbleSettings />
-            <Divider />
+            {isElectron() && (
+                <>
+                    <ScrobbleSettings />
+                    <Divider />
+                </>
+            )}
             <LyricSettings />
         </Stack>
     );

@@ -151,6 +151,7 @@ const normalizeSong = (
         createdAt: item.DateCreated,
         discNumber: (item.ParentIndexNumber && item.ParentIndexNumber) || 1,
         duration: item.RunTimeTicks / 10000000,
+        gain: null,
         genres: item.GenreItems?.map((entry) => ({
             id: entry.Id,
             imageUrl: null,
@@ -165,6 +166,7 @@ const normalizeSong = (
         lyrics: null,
         name: item.Name,
         path: (item.MediaSources && item.MediaSources[0]?.Path) || null,
+        peak: null,
         playCount: (item.UserData && item.UserData.PlayCount) || 0,
         playlistItemId: item.PlaylistItemId,
         // releaseDate: (item.ProductionYear && new Date(item.ProductionYear, 0, 1).toISOString()) || null,
