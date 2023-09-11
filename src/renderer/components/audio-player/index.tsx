@@ -263,8 +263,11 @@ export const AudioPlayer = forwardRef(
         }, [calculateReplayGain, player2, player2Source, webAudio]);
 
         const handlePlayer1Start = useCallback(
-            (player: ReactPlayer) => {
+            async (player: ReactPlayer) => {
                 if (!webAudio || player1Source) return;
+                if (webAudio.context.state !== 'running') {
+                    await webAudio.context.resume();
+                }
 
                 const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
                 if (internal) {
@@ -278,8 +281,11 @@ export const AudioPlayer = forwardRef(
         );
 
         const handlePlayer2Start = useCallback(
-            (player: ReactPlayer) => {
+            async (player: ReactPlayer) => {
                 if (!webAudio || player2Source) return;
+                if (webAudio.context.state !== 'running') {
+                    await webAudio.context.resume();
+                }
 
                 const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
                 if (internal) {
