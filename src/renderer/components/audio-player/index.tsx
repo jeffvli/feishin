@@ -126,6 +126,8 @@ export const AudioPlayer = forwardRef(
 
                 setWebAudio({ context, gain });
 
+                console.log(context, gain);
+
                 return () => {
                     return context.close();
                 };
@@ -245,22 +247,22 @@ export const AudioPlayer = forwardRef(
                 if (player1 === undefined) {
                     player1Source.disconnect();
                     setPlayer1Source(null);
-                } else {
+                } else if (currentPlayer === 1) {
                     webAudio.gain.gain.setValueAtTime(calculateReplayGain(player1), 0);
                 }
             }
-        }, [calculateReplayGain, player1, player1Source, webAudio]);
+        }, [calculateReplayGain, currentPlayer, player1, player1Source, webAudio]);
 
         useEffect(() => {
             if (webAudio && player2Source) {
                 if (player2 === undefined) {
                     player2Source.disconnect();
                     setPlayer2Source(null);
-                } else {
+                } else if (currentPlayer === 2) {
                     webAudio.gain.gain.setValueAtTime(calculateReplayGain(player2), 0);
                 }
             }
-        }, [calculateReplayGain, player2, player2Source, webAudio]);
+        }, [calculateReplayGain, currentPlayer, player2, player2Source, webAudio]);
 
         const handlePlayer1Start = useCallback(
             async (player: ReactPlayer) => {
