@@ -377,8 +377,6 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
 const savePlayQueue = async (args: SaveQueueArgs): Promise<void> => {
     const { query, apiClientProps } = args;
 
-    console.log(query);
-
     const res = await ssApiClient(apiClientProps).savePlayQueue({
         query: {
             current: query.current,

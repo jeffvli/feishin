@@ -185,12 +185,14 @@ const sessionInfo = z.object({
     IsActive: z.boolean(),
     LastActivityDate: z.string(),
     LastPlaybackCheckIn: z.string(),
+    NowPlayingItem: z.any().optional(),
     NowPlayingQueue: z.array(z.any()),
     NowPlayingQueueFullItems: z.array(z.any()),
     PlayState: z.object({
         CanSeek: z.boolean(),
         IsMuted: z.boolean(),
         IsPaused: z.boolean(),
+        PositionTicks: z.number().optional(),
         RepeatMode: z.string(),
     }),
     PlayableMediaTypes: z.array(z.any()),
@@ -618,6 +620,7 @@ const scrobbleParameters = z.object({
     EventName: z.string().optional(),
     IsPaused: z.boolean().optional(),
     ItemId: z.string(),
+    PlaylistItemId: z.string().optional(),
     PositionTicks: z.number().optional(),
 });
 
@@ -652,6 +655,29 @@ const lyrics = z.object({
     Lyrics: z.array(lyricText),
 });
 
+const queueItem = z.object({
+    Id: z.string(),
+    PlaylistItemId: z.string().optional(),
+});
+
+const queue = z.object({
+    NowPlayingQueue: z.array(queueItem),
+});
+
+const saveQueueParameters = scrobbleParameters.merge(queue);
+
+const getQueueParameters = z.object({
+    DeviceId: z.string(),
+});
+
+const getSessions = z.array(
+    sessionInfo.merge(
+        z.object({
+            PlaylistItemId: z.string().optional(),
+        }),
+    ),
+);
+
 export const jfType = {
     _enum: {
         albumArtistList: albumArtistListSort,
@@ -674,10 +700,12 @@ export const jfType = {
         deletePlaylist: deletePlaylistParameters,
         favorite: favoriteParameters,
         genreList: genreListParameters,
+        getQueue: getQueueParameters,
         musicFolderList: musicFolderListParameters,
         playlistDetail: playlistDetailParameters,
         playlistList: playlistListParameters,
         removeFromPlaylist: removeFromPlaylistParameters,
+        saveQueue: saveQueueParameters,
         scrobble: scrobbleParameters,
         search: searchParameters,
         similarArtistList: similarArtistListParameters,
@@ -697,6 +725,7 @@ export const jfType = {
         favorite,
         genre,
         genreList,
+        getSessions,
         lyrics,
         musicFolderList,
         playlist,

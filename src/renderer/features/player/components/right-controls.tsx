@@ -118,7 +118,7 @@ export const RightControls = () => {
     const showRating = isSongDefined && server?.type === ServerType.NAVIDROME;
 
     const handleSaveQueue = useCallback(() => {
-        if (server === null || server.type === ServerType.JELLYFIN) return;
+        if (server === null) return;
 
         const { current, queue } = usePlayerStore.getState();
         let songIds: string[] = [];
@@ -140,6 +140,7 @@ export const RightControls = () => {
                 apiClientProps: { server },
                 query: {
                     current: current.song?.id,
+                    currentIndex: current.index,
                     positionMs: current.song ? Math.round(current.time * 1000) : undefined,
                     songs: songIds,
                 },
@@ -157,7 +158,7 @@ export const RightControls = () => {
     }, [server]);
 
     const handleRestoreQueue = useCallback(async () => {
-        if (server === null || server.type === ServerType.JELLYFIN) return;
+        if (server === null) return;
 
         const queue = await api.controller.getPlayQueue({ apiClientProps: { server } });
         handlePlayQueueAdd?.({
@@ -266,7 +267,7 @@ export const RightControls = () => {
                     variant="secondary"
                     onClick={handleToggleQueue}
                 />
-                {server && server.type !== ServerType.JELLYFIN && (
+                {server && (
                     <>
                         <PlayerButton
                             icon={<RiUploadCloud2Line size="1.1rem" />}

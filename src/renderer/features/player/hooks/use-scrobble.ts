@@ -62,7 +62,7 @@ export const useScrobble = () => {
         (currentTime: number) => {
             if (!isScrobbleEnabled) return;
 
-            const currentSong = usePlayerStore.getState().current.song;
+            const { song: currentSong, index } = usePlayerStore.getState().current;
 
             if (!currentSong?.id || currentSong?.serverType !== ServerType.JELLYFIN) return;
 
@@ -74,6 +74,7 @@ export const useScrobble = () => {
                     event: 'timeupdate',
                     id: currentSong.id,
                     position,
+                    queueIndex: currentSong?.serverType === ServerType.JELLYFIN ? index : undefined,
                     submission: false,
                 },
                 serverId: currentSong?.serverId,
@@ -121,6 +122,7 @@ export const useScrobble = () => {
                         query: {
                             id: previousSong.id,
                             position,
+                            queueIndex: previous[2] as number | undefined,
                             submission: true,
                         },
                         serverId: previousSong?.serverId,
@@ -142,6 +144,7 @@ export const useScrobble = () => {
                             event: 'start',
                             id: currentSong.id,
                             position: 0,
+                            queueIndex: current[2] as number | undefined,
                             submission: false,
                         },
                         serverId: currentSong?.serverId,
@@ -171,7 +174,7 @@ export const useScrobble = () => {
         (status: PlayerStatus | undefined) => {
             if (!isScrobbleEnabled) return;
 
-            const currentSong = usePlayerStore.getState().current.song;
+            const { song: currentSong, index } = usePlayerStore.getState().current;
 
             if (!currentSong?.id) return;
 
@@ -180,6 +183,8 @@ export const useScrobble = () => {
                     ? usePlayerStore.getState().current.time * 1e7
                     : undefined;
 
+            const queueIndex = currentSong?.serverType === ServerType.JELLYFIN ? index : undefined;
+
             // Whenever the player is restarted, send a 'start' scrobble
             if (status === PlayerStatus.PLAYING) {
                 sendScrobble.mutate({
@@ -187,6 +192,7 @@ export const useScrobble = () => {
                         event: 'unpause',
                         id: currentSong.id,
                         position,
+                        queueIndex,
                         submission: false,
                     },
                     serverId: currentSong?.serverId,
@@ -206,6 +212,7 @@ export const useScrobble = () => {
                         event: 'pause',
                         id: currentSong.id,
                         position,
+                        queueIndex,
                         submission: false,
                     },
                     serverId: currentSong?.serverId,
@@ -227,6 +234,7 @@ export const useScrobble = () => {
                     sendScrobble.mutate({
                         query: {
                             id: currentSong.id,
+                            queueIndex,
                             submission: true,
                         },
                         serverId: currentSong?.serverId,
@@ -253,7 +261,7 @@ export const useScrobble = () => {
         (currentTime: number) => {
             if (!isScrobbleEnabled) return;
 
-            const currentSong = usePlayerStore.getState().current.song;
+            const { song: currentSong, index } = usePlayerStore.getState().current;
 
             if (!currentSong?.id) return;
 
@@ -267,11 +275,14 @@ export const useScrobble = () => {
                 songDuration: currentSong.duration,
             });
 
+            const queueIndex = currentSong.serverType === ServerType.JELLYFIN ? index : undefined;
+
             if (!isCurrentSongScrobbled && shouldSubmitScrobble) {
                 sendScrobble.mutate({
                     query: {
                         id: currentSong.id,
                         position,
+                        queueIndex,
                         submission: true,
                     },
                     serverId: currentSong?.serverId,
@@ -284,6 +295,7 @@ export const useScrobble = () => {
                         event: 'start',
                         id: currentSong.id,
                         position: 0,
+                        queueIndex,
                         submission: false,
                     },
                     serverId: currentSong?.serverId,
@@ -303,7 +315,7 @@ export const useScrobble = () => {
 
     useEffect(() => {
         const unsubSongChange = usePlayerStore.subscribe(
-            (state) => [state.current.song, state.current.time],
+            (state) => [state.current.song, state.current.time, state.current.index],
             handleScrobbleFromSongChange,
             {
                 // We need the current time to check the scrobble condition, but we only want to
