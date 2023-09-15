@@ -150,7 +150,7 @@ const normalizeSong = (
         container: (item.MediaSources && item.MediaSources[0]?.Container) || null,
         createdAt: item.DateCreated,
         discNumber: (item.ParentIndexNumber && item.ParentIndexNumber) || 1,
-        duration: item.RunTimeTicks / 10000000,
+        duration: item.RunTimeTicks / 10000,
         genres: item.GenreItems?.map((entry) => ({
             id: entry.Id,
             imageUrl: null,
