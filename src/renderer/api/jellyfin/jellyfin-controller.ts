@@ -765,6 +765,7 @@ const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
                 EventName: query.event,
                 IsPaused: false,
                 ItemId: query.id,
+                PlaylistItemId: query.queueIndex?.toString(),
                 PositionTicks: position,
             },
         });
@@ -775,6 +776,7 @@ const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
     jfApiClient(apiClientProps).scrobbleProgress({
         body: {
             ItemId: query.id,
+            PlaylistItemId: query.queueIndex?.toString(),
             PositionTicks: position,
         },
     });

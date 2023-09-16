@@ -31,11 +31,16 @@ import { PlayerbarSlider } from '/@/renderer/features/player/components/playerba
 import { api } from '/@/renderer/api';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { Play } from '/@/renderer/types';
+import { useCenterControls } from '/@/renderer/features/player/hooks/use-center-controls';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
 
-export const RightControls = () => {
+interface RightControlsProps {
+    playersRef: any;
+}
+
+export const RightControls = ({ playersRef }: RightControlsProps) => {
     const isMinWidth = useMediaQuery('(max-width: 480px)');
     const volume = useVolume();
     const muted = useMuted();
@@ -51,6 +56,7 @@ export const RightControls = () => {
     const addToFavoritesMutation = useCreateFavorite({});
     const removeFromFavoritesMutation = useDeleteFavorite({});
     const handlePlayQueueAdd = usePlayQueueAdd();
+    const { handleSeekSlider } = useCenterControls({ playersRef });
 
     const handleAddToFavorites = () => {
         if (!currentSong) return;
@@ -161,12 +167,16 @@ export const RightControls = () => {
         if (server === null) return;
 
         const queue = await api.controller.getPlayQueue({ apiClientProps: { server } });
-        handlePlayQueueAdd?.({
-            byData: queue?.entry,
-            initialIndex: queue?.currentIndex,
-            playType: Play.NOW,
-        });
-    }, [handlePlayQueueAdd, server]);
+        if (queue && handlePlayQueueAdd) {
+            await handlePlayQueueAdd({
+                byData: queue.entry,
+                initialIndex: queue.currentIndex,
+                playType: Play.NOW,
+            });
+
+            handleSeekSlider(queue.position ? queue.position / 1000 : 0);
+        }
+    }, [handlePlayQueueAdd, handleSeekSlider, server]);
 
     useHotkeys([
         [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDown],

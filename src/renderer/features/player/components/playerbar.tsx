@@ -93,7 +93,7 @@ export const Playerbar = () => {
                     <CenterControls playersRef={playersRef} />
                 </CenterGridItem>
                 <RightGridItem>
-                    <RightControls />
+                    <RightControls playersRef={playersRef} />
                 </RightGridItem>
             </PlayerbarControlsGrid>
             {settings.type === PlaybackType.WEB && (
