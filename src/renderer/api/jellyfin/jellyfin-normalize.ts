@@ -151,7 +151,11 @@ const normalizeSong = (
         createdAt: item.DateCreated,
         discNumber: (item.ParentIndexNumber && item.ParentIndexNumber) || 1,
         duration: item.RunTimeTicks / 10000000,
-        gain: null,
+        gain: item.LUFS
+            ? {
+                  track: -18 - item.LUFS,
+              }
+            : null,
         genres: item.GenreItems?.map((entry) => ({
             id: entry.Id,
             imageUrl: null,
