@@ -95,7 +95,6 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const queryClient = useQueryClient();
     const [isSeeking, setIsSeeking] = useState(false);
     const currentSong = useCurrentSong();
-    const songDuration = currentSong?.duration;
     const skip = useSettingsStore((state) => state.general.skipButtons);
     const playerType = usePlayerType();
     const player1 = playersRef?.current?.player1;
@@ -122,9 +121,10 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     } = useCenterControls({ playersRef });
     const handlePlayQueueAdd = usePlayQueueAdd();
 
+    const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
     const currentTime = useCurrentTime();
     const currentPlayerRef = player === 1 ? player1 : player2;
-    const duration = formatDuration(songDuration || 0);
+    const duration = formatDuration(songDuration * 1000 || 0);
     const formattedTime = formatDuration(currentTime * 1000 || 0);
 
     useEffect(() => {
