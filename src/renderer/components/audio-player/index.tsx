@@ -126,8 +126,6 @@ export const AudioPlayer = forwardRef(
 
                 setWebAudio({ context, gain });
 
-                console.log(context, gain);
-
                 return () => {
                     return context.close();
                 };
