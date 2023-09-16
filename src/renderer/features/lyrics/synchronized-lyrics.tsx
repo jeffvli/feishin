@@ -28,12 +28,12 @@ const SynchronizedLyricsContainer = styled.div<{ $gap: number }>`
     mask-image: linear-gradient(
         180deg,
         transparent 5%,
-        rgba(0, 0, 0, 100%) 20%,
-        rgba(0, 0, 0, 100%) 85%,
+        rgb(0 0 0 / 100%) 20%,
+        rgb(0 0 0 / 100%) 85%,
         transparent 95%
     );
 
-    @media screen and (max-width: 768px) {
+    @media screen and (width <= 768px) {
         padding: 5vh 0;
     }
 `;

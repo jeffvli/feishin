@@ -30,9 +30,9 @@ export const HeaderWrapper = styled.div<{ position: Options['position'] }>`
 const HeaderText = styled(_Text)<{ position: Options['position'] }>`
     width: 100%;
     height: 100%;
-    color: var(--ag-header-foreground-color);
     font-weight: 500;
     line-height: inherit;
+    color: var(--ag-header-foreground-color);
     text-align: ${(props) =>
         props.position === 'right'
             ? 'flex-end'

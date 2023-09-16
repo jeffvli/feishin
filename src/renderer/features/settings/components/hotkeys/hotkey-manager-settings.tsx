@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, KeyboardEvent, ChangeEvent } from 'react';
 import { Group } from '@mantine/core';
 import isElectron from 'is-electron';
 import debounce from 'lodash/debounce';
@@ -50,7 +50,7 @@ export const HotkeyManagerSettings = () => {
     const [selected, setSelected] = useState<BindingActions | null>(null);
 
     const debouncedSetHotkey = debounce(
-        (binding: BindingActions, e: React.KeyboardEvent<HTMLInputElement>) => {
+        (binding: BindingActions, e: KeyboardEvent<HTMLInputElement>) => {
             e.preventDefault();
             const IGNORED_KEYS = ['Control', 'Alt', 'Shift', 'Meta', ' ', 'Escape'];
             const keys = [];
@@ -101,7 +101,7 @@ export const HotkeyManagerSettings = () => {
     ]);
 
     const handleSetGlobalHotkey = useCallback(
-        (binding: BindingActions, e: React.ChangeEvent<HTMLInputElement>) => {
+        (binding: BindingActions, e: ChangeEvent<HTMLInputElement>) => {
             const updatedBindings = {
                 ...bindings,
                 [binding]: { ...bindings[binding], isGlobal: e.currentTarget.checked },

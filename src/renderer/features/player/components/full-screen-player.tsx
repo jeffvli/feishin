@@ -38,7 +38,7 @@ const Container = styled(motion.div)`
     justify-content: center;
     padding: 2rem;
 
-    @media screen and (max-width: 768px) {
+    @media screen and (width <= 768px) {
         padding: 2rem 2rem 1rem;
     }
 `;
@@ -52,7 +52,7 @@ const ResponsiveContainer = styled.div`
     max-width: 2560px;
     margin-top: 5rem;
 
-    @media screen and (max-width: 768px) {
+    @media screen and (width <= 768px) {
         grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
         grid-template-columns: minmax(0, 1fr);
         margin-top: 0;

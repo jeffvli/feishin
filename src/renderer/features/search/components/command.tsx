@@ -15,10 +15,10 @@ export const Command = styled(Cmdk)`
     input[cmdk-input] {
         width: 100%;
         height: 1.5rem;
-        margin-bottom: 1rem;
         padding: 1.3rem 0.5rem;
-        color: var(--input-fg);
+        margin-bottom: 1rem;
         font-family: var(--content-font-family);
+        color: var(--input-fg);
         background: var(--input-bg);
         border: none;
         border-radius: 5px;
@@ -45,11 +45,11 @@ export const Command = styled(Cmdk)`
         gap: 0.5rem;
         align-items: center;
         padding: 0.5rem;
-        color: var(--btn-default-fg);
         font-family: var(--content-font-family);
+        color: var(--btn-default-fg);
+        cursor: pointer;
         background: var(--btn-default-bg);
         border-radius: 5px;
-        cursor: pointer;
 
         svg {
             width: 1.2rem;

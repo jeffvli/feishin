@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, ReactNode } from 'react';
 import { SliderProps } from '@mantine/core';
 import styled from 'styled-components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
@@ -7,7 +7,7 @@ const SliderContainer = styled.div`
     display: flex;
     width: 95%;
     height: 20px;
-    margin: 10px 0px;
+    margin: 10px 0;
 `;
 
 const SliderValueWrapper = styled.div<{ position: 'left' | 'right' }>`
@@ -26,9 +26,9 @@ const SliderWrapper = styled.div`
 `;
 
 export interface WrappedProps extends Omit<SliderProps, 'onChangeEnd'> {
-    leftLabel?: JSX.Element;
+    leftLabel?: ReactNode;
     onChangeEnd: (value: number) => void;
-    rightLabel?: JSX.Element;
+    rightLabel?: ReactNode;
     value: number;
 }
 

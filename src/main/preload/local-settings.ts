@@ -1,5 +1,5 @@
-import Store from 'electron-store';
 import { ipcRenderer, webFrame } from 'electron';
+import Store from 'electron-store';
 
 const store = new Store();
 

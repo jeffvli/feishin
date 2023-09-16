@@ -53,7 +53,7 @@ const TableWrapper = styled.div`
 
 const DummyHeader = styled.div<{ height?: number }>`
     position: absolute;
-    height: ${({ height }) => height || 36}px};
+    height: ${({ height }) => height || 36}px;
 `;
 
 dayjs.extend(relativeTime);

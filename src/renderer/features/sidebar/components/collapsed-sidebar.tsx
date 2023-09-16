@@ -42,7 +42,7 @@ const SidebarContainer = styled(motion.div)<{ windowBarStyle: Platform }>`
     max-height: ${(props) =>
         props.windowBarStyle === Platform.WEB || props.windowBarStyle === Platform.LINUX
             ? 'calc(100vh - 149px)'
-            : 'calc(100vh - 119px)'}; // Playerbar (90px), titlebar (65px), windowbar (30px)
+            : 'calc(100vh - 119px)'};
     user-select: none;
 `;
 
