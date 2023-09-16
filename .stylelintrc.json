@@ -1,27 +1,16 @@
 {
+    "customSyntax": "postcss-styled-syntax",
     "extends": [
-        "stylelint-config-standard-scss",
-        "stylelint-config-css-modules",
-        "stylelint-config-rational-order"
+        "stylelint-config-standard",
+        "stylelint-config-styled-components",
+        "stylelint-config-recess-order"
     ],
     "rules": {
-        "indentation": 4,
-        "color-function-notation": ["legacy"],
         "declaration-empty-line-before": null,
-        "order/properties-order": [],
-        "plugin/rational-order": [
-            true,
-            {
-                "border-in-box-model": false,
-                "empty-line-between-groups": false
-            }
-        ],
-        "string-quotes": "single",
         "declaration-block-no-redundant-longhand-properties": null,
         "selector-class-pattern": null,
         "selector-type-case": ["lower", { "ignoreTypes": ["/^\\$\\w+/"] }],
         "selector-type-no-unknown": [true, { "ignoreTypes": ["/-styled-mixin/", "/^\\$\\w+/"] }],
-        "value-keyword-case": ["lower", { "ignoreKeywords": ["dummyValue"] }],
         "declaration-colon-newline-after": null
     }
 }
