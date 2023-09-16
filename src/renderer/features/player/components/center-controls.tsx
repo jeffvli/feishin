@@ -124,7 +124,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
 
     const currentTime = useCurrentTime();
     const currentPlayerRef = player === 1 ? player1 : player2;
-    const duration = formatDuration((songDuration || 0) * 1000);
+    const duration = formatDuration(songDuration || 0);
     const formattedTime = formatDuration(currentTime * 1000 || 0);
 
     useEffect(() => {

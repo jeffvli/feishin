@@ -360,6 +360,16 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                     <RiFilterFill size="1.3rem" />
                 </Button>
                 <Divider orientation="vertical" />
+                <Button
+                    compact
+                    size="md"
+                    tooltip={{ label: 'Refresh' }}
+                    variant="subtle"
+                    onClick={handleRefresh}
+                >
+                    <RiRefreshLine size="1.3rem" />
+                </Button>
+                <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button

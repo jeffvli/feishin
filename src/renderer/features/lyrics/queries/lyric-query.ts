@@ -18,11 +18,11 @@ const lyricsIpc = isElectron() ? window.electron.lyrics : null;
 
 // Match LRC lyrics format by https://github.com/ustbhuangyi/lyric-parser
 // [mm:ss.SSS] text
-const timeExp = /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?]([^\n]+)\n/g;
+const timeExp = /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?]([^\n]+)(\n|$)/g;
 
 // Match karaoke lyrics format returned by NetEase
 // [SSS,???] text
-const alternateTimeExp = /\[(\d*),(\d*)]([^\n]+)\n/g;
+const alternateTimeExp = /\[(\d*),(\d*)]([^\n]+)(\n|$)/g;
 
 const formatLyrics = (lyrics: string) => {
     const synchronizedLines = lyrics.matchAll(timeExp);

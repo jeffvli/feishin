@@ -7,6 +7,7 @@ interface FullScreenPlayerState {
     activeTab: string | 'queue' | 'related' | 'lyrics';
     dynamicBackground?: boolean;
     expanded: boolean;
+    opacity: number;
     useImageAspectRatio: boolean;
 }
 
@@ -28,6 +29,7 @@ export const useFullScreenPlayerStore = create<FullScreenPlayerSlice>()(
                 activeTab: 'queue',
                 dynamicBackground: true,
                 expanded: false,
+                opacity: 60,
                 useImageAspectRatio: false,
             })),
             { name: 'store_full_screen_player' },

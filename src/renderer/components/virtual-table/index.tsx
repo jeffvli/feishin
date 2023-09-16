@@ -189,7 +189,7 @@ const tableColumns: { [key: string]: ColDef } = {
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center', preset: 'duration' }),
         suppressSizeToFit: true,
-        valueFormatter: (params: ValueFormatterParams) => formatDuration(params.value * 1000),
+        valueFormatter: (params: ValueFormatterParams) => formatDuration(Number(params.value)),
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.duration : undefined,
         width: 70,
