@@ -50,7 +50,7 @@ const GridContainer = styled.div<TransparendGridContainerProps>`
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-columns: 1fr;
     padding: 1rem;
-    background: rgb(var(--main-bg-transparent) ${({ opacity }) => opacity}%);
+    background: rgb(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     border-radius: 5px;
 `;
 
