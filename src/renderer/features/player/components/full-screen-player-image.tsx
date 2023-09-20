@@ -24,6 +24,7 @@ const Image = styled(motion.img)<{ $useAspectRatio: boolean }>`
     object-position: 50% 100%;
     filter: drop-shadow(0 0 5px rgb(0 0 0 / 40%)) drop-shadow(0 0 5px rgb(0 0 0 / 40%));
     border-radius: 5px;
+    max-width: 100%;
 `;
 
 const ImageContainer = styled(motion.div)`
@@ -42,7 +43,7 @@ interface TransparentMetadataContainer {
 
 const MetadataContainer = styled(Stack)<TransparentMetadataContainer>`
     padding: 1rem;
-    background: rgb(var(--main-bg-transparent) ${({ opacity }) => opacity}%);
+    background: rgb(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     border-radius: 5px;
 
     h1 {

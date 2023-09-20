@@ -45,7 +45,7 @@ export const RemoteContainer = () => {
                         <Title order={2}>Artist: {song.artistName}</Title>
                     </Group>
                     <Group position="apart">
-                        <Title order={3}>Duration: {formatDuration(song.duration * 1000)}</Title>
+                        <Title order={3}>Duration: {formatDuration(song.duration)}</Title>
                         {song.releaseDate && (
                             <Title order={3}>
                                 Released: {new Date(song.releaseDate).toLocaleDateString()}
