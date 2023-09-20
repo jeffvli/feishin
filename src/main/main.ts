@@ -426,7 +426,7 @@ const prefetchPlaylistParams = [
 ];
 
 const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
-    const parameters = ['--idle=yes'];
+    const parameters = ['--idle=yes', '--no-config', '--load-scripts=no'];
 
     if (!extraParameters?.some((param) => prefetchPlaylistParams.includes(param))) {
         parameters.push('--prefetch-playlist=yes');
