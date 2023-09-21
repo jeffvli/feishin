@@ -65,6 +65,7 @@
                     "x64"
                 ]
             },
+            "icon": "assets/icons/icon.icns",
             "type": "distribution",
             "hardenedRuntime": true,
             "entitlements": "assets/entitlements.mac.plist",
@@ -89,14 +90,15 @@
             "target": [
                 "nsis",
                 "zip"
-            ]
+            ],
+            "icon": "assets/icons/icon.ico"
         },
         "linux": {
             "target": [
                 "AppImage",
                 "tar.xz"
             ],
-            "icon": "assets/icons/placeholder.png",
+            "icon": "assets/icons/icon.png",
             "category": "Development"
         },
         "directories": {
