@@ -62,7 +62,7 @@ const SliderValueWrapper = styled.div<{ position: 'left' | 'right' }>`
     justify-content: center;
     max-width: 50px;
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
         display: none;
     }
 `;
@@ -80,7 +80,7 @@ const ControlsContainer = styled.div`
     justify-content: center;
     height: 35px;
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
         ${ButtonsContainer} {
             gap: 0;
         }
@@ -95,7 +95,6 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const queryClient = useQueryClient();
     const [isSeeking, setIsSeeking] = useState(false);
     const currentSong = useCurrentSong();
-    const songDuration = currentSong?.duration;
     const skip = useSettingsStore((state) => state.general.skipButtons);
     const playerType = usePlayerType();
     const player1 = playersRef?.current?.player1;
@@ -122,9 +121,10 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     } = useCenterControls({ playersRef });
     const handlePlayQueueAdd = usePlayQueueAdd();
 
+    const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
     const currentTime = useCurrentTime();
     const currentPlayerRef = player === 1 ? player1 : player2;
-    const duration = formatDuration((songDuration || 0) * 1000);
+    const duration = formatDuration(songDuration * 1000 || 0);
     const formattedTime = formatDuration(currentTime * 1000 || 0);
 
     useEffect(() => {

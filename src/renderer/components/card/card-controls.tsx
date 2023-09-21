@@ -23,7 +23,7 @@ const PlayButton = styled.button<PlayButtonType>`
     justify-content: center;
     width: 50px;
     height: 50px;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(255 255 255);
     border: none;
     border-radius: 50%;
     opacity: 0.8;
@@ -41,8 +41,8 @@ const PlayButton = styled.button<PlayButtonType>`
     }
 
     svg {
-        fill: rgb(0, 0, 0);
-        stroke: rgb(0, 0, 0);
+        fill: rgb(0 0 0);
+        stroke: rgb(0 0 0);
     }
 `;
 

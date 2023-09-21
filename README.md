@@ -1,3 +1,5 @@
+<img src="assets/feishin.png" alt="logo" title="feishin" align="right" height="60px" />
+
 # Feishin
 
   <p align="center">
@@ -29,13 +31,13 @@ Rewrite of [Sonixd](https://github.com/jeffvli/sonixd).
 
 ## Features
 
-- [x] MPV player backend
-- [x] Web player backend
-- [x] Modern UI
-- [x] Scrobble playback to your server
-- [x] Smart playlist editor (Navidrome)
-- [x] Synchronized and unsynchronized lyrics support
-- [ ] [Request a feature](https://github.com/jeffvli/feishin/issues) or [view taskboard](https://github.com/users/jeffvli/projects/5/views/1)
+-   [x] MPV player backend
+-   [x] Web player backend
+-   [x] Modern UI
+-   [x] Scrobble playback to your server
+-   [x] Smart playlist editor (Navidrome)
+-   [x] Synchronized and unsynchronized lyrics support
+-   [ ] [Request a feature](https://github.com/jeffvli/feishin/issues) or [view taskboard](https://github.com/users/jeffvli/projects/5/views/1)
 
 ## Screenshots
 
@@ -53,18 +55,22 @@ If you're using a device running macOS 12 (Monterey) or higher, [check here](htt
 
 2. After restarting the app, you will be prompted to select a server. Click the `Open menu` button and select `Manage servers`. Click the `Add server` button in the popup and fill out all applicable details. You will need to enter the full URL to your server, including the protocol and port if applicable (e.g. `https://navidrome.my-server.com` or `http://192.168.0.1:4533`).
 
-- **Navidrome** - For the best experience, select "Save password" when creating the server and configure the `SessionTimeout` setting in your Navidrome config to a larger value (e.g. 72h).
+-   **Navidrome** - For the best experience, select "Save password" when creating the server and configure the `SessionTimeout` setting in your Navidrome config to a larger value (e.g. 72h).
 
 ## FAQ
+
+### MPV is either not working or is rapidly switching between pause/play states
+
+First thing to do is check that your MPV binary path is correct. Navigate to the settings page and re-set the path and restart the app. If your issue still isn't resolved, try reinstalling MPV. Known working versions include `v0.35.x` and `v0.36.x`. `v0.34.x` is a known broken version.
 
 ### What music servers does Feishin support?
 
 Feishin supports any music server that implements a [Navidrome](https://www.navidrome.org/) or [Jellyfin](https://jellyfin.org/) API. **Subsonic API is not currently supported**. This will likely be added in [later when the new Subsonic API is decided on](https://support.symfonium.app/t/subsonic-servers-participation/1233).
 
-- [Navidrome](https://github.com/navidrome/navidrome)
-- [Jellyfin](https://github.com/jellyfin/jellyfin)
-- [Funkwhale](https://funkwhale.audio/) - TBD
-- Subsonic-compatible servers - TBD
+-   [Navidrome](https://github.com/navidrome/navidrome)
+-   [Jellyfin](https://github.com/jellyfin/jellyfin)
+-   [Funkwhale](https://funkwhale.audio/) - TBD
+-   Subsonic-compatible servers - TBD
 
 ## Development
 

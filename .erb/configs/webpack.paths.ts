@@ -5,6 +5,7 @@ const rootPath = path.join(__dirname, '../..');
 const dllPath = path.join(__dirname, '../dll');
 
 const srcPath = path.join(rootPath, 'src');
+const assetsPath = path.join(rootPath, 'assets');
 const srcMainPath = path.join(srcPath, 'main');
 const srcRemotePath = path.join(srcPath, 'remote');
 const srcRendererPath = path.join(srcPath, 'renderer');
@@ -24,21 +25,22 @@ const distWebPath = path.join(distPath, 'web');
 const buildPath = path.join(releasePath, 'build');
 
 export default {
-  rootPath,
-  dllPath,
-  srcPath,
-  srcMainPath,
-  srcRemotePath,
-  srcRendererPath,
-  releasePath,
-  appPath,
-  appPackagePath,
-  appNodeModulesPath,
-  srcNodeModulesPath,
-  distPath,
-  distMainPath,
-  distRemotePath,
-  distRendererPath,
-  distWebPath,
-  buildPath,
+    assetsPath,
+    rootPath,
+    dllPath,
+    srcPath,
+    srcMainPath,
+    srcRemotePath,
+    srcRendererPath,
+    releasePath,
+    appPath,
+    appPackagePath,
+    appNodeModulesPath,
+    srcNodeModulesPath,
+    distPath,
+    distMainPath,
+    distRemotePath,
+    distRendererPath,
+    distWebPath,
+    buildPath,
 };

@@ -88,11 +88,11 @@ const normalizeSong = (
         container: item.suffix,
         createdAt: item.createdAt.split('T')[0],
         discNumber: item.discNumber,
-        duration: item.duration,
         gain:
             item.rgAlbumGain || item.rgTrackGain
                 ? { album: item.rgAlbumGain, track: item.rgTrackGain }
                 : null,
+        duration: item.duration * 1000,
         genres: item.genres?.map((genre) => ({
             id: genre.id,
             imageUrl: null,

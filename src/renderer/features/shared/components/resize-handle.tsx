@@ -27,7 +27,7 @@ export const ResizeHandle = styled.div<{
         left: ${(props) => props.placement === 'left' && 0};
         width: 1px;
         height: 100%;
-        background-color: var(--sidebar-handle-bg);
         content: '';
+        background-color: var(--sidebar-handle-bg);
     }
 `;

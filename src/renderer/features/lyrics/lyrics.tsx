@@ -65,8 +65,8 @@ const ScrollContainer = styled(motion.div)`
     mask-image: linear-gradient(
         180deg,
         transparent 5%,
-        rgba(0, 0, 0, 100%) 20%,
-        rgba(0, 0, 0, 100%) 85%,
+        rgb(0 0 0 / 100%) 20%,
+        rgb(0 0 0 / 100%) 85%,
         transparent 95%
     );
 

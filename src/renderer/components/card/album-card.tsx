@@ -14,9 +14,9 @@ const CardWrapper = styled.div<{
     link?: boolean;
 }>`
     padding: 1rem;
+    cursor: ${({ link }) => link && 'pointer'};
     background: var(--card-default-bg);
     border-radius: var(--card-default-radius);
-    cursor: ${({ link }) => link && 'pointer'};
     transition: border 0.2s ease-in-out, background 0.2s ease-in-out;
 
     &:hover {
@@ -61,17 +61,17 @@ const ImageSection = styled.div`
         z-index: 1;
         width: 100%;
         height: 100%;
-        background: linear-gradient(0deg, rgba(0, 0, 0, 100%) 35%, rgba(0, 0, 0, 0%) 100%);
-        opacity: 0;
-        transition: all 0.2s ease-in-out;
         content: '';
         user-select: none;
+        background: linear-gradient(0deg, rgb(0 0 0 / 100%) 35%, rgb(0 0 0 / 0%) 100%);
+        opacity: 0;
+        transition: all 0.2s ease-in-out;
     }
 `;
 
 const Image = styled(SimpleImg)`
     border-radius: var(--card-default-radius);
-    box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 20%);
+    box-shadow: 2px 2px 10px 2px rgb(0 0 0 / 20%);
 `;
 
 const ControlsContainer = styled.div`
@@ -95,8 +95,8 @@ const Row = styled.div<{ $secondary?: boolean }>`
     padding: 0 0.2rem;
     overflow: hidden;
     color: ${({ $secondary }) => ($secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)')};
-    white-space: nowrap;
     text-overflow: ellipsis;
+    white-space: nowrap;
     user-select: none;
 `;
 

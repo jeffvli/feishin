@@ -18,13 +18,13 @@ import {
 } from '/@/renderer/store';
 
 const Image = styled(motion.img)<{ $useAspectRatio: boolean }>`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: ${({ $useAspectRatio }) => ($useAspectRatio ? 'contain' : 'cover')}};
-  object-position: 50% 100%;
-  border-radius: 5px;
-  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 40%)) drop-shadow(0 0 5px rgba(0, 0, 0, 40%));
+    position: absolute;
+    height: 100%;
+    object-fit: ${({ $useAspectRatio }) => ($useAspectRatio ? 'contain' : 'cover')};
+    object-position: 50% 100%;
+    filter: drop-shadow(0 0 5px rgb(0 0 0 / 40%)) drop-shadow(0 0 5px rgb(0 0 0 / 40%));
+    border-radius: 5px;
+    max-width: 100%;
 `;
 
 const ImageContainer = styled(motion.div)`
@@ -32,8 +32,8 @@ const ImageContainer = styled(motion.div)`
     display: flex;
     align-items: flex-end;
     max-width: 100%;
-    aspect-ratio: 1/1;
     height: 65%;
+    aspect-ratio: 1/1;
     margin-bottom: 1rem;
 `;
 
@@ -42,8 +42,8 @@ interface TransparentMetadataContainer {
 }
 
 const MetadataContainer = styled(Stack)<TransparentMetadataContainer>`
-    background: rgba(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     padding: 1rem;
+    background: rgb(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     border-radius: 5px;
 
     h1 {
@@ -52,7 +52,7 @@ const MetadataContainer = styled(Stack)<TransparentMetadataContainer>`
 `;
 
 const PlayerContainer = styled(Flex)`
-    @media screen and (max-height: 640px) {
+    @media screen and (height <= 640px) {
         .full-screen-player-image-metadata {
             display: none;
             height: 100%;

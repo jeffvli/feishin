@@ -1,12 +1,12 @@
 import axios, { AxiosResponse } from 'axios';
 import { load } from 'cheerio';
+import { orderSearchResults } from './shared';
 import {
     LyricSource,
     InternetProviderLyricResponse,
     InternetProviderLyricSearchResponse,
     LyricSearchQuery,
 } from '../../../../renderer/api/types';
-import { orderSearchResults } from './shared';
 
 const SEARCH_URL = 'https://genius.com/api/search/song';
 

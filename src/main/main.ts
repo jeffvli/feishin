@@ -129,7 +129,9 @@ const createTray = () => {
         return;
     }
 
-    tray = isLinux() ? new Tray(getAssetPath('icon.png')) : new Tray(getAssetPath('icon.ico'));
+    tray = isLinux()
+        ? new Tray(getAssetPath('icons/icon.png'))
+        : new Tray(getAssetPath('icons/icon.ico'));
     const contextMenu = Menu.buildFromTemplate([
         {
             click: () => {
@@ -212,7 +214,7 @@ const createWindow = async () => {
         autoHideMenuBar: true,
         frame: false,
         height: 900,
-        icon: getAssetPath('icon.png'),
+        icon: getAssetPath('icons/icon.png'),
         minHeight: 640,
         minWidth: 480,
         show: false,
@@ -426,7 +428,7 @@ const prefetchPlaylistParams = [
 ];
 
 const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
-    const parameters = ['--idle=yes'];
+    const parameters = ['--idle=yes', '--no-config', '--load-scripts=no'];
 
     if (!extraParameters?.some((param) => prefetchPlaylistParams.includes(param))) {
         parameters.push('--prefetch-playlist=yes');

@@ -10,7 +10,6 @@
         "declaration": true,
         "declarationMap": true,
         "jsx": "react-jsx",
-        "jsxImportSource": "@emotion/react",
         "strict": true,
         "pretty": true,
         "sourceMap": true,

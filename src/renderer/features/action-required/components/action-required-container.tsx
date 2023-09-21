@@ -1,9 +1,10 @@
 import { Stack, Group } from '@mantine/core';
 import { RiAlertFill } from 'react-icons/ri';
 import { Text } from '/@/renderer/components';
+import { ReactNode } from 'react';
 
 interface ActionRequiredContainerProps {
-    children: React.ReactNode;
+    children: ReactNode;
     title: string;
 }
 

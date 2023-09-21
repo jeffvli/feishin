@@ -30,8 +30,10 @@ const StyledMenuLabel = styled(MantineMenu.Label)<MenuLabelProps>`
 const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
     position: relative;
     padding: var(--dropdown-menu-item-padding);
-    font-size: var(--dropdown-menu-item-font-size);
     font-family: var(--content-font-family);
+    font-size: var(--dropdown-menu-item-font-size);
+
+    cursor: default;
 
     &:disabled {
         opacity: 0.6;
@@ -50,17 +52,15 @@ const StyledMenuItem = styled(MantineMenu.Item)<MenuItemProps>`
     & .mantine-Menu-itemRightSection {
         display: flex;
     }
-
-    cursor: default;
 `;
 
 const StyledMenuDropdown = styled(MantineMenu.Dropdown)`
-    margin: 0;
     padding: 0;
+    margin: 0;
     background: var(--dropdown-menu-bg);
+    filter: drop-shadow(0 0 5px rgb(0 0 0 / 50%));
     border: var(--dropdown-menu-border);
     border-radius: var(--dropdown-menu-border-radius);
-    filter: drop-shadow(0 0 5px rgb(0, 0, 0, 50%));
 
     /* *:first-child {
     border-top-left-radius: var(--dropdown-menu-border-radius);
@@ -74,8 +74,8 @@ const StyledMenuDropdown = styled(MantineMenu.Dropdown)`
 `;
 
 const StyledMenuDivider = styled(MantineMenu.Divider)`
-    margin: 0;
     padding: 0;
+    margin: 0;
 `;
 
 export const DropdownMenu = ({ children, ...props }: MenuProps) => {

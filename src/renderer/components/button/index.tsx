@@ -27,8 +27,8 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     transition: background 0.2s ease-in-out, color 0.2s ease-in-out, border 0.2s ease-in-out;
 
     svg {
-        transition: fill 0.2s ease-in-out;
         fill: ${(props) => `var(--btn-${props.variant}-fg)`};
+        transition: fill 0.2s ease-in-out;
     }
 
     &:disabled {

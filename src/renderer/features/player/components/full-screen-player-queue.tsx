@@ -17,9 +17,9 @@ const QueueContainer = styled.div`
     height: 100%;
 
     .ag-theme-alpine-dark {
-        --ag-header-background-color: rgba(0, 0, 0, 0%) !important;
-        --ag-background-color: rgba(0, 0, 0, 0%) !important;
-        --ag-odd-row-background-color: rgba(0, 0, 0, 0%) !important;
+        --ag-header-background-color: rgb(0 0 0 / 0%) !important;
+        --ag-background-color: rgb(0 0 0 / 0%) !important;
+        --ag-odd-row-background-color: rgb(0 0 0 / 0%) !important;
     }
 
     .ag-header {
@@ -46,11 +46,11 @@ interface TransparendGridContainerProps {
 }
 
 const GridContainer = styled.div<TransparendGridContainerProps>`
-    padding: 1rem;
-    background: rgba(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-columns: 1fr;
+    padding: 1rem;
+    background: rgb(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     border-radius: 5px;
 `;
 

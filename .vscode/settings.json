@@ -38,7 +38,7 @@
     "i18n-ally.localesPaths": ["src/i18n", "src/i18n/locales"],
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "typescript.preferences.importModuleSpecifier": "non-relative",
-    "stylelint.validate": ["css", "less", "postcss", "scss"],
+    "stylelint.validate": ["css", "scss", "typescript", "typescriptreact"],
     "typescript.updateImportsOnFileMove.enabled": "always",
     "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
     "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },

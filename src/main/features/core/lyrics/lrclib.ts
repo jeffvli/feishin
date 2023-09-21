@@ -1,12 +1,12 @@
 // Credits to https://github.com/tranxuanthang/lrcget for API implementation
 import axios, { AxiosResponse } from 'axios';
+import { orderSearchResults } from './shared';
 import {
     InternetProviderLyricResponse,
     InternetProviderLyricSearchResponse,
     LyricSearchQuery,
     LyricSource,
 } from '../../../../renderer/api/types';
-import { orderSearchResults } from './shared';
 
 const FETCH_URL = 'https://lrclib.net/api/get';
 const SEEARCH_URL = 'https://lrclib.net/api/search';

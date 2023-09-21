@@ -9,10 +9,11 @@
         "build:remote": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.remote.prod.ts",
         "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
         "build:web": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.web.prod.ts",
+        "build:docker": "npm run build:web && docker build -t jeffvli/feishin .",
         "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
-        "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
-        "lint:fix": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx --fix",
-        "lint:styles": "npx stylelint **/*.tsx",
+        "lint": "concurrently \"npm run lint:code\" \"npm run lint:styles\"",
+        "lint:code": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx --fix",
+        "lint:styles": "npx stylelint **/*.tsx --fix",
         "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
         "package:pr": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never --win --mac --linux",
         "package:dev": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never --dir",
@@ -55,7 +56,7 @@
             "package.json"
         ],
         "afterSign": ".erb/scripts/notarize.js",
-        "electronVersion": "25.3.0",
+        "electronVersion": "25.8.1",
         "mac": {
             "target": {
                 "target": "default",
@@ -64,6 +65,7 @@
                     "x64"
                 ]
             },
+            "icon": "assets/icons/icon.icns",
             "type": "distribution",
             "hardenedRuntime": true,
             "entitlements": "assets/entitlements.mac.plist",
@@ -88,14 +90,15 @@
             "target": [
                 "nsis",
                 "zip"
-            ]
+            ],
+            "icon": "assets/icons/icon.ico"
         },
         "linux": {
             "target": [
                 "AppImage",
                 "tar.xz"
             ],
-            "icon": "assets/icons/placeholder.png",
+            "icon": "assets/icons/icon.png",
             "category": "Development"
         },
         "directories": {
@@ -194,7 +197,7 @@
         "css-loader": "^6.7.1",
         "css-minimizer-webpack-plugin": "^3.4.1",
         "detect-port": "^1.3.0",
-        "electron": "^25.3.0",
+        "electron": "^25.8.1",
         "electron-builder": "^24.6.3",
         "electron-devtools-installer": "^3.2.0",
         "electron-notarize": "^1.2.1",
@@ -222,6 +225,7 @@
         "lint-staged": "^12.3.7",
         "mini-css-extract-plugin": "^2.6.0",
         "postcss-scss": "^4.0.4",
+        "postcss-styled-syntax": "^0.5.0",
         "postcss-syntax": "^0.36.2",
         "prettier": "^2.6.2",
         "react-refresh": "^0.12.0",
@@ -231,16 +235,19 @@
         "sass": "^1.49.11",
         "sass-loader": "^12.6.0",
         "style-loader": "^3.3.1",
-        "stylelint": "^14.9.1",
+        "stylelint": "^15.10.3",
         "stylelint-config-css-modules": "^4.3.0",
-        "stylelint-config-rational-order": "^0.1.2",
+        "stylelint-config-recess-order": "^4.3.0",
+        "stylelint-config-standard": "^34.0.0",
         "stylelint-config-standard-scss": "^4.0.0",
+        "stylelint-config-styled-components": "^0.1.1",
         "terser-webpack-plugin": "^5.3.1",
         "ts-jest": "^27.1.4",
         "ts-loader": "^9.2.8",
         "ts-node": "^10.7.0",
         "tsconfig-paths-webpack-plugin": "^4.0.0",
-        "typescript": "^4.8.4",
+        "typescript": "^5.2.2",
+        "typescript-plugin-styled-components": "^3.0.0",
         "url-loader": "^4.1.1",
         "webpack": "^5.71.0",
         "webpack-bundle-analyzer": "^4.5.0",
@@ -304,13 +311,13 @@
         "react-virtualized-auto-sizer": "^1.0.17",
         "react-window": "^1.8.9",
         "react-window-infinite-loader": "^1.0.9",
-        "styled-components": "^5.3.11",
+        "styled-components": "^6.0.8",
         "swiper": "^9.3.1",
         "zod": "^3.21.4",
         "zustand": "^4.3.9"
     },
     "resolutions": {
-        "styled-components": "^5"
+        "styled-components": "^6"
     },
     "devEngines": {
         "node": ">=14.x",
