@@ -190,6 +190,7 @@ export type Song = {
     container: string | null;
     createdAt: string;
     discNumber: number;
+    discSubtitle: string | null;
     duration: number;
     gain: GainInfo | null;
     genres: Genre[];

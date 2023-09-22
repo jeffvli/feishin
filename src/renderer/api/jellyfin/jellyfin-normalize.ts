@@ -150,6 +150,7 @@ const normalizeSong = (
         container: (item.MediaSources && item.MediaSources[0]?.Container) || null,
         createdAt: item.DateCreated,
         discNumber: (item.ParentIndexNumber && item.ParentIndexNumber) || 1,
+        discSubtitle: null,
         duration: item.RunTimeTicks / 10000,
         gain: item.LUFS
             ? {

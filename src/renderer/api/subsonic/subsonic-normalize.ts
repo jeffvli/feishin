@@ -67,6 +67,7 @@ const normalizeSong = (
         container: item.contentType,
         createdAt: item.created,
         discNumber: item.discNumber || 1,
+        discSubtitle: null,
         duration: item.duration ? item.duration * 1000 : 0,
         gain: null,
         genres: item.genre

@@ -88,9 +88,15 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
             const songsByDiscNumber = detailQuery.data?.songs.filter(
                 (s) => s.discNumber === discNumber,
             );
+
+            const discSubtitle = songsByDiscNumber?.[0]?.discSubtitle;
+            const discName = [`Disc ${discNumber}`.toLocaleUpperCase(), discSubtitle]
+                .filter(Boolean)
+                .join(': ');
+
             rowData.push({
                 id: `disc-${discNumber}`,
-                name: `Disc ${discNumber}`.toLocaleUpperCase(),
+                name: discName,
             });
             rowData.push(...songsByDiscNumber);
         }
