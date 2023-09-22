@@ -36,6 +36,7 @@ import { TablePagination } from '/@/renderer/components/virtual-table/table-pagi
 import { ActionsCell } from '/@/renderer/components/virtual-table/cells/actions-cell';
 import { TitleCell } from '/@/renderer/components/virtual-table/cells/title-cell';
 import { useFixedTableHeader } from '/@/renderer/components/virtual-table/hooks/use-fixed-table-header';
+import { NoteCell } from '/@/renderer/components/virtual-table/cells/note-cell';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -150,7 +151,7 @@ const tableColumns: { [key: string]: ColDef } = {
         width: 100,
     },
     comment: {
-        cellRenderer: GenericCell,
+        cellRenderer: NoteCell,
         colId: TableColumn.COMMENT,
         headerName: 'Note',
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data.comment : undefined),
