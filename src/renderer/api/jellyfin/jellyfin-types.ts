@@ -406,6 +406,7 @@ const song = z.object({
     ImageTags: imageTags,
     IndexNumber: z.number(),
     IsFolder: z.boolean(),
+    LUFS: z.number().optional(),
     LocationType: z.string(),
     MediaSources: z.array(mediaSources),
     MediaType: z.string(),
