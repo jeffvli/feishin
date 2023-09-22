@@ -19,18 +19,19 @@ import {
 
 const Image = styled(motion.img)<{ $useAspectRatio: boolean }>`
     position: absolute;
+    max-width: 100%;
     height: 100%;
-    object-fit: ${({ $useAspectRatio }) => ($useAspectRatio ? 'contain' : 'cover')};
-    object-position: 50% 100%;
     filter: drop-shadow(0 0 5px rgb(0 0 0 / 40%)) drop-shadow(0 0 5px rgb(0 0 0 / 40%));
     border-radius: 5px;
-    max-width: 100%;
+    object-fit: ${({ $useAspectRatio }) => ($useAspectRatio ? 'contain' : 'cover')};
+    object-position: 50% 100%;
 `;
 
 const ImageContainer = styled(motion.div)`
     position: relative;
     display: flex;
     align-items: flex-end;
+    justify-content: center;
     max-width: 100%;
     height: 65%;
     aspect-ratio: 1/1;
@@ -43,7 +44,6 @@ interface TransparentMetadataContainer {
 
 const MetadataContainer = styled(Stack)<TransparentMetadataContainer>`
     padding: 1rem;
-    background: rgb(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     border-radius: 5px;
 
     h1 {
@@ -223,6 +223,10 @@ export const FullScreenPlayerImage = () => {
                     align="center"
                     order={1}
                     overflow="hidden"
+                    pb="0.5rem"
+                    style={{
+                        textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                    }}
                     w="100%"
                     weight={900}
                 >
@@ -230,14 +234,17 @@ export const FullScreenPlayerImage = () => {
                 </TextTitle>
                 <TextTitle
                     $link
-                    $secondary
                     align="center"
                     component={Link}
-                    order={2}
+                    order={3}
                     overflow="hidden"
+                    style={{
+                        textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                    }}
                     to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
                         albumId: currentSong?.albumId || '',
                     })}
+                    transform="uppercase"
                     w="100%"
                     weight={600}
                 >
@@ -246,9 +253,12 @@ export const FullScreenPlayerImage = () => {
                 {currentSong?.artists?.map((artist, index) => (
                     <TextTitle
                         key={`fs-artist-${artist.id}`}
-                        $secondary
                         align="center"
-                        order={4}
+                        order={3}
+                        style={{
+                            textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                        }}
+                        transform="uppercase"
                     >
                         {index > 0 && (
                             <Text
@@ -262,11 +272,14 @@ export const FullScreenPlayerImage = () => {
                         )}
                         <Text
                             $link
-                            $secondary
                             component={Link}
+                            style={{
+                                textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                            }}
                             to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                 albumArtistId: artist.id,
                             })}
+                            transform="uppercase"
                             weight={600}
                         >
                             {artist.name}
