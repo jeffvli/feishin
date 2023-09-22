@@ -24,14 +24,14 @@ if (!isElectron()) {
     });
 }
 
-const Layout = styled.div<{ windowBarStyle: Platform }>`
+const Layout = styled.div<{ $windowBarStyle: Platform }>`
     display: grid;
     grid-template-areas:
         'window-bar'
         'main-content'
         'player';
     grid-template-rows: ${(props) =>
-        props.windowBarStyle === Platform.WINDOWS || props.windowBarStyle === Platform.MACOS
+        props.$windowBarStyle === Platform.WINDOWS || props.$windowBarStyle === Platform.MACOS
             ? '30px calc(100vh - 120px) 90px'
             : '0px calc(100vh - 90px) 90px'};
     grid-template-columns: 1fr;
@@ -84,8 +84,8 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
     return (
         <>
             <Layout
+                $windowBarStyle={windowBarStyle}
                 id="default-layout"
-                windowBarStyle={windowBarStyle}
             >
                 {windowBarStyle !== Platform.WEB && <WindowBar />}
                 <MainContent shell={shell} />

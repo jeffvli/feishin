@@ -135,13 +135,13 @@ const MacOsButtonGroup = styled.div`
 `;
 
 export const MacOsButton = styled.div<{
-    maxButton?: boolean;
-    minButton?: boolean;
-    restoreButton?: boolean;
+    $maxButton?: boolean;
+    $minButton?: boolean;
+    $restoreButton?: boolean;
 }>`
     grid-row: 1 / span 1;
     grid-column: ${(props) =>
-        props.minButton ? 2 : props.maxButton || props.restoreButton ? 3 : 1};
+        props.$minButton ? 2 : props.$maxButton || props.$restoreButton ? 3 : 1};
     align-items: center;
     justify-content: center;
     width: 100%;
@@ -165,7 +165,7 @@ const MacOsControls = ({ controls, title }: WindowBarControlsProps) => {
         <MacOsContainer>
             <MacOsButtonGroup>
                 <MacOsButton
-                    minButton
+                    $minButton
                     className="button"
                     id="min-button"
                     onClick={handleMinimize}
@@ -180,7 +180,7 @@ const MacOsControls = ({ controls, title }: WindowBarControlsProps) => {
                     />
                 </MacOsButton>
                 <MacOsButton
-                    maxButton
+                    $maxButton
                     className="button"
                     id="max-button"
                     onClick={handleMaximize}

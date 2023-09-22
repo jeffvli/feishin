@@ -66,8 +66,6 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     const handlePlayQueueAdd = usePlayQueueAdd();
     const tableConfig = useTableSettings('albumDetail');
 
-    console.log('tableConfig :>> ', tableConfig);
-
     const columnDefs = useMemo(() => getColumnDefs(tableConfig.columns), [tableConfig.columns]);
 
     const getRowHeight = useCallback((params: RowHeightParams) => {
@@ -266,7 +264,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
 
     return (
         <ContentContainer>
-            <LibraryBackgroundOverlay backgroundColor={background} />
+            <LibraryBackgroundOverlay $backgroundColor={background} />
             <DetailContainer>
                 <Box component="section">
                     <Group

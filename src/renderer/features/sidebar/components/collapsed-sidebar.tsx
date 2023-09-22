@@ -35,12 +35,12 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { SidebarItemType, useGeneralSettings, useWindowSettings } from '/@/renderer/store';
 import { Platform } from '/@/renderer/types';
 
-const SidebarContainer = styled(motion.div)<{ windowBarStyle: Platform }>`
+const SidebarContainer = styled(motion.div)<{ $windowBarStyle: Platform }>`
     display: flex;
     flex-direction: column;
     height: 100%;
     max-height: ${(props) =>
-        props.windowBarStyle === Platform.WEB || props.windowBarStyle === Platform.LINUX
+        props.$windowBarStyle === Platform.WEB || props.$windowBarStyle === Platform.LINUX
             ? 'calc(100vh - 149px)'
             : 'calc(100vh - 119px)'};
     user-select: none;
@@ -110,7 +110,7 @@ export const CollapsedSidebar = () => {
     }, [sidebarItems]);
 
     return (
-        <SidebarContainer windowBarStyle={windowBarStyle}>
+        <SidebarContainer $windowBarStyle={windowBarStyle}>
             <ScrollArea
                 scrollHideDelay={0}
                 scrollbarSize={8}

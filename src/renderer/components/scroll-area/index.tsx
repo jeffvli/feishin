@@ -29,7 +29,10 @@ const StyledScrollArea = styled(MantineScrollArea)`
     }
 `;
 
-const StyledNativeScrollArea = styled.div<{ scrollBarOffset?: string; windowBarStyle?: Platform }>`
+const StyledNativeScrollArea = styled.div<{
+    $scrollBarOffset?: string;
+    $windowBarStyle?: Platform;
+}>`
     height: 100%;
 `;
 
@@ -133,8 +136,8 @@ export const NativeScrollArea = forwardRef(
                 />
                 <StyledNativeScrollArea
                     ref={mergedRef}
-                    scrollBarOffset={scrollBarOffset}
-                    windowBarStyle={windowBarStyle}
+                    $scrollBarOffset={scrollBarOffset}
+                    $windowBarStyle={windowBarStyle}
                     {...props}
                 >
                     {children}

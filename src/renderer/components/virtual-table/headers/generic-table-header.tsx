@@ -14,12 +14,12 @@ type Options = {
     preset?: Presets;
 };
 
-export const HeaderWrapper = styled.div<{ position: Options['position'] }>`
+export const HeaderWrapper = styled.div<{ $position: Options['position'] }>`
     display: flex;
     justify-content: ${(props) =>
-        props.position === 'right'
+        props.$position === 'right'
             ? 'flex-end'
-            : props.position === 'center'
+            : props.$position === 'center'
             ? 'center'
             : 'flex-start'};
     width: 100%;
@@ -27,16 +27,16 @@ export const HeaderWrapper = styled.div<{ position: Options['position'] }>`
     text-transform: uppercase;
 `;
 
-const HeaderText = styled(_Text)<{ position: Options['position'] }>`
+const HeaderText = styled(_Text)<{ $position: Options['position'] }>`
     width: 100%;
     height: 100%;
     font-weight: 500;
     line-height: inherit;
     color: var(--ag-header-foreground-color);
     text-align: ${(props) =>
-        props.position === 'right'
+        props.$position === 'right'
             ? 'flex-end'
-            : props.position === 'center'
+            : props.$position === 'center'
             ? 'center'
             : 'flex-start'};
     text-transform: uppercase;
@@ -80,14 +80,14 @@ export const GenericTableHeader = (
     { preset, children, position }: Options,
 ) => {
     if (preset) {
-        return <HeaderWrapper position={position}>{headerPresets[preset]}</HeaderWrapper>;
+        return <HeaderWrapper $position={position}>{headerPresets[preset]}</HeaderWrapper>;
     }
 
     return (
-        <HeaderWrapper position={position}>
+        <HeaderWrapper $position={position}>
             <HeaderText
+                $position={position}
                 overflow="hidden"
-                position={position}
                 weight={500}
             >
                 {children || displayName}

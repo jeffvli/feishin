@@ -47,7 +47,7 @@ export const RatingCell = ({ value, node }: ICellRendererParams) => {
     };
 
     return (
-        <CellContainer position="center">
+        <CellContainer $position="center">
             <Rating
                 size="xs"
                 value={value?.userRating}

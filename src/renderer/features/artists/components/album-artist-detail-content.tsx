@@ -333,7 +333,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
 
     return (
         <ContentContainer ref={cq.ref}>
-            <LibraryBackgroundOverlay backgroundColor={background} />
+            <LibraryBackgroundOverlay $backgroundColor={background} />
             <DetailContainer>
                 <Stack spacing="lg">
                     <Group spacing="md">

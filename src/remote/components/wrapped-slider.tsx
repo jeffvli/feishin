@@ -10,7 +10,7 @@ const SliderContainer = styled.div`
     margin: 10px 0;
 `;
 
-const SliderValueWrapper = styled.div<{ position: 'left' | 'right' }>`
+const SliderValueWrapper = styled.div<{ $position: 'left' | 'right' }>`
     display: flex;
     flex: 1;
     align-self: flex-end;
@@ -38,7 +38,7 @@ export const WrapperSlider = ({ leftLabel, rightLabel, value, ...props }: Wrappe
 
     return (
         <SliderContainer>
-            {leftLabel && <SliderValueWrapper position="left">{leftLabel}</SliderValueWrapper>}
+            {leftLabel && <SliderValueWrapper $position="left">{leftLabel}</SliderValueWrapper>}
             <SliderWrapper>
                 <PlayerbarSlider
                     {...props}
@@ -56,7 +56,7 @@ export const WrapperSlider = ({ leftLabel, rightLabel, value, ...props }: Wrappe
                     }}
                 />
             </SliderWrapper>
-            {rightLabel && <SliderValueWrapper position="right">{rightLabel}</SliderValueWrapper>}
+            {rightLabel && <SliderValueWrapper $position="right">{rightLabel}</SliderValueWrapper>}
         </SliderContainer>
     );
 };

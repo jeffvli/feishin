@@ -7,13 +7,13 @@ import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
 
 const Container = styled(motion(Flex))<{
-    height?: string;
-    position?: string;
+    $height?: string;
+    $position?: string;
 }>`
-    position: ${(props) => props.position || 'relative'};
+    position: ${(props) => props.$position || 'relative'};
     z-index: 200;
     width: 100%;
-    height: ${(props) => props.height || '65px'};
+    height: ${(props) => props.$height || '65px'};
     background: var(--titlebar-bg);
 `;
 
@@ -40,13 +40,13 @@ const Header = styled(motion.div)<{
     }
 `;
 
-const BackgroundImage = styled.div<{ background: string }>`
+const BackgroundImage = styled.div<{ $background: string }>`
     position: absolute;
     top: 0;
     z-index: 1;
     width: 100%;
     height: 100%;
-    background: ${(props) => props.background || 'var(--titlebar-bg)'};
+    background: ${(props) => props.$background || 'var(--titlebar-bg)'};
 `;
 
 const BackgroundImageOverlay = styled.div<{ theme: 'light' | 'dark' }>`
@@ -129,8 +129,8 @@ export const PageHeader = ({
             {!isHidden && (
                 <Container
                     ref={ref}
-                    height={height}
-                    position={position}
+                    $height={height}
+                    $position={position}
                     {...props}
                 >
                     <Header
@@ -151,7 +151,9 @@ export const PageHeader = ({
                     </Header>
                     {backgroundColor && (
                         <>
-                            <BackgroundImage background={backgroundColor || 'var(--titlebar-bg)'} />
+                            <BackgroundImage
+                                $background={backgroundColor || 'var(--titlebar-bg)'}
+                            />
                             <BackgroundImageOverlay theme={theme as 'light' | 'dark'} />
                         </>
                     )}

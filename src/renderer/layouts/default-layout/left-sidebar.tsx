@@ -25,8 +25,8 @@ export const LeftSidebar = ({ isResizing, startResizing }: LeftSidebarProps) => 
         <SidebarContainer id="sidebar">
             <ResizeHandle
                 ref={sidebarRef}
-                isResizing={isResizing}
-                placement="right"
+                $isResizing={isResizing}
+                $placement="right"
                 onMouseDown={(e) => {
                     e.preventDefault();
                     startResizing('left');
