@@ -11,6 +11,7 @@
         "selector-class-pattern": null,
         "selector-type-case": ["lower", { "ignoreTypes": ["/^\\$\\w+/"] }],
         "selector-type-no-unknown": [true, { "ignoreTypes": ["/-styled-mixin/", "/^\\$\\w+/"] }],
-        "declaration-colon-newline-after": null
+        "declaration-colon-newline-after": null,
+        "property-no-vendor-prefix": null
     }
 }
