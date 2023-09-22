@@ -1,4 +1,4 @@
-<img src="assets/feishin.png" alt="logo" title="feishin" align="right" height="60px" />
+<img src="assets/icons/icon.png" alt="logo" title="feishin" align="right" height="60px" />
 
 # Feishin
 
