@@ -125,14 +125,12 @@ export const NativeScrollArea = forwardRef(
 
         return (
             <>
-                {shouldShowHeader && (
-                    <PageHeader
-                        animated
-                        isHidden={false}
-                        position="absolute"
-                        {...pageHeaderProps}
-                    />
-                )}
+                <PageHeader
+                    animated
+                    isHidden={!shouldShowHeader}
+                    position="absolute"
+                    {...pageHeaderProps}
+                />
                 <StyledNativeScrollArea
                     ref={mergedRef}
                     scrollBarOffset={scrollBarOffset}

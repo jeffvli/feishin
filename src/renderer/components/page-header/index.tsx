@@ -79,6 +79,24 @@ const TitleWrapper = styled(motion.div)`
     height: 100%;
 `;
 
+const DragContainer = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: calc(100% - 130px);
+    height: 65px;
+    -webkit-app-region: drag;
+
+    button {
+        -webkit-app-region: no-drag;
+    }
+
+    input {
+        -webkit-app-region: no-drag;
+    }
+`;
+
 const variants: Variants = {
     animate: {
         opacity: 1,
@@ -106,34 +124,39 @@ export const PageHeader = ({
     const theme = useTheme();
 
     return (
-        <Container
-            ref={ref}
-            height={height}
-            position={position}
-            {...props}
-        >
-            <Header
-                $isDraggable={windowBarStyle === Platform.WEB}
-                $isHidden={isHidden}
-                $padRight={padRight}
-            >
-                <AnimatePresence initial={animated ?? false}>
-                    <TitleWrapper
-                        animate="animate"
-                        exit="exit"
-                        initial="initial"
-                        variants={variants}
+        <>
+            {windowBarStyle === Platform.WEB && <DragContainer />}
+            {!isHidden && (
+                <Container
+                    ref={ref}
+                    height={height}
+                    position={position}
+                    {...props}
+                >
+                    <Header
+                        $isDraggable={windowBarStyle === Platform.WEB}
+                        $isHidden={isHidden}
+                        $padRight={padRight}
                     >
-                        {children}
-                    </TitleWrapper>
-                </AnimatePresence>
-            </Header>
-            {backgroundColor && (
-                <>
-                    <BackgroundImage background={backgroundColor || 'var(--titlebar-bg)'} />
-                    <BackgroundImageOverlay theme={theme as 'light' | 'dark'} />
-                </>
+                        <AnimatePresence initial={animated ?? false}>
+                            <TitleWrapper
+                                animate="animate"
+                                exit="exit"
+                                initial="initial"
+                                variants={variants}
+                            >
+                                {children}
+                            </TitleWrapper>
+                        </AnimatePresence>
+                    </Header>
+                    {backgroundColor && (
+                        <>
+                            <BackgroundImage background={backgroundColor || 'var(--titlebar-bg)'} />
+                            <BackgroundImageOverlay theme={theme as 'light' | 'dark'} />
+                        </>
+                    )}
+                </Container>
             )}
-        </Container>
+        </>
     );
 };
