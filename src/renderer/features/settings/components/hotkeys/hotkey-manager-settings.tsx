@@ -11,6 +11,8 @@ import { SettingsOptions } from '/@/renderer/features/settings/components/settin
 const ipc = isElectron() ? window.electron.ipc : null;
 
 const BINDINGS_MAP: Record<BindingActions, string> = {
+    browserBack: 'Browser back',
+    browserForward: 'Browser forward',
     globalSearch: 'Global search',
     localSearch: 'In-page search',
     next: 'Next track',

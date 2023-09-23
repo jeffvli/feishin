@@ -81,6 +81,8 @@ type MpvSettings = {
 };
 
 export enum BindingActions {
+    BROWSER_BACK = 'browserBack',
+    BROWSER_FORWARD = 'browserForward',
     GLOBAL_SEARCH = 'globalSearch',
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
@@ -221,6 +223,8 @@ const initialState: SettingsState = {
     },
     hotkeys: {
         bindings: {
+            browserBack: { allowGlobal: false, hotkey: '', isGlobal: false },
+            browserForward: { allowGlobal: false, hotkey: '', isGlobal: false },
             globalSearch: { allowGlobal: false, hotkey: 'mod+k', isGlobal: false },
             localSearch: { allowGlobal: false, hotkey: 'mod+f', isGlobal: false },
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
