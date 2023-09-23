@@ -41,6 +41,7 @@ export const ALBUM_TABLE_COLUMNS = [
     { label: 'Duration', value: TableColumn.DURATION },
     { label: 'Album Artist', value: TableColumn.ALBUM_ARTIST },
     { label: 'Artist', value: TableColumn.ARTIST },
+    { label: 'Song Count', value: TableColumn.SONG_COUNT },
     { label: 'Genre', value: TableColumn.GENRE },
     { label: 'Year', value: TableColumn.YEAR },
     { label: 'Release Date', value: TableColumn.RELEASE_DATE },
