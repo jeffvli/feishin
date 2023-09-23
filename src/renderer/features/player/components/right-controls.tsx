@@ -69,7 +69,7 @@ export const RightControls = () => {
         });
     };
 
-    const handleClearRating = (_e: MouseEvent<HTMLDivElement>, rating?: number) => {
+    const handleClearRating = (_e: MouseEvent<HTMLDivElement> | null, rating?: number) => {
         if (!currentSong || !rating) return;
 
         updateRatingMutation.mutate({
@@ -115,6 +115,12 @@ export const RightControls = () => {
         [bindings.volumeUp.isGlobal ? '' : bindings.volumeUp.hotkey, handleVolumeUp],
         [bindings.volumeMute.isGlobal ? '' : bindings.volumeMute.hotkey, handleMute],
         [bindings.toggleQueue.isGlobal ? '' : bindings.toggleQueue.hotkey, handleToggleQueue],
+        [bindings.rate0.isGlobal ? '' : bindings.rate0.hotkey, () => handleClearRating(null, 0)],
+        [bindings.rate1.isGlobal ? '' : bindings.rate1.hotkey, () => handleUpdateRating(1)],
+        [bindings.rate2.isGlobal ? '' : bindings.rate2.hotkey, () => handleUpdateRating(2)],
+        [bindings.rate3.isGlobal ? '' : bindings.rate3.hotkey, () => handleUpdateRating(3)],
+        [bindings.rate4.isGlobal ? '' : bindings.rate4.hotkey, () => handleUpdateRating(4)],
+        [bindings.rate5.isGlobal ? '' : bindings.rate5.hotkey, () => handleUpdateRating(5)],
     ]);
 
     useEffect(() => {
