@@ -1,7 +1,7 @@
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import {
     RiAddBoxFill,
     RiAddCircleFill,
@@ -16,6 +16,7 @@ import { useListStoreByKey } from '../../../store/list.store';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { LibraryItem, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
 import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
@@ -72,16 +73,21 @@ const FILTERS = {
 };
 
 interface SongListHeaderFiltersProps {
+    gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) => {
+export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFiltersProps) => {
     const server = useCurrentServer();
     const { pageKey, handlePlay, customFilters } = useListContext();
-    const { display, table, filter } = useListStoreByKey({ filter: customFilters, key: pageKey });
-    const { setFilter, setTable, setTablePagination, setDisplayType } = useListStoreActions();
+    const { display, table, filter, grid } = useListStoreByKey({
+        filter: customFilters,
+        key: pageKey,
+    });
+    const { setFilter, setGrid, setTable, setTablePagination, setDisplayType } =
+        useListStoreActions();
 
-    const { handleRefreshTable } = useListFilterRefresh({
+    const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
         itemType: LibraryItem.SONG,
         server,
     });
@@ -97,10 +103,11 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
             ).find((f) => f.value === filter.sortBy)?.name) ||
         'Unknown';
 
+    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
+
     const handleSetSortBy = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
             if (!e.currentTarget?.value || !server?.type) return;
-
             const sortOrder = FILTERS[server.type as keyof typeof FILTERS].find(
                 (f) => f.value === e.currentTarget.value,
             )?.defaultOrder;
@@ -115,9 +122,23 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                 key: pageKey,
             }) as SongListFilter;
 
-            handleRefreshTable(tableRef, updatedFilters);
+            if (isGrid) {
+                handleRefreshGrid(gridRef, updatedFilters);
+            } else {
+                handleRefreshTable(tableRef, updatedFilters);
+            }
         },
-        [customFilters, handleRefreshTable, pageKey, server?.type, setFilter, tableRef],
+        [
+            customFilters,
+            gridRef,
+            handleRefreshGrid,
+            handleRefreshTable,
+            isGrid,
+            pageKey,
+            server?.type,
+            setFilter,
+            tableRef,
+        ],
     );
 
     const handleSetMusicFolder = useCallback(
@@ -141,9 +162,23 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                 }) as SongListFilter;
             }
 
-            handleRefreshTable(tableRef, updatedFilters);
+            if (isGrid) {
+                handleRefreshGrid(gridRef, updatedFilters);
+            } else {
+                handleRefreshTable(tableRef, updatedFilters);
+            }
         },
-        [filter.musicFolderId, handleRefreshTable, tableRef, setFilter, customFilters, pageKey],
+        [
+            filter.musicFolderId,
+            isGrid,
+            setFilter,
+            customFilters,
+            pageKey,
+            handleRefreshGrid,
+            gridRef,
+            handleRefreshTable,
+            tableRef,
+        ],
     );
 
     const handleToggleSortOrder = useCallback(() => {
@@ -154,8 +189,23 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
             itemType: LibraryItem.SONG,
             key: pageKey,
         }) as SongListFilter;
-        handleRefreshTable(tableRef, updatedFilters);
-    }, [customFilters, filter.sortOrder, handleRefreshTable, pageKey, setFilter, tableRef]);
+
+        if (isGrid) {
+            handleRefreshGrid(gridRef, updatedFilters);
+        } else {
+            handleRefreshTable(tableRef, updatedFilters);
+        }
+    }, [
+        customFilters,
+        filter.sortOrder,
+        gridRef,
+        handleRefreshGrid,
+        handleRefreshTable,
+        isGrid,
+        pageKey,
+        setFilter,
+        tableRef,
+    ]);
 
     const handleSetViewType = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
@@ -212,19 +262,37 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
         }
     };
 
-    const handleRowHeight = (e: number) => {
-        setTable({ data: { rowHeight: e }, key: pageKey });
+    const handleItemSize = (e: number) => {
+        if (isGrid) {
+            setGrid({ data: { itemSize: e }, key: pageKey });
+        } else {
+            setTable({ data: { rowHeight: e }, key: pageKey });
+        }
+    };
+
+    const handleItemGap = (e: number) => {
+        setGrid({ data: { itemGap: e }, key: pageKey });
     };
 
     const handleRefresh = () => {
         queryClient.invalidateQueries(queryKeys.songs.list(server?.id || ''));
-        handleRefreshTable(tableRef, filter);
+        if (isGrid) {
+            handleRefreshGrid(gridRef, filter);
+        } else {
+            handleRefreshTable(tableRef, filter);
+        }
     };
 
     const onFilterChange = (filter: SongListFilter) => {
-        handleRefreshTable(tableRef, {
-            ...filter,
-        });
+        if (isGrid) {
+            handleRefreshGrid(gridRef, {
+                ...filter,
+            });
+        } else {
+            handleRefreshTable(tableRef, {
+                ...filter,
+            });
+        }
     };
 
     const handleOpenFiltersModal = () => {
@@ -430,6 +498,20 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Label>Display type</DropdownMenu.Label>
                         <DropdownMenu.Item
+                            $isActive={display === ListDisplayType.CARD}
+                            value={ListDisplayType.CARD}
+                            onClick={handleSetViewType}
+                        >
+                            Card
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                            $isActive={display === ListDisplayType.POSTER}
+                            value={ListDisplayType.POSTER}
+                            onClick={handleSetViewType}
+                        >
+                            Poster
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}
                             onClick={handleSetViewType}
@@ -447,13 +529,25 @@ export const SongListHeaderFilters = ({ tableRef }: SongListHeaderFiltersProps) 
                         <DropdownMenu.Label>Item Size</DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
-                                defaultValue={table.rowHeight || 0}
-                                label={null}
-                                max={100}
-                                min={25}
-                                onChangeEnd={handleRowHeight}
+                                defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
+                                max={isGrid ? 300 : 100}
+                                min={isGrid ? 150 : 25}
+                                onChangeEnd={handleItemSize}
                             />
                         </DropdownMenu.Item>
+                        {isGrid && (
+                            <>
+                                <DropdownMenu.Label>Item gap</DropdownMenu.Label>
+                                <DropdownMenu.Item closeMenuOnClick={false}>
+                                    <Slider
+                                        defaultValue={grid?.itemGap || 0}
+                                        max={30}
+                                        min={0}
+                                        onChangeEnd={handleItemGap}
+                                    />
+                                </DropdownMenu.Item>
+                            </>
+                        )}
                         <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
                         <DropdownMenu.Item
                             closeMenuOnClick={false}

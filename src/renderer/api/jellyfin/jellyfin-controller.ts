@@ -439,7 +439,9 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
     }
 
     return {
-        items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
+        items: res.body.Items.map((item) =>
+            jfNormalize.song(item, apiClientProps.server, '', query.imageSize),
+        ),
         startIndex: query.startIndex,
         totalRecordCount: res.body.TotalRecordCount,
     };

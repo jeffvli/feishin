@@ -481,6 +481,7 @@ export type SongListQuery = {
     };
     albumIds?: string[];
     artistIds?: string[];
+    imageSize?: number;
     limit?: number;
     musicFolderId?: string;
     searchTerm?: string;

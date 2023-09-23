@@ -13,14 +13,16 @@ import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh'
 import { SongListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { ListDisplayType } from '/@/renderer/types';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 
 interface SongListHeaderProps {
+    gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
     itemCount?: number;
     tableRef: MutableRefObject<AgGridReactType | null>;
     title?: string;
 }
 
-export const SongListHeader = ({ title, itemCount, tableRef }: SongListHeaderProps) => {
+export const SongListHeader = ({ gridRef, title, itemCount, tableRef }: SongListHeaderProps) => {
     const server = useCurrentServer();
     const { pageKey, handlePlay, customFilters } = useListContext();
     const { setFilter, setTablePagination } = useListStoreActions();
@@ -86,7 +88,10 @@ export const SongListHeader = ({ title, itemCount, tableRef }: SongListHeaderPro
                 </Flex>
             </PageHeader>
             <FilterBar>
-                <SongListHeaderFilters tableRef={tableRef} />
+                <SongListHeaderFilters
+                    gridRef={gridRef}
+                    tableRef={tableRef}
+                />
             </FilterBar>
         </Stack>
     );
