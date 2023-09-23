@@ -113,6 +113,7 @@ export interface SettingsState {
         resume: boolean;
         showQueueDrawerButton: boolean;
         sideQueueType: SideQueueType;
+        sidebarCollapsedNavigation: boolean;
         sidebarItems: SidebarItemType[];
         sidebarPlaylistList: boolean;
         skipButtons: {
@@ -208,6 +209,7 @@ const initialState: SettingsState = {
         resume: false,
         showQueueDrawerButton: false,
         sideQueueType: 'sideQueue',
+        sidebarCollapsedNavigation: true,
         sidebarItems,
         sidebarPlaylistList: true,
         skipButtons: {

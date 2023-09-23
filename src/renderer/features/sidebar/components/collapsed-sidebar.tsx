@@ -95,7 +95,7 @@ const sidebarItemMap = {
 export const CollapsedSidebar = () => {
     const navigate = useNavigate();
     const { windowBarStyle } = useWindowSettings();
-    const { sidebarItems } = useGeneralSettings();
+    const { sidebarItems, sidebarCollapsedNavigation } = useGeneralSettings();
 
     const sidebarItemsWithRoute: (SidebarItemType & {
         activeIcon: IconType;
@@ -119,26 +119,28 @@ export const CollapsedSidebar = () => {
                 scrollHideDelay={0}
                 scrollbarSize={8}
             >
-                <Group
-                    grow
-                    spacing={0}
-                    style={{
-                        borderRight: 'var(--sidebar-border)',
-                    }}
-                >
-                    <CollapsedSidebarButton
-                        component={UnstyledButton}
-                        onClick={() => navigate(-1)}
+                {sidebarCollapsedNavigation && (
+                    <Group
+                        grow
+                        spacing={0}
+                        style={{
+                            borderRight: 'var(--sidebar-border)',
+                        }}
                     >
-                        <RiArrowLeftSLine size="22" />
-                    </CollapsedSidebarButton>
-                    <CollapsedSidebarButton
-                        component={UnstyledButton}
-                        onClick={() => navigate(1)}
-                    >
-                        <RiArrowRightSLine size="22" />
-                    </CollapsedSidebarButton>
-                </Group>
+                        <CollapsedSidebarButton
+                            component={UnstyledButton}
+                            onClick={() => navigate(-1)}
+                        >
+                            <RiArrowLeftSLine size="22" />
+                        </CollapsedSidebarButton>
+                        <CollapsedSidebarButton
+                            component={UnstyledButton}
+                            onClick={() => navigate(1)}
+                        >
+                            <RiArrowRightSLine size="22" />
+                        </CollapsedSidebarButton>
+                    </Group>
+                )}
                 <DropdownMenu position="right-start">
                     <DropdownMenu.Target>
                         <CollapsedSidebarItem
