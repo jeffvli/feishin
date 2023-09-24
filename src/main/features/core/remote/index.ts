@@ -52,7 +52,9 @@ type SendData = ServerEvent & {
 
 function send({ client, event, data }: SendData): void {
     if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ data, event }));
+        if (client.alive) {
+            client.send(JSON.stringify({ data, event }));
+        }
     }
 }
 
@@ -141,17 +143,9 @@ async function serveFile(
     res: ServerResponse,
 ): Promise<void> {
     const fileName = `${file}.${extension}`;
-    let path: string;
-
-    if (extension === 'ico') {
-        path = app.isPackaged
-            ? join(process.resourcesPath, 'assets', fileName)
-            : join(__dirname, '../../../../../assets', fileName);
-    } else {
-        path = app.isPackaged
-            ? join(__dirname, '../remote', fileName)
-            : join(__dirname, '../../../../../.erb/dll', fileName);
-    }
+    const path = app.isPackaged
+        ? join(__dirname, '../remote', fileName)
+        : join(__dirname, '../../../../../.erb/dll', fileName);
 
     let stats: Stats;
 
@@ -291,7 +285,7 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                             break;
                         }
                         case '/favicon.ico': {
-                            await serveFile(req, 'icon', 'ico', res);
+                            await serveFile(req, 'favicon', 'ico', res);
                             break;
                         }
                         case '/remote.css': {
@@ -300,6 +294,12 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                         }
                         case '/remote.js': {
                             await serveFile(req, 'remote', 'js', res);
+                            break;
+                        }
+                        case '/credentials': {
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'text/plain');
+                            res.end(req.headers.authorization);
                             break;
                         }
                         default: {
@@ -318,17 +318,42 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
             server.listen(config.port, resolve);
             wsServer = new WebSocketServer({ server });
 
-            wsServer.on('connection', (ws, req) => {
-                if (!authorize(req)) {
-                    ws.close(4003);
-                    return;
-                }
+            wsServer.on('connection', (ws) => {
+                let authFail: number | undefined;
 
-                ws.alive = true;
+                if (!settings.username && !settings.password) {
+                    ws.alive = true;
+                } else {
+                    authFail = setTimeout(() => {
+                        if (!ws.alive) {
+                            ws.close();
+                        }
+                    }, 10000) as unknown as number;
+                }
 
                 ws.on('error', console.error);
 
                 ws.on('message', (data) => {
+                    if (!ws.alive) {
+                        try {
+                            const auth = data.toString().split(' ')[1];
+                            const [login, password] = Buffer.from(auth, 'base64')
+                                .toString()
+                                .split(':');
+
+                            if (login === settings.username && password === settings.password) {
+                                ws.alive = true;
+                            } else {
+                                ws.close();
+                            }
+
+                            clearTimeout(authFail);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                        return;
+                    }
+
                     try {
                         const json = JSON.parse(data.toString()) as ClientEvent;
                         const event = json.event;
