@@ -445,11 +445,14 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
     const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
     console.log('Setting mpv params: ', params);
 
+    const extra = isDevelopment ? '-dev' : '';
+
     const mpv = new MpvAPI(
         {
             audio_only: true,
             auto_restart: false,
             binary: MPV_BINARY_PATH || '',
+            socket: isWindows() ? `\\\\.\\pipe\\mpvserver${extra}` : `/tmp/node-mpv${extra}.sock`,
             time_update: 1,
         },
         params,
