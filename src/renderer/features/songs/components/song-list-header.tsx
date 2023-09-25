@@ -29,7 +29,7 @@ export const SongListHeader = ({ gridRef, title, itemCount, tableRef }: SongList
     const { display, filter } = useListStoreByKey({ key: pageKey });
     const cq = useContainerQuery();
 
-    const { handleRefreshTable } = useListFilterRefresh({
+    const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
         itemType: LibraryItem.SONG,
         server,
     });
@@ -51,7 +51,7 @@ export const SongListHeader = ({ gridRef, title, itemCount, tableRef }: SongList
             handleRefreshTable(tableRef, filterWithCustom);
             setTablePagination({ data: { currentPage: 0 }, key: pageKey });
         } else {
-            // handleRefreshGrid(gridRef, filterWithCustom);
+            handleRefreshGrid(gridRef, filterWithCustom);
         }
     }, 500);
 
