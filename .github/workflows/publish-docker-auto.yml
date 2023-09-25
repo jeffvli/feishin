@@ -1,13 +1,12 @@
 # Referenced from: https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#introduction
 name: Publish Docker to GHCR
+permissions: write-all
 
 on:
     push:
         tags:
             - 'v*.*.*'
-    pull_request:
-        branches:
-            - 'development'
+
 env:
     REGISTRY: ghcr.io
     IMAGE_NAME: ${{ github.repository }}
