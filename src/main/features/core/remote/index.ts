@@ -34,6 +34,7 @@ interface MimeType {
 
 interface StatefulWebSocket extends WebSocket {
     alive: boolean;
+    auth: boolean;
 }
 
 let server: Server | undefined;
@@ -52,7 +53,7 @@ type SendData = ServerEvent & {
 
 function send({ client, event, data }: SendData): void {
     if (client.readyState === WebSocket.OPEN) {
-        if (client.alive) {
+        if (client.alive && client.auth) {
             client.send(JSON.stringify({ data, event }));
         }
     }
@@ -320,12 +321,13 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
 
             wsServer.on('connection', (ws) => {
                 let authFail: number | undefined;
+                ws.alive = true;
 
                 if (!settings.username && !settings.password) {
-                    ws.alive = true;
+                    ws.auth = true;
                 } else {
                     authFail = setTimeout(() => {
-                        if (!ws.alive) {
+                        if (!ws.auth) {
                             ws.close();
                         }
                     }, 10000) as unknown as number;
@@ -334,29 +336,28 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                 ws.on('error', console.error);
 
                 ws.on('message', (data) => {
-                    if (!ws.alive) {
-                        try {
-                            const auth = data.toString().split(' ')[1];
-                            const [login, password] = Buffer.from(auth, 'base64')
-                                .toString()
-                                .split(':');
-
-                            if (login === settings.username && password === settings.password) {
-                                ws.alive = true;
-                            } else {
-                                ws.close();
-                            }
-
-                            clearTimeout(authFail);
-                        } catch (e) {
-                            console.error(e);
-                        }
-                        return;
-                    }
-
                     try {
                         const json = JSON.parse(data.toString()) as ClientEvent;
                         const event = json.event;
+
+                        if (!ws.auth) {
+                            if (event === 'authenticate') {
+                                const auth = json.header.split(' ')[1];
+                                const [login, password] = Buffer.from(auth, 'base64')
+                                    .toString()
+                                    .split(':');
+
+                                if (login === settings.username && password === settings.password) {
+                                    ws.auth = true;
+                                } else {
+                                    ws.close();
+                                }
+
+                                clearTimeout(authFail);
+                            } else {
+                                return;
+                            }
+                        }
 
                         switch (event) {
                             case 'pause': {

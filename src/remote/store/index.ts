@@ -87,7 +87,7 @@ export const useRemoteStore = create<SettingsSlice>()(
         devtools(
             immer((set, get) => ({
                 actions: {
-                    reconnect: () => {
+                    reconnect: async () => {
                         const existing = get().socket;
 
                         if (existing) {
@@ -99,91 +99,102 @@ export const useRemoteStore = create<SettingsSlice>()(
                                 existing.close(4001);
                             }
                         }
-                        set(async (state) => {
-                            try {
-                                const credentials = await fetch('/credentials');
-                                const authHeader = await credentials.text();
 
-                                const socket = new WebSocket(
+                        let authHeader: string | undefined;
+
+                        try {
+                            const credentials = await fetch('/credentials');
+                            authHeader = await credentials.text();
+                        } catch (error) {
+                            console.error('Failed to get credentials');
+                        }
+
+                        set((state) => {
+                            const socket = new WebSocket(
+                                // eslint-disable-next-line no-restricted-globals
+                                location.href.replace('http', 'ws'),
+                            ) as StatefulWebSocket;
+
+                            socket.natural = false;
+
+                            socket.addEventListener('message', (message) => {
+                                const { event, data } = JSON.parse(message.data) as ServerEvent;
+
+                                switch (event) {
+                                    case 'error': {
+                                        toast.error({ message: data, title: 'Socket error' });
+                                        break;
+                                    }
+                                    case 'favorite': {
+                                        set((state) => {
+                                            if (state.info.song?.id === data.id) {
+                                                state.info.song.userFavorite = data.favorite;
+                                            }
+                                        });
+                                        break;
+                                    }
+                                    case 'proxy': {
+                                        set((state) => {
+                                            if (state.info.song) {
+                                                state.info.song.imageUrl = `data:image/jpeg;base64,${data}`;
+                                            }
+                                        });
+                                        break;
+                                    }
+                                    case 'rating': {
+                                        set((state) => {
+                                            if (state.info.song?.id === data.id) {
+                                                state.info.song.userRating = data.rating;
+                                            }
+                                        });
+                                        break;
+                                    }
+                                    case 'song': {
+                                        set((nested) => {
+                                            nested.info = { ...nested.info, ...data };
+                                        });
+                                    }
+                                }
+                            });
+
+                            socket.addEventListener('open', () => {
+                                if (authHeader) {
+                                    socket.send(
+                                        JSON.stringify({
+                                            event: 'authenticate',
+                                            header: authHeader,
+                                        }),
+                                    );
+                                }
+                                set({ connected: true });
+                            });
+
+                            socket.addEventListener('close', (reason) => {
+                                if (reason.code === 4002 || reason.code === 4003) {
                                     // eslint-disable-next-line no-restricted-globals
-                                    location.href.replace('http', 'ws'),
-                                ) as StatefulWebSocket;
+                                    location.reload();
+                                } else if (reason.code === 4000) {
+                                    toast.warn({
+                                        message: 'Feishin remote server is down',
+                                        title: 'Connection closed',
+                                    });
+                                } else if (reason.code !== 4001 && !socket.natural) {
+                                    toast.error({
+                                        message: 'Socket closed for unexpected reason',
+                                        title: 'Connection closed',
+                                    });
+                                }
 
-                                socket.natural = false;
+                                if (!socket.natural) {
+                                    set({ connected: false, info: {} });
+                                }
+                            });
 
-                                socket.addEventListener('message', (message) => {
-                                    const { event, data } = JSON.parse(message.data) as ServerEvent;
-
-                                    switch (event) {
-                                        case 'error': {
-                                            toast.error({ message: data, title: 'Socket error' });
-                                            break;
-                                        }
-                                        case 'favorite': {
-                                            set((state) => {
-                                                if (state.info.song?.id === data.id) {
-                                                    state.info.song.userFavorite = data.favorite;
-                                                }
-                                            });
-                                            break;
-                                        }
-                                        case 'proxy': {
-                                            set((state) => {
-                                                if (state.info.song) {
-                                                    state.info.song.imageUrl = `data:image/jpeg;base64,${data}`;
-                                                }
-                                            });
-                                            break;
-                                        }
-                                        case 'rating': {
-                                            set((state) => {
-                                                if (state.info.song?.id === data.id) {
-                                                    state.info.song.userRating = data.rating;
-                                                }
-                                            });
-                                            break;
-                                        }
-                                        case 'song': {
-                                            set((nested) => {
-                                                nested.info = { ...nested.info, ...data };
-                                            });
-                                        }
-                                    }
-                                });
-
-                                socket.addEventListener('open', () => {
-                                    socket.send(authHeader);
-                                    set({ connected: true });
-                                });
-
-                                socket.addEventListener('close', (reason) => {
-                                    if (reason.code === 4002 || reason.code === 4003) {
-                                        // eslint-disable-next-line no-restricted-globals
-                                        location.reload();
-                                    } else if (reason.code === 4000) {
-                                        toast.warn({
-                                            message: 'Feishin remote server is down',
-                                            title: 'Connection closed',
-                                        });
-                                    } else if (reason.code !== 4001 && !socket.natural) {
-                                        toast.error({
-                                            message: 'Socket closed for unexpected reason',
-                                            title: 'Connection closed',
-                                        });
-                                    }
-
-                                    if (!socket.natural) {
-                                        set({ connected: false, info: {} });
-                                    }
-                                });
-
-                                state.socket = socket;
-                            } catch (err) {
-                                console.error(err);
-                            }
+                            state.socket = socket;
                         });
                     },
                     send: (data: ClientEvent) => {
+                        console.log(data, get().socket);
                         get().socket?.send(JSON.stringify(data));
                     },
                     toggleIsDark: () => {
