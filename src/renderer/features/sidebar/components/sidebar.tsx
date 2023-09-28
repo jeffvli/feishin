@@ -54,6 +54,7 @@ import {
 } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
 import { Platform } from '/@/renderer/types';
+import { RescanSiderbar } from '/@/renderer/features/sidebar/components/rescan';
 
 const SidebarContainer = styled.div<{ $windowBarStyle: Platform }>`
     height: 100%;
@@ -214,6 +215,7 @@ export const Sidebar = () => {
                     sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
                 >
                     <Stack spacing={0}>
+                        <RescanSiderbar />
                         {sidebarItemsWithRoute.map((item) => (
                             <SidebarItem
                                 key={`sidebar-${item.route}`}

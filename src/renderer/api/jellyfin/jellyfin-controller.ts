@@ -47,6 +47,8 @@ import {
     LyricsArgs,
     LyricsResponse,
     genreListSortMap,
+    RescanArgs,
+    ScanStatus,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -940,6 +942,24 @@ const getLyrics = async (args: LyricsArgs): Promise<LyricsResponse> => {
     return res.body.Lyrics.map((lyric) => [lyric.Start! / 1e4, lyric.Text]);
 };
 
+const rescan = async (args: RescanArgs): Promise<ScanStatus> => {
+    const { apiClientProps } = args;
+
+    if (!apiClientProps.server?.userId) {
+        throw new Error('No userId found');
+    }
+
+    const res = await jfApiClient(apiClientProps).refresh({
+        body: null,
+    });
+
+    if (res.status !== 204) {
+        throw new Error('Failed to get lyrics');
+    }
+
+    return { scanning: true };
+};
+
 export const jfController = {
     addToPlaylist,
     authenticate,
@@ -962,6 +982,7 @@ export const jfController = {
     getSongList,
     getTopSongList,
     removeFromPlaylist,
+    rescan,
     scrobble,
     search,
     updatePlaylist,

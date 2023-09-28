@@ -192,6 +192,15 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    refresh: {
+        body: null,
+        method: 'POST',
+        path: 'library/refresh',
+        responses: {
+            204: z.null(),
+            400: jfType._response.error,
+        },
+    },
     removeFavorite: {
         body: jfType._parameters.favorite,
         method: 'DELETE',

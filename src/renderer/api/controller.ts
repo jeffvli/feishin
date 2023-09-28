@@ -48,6 +48,9 @@ import type {
     SearchResponse,
     LyricsArgs,
     LyricsResponse,
+    RescanArgs,
+    ScanStatus,
+    ScanStatusArgs,
 } from '/@/renderer/api/types';
 import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
@@ -84,11 +87,13 @@ export type ControllerEndpoint = Partial<{
     getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
     getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
     getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
+    getScanStatus: (args: ScanStatusArgs) => Promise<ScanStatus>;
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getUserList: (args: UserListArgs) => Promise<UserListResponse>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
+    rescan: (args: RescanArgs) => Promise<ScanStatus>;
     scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
     search: (args: SearchArgs) => Promise<SearchResponse>;
     setRating: (args: SetRatingArgs) => Promise<RatingResponse>;
@@ -128,11 +133,13 @@ const endpoints: ApiController = {
         getPlaylistList: jfController.getPlaylistList,
         getPlaylistSongList: jfController.getPlaylistSongList,
         getRandomSongList: jfController.getRandomSongList,
+        getScanStatus: undefined,
         getSongDetail: undefined,
         getSongList: jfController.getSongList,
         getTopSongs: jfController.getTopSongList,
         getUserList: undefined,
         removeFromPlaylist: jfController.removeFromPlaylist,
+        rescan: jfController.rescan,
         scrobble: jfController.scrobble,
         search: jfController.search,
         setRating: undefined,
@@ -164,11 +171,13 @@ const endpoints: ApiController = {
         getPlaylistList: ndController.getPlaylistList,
         getPlaylistSongList: ndController.getPlaylistSongList,
         getRandomSongList: ssController.getRandomSongList,
+        getScanStatus: ssController.getScanStatus,
         getSongDetail: ndController.getSongDetail,
         getSongList: ndController.getSongList,
         getTopSongs: ssController.getTopSongList,
         getUserList: ndController.getUserList,
         removeFromPlaylist: ndController.removeFromPlaylist,
+        rescan: ssController.rescan,
         scrobble: ssController.scrobble,
         search: ssController.search3,
         setRating: ssController.setRating,
@@ -197,10 +206,12 @@ const endpoints: ApiController = {
         getMusicFolderList: ssController.getMusicFolderList,
         getPlaylistDetail: undefined,
         getPlaylistList: undefined,
+        getScanStatus: ssController.getScanStatus,
         getSongDetail: undefined,
         getSongList: undefined,
         getTopSongs: ssController.getTopSongList,
         getUserList: undefined,
+        rescan: ssController.rescan,
         scrobble: ssController.scrobble,
         search: ssController.search3,
         setRating: undefined,
@@ -469,6 +480,21 @@ const getLyrics = async (args: LyricsArgs) => {
     )?.(args);
 };
 
+const rescan = async (args: RescanArgs) => {
+    return (
+        apiController('rescan', args.apiClientProps.server?.type) as ControllerEndpoint['rescan']
+    )?.(args);
+};
+
+const getScanStatus = async (args: RescanArgs) => {
+    return (
+        apiController(
+            'getScanStatus',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getScanStatus']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -488,11 +514,13 @@ export const controller = {
     getPlaylistList,
     getPlaylistSongList,
     getRandomSongList,
+    getScanStatus,
     getSongDetail,
     getSongList,
     getTopSongList,
     getUserList,
     removeFromPlaylist,
+    rescan,
     scrobble,
     search,
     updatePlaylist,

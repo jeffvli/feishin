@@ -21,6 +21,9 @@ import {
     SearchResponse,
     RandomSongListResponse,
     RandomSongListArgs,
+    RescanArgs,
+    ScanStatus,
+    ScanStatusArgs,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -368,14 +371,66 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
     };
 };
 
+const rescan = async (args: RescanArgs): Promise<ScanStatus> => {
+    const { full, apiClientProps } = args;
+
+    if (!apiClientProps.server?.userId) {
+        throw new Error('No userId found');
+    }
+
+    const res = await ssApiClient(apiClientProps).startScan({
+        query:
+            full !== undefined
+                ? {
+                      fullScan: full,
+                  }
+                : undefined,
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Could not start scan');
+    }
+
+    const { scanning, count, folderCount } = res.body.scanStatus;
+
+    return {
+        folders: folderCount,
+        scanning,
+        tracks: count,
+    };
+};
+
+const getScanStatus = async (args: ScanStatusArgs): Promise<ScanStatus> => {
+    const { apiClientProps } = args;
+
+    if (!apiClientProps.server?.userId) {
+        throw new Error('No userId found');
+    }
+
+    const res = await ssApiClient(apiClientProps).getScanStatus();
+    if (res.status !== 200) {
+        throw new Error('Could not start scan');
+    }
+
+    const { scanning, count, folderCount } = res.body.scanStatus;
+
+    return {
+        folders: folderCount,
+        scanning,
+        tracks: count,
+    };
+};
+
 export const ssController = {
     authenticate,
     createFavorite,
     getArtistInfo,
     getMusicFolderList,
     getRandomSongList,
+    getScanStatus,
     getTopSongList,
     removeFavorite,
+    rescan,
     scrobble,
     search3,
     setRating,

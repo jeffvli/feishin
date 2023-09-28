@@ -37,6 +37,7 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { SidebarItemType, useGeneralSettings, useWindowSettings } from '/@/renderer/store';
 import { Platform } from '/@/renderer/types';
 import { CollapsedSidebarButton } from '/@/renderer/features/sidebar/components/collapsed-sidebar-button';
+import { RescanButton } from '/@/renderer/features/sidebar/components/rescan';
 
 const SidebarContainer = styled(motion.div)<{ $windowBarStyle: Platform }>`
     display: flex;
@@ -141,6 +142,7 @@ export const CollapsedSidebar = () => {
                         </CollapsedSidebarButton>
                     </Group>
                 )}
+                <RescanButton />
                 <DropdownMenu position="right-start">
                     <DropdownMenu.Target>
                         <CollapsedSidebarItem

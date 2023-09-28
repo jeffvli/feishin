@@ -206,6 +206,19 @@ const randomSongList = z.object({
     }),
 });
 
+const scanParameters = z.object({
+    fullScan: z.boolean().optional(),
+});
+
+const scanStatus = z.object({
+    scanStatus: z.object({
+        count: z.number().optional(),
+        folderCount: z.number().optional(),
+        lastScan: z.string().optional(),
+        scanning: z.boolean(),
+    }),
+});
+
 export const ssType = {
     _parameters: {
         albumList: albumListParameters,
@@ -214,6 +227,7 @@ export const ssType = {
         createFavorite: createFavoriteParameters,
         randomSongList: randomSongListParameters,
         removeFavorite: removeFavoriteParameters,
+        scan: scanParameters,
         scrobble: scrobbleParameters,
         search3: search3Parameters,
         setRating: setRatingParameters,
@@ -231,6 +245,7 @@ export const ssType = {
         musicFolderList,
         randomSongList,
         removeFavorite,
+        scanStatus,
         scrobble,
         search3,
         setRating,
