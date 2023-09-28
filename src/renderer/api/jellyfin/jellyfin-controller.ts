@@ -954,7 +954,7 @@ const rescan = async (args: RescanArgs): Promise<ScanStatus> => {
     });
 
     if (res.status !== 204) {
-        throw new Error('Failed to get lyrics');
+        throw new Error('Failed to start scan');
     }
 
     return { scanning: true };
