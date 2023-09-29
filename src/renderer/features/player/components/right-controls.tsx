@@ -1,4 +1,4 @@
-import { MouseEvent, useCallback, useEffect } from 'react';
+import { MouseEvent, MutableRefObject, useCallback, useEffect } from 'react';
 import { Flex, Group } from '@mantine/core';
 import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import isElectron from 'is-electron';
@@ -31,16 +31,15 @@ import { PlayerbarSlider } from '/@/renderer/features/player/components/playerba
 import { api } from '/@/renderer/api';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { Play } from '/@/renderer/types';
-import { useCenterControls } from '/@/renderer/features/player/hooks/use-center-controls';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
 
 interface RightControlsProps {
-    playersRef: any;
+    seekRef: MutableRefObject<((position: number) => void) | undefined>;
 }
 
-export const RightControls = ({ playersRef }: RightControlsProps) => {
+export const RightControls = ({ seekRef }: RightControlsProps) => {
     const isMinWidth = useMediaQuery('(max-width: 480px)');
     const volume = useVolume();
     const muted = useMuted();
@@ -56,7 +55,6 @@ export const RightControls = ({ playersRef }: RightControlsProps) => {
     const addToFavoritesMutation = useCreateFavorite({});
     const removeFromFavoritesMutation = useDeleteFavorite({});
     const handlePlayQueueAdd = usePlayQueueAdd();
-    const { handleSeekSlider } = useCenterControls({ playersRef });
 
     const handleAddToFavorites = () => {
         if (!currentSong) return;
@@ -174,9 +172,9 @@ export const RightControls = ({ playersRef }: RightControlsProps) => {
                 playType: Play.NOW,
             });
 
-            handleSeekSlider(queue.position ? queue.position / 1000 : 0);
+            if (seekRef.current) seekRef.current(queue.position ? queue.position / 1000 : 0);
         }
-    }, [handlePlayQueueAdd, handleSeekSlider, server]);
+    }, [handlePlayQueueAdd, seekRef, server]);
 
     useHotkeys([
         [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDown],

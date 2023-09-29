@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import isElectron from 'is-electron';
 import styled from 'styled-components';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
@@ -71,6 +71,7 @@ export const Playerbar = () => {
     const player = useCurrentPlayer();
     const muted = useMuted();
     const { autoNext } = usePlayerControls();
+    const handleSeekRef = useRef<(position: number) => void>();
 
     const autoNextFn = useCallback(() => {
         const playerData = autoNext();
@@ -90,10 +91,13 @@ export const Playerbar = () => {
                     <LeftControls />
                 </LeftGridItem>
                 <CenterGridItem>
-                    <CenterControls playersRef={playersRef} />
+                    <CenterControls
+                        playersRef={playersRef}
+                        seekRef={handleSeekRef}
+                    />
                 </CenterGridItem>
                 <RightGridItem>
-                    <RightControls playersRef={playersRef} />
+                    <RightControls seekRef={handleSeekRef} />
                 </RightGridItem>
             </PlayerbarControlsGrid>
             {settings.type === PlaybackType.WEB && (

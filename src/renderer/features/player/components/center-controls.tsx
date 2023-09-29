@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { MutableRefObject, useEffect, useState } from 'react';
 import { useHotkeys } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import formatDuration from 'format-duration';
@@ -41,6 +41,7 @@ import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue
 
 interface CenterControlsProps {
     playersRef: any;
+    seekRef: MutableRefObject<((position: number) => void) | undefined>;
 }
 
 const ButtonsContainer = styled.div`
@@ -91,7 +92,7 @@ const ControlsContainer = styled.div`
     }
 `;
 
-export const CenterControls = ({ playersRef }: CenterControlsProps) => {
+export const CenterControls = ({ playersRef, seekRef }: CenterControlsProps) => {
     const queryClient = useQueryClient();
     const [isSeeking, setIsSeeking] = useState(false);
     const currentSong = useCurrentSong();
@@ -142,6 +143,10 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
 
         return () => clearInterval(interval);
     }, [currentPlayerRef, isSeeking, setCurrentTime, playerType, status]);
+
+    useEffect(() => {
+        seekRef.current = handleSeekSlider;
+    }, [handleSeekSlider, seekRef]);
 
     const [seekValue, setSeekValue] = useState(0);
 
