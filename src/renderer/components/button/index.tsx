@@ -27,8 +27,8 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     transition: background 0.2s ease-in-out, color 0.2s ease-in-out, border 0.2s ease-in-out;
 
     svg {
-        transition: fill 0.2s ease-in-out;
         fill: ${(props) => `var(--btn-${props.variant}-fg)`};
+        transition: fill 0.2s ease-in-out;
     }
 
     &:disabled {
@@ -65,7 +65,6 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
         display: flex;
         height: 100%;
         margin-right: 0.5rem;
-        transform: translateY(-0.1rem);
     }
 
     .mantine-Button-rightIcon {

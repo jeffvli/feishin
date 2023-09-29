@@ -7,8 +7,8 @@ type SegmentedControlProps = MantineSegmentedControlProps;
 
 const StyledSegmentedControl = styled(MantineSegmentedControl)<MantineSegmentedControlProps>`
     & .mantine-SegmentedControl-label {
-        color: var(--input-fg);
         font-family: var(--content-font-family);
+        color: var(--input-fg);
     }
 
     background-color: var(--input-bg);

@@ -195,7 +195,7 @@ export const MpvSettings = () => {
             ),
             description:
                 'Select the output sample rate to be used if the sample frequency selected is different from that of the current media',
-            isHidden: settings.type !== PlaybackType.LOCAL,
+            note: 'Page refresh required for web player',
             title: 'Sample rate',
         },
         {
@@ -233,7 +233,6 @@ export const MpvSettings = () => {
             ),
             description:
                 'Adjust volume gain according to replaygain values stored in the file metadata (--replaygain)',
-            isHidden: settings.type !== PlaybackType.LOCAL,
             note: 'Restart required',
             title: 'ReplayGain mode',
         },
@@ -247,7 +246,6 @@ export const MpvSettings = () => {
             ),
             description:
                 'Pre-amplification gain in dB to apply to the selected replaygain gain (--replaygain-preamp)',
-            isHidden: settings.type !== PlaybackType.LOCAL,
             title: 'ReplayGain preamp (dB)',
         },
         {
@@ -261,7 +259,6 @@ export const MpvSettings = () => {
             ),
             description:
                 'Prevent clipping caused by replaygain by automatically lowering the gain (--replaygain-clip)',
-            isHidden: settings.type !== PlaybackType.LOCAL,
             title: 'ReplayGain clipping',
         },
         {
@@ -274,7 +271,6 @@ export const MpvSettings = () => {
             ),
             description:
                 'Gain in dB to apply if the file has no replay gain tags. This option is always applied if the replaygain logic is somehow inactive. If this is applied, no other replaygain options are applied',
-            isHidden: settings.type !== PlaybackType.LOCAL,
             title: 'ReplayGain fallback (dB)',
         },
     ];

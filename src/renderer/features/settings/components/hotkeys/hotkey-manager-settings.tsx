@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, KeyboardEvent, ChangeEvent } from 'react';
 import { Group } from '@mantine/core';
 import isElectron from 'is-electron';
 import debounce from 'lodash/debounce';
@@ -11,6 +11,8 @@ import { SettingsOptions } from '/@/renderer/features/settings/components/settin
 const ipc = isElectron() ? window.electron.ipc : null;
 
 const BINDINGS_MAP: Record<BindingActions, string> = {
+    browserBack: 'Browser back',
+    browserForward: 'Browser forward',
     globalSearch: 'Global search',
     localSearch: 'In-page search',
     next: 'Next track',
@@ -18,6 +20,12 @@ const BINDINGS_MAP: Record<BindingActions, string> = {
     play: 'Play',
     playPause: 'Play / Pause',
     previous: 'Previous track',
+    rate0: 'Rating clear',
+    rate1: 'Rating 1 star',
+    rate2: 'Rating 2 star',
+    rate3: 'Rating 3 star',
+    rate4: 'Rating 4 star',
+    rate5: 'Rating 5 star',
     skipBackward: 'Skip backward',
     skipForward: 'Skip forward',
     stop: 'Stop',
@@ -50,7 +58,7 @@ export const HotkeyManagerSettings = () => {
     const [selected, setSelected] = useState<BindingActions | null>(null);
 
     const debouncedSetHotkey = debounce(
-        (binding: BindingActions, e: React.KeyboardEvent<HTMLInputElement>) => {
+        (binding: BindingActions, e: KeyboardEvent<HTMLInputElement>) => {
             e.preventDefault();
             const IGNORED_KEYS = ['Control', 'Alt', 'Shift', 'Meta', ' ', 'Escape'];
             const keys = [];
@@ -101,7 +109,7 @@ export const HotkeyManagerSettings = () => {
     ]);
 
     const handleSetGlobalHotkey = useCallback(
-        (binding: BindingActions, e: React.ChangeEvent<HTMLInputElement>) => {
+        (binding: BindingActions, e: ChangeEvent<HTMLInputElement>) => {
             const updatedBindings = {
                 ...bindings,
                 [binding]: { ...bindings[binding], isGlobal: e.currentTarget.checked },

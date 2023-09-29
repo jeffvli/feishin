@@ -87,7 +87,7 @@ export const useRemoteStore = create<SettingsSlice>()(
         devtools(
             immer((set, get) => ({
                 actions: {
-                    reconnect: () => {
+                    reconnect: async () => {
                         const existing = get().socket;
 
                         if (existing) {
@@ -99,6 +99,16 @@ export const useRemoteStore = create<SettingsSlice>()(
                                 existing.close(4001);
                             }
                         }
+
+                        let authHeader: string | undefined;
+
+                        try {
+                            const credentials = await fetch('/credentials');
+                            authHeader = await credentials.text();
+                        } catch (error) {
+                            console.error('Failed to get credentials');
+                        }
+
                         set((state) => {
                             const socket = new WebSocket(
                                 // eslint-disable-next-line no-restricted-globals
@@ -148,6 +158,14 @@ export const useRemoteStore = create<SettingsSlice>()(
                             });
 
                             socket.addEventListener('open', () => {
+                                if (authHeader) {
+                                    socket.send(
+                                        JSON.stringify({
+                                            event: 'authenticate',
+                                            header: authHeader,
+                                        }),
+                                    );
+                                }
                                 set({ connected: true });
                             });
 
@@ -176,6 +194,7 @@ export const useRemoteStore = create<SettingsSlice>()(
                         });
                     },
                     send: (data: ClientEvent) => {
+                        console.log(data, get().socket);
                         get().socket?.send(JSON.stringify(data));
                     },
                     toggleIsDark: () => {

@@ -171,6 +171,11 @@ export type Album = {
     userRating: number | null;
 } & { songs?: Song[] };
 
+export type GainInfo = {
+    album?: number;
+    track?: number;
+};
+
 export type Song = {
     album: string | null;
     albumArtists: RelatedArtist[];
@@ -185,7 +190,9 @@ export type Song = {
     container: string | null;
     createdAt: string;
     discNumber: number;
+    discSubtitle: string | null;
     duration: number;
+    gain: GainInfo | null;
     genres: Genre[];
     id: string;
     imagePlaceholderUrl: string | null;
@@ -195,6 +202,7 @@ export type Song = {
     lyrics: string | null;
     name: string;
     path: string | null;
+    peak: GainInfo | null;
     playCount: number;
     playlistItemId?: string;
     releaseDate: string | null;
@@ -473,6 +481,7 @@ export type SongListQuery = {
     };
     albumIds?: string[];
     artistIds?: string[];
+    imageSize?: number;
     limit?: number;
     musicFolderId?: string;
     searchTerm?: string;

@@ -66,8 +66,6 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     const handlePlayQueueAdd = usePlayQueueAdd();
     const tableConfig = useTableSettings('albumDetail');
 
-    console.log('tableConfig :>> ', tableConfig);
-
     const columnDefs = useMemo(() => getColumnDefs(tableConfig.columns), [tableConfig.columns]);
 
     const getRowHeight = useCallback((params: RowHeightParams) => {
@@ -90,9 +88,15 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
             const songsByDiscNumber = detailQuery.data?.songs.filter(
                 (s) => s.discNumber === discNumber,
             );
+
+            const discSubtitle = songsByDiscNumber?.[0]?.discSubtitle;
+            const discName = [`Disc ${discNumber}`.toLocaleUpperCase(), discSubtitle]
+                .filter(Boolean)
+                .join(': ');
+
             rowData.push({
                 id: `disc-${discNumber}`,
-                name: `Disc ${discNumber}`.toLocaleUpperCase(),
+                name: discName,
             });
             rowData.push(...songsByDiscNumber);
         }
@@ -266,7 +270,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
 
     return (
         <ContentContainer>
-            <LibraryBackgroundOverlay backgroundColor={background} />
+            <LibraryBackgroundOverlay $backgroundColor={background} />
             <DetailContainer>
                 <Box component="section">
                     <Group

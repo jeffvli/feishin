@@ -17,8 +17,8 @@ const SearchItem = styled.button`
     all: unset;
     box-sizing: border-box !important;
     padding: 0.5rem;
-    border-radius: 5px;
     cursor: pointer;
+    border-radius: 5px;
 
     &:hover,
     &:focus-visible {

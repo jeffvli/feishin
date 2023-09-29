@@ -1,4 +1,4 @@
-import { UnstyledButton } from '@mantine/core';
+import { Group, UnstyledButton } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { useMemo } from 'react';
 import { IconType } from 'react-icons';
@@ -24,8 +24,10 @@ import {
     RiSettings2Fill,
     RiSettings2Line,
     RiFlag2Line,
+    RiArrowLeftSLine,
+    RiArrowRightSLine,
 } from 'react-icons/ri';
-import { generatePath, NavLink } from 'react-router-dom';
+import { generatePath, NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { LibraryItem } from '/@/renderer/api/types';
 import { DropdownMenu, ScrollArea } from '/@/renderer/components';
@@ -34,15 +36,16 @@ import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 import { AppRoute } from '/@/renderer/router/routes';
 import { SidebarItemType, useGeneralSettings, useWindowSettings } from '/@/renderer/store';
 import { Platform } from '/@/renderer/types';
+import { CollapsedSidebarButton } from '/@/renderer/features/sidebar/components/collapsed-sidebar-button';
 
-const SidebarContainer = styled(motion.div)<{ windowBarStyle: Platform }>`
+const SidebarContainer = styled(motion.div)<{ $windowBarStyle: Platform }>`
     display: flex;
     flex-direction: column;
     height: 100%;
     max-height: ${(props) =>
-        props.windowBarStyle === Platform.WEB || props.windowBarStyle === Platform.LINUX
+        props.$windowBarStyle === Platform.WEB || props.$windowBarStyle === Platform.LINUX
             ? 'calc(100vh - 149px)'
-            : 'calc(100vh - 119px)'}; // Playerbar (90px), titlebar (65px), windowbar (30px)
+            : 'calc(100vh - 119px)'};
     user-select: none;
 `;
 
@@ -90,8 +93,9 @@ const sidebarItemMap = {
 };
 
 export const CollapsedSidebar = () => {
+    const navigate = useNavigate();
     const { windowBarStyle } = useWindowSettings();
-    const { sidebarItems } = useGeneralSettings();
+    const { sidebarItems, sidebarCollapsedNavigation } = useGeneralSettings();
 
     const sidebarItemsWithRoute: (SidebarItemType & {
         activeIcon: IconType;
@@ -110,11 +114,33 @@ export const CollapsedSidebar = () => {
     }, [sidebarItems]);
 
     return (
-        <SidebarContainer windowBarStyle={windowBarStyle}>
+        <SidebarContainer $windowBarStyle={windowBarStyle}>
             <ScrollArea
                 scrollHideDelay={0}
                 scrollbarSize={8}
             >
+                {sidebarCollapsedNavigation && (
+                    <Group
+                        grow
+                        spacing={0}
+                        style={{
+                            borderRight: 'var(--sidebar-border)',
+                        }}
+                    >
+                        <CollapsedSidebarButton
+                            component={UnstyledButton}
+                            onClick={() => navigate(-1)}
+                        >
+                            <RiArrowLeftSLine size="22" />
+                        </CollapsedSidebarButton>
+                        <CollapsedSidebarButton
+                            component={UnstyledButton}
+                            onClick={() => navigate(1)}
+                        >
+                            <RiArrowRightSLine size="22" />
+                        </CollapsedSidebarButton>
+                    </Group>
+                )}
                 <DropdownMenu position="right-start">
                     <DropdownMenu.Target>
                         <CollapsedSidebarItem

@@ -2,7 +2,7 @@ import React from 'react';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Album, AlbumArtist, Artist, Playlist } from '/@/renderer/api/types';
+import { Album, AlbumArtist, Artist, Playlist, Song } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components/text';
 import { AppRoute } from '/@/renderer/router/routes';
 import { CardRow } from '/@/renderer/types';
@@ -14,8 +14,8 @@ const Row = styled.div<{ $secondary?: boolean }>`
     padding: 0 0.2rem;
     overflow: hidden;
     color: ${({ $secondary }) => ($secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)')};
-    white-space: nowrap;
     text-overflow: ellipsis;
+    white-space: nowrap;
     user-select: none;
 `;
 
@@ -180,6 +180,60 @@ export const ALBUM_CARD_ROWS: { [key: string]: CardRow<Album> } = {
     },
     songCount: {
         property: 'songCount',
+    },
+};
+
+export const SONG_CARD_ROWS: { [key: string]: CardRow<Song> } = {
+    album: {
+        property: 'album',
+        route: {
+            route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+            slugs: [{ idProperty: 'albumId', slugProperty: 'albumId' }],
+        },
+    },
+    albumArtists: {
+        arrayProperty: 'name',
+        property: 'albumArtists',
+        route: {
+            route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
+            slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
+        },
+    },
+    artists: {
+        arrayProperty: 'name',
+        property: 'artists',
+        route: {
+            route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
+            slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
+        },
+    },
+    createdAt: {
+        property: 'createdAt',
+    },
+    duration: {
+        property: 'duration',
+    },
+    lastPlayedAt: {
+        property: 'lastPlayedAt',
+    },
+    name: {
+        property: 'name',
+        route: {
+            route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+            slugs: [{ idProperty: 'albumId', slugProperty: 'albumId' }],
+        },
+    },
+    playCount: {
+        property: 'playCount',
+    },
+    rating: {
+        property: 'userRating',
+    },
+    releaseDate: {
+        property: 'releaseDate',
+    },
+    releaseYear: {
+        property: 'releaseYear',
     },
 };
 

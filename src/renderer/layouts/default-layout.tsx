@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import isElectron from 'is-electron';
+import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import {
     useWindowSettings,
@@ -24,14 +25,14 @@ if (!isElectron()) {
     });
 }
 
-const Layout = styled.div<{ windowBarStyle: Platform }>`
+const Layout = styled.div<{ $windowBarStyle: Platform }>`
     display: grid;
     grid-template-areas:
         'window-bar'
         'main-content'
         'player';
     grid-template-rows: ${(props) =>
-        props.windowBarStyle === Platform.WINDOWS || props.windowBarStyle === Platform.MACOS
+        props.$windowBarStyle === Platform.WINDOWS || props.$windowBarStyle === Platform.MACOS
             ? '30px calc(100vh - 120px) 90px'
             : '0px calc(100vh - 90px) 90px'};
     grid-template-columns: 1fr;
@@ -54,6 +55,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
     const { windowBarStyle } = useWindowSettings();
     const { opened, ...handlers } = useCommandPalette();
     const { bindings } = useHotkeySettings();
+    const navigate = useNavigate();
     const localSettings = isElectron() ? window.electron.localSettings : null;
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -78,14 +80,16 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
 
     useHotkeys([
         [bindings.globalSearch.hotkey, () => handlers.open()],
+        [bindings.browserBack.hotkey, () => navigate(-1)],
+        [bindings.browserForward.hotkey, () => navigate(1)],
         ...(isElectron() ? zoomHotkeys : []),
     ]);
 
     return (
         <>
             <Layout
+                $windowBarStyle={windowBarStyle}
                 id="default-layout"
-                windowBarStyle={windowBarStyle}
             >
                 {windowBarStyle !== Platform.WEB && <WindowBar />}
                 <MainContent shell={shell} />

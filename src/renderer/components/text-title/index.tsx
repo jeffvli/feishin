@@ -20,8 +20,8 @@ const StyledTextTitle = styled(MantineHeader)<TextTitleProps>`
     overflow: ${(props) => props.overflow};
     color: ${(props) => (props.$secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)')};
     cursor: ${(props) => props.$link && 'cursor'};
-    transition: color 0.2s ease-in-out;
     user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
+    transition: color 0.2s ease-in-out;
     ${(props) => props.overflow === 'hidden' && !props.lineClamp && textEllipsis}
 
     &:hover {
@@ -49,7 +49,6 @@ _TextTitle.defaultProps = {
     $link: false,
     $noSelect: false,
     $secondary: false,
-    font: undefined,
     overflow: 'visible',
     to: '',
     weight: 400,

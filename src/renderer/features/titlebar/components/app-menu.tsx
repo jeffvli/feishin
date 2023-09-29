@@ -13,6 +13,7 @@ import {
     RiServerLine,
     RiGithubLine,
     RiExternalLinkLine,
+    RiCloseCircleLine,
 } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -89,7 +90,9 @@ export const AppMenu = () => {
         setSideBar({ collapsed: false });
     };
 
-    const showBrowserDevToolsButton = isElectron();
+    const handleQuit = () => {
+        browser?.quit();
+    };
 
     return (
         <>
@@ -174,7 +177,7 @@ export const AppMenu = () => {
             >
                 Version {packageJson.version}
             </DropdownMenu.Item>
-            {showBrowserDevToolsButton && (
+            {isElectron() && (
                 <>
                     <DropdownMenu.Divider />
                     <DropdownMenu.Item
@@ -182,6 +185,12 @@ export const AppMenu = () => {
                         onClick={handleBrowserDevTools}
                     >
                         Open browser devtools
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item
+                        icon={<RiCloseCircleLine />}
+                        onClick={handleQuit}
+                    >
+                        Quit
                     </DropdownMenu.Item>
                 </>
             )}

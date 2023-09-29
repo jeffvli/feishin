@@ -18,6 +18,7 @@ export const ServerList = () => {
     const handleAddServerModal = () => {
         openContextModal({
             innerProps: {
+                // eslint-disable-next-line react/no-unstable-nested-components
                 modalBody: (vars: ContextModalVars) => (
                     <AddServerForm onCancel={() => vars.context.closeModal(vars.id)} />
                 ),

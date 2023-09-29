@@ -15,10 +15,10 @@ import { Skeleton } from '/@/renderer/components/skeleton';
 
 const CellContainer = styled(motion.div)<{ height: number }>`
     display: grid;
-    grid-auto-columns: 1fr;
     grid-template-areas: 'image info';
     grid-template-rows: 1fr;
     grid-template-columns: ${(props) => props.height}px minmax(0, 1fr);
+    grid-auto-columns: 1fr;
     gap: 0.5rem;
     width: 100%;
     max-width: 100%;

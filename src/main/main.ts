@@ -129,7 +129,9 @@ const createTray = () => {
         return;
     }
 
-    tray = isLinux() ? new Tray(getAssetPath('icon.png')) : new Tray(getAssetPath('icon.ico'));
+    tray = isLinux()
+        ? new Tray(getAssetPath('icons/icon.png'))
+        : new Tray(getAssetPath('icons/icon.ico'));
     const contextMenu = Menu.buildFromTemplate([
         {
             click: () => {
@@ -212,7 +214,7 @@ const createWindow = async () => {
         autoHideMenuBar: true,
         frame: false,
         height: 900,
-        icon: getAssetPath('icon.png'),
+        icon: getAssetPath('icons/icon.png'),
         minHeight: 640,
         minWidth: 480,
         show: false,
@@ -255,6 +257,11 @@ const createWindow = async () => {
 
     ipcMain.on('window-close', () => {
         mainWindow?.close();
+    });
+
+    ipcMain.on('window-quit', () => {
+        mainWindow?.close();
+        app.exit();
     });
 
     ipcMain.on('app-restart', () => {
@@ -426,7 +433,7 @@ const prefetchPlaylistParams = [
 ];
 
 const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
-    const parameters = ['--idle=yes'];
+    const parameters = ['--idle=yes', '--no-config', '--load-scripts=no'];
 
     if (!extraParameters?.some((param) => prefetchPlaylistParams.includes(param))) {
         parameters.push('--prefetch-playlist=yes');
@@ -443,11 +450,14 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
     const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
     console.log('Setting mpv params: ', params);
 
+    const extra = isDevelopment ? '-dev' : '';
+
     const mpv = new MpvAPI(
         {
             audio_only: true,
             auto_restart: false,
             binary: MPV_BINARY_PATH || '',
+            socket: isWindows() ? `\\\\.\\pipe\\mpvserver${extra}` : `/tmp/node-mpv${extra}.sock`,
             time_update: 1,
         },
         params,

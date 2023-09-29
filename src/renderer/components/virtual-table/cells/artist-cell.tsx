@@ -11,7 +11,7 @@ import { Skeleton } from '/@/renderer/components/skeleton';
 export const ArtistCell = ({ value, data }: ICellRendererParams) => {
     if (value === undefined) {
         return (
-            <CellContainer position="left">
+            <CellContainer $position="left">
                 <Skeleton
                     height="1rem"
                     width="80%"
@@ -21,7 +21,7 @@ export const ArtistCell = ({ value, data }: ICellRendererParams) => {
     }
 
     return (
-        <CellContainer position="left">
+        <CellContainer $position="left">
             <Text
                 $secondary
                 overflow="hidden"

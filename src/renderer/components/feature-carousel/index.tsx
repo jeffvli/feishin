@@ -20,16 +20,16 @@ const Carousel = styled(motion.div)`
     min-height: 250px;
     padding: 2rem;
     overflow: hidden;
-    background: linear-gradient(180deg, var(--main-bg), rgba(25, 26, 28, 60%));
+    background: linear-gradient(180deg, var(--main-bg), rgb(25 26 28 / 60%));
     border-radius: 1rem;
 `;
 
 const Grid = styled.div`
     display: grid;
-    grid-auto-columns: 1fr;
     grid-template-areas: 'image info';
     grid-template-rows: 1fr;
     grid-template-columns: 200px minmax(0, 1fr);
+    grid-auto-columns: 1fr;
     width: 100%;
     max-width: 100%;
     height: 100%;
@@ -59,10 +59,10 @@ const BackgroundImage = styled.img`
     z-index: 0;
     width: 150%;
     height: 150%;
+    user-select: none;
+    filter: blur(24px);
     object-fit: cover;
     object-position: 0 30%;
-    filter: blur(24px);
-    user-select: none;
 `;
 
 const BackgroundImageOverlay = styled.div`
@@ -72,7 +72,7 @@ const BackgroundImageOverlay = styled.div`
     z-index: 10;
     width: 100%;
     height: 100%;
-    background: linear-gradient(180deg, rgba(25, 26, 28, 30%), var(--main-bg));
+    background: linear-gradient(180deg, rgb(25 26 28 / 30%), var(--main-bg));
 `;
 
 const Wrapper = styled(Link)`

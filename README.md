@@ -1,3 +1,5 @@
+<img src="assets/icons/icon.png" alt="logo" title="feishin" align="right" height="60px" />
+
 # Feishin
 
   <p align="center">
@@ -43,9 +45,26 @@ Rewrite of [Sonixd](https://github.com/jeffvli/sonixd).
 
 ## Getting Started
 
-Download the [latest desktop client](https://github.com/jeffvli/feishin/releases).
+### Desktop (recommended)
+
+Download the [latest desktop client](https://github.com/jeffvli/feishin/releases). The desktop client is the recommended way to use Feishin. It supports both the MPV and web player backends, as well as includes built-in fetching for lyrics.
 
 If you're using a device running macOS 12 (Monterey) or higher, [check here](https://github.com/jeffvli/feishin/issues/104#issuecomment-1553914730) for instructions on how to remove the app from quarantine.
+
+### Web and Docker
+
+Visit [https://feishin.vercel.app](https://feishin.vercel.app) to use the hosted web version of Feishin. The web client only supports the web player backend.
+
+Feishin is also available as a Docker image. The images are hosted via `ghcr.io` and are available to view [here](https://github.com/jeffvli/feishin/pkgs/container/feishin). You can run the container using the following commands:
+
+```bash
+# Run the latest version
+docker run --name feishin --port 9180:9180 ghcr.io/jeffvli/feishin:latest
+
+# Build the image locally
+docker build -t feishin .
+docker run --name feishin --port 9180:9180 feishin
+```
 
 ### Configuration
 

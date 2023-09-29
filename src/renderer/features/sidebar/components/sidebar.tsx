@@ -55,11 +55,11 @@ import {
 import { fadeIn } from '/@/renderer/styles';
 import { Platform } from '/@/renderer/types';
 
-const SidebarContainer = styled.div<{ windowBarStyle: Platform }>`
+const SidebarContainer = styled.div<{ $windowBarStyle: Platform }>`
     height: 100%;
     max-height: ${
         (props) =>
-            props.windowBarStyle === Platform.WEB || props.windowBarStyle === Platform.LINUX
+            props.$windowBarStyle === Platform.WEB || props.$windowBarStyle === Platform.LINUX
                 ? 'calc(100vh - 160px)' // Playerbar (90px) & ActionBar (70px)
                 : 'calc(100vh - 190px)' // plus windowbar (30px) if the windowBarStyle is Windows/Mac
         // We use the height of the SidebarContainer to keep the Stack below the ActionBar at the correct height
@@ -199,7 +199,7 @@ export const Sidebar = () => {
     return (
         <SidebarContainer
             ref={cq.ref}
-            windowBarStyle={windowBarStyle}
+            $windowBarStyle={windowBarStyle}
         >
             <ActionBar />
             <Stack

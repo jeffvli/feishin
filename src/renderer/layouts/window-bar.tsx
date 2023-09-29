@@ -5,13 +5,13 @@ import styled from 'styled-components';
 import { useCurrentStatus, useQueueStatus } from '/@/renderer/store';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform, PlayerStatus } from '/@/renderer/types';
-import appIcon from '../../../assets/icons/32x32.png';
 import macCloseHover from './assets/close-mac-hover.png';
 import macClose from './assets/close-mac.png';
 import macMaxHover from './assets/max-mac-hover.png';
 import macMax from './assets/max-mac.png';
 import macMinHover from './assets/min-mac-hover.png';
 import macMin from './assets/min-mac.png';
+import appIcon from '../../../assets/icons/32x32.png';
 
 const WindowsContainer = styled.div`
     display: flex;
@@ -55,8 +55,8 @@ const PlayerStatusContainer = styled.div`
     max-width: 45vw;
     padding-left: 1rem;
     overflow: hidden;
-    white-space: nowrap;
     text-overflow: ellipsis;
+    white-space: nowrap;
 `;
 
 const browser = isElectron() ? window.electron.browser : null;
@@ -135,13 +135,13 @@ const MacOsButtonGroup = styled.div`
 `;
 
 export const MacOsButton = styled.div<{
-    maxButton?: boolean;
-    minButton?: boolean;
-    restoreButton?: boolean;
+    $maxButton?: boolean;
+    $minButton?: boolean;
+    $restoreButton?: boolean;
 }>`
     grid-row: 1 / span 1;
     grid-column: ${(props) =>
-        props.minButton ? 2 : props.maxButton || props.restoreButton ? 3 : 1};
+        props.$minButton ? 2 : props.$maxButton || props.$restoreButton ? 3 : 1};
     align-items: center;
     justify-content: center;
     width: 100%;
@@ -165,7 +165,7 @@ const MacOsControls = ({ controls, title }: WindowBarControlsProps) => {
         <MacOsContainer>
             <MacOsButtonGroup>
                 <MacOsButton
-                    minButton
+                    $minButton
                     className="button"
                     id="min-button"
                     onClick={handleMinimize}
@@ -180,7 +180,7 @@ const MacOsControls = ({ controls, title }: WindowBarControlsProps) => {
                     />
                 </MacOsButton>
                 <MacOsButton
-                    maxButton
+                    $maxButton
                     className="button"
                     id="max-button"
                     onClick={handleMaximize}

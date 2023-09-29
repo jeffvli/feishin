@@ -81,6 +81,8 @@ type MpvSettings = {
 };
 
 export enum BindingActions {
+    BROWSER_BACK = 'browserBack',
+    BROWSER_FORWARD = 'browserForward',
     GLOBAL_SEARCH = 'globalSearch',
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
@@ -89,6 +91,12 @@ export enum BindingActions {
     PLAY = 'play',
     PLAY_PAUSE = 'playPause',
     PREVIOUS = 'previous',
+    RATE_0 = 'rate0',
+    RATE_1 = 'rate1',
+    RATE_2 = 'rate2',
+    RATE_3 = 'rate3',
+    RATE_4 = 'rate4',
+    RATE_5 = 'rate5',
     SHUFFLE = 'toggleShuffle',
     SKIP_BACKWARD = 'skipBackward',
     SKIP_FORWARD = 'skipForward',
@@ -111,6 +119,7 @@ export interface SettingsState {
         resume: boolean;
         showQueueDrawerButton: boolean;
         sideQueueType: SideQueueType;
+        sidebarCollapsedNavigation: boolean;
         sidebarItems: SidebarItemType[];
         sidebarPlaylistList: boolean;
         skipButtons: {
@@ -206,6 +215,7 @@ const initialState: SettingsState = {
         resume: false,
         showQueueDrawerButton: false,
         sideQueueType: 'sideQueue',
+        sidebarCollapsedNavigation: true,
         sidebarItems,
         sidebarPlaylistList: true,
         skipButtons: {
@@ -221,6 +231,8 @@ const initialState: SettingsState = {
     },
     hotkeys: {
         bindings: {
+            browserBack: { allowGlobal: false, hotkey: '', isGlobal: false },
+            browserForward: { allowGlobal: false, hotkey: '', isGlobal: false },
             globalSearch: { allowGlobal: false, hotkey: 'mod+k', isGlobal: false },
             localSearch: { allowGlobal: false, hotkey: 'mod+f', isGlobal: false },
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
@@ -228,6 +240,12 @@ const initialState: SettingsState = {
             play: { allowGlobal: true, hotkey: '', isGlobal: false },
             playPause: { allowGlobal: true, hotkey: '', isGlobal: false },
             previous: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate0: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate1: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate2: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate3: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate4: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate5: { allowGlobal: true, hotkey: '', isGlobal: false },
             skipBackward: { allowGlobal: true, hotkey: '', isGlobal: false },
             skipForward: { allowGlobal: true, hotkey: '', isGlobal: false },
             stop: { allowGlobal: true, hotkey: '', isGlobal: false },

@@ -41,9 +41,9 @@ const Image = styled(motion.div)`
     position: relative;
     width: 60px;
     height: 60px;
-    background-color: var(--placeholder-bg);
     cursor: pointer;
-    filter: drop-shadow(0 5px 6px rgb(0, 0, 0, 50%));
+    background-color: var(--placeholder-bg);
+    filter: drop-shadow(0 5px 6px rgb(0 0 0 / 50%));
 
     ${fadeIn};
     animation: fadein 0.2s ease-in-out;
@@ -68,10 +68,10 @@ const LineItem = styled.div<{ $secondary?: boolean }>`
     width: 95%;
     max-width: 20vw;
     overflow: hidden;
-    color: ${(props) => props.$secondary && 'var(--main-fg-secondary)'};
     line-height: 1.3;
-    white-space: nowrap;
+    color: ${(props) => props.$secondary && 'var(--main-fg-secondary)'};
     text-overflow: ellipsis;
+    white-space: nowrap;
 
     a {
         color: ${(props) => props.$secondary && 'var(--text-secondary)'};
@@ -84,7 +84,7 @@ const LeftControlsContainer = styled.div`
     height: 100%;
     padding-left: 1rem;
 
-    @media (max-width: 640px) {
+    @media (width <= 640px) {
         ${ImageWrapper} {
             display: none;
         }

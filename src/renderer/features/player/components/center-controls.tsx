@@ -55,14 +55,14 @@ const SliderContainer = styled.div`
     height: 20px;
 `;
 
-const SliderValueWrapper = styled.div<{ position: 'left' | 'right' }>`
+const SliderValueWrapper = styled.div<{ $position: 'left' | 'right' }>`
     display: flex;
     flex: 1;
     align-self: center;
     justify-content: center;
     max-width: 50px;
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
         display: none;
     }
 `;
@@ -80,7 +80,7 @@ const ControlsContainer = styled.div`
     justify-content: center;
     height: 35px;
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
         ${ButtonsContainer} {
             gap: 0;
         }
@@ -281,7 +281,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                 </ButtonsContainer>
             </ControlsContainer>
             <SliderContainer>
-                <SliderValueWrapper position="left">
+                <SliderValueWrapper $position="left">
                     <Text
                         $noSelect
                         $secondary
@@ -309,7 +309,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         }}
                     />
                 </SliderWrapper>
-                <SliderValueWrapper position="right">
+                <SliderValueWrapper $position="right">
                     <Text
                         $noSelect
                         $secondary

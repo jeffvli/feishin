@@ -1,4 +1,3 @@
-import isElectron from 'is-electron';
 import { NumberInput, Slider, Switch, Text } from '/@/renderer/components';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { SettingOption, SettingsSection } from '../settings-section';
@@ -27,7 +26,6 @@ export const ScrobbleSettings = () => {
                 />
             ),
             description: 'Enable or disable scrobbling to your media server',
-            isHidden: !isElectron(),
             title: 'Scrobble',
         },
         {
@@ -54,7 +52,6 @@ export const ScrobbleSettings = () => {
             ),
             description:
                 'The percentage of the song that must be played before submitting a scrobble',
-            isHidden: !isElectron(),
             title: 'Minimum scrobble percentage*',
         },
         {
@@ -81,7 +78,6 @@ export const ScrobbleSettings = () => {
             ),
             description:
                 'The duration in seconds of a song that must be played before submitting a scrobble',
-            isHidden: !isElectron(),
             title: 'Minimum scrobble duration (seconds)*',
         },
     ];

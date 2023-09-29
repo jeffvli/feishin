@@ -13,8 +13,8 @@ const StyledTabs = styled(MantineTabs)`
 
     &.mantine-Tabs-tab {
         padding: 0.5rem 1rem;
-        font-weight: 600;
         font-size: 1rem;
+        font-weight: 600;
         background-color: var(--main-bg);
     }
 

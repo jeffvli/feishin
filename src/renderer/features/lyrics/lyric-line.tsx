@@ -10,12 +10,14 @@ interface LyricLineProps extends ComponentPropsWithoutRef<'div'> {
 }
 
 const StyledText = styled(TextTitle)<TitleProps & { $alignment: string; $fontSize: number }>`
-    color: var(--main-fg);
-    font-weight: 600;
-    text-align: ${(props) => props.$alignment};
-    font-size: ${(props) => props.$fontSize}px;
-    opacity: 0.5;
     padding: 0 1rem;
+    font-size: ${(props) => props.$fontSize}px;
+    font-weight: 600;
+    color: var(--main-fg);
+    text-align: ${(props) => props.$alignment};
+    opacity: 0.5;
+
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 
     &.active {
         opacity: 1;
@@ -24,8 +26,6 @@ const StyledText = styled(TextTitle)<TitleProps & { $alignment: string; $fontSiz
     &.unsynchronized {
         opacity: 1;
     }
-
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 `;
 
 export const LyricLine = ({ text, alignment, fontSize, ...props }: LyricLineProps) => {

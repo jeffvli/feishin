@@ -87,6 +87,15 @@ export const SidebarSettings = () => {
         });
     };
 
+    const handleSetSidebarCollapsedNavigation = (e: ChangeEvent<HTMLInputElement>) => {
+        setSettings({
+            general: {
+                ...settings,
+                sidebarCollapsedNavigation: e.target.checked,
+            },
+        });
+    };
+
     const isSaveButtonDisabled = isEqual(settings.sidebarItems, localSidebarItems);
 
     return (
@@ -100,6 +109,16 @@ export const SidebarSettings = () => {
                 }
                 description="Show playlist list in sidebar"
                 title="Sidebar playlist list"
+            />
+            <SettingsOptions
+                control={
+                    <Switch
+                        checked={settings.sidebarCollapsedNavigation}
+                        onChange={handleSetSidebarCollapsedNavigation}
+                    />
+                }
+                description="Show navigation buttons in the collapsed sidebar"
+                title="Sidebar (collapsed) navigation"
             />
             <SettingsOptions
                 control={

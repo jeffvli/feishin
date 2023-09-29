@@ -1,19 +1,19 @@
 import { Flex, FlexProps } from '@mantine/core';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
-import { useRef } from 'react';
+import { ReactNode, useRef } from 'react';
 import styled from 'styled-components';
 import { useShouldPadTitlebar, useTheme } from '/@/renderer/hooks';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
 
 const Container = styled(motion(Flex))<{
-    height?: string;
-    position?: string;
+    $height?: string;
+    $position?: string;
 }>`
-    position: ${(props) => props.position || 'relative'};
+    position: ${(props) => props.$position || 'relative'};
     z-index: 200;
     width: 100%;
-    height: ${(props) => props.height || '65px'};
+    height: ${(props) => props.$height || '65px'};
     background: var(--titlebar-bg);
 `;
 
@@ -27,8 +27,8 @@ const Header = styled(motion.div)<{
     width: 100%;
     height: 100%;
     margin-right: ${(props) => (props.$padRight ? '140px' : '1rem')};
-    user-select: ${(props) => (props.$isHidden ? 'none' : 'auto')};
     pointer-events: ${(props) => (props.$isHidden ? 'none' : 'auto')};
+    user-select: ${(props) => (props.$isHidden ? 'none' : 'auto')};
     -webkit-app-region: ${(props) => props.$isDraggable && 'drag'};
 
     button {
@@ -40,13 +40,13 @@ const Header = styled(motion.div)<{
     }
 `;
 
-const BackgroundImage = styled.div<{ background: string }>`
+const BackgroundImage = styled.div<{ $background: string }>`
     position: absolute;
     top: 0;
     z-index: 1;
     width: 100%;
     height: 100%;
-    background: ${(props) => props.background || 'var(--titlebar-bg)'};
+    background: ${(props) => props.$background || 'var(--titlebar-bg)'};
 `;
 
 const BackgroundImageOverlay = styled.div<{ theme: 'light' | 'dark' }>`
@@ -66,7 +66,7 @@ export interface PageHeaderProps
     extends Omit<FlexProps, 'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'> {
     animated?: boolean;
     backgroundColor?: string;
-    children?: React.ReactNode;
+    children?: ReactNode;
     height?: string;
     isHidden?: boolean;
     position?: string;
@@ -106,34 +106,36 @@ export const PageHeader = ({
     const theme = useTheme();
 
     return (
-        <Container
-            ref={ref}
-            height={height}
-            position={position}
-            {...props}
-        >
-            <Header
-                $isDraggable={windowBarStyle === Platform.WEB}
-                $isHidden={isHidden}
-                $padRight={padRight}
+        <>
+            <Container
+                ref={ref}
+                $height={height}
+                $position={position}
+                {...props}
             >
-                <AnimatePresence initial={animated ?? false}>
-                    <TitleWrapper
-                        animate="animate"
-                        exit="exit"
-                        initial="initial"
-                        variants={variants}
-                    >
-                        {children}
-                    </TitleWrapper>
-                </AnimatePresence>
-            </Header>
-            {backgroundColor && (
-                <>
-                    <BackgroundImage background={backgroundColor || 'var(--titlebar-bg)'} />
-                    <BackgroundImageOverlay theme={theme} />
-                </>
-            )}
-        </Container>
+                <Header
+                    $isDraggable={windowBarStyle === Platform.WEB}
+                    $isHidden={isHidden}
+                    $padRight={padRight}
+                >
+                    <AnimatePresence initial={animated ?? false}>
+                        <TitleWrapper
+                            animate="animate"
+                            exit="exit"
+                            initial="initial"
+                            variants={variants}
+                        >
+                            {children}
+                        </TitleWrapper>
+                    </AnimatePresence>
+                </Header>
+                {backgroundColor && (
+                    <>
+                        <BackgroundImage $background={backgroundColor || 'var(--titlebar-bg)'} />
+                        <BackgroundImageOverlay theme={theme as 'light' | 'dark'} />
+                    </>
+                )}
+            </Container>
+        </>
     );
 };

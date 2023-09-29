@@ -7,23 +7,23 @@ interface AnimatedPageProps {
     children: ReactNode;
 }
 
-const variants = {
-    animate: { opacity: 1 },
-    exit: { opacity: 0 },
-    initial: { opacity: 0 },
-};
+// const variants = {
+//     animate: { opacity: 1 },
+//     exit: { opacity: 0 },
+//     initial: { opacity: 0 },
+// };
 
 export const AnimatedPage = forwardRef(
     ({ children }: AnimatedPageProps, ref: Ref<HTMLDivElement>) => {
         return (
             <motion.main
                 ref={ref}
-                animate="animate"
+                // animate="animate"
                 className={styles.animatedPage}
-                exit="exit"
-                initial="initial"
-                transition={{ duration: 0.3, ease: 'easeIn' }}
-                variants={variants}
+                // exit="exit"
+                // initial="initial"
+                // transition={{ duration: 0.3, ease: 'easeIn' }}
+                // variants={variants}
             >
                 {children}
             </motion.main>

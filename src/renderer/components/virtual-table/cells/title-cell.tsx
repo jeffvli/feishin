@@ -6,7 +6,7 @@ import { CellContainer } from '/@/renderer/components/virtual-table/cells/generi
 export const TitleCell = ({ value }: ICellRendererParams) => {
     if (value === undefined) {
         return (
-            <CellContainer position="left">
+            <CellContainer $position="left">
                 <Skeleton
                     height="1rem"
                     width="80%"
@@ -16,7 +16,7 @@ export const TitleCell = ({ value }: ICellRendererParams) => {
     }
 
     return (
-        <CellContainer position="left">
+        <CellContainer $position="left">
             <Text
                 className="current-song-child"
                 overflow="hidden"

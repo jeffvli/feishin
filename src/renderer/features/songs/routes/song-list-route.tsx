@@ -13,8 +13,10 @@ import { useSongList } from '/@/renderer/features/songs/queries/song-list-query'
 import { useCurrentServer, useListFilterByKey } from '/@/renderer/store';
 import { Play } from '/@/renderer/types';
 import { titleCase } from '/@/renderer/utils';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 
 const TrackListRoute = () => {
+    const gridRef = useRef<VirtualInfiniteGridRef | null>(null);
     const tableRef = useRef<AgGridReactType | null>(null);
     const server = useCurrentServer();
     const [searchParams] = useSearchParams();
@@ -134,6 +136,7 @@ const TrackListRoute = () => {
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
                 <SongListHeader
+                    gridRef={gridRef}
                     itemCount={itemCount}
                     tableRef={tableRef}
                     title={
@@ -143,6 +146,7 @@ const TrackListRoute = () => {
                     }
                 />
                 <SongListContent
+                    gridRef={gridRef}
                     itemCount={itemCount}
                     tableRef={tableRef}
                 />

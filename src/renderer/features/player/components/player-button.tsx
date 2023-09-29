@@ -73,14 +73,14 @@ const ButtonTertiaryVariant = css`
 type StyledPlayerButtonProps = Omit<PlayerButtonProps, 'icon'>;
 
 const StyledPlayerButton = styled(UnstyledButton)<StyledPlayerButtonProps>`
+    all: unset;
     display: flex;
     align-items: center;
     width: 100%;
     padding: 0.5rem;
     overflow: visible;
-    background: var(--playerbar-btn-bg-hover);
-    all: unset;
     cursor: default;
+    background: var(--playerbar-btn-bg-hover);
 
     button {
         display: flex;
