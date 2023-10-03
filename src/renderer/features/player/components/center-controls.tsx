@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useHotkeys } from '@mantine/hooks';
+import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import formatDuration from 'format-duration';
 import isElectron from 'is-electron';
@@ -28,6 +28,7 @@ import {
     useRepeatStatus,
     useShuffleStatus,
     useCurrentTime,
+    useSpeed,
 } from '/@/renderer/store';
 import {
     useHotkeySettings,
@@ -92,6 +93,7 @@ const ControlsContainer = styled.div`
 `;
 
 export const CenterControls = ({ playersRef }: CenterControlsProps) => {
+    const isSmallPlayerBar = useMediaQuery('(max-width: 1050px)');
     const queryClient = useQueryClient();
     const [isSeeking, setIsSeeking] = useState(false);
     const currentSong = useCurrentSong();
@@ -105,6 +107,9 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const repeat = useRepeatStatus();
     const shuffle = useShuffleStatus();
     const { bindings } = useHotkeySettings();
+    const speed = useSpeed();
+    const [isSpeedSeeking, setIsSpeedSeeking] = useState(false);
+    const [speedSeek, setSpeedSeek] = useState(1);
 
     const {
         handleNextTrack,
@@ -112,6 +117,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
         handlePrevTrack,
         handleSeekSlider,
         handleSkipBackward,
+        handleSpeedSlider,
         handleSkipForward,
         handleToggleRepeat,
         handleToggleShuffle,
@@ -278,6 +284,40 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                             })
                         }
                     />
+                    {!isSmallPlayerBar && (
+                        <SliderContainer>
+                            <SliderWrapper>
+                                <PlayerbarSlider
+                                    label={null}
+                                    max={2}
+                                    min={0.25}
+                                    step={0.25}
+                                    value={!isSpeedSeeking ? speed : speedSeek}
+                                    w="50px"
+                                    onChange={(e) => {
+                                        setIsSpeedSeeking(true);
+                                        setSpeedSeek(e);
+                                    }}
+                                    onChangeEnd={(e) => {
+                                        handleSpeedSlider(e);
+                                        setIsSpeedSeeking(false);
+                                    }}
+                                />
+                            </SliderWrapper>
+                            <SliderValueWrapper $position="right">
+                                <Text
+                                    $noSelect
+                                    $secondary
+                                    ml="5px"
+                                    size="md"
+                                    w="40px"
+                                    weight={600}
+                                >
+                                    {!isSpeedSeeking ? speed : speedSeek} x
+                                </Text>
+                            </SliderValueWrapper>
+                        </SliderContainer>
+                    )}
                 </ButtonsContainer>
             </ControlsContainer>
             <SliderContainer>

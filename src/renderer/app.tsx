@@ -62,7 +62,8 @@ export const App = () => {
 
             if (!isRunning) {
                 const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
-                const properties = {
+                const properties: Record<string, any> = {
+                    speed: usePlayerStore.getState().current.speed,
                     ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
                 };
 
