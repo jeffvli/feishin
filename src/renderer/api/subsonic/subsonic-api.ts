@@ -41,6 +41,13 @@ export const contract = c.router({
             200: ssType._response.musicFolderList,
         },
     },
+    getPlayQueue: {
+        method: 'GET',
+        path: 'getPlayQueue.view',
+        responses: {
+            200: ssType._response.playQueue,
+        },
+    },
     getRandomSongList: {
         method: 'GET',
         path: 'getRandomSongs.view',
@@ -63,6 +70,14 @@ export const contract = c.router({
         query: ssType._parameters.removeFavorite,
         responses: {
             200: ssType._response.removeFavorite,
+        },
+    },
+    savePlayQueue: {
+        method: 'GET',
+        path: 'savePlayQueue.view',
+        query: ssType._parameters.saveQueue,
+        responses: {
+            200: ssType._response.saveQueue,
         },
     },
     scrobble: {
@@ -121,7 +136,12 @@ axiosClient.interceptors.response.use(
 const parsePath = (fullPath: string) => {
     const [path, params] = fullPath.split('?');
 
-    const parsedParams = qs.parse(params);
+    // override the number of parameters (useful for save queue).
+    // Practically speaking, exceeding the default limits of 1000 will almost certainly fail
+    const parsedParams = qs.parse(params, {
+        arrayLimit: 99999,
+        parameterLimit: 99999,
+    });
     const notNilParams = omitBy(parsedParams, (value) => value === 'undefined' || value === 'null');
 
     return {
@@ -192,7 +212,7 @@ export const ssApiClient = (args: {
 
                     return {
                         body: response?.data,
-                        headers: response.headers as any,
+                        headers: response?.headers as any,
                         status: response?.status,
                     };
                 }

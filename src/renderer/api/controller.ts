@@ -48,6 +48,9 @@ import type {
     SearchResponse,
     LyricsArgs,
     LyricsResponse,
+    SaveQueueArgs,
+    GetQueueArgs,
+    GetQueueResponse,
 } from '/@/renderer/api/types';
 import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
@@ -80,6 +83,7 @@ export type ControllerEndpoint = Partial<{
     getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
     getLyrics: (args: LyricsArgs) => Promise<LyricsResponse>;
     getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
+    getPlayQueue: (args: GetQueueArgs) => Promise<GetQueueResponse>;
     getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
     getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
     getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
@@ -89,6 +93,7 @@ export type ControllerEndpoint = Partial<{
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getUserList: (args: UserListArgs) => Promise<UserListResponse>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
+    savePlayQueue: (args: SaveQueueArgs) => Promise<void>;
     scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
     search: (args: SearchArgs) => Promise<SearchResponse>;
     setRating: (args: SetRatingArgs) => Promise<RatingResponse>;
@@ -124,6 +129,7 @@ const endpoints: ApiController = {
         getGenreList: jfController.getGenreList,
         getLyrics: jfController.getLyrics,
         getMusicFolderList: jfController.getMusicFolderList,
+        getPlayQueue: jfController.getPlayQueue,
         getPlaylistDetail: jfController.getPlaylistDetail,
         getPlaylistList: jfController.getPlaylistList,
         getPlaylistSongList: jfController.getPlaylistSongList,
@@ -133,6 +139,7 @@ const endpoints: ApiController = {
         getTopSongs: jfController.getTopSongList,
         getUserList: undefined,
         removeFromPlaylist: jfController.removeFromPlaylist,
+        savePlayQueue: jfController.savePlayQueue,
         scrobble: jfController.scrobble,
         search: jfController.search,
         setRating: undefined,
@@ -160,6 +167,7 @@ const endpoints: ApiController = {
         getGenreList: ndController.getGenreList,
         getLyrics: undefined,
         getMusicFolderList: ssController.getMusicFolderList,
+        getPlayQueue: ndController.getPlayQueue,
         getPlaylistDetail: ndController.getPlaylistDetail,
         getPlaylistList: ndController.getPlaylistList,
         getPlaylistSongList: ndController.getPlaylistSongList,
@@ -169,6 +177,7 @@ const endpoints: ApiController = {
         getTopSongs: ssController.getTopSongList,
         getUserList: ndController.getUserList,
         removeFromPlaylist: ndController.removeFromPlaylist,
+        savePlayQueue: ssController.savePlayQueue,
         scrobble: ssController.scrobble,
         search: ssController.search3,
         setRating: ssController.setRating,
@@ -195,12 +204,15 @@ const endpoints: ApiController = {
         getGenreList: undefined,
         getLyrics: undefined,
         getMusicFolderList: ssController.getMusicFolderList,
+        // NOTE: this does not include rating/favorite
+        getPlayQueue: ssController.getPlayQueue,
         getPlaylistDetail: undefined,
         getPlaylistList: undefined,
         getSongDetail: undefined,
         getSongList: undefined,
         getTopSongs: ssController.getTopSongList,
         getUserList: undefined,
+        savePlayQueue: ssController.savePlayQueue,
         scrobble: ssController.scrobble,
         search: ssController.search3,
         setRating: undefined,
@@ -469,6 +481,24 @@ const getLyrics = async (args: LyricsArgs) => {
     )?.(args);
 };
 
+const savePlayQueue = async (args: SaveQueueArgs) => {
+    return (
+        apiController(
+            'savePlayQueue',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['savePlayQueue']
+    )?.(args);
+};
+
+const getPlayQueue = async (args: GetQueueArgs) => {
+    return (
+        apiController(
+            'getPlayQueue',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getPlayQueue']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -484,6 +514,7 @@ export const controller = {
     getGenreList,
     getLyrics,
     getMusicFolderList,
+    getPlayQueue,
     getPlaylistDetail,
     getPlaylistList,
     getPlaylistSongList,
@@ -493,6 +524,7 @@ export const controller = {
     getTopSongList,
     getUserList,
     removeFromPlaylist,
+    savePlayQueue,
     scrobble,
     search,
     updatePlaylist,

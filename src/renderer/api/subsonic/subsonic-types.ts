@@ -206,6 +206,25 @@ const randomSongList = z.object({
     }),
 });
 
+const saveQueueParameters = z.object({
+    current: z.string().optional(),
+    id: z.string().array(),
+    position: z.number().optional(),
+});
+
+const saveQueue = z.null();
+
+const playQueue = z.object({
+    playQueue: z.object({
+        changed: z.string(),
+        changedBy: z.string(),
+        current: z.string().optional(),
+        entry: song.array(),
+        position: z.number().optional(),
+        username: z.string(),
+    }),
+});
+
 export const ssType = {
     _parameters: {
         albumList: albumListParameters,
@@ -214,6 +233,7 @@ export const ssType = {
         createFavorite: createFavoriteParameters,
         randomSongList: randomSongListParameters,
         removeFavorite: removeFavoriteParameters,
+        saveQueue: saveQueueParameters,
         scrobble: scrobbleParameters,
         search3: search3Parameters,
         setRating: setRatingParameters,
@@ -229,8 +249,10 @@ export const ssType = {
         baseResponse,
         createFavorite,
         musicFolderList,
+        playQueue,
         randomSongList,
         removeFavorite,
+        saveQueue,
         scrobble,
         search3,
         setRating,

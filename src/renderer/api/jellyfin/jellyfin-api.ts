@@ -122,6 +122,15 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    getPlayQueue: {
+        method: 'GET',
+        path: 'sessions',
+        query: jfType._parameters.getQueue,
+        responses: {
+            200: jfType._response.getSessions,
+            400: jfType._response.error,
+        },
+    },
     getPlaylistDetail: {
         method: 'GET',
         path: 'users/:userId/items/:id',
@@ -208,6 +217,15 @@ export const contract = c.router({
         query: jfType._parameters.removeFromPlaylist,
         responses: {
             200: jfType._response.removeFromPlaylist,
+            400: jfType._response.error,
+        },
+    },
+    savePlayQueue: {
+        body: jfType._parameters.saveQueue,
+        method: 'POST',
+        path: 'sessions/playing',
+        responses: {
+            200: jfType._response.scrobble,
             400: jfType._response.error,
         },
     },

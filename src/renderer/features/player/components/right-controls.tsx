@@ -1,4 +1,4 @@
-import { MouseEvent, useEffect } from 'react';
+import { MouseEvent, MutableRefObject, useCallback, useEffect } from 'react';
 import { Flex, Group } from '@mantine/core';
 import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import isElectron from 'is-electron';
@@ -9,6 +9,8 @@ import {
     RiVolumeMuteFill,
     RiHeartLine,
     RiHeartFill,
+    RiUploadCloud2Line,
+    RiDownloadCloud2Line,
 } from 'react-icons/ri';
 import {
     useAppStoreActions,
@@ -16,20 +18,28 @@ import {
     useCurrentSong,
     useHotkeySettings,
     useMuted,
+    usePlayerStore,
     useSidebarStore,
     useVolume,
 } from '/@/renderer/store';
 import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';
-import { LibraryItem, ServerType, Song } from '/@/renderer/api/types';
+import { LibraryItem, QueueSong, ServerType, Song } from '/@/renderer/api/types';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
-import { Rating } from '/@/renderer/components';
+import { Rating, toast } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
+import { api } from '/@/renderer/api';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { Play } from '/@/renderer/types';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
 
-export const RightControls = () => {
+interface RightControlsProps {
+    seekRef: MutableRefObject<((position: number) => void) | undefined>;
+}
+
+export const RightControls = ({ seekRef }: RightControlsProps) => {
     const isMinWidth = useMediaQuery('(max-width: 480px)');
     const volume = useVolume();
     const muted = useMuted();
@@ -44,6 +54,7 @@ export const RightControls = () => {
     const updateRatingMutation = useSetRating({});
     const addToFavoritesMutation = useCreateFavorite({});
     const removeFromFavoritesMutation = useDeleteFavorite({});
+    const handlePlayQueueAdd = usePlayQueueAdd();
 
     const handleAddToFavorites = () => {
         if (!currentSong) return;
@@ -109,6 +120,61 @@ export const RightControls = () => {
 
     const isSongDefined = Boolean(currentSong?.id);
     const showRating = isSongDefined && server?.type === ServerType.NAVIDROME;
+
+    const handleSaveQueue = useCallback(() => {
+        if (server === null) return;
+
+        const { current, queue } = usePlayerStore.getState();
+        let songIds: string[] = [];
+
+        if (queue.shuffled.length > 0) {
+            const queueMapping: Record<string, QueueSong> = {};
+            for (const song of queue.default) {
+                queueMapping[song.uniqueId] = song;
+            }
+            for (const shuffledId of queue.shuffled) {
+                songIds.push(queueMapping[shuffledId].id);
+            }
+        } else {
+            songIds = queue.default.map((song) => song.id);
+        }
+
+        api.controller
+            .savePlayQueue({
+                apiClientProps: { server },
+                query: {
+                    current: current.song?.id,
+                    currentIndex: current.index,
+                    positionMs: current.song ? Math.round(current.time * 1000) : undefined,
+                    songs: songIds,
+                },
+            })
+            .then(() => {
+                return toast.success({ message: '', title: 'Saved play queue' });
+            })
+            .catch((error) => {
+                toast.error({
+                    message: 'This is most likely because your queue is too large (> 1000 tracks)',
+                    title: 'Failed to save play queue',
+                });
+                console.error(error);
+            });
+    }, [server]);
+
+    const handleRestoreQueue = useCallback(async () => {
+        if (server === null) return;
+
+        const queue = await api.controller.getPlayQueue({ apiClientProps: { server } });
+        if (queue && handlePlayQueueAdd) {
+            await handlePlayQueueAdd({
+                byData: queue.entry,
+                initialIndex: queue.currentIndex,
+                playType: Play.NOW,
+            });
+
+            if (seekRef.current) seekRef.current(queue.position ? queue.position / 1000 : 0);
+        }
+    }, [handlePlayQueueAdd, seekRef, server]);
 
     useHotkeys([
         [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDown],
@@ -215,6 +281,22 @@ export const RightControls = () => {
                     variant="secondary"
                     onClick={handleToggleQueue}
                 />
+                {server && (
+                    <>
+                        <PlayerButton
+                            icon={<RiUploadCloud2Line size="1.1rem" />}
+                            tooltip={{ label: 'Save queue', openDelay: 500 }}
+                            variant="secondary"
+                            onClick={handleSaveQueue}
+                        />
+                        <PlayerButton
+                            icon={<RiDownloadCloud2Line size="1.1rem" />}
+                            tooltip={{ label: 'Restore queue', openDelay: 500 }}
+                            variant="secondary"
+                            onClick={handleRestoreQueue}
+                        />
+                    </>
+                )}
                 <Group
                     noWrap
                     spacing="xs"

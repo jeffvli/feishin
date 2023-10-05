@@ -47,6 +47,10 @@ import {
     LyricsArgs,
     LyricsResponse,
     genreListSortMap,
+    SaveQueueArgs,
+    QueueSong,
+    GetQueueArgs,
+    GetQueueResponse,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -723,6 +727,7 @@ const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
             body: {
                 IsPaused: true,
                 ItemId: query.id,
+                PlaylistItemId: query.queueIndex?.toString(),
                 PositionTicks: position,
             },
         });
@@ -734,6 +739,7 @@ const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
         jfApiClient(apiClientProps).scrobblePlaying({
             body: {
                 ItemId: query.id,
+                PlaylistItemId: query.queueIndex?.toString(),
                 PositionTicks: position,
             },
         });
@@ -747,6 +753,7 @@ const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
                 EventName: query.event,
                 IsPaused: true,
                 ItemId: query.id,
+                PlaylistItemId: query.queueIndex?.toString(),
                 PositionTicks: position,
             },
         });
@@ -760,6 +767,7 @@ const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
                 EventName: query.event,
                 IsPaused: false,
                 ItemId: query.id,
+                PlaylistItemId: query.queueIndex?.toString(),
                 PositionTicks: position,
             },
         });
@@ -770,6 +778,7 @@ const scrobble = async (args: ScrobbleArgs): Promise<ScrobbleResponse> => {
     jfApiClient(apiClientProps).scrobbleProgress({
         body: {
             ItemId: query.id,
+            PlaylistItemId: query.queueIndex?.toString(),
             PositionTicks: position,
         },
     });
@@ -940,6 +949,76 @@ const getLyrics = async (args: LyricsArgs): Promise<LyricsResponse> => {
     return res.body.Lyrics.map((lyric) => [lyric.Start! / 1e4, lyric.Text]);
 };
 
+const savePlayQueue = async (args: SaveQueueArgs): Promise<void> => {
+    const { query, apiClientProps } = args;
+
+    if (!query.current || query.positionMs === undefined) {
+        throw new Error('Must have one item in teh queue');
+    }
+
+    const res = await jfApiClient(apiClientProps).savePlayQueue({
+        body: {
+            IsPaused: false,
+            ItemId: query.current,
+            NowPlayingQueue: query.songs.map((song, idx) => ({
+                Id: song,
+                PlaylistItemId: idx.toString(),
+            })),
+            PlaylistItemId: query.currentIndex?.toString(),
+            PositionTicks: query.positionMs * 1000,
+        },
+    });
+
+    if (res.status !== 204) {
+        throw new Error('Failed to save play queue');
+    }
+};
+
+const getPlayQueue = async (args: GetQueueArgs): Promise<GetQueueResponse> => {
+    const { apiClientProps } = args;
+
+    const res = await jfApiClient(apiClientProps).getPlayQueue({
+        query: {
+            DeviceId: 'Feishin',
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get play queue songs');
+    } else if (res.body.length === 0) {
+        throw new Error('No saved session');
+    }
+
+    const {
+        LastActivityDate,
+        NowPlayingQueue,
+        NowPlayingQueueFullItems,
+        PlaylistItemId,
+        PlayState,
+        UserName,
+    } = res.body[0];
+
+    const tempMapping = new Map<string, any>();
+    for (const song of NowPlayingQueueFullItems) {
+        tempMapping.set(song.Id, song);
+    }
+
+    const currentIndex = PlaylistItemId ? parseInt(PlaylistItemId, 10) : 0;
+    const entries = NowPlayingQueue.map(
+        (item): QueueSong => jfNormalize.song(tempMapping.get(item.Id), apiClientProps.server, ''),
+    );
+
+    return {
+        changed: LastActivityDate,
+        changedBy: UserName,
+        currentIndex,
+        entry: entries,
+        position:
+            PlayState.PositionTicks !== undefined ? PlayState.PositionTicks / 1000 : undefined,
+        username: UserName,
+    };
+};
+
 export const jfController = {
     addToPlaylist,
     authenticate,
@@ -955,6 +1034,7 @@ export const jfController = {
     getGenreList,
     getLyrics,
     getMusicFolderList,
+    getPlayQueue,
     getPlaylistDetail,
     getPlaylistList,
     getPlaylistSongList,
@@ -962,6 +1042,7 @@ export const jfController = {
     getSongList,
     getTopSongList,
     removeFromPlaylist,
+    savePlayQueue,
     scrobble,
     search,
     updatePlaylist,
