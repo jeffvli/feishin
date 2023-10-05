@@ -934,7 +934,7 @@ const getLyrics = async (args: LyricsArgs): Promise<LyricsResponse> => {
     }
 
     if (res.body.Lyrics.length > 0 && res.body.Lyrics[0].Start === undefined) {
-        return res.body.Lyrics[0].Text;
+        return res.body.Lyrics.map((lyric) => lyric.Text).join('\n');
     }
 
     return res.body.Lyrics.map((lyric) => [lyric.Start! / 1e4, lyric.Text]);
