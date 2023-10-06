@@ -34,21 +34,21 @@ Progress Events (Jellyfin only):
 */
 
 const checkScrobbleConditions = (args: {
-    scrobbleAtDuration: number;
+    scrobbleAtDurationMs: number;
     scrobbleAtPercentage: number;
     songCompletedDurationMs: number;
     songDurationMs: number;
 }) => {
-    const { scrobbleAtDuration, scrobbleAtPercentage, songCompletedDurationMs, songDurationMs } =
+    const { scrobbleAtDurationMs, scrobbleAtPercentage, songCompletedDurationMs, songDurationMs } =
         args;
     const percentageOfSongCompleted = songDurationMs
         ? (songCompletedDurationMs / songDurationMs) * 100
         : 0;
 
-    return (
-        percentageOfSongCompleted >= scrobbleAtPercentage ||
-        songCompletedDurationMs >= scrobbleAtDuration
-    );
+    const shouldScrobbleBasedOnPercetange = percentageOfSongCompleted >= scrobbleAtPercentage;
+    const shouldScrobbleBasedOnDuration = songCompletedDurationMs >= scrobbleAtDurationMs;
+
+    return shouldScrobbleBasedOnPercetange || shouldScrobbleBasedOnDuration;
 };
 
 export const useScrobble = () => {
@@ -103,7 +103,7 @@ export const useScrobble = () => {
             // Send completion scrobble when song changes and a previous song exists
             if (previousSong?.id) {
                 const shouldSubmitScrobble = checkScrobbleConditions({
-                    scrobbleAtDuration: scrobbleSettings?.scrobbleAtDuration,
+                    scrobbleAtDurationMs: (scrobbleSettings?.scrobbleAtDuration ?? 0) * 1000,
                     scrobbleAtPercentage: scrobbleSettings?.scrobbleAtPercentage,
                     songCompletedDurationMs: previousSongTimeSec * 1000,
                     songDurationMs: previousSong.duration,
@@ -227,7 +227,7 @@ export const useScrobble = () => {
 
                 // If not already scrobbled, send a 'submission' scrobble if conditions are met
                 const shouldSubmitScrobble = checkScrobbleConditions({
-                    scrobbleAtDuration: scrobbleSettings?.scrobbleAtDuration,
+                    scrobbleAtDurationMs: (scrobbleSettings?.scrobbleAtDuration ?? 0) * 1000,
                     scrobbleAtPercentage: scrobbleSettings?.scrobbleAtPercentage,
                     // If scrobbling the last song in the queue, use the previous time instead of the current time since otherwise time value will be 0
                     songCompletedDurationMs:
@@ -273,7 +273,7 @@ export const useScrobble = () => {
                 currentSong?.serverType === ServerType.JELLYFIN ? currentTime * 1e7 : undefined;
 
             const shouldSubmitScrobble = checkScrobbleConditions({
-                scrobbleAtDuration: scrobbleSettings?.scrobbleAtDuration,
+                scrobbleAtDurationMs: (scrobbleSettings?.scrobbleAtDuration ?? 0) * 1000,
                 scrobbleAtPercentage: scrobbleSettings?.scrobbleAtPercentage,
                 songCompletedDurationMs: currentTime,
                 songDurationMs: currentSong.duration,
