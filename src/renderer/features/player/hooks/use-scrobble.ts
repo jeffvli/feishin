@@ -36,18 +36,18 @@ Progress Events (Jellyfin only):
 const checkScrobbleConditions = (args: {
     scrobbleAtDuration: number;
     scrobbleAtPercentage: number;
-    songCompletedDurationSec: number;
+    songCompletedDurationMs: number;
     songDurationMs: number;
 }) => {
-    const { scrobbleAtDuration, scrobbleAtPercentage, songCompletedDurationSec, songDurationMs } =
+    const { scrobbleAtDuration, scrobbleAtPercentage, songCompletedDurationMs, songDurationMs } =
         args;
     const percentageOfSongCompleted = songDurationMs
-        ? ((songCompletedDurationSec * 1000) / songDurationMs) * 100
+        ? (songCompletedDurationMs / songDurationMs) * 100
         : 0;
 
     return (
         percentageOfSongCompleted >= scrobbleAtPercentage ||
-        songCompletedDurationSec >= scrobbleAtDuration
+        songCompletedDurationMs >= scrobbleAtDuration
     );
 };
 
@@ -98,14 +98,14 @@ export const useScrobble = () => {
 
             // const currentSong = current[0] as QueueSong | undefined;
             const previousSong = previous[0] as QueueSong;
-            const previousSongTime = previous[1] as number;
+            const previousSongTimeSec = previous[1] as number;
 
             // Send completion scrobble when song changes and a previous song exists
             if (previousSong?.id) {
                 const shouldSubmitScrobble = checkScrobbleConditions({
                     scrobbleAtDuration: scrobbleSettings?.scrobbleAtDuration,
                     scrobbleAtPercentage: scrobbleSettings?.scrobbleAtPercentage,
-                    songCompletedDurationSec: previousSongTime,
+                    songCompletedDurationMs: previousSongTimeSec * 1000,
                     songDurationMs: previousSong.duration,
                 });
 
@@ -115,7 +115,7 @@ export const useScrobble = () => {
                 ) {
                     const position =
                         previousSong?.serverType === ServerType.JELLYFIN
-                            ? previousSongTime * 1e7
+                            ? previousSongTimeSec * 1e7
                             : undefined;
 
                     sendScrobble.mutate({
@@ -169,7 +169,10 @@ export const useScrobble = () => {
     );
 
     const handleScrobbleFromStatusChange = useCallback(
-        (status: PlayerStatus | undefined) => {
+        (
+            current: (PlayerStatus | number | undefined)[],
+            previous: (PlayerStatus | number | undefined)[],
+        ) => {
             if (!isScrobbleEnabled) return;
 
             const currentSong = usePlayerStore.getState().current.song;
@@ -181,8 +184,11 @@ export const useScrobble = () => {
                     ? usePlayerStore.getState().current.time * 1e7
                     : undefined;
 
+            const currentStatus = current[0] as PlayerStatus;
+            const currentTimeSec = current[1] as number;
+
             // Whenever the player is restarted, send a 'start' scrobble
-            if (status === PlayerStatus.PLAYING) {
+            if (currentStatus === PlayerStatus.PLAYING) {
                 sendScrobble.mutate({
                     query: {
                         event: 'unpause',
@@ -195,7 +201,7 @@ export const useScrobble = () => {
 
                 if (currentSong?.serverType === ServerType.JELLYFIN) {
                     progressIntervalId.current = setInterval(() => {
-                        const currentTime = usePlayerStore.getState().current.time;
+                        const currentTime = currentTimeSec;
                         handleScrobbleFromSeek(currentTime);
                     }, 10000);
                 }
@@ -216,11 +222,16 @@ export const useScrobble = () => {
                     clearInterval(progressIntervalId.current as ReturnType<typeof setInterval>);
                 }
             } else {
+                const isLastTrackInQueue = usePlayerStore.getState().actions.checkIsLastTrack();
+                const previousTimeSec = previous[1] as number;
+
                 // If not already scrobbled, send a 'submission' scrobble if conditions are met
                 const shouldSubmitScrobble = checkScrobbleConditions({
                     scrobbleAtDuration: scrobbleSettings?.scrobbleAtDuration,
                     scrobbleAtPercentage: scrobbleSettings?.scrobbleAtPercentage,
-                    songCompletedDurationSec: usePlayerStore.getState().current.time,
+                    // If scrobbling the last song in the queue, use the previous time instead of the current time since otherwise time value will be 0
+                    songCompletedDurationMs:
+                        (isLastTrackInQueue ? previousTimeSec : currentTimeSec) * 1000,
                     songDurationMs: currentSong.duration,
                 });
 
@@ -264,7 +275,7 @@ export const useScrobble = () => {
             const shouldSubmitScrobble = checkScrobbleConditions({
                 scrobbleAtDuration: scrobbleSettings?.scrobbleAtDuration,
                 scrobbleAtPercentage: scrobbleSettings?.scrobbleAtPercentage,
-                songCompletedDurationSec: currentTime,
+                songCompletedDurationMs: currentTime,
                 songDurationMs: currentSong.duration,
             });
 
@@ -314,8 +325,11 @@ export const useScrobble = () => {
         );
 
         const unsubStatusChange = usePlayerStore.subscribe(
-            (state) => state.current.status,
+            (state) => [state.current.status, state.current.time],
             handleScrobbleFromStatusChange,
+            {
+                equalityFn: (a, b) => (a[0] as PlayerStatus) === (b[0] as PlayerStatus),
+            },
         );
 
         return () => {
