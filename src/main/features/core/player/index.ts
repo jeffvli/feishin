@@ -114,16 +114,14 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
         if (data.queue.current) {
             getMpvInstance()
                 ?.load(data.queue.current.streamUrl, 'replace')
-                .then(() => {
-                    // eslint-disable-next-line promise/always-return
-                    if (data.queue.next) {
-                        getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
-                    }
-                })
                 .catch((err) => {
                     console.log('MPV failed to load song', err);
                     getMpvInstance()?.play();
                 });
+
+            if (data.queue.next) {
+                getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
+            }
         }
     } catch (err) {
         console.error(err);
