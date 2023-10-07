@@ -112,7 +112,7 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
 
     try {
         if (data.queue.current) {
-            getMpvInstance()
+            await getMpvInstance()
                 ?.load(data.queue.current.streamUrl, 'replace')
                 .catch((err) => {
                     console.log('MPV failed to load song', err);
@@ -120,7 +120,7 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
                 });
 
             if (data.queue.next) {
-                getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
+                await getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
             }
         }
     } catch (err) {
