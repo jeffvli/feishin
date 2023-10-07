@@ -184,6 +184,9 @@
     }
 
     .current-song {
+        background: var(--table-row-hover-bg);
+        border: 1px solid var(--primary-color) !important;
+
         .current-song-child {
             color: var(--primary-color) !important;
         }
