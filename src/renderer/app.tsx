@@ -38,6 +38,7 @@ const remote = isElectron() ? window.electron.remote : null;
 export const App = () => {
     const theme = useTheme();
     const contentFont = useSettingsStore((state) => state.general.fontContent);
+    const accent = useSettingsStore((store) => store.general.accent);
     const { type: playbackType } = usePlaybackSettings();
     const { bindings } = useHotkeySettings();
     const handlePlayQueueAdd = useHandlePlayQueueAdd();
@@ -48,6 +49,11 @@ export const App = () => {
         const root = document.documentElement;
         root.style.setProperty('--content-font-family', contentFont);
     }, [contentFont]);
+
+    useEffect(() => {
+        const root = document.documentElement;
+        root.style.setProperty('--primary-color', accent);
+    }, [accent]);
 
     const providerValue = useMemo(() => {
         return { handlePlayQueueAdd };

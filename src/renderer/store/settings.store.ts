@@ -112,6 +112,7 @@ export enum BindingActions {
 
 export interface SettingsState {
     general: {
+        accent: string;
         defaultFullPlaylist: boolean;
         followSystemTheme: boolean;
         fontContent: string;
@@ -208,6 +209,7 @@ const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle
 
 const initialState: SettingsState = {
     general: {
+        accent: 'rgb(53, 116, 252)',
         defaultFullPlaylist: true,
         followSystemTheme: false,
         fontContent: 'Inter',
