@@ -196,6 +196,7 @@ export interface SettingsSlice extends SettingsState {
         reset: () => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
+        setTable: (type: TableType, data: DataTableProps) => void;
     };
 }
 
@@ -495,6 +496,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                     setSidebarItems: (items: SidebarItemType[]) => {
                         set((state) => {
                             state.general.sidebarItems = items;
+                        });
+                    },
+                    setTable: (type: TableType, data: DataTableProps) => {
+                        set((state) => {
+                            state.tables[type] = data;
                         });
                     },
                 },
