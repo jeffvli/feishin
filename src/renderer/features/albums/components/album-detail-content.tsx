@@ -12,9 +12,9 @@ import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/ap
 import { Button, Popover } from '/@/renderer/components';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import {
-    getColumnDefs,
     TableConfigDropdown,
     VirtualTable,
+    getColumnDefs,
 } from '/@/renderer/components/virtual-table';
 import { FullWidthDiscCell } from '/@/renderer/components/virtual-table/cells/full-width-disc-cell';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
@@ -34,7 +34,11 @@ import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { usePlayButtonBehavior, useTableSettings } from '/@/renderer/store/settings.store';
+import {
+    usePlayButtonBehavior,
+    useSettingsStoreActions,
+    useTableSettings,
+} from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
 
 const isFullWidthRow = (node: RowNode) => {
@@ -65,16 +69,20 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     const cq = useContainerQuery();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const tableConfig = useTableSettings('albumDetail');
+    const { setTable } = useSettingsStoreActions();
 
     const columnDefs = useMemo(() => getColumnDefs(tableConfig.columns), [tableConfig.columns]);
 
-    const getRowHeight = useCallback((params: RowHeightParams) => {
-        if (isFullWidthRow(params.node)) {
-            return 45;
-        }
+    const getRowHeight = useCallback(
+        (params: RowHeightParams) => {
+            if (isFullWidthRow(params.node)) {
+                return 45;
+            }
 
-        return 60;
-    }, []);
+            return tableConfig.rowHeight;
+        },
+        [tableConfig.rowHeight],
+    );
 
     const songsRowData = useMemo(() => {
         if (!detailQuery.data?.songs) {
@@ -266,6 +274,32 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
         ALBUM_CONTEXT_MENU_ITEMS,
     );
 
+    const onColumnMoved = useCallback(() => {
+        const { columnApi } = tableRef?.current || {};
+        const columnsOrder = columnApi?.getAllGridColumns();
+
+        if (!columnsOrder) return;
+
+        const columnsInSettings = tableConfig.columns;
+        const updatedColumns = [];
+        for (const column of columnsOrder) {
+            const columnInSettings = columnsInSettings.find(
+                (c) => c.column === column.getColDef().colId,
+            );
+
+            if (columnInSettings) {
+                updatedColumns.push({
+                    ...columnInSettings,
+                    ...(!tableConfig.autoFit && {
+                        width: column.getActualWidth(),
+                    }),
+                });
+            }
+        }
+
+        setTable('albumDetail', { ...tableConfig, columns: updatedColumns });
+    }, [setTable, tableConfig, tableRef]);
+
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
     return (
@@ -352,6 +386,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 )}
                 <Box style={{ minHeight: '300px' }}>
                     <VirtualTable
+                        key={`table-${tableConfig.rowHeight}`}
                         ref={tableRef}
                         autoHeight
                         stickyHeader
@@ -378,6 +413,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         rowData={songsRowData}
                         rowSelection="multiple"
                         onCellContextMenu={onCellContextMenu}
+                        onColumnMoved={onColumnMoved}
                         onRowDoubleClicked={handleRowDoubleClick}
                     />
                 </Box>
