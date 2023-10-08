@@ -216,7 +216,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
         });
     };
 
-    const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
+    const onCellContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
     const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
         if (!e.data || e.node.isFullWidthCell()) return;
@@ -361,6 +361,9 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         autoFitColumns={tableConfig.autoFit}
                         className="album-table"
                         columnDefs={columnDefs}
+                        context={{
+                            onCellContextMenu,
+                        }}
                         enableCellChangeFlash={false}
                         fullWidthCellRenderer={FullWidthDiscCell}
                         getRowHeight={getRowHeight}
@@ -375,7 +378,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         rowClassRules={rowClassRules}
                         rowData={songsRowData}
                         rowSelection="multiple"
-                        onCellContextMenu={handleContextMenu}
+                        onCellContextMenu={onCellContextMenu}
                         onRowDoubleClicked={handleRowDoubleClick}
                     />
                 </Box>

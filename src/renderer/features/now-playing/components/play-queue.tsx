@@ -206,7 +206,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
         }
     }, [currentSong, previousSong, tableConfig.followCurrentSong]);
 
-    const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, QUEUE_CONTEXT_MENU_ITEMS);
+    const onCellContextMenu = useHandleTableContextMenu(LibraryItem.SONG, QUEUE_CONTEXT_MENU_ITEMS);
 
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -218,6 +218,9 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
                     rowDragMultiRow
                     autoFitColumns={tableConfig.autoFit}
                     columnDefs={columnDefs}
+                    context={{
+                        onCellContextMenu,
+                    }}
                     deselectOnClickOutside={type === 'fullScreen'}
                     getRowId={(data) => data.data.uniqueId}
                     rowBuffer={50}
@@ -225,7 +228,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
                     rowData={queue}
                     rowHeight={tableConfig.rowHeight || 40}
                     suppressCellFocus={type === 'fullScreen'}
-                    onCellContextMenu={handleContextMenu}
+                    onCellContextMenu={onCellContextMenu}
                     onCellDoubleClicked={handleDoubleClick}
                     onColumnMoved={handleColumnChange}
                     onColumnResized={debouncedColumnChange}
