@@ -269,7 +269,7 @@ const tableColumns: { [key: string]: ColDef } = {
         valueGetter: (params) => {
             return (params.node?.rowIndex || 0) + 1;
         },
-        width: 71,
+        width: 80,
     },
     songCount: {
         cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
@@ -313,7 +313,7 @@ const tableColumns: { [key: string]: ColDef } = {
     },
     trackNumber: {
         cellClass: 'track-number',
-        cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+        cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'right' }),
         colId: TableColumn.TRACK_NUMBER,
         field: 'trackNumber',
         headerComponent: (params: IHeaderParams) =>

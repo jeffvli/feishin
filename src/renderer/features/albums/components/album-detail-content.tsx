@@ -359,6 +359,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         suppressLoadingOverlay
                         suppressRowDrag
                         autoFitColumns={tableConfig.autoFit}
+                        className="album-table"
                         columnDefs={columnDefs}
                         enableCellChangeFlash={false}
                         fullWidthCellRenderer={FullWidthDiscCell}

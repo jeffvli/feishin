@@ -184,39 +184,35 @@
         border: 1px var(--table-border-color) solid !important;
     }
 
-    .row-index > div {
-        width: 45px;
-    }
-
     .current-song {
         background: var(--table-row-hover-bg);
-
-        .row-index > ::after {
-            @keyframes pulse {
-                0% {
-                    opacity: 0.5;
-                }
-                50% {
-                    opacity: 1;
-                }
-                100% {
-                    opacity: 0.5;
-                }
-            }
-
-            position: absolute;
-            right: 0px;
-            height: 18px;
-            width: 18px;
-            content: '';
-            background-color: var(--primary-color);
-            mask-image: var(--current-song-image);
-            -webkit-mask-image: var(--current-song-image);
-            animation: pulse 3s infinite;
-        }
 
         .current-song-child {
             color: var(--primary-color) !important;
         }
+    }
+
+    .current-song > .row-index > ::before,
+    .album-table .current-song .track-number > ::before {
+        @keyframes pulse {
+            0% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.5;
+            }
+        }
+        display: block;
+        margin-right: 3px;
+        height: 19px;
+        width: 19px;
+        content: '';
+        background-color: var(--primary-color);
+        mask-image: var(--current-song-image);
+        -webkit-mask-image: var(--current-song-image);
+        animation: pulse 3s infinite;
     }
 }
