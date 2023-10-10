@@ -1,7 +1,7 @@
 import { Flex, Stack, Group, Center } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useRef, useLayoutEffect, useState } from 'react';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -89,11 +89,11 @@ const imageVariants: Variants = {
     },
 };
 
-const scaleImageUrl = (url?: string | null) => {
+const scaleImageUrl = (imageSize: number, url?: string | null) => {
     return url
-        ?.replace(/&size=\d+/, '&size=500')
-        .replace(/\?width=\d+/, '?width=500')
-        .replace(/&height=\d+/, '&height=500');
+        ?.replace(/&size=\d+/, '&size='+imageSize)
+        .replace(/\?width=\d+/, '?width='+imageSize)
+        .replace(/&height=\d+/, '&height='+imageSize);
 };
 
 const ImageWithPlaceholder = ({
@@ -127,6 +127,9 @@ const ImageWithPlaceholder = ({
 };
 
 export const FullScreenPlayerImage = () => {
+    const mainImageRef = useRef();
+    const [mainImageDimensions, setMainImageDimensions] = useState({ idealSize: 1 });
+
     const { queue } = usePlayerData();
     const { opacity, useImageAspectRatio } = useFullScreenPlayerStore();
     const currentSong = queue.current;
@@ -136,12 +139,29 @@ export const FullScreenPlayerImage = () => {
         srcLoaded: true,
     });
     const imageKey = `image-${background}`;
-
     const [imageState, setImageState] = useSetState({
-        bottomImage: scaleImageUrl(queue.next?.imageUrl),
+        bottomImage: scaleImageUrl(mainImageDimensions.idealSize, queue.next?.imageUrl),
         current: 0,
-        topImage: scaleImageUrl(queue.current?.imageUrl),
+        topImage: scaleImageUrl(mainImageDimensions.idealSize, queue.current?.imageUrl),
     });
+
+    const updateImageSize = ()=>{
+      if (mainImageRef.current) {
+        setMainImageDimensions({
+            idealSize: Math.round(mainImageRef.current.offsetHeight / 100) * 100
+        });
+
+        setImageState({
+            bottomImage: scaleImageUrl(mainImageDimensions.idealSize, queue.next?.imageUrl),
+            current: 0,
+            topImage: scaleImageUrl(mainImageDimensions.idealSize, queue.current?.imageUrl),
+        });
+      }
+    }
+
+    useLayoutEffect(() => {
+      updateImageSize();
+    }, []);
 
     useEffect(() => {
         const unsubSongChange = usePlayerStore.subscribe(
@@ -150,8 +170,8 @@ export const FullScreenPlayerImage = () => {
                 const isTop = imageState.current === 0;
                 const queue = state[1] as PlayerData['queue'];
 
-                const currentImageUrl = scaleImageUrl(queue.current?.imageUrl);
-                const nextImageUrl = scaleImageUrl(queue.next?.imageUrl);
+                const currentImageUrl = scaleImageUrl(mainImageDimensions.idealSize, queue.current?.imageUrl);
+                const nextImageUrl = scaleImageUrl(mainImageDimensions.idealSize, queue.next?.imageUrl);
 
                 setImageState({
                     bottomImage: isTop ? currentImageUrl : nextImageUrl,
@@ -175,7 +195,7 @@ export const FullScreenPlayerImage = () => {
             justify="flex-start"
             p="1rem"
         >
-            <ImageContainer>
+            <ImageContainer ref={mainImageRef} onLoad={updateImageSize}>
                 <AnimatePresence
                     initial={false}
                     mode="sync"
