@@ -148,7 +148,7 @@ export const FullScreenPlayerImage = () => {
     const updateImageSize = ()=>{
       if (mainImageRef.current) {
         setMainImageDimensions({
-            idealSize: Math.round(mainImageRef.current.offsetHeight / 100) * 100
+            idealSize: Math.ceil(mainImageRef.current.offsetHeight / 100) * 100
         });
 
         setImageState({
