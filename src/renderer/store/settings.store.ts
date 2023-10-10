@@ -52,6 +52,7 @@ export const sidebarItems = [
     { disabled: true, id: 'Folders', label: 'Folders', route: AppRoute.LIBRARY_FOLDERS },
     { disabled: true, id: 'Playlists', label: 'Playlists', route: AppRoute.PLAYLISTS },
     { disabled: true, id: 'Settings', label: 'Settings', route: AppRoute.SETTINGS },
+    { disabled: true, id: 'Rescan', label: 'Rescan', route: AppRoute.RESCAN },
 ];
 
 export type PersistedTableColumn = {

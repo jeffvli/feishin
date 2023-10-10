@@ -134,6 +134,10 @@ const sidebarItemMap = {
         activeIcon: RiPlayFill,
         icon: RiPlayLine,
     },
+    [AppRoute.RESCAN]: {
+        activeIcon: undefined,
+        icon: undefined,
+    },
 };
 
 export const Sidebar = () => {
@@ -215,22 +219,25 @@ export const Sidebar = () => {
                     sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
                 >
                     <Stack spacing={0}>
-                        <RescanSiderbar />
-                        {sidebarItemsWithRoute.map((item) => (
-                            <SidebarItem
-                                key={`sidebar-${item.route}`}
-                                to={item.route}
-                            >
-                                <Group spacing="sm">
-                                    {location.pathname === item.route ? (
-                                        <item.activeIcon size="1.1em" />
-                                    ) : (
-                                        <item.icon size="1.1em" />
-                                    )}
-                                    {item.label}
-                                </Group>
-                            </SidebarItem>
-                        ))}
+                        {sidebarItemsWithRoute.map((item) =>
+                            item.route === AppRoute.RESCAN ? (
+                                <RescanSiderbar />
+                            ) : (
+                                <SidebarItem
+                                    key={`sidebar-${item.route}`}
+                                    to={item.route}
+                                >
+                                    <Group spacing="sm">
+                                        {location.pathname === item.route ? (
+                                            <item.activeIcon size="1.1em" />
+                                        ) : (
+                                            <item.icon size="1.1em" />
+                                        )}
+                                        {item.label}
+                                    </Group>
+                                </SidebarItem>
+                            ),
+                        )}
                     </Stack>
                     <Divider
                         mx="1rem"

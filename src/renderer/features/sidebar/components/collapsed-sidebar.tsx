@@ -91,6 +91,10 @@ const sidebarItemMap = {
         activeIcon: RiPlayFill,
         icon: RiPlayLine,
     },
+    [AppRoute.RESCAN]: {
+        activeIcon: undefined,
+        icon: undefined,
+    },
 };
 
 export const CollapsedSidebar = () => {
@@ -142,7 +146,6 @@ export const CollapsedSidebar = () => {
                         </CollapsedSidebarButton>
                     </Group>
                 )}
-                <RescanButton />
                 <DropdownMenu position="right-start">
                     <DropdownMenu.Target>
                         <CollapsedSidebarItem
@@ -156,17 +159,21 @@ export const CollapsedSidebar = () => {
                         <AppMenu />
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
-                {sidebarItemsWithRoute.map((item) => (
-                    <CollapsedSidebarItem
-                        key={item.id}
-                        activeIcon={<item.activeIcon size="25" />}
-                        component={NavLink}
-                        icon={<item.icon size="25" />}
-                        label={item.label}
-                        route={item.route}
-                        to={item.route}
-                    />
-                ))}
+                {sidebarItemsWithRoute.map((item) =>
+                    item.route === AppRoute.RESCAN ? (
+                        <RescanButton />
+                    ) : (
+                        <CollapsedSidebarItem
+                            key={item.id}
+                            activeIcon={<item.activeIcon size="25" />}
+                            component={NavLink}
+                            icon={<item.icon size="25" />}
+                            label={item.label}
+                            route={item.route}
+                            to={item.route}
+                        />
+                    ),
+                )}
             </ScrollArea>
         </SidebarContainer>
     );
