@@ -12,9 +12,8 @@ server {
   gzip_types        text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
   gzip_comp_level   9;
 
-  root /usr/share/nginx/html;
-
-  location / {
+  location ${PUBLIC_PATH} {
+    alias /usr/share/nginx/html/;
     try_files $uri $uri/ /index.html =404;
   }
 }
