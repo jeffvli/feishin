@@ -98,21 +98,25 @@ export const ServerList = () => {
                         );
                     })}
                 </Accordion>
-                <Divider />
-                <Group>
-                    <Switch
-                        checked={ignoreCORS === 'true'}
-                        label="Ignore CORS (requires restart)"
-                        onChange={handleUpdateIgnoreCORS}
-                    />
-                </Group>
-                <Group>
-                    <Switch
-                        checked={ignoreSSL === 'true'}
-                        label="Ignore SSL (requires restart)"
-                        onChange={handleUpdateIgnoreSSL}
-                    />
-                </Group>
+                {isElectron() && (
+                    <>
+                        <Divider />
+                        <Group>
+                            <Switch
+                                checked={ignoreCORS === 'true'}
+                                label="Ignore CORS (requires restart)"
+                                onChange={handleUpdateIgnoreCORS}
+                            />
+                        </Group>
+                        <Group>
+                            <Switch
+                                checked={ignoreSSL === 'true'}
+                                label="Ignore SSL (requires restart)"
+                                onChange={handleUpdateIgnoreSSL}
+                            />
+                        </Group>
+                    </>
+                )}
             </Stack>
         </>
     );
