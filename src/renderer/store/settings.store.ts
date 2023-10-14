@@ -111,10 +111,15 @@ export enum BindingActions {
 }
 
 export interface SettingsState {
+    font: {
+        builtIn: string;
+        system: string | null;
+        useSystem: boolean;
+    };
     general: {
         defaultFullPlaylist: boolean;
         followSystemTheme: boolean;
-        fontContent: string;
+
         playButtonBehavior: Play;
         resume: boolean;
         showQueueDrawerButton: boolean;
@@ -208,10 +213,14 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    font: {
+        builtIn: 'Inter',
+        system: null,
+        useSystem: false,
+    },
     general: {
         defaultFullPlaylist: true,
         followSystemTheme: false,
-        fontContent: 'Inter',
         playButtonBehavior: Play.NOW,
         resume: false,
         showQueueDrawerButton: false,
@@ -538,3 +547,5 @@ export const useMpvSettings = () =>
 export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics, shallow);
 
 export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);
+
+export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
