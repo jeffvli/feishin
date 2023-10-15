@@ -7,7 +7,11 @@ import {
     crossfadeHandler,
     gaplessHandler,
 } from '/@/renderer/components/audio-player/utils/list-handlers';
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import {
+    AudioFrequencies,
+    useAudioSettings,
+    useSettingsStore,
+} from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
 
@@ -35,6 +39,7 @@ const getDuration = (ref: any) => {
 
 type WebAudio = {
     context: AudioContext;
+    filters: BiquadFilterNode[];
     gain: GainNode;
 };
 
@@ -54,6 +59,8 @@ export const AudioPlayer = forwardRef(
         }: AudioPlayerProps,
         ref: any,
     ) => {
+        const { bands } = useAudioSettings();
+
         const player1Ref = useRef<ReactPlayer>(null);
         const player2Ref = useRef<ReactPlayer>(null);
         const [isTransitioning, setIsTransitioning] = useState(false);
@@ -122,9 +129,22 @@ export const AudioPlayer = forwardRef(
                     sampleRate: playback.audioSampleRateHz || undefined,
                 });
                 const gain = context.createGain();
-                gain.connect(context.destination);
+                const filters: BiquadFilterNode[] = [];
 
-                setWebAudio({ context, gain });
+                let priorNode = gain;
+
+                for (let i = 0; i < AudioFrequencies.length; i += 1) {
+                    const filter = context.createBiquadFilter();
+                    filter.type = 'peaking';
+                    filter.Q.value = AudioFrequencies[i].quality;
+                    priorNode.connect(filter);
+                    priorNode = filter;
+                    filters.push(filter);
+                }
+
+                priorNode.connect(context.destination);
+
+                setWebAudio({ context, filters, gain });
 
                 return () => {
                     return context.close();
@@ -134,6 +154,14 @@ export const AudioPlayer = forwardRef(
             // Intentionally ignore the sample rate dependency, as it makes things really messy
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, []);
+
+        useEffect(() => {
+            if (webAudio) {
+                bands.forEach((band, idx) => {
+                    webAudio.filters[idx].gain.value = band.gain;
+                });
+            }
+        }, [bands, webAudio]);
 
         useImperativeHandle(ref, () => ({
             get player1() {
