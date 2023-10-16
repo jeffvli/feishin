@@ -1,10 +1,7 @@
-import type { AudioBand } from '/@/renderer/store';
+import { AudioBand } from '/@/renderer/utils/audio-info';
 
 export const bandsToAudioFilter = (bands: AudioBand[]): string => {
     return bands
-        .map(
-            (info) =>
-                `lavfi=[equalizer=f=${info.frequency}:width_type=o:w=${info.quality}:g=${info.gain}]`,
-        )
+        .map((info) => `lavfi=[equalizer=f=${info.frequency}:width_type=o:w=0.3333:g=${info.gain}]`)
         .join(',');
 };

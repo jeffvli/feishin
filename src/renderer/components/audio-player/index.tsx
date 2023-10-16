@@ -7,13 +7,10 @@ import {
     crossfadeHandler,
     gaplessHandler,
 } from '/@/renderer/components/audio-player/utils/list-handlers';
-import {
-    AudioFrequencies,
-    useAudioSettings,
-    useSettingsStore,
-} from '/@/renderer/store/settings.store';
+import { useAudioSettings, useSettingsStore } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
+import { AudioFrequencies, AudioQuality } from '/@/renderer/utils';
 
 interface AudioPlayerProps extends ReactPlayerProps {
     crossfadeDuration: number;
@@ -135,8 +132,9 @@ export const AudioPlayer = forwardRef(
 
                 for (let i = 0; i < AudioFrequencies.length; i += 1) {
                     const filter = context.createBiquadFilter();
+                    filter.frequency.value = AudioFrequencies[i];
                     filter.type = 'peaking';
-                    filter.Q.value = AudioFrequencies[i].quality;
+                    filter.Q.value = AudioQuality;
                     priorNode.connect(filter);
                     priorNode = filter;
                     filters.push(filter);

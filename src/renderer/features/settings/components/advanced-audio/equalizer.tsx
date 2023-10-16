@@ -1,11 +1,11 @@
 import { Grid } from '@mantine/core';
 import { EqualizerSlider } from '/@/renderer/features/settings/components/advanced-audio/eqalizer-slider';
-import { AudioFrequencies, useAudioSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { useAudioSettings, useSettingsStoreActions } from '/@/renderer/store';
 import isElectron from 'is-electron';
 import { useCallback } from 'react';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 import { Button } from '/@/renderer/components';
-import { bandsToAudioFilter } from '/@/renderer/utils';
+import { AudioFrequencies, bandsToAudioFilter } from '/@/renderer/utils';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
@@ -35,8 +35,8 @@ export const Equalizer = () => {
     );
 
     const resetBand = useCallback(() => {
-        const bands = AudioFrequencies.map((info) => ({
-            ...info,
+        const bands = AudioFrequencies.map((frequency) => ({
+            frequency,
             gain: 0,
         }));
 

@@ -20,7 +20,7 @@ import {
     TableType,
     Platform,
 } from '/@/renderer/types';
-import { randomString } from '/@/renderer/utils';
+import { AudioBand, AudioFrequencies, randomString } from '/@/renderer/utils';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -110,23 +110,6 @@ export enum BindingActions {
     ZOOM_OUT = 'zoomOut',
 }
 
-export type BandInfo = {
-    frequency: number;
-    quality: number;
-};
-
-export type AudioBand = {
-    gain: number;
-} & BandInfo;
-
-export const AudioFrequencies: BandInfo[] = [
-    { frequency: 63, quality: 0.35555555555555557 }, // 20-200
-    { frequency: 400, quality: 0.6666666666666666 }, // 200-800
-    { frequency: 1250, quality: 1.0416666666666667 }, // 800-2000
-    { frequency: 2830, quality: 1.415 }, // 2000 - 4000
-    { frequency: 5600, quality: 1.4 }, // 4000-8000
-    { frequency: 12500, quality: 1.0416666666666667 }, // 8000-20000
-];
 export interface SettingsState {
     audio: {
         bands: AudioBand[];
@@ -229,8 +212,8 @@ const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle
 
 const initialState: SettingsState = {
     audio: {
-        bands: AudioFrequencies.map((info) => ({
-            ...info,
+        bands: AudioFrequencies.map((frequency) => ({
+            frequency,
             gain: 0,
         })),
     },
