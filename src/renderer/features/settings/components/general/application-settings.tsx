@@ -1,3 +1,4 @@
+import type { IpcRendererEvent } from 'electron';
 import isElectron from 'is-electron';
 import { FileInput, NumberInput, Select, toast } from '/@/renderer/components';
 import {
@@ -9,10 +10,11 @@ import {
     useGeneralSettings,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FontType } from '/@/renderer/types';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
+const ipc = isElectron() ? window.electron.ipc : null;
 
 type Font = {
     label: string;
@@ -55,6 +57,34 @@ export const ApplicationSettings = () => {
         }
         return null;
     }, [fontSettings.custom]);
+
+    const onFontError = useCallback(
+        (_: IpcRendererEvent, file: string) => {
+            toast.error({
+                message: `${file} is not a valid font file`,
+            });
+
+            setSettings({
+                font: {
+                    ...fontSettings,
+                    custom: null,
+                },
+            });
+        },
+        [fontSettings, setSettings],
+    );
+
+    useEffect(() => {
+        if (localSettings) {
+            localSettings.fontError(onFontError);
+
+            return () => {
+                ipc!.removeAllListeners('custom-font-error');
+            };
+        }
+
+        return () => {};
+    }, [onFontError]);
 
     useEffect(() => {
         const getFonts = async () => {
