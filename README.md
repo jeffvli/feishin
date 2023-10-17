@@ -74,6 +74,8 @@ docker run --name feishin --port 9180:9180 feishin
 
 -   **Navidrome** - For the best experience, select "Save password" when creating the server and configure the `SessionTimeout` setting in your Navidrome config to a larger value (e.g. 72h).
 
+3. _Optional_ - If you want to host Feishin on a subpath (not `/`), then pass in the following environment variable: `PUBLIC_PATH=PATH`. For example, to host on `/feishin`, pass in `PUBLIC_PATH=/feishin`.
+
 ## FAQ
 
 ### MPV is either not working or is rapidly switching between pause/play states
