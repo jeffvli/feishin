@@ -41,6 +41,12 @@ export const ApplicationSettings = () => {
         const getFonts = async () => {
             if (fontSettings.useSystem && localFonts.length === 0 && window.queryLocalFonts) {
                 try {
+                    const status = await navigator.permissions.query({ name: 'local-fonts' });
+
+                    if (status.state === 'denied') {
+                        throw new Error('Access denied to local fonts');
+                    }
+
                     const data = await window.queryLocalFonts();
                     setLocalFonts(
                         data.map((font) => ({
