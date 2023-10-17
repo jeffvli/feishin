@@ -128,7 +128,7 @@ const endpoints: ApiController = {
         getPlaylistList: jfController.getPlaylistList,
         getPlaylistSongList: jfController.getPlaylistSongList,
         getRandomSongList: jfController.getRandomSongList,
-        getSongDetail: undefined,
+        getSongDetail: jfController.getSongDetail,
         getSongList: jfController.getSongList,
         getTopSongs: jfController.getTopSongList,
         getUserList: undefined,
