@@ -1,6 +1,5 @@
-import { Switch } from '@mantine/core';
 import isElectron from 'is-electron';
-import { NumberInput, Select, toast } from '/@/renderer/components';
+import { FileInput, NumberInput, Select, toast } from '/@/renderer/components';
 import {
     SettingsSection,
     SettingOption,
@@ -10,7 +9,8 @@ import {
     useGeneralSettings,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { FontType } from '/@/renderer/types';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -31,16 +31,42 @@ const FONT_OPTIONS: Font[] = [
     { label: 'Work Sans', value: 'Work Sans' },
 ];
 
+const FONT_TYPES: Font[] = [{ label: 'Built-in font', value: FontType.BUILT_IN }];
+
+if (window.queryLocalFonts) {
+    FONT_TYPES.push({ label: 'System font', value: FontType.SYSTEM });
+}
+
+if (isElectron()) {
+    FONT_TYPES.push({ label: 'Custom font', value: FontType.CUSTOM });
+}
+
 export const ApplicationSettings = () => {
     const settings = useGeneralSettings();
     const fontSettings = useFontSettings();
     const { setSettings } = useSettingsStoreActions();
     const [localFonts, setLocalFonts] = useState<Font[]>([]);
 
+    const fontList = useMemo(() => {
+        if (fontSettings.custom) {
+            const newFile = new File([], fontSettings.custom.split(/(\\|\/)/g).pop()!);
+            newFile.path = fontSettings.custom;
+            return newFile;
+        }
+        return null;
+    }, [fontSettings.custom]);
+
     useEffect(() => {
         const getFonts = async () => {
-            if (fontSettings.useSystem && localFonts.length === 0 && window.queryLocalFonts) {
+            if (
+                fontSettings.type === FontType.SYSTEM &&
+                localFonts.length === 0 &&
+                window.queryLocalFonts
+            ) {
                 try {
+                    // WARNING (Oct 17 2023): while this query is valid for chromium-based
+                    // browsers, it is still experimental, and so Typescript will complain
+                    // @ts-ignore
                     const status = await navigator.permissions.query({ name: 'local-fonts' });
 
                     if (status.state === 'denied') {
@@ -62,7 +88,7 @@ export const ApplicationSettings = () => {
                     setSettings({
                         font: {
                             ...fontSettings,
-                            useSystem: false,
+                            type: FontType.BUILT_IN,
                         },
                     });
                 }
@@ -85,20 +111,23 @@ export const ApplicationSettings = () => {
         },
         {
             control: (
-                <Switch
-                    defaultChecked={fontSettings.useSystem}
+                <Select
+                    data={FONT_TYPES}
+                    value={fontSettings.type}
                     onChange={(e) => {
+                        if (!e) return;
                         setSettings({
                             font: {
                                 ...fontSettings,
-                                useSystem: e.currentTarget.checked,
+                                type: e as FontType,
                             },
                         });
                     }}
                 />
             ),
-            description: 'Whether to select from system fonts, or built-in fonts',
-            isHidden: !window.queryLocalFonts,
+            description:
+                'What font to use. Built-in font selects one of the fonts provided by Feishin. System font allows you to select any font provided by your OS. Custom allows you to provide your own font',
+            isHidden: FONT_TYPES.length === 1,
             title: 'Use system font',
         },
         {
@@ -119,7 +148,7 @@ export const ApplicationSettings = () => {
                 />
             ),
             description: 'Sets the application content font',
-            isHidden: localFonts && fontSettings.useSystem,
+            isHidden: localFonts && fontSettings.type !== FontType.BUILT_IN,
             title: 'Font (Content)',
         },
         {
@@ -141,8 +170,28 @@ export const ApplicationSettings = () => {
                 />
             ),
             description: 'Sets the application content font',
-            isHidden: !localFonts || !fontSettings.useSystem,
+            isHidden: !localFonts || fontSettings.type !== FontType.SYSTEM,
             title: 'Font (Content)',
+        },
+        {
+            control: (
+                <FileInput
+                    accept=".ttc,.ttf,.otf,.woff,.woff2"
+                    defaultValue={fontList}
+                    w={300}
+                    onChange={(e) =>
+                        setSettings({
+                            font: {
+                                ...fontSettings,
+                                custom: e?.path ?? null,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: 'Path to custom font',
+            isHidden: fontSettings.type !== FontType.CUSTOM,
+            title: 'Path to custom font',
         },
         {
             control: (

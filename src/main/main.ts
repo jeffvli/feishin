@@ -21,6 +21,8 @@ import {
     Menu,
     nativeImage,
     BrowserWindowConstructorOptions,
+    protocol,
+    net,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log';
@@ -42,6 +44,8 @@ export default class AppUpdater {
         autoUpdater.checkForUpdatesAndNotify();
     }
 }
+
+protocol.registerSchemesAsPrivileged([{ privileges: { bypassCSP: true }, scheme: 'feishin' }]);
 
 process.on('uncaughtException', (error: any) => {
     console.log('Error in main process', error);
@@ -655,6 +659,10 @@ app.on('window-all-closed', () => {
 
 app.whenReady()
     .then(() => {
+        protocol.handle('feishin', (request) => {
+            return net.fetch(`file://${request.url.slice('feishin://'.length)}`);
+        });
+
         createWindow();
         createTray();
         app.on('activate', () => {

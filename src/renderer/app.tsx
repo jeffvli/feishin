@@ -23,7 +23,7 @@ import { PlayQueueHandlerContext } from '/@/renderer/features/player';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
 import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
-import { PlaybackType, PlayerStatus } from '/@/renderer/types';
+import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
 import '@ag-grid-community/styles/ag-grid.css';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
@@ -37,7 +37,7 @@ const remote = isElectron() ? window.electron.remote : null;
 
 export const App = () => {
     const theme = useTheme();
-    const { builtIn, system, useSystem } = useSettingsStore((state) => state.font);
+    const { builtIn, custom, system, type } = useSettingsStore((state) => state.font);
     const { type: playbackType } = usePlaybackSettings();
     const { bindings } = useHotkeySettings();
     const handlePlayQueueAdd = useHandlePlayQueueAdd();
@@ -46,7 +46,7 @@ export const App = () => {
     const textStyleRef = useRef<HTMLStyleElement>();
 
     useEffect(() => {
-        if (useSystem && system) {
+        if (type === FontType.SYSTEM && system) {
             const root = document.documentElement;
             root.style.setProperty('--content-font-family', 'dynamic-font');
 
@@ -60,11 +60,25 @@ export const App = () => {
                 font-family: "dynamic-font";
                 src: local("${system}");
             }`;
+        } else if (type === FontType.CUSTOM && custom) {
+            const root = document.documentElement;
+            root.style.setProperty('--content-font-family', 'dynamic-font');
+
+            if (!textStyleRef.current) {
+                textStyleRef.current = document.createElement('style');
+                document.body.appendChild(textStyleRef.current);
+            }
+
+            textStyleRef.current.textContent = `
+            @font-face {
+                font-family: "dynamic-font";
+                src: url("feishin://${custom}");
+            }`;
         } else {
             const root = document.documentElement;
             root.style.setProperty('--content-font-family', builtIn);
         }
-    }, [builtIn, system, useSystem]);
+    }, [builtIn, custom, system, type]);
 
     const providerValue = useMemo(() => {
         return { handlePlayQueueAdd };

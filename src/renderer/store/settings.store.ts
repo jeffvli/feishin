@@ -19,6 +19,7 @@ import {
     PlaybackType,
     TableType,
     Platform,
+    FontType,
 } from '/@/renderer/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -113,8 +114,9 @@ export enum BindingActions {
 export interface SettingsState {
     font: {
         builtIn: string;
+        custom: string | null;
         system: string | null;
-        useSystem: boolean;
+        type: FontType;
     };
     general: {
         defaultFullPlaylist: boolean;
@@ -215,8 +217,9 @@ const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle
 const initialState: SettingsState = {
     font: {
         builtIn: 'Inter',
+        custom: null,
         system: null,
-        useSystem: false,
+        type: FontType.BUILT_IN,
     },
     general: {
         defaultFullPlaylist: true,
