@@ -98,7 +98,7 @@ export const AddToPlaylistContextModal = ({
     const handleSubmit = form.onSubmit(async (values) => {
         setIsLoading(true);
         const allSongIds: string[] = [];
-        const uniqueSongIds: string[] = [];
+        let totalUniquesAdded = 0;
 
         if (albumId && albumId.length > 0) {
             for (const id of albumId) {
@@ -129,6 +129,8 @@ export const AddToPlaylistContextModal = ({
         }
 
         for (const playlistId of values.playlistId) {
+            const uniqueSongIds: string[] = [];
+
             if (values.skipDuplicates) {
                 const query = {
                     id: playlistId,
@@ -155,6 +157,7 @@ export const AddToPlaylistContextModal = ({
                         uniqueSongIds.push(songId);
                     }
                 }
+                totalUniquesAdded += uniqueSongIds.length;
             }
 
             if (values.skipDuplicates ? uniqueSongIds.length > 0 : allSongIds.length > 0) {
@@ -180,11 +183,15 @@ export const AddToPlaylistContextModal = ({
             }
         }
 
+        const addMessage =
+            values.skipDuplicates &&
+            allSongIds.length * values.playlistId.length !== totalUniquesAdded
+                ? `around ${Math.floor(totalUniquesAdded / values.playlistId.length)}`
+                : allSongIds.length;
+
         setIsLoading(false);
         toast.success({
-            message: `Added ${
-                values.skipDuplicates ? uniqueSongIds.length : allSongIds.length
-            } songs to ${values.playlistId.length} playlist(s)`,
+            message: `Added ${addMessage} songs to ${values.playlistId.length} playlist(s)`,
         });
         closeModal(id);
         return null;
