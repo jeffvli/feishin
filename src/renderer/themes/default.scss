@@ -101,7 +101,6 @@
     --card-poster-bg-hover: transparent;
     --card-poster-radius: 3px;
     --background-noise: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1IiBkPSJNMCAwaDMwMHYzMDBIMHoiLz48L3N2Zz4=');
-    --current-song-image: url('data:image/svg+xml;base64,PHN2ZyBzdHJva2U9ImN1cnJlbnRDb2xvciIgZmlsbD0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgaGVpZ2h0PSIxLjJyZW0iIHdpZHRoPSIxLjJyZW0iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTIgMTYuMDAwMUg1Ljg4ODg5TDExLjE4MzQgMjAuMzMxOUMxMS4yNzI3IDIwLjQwNSAxMS4zODQ2IDIwLjQ0NDkgMTEuNSAyMC40NDQ5QzExLjc3NjEgMjAuNDQ0OSAxMiAyMC4yMjExIDEyIDE5Ljk0NDlWNC4wNTUxOUMxMiAzLjkzOTc3IDExLjk2MDEgMy44Mjc5IDExLjg4NyAzLjczODU3QzExLjcxMjEgMy41MjQ4NSAxMS4zOTcxIDMuNDkzMzUgMTEuMTgzNCAzLjY2ODIxTDUuODg4ODkgOC4wMDAwN0gyQzEuNDQ3NzIgOC4wMDAwNyAxIDguNDQ3NzggMSA5LjAwMDA3VjE1LjAwMDFDMSAxNS41NTI0IDEuNDQ3NzIgMTYuMDAwMSAyIDE2LjAwMDFaTTIzIDEyQzIzIDE1LjI5MiAyMS41NTM5IDE4LjI0NjMgMTkuMjYyMiAyMC4yNjIyTDE3Ljg0NDUgMTguODQ0NEMxOS43NzU4IDE3LjE5MzcgMjEgMTQuNzM5OCAyMSAxMkMyMSA5LjI2MDE2IDE5Ljc3NTggNi44MDYyOSAxNy44NDQ1IDUuMTU1NTdMMTkuMjYyMiAzLjczNzc5QzIxLjU1MzkgNS43NTM2OCAyMyA4LjcwNzk1IDIzIDEyWk0xOCAxMkMxOCAxMC4wODgzIDE3LjEwNiA4LjM4NTQ4IDE1LjcxMzMgNy4yODY3M0wxNC4yODQyIDguNzE1ODRDMTUuMzIxMyA5LjQzODU1IDE2IDEwLjY0IDE2IDEyQzE2IDEzLjM2IDE1LjMyMTMgMTQuNTYxNCAxNC4yODQyIDE1LjI4NDFMMTUuNzEzMyAxNi43MTMyQzE3LjEwNiAxNS42MTQ1IDE4IDEzLjkxMTYgMTggMTJaIi8+PC9zdmc+');
     --bg-header-overlay: linear-gradient(transparent 0%, rgba(0, 0, 0, 50%) 100%),
         var(--background-noise);
     --bg-subheader-overlay: linear-gradient(180deg, rgba(0, 0, 0, 5%) 0%, var(--main-bg) 100%),
@@ -190,29 +189,5 @@
         .current-song-child {
             color: var(--primary-color) !important;
         }
-    }
-
-    .current-song > .row-index > ::before,
-    .album-table .current-song .track-number > ::before {
-        @keyframes pulse {
-            0% {
-                opacity: 0.5;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0.5;
-            }
-        }
-        display: block;
-        margin-right: 3px;
-        height: 19px;
-        width: 19px;
-        content: '';
-        background-color: var(--primary-color);
-        mask-image: var(--current-song-image);
-        -webkit-mask-image: var(--current-song-image);
-        animation: pulse 3s infinite;
     }
 }
