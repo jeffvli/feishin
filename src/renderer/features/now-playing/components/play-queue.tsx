@@ -11,6 +11,7 @@ import '@ag-grid-community/styles/ag-theme-alpine.css';
 import {
     useAppStoreActions,
     useCurrentSong,
+    useCurrentStatus,
     useDefaultQueue,
     usePlayerControls,
     usePreviousSong,
@@ -49,6 +50,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     const { reorderQueue, setCurrentTrack } = useQueueControls();
     const currentSong = useCurrentSong();
     const previousSong = usePreviousSong();
+    const status = useCurrentStatus();
     const { setSettings } = useSettingsStoreActions();
     const { setAppStore } = useAppStoreActions();
     const tableConfig = useTableSettings(type);
@@ -204,7 +206,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
                 }
             }
         }
-    }, [currentSong, previousSong, tableConfig.followCurrentSong]);
+    }, [currentSong, previousSong, tableConfig.followCurrentSong, status]);
 
     const onCellContextMenu = useHandleTableContextMenu(LibraryItem.SONG, QUEUE_CONTEXT_MENU_ITEMS);
 
