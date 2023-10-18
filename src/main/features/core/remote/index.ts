@@ -6,6 +6,7 @@ import { deflate, gzip } from 'zlib';
 import axios from 'axios';
 import { app, ipcMain } from 'electron';
 import { Server as WsServer, WebSocketServer, WebSocket } from 'ws';
+import manifest from './manifest.json';
 import { ClientEvent, ServerEvent } from '../../../../remote/types';
 import { PlayerRepeat, SongUpdate } from '../../../../renderer/types';
 import { getMainWindow } from '../../../main';
@@ -297,6 +298,12 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                             await serveFile(req, 'remote', 'js', res);
                             break;
                         }
+                        case '/manifest.json': {
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.end(JSON.stringify(manifest));
+                            break;
+                        }
                         case '/credentials': {
                             res.statusCode = 200;
                             res.setHeader('Content-Type', 'text/plain');
@@ -304,9 +311,13 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                             break;
                         }
                         default: {
-                            res.statusCode = 404;
-                            res.setHeader('Content-Type', 'text/plain');
-                            res.end('Not FOund');
+                            if (req.url?.startsWith('/worker.js')) {
+                                await serveFile(req, 'worker', 'js', res);
+                            } else {
+                                res.statusCode = 404;
+                                res.setHeader('Content-Type', 'text/plain');
+                                res.end('Not Found');
+                            }
                         }
                     }
                 } catch (error) {
