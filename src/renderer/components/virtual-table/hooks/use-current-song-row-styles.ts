@@ -1,9 +1,10 @@
+import { MutableRefObject, useEffect, useMemo, useRef } from 'react';
 import { RowClassRules, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { MutableRefObject, useEffect, useMemo, useRef } from 'react';
 import { Song } from '/@/renderer/api/types';
 import { useAppFocus } from '/@/renderer/hooks';
 import { useCurrentSong, usePlayerStore } from '/@/renderer/store';
+import { PlayerStatus } from '/@/renderer/types';
 
 interface UseCurrentSongRowStylesProps {
     tableRef: MutableRefObject<AgGridReactType | null>;
@@ -75,8 +76,10 @@ export const useCurrentSongRowStyles = ({ tableRef }: UseCurrentSongRowStylesPro
 
         // Redraw song rows when the status changes
         const unsubStatusChange = usePlayerStore.subscribe(
-            (state) => state.current.song,
-            (song, previousSong) => {
+            (state) => [state.current.status, state.current.song],
+            (current: (PlayerStatus | Song | undefined)[]) => {
+                const song = current[1] as Song;
+
                 if (tableRef?.current) {
                     const { api, columnApi } = tableRef?.current || {};
                     if (api == null || columnApi == null) {
@@ -84,19 +87,14 @@ export const useCurrentSongRowStyles = ({ tableRef }: UseCurrentSongRowStylesPro
                     }
 
                     const currentNode = song?.id ? api.getRowNode(song.id) : undefined;
-
-                    const previousNode = previousSong?.id
-                        ? api.getRowNode(previousSong?.id)
-                        : undefined;
-
-                    const rowNodes = [currentNode, previousNode].filter(
-                        (e) => e !== undefined,
-                    ) as RowNode<any>[];
+                    const rowNodes = [currentNode].filter((e) => e !== undefined) as RowNode<any>[];
 
                     api.redrawRows({ rowNodes });
                 }
             },
-            { equalityFn: (a, b) => a?.id === b?.id },
+            {
+                equalityFn: (a, b) => (a[0] as PlayerStatus) === (b[0] as PlayerStatus),
+            },
         );
 
         return () => {
