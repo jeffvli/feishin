@@ -8,7 +8,8 @@ import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/ho
 import { useVirtualTable } from '/@/renderer/components/virtual-table/hooks/use-virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-import { useCurrentServer, usePlayButtonBehavior } from '/@/renderer/store';
+import { useAppFocus } from '/@/renderer/hooks';
+import { useCurrentServer, useCurrentStatus, usePlayButtonBehavior } from '/@/renderer/store';
 
 interface SongListTableViewProps {
     itemCount?: number;
@@ -18,6 +19,8 @@ interface SongListTableViewProps {
 export const SongListTableView = ({ tableRef, itemCount }: SongListTableViewProps) => {
     const server = useCurrentServer();
     const { pageKey, id, handlePlay, customFilters } = useListContext();
+    const isFocused = useAppFocus();
+    const status = useCurrentStatus();
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
@@ -46,6 +49,11 @@ export const SongListTableView = ({ tableRef, itemCount }: SongListTableViewProp
                 key={`table-${tableProps.rowHeight}-${server?.id}`}
                 ref={tableRef}
                 {...tableProps}
+                context={{
+                    ...tableProps.context,
+                    isFocused,
+                    status,
+                }}
                 rowClassRules={rowClassRules}
                 onRowDoubleClicked={handleRowDoubleClick}
             />
