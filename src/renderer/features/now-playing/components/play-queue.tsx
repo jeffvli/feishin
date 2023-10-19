@@ -73,7 +73,10 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
         },
     }));
 
-    const columnDefs = useMemo(() => getColumnDefs(tableConfig.columns), [tableConfig.columns]);
+    const columnDefs = useMemo(
+        () => getColumnDefs(tableConfig.columns, false, 'generic'),
+        [tableConfig.columns],
+    );
 
     const handleDoubleClick = (e: CellDoubleClickedEvent) => {
         const playerData = setCurrentTrack(e.data.uniqueId);
