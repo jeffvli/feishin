@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import formatDuration from 'format-duration';
 import { AnimatePresence } from 'framer-motion';
+import isElectron from 'is-electron';
 import { generatePath } from 'react-router';
 import styled from 'styled-components';
 import { AlbumArtistCell } from '/@/renderer/components/virtual-table/cells/album-artist-cell';
@@ -268,7 +269,7 @@ const tableColumns: { [key: string]: ColDef } = {
         cellClass: 'row-index',
         cellClassRules: {
             focused: (params) => {
-                return params.context?.isFocused;
+                return isElectron() && params.context?.isFocused;
             },
             playing: (params) => {
                 return params.context?.status === PlayerStatus.PLAYING;
@@ -341,7 +342,7 @@ const tableColumns: { [key: string]: ColDef } = {
         cellClass: 'row-index',
         cellClassRules: {
             focused: (params) => {
-                return params.context?.isFocused;
+                return isElectron() && params.context?.isFocused;
             },
             playing: (params) => {
                 return params.context?.status === PlayerStatus.PLAYING;
