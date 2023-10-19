@@ -196,30 +196,4 @@
     .current-song > .row-index.playing .current-song-index {
         display: none;
     }
-
-    .current-song > .row-index.playing.focused ::before {
-        content: ' ';
-        display: block;
-        height: 1rem;
-        width: 1rem;
-        background-color: var(--primary-color);
-        -webkit-mask-image: var(--current-song-image-animated);
-        -webkit-mask-repeat: no-repeat;
-        mask-repeat: no-repeat;
-        transform: rotate(180deg);
-        mask-image: var(--current-song-image-animated);
-    }
-
-    .current-song > .row-index.playing ::before {
-        content: ' ';
-        display: block;
-        height: 1rem;
-        width: 1rem;
-        background-color: var(--primary-color);
-        -webkit-mask-image: var(--current-song-image);
-        -webkit-mask-repeat: no-repeat;
-        mask-repeat: no-repeat;
-        transform: rotate(180deg);
-        mask-image: var(--current-song-image);
-    }
 }

@@ -223,6 +223,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
                     autoFitColumns={tableConfig.autoFit}
                     columnDefs={columnDefs}
                     context={{
+                        currentSong,
                         isFocused,
                         onCellContextMenu,
                         status,

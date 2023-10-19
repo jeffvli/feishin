@@ -19,7 +19,6 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import formatDuration from 'format-duration';
 import { AnimatePresence } from 'framer-motion';
-import isElectron from 'is-electron';
 import { generatePath } from 'react-router';
 import styled from 'styled-components';
 import { AlbumArtistCell } from '/@/renderer/components/virtual-table/cells/album-artist-cell';
@@ -268,8 +267,40 @@ const tableColumns: { [key: string]: ColDef } = {
     rowIndex: {
         cellClass: 'row-index',
         cellClassRules: {
+            'current-playlist-song': (params) => {
+                return params.data?.uniqueId === params.context?.currentSong?.uniqueId;
+            },
+            'current-song': (params) => {
+                return params.data?.uniqueId === params.context?.currentSong?.uniqueId;
+            },
             focused: (params) => {
-                return isElectron() && params.context?.isFocused;
+                return params.context?.isFocused;
+            },
+            playing: (params) => {
+                return params.context?.status === PlayerStatus.PLAYING;
+            },
+        },
+        cellRenderer: RowIndexCell,
+        colId: TableColumn.ROW_INDEX,
+        headerComponent: (params: IHeaderParams) =>
+            GenericTableHeader(params, { position: 'right', preset: 'rowIndex' }),
+        suppressSizeToFit: true,
+        valueGetter: (params) => {
+            return (params.node?.rowIndex || 0) + 1;
+        },
+        width: 65,
+    },
+    rowIndexGeneric: {
+        cellClass: 'row-index',
+        cellClassRules: {
+            'current-song': (params) => {
+                return (
+                    params.data?.id === params.context?.currentSong?.id &&
+                    params.data?.albumId === params.context?.currentSong?.albumId
+                );
+            },
+            focused: (params) => {
+                return params.context?.isFocused;
             },
             playing: (params) => {
                 return params.context?.status === PlayerStatus.PLAYING;
@@ -341,8 +372,14 @@ const tableColumns: { [key: string]: ColDef } = {
     trackNumberDetail: {
         cellClass: 'row-index',
         cellClassRules: {
+            'current-song': (params) => {
+                return (
+                    params.data?.id === params.context?.currentSong?.id &&
+                    params.data?.albumId === params.context?.currentSong?.albumId
+                );
+            },
             focused: (params) => {
-                return isElectron() && params.context?.isFocused;
+                return params.context?.isFocused;
             },
             playing: (params) => {
                 return params.context?.status === PlayerStatus.PLAYING;
@@ -394,14 +431,18 @@ export const getColumnDef = (column: TableColumn) => {
 export const getColumnDefs = (
     columns: PersistedTableColumn[],
     useWidth?: boolean,
-    type?: 'albumDetail',
+    type?: 'albumDetail' | 'generic',
 ) => {
     const columnDefs: ColDef[] = [];
     for (const column of columns) {
         let presetColumn = tableColumns[column.column as keyof typeof tableColumns];
 
-        if (type === 'albumDetail' && column.column === TableColumn.TRACK_NUMBER) {
+        if (column.column === TableColumn.TRACK_NUMBER && type === 'albumDetail') {
             presetColumn = tableColumns['trackNumberDetail' as keyof typeof tableColumns];
+        }
+
+        if (column.column === TableColumn.ROW_INDEX && type === 'generic') {
+            presetColumn = tableColumns['rowIndexGeneric' as keyof typeof tableColumns];
         }
 
         if (presetColumn) {

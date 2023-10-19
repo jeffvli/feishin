@@ -33,7 +33,7 @@ import { PlayButton, useCreateFavorite, useDeleteFavorite } from '/@/renderer/fe
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { useAppFocus, useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useCurrentStatus } from '/@/renderer/store';
+import { useCurrentServer, useCurrentSong, useCurrentStatus } from '/@/renderer/store';
 import {
     usePlayButtonBehavior,
     useSettingsStoreActions,
@@ -72,6 +72,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     const { setTable } = useSettingsStoreActions();
     const status = useCurrentStatus();
     const isFocused = useAppFocus();
+    const currentSong = useCurrentSong();
 
     const columnDefs = useMemo(
         () => getColumnDefs(tableConfig.columns, false, 'albumDetail'),
@@ -401,6 +402,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         autoFitColumns={tableConfig.autoFit}
                         columnDefs={columnDefs}
                         context={{
+                            currentSong,
                             isFocused,
                             onCellContextMenu,
                             status,

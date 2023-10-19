@@ -34,6 +34,7 @@ import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playli
 import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
 import {
     useCurrentServer,
+    useCurrentSong,
     useCurrentStatus,
     usePlaylistDetailStore,
     usePlaylistDetailTablePagination,
@@ -53,6 +54,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     const queryClient = useQueryClient();
     const status = useCurrentStatus();
     const isFocused = useAppFocus();
+    const currentSong = useCurrentSong();
     const server = useCurrentServer();
     const page = usePlaylistDetailStore();
     const filters: Partial<PlaylistSongListQuery> = useMemo(() => {
@@ -90,7 +92,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     });
 
     const columnDefs: ColDef[] = useMemo(
-        () => getColumnDefs(page.table.columns),
+        () => getColumnDefs(page.table.columns, false, 'generic'),
         [page.table.columns],
     );
 
@@ -241,6 +243,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     autoFitColumns={page.table.autoFit}
                     columnDefs={columnDefs}
                     context={{
+                        currentSong,
                         isFocused,
                         onCellContextMenu: handleContextMenu,
                         status,

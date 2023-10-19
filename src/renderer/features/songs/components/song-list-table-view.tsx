@@ -9,7 +9,12 @@ import { useVirtualTable } from '/@/renderer/components/virtual-table/hooks/use-
 import { useListContext } from '/@/renderer/context/list-context';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { useAppFocus } from '/@/renderer/hooks';
-import { useCurrentServer, useCurrentStatus, usePlayButtonBehavior } from '/@/renderer/store';
+import {
+    useCurrentServer,
+    useCurrentSong,
+    useCurrentStatus,
+    usePlayButtonBehavior,
+} from '/@/renderer/store';
 
 interface SongListTableViewProps {
     itemCount?: number;
@@ -20,11 +25,13 @@ export const SongListTableView = ({ tableRef, itemCount }: SongListTableViewProp
     const server = useCurrentServer();
     const { pageKey, id, handlePlay, customFilters } = useListContext();
     const isFocused = useAppFocus();
+    const currentSong = useCurrentSong();
     const status = useCurrentStatus();
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
     const tableProps = useVirtualTable<SongListQuery>({
+        columnType: 'generic',
         contextMenu: SONG_CONTEXT_MENU_ITEMS,
         customFilters,
         isSearchParams: Boolean(id),
@@ -51,6 +58,7 @@ export const SongListTableView = ({ tableRef, itemCount }: SongListTableViewProp
                 {...tableProps}
                 context={{
                     ...tableProps.context,
+                    currentSong,
                     isFocused,
                     status,
                 }}
