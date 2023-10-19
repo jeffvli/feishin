@@ -282,7 +282,7 @@ const tableColumns: { [key: string]: ColDef } = {
         valueGetter: (params) => {
             return (params.node?.rowIndex || 0) + 1;
         },
-        width: 80,
+        width: 65,
     },
     songCount: {
         cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
