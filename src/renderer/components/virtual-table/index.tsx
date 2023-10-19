@@ -266,21 +266,7 @@ const tableColumns: { [key: string]: ColDef } = {
     },
     rowIndex: {
         cellClass: 'row-index',
-        cellClassRules: {
-            'current-playlist-song': (params) => {
-                return params.data?.uniqueId === params.context?.currentSong?.uniqueId;
-            },
-            'current-song': (params) => {
-                return params.data?.uniqueId === params.context?.currentSong?.uniqueId;
-            },
-            focused: (params) => {
-                return params.context?.isFocused;
-            },
-            playing: (params) => {
-                return params.context?.status === PlayerStatus.PLAYING;
-            },
-        },
-        cellRenderer: RowIndexCell,
+        cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'right' }),
         colId: TableColumn.ROW_INDEX,
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'right', preset: 'rowIndex' }),
@@ -293,7 +279,10 @@ const tableColumns: { [key: string]: ColDef } = {
     rowIndexGeneric: {
         cellClass: 'row-index',
         cellClassRules: {
-            'current-song': (params) => {
+            'current-playlist-song-cell': (params) => {
+                return params.data?.uniqueId === params.context?.currentSong?.uniqueId;
+            },
+            'current-song-cell': (params) => {
                 return (
                     params.data?.id === params.context?.currentSong?.id &&
                     params.data?.albumId === params.context?.currentSong?.albumId
@@ -372,7 +361,7 @@ const tableColumns: { [key: string]: ColDef } = {
     trackNumberDetail: {
         cellClass: 'row-index',
         cellClassRules: {
-            'current-song': (params) => {
+            'current-song-cell': (params) => {
                 return (
                     params.data?.id === params.context?.currentSong?.id &&
                     params.data?.albumId === params.context?.currentSong?.albumId

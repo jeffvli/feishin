@@ -137,7 +137,7 @@ export const RowIndexCell = ({ value, eGridCell }: ICellRendererParams) => {
     const isFocused = classList.contains('focused');
     const isPlaying = classList.contains('playing');
     const isCurrentSong =
-        classList.contains('current-song') || classList.contains('current-playlist-song');
+        classList.contains('current-song-cell') || classList.contains('current-playlist-song-cell');
 
     return (
         <CellContainer $position="right">
