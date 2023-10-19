@@ -345,6 +345,10 @@ const initialState: SettingsState = {
             autoFit: true,
             columns: [
                 {
+                    column: TableColumn.ROW_INDEX,
+                    width: 80,
+                },
+                {
                     column: TableColumn.TITLE_COMBINED,
                     width: 500,
                 },
@@ -365,7 +369,7 @@ const initialState: SettingsState = {
             columns: [
                 {
                     column: TableColumn.ROW_INDEX,
-                    width: 50,
+                    width: 80,
                 },
                 {
                     column: TableColumn.TITLE,
