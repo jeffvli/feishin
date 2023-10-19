@@ -203,3 +203,9 @@ export type SongUpdate = {
     /** This volume is in range 0-100 */
     volume?: number;
 };
+
+export type WebAudio = {
+    analyzer: AnalyserNode;
+    context: AudioContext;
+    gain: GainNode;
+};

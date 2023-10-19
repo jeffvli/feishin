@@ -262,6 +262,7 @@
         "@ag-grid-community/react": "^28.2.1",
         "@ag-grid-community/styles": "^28.2.1",
         "@emotion/react": "^11.10.4",
+        "@foobar404/wave": "github:kgarner7/wave.js#fc9d339c49d1f7da44238f026c4a6870a36df9f6",
         "@mantine/core": "^6.0.17",
         "@mantine/dates": "^6.0.17",
         "@mantine/form": "^6.0.17",
