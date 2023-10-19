@@ -191,8 +191,9 @@ export const useCenterControls = (args: { playersRef: any }) => {
             return mpvPlayer?.setQueueNext(playerData);
         }
 
+        const playerData = setRepeat(PlayerRepeat.NONE);
         remote?.updateRepeat(PlayerRepeat.NONE);
-        return setRepeat(PlayerRepeat.NONE);
+        return mpvPlayer?.setQueueNext(playerData);
     }, [repeatStatus, setRepeat]);
 
     const checkIsLastTrack = useCallback(() => {

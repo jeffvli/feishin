@@ -194,7 +194,6 @@ export const useRemoteStore = create<SettingsSlice>()(
                         });
                     },
                     send: (data: ClientEvent) => {
-                        console.log(data, get().socket);
                         get().socket?.send(JSON.stringify(data));
                     },
                     toggleIsDark: () => {

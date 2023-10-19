@@ -28,16 +28,19 @@ export const RemoteSettings = () => {
                 title: enabled ? 'Error enabling remote' : 'Error disabling remote',
             });
         }
-    }, 100);
+    }, 50);
 
     const debouncedChangeRemotePort = debounce(async (port: number) => {
         const errorMsg = await remote!.setRemotePort(port);
-        if (errorMsg === null) {
+        if (!errorMsg) {
             setSettings({
                 remote: {
                     ...settings,
                     port,
                 },
+            });
+            toast.warn({
+                message: 'To have your port change take effect, stop and restart the server',
             });
         } else {
             toast.error({
@@ -45,7 +48,7 @@ export const RemoteSettings = () => {
                 title: 'Error setting port',
             });
         }
-    });
+    }, 100);
 
     const isHidden = !isElectron();
 
