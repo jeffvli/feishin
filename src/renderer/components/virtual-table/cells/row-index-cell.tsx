@@ -133,14 +133,20 @@ const StaticSvg = () => {
 };
 
 export const RowIndexCell = ({ value, eGridCell }: ICellRendererParams) => {
-    const isFocused = eGridCell.classList.contains('focused');
+    const classList = eGridCell.classList;
+    const isFocused = classList.contains('focused');
+    const isPlaying = classList.contains('playing');
     const isCurrentSong =
-        eGridCell.classList.contains('current-song') ||
-        eGridCell.classList.contains('current-playlist-song');
+        classList.contains('current-song') || classList.contains('current-playlist-song');
 
     return (
         <CellContainer $position="right">
-            {isFocused && isCurrentSong ? <AnimatedSvg /> : isCurrentSong ? <StaticSvg /> : null}
+            {isPlaying &&
+                (isFocused && isCurrentSong ? (
+                    <AnimatedSvg />
+                ) : isCurrentSong ? (
+                    <StaticSvg />
+                ) : null)}
             <Text
                 $secondary
                 align="right"
