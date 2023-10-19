@@ -7,3 +7,5 @@ export * from './get-header-color';
 export * from './parse-search-params';
 export * from './format-duration-string';
 export * from './rgb-to-rgba';
+export * from './bands-to-audio-filter';
+export * from './audio-info';

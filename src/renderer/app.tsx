@@ -25,6 +25,7 @@ import { getMpvProperties } from '/@/renderer/features/settings/components/playb
 import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
 import { PlaybackType, PlayerStatus } from '/@/renderer/types';
 import '@ag-grid-community/styles/ag-grid.css';
+import { bandsToAudioFilter } from '/@/renderer/utils';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -38,6 +39,7 @@ const remote = isElectron() ? window.electron.remote : null;
 export const App = () => {
     const theme = useTheme();
     const contentFont = useSettingsStore((state) => state.general.fontContent);
+    const audioBands = useSettingsStore((state) => state.audio.bands);
     const { type: playbackType } = usePlaybackSettings();
     const { bindings } = useHotkeySettings();
     const handlePlayQueueAdd = useHandlePlayQueueAdd();
@@ -66,12 +68,15 @@ export const App = () => {
                     ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
                 };
 
+                const volume = properties.volume;
+                properties.af = bandsToAudioFilter(audioBands);
+
                 mpvPlayer?.initialize({
                     extraParameters,
                     properties,
                 });
 
-                mpvPlayer?.volume(properties.volume);
+                mpvPlayer?.volume(volume);
             }
             mpvPlayer?.restoreQueue();
         };
@@ -85,6 +90,8 @@ export const App = () => {
             mpvPlayer?.stop();
             mpvPlayer?.cleanup();
         };
+        // audioBands should NOT cause a cleanup of this function
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [clearQueue, playbackType]);
 
     useEffect(() => {

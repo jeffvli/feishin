@@ -28,6 +28,14 @@ const HotkeysTab = lazy(() =>
     })),
 );
 
+const AdvancedAudioTab = lazy(() =>
+    import('/@/renderer/features/settings/components/advanced-audio/advanced-audio-tab').then(
+        (module) => ({
+            default: module.AdvancedAudioTab,
+        }),
+    ),
+);
+
 const TabContainer = styled.div`
     width: 100%;
     height: 100%;
@@ -53,6 +61,9 @@ export const SettingsContent = () => {
                     <Tabs.Tab value="playback">Playback</Tabs.Tab>
                     <Tabs.Tab value="hotkeys">Hotkeys</Tabs.Tab>
                     {isElectron() && <Tabs.Tab value="window">Window</Tabs.Tab>}
+                    {(isElectron() || 'AudioContext' in window) && (
+                        <Tabs.Tab value="advanced-audio">Advanced Audio settings</Tabs.Tab>
+                    )}
                 </Tabs.List>
                 <Tabs.Panel value="general">
                     <GeneralTab />
@@ -68,6 +79,9 @@ export const SettingsContent = () => {
                         <ApplicationTab />
                     </Tabs.Panel>
                 )}
+                <Tabs.Panel value="advanced-audio">
+                    <AdvancedAudioTab />
+                </Tabs.Panel>
             </Tabs>
         </TabContainer>
     );

@@ -20,7 +20,7 @@ import {
     TableType,
     Platform,
 } from '/@/renderer/types';
-import { randomString } from '/@/renderer/utils';
+import { AudioBand, AudioFrequencies, randomString } from '/@/renderer/utils';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -111,6 +111,9 @@ export enum BindingActions {
 }
 
 export interface SettingsState {
+    audio: {
+        bands: AudioBand[];
+    };
     general: {
         defaultFullPlaylist: boolean;
         followSystemTheme: boolean;
@@ -208,6 +211,12 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    audio: {
+        bands: AudioFrequencies.map((frequency) => ({
+            frequency,
+            gain: 0,
+        })),
+    },
     general: {
         defaultFullPlaylist: true,
         followSystemTheme: false,
@@ -542,3 +551,5 @@ export const useMpvSettings = () =>
 export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics, shallow);
 
 export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);
+
+export const useAudioSettings = () => useSettingsStore((state) => state.audio, shallow);
