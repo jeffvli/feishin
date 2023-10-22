@@ -189,20 +189,18 @@ const PlaylistDetailSongListRoute = () => {
                             </Button>
                             <Text>Query Editor</Text>
                         </Group>
-                        <Box>
-                            {isQueryBuilderExpanded && (
-                                <PlaylistQueryBuilder
-                                    key={JSON.stringify(detailQuery?.data?.rules)}
-                                    isSaving={createPlaylistMutation?.isLoading}
-                                    limit={detailQuery?.data?.rules?.limit}
-                                    query={detailQuery?.data?.rules}
-                                    sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
-                                    sortOrder={detailQuery?.data?.rules?.order || 'asc'}
-                                    onSave={handleSave}
-                                    onSaveAs={handleSaveAs}
-                                />
-                            )}
-                        </Box>
+                        {isQueryBuilderExpanded && (
+                            <PlaylistQueryBuilder
+                                key={JSON.stringify(detailQuery?.data?.rules)}
+                                isSaving={createPlaylistMutation?.isLoading}
+                                limit={detailQuery?.data?.rules?.limit}
+                                query={detailQuery?.data?.rules}
+                                sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
+                                sortOrder={detailQuery?.data?.rules?.order || 'asc'}
+                                onSave={handleSave}
+                                onSaveAs={handleSaveAs}
+                            />
+                        )}
                     </Paper>
                 </Box>
             )}

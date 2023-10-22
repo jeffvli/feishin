@@ -103,32 +103,9 @@ const HomeRoute = () => {
     const carousels = [
         {
             data: random?.data?.items,
-            title: (
-                <Group>
-                    <TextTitle
-                        order={2}
-                        weight={700}
-                    >
-                        Explore from your library
-                    </TextTitle>
-
-                    <ActionIcon
-                        onClick={() =>
-                            queryClient.invalidateQueries({
-                                exact: false,
-                                queryKey: queryKeys.albums.list(server?.id, {
-                                    limit: itemsPerPage,
-                                    sortBy: AlbumListSort.RANDOM,
-                                    sortOrder: SortOrder.ASC,
-                                    startIndex: 0,
-                                }),
-                            })
-                        }
-                    >
-                        <RiRefreshLine />
-                    </ActionIcon>
-                </Group>
-            ),
+            sortBy: AlbumListSort.RANDOM,
+            sortOrder: SortOrder.ASC,
+            title: 'Explore from your library',
             uniqueId: 'random',
         },
         {
@@ -136,6 +113,8 @@ const HomeRoute = () => {
             pagination: {
                 itemsPerPage,
             },
+            sortBy: AlbumListSort.RECENTLY_PLAYED,
+            sortOrder: SortOrder.DESC,
             title: 'Recently played',
             uniqueId: 'recentlyPlayed',
         },
@@ -144,6 +123,8 @@ const HomeRoute = () => {
             pagination: {
                 itemsPerPage,
             },
+            sortBy: AlbumListSort.RECENTLY_ADDED,
+            sortOrder: SortOrder.DESC,
             title: 'Newly added releases',
             uniqueId: 'recentlyAdded',
         },
@@ -152,6 +133,8 @@ const HomeRoute = () => {
             pagination: {
                 itemsPerPage,
             },
+            sortBy: AlbumListSort.PLAY_COUNT,
+            sortOrder: SortOrder.DESC,
             title: 'Most played',
             uniqueId: 'mostPlayed',
         },
@@ -220,7 +203,37 @@ const HomeRoute = () => {
                                     route: AppRoute.LIBRARY_ALBUMS_DETAIL,
                                     slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
                                 }}
-                                title={{ label: carousel.title }}
+                                title={{
+                                    label: (
+                                        <Group>
+                                            <TextTitle
+                                                order={2}
+                                                weight={700}
+                                            >
+                                                {carousel.title}
+                                            </TextTitle>
+
+                                            <ActionIcon
+                                                onClick={() =>
+                                                    queryClient.invalidateQueries({
+                                                        exact: false,
+                                                        queryKey: queryKeys.albums.list(
+                                                            server?.id,
+                                                            {
+                                                                limit: itemsPerPage,
+                                                                sortBy: carousel.sortBy,
+                                                                sortOrder: carousel.sortOrder,
+                                                                startIndex: 0,
+                                                            },
+                                                        ),
+                                                    })
+                                                }
+                                            >
+                                                <RiRefreshLine />
+                                            </ActionIcon>
+                                        </Group>
+                                    ),
+                                }}
                                 uniqueId={carousel.uniqueId}
                             />
                         ))}

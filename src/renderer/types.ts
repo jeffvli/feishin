@@ -203,3 +203,9 @@ export type SongUpdate = {
     /** This volume is in range 0-100 */
     volume?: number;
 };
+
+export enum FontType {
+    BUILT_IN = 'builtIn',
+    CUSTOM = 'custom',
+    SYSTEM = 'system',
+}

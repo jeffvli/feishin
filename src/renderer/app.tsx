@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
@@ -23,7 +23,7 @@ import { PlayQueueHandlerContext } from '/@/renderer/features/player';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
 import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
-import { PlaybackType, PlayerStatus } from '/@/renderer/types';
+import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
 import '@ag-grid-community/styles/ag-grid.css';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
@@ -39,16 +39,48 @@ export const App = () => {
     const theme = useTheme();
     const contentFont = useSettingsStore((state) => state.general.fontContent);
     const accent = useSettingsStore((store) => store.general.accent);
+    const { builtIn, custom, system, type } = useSettingsStore((state) => state.font);
     const { type: playbackType } = usePlaybackSettings();
     const { bindings } = useHotkeySettings();
     const handlePlayQueueAdd = useHandlePlayQueueAdd();
     const { clearQueue, restoreQueue } = useQueueControls();
     const remoteSettings = useRemoteSettings();
+    const textStyleRef = useRef<HTMLStyleElement>();
 
     useEffect(() => {
-        const root = document.documentElement;
-        root.style.setProperty('--content-font-family', contentFont);
-    }, [contentFont]);
+        if (type === FontType.SYSTEM && system) {
+            const root = document.documentElement;
+            root.style.setProperty('--content-font-family', 'dynamic-font');
+
+            if (!textStyleRef.current) {
+                textStyleRef.current = document.createElement('style');
+                document.body.appendChild(textStyleRef.current);
+            }
+
+            textStyleRef.current.textContent = `
+            @font-face {
+                font-family: "dynamic-font";
+                src: local("${system}");
+            }`;
+        } else if (type === FontType.CUSTOM && custom) {
+            const root = document.documentElement;
+            root.style.setProperty('--content-font-family', 'dynamic-font');
+
+            if (!textStyleRef.current) {
+                textStyleRef.current = document.createElement('style');
+                document.body.appendChild(textStyleRef.current);
+            }
+
+            textStyleRef.current.textContent = `
+            @font-face {
+                font-family: "dynamic-font";
+                src: url("feishin://${custom}");
+            }`;
+        } else {
+            const root = document.documentElement;
+            root.style.setProperty('--content-font-family', builtIn);
+        }
+    }, [builtIn, custom, system, type]);
 
     useEffect(() => {
         const root = document.documentElement;

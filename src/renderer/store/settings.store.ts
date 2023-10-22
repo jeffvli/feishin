@@ -19,6 +19,7 @@ import {
     PlaybackType,
     TableType,
     Platform,
+    FontType,
 } from '/@/renderer/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -111,11 +112,17 @@ export enum BindingActions {
 }
 
 export interface SettingsState {
+    font: {
+        builtIn: string;
+        custom: string | null;
+        system: string | null;
+        type: FontType;
+    };
     general: {
         accent: string;
         defaultFullPlaylist: boolean;
         followSystemTheme: boolean;
-        fontContent: string;
+
         playButtonBehavior: Play;
         resume: boolean;
         showQueueDrawerButton: boolean;
@@ -197,6 +204,7 @@ export interface SettingsSlice extends SettingsState {
         reset: () => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
+        setTable: (type: TableType, data: DataTableProps) => void;
     };
 }
 
@@ -208,11 +216,16 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    font: {
+        builtIn: 'Inter',
+        custom: null,
+        system: null,
+        type: FontType.BUILT_IN,
+    },
     general: {
         accent: 'rgb(53, 116, 252)',
         defaultFullPlaylist: true,
         followSystemTheme: false,
-        fontContent: 'Inter',
         playButtonBehavior: Play.NOW,
         resume: false,
         showQueueDrawerButton: false,
@@ -346,6 +359,10 @@ const initialState: SettingsState = {
             autoFit: true,
             columns: [
                 {
+                    column: TableColumn.ROW_INDEX,
+                    width: 80,
+                },
+                {
                     column: TableColumn.TITLE_COMBINED,
                     width: 500,
                 },
@@ -366,7 +383,7 @@ const initialState: SettingsState = {
             columns: [
                 {
                     column: TableColumn.ROW_INDEX,
-                    width: 50,
+                    width: 80,
                 },
                 {
                     column: TableColumn.TITLE,
@@ -495,6 +512,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                             state.general.sidebarItems = items;
                         });
                     },
+                    setTable: (type: TableType, data: DataTableProps) => {
+                        set((state) => {
+                            state.tables[type] = data;
+                        });
+                    },
                 },
                 ...initialState,
             })),
@@ -534,3 +556,5 @@ export const useMpvSettings = () =>
 export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics, shallow);
 
 export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);
+
+export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
