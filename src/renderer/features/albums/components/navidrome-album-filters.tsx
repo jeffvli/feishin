@@ -152,11 +152,11 @@ export const NavidromeAlbumFilters = ({
             customFilters,
             data: {
                 _custom: {
+                    ...filter._custom,
                     navidrome: {
                         ...filter._custom?.navidrome,
                         year: e === '' ? undefined : (e as number),
                     },
-                    ...filter._custom,
                 },
             },
             itemType: LibraryItem.ALBUM,

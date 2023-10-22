@@ -87,6 +87,7 @@ export const GENRE_TABLE_COLUMNS = [
 ];
 
 interface TableConfigDropdownProps {
+    // tableRef?: MutableRefObject<AgGridReactType<any> | null>;
     type: TableType;
 }
 

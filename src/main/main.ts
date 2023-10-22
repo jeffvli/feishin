@@ -259,6 +259,11 @@ const createWindow = async () => {
         mainWindow?.close();
     });
 
+    ipcMain.on('window-quit', () => {
+        mainWindow?.close();
+        app.exit();
+    });
+
     ipcMain.on('app-restart', () => {
         // Fix for .AppImage
         if (process.env.APPIMAGE) {

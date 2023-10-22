@@ -38,7 +38,7 @@ const configuration: webpack.Configuration = {
 
     output: {
         path: webpackPaths.distWebPath,
-        publicPath: '/',
+        publicPath: 'auto',
         filename: 'renderer.js',
         library: {
             type: 'umd',

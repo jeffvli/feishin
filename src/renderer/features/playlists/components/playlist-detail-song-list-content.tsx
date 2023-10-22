@@ -22,7 +22,7 @@ import {
     SortOrder,
 } from '/@/renderer/api/types';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
-import { getColumnDefs, TablePagination, VirtualTable } from '/@/renderer/components/virtual-table';
+import { TablePagination, VirtualTable, getColumnDefs } from '/@/renderer/components/virtual-table';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import {
@@ -34,6 +34,8 @@ import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playli
 import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
 import {
     useCurrentServer,
+    useCurrentSong,
+    useCurrentStatus,
     usePlaylistDetailStore,
     usePlaylistDetailTablePagination,
     useSetPlaylistDetailTable,
@@ -41,6 +43,7 @@ import {
 } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { ListDisplayType } from '/@/renderer/types';
+import { useAppFocus } from '/@/renderer/hooks';
 
 interface PlaylistDetailContentProps {
     tableRef: MutableRefObject<AgGridReactType | null>;
@@ -49,6 +52,9 @@ interface PlaylistDetailContentProps {
 export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailContentProps) => {
     const { playlistId } = useParams() as { playlistId: string };
     const queryClient = useQueryClient();
+    const status = useCurrentStatus();
+    const isFocused = useAppFocus();
+    const currentSong = useCurrentSong();
     const server = useCurrentServer();
     const page = usePlaylistDetailStore();
     const filters: Partial<PlaylistSongListQuery> = useMemo(() => {
@@ -86,7 +92,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     });
 
     const columnDefs: ColDef[] = useMemo(
-        () => getColumnDefs(page.table.columns),
+        () => getColumnDefs(page.table.columns, false, 'generic'),
         [page.table.columns],
     );
 
@@ -236,6 +242,12 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     alwaysShowHorizontalScroll
                     autoFitColumns={page.table.autoFit}
                     columnDefs={columnDefs}
+                    context={{
+                        currentSong,
+                        isFocused,
+                        onCellContextMenu: handleContextMenu,
+                        status,
+                    }}
                     getRowId={(data) => data.data.uniqueId}
                     infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 100}
                     pagination={isPaginationEnabled}

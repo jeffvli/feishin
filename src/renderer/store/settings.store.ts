@@ -197,6 +197,7 @@ export interface SettingsSlice extends SettingsState {
         reset: () => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
+        setTable: (type: TableType, data: DataTableProps) => void;
     };
 }
 
@@ -345,6 +346,10 @@ const initialState: SettingsState = {
             autoFit: true,
             columns: [
                 {
+                    column: TableColumn.ROW_INDEX,
+                    width: 80,
+                },
+                {
                     column: TableColumn.TITLE_COMBINED,
                     width: 500,
                 },
@@ -365,7 +370,7 @@ const initialState: SettingsState = {
             columns: [
                 {
                     column: TableColumn.ROW_INDEX,
-                    width: 50,
+                    width: 80,
                 },
                 {
                     column: TableColumn.TITLE,
@@ -492,6 +497,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                     setSidebarItems: (items: SidebarItemType[]) => {
                         set((state) => {
                             state.general.sidebarItems = items;
+                        });
+                    },
+                    setTable: (type: TableType, data: DataTableProps) => {
+                        set((state) => {
+                            state.tables[type] = data;
                         });
                     },
                 },

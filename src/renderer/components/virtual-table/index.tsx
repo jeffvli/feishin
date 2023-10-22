@@ -29,7 +29,11 @@ import { GenreCell } from '/@/renderer/components/virtual-table/cells/genre-cell
 import { GenericTableHeader } from '/@/renderer/components/virtual-table/headers/generic-table-header';
 import { AppRoute } from '/@/renderer/router/routes';
 import { PersistedTableColumn } from '/@/renderer/store/settings.store';
-import { TableColumn, TablePagination as TablePaginationType } from '/@/renderer/types';
+import {
+    PlayerStatus,
+    TableColumn,
+    TablePagination as TablePaginationType,
+} from '/@/renderer/types';
 import { FavoriteCell } from '/@/renderer/components/virtual-table/cells/favorite-cell';
 import { RatingCell } from '/@/renderer/components/virtual-table/cells/rating-cell';
 import { TablePagination } from '/@/renderer/components/virtual-table/table-pagination';
@@ -37,6 +41,7 @@ import { ActionsCell } from '/@/renderer/components/virtual-table/cells/actions-
 import { TitleCell } from '/@/renderer/components/virtual-table/cells/title-cell';
 import { useFixedTableHeader } from '/@/renderer/components/virtual-table/hooks/use-fixed-table-header';
 import { NoteCell } from '/@/renderer/components/virtual-table/cells/note-cell';
+import { RowIndexCell } from '/@/renderer/components/virtual-table/cells/row-index-cell';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -260,7 +265,37 @@ const tableColumns: { [key: string]: ColDef } = {
         width: 80,
     },
     rowIndex: {
+        cellClass: 'row-index',
         cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'right' }),
+        colId: TableColumn.ROW_INDEX,
+        headerComponent: (params: IHeaderParams) =>
+            GenericTableHeader(params, { position: 'right', preset: 'rowIndex' }),
+        suppressSizeToFit: true,
+        valueGetter: (params) => {
+            return (params.node?.rowIndex || 0) + 1;
+        },
+        width: 65,
+    },
+    rowIndexGeneric: {
+        cellClass: 'row-index',
+        cellClassRules: {
+            'current-playlist-song-cell': (params) => {
+                return params.data?.uniqueId === params.context?.currentSong?.uniqueId;
+            },
+            'current-song-cell': (params) => {
+                return (
+                    params.data?.id === params.context?.currentSong?.id &&
+                    params.data?.albumId === params.context?.currentSong?.albumId
+                );
+            },
+            focused: (params) => {
+                return params.context?.isFocused;
+            },
+            playing: (params) => {
+                return params.context?.status === PlayerStatus.PLAYING;
+            },
+        },
+        cellRenderer: RowIndexCell,
         colId: TableColumn.ROW_INDEX,
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'right', preset: 'rowIndex' }),
@@ -311,7 +346,35 @@ const tableColumns: { [key: string]: ColDef } = {
         width: 250,
     },
     trackNumber: {
-        cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+        cellClass: 'track-number',
+        cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'right' }),
+        colId: TableColumn.TRACK_NUMBER,
+        field: 'trackNumber',
+        headerComponent: (params: IHeaderParams) =>
+            GenericTableHeader(params, { position: 'center' }),
+        headerName: 'Track',
+        suppressSizeToFit: true,
+        valueGetter: (params: ValueGetterParams) =>
+            params.data ? params.data.trackNumber : undefined,
+        width: 80,
+    },
+    trackNumberDetail: {
+        cellClass: 'row-index',
+        cellClassRules: {
+            'current-song-cell': (params) => {
+                return (
+                    params.data?.id === params.context?.currentSong?.id &&
+                    params.data?.albumId === params.context?.currentSong?.albumId
+                );
+            },
+            focused: (params) => {
+                return params.context?.isFocused;
+            },
+            playing: (params) => {
+                return params.context?.status === PlayerStatus.PLAYING;
+            },
+        },
+        cellRenderer: RowIndexCell,
         colId: TableColumn.TRACK_NUMBER,
         field: 'trackNumber',
         headerComponent: (params: IHeaderParams) =>
@@ -354,10 +417,23 @@ export const getColumnDef = (column: TableColumn) => {
     return tableColumns[column as keyof typeof tableColumns];
 };
 
-export const getColumnDefs = (columns: PersistedTableColumn[], useWidth?: boolean) => {
+export const getColumnDefs = (
+    columns: PersistedTableColumn[],
+    useWidth?: boolean,
+    type?: 'albumDetail' | 'generic',
+) => {
     const columnDefs: ColDef[] = [];
     for (const column of columns) {
-        const presetColumn = tableColumns[column.column as keyof typeof tableColumns];
+        let presetColumn = tableColumns[column.column as keyof typeof tableColumns];
+
+        if (column.column === TableColumn.TRACK_NUMBER && type === 'albumDetail') {
+            presetColumn = tableColumns['trackNumberDetail' as keyof typeof tableColumns];
+        }
+
+        if (column.column === TableColumn.ROW_INDEX && type === 'generic') {
+            presetColumn = tableColumns['rowIndexGeneric' as keyof typeof tableColumns];
+        }
+
         if (presetColumn) {
             columnDefs.push({
                 ...presetColumn,

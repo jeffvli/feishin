@@ -1,45 +1,20 @@
-import { MouseEvent, useMemo } from 'react';
 import { Box, Center, Divider, Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
-import { IconType } from 'react-icons';
-import {
-    RiAddFill,
-    RiAlbumFill,
-    RiAlbumLine,
-    RiArrowDownSLine,
-    RiDiscLine,
-    RiFlag2Fill,
-    RiFlagLine,
-    RiFolder3Fill,
-    RiFolder3Line,
-    RiHome6Fill,
-    RiHome6Line,
-    RiListUnordered,
-    RiMusic2Fill,
-    RiMusic2Line,
-    RiPlayLine,
-    RiSearchFill,
-    RiUserVoiceFill,
-    RiUserVoiceLine,
-    RiSearchLine,
-    RiPlayFill,
-    RiSettings2Line,
-    RiSettings2Fill,
-    RiPlayListLine,
-    RiPlayListFill,
-} from 'react-icons/ri';
-import { generatePath, Link, useLocation } from 'react-router-dom';
+import { MouseEvent, useMemo } from 'react';
+import { RiAddFill, RiArrowDownSLine, RiDiscLine, RiListUnordered } from 'react-icons/ri';
+import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import {
     SidebarItemType,
     useGeneralSettings,
     useWindowSettings,
 } from '../../../store/settings.store';
-import { LibraryItem, PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
+import { PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import { Button, MotionStack, Spinner, Tooltip } from '/@/renderer/components';
 import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
+import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import { SidebarPlaylistList } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -93,53 +68,6 @@ const SidebarImage = styled.img`
     background: var(--placeholder-bg);
 `;
 
-const sidebarItemMap = {
-    [AppRoute.HOME]: {
-        activeIcon: RiHome6Fill,
-        icon: RiHome6Line,
-    },
-    [AppRoute.LIBRARY_ALBUMS]: {
-        activeIcon: RiAlbumFill,
-        icon: RiAlbumLine,
-    },
-    [AppRoute.LIBRARY_ALBUM_ARTISTS]: {
-        activeIcon: RiUserVoiceFill,
-        icon: RiUserVoiceLine,
-    },
-    [AppRoute.PLAYLISTS]: {
-        activeIcon: RiPlayListFill,
-        icon: RiPlayListLine,
-    },
-    [AppRoute.LIBRARY_SONGS]: {
-        activeIcon: RiMusic2Fill,
-        icon: RiMusic2Line,
-    },
-    [AppRoute.LIBRARY_FOLDERS]: {
-        activeIcon: RiFolder3Fill,
-        icon: RiFolder3Line,
-    },
-    [AppRoute.LIBRARY_GENRES]: {
-        activeIcon: RiFlag2Fill,
-        icon: RiFlagLine,
-    },
-    [generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG })]: {
-        activeIcon: RiSearchFill,
-        icon: RiSearchLine,
-    },
-    [AppRoute.SETTINGS]: {
-        activeIcon: RiSettings2Fill,
-        icon: RiSettings2Line,
-    },
-    [AppRoute.NOW_PLAYING]: {
-        activeIcon: RiPlayFill,
-        icon: RiPlayLine,
-    },
-    [AppRoute.RESCAN]: {
-        activeIcon: undefined,
-        icon: undefined,
-    },
-};
-
 export const Sidebar = () => {
     const location = useLocation();
     const sidebar = useSidebarStore();
@@ -185,17 +113,13 @@ export const Sidebar = () => {
 
     const { sidebarItems } = useGeneralSettings();
 
-    const sidebarItemsWithRoute: (SidebarItemType & {
-        activeIcon: IconType;
-        icon: IconType;
-    })[] = useMemo(() => {
+    const sidebarItemsWithRoute: SidebarItemType[] = useMemo(() => {
         if (!sidebarItems) return [];
 
         const items = sidebarItems
             .filter((item) => !item.disabled)
             .map((item) => ({
                 ...item,
-                ...sidebarItemMap[item.route as keyof typeof sidebarItemMap],
             }));
 
         return items;
@@ -228,11 +152,11 @@ export const Sidebar = () => {
                                     to={item.route}
                                 >
                                     <Group spacing="sm">
-                                        {location.pathname === item.route ? (
-                                            <item.activeIcon size="1.1em" />
-                                        ) : (
-                                            <item.icon size="1.1em" />
-                                        )}
+                                        <SidebarIcon
+                                            active={location.pathname === item.route}
+                                            route={item.route}
+                                            size="1.1em"
+                                        />
                                         {item.label}
                                     </Group>
                                 </SidebarItem>

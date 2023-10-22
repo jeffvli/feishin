@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="100 130 57 80" xmlns="http://www.w3.org/2000/svg">
+  <rect x="100" y="130" width="12" height="20" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); transform-origin: 106px 140px;"/>
+  <rect x="115" y="130" width="12" height="60" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); transform-origin: 121px 160px;"/>
+  <rect x="130" y="130" width="12" height="80" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); transform-origin: 136px 170px;"/>
+  <rect x="145" y="130" width="12" height="45" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); transform-origin: 151px 152.5px;"/>
+</svg>

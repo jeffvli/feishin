@@ -91,7 +91,7 @@ export const AppMenu = () => {
     };
 
     const handleQuit = () => {
-        browser?.exit();
+        browser?.quit();
     };
 
     return (
