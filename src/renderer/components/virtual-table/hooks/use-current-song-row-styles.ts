@@ -40,6 +40,7 @@ export const useCurrentSongRowStyles = ({ tableRef }: UseCurrentSongRowStylesPro
         return {
             'current-song': (params) => {
                 return (
+                    currentSong?.id !== undefined &&
                     params?.data?.id === currentSong?.id &&
                     params?.data?.albumId === currentSong?.albumId
                 );

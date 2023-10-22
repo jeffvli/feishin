@@ -280,10 +280,14 @@ const tableColumns: { [key: string]: ColDef } = {
         cellClass: 'row-index',
         cellClassRules: {
             'current-playlist-song-cell': (params) => {
-                return params.data?.uniqueId === params.context?.currentSong?.uniqueId;
+                return (
+                    params.context?.currentSong?.uniqueId !== undefined &&
+                    params.data?.uniqueId === params.context?.currentSong?.uniqueId
+                );
             },
             'current-song-cell': (params) => {
                 return (
+                    params.context?.currentSong?.id !== undefined &&
                     params.data?.id === params.context?.currentSong?.id &&
                     params.data?.albumId === params.context?.currentSong?.albumId
                 );
@@ -363,6 +367,7 @@ const tableColumns: { [key: string]: ColDef } = {
         cellClassRules: {
             'current-song-cell': (params) => {
                 return (
+                    params.context?.currentSong?.id !== undefined &&
                     params.data?.id === params.context?.currentSong?.id &&
                     params.data?.albumId === params.context?.currentSong?.albumId
                 );
