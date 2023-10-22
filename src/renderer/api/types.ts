@@ -1130,3 +1130,12 @@ export enum LyricSource {
 }
 
 export type LyricsOverride = Omit<FullLyricsMetadata, 'lyrics'> & { id: string };
+
+// This type from https://wicg.github.io/local-font-access/#fontdata
+// NOTE: it is still experimental, so this should be updates as appropriate
+export type FontData = {
+    family: string;
+    fullName: string;
+    postscriptName: string;
+    style: string;
+};

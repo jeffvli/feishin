@@ -21,6 +21,8 @@ import {
     Menu,
     nativeImage,
     BrowserWindowConstructorOptions,
+    protocol,
+    net,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log';
@@ -42,6 +44,8 @@ export default class AppUpdater {
         autoUpdater.checkForUpdatesAndNotify();
     }
 }
+
+protocol.registerSchemesAsPrivileged([{ privileges: { bypassCSP: true }, scheme: 'feishin' }]);
 
 process.on('uncaughtException', (error: any) => {
     console.log('Error in main process', error);
@@ -653,8 +657,34 @@ app.on('window-all-closed', () => {
     }
 });
 
+const FONT_HEADERS = [
+    'font/collection',
+    'font/otf',
+    'font/sfnt',
+    'font/ttf',
+    'font/woff',
+    'font/woff2',
+];
+
 app.whenReady()
     .then(() => {
+        protocol.handle('feishin', async (request) => {
+            const filePath = `file://${request.url.slice('feishin://'.length)}`;
+            const response = await net.fetch(filePath);
+            const contentType = response.headers.get('content-type');
+
+            if (!contentType || !FONT_HEADERS.includes(contentType)) {
+                getMainWindow()?.webContents.send('custom-font-error', filePath);
+
+                return new Response(null, {
+                    status: 403,
+                    statusText: 'Forbidden',
+                });
+            }
+
+            return response;
+        });
+
         createWindow();
         createTray();
         app.on('activate', () => {

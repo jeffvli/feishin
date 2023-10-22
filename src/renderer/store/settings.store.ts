@@ -19,6 +19,7 @@ import {
     PlaybackType,
     TableType,
     Platform,
+    FontType,
 } from '/@/renderer/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -111,10 +112,16 @@ export enum BindingActions {
 }
 
 export interface SettingsState {
+    font: {
+        builtIn: string;
+        custom: string | null;
+        system: string | null;
+        type: FontType;
+    };
     general: {
         defaultFullPlaylist: boolean;
         followSystemTheme: boolean;
-        fontContent: string;
+
         playButtonBehavior: Play;
         resume: boolean;
         showQueueDrawerButton: boolean;
@@ -208,10 +215,15 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    font: {
+        builtIn: 'Inter',
+        custom: null,
+        system: null,
+        type: FontType.BUILT_IN,
+    },
     general: {
         defaultFullPlaylist: true,
         followSystemTheme: false,
-        fontContent: 'Inter',
         playButtonBehavior: Play.NOW,
         resume: false,
         showQueueDrawerButton: false,
@@ -542,3 +554,5 @@ export const useMpvSettings = () =>
 export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics, shallow);
 
 export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);
+
+export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);

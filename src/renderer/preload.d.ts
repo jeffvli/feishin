@@ -1,6 +1,6 @@
 import { IpcRendererEvent } from 'electron';
 import { PlayerData, PlayerState } from './store';
-import { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
+import { FontData, InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
 import { Remote } from '/@/main/preload/remote';
 import { Mpris } from '/@/main/preload/mpris';
 import { MpvPLayer, MpvPlayerListener } from '/@/main/preload/mpv-player';
@@ -76,6 +76,7 @@ declare global {
             remote?: Remote;
             utils?: Utils;
         };
+        queryLocalFonts?: () => Promise<FontData[]>;
     }
 }
 
