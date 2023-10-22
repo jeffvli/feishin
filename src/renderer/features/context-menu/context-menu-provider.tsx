@@ -434,6 +434,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     case LibraryItem.ALBUM:
                         albumId.push(item.id);
                         break;
+                    case LibraryItem.ALBUM_ARTIST:
+                        artistId.push(item.id);
+                        break;
                     case LibraryItem.ARTIST:
                         artistId.push(item.id);
                         break;
