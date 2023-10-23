@@ -41,8 +41,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     &:not([data-disabled])&:hover {
         color: ${(props) => `var(--btn-${props.variant}-fg) !important`};
         background: ${(props) => `var(--btn-${props.variant}-bg)`};
-        background-image: ${(props) =>
-            props.variant === 'filled' ? 'linear-gradient(rgb(0 0 0/40%) 0 0)' : undefined};
+        filter: brightness(85%);
         border: ${(props) => `var(--btn-${props.variant}-border-hover)`};
 
         svg {
@@ -53,12 +52,7 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     &:not([data-disabled])&:focus-visible {
         color: ${(props) => `var(--btn-${props.variant}-fg-hover)`};
         background: ${(props) => `var(--btn-${props.variant}-bg)`};
-        background-image: ${(props) =>
-            props.variant === 'filled' ? 'linear-gradient(rgb(0 0 0/40%) 0 0)' : undefined};
-    }
-
-    &:active {
-        transform: none;
+        filter: brightness(85%);
     }
 
     & .mantine-Button-centerLoader {
