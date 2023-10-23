@@ -18,6 +18,7 @@ export interface PlayerState {
         seek: boolean;
         shuffledIndex: number;
         song?: QueueSong;
+        speed: number;
         status: PlayerStatus;
         time: number;
     };
@@ -81,6 +82,7 @@ export interface PlayerSlice extends PlayerState {
         reorderQueue: (rowUniqueIds: string[], afterUniqueId?: string) => PlayerData;
         restoreQueue: (data: Partial<PlayerState>) => PlayerData;
         setCurrentIndex: (index: number) => PlayerData;
+        setCurrentSpeed: (speed: number) => void;
         setCurrentTime: (time: number, seek?: boolean) => void;
         setCurrentTrack: (uniqueId: string) => PlayerData;
         setFavorite: (ids: string[], favorite: boolean) => string[];
@@ -750,6 +752,11 @@ export const usePlayerStore = create<PlayerSlice>()(
 
                             return get().actions.getPlayerData();
                         },
+                        setCurrentSpeed: (speed) => {
+                            set((state) => {
+                                state.current.speed = speed;
+                            });
+                        },
                         setCurrentTime: (time, seek = false) => {
                             set((state) => {
                                 state.current.seek = seek;
@@ -924,6 +931,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                         seek: false,
                         shuffledIndex: 0,
                         song: {} as QueueSong,
+                        speed: 1.0,
                         status: PlayerStatus.PAUSED,
                         time: 0,
                     },
@@ -1037,6 +1045,10 @@ export const useSeeked = () => usePlayerStore((state) => state.current.seek);
 export const useVolume = () => usePlayerStore((state) => state.volume);
 
 export const useMuted = () => usePlayerStore((state) => state.muted);
+
+export const useSpeed = () => usePlayerStore((state) => state.current.speed);
+
+export const useSetCurrentSpeed = () => usePlayerStore((state) => state.actions.setCurrentSpeed);
 
 export const useSetQueueFavorite = () => usePlayerStore((state) => state.actions.setFavorite);
 

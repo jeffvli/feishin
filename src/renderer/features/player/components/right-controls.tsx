@@ -17,17 +17,20 @@ import {
     useHotkeySettings,
     useMuted,
     useSidebarStore,
+    useSpeed,
     useVolume,
 } from '/@/renderer/store';
 import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';
 import { LibraryItem, ServerType, Song } from '/@/renderer/api/types';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
-import { Rating } from '/@/renderer/components';
+import { DropdownMenu, Rating } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
+
+const PLAYBACK_SPEEDS = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
 export const RightControls = () => {
     const isMinWidth = useMediaQuery('(max-width: 480px)');
@@ -38,8 +41,16 @@ export const RightControls = () => {
     const { setSideBar } = useAppStoreActions();
     const { rightExpanded: isQueueExpanded } = useSidebarStore();
     const { bindings } = useHotkeySettings();
-    const { handleVolumeSlider, handleVolumeWheel, handleMute, handleVolumeDown, handleVolumeUp } =
-        useRightControls();
+    const {
+        handleVolumeSlider,
+        handleVolumeWheel,
+        handleMute,
+        handleVolumeDown,
+        handleVolumeUp,
+        handleSpeed,
+    } = useRightControls();
+
+    const speed = useSpeed();
 
     const updateRatingMutation = useSetRating({});
     const addToFavoritesMutation = useCreateFavorite({});
@@ -184,6 +195,28 @@ export const RightControls = () => {
                 align="center"
                 spacing="xs"
             >
+                <DropdownMenu>
+                    <DropdownMenu.Target>
+                        <PlayerButton
+                            icon={<>{speed} x</>}
+                            tooltip={{
+                                label: 'Playback speed',
+                                openDelay: 500,
+                            }}
+                            variant="secondary"
+                        />
+                    </DropdownMenu.Target>
+                    <DropdownMenu.Dropdown>
+                        {PLAYBACK_SPEEDS.map((speed) => (
+                            <DropdownMenu.Item
+                                key={`speed-select-${speed}`}
+                                onClick={() => handleSpeed(Number(speed))}
+                            >
+                                {speed}
+                            </DropdownMenu.Item>
+                        ))}
+                    </DropdownMenu.Dropdown>
+                </DropdownMenu>
                 <PlayerButton
                     icon={
                         currentSong?.userFavorite ? (
@@ -209,12 +242,14 @@ export const RightControls = () => {
                     variant="secondary"
                     onClick={handleToggleFavorite}
                 />
-                <PlayerButton
-                    icon={<HiOutlineQueueList size="1.1rem" />}
-                    tooltip={{ label: 'View queue', openDelay: 500 }}
-                    variant="secondary"
-                    onClick={handleToggleQueue}
-                />
+                {!isMinWidth ? (
+                    <PlayerButton
+                        icon={<HiOutlineQueueList size="1.1rem" />}
+                        tooltip={{ label: 'View queue', openDelay: 500 }}
+                        variant="secondary"
+                        onClick={handleToggleQueue}
+                    />
+                ) : null}
                 <Group
                     noWrap
                     spacing="xs"

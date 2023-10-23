@@ -10,6 +10,7 @@ import {
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
+import { useSpeed } from '/@/renderer/store';
 
 interface AudioPlayerProps extends ReactPlayerProps {
     crossfadeDuration: number;
@@ -59,6 +60,7 @@ export const AudioPlayer = forwardRef(
         const [isTransitioning, setIsTransitioning] = useState(false);
         const audioDeviceId = useSettingsStore((state) => state.playback.audioDeviceId);
         const playback = useSettingsStore((state) => state.playback.mpvProperties);
+        const playbackSpeed = useSpeed();
 
         const [webAudio, setWebAudio] = useState<WebAudio | null>(null);
         const [player1Source, setPlayer1Source] = useState<MediaElementAudioSourceNode | null>(
@@ -307,6 +309,7 @@ export const AudioPlayer = forwardRef(
                     }}
                     height={0}
                     muted={muted}
+                    playbackRate={playbackSpeed}
                     playing={currentPlayer === 1 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
                     url={player1?.streamUrl}
@@ -325,6 +328,7 @@ export const AudioPlayer = forwardRef(
                     }}
                     height={0}
                     muted={muted}
+                    playbackRate={playbackSpeed}
                     playing={currentPlayer === 2 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
                     url={player2?.streamUrl}
