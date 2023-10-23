@@ -395,7 +395,7 @@ export const albumListSortMap: AlbumListSortMap = {
         duration: undefined,
         favorited: undefined,
         name: JFAlbumListSort.NAME,
-        playCount: undefined,
+        playCount: JFAlbumListSort.PLAY_COUNT,
         random: JFAlbumListSort.RANDOM,
         rating: undefined,
         recentlyAdded: JFAlbumListSort.RECENTLY_ADDED,

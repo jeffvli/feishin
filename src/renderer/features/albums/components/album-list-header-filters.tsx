@@ -42,6 +42,7 @@ const FILTERS = {
         },
         { defaultOrder: SortOrder.DESC, name: 'Critic Rating', value: AlbumListSort.CRITIC_RATING },
         { defaultOrder: SortOrder.ASC, name: 'Name', value: AlbumListSort.NAME },
+        { defaultOrder: SortOrder.DESC, name: 'Play Count', value: AlbumListSort.PLAY_COUNT },
         { defaultOrder: SortOrder.ASC, name: 'Random', value: AlbumListSort.RANDOM },
         {
             defaultOrder: SortOrder.DESC,
