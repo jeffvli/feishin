@@ -10,7 +10,6 @@ import {
     usePlayerControls,
     usePlayerStore,
     useRepeatStatus,
-    useSetCurrentSpeed,
     useSetCurrentTime,
     useShuffleStatus,
 } from '/@/renderer/store';
@@ -35,7 +34,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
     const currentPlayer = useCurrentPlayer();
     const { setShuffle, setRepeat, play, pause, previous, next, setCurrentIndex, autoNext } =
         usePlayerControls();
-    const setCurrentSpeed = useSetCurrentSpeed();
     const setCurrentTime = useSetCurrentTime();
     const queue = useDefaultQueue();
     const playerStatus = useCurrentStatus();
@@ -608,18 +606,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
         [debouncedSeek, handleScrobbleFromSeek, setCurrentTime],
     );
 
-    const debouncedSpeedSeek = debounce((e: number) => {
-        mpvPlayer?.setProperties({ speed: e });
-    }, 100);
-
-    const handleSpeedSlider = useCallback(
-        (e: number) => {
-            setCurrentSpeed(e);
-            debouncedSpeedSeek(e);
-        },
-        [debouncedSpeedSeek, setCurrentSpeed],
-    );
-
     const handleQuit = useCallback(() => {
         mpvPlayer!.quit();
     }, []);
@@ -860,7 +846,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
         handleSeekSlider,
         handleSkipBackward,
         handleSkipForward,
-        handleSpeedSlider,
         handleStop,
         handleToggleRepeat,
         handleToggleShuffle,

@@ -103,6 +103,7 @@ const StyledPlayerButton = styled(UnstyledButton)<StyledPlayerButtonProps>`
     }
 
     &:hover {
+        color: var(--playerbar-btn-fg-hover);
         background: var(--playerbar-btn-bg-hover);
 
         svg {
