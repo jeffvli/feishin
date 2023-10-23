@@ -261,6 +261,13 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 });
                             }
 
+                            if (isLastTrack && repeat === PlayerRepeat.NONE) {
+                                set((state) => {
+                                    state.current.time = 0;
+                                    state.current.status = PlayerStatus.PAUSED;
+                                });
+                            }
+
                             return get().actions.getPlayerData();
                         },
                         checkIsFirstTrack: () => {
