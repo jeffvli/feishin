@@ -119,6 +119,7 @@ export interface SettingsState {
         type: FontType;
     };
     general: {
+        accent: string;
         defaultFullPlaylist: boolean;
         followSystemTheme: boolean;
 
@@ -222,6 +223,7 @@ const initialState: SettingsState = {
         type: FontType.BUILT_IN,
     },
     general: {
+        accent: 'rgb(53, 116, 252)',
         defaultFullPlaylist: true,
         followSystemTheme: false,
         playButtonBehavior: Play.NOW,
