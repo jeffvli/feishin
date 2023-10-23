@@ -112,6 +112,13 @@ export enum BindingActions {
 }
 
 export interface SettingsState {
+    discord: {
+        clientId: string;
+        enableIdle: boolean;
+        enabled: boolean;
+        showServerImage: boolean;
+        updateInterval: number;
+    };
     font: {
         builtIn: string;
         custom: string | null;
@@ -216,6 +223,13 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    discord: {
+        clientId: '1165957668758900787',
+        enableIdle: false,
+        enabled: false,
+        showServerImage: false,
+        updateInterval: 15,
+    },
     font: {
         builtIn: 'Inter',
         custom: null,
@@ -558,3 +572,5 @@ export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics,
 export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);
 
 export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
+
+export const useDiscordSetttings = () => useSettingsStore((state) => state.discord, shallow);

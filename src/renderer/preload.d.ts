@@ -8,11 +8,13 @@ import { Lyrics } from '/@/main/preload/lyrics';
 import { Utils } from '/@/main/preload/utils';
 import { LocalSettings } from '/@/main/preload/local-settings';
 import { Ipc } from '/@/main/preload/ipc';
+import { DiscordRpc } from '/@/main/preload/discord-rpc';
 
 declare global {
     interface Window {
         electron: {
             browser: any;
+            discordRpc: DiscordRpc;
             ipc?: Ipc;
             ipcRenderer: {
                 APP_RESTART(): void;

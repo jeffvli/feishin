@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron';
 import { browser } from './preload/browser';
+import { discordRpc } from './preload/discord-rpc';
 import { ipc } from './preload/ipc';
 import { localSettings } from './preload/local-settings';
 import { lyrics } from './preload/lyrics';
@@ -10,6 +11,7 @@ import { utils } from './preload/utils';
 
 contextBridge.exposeInMainWorld('electron', {
     browser,
+    discordRpc,
     ipc,
     localSettings,
     lyrics,
