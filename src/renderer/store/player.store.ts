@@ -827,6 +827,15 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 });
                             }
 
+                            const previousSongId = get().queue.previousNode?.id;
+                            if (previousSongId && ids.includes(previousSongId)) {
+                                set((state) => {
+                                    if (state.queue.previousNode) {
+                                        state.queue.previousNode.userFavorite = favorite;
+                                    }
+                                });
+                            }
+
                             return foundUniqueIds;
                         },
                         setMuted: (muted: boolean) => {

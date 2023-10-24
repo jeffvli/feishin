@@ -13,6 +13,12 @@ const ipc = isElectron() ? window.electron.ipc : null;
 const BINDINGS_MAP: Record<BindingActions, string> = {
     browserBack: 'Browser back',
     browserForward: 'Browser forward',
+    favoriteCurrentAdd: 'Add current song to favorites',
+    favoriteCurrentRemove: 'Remove current song from favorites',
+    favoriteCurrentToggle: 'Toggle current song favorite',
+    favoritePreviousAdd: 'Add previous song to favorites',
+    favoritePreviousRemove: 'Remove previous song from favorites',
+    favoritePreviousToggle: 'Toggle previous song favorite',
     globalSearch: 'Global search',
     localSearch: 'In-page search',
     next: 'Next track',
