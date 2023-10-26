@@ -72,7 +72,9 @@ export const HomeCommands = ({
                           })
                         : `${t('common.search', { postProcess: 'sentenceCase' })}...`}
                 </Command.Item>
-                <Command.Item onSelect={handleCreatePlaylistModal}>{t('')}...</Command.Item>
+                <Command.Item onSelect={handleCreatePlaylistModal}>
+                    {t('action.createPlaylist', { postProcess: 'sentenceCase' })}...
+                </Command.Item>
                 <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.GO_TO])}>
                     {t('page.globalSearch.commands.goToPage', { postProcess: 'sentenceCase' })}...
                 </Command.Item>

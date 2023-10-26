@@ -183,6 +183,6 @@ export const openUpdatePlaylistModal = async (args: {
                 onCancel={closeAllModals}
             />
         ),
-        title: i18n.t('form.editPlaylist', { postProcess: 'titleCase' }) as string,
+        title: i18n.t('form.editPlaylist.title', { postProcess: 'titleCase' }) as string,
     });
 };
