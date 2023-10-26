@@ -11,6 +11,7 @@ import { useContainerQuery } from '/@/renderer/hooks';
 import { PlaylistListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { ListDisplayType, ServerType } from '/@/renderer/types';
 import debounce from 'lodash/debounce';
+import { useTranslation } from 'react-i18next';
 import { RiFileAddFill } from 'react-icons/ri';
 import { LibraryItem } from '/@/renderer/api/types';
 import { useListFilterRefresh } from '../../../hooks/use-list-filter-refresh';
@@ -24,6 +25,7 @@ interface PlaylistListHeaderProps {
 }
 
 export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistListHeaderProps) => {
+    const { t } = useTranslation();
     const { pageKey } = useListContext();
     const cq = useContainerQuery();
     const server = useCurrentServer();
@@ -37,7 +39,7 @@ export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistLis
                 tableRef?.current?.api?.purgeInfiniteCache();
             },
             size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
-            title: 'Create Playlist',
+            title: t('form.createPlaylist.title', { postProcess: 'sentenceCase' }),
         });
     };
 
@@ -74,7 +76,9 @@ export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistLis
                     w="100%"
                 >
                     <LibraryHeaderBar>
-                        <LibraryHeaderBar.Title>Playlists</LibraryHeaderBar.Title>
+                        <LibraryHeaderBar.Title>
+                            {t('page.playlistList.title', { postProcess: 'titleCase' })}
+                        </LibraryHeaderBar.Title>
                         <Paper
                             fw="600"
                             px="1rem"
@@ -88,7 +92,10 @@ export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistLis
                             )}
                         </Paper>
                         <Button
-                            tooltip={{ label: 'Create playlist', openDelay: 500 }}
+                            tooltip={{
+                                label: t('action.createPlaylist', { postProcess: 'sentenceCase' }),
+                                openDelay: 500,
+                            }}
                             variant="filled"
                             onClick={handleCreatePlaylistModal}
                         >

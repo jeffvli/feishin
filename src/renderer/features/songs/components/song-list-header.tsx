@@ -2,6 +2,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, MutableRefObject } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useListStoreByKey } from '../../../store/list.store';
 import { LibraryItem } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
@@ -23,6 +24,7 @@ interface SongListHeaderProps {
 }
 
 export const SongListHeader = ({ gridRef, title, itemCount, tableRef }: SongListHeaderProps) => {
+    const { t } = useTranslation();
     const server = useCurrentServer();
     const { pageKey, handlePlay, customFilters } = useListContext();
     const { setFilter, setTablePagination } = useListStoreActions();
@@ -71,7 +73,9 @@ export const SongListHeader = ({ gridRef, title, itemCount, tableRef }: SongList
                         <LibraryHeaderBar.PlayButton
                             onClick={() => handlePlay?.({ playType: playButtonBehavior })}
                         />
-                        <LibraryHeaderBar.Title>{title || 'Tracks'}</LibraryHeaderBar.Title>
+                        <LibraryHeaderBar.Title>
+                            {title || t('page.trackList.title', { postProcess: 'titleCase' })}
+                        </LibraryHeaderBar.Title>
                         <LibraryHeaderBar.Badge
                             isLoading={itemCount === null || itemCount === undefined}
                         >

@@ -36,7 +36,6 @@ export const ActionBar = () => {
                         <TextInput
                             readOnly
                             icon={<RiSearchLine />}
-                            placeholder="Search"
                             size="md"
                             onClick={open}
                             onKeyDown={(e) => {

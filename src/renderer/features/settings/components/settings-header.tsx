@@ -1,11 +1,13 @@
 import { Flex, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
+import { useTranslation } from 'react-i18next';
 import { RiSettings2Fill } from 'react-icons/ri';
 import { Button, ConfirmModal, PageHeader } from '/@/renderer/components';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useSettingsStoreActions } from '../../../store/settings.store';
 
 export const SettingsHeader = () => {
+    const { t } = useTranslation();
     const { reset } = useSettingsStoreActions();
 
     const handleResetToDefault = () => {
@@ -15,8 +17,12 @@ export const SettingsHeader = () => {
 
     const openResetConfirmModal = () => {
         openModal({
-            children: <ConfirmModal onConfirm={handleResetToDefault}>Are you sure?</ConfirmModal>,
-            title: 'Reset settings to default',
+            children: (
+                <ConfirmModal onConfirm={handleResetToDefault}>
+                    {t('common.areYouSure', { postProcess: 'sentenceCase' })}
+                </ConfirmModal>
+            ),
+            title: t('common.resetToDefault', { postProcess: 'sentenceCase' }),
         });
     };
 
@@ -31,14 +37,16 @@ export const SettingsHeader = () => {
                     >
                         <Group noWrap>
                             <RiSettings2Fill size="2rem" />
-                            <LibraryHeaderBar.Title>Settings</LibraryHeaderBar.Title>
+                            <LibraryHeaderBar.Title>
+                                {t('glossary.setting', { count: 2, postProcess: 'titleCase' })}
+                            </LibraryHeaderBar.Title>
                         </Group>
                         <Button
                             compact
                             variant="default"
                             onClick={openResetConfirmModal}
                         >
-                            Reset to default
+                            {t('common.resetToDefault', { postProcess: 'sentenceCase' })}
                         </Button>
                     </Flex>
                 </LibraryHeaderBar>

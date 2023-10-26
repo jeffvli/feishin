@@ -1,5 +1,6 @@
 import isElectron from 'is-electron';
 import { Platform } from '/@/renderer/types';
+import { useTranslation } from 'react-i18next';
 import { useWindowSettings, useSettingsStoreActions } from '../../../../store/settings.store';
 import {
     SettingsSection,
@@ -17,6 +18,7 @@ const WINDOW_BAR_OPTIONS = [
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const WindowSettings = () => {
+    const { t } = useTranslation();
     const settings = useWindowSettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -43,12 +45,15 @@ export const WindowSettings = () => {
                             toast.info({
                                 autoClose: false,
                                 id: 'restart-toast',
-                                message:
-                                    'Restart to apply changes... close the notification to restart Feishin',
+                                message: t('common.forceRestartRequired', {
+                                    postProcess: 'sentenceCase',
+                                }),
                                 onClose: () => {
                                     window.electron.ipc!.send('app-restart');
                                 },
-                                title: 'Restart required',
+                                title: t('common.restartRequired', {
+                                    postProcess: 'sentenceCase',
+                                }),
                             });
                         } else {
                             toast.update({
@@ -69,9 +74,12 @@ export const WindowSettings = () => {
                     }}
                 />
             ),
-            description: 'Adjust the style of the application window bar',
+            description: t('setting.windowBarStyle', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Window bar style',
+            title: t('setting.windowBarStyle', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -91,9 +99,12 @@ export const WindowSettings = () => {
                     }}
                 />
             ),
-            description: 'Minimize the application to the system tray',
+            description: t('setting.minimizeToTray', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Minimize to tray',
+            title: t('setting.minimizeToTray', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -113,9 +124,12 @@ export const WindowSettings = () => {
                     }}
                 />
             ),
-            description: 'Exit the application to the system tray',
+            description: t('setting.exitToTray', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Exit to tray',
+            title: t('setting.exitToTray', { postProcess: 'sentenceCase' }),
         },
     ];
 

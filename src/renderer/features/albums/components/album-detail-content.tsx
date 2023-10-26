@@ -1,8 +1,9 @@
+import { MutableRefObject, useCallback, useMemo } from 'react';
 import { RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
-import { MutableRefObject, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiHeartFill, RiHeartLine, RiMoreFill, RiSettings2Fill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -63,6 +64,7 @@ interface AlbumDetailContentProps {
 }
 
 export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentProps) => {
+    const { t } = useTranslation();
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();
     const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
@@ -206,7 +208,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 handlePreviousPage: () => handlePreviousPage('artist'),
                 hasPreviousPage: pagination.artist > 0,
             },
-            title: 'More from this artist',
+            title: t('page.albumDetail.moreFromArtist', { postProcess: 'sentenceCase' }),
             uniqueId: 'mostPlayed',
         },
         {
@@ -217,7 +219,10 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 (a) => a.id !== detailQuery?.data?.id,
             ).length,
             loading: relatedAlbumGenresQuery?.isLoading || relatedAlbumGenresQuery.isFetching,
-            title: `More from ${detailQuery?.data?.genres?.[0]?.name}`,
+            title: t('page.albumDetail.moreFromGeneric', {
+                item: detailQuery?.data?.genres?.[0]?.name,
+                postProcess: 'sentenceCase',
+            }),
             uniqueId: 'relatedGenres',
         },
     ];

@@ -2,48 +2,74 @@ import { useCallback, useMemo, useState, KeyboardEvent, ChangeEvent } from 'reac
 import { Group } from '@mantine/core';
 import isElectron from 'is-electron';
 import debounce from 'lodash/debounce';
+import { useTranslation } from 'react-i18next';
 import { RiDeleteBinLine, RiEditLine, RiKeyboardBoxLine } from 'react-icons/ri';
 import styled from 'styled-components';
 import { Button, TextInput, Checkbox } from '/@/renderer/components';
 import { BindingActions, useHotkeySettings, useSettingsStoreActions } from '/@/renderer/store';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
+import i18n from '/@/i18n/i18n';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 
 const BINDINGS_MAP: Record<BindingActions, string> = {
-    browserBack: 'Browser back',
-    browserForward: 'Browser forward',
+    browserBack: i18n.t('setting.hotkey', { context: 'browserBack', postProcess: 'sentenceCase' }),
+    browserForward: i18n.t('setting.hotkey', {
+        context: 'browserForward',
+        postProcess: 'sentenceCase',
+    }),
     favoriteCurrentAdd: 'Favorite current song',
     favoriteCurrentRemove: 'Unfavorite current song',
     favoriteCurrentToggle: 'Toggle current song favorite',
     favoritePreviousAdd: 'Favorite previous song',
     favoritePreviousRemove: 'Unfavorite previous song',
     favoritePreviousToggle: 'Toggle previous song favorite',
-    globalSearch: 'Global search',
-    localSearch: 'In-page search',
-    next: 'Next track',
-    pause: 'Pause',
-    play: 'Play',
-    playPause: 'Play / Pause',
-    previous: 'Previous track',
-    rate0: 'Rating clear',
-    rate1: 'Rating 1 star',
-    rate2: 'Rating 2 star',
-    rate3: 'Rating 3 star',
-    rate4: 'Rating 4 star',
-    rate5: 'Rating 5 star',
-    skipBackward: 'Skip backward',
-    skipForward: 'Skip forward',
-    stop: 'Stop',
-    toggleFullscreenPlayer: 'Toggle fullscreen player',
-    toggleQueue: 'Toggle queue',
-    toggleRepeat: 'Toggle repeat',
-    toggleShuffle: 'Toggle shuffle',
-    volumeDown: 'Volume down',
-    volumeMute: 'Volume mute',
-    volumeUp: 'Volume up',
-    zoomIn: 'Zoom in',
-    zoomOut: 'Zoom out',
+    globalSearch: i18n.t('setting.hotkey', {
+        context: 'globalSearch',
+        postProcess: 'sentenceCase',
+    }),
+    localSearch: i18n.t('setting.hotkey', { context: 'localSearch', postProcess: 'sentenceCase' }),
+    next: i18n.t('setting.hotkey', { context: 'playbackNext', postProcess: 'sentenceCase' }),
+    pause: i18n.t('setting.hotkey', { context: 'playbackPause', postProcess: 'sentenceCase' }),
+    play: i18n.t('setting.hotkey', { context: 'playbackPlay', postProcess: 'sentenceCase' }),
+    playPause: i18n.t('setting.hotkey', {
+        context: 'playbackPlayPause',
+        postProcess: 'sentenceCase',
+    }),
+    previous: i18n.t('setting.hotkey', {
+        context: 'playbackPrevious',
+        postProcess: 'sentenceCase',
+    }),
+    rate0: i18n.t('setting.hotkey', { context: 'rate0', postProcess: 'sentenceCase' }),
+    rate1: i18n.t('setting.hotkey', { context: 'rate1', postProcess: 'sentenceCase' }),
+    rate2: i18n.t('setting.hotkey', { context: 'rate2', postProcess: 'sentenceCase' }),
+    rate3: i18n.t('setting.hotkey', { context: 'rate3', postProcess: 'sentenceCase' }),
+    rate4: i18n.t('setting.hotkey', { context: 'rate4', postProcess: 'sentenceCase' }),
+    rate5: i18n.t('setting.hotkey', { context: 'rate5', postProcess: 'sentenceCase' }),
+    skipBackward: i18n.t('setting.hotkey', {
+        context: 'skipBackward',
+        postProcess: 'sentenceCase',
+    }),
+    skipForward: i18n.t('setting.hotkey', { context: 'skipForward', postProcess: 'sentenceCase' }),
+    stop: i18n.t('setting.hotkey', { context: 'playbackStop', postProcess: 'sentenceCase' }),
+    toggleFullscreenPlayer: i18n.t('setting.hotkey', {
+        context: 'toggleFullScreenPlayer',
+        postProcess: 'sentenceCase',
+    }),
+    toggleQueue: i18n.t('setting.hotkey', { context: 'toggleQueue', postProcess: 'sentenceCase' }),
+    toggleRepeat: i18n.t('setting.hotkey', {
+        context: 'toggleRepeat',
+        postProcess: 'sentenceCase',
+    }),
+    toggleShuffle: i18n.t('setting.hotkey', {
+        context: 'toggleShuffle',
+        postProcess: 'sentenceCase',
+    }),
+    volumeDown: i18n.t('setting.hotkey', { context: 'volumeDown', postProcess: 'sentenceCase' }),
+    volumeMute: i18n.t('setting.hotkey', { context: 'volumeMute', postProcess: 'sentenceCase' }),
+    volumeUp: i18n.t('setting.hotkey', { context: 'volumeUp', postProcess: 'sentenceCase' }),
+    zoomIn: i18n.t('setting.hotkey', { context: 'zoomIn', postProcess: 'sentenceCase' }),
+    zoomOut: i18n.t('setting.hotkey', { context: 'zoomOut', postProcess: 'sentenceCase' }),
 };
 
 const HotkeysContainer = styled.div`
@@ -59,6 +85,7 @@ const HotkeysContainer = styled.div`
 `;
 
 export const HotkeyManagerSettings = () => {
+    const { t } = useTranslation();
     const { bindings, globalMediaHotkeys } = useHotkeySettings();
     const { setSettings } = useSettingsStoreActions();
     const [selected, setSelected] = useState<BindingActions | null>(null);
@@ -175,8 +202,11 @@ export const HotkeyManagerSettings = () => {
         <>
             <SettingsOptions
                 control={<></>}
-                description="Configure application hotkeys. Toggle the checkbox to set as a global hotkey (desktop only)"
-                title="Application hotkeys"
+                description={t('setting.applicationHotkeys', {
+                    context: 'description',
+                    postProcess: 'sentenceCase',
+                })}
+                title={t('setting.applicationHotkeys', { postProcess: 'sentenceCase' })}
             />
             <HotkeysContainer>
                 {Object.keys(bindings)

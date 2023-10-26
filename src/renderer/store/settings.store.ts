@@ -22,6 +22,7 @@ import {
     FontType,
 } from '/@/renderer/types';
 import { randomString } from '/@/renderer/utils';
+import i18n from '/@/i18n/i18n';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -33,26 +34,61 @@ export type SidebarItemType = {
 };
 
 export const sidebarItems = [
-    { disabled: true, id: 'Now Playing', label: 'Now Playing', route: AppRoute.NOW_PLAYING },
+    {
+        disabled: true,
+        id: 'Now Playing',
+        label: i18n.t('page.sidebar.nowPlaying'),
+        route: AppRoute.NOW_PLAYING,
+    },
     {
         disabled: true,
         id: 'Search',
-        label: 'Search',
+        label: i18n.t('page.sidebar.search'),
         route: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
     },
-    { disabled: false, id: 'Home', label: 'Home', route: AppRoute.HOME },
-    { disabled: false, id: 'Albums', label: 'Albums', route: AppRoute.LIBRARY_ALBUMS },
-    { disabled: false, id: 'Tracks', label: 'Tracks', route: AppRoute.LIBRARY_SONGS },
+    { disabled: false, id: 'Home', label: i18n.t('page.sidebar.home'), route: AppRoute.HOME },
+    {
+        disabled: false,
+        id: 'Albums',
+        label: i18n.t('page.sidebar.albums'),
+        route: AppRoute.LIBRARY_ALBUMS,
+    },
+    {
+        disabled: false,
+        id: 'Tracks',
+        label: i18n.t('page.sidebar.tracks'),
+        route: AppRoute.LIBRARY_SONGS,
+    },
     {
         disabled: false,
         id: 'Artists',
-        label: 'Artists',
+        label: i18n.t('page.sidebar.artists'),
         route: AppRoute.LIBRARY_ALBUM_ARTISTS,
     },
-    { disabled: false, id: 'Genres', label: 'Genres', route: AppRoute.LIBRARY_GENRES },
-    { disabled: true, id: 'Folders', label: 'Folders', route: AppRoute.LIBRARY_FOLDERS },
-    { disabled: true, id: 'Playlists', label: 'Playlists', route: AppRoute.PLAYLISTS },
-    { disabled: true, id: 'Settings', label: 'Settings', route: AppRoute.SETTINGS },
+    {
+        disabled: false,
+        id: 'Genres',
+        label: i18n.t('page.sidebar.genres'),
+        route: AppRoute.LIBRARY_GENRES,
+    },
+    {
+        disabled: true,
+        id: 'Folders',
+        label: i18n.t('page.sidebar.folders'),
+        route: AppRoute.LIBRARY_FOLDERS,
+    },
+    {
+        disabled: true,
+        id: 'Playlists',
+        label: i18n.t('page.sidebar.playlists'),
+        route: AppRoute.PLAYLISTS,
+    },
+    {
+        disabled: true,
+        id: 'Settings',
+        label: i18n.t('page.sidebar.settings'),
+        route: AppRoute.SETTINGS,
+    },
 ];
 
 export type PersistedTableColumn = {

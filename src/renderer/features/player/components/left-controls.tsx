@@ -2,6 +2,7 @@ import React, { MouseEvent } from 'react';
 import { Center, Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { RiArrowUpSLine, RiDiscLine, RiMore2Fill } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -92,6 +93,7 @@ const LeftControlsContainer = styled.div`
 `;
 
 export const LeftControls = () => {
+    const { t } = useTranslation();
     const { setSideBar } = useAppStoreActions();
     const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
@@ -147,7 +149,9 @@ export const LeftControls = () => {
                                 onClick={handleToggleFullScreenPlayer}
                             >
                                 <Tooltip
-                                    label="Toggle fullscreen player"
+                                    label={t('player.toggleFullscreenPlayer', {
+                                        postProcess: 'sentenceCase',
+                                    })}
                                     openDelay={500}
                                 >
                                     {currentSong?.imageUrl ? (
@@ -182,7 +186,12 @@ export const LeftControls = () => {
                                             right: 2,
                                             top: 2,
                                         }}
-                                        tooltip={{ label: 'Expand', openDelay: 500 }}
+                                        tooltip={{
+                                            label: t('glossary.expand', {
+                                                postProcess: 'titleCase',
+                                            }),
+                                            openDelay: 500,
+                                        }}
                                         variant="default"
                                         onClick={handleToggleSidebarImage}
                                     >

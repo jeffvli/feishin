@@ -1,8 +1,10 @@
-import { NumberInput, Slider, Switch, Text } from '/@/renderer/components';
+import { NumberInput, Slider, Switch } from '/@/renderer/components';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { SettingOption, SettingsSection } from '../settings-section';
+import { useTranslation } from 'react-i18next';
 
 export const ScrobbleSettings = () => {
+    const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -25,8 +27,11 @@ export const ScrobbleSettings = () => {
                     }}
                 />
             ),
-            description: 'Enable or disable scrobbling to your media server',
-            title: 'Scrobble',
+            description: t('setting.scrobble', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.scrobble', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -50,9 +55,11 @@ export const ScrobbleSettings = () => {
                     }}
                 />
             ),
-            description:
-                'The percentage of the song that must be played before submitting a scrobble',
-            title: 'Minimum scrobble percentage*',
+            description: t('setting.minimumScrobblePercentage', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.minimumScrobblePercentage', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -76,21 +83,13 @@ export const ScrobbleSettings = () => {
                     }}
                 />
             ),
-            description:
-                'The duration in seconds of a song that must be played before submitting a scrobble',
-            title: 'Minimum scrobble duration (seconds)*',
+            description: t('setting.minimumScrobblePercentage', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.minimumScrobbleSeconds', { postProcess: 'sentenceCase' }),
         },
     ];
 
-    return (
-        <>
-            <SettingsSection options={scrobbleOptions} />
-            <Text
-                $secondary
-                size="sm"
-            >
-                *The scrobble will be submitted if one or more of the above conditions is met
-            </Text>
-        </>
-    );
+    return <SettingsSection options={scrobbleOptions} />;
 };

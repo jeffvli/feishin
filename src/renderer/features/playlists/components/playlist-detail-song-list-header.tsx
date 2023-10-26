@@ -1,6 +1,7 @@
+import { MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Stack } from '@mantine/core';
-import { MutableRefObject } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { LibraryItem } from '/@/renderer/api/types';
 import { Badge, PageHeader, Paper, SpinnerIcon } from '/@/renderer/components';
@@ -23,6 +24,7 @@ export const PlaylistDetailSongListHeader = ({
     itemCount,
     handleToggleShowQueryBuilder,
 }: PlaylistDetailHeaderProps) => {
+    const { t } = useTranslation();
     const { playlistId } = useParams() as { playlistId: string };
     const server = useCurrentServer();
     const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
@@ -58,7 +60,7 @@ export const PlaylistDetailSongListHeader = ({
                             itemCount
                         )}
                     </Paper>
-                    {isSmartPlaylist && <Badge size="lg">Smart playlist</Badge>}
+                    {isSmartPlaylist && <Badge size="lg">{t('entity.smartPlaylist')}</Badge>}
                 </LibraryHeaderBar>
             </PageHeader>
             <Paper p="1rem">

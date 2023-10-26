@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { SettingOption, SettingsSection } from '../settings-section';
 import { Switch } from '/@/renderer/components';
 import { useHotkeySettings, useSettingsStoreActions } from '/@/renderer/store';
@@ -6,6 +7,7 @@ import { useHotkeySettings, useSettingsStoreActions } from '/@/renderer/store';
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const WindowHotkeySettings = () => {
+    const { t } = useTranslation();
     const settings = useHotkeySettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -13,7 +15,6 @@ export const WindowHotkeySettings = () => {
         {
             control: (
                 <Switch
-                    aria-label="Toggle global media hotkeys"
                     defaultChecked={settings.globalMediaHotkeys}
                     disabled={!isElectron()}
                     onChange={(e) => {
@@ -33,10 +34,12 @@ export const WindowHotkeySettings = () => {
                     }}
                 />
             ),
-            description:
-                'Enable or disable the usage of your system media hotkeys to control the audio player',
+            description: t('setting.globalMediaHotkeys', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Global media hotkeys',
+            title: t('setting.globalMediaHotkeys', { postProcess: 'sentenceCase' }),
         },
     ];
 

@@ -1,8 +1,9 @@
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
 import { useListContext } from '../../../context/list-context';
 import { useListStoreByKey } from '../../../store/list.store';
@@ -42,6 +43,7 @@ export const PlaylistListHeaderFilters = ({
     gridRef,
     tableRef,
 }: PlaylistListHeaderFiltersProps) => {
+    const { t } = useTranslation();
     const { pageKey } = useListContext();
     const queryClient = useQueryClient();
     const server = useCurrentServer();
@@ -285,7 +287,7 @@ export const PlaylistListHeaderFilters = ({
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Refresh' }}
+                    tooltip={{ label: t('glossary.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >
@@ -308,7 +310,7 @@ export const PlaylistListHeaderFilters = ({
                             icon={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
-                            Refresh
+                            {t('glossary.refresh', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
@@ -328,27 +330,29 @@ export const PlaylistListHeaderFilters = ({
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        <DropdownMenu.Label>Display type</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.displayType', { postProcess: 'titleCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.CARD}
                             value={ListDisplayType.CARD}
                             onClick={handleSetViewType}
                         >
-                            Card
+                            {t('table.config.view.card', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.POSTER}
                             value={ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                         >
-                            Poster
+                            {t('table.config.view.poster', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                         >
-                            Table
+                            {t('table.config.view.table', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         {/* <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE_PAGINATED}
@@ -382,7 +386,11 @@ export const PlaylistListHeaderFilters = ({
                         </DropdownMenu.Item>
                         {!isGrid && (
                             <>
-                                <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.generaltableColumns', {
+                                        postProcess: 'titleCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
@@ -399,7 +407,11 @@ export const PlaylistListHeaderFilters = ({
                                             onChange={handleTableColumns}
                                         />
                                         <Group position="apart">
-                                            <Text>Auto Fit Columns</Text>
+                                            <Text>
+                                                {t('table.config.general.autoFitColumns', {
+                                                    postProcess: 'titleCase',
+                                                })}
+                                            </Text>
                                             <Switch
                                                 defaultChecked={table.autoFit}
                                                 onChange={handleAutoFitColumns}

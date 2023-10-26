@@ -1,6 +1,7 @@
+import { ChangeEvent, useMemo, useState } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useListFilterByKey } from '../../../store/list.store';
 import { AlbumArtistListSort, GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { MultiSelect, NumberInput, SpinnerIcon, Switch, Text } from '/@/renderer/components';
@@ -23,6 +24,7 @@ export const JellyfinAlbumFilters = ({
     pageKey,
     serverId,
 }: JellyfinAlbumFiltersProps) => {
+    const { t } = useTranslation();
     const filter = useListFilterByKey({ key: pageKey });
     const { setFilter } = useListStoreActions();
 
@@ -193,7 +195,7 @@ export const JellyfinAlbumFilters = ({
                 <NumberInput
                     defaultValue={filter?._custom?.jellyfin?.minYear}
                     hideControls={false}
-                    label="From year"
+                    label={t('filter.fromYear', { postProcess: 'sentenceCase' })}
                     max={2300}
                     min={1700}
                     required={!!filter?._custom?.jellyfin?.maxYear}
@@ -202,7 +204,7 @@ export const JellyfinAlbumFilters = ({
                 <NumberInput
                     defaultValue={filter?._custom?.jellyfin?.maxYear}
                     hideControls={false}
-                    label="To year"
+                    label={t('filter.toYear', { postProcess: 'sentenceCase' })}
                     max={2300}
                     min={1700}
                     required={!!filter?._custom?.jellyfin?.minYear}
@@ -215,7 +217,7 @@ export const JellyfinAlbumFilters = ({
                     searchable
                     data={genreList}
                     defaultValue={selectedGenres}
-                    label="Genres"
+                    label={t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
                     onChange={handleGenresFilter}
                 />
             </Group>
@@ -227,7 +229,7 @@ export const JellyfinAlbumFilters = ({
                     data={selectableAlbumArtists}
                     defaultValue={filter?._custom?.jellyfin?.AlbumArtistIds?.split(',')}
                     disabled={disableArtistFilter}
-                    label="Artist"
+                    label={t('entity.artist', { count: 2, postProcess: 'sentenceCase' })}
                     limit={300}
                     placeholder="Type to search for an artist"
                     rightSection={albumArtistListQuery.isFetching ? <SpinnerIcon /> : undefined}
