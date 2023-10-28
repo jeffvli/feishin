@@ -93,6 +93,39 @@
             ],
             "icon": "assets/icons/icon.ico"
         },
+        "deb": {
+            "depends": [
+                "libgssapi_krb5.so.2",
+                "libavahi-common.so.3",
+                "libavahi-client.so.3",
+                "libkrb5.so.3",
+                "libkrb5support.so.0",
+                "libkeyutils.so.1",
+                "libcups.so.2"
+            ]
+        },
+        "rpm": {
+            "depends": [
+                "libgssapi_krb5.so.2",
+                "libavahi-common.so.3",
+                "libavahi-client.so.3",
+                "libkrb5.so.3",
+                "libkrb5support.so.0",
+                "libkeyutils.so.1",
+                "libcups.so.2"
+            ]
+        },
+        "freebsd": {
+            "depends": [
+                "libgssapi_krb5.so.2",
+                "libavahi-common.so.3",
+                "libavahi-client.so.3",
+                "libkrb5.so.3",
+                "libkrb5support.so.0",
+                "libkeyutils.so.1",
+                "libcups.so.2"
+            ]
+        },
         "linux": {
             "target": [
                 "AppImage",
