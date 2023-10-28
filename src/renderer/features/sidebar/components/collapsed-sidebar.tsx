@@ -76,7 +76,7 @@ export const CollapsedSidebar = () => {
                             activeIcon={<RiMenuFill size="25" />}
                             component={UnstyledButton}
                             icon={<RiMenuFill size="25" />}
-                            label={t('glossary.menu', { postProcess: 'titleCase' })}
+                            label={t('common.menu', { postProcess: 'titleCase' })}
                         />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>

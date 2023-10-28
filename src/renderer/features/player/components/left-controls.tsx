@@ -187,7 +187,7 @@ export const LeftControls = () => {
                                             top: 2,
                                         }}
                                         tooltip={{
-                                            label: t('glossary.expand', {
+                                            label: t('common.expand', {
                                                 postProcess: 'titleCase',
                                             }),
                                             openDelay: 500,

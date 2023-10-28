@@ -228,7 +228,7 @@ export const NavidromeAlbumFilters = ({
                 <NumberInput
                     defaultValue={filter._custom?.navidrome?.year}
                     hideControls={false}
-                    label={t('glossary.year', { postProcess: 'titleCase' })}
+                    label={t('common.year', { postProcess: 'titleCase' })}
                     max={5000}
                     min={0}
                     onChange={(e) => handleYearFilter(e)}

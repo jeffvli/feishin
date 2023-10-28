@@ -172,7 +172,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                             compact
                             size="md"
                             tooltip={{
-                                label: t('glossary.configure', { postProcess: 'sentenceCase' }),
+                                label: t('common.configure', { postProcess: 'sentenceCase' }),
                             }}
                             variant="subtle"
                         >

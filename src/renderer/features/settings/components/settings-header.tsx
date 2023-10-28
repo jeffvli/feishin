@@ -38,7 +38,7 @@ export const SettingsHeader = () => {
                         <Group noWrap>
                             <RiSettings2Fill size="2rem" />
                             <LibraryHeaderBar.Title>
-                                {t('glossary.setting', { count: 2, postProcess: 'titleCase' })}
+                                {t('common.setting', { count: 2, postProcess: 'titleCase' })}
                             </LibraryHeaderBar.Title>
                         </Group>
                         <Button

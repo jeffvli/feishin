@@ -56,7 +56,7 @@ export const LyricsActions = ({
                             })
                         }
                     >
-                        {t('glossary.search', { postProcess: 'titleCase' })}
+                        {t('common.search', { postProcess: 'titleCase' })}
                     </Button>
                 ) : null}
                 <Button
@@ -92,7 +92,7 @@ export const LyricsActions = ({
                         variant="subtle"
                         onClick={onResetLyric}
                     >
-                        {t('glossary.reset', { postProcess: 'sentenceCase' })}
+                        {t('common.reset', { postProcess: 'sentenceCase' })}
                     </Button>
                 ) : null}
             </Group>
@@ -106,7 +106,7 @@ export const LyricsActions = ({
                         variant="subtle"
                         onClick={onRemoveLyric}
                     >
-                        {t('glossary.clear', { postProcess: 'sentenceCase' })}
+                        {t('common.clear', { postProcess: 'sentenceCase' })}
                     </Button>
                 ) : null}
             </Box>

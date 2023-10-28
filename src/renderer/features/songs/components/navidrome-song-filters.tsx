@@ -121,7 +121,7 @@ export const NavidromeSongFilters = ({
             <Divider my="0.5rem" />
             <Group grow>
                 <NumberInput
-                    label={t('glossary.year', { postProcess: 'titleCase' })}
+                    label={t('common.year', { postProcess: 'titleCase' })}
                     max={5000}
                     min={0}
                     value={filter._custom?.navidrome?.year}

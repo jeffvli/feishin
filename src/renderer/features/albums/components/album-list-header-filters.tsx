@@ -430,7 +430,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                         },
                     }}
                     tooltip={{
-                        label: t('glossary.filter', { count: 2, postProcess: 'sentenceCase' }),
+                        label: t('common.filter', { count: 2, postProcess: 'sentenceCase' }),
                     }}
                     variant="subtle"
                     onClick={handleOpenFiltersModal}
@@ -441,7 +441,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: t('glossary.refresh', { postProcess: 'sentenceCase' }) }}
+                    tooltip={{ label: t('common.refresh', { postProcess: 'sentenceCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >
@@ -482,7 +482,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                             icon={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
-                            {t('glossary.refresh', { postProcess: 'sentenceCase' })}
+                            {t('common.refresh', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
@@ -500,7 +500,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                             compact
                             size="md"
                             tooltip={{
-                                label: t('glossary.configure', { postProcess: 'sentenceCase' }),
+                                label: t('common.configure', { postProcess: 'sentenceCase' }),
                             }}
                             variant="subtle"
                         >

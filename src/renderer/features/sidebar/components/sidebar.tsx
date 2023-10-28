@@ -263,7 +263,7 @@ export const Sidebar = () => {
                                 size="md"
                                 sx={{ cursor: 'default', position: 'absolute', right: 5, top: 5 }}
                                 tooltip={{
-                                    label: t('glossary.collapse', { postProcess: 'titleCase' }),
+                                    label: t('common.collapse', { postProcess: 'titleCase' }),
                                     openDelay: 500,
                                 }}
                                 variant="default"

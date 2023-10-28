@@ -271,7 +271,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: t('glossary.refresh', { postProcess: 'titleCase' }) }}
+                    tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >
@@ -293,7 +293,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                             icon={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
-                            {t('glossary.refresh', { postProcess: 'titleCase' })}
+                            {t('common.refresh', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
@@ -311,7 +311,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                             compact
                             size="md"
                             tooltip={{
-                                label: t('glossary.configure', { postProcess: 'titleCase' }),
+                                label: t('common.configure', { postProcess: 'titleCase' }),
                             }}
                             variant="subtle"
                         >

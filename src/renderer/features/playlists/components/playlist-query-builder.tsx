@@ -420,21 +420,21 @@ export const PlaylistQueryBuilder = forwardRef(
                         <Select
                             data={[
                                 {
-                                    label: t('glossary.ascending', { postProcess: 'titleCase' }),
+                                    label: t('common.ascending', { postProcess: 'titleCase' }),
                                     value: 'asc',
                                 },
                                 {
-                                    label: t('glossary.descending', { postProcess: 'titleCase' }),
+                                    label: t('common.descending', { postProcess: 'titleCase' }),
                                     value: 'desc',
                                 },
                             ]}
-                            label={t('glossary.order', { postProcess: 'titleCase' })}
+                            label={t('common.order', { postProcess: 'titleCase' })}
                             maxWidth="20%"
                             width={125}
                             {...extraFiltersForm.getInputProps('sortOrder')}
                         />
                         <NumberInput
-                            label={t('glossary.limit', { postProcess: 'titleCase' })}
+                            label={t('common.limit', { postProcess: 'titleCase' })}
                             maxWidth="20%"
                             width={75}
                             {...extraFiltersForm.getInputProps('limit')}

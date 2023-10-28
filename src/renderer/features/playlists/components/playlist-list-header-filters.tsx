@@ -287,7 +287,7 @@ export const PlaylistListHeaderFilters = ({
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: t('glossary.refresh', { postProcess: 'titleCase' }) }}
+                    tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >
@@ -310,7 +310,7 @@ export const PlaylistListHeaderFilters = ({
                             icon={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
-                            {t('glossary.refresh', { postProcess: 'titleCase' })}
+                            {t('common.refresh', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
