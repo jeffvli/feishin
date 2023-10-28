@@ -710,7 +710,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={0}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(0),
@@ -721,7 +720,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={1}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(1),
@@ -732,7 +730,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={2}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(2),
@@ -743,7 +740,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={3}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(3),
@@ -754,7 +750,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={4}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(4),
@@ -765,7 +760,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={5}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(5),
