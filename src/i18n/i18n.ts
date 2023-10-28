@@ -1,13 +1,13 @@
 import { PostProcessorModule } from 'i18next';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-const en = require('./locales/en.json');
+import en from './locales/en.json';
 
 const resources = {
     en: { translation: en },
 };
 
-export const Languages = [
+export const languages = [
     {
         label: 'English',
         value: 'en',
@@ -66,7 +66,6 @@ i18n.use(lowerCasePostProcessor)
         interpolation: {
             escapeValue: false, // react already safes from xss
         },
-        lng: 'en',
         resources,
     });
 

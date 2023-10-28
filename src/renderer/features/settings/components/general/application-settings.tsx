@@ -13,7 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FontType } from '/@/renderer/types';
-import i18n from '/@/i18n/i18n';
+import i18n, { languages } from '/@/i18n/i18n';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 const ipc = isElectron() ? window.electron.ipc : null;
@@ -146,12 +146,22 @@ export const ApplicationSettings = () => {
         getFonts();
     }, [fontSettings, localFonts, setSettings, t]);
 
+    const handleChangeLanguage = (e: string) => {
+        setSettings({
+            general: {
+                ...settings,
+                language: e,
+            },
+        });
+    };
+
     const options: SettingOption[] = [
         {
             control: (
                 <Select
-                    disabled
-                    data={[]}
+                    data={languages}
+                    value={settings.language}
+                    onChange={handleChangeLanguage}
                 />
             ),
             description: t('setting.language', {

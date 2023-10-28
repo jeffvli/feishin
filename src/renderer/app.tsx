@@ -26,6 +26,7 @@ import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store
 import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
 import '@ag-grid-community/styles/ag-grid.css';
 import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
+import i18n from '/@/i18n/i18n';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -39,6 +40,7 @@ const remote = isElectron() ? window.electron.remote : null;
 export const App = () => {
     const theme = useTheme();
     const accent = useSettingsStore((store) => store.general.accent);
+    const language = useSettingsStore((store) => store.general.language);
     const { builtIn, custom, system, type } = useSettingsStore((state) => state.font);
     const { type: playbackType } = usePlaybackSettings();
     const { bindings } = useHotkeySettings();
@@ -177,6 +179,12 @@ export const App = () => {
         // We only want to fire this once
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (language) {
+            i18n.changeLanguage(language);
+        }
+    }, [language]);
 
     return (
         <MantineProvider

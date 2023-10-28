@@ -171,7 +171,7 @@ export interface SettingsState {
         accent: string;
         defaultFullPlaylist: boolean;
         followSystemTheme: boolean;
-
+        language: string;
         playButtonBehavior: Play;
         resume: boolean;
         showQueueDrawerButton: boolean;
@@ -282,6 +282,7 @@ const initialState: SettingsState = {
         accent: 'rgb(53, 116, 252)',
         defaultFullPlaylist: true,
         followSystemTheme: false,
+        language: 'en',
         playButtonBehavior: Play.NOW,
         resume: false,
         showQueueDrawerButton: false,
