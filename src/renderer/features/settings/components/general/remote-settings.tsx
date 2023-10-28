@@ -95,7 +95,7 @@ export const RemoteSettings = () => {
             description:
                 'Remote server port. Changes here only take effect when you enable the remote',
             isHidden,
-            title: 'Remove server port',
+            title: 'Remote server port',
         },
         {
             control: (
