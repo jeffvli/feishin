@@ -17,6 +17,8 @@
         "viewPlaylists": "view $t(entity.playlist_other)"
     },
     "common": {
+        "currentSong": "current $t(entity.track_one)",
+        "previousSong": "previous $t(entity.track_one)",
         "backward": "backward",
         "forward": "forward",
         "modified": "modified",
@@ -414,6 +416,12 @@
         "gaplessAudio_optionWeak": "weak (recommended)",
         "globalMediaHotkeys": "global media hotkeys",
         "globalMediaHotkeys_description": "enable or disable the usage of your system media hotkeys to control playback",
+        "hotkey_favoriteCurrentSong": "favorite $t(common.currentSong)",
+        "hotkey_unfavoriteCurrentSong": "unfavorite $t(common.currentSong)",
+        "hotkey_toggleCurrentSongFavorite": "toggle $t(common.currentSong) favorite",
+        "hotkey_favoritePreviousSong": "favorite $t(common.previousSong)",
+        "hotkey_unfavoritePreviousSong": "unfavorite $t(common.previousSong)",
+        "hotkey_togglePreviousSongFavorite": "toggle $t(common.previousSong) favorite",
         "hotkey_browserBack": "browser back",
         "hotkey_browserForward": "browser forward",
         "hotkey_globalSearch": "global search",

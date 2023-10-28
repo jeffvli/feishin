@@ -18,12 +18,30 @@ const BINDINGS_MAP: Record<BindingActions, string> = {
         context: 'browserForward',
         postProcess: 'sentenceCase',
     }),
-    favoriteCurrentAdd: 'Favorite current song',
-    favoriteCurrentRemove: 'Unfavorite current song',
-    favoriteCurrentToggle: 'Toggle current song favorite',
-    favoritePreviousAdd: 'Favorite previous song',
-    favoritePreviousRemove: 'Unfavorite previous song',
-    favoritePreviousToggle: 'Toggle previous song favorite',
+    favoriteCurrentAdd: i18n.t('setting.hotkey', {
+        context: 'favoriteCurrentSong',
+        postProcess: 'sentenceCase',
+    }),
+    favoriteCurrentRemove: i18n.t('setting.hotkey', {
+        context: 'unfavoriteCurrentSong',
+        postProcess: 'sentenceCase',
+    }),
+    favoriteCurrentToggle: i18n.t('setting.hotkey', {
+        context: 'toggleCurrentSongFavorite',
+        postProcess: 'sentenceCase',
+    }),
+    favoritePreviousAdd: i18n.t('setting.hotkey', {
+        context: 'favoritePreviousSong',
+        postProcess: 'sentenceCase',
+    }),
+    favoritePreviousRemove: i18n.t('setting.hotkey', {
+        context: 'unfavoritePreviousSong',
+        postProcess: 'sentenceCase',
+    }),
+    favoritePreviousToggle: i18n.t('setting.hotkey', {
+        context: 'togglePreviousSongFavorite',
+        postProcess: 'sentenceCase',
+    }),
     globalSearch: i18n.t('setting.hotkey', {
         context: 'globalSearch',
         postProcess: 'sentenceCase',
