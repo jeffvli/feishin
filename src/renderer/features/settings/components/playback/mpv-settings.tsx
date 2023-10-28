@@ -282,7 +282,7 @@ export const MpvSettings = () => {
             note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
             title: t('setting.replayGainMode', {
                 ReplayGain: 'ReplayGain',
-                postProcess: 'lowerCase',
+                postProcess: 'sentenceCase',
             }),
         },
         {
@@ -300,7 +300,7 @@ export const MpvSettings = () => {
             }),
             title: t('setting.replayGainPreamp', {
                 ReplayGain: 'ReplayGain',
-                postProcess: 'lowerCase',
+                postProcess: 'sentenceCase',
             }),
         },
         {
@@ -318,7 +318,7 @@ export const MpvSettings = () => {
             }),
             title: t('setting.replayGainClipping', {
                 ReplayGain: 'ReplayGain',
-                postProcess: 'lowerCase',
+                postProcess: 'sentenceCase',
             }),
         },
         {
@@ -335,7 +335,7 @@ export const MpvSettings = () => {
             }),
             title: t('setting.replayGainFallback', {
                 ReplayGain: 'ReplayGain',
-                postProcess: 'lowerCase',
+                postProcess: 'sentenceCase',
             }),
         },
     ];

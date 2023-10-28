@@ -271,9 +271,14 @@ export const ApplicationSettings = () => {
                     }}
                 />
             ),
-            description: 'Sets the application zoom factor in percent',
+            description: t('setting.zoom', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Zoom factor',
+            title: t('setting.zoom', {
+                postProcess: 'sentenceCase',
+            }),
         },
     ];
 

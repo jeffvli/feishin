@@ -3,6 +3,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { Group } from '@mantine/core';
 import { Button, Popover } from '/@/renderer/components';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import {
     RiArrowDownLine,
     RiArrowUpLine,
@@ -27,6 +28,7 @@ interface PlayQueueListOptionsProps {
 }
 
 export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsProps) => {
+    const { t } = useTranslation();
     const { clearQueue, moveToBottomOfQueue, moveToTopOfQueue, shuffleQueue, removeFromQueue } =
         useQueueControls();
 
@@ -115,7 +117,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Shuffle queue' }}
+                    tooltip={{ label: t('player.shuffle', { postProcess: 'sentenceCase' }) }}
                     variant="default"
                     onClick={handleShuffleQueue}
                 >
@@ -124,7 +126,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Move selected to bottom' }}
+                    tooltip={{ label: t('action.moveToBottom', { postProcess: 'sentenceCase' }) }}
                     variant="default"
                     onClick={handleMoveToBottom}
                 >
@@ -133,7 +135,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Move selected to top' }}
+                    tooltip={{ label: t('action.moveToTop', { postProcess: 'sentenceCase' }) }}
                     variant="default"
                     onClick={handleMoveToTop}
                 >
@@ -142,7 +144,9 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Remove selected' }}
+                    tooltip={{
+                        label: t('action.removeFromQueue', { postProcess: 'sentenceCase' }),
+                    }}
                     variant="default"
                     onClick={handleRemoveSelected}
                 >
@@ -151,7 +155,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Clear queue' }}
+                    tooltip={{ label: t('action.clearQueue', { postProcess: 'sentenceCase' }) }}
                     variant="default"
                     onClick={handleClearQueue}
                 >
@@ -167,7 +171,9 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                         <Button
                             compact
                             size="md"
-                            tooltip={{ label: 'Configure' }}
+                            tooltip={{
+                                label: t('glossary.configure', { postProcess: 'sentenceCase' }),
+                            }}
                             variant="subtle"
                         >
                             <RiListSettingsLine size="1.1rem" />

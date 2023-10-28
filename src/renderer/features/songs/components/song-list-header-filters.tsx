@@ -423,7 +423,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                             fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
                         },
                     }}
-                    tooltip={{ label: 'Filters' }}
+                    tooltip={{ label: t('common.filters', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleOpenFiltersModal}
                 >
@@ -433,7 +433,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Refresh' }}
+                    tooltip={{ label: t('glossary.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >

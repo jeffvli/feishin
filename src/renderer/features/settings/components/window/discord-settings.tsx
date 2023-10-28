@@ -38,7 +38,7 @@ export const DiscordSettings = () => {
             isHidden: !isElectron(),
             title: t('setting.discordRichPresence', {
                 discord: 'Discord',
-                postProcess: 'lowerCase',
+                postProcess: 'sentenceCase',
             }),
         },
         {
@@ -64,7 +64,7 @@ export const DiscordSettings = () => {
             isHidden: !isElectron(),
             title: t('setting.discordApplicationId', {
                 discord: 'Discord',
-                postProcess: 'lowerCase',
+                postProcess: 'sentenceCase',
             }),
         },
         {
@@ -93,7 +93,7 @@ export const DiscordSettings = () => {
             isHidden: !isElectron(),
             title: t('setting.discordUpdateInterval', {
                 discord: 'Discord',
-                postProcess: 'lowerCase',
+                postProcess: 'sentenceCase',
             }),
         },
         {

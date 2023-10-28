@@ -53,7 +53,7 @@ export const JellyfinAlbumFilters = ({
 
     const toggleFilters = [
         {
-            label: 'Is favorited',
+            label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
                     customFilters,

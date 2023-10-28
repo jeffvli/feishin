@@ -136,7 +136,7 @@ export const SidebarSettings = () => {
                         variant="filled"
                         onClick={handleSave}
                     >
-                        Save sidebar configuration
+                        {t('common.save', { postProcess: 'titleCase' })}
                     </Button>
                 }
                 description={t('setting.sidebarCollapsedNavigation', {

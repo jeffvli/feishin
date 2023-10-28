@@ -2,10 +2,12 @@
     "action": {
         "addToFavorites": "add to $t(entity.favorite_other)",
         "addToPlaylist": "add to $t(entity.playlist_one)",
+        "clearQueue": "clear queue",
         "createPlaylist": "create $t(entity.playlist_one)",
         "deletePlaylist": "delete $t(entity.playlist_one)",
         "deselectAll": "deselect all",
         "editPlaylist": "edit $t(entity.playlist_one)",
+        "goToPage": "go to page",
         "moveToBottom": "move to bottom",
         "moveToTop": "move to top",
         "refresh": "$t(glossary.refresh)",
@@ -17,43 +19,46 @@
         "viewPlaylists": "view $t(entity.playlist_other)"
     },
     "common": {
-        "currentSong": "current $t(entity.track_one)",
-        "previousSong": "previous $t(entity.track_one)",
-        "backward": "backward",
-        "forward": "forward",
-        "modified": "modified",
-        "minimize": "minimize",
-        "increase": "increase",
-        "decrease": "decrease",
-        "maximize": "maximize",
-        "areYouSure": "are you sure?",
-        "resetToDefault": "reset to default",
-        "manage": "manage",
         "add": "add",
+        "areYouSure": "are you sure?",
+        "backward": "backward",
         "cancel": "cancel",
+        "center": "center",
+        "comingSoon": "coming soon...",
         "confirm": "confirm",
         "create": "create",
+        "currentSong": "current $t(entity.track_one)",
+        "decrease": "decrease",
         "delete": "delete",
         "disable": "disable",
         "dismiss": "dismiss",
         "edit": "edit",
         "enable": "enable",
+        "filters": "filters",
+        "forceRestartRequired": "restart to apply changes... close the notification to restart",
+        "forward": "forward",
+        "increase": "increase",
+        "left": "left",
+        "manage": "manage",
+        "maximize": "maximize",
+        "minimize": "minimize",
+        "modified": "modified",
         "no": "no",
         "none": "none",
+        "noResultsFromQuery": "the query returned no results",
         "ok": "ok",
         "playerMustBePaused": "player must be paused",
+        "previousSong": "previous $t(entity.track_one)",
         "quit": "quit",
+        "resetToDefault": "reset to default",
         "restartRequired": "restart required",
-        "forceRestartRequired": "restart to apply changes... close the notification to restart",
-        "save": "save",
-        "saveAs": "save as",
-        "saveAndReplace": "save and replace",
-        "yes": "yes",
-        "left": "left",
-        "center": "center",
         "right": "right",
+        "save": "save",
+        "saveAndReplace": "save and replace",
+        "saveAs": "save as",
         "search": "search",
-        "noResultsFromQuery": "the query returned no results"
+        "unknown": "unknown",
+        "yes": "yes"
     },
     "entity": {
         "album_one": "album",
@@ -82,8 +87,6 @@
         "playlist_other": "playlists",
         "playlistWithCount_one": "{{count}} playlist",
         "playlistWithCount_other": "{{count}} playlists",
-        "setting_one": "setting",
-        "setting_other": "settings",
         "smartPlaylist": "smart $t(entity.playlist_one)",
         "track_one": "track",
         "track_other": "tracks",
@@ -91,79 +94,27 @@
         "trackWithCount_other": "{{count}} tracks"
     },
     "error": {
-        "playbackError": "an error occurred when trying to play the media",
-        "genericError": "an error occurred",
         "apiRouteError": "unable to route request",
-        "serverNotSelectedError": "no server selected",
-        "endpointNotImplementedError": "endpoint {{endpoint} is not implemented for {{serverType}}",
         "audioDeviceFetchError": "an error occurred when trying to get audio devices",
+        "authenticationFailed": "authentication failed",
+        "credentialsRequired": "credentials required",
+        "endpointNotImplementedError": "endpoint {{endpoint} is not implemented for {{serverType}}",
+        "genericError": "an error occurred",
+        "invalidServer": "invalid server",
         "localFontAccessDenied": "access denied to local fonts",
+        "loginRateError": "too many login attempts, please try again in a few seconds",
+        "mpvRequired": "MPV required",
+        "playbackError": "an error occurred when trying to play the media",
         "remoteDisableError": "an error occurred when trying to $t(common.disable) the remote server",
         "remoteEnableError": "an error occurred when trying to $t(common.enable) the remote server",
         "remotePortError": "an error occurred when trying to set the remote server port",
         "remotePortWarning": "restart the server to apply the new port",
-        "systemFontError": "an error occurred when trying to get system fonts",
-        "invalidServer": "invalid server",
-        "authenticationFailed": "authentication failed",
+        "serverNotSelectedError": "no server selected",
+        "serverRequired": "server required",
         "sessionExpiredError": "your session has expired",
-        "loginRateError": "too many login attempts, please try again in a few seconds",
-        "mpvRequired": "MPV required",
-        "credentialsRequired": "credentials required",
-        "serverRequired": "server required"
-    },
-    "form": {
-        "addServer": {
-            "title": "add server",
-            "input_name": "server name",
-            "input_url": "url",
-            "input_username": "username",
-            "input_password": "password",
-            "input_savePassword": "save password",
-            "input_legacyAuthentication": "enable legacy authentication",
-            "ignoreCors": "ignore cors ($t(common.restartRequired))",
-            "ignoreSsl": "ignore ssl ($t(common.restartRequired))",
-            "success": "server added successfully",
-            "error_savePassword": "an error occurred when trying to save the password"
-        },
-        "createPlaylist": {
-            "title": "create $t(entity.playlist_one)",
-            "input_name": "$t(glossary.name)",
-            "input_description": "$t(glossary.description)",
-            "input_public": "public",
-            "input_owner": "$t(glossary.owner)",
-            "success": "$t(entity.playlist_one) created successfully"
-        },
-        "editPlaylist": {
-            "title": "edit $t(entity.playlist_one)"
-        },
-        "deletePlaylist": {
-            "title": "delete $t(entity.playlist_one)",
-            "input_confirm": "type the name of the $t(entity.playlist_one) to confirm",
-            "success": "$t(entity.playlist_one) deleted successfully"
-        },
-        "addToPlaylist": {
-            "title": "add to $t(entity.playlist_one)",
-            "input_playlists": "$t(entity.playlist_other)",
-            "input_skipDuplicates": "skip duplicates",
-            "success": "added {{message}} $t(entity.song_other) to {{numOfPlaylists}} $t(entity.playlist_other)"
-        },
-        "updateServer": {
-            "title": "update server",
-            "success": "server updated successfully"
-        },
-        "lyricSearch": {
-            "title": "lyric search",
-            "input_name": "$t(glossary.name)",
-            "input_artist": "$t(entity.artist_one)"
-        }
+        "systemFontError": "an error occurred when trying to get system fonts"
     },
     "filter": {
-        "isRated": "is rated",
-        "isFavorited": "is favorited",
-        "isCompilation": "is compilation",
-        "isRecentlyPlayed": "is recently played",
-        "fromYear": "from year",
-        "toYear": "to year",
         "albumArtist": "$t(entity.albumArtist_one)",
         "artist": "$t(entity.artist_one)",
         "biography": "biography",
@@ -175,6 +126,11 @@
         "disc": "disc",
         "duration": "duration",
         "favorited": "favorited",
+        "fromYear": "from year",
+        "isCompilation": "is compilation",
+        "isFavorited": "is favorited",
+        "isRated": "is rated",
+        "isRecentlyPlayed": "is recently played",
         "lastPlayed": "last played",
         "mostPlayed": "most played",
         "name": "name",
@@ -190,16 +146,61 @@
         "search": "search",
         "songCount": "song count",
         "title": "title",
+        "toYear": "to year",
         "trackNumber": "track"
     },
+    "form": {
+        "addServer": {
+            "error_savePassword": "an error occurred when trying to save the password",
+            "ignoreCors": "ignore cors ($t(common.restartRequired))",
+            "ignoreSsl": "ignore ssl ($t(common.restartRequired))",
+            "input_legacyAuthentication": "enable legacy authentication",
+            "input_name": "server name",
+            "input_password": "password",
+            "input_savePassword": "save password",
+            "input_url": "url",
+            "input_username": "username",
+            "success": "server added successfully",
+            "title": "add server"
+        },
+        "addToPlaylist": {
+            "input_playlists": "$t(entity.playlist_other)",
+            "input_skipDuplicates": "skip duplicates",
+            "success": "added {{message}} $t(entity.song_other) to {{numOfPlaylists}} $t(entity.playlist_other)",
+            "title": "add to $t(entity.playlist_one)"
+        },
+        "createPlaylist": {
+            "input_description": "$t(glossary.description)",
+            "input_name": "$t(glossary.name)",
+            "input_owner": "$t(glossary.owner)",
+            "input_public": "public",
+            "success": "$t(entity.playlist_one) created successfully",
+            "title": "create $t(entity.playlist_one)"
+        },
+        "deletePlaylist": {
+            "input_confirm": "type the name of the $t(entity.playlist_one) to confirm",
+            "success": "$t(entity.playlist_one) deleted successfully",
+            "title": "delete $t(entity.playlist_one)"
+        },
+        "editPlaylist": {
+            "title": "edit $t(entity.playlist_one)"
+        },
+        "lyricSearch": {
+            "input_artist": "$t(entity.artist_one)",
+            "input_name": "$t(glossary.name)",
+            "title": "lyric search"
+        },
+        "queryEditor": {
+            "input_optionMatchAll": "match all",
+            "input_optionMatchAny": "match any"
+        },
+        "updateServer": {
+            "success": "server updated successfully",
+            "title": "update server"
+        }
+    },
     "glossary": {
-        "sortOrder": "order",
-        "limit": "limit",
-        "reset": "reset",
-        "clear": "clear",
         "action": "action",
-        "expand": "expand",
-        "collapse": "collapse",
         "action_other": "actions",
         "ascending": "ascending",
         "biography": "biography",
@@ -207,16 +208,20 @@
         "bpm": "bpm",
         "channel": "channel",
         "channel_other": "channels",
+        "clear": "clear",
+        "collapse": "collapse",
         "configure": "configure",
         "descending": "descending",
+        "description": "description",
         "disc": "disc",
         "duration": "duration",
+        "expand": "expand",
         "favorite": "favorite",
         "filter_one": "filter",
         "filter_other": "filters",
-        "description": "description",
         "gap": "gap",
         "home": "home",
+        "limit": "limit",
         "menu": "menu",
         "name": "name",
         "note": "note",
@@ -225,28 +230,24 @@
         "random": "random",
         "rating": "rating",
         "refresh": "refresh",
+        "reset": "reset",
         "search": "search",
         "setting": "setting",
         "setting_other": "settings",
         "size": "size",
+        "sortOrder": "order",
         "title": "title",
         "trackNumber": "track",
         "version": "version",
         "year": "year"
     },
     "page": {
+        "albumArtistList": {
+            "title": "$t(entity.albumArtist_other)"
+        },
         "albumDetail": {
             "moreFromArtist": "more from this $t(entity.genre_one)",
             "moreFromGeneric": "more from {{item}}"
-        },
-        "setting": {
-            "generalTab": "general",
-            "playbackTab": "playback",
-            "hotkeysTab": "hotkeys",
-            "windowTab": "window"
-        },
-        "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
         },
         "albumList": {
             "title": "$t(entity.album_other)"
@@ -281,8 +282,34 @@
             "removeFromQueue": "$t(action.removeFromQueue)",
             "setRating": "$t(action.setRating)"
         },
+        "fullscreenPlayer": {
+            "config": {
+                "dynamicBackground": "dynamic background",
+                "followCurrentLyric": "follow current lyric",
+                "lyricAlignment": "lyric alignment",
+                "lyricGap": "lyric gap",
+                "lyricSize": "lyric size",
+                "opacity": "opacity",
+                "showLyricMatch": "show lyric match",
+                "showLyricProvider": "show lyric provider",
+                "synchronized": "synchronized",
+                "unsynchronized": "unsynchronized",
+                "useImageAspectRatio": "use image aspect ratio"
+            },
+            "lyrics": "lyrics",
+            "related": "related",
+            "upNext": "up next"
+        },
         "genreList": {
             "title": "$t(entity.genre_other)"
+        },
+        "globalSearch": {
+            "commands": {
+                "goToPage": "go to page",
+                "searchFor": "search for {{query}}",
+                "serverCommands": "server commands"
+            },
+            "title": "commands"
         },
         "home": {
             "explore": "explore from your library",
@@ -294,10 +321,16 @@
         "playlistList": {
             "title": "$t(entity.playlist_other)"
         },
+        "setting": {
+            "generalTab": "general",
+            "hotkeysTab": "hotkeys",
+            "playbackTab": "playback",
+            "windowTab": "window"
+        },
         "sidebar": {
+            "albumArtists": "$t(entity.albumArtist_other)",
             "albums": "$t(entity.album_other)",
             "artists": "$t(entity.artist_other)",
-            "albumArtists": "$t(entity.albumArtist_other)",
             "folders": "$t(entity.folder_other)",
             "genres": "$t(entity.genre_other)",
             "home": "$t(glossary.home)",
@@ -309,40 +342,21 @@
         },
         "trackList": {
             "title": "$t(entity.track_other)"
-        },
-        "globalSearch": {
-            "title": "commands",
-            "commands": {
-                "searchFor": "search for {{query}}",
-                "goToPage": "go to page",
-                "serverCommands": "server commands"
-            }
-        },
-        "fullscreenPlayer": {
-            "config": {
-                "dynamicBackground": "dynamic background",
-                "useImageAspectRatio": "use image aspect ratio",
-                "opacity": "opacity",
-                "followCurrentLyric": "follow current lyric",
-                "showLyricProvider": "show lyric provider",
-                "showLyricMatch": "show lyric match",
-                "lyricSize": "lyric size",
-                "synchronized": "synchronized",
-                "unsynchronized": "unsynchronized",
-                "lyricGap": "lyric gap",
-                "lyricAlignment": "lyric alignment"
-            }
         }
     },
     "player": {
-        "favorite": "favorite",
-        "unfavorite": "unfavorite",
         "addLast": "add last",
         "addNext": "add next",
+        "favorite": "favorite",
         "mute": "mute",
         "muted": "muted",
         "next": "next",
         "play": "play",
+        "playbackFetchCancel": "this is taking a while... close the notification to cancel",
+        "playbackFetchInProgress": "loading songs...",
+        "playbackFetchNoResults": "no songs found",
+        "playbackSpeed": "playback speed",
+        "playRandom": "play random",
         "previous": "previous",
         "queue_clear": "clear queue",
         "queue_moveToBottom": "move selected to top",
@@ -352,36 +366,16 @@
         "repeat_all": "repeat all",
         "repeat_off": "repeat disabled",
         "repeat_one": "repeat one",
+        "shuffle": "shuffle",
+        "shuffle_off": "shuffle disabled",
         "skip": "skip",
         "skip_back": "skip backwards",
         "skip_forward": "skip forwards",
-        "shuffle": "shuffle",
-        "playRandom": "play random",
-        "shuffle_off": "shuffle disabled",
         "stop": "stop",
         "toggleFullscreenPlayer": "toggle fullscreen player",
-        "playbackSpeed": "playback speed",
-        "playbackFetchNoResults": "no songs found",
-        "playbackFetchInProgress": "loading songs...",
-        "playbackFetchCancel": "this is taking a while... close the notification to cancel"
+        "unfavorite": "unfavorite"
     },
     "setting": {
-        "exitToTray": "exit to tray",
-        "exitToTray_description": "exit the application to the system tray",
-        "minimizeToTray": "minimize to tray",
-        "minimizeToTray_description": "minimize the application to the system tray",
-        "windowBarStyle": "window bar style",
-        "windowBarStyle_description": "select the style of the window bar",
-        "disableAutomaticUpdates": "disable automatic updates",
-        "disableLibraryUpdateOnStartup": "disable checking for new versions on startup",
-        "discordRichPresence": "{{discord}} rich presence",
-        "discordRichPresence_description": "enable playback status in {{discord}} rich presence. Image keys are: {{icon}}, {{playing}}, and {{paused}} ",
-        "discordApplicationId": "{{discord}} application id",
-        "discordApplicationId_description": "the application id for {{discord}} rich presence (defaults to {{defaultId}}",
-        "discordUpdateInterval": "{{discord}} rich presence update interval",
-        "discordUpdateInterval_description": "the time in seconds between each update (minimum 15 seconds)",
-        "discordIdleStatus": "show rich presence idle status",
-        "discordIdleStatus_description": "when enabled, update status while player is idle",
         "accentColor": "accent color",
         "accentColor_description": "sets the accent color for the application",
         "applicationHotkeys": "application hotkeys",
@@ -398,8 +392,20 @@
         "crossfadeStyle_description": "select the crossfade style to use for the audio player",
         "customFontPath": "custom font path",
         "customFontPath_description": "sets the path to the custom font to use for the application",
+        "disableAutomaticUpdates": "disable automatic updates",
+        "disableLibraryUpdateOnStartup": "disable checking for new versions on startup",
+        "discordApplicationId": "{{discord}} application id",
+        "discordApplicationId_description": "the application id for {{discord}} rich presence (defaults to {{defaultId}}",
+        "discordIdleStatus": "show rich presence idle status",
+        "discordIdleStatus_description": "when enabled, update status while player is idle",
+        "discordRichPresence": "{{discord}} rich presence",
+        "discordRichPresence_description": "enable playback status in {{discord}} rich presence. Image keys are: {{icon}}, {{playing}}, and {{paused}} ",
+        "discordUpdateInterval": "{{discord}} rich presence update interval",
+        "discordUpdateInterval_description": "the time in seconds between each update (minimum 15 seconds)",
         "enableRemote": "enable remote control server",
         "enableRemote_description": "enables the remote control server to allow other devices to control the application",
+        "exitToTray": "exit to tray",
+        "exitToTray_description": "exit the application to the system tray",
         "floatingQueueArea": "show floating queue hover area",
         "floatingQueueArea_description": "display a hover icon on the right side of the screen to view the play queue",
         "followLyric": "follow current lyric",
@@ -416,14 +422,10 @@
         "gaplessAudio_optionWeak": "weak (recommended)",
         "globalMediaHotkeys": "global media hotkeys",
         "globalMediaHotkeys_description": "enable or disable the usage of your system media hotkeys to control playback",
-        "hotkey_favoriteCurrentSong": "favorite $t(common.currentSong)",
-        "hotkey_unfavoriteCurrentSong": "unfavorite $t(common.currentSong)",
-        "hotkey_toggleCurrentSongFavorite": "toggle $t(common.currentSong) favorite",
-        "hotkey_favoritePreviousSong": "favorite $t(common.previousSong)",
-        "hotkey_unfavoritePreviousSong": "unfavorite $t(common.previousSong)",
-        "hotkey_togglePreviousSongFavorite": "toggle $t(common.previousSong) favorite",
         "hotkey_browserBack": "browser back",
         "hotkey_browserForward": "browser forward",
+        "hotkey_favoriteCurrentSong": "favorite $t(common.currentSong)",
+        "hotkey_favoritePreviousSong": "favorite $t(common.previousSong)",
         "hotkey_globalSearch": "global search",
         "hotkey_localSearch": "in-page search",
         "hotkey_playbackNext": "next track",
@@ -440,23 +442,29 @@
         "hotkey_rate5": "rating 5 stars",
         "hotkey_skipBackward": "skip backward",
         "hotkey_skipForward": "skip forward",
+        "hotkey_toggleCurrentSongFavorite": "toggle $t(common.currentSong) favorite",
         "hotkey_toggleFullScreenPlayer": "toggle full screen player",
+        "hotkey_togglePreviousSongFavorite": "toggle $t(common.previousSong) favorite",
         "hotkey_toggleQueue": "toggle queue",
         "hotkey_toggleRepeat": "toggle repeat",
         "hotkey_toggleShuffle": "toggle shuffle",
+        "hotkey_unfavoriteCurrentSong": "unfavorite $t(common.currentSong)",
+        "hotkey_unfavoritePreviousSong": "unfavorite $t(common.previousSong)",
         "hotkey_volumeDown": "volume down",
         "hotkey_volumeMute": "volume mute",
         "hotkey_volumeUp": "volume up",
         "hotkey_zoomIn": "zoom in",
         "hotkey_zoomOut": "zoom out",
         "language": "language",
-        "language_description": "sets the language for the application",
+        "language_description": "sets the language for the application ($t(common.restartRequired))",
         "lyricFetch": "fetch lyrics from the internet",
         "lyricFetch_description": "fetch lyrics from various internet sources",
         "lyricFetchProvider": "providers to fetch lyrics from",
         "lyricFetchProvider_description": "select the providers to fetch lyrics from. the order of the providers is the order in which they will be queried",
         "lyricOffset": "lyric offset (ms)",
         "lyricOffset_description": "offset the lyric by the specified amount of milliseconds",
+        "minimizeToTray": "minimize to tray",
+        "minimizeToTray_description": "minimize the application to the system tray",
         "minimumScrobblePercentage": "minimum scrobble duration (percentage)",
         "minimumScrobblePercentage_description": "the minimum percentage of the song that must be played before it is scrobbled",
         "minimumScrobbleSeconds": "minimum scrobble (seconds)",
@@ -525,10 +533,10 @@
         "useSystemTheme_description": "follow the system-defined light or dark preference",
         "volumeWheelStep": "volume wheel step",
         "volumeWheelStep_description": "the amount of volume to change when scrolling the mouse wheel on the volume slider",
+        "windowBarStyle": "window bar style",
+        "windowBarStyle_description": "select the style of the window bar",
         "zoom": "zoom percentage",
-        "zoom_description": "sets the zoom percentage for the application",
-        "zoomPercentage": "zoom percentage",
-        "zoomPercentage_description": "sets the zoom percentage for the application"
+        "zoom_description": "sets the zoom percentage for the application"
     },
     "table": {
         "column": {
