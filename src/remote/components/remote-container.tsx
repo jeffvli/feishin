@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Group, Image, Rating, Text, Title } from '@mantine/core';
+import { Group, Image, Text, Title } from '@mantine/core';
 import { useInfo, useSend, useShowImage } from '/@/remote/store';
 import { RemoteButton } from '/@/remote/components/buttons/remote-button';
 import formatDuration from 'format-duration';
@@ -18,6 +18,7 @@ import {
 import { PlayerRepeat, PlayerStatus } from '/@/renderer/types';
 import { WrapperSlider } from '/@/remote/components/wrapped-slider';
 import { Tooltip } from '/@/renderer/components/tooltip';
+import { Rating } from '/@/renderer/components';
 
 export const RemoteContainer = () => {
     const { repeat, shuffle, song, status, volume } = useInfo();

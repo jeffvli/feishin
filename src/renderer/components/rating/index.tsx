@@ -1,12 +1,8 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import { MouseEvent } from 'react';
-import { Rating as MantineRating, RatingProps as MantineRatingProps } from '@mantine/core';
+import { useCallback } from 'react';
+import { Rating as MantineRating, RatingProps } from '@mantine/core';
+import debounce from 'lodash/debounce';
 import styled from 'styled-components';
-import { Tooltip } from '/@/renderer/components/tooltip';
-
-interface RatingProps extends Omit<MantineRatingProps, 'onClick'> {
-    onClick: (e: MouseEvent<HTMLDivElement>, value: number | undefined) => void;
-}
 
 const StyledRating = styled(MantineRating)`
     & .mantine-Rating-symbolBody {
@@ -16,18 +12,28 @@ const StyledRating = styled(MantineRating)`
     }
 `;
 
-export const Rating = ({ onClick, ...props }: RatingProps) => {
-    // const debouncedOnClick = debounce(onClick, 100);
+export const Rating = ({ onChange, ...props }: RatingProps) => {
+    const valueChange = useCallback(
+        (rating: number) => {
+            if (onChange) {
+                if (rating === props.value) {
+                    onChange(0);
+                } else {
+                    onChange(rating);
+                }
+            }
+        },
+        [onChange, props.value],
+    );
+
+    const debouncedOnChange = debounce(valueChange, 100);
 
     return (
-        <Tooltip
-            label="Double click to clear"
-            openDelay={1000}
-        >
-            <StyledRating
-                {...props}
-                onDoubleClick={(e) => onClick(e, props.value)}
-            />
-        </Tooltip>
+        <StyledRating
+            {...props}
+            onChange={(e) => {
+                debouncedOnChange(e);
+            }}
+        />
     );
 };

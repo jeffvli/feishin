@@ -212,7 +212,6 @@ export const RightControls = () => {
                         size="sm"
                         value={currentSong?.userRating || 0}
                         onChange={handleUpdateRating}
-                        onClick={handleClearRating}
                     />
                 )}
             </Group>
