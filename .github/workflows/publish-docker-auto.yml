@@ -37,6 +37,10 @@ jobs:
                       type=semver,pattern={{version}}
                       type=semver,pattern={{major}}.{{minor}}
                       type=semver,pattern={{major}}
+            - name: Set up QEMU
+              uses: docker/setup-qemu-action@v3
+            - name: Setup Docker buildx
+              uses: docker/setup-buildx-action@v3
             - name: Build and push Docker image
               uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
               with:
@@ -44,3 +48,10 @@ jobs:
                   push: true
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
+                  platforms: |
+                    linux/amd64
+                    linux/arm/v6
+                    linux/arm/v7
+                    linux/arm64/v8
+                    linux/ppc64le
+                    linux/s390x
