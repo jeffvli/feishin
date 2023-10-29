@@ -10,6 +10,10 @@ import {
     useFullScreenPlayerStoreActions,
 } from '/@/renderer/store/full-screen-player.store';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
+import { Visualizer } from '/@/renderer/features/player/components/visualizer';
+import { useMemo } from 'react';
+import { usePlaybackSettings } from '/@/renderer/store';
+import { PlaybackType } from '/@/renderer/types';
 
 const QueueContainer = styled.div`
     position: relative;
@@ -57,27 +61,41 @@ const GridContainer = styled.div<TransparendGridContainerProps>`
 export const FullScreenPlayerQueue = () => {
     const { activeTab, opacity } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
+    const { type } = usePlaybackSettings();
 
-    const headerItems = [
-        {
-            active: activeTab === 'queue',
-            icon: <RiFileMusicLine size="1.5rem" />,
-            label: 'Up Next',
-            onClick: () => setStore({ activeTab: 'queue' }),
-        },
-        {
-            active: activeTab === 'related',
-            icon: <HiOutlineQueueList size="1.5rem" />,
-            label: 'Related',
-            onClick: () => setStore({ activeTab: 'related' }),
-        },
-        {
-            active: activeTab === 'lyrics',
-            icon: <RiFileTextLine size="1.5rem" />,
-            label: 'Lyrics',
-            onClick: () => setStore({ activeTab: 'lyrics' }),
-        },
-    ];
+    const headerItems = useMemo(() => {
+        const items = [
+            {
+                active: activeTab === 'queue',
+                icon: <RiFileMusicLine size="1.5rem" />,
+                label: 'Up Next',
+                onClick: () => setStore({ activeTab: 'queue' }),
+            },
+            {
+                active: activeTab === 'related',
+                icon: <HiOutlineQueueList size="1.5rem" />,
+                label: 'Related',
+                onClick: () => setStore({ activeTab: 'related' }),
+            },
+            {
+                active: activeTab === 'lyrics',
+                icon: <RiFileTextLine size="1.5rem" />,
+                label: 'Lyrics',
+                onClick: () => setStore({ activeTab: 'lyrics' }),
+            },
+        ];
+
+        if (type === PlaybackType.WEB) {
+            items.push({
+                active: activeTab === 'visualizer',
+                icon: <RiFileTextLine size="1.5rem" />,
+                label: 'Visualizer',
+                onClick: () => setStore({ activeTab: 'visualizer' }),
+            });
+        }
+
+        return items;
+    }, [activeTab, setStore, type]);
 
     return (
         <GridContainer
@@ -87,6 +105,7 @@ export const FullScreenPlayerQueue = () => {
             <Group
                 grow
                 align="center"
+                className="full-screen-player-queue-header"
                 position="center"
             >
                 {headerItems.map((item) => (
@@ -131,6 +150,8 @@ export const FullScreenPlayerQueue = () => {
                 </Center>
             ) : activeTab === 'lyrics' ? (
                 <Lyrics />
+            ) : activeTab === 'visualizer' && type === PlaybackType.WEB ? (
+                <Visualizer />
             ) : null}
         </GridContainer>
     );

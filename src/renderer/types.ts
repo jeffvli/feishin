@@ -209,3 +209,9 @@ export enum FontType {
     CUSTOM = 'custom',
     SYSTEM = 'system',
 }
+
+export type WebAudio = {
+    analyzer: AnalyserNode;
+    context: AudioContext;
+    gain: GainNode;
+};

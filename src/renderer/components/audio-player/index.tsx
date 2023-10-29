@@ -10,6 +10,7 @@ import {
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
+import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import { useSpeed } from '/@/renderer/store';
 
 interface AudioPlayerProps extends ReactPlayerProps {
@@ -32,11 +33,6 @@ export type AudioPlayerProgress = {
 
 const getDuration = (ref: any) => {
     return ref.current?.player?.player?.player?.duration;
-};
-
-type WebAudio = {
-    context: AudioContext;
-    gain: GainNode;
 };
 
 export const AudioPlayer = forwardRef(
@@ -62,7 +58,7 @@ export const AudioPlayer = forwardRef(
         const playback = useSettingsStore((state) => state.playback.mpvProperties);
         const playbackSpeed = useSpeed();
 
-        const [webAudio, setWebAudio] = useState<WebAudio | null>(null);
+        const { webAudio, setWebAudio } = useWebAudio();
         const [player1Source, setPlayer1Source] = useState<MediaElementAudioSourceNode | null>(
             null,
         );
@@ -124,9 +120,11 @@ export const AudioPlayer = forwardRef(
                     sampleRate: playback.audioSampleRateHz || undefined,
                 });
                 const gain = context.createGain();
-                gain.connect(context.destination);
+                const analyzer = context.createAnalyser();
+                gain.connect(analyzer);
+                analyzer.connect(context.destination);
 
-                setWebAudio({ context, gain });
+                setWebAudio!({ analyzer, context, gain });
 
                 return () => {
                     return context.close();
