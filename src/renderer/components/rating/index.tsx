@@ -34,6 +34,10 @@ export const Rating = ({ onChange, ...props }: RatingProps) => {
             onChange={(e) => {
                 debouncedOnChange(e);
             }}
+            onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }}
         />
     );
 };
