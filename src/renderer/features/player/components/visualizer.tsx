@@ -1,8 +1,10 @@
 import { createRef, useCallback, useEffect, useState } from 'react';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import styled from 'styled-components';
+import { useSettingsStore } from '/@/renderer/store';
 
 const StyledContainer = styled.div`
+    margin: auto;
     max-width: 100%;
 
     canvas {
@@ -13,11 +15,13 @@ const StyledContainer = styled.div`
 
 const CANVAS_SIZE = 510;
 const TARGET_MAX_FREQUENCY = 20000;
-const LOG_SCALING = 1.5;
+const LOG_SCALING = 1.15;
+const MIN_SAMPLE_FREQUENCY = 16;
 
 export const Visualizer = () => {
     const { webAudio } = useWebAudio();
     const canvasRef = createRef<HTMLCanvasElement>();
+    const accent = useSettingsStore((store) => store.general.accent);
 
     const [length, setLength] = useState(500);
 
@@ -30,15 +34,16 @@ export const Visualizer = () => {
                 return () => {};
             }
 
+            const rgb = accent.substring(4, accent.length - 1);
             analyzer.fftSize = 32768;
 
             const sampleWidth = context.sampleRate / analyzer.fftSize;
             const numSamplesInRange = Math.ceil(TARGET_MAX_FREQUENCY / sampleWidth);
-            const samples: Array<number> = [0];
+            const samples: Array<number> = [];
 
             for (let i = 1; i <= numSamplesInRange; i *= LOG_SCALING) {
                 const position = Math.round(i) - 1;
-                if (samples[samples.length - 1] !== position) {
+                if ((position + 0.5) * sampleWidth >= MIN_SAMPLE_FREQUENCY) {
                     samples.push(position);
                 }
             }
@@ -58,12 +63,12 @@ export const Visualizer = () => {
                 for (const position of samples) {
                     barHeight = currentDataArray[position];
 
-                    canvasCtx.fillStyle = `rgb(${barHeight + 100},50,50)`;
-                    canvasCtx.fillRect(x, CANVAS_SIZE - barHeight, barWidth, barHeight);
+                    canvasCtx.fillStyle = `rgba(${rgb}, ${(barHeight + 75) / 255})`;
+                    canvasCtx.fillRect(x, CANVAS_SIZE - barHeight * 1.5, barWidth, barHeight * 1.5);
 
                     x += barWidth + 2;
                 }
-            }, 30);
+            }, 60);
 
             return () => {
                 clearInterval(draw);
@@ -71,7 +76,7 @@ export const Visualizer = () => {
         }
 
         return () => {};
-    }, [webAudio, canvasRef]);
+    }, [accent, canvasRef, webAudio]);
 
     const resize = useCallback(() => {
         const body = document.querySelector('.full-screen-player-queue-container');

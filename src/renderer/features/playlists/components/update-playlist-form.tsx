@@ -71,6 +71,7 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
     });
 
     const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
+    const isOwnerDisplayed = server?.type === ServerType.NAVIDROME;
     const isSubmitDisabled = !form.values.name || mutation.isLoading;
 
     return (
@@ -86,11 +87,13 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                     label="Description"
                     {...form.getInputProps('comment')}
                 />
-                <Select
-                    data={userList || []}
-                    {...form.getInputProps('_custom.navidrome.ownerId')}
-                    label="Owner"
-                />
+                {isOwnerDisplayed && (
+                    <Select
+                        data={userList || []}
+                        {...form.getInputProps('_custom.navidrome.ownerId')}
+                        label="Owner"
+                    />
+                )}
                 {isPublicDisplayed && (
                     <Switch
                         label="Is Public?"
@@ -132,11 +135,14 @@ export const openUpdatePlaylistModal = async (args: {
 
     if (!server) return;
 
-    const users = await queryClient.fetchQuery({
-        queryFn: ({ signal }) =>
-            api.controller.getUserList({ apiClientProps: { server, signal }, query }),
-        queryKey: queryKeys.users.list(server?.id || '', query),
-    });
+    const users =
+        server?.type === ServerType.NAVIDROME
+            ? await queryClient.fetchQuery({
+                  queryFn: ({ signal }) =>
+                      api.controller.getUserList({ apiClientProps: { server, signal }, query }),
+                  queryKey: queryKeys.users.list(server?.id || '', query),
+              })
+            : null;
 
     openModal({
         children: (

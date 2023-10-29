@@ -39,8 +39,9 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     }
 
     &:not([data-disabled])&:hover {
-        color: ${(props) => `var(--btn-${props.variant}-fg-hover) !important`};
-        background: ${(props) => `var(--btn-${props.variant}-bg-hover)`};
+        color: ${(props) => `var(--btn-${props.variant}-fg) !important`};
+        background: ${(props) => `var(--btn-${props.variant}-bg)`};
+        filter: brightness(85%);
         border: ${(props) => `var(--btn-${props.variant}-border-hover)`};
 
         svg {
@@ -50,11 +51,8 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
 
     &:not([data-disabled])&:focus-visible {
         color: ${(props) => `var(--btn-${props.variant}-fg-hover)`};
-        background: ${(props) => `var(--btn-${props.variant}-bg-hover)`};
-    }
-
-    &:active {
-        transform: none;
+        background: ${(props) => `var(--btn-${props.variant}-bg)`};
+        filter: brightness(85%);
     }
 
     & .mantine-Button-centerLoader {

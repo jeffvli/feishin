@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="100 130 57 80" xmlns="http://www.w3.org/2000/svg">
+  <rect x="100" y="130" width="12" height="80" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); transform-origin: 106px 170px;">
+    <animate attributeName="height" values="80;15;80" begin="0.1s" dur="0.95s" keyTimes="0; 0.47368; 1" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"/>
+  </rect>
+  <rect x="115" y="130" width="12" height="80" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); transform-origin: 121px 170px;">
+    <animate attributeName="height" values="25;80;25" begin="0.1s" dur="0.95s" keyTimes="0; 0.44444; 1" repeatCount="indefinite" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1"/>
+  </rect>
+  <rect x="130" y="130" width="12" height="80" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); transform-origin: 136px 170px;">
+    <animate attributeName="height" values="80;10;80" begin="0.1s" dur="0.85s" keyTimes="0; 0.42105; 1" repeatCount="indefinite" calcMode="spline" keySplines="0.65 0 0.35 1; 0.65 0 0.35 1"/>
+  </rect>
+  <rect x="145" y="130" width="12" height="80" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); transform-origin: 151px 170px;">
+    <animate attributeName="height" values="30;80;30" begin="0.1s" dur="1.05s" keyTimes="0; 0.31579; 1" repeatCount="indefinite" calcMode="spline" keySplines="0.42 0 0.58 1; 0.42 0 0.58 1"/>
+  </rect>
+</svg>

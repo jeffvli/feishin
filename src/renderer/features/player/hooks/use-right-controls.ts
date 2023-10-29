@@ -1,6 +1,12 @@
 import { useCallback, useEffect, WheelEvent } from 'react';
 import isElectron from 'is-electron';
-import { useMuted, usePlayerControls, useVolume } from '/@/renderer/store';
+import {
+    useMuted,
+    usePlayerControls,
+    useSetCurrentSpeed,
+    useSpeed,
+    useVolume,
+} from '/@/renderer/store';
 import { useGeneralSettings } from '/@/renderer/store/settings.store';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
@@ -37,6 +43,8 @@ export const useRightControls = () => {
     const volume = useVolume();
     const muted = useMuted();
     const { volumeWheelStep } = useGeneralSettings();
+    const speed = useSpeed();
+    const setCurrentSpeed = useSetCurrentSpeed();
 
     // Ensure that the mpv player volume is set on startup
     useEffect(() => {
@@ -44,6 +52,7 @@ export const useRightControls = () => {
 
         if (mpvPlayer) {
             mpvPlayer.volume(volume);
+            mpvPlayer.setProperties({ speed });
 
             if (muted) {
                 mpvPlayer.mute(muted);
@@ -52,6 +61,16 @@ export const useRightControls = () => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handleSpeed = useCallback(
+        (e: number) => {
+            setCurrentSpeed(e);
+            if (mpvPlayer) {
+                mpvPlayer?.setProperties({ speed: e });
+            }
+        },
+        [setCurrentSpeed],
+    );
 
     const handleVolumeSlider = (e: number) => {
         mpvPlayer?.volume(e);
@@ -123,6 +142,7 @@ export const useRightControls = () => {
 
     return {
         handleMute,
+        handleSpeed,
         handleVolumeDown,
         handleVolumeSlider,
         handleVolumeSliderState,

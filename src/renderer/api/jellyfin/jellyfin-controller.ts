@@ -47,6 +47,8 @@ import {
     LyricsArgs,
     LyricsResponse,
     genreListSortMap,
+    SongDetailArgs,
+    SongDetailResponse,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -100,9 +102,9 @@ const authenticate = async (
             Username: body.username,
         },
         headers: {
-            'x-emby-authorization': `MediaBrowser Client="Feishin", Device="${getHostname()}", DeviceId="Feishin-${getHostname()}-${body.username}", Version="${
-                packageJson.version
-            }"`,
+            'x-emby-authorization': `MediaBrowser Client="Feishin", Device="${getHostname()}", DeviceId="Feishin-${getHostname()}-${
+                body.username
+            }", Version="${packageJson.version}"`,
         },
     });
 
@@ -559,20 +561,6 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
         throw new Error('No userId found');
     }
 
-    const musicFoldersRes = await jfApiClient(apiClientProps).getMusicFolderList({
-        params: {
-            userId: apiClientProps.server?.userId,
-        },
-    });
-
-    if (musicFoldersRes.status !== 200) {
-        throw new Error('Failed playlist folder');
-    }
-
-    const playlistFolder = musicFoldersRes.body.Items.filter(
-        (folder) => folder.CollectionType === jfType._enum.collection.PLAYLISTS,
-    )?.[0];
-
     const res = await jfApiClient(apiClientProps).getPlaylistList({
         params: {
             userId: apiClientProps.server?.userId,
@@ -581,7 +569,8 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
             Fields: 'ChildCount, Genres, DateCreated, ParentId, Overview',
             IncludeItemTypes: 'Playlist',
             Limit: query.limit,
-            ParentId: playlistFolder?.Id,
+            MediaTypes: 'Audio',
+            Recursive: true,
             SearchTerm: query.searchTerm,
             SortBy: playlistListSortMap.jellyfin[query.sortBy],
             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
@@ -940,6 +929,23 @@ const getLyrics = async (args: LyricsArgs): Promise<LyricsResponse> => {
     return res.body.Lyrics.map((lyric) => [lyric.Start! / 1e4, lyric.Text]);
 };
 
+const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> => {
+    const { query, apiClientProps } = args;
+
+    const res = await jfApiClient(apiClientProps).getSongDetail({
+        params: {
+            id: query.id,
+            userId: apiClientProps.server?.userId ?? '',
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get song detail');
+    }
+
+    return jfNormalize.song(res.body, apiClientProps.server, '');
+};
+
 export const jfController = {
     addToPlaylist,
     authenticate,
@@ -959,6 +965,7 @@ export const jfController = {
     getPlaylistList,
     getPlaylistSongList,
     getRandomSongList,
+    getSongDetail,
     getSongList,
     getTopSongList,
     removeFromPlaylist,

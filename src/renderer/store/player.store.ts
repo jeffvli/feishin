@@ -18,6 +18,7 @@ export interface PlayerState {
         seek: boolean;
         shuffledIndex: number;
         song?: QueueSong;
+        speed: number;
         status: PlayerStatus;
         time: number;
     };
@@ -81,6 +82,7 @@ export interface PlayerSlice extends PlayerState {
         reorderQueue: (rowUniqueIds: string[], afterUniqueId?: string) => PlayerData;
         restoreQueue: (data: Partial<PlayerState>) => PlayerData;
         setCurrentIndex: (index: number) => PlayerData;
+        setCurrentSpeed: (speed: number) => void;
         setCurrentTime: (time: number, seek?: boolean) => void;
         setCurrentTrack: (uniqueId: string) => PlayerData;
         setFavorite: (ids: string[], favorite: boolean) => string[];
@@ -256,6 +258,13 @@ export const usePlayerStore = create<PlayerSlice>()(
                                     state.current.player = state.current.player === 1 ? 2 : 1;
                                     state.current.song = get().queue.default[nextIndex];
                                     state.queue.previousNode = get().current.song;
+                                });
+                            }
+
+                            if (isLastTrack && repeat === PlayerRepeat.NONE) {
+                                set((state) => {
+                                    state.current.time = 0;
+                                    state.current.status = PlayerStatus.PAUSED;
                                 });
                             }
 
@@ -631,10 +640,17 @@ export const usePlayerStore = create<PlayerSlice>()(
                         removeFromQueue: (uniqueIds) => {
                             const queue = get().queue.default;
                             const currentSong = get().current.song;
+                            const currentPosition = get().current.index;
+                            let queueShift = 0;
 
-                            const newQueue = queue.filter(
-                                (song) => !uniqueIds.includes(song.uniqueId),
-                            );
+                            const newQueue = queue.filter((song, index) => {
+                                const shouldKeep = !uniqueIds.includes(song.uniqueId);
+                                if (!shouldKeep && index < currentPosition) {
+                                    queueShift += 1;
+                                }
+
+                                return shouldKeep;
+                            });
                             const newShuffledQueue = get().queue.shuffled.filter(
                                 (uniqueId) => !uniqueIds.includes(uniqueId),
                             );
@@ -648,6 +664,10 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 if (isCurrentSongRemoved) {
                                     state.current.song = newQueue[0];
                                     state.current.index = 0;
+                                } else {
+                                    // if we removed any songs prior to the current one,
+                                    // shift the index back as necessary
+                                    state.current.index -= queueShift;
                                 }
                             });
 
@@ -739,6 +759,11 @@ export const usePlayerStore = create<PlayerSlice>()(
 
                             return get().actions.getPlayerData();
                         },
+                        setCurrentSpeed: (speed) => {
+                            set((state) => {
+                                state.current.speed = speed;
+                            });
+                        },
                         setCurrentTime: (time, seek = false) => {
                             set((state) => {
                                 state.current.seek = seek;
@@ -798,6 +823,15 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 set((state) => {
                                     if (state.current.song) {
                                         state.current.song.userFavorite = favorite;
+                                    }
+                                });
+                            }
+
+                            const previousSongId = get().queue.previousNode?.id;
+                            if (previousSongId && ids.includes(previousSongId)) {
+                                set((state) => {
+                                    if (state.queue.previousNode) {
+                                        state.queue.previousNode.userFavorite = favorite;
                                     }
                                 });
                             }
@@ -913,6 +947,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                         seek: false,
                         shuffledIndex: 0,
                         song: {} as QueueSong,
+                        speed: 1.0,
                         status: PlayerStatus.PAUSED,
                         time: 0,
                     },
@@ -1026,6 +1061,10 @@ export const useSeeked = () => usePlayerStore((state) => state.current.seek);
 export const useVolume = () => usePlayerStore((state) => state.volume);
 
 export const useMuted = () => usePlayerStore((state) => state.muted);
+
+export const useSpeed = () => usePlayerStore((state) => state.current.speed);
+
+export const useSetCurrentSpeed = () => usePlayerStore((state) => state.actions.setCurrentSpeed);
 
 export const useSetQueueFavorite = () => usePlayerStore((state) => state.actions.setFavorite);
 

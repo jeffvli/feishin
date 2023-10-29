@@ -20,10 +20,6 @@ const getImageUrl = (args: { url: string | null }) => {
         return null;
     }
 
-    if (url?.match('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9')) {
-        return null;
-    }
-
     return url;
 };
 
@@ -186,7 +182,16 @@ const normalizeAlbumArtist = (
     },
     server: ServerListItem | null,
 ): AlbumArtist => {
-    const imageUrl = getImageUrl({ url: item?.largeImageUrl || null });
+    let imageUrl = getImageUrl({ url: item?.largeImageUrl || null });
+
+    if (!imageUrl) {
+        imageUrl = getCoverArtUrl({
+            baseUrl: server?.url,
+            coverArtId: `ar-${item.id}`,
+            credential: server?.credential,
+            size: 100,
+        });
+    }
 
     return {
         albumCount: item.albumCount,

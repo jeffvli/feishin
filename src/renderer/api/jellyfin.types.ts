@@ -547,6 +547,7 @@ export enum JFAlbumListSort {
     COMMUNITY_RATING = 'CommunityRating,SortName',
     CRITIC_RATING = 'CriticRating,SortName',
     NAME = 'SortName',
+    PLAY_COUNT = 'PlayCount',
     RANDOM = 'Random,SortName',
     RECENTLY_ADDED = 'DateCreated,SortName',
     RELEASE_DATE = 'ProductionYear,PremiereDate,SortName',

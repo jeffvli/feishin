@@ -1,5 +1,5 @@
 import { Group } from '@mantine/core';
-import { forwardRef, ReactNode, Ref } from 'react';
+import { forwardRef, ReactNode, Ref, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './library-header.module.scss';
 import { LibraryItem } from '/@/renderer/api/types';
@@ -20,6 +20,12 @@ export const LibraryHeader = forwardRef(
         { imageUrl, imagePlaceholderUrl, background, title, item, children }: LibraryHeaderProps,
         ref: Ref<HTMLDivElement>,
     ) => {
+        const [isImageError, setIsImageError] = useState<boolean | null>(false);
+
+        const onImageError = () => {
+            setIsImageError(true);
+        };
+
         return (
             <div
                 ref={ref}
@@ -31,13 +37,14 @@ export const LibraryHeader = forwardRef(
                 />
                 <div className={styles.backgroundOverlay} />
                 <div className={styles.imageSection}>
-                    {imageUrl ? (
+                    {imageUrl && !isImageError ? (
                         <img
                             alt="cover"
                             className={styles.image}
                             placeholder={imagePlaceholderUrl || 'var(--placeholder-bg)'}
                             src={imageUrl}
                             style={{ height: '' }}
+                            onError={onImageError}
                         />
                     ) : (
                         <ItemImagePlaceholder itemType={item.type} />

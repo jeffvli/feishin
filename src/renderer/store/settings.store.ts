@@ -19,6 +19,7 @@ import {
     PlaybackType,
     TableType,
     Platform,
+    FontType,
 } from '/@/renderer/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -83,6 +84,12 @@ type MpvSettings = {
 export enum BindingActions {
     BROWSER_BACK = 'browserBack',
     BROWSER_FORWARD = 'browserForward',
+    FAVORITE_CURRENT_ADD = 'favoriteCurrentAdd',
+    FAVORITE_CURRENT_REMOVE = 'favoriteCurrentRemove',
+    FAVORITE_CURRENT_TOGGLE = 'favoriteCurrentToggle',
+    FAVORITE_PREVIOUS_ADD = 'favoritePreviousAdd',
+    FAVORITE_PREVIOUS_REMOVE = 'favoritePreviousRemove',
+    FAVORITE_PREVIOUS_TOGGLE = 'favoritePreviousToggle',
     GLOBAL_SEARCH = 'globalSearch',
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
@@ -111,10 +118,24 @@ export enum BindingActions {
 }
 
 export interface SettingsState {
+    discord: {
+        clientId: string;
+        enableIdle: boolean;
+        enabled: boolean;
+        showServerImage: boolean;
+        updateInterval: number;
+    };
+    font: {
+        builtIn: string;
+        custom: string | null;
+        system: string | null;
+        type: FontType;
+    };
     general: {
+        accent: string;
         defaultFullPlaylist: boolean;
         followSystemTheme: boolean;
-        fontContent: string;
+
         playButtonBehavior: Play;
         resume: boolean;
         showQueueDrawerButton: boolean;
@@ -208,10 +229,23 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    discord: {
+        clientId: '1165957668758900787',
+        enableIdle: false,
+        enabled: false,
+        showServerImage: false,
+        updateInterval: 15,
+    },
+    font: {
+        builtIn: 'Inter',
+        custom: null,
+        system: null,
+        type: FontType.BUILT_IN,
+    },
     general: {
+        accent: 'rgb(53, 116, 252)',
         defaultFullPlaylist: true,
         followSystemTheme: false,
-        fontContent: 'Inter',
         playButtonBehavior: Play.NOW,
         resume: false,
         showQueueDrawerButton: false,
@@ -234,6 +268,12 @@ const initialState: SettingsState = {
         bindings: {
             browserBack: { allowGlobal: false, hotkey: '', isGlobal: false },
             browserForward: { allowGlobal: false, hotkey: '', isGlobal: false },
+            favoriteCurrentAdd: { allowGlobal: true, hotkey: '', isGlobal: false },
+            favoriteCurrentRemove: { allowGlobal: true, hotkey: '', isGlobal: false },
+            favoriteCurrentToggle: { allowGlobal: true, hotkey: '', isGlobal: false },
+            favoritePreviousAdd: { allowGlobal: true, hotkey: '', isGlobal: false },
+            favoritePreviousRemove: { allowGlobal: true, hotkey: '', isGlobal: false },
+            favoritePreviousToggle: { allowGlobal: true, hotkey: '', isGlobal: false },
             globalSearch: { allowGlobal: false, hotkey: 'mod+k', isGlobal: false },
             localSearch: { allowGlobal: false, hotkey: 'mod+f', isGlobal: false },
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
@@ -345,6 +385,10 @@ const initialState: SettingsState = {
             autoFit: true,
             columns: [
                 {
+                    column: TableColumn.ROW_INDEX,
+                    width: 80,
+                },
+                {
                     column: TableColumn.TITLE_COMBINED,
                     width: 500,
                 },
@@ -365,7 +409,7 @@ const initialState: SettingsState = {
             columns: [
                 {
                     column: TableColumn.ROW_INDEX,
-                    width: 50,
+                    width: 80,
                 },
                 {
                     column: TableColumn.TITLE,
@@ -538,3 +582,7 @@ export const useMpvSettings = () =>
 export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics, shallow);
 
 export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);
+
+export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
+
+export const useDiscordSetttings = () => useSettingsStore((state) => state.discord, shallow);

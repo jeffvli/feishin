@@ -1,4 +1,5 @@
-import { Switch, Select } from '/@/renderer/components';
+import { ColorPicker, Stack } from '@mantine/core';
+import { Switch, Select, Text } from '/@/renderer/components';
 import {
     SettingsSection,
     SettingOption,
@@ -86,6 +87,35 @@ export const ThemeSettings = () => {
             description: 'Sets the light theme',
             isHidden: !settings.followSystemTheme,
             title: 'Theme (light)',
+        },
+        {
+            control: (
+                <Stack align="center">
+                    <ColorPicker
+                        defaultValue={settings.accent}
+                        format="rgb"
+                        swatches={[
+                            'rgb(53, 116, 252)',
+                            'rgb(240, 170, 22)',
+                            'rgb(29, 185, 84)',
+                            'rgb(214, 81, 63)',
+                            'rgb(170, 110, 216)',
+                        ]}
+                        swatchesPerRow={5}
+                        onChangeEnd={(e) => {
+                            setSettings({
+                                general: {
+                                    ...settings,
+                                    accent: e,
+                                },
+                            });
+                        }}
+                    />
+                    <Text>{settings.accent}</Text>
+                </Stack>
+            ),
+            description: 'Sets the accent color',
+            title: 'Accent color',
         },
     ];
 

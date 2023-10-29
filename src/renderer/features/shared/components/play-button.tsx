@@ -6,7 +6,7 @@ const MotionButton = styled(UnstyledButton)`
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--btn-filled-bg);
+    background: var(--btn-filled-bg);
     border: none;
     border-radius: 50%;
     opacity: 0.8;
@@ -16,7 +16,7 @@ const MotionButton = styled(UnstyledButton)`
     }
 
     &:hover {
-        background-color: var(--btn-filled-bg-hover);
+        background: var(--btn-filled-bg);
         transform: scale(1.1);
 
         svg {

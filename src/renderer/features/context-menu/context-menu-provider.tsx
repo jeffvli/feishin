@@ -434,6 +434,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     case LibraryItem.ALBUM:
                         albumId.push(item.id);
                         break;
+                    case LibraryItem.ALBUM_ARTIST:
+                        artistId.push(item.id);
+                        break;
                     case LibraryItem.ARTIST:
                         artistId.push(item.id);
                         break;
@@ -613,10 +616,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             }
         }
 
+        ctx.tableApi?.redrawRows();
+
         if (isCurrentSongRemoved) {
             remote?.updateSong({ song: playerData.current.song });
         }
-    }, [ctx.dataNodes, playerType, removeFromQueue]);
+    }, [ctx.dataNodes, ctx.tableApi, playerType, removeFromQueue]);
 
     const handleDeselectAll = useCallback(() => {
         ctx.tableApi?.deselectAll();

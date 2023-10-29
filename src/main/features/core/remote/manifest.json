@@ -1,0 +1,17 @@
+{
+    "name": "Feishin Remote",
+    "short_name": "Feishin Remote",
+    "start_url": "/",
+    "background_color": "#000100",
+    "theme_color": "#E7E7E7",
+    "icons": [
+        {
+            "src": "favicon.ico",
+            "sizes": "32x32",
+            "type": "image/png",
+            "purpose": "maskable any"
+        }
+    ],
+    "display": "standalone",
+    "orientation": "portrait"
+}

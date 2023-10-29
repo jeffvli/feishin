@@ -11,6 +11,7 @@ import '@ag-grid-community/styles/ag-theme-alpine.css';
 import {
     useAppStoreActions,
     useCurrentSong,
+    useCurrentStatus,
     useDefaultQueue,
     usePlayerControls,
     usePreviousSong,
@@ -34,6 +35,7 @@ import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
+import { useAppFocus } from '/@/renderer/hooks';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const remote = isElectron() ? window.electron.remote : null;
@@ -49,6 +51,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     const { reorderQueue, setCurrentTrack } = useQueueControls();
     const currentSong = useCurrentSong();
     const previousSong = usePreviousSong();
+    const status = useCurrentStatus();
     const { setSettings } = useSettingsStoreActions();
     const { setAppStore } = useAppStoreActions();
     const tableConfig = useTableSettings(type);
@@ -56,6 +59,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     const playerType = usePlayerType();
     const { play } = usePlayerControls();
     const volume = useVolume();
+    const isFocused = useAppFocus();
 
     useEffect(() => {
         if (tableRef.current) {
@@ -69,7 +73,10 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
         },
     }));
 
-    const columnDefs = useMemo(() => getColumnDefs(tableConfig.columns), [tableConfig.columns]);
+    const columnDefs = useMemo(
+        () => getColumnDefs(tableConfig.columns, false, 'generic'),
+        [tableConfig.columns],
+    );
 
     const handleDoubleClick = (e: CellDoubleClickedEvent) => {
         const playerData = setCurrentTrack(e.data.uniqueId);
@@ -204,7 +211,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
                 }
             }
         }
-    }, [currentSong, previousSong, tableConfig.followCurrentSong]);
+    }, [currentSong, previousSong, tableConfig.followCurrentSong, status, isFocused]);
 
     const onCellContextMenu = useHandleTableContextMenu(LibraryItem.SONG, QUEUE_CONTEXT_MENU_ITEMS);
 
@@ -219,7 +226,10 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
                     autoFitColumns={tableConfig.autoFit}
                     columnDefs={columnDefs}
                     context={{
+                        currentSong,
+                        isFocused,
                         onCellContextMenu,
+                        status,
                     }}
                     deselectOnClickOutside={type === 'fullScreen'}
                     getRowId={(data) => data.data.uniqueId}

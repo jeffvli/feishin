@@ -160,7 +160,7 @@ export const contract = c.router({
     },
     getSongDetail: {
         method: 'GET',
-        path: 'song/:id',
+        path: 'users/:userId/items/:id',
         responses: {
             200: jfType._response.song,
             400: jfType._response.error,

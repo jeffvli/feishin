@@ -204,6 +204,12 @@ export type SongUpdate = {
     volume?: number;
 };
 
+export enum FontType {
+    BUILT_IN = 'builtIn',
+    CUSTOM = 'custom',
+    SYSTEM = 'system',
+}
+
 export type WebAudio = {
     analyzer: AnalyserNode;
     context: AudioContext;

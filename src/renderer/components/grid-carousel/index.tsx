@@ -1,4 +1,13 @@
-import { isValidElement, memo, ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import {
+    isValidElement,
+    memo,
+    ReactNode,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { Group, Stack } from '@mantine/core';
 import throttle from 'lodash/throttle';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
@@ -108,6 +117,10 @@ export const SwiperGridCarousel = ({
     const swiperRef = useRef<SwiperCore | any>(null);
     const playButtonBehavior = usePlayButtonBehavior();
     const handlePlayQueueAdd = usePlayQueueAdd();
+
+    useEffect(() => {
+        swiperRef.current?.slideTo(0, 0);
+    }, [data]);
 
     const [pagination, setPagination] = useState({
         hasNextPage: (data?.length || 0) > Math.round(3),
