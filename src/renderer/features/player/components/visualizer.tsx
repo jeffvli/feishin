@@ -15,7 +15,7 @@ const StyledContainer = styled.div`
 
 const CANVAS_SIZE = 510;
 const TARGET_MAX_FREQUENCY = 20000;
-const LOG_SCALING = 1.15;
+const LOG_SCALING = 1.1;
 const MIN_SAMPLE_FREQUENCY = 16;
 
 export const Visualizer = () => {
@@ -35,7 +35,7 @@ export const Visualizer = () => {
             }
 
             const rgb = accent.substring(4, accent.length - 1);
-            analyzer.fftSize = 32768;
+            analyzer.fftSize = 2048;
 
             const sampleWidth = context.sampleRate / analyzer.fftSize;
             const numSamplesInRange = Math.ceil(TARGET_MAX_FREQUENCY / sampleWidth);
@@ -43,7 +43,10 @@ export const Visualizer = () => {
 
             for (let i = 1; i <= numSamplesInRange; i *= LOG_SCALING) {
                 const position = Math.round(i) - 1;
-                if ((position + 0.5) * sampleWidth >= MIN_SAMPLE_FREQUENCY) {
+                if (
+                    (position + 0.5) * sampleWidth >= MIN_SAMPLE_FREQUENCY &&
+                    position !== samples[samples.length - 1]
+                ) {
                     samples.push(position);
                 }
             }
@@ -55,7 +58,7 @@ export const Visualizer = () => {
             const draw = setInterval(() => {
                 analyzer.getByteFrequencyData(currentDataArray);
 
-                canvasCtx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+                canvasCtx.clearRect(0, CANVAS_SIZE / 4, CANVAS_SIZE, (CANVAS_SIZE / 4) * 3);
 
                 let barHeight;
                 let x = 0;
