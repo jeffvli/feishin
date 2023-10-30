@@ -9,7 +9,7 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import { access, constants, readFile, writeFile } from 'fs';
-import { mkdir } from 'fs/promises';
+import { mkdir, stat } from 'fs/promises';
 import { join, normalize } from 'path';
 import { deflate, inflate } from 'zlib';
 import {
@@ -720,7 +720,20 @@ app.whenReady()
                 });
             }
 
-            return net.fetch(`file://${requestingPath}`);
+            try {
+                const stats = await stat(requestingPath);
+                const resp = await net.fetch(`file://${requestingPath}`);
+                // We need to set content length to enable seeking
+                resp.headers.set('Content-Length', stats.size.toString());
+                // We don't support seeking in the file
+                resp.headers.set('Accept-Ranges', 'none');
+                return resp;
+            } catch (err) {
+                return new Response(null, {
+                    status: 404,
+                    statusText: 'Not Found',
+                });
+            }
         });
 
         createWindow();
