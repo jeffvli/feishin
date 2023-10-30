@@ -1,4 +1,4 @@
-import { MouseEvent, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Flex, Group } from '@mantine/core';
 import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import isElectron from 'is-electron';
@@ -82,18 +82,6 @@ export const RightControls = () => {
         });
     };
 
-    const handleClearRating = (_e: MouseEvent<HTMLDivElement> | null, rating?: number) => {
-        if (!currentSong || !rating) return;
-
-        updateRatingMutation.mutate({
-            query: {
-                item: [currentSong],
-                rating: 0,
-            },
-            serverId: currentSong?.serverId,
-        });
-    };
-
     const handleRemoveFromFavorites = (song: QueueSong | undefined) => {
         if (!song?.id) return;
 
@@ -152,7 +140,7 @@ export const RightControls = () => {
             bindings.favoritePreviousToggle.isGlobal ? '' : bindings.favoritePreviousToggle.hotkey,
             () => handleToggleFavorite(previousSong),
         ],
-        [bindings.rate0.isGlobal ? '' : bindings.rate0.hotkey, () => handleClearRating(null, 0)],
+        [bindings.rate0.isGlobal ? '' : bindings.rate0.hotkey, () => handleUpdateRating(0)],
         [bindings.rate1.isGlobal ? '' : bindings.rate1.hotkey, () => handleUpdateRating(1)],
         [bindings.rate2.isGlobal ? '' : bindings.rate2.hotkey, () => handleUpdateRating(2)],
         [bindings.rate3.isGlobal ? '' : bindings.rate3.hotkey, () => handleUpdateRating(3)],
