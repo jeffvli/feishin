@@ -4,6 +4,7 @@ import { AudioSettings } from '/@/renderer/features/settings/components/playback
 import { ScrobbleSettings } from '/@/renderer/features/settings/components/playback/scrobble-settings';
 import isElectron from 'is-electron';
 import { LyricSettings } from '/@/renderer/features/settings/components/playback/lyric-settings';
+import { CacheSettings } from '/@/renderer/features/settings/components/playback/cache-settings';
 
 const MpvSettings = lazy(() =>
     import('/@/renderer/features/settings/components/playback/mpv-settings').then((module) => {
@@ -27,6 +28,8 @@ export const PlaybackTab = () => {
                 </>
             )}
             <LyricSettings />
+            <Divider />
+            {isElectron() && <CacheSettings />}
         </Stack>
     );
 };

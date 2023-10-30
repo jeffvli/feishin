@@ -1,4 +1,12 @@
-import { useImperativeHandle, forwardRef, useRef, useState, useCallback, useEffect } from 'react';
+import {
+    useImperativeHandle,
+    forwardRef,
+    useRef,
+    useState,
+    useCallback,
+    useEffect,
+    useMemo,
+} from 'react';
 import isElectron from 'is-electron';
 import type { ReactPlayerProps } from 'react-player';
 import ReactPlayer from 'react-player/lazy';
@@ -7,10 +15,12 @@ import {
     crossfadeHandler,
     gaplessHandler,
 } from '/@/renderer/components/audio-player/utils/list-handlers';
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { useCacheSettings, useSettingsStore } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
 import { useSpeed } from '/@/renderer/store';
+
+const cache = isElectron() ? window.electron.cache : null;
 
 interface AudioPlayerProps extends ReactPlayerProps {
     crossfadeDuration: number;
@@ -61,6 +71,21 @@ export const AudioPlayer = forwardRef(
         const audioDeviceId = useSettingsStore((state) => state.playback.audioDeviceId);
         const playback = useSettingsStore((state) => state.playback.mpvProperties);
         const playbackSpeed = useSpeed();
+        const cacheSettings = useCacheSettings();
+
+        const player1Stream = useMemo(() => {
+            if (player1 && cacheSettings.enabled && cache) {
+                return cache.getPath(player1, 'feishin-cache');
+            }
+            return player1?.streamUrl;
+        }, [cacheSettings, player1]);
+
+        const player2Stream = useMemo(() => {
+            if (player2 && cacheSettings.enabled && cache) {
+                return cache.getPath(player2, 'feishin-cache');
+            }
+            return player2?.streamUrl;
+        }, [cacheSettings, player2]);
 
         const [webAudio, setWebAudio] = useState<WebAudio | null>(null);
         const [player1Source, setPlayer1Source] = useState<MediaElementAudioSourceNode | null>(
@@ -146,10 +171,27 @@ export const AudioPlayer = forwardRef(
             },
         }));
 
-        const handleOnEnded = () => {
+        const handleOnEnded = useCallback(() => {
+            if (cache && cacheSettings.enabled) {
+                if (currentPlayer === 1) {
+                    if (player1Stream && !player1Stream.startsWith('feishin-cache://')) {
+                        cache.cacheFile(player1);
+                    }
+                } else if (player2Stream && !player2Stream.startsWith('feishin-cache://')) {
+                    cache.cacheFile(player2);
+                }
+            }
             autoNext();
             setIsTransitioning(false);
-        };
+        }, [
+            autoNext,
+            cacheSettings,
+            currentPlayer,
+            player1,
+            player1Stream,
+            player2,
+            player2Stream,
+        ]);
 
         useEffect(() => {
             if (status === PlayerStatus.PLAYING) {
@@ -312,7 +354,7 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 1 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player1?.streamUrl}
+                    url={player1Stream}
                     volume={volume}
                     width={0}
                     onEnded={handleOnEnded}
@@ -331,7 +373,7 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 2 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player2?.streamUrl}
+                    url={player2Stream}
                     volume={volume}
                     width={0}
                     onEnded={handleOnEnded}

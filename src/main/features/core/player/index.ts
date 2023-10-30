@@ -1,7 +1,13 @@
 import console from 'console';
+import { constants } from 'fs';
+import { access } from 'fs/promises';
+import { join } from 'path';
 import { ipcMain } from 'electron';
 import { getMpvInstance } from '../../../main';
 import { PlayerData } from '/@/renderer/store';
+import { MediaCache } from '../../../utils';
+import { store } from '../settings';
+import { Song } from '/@/renderer/api/types';
 
 declare module 'node-mpv';
 
@@ -12,6 +18,22 @@ declare module 'node-mpv';
 //         }, timeout);
 //     });
 // }
+
+const getPath = async (song: Song): Promise<string> => {
+    const { enabled, path } = (store.get('cache') as MediaCache | undefined) || {};
+
+    if (!enabled || !path) {
+        return song.streamUrl;
+    }
+
+    try {
+        const filePath = join(path, `${song.serverId}-${song.id}`);
+        access(filePath, constants.R_OK);
+        return `file://${filePath}`;
+    } catch (error) {
+        return song.streamUrl;
+    }
+};
 
 ipcMain.handle('player-is-running', async () => {
     return getMpvInstance()?.isRunning();
@@ -112,15 +134,18 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
 
     try {
         if (data.queue.current) {
+            const currentUrl = await getPath(data.queue.current);
+
             await getMpvInstance()
-                ?.load(data.queue.current.streamUrl, 'replace')
+                ?.load(currentUrl, 'replace')
                 .catch((err) => {
                     console.log('MPV failed to load song', err);
                     getMpvInstance()?.play();
                 });
 
             if (data.queue.next) {
-                await getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
+                const nextUrl = await getPath(data.queue.next);
+                await getMpvInstance()?.load(nextUrl, 'append');
             }
         }
     } catch (err) {
@@ -153,8 +178,9 @@ ipcMain.on('player-set-queue-next', async (_event, data: PlayerData) => {
     }
 
     if (data.queue.next) {
+        const nextUrl = await getPath(data.queue.next);
         await getMpvInstance()
-            ?.load(data.queue.next.streamUrl, 'append')
+            ?.load(nextUrl, 'append')
             .catch((err) => {
                 console.log('MPV failed to load next song', err);
             });
@@ -174,8 +200,9 @@ ipcMain.on('player-auto-next', async (_event, data: PlayerData) => {
         });
 
     if (data.queue.next) {
+        const nextUrl = await getPath(data.queue.next);
         await getMpvInstance()
-            ?.load(data.queue.next.streamUrl, 'append')
+            ?.load(nextUrl, 'append')
             .catch((err) => {
                 console.log('MPV failed to load next song', err);
             });

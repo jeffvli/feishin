@@ -9,7 +9,8 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import { access, constants, readFile, writeFile } from 'fs';
-import path, { join } from 'path';
+import { mkdir } from 'fs/promises';
+import { join, normalize } from 'path';
 import { deflate, inflate } from 'zlib';
 import {
     app,
@@ -32,7 +33,14 @@ import MpvAPI from 'node-mpv';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
-import { hotkeyToElectronAccelerator, isLinux, isMacOS, isWindows, resolveHtmlPath } from './utils';
+import {
+    MediaCache,
+    hotkeyToElectronAccelerator,
+    isLinux,
+    isMacOS,
+    isWindows,
+    resolveHtmlPath,
+} from './utils';
 import './features';
 
 declare module 'node-mpv';
@@ -45,7 +53,16 @@ export default class AppUpdater {
     }
 }
 
-protocol.registerSchemesAsPrivileged([{ privileges: { bypassCSP: true }, scheme: 'feishin' }]);
+protocol.registerSchemesAsPrivileged([
+    {
+        privileges: { bypassCSP: true },
+        scheme: 'feishin',
+    },
+    {
+        privileges: { bypassCSP: true, stream: true },
+        scheme: 'feishin-cache',
+    },
+]);
 
 process.on('uncaughtException', (error: any) => {
     console.log('Error in main process', error);
@@ -54,6 +71,12 @@ process.on('uncaughtException', (error: any) => {
 if (store.get('ignore_ssl')) {
     app.commandLine.appendSwitch('ignore-certificate-errors');
 }
+
+mkdir(join(app.getPath('userData'), 'cache')).catch((error) => {
+    if (error.code !== 'EEXIST') {
+        console.error(`Failed to create default cache directory: ${error}`);
+    }
+});
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -95,11 +118,11 @@ if (!singleInstance) {
 }
 
 const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
+    ? join(process.resourcesPath, 'assets')
+    : join(__dirname, '../../assets');
 
 const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
+    return join(RESOURCES_PATH, ...paths);
 };
 
 export const getMainWindow = () => {
@@ -229,8 +252,8 @@ const createWindow = async () => {
             devTools: true,
             nodeIntegration: true,
             preload: app.isPackaged
-                ? path.join(__dirname, 'preload.js')
-                : path.join(__dirname, '../../.erb/dll/preload.js'),
+                ? join(__dirname, 'preload.js')
+                : join(__dirname, '../../.erb/dll/preload.js'),
             webSecurity: !store.get('ignore_cors'),
         },
         width: 1440,
@@ -657,14 +680,14 @@ app.on('window-all-closed', () => {
     }
 });
 
-const FONT_HEADERS = [
+const FONT_HEADERS = new Set([
     'font/collection',
     'font/otf',
     'font/sfnt',
     'font/ttf',
     'font/woff',
     'font/woff2',
-];
+]);
 
 app.whenReady()
     .then(() => {
@@ -673,7 +696,7 @@ app.whenReady()
             const response = await net.fetch(filePath);
             const contentType = response.headers.get('content-type');
 
-            if (!contentType || !FONT_HEADERS.includes(contentType)) {
+            if (!contentType || !FONT_HEADERS.has(contentType)) {
                 getMainWindow()?.webContents.send('custom-font-error', filePath);
 
                 return new Response(null, {
@@ -683,6 +706,21 @@ app.whenReady()
             }
 
             return response;
+        });
+
+        protocol.handle('feishin-cache', async (request) => {
+            // Normalize the path helps prevent .. going up a directory
+            const requestingPath = normalize(request.url.slice('feishin-cache://'.length));
+            const { enabled, path } = (store.get('cache') as MediaCache | undefined) || {};
+
+            if (!enabled || !path || !requestingPath.startsWith(path)) {
+                return new Response(null, {
+                    status: 403,
+                    statusText: 'Forbidden',
+                });
+            }
+
+            return net.fetch(`file://${requestingPath}`);
         });
 
         createWindow();

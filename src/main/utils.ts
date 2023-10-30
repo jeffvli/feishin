@@ -50,3 +50,8 @@ export const hotkeyToElectronAccelerator = (hotkey: string) => {
 
     return accelerator;
 };
+
+export type MediaCache = {
+    enabled?: boolean;
+    path?: string;
+};

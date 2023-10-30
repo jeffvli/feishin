@@ -24,6 +24,7 @@ import {
 import { randomString } from '/@/renderer/utils';
 
 const utils = isElectron() ? window.electron.utils : null;
+const settingPath = isElectron() ? window.electron.localSettings.path : '';
 
 export type SidebarItemType = {
     disabled: boolean;
@@ -118,6 +119,10 @@ export enum BindingActions {
 }
 
 export interface SettingsState {
+    cache: {
+        enabled: boolean;
+        path: string;
+    };
     discord: {
         clientId: string;
         enableIdle: boolean;
@@ -229,6 +234,10 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    cache: {
+        enabled: false,
+        path: settingPath,
+    },
     discord: {
         clientId: '1165957668758900787',
         enableIdle: false,
@@ -586,3 +595,5 @@ export const useRemoteSettings = () => useSettingsStore((state) => state.remote,
 export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
 
 export const useDiscordSetttings = () => useSettingsStore((state) => state.discord, shallow);
+
+export const useCacheSettings = () => useSettingsStore((state) => state.cache, shallow);
