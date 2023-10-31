@@ -12,6 +12,7 @@ import {
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { PlaybackType } from '/@/renderer/types';
+import { useTranslation } from 'react-i18next';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
@@ -60,6 +61,7 @@ export const getMpvProperties = (settings: SettingsState['playback']['mpvPropert
 };
 
 export const MpvSettings = () => {
+    const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -116,10 +118,13 @@ export const MpvSettings = () => {
                     onChange={handleSetMpvPath}
                 />
             ),
-            description: 'The location of your mpv executable',
+            description: t('setting.mpvExecutablePath', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: settings.type !== PlaybackType.LOCAL,
             note: 'Restart required',
-            title: 'MPV executable path',
+            title: t('setting.mpvExecutablePath', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -128,9 +133,10 @@ export const MpvSettings = () => {
                         autosize
                         defaultValue={settings.mpvExtraParameters.join('\n')}
                         minRows={4}
-                        placeholder={
-                            '(Add one per line):\n--gapless-audio=weak\n--prefetch-playlist=yes'
-                        }
+                        placeholder={`(${t('setting.mpvExtraParameters', {
+                            context: 'help',
+                            postProcess: 'sentenceCase',
+                        })}):\n--gapless-audio=weak\n--prefetch-playlist=yes`}
                         width={225}
                         onBlur={(e) => {
                             handleSetExtraParameters(e.currentTarget.value.split('\n'));
@@ -145,7 +151,10 @@ export const MpvSettings = () => {
                         $secondary
                         size="sm"
                     >
-                        Options to pass to the player
+                        {t('setting.mpvExtraParameters', {
+                            context: 'description',
+                            postProcess: 'sentenceCase',
+                        })}
                     </Text>
                     <Text size="sm">
                         <a
@@ -159,8 +168,12 @@ export const MpvSettings = () => {
                 </Stack>
             ),
             isHidden: settings.type !== PlaybackType.LOCAL,
-            note: 'Restart required',
-            title: 'MPV parameters',
+            note: t('common.restartRequired', {
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.mpvExtraParameters', {
+                postProcess: 'sentenceCase',
+            }),
         },
     ];
 
@@ -169,18 +182,26 @@ export const MpvSettings = () => {
             control: (
                 <Select
                     data={[
-                        { label: 'No', value: 'no' },
-                        { label: 'Yes', value: 'yes' },
-                        { label: 'Weak (recommended)', value: 'weak' },
+                        { label: t('common.no', { postProcess: 'titleCase' }), value: 'no' },
+                        { label: t('common.yes', { postProcess: 'titleCase' }), value: 'yes' },
+                        {
+                            label: t('setting.gaplessAudio', {
+                                context: 'optionWeak',
+                                postProcess: 'sentenceCase',
+                            }),
+                            value: 'weak',
+                        },
                     ]}
                     defaultValue={settings.mpvProperties.gaplessAudio}
                     onChange={(e) => handleSetMpvProperty('gaplessAudio', e)}
                 />
             ),
-            description:
-                'Try to play consecutive audio files with no silence or disruption at the point of file change (--gapless-audio)',
+            description: t('setting.gaplessAudio', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: settings.type !== PlaybackType.LOCAL,
-            title: 'Gapless audio',
+            title: t('setting.gaplessAudio', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -193,10 +214,12 @@ export const MpvSettings = () => {
                     }}
                 />
             ),
-            description:
-                'Select the output sample rate to be used if the sample frequency selected is different from that of the current media',
+            description: t('setting.sampleRate', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             note: 'Page refresh required for web player',
-            title: 'Sample rate',
+            title: t('setting.sampleRate', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -211,10 +234,12 @@ export const MpvSettings = () => {
                 />
             ),
 
-            description:
-                'Enable exclusive output mode. In this mode, the system is usually locked out, and only mpv will be able to output audio (--audio-exclusive)',
+            description: t('setting.audioExclusiveMode', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: settings.type !== PlaybackType.LOCAL,
-            title: 'Audio exclusive mode',
+            title: t('setting.audioExclusiveMode', { postProcess: 'sentenceCase' }),
         },
     ];
 
@@ -223,18 +248,42 @@ export const MpvSettings = () => {
             control: (
                 <Select
                     data={[
-                        { label: 'None', value: 'no' },
-                        { label: 'Track', value: 'track' },
-                        { label: 'Album', value: 'album' },
+                        {
+                            label: t('setting.replayGainMode', {
+                                context: 'optionNone',
+                                postProcess: 'titleCase',
+                            }),
+                            value: 'no',
+                        },
+                        {
+                            label: t('setting.replayGainMode', {
+                                context: 'optionTrack',
+                                postProcess: 'titleCase',
+                            }),
+                            value: 'track',
+                        },
+                        {
+                            label: t('setting.replayGainMode', {
+                                context: 'optionAlbum',
+                                postProcess: 'titleCase',
+                            }),
+                            value: 'album',
+                        },
                     ]}
                     defaultValue={settings.mpvProperties.replayGainMode}
                     onChange={(e) => handleSetMpvProperty('replayGainMode', e)}
                 />
             ),
-            description:
-                'Adjust volume gain according to replaygain values stored in the file metadata (--replaygain)',
-            note: 'Restart required',
-            title: 'ReplayGain mode',
+            description: t('setting.replayGainMode', {
+                ReplayGain: 'ReplayGain',
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
+            title: t('setting.replayGainMode', {
+                ReplayGain: 'ReplayGain',
+                postProcess: 'sentenceCase',
+            }),
         },
         {
             control: (
@@ -244,9 +293,15 @@ export const MpvSettings = () => {
                     onChange={(e) => handleSetMpvProperty('replayGainPreampDB', e)}
                 />
             ),
-            description:
-                'Pre-amplification gain in dB to apply to the selected replaygain gain (--replaygain-preamp)',
-            title: 'ReplayGain preamp (dB)',
+            description: t('setting.replayGainMode', {
+                ReplayGain: 'ReplayGain',
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.replayGainPreamp', {
+                ReplayGain: 'ReplayGain',
+                postProcess: 'sentenceCase',
+            }),
         },
         {
             control: (
@@ -257,9 +312,14 @@ export const MpvSettings = () => {
                     }
                 />
             ),
-            description:
-                'Prevent clipping caused by replaygain by automatically lowering the gain (--replaygain-clip)',
-            title: 'ReplayGain clipping',
+            description: t('setting.replayGainClipping', {
+                ReplayGain: 'ReplayGain',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.replayGainClipping', {
+                ReplayGain: 'ReplayGain',
+                postProcess: 'sentenceCase',
+            }),
         },
         {
             control: (
@@ -269,9 +329,14 @@ export const MpvSettings = () => {
                     onBlur={(e) => handleSetMpvProperty('replayGainFallbackDB', e)}
                 />
             ),
-            description:
-                'Gain in dB to apply if the file has no replay gain tags. This option is always applied if the replaygain logic is somehow inactive. If this is applied, no other replaygain options are applied',
-            title: 'ReplayGain fallback (dB)',
+            description: t('setting.replayGainFallback', {
+                ReplayGain: 'ReplayGain',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.replayGainFallback', {
+                ReplayGain: 'ReplayGain',
+                postProcess: 'sentenceCase',
+            }),
         },
     ];
 

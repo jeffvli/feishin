@@ -1,9 +1,10 @@
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiFolder2Line, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
 import { useListContext } from '../../../context/list-context';
 import { api } from '/@/renderer/api';
@@ -62,6 +63,7 @@ export const AlbumArtistListHeaderFilters = ({
     gridRef,
     tableRef,
 }: AlbumArtistListHeaderFiltersProps) => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const server = useCurrentServer();
     const { pageKey } = useListContext();
@@ -77,7 +79,7 @@ export const AlbumArtistListHeaderFilters = ({
         (server?.type &&
             FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filter.sortBy)
                 ?.name) ||
-        'Unknown';
+        t('common.unknown', { postProcess: 'titleCase' });
 
     const handleItemSize = (e: number) => {
         if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
@@ -359,7 +361,7 @@ export const AlbumArtistListHeaderFilters = ({
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Refresh' }}
+                    tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >
@@ -407,21 +409,27 @@ export const AlbumArtistListHeaderFilters = ({
                             value={ListDisplayType.CARD}
                             onClick={handleSetViewType}
                         >
-                            Card
+                            {t('table.config.view.card', {
+                                postProcess: 'sentenceCase',
+                            })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.POSTER}
                             value={ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                         >
-                            Poster
+                            {t('table.config.view.poster', {
+                                postProcess: 'sentenceCase',
+                            })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                         >
-                            Table
+                            {t('table.config.view.table', {
+                                postProcess: 'sentenceCase',
+                            })}
                         </DropdownMenu.Item>
                         {/* <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE_PAGINATED}
@@ -465,7 +473,11 @@ export const AlbumArtistListHeaderFilters = ({
                         )}
                         {!isGrid && (
                             <>
-                                <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.tableColumns', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
@@ -482,7 +494,11 @@ export const AlbumArtistListHeaderFilters = ({
                                             onChange={handleTableColumns}
                                         />
                                         <Group position="apart">
-                                            <Text>Auto Fit Columns</Text>
+                                            <Text>
+                                                {t('table.config.general.autoFitColumns', {
+                                                    postProcess: 'sentenceCase',
+                                                })}
+                                            </Text>
                                             <Switch
                                                 defaultChecked={table.autoFit}
                                                 onChange={handleAutoFitColumns}

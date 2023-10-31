@@ -11,9 +11,11 @@ import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel
 import { Platform } from '/@/renderer/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { useTranslation } from 'react-i18next';
 import { RiRefreshLine } from 'react-icons/ri';
 
 const HomeRoute = () => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const server = useCurrentServer();
@@ -105,7 +107,7 @@ const HomeRoute = () => {
             data: random?.data?.items,
             sortBy: AlbumListSort.RANDOM,
             sortOrder: SortOrder.ASC,
-            title: 'Explore from your library',
+            title: t('page.home.explore', { postProcess: 'sentenceCase' }),
             uniqueId: 'random',
         },
         {
@@ -115,7 +117,7 @@ const HomeRoute = () => {
             },
             sortBy: AlbumListSort.RECENTLY_PLAYED,
             sortOrder: SortOrder.DESC,
-            title: 'Recently played',
+            title: t('page.home.recentlyPlayed', { postProcess: 'sentenceCase' }),
             uniqueId: 'recentlyPlayed',
         },
         {
@@ -125,7 +127,7 @@ const HomeRoute = () => {
             },
             sortBy: AlbumListSort.RECENTLY_ADDED,
             sortOrder: SortOrder.DESC,
-            title: 'Newly added releases',
+            title: t('page.home.newlyAdded', { postProcess: 'sentenceCase' }),
             uniqueId: 'recentlyAdded',
         },
         {
@@ -135,7 +137,7 @@ const HomeRoute = () => {
             },
             sortBy: AlbumListSort.PLAY_COUNT,
             sortOrder: SortOrder.DESC,
-            title: 'Most played',
+            title: t('page.home.mostPlayed', { postProcess: 'sentenceCase' }),
             uniqueId: 'mostPlayed',
         },
     ];
@@ -148,7 +150,9 @@ const HomeRoute = () => {
                     backgroundColor: 'var(--titlebar-bg)',
                     children: (
                         <LibraryHeaderBar>
-                            <LibraryHeaderBar.Title>Home</LibraryHeaderBar.Title>
+                            <LibraryHeaderBar.Title>
+                                {t('page.home.title', { postProcess: 'titleCase' })}
+                            </LibraryHeaderBar.Title>
                         </LibraryHeaderBar>
                     ),
                     offset: 200,

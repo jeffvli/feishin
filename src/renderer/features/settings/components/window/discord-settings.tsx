@@ -5,8 +5,10 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useDiscordSetttings, useSettingsStoreActions } from '/@/renderer/store';
+import { useTranslation } from 'react-i18next';
 
 export const DiscordSettings = () => {
+    const { t } = useTranslation();
     const settings = useDiscordSetttings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -25,10 +27,19 @@ export const DiscordSettings = () => {
                     }}
                 />
             ),
-            description:
-                'Enable playback status in Discord rich presence. Image keys include: "icon", "playing", and "paused"',
+            description: t('setting.discordRichPresence', {
+                context: 'description',
+                discord: 'Discord',
+                icon: 'icon',
+                paused: 'paused',
+                playing: 'playing',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Discord rich presence',
+            title: t('setting.discordRichPresence', {
+                discord: 'Discord',
+                postProcess: 'sentenceCase',
+            }),
         },
         {
             control: (
@@ -44,9 +55,17 @@ export const DiscordSettings = () => {
                     }}
                 />
             ),
-            description: 'The Discord application ID (defaults to 1165957668758900787)',
+            description: t('setting.discordApplicationId', {
+                context: 'description',
+                defaultId: '1165957668758900787',
+                discord: 'Discord',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Discord application ID',
+            title: t('setting.discordApplicationId', {
+                discord: 'Discord',
+                postProcess: 'sentenceCase',
+            }),
         },
         {
             control: (
@@ -67,9 +86,15 @@ export const DiscordSettings = () => {
                     }}
                 />
             ),
-            description: 'The time in seconds between each update (minimum 15 seconds)',
+            description: t('setting.discordUpdateInterval', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Rich presence update interval (seconds)',
+            title: t('setting.discordUpdateInterval', {
+                discord: 'Discord',
+                postProcess: 'sentenceCase',
+            }),
         },
         {
             control: (
@@ -85,9 +110,14 @@ export const DiscordSettings = () => {
                     }}
                 />
             ),
-            description: 'When enabled, the rich presence will update while player is idle',
+            description: t('setting.discordIdleStatus', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Show rich presence when idle',
+            title: t('setting.discordIdleStatus', {
+                postProcess: 'sentenceCase',
+            }),
         },
     ];
 

@@ -28,6 +28,7 @@ import {
     getGenreSongsById,
 } from '/@/renderer/features/player/utils';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { useTranslation } from 'react-i18next';
 
 const getRootQueryKey = (itemType: LibraryItem, serverId: string) => {
     let queryKey;
@@ -62,6 +63,7 @@ const remote = isElectron() ? window.electron.remote : null;
 const addToQueue = usePlayerStore.getState().actions.addToQueue;
 
 export const useHandlePlayQueueAdd = () => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const playerType = usePlayerType();
     const server = useCurrentServer();
@@ -86,15 +88,18 @@ export const useHandlePlayQueueAdd = () => {
                         toast.info({
                             autoClose: false,
                             id: fetchId,
-                            message:
-                                'This is taking a while... close the notification to cancel the request',
+                            message: t('player.playbackFetchCancel', {
+                                postProcess: 'sentenceCase',
+                            }),
                             onClose: () => {
                                 queryClient.cancelQueries({
                                     exact: false,
                                     queryKey: getRootQueryKey(itemType, server?.id),
                                 });
                             },
-                            title: 'Adding to queue',
+                            title: t('player.playbackFetchInProgress', {
+                                postProcess: 'sentenceCase',
+                            }),
                         });
                     }, 2000),
                 };
@@ -140,7 +145,7 @@ export const useHandlePlayQueueAdd = () => {
 
                     return toast.error({
                         message: err.message,
-                        title: 'Play queue add failed',
+                        title: t('error.genericError', { postProcess: 'sentenceCase' }) as string,
                     });
                 }
 
@@ -152,8 +157,8 @@ export const useHandlePlayQueueAdd = () => {
 
             if (!songs || songs?.length === 0)
                 return toast.warn({
-                    message: 'The query returned no results',
-                    title: 'No tracks added',
+                    message: t('common.noResultsFromQuery', { postProcess: 'sentenceCase' }),
+                    title: t('player.playbackFetchNoResults'),
                 });
 
             if (initialIndex) {
@@ -190,7 +195,7 @@ export const useHandlePlayQueueAdd = () => {
 
             return null;
         },
-        [play, playerType, queryClient, server],
+        [play, playerType, queryClient, server, t],
     );
 
     return handlePlayQueueAdd;

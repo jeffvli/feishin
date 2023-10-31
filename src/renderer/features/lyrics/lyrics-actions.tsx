@@ -1,5 +1,6 @@
 import { Box, Group } from '@mantine/core';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
 import { LyricsOverride } from '/@/renderer/api/types';
 import { Button, NumberInput, Tooltip } from '/@/renderer/components';
@@ -22,6 +23,7 @@ export const LyricsActions = ({
     onResetLyric,
     onSearchOverride,
 }: LyricsActionsProps) => {
+    const { t } = useTranslation();
     const currentSong = useCurrentSong();
     const { setSettings } = useSettingsStoreActions();
     const { delayMs, sources } = useLyricsSettings();
@@ -54,7 +56,7 @@ export const LyricsActions = ({
                             })
                         }
                     >
-                        Search
+                        {t('common.search', { postProcess: 'titleCase' })}
                     </Button>
                 ) : null}
                 <Button
@@ -65,7 +67,7 @@ export const LyricsActions = ({
                     <RiSubtractFill />
                 </Button>
                 <Tooltip
-                    label="Offset (ms)"
+                    label={t('setting.lyricOffset', { postProcess: 'sentenceCase' })}
                     openDelay={500}
                 >
                     <NumberInput
@@ -90,7 +92,7 @@ export const LyricsActions = ({
                         variant="subtle"
                         onClick={onResetLyric}
                     >
-                        Reset
+                        {t('common.reset', { postProcess: 'sentenceCase' })}
                     </Button>
                 ) : null}
             </Group>
@@ -104,7 +106,7 @@ export const LyricsActions = ({
                         variant="subtle"
                         onClick={onRemoveLyric}
                     >
-                        Clear
+                        {t('common.clear', { postProcess: 'sentenceCase' })}
                     </Button>
                 ) : null}
             </Box>

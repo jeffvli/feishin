@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { RiAddBoxFill, RiAddCircleFill, RiMoreFill, RiPlayFill } from 'react-icons/ri';
 import { QueueSong } from '/@/renderer/api/types';
 import { Button, DropdownMenu, PageHeader, SpinnerIcon, Paper } from '/@/renderer/components';
@@ -17,6 +18,7 @@ export const AlbumArtistDetailTopSongsListHeader = ({
     itemCount,
     data,
 }: AlbumArtistDetailTopSongsListHeaderProps) => {
+    const { t } = useTranslation();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const playButtonBehavior = usePlayButtonBehavior();
 
@@ -55,19 +57,19 @@ export const AlbumArtistDetailTopSongsListHeader = ({
                             icon={<RiPlayFill />}
                             onClick={() => handlePlay(Play.NOW)}
                         >
-                            Play
+                            {t('player.add', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddBoxFill />}
                             onClick={() => handlePlay(Play.LAST)}
                         >
-                            Add to queue
+                            {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddCircleFill />}
                             onClick={() => handlePlay(Play.NEXT)}
                         >
-                            Add to queue next
+                            {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>

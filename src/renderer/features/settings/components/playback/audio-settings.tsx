@@ -9,6 +9,7 @@ import {
 import { useCurrentStatus, usePlayerStore } from '/@/renderer/store';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { PlaybackType, PlayerStatus, PlaybackStyle, CrossfadeStyle } from '/@/renderer/types';
+import { useTranslation } from 'react-i18next';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
@@ -18,6 +19,7 @@ const getAudioDevice = async () => {
 };
 
 export const AudioSettings = () => {
+    const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
     const status = useCurrentStatus();
@@ -30,13 +32,17 @@ export const AudioSettings = () => {
                 .then((dev) =>
                     setAudioDevices(dev.map((d) => ({ label: d.label, value: d.deviceId }))),
                 )
-                .catch(() => toast.error({ message: 'Error fetching audio devices' }));
+                .catch(() =>
+                    toast.error({
+                        message: t('error.audioDeviceFetchError', { postProcess: 'sentenceCase' }),
+                    }),
+                );
         };
 
         if (settings.type === PlaybackType.WEB) {
             getAudioDevices();
         }
-    }, [settings.type]);
+    }, [settings.type, t]);
 
     const audioOptions: SettingOption[] = [
         {
@@ -61,10 +67,16 @@ export const AudioSettings = () => {
                     }}
                 />
             ),
-            description: 'The audio player to use for playback',
+            description: t('setting.audioPlayer', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            note: status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
-            title: 'Audio player',
+            note:
+                status === PlayerStatus.PLAYING
+                    ? t('common.playerMustBePaused', { postProcess: 'sentenceCase' })
+                    : undefined,
+            title: t('setting.audioPlayer', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -76,16 +88,31 @@ export const AudioSettings = () => {
                     onChange={(e) => setSettings({ playback: { ...settings, audioDeviceId: e } })}
                 />
             ),
-            description: 'The audio device to use for playback (web player only)',
+            description: t('setting.audioDevice', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron() || settings.type !== PlaybackType.WEB,
-            title: 'Audio device',
+            title: t('setting.audioDevice', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <Select
                     data={[
-                        { label: 'Normal', value: PlaybackStyle.GAPLESS },
-                        { label: 'Crossfade', value: PlaybackStyle.CROSSFADE },
+                        {
+                            label: t('setting.playbackStyle', {
+                                context: 'optionNormal',
+                                postProcess: 'titleCase',
+                            }),
+                            value: PlaybackStyle.GAPLESS,
+                        },
+                        {
+                            label: t('setting.playbackStyle', {
+                                context: 'optionCrossFade',
+                                postProcess: 'titleCase',
+                            }),
+                            value: PlaybackStyle.CROSSFADE,
+                        },
                     ]}
                     defaultValue={settings.style}
                     disabled={settings.type !== PlaybackType.WEB || status === PlayerStatus.PLAYING}
@@ -94,10 +121,16 @@ export const AudioSettings = () => {
                     }
                 />
             ),
-            description: 'Adjust the playback style (web player only)',
+            description: t('setting.playbackStyle', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: settings.type !== PlaybackType.WEB,
             note: status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
-            title: 'Playback style',
+            title: t('setting.playbackStyle', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
         },
         {
             control: (
@@ -116,10 +149,15 @@ export const AudioSettings = () => {
                     }
                 />
             ),
-            description: 'Adjust the crossfade duration (web player only)',
+            description: t('setting.crossfadeDuration', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: settings.type !== PlaybackType.WEB,
             note: status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
-            title: 'Crossfade Duration',
+            title: t('setting.crossfadeDuration', {
+                postProcess: 'sentenceCase',
+            }),
         },
         {
             control: (
@@ -153,10 +191,13 @@ export const AudioSettings = () => {
                     }}
                 />
             ),
-            description: 'Change the crossfade algorithm (web player only)',
+            description: t('setting.crossfadeStyle', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: settings.type !== PlaybackType.WEB,
             note: status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
-            title: 'Crossfade Style',
+            title: t('setting.crossfadeStyle', { postProcess: 'sentenceCase' }),
         },
     ];
 

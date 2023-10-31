@@ -7,8 +7,10 @@ import {
 import { THEME_DATA } from '/@/renderer/hooks';
 import { useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { AppTheme } from '/@/renderer/themes/types';
+import { useTranslation } from 'react-i18next';
 
 export const ThemeSettings = () => {
+    const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -27,9 +29,12 @@ export const ThemeSettings = () => {
                     }}
                 />
             ),
-            description: 'Follows the system-defined light or dark preference',
+            description: t('setting.useSystemTheme', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Use system theme',
+            title: t('setting.useSystemTheme', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -46,9 +51,12 @@ export const ThemeSettings = () => {
                     }}
                 />
             ),
-            description: 'Sets the default theme',
+            description: t('setting.theme', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: settings.followSystemTheme,
-            title: 'Theme',
+            title: t('setting.theme', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -65,9 +73,12 @@ export const ThemeSettings = () => {
                     }}
                 />
             ),
-            description: 'Sets the dark theme',
+            description: t('setting.themeDark', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !settings.followSystemTheme,
-            title: 'Theme (dark)',
+            title: t('setting.themeDark', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -84,9 +95,12 @@ export const ThemeSettings = () => {
                     }}
                 />
             ),
-            description: 'Sets the light theme',
+            description: t('setting.themeLight', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !settings.followSystemTheme,
-            title: 'Theme (light)',
+            title: t('setting.themeLight', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -114,8 +128,11 @@ export const ThemeSettings = () => {
                     <Text>{settings.accent}</Text>
                 </Stack>
             ),
-            description: 'Sets the accent color',
-            title: 'Accent color',
+            description: t('setting.accentColor', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.accentColor', { postProcess: 'sentenceCase' }),
         },
     ];
 

@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { Group, UnstyledButton } from '@mantine/core';
 import { motion } from 'framer-motion';
-import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiMenuFill } from 'react-icons/ri';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -24,6 +25,7 @@ const SidebarContainer = styled(motion.div)<{ $windowBarStyle: Platform }>`
 `;
 
 export const CollapsedSidebar = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { windowBarStyle } = useWindowSettings();
     const { sidebarItems, sidebarCollapsedNavigation } = useGeneralSettings();
@@ -74,7 +76,7 @@ export const CollapsedSidebar = () => {
                             activeIcon={<RiMenuFill size="25" />}
                             component={UnstyledButton}
                             icon={<RiMenuFill size="25" />}
-                            label="Menu"
+                            label={t('common.menu', { postProcess: 'titleCase' })}
                         />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>

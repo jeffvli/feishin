@@ -4,6 +4,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
     RiMoreFill,
     RiSettings3Fill,
@@ -101,6 +102,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
     tableRef,
     handleToggleShowQueryBuilder,
 }: PlaylistDetailSongListHeaderFiltersProps) => {
+    const { t } = useTranslation();
     const { playlistId } = useParams() as { playlistId: string };
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -267,19 +269,16 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 onError: (err) => {
                     toast.error({
                         message: err.message,
-                        title: 'Error deleting playlist',
+                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
                     });
                 },
                 onSuccess: () => {
-                    toast.success({
-                        message: `Playlist has been deleted`,
-                    });
                     navigate(AppRoute.PLAYLISTS, { replace: true });
                 },
             },
         );
         closeAllModals();
-    }, [deletePlaylistMutation, detailQuery.data, navigate]);
+    }, [deletePlaylistMutation, detailQuery.data, navigate, t]);
 
     const openDeletePlaylistModal = () => {
         openModal({
@@ -288,7 +287,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                     <Text>Are you sure you want to delete this playlist?</Text>
                 </ConfirmModal>
             ),
-            title: 'Delete playlist(s)',
+            title: t('form.deletePlaylist.title', { postProcess: 'sentenceCase' }),
         });
     };
 
@@ -345,19 +344,19 @@ export const PlaylistDetailSongListHeaderFilters = ({
                             icon={<RiPlayFill />}
                             onClick={() => handlePlay(Play.NOW)}
                         >
-                            Play
+                            {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddBoxFill />}
                             onClick={() => handlePlay(Play.LAST)}
                         >
-                            Add to queue
+                            {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddCircleFill />}
                             onClick={() => handlePlay(Play.NEXT)}
                         >
-                            Add to queue next
+                            {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
@@ -369,20 +368,20 @@ export const PlaylistDetailSongListHeaderFilters = ({
                                 })
                             }
                         >
-                            Edit playlist
+                            {t('action.editPlaylist', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiDeleteBinFill />}
                             onClick={openDeletePlaylistModal}
                         >
-                            Delete playlist
+                            {t('action.deletePlaylist', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
                             icon={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
-                            Refresh
+                            {t('action.refresh', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         {server?.type === ServerType.NAVIDROME && !isSmartPlaylist && (
                             <>
@@ -391,7 +390,9 @@ export const PlaylistDetailSongListHeaderFilters = ({
                                     $danger
                                     onClick={handleToggleShowQueryBuilder}
                                 >
-                                    Toggle smart playlist editor
+                                    {t('action.toggleSmartPlaylistEditor', {
+                                        postProcess: 'sentenceCase',
+                                    })}
                                 </DropdownMenu.Item>
                             </>
                         )}

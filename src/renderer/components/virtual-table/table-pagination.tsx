@@ -1,8 +1,9 @@
+import { MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { MutableRefObject } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiHashtag } from 'react-icons/ri';
 import { Button } from '/@/renderer/components/button';
 import { MotionFlex } from '../motion';
@@ -29,6 +30,7 @@ export const TablePagination = ({
     setPagination,
     setIdPagination,
 }: TablePaginationProps) => {
+    const { t } = useTranslation();
     const [isGoToPageOpen, handlers] = useDisclosure(false);
     const containerQuery = useContainerQuery();
 
@@ -115,7 +117,9 @@ export const TablePagination = ({
                             radius="sm"
                             size="sm"
                             sx={{ height: '26px', padding: '0', width: '26px' }}
-                            tooltip={{ label: 'Go to page' }}
+                            tooltip={{
+                                label: t('action.goToPage', { postProcess: 'sentenceCase' }),
+                            }}
                             variant="default"
                             onClick={() => handlers.toggle()}
                         >

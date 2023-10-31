@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Flex, Group } from '@mantine/core';
 import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import {
     RiVolumeUpFill,
@@ -34,6 +35,7 @@ const remote = isElectron() ? window.electron.remote : null;
 const PLAYBACK_SPEEDS = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
 export const RightControls = () => {
+    const { t } = useTranslation();
     const isMinWidth = useMediaQuery('(max-width: 480px)');
     const volume = useVolume();
     const muted = useMuted();
@@ -213,7 +215,7 @@ export const RightControls = () => {
                         <PlayerButton
                             icon={<>{speed} x</>}
                             tooltip={{
-                                label: 'Playback speed',
+                                label: t('player.playbackSpeed', { postProcess: 'sentenceCase' }),
                                 openDelay: 500,
                             }}
                             variant="secondary"
@@ -249,7 +251,9 @@ export const RightControls = () => {
                         },
                     }}
                     tooltip={{
-                        label: currentSong?.userFavorite ? 'Unfavorite' : 'Favorite',
+                        label: currentSong?.userFavorite
+                            ? t('player.unfavorite', { postProcess: 'titleCase' })
+                            : t('player.favorite', { postProcess: 'titleCase' }),
                         openDelay: 500,
                     }}
                     variant="secondary"
@@ -277,7 +281,10 @@ export const RightControls = () => {
                                 <RiVolumeDownFill size="1.2rem" />
                             )
                         }
-                        tooltip={{ label: muted ? 'Muted' : volume, openDelay: 500 }}
+                        tooltip={{
+                            label: muted ? t('player.muted', { postProcess: 'titleCase' }) : volume,
+                            openDelay: 500,
+                        }}
                         variant="secondary"
                         onClick={handleMute}
                         onWheel={handleVolumeWheel}

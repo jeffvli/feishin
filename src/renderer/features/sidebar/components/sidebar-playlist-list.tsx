@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Flex, Group } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
+import { useTranslation } from 'react-i18next';
 import { RiAddBoxFill, RiAddCircleFill, RiPlayFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -20,6 +21,7 @@ interface SidebarPlaylistListProps {
 }
 
 const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
+    const { t } = useTranslation();
     const path = data?.items[index].id
         ? data.defaultFullPlaylist
             ? generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data.items[index].id })
@@ -71,7 +73,10 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                     <Button
                         compact
                         size="md"
-                        tooltip={{ label: 'Play', openDelay: 500 }}
+                        tooltip={{
+                            label: t('player.play', { postProcess: 'sentenceCase' }),
+                            openDelay: 500,
+                        }}
                         variant="default"
                         onClick={() => {
                             if (!data?.items?.[index].id) return;
@@ -83,7 +88,10 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                     <Button
                         compact
                         size="md"
-                        tooltip={{ label: 'Add to queue', openDelay: 500 }}
+                        tooltip={{
+                            label: t('player.addLast', { postProcess: 'sentenceCase' }),
+                            openDelay: 500,
+                        }}
                         variant="default"
                         onClick={() => {
                             if (!data?.items?.[index].id) return;
@@ -95,7 +103,10 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                     <Button
                         compact
                         size="md"
-                        tooltip={{ label: 'Add to queue next', openDelay: 500 }}
+                        tooltip={{
+                            label: t('player.addNext', { postProcess: 'sentenceCase' }),
+                            openDelay: 500,
+                        }}
                         variant="default"
                         onClick={() => {
                             if (!data?.items?.[index].id) return;

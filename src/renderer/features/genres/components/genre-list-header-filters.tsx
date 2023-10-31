@@ -1,7 +1,8 @@
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiFolder2Fill, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
@@ -31,6 +32,7 @@ interface GenreListHeaderFiltersProps {
 }
 
 export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFiltersProps) => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { pageKey, customFilters } = useListContext();
     const server = useCurrentServer();
@@ -269,7 +271,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Refresh' }}
+                    tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >
@@ -291,7 +293,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                             icon={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
-                            Refresh
+                            {t('common.refresh', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
@@ -308,37 +310,43 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                         <Button
                             compact
                             size="md"
-                            tooltip={{ label: 'Configure' }}
+                            tooltip={{
+                                label: t('common.configure', { postProcess: 'titleCase' }),
+                            }}
                             variant="subtle"
                         >
                             <RiSettings3Fill size="1.3rem" />
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        <DropdownMenu.Label>Display type</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.displayType', { postProcess: 'titleCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.CARD}
                             value={ListDisplayType.CARD}
                             onClick={handleSetViewType}
                         >
-                            Card
+                            {t('table.config.view.card', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.POSTER}
                             value={ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                         >
-                            Poster
+                            {t('table.config.view.poster', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                         >
-                            Table
+                            {t('table.config.view.table', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>Item size</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.size', { postProcess: 'titleCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
                                 defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
@@ -363,7 +371,11 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                         {(display === ListDisplayType.TABLE ||
                             display === ListDisplayType.TABLE_PAGINATED) && (
                             <>
-                                <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.tableColumns', {
+                                        postProcess: 'titleCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
@@ -380,7 +392,11 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                                             onChange={handleTableColumns}
                                         />
                                         <Group position="apart">
-                                            <Text>Auto Fit Columns</Text>
+                                            <Text>
+                                                {t('table.config.general.autoFitColumns', {
+                                                    postProcess: 'titleCase',
+                                                })}
+                                            </Text>
                                             <Switch
                                                 defaultChecked={table.autoFit}
                                                 onChange={handleAutoFitColumns}

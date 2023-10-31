@@ -1,7 +1,8 @@
+import { MouseEvent, useMemo } from 'react';
 import { Box, Center, Divider, Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
-import { MouseEvent, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiArrowDownSLine, RiDiscLine, RiListUnordered } from 'react-icons/ri';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -68,6 +69,7 @@ const SidebarImage = styled.img`
 `;
 
 export const Sidebar = () => {
+    const { t } = useTranslation();
     const location = useLocation();
     const sidebar = useSidebarStore();
     const { setSideBar } = useAppStoreActions();
@@ -89,7 +91,7 @@ export const Sidebar = () => {
         openModal({
             children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
             size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
-            title: 'Create Playlist',
+            title: t('form.createPlaylist.title', { postProcess: 'titleCase' }),
         });
     };
 
@@ -176,7 +178,7 @@ export const Sidebar = () => {
                                         fw="600"
                                         sx={{ fontSize: '1.2rem' }}
                                     >
-                                        Playlists
+                                        {t('page.sidebar.playlists', { postProcess: 'titleCase' })}
                                     </Box>
                                     {playlistsQuery.isLoading && <Spinner />}
                                 </Group>
@@ -184,7 +186,12 @@ export const Sidebar = () => {
                                     <Button
                                         compact
                                         size="md"
-                                        tooltip={{ label: 'Create playlist', openDelay: 500 }}
+                                        tooltip={{
+                                            label: t('action.createPlaylist', {
+                                                postProcess: 'sentenceCase',
+                                            }),
+                                            openDelay: 500,
+                                        }}
                                         variant="default"
                                         onClick={handleCreatePlaylistModal}
                                     >
@@ -195,7 +202,12 @@ export const Sidebar = () => {
                                         component={Link}
                                         size="md"
                                         to={AppRoute.PLAYLISTS}
-                                        tooltip={{ label: 'Playlist list', openDelay: 500 }}
+                                        tooltip={{
+                                            label: t('action.viewPlaylists', {
+                                                postProcess: 'sentenceCase',
+                                            }),
+                                            openDelay: 500,
+                                        }}
                                         variant="default"
                                         onClick={(e) => e.stopPropagation()}
                                     >
@@ -223,7 +235,9 @@ export const Sidebar = () => {
                             onClick={expandFullScreenPlayer}
                         >
                             <Tooltip
-                                label="Toggle fullscreen player"
+                                label={t('player.toggleFullScreenPlayer', {
+                                    postProcess: 'sentenceCase',
+                                })}
                                 openDelay={500}
                             >
                                 {upsizedImageUrl ? (
@@ -248,7 +262,10 @@ export const Sidebar = () => {
                                 radius={100}
                                 size="md"
                                 sx={{ cursor: 'default', position: 'absolute', right: 5, top: 5 }}
-                                tooltip={{ label: 'Collapse', openDelay: 500 }}
+                                tooltip={{
+                                    label: t('common.collapse', { postProcess: 'titleCase' }),
+                                    openDelay: 500,
+                                }}
                                 variant="default"
                                 onClick={(e) => {
                                     e.stopPropagation();

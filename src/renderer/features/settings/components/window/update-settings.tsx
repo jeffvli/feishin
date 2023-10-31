@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { useWindowSettings, useSettingsStoreActions } from '../../../../store/settings.store';
 import {
     SettingsSection,
@@ -9,6 +10,7 @@ import { Switch } from '/@/renderer/components';
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const UpdateSettings = () => {
+    const { t } = useTranslation();
     const settings = useWindowSettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -31,9 +33,12 @@ export const UpdateSettings = () => {
                     }}
                 />
             ),
-            description: 'Enabling this option will disable checking for new versions on startup',
+            description: t('setting.disableAutomaticUpdates', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Disable automatic updates',
+            title: t('setting.disableAutomaticUpdates', { postProcess: 'sentenceCase' }),
         },
     ];
 

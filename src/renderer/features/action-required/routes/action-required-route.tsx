@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Center, Group, Stack } from '@mantine/core';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { RiCheckFill } from 'react-icons/ri';
 import { Link, Navigate } from 'react-router-dom';
 import { Button, PageHeader, Text } from '/@/renderer/components';
@@ -15,6 +16,7 @@ import { useCurrentServer } from '/@/renderer/store';
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const ActionRequiredRoute = () => {
+    const { t } = useTranslation();
     const currentServer = useCurrentServer();
     const [isMpvRequired, setIsMpvRequired] = useState(false);
     const isServerRequired = !currentServer;
@@ -38,17 +40,17 @@ const ActionRequiredRoute = () => {
     const checks = [
         {
             component: <MpvRequired />,
-            title: 'MPV required',
+            title: t('error.mpvRequired', { postProcess: 'sentenceCase' }),
             valid: !isMpvRequired,
         },
         {
             component: <ServerCredentialRequired />,
-            title: 'Credentials required',
+            title: t('error.credentialsRequired', { postProcess: 'sentenceCase' }),
             valid: !isCredentialRequired,
         },
         {
             component: <ServerRequired />,
-            title: 'Server required',
+            title: t('error.serverRequired', { postProcess: 'serverRequired' }),
             valid: !isServerRequired,
         },
     ];

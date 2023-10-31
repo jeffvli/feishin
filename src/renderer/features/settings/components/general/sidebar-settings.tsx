@@ -2,6 +2,7 @@ import { ChangeEvent, useCallback, useState } from 'react';
 import { Group } from '@mantine/core';
 import { Reorder, useDragControls } from 'framer-motion';
 import isEqual from 'lodash/isEqual';
+import { useTranslation } from 'react-i18next';
 import { MdDragIndicator } from 'react-icons/md';
 import { Button, Checkbox, Switch } from '/@/renderer/components';
 import { useSettingsStoreActions, useGeneralSettings } from '../../../../store/settings.store';
@@ -54,6 +55,7 @@ const DraggableSidebarItem = ({ item, handleChangeDisabled }: DraggableSidebarIt
 };
 
 export const SidebarSettings = () => {
+    const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSidebarItems, setSettings } = useSettingsStoreActions();
 
@@ -107,8 +109,11 @@ export const SidebarSettings = () => {
                         onChange={handleSetSidebarPlaylistList}
                     />
                 }
-                description="Show playlist list in sidebar"
-                title="Sidebar playlist list"
+                description={t('setting.sidebarPlaylistList', {
+                    context: 'description',
+                    postProcess: 'sentenceCase',
+                })}
+                title={t('setting.sidebarPlaylistList', { postProcess: 'sentenceCase' })}
             />
             <SettingsOptions
                 control={
@@ -117,8 +122,11 @@ export const SidebarSettings = () => {
                         onChange={handleSetSidebarCollapsedNavigation}
                     />
                 }
-                description="Show navigation buttons in the collapsed sidebar"
-                title="Sidebar (collapsed) navigation"
+                description={t('setting.sidebarPlaylistList', {
+                    context: 'description',
+                    postProcess: 'sentenceCase',
+                })}
+                title={t('setting.sidebarCollapsedNavigation', { postProcess: 'sentenceCase' })}
             />
             <SettingsOptions
                 control={
@@ -128,11 +136,14 @@ export const SidebarSettings = () => {
                         variant="filled"
                         onClick={handleSave}
                     >
-                        Save sidebar configuration
+                        {t('common.save', { postProcess: 'titleCase' })}
                     </Button>
                 }
-                description="Select the items and order in which they appear in the sidebar"
-                title="Sidebar configuration"
+                description={t('setting.sidebarCollapsedNavigation', {
+                    context: 'description',
+                    postProcess: 'sentenceCase',
+                })}
+                title={t('setting.sidebarConfiguration', { postProcess: 'sentenceCase' })}
             />
             <Reorder.Group
                 axis="y"
