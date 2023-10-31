@@ -97,6 +97,10 @@ Built and tested using Node `v16.15.0`.
 
 This project is built off of [electron-react-boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate) v4.6.0.
 
+## Translation
+
+This project uses [Weblate](https://hosted.weblate.org/projects/feishin/) for translations. If you would like to contribute, please visit the link and submit a translation.
+
 ## License
 
 [GNU General Public License v3.0 ©](https://github.com/jeffvli/feishin/blob/dev/LICENSE)
