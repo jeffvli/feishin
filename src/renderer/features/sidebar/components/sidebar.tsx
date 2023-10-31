@@ -235,7 +235,7 @@ export const Sidebar = () => {
                             onClick={expandFullScreenPlayer}
                         >
                             <Tooltip
-                                label={t('player.toggleFullScreenPlayer', {
+                                label={t('player.toggleFullscreenPlayer', {
                                     postProcess: 'sentenceCase',
                                 })}
                                 openDelay={500}
