@@ -3,6 +3,7 @@ import { access, lstat, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { Song } from '/@/renderer/api/types';
 import { localSettings } from '/@/main/preload/local-settings';
+import { ipcRenderer } from 'electron';
 
 let cachePath: string;
 
@@ -42,10 +43,20 @@ export const setCachePath = (path: string): void => {
     localSettings.set('cache.path', path);
 };
 
+export const openCacheDialog = (): Promise<string | null> => {
+    return ipcRenderer.invoke('cache-open-dialog');
+};
+
+export const openCachePath = (path: string) => {
+    ipcRenderer.invoke('cache-open-path', path);
+};
+
 export const cache = {
     cacheFile,
     getPath,
     isValidDirectory,
+    openCacheDialog,
+    openCachePath,
     setCachePath,
 };
 

@@ -24,6 +24,7 @@ import {
     BrowserWindowConstructorOptions,
     protocol,
     net,
+    dialog,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log';
@@ -662,6 +663,26 @@ ipcMain.on(
         }
     },
 );
+
+ipcMain.handle('cache-open-dialog', async (): Promise<string | null> => {
+    const window = getMainWindow();
+    if (window) {
+        const response = await dialog.showOpenDialog(window, {
+            defaultPath: app.getPath('userData'),
+            properties: ['openDirectory', 'showHiddenFiles'],
+        });
+        if (response.canceled) {
+            return null;
+        }
+
+        return response.filePaths[0];
+    }
+    return null;
+});
+
+ipcMain.handle('cache-open-path', async (_event, path: string) => {
+    return shell.openPath(path);
+});
 
 app.on('before-quit', () => {
     getMpvInstance()?.stop();

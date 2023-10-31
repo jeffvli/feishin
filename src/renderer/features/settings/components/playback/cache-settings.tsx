@@ -1,9 +1,11 @@
-import { Switch, TextInput, toast } from '/@/renderer/components';
+import { Stack } from '@mantine/core';
+import { Button, Switch } from '/@/renderer/components';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useCacheSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { RiExternalLinkLine } from 'react-icons/ri';
 
 const cache = window.electron.cache;
 const localSettings = window.electron.localSettings;
@@ -35,27 +37,33 @@ export const CacheSettings = () => {
         },
         {
             control: (
-                <TextInput
-                    defaultValue={settings.path}
-                    w={300}
-                    onChange={async (e) => {
-                        const path = e.currentTarget.value;
-
-                        if (await cache.isValidDirectory(path)) {
-                            setSettings({
-                                cache: {
-                                    ...settings,
-                                    path,
-                                },
-                            });
-                        } else {
-                            toast.error({
-                                message: `${path} is not a directory or does not exist`,
-                                title: 'Invalid path',
-                            });
-                        }
-                    }}
-                />
+                <Stack>
+                    <Button
+                        variant="filled"
+                        onClick={async () => {
+                            const path = await cache.openCacheDialog();
+                            if (path) {
+                                setSettings({
+                                    cache: {
+                                        ...settings,
+                                        path,
+                                    },
+                                });
+                            }
+                        }}
+                    >
+                        Set cache path
+                    </Button>
+                    <Button
+                        rightIcon={<RiExternalLinkLine />}
+                        variant="default"
+                        onClick={() => {
+                            cache.openCachePath(settings.path);
+                        }}
+                    >
+                        {settings.path}
+                    </Button>
+                </Stack>
             ),
             description: 'Path to store tracks',
             title: 'Cache location',
