@@ -79,9 +79,9 @@ export const Sidebar = () => {
     const server = useCurrentServer();
 
     const upsizedImageUrl = imageUrl
-        ?.replace(/size=\d+/, 'size=300')
-        .replace(/width=\d+/, 'width=300')
-        .replace(/height=\d+/, 'height=300');
+        ?.replace(/size=\d+/, 'size=450')
+        .replace(/width=\d+/, 'width=450')
+        .replace(/height=\d+/, 'height=450');
 
     const showImage = sidebar.image;
 
