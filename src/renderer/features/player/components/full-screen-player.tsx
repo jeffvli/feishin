@@ -126,7 +126,7 @@ const Controls = () => {
                 <Popover.Dropdown>
                     <Option>
                         <Option.Label>
-                            {t('page.fullscreenPlayer.dynamicBackground', {
+                            {t('page.fullscreenPlayer.config.dynamicBackground', {
                                 postProcess: 'sentenceCase',
                             })}
                         </Option.Label>
@@ -144,7 +144,7 @@ const Controls = () => {
                     {dynamicBackground && (
                         <Option>
                             <Option.Label>
-                                {t('page.fullscreenPlayer.opacity', {
+                                {t('page.fullscreenPlayer.config.opacity', {
                                     postProcess: 'sentenceCase',
                                 })}
                             </Option.Label>
@@ -162,7 +162,7 @@ const Controls = () => {
                     )}
                     <Option>
                         <Option.Label>
-                            {t('page.fullscreenPlayer.useImageAspectRatio', {
+                            {t('page.fullscreenPlayer.config.useImageAspectRatio', {
                                 postProcess: 'sentenceCase',
                             })}
                         </Option.Label>
@@ -180,7 +180,7 @@ const Controls = () => {
                     <Divider my="sm" />
                     <Option>
                         <Option.Label>
-                            {t('page.fullscreenPlayer.followCurrentLyric', {
+                            {t('page.fullscreenPlayer.config.followCurrentLyric', {
                                 postProcess: 'sentenceCase',
                             })}
                         </Option.Label>
@@ -195,7 +195,7 @@ const Controls = () => {
                     </Option>
                     <Option>
                         <Option.Label>
-                            {t('page.fullscreenPlayer.showLyricProvider', {
+                            {t('page.fullscreenPlayer.config.showLyricProvider', {
                                 postProcess: 'sentenceCase',
                             })}
                         </Option.Label>
@@ -210,7 +210,7 @@ const Controls = () => {
                     </Option>
                     <Option>
                         <Option.Label>
-                            {t('page.fullscreenPlayer.showLyricMatch', {
+                            {t('page.fullscreenPlayer.config.showLyricMatch', {
                                 postProcess: 'sentenceCase',
                             })}
                         </Option.Label>
@@ -225,7 +225,7 @@ const Controls = () => {
                     </Option>
                     <Option>
                         <Option.Label>
-                            {t('page.fullscreenPlayer.lyric', {
+                            {t('page.fullscreenPlayer.config.lyric', {
                                 postProcess: 'sentenceCase',
                             })}
                         </Option.Label>
@@ -237,7 +237,7 @@ const Controls = () => {
                                 <Slider
                                     defaultValue={lyricConfig.fontSize}
                                     label={(e) =>
-                                        `${t('page.fullscreenPlayer.synchronized', {
+                                        `${t('page.fullscreenPlayer.config.synchronized', {
                                             postProcess: 'titleCase',
                                         })}: ${e}px`
                                     }
@@ -249,7 +249,7 @@ const Controls = () => {
                                 <Slider
                                     defaultValue={lyricConfig.fontSize}
                                     label={(e) =>
-                                        `${t('page.fullscreenPlayer.unsynchronized', {
+                                        `${t('page.fullscreenPlayer.config.unsynchronized', {
                                             postProcess: 'sentenceCase',
                                         })}: ${e}px`
                                     }
@@ -265,7 +265,7 @@ const Controls = () => {
                     </Option>
                     <Option>
                         <Option.Label>
-                            {t('page.fullscreenPlayer.lyricGap', {
+                            {t('page.fullscreenPlayer.config.lyricGap', {
                                 postProcess: 'sentenceCase',
                             })}
                         </Option.Label>
@@ -297,7 +297,7 @@ const Controls = () => {
                     </Option>
                     <Option>
                         <Option.Label>
-                            {t('page.fullscreenPlayer.lyricAlignment', {
+                            {t('page.fullscreenPlayer.config.lyricAlignment', {
                                 postProcess: 'sentenceCase',
                             })}
                         </Option.Label>

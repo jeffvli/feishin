@@ -65,22 +65,24 @@ export const FullScreenPlayerQueue = () => {
         {
             active: activeTab === 'queue',
             icon: <RiFileMusicLine size="1.5rem" />,
-            label: t('page.fullScreenPlayer.upNext'),
+            label: t('page.fullscreenPlayer.upNext'),
             onClick: () => setStore({ activeTab: 'queue' }),
         },
         {
             active: activeTab === 'related',
             icon: <HiOutlineQueueList size="1.5rem" />,
-            label: t('page.fullScreenPlayer.related'),
+            label: t('page.fullscreenPlayer.related'),
             onClick: () => setStore({ activeTab: 'related' }),
         },
         {
             active: activeTab === 'lyrics',
             icon: <RiFileTextLine size="1.5rem" />,
-            label: t('page.fullScreenPlayer.lyrics'),
+            label: t('page.fullscreenPlayer.lyrics'),
             onClick: () => setStore({ activeTab: 'lyrics' }),
         },
     ];
+
+    console.log('opacity', opacity);
 
     return (
         <GridContainer
