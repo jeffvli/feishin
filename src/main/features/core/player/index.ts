@@ -28,7 +28,7 @@ const getPath = async (song: Song): Promise<string> => {
 
     try {
         const filePath = join(path, `${song.serverId}-${song.id}`);
-        access(filePath, constants.R_OK);
+        await access(filePath, constants.F_OK);
         return `file://${filePath}`;
     } catch (error) {
         return song.streamUrl;

@@ -13,7 +13,11 @@ import {
     useSetCurrentTime,
     useShuffleStatus,
 } from '/@/renderer/store';
-import { usePlayerType, useSettingsStore } from '/@/renderer/store/settings.store';
+import {
+    useCacheSettings,
+    usePlayerType,
+    useSettingsStore,
+} from '/@/renderer/store/settings.store';
 import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
 import debounce from 'lodash/debounce';
 import { QueueSong } from '/@/renderer/api/types';
@@ -26,20 +30,31 @@ const utils = isElectron() ? window.electron.utils : null;
 const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
 const remote = isElectron() ? window.electron.remote : null;
 const mediaSession = !isElectron() || !utils?.isLinux() ? navigator.mediaSession : null;
+const cache = isElectron() ? window.electron.cache : null;
 
 export const useCenterControls = (args: { playersRef: any }) => {
     const { playersRef } = args;
 
     const settings = useSettingsStore((state) => state.playback);
     const currentPlayer = useCurrentPlayer();
-    const { setShuffle, setRepeat, play, pause, previous, next, setCurrentIndex, autoNext } =
-        usePlayerControls();
+    const {
+        setShuffle,
+        setRepeat,
+        play,
+        pause,
+        previous,
+        next,
+        setCurrentIndex,
+        autoNext,
+        getPlayerData,
+    } = usePlayerControls();
     const setCurrentTime = useSetCurrentTime();
     const queue = useDefaultQueue();
     const playerStatus = useCurrentStatus();
     const repeatStatus = useRepeatStatus();
     const shuffleStatus = useShuffleStatus();
     const playerType = usePlayerType();
+    const cacheSettings = useCacheSettings();
     const player1Ref = playersRef?.current?.player1;
     const player2Ref = playersRef?.current?.player2;
     const currentPlayerRef = currentPlayer === 1 ? player1Ref : player2Ref;
@@ -275,6 +290,13 @@ export const useCenterControls = (args: { playersRef: any }) => {
             },
         };
 
+        if (cache && cacheSettings.enabled) {
+            const song = getPlayerData().current.song;
+            if (song) {
+                cache.cacheFile(song).catch(console.error);
+            }
+        }
+
         switch (repeatStatus) {
             case PlayerRepeat.NONE:
                 handleRepeatNone[playerType]();
@@ -291,7 +313,9 @@ export const useCenterControls = (args: { playersRef: any }) => {
         }
     }, [
         autoNext,
+        cacheSettings,
         checkIsLastTrack,
+        getPlayerData,
         pause,
         play,
         playerType,
@@ -681,7 +705,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
             ipc?.removeAllListeners('renderer-player-error');
         };
     }, [
-        autoNext,
         handleAutoNext,
         handleError,
         handleNextTrack,

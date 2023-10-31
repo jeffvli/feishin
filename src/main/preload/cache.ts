@@ -1,16 +1,24 @@
-import { existsSync } from 'fs';
-import { lstat, writeFile } from 'fs/promises';
+import { constants, existsSync } from 'fs';
+import { access, lstat, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { Song } from '/@/renderer/api/types';
 import { localSettings } from '/@/main/preload/local-settings';
 
 let cachePath: string;
 
-const cacheFile = async (song: Song) => {
+const cacheFile = async (song: Song): Promise<void> => {
+    if (!song.id || !song.serverId) return;
+
     const filePath = join(cachePath, `${song.serverId}-${song.id}`);
-    const response = await fetch(song.streamUrl);
-    const buffer = await response.arrayBuffer();
-    return writeFile(filePath, Buffer.from(buffer));
+
+    try {
+        await access(filePath, constants.F_OK);
+        return;
+    } catch (error) {
+        const response = await fetch(song.streamUrl);
+        const buffer = await response.arrayBuffer();
+        await writeFile(filePath, Buffer.from(buffer));
+    }
 };
 
 export const getPath = (song: Song, prefix: string): string => {
