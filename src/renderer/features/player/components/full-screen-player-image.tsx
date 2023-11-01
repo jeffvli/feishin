@@ -255,7 +255,7 @@ export const FullScreenPlayerImage = () => {
                     overflow="hidden"
                     pb="0.5rem"
                     style={{
-                        textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                        textShadow: 'var(--fullscreen-player-text-shadow)',
                     }}
                     w="100%"
                     weight={900}
@@ -269,7 +269,7 @@ export const FullScreenPlayerImage = () => {
                     order={3}
                     overflow="hidden"
                     style={{
-                        textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                        textShadow: 'var(--fullscreen-player-text-shadow)',
                     }}
                     to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
                         albumId: currentSong?.albumId || '',
@@ -286,7 +286,7 @@ export const FullScreenPlayerImage = () => {
                         align="center"
                         order={3}
                         style={{
-                            textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                            textShadow: 'var(--fullscreen-player-text-shadow)',
                         }}
                         transform="uppercase"
                     >
@@ -304,7 +304,7 @@ export const FullScreenPlayerImage = () => {
                             $link
                             component={Link}
                             style={{
-                                textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                                textShadow: 'var(--fullscreen-player-text-shadow)',
                             }}
                             to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                 albumArtistId: artist.id,
