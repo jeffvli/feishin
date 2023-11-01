@@ -7,6 +7,20 @@ import { MdDragIndicator } from 'react-icons/md';
 import { Button, Checkbox, Switch } from '/@/renderer/components';
 import { useSettingsStoreActions, useGeneralSettings } from '../../../../store/settings.store';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
+import i18n from '/@/i18n/i18n';
+
+const translatedSidebarItemMap = {
+    Albums: i18n.t('page.sidebar.albums', { postProcess: 'titleCase' }),
+    Artists: i18n.t('page.sidebar.artists', { postProcess: 'titleCase' }),
+    Folders: i18n.t('page.sidebar.folders', { postProcess: 'titleCase' }),
+    Genres: i18n.t('page.sidebar.genres', { postProcess: 'titleCase' }),
+    Home: i18n.t('page.sidebar.home', { postProcess: 'titleCase' }),
+    'Now Playing': i18n.t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
+    Playlists: i18n.t('page.sidebar.playlists', { postProcess: 'titleCase' }),
+    Search: i18n.t('page.sidebar.search', { postProcess: 'titleCase' }),
+    Settings: i18n.t('page.sidebar.settings', { postProcess: 'titleCase' }),
+    Tracks: i18n.t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+};
 
 const DragHandle = ({ dragControls }: any) => {
     return (
@@ -48,7 +62,7 @@ const DraggableSidebarItem = ({ item, handleChangeDisabled }: DraggableSidebarIt
                     onChange={(e) => handleChangeDisabled(item.id, e.target.checked)}
                 />
                 <DragHandle dragControls={dragControls} />
-                {item.id}
+                {translatedSidebarItemMap[item.id as keyof typeof translatedSidebarItemMap]}
             </Group>
         </Reorder.Item>
     );

@@ -78,6 +78,21 @@ export const Sidebar = () => {
     const imageUrl = useCurrentSong()?.imageUrl;
     const server = useCurrentServer();
 
+    const translatedSidebarItemMap = useMemo(
+        () => ({
+            Albums: t('page.sidebar.albums', { postProcess: 'titleCase' }),
+            Artists: t('page.sidebar.artists', { postProcess: 'titleCase' }),
+            Folders: t('page.sidebar.folders', { postProcess: 'titleCase' }),
+            Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
+            Home: t('page.sidebar.home', { postProcess: 'titleCase' }),
+            'Now Playing': t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
+            Playlists: t('page.sidebar.playlists', { postProcess: 'titleCase' }),
+            Search: t('page.sidebar.search', { postProcess: 'titleCase' }),
+            Settings: t('page.sidebar.settings', { postProcess: 'titleCase' }),
+            Tracks: t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+        }),
+        [t],
+    );
     const upsizedImageUrl = imageUrl
         ?.replace(/size=\d+/, 'size=450')
         .replace(/width=\d+/, 'width=450')
@@ -121,10 +136,13 @@ export const Sidebar = () => {
             .filter((item) => !item.disabled)
             .map((item) => ({
                 ...item,
+                label:
+                    translatedSidebarItemMap[item.id as keyof typeof translatedSidebarItemMap] ??
+                    item.label,
             }));
 
         return items;
-    }, [sidebarItems]);
+    }, [sidebarItems, translatedSidebarItemMap]);
 
     return (
         <SidebarContainer

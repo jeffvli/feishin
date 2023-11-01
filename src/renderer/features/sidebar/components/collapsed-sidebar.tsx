@@ -30,6 +30,22 @@ export const CollapsedSidebar = () => {
     const { windowBarStyle } = useWindowSettings();
     const { sidebarItems, sidebarCollapsedNavigation } = useGeneralSettings();
 
+    const translatedSidebarItemMap = useMemo(
+        () => ({
+            Albums: t('page.sidebar.albums', { postProcess: 'titleCase' }),
+            Artists: t('page.sidebar.artists', { postProcess: 'titleCase' }),
+            Folders: t('page.sidebar.folders', { postProcess: 'titleCase' }),
+            Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
+            Home: t('page.sidebar.home', { postProcess: 'titleCase' }),
+            'Now Playing': t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
+            Playlists: t('page.sidebar.playlists', { postProcess: 'titleCase' }),
+            Search: t('page.sidebar.search', { postProcess: 'titleCase' }),
+            Settings: t('page.sidebar.settings', { postProcess: 'titleCase' }),
+            Tracks: t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+        }),
+        [t],
+    );
+
     const sidebarItemsWithRoute: SidebarItemType[] = useMemo(() => {
         if (!sidebarItems) return [];
 
@@ -37,10 +53,13 @@ export const CollapsedSidebar = () => {
             .filter((item) => !item.disabled)
             .map((item) => ({
                 ...item,
+                label:
+                    translatedSidebarItemMap[item.id as keyof typeof translatedSidebarItemMap] ??
+                    item.label,
             }));
 
         return items;
-    }, [sidebarItems]);
+    }, [sidebarItems, translatedSidebarItemMap]);
 
     return (
         <SidebarContainer $windowBarStyle={windowBarStyle}>
