@@ -20,10 +20,23 @@ import {
     useListStoreByKey,
 } from '/@/renderer/store';
 import { ListDisplayType, ServerType, TableColumn } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
-    jellyfin: [{ defaultOrder: SortOrder.ASC, name: 'Name', value: GenreListSort.NAME }],
-    navidrome: [{ defaultOrder: SortOrder.ASC, name: 'Name', value: GenreListSort.NAME }],
+    jellyfin: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: GenreListSort.NAME,
+        },
+    ],
+    navidrome: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: GenreListSort.NAME,
+        },
+    ],
 };
 
 interface GenreListHeaderFiltersProps {

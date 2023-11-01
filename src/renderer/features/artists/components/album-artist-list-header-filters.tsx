@@ -22,16 +22,33 @@ import {
     useListStoreByKey,
 } from '/@/renderer/store';
 import { ListDisplayType, ServerType, TableColumn } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
     jellyfin: [
-        { defaultOrder: SortOrder.ASC, name: 'Album', value: AlbumArtistListSort.ALBUM },
-        { defaultOrder: SortOrder.DESC, name: 'Duration', value: AlbumArtistListSort.DURATION },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: AlbumArtistListSort.NAME },
-        { defaultOrder: SortOrder.ASC, name: 'Random', value: AlbumArtistListSort.RANDOM },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.album', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.ALBUM,
+        },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Recently Added',
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.RANDOM,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
             value: AlbumArtistListSort.RECENTLY_ADDED,
         },
         // { defaultOrder: SortOrder.DESC, name: 'Release Date', value: AlbumArtistListSort.RELEASE_DATE },
@@ -39,18 +56,34 @@ const FILTERS = {
     navidrome: [
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Album Count',
+            name: i18n.t('filter.albumCount', { postProcess: 'titleCase' }),
             value: AlbumArtistListSort.ALBUM_COUNT,
         },
-        { defaultOrder: SortOrder.DESC, name: 'Favorited', value: AlbumArtistListSort.FAVORITED },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Most Played',
+            name: i18n.t('filter.isFavorited', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.mostPlayed', { postProcess: 'titleCase' }),
             value: AlbumArtistListSort.PLAY_COUNT,
         },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: AlbumArtistListSort.NAME },
-        { defaultOrder: SortOrder.DESC, name: 'Rating', value: AlbumArtistListSort.RATING },
-        { defaultOrder: SortOrder.DESC, name: 'Song Count', value: AlbumArtistListSort.SONG_COUNT },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.RATING,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.SONG_COUNT,
+        },
     ],
 };
 

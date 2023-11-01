@@ -17,20 +17,57 @@ import { OrderToggleButton } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { PlaylistListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { ListDisplayType, TableColumn } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
     jellyfin: [
-        { defaultOrder: SortOrder.DESC, name: 'Duration', value: PlaylistListSort.DURATION },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: PlaylistListSort.NAME },
-        { defaultOrder: SortOrder.DESC, name: 'Song Count', value: PlaylistListSort.SONG_COUNT },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.SONG_COUNT,
+        },
     ],
     navidrome: [
-        { defaultOrder: SortOrder.DESC, name: 'Duration', value: PlaylistListSort.DURATION },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: PlaylistListSort.NAME },
-        { defaultOrder: SortOrder.ASC, name: 'Owner', value: PlaylistListSort.OWNER },
-        { defaultOrder: SortOrder.DESC, name: 'Public', value: PlaylistListSort.PUBLIC },
-        { defaultOrder: SortOrder.DESC, name: 'Song Count', value: PlaylistListSort.SONG_COUNT },
-        { defaultOrder: SortOrder.DESC, name: 'Updated At', value: PlaylistListSort.UPDATED_AT },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.owner', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.OWNER,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.isPublic', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.PUBLIC,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.SONG_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyUpdated', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.UPDATED_AT,
+        },
     ],
 };
 

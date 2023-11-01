@@ -28,48 +28,137 @@ import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh'
 import { queryClient } from '/@/renderer/lib/react-query';
 import { SongListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { ListDisplayType, Play, ServerType, TableColumn } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
     jellyfin: [
-        { defaultOrder: SortOrder.ASC, name: 'Album', value: SongListSort.ALBUM },
-        { defaultOrder: SortOrder.ASC, name: 'Album Artist', value: SongListSort.ALBUM_ARTIST },
-        { defaultOrder: SortOrder.ASC, name: 'Artist', value: SongListSort.ARTIST },
-        { defaultOrder: SortOrder.ASC, name: 'Duration', value: SongListSort.DURATION },
-        { defaultOrder: SortOrder.ASC, name: 'Most Played', value: SongListSort.PLAY_COUNT },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: SongListSort.NAME },
-        { defaultOrder: SortOrder.ASC, name: 'Random', value: SongListSort.RANDOM },
-        { defaultOrder: SortOrder.ASC, name: 'Recently Added', value: SongListSort.RECENTLY_ADDED },
         {
             defaultOrder: SortOrder.ASC,
-            name: 'Recently Played',
+            name: i18n.t('filter.album', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.artist', { postProcess: 'titleCase' }),
+            value: SongListSort.ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: SongListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+            value: SongListSort.PLAY_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: SongListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+            value: SongListSort.RANDOM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
+            value: SongListSort.RECENTLY_ADDED,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
             value: SongListSort.RECENTLY_PLAYED,
         },
-        { defaultOrder: SortOrder.ASC, name: 'Release Date', value: SongListSort.RELEASE_DATE },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.releaseDate', { postProcess: 'titleCase' }),
+            value: SongListSort.RELEASE_DATE,
+        },
     ],
     navidrome: [
-        { defaultOrder: SortOrder.ASC, name: 'Album', value: SongListSort.ALBUM },
-        { defaultOrder: SortOrder.ASC, name: 'Album Artist', value: SongListSort.ALBUM_ARTIST },
-        { defaultOrder: SortOrder.ASC, name: 'Artist', value: SongListSort.ARTIST },
-        { defaultOrder: SortOrder.DESC, name: 'BPM', value: SongListSort.BPM },
-        { defaultOrder: SortOrder.ASC, name: 'Channels', value: SongListSort.CHANNELS },
-        { defaultOrder: SortOrder.ASC, name: 'Comment', value: SongListSort.COMMENT },
-        { defaultOrder: SortOrder.DESC, name: 'Duration', value: SongListSort.DURATION },
-        { defaultOrder: SortOrder.DESC, name: 'Favorited', value: SongListSort.FAVORITED },
-        { defaultOrder: SortOrder.ASC, name: 'Genre', value: SongListSort.GENRE },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: SongListSort.NAME },
-        { defaultOrder: SortOrder.DESC, name: 'Play Count', value: SongListSort.PLAY_COUNT },
-        { defaultOrder: SortOrder.DESC, name: 'Rating', value: SongListSort.RATING },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.album', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.artist', { postProcess: 'titleCase' }),
+            value: SongListSort.ARTIST,
+        },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Recently Added',
+            name: i18n.t('filter.bpm', { postProcess: 'titleCase' }),
+            value: SongListSort.BPM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('common.channel', { count: 2, postProcess: 'titleCase' }),
+            value: SongListSort.CHANNELS,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.comment', { postProcess: 'titleCase' }),
+            value: SongListSort.COMMENT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: SongListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.isFavorited', { postProcess: 'titleCase' }),
+            value: SongListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+            value: SongListSort.GENRE,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: SongListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+            value: SongListSort.PLAY_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
+            value: SongListSort.RATING,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
             value: SongListSort.RECENTLY_ADDED,
         },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Recently Played',
+            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
             value: SongListSort.RECENTLY_PLAYED,
         },
-        { defaultOrder: SortOrder.DESC, name: 'Year', value: SongListSort.YEAR },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
+            value: SongListSort.YEAR,
+        },
     ],
 };
 
