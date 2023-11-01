@@ -68,11 +68,9 @@ export const ApplicationSettings = () => {
 
     const fontList = useMemo(() => {
         if (fontSettings.custom) {
-            const newFile = new File([], fontSettings.custom.split(/(\\|\/)/g).pop()!);
-            newFile.path = fontSettings.custom;
-            return newFile;
+            return fontSettings.custom.split(/(\\|\/)/g).pop()!;
         }
-        return null;
+        return '';
     }, [fontSettings.custom]);
 
     const onFontError = useCallback(
@@ -241,7 +239,7 @@ export const ApplicationSettings = () => {
             control: (
                 <FileInput
                     accept=".ttc,.ttf,.otf,.woff,.woff2"
-                    defaultValue={fontList}
+                    placeholder={fontList}
                     w={300}
                     onChange={(e) =>
                         setSettings({
