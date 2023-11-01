@@ -1,6 +1,12 @@
 import { useMemo, useRef } from 'react';
 import { ActionIcon, Group, Stack } from '@mantine/core';
-import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
+import {
+    AlbumListSort,
+    LibraryItem,
+    ServerType,
+    SongListSort,
+    SortOrder,
+} from '/@/renderer/api/types';
 import { FeatureCarousel, NativeScrollArea, Spinner, TextTitle } from '/@/renderer/components';
 import { useAlbumList } from '/@/renderer/features/albums';
 import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-played-query';
@@ -13,6 +19,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { useTranslation } from 'react-i18next';
 import { RiRefreshLine } from 'react-icons/ri';
+import { useSongList } from '/@/renderer/features/songs';
 
 const HomeRoute = () => {
     const { t } = useTranslation();
@@ -79,8 +86,9 @@ const HomeRoute = () => {
         serverId: server?.id,
     });
 
-    const mostPlayed = useAlbumList({
+    const mostPlayedAlbums = useAlbumList({
         options: {
+            enabled: server?.type === ServerType.SUBSONIC || server?.type === ServerType.NAVIDROME,
             staleTime: 1000 * 60 * 5,
         },
         query: {
@@ -92,11 +100,30 @@ const HomeRoute = () => {
         serverId: server?.id,
     });
 
+    const mostPlayedSongs = useSongList(
+        {
+            options: {
+                enabled: server?.type === ServerType.JELLYFIN,
+                staleTime: 1000 * 60 * 5,
+            },
+            query: {
+                limit: itemsPerPage,
+                sortBy: SongListSort.PLAY_COUNT,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        },
+        300,
+    );
+
     const isLoading =
         random.isLoading ||
         recentlyPlayed.isLoading ||
         recentlyAdded.isLoading ||
-        mostPlayed.isLoading;
+        (server?.type === ServerType.JELLYFIN && mostPlayedSongs.isLoading) ||
+        ((server?.type === ServerType.SUBSONIC || server?.type === ServerType.NAVIDROME) &&
+            mostPlayedAlbums.isLoading);
 
     if (isLoading) {
         return <Spinner container />;
@@ -105,6 +132,7 @@ const HomeRoute = () => {
     const carousels = [
         {
             data: random?.data?.items,
+            itemType: LibraryItem.ALBUM,
             sortBy: AlbumListSort.RANDOM,
             sortOrder: SortOrder.ASC,
             title: t('page.home.explore', { postProcess: 'sentenceCase' }),
@@ -112,6 +140,7 @@ const HomeRoute = () => {
         },
         {
             data: recentlyPlayed?.data?.items,
+            itemType: LibraryItem.ALBUM,
             pagination: {
                 itemsPerPage,
             },
@@ -122,6 +151,7 @@ const HomeRoute = () => {
         },
         {
             data: recentlyAdded?.data?.items,
+            itemType: LibraryItem.ALBUM,
             pagination: {
                 itemsPerPage,
             },
@@ -131,16 +161,53 @@ const HomeRoute = () => {
             uniqueId: 'recentlyAdded',
         },
         {
-            data: mostPlayed?.data?.items,
+            data:
+                server?.type === ServerType.JELLYFIN
+                    ? mostPlayedSongs?.data?.items
+                    : mostPlayedAlbums?.data?.items,
+            itemType: server?.type === ServerType.JELLYFIN ? LibraryItem.SONG : LibraryItem.ALBUM,
             pagination: {
                 itemsPerPage,
             },
-            sortBy: AlbumListSort.PLAY_COUNT,
+            sortBy:
+                server?.type === ServerType.JELLYFIN
+                    ? SongListSort.PLAY_COUNT
+                    : AlbumListSort.PLAY_COUNT,
             sortOrder: SortOrder.DESC,
             title: t('page.home.mostPlayed', { postProcess: 'sentenceCase' }),
             uniqueId: 'mostPlayed',
         },
     ];
+
+    const invalidateCarouselQuery = (carousel: {
+        itemType: LibraryItem;
+        sortBy: SongListSort | AlbumListSort;
+        sortOrder: SortOrder;
+    }) => {
+        if (carousel.itemType === LibraryItem.ALBUM) {
+            queryClient.invalidateQueries({
+                exact: false,
+                queryKey: queryKeys.albums.list(server?.id, {
+                    limit: itemsPerPage,
+                    sortBy: carousel.sortBy,
+                    sortOrder: carousel.sortOrder,
+                    startIndex: 0,
+                }),
+            });
+        }
+
+        if (carousel.itemType === LibraryItem.SONG) {
+            queryClient.invalidateQueries({
+                exact: false,
+                queryKey: queryKeys.songs.list(server?.id, {
+                    limit: itemsPerPage,
+                    sortBy: carousel.sortBy,
+                    sortOrder: carousel.sortOrder,
+                    startIndex: 0,
+                }),
+            });
+        }
+    };
 
     return (
         <AnimatedPage>
@@ -202,7 +269,7 @@ const HomeRoute = () => {
                                     },
                                 ]}
                                 data={carousel.data}
-                                itemType={LibraryItem.ALBUM}
+                                itemType={carousel.itemType}
                                 route={{
                                     route: AppRoute.LIBRARY_ALBUMS_DETAIL,
                                     slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
@@ -218,20 +285,7 @@ const HomeRoute = () => {
                                             </TextTitle>
 
                                             <ActionIcon
-                                                onClick={() =>
-                                                    queryClient.invalidateQueries({
-                                                        exact: false,
-                                                        queryKey: queryKeys.albums.list(
-                                                            server?.id,
-                                                            {
-                                                                limit: itemsPerPage,
-                                                                sortBy: carousel.sortBy,
-                                                                sortOrder: carousel.sortOrder,
-                                                                startIndex: 0,
-                                                            },
-                                                        ),
-                                                    })
-                                                }
+                                                onClick={() => invalidateCarouselQuery(carousel)}
                                             >
                                                 <RiRefreshLine />
                                             </ActionIcon>
