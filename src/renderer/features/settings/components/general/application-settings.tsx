@@ -68,9 +68,7 @@ export const ApplicationSettings = () => {
 
     const fontList = useMemo(() => {
         if (fontSettings.custom) {
-            const newFile = new File([], fontSettings.custom.split(/(\\|\/)/g).pop()!);
-            newFile.path = fontSettings.custom;
-            return newFile;
+            return new File([], fontSettings.custom.split(/(\\|\/)/g).pop()!);
         }
         return null;
     }, [fontSettings.custom]);
