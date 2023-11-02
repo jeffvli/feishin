@@ -2,15 +2,69 @@ import { PostProcessorModule } from 'i18next';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import en from './locales/en.json';
+import es from './locales/es.json';
+import fr from './locales/fr.json';
+import ja from './locales/ja.json';
+import pl from './locales/pl.json';
+import zhHans from './locales/zh-Hans.json';
+import de from './locales/de.json';
+import it from './locales/it.json';
+import ru from './locales/ru.json';
+import ptBr from './locales/pt-BR.json';
 
 const resources = {
     en: { translation: en },
+    es: { translation: es },
+    de: { translation: de },
+    it: { translation: it },
+    ru: { translation: ru },
+    'pt-BR': { translation: ptBr },
+    fr: { translation: fr },
+    ja: { translation: ja },
+    pl: { translation: pl },
+    'zh-Hans': { translation: zhHans },
 };
 
 export const languages = [
     {
         label: 'English',
         value: 'en',
+    },
+    {
+        label: 'Español',
+        value: 'es',
+    },
+    {
+        label: 'Deutsch',
+        value: 'de',
+    },
+    {
+        label: 'Français',
+        value: 'fr',
+    },
+    {
+        label: 'Italiano',
+        value: 'it',
+    },
+    {
+        label: '日本語',
+        value: 'ja',
+    },
+    {
+        label: 'Русский',
+        value: 'ru',
+    },
+    {
+        label: 'Português (Brasil)',
+        value: 'pt-BR',
+    },
+    {
+        label: 'Polski',
+        value: 'pl',
+    },
+    {
+        label: '简体中文',
+        value: 'zh-Hans',
     },
 ];
 
