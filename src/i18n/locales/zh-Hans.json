@@ -544,8 +544,8 @@
             "success": "$t(entity.playlist_one)已成功删除",
             "input_confirm": "输入$t(entity.playlist_one)的名称进行确认"
         },
-        "addServer": {
-            "title": "添加服务器",
+        "logon": {
+            "title": "登录",
             "input_username": "用户名",
             "input_password": "密码",
             "input_legacyAuthentication": "启用旧版认证方式",

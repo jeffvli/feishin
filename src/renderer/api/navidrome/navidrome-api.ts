@@ -52,6 +52,16 @@ export const contract = c.router({
             500: resultWithHeaders(ndType._response.error),
         },
     },
+    deleteSong: {
+        body: ndType._parameters.deleteSong,
+        method: 'DELETE',
+        path: 'deleteSong',
+        query: null,
+        responses: {
+            200: resultWithHeaders(ndType._response.deleteSong),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
     getAlbumArtistDetail: {
         method: 'GET',
         path: 'artist/:id',

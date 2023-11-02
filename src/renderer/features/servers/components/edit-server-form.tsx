@@ -102,7 +102,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                     const saved = await localSettings.passwordSet(values.password, server.id);
                     if (!saved) {
                         toast.error({
-                            message: t('form.addServer.error', {
+                            message: t('form.logon.error', {
                                 context: 'savePassword',
                                 postProcess: 'sentenceCase',
                             }),
@@ -128,7 +128,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
             <Stack ref={focusTrapRef}>
                 <TextInput
                     required
-                    label={t('form.addServer.input', {
+                    label={t('form.logon.input', {
                         context: 'name',
                         postProcess: 'titleCase',
                     })}
@@ -137,7 +137,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                 />
                 <TextInput
                     required
-                    label={t('form.addServer.input', {
+                    label={t('form.logon.input', {
                         context: 'url',
                         postProcess: 'titleCase',
                     })}
@@ -146,7 +146,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                 />
                 <TextInput
                     required
-                    label={t('form.addServer.input', {
+                    label={t('form.logon.input', {
                         context: 'username',
                         postProcess: 'titleCase',
                     })}
@@ -155,7 +155,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                 />
                 <PasswordInput
                     data-autofocus
-                    label={t('form.addServer.input', {
+                    label={t('form.logon.input', {
                         context: 'password',
                         postProcess: 'titleCase',
                     })}
@@ -164,7 +164,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                 />
                 {localSettings && isNavidrome && (
                     <Checkbox
-                        label={t('form.addServer.input', {
+                        label={t('form.logon.input', {
                             context: 'savePassword',
                             postProcess: 'titleCase',
                         })}
@@ -175,7 +175,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                 )}
                 {isSubsonic && (
                     <Checkbox
-                        label={t('form.addServer.input', {
+                        label={t('form.logon.input', {
                             context: 'legacyAuthentication',
                             postProcess: 'titleCase',
                         })}

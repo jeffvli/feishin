@@ -539,8 +539,8 @@
             "success": "$t(entity.playlist_one) を作成しました",
             "input_owner": "$t(common.owner)"
         },
-        "addServer": {
-            "title": "サーバーを追加",
+        "logon": {
+            "title": "ログ",
             "input_username": "ユーザー名",
             "input_url": "URL",
             "input_password": "パスワード",

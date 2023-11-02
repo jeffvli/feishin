@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Stack, Group, Checkbox } from '@mantine/core';
-import { Button, PasswordInput, SegmentedControl, TextInput, toast } from '/@/renderer/components';
+import { Button, PasswordInput, TextInput, toast } from '/@/renderer/components';
 import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
@@ -13,12 +13,6 @@ import { api } from '/@/renderer/api';
 import { useTranslation } from 'react-i18next';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
-
-const SERVER_TYPES = [
-    { label: 'Jellyfin', value: ServerType.JELLYFIN },
-    { label: 'Navidrome', value: ServerType.NAVIDROME },
-    // { label: 'Subsonic', value: ServerType.SUBSONIC },
-];
 
 interface AddServerFormProps {
     onCancel: () => void;
@@ -39,22 +33,13 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             type:
                 (localSettings
                     ? localSettings.env.SERVER_TYPE
-                    : toServerType(window.SERVER_TYPE)) ?? ServerType.JELLYFIN,
+                    : toServerType(window.SERVER_TYPE)) ?? ServerType.NAVIDROME,
             url: (localSettings ? localSettings.env.SERVER_URL : window.SERVER_URL) ?? 'https://',
             username: '',
         },
     });
 
-    // server lock for web is only true if lock is true *and* all other properties are set
-    const serverLock =
-        (localSettings
-            ? !!localSettings.env.SERVER_LOCK
-            : !!window.SERVER_LOCK &&
-              window.SERVER_TYPE &&
-              window.SERVER_NAME &&
-              window.SERVER_URL) || false;
-
-    const isSubmitDisabled = !form.values.name || !form.values.url || !form.values.username;
+    const isSubmitDisabled = !form.values.username;
 
     const handleSubmit = form.onSubmit(async (values) => {
         const authFunction = api.controller.authenticate;
@@ -65,10 +50,18 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             });
         }
 
+        console.log('lajp test');
+        // for local testing
+        const url = `http://localhost:4533`;
+        // for production
+        // todo for production should try going via localhost as that should reduce latency
+        // will probably need to make a request to pymix to get the navidrome port for the user and then use that on localhost
+        // const url = `https://www.sub-box.net/navidrome${values.username}`;
+
         try {
             setIsLoading(true);
             const data: AuthenticationResponse | undefined = await authFunction(
-                values.url,
+                url,
                 {
                     legacy: values.legacyAuth,
                     password: values.password,
@@ -86,10 +79,10 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             const serverItem = {
                 credential: data.credential,
                 id: nanoid(),
-                name: values.name,
+                name: data.username,
                 ndCredential: data.ndCredential,
                 type: values.type as ServerType,
-                url: values.url.replace(/\/$/, ''),
+                url: url.replace(/\/$/, ''),
                 userId: data.userId,
                 username: data.username,
             };
@@ -99,14 +92,14 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             closeAllModals();
 
             toast.success({
-                message: t('form.addServer.success', { postProcess: 'sentenceCase' }),
+                message: t('form.logon.success', { postProcess: 'sentenceCase' }),
             });
 
             if (localSettings && values.savePassword) {
                 const saved = await localSettings.passwordSet(values.password, serverItem.id);
                 if (!saved) {
                     toast.error({
-                        message: t('form.addServer.error', {
+                        message: t('form.logon.error', {
                             context: 'savePassword',
                             postProcess: 'sentenceCase',
                         }),
@@ -127,39 +120,15 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 ref={focusTrapRef}
                 m={5}
             >
-                <SegmentedControl
-                    data={SERVER_TYPES}
-                    disabled={Boolean(serverLock)}
-                    {...form.getInputProps('type')}
-                />
-                <Group grow>
-                    <TextInput
-                        data-autofocus
-                        disabled={Boolean(serverLock)}
-                        label={t('form.addServer.input', {
-                            context: 'name',
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('name')}
-                    />
-                    <TextInput
-                        disabled={Boolean(serverLock)}
-                        label={t('form.addServer.input', {
-                            context: 'url',
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('url')}
-                    />
-                </Group>
                 <TextInput
-                    label={t('form.addServer.input', {
+                    label={t('form.logon.input', {
                         context: 'username',
                         postProcess: 'titleCase',
                     })}
                     {...form.getInputProps('username')}
                 />
                 <PasswordInput
-                    label={t('form.addServer.input', {
+                    label={t('form.logon.input', {
                         context: 'password',
                         postProcess: 'titleCase',
                     })}
@@ -167,22 +136,13 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 />
                 {localSettings && form.values.type === ServerType.NAVIDROME && (
                     <Checkbox
-                        label={t('form.addServer.input', {
+                        label={t('form.logon.input', {
                             context: 'savePassword',
                             postProcess: 'titleCase',
                         })}
                         {...form.getInputProps('savePassword', {
                             type: 'checkbox',
                         })}
-                    />
-                )}
-                {form.values.type === ServerType.SUBSONIC && (
-                    <Checkbox
-                        label={t('form.addServer.input', {
-                            context: 'legacyAuthentication',
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
                     />
                 )}
                 <Group position="right">

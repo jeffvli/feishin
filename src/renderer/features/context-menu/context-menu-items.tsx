@@ -5,6 +5,7 @@ export const QUEUE_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { id: 'moveToBottomOfQueue' },
     { divider: true, id: 'moveToTopOfQueue' },
     { divider: true, id: 'addToPlaylist' },
+    { divider: true, id: 'deleteSong' },
     { id: 'addToFavorites' },
     { divider: true, id: 'removeFromFavorites' },
     { children: true, disabled: false, id: 'setRating' },
@@ -17,6 +18,7 @@ export const SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { id: 'playLast' },
     { divider: true, id: 'playNext' },
     { divider: true, id: 'addToPlaylist' },
+    { divider: true, id: 'deleteSong' },
     { id: 'addToFavorites' },
     { divider: true, id: 'removeFromFavorites' },
     { children: true, disabled: false, divider: true, id: 'setRating' },
@@ -37,6 +39,7 @@ export const PLAYLIST_SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { divider: true, id: 'playNext' },
     { id: 'addToPlaylist' },
     { divider: true, id: 'removeFromPlaylist' },
+    { divider: true, id: 'deleteSong' },
     { id: 'addToFavorites' },
     { divider: true, id: 'removeFromFavorites' },
     { children: true, disabled: false, id: 'setRating' },
@@ -48,6 +51,7 @@ export const SMART_PLAYLIST_SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { id: 'playLast' },
     { divider: true, id: 'playNext' },
     { divider: true, id: 'addToPlaylist' },
+    { divider: true, id: 'deleteSong' },
     { id: 'addToFavorites' },
     { divider: true, id: 'removeFromFavorites' },
     { children: true, disabled: false, id: 'setRating' },
@@ -59,6 +63,7 @@ export const ALBUM_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { id: 'playLast' },
     { divider: true, id: 'playNext' },
     { divider: true, id: 'addToPlaylist' },
+    { divider: true, id: 'deleteSong' },
     { id: 'addToFavorites' },
     { id: 'removeFromFavorites' },
     { children: true, disabled: false, divider: true, id: 'setRating' },
@@ -71,6 +76,7 @@ export const GENRE_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { id: 'playLast' },
     { divider: true, id: 'playNext' },
     { divider: true, id: 'addToPlaylist' },
+    { divider: true, id: 'deleteSong' },
 ];
 
 export const ARTIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
@@ -78,6 +84,7 @@ export const ARTIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { id: 'playLast' },
     { divider: true, id: 'playNext' },
     { divider: true, id: 'addToPlaylist' },
+    { divider: true, id: 'deleteSong' },
     { id: 'addToFavorites' },
     { divider: true, id: 'removeFromFavorites' },
     { children: true, disabled: false, id: 'setRating' },
@@ -89,4 +96,5 @@ export const PLAYLIST_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { id: 'playLast' },
     { divider: true, id: 'playNext' },
     { id: 'deletePlaylist' },
+    { divider: true, id: 'deleteSong' },
 ];

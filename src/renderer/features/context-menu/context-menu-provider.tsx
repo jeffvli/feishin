@@ -523,6 +523,66 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         t,
     ]);
 
+    const handleDeleteSong = useCallback(() => {
+        if (!ctx.dataNodes && !ctx.data) return;
+
+        const albumId: string[] = [];
+        const artistId: string[] = [];
+        const songId: string[] = [];
+        const genreId: string[] = [];
+
+        if (ctx.dataNodes) {
+            for (const node of ctx.dataNodes) {
+                switch (node.data.itemType) {
+                    case LibraryItem.ALBUM:
+                        albumId.push(node.data.id);
+                        break;
+                    case LibraryItem.ARTIST:
+                        artistId.push(node.data.id);
+                        break;
+                    case LibraryItem.GENRE:
+                        genreId.push(node.data.id);
+                        break;
+                    case LibraryItem.SONG:
+                        songId.push(node.data.id);
+                        break;
+                }
+            }
+        } else {
+            for (const item of ctx.data) {
+                switch (item.itemType) {
+                    case LibraryItem.ALBUM:
+                        albumId.push(item.id);
+                        break;
+                    case LibraryItem.ALBUM_ARTIST:
+                        artistId.push(item.id);
+                        break;
+                    case LibraryItem.ARTIST:
+                        artistId.push(item.id);
+                        break;
+                    case LibraryItem.GENRE:
+                        genreId.push(item.id);
+                        break;
+                    case LibraryItem.SONG:
+                        songId.push(item.id);
+                        break;
+                }
+            }
+        }
+
+        openContextModal({
+            innerProps: {
+                albumId: albumId.length > 0 ? albumId : undefined,
+                artistId: artistId.length > 0 ? artistId : undefined,
+                genreId: genreId.length > 0 ? genreId : undefined,
+                songId: songId.length > 0 ? songId : undefined,
+            },
+            modal: 'deleteSong',
+            size: 'md',
+            title: t('page.contextMenu.deleteSong', { postProcess: 'sentenceCase' }),
+        });
+    }, [ctx.data, ctx.dataNodes, t]);
+
     const updateRatingMutation = useSetRating({});
 
     const handleUpdateRating = useCallback(
@@ -683,6 +743,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 leftIcon: <RiDeleteBinFill size="1.1rem" />,
                 onClick: openDeletePlaylistModal,
             },
+            deleteSong: {
+                id: 'deleteSong',
+                label: t('page.contextMenu.deleteSong', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiDeleteBinFill size="1.1rem" />,
+                onClick: handleDeleteSong,
+            },
             deselectAll: {
                 id: 'deselectAll',
                 label: t('page.contextMenu.deselectAll', { postProcess: 'sentenceCase' }),
@@ -827,6 +893,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         handleAddToPlaylist,
         openDeletePlaylistModal,
         handleDeselectAll,
+        handleDeleteSong,
         handleMoveToBottom,
         handleMoveToTop,
         handleRemoveFromFavorites,

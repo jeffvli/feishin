@@ -540,8 +540,8 @@
             "success": "$t(entity.playlist_one) creado correctamente",
             "input_owner": "$t(common.owner)"
         },
-        "addServer": {
-            "title": "añadir servidor",
+        "logon": {
+            "title": "logon",
             "input_username": "nombre de usuario",
             "input_url": "url",
             "input_password": "contraseña",

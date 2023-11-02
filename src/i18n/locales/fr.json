@@ -474,8 +474,8 @@
             "success": "$t(entity.playlist_one) supprimée avec succès",
             "input_confirm": "taper le nom de la $t(entity.playlist_one) pour confirmer"
         },
-        "addServer": {
-            "title": "ajouter un serveur",
+        "logon": {
+            "title": "logon",
             "input_username": "nom d'utilisateur",
             "input_url": "url",
             "input_password": "mot de passe",

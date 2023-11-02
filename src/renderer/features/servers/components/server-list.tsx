@@ -27,7 +27,7 @@ export const ServerList = () => {
                 ),
             },
             modal: 'base',
-            title: t('form.addServer.title', { postProcess: 'titleCase' }),
+            title: t('form.logon.title', { postProcess: 'titleCase' }),
         });
     };
 
@@ -77,7 +77,7 @@ export const ServerList = () => {
                     variant="filled"
                     onClick={handleAddServerModal}
                 >
-                    {t('form.addServer.title', { postProcess: 'titleCase' })}
+                    {t('form.logon.title', { postProcess: 'titleCase' })}
                 </Button>
             </Group>
             <Stack>
@@ -109,7 +109,7 @@ export const ServerList = () => {
                         <Group>
                             <Switch
                                 checked={ignoreCORS === 'true'}
-                                label={t('form.addServer.ignoreCors', {
+                                label={t('form.logon.ignoreCors', {
                                     postProcess: 'sentenceCase',
                                 })}
                                 onChange={handleUpdateIgnoreCORS}
@@ -118,7 +118,7 @@ export const ServerList = () => {
                         <Group>
                             <Switch
                                 checked={ignoreSSL === 'true'}
-                                label={t('form.addServer.ignoreSsl', {
+                                label={t('form.logon.ignoreSsl', {
                                     postProcess: 'sentenceCase',
                                 })}
                                 onChange={handleUpdateIgnoreSSL}

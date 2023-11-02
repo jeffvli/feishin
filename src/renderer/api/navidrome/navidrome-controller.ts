@@ -49,6 +49,8 @@ import {
     ShareItemResponse,
     SimilarSongsArgs,
     Song,
+    DeleteSongArgs,
+    DeleteSongResponse,
 } from '../types';
 import { VersionInfo, getFeatures, hasFeature } from '/@/renderer/api/utils';
 import { ServerFeature, ServerFeatures } from '/@/renderer/api/features-types';
@@ -604,11 +606,29 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
     }, []);
 };
 
+const deleteSong = async (args: DeleteSongArgs): Promise<DeleteSongResponse> => {
+    const { body, apiClientProps } = args;
+    const res = await ndApiClient(apiClientProps).deleteSong({
+        body: {
+            ids: body.songId,
+            user: body.user
+        },
+        query: null,
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to delete song');
+    }
+
+    return null;
+};
+
 export const ndController = {
     addToPlaylist,
     authenticate,
     createPlaylist,
     deletePlaylist,
+    deleteSong,
     getAlbumArtistDetail,
     getAlbumArtistList,
     getAlbumDetail,

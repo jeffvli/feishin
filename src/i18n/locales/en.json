@@ -5,6 +5,7 @@
         "clearQueue": "clear queue",
         "createPlaylist": "create $t(entity.playlist_one)",
         "deletePlaylist": "delete $t(entity.playlist_one)",
+        "deleteSong": "delete song from library",
         "deselectAll": "deselect all",
         "editPlaylist": "edit $t(entity.playlist_one)",
         "goToPage": "go to page",
@@ -142,6 +143,7 @@
         "playlistWithCount_one": "{{count}} playlist",
         "playlistWithCount_other": "{{count}} playlists",
         "smartPlaylist": "smart $t(entity.playlist_one)",
+        "song_other": "songs",
         "track_one": "track",
         "track_other": "tracks",
         "trackWithCount_one": "{{count}} track",
@@ -216,7 +218,7 @@
         "trackNumber": "track"
     },
     "form": {
-        "addServer": {
+        "logon": {
             "error_savePassword": "an error occurred when trying to save the password",
             "ignoreCors": "ignore cors ($t(common.restartRequired))",
             "ignoreSsl": "ignore ssl ($t(common.restartRequired))",
@@ -226,8 +228,8 @@
             "input_savePassword": "save password",
             "input_url": "url",
             "input_username": "username",
-            "success": "server added successfully",
-            "title": "add server"
+            "success": "success",
+            "title": "logon"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist_other)",
@@ -247,6 +249,10 @@
             "input_confirm": "type the name of the $t(entity.playlist_one) to confirm",
             "success": "$t(entity.playlist_one) deleted successfully",
             "title": "delete $t(entity.playlist_one)"
+        },
+        "deleteSong": {
+            "success": "song deleted successfully",
+            "title": "delete song"
         },
         "editPlaylist": {
             "title": "edit $t(entity.playlist_one)"
@@ -317,6 +323,7 @@
             "addToPlaylist": "$t(action.addToPlaylist)",
             "createPlaylist": "$t(action.createPlaylist)",
             "deletePlaylist": "$t(action.deletePlaylist)",
+            "deleteSong": "$t(action.deleteSong)",
             "deselectAll": "$t(action.deselectAll)",
             "moveToBottom": "$t(action.moveToBottom)",
             "moveToTop": "$t(action.moveToTop)",

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Button, PageHeader, Text } from '/@/renderer/components';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
 import { ServerCredentialRequired } from '/@/renderer/features/action-required/components/server-credential-required';
-import { ServerRequired } from '/@/renderer/features/action-required/components/server-required';
+import { LogonRequired } from '/@/renderer/features/action-required/components/server-required';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
@@ -25,8 +25,8 @@ const ActionRequiredRoute = () => {
             valid: !isCredentialRequired,
         },
         {
-            component: <ServerRequired />,
-            title: t('error.serverRequired', { postProcess: 'serverRequired' }),
+            component: <LogonRequired />,
+            title: '',
             valid: !isServerRequired,
         },
     ];
@@ -67,7 +67,7 @@ const ActionRequiredRoute = () => {
                                         color="var(--success-color)"
                                         size={30}
                                     />
-                                    <Text size="xl">No issues found</Text>
+                                    <Text size="xl">System Healthy</Text>
                                 </Group>
                                 <Button
                                     component={Link}
@@ -76,26 +76,9 @@ const ActionRequiredRoute = () => {
                                     to={AppRoute.HOME}
                                     variant="filled"
                                 >
-                                    Go back
+                                    Enter
                                 </Button>
                             </>
-                        )}
-                        {!displayedCheck && (
-                            <Group
-                                noWrap
-                                position="center"
-                            >
-                                <Button
-                                    fullWidth
-                                    leftIcon={<RiEdit2Line />}
-                                    variant="filled"
-                                    onClick={handleManageServersModal}
-                                >
-                                    {t('page.appMenu.manageServers', {
-                                        postProcess: 'sentenceCase',
-                                    })}
-                                </Button>
-                            </Group>
                         )}
                     </Stack>
                 </Stack>

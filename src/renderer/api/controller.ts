@@ -12,6 +12,8 @@ import type {
     GenreListArgs,
     CreatePlaylistArgs,
     DeletePlaylistArgs,
+    DeleteSongArgs,
+    DeleteSongResponse,
     PlaylistDetailArgs,
     PlaylistListArgs,
     MusicFolderListArgs,
@@ -75,6 +77,7 @@ export type ControllerEndpoint = Partial<{
     createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse>;
     deleteFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
     deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
+    deleteSong: (args: DeleteSongArgs) => Promise<DeleteSongResponse>;
     getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
     getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
     getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse>;
@@ -163,6 +166,7 @@ const endpoints: ApiController = {
         createPlaylist: ndController.createPlaylist,
         deleteFavorite: ssController.removeFavorite,
         deletePlaylist: ndController.deletePlaylist,
+        deleteSong: ndController.deleteSong,
         getAlbumArtistDetail: ndController.getAlbumArtistDetail,
         getAlbumArtistList: ndController.getAlbumArtistList,
         getAlbumDetail: ndController.getAlbumDetail,
@@ -391,6 +395,15 @@ const deletePlaylist = async (args: DeletePlaylistArgs) => {
     )?.(args);
 };
 
+const deleteSong = async (args: DeleteSongArgs) => {
+    return (
+        apiController(
+            'deleteSong',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['deleteSong']
+    )?.(args);
+};
+
 const addToPlaylist = async (args: AddToPlaylistArgs) => {
     return (
         apiController(
@@ -548,6 +561,7 @@ export const controller = {
     createPlaylist,
     deleteFavorite,
     deletePlaylist,
+    deleteSong,
     getAlbumArtistDetail,
     getAlbumArtistList,
     getAlbumDetail,

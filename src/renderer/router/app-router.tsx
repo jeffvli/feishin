@@ -8,6 +8,7 @@ import { ModalsProvider } from '@mantine/modals';
 import { BaseContextModal } from '/@/renderer/components';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
 import { ShareItemContextModal } from '/@/renderer/features/sharing';
+import { DeleteSongContextModal } from '/@/renderer/features/songs/delete-song-context-modal';
 
 const NowPlayingRoute = lazy(
     () => import('/@/renderer/features/now-playing/routes/now-playing-route'),
@@ -87,6 +88,7 @@ export const AppRouter = () => {
                 }}
                 modals={{
                     addToPlaylist: AddToPlaylistContextModal,
+                    deleteSong: DeleteSongContextModal,
                     base: BaseContextModal,
                     shareItem: ShareItemContextModal,
                 }}

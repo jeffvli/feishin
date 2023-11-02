@@ -1,0 +1,9 @@
+version: '3.4'
+services:
+  feishin:
+    image: feishinintegration
+    restart: unless-stopped
+    container_name: "feishin"
+    #user: "501:20"
+    ports:
+      - 9180:9180

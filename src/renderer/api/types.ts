@@ -577,6 +577,22 @@ export type SongDetailQuery = { id: string };
 
 export type SongDetailArgs = { query: SongDetailQuery } & BaseEndpointArgs;
 
+// Delete Song
+export type DeleteSongResponse = null | undefined;
+
+export type DeleteSongQuery = null;
+
+export type DeleteSongBody = {
+    songId: string[];
+    user: string;
+};
+
+export type DeleteSongArgs = {
+    body: DeleteSongBody;
+    query: DeleteSongQuery;
+    serverId?: string;
+} & BaseEndpointArgs;
+
 // Album Artist List
 export type AlbumArtistListResponse = BasePaginatedResponse<AlbumArtist[]> | null | undefined;
 

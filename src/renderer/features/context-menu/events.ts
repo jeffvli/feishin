@@ -25,6 +25,7 @@ export type ContextMenuItemType =
     | 'playNext'
     | 'addToPlaylist'
     | 'removeFromPlaylist'
+    | 'deleteSong'
     | 'addToFavorites'
     | 'removeFromFavorites'
     | 'setRating'
