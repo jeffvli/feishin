@@ -344,7 +344,7 @@
             "nowPlaying": "now playing",
             "playlists": "$t(entity.playlist_other)",
             "search": "$t(common.search)",
-            "settings": "$t(entity.setting_other)",
+            "settings": "$t(common.setting_other)",
             "tracks": "$t(entity.track_other)"
         },
         "trackList": {
@@ -381,7 +381,8 @@
         "skip_forward": "skip forwards",
         "stop": "stop",
         "toggleFullscreenPlayer": "toggle fullscreen player",
-        "unfavorite": "unfavorite"
+        "unfavorite": "unfavorite",
+        "pause": "pause"
     },
     "setting": {
         "accentColor": "accent color",
