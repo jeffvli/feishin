@@ -26,7 +26,8 @@
         "shuffle_off": "lecture aléatoire désactivée",
         "addLast": "ajouter en dernier",
         "mute": "muet",
-        "skip_forward": "suivant"
+        "skip_forward": "suivant",
+        "pause": "pause"
     },
     "action": {
         "editPlaylist": "éditer $t(entity.playlist_one)",
@@ -182,7 +183,8 @@
         "toYear": "à l'année",
         "fromYear": "année",
         "criticRating": "note des critiques",
-        "trackNumber": "piste"
+        "trackNumber": "piste",
+        "albumArtist": "$t(entity.albumArtist_one)"
     },
     "page": {
         "sidebar": {
@@ -315,7 +317,7 @@
         "playbackStyle": "style de lecture",
         "hotkey_toggleShuffle": "basculer la lecture aléatoire",
         "playbackStyle_description": "sélectionnez le style de lecture à utiliser pour le lecteur audio",
-        "discordRichPresence_description": "activer le status du lecteur dans {{discord}} rich presence. Les images clés sont: {{icon}}, {{playing}}, et {{paused}} ",
+        "discordRichPresence_description": "activer le status du lecteur dans {{discord}} rich presence. Les images clés sont : {{icon}}, {{playing}}, et {{paused}} ",
         "mpvExecutablePath": "chemin de l'exécutable mpv",
         "hotkey_rate2": "noter 2 étoiles",
         "playButtonBehavior_description": "définit le comportement par défaut du bouton play, lors de l'ajout de chanson à la file d'attente",
@@ -358,7 +360,30 @@
         "sidebarConfiguration": "configuration de la barre latérale",
         "sidebarConfiguration_description": "sélectionnez les items et l'ordre dans lesquels ils seront affichaient dans la barre latérale",
         "sidebarPlaylistList": "liste de playlist de la barre latérale",
-        "sidebarCollapsedNavigation": "navigation de la barre latéral (réduite)"
+        "sidebarCollapsedNavigation": "navigation de la barre latéral (réduite)",
+        "skipDuration": "temps de l'avance rapide",
+        "sidePlayQueueStyle_optionAttached": "attaché",
+        "sidePlayQueueStyle": "style de la liste de lecture latérale",
+        "sidebarPlaylistList_description": "affiche ou cache la liste de playlist de la barre latérale",
+        "sidePlayQueueStyle_description": "définit le style de la liste de lecture latérale",
+        "sidePlayQueueStyle_optionDetached": "détaché",
+        "volumeWheelStep_description": "la quantité de volume à modifier lors du défilement de la molette de la souris sur le curseur de volume",
+        "theme_description": "définit le thème à utiliser pour l'application",
+        "skipDuration_description": "définit le durée de l'avance rapide, lors de l'utilisation des boutons skip dans la barre de lecture",
+        "themeLight": "thème (clair)",
+        "zoom": "pourcentage de zoom",
+        "themeDark_description": "définit le thème sombre à utiliser pour l'application",
+        "themeLight_description": "définit le thème clair à utiliser pour l'application",
+        "zoom_description": "définit le pourcentage de zoom de l'application",
+        "theme": "thème",
+        "skipPlaylistPage_description": "lors de la navigation dans une playlist, aller directement vers le liste des morceaux, au lieu de la page par défaut",
+        "volumeWheelStep": "marche du curseur de volume",
+        "windowBarStyle": "style de la barre de la fenêtre",
+        "useSystemTheme_description": "suivre le système en termes de thème sombre ou clair",
+        "skipPlaylistPage": "sauter la page de playlist",
+        "themeDark": "thème (sombre)",
+        "windowBarStyle_description": "sélectionner le style de la barre de la fenêtre",
+        "useSystemTheme": "utiliser le thème du système"
     },
     "form": {
         "deletePlaylist": {
@@ -451,5 +476,46 @@
         "trackWithCount_one": "{{count}} piste",
         "trackWithCount_many": "{{count}} pistes",
         "trackWithCount_other": "{{count}} pistes"
+    },
+    "table": {
+        "config": {
+            "general": {
+                "displayType": "Type d'affichage",
+                "tableColumns": "colonnes du tableau",
+                "autoFitColumns": "colonnes à ajustement automatique"
+            },
+            "view": {
+                "table": "tableau",
+                "poster": "poster"
+            },
+            "label": {
+                "releaseDate": "date de sortie",
+                "titleCombined": "$t(common.title) (combiné)",
+                "dateAdded": "date d'ajout",
+                "lastPlayed": "dernière écoute",
+                "trackNumber": "numéro de piste",
+                "rowIndex": "index de ligne",
+                "playCount": "nombre de lecture",
+                "discNumber": "disque n°"
+            }
+        },
+        "column": {
+            "comment": "commentaire",
+            "album": "album",
+            "rating": "notation",
+            "favorite": "favoris",
+            "playCount": "lectures",
+            "releaseYear": "année",
+            "biography": "biographie",
+            "releaseDate": "date de sortie",
+            "bitrate": "bitrate",
+            "title": "titre",
+            "bpm": "bpm",
+            "dateAdded": "date d'ajout",
+            "trackNumber": "piste",
+            "albumArtist": "artiste de l'album",
+            "path": "chemin",
+            "discNumber": "disque"
+        }
     }
 }
