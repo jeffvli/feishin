@@ -27,7 +27,8 @@
         "shuffle_off": "シャッフル無効",
         "addLast": "最後へ追加",
         "mute": "ミュート",
-        "skip_forward": "次へスキップ"
+        "skip_forward": "次へスキップ",
+        "pause": "一時停止"
     },
     "setting": {
         "crossfadeStyle_description": "オーディオプレーヤーが使用するクロスフェードのスタイルを選択します",
@@ -409,7 +410,10 @@
         "toYear": "年まで",
         "fromYear": "年から",
         "criticRating": "批評家の評価",
-        "trackNumber": "トラック"
+        "trackNumber": "トラック",
+        "comment": "コメント",
+        "recentlyUpdated": "新規更新",
+        "isPublic": "共有済み"
     },
     "page": {
         "sidebar": {
@@ -420,7 +424,7 @@
             "albums": "$t(entity.album_other)",
             "genres": "$t(entity.genre_other)",
             "folders": "$t(entity.folder_other)",
-            "settings": "$t(entity.setting_other)",
+            "settings": "$t(common.setting_other)",
             "home": "$t(common.home)",
             "artists": "$t(entity.artist_other)",
             "albumArtists": "$t(entity.albumArtist_other)"
