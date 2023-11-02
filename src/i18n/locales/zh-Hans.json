@@ -1,20 +1,20 @@
 {
     "action": {
-        "editPlaylist": "编辑$t(entity.playlist_one)",
+        "editPlaylist": "编辑 $t(entity.playlist_one)",
         "moveToTop": "跳至顶部",
         "clearQueue": "清空播放队列",
-        "addToFavorites": "添加到 $t(entity.favorite_other)",
-        "addToPlaylist": "添加到 $t(entity.playlist_one)",
-        "createPlaylist": "创建 $t(entity.playlist_one)",
+        "addToFavorites": "添加到$t(entity.favorite_other)",
+        "addToPlaylist": "添加到$t(entity.playlist_one)",
+        "createPlaylist": "创建$t(entity.playlist_one)",
         "removeFromPlaylist": "从$t(entity.playlist_one)移除",
-        "viewPlaylists": "查看 $t(entity.playlist_other)",
+        "viewPlaylists": "查看$t(entity.playlist_other)",
         "refresh": "$t(common.refresh)",
-        "deletePlaylist": "删除 $t(entity.playlist_one)",
+        "deletePlaylist": "删除$t(entity.playlist_one)",
         "removeFromQueue": "从播放队列中移除",
         "deselectAll": "取消全选",
         "moveToBottom": "跳至底部",
         "setRating": "评分",
-        "toggleSmartPlaylistEditor": "切换 $t(entity.smartPlaylist) 编辑器",
+        "toggleSmartPlaylistEditor": "切换$t(entity.smartPlaylist)编辑器",
         "removeFromFavorites": "从$t(entity.favorite_other)移除",
         "goToPage": "转到页面"
     },
@@ -53,7 +53,7 @@
         "forward": "前进",
         "delete": "删除",
         "cancel": "取消",
-        "forceRestartRequired": "重启应用使更改生效... 关闭通知即可重启",
+        "forceRestartRequired": "重启应用使更改生效…关闭通知即可重启",
         "setting": "设置",
         "version": "版本",
         "title": "标题",
@@ -71,7 +71,7 @@
         "disable": "禁用",
         "menu": "菜单",
         "restartRequired": "需要重启应用",
-        "previousSong": "前一$t(entity.track_one)",
+        "previousSong": "上一首$t(entity.track_one)",
         "noResultsFromQuery": "未查询到匹配结果",
         "quit": "退出",
         "expand": "展开",
@@ -92,7 +92,8 @@
         "disc": "盘",
         "yes": "是",
         "size": "大小",
-        "areYouSure": "是否继续？"
+        "areYouSure": "是否继续？",
+        "note": "注释"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -128,7 +129,7 @@
         "playbackFetchNoResults": "未找到歌曲",
         "playbackFetchInProgress": "正在加载歌曲…",
         "addNext": "添加为播放列表下一首",
-        "playbackFetchCancel": "请稍等... 关闭通知以取消操作",
+        "playbackFetchCancel": "请稍等…关闭通知以取消操作",
         "play": "播放",
         "repeat_off": "不循环",
         "queue_clear": "清空播放队列",
@@ -140,7 +141,8 @@
         "addLast": "添加到播放列表末尾",
         "mute": "静音",
         "skip_forward": "向前跳过",
-        "playbackSpeed": "播放速度"
+        "playbackSpeed": "播放速度",
+        "pause": "暂停"
     },
     "setting": {
         "crossfadeStyle_description": "选择用于音频播放器的淡入淡出风格",
@@ -172,20 +174,20 @@
         "gaplessAudio_optionWeak": "弱（推荐）",
         "font_description": "设置应用使用的字体",
         "audioDevice_description": "选择用于播放的音频设备（仅 web 播放器）",
-        "enableRemote_description": "启用远程服务器，使得其他设备可以控制本应用",
+        "enableRemote_description": "启用远程控制服务器，以允许其他设备控制此应用",
         "remotePort_description": "设置远程服务器端口",
         "hotkey_skipBackward": "向回跳过",
         "replayGainMode_description": "根据乐曲元数据中存储的{{ReplayGain}}值调整音量增益",
         "volumeWheelStep_description": "在音量滑块上滚动鼠标滚轮时要更改的音量大小",
         "theme_description": "设置应用的主题",
         "hotkey_playbackPause": "暂停",
-        "replayGainFallback": "{{ReplayGain}}反馈",
+        "replayGainFallback": "{{ReplayGain}}后备替代",
         "sidebarCollapsedNavigation_description": "在折叠的侧边栏中显示或隐藏导航",
         "hotkey_volumeUp": "音量增高",
         "skipDuration": "跳过时长",
         "showSkipButtons": "显示跳过按钮",
         "playButtonBehavior_optionPlay": "$t(player.play)",
-        "minimumScrobblePercentage": "最小 Scrobble 时长（百分比）",
+        "minimumScrobblePercentage": "最小 scrobble 时长（百分比）",
         "lyricFetch": "从互联网获取歌词",
         "scrobble": "记录播放信息（Scrobble）",
         "skipDuration_description": "设置每次按下跳过按钮将会跳过的时长",
@@ -244,14 +246,14 @@
         "mpvExecutablePath": "mpv 二进制文件路径",
         "hotkey_rate2": "评为 2 星",
         "playButtonBehavior_description": "设置将歌曲添加到队列时播放按钮的默认行为",
-        "minimumScrobblePercentage_description": "歌曲被记录为已播放（Scrobble）所需的最小播放百分比",
+        "minimumScrobblePercentage_description": "歌曲被记录为已播放（scrobble）所需的最小播放百分比",
         "exitToTray": "退出时最小化到托盘",
         "hotkey_rate4": "评为 4 星",
         "showSkipButton_description": "在播放条上显示/隐藏跳过按钮",
         "savePlayQueue": "保存播放列表",
-        "minimumScrobbleSeconds_description": "歌曲被记录为已播放（Scrobble）所需的最小播放时间",
+        "minimumScrobbleSeconds_description": "歌曲被记录为已播放（scrobble）所需的最小播放时间",
         "skipPlaylistPage_description": "打开歌单时，直接查看歌曲列表而非查看默认页面",
-        "fontType_description": "内置字体选择 Feishin 提供的字体之一。系统字体允许您选择操作系统提供的任何字体。自定义选项允许您使用自己的字体",
+        "fontType_description": "内置字体可以选择 Feishin 提供的字体之一。系统字体允许您选择操作系统提供的任何字体。自定义选项允许您使用自己的字体",
         "playButtonBehavior": "播放按钮行为",
         "volumeWheelStep": "音量滚轮步长",
         "sidebarPlaylistList_description": "显示或隐藏侧边栏歌单列表",
@@ -276,7 +278,7 @@
         "hotkey_rate0": "清除评分",
         "floatingQueueArea_description": "在屏幕右侧显示一个悬停图标，以查看播放队列",
         "hotkey_volumeMute": "静音",
-        "hotkey_toggleCurrentSongFavorite": "收藏 / 取消收藏 $t(common.currentSong)",
+        "hotkey_toggleCurrentSongFavorite": "收藏 / 取消收藏$t(common.currentSong)",
         "remoteUsername": "远程服务器用户名",
         "hotkey_browserBack": "浏览器后退",
         "showSkipButton": "显示跳过按钮",
@@ -285,17 +287,31 @@
         "skipPlaylistPage": "跳过歌单页面",
         "themeDark": "主题（深色）",
         "sidebarCollapsedNavigation": "侧边栏（已折叠）导航",
-        "minimumScrobbleSeconds": "最小 Scrobble 时间（秒）",
+        "minimumScrobbleSeconds": "最小 scrobble 时间（秒）",
         "hotkey_playbackStop": "停止",
         "windowBarStyle_description": "选择窗口顶栏的风格",
         "savePlayQueue_description": "当应用程序关闭时保存播放队列，并在应用程序打开时恢复它",
-        "useSystemTheme": "跟随系统"
+        "useSystemTheme": "跟随系统",
+        "mpvExecutablePath_help": "每行一个",
+        "discordIdleStatus_description": "启用后将会在播放器闲置时更新状态",
+        "replayGainClipping_description": "自动降低增益以防止{{ReplayGain}}造成削波",
+        "replayGainPreamp": "{{ReplayGain}}前置放大（分贝）",
+        "replayGainClipping": "{{ReplayGain}}削波",
+        "discordUpdateInterval": "{{discord}} rich presence 更新间隔",
+        "discordApplicationId_description": "{{discord}} rich presence 应用 id（默认为 {{defaultId}}）",
+        "discordUpdateInterval_description": "更新间隔秒数（至少 15 秒）",
+        "discordRichPresence_description": "在 {{discord}} rich presence 中显示播放状态。图片键为：{{icon}}、{{playing}} 和 {{paused}} ",
+        "accentColor": "强调色",
+        "accentColor_description": "设置应用的强调色",
+        "replayGainPreamp_description": "调整应用在{{ReplayGain}}值上的前置放大增益",
+        "discordIdleStatus": "显示 rich presence 闲置状态",
+        "discordRichPresence": "{{discord}} rich presence"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
         "systemFontError": "获取系统字体时出现错误",
         "playbackError": "无法播放媒体",
-        "endpointNotImplementedError": "端点 {{endpoint} is not implemented for {{serverType}}",
+        "endpointNotImplementedError": "{{serverType}} 尚未实现端点 {{endpoint}}",
         "remotePortError": "设置远程服务器端口时发生错误",
         "serverRequired": "需要服务器",
         "authenticationFailed": "认证失败",
@@ -303,11 +319,11 @@
         "genericError": "发生了错误",
         "credentialsRequired": "需要凭证",
         "sessionExpiredError": "会话已过期",
-        "remoteEnableError": "$t(common.enable) 远程服务器时出现错误",
+        "remoteEnableError": "$t(common.enable)远程服务器时出现错误",
         "localFontAccessDenied": "无法获取本地字体",
         "serverNotSelectedError": "未选择服务器",
-        "remoteDisableError": "$t(common.disable) 远程服务器时出现错误",
-        "mpvRequired": "需要配置 MPV",
+        "remoteDisableError": "$t(common.disable)远程服务器时出现错误",
+        "mpvRequired": "需要 MPV",
         "audioDeviceFetchError": "无法获取音频设备",
         "invalidServer": "无效的服务器",
         "loginRateError": "登录请求尝试次数过多，请稍后再试"
@@ -337,7 +353,7 @@
         "fromYear": "从年份",
         "criticRating": "评论家评分",
         "trackNumber": "曲目",
-        "bpm": "BPM",
+        "bpm": "bpm",
         "artist": "$t(entity.artist_one)",
         "comment": "评论",
         "isCompilation": "为合辑",
@@ -345,7 +361,16 @@
         "isPublic": "已公开",
         "recentlyUpdated": "最近更新",
         "isRated": "已评分",
-        "isRecentlyPlayed": "最近播放过"
+        "isRecentlyPlayed": "最近播放过",
+        "channels": "$t(common.channel_other)",
+        "owner": "$t(common.owner)",
+        "genre": "$t(entity.genre_one)",
+        "note": "注释",
+        "albumCount": "$t(entity.album_other)数",
+        "id": "id",
+        "disc": "盘",
+        "duration": "时长",
+        "album": "$t(entity.album_one)"
     },
     "page": {
         "sidebar": {
@@ -376,7 +401,8 @@
                 "followCurrentLyric": "跟随当前歌词"
             },
             "lyrics": "歌词",
-            "related": "相关"
+            "related": "相关",
+            "upNext": "即将播放"
         },
         "appMenu": {
             "selectServer": "选择服务器",
@@ -386,16 +412,20 @@
             "collapseSidebar": "折叠侧边栏",
             "openBrowserDevtools": "打开浏览器开发者工具",
             "goBack": "返回",
-            "goForward": "前进"
+            "goForward": "前进",
+            "settings": "$t(common.setting_other)",
+            "quit": "$t(common.quit)"
         },
         "home": {
             "mostPlayed": "最多播放",
             "newlyAdded": "最近添加的发布",
             "explore": "从库中搜索",
-            "recentlyPlayed": "最近播放"
+            "recentlyPlayed": "最近播放",
+            "title": "$t(common.home)"
         },
         "albumDetail": {
-            "moreFromArtist": "更多 $t(entity.genre_one) 风格作品"
+            "moreFromArtist": "更多该$t(entity.genre_one)作品",
+            "moreFromGeneric": "更多{{item}}作品"
         },
         "setting": {
             "playbackTab": "播放",
@@ -417,17 +447,39 @@
             "removeFromFavorites": "$t(action.removeFromFavorites)",
             "play": "$t(player.play)",
             "numberSelected": "{{count}} 已选择",
-            "removeFromQueue": "$t(action.removeFromQueue)"
+            "removeFromQueue": "$t(action.removeFromQueue)",
+            "addToPlaylist": "$t(action.addToPlaylist)",
+            "addToFavorites": "$t(action.addToFavorites)",
+            "moveToTop": "$t(action.moveToTop)",
+            "deletePlaylist": "$t(action.deletePlaylist)",
+            "moveToBottom": "$t(action.moveToBottom)",
+            "createPlaylist": "$t(action.createPlaylist)",
+            "addNext": "$t(player.addNext)",
+            "deselectAll": "$t(action.deselectAll)",
+            "addLast": "$t(player.addLast)",
+            "addFavorite": "$t(action.addToFavorites)"
         },
         "trackList": {
             "title": "$t(entity.track_other)"
+        },
+        "albumArtistList": {
+            "title": "$t(entity.albumArtist_other)"
+        },
+        "albumList": {
+            "title": "$t(entity.album_other)"
+        },
+        "genreList": {
+            "title": "$t(entity.genre_other)"
+        },
+        "playlistList": {
+            "title": "$t(entity.playlist_other)"
         }
     },
     "form": {
         "deletePlaylist": {
-            "title": "删除 $t(entity.playlist_one)",
-            "success": "$t(entity.playlist_one) 已成功删除",
-            "input_confirm": "输入 $t(entity.playlist_one) 的名称进行确认"
+            "title": "删除$t(entity.playlist_one)",
+            "success": "$t(entity.playlist_one)已成功删除",
+            "input_confirm": "输入$t(entity.playlist_one)的名称进行确认"
         },
         "addServer": {
             "title": "添加服务器",
@@ -439,17 +491,22 @@
             "input_savePassword": "保存密码",
             "ignoreSsl": "忽略 ssl $t(common.restartRequired)",
             "ignoreCors": "忽略 cors $t(common.restartRequired)",
-            "error_savePassword": "保存密码时出现错误"
+            "error_savePassword": "保存密码时出现错误",
+            "input_url": "url"
         },
         "addToPlaylist": {
             "success": "添加 {{message}} $t(entity.song_other) 到 {{numOfPlaylists}} $t(entity.playlist_other)",
             "title": "添加到$t(entity.playlist_one)",
-            "input_skipDuplicates": "跳过重复"
+            "input_skipDuplicates": "跳过重复",
+            "input_playlists": "$t(entity.playlist_other)"
         },
         "createPlaylist": {
-            "title": "创建 $t(entity.playlist_one)",
+            "title": "创建$t(entity.playlist_one)",
             "input_public": "公开",
-            "success": "已成功创建 $t(entity.playlist_one)"
+            "success": "已成功创建 $t(entity.playlist_one)",
+            "input_description": "$t(common.description)",
+            "input_name": "$t(common.name)",
+            "input_owner": "$t(common.owner)"
         },
         "updateServer": {
             "title": "更新服务器",
@@ -457,13 +514,15 @@
         },
         "queryEditor": {
             "input_optionMatchAll": "匹配全部",
-            "input_optionMatchAny": "匹配任一"
+            "input_optionMatchAny": "匹配任何"
         },
         "editPlaylist": {
-            "title": "编辑 $t(entity.playlist_one)"
+            "title": "编辑$t(entity.playlist_one)"
         },
         "lyricSearch": {
-            "title": "搜索歌词"
+            "title": "搜索歌词",
+            "input_name": "$t(common.name)",
+            "input_artist": "$t(entity.artist_one)"
         }
     },
     "table": {
@@ -477,7 +536,8 @@
             },
             "view": {
                 "table": "表格",
-                "poster": "海报"
+                "poster": "海报",
+                "card": "卡片"
             },
             "label": {
                 "releaseDate": "发布日期",
@@ -504,7 +564,8 @@
                 "discNumber": "碟片编号",
                 "favorite": "$t(common.favorite)",
                 "year": "$t(common.year)",
-                "albumArtist": "$t(entity.albumArtist_one)"
+                "albumArtist": "$t(entity.albumArtist_one)",
+                "titleCombined": "$t(common.title)（合并）"
             }
         },
         "column": {
@@ -528,7 +589,8 @@
             "genre": "$t(entity.genre_one)",
             "albumArtist": "专辑艺术家",
             "path": "路径",
-            "channels": "$t(common.channel_other)"
+            "channels": "$t(common.channel_other)",
+            "discNumber": "盘"
         }
     }
 }
