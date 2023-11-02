@@ -1,0 +1,11 @@
+{
+    "action": {
+        "editPlaylist": "bearbeite $t(entity.playlist_one)",
+        "clearQueue": "warteschlange löschen",
+        "addToFavorites": "hinzufügen zu $t(entity.favorite_other)",
+        "addToPlaylist": "hinzufügen zu $t(entity.playlist_one)",
+        "createPlaylist": "erstelle $t(entity.playlist_one)",
+        "deletePlaylist": "lösche $t(entity.playlist_one)",
+        "deselectAll": "alle abwählen"
+    }
+}
