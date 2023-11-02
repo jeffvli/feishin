@@ -1,0 +1,25 @@
+{
+    "common": {
+        "backward": "voltar",
+        "areYouSure": "tem certeza?",
+        "add": "adicionar",
+        "ascending": "ascendente",
+        "center": "centro",
+        "cancel": "cancelar",
+        "bitrate": "taxa de bits",
+        "action_one": "ação",
+        "action_many": "ações",
+        "action_other": "(n == 0 || n == 1) ? ação : ações",
+        "biography": "biografia"
+    },
+    "action": {
+        "goToPage": "vá para página",
+        "addToFavorites": "adicionar em $t(entity.favorite_other)",
+        "viewPlaylists": "ver $t(entity.playlist_other)",
+        "setRating": "definir classificação",
+        "moveToTop": "mover para o topo",
+        "refresh": "$t(common.refresh)",
+        "removeFromQueue": "remover da fila",
+        "moveToBottom": "mover para baixo"
+    }
+}
