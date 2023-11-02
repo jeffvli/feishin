@@ -27,7 +27,8 @@
         "shuffle_off": "mezclar desactivado",
         "addLast": "añadir último",
         "mute": "silencio",
-        "skip_forward": "saltar hacia delante"
+        "skip_forward": "saltar hacia delante",
+        "pause": "pausa"
     },
     "setting": {
         "crossfadeStyle_description": "selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -72,12 +73,12 @@
         "hotkey_rate1": "calificar con 1 estrella",
         "hotkey_skipForward": "saltar hacia delante",
         "disableLibraryUpdateOnStartup": "desactiva la comprobación de nuevas versiones al inicio",
-        "discordApplicationId_description": "la id de aplicación para el estado de actividad de {{discord}} (por defecto es {{defaultId}})",
+        "discordApplicationId_description": "el id de aplicación para el estado de actividad de {{discord}} (por defecto es {{defaultId}})",
         "sidePlayQueueStyle": "estilo de la cola de reproducción lateral",
         "gaplessAudio": "audio sin pausas",
         "playButtonBehavior_optionAddLast": "$t(player.addLast)",
         "minimizeToTray_description": "minimiza la aplicación a la bandeja del sistema",
-        "hotkey_playbackPlay": "play",
+        "hotkey_playbackPlay": "reproducir",
         "hotkey_togglePreviousSongFavorite": "cambia $t(common.previousSong) a favorito",
         "hotkey_volumeDown": "bajar volumen",
         "hotkey_unfavoritePreviousSong": "$t(common.previousSong) no favorito",
@@ -178,7 +179,19 @@
         "discordRichPresence": "estado de actividad de {{discord}}",
         "font_description": "establece la fuente a usar por la aplicación",
         "savePlayQueue_description": "guarda la cola de reproducción cuando la aplicación es cerrada y la restaura cuando la aplicación es abierta",
-        "useSystemTheme": "usar tema del sistema"
+        "useSystemTheme": "usar tema del sistema",
+        "volumeWheelStep_description": "la cantidad de volumen a cambiar cuando se desplaza la rueda del ratón en el control deslizante del volumen",
+        "zoom": "porcentaje de zoom",
+        "zoom_description": "establece el porcentaje de zoom para la aplicación",
+        "volumeWheelStep": "paso de rueda del volumen",
+        "windowBarStyle": "estilo de la barra de ventana",
+        "windowBarStyle_description": "selecciona el estilo de la barra de ventana",
+        "skipPlaylistPage_description": "cuando se navega a una lista de reproducción, se va a la página de lista de canciones de la lista de reproducción en lugar de a la página por defecto",
+        "accentColor": "color de realce",
+        "accentColor_description": "establece el color de realce para la aplicación",
+        "skipPlaylistPage": "saltar página de lista de reproducción",
+        "hotkey_browserForward": "avance",
+        "hotkey_browserBack": "retroceso"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -237,7 +250,7 @@
         "owner": "propietario",
         "enable": "activar",
         "clear": "limpiar",
-        "forward": "avanzar",
+        "forward": "hacia delante",
         "delete": "eliminar",
         "cancel": "cancelar",
         "forceRestartRequired": "reiniciar para aplicar cambios... cerrar la notificación para reiniciar",
@@ -270,7 +283,17 @@
         "random": "aleatorio",
         "size": "tamaño",
         "biography": "biografía",
-        "note": "nota"
+        "note": "nota",
+        "gap": "desfase",
+        "filter_one": "filtro",
+        "filter_many": "filtros",
+        "filter_other": "filtros",
+        "action_one": "acción",
+        "action_many": "acciones",
+        "action_other": "acciones",
+        "channel_one": "Canal",
+        "channel_many": "Canales",
+        "channel_other": "Canales"
     },
     "error": {
         "remotePortWarning": "reiniciar el servidor para aplicar el nuevo puerto",
@@ -324,7 +347,18 @@
         "toYear": "hasta el año",
         "fromYear": "desde el año",
         "criticRating": "calificación de la crítica",
-        "trackNumber": "pista"
+        "trackNumber": "pista",
+        "comment": "comentarios",
+        "playCount": "número de reproducción",
+        "recentlyUpdated": "actualizado recientemente",
+        "channels": "$t(common.channel_other)",
+        "owner": "$t(common.owner)",
+        "genre": "$t(entity.genre_one)",
+        "id": "id",
+        "songCount": "número de canción",
+        "isPublic": "es público",
+        "album": "$t(entity.album_one)",
+        "albumCount": "Contar $t(entity.album_other)"
     },
     "page": {
         "sidebar": {
@@ -335,7 +369,7 @@
             "albums": "$t(entity.album_other)",
             "genres": "$t(entity.genre_other)",
             "folders": "$t(entity.folder_other)",
-            "settings": "$t(entity.setting_other)",
+            "settings": "$t(common.setting_other)",
             "home": "$t(common.home)",
             "artists": "$t(entity.artist_other)",
             "albumArtists": "$t(entity.albumArtist_other)"
@@ -349,8 +383,8 @@
             "collapseSidebar": "contraer barra lateral",
             "openBrowserDevtools": "abrir herramientas de desarrollador del navegador",
             "quit": "$t(common.quit)",
-            "goBack": "volver atrás",
-            "goForward": "ir hacia adelante"
+            "goBack": "retroceder",
+            "goForward": "avanzar"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -388,7 +422,9 @@
                 "showLyricProvider": "mostrar proveedor de letra",
                 "unsynchronized": "no sincronizado",
                 "lyricAlignment": "alineación de letra",
-                "useImageAspectRatio": "usar ratio de aspecto de imagen"
+                "useImageAspectRatio": "usar ratio de aspecto de imagen",
+                "showLyricMatch": "mostrar coincidencia de letras",
+                "lyricGap": "desfase de letra"
             },
             "lyrics": "letras",
             "related": "relacionado"
@@ -471,19 +507,126 @@
         },
         "editPlaylist": {
             "title": "editar $t(entity.playlist_one)"
+        },
+        "queryEditor": {
+            "input_optionMatchAll": "coincidir todos",
+            "input_optionMatchAny": "coincidir cualquiera"
         }
     },
     "table": {
         "column": {
-            "rating": "calificación"
+            "rating": "calificación",
+            "comment": "comentarios",
+            "album": "álbum",
+            "favorite": "favorito",
+            "playCount": "reproducciones",
+            "albumCount": "$t(entity.album_other)",
+            "releaseYear": "año",
+            "lastPlayed": "última reproducción",
+            "biography": "biografía",
+            "releaseDate": "fecha de lanzamiento",
+            "bitrate": "tasa de bits",
+            "title": "título",
+            "bpm": "bpm",
+            "dateAdded": "fecha de adición",
+            "artist": "$t(entity.artist_one)",
+            "songCount": "$t(entity.track_other)",
+            "trackNumber": "pista",
+            "genre": "$t(entity.genre_one)",
+            "albumArtist": "artista de álbum",
+            "path": "ruta",
+            "discNumber": "disco",
+            "channels": "$t(common.channel_other)"
         },
         "config": {
             "label": {
-                "rating": "$t(common.rating)"
+                "rating": "$t(common.rating)",
+                "dateAdded": "fecha de adición",
+                "bpm": "$t(common.bpm)",
+                "lastPlayed": "última reproducción",
+                "artist": "$t(entity.artist_one)",
+                "album": "$t(entity.album_one)",
+                "biography": "$t(common.biography)",
+                "channels": "$t(common.channel_other)",
+                "bitrate": "$t(common.bitrate)",
+                "actions": "$t(common.action_other)",
+                "albumArtist": "$t(entity.albumArtist_one)",
+                "discNumber": "número de disco",
+                "releaseDate": "fecha de lanzamiento",
+                "title": "$t(common.title)",
+                "duration": "$t(common.duration)",
+                "titleCombined": "$t(common.title) (combinado)",
+                "size": "$t(common.size)",
+                "trackNumber": "número de pista",
+                "rowIndex": "índice de filas",
+                "note": "$t(common.note)",
+                "owner": "$t(common.owner)",
+                "path": "$t(common.path)",
+                "playCount": "número de reproducción",
+                "genre": "$t(entity.genre_one)",
+                "favorite": "$t(common.favorite)",
+                "year": "$t(common.year)"
+            },
+            "general": {
+                "gap": "$t(common.gap)",
+                "tableColumns": "columnas de la tabla",
+                "autoFitColumns": "ajuste automático de columnas",
+                "size": "$t(common.size)",
+                "displayType": "tipo de visualización"
+            },
+            "view": {
+                "card": "tarjeta",
+                "table": "tabla",
+                "poster": "cartel"
             }
         }
     },
     "entity": {
-        "smartPlaylist": "$t(entity.playlist_one) inteligente"
+        "smartPlaylist": "$t(entity.playlist_one) inteligente",
+        "genre_one": "género",
+        "genre_many": "géneros",
+        "genre_other": "géneros",
+        "playlistWithCount_one": "{{count}} lista de reproducción",
+        "playlistWithCount_many": "{{count}} listas de reproducción",
+        "playlistWithCount_other": "{{count}} listas de reproducción",
+        "playlist_one": "lista de reproducción",
+        "playlist_many": "listas de reproducción",
+        "playlist_other": "listas de reproducción",
+        "artist_one": "artista",
+        "artist_many": "artistas",
+        "artist_other": "artistas",
+        "folderWithCount_one": "{{count}} carpeta",
+        "folderWithCount_many": "{{count}} carpetas",
+        "folderWithCount_other": "{{count}} carpetas",
+        "albumArtist_one": "artista de álbum",
+        "albumArtist_many": "artistas de álbum",
+        "albumArtist_other": "artistas de álbum",
+        "track_one": "pista",
+        "track_many": "pistas",
+        "track_other": "pistas",
+        "albumArtistCount_one": "{{count}} artista de álbum",
+        "albumArtistCount_many": "{{count}} artistas de álbum",
+        "albumArtistCount_other": "{{count}} artistas de álbum",
+        "albumWithCount_one": "{{count}} álbum",
+        "albumWithCount_many": "{{count}} álbumes",
+        "albumWithCount_other": "{{count}} álbumes",
+        "favorite_one": "favorito",
+        "favorite_many": "favoritos",
+        "favorite_other": "favoritos",
+        "artistWithCount_one": "{{count}} artista",
+        "artistWithCount_many": "{{count}} artistas",
+        "artistWithCount_other": "{{count}} artistas",
+        "folder_one": "carpeta",
+        "folder_many": "carpetas",
+        "folder_other": "carpetas",
+        "album_one": "álbum",
+        "album_many": "álbumes",
+        "album_other": "álbumes",
+        "genreWithCount_one": "{{count}} género",
+        "genreWithCount_many": "{{count}} géneros",
+        "genreWithCount_other": "{{count}} géneros",
+        "trackWithCount_one": "{{count}} pista",
+        "trackWithCount_many": "{{count}} pistas",
+        "trackWithCount_other": "{{count}} pistas"
     }
 }
