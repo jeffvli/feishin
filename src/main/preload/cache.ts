@@ -1,5 +1,5 @@
 import { constants, existsSync } from 'fs';
-import { access, lstat, writeFile } from 'fs/promises';
+import { access, readdir, lstat, writeFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import { Song } from '/@/renderer/api/types';
 import { localSettings } from '/@/main/preload/local-settings';
@@ -22,10 +22,10 @@ const cacheFile = async (song: Song): Promise<void> => {
     }
 };
 
-export const getPath = (song: Song, prefix: string): string => {
+export const getPath = (song: Song): string => {
     const filePath = join(cachePath, `${song.serverId}-${song.id}`);
     if (existsSync(filePath)) {
-        return `${prefix}://${filePath}`;
+        return `feishin-cache://${filePath}`;
     }
     return song.streamUrl;
 };
@@ -51,12 +51,30 @@ export const openCachePath = (path: string) => {
     ipcRenderer.invoke('cache-open-path', path);
 };
 
+export const purgeFiles = async (): Promise<void[]> => {
+    const files = await readdir(cachePath);
+    return Promise.all(files.map((file) => unlink(join(cachePath, file))));
+};
+
+export const getSize = async (): Promise<[number, number]> => {
+    const files = await readdir(cachePath);
+    const all = await Promise.all(files.map((file) => lstat(join(cachePath, file))));
+    return all.reduce(
+        ([count, size], curr) => {
+            return [count + 1, size + curr.size];
+        },
+        [0, 0],
+    );
+};
+
 export const cache = {
     cacheFile,
     getPath,
+    getSize,
     isValidDirectory,
     openCacheDialog,
     openCachePath,
+    purgeFiles,
     setCachePath,
 };
 

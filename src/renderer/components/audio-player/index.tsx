@@ -1,12 +1,4 @@
-import {
-    useImperativeHandle,
-    forwardRef,
-    useRef,
-    useState,
-    useCallback,
-    useEffect,
-    useMemo,
-} from 'react';
+import { useImperativeHandle, forwardRef, useRef, useState, useCallback, useEffect } from 'react';
 import isElectron from 'is-electron';
 import type { ReactPlayerProps } from 'react-player';
 import ReactPlayer from 'react-player/lazy';
@@ -73,18 +65,27 @@ export const AudioPlayer = forwardRef(
         const playbackSpeed = useSpeed();
         const cacheSettings = useCacheSettings();
 
-        const player1Stream = useMemo(() => {
-            if (player1 && cacheSettings.enabled && cache) {
-                return cache.getPath(player1, 'feishin-cache');
+        const [stream1, setStream1] = useState<string>();
+        const [stream2, setStream2] = useState<string>();
+
+        useEffect(() => {
+            if (cache) {
+                if (cacheSettings.enabled && player1) {
+                    setStream1(cache.getPath(player1));
+                } else {
+                    setStream1(undefined);
+                }
             }
-            return player1?.streamUrl;
         }, [cacheSettings, player1]);
 
-        const player2Stream = useMemo(() => {
-            if (player2 && cacheSettings.enabled && cache) {
-                return cache.getPath(player2, 'feishin-cache');
+        useEffect(() => {
+            if (cache) {
+                if (cacheSettings.enabled && player2) {
+                    setStream1(cache.getPath(player2));
+                } else {
+                    setStream2(undefined);
+                }
             }
-            return player2?.streamUrl;
         }, [cacheSettings, player2]);
 
         const [webAudio, setWebAudio] = useState<WebAudio | null>(null);
@@ -174,24 +175,16 @@ export const AudioPlayer = forwardRef(
         const handleOnEnded = useCallback(() => {
             if (cache && cacheSettings.enabled) {
                 if (currentPlayer === 1) {
-                    if (player1Stream && !player1Stream.startsWith('feishin-cache://')) {
-                        cache.cacheFile(player1);
+                    if (player1) {
+                        cache.cacheFile(player1).catch(console.error);
                     }
-                } else if (player2Stream && !player2Stream.startsWith('feishin-cache://')) {
-                    cache.cacheFile(player2);
+                } else if (player2) {
+                    cache.cacheFile(player2).catch(console.error);
                 }
             }
             autoNext();
             setIsTransitioning(false);
-        }, [
-            autoNext,
-            cacheSettings,
-            currentPlayer,
-            player1,
-            player1Stream,
-            player2,
-            player2Stream,
-        ]);
+        }, [autoNext, cacheSettings, currentPlayer, player1, player2]);
 
         useEffect(() => {
             if (status === PlayerStatus.PLAYING) {
@@ -354,10 +347,11 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 1 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player1Stream}
+                    url={stream1 ?? player1?.streamUrl}
                     volume={volume}
                     width={0}
                     onEnded={handleOnEnded}
+                    onError={() => setStream1(undefined)}
                     onProgress={
                         playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1
                     }
@@ -373,10 +367,11 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 2 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player2Stream}
+                    url={stream2 ?? player2?.streamUrl}
                     volume={volume}
                     width={0}
                     onEnded={handleOnEnded}
+                    onError={() => setStream2(undefined)}
                     onProgress={
                         playbackStyle === PlaybackStyle.GAPLESS ? handleGapless2 : handleCrossfade2
                     }

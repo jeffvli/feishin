@@ -60,7 +60,7 @@ protocol.registerSchemesAsPrivileged([
         scheme: 'feishin',
     },
     {
-        privileges: { bypassCSP: true, stream: true },
+        privileges: { bypassCSP: true, standard: true, stream: true },
         scheme: 'feishin-cache',
     },
 ]);
@@ -731,7 +731,7 @@ app.whenReady()
 
         protocol.handle('feishin-cache', async (request) => {
             // Normalize the path helps prevent .. going up a directory
-            const requestingPath = normalize(request.url.slice('feishin-cache://'.length));
+            const requestingPath = normalize(request.url.slice('feishin-cache:/'.length));
             const { enabled, path } = (store.get('cache') as MediaCache | undefined) || {};
 
             if (!enabled || !path || !requestingPath.startsWith(path)) {
@@ -743,11 +743,16 @@ app.whenReady()
 
             try {
                 const stats = await stat(requestingPath);
-                const resp = await net.fetch(`file://${requestingPath}`);
-                // We need to set content length to enable seeking
-                resp.headers.set('Content-Length', stats.size.toString());
-                // We don't support seeking in the file
-                resp.headers.set('Accept-Ranges', 'none');
+                const resp = await net.fetch(`file://${requestingPath}`, {
+                    headers: request.headers,
+                });
+
+                // parse the bytes range and remove that; we don't want to serve teh beginning of the file again
+                const offsetString = request.headers.get('Range')?.split('-')[0].substring(6);
+                const offset = offsetString ? parseInt(offsetString, 10) : 0;
+
+                // // We need to set content length to enable seeking
+                resp.headers.set('Content-Length', (stats.size - offset).toString());
                 return resp;
             } catch (err) {
                 return new Response(null, {
