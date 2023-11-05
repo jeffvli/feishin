@@ -1,9 +1,8 @@
 import { useCallback } from 'react';
-import { Group, Image, Text, Title } from '@mantine/core';
+import { Center, Grid, Group, Image, MediaQuery, Text, Title } from '@mantine/core';
 import { useInfo, useSend, useShowImage } from '/@/remote/store';
 import { RemoteButton } from '/@/remote/components/buttons/remote-button';
 import formatDuration from 'format-duration';
-import debounce from 'lodash/debounce';
 import {
     RiHeartLine,
     RiPauseFill,
@@ -17,7 +16,6 @@ import {
 } from 'react-icons/ri';
 import { PlayerRepeat, PlayerStatus } from '/@/renderer/types';
 import { WrapperSlider } from '/@/remote/components/wrapped-slider';
-import { Tooltip } from '/@/renderer/components/tooltip';
 import { Rating } from '/@/renderer/components';
 
 export const RemoteContainer = () => {
@@ -33,8 +31,6 @@ export const RemoteContainer = () => {
         },
         [send, id],
     );
-
-    const debouncedSetRating = debounce(setRating, 400);
 
     return (
         <>
@@ -56,101 +52,125 @@ export const RemoteContainer = () => {
                     </Group>
                 </>
             )}
-            <Group
+            <Grid
                 grow
-                spacing={0}
+                align="center"
+                gutter={0}
             >
-                <RemoteButton
-                    tooltip="Previous track"
-                    variant="default"
-                    onClick={() => send({ event: 'previous' })}
-                >
-                    <RiSkipBackFill size={25} />
-                </RemoteButton>
-                <RemoteButton
-                    tooltip={status === PlayerStatus.PLAYING ? 'Pause' : 'Play'}
-                    variant="default"
-                    onClick={() => {
-                        if (status === PlayerStatus.PLAYING) {
-                            send({ event: 'pause' });
-                        } else if (status === PlayerStatus.PAUSED) {
-                            send({ event: 'play' });
-                        }
-                    }}
-                >
-                    {status === PlayerStatus.PLAYING ? (
-                        <RiPauseFill size={25} />
-                    ) : (
-                        <RiPlayFill size={25} />
-                    )}
-                </RemoteButton>
-                <RemoteButton
-                    tooltip="Next track"
-                    variant="default"
-                    onClick={() => send({ event: 'next' })}
-                >
-                    <RiSkipForwardFill size={25} />
-                </RemoteButton>
-            </Group>
-            <Group
-                grow
-                spacing={0}
-            >
-                <RemoteButton
-                    $active={shuffle || false}
-                    tooltip={shuffle ? 'Shuffle tracks' : 'Shuffle disabled'}
-                    variant="default"
-                    onClick={() => send({ event: 'shuffle' })}
-                >
-                    <RiShuffleFill size={25} />
-                </RemoteButton>
-                <RemoteButton
-                    $active={repeat !== undefined && repeat !== PlayerRepeat.NONE}
-                    tooltip={`Repeat ${
-                        repeat === PlayerRepeat.ONE
-                            ? 'One'
-                            : repeat === PlayerRepeat.ALL
-                            ? 'all'
-                            : 'none'
-                    }`}
-                    variant="default"
-                    onClick={() => send({ event: 'repeat' })}
-                >
-                    {repeat === undefined || repeat === PlayerRepeat.ONE ? (
-                        <RiRepeatOneLine size={25} />
-                    ) : (
-                        <RiRepeat2Line size={25} />
-                    )}
-                </RemoteButton>
-                <RemoteButton
-                    $active={song?.userFavorite}
-                    disabled={!song}
-                    tooltip={song?.userFavorite ? 'Unfavorite' : 'Favorite'}
-                    variant="default"
-                    onClick={() => {
-                        if (!id) return;
+                <Grid.Col span={4}>
+                    <RemoteButton
+                        tooltip="Previous track"
+                        onClick={() => send({ event: 'previous' })}
+                    >
+                        <RiSkipBackFill size={25} />
+                    </RemoteButton>
+                </Grid.Col>
+                <Grid.Col span={4}>
+                    <RemoteButton
+                        tooltip={status === PlayerStatus.PLAYING ? 'Pause' : 'Play'}
+                        onClick={() => {
+                            if (status === PlayerStatus.PLAYING) {
+                                send({ event: 'pause' });
+                            } else if (status === PlayerStatus.PAUSED) {
+                                send({ event: 'play' });
+                            }
+                        }}
+                    >
+                        {status === PlayerStatus.PLAYING ? (
+                            <RiPauseFill size={25} />
+                        ) : (
+                            <RiPlayFill size={25} />
+                        )}
+                    </RemoteButton>
+                </Grid.Col>
 
-                        send({ event: 'favorite', favorite: !song.userFavorite, id });
-                    }}
+                <Grid.Col span={4}>
+                    <RemoteButton
+                        tooltip="Next track"
+                        onClick={() => send({ event: 'next' })}
+                    >
+                        <RiSkipForwardFill size={25} />
+                    </RemoteButton>
+                </Grid.Col>
+            </Grid>
+            <Grid
+                grow
+                align="center"
+                gutter={0}
+            >
+                <Grid.Col
+                    md={3}
+                    span={4}
                 >
-                    <RiHeartLine size={25} />
-                </RemoteButton>
+                    <RemoteButton
+                        $active={shuffle || false}
+                        tooltip={shuffle ? 'Shuffle tracks' : 'Shuffle disabled'}
+                        onClick={() => send({ event: 'shuffle' })}
+                    >
+                        <RiShuffleFill size={25} />
+                    </RemoteButton>
+                </Grid.Col>
+                <Grid.Col
+                    md={3}
+                    span={4}
+                >
+                    <RemoteButton
+                        $active={repeat !== undefined && repeat !== PlayerRepeat.NONE}
+                        tooltip={`Repeat ${
+                            repeat === PlayerRepeat.ONE
+                                ? 'One'
+                                : repeat === PlayerRepeat.ALL
+                                ? 'all'
+                                : 'none'
+                        }`}
+                        onClick={() => send({ event: 'repeat' })}
+                    >
+                        {repeat === undefined || repeat === PlayerRepeat.ONE ? (
+                            <RiRepeatOneLine size={25} />
+                        ) : (
+                            <RiRepeat2Line size={25} />
+                        )}
+                    </RemoteButton>
+                </Grid.Col>
+
+                <Grid.Col
+                    md={3}
+                    span={4}
+                >
+                    <RemoteButton
+                        $active={song?.userFavorite}
+                        disabled={!song}
+                        tooltip={song?.userFavorite ? 'Unfavorite' : 'Favorite'}
+                        onClick={() => {
+                            if (!id) return;
+
+                            send({ event: 'favorite', favorite: !song.userFavorite, id });
+                        }}
+                    >
+                        <RiHeartLine size={25} />
+                    </RemoteButton>
+                </Grid.Col>
+
                 {(song?.serverType === 'navidrome' || song?.serverType === 'subsonic') && (
-                    <div style={{ margin: 'auto' }}>
-                        <Tooltip
-                            label="Double click to clear"
-                            openDelay={1000}
+                    <MediaQuery
+                        smallerThan="md"
+                        styles={{ marginTop: 10 }}
+                    >
+                        <Grid.Col
+                            md={3}
+                            span={4}
                         >
-                            <Rating
-                                sx={{ margin: 'auto' }}
-                                value={song.userRating ?? 0}
-                                onChange={debouncedSetRating}
-                                onDoubleClick={() => debouncedSetRating(0)}
-                            />
-                        </Tooltip>
-                    </div>
+                            <Center>
+                                <Rating
+                                    size="xl"
+                                    value={song.userRating ?? 0}
+                                    onChange={setRating}
+                                />
+                            </Center>
+                        </Grid.Col>
+                    </MediaQuery>
                 )}
-            </Group>
+            </Grid>
             <WrapperSlider
                 leftLabel={<RiVolumeUpFill size={20} />}
                 max={100}

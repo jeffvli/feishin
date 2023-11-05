@@ -8,10 +8,7 @@ export const ImageButton = () => {
 
     return (
         <RemoteButton
-            mr={5}
-            size="xl"
             tooltip={showImage ? 'Hide Image' : 'Show Image'}
-            variant="default"
             onClick={() => toggleImage()}
         >
             {showImage ? <CiImageOff size={30} /> : <CiImageOn size={30} />}
