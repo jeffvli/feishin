@@ -1,5 +1,5 @@
-import { AnimatePresence, Variants, motion, useDragControls } from 'framer-motion';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { Variants, motion, useDragControls } from 'framer-motion';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import styled from 'styled-components';
 import { Platform } from '/@/renderer/types';
@@ -21,6 +21,9 @@ export const LyricsOverlay = () => {
     const dragControls = useDragControls();
     const constraintsRef = useRef(null);
     const { open, width } = useLyricsStore();
+    const lyricRef = useRef<HTMLDivElement>(null);
+
+    const [x, setX] = useState((document.body.clientWidth - width) / 2);
 
     const variants: Variants = useMemo(
         () => ({
@@ -29,7 +32,6 @@ export const LyricsOverlay = () => {
                     windowBarStyle === Platform.WINDOWS || Platform.MACOS
                         ? 'calc(100vh - 205px)'
                         : 'calc(100vh - 175px)',
-                left: 'calc(50vw - 225px)',
                 position: 'absolute',
                 top: '75px',
                 transition: {
@@ -37,6 +39,7 @@ export const LyricsOverlay = () => {
                     ease: 'anticipate',
                 },
                 width,
+                x,
             }),
             open: (windowBarStyle) => ({
                 boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.8)',
@@ -45,47 +48,45 @@ export const LyricsOverlay = () => {
                     windowBarStyle === Platform.WINDOWS || Platform.MACOS
                         ? 'calc(100vh - 205px)'
                         : 'calc(100vh - 175px)',
-                transition: {
-                    damping: 10,
-                    delay: 0,
-                    duration: 0.4,
-                    ease: 'anticipate',
-                    mass: 0.5,
-                },
                 width,
+                x,
                 zIndex: 121,
             }),
         }),
-        [width],
+        [width, x],
     );
 
     return (
-        <AnimatePresence
-            key="lyric-drawer"
-            presenceAffectsLayout
-            initial={false}
-            mode="sync"
-        >
-            {open && (
-                <LyricsContainer ref={constraintsRef}>
-                    <LyricsDrawer
-                        key="lyric-drawer"
-                        dragListener
-                        animate="open"
-                        drag="x"
-                        dragConstraints={constraintsRef}
-                        dragControls={dragControls}
-                        dragElastic={0}
-                        dragMomentum={false}
-                        exit="closed"
-                        id="drawer-lyric"
-                        initial="closed"
-                        variants={variants}
-                    >
-                        <Lyrics />
-                    </LyricsDrawer>
-                </LyricsContainer>
-            )}
-        </AnimatePresence>
+        open && (
+            <LyricsContainer
+                // This key is here to force rerender when lyric width changes. Otherwise
+                // the constraints are not updated properly
+                key={width}
+                ref={constraintsRef}
+            >
+                <LyricsDrawer
+                    key="lyric-drawer"
+                    ref={lyricRef}
+                    dragListener
+                    animate="open"
+                    drag="x"
+                    dragConstraints={constraintsRef}
+                    dragControls={dragControls}
+                    dragElastic={0}
+                    dragMomentum={false}
+                    exit="closed"
+                    id="drawer-lyric"
+                    initial="closed"
+                    variants={variants}
+                    onDragEnd={() => {
+                        // bodge to save the current position, so that on resize
+                        // window does not snap back to 0
+                        setX(lyricRef.current!.getBoundingClientRect().x);
+                    }}
+                >
+                    <Lyrics />
+                </LyricsDrawer>
+            </LyricsContainer>
+        )
     );
 };

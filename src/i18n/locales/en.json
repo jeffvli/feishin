@@ -473,6 +473,7 @@
         "lyricFetchProvider_description": "select the providers to fetch lyrics from. the order of the providers is the order in which they will be queried",
         "lyricOffset": "lyric offset (ms)",
         "lyricOffset_description": "offset the lyric by the specified amount of milliseconds",
+        "lyricWdith": "lyric overlay width",
         "minimizeToTray": "minimize to tray",
         "minimizeToTray_description": "minimize the application to the system tray",
         "minimumScrobblePercentage": "minimum scrobble duration (percentage)",

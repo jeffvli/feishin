@@ -93,7 +93,7 @@ export const useAppStore = create<AppSlice>()(
                 isReorderingQueue: false,
                 lyrics: {
                     open: false,
-                    width: 450,
+                    width: 525,
                 },
                 platform: Platform.WINDOWS,
                 sidebar: {
