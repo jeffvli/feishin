@@ -25,9 +25,15 @@ type CommandPaletteProps = {
     toggle: () => void;
 };
 
+type LyricsProps = {
+    open: boolean;
+    width: number;
+};
+
 export interface AppState {
     commandPalette: CommandPaletteProps;
     isReorderingQueue: boolean;
+    lyrics: LyricsProps;
     platform: Platform;
     sidebar: SidebarProps;
     titlebar: TitlebarProps;
@@ -36,6 +42,7 @@ export interface AppState {
 export interface AppSlice extends AppState {
     actions: {
         setAppStore: (data: Partial<AppSlice>) => void;
+        setLyrics: (options: Partial<LyricsProps>) => void;
         setSideBar: (options: Partial<SidebarProps>) => void;
         setTitleBar: (options: Partial<TitlebarProps>) => void;
     };
@@ -48,6 +55,11 @@ export const useAppStore = create<AppSlice>()(
                 actions: {
                     setAppStore: (data) => {
                         set({ ...get(), ...data });
+                    },
+                    setLyrics: (options) => {
+                        set((state) => {
+                            state.lyrics = { ...state.lyrics, ...options };
+                        });
                     },
                     setSideBar: (options) => {
                         set((state) => {
@@ -79,6 +91,10 @@ export const useAppStore = create<AppSlice>()(
                     },
                 },
                 isReorderingQueue: false,
+                lyrics: {
+                    open: false,
+                    width: 450,
+                },
                 platform: Platform.WINDOWS,
                 sidebar: {
                     collapsed: false,
@@ -100,7 +116,7 @@ export const useAppStore = create<AppSlice>()(
                 return merge(currentState, persistedState);
             },
             name: 'store_app',
-            version: 2,
+            version: 3,
         },
     ),
 );
@@ -116,3 +132,5 @@ export const useSetTitlebar = () => useAppStore((state) => state.actions.setTitl
 export const useTitlebarStore = () => useAppStore((state) => state.titlebar);
 
 export const useCommandPalette = () => useAppStore((state) => state.commandPalette);
+
+export const useLyricsStore = () => useAppStore((state) => state.lyrics);

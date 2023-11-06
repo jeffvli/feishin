@@ -4,6 +4,7 @@ import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineQueueList } from 'react-icons/hi2';
+import { MdOutlineLyrics } from 'react-icons/md';
 import {
     RiVolumeUpFill,
     RiVolumeDownFill,
@@ -16,6 +17,7 @@ import {
     useCurrentServer,
     useCurrentSong,
     useHotkeySettings,
+    useLyricsStore,
     useMuted,
     usePreviousSong,
     useSidebarStore,
@@ -42,7 +44,7 @@ export const RightControls = () => {
     const server = useCurrentServer();
     const currentSong = useCurrentSong();
     const previousSong = usePreviousSong();
-    const { setSideBar } = useAppStoreActions();
+    const { setSideBar, setLyrics } = useAppStoreActions();
     const { rightExpanded: isQueueExpanded } = useSidebarStore();
     const { bindings } = useHotkeySettings();
     const {
@@ -53,6 +55,7 @@ export const RightControls = () => {
         handleVolumeUp,
         handleSpeed,
     } = useRightControls();
+    const { open } = useLyricsStore();
 
     const speed = useSpeed();
 
@@ -108,6 +111,10 @@ export const RightControls = () => {
 
     const handleToggleQueue = () => {
         setSideBar({ rightExpanded: !isQueueExpanded });
+    };
+
+    const handleToggleLyrics = () => {
+        setLyrics({ open: !open });
     };
 
     const isSongDefined = Boolean(currentSong?.id);
@@ -265,6 +272,17 @@ export const RightControls = () => {
                         tooltip={{ label: 'View queue', openDelay: 500 }}
                         variant="secondary"
                         onClick={handleToggleQueue}
+                    />
+                ) : null}
+                {!isMinWidth ? (
+                    <PlayerButton
+                        icon={<MdOutlineLyrics size="1.1rem" />}
+                        tooltip={{
+                            label: t('player.show_lyrics', { postProcess: 'titleCase' }),
+                            openDelay: 500,
+                        }}
+                        variant="secondary"
+                        onClick={handleToggleLyrics}
                     />
                 ) : null}
                 <Group
