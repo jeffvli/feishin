@@ -485,7 +485,7 @@
             "recentlyPlayed": "最近の再生"
         },
         "albumDetail": {
-            "moreFromArtist": "$t(entity.genre_one) の他の項目",
+            "moreFromArtist": "$t(entity.artist_one) の他の項目",
             "moreFromGeneric": "{{item}} の他の項目"
         },
         "setting": {

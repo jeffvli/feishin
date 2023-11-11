@@ -424,7 +424,7 @@
             "title": "$t(common.home)"
         },
         "albumDetail": {
-            "moreFromArtist": "更多该$t(entity.genre_one)作品",
+            "moreFromArtist": "更多该$t(entity.artist_one)作品",
             "moreFromGeneric": "更多{{item}}作品"
         },
         "setting": {

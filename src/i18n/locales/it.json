@@ -402,7 +402,7 @@
             "recentlyPlayed": "riprodotti recentemente"
         },
         "albumDetail": {
-            "moreFromArtist": "di più da questo $t(entity.genre_one)",
+            "moreFromArtist": "di più da questo $t(entity.artist_one)",
             "moreFromGeneric": "di più da {{item}}"
         },
         "setting": {

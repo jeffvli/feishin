@@ -253,7 +253,7 @@
             "title": "$t(entity.albumArtist_other)"
         },
         "albumDetail": {
-            "moreFromArtist": "more from this $t(entity.genre_one)",
+            "moreFromArtist": "more from this $t(entity.artist_one)",
             "moreFromGeneric": "more from {{item}}"
         },
         "albumList": {

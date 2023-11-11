@@ -430,7 +430,7 @@
             "related": "relacionado"
         },
         "albumDetail": {
-            "moreFromArtist": "más de este $t(entity.genre_one)",
+            "moreFromArtist": "más de este $t(entity.artist_one)",
             "moreFromGeneric": "más de {{item}}"
         },
         "setting": {
