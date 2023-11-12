@@ -59,11 +59,11 @@ Feishin is also available as a Docker image. The images are hosted via `ghcr.io`
 
 ```bash
 # Run the latest version
-docker run --name feishin --port 9180:9180 ghcr.io/jeffvli/feishin:latest
+docker run --name feishin -p 9180:9180 ghcr.io/jeffvli/feishin:latest
 
 # Build the image locally
 docker build -t feishin .
-docker run --name feishin --port 9180:9180 feishin
+docker run --name feishin -p 9180:9180 feishin
 ```
 
 ### Configuration
