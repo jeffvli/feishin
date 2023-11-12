@@ -88,9 +88,7 @@ const titleCasePostProcessor: PostProcessorModule = {
     type: 'postProcessor',
     name: 'titleCase',
     process: (value: string) => {
-        return value.replace(/\w\S*/g, (txt) => {
-            return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
-        });
+        return value.charAt(0).toLocaleUpperCase() + value.slice(1).toLowerCase();
     },
 };
 
@@ -102,7 +100,9 @@ const sentenceCasePostProcessor: PostProcessorModule = {
 
         return sentences
             .map((sentence) => {
-                return sentence.charAt(0).toUpperCase() + sentence.slice(1).toLocaleLowerCase();
+                return (
+                    sentence.charAt(0).toLocaleUpperCase() + sentence.slice(1).toLocaleLowerCase()
+                );
             })
             .join('. ');
     },
