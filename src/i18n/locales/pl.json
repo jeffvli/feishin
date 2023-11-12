@@ -314,7 +314,7 @@
             "removeFromQueue": "$t(action.removeFromQueue)"
         },
         "albumDetail": {
-            "moreFromArtist": "więcej od $t(entity.genre_one)",
+            "moreFromArtist": "więcej od $t(entity.artist_one)",
             "moreFromGeneric": "więcej od {{item}}"
         },
         "albumArtistList": {

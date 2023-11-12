@@ -221,7 +221,7 @@
             "recentlyPlayed": "récemment joués"
         },
         "albumDetail": {
-            "moreFromArtist": "plus de $t(entity.genre_one)",
+            "moreFromArtist": "plus de $t(entity.artist_one)",
             "moreFromGeneric": "plus de {{item}}"
         },
         "setting": {
