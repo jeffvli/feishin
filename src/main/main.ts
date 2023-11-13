@@ -9,7 +9,8 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import { access, constants, readFile, writeFile } from 'fs';
-import path, { join } from 'path';
+import { mkdir, stat } from 'fs/promises';
+import { join, normalize } from 'path';
 import { deflate, inflate } from 'zlib';
 import {
     app,
@@ -23,6 +24,7 @@ import {
     BrowserWindowConstructorOptions,
     protocol,
     net,
+    dialog,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log';
@@ -32,7 +34,14 @@ import MpvAPI from 'node-mpv';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
-import { hotkeyToElectronAccelerator, isLinux, isMacOS, isWindows, resolveHtmlPath } from './utils';
+import {
+    MediaCache,
+    hotkeyToElectronAccelerator,
+    isLinux,
+    isMacOS,
+    isWindows,
+    resolveHtmlPath,
+} from './utils';
 import './features';
 
 declare module 'node-mpv';
@@ -45,7 +54,16 @@ export default class AppUpdater {
     }
 }
 
-protocol.registerSchemesAsPrivileged([{ privileges: { bypassCSP: true }, scheme: 'feishin' }]);
+protocol.registerSchemesAsPrivileged([
+    {
+        privileges: { bypassCSP: true },
+        scheme: 'feishin',
+    },
+    {
+        privileges: { bypassCSP: true, standard: true, stream: true },
+        scheme: 'feishin-cache',
+    },
+]);
 
 process.on('uncaughtException', (error: any) => {
     console.log('Error in main process', error);
@@ -54,6 +72,12 @@ process.on('uncaughtException', (error: any) => {
 if (store.get('ignore_ssl')) {
     app.commandLine.appendSwitch('ignore-certificate-errors');
 }
+
+mkdir(join(app.getPath('userData'), 'cache')).catch((error) => {
+    if (error.code !== 'EEXIST') {
+        console.error(`Failed to create default cache directory: ${error}`);
+    }
+});
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
@@ -95,11 +119,11 @@ if (!singleInstance) {
 }
 
 const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
+    ? join(process.resourcesPath, 'assets')
+    : join(__dirname, '../../assets');
 
 const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
+    return join(RESOURCES_PATH, ...paths);
 };
 
 export const getMainWindow = () => {
@@ -229,8 +253,8 @@ const createWindow = async () => {
             devTools: true,
             nodeIntegration: true,
             preload: app.isPackaged
-                ? path.join(__dirname, 'preload.js')
-                : path.join(__dirname, '../../.erb/dll/preload.js'),
+                ? join(__dirname, 'preload.js')
+                : join(__dirname, '../../.erb/dll/preload.js'),
             webSecurity: !store.get('ignore_cors'),
         },
         width: 1440,
@@ -640,6 +664,26 @@ ipcMain.on(
     },
 );
 
+ipcMain.handle('cache-open-dialog', async (): Promise<string | null> => {
+    const window = getMainWindow();
+    if (window) {
+        const response = await dialog.showOpenDialog(window, {
+            defaultPath: app.getPath('userData'),
+            properties: ['openDirectory', 'showHiddenFiles'],
+        });
+        if (response.canceled) {
+            return null;
+        }
+
+        return response.filePaths[0];
+    }
+    return null;
+});
+
+ipcMain.handle('cache-open-path', async (_event, path: string) => {
+    return shell.openPath(path);
+});
+
 app.on('before-quit', () => {
     getMpvInstance()?.stop();
     getMpvInstance()?.quit();
@@ -657,14 +701,14 @@ app.on('window-all-closed', () => {
     }
 });
 
-const FONT_HEADERS = [
+const FONT_HEADERS = new Set([
     'font/collection',
     'font/otf',
     'font/sfnt',
     'font/ttf',
     'font/woff',
     'font/woff2',
-];
+]);
 
 app.whenReady()
     .then(() => {
@@ -673,7 +717,7 @@ app.whenReady()
             const response = await net.fetch(filePath);
             const contentType = response.headers.get('content-type');
 
-            if (!contentType || !FONT_HEADERS.includes(contentType)) {
+            if (!contentType || !FONT_HEADERS.has(contentType)) {
                 getMainWindow()?.webContents.send('custom-font-error', filePath);
 
                 return new Response(null, {
@@ -683,6 +727,39 @@ app.whenReady()
             }
 
             return response;
+        });
+
+        protocol.handle('feishin-cache', async (request) => {
+            // Normalize the path helps prevent .. going up a directory
+            const requestingPath = normalize(request.url.slice('feishin-cache:/'.length));
+            const { enabled, path } = (store.get('cache') as MediaCache | undefined) || {};
+
+            if (!enabled || !path || !requestingPath.startsWith(path)) {
+                return new Response(null, {
+                    status: 403,
+                    statusText: 'Forbidden',
+                });
+            }
+
+            try {
+                const stats = await stat(requestingPath);
+                const resp = await net.fetch(`file://${requestingPath}`, {
+                    headers: request.headers,
+                });
+
+                // parse the bytes range and remove that; we don't want to serve teh beginning of the file again
+                const offsetString = request.headers.get('Range')?.split('-')[0].substring(6);
+                const offset = offsetString ? parseInt(offsetString, 10) : 0;
+
+                // // We need to set content length to enable seeking
+                resp.headers.set('Content-Length', (stats.size - offset).toString());
+                return resp;
+            } catch (err) {
+                return new Response(null, {
+                    status: 404,
+                    statusText: 'Not Found',
+                });
+            }
         });
 
         createWindow();

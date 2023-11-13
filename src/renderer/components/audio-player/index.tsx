@@ -7,10 +7,12 @@ import {
     crossfadeHandler,
     gaplessHandler,
 } from '/@/renderer/components/audio-player/utils/list-handlers';
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { useCacheSettings, useSettingsStore } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
 import { useSpeed } from '/@/renderer/store';
+
+const cache = isElectron() ? window.electron.cache : null;
 
 interface AudioPlayerProps extends ReactPlayerProps {
     crossfadeDuration: number;
@@ -61,6 +63,30 @@ export const AudioPlayer = forwardRef(
         const audioDeviceId = useSettingsStore((state) => state.playback.audioDeviceId);
         const playback = useSettingsStore((state) => state.playback.mpvProperties);
         const playbackSpeed = useSpeed();
+        const cacheSettings = useCacheSettings();
+
+        const [stream1, setStream1] = useState<string>();
+        const [stream2, setStream2] = useState<string>();
+
+        useEffect(() => {
+            if (cache) {
+                if (cacheSettings.enabled && player1) {
+                    setStream1(cache.getPath(player1));
+                } else {
+                    setStream1(undefined);
+                }
+            }
+        }, [cacheSettings, player1]);
+
+        useEffect(() => {
+            if (cache) {
+                if (cacheSettings.enabled && player2) {
+                    setStream1(cache.getPath(player2));
+                } else {
+                    setStream2(undefined);
+                }
+            }
+        }, [cacheSettings, player2]);
 
         const [webAudio, setWebAudio] = useState<WebAudio | null>(null);
         const [player1Source, setPlayer1Source] = useState<MediaElementAudioSourceNode | null>(
@@ -146,10 +172,19 @@ export const AudioPlayer = forwardRef(
             },
         }));
 
-        const handleOnEnded = () => {
+        const handleOnEnded = useCallback(() => {
+            if (cache && cacheSettings.enabled) {
+                if (currentPlayer === 1) {
+                    if (player1) {
+                        cache.cacheFile(player1).catch(console.error);
+                    }
+                } else if (player2) {
+                    cache.cacheFile(player2).catch(console.error);
+                }
+            }
             autoNext();
             setIsTransitioning(false);
-        };
+        }, [autoNext, cacheSettings, currentPlayer, player1, player2]);
 
         useEffect(() => {
             if (status === PlayerStatus.PLAYING) {
@@ -312,10 +347,11 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 1 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player1?.streamUrl}
+                    url={stream1 ?? player1?.streamUrl}
                     volume={volume}
                     width={0}
                     onEnded={handleOnEnded}
+                    onError={() => setStream1(undefined)}
                     onProgress={
                         playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1
                     }
@@ -331,10 +367,11 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 2 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player2?.streamUrl}
+                    url={stream2 ?? player2?.streamUrl}
                     volume={volume}
                     width={0}
                     onEnded={handleOnEnded}
+                    onError={() => setStream2(undefined)}
                     onProgress={
                         playbackStyle === PlaybackStyle.GAPLESS ? handleGapless2 : handleCrossfade2
                     }

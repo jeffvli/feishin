@@ -988,6 +988,7 @@ export const usePlayerControls = () =>
     usePlayerStore(
         (state) => ({
             autoNext: state.actions.autoNext,
+            getPlayerData: state.actions.getPlayerData,
             next: state.actions.next,
             pause: state.actions.pause,
             play: state.actions.play,

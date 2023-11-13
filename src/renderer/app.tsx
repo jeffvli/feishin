@@ -11,6 +11,7 @@ import { useTheme } from './hooks';
 import { IsUpdatedDialog } from './is-updated-dialog';
 import { AppRouter } from './router/app-router';
 import {
+    useCacheSettings,
     useHotkeySettings,
     usePlaybackSettings,
     useRemoteSettings,
@@ -36,6 +37,7 @@ const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
 const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
+const cache = isElectron() ? window.electron.cache : null;
 
 export const App = () => {
     const theme = useTheme();
@@ -48,6 +50,7 @@ export const App = () => {
     const { clearQueue, restoreQueue } = useQueueControls();
     const remoteSettings = useRemoteSettings();
     const textStyleRef = useRef<HTMLStyleElement>();
+    const cacheSettings = useCacheSettings();
     useDiscordRpc();
 
     useEffect(() => {
@@ -89,6 +92,12 @@ export const App = () => {
         const root = document.documentElement;
         root.style.setProperty('--primary-color', accent);
     }, [accent]);
+
+    useEffect(() => {
+        if (cache) {
+            cache.setCachePath(cacheSettings.path);
+        }
+    }, [cacheSettings.path]);
 
     const providerValue = useMemo(() => {
         return { handlePlayQueueAdd };

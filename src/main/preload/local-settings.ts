@@ -1,3 +1,4 @@
+import { dirname, join } from 'path';
 import { IpcRendererEvent, ipcRenderer, webFrame } from 'electron';
 import Store from 'electron-store';
 
@@ -51,6 +52,7 @@ export const localSettings = {
     passwordGet,
     passwordRemove,
     passwordSet,
+    path: join(dirname(store.path), 'cache'),
     restart,
     set,
     setZoomFactor,
