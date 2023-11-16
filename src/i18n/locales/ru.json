@@ -77,7 +77,7 @@
         "playerMustBePaused": "воспроизведение должно быть остановлено",
         "confirm": "подтвердить",
         "resetToDefault": "сбросить к настройкам по умолчанию",
-        "home": "домой",
+        "home": "Главная страница",
         "comingSoon": "скоро будет…",
         "reset": "сбросить",
         "channel_one": "канал",
@@ -91,7 +91,7 @@
         "noResultsFromQuery": "нет результатов",
         "quit": "выйти",
         "expand": "расширить",
-        "search": "поиск",
+        "search": "Поиск",
         "saveAs": "сохранить как",
         "disc": "диск",
         "yes": "да",
@@ -211,7 +211,7 @@
         "remotePortWarning": "перезапустить сервер для применения нового порта",
         "systemFontError": "произошла ошибка при попытке получить системные шрифты",
         "playbackError": "произошла ошибка при попытке проиграть медиа",
-        "endpointNotImplementedError": "запрос {{endpoint} is not implemented for {{serverType}}",
+        "endpointNotImplementedError": "запрос {{endpoint}} is not implemented for {{serverType}}",
         "remotePortError": "произошла ошибка при попытке установить порт удаленного сервера",
         "serverRequired": "необходим сервер",
         "authenticationFailed": "аутентификация завершилась с ошибкой",
@@ -243,6 +243,246 @@
         "artist": "$t(entity.artist_one)",
         "duration": "продолжительность",
         "fromYear": "из года",
-        "criticRating": "рейтинг критиков"
+        "criticRating": "рейтинг критиков",
+        "mostPlayed": "наибольшое кол-во воспроизведений",
+        "comment": "комментировать",
+        "playCount": "кол-во воспроизведений",
+        "recentlyUpdated": "недавно обновлено",
+        "channels": "$t(common.channel_other)",
+        "recentlyPlayed": "недавно проиграно",
+        "owner": "$t(common.owner)",
+        "title": "название",
+        "rating": "рейтинг",
+        "search": "Поиск",
+        "genre": "$t(entity.genre_one)",
+        "recentlyAdded": "недавно добавлено",
+        "note": "заметка",
+        "name": "название",
+        "releaseDate": "дата выхода",
+        "albumCount": "$t(entity.album_other) кол-во",
+        "path": "путь",
+        "isRecentlyPlayed": "недавно проигрывалась",
+        "releaseYear": "год выхода",
+        "id": "#",
+        "songCount": "кол-во песен",
+        "isPublic": "публичный",
+        "random": "случайный",
+        "lastPlayed": "последний раз проигрывалась",
+        "toYear": "до года",
+        "album": "$t(entity.album_one)",
+        "trackNumber": "трек"
+    },
+    "player": {
+        "repeat_all": "повтор всех",
+        "stop": "остановить",
+        "repeat": "повтор",
+        "queue_remove": "удалить выделенные",
+        "playRandom": "случайные песни",
+        "skip": "пропустить",
+        "previous": "предыдущий",
+        "toggleFullscreenPlayer": "включить полноэкранный режим",
+        "skip_back": "назад",
+        "favorite": "любимый",
+        "next": "следующее",
+        "shuffle": "перемешать",
+        "playbackFetchNoResults": "нет песен",
+        "playbackFetchInProgress": "загрузка песен..",
+        "addNext": "добавить следующий",
+        "playbackSpeed": "скорость воспроизведения",
+        "playbackFetchCancel": "это занимает некоторое время... закрыть уведомление для отмены",
+        "play": "прослушать",
+        "repeat_off": "повтор выключен",
+        "pause": "пауза",
+        "queue_clear": "очистить очередь",
+        "muted": "звук отключён",
+        "unfavorite": "убрать из любимых",
+        "queue_moveToTop": "переместить выделение вниз",
+        "queue_moveToBottom": "переместить выделение вверх",
+        "shuffle_off": "перемешивание выключено",
+        "addLast": "добавить последний",
+        "mute": "отключить звук",
+        "skip_forward": "вперёд"
+    },
+    "page": {
+        "sidebar": {
+            "nowPlaying": "Cейчас проигрывается",
+            "playlists": "$t(entity.playlist_other)",
+            "search": "$t(common.search)",
+            "tracks": "$t(entity.track_other)",
+            "albums": "$t(entity.album_other)",
+            "genres": "$t(entity.genre_other)",
+            "folders": "$t(entity.folder_other)",
+            "settings": "$t(common.setting_other)",
+            "home": "$t(common.home)",
+            "artists": "$t(entity.artist_other)",
+            "albumArtists": "$t(entity.albumArtist_other)"
+        },
+        "fullscreenPlayer": {
+            "config": {
+                "showLyricMatch": "показать слова песни",
+                "dynamicBackground": "динамический фон",
+                "synchronized": "синхронизировано",
+                "followCurrentLyric": "следовать за текущими словами песни",
+                "opacity": "непрозрачность",
+                "lyricSize": "размер слов",
+                "showLyricProvider": "показать провайдера слов",
+                "unsynchronized": "несинхронизировано",
+                "lyricAlignment": "выравнивание слов песни",
+                "useImageAspectRatio": "использовать соотношение сторон изображения",
+                "lyricGap": "пробел между словами"
+            },
+            "upNext": "следующее",
+            "lyrics": "слова песни",
+            "related": "схожие"
+        },
+        "appMenu": {
+            "selectServer": "выбрать сервер",
+            "version": "версия {{version}}",
+            "settings": "$t(common.setting_other)",
+            "manageServers": "настроить список серверов",
+            "expandSidebar": "развернуть",
+            "collapseSidebar": "Скрыть боковую панель",
+            "openBrowserDevtools": "открыть инструменты разработчика",
+            "quit": "$t(common.quit)",
+            "goBack": "назад",
+            "goForward": "вперёд"
+        },
+        "contextMenu": {
+            "addToPlaylist": "$t(action.addToPlaylist)",
+            "addToFavorites": "$t(action.addToFavorites)",
+            "setRating": "$t(action.setRating)",
+            "moveToTop": "$t(action.moveToTop)",
+            "deletePlaylist": "$t(action.deletePlaylist)",
+            "moveToBottom": "$t(action.moveToBottom)",
+            "createPlaylist": "$t(action.createPlaylist)",
+            "removeFromPlaylist": "$t(action.removeFromPlaylist)",
+            "removeFromFavorites": "$t(action.removeFromFavorites)",
+            "addNext": "$t(player.addNext)",
+            "deselectAll": "$t(action.deselectAll)",
+            "addLast": "$t(player.addLast)",
+            "addFavorite": "$t(action.addToFavorites)",
+            "play": "$t(player.play)",
+            "numberSelected": "{{count}} выбрано",
+            "removeFromQueue": "$t(action.removeFromQueue)"
+        },
+        "home": {
+            "mostPlayed": "наибольшее кол-во воспроизведений",
+            "newlyAdded": "недавно добавленные релизы",
+            "title": "$t(common.home)",
+            "explore": "изучите вашу медиатеку",
+            "recentlyPlayed": "недавно прослушано"
+        },
+        "albumDetail": {
+            "moreFromArtist": "больше из жанра $t(entity.genre_one)",
+            "moreFromGeneric": "больше из {{item}}"
+        },
+        "setting": {
+            "playbackTab": "воспроизведение",
+            "generalTab": "общее",
+            "hotkeysTab": "горячие клавиши",
+            "windowTab": "окно"
+        },
+        "albumArtistList": {
+            "title": "$t(entity.albumArtist_other)"
+        },
+        "genreList": {
+            "title": "$t(entity.genre_other)"
+        },
+        "trackList": {
+            "title": "$t(entity.track_other)"
+        },
+        "globalSearch": {
+            "commands": {
+                "serverCommands": "команды сервера",
+                "goToPage": "перейти на страницу",
+                "searchFor": "поиск {{query}}"
+            },
+            "title": "комманды"
+        },
+        "playlistList": {
+            "title": "$t(entity.playlist_other)"
+        },
+        "albumList": {
+            "title": "$t(entity.album_other)"
+        }
+    },
+    "form": {
+        "deletePlaylist": {
+            "title": "удалить $t(entity.playlist_one)",
+            "success": "$t(entity.playlist_one) успешно удалён",
+            "input_confirm": "напишите название $t(entity.playlist_one), чтобы подтвердить действие"
+        },
+        "createPlaylist": {
+            "input_description": "$t(common.description)",
+            "title": "создать $t(entity.playlist_one)",
+            "input_public": "публичный",
+            "input_name": "$t(common.name)",
+            "success": "$t(entity.playlist_one) успешно создан",
+            "input_owner": "$t(common.owner)"
+        },
+        "addServer": {
+            "title": "добавить сервер",
+            "input_username": "пользователь",
+            "input_url": "url",
+            "input_password": "пароль",
+            "input_legacyAuthentication": "включить старую аутентификацию",
+            "input_name": "название сервера",
+            "success": "сервер добавлен успешно",
+            "input_savePassword": "сохранить пароль",
+            "ignoreSsl": "ignore ssl $t(common.restartRequired)",
+            "ignoreCors": "$t(common.restartRequired)",
+            "error_savePassword": "произошла ошибка во время попытки сохранения пароля"
+        },
+        "addToPlaylist": {
+            "success": "добавлено(а) {{message}} $t(entity.song_other) в {{numOfPlaylists}} $t(entity.playlist_other)",
+            "title": "добавить в $t(entity.playlist_one)",
+            "input_skipDuplicates": "пропустить дубликаты",
+            "input_playlists": "$t(entity.playlist_other)"
+        },
+        "updateServer": {
+            "title": "обновить сервер",
+            "success": "сервер успешно обновлён"
+        },
+        "queryEditor": {
+            "input_optionMatchAll": "сопоставить все",
+            "input_optionMatchAny": "сопоставить любой"
+        },
+        "lyricSearch": {
+            "input_name": "$t(common.name)",
+            "input_artist": "$t(entity.artist_one)",
+            "title": "поиск слов песни"
+        },
+        "editPlaylist": {
+            "title": "редактировать $t(entity.playlist_one)"
+        }
+    },
+    "setting": {
+        "accentColor": "цвет акцента",
+        "accentColor_description": "устанавливает цвет акцента для приложения",
+        "applicationHotkeys": "горячие клавиши приложения",
+        "crossfadeStyle_description": "Выберите вид эффекта crossfade для аудиоплеера",
+        "enableRemote_description": "Включает сервер удалённого управления для управления воспроизведением с помощью других устройств",
+        "fontType_optionSystem": "Системный шрифт",
+        "mpvExecutablePath_description": "Укажите папку, в которой находится исполняющий файл аудиоплеера MPV",
+        "crossfadeStyle": "Вид эффекта crossfade",
+        "fontType_optionBuiltIn": "Встроенный в приложение",
+        "disableLibraryUpdateOnStartup": "Отключить проверку новых версий при запуске приложения",
+        "minimizeToTray_description": "Сворачивать приложение в панель уведомлений",
+        "audioPlayer_description": "Укажите - какой аудиоплеер использовать для воспроизведения",
+        "disableAutomaticUpdates": "Отключить проверку обновлений",
+        "exitToTray_description": "При закрытии приложения - оно останется в панели уведомлений",
+        "fontType_optionCustom": "Пользовательский шрифт",
+        "remotePassword": "Пароль к серверу удалённого управления",
+        "font": "Шрифт",
+        "crossfadeDuration_description": "Укажите длительность эффекта crossfade",
+        "mpvExecutablePath": "Папка с аудиоплеером MPV",
+        "exitToTray": "Сворачивать в панель уведомлений при закрытии",
+        "enableRemote": "Включить сервер удалённого управления",
+        "fontType": "Источник шрифта",
+        "crossfadeDuration": "Длительность эффекта crossfade",
+        "audioPlayer": "Аудиоплеер",
+        "minimizeToTray": "Сворачивать в панель уведомлений",
+        "font_description": "Выберите - какой шрифт использовать в приложении",
+        "remoteUsername": "Имя пользователя для доступа к серверу удалённого управления"
     }
 }
