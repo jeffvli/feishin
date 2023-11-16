@@ -109,7 +109,7 @@
         "favorite_other": "收藏",
         "artistWithCount_other": "{{count}} 位艺术家",
         "folder_other": "文件夹",
-        "smartPlaylist": "智能 $t(entity.playlist_one)",
+        "smartPlaylist": "智能$t(entity.playlist_one)",
         "genreWithCount_other": "{{count}} 种流派",
         "trackWithCount_other": "{{count}} 首乐曲"
     },
