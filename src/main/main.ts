@@ -84,16 +84,6 @@ const installExtensions = async () => {
         .catch(console.log);
 };
 
-const singleInstance = app.requestSingleInstanceLock();
-
-if (!singleInstance) {
-    app.quit();
-} else {
-    app.on('second-instance', () => {
-        mainWindow?.show();
-    });
-}
-
 const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
@@ -666,31 +656,47 @@ const FONT_HEADERS = [
     'font/woff2',
 ];
 
-app.whenReady()
-    .then(() => {
-        protocol.handle('feishin', async (request) => {
-            const filePath = `file://${request.url.slice('feishin://'.length)}`;
-            const response = await net.fetch(filePath);
-            const contentType = response.headers.get('content-type');
+const singleInstance = app.requestSingleInstanceLock();
 
-            if (!contentType || !FONT_HEADERS.includes(contentType)) {
-                getMainWindow()?.webContents.send('custom-font-error', filePath);
-
-                return new Response(null, {
-                    status: 403,
-                    statusText: 'Forbidden',
-                });
+if (!singleInstance) {
+    app.quit();
+} else {
+    app.on('second-instance', () => {
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) {
+                mainWindow.restore();
             }
 
-            return response;
-        });
+            mainWindow.focus();
+        }
+    });
 
-        createWindow();
-        createTray();
-        app.on('activate', () => {
-            // On macOS it's common to re-create a window in the app when the
-            // dock icon is clicked and there are no other windows open.
-            if (mainWindow === null) createWindow();
-        });
-    })
-    .catch(console.log);
+    app.whenReady()
+        .then(() => {
+            protocol.handle('feishin', async (request) => {
+                const filePath = `file://${request.url.slice('feishin://'.length)}`;
+                const response = await net.fetch(filePath);
+                const contentType = response.headers.get('content-type');
+
+                if (!contentType || !FONT_HEADERS.includes(contentType)) {
+                    getMainWindow()?.webContents.send('custom-font-error', filePath);
+
+                    return new Response(null, {
+                        status: 403,
+                        statusText: 'Forbidden',
+                    });
+                }
+
+                return response;
+            });
+
+            createWindow();
+            createTray();
+            app.on('activate', () => {
+                // On macOS it's common to re-create a window in the app when the
+                // dock icon is clicked and there are no other windows open.
+                if (mainWindow === null) createWindow();
+            });
+        })
+        .catch(console.log);
+}
