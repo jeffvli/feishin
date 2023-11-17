@@ -7,6 +7,7 @@ import { ServerListItem } from '/@/renderer/types';
 import omitBy from 'lodash/omitBy';
 import { z } from 'zod';
 import { authenticationFailure } from '/@/renderer/api/utils';
+import i18n from '/@/i18n/i18n';
 
 const c = initContract();
 
@@ -337,6 +338,14 @@ export const jfApiClient = (args: {
                 };
             } catch (e: Error | AxiosError | any) {
                 if (isAxiosError(e)) {
+                    if (e.code === 'ERR_NETWORK') {
+                        throw new Error(
+                            i18n.t('error.networkError', {
+                                postProcess: 'sentenceCase',
+                            }) as string,
+                        );
+                    }
+
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
                     return {

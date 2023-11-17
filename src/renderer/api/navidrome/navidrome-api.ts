@@ -380,12 +380,20 @@ export const ndApiClient = (args: {
                 };
             } catch (e: Error | AxiosError | any) {
                 if (isAxiosError(e)) {
+                    if (e.code === 'ERR_NETWORK') {
+                        throw new Error(
+                            i18n.t('error.networkError', {
+                                postProcess: 'sentenceCase',
+                            }) as string,
+                        );
+                    }
+
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
                     return {
-                        body: { data: response.data, headers: response.headers },
-                        headers: response.headers as any,
-                        status: response.status,
+                        body: { data: response?.data, headers: response?.headers },
+                        headers: response?.headers as any,
+                        status: response?.status,
                     };
                 }
                 throw e;

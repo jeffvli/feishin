@@ -185,9 +185,15 @@ export const ssApiClient = (args: {
                     status: result.status,
                 };
             } catch (e: Error | AxiosError | any) {
-                console.log('CATCH ERR');
-
                 if (isAxiosError(e)) {
+                    if (e.code === 'ERR_NETWORK') {
+                        throw new Error(
+                            i18n.t('error.networkError', {
+                                postProcess: 'sentenceCase',
+                            }) as string,
+                        );
+                    }
+
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
 
