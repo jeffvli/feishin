@@ -31,7 +31,15 @@ export const useAuthStore = create<AuthSlice>()(
                 actions: {
                     addServer: (args) => {
                         set((state) => {
+                            if (state.serverList[args.id]) {
+                                return;
+                            }
+
                             state.serverList[args.id] = args;
+
+                            if (!state.currentServer) {
+                                state.currentServer = args;
+                            }
                         });
                     },
                     deleteServer: (id) => {

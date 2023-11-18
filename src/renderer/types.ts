@@ -61,15 +61,16 @@ export enum ServerType {
 }
 
 export type ServerListItem = {
-    credential: string;
+    credential?: string;
     id: string;
     name: string;
     ndCredential?: string;
     savePassword?: boolean;
+    static?: boolean;
     type: ServerType;
     url: string;
-    userId: string | null;
-    username: string;
+    userId?: string | null;
+    username?: string;
 };
 
 export enum PlayerStatus {

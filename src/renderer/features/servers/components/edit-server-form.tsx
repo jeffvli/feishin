@@ -46,7 +46,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
             savePassword: server.savePassword || false,
             type: server?.type,
             url: server?.url,
-            username: server?.username,
+            username: server?.username || '',
         },
     });
 
@@ -125,6 +125,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
             <Stack ref={focusTrapRef}>
                 <TextInput
                     required
+                    disabled={server?.static}
                     label={t('form.addServer.input', {
                         context: 'name',
                         postProcess: 'titleCase',
@@ -134,6 +135,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                 />
                 <TextInput
                     required
+                    disabled={server?.static}
                     label={t('form.addServer.input', {
                         context: 'url',
                         postProcess: 'titleCase',
@@ -143,6 +145,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                 />
                 <TextInput
                     required
+                    data-autofocus={!server?.username}
                     label={t('form.addServer.input', {
                         context: 'username',
                         postProcess: 'titleCase',
@@ -151,8 +154,8 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                     {...form.getInputProps('username')}
                 />
                 <PasswordInput
-                    data-autofocus
                     required
+                    data-autofocus={server?.username}
                     label={t('form.addServer.input', {
                         context: 'password',
                         postProcess: 'titleCase',

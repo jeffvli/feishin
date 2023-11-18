@@ -7,6 +7,7 @@
         "deletePlaylist": "delete $t(entity.playlist_one)",
         "deselectAll": "deselect all",
         "editPlaylist": "edit $t(entity.playlist_one)",
+        "signIn": "sign in",
         "goToPage": "go to page",
         "moveToBottom": "move to bottom",
         "moveToTop": "move to top",
@@ -14,6 +15,7 @@
         "removeFromFavorites": "remove from $t(entity.favorite_other)",
         "removeFromPlaylist": "remove from $t(entity.playlist_one)",
         "removeFromQueue": "remove from queue",
+        "removeServer": "remove server",
         "setRating": "set rating",
         "toggleSmartPlaylistEditor": "toggle $t(entity.smartPlaylist) editor",
         "viewPlaylists": "view $t(entity.playlist_other)"

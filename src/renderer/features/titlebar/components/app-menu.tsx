@@ -69,14 +69,14 @@ export const AppMenu = () => {
                 />
             ),
             size: 'sm',
-            title: `Update session for "${server.name}"`,
+            title: server.name,
         });
     };
 
     const handleManageServersModal = () => {
         openModal({
             children: <ServerList />,
-            title: 'Manage Servers',
+            title: t('page.appMenu.manageServers', { postProcess: 'sentenceCase' }),
         });
     };
 

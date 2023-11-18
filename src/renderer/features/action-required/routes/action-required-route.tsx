@@ -4,7 +4,7 @@ import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { RiCheckFill } from 'react-icons/ri';
 import { Link, Navigate } from 'react-router-dom';
-import { Button, PageHeader, Text } from '/@/renderer/components';
+import { Button, PageHeader } from '/@/renderer/components';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
 import { MpvRequired } from '/@/renderer/features/action-required/components/mpv-required';
 import { ServerCredentialRequired } from '/@/renderer/features/action-required/components/server-credential-required';
@@ -12,15 +12,36 @@ import { ServerRequired } from '/@/renderer/features/action-required/components/
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
+import { ServerListItem, ServerType } from '/@/renderer/types';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
+
+export const getIsCredentialRequired = (currentServer: ServerListItem | null) => {
+    if (currentServer === null) {
+        return false;
+    }
+
+    if (currentServer.type === ServerType.NAVIDROME) {
+        return !currentServer.ndCredential || !currentServer.credential || !currentServer.username;
+    }
+
+    if (currentServer.type === ServerType.JELLYFIN) {
+        return !currentServer.credential || !currentServer.username;
+    }
+
+    if (currentServer.type === ServerType.SUBSONIC) {
+        return !currentServer.credential || !currentServer.username;
+    }
+
+    return false;
+};
 
 const ActionRequiredRoute = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServer();
     const [isMpvRequired, setIsMpvRequired] = useState(false);
     const isServerRequired = !currentServer;
-    const isCredentialRequired = false;
+    const isCredentialRequired = getIsCredentialRequired(currentServer);
 
     useEffect(() => {
         const getMpvPath = async () => {
@@ -85,7 +106,6 @@ const ActionRequiredRoute = () => {
                                         color="var(--success-color)"
                                         size={30}
                                     />
-                                    <Text size="xl">No issues found</Text>
                                 </Group>
                                 <Button
                                     component={Link}
@@ -93,7 +113,7 @@ const ActionRequiredRoute = () => {
                                     to={AppRoute.HOME}
                                     variant="filled"
                                 >
-                                    Go back
+                                    {t('page.appMenu.goBack', { postProcess: 'sentenceCase' })}
                                 </Button>
                             </>
                         )}

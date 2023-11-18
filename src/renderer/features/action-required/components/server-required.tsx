@@ -1,8 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { RiMenuFill } from 'react-icons/ri';
 import { Button, DropdownMenu, Text } from '/@/renderer/components';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 
 export const ServerRequired = () => {
+    const { t } = useTranslation();
+
     return (
         <>
             <Text>No server selected.</Text>
@@ -12,7 +15,7 @@ export const ServerRequired = () => {
                         leftIcon={<RiMenuFill />}
                         variant="filled"
                     >
-                        Open menu
+                        {t('common.menu', { postProcess: 'titleCase' })}
                     </Button>
                 </DropdownMenu.Target>
                 <DropdownMenu.Dropdown>

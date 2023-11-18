@@ -43,6 +43,11 @@ const configuration: webpack.Configuration = {
     plugins: [
         new webpack.EnvironmentPlugin({
             NODE_ENV: 'production',
+            FS_SERVER_NAME: process.env.SERVER_URL ?? null,
+            FS_SERVER_URL: process.env.SERVER_URL ?? null,
+            FS_SERVER_TYPE: process.env.SERVER_URL ?? null,
+            FS_SERVER_USERNAME: process.env.SERVER_URL ?? null,
+            FS_SERVER_PASSWORD: process.env.SERVER_URL ?? null,
         }),
     ],
 

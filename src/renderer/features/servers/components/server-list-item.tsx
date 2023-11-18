@@ -3,6 +3,7 @@ import { Stack, Group, Divider } from '@mantine/core';
 import { Button, Text, TimeoutButton } from '/@/renderer/components';
 import { useDisclosure } from '@mantine/hooks';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { RiDeleteBin2Line, RiEdit2Fill } from 'react-icons/ri';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { ServerSection } from '/@/renderer/features/servers/components/server-section';
@@ -16,6 +17,7 @@ interface ServerListItemProps {
 }
 
 export const ServerListItem = ({ server }: ServerListItemProps) => {
+    const { t } = useTranslation();
     const [edit, editHandlers] = useDisclosure(false);
     const [savedPassword, setSavedPassword] = useState('');
     const { deleteServer } = useAuthStoreActions();
@@ -68,8 +70,18 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                     <Stack>
                         <Group noWrap>
                             <Stack>
-                                <Text>URL</Text>
-                                <Text>Username</Text>
+                                <Text>
+                                    {t('form.addServer.input', {
+                                        context: 'url',
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </Text>
+                                <Text>
+                                    {t('form.addServer.input', {
+                                        context: 'username',
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </Text>
                             </Stack>
                             <Stack>
                                 <Text>{server.url}</Text>
@@ -83,7 +95,9 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                                 variant="subtle"
                                 onClick={() => handleEdit()}
                             >
-                                Edit
+                                {t('common.edit', {
+                                    postProcess: 'sentenceCase',
+                                })}
                             </Button>
                         </Group>
                     </Stack>
@@ -95,7 +109,9 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                 timeoutProps={{ callback: handleDeleteServer, duration: 1000 }}
                 variant="subtle"
             >
-                Remove server
+                {t('action.removeServer', {
+                    postProcess: 'sentenceCase',
+                })}
             </TimeoutButton>
         </Stack>
     );

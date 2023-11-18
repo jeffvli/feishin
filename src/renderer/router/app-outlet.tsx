@@ -3,6 +3,7 @@ import isElectron from 'is-electron';
 import { Navigate, Outlet } from 'react-router-dom';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
+import { getIsCredentialRequired } from '/@/renderer/features/action-required/routes/action-required-route';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -17,9 +18,11 @@ export const AppOutlet = () => {
             return true;
         };
 
+        const isCredentialRequired = getIsCredentialRequired(currentServer);
+
         const isServerRequired = !currentServer;
 
-        const actions = [isServerRequired, isMpvRequired()];
+        const actions = [isServerRequired, isCredentialRequired, isMpvRequired()];
         const isActionRequired = actions.some((c) => c);
 
         return isActionRequired;

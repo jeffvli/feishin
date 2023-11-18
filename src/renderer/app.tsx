@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
@@ -22,8 +22,19 @@ import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-han
 import { PlayQueueHandlerContext } from '/@/renderer/features/player';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
-import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
-import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
+import {
+    PlayerState,
+    useAuthStoreActions,
+    usePlayerStore,
+    useQueueControls,
+} from '/@/renderer/store';
+import {
+    FontType,
+    PlaybackType,
+    PlayerStatus,
+    ServerListItem,
+    ServerType,
+} from '/@/renderer/types';
 import '@ag-grid-community/styles/ag-grid.css';
 import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
 import i18n from '/@/i18n/i18n';
@@ -48,6 +59,57 @@ export const App = () => {
     const { clearQueue, restoreQueue } = useQueueControls();
     const remoteSettings = useRemoteSettings();
     const textStyleRef = useRef<HTMLStyleElement>();
+    const { addServer } = useAuthStoreActions();
+
+    const setStaticServer = useCallback(() => {
+        console.log('process.env.FS_SERVER_URL :>> ', process.env.FS_SERVER_URL);
+        console.log('process.env.FS_SERVER_NAME', process.env.FS_SERVER_NAME);
+        console.log('process.env.FS_SERVER_TYPE :>> ', process.env.FS_SERVER_TYPE);
+        const url = process.env.FS_SERVER_URL;
+        let serverType: ServerType | null = null;
+        const name =
+            process.env.FS_SERVER_NAME || serverType === ServerType.NAVIDROME
+                ? 'Navidrome'
+                : 'Jellyfin';
+
+        switch (process.env.FS_SERVER_TYPE?.toLocaleLowerCase()) {
+            case 'jellyfin':
+                serverType = ServerType.JELLYFIN;
+                break;
+            case 'navidrome':
+                serverType = ServerType.NAVIDROME;
+                break;
+            case 'subsonic':
+                serverType = ServerType.SUBSONIC;
+                break;
+            default:
+                serverType = null;
+                break;
+        }
+
+        if (!url || !serverType) {
+            return;
+        }
+
+        const serverItem: ServerListItem = {
+            credential: undefined,
+            id: 'static-server',
+            name,
+            ndCredential: undefined,
+            static: true,
+            type: serverType,
+            url: url.replace(/\/$/, ''),
+            userId: undefined,
+            username: undefined,
+        };
+
+        addServer(serverItem);
+    }, [addServer]);
+
+    useEffect(() => {
+        setStaticServer();
+    }, [setStaticServer]);
+
     useDiscordRpc();
 
     useEffect(() => {
