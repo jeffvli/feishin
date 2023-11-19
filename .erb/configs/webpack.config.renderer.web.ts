@@ -116,6 +116,9 @@ const configuration: webpack.Configuration = {
             env: process.env.NODE_ENV,
             isDevelopment: process.env.NODE_ENV !== 'production',
             nodeModules: webpackPaths.appNodeModulesPath,
+            templateParameters: {
+                web: false, // with hot reload, we don't have NGINX injecting variables
+            },
         }),
     ],
 

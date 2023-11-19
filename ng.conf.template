@@ -12,6 +12,11 @@ server {
   gzip_types        text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
   gzip_comp_level   9;
 
+  location ${PUBLIC_PATH}settings.js {
+    add_header Content-Type application/javascript;
+    return 200 '"use strict";window.FS_SERVER_NAME="${FS_SERVER_NAME}";window.FS_SERVER_URL="${FS_SERVER_URL}";window.FS_SERVER_TYPE="${FS_SERVER_TYPE}";window.FS_SERVER_USERNAME="${FS_SERVER_USERNAME}";window.FS_SERVER_PASSWORD="${FS_SERVER_PASSWORD}"';
+  }
+
   location ${PUBLIC_PATH} {
     alias /usr/share/nginx/html/;
     try_files $uri $uri/ /index.html =404;
