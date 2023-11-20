@@ -120,11 +120,9 @@ export const AudioPlayer = forwardRef(
                     sampleRate: playback.audioSampleRateHz || undefined,
                 });
                 const gain = context.createGain();
-                const analyzer = context.createAnalyser();
-                gain.connect(analyzer);
-                analyzer.connect(context.destination);
+                gain.connect(context.destination);
 
-                setWebAudio!({ analyzer, context, gain });
+                setWebAudio!({ context, gain });
 
                 return () => {
                     return context.close();

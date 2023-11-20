@@ -211,7 +211,6 @@ export enum FontType {
 }
 
 export type WebAudio = {
-    analyzer: AnalyserNode;
     context: AudioContext;
     gain: GainNode;
 };
