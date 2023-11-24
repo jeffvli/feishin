@@ -10,7 +10,7 @@ import {
 import { useAudioSettings, useSettingsStore } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
-import { AudioFrequencies, AudioQuality } from '/@/renderer/utils';
+import { AudioFrequencies, octaveToQFactor } from '/@/renderer/utils';
 
 interface AudioPlayerProps extends ReactPlayerProps {
     crossfadeDuration: number;
@@ -56,7 +56,7 @@ export const AudioPlayer = forwardRef(
         }: AudioPlayerProps,
         ref: any,
     ) => {
-        const { bands } = useAudioSettings();
+        const { bands, octave } = useAudioSettings();
 
         const player1Ref = useRef<ReactPlayer>(null);
         const player2Ref = useRef<ReactPlayer>(null);
@@ -134,7 +134,6 @@ export const AudioPlayer = forwardRef(
                     const filter = context.createBiquadFilter();
                     filter.frequency.value = AudioFrequencies[i];
                     filter.type = 'peaking';
-                    filter.Q.value = AudioQuality;
                     priorNode.connect(filter);
                     priorNode = filter;
                     filters.push(filter);
@@ -152,6 +151,15 @@ export const AudioPlayer = forwardRef(
             // Intentionally ignore the sample rate dependency, as it makes things really messy
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, []);
+
+        useEffect(() => {
+            if (webAudio) {
+                const qValue = octaveToQFactor(octave);
+                for (const filter of webAudio.filters) {
+                    filter.Q.value = qValue;
+                }
+            }
+        }, [octave, webAudio]);
 
         useEffect(() => {
             if (webAudio) {

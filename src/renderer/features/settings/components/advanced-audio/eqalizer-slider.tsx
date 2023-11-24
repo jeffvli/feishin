@@ -89,15 +89,15 @@ export const EqualizerSlider = ({ value, title, onChange }: VerticalSliderProps)
                         min={-DB_RADIUS}
                         precision={1}
                         radius="xs"
+                        rightSection="db"
                         step={0.1}
                         value={displayValue}
                         variant="unstyled"
-                        width={rem(54)}
+                        width={rem(74)}
                         onChange={(val) => {
                             onChange(Number(val));
                         }}
                     />
-                    db
                 </Group>
             </Stack>
         </>

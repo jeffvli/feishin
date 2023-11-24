@@ -20,7 +20,7 @@ import {
     TableType,
     Platform,
 } from '/@/renderer/types';
-import { AudioBand, AudioFrequencies, randomString } from '/@/renderer/utils';
+import { AudioBand, AudioFrequencies, Octave, randomString } from '/@/renderer/utils';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -113,6 +113,7 @@ export enum BindingActions {
 export interface SettingsState {
     audio: {
         bands: AudioBand[];
+        octave: Octave;
     };
     general: {
         defaultFullPlaylist: boolean;
@@ -216,6 +217,7 @@ const initialState: SettingsState = {
             frequency,
             gain: 0,
         })),
+        octave: Octave.Third,
     },
     general: {
         defaultFullPlaylist: true,
