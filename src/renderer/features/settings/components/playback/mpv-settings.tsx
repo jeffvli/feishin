@@ -326,7 +326,9 @@ export const MpvSettings = () => {
                 <NumberInput
                     defaultValue={settings.mpvProperties.replayGainFallbackDB}
                     width={75}
-                    onBlur={(e) => handleSetMpvProperty('replayGainFallbackDB', e)}
+                    onBlur={(e) =>
+                        handleSetMpvProperty('replayGainFallbackDB', Number(e.currentTarget.value))
+                    }
                 />
             ),
             description: t('setting.replayGainFallback', {
