@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
-import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
-import { QueueSong, LibraryItem, AlbumArtist, Album } from '/@/renderer/api/types';
+import { SubsonicApi } from '/@/renderer/api/subsonic/subsonic-types';
+import { QueueSong, LibraryItem, AlbumArtist, Album, Genre } from '/@/renderer/api/types';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 
 const getCoverArtUrl = (args: {
@@ -27,7 +27,7 @@ const getCoverArtUrl = (args: {
 };
 
 const normalizeSong = (
-    item: z.infer<typeof ssType._response.song>,
+    item: z.infer<typeof SubsonicApi._baseTypes.song>,
     server: ServerListItem | null,
     deviceId: string,
 ): QueueSong => {
@@ -105,7 +105,7 @@ const normalizeSong = (
 };
 
 const normalizeAlbumArtist = (
-    item: z.infer<typeof ssType._response.albumArtist>,
+    item: z.infer<typeof SubsonicApi._baseTypes.artist>,
     server: ServerListItem | null,
 ): AlbumArtist => {
     const imageUrl =
@@ -138,7 +138,9 @@ const normalizeAlbumArtist = (
 };
 
 const normalizeAlbum = (
-    item: z.infer<typeof ssType._response.album>,
+    item:
+        | z.infer<typeof SubsonicApi._baseTypes.album>
+        | z.infer<typeof SubsonicApi._baseTypes.albumListEntry>,
     server: ServerListItem | null,
 ): Album => {
     const imageUrl =
@@ -189,8 +191,20 @@ const normalizeAlbum = (
     };
 };
 
-export const ssNormalize = {
+const normalizeGenre = (item: z.infer<typeof SubsonicApi._baseTypes.genre>): Genre => {
+    return {
+        albumCount: item.albumCount,
+        id: item.value,
+        imageUrl: null,
+        itemType: LibraryItem.GENRE,
+        name: item.value,
+        songCount: item.songCount,
+    };
+};
+
+export const subsonicNormalize = {
     album: normalizeAlbum,
     albumArtist: normalizeAlbumArtist,
+    genre: normalizeGenre,
     song: normalizeSong,
 };
