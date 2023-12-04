@@ -1022,7 +1022,7 @@ export type SearchQuery = {
     albumLimit?: number;
     albumStartIndex?: number;
     musicFolderId?: string;
-    query?: string;
+    query: string;
     songLimit?: number;
     songStartIndex?: number;
 };
