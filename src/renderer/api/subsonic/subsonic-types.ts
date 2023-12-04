@@ -156,23 +156,21 @@ const playlistListEntry = playlist.omit({
 });
 
 const artistInfo = z.object({
-    artistInfo: z.object({
-        biography: z.string().optional(),
-        largeImageUrl: z.string().optional(),
-        lastFmUrl: z.string().optional(),
-        mediumImageUrl: z.string().optional(),
-        musicBrainzId: z.string().optional(),
-        similarArtist: z.array(
-            z.object({
-                albumCount: z.string(),
-                artistImageUrl: z.string().optional(),
-                coverArt: z.string().optional(),
-                id: z.string(),
-                name: z.string(),
-            }),
-        ),
-        smallImageUrl: z.string().optional(),
-    }),
+    biography: z.string().optional(),
+    largeImageUrl: z.string().optional(),
+    lastFmUrl: z.string().optional(),
+    mediumImageUrl: z.string().optional(),
+    musicBrainzId: z.string().optional(),
+    similarArtist: z.array(
+        z.object({
+            albumCount: z.string(),
+            artistImageUrl: z.string().optional(),
+            coverArt: z.string().optional(),
+            id: z.string(),
+            name: z.string(),
+        }),
+    ),
+    smallImageUrl: z.string().optional(),
 });
 
 const albumInfo = z.object({

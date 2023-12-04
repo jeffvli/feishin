@@ -1,100 +1,38 @@
-import { useAuthStore } from '/@/renderer/store';
-import { toast } from '/@/renderer/components/toast/index';
+import { RandomSongListArgs } from './types';
+import i18n from '/@/i18n/i18n';
+import { jfController } from '/@/renderer/api/jellyfin/jellyfin-controller';
+import { NavidromeController } from '/@/renderer/api/navidrome/navidrome-controller';
+import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
 import type {
-    AlbumDetailArgs,
-    AlbumListArgs,
-    SongListArgs,
-    SongDetailArgs,
+    AddToPlaylistArgs,
     AlbumArtistDetailArgs,
     AlbumArtistListArgs,
-    SetRatingArgs,
-    GenreListArgs,
+    AlbumDetailArgs,
+    AlbumListArgs,
+    ArtistListArgs,
+    ControllerEndpoint,
     CreatePlaylistArgs,
     DeletePlaylistArgs,
+    FavoriteArgs,
+    GenreListArgs,
+    LyricsArgs,
+    MusicFolderListArgs,
     PlaylistDetailArgs,
     PlaylistListArgs,
-    MusicFolderListArgs,
     PlaylistSongListArgs,
-    ArtistListArgs,
+    RemoveFromPlaylistArgs,
+    ScrobbleArgs,
+    SearchArgs,
+    SetRatingArgs,
+    SongDetailArgs,
+    SongListArgs,
+    TopSongListArgs,
     UpdatePlaylistArgs,
     UserListArgs,
-    FavoriteArgs,
-    TopSongListArgs,
-    AddToPlaylistArgs,
-    AddToPlaylistResponse,
-    RemoveFromPlaylistArgs,
-    RemoveFromPlaylistResponse,
-    ScrobbleArgs,
-    ScrobbleResponse,
-    AlbumArtistDetailResponse,
-    FavoriteResponse,
-    CreatePlaylistResponse,
-    AlbumArtistListResponse,
-    AlbumDetailResponse,
-    AlbumListResponse,
-    ArtistListResponse,
-    GenreListResponse,
-    MusicFolderListResponse,
-    PlaylistDetailResponse,
-    PlaylistListResponse,
-    RatingResponse,
-    SongDetailResponse,
-    SongListResponse,
-    TopSongListResponse,
-    UpdatePlaylistResponse,
-    UserListResponse,
-    AuthenticationResponse,
-    SearchArgs,
-    SearchResponse,
-    LyricsArgs,
-    LyricsResponse,
 } from '/@/renderer/api/types';
+import { toast } from '/@/renderer/components/toast/index';
+import { useAuthStore } from '/@/renderer/store';
 import { ServerType } from '/@/renderer/types';
-import { DeletePlaylistResponse, RandomSongListArgs } from './types';
-import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
-import { ssController } from '/@/renderer/api/subsonic/subsonic-controller';
-import { jfController } from '/@/renderer/api/jellyfin/jellyfin-controller';
-import i18n from '/@/i18n/i18n';
-
-export type ControllerEndpoint = Partial<{
-    addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
-    authenticate: (
-        url: string,
-        body: { password: string; username: string },
-    ) => Promise<AuthenticationResponse>;
-    clearPlaylist: () => void;
-    createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
-    createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse>;
-    deleteFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
-    deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
-    getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
-    getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
-    getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse>;
-    getAlbumList: (args: AlbumListArgs) => Promise<AlbumListResponse>;
-    getArtistDetail: () => void;
-    getArtistInfo: (args: any) => void;
-    getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse>;
-    getFavoritesList: () => void;
-    getFolderItemList: () => void;
-    getFolderList: () => void;
-    getFolderSongs: () => void;
-    getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
-    getLyrics: (args: LyricsArgs) => Promise<LyricsResponse>;
-    getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
-    getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
-    getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
-    getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
-    getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
-    getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
-    getSongList: (args: SongListArgs) => Promise<SongListResponse>;
-    getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
-    getUserList: (args: UserListArgs) => Promise<UserListResponse>;
-    removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
-    scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
-    search: (args: SearchArgs) => Promise<SearchResponse>;
-    setRating: (args: SetRatingArgs) => Promise<RatingResponse>;
-    updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
-}>;
 
 type ApiController = {
     jellyfin: ControllerEndpoint;
@@ -139,74 +77,8 @@ const endpoints: ApiController = {
         setRating: undefined,
         updatePlaylist: jfController.updatePlaylist,
     },
-    navidrome: {
-        addToPlaylist: ndController.addToPlaylist,
-        authenticate: ndController.authenticate,
-        clearPlaylist: undefined,
-        createFavorite: ssController.createFavorite,
-        createPlaylist: ndController.createPlaylist,
-        deleteFavorite: ssController.removeFavorite,
-        deletePlaylist: ndController.deletePlaylist,
-        getAlbumArtistDetail: ndController.getAlbumArtistDetail,
-        getAlbumArtistList: ndController.getAlbumArtistList,
-        getAlbumDetail: ndController.getAlbumDetail,
-        getAlbumList: ndController.getAlbumList,
-        getArtistDetail: undefined,
-        getArtistInfo: undefined,
-        getArtistList: undefined,
-        getFavoritesList: undefined,
-        getFolderItemList: undefined,
-        getFolderList: undefined,
-        getFolderSongs: undefined,
-        getGenreList: ndController.getGenreList,
-        getLyrics: undefined,
-        getMusicFolderList: ssController.getMusicFolderList,
-        getPlaylistDetail: ndController.getPlaylistDetail,
-        getPlaylistList: ndController.getPlaylistList,
-        getPlaylistSongList: ndController.getPlaylistSongList,
-        getRandomSongList: ssController.getRandomSongList,
-        getSongDetail: ndController.getSongDetail,
-        getSongList: ndController.getSongList,
-        getTopSongs: ssController.getTopSongList,
-        getUserList: ndController.getUserList,
-        removeFromPlaylist: ndController.removeFromPlaylist,
-        scrobble: ssController.scrobble,
-        search: ssController.search3,
-        setRating: ssController.setRating,
-        updatePlaylist: ndController.updatePlaylist,
-    },
-    subsonic: {
-        authenticate: ssController.authenticate,
-        clearPlaylist: undefined,
-        createFavorite: ssController.createFavorite,
-        createPlaylist: undefined,
-        deleteFavorite: ssController.removeFavorite,
-        deletePlaylist: undefined,
-        getAlbumArtistDetail: undefined,
-        getAlbumArtistList: undefined,
-        getAlbumDetail: undefined,
-        getAlbumList: undefined,
-        getArtistDetail: undefined,
-        getArtistInfo: undefined,
-        getArtistList: undefined,
-        getFavoritesList: undefined,
-        getFolderItemList: undefined,
-        getFolderList: undefined,
-        getFolderSongs: undefined,
-        getGenreList: undefined,
-        getLyrics: undefined,
-        getMusicFolderList: ssController.getMusicFolderList,
-        getPlaylistDetail: undefined,
-        getPlaylistList: undefined,
-        getSongDetail: undefined,
-        getSongList: undefined,
-        getTopSongs: ssController.getTopSongList,
-        getUserList: undefined,
-        scrobble: ssController.scrobble,
-        search: ssController.search3,
-        setRating: undefined,
-        updatePlaylist: undefined,
-    },
+    navidrome: NavidromeController,
+    subsonic: SubsonicController,
 };
 
 const apiController = (endpoint: keyof ControllerEndpoint, type?: ServerType) => {

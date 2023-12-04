@@ -39,11 +39,13 @@ import {
     RemoveFromPlaylistResponse,
     RemoveFromPlaylistArgs,
     genreListSortMap,
+    ControllerEndpoint,
 } from '../types';
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
 import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
-import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import { subsonicApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
 
 const authenticate = async (
     url: string,
@@ -129,7 +131,7 @@ const getAlbumArtistDetail = async (
         },
     });
 
-    const artistInfoRes = await ssApiClient(apiClientProps).getArtistInfo({
+    const artistInfoRes = await subsonicApiClient(apiClientProps).getArtistInfo({
         query: {
             count: 10,
             id: query.id,
@@ -148,15 +150,16 @@ const getAlbumArtistDetail = async (
         {
             ...res.body.data,
             ...(artistInfoRes.status === 200 && {
-                similarArtists: artistInfoRes.body.artistInfo.similarArtist,
+                similarArtists: artistInfoRes.body['subsonic-response'].artistInfo.similarArtist,
                 ...(!res.body.data.largeImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.largeImageUrl,
+                    largeImageUrl: artistInfoRes.body['subsonic-response'].artistInfo.largeImageUrl,
                 }),
                 ...(!res.body.data.mediumImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.mediumImageUrl,
+                    largeImageUrl:
+                        artistInfoRes.body['subsonic-response'].artistInfo.mediumImageUrl,
                 }),
                 ...(!res.body.data.smallImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.smallImageUrl,
+                    largeImageUrl: artistInfoRes.body['subsonic-response'].artistInfo.smallImageUrl,
                 }),
             }),
         },
@@ -322,7 +325,7 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
             name: body.name,
             public: body._custom?.navidrome?.public || false,
             rules: body._custom?.navidrome?.rules ? body._custom.navidrome.rules : undefined,
-            sync: body._custom?.navidrome?.sync || undefined,
+            sync: body._custom?.navidrome?.sync,
         },
         params: {
             id: query.id,
@@ -340,7 +343,6 @@ const deletePlaylist = async (args: DeletePlaylistArgs): Promise<DeletePlaylistR
     const { query, apiClientProps } = args;
 
     const res = await ndApiClient(apiClientProps).deletePlaylist({
-        body: null,
         params: {
             id: query.id,
         },
@@ -360,7 +362,9 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
         query: {
             _end: query.startIndex + (query.limit || 0),
             _order: sortOrderMap.navidrome[query.sortOrder],
-            _sort: query.sortBy ? playlistListSortMap.navidrome[query.sortBy] : undefined,
+            _sort: query.sortBy
+                ? playlistListSortMap.navidrome[query.sortBy]
+                : playlistListSortMap.navidrome.name,
             _start: query.startIndex,
             q: query.searchTerm,
             ...query._custom?.navidrome,
@@ -449,7 +453,6 @@ const removeFromPlaylist = async (
     const { query, apiClientProps } = args;
 
     const res = await ndApiClient(apiClientProps).removeFromPlaylist({
-        body: null,
         params: {
             id: query.id,
         },
@@ -463,6 +466,41 @@ const removeFromPlaylist = async (
     }
 
     return null;
+};
+
+export const NavidromeController: ControllerEndpoint = {
+    addToPlaylist,
+    authenticate,
+    clearPlaylist: undefined,
+    createFavorite: SubsonicController.createFavorite,
+    createPlaylist,
+    deleteFavorite: SubsonicController.deleteFavorite,
+    deletePlaylist,
+    getAlbumArtistDetail,
+    getAlbumArtistList,
+    getAlbumDetail,
+    getAlbumList,
+    getArtistDetail: undefined,
+    getArtistInfo: undefined,
+    getFavoritesList: undefined,
+    getFolderItemList: undefined,
+    getFolderList: undefined,
+    getFolderSongs: undefined,
+    getGenreList,
+    getMusicFolderList: SubsonicController.getMusicFolderList,
+    getPlaylistDetail,
+    getPlaylistList,
+    getPlaylistSongList,
+    getRandomSongList: SubsonicController.getRandomSongList,
+    getSongDetail,
+    getSongList,
+    getTopSongs: SubsonicController.getTopSongs,
+    getUserList,
+    removeFromPlaylist,
+    scrobble: SubsonicController.scrobble,
+    search: SubsonicController.search,
+    setRating: SubsonicController.setRating,
+    updatePlaylist,
 };
 
 export const ndController = {
