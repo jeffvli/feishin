@@ -124,7 +124,7 @@ export interface BasePaginatedResponse<T> {
     error?: string | any;
     items: T;
     startIndex: number;
-    totalRecordCount: number;
+    totalRecordCount: number | null;
 }
 
 export type AuthenticationResponse = {
@@ -370,7 +370,10 @@ export type AlbumListQuery = {
         navidrome?: Partial<z.infer<typeof ndType._parameters.albumList>>;
     };
     artistIds?: string[];
+    genre?: string;
     limit?: number;
+    maxYear?: number;
+    minYear?: number;
     musicFolderId?: string;
     searchTerm?: string;
     sortBy: AlbumListSort;
@@ -826,6 +829,11 @@ export type UpdatePlaylistBody = {
     comment?: string;
     genres?: Genre[];
     name: string;
+    owner?: string;
+    ownerId?: string;
+    public?: boolean;
+    rules?: Record<string, any>;
+    sync?: boolean;
 };
 
 export type UpdatePlaylistArgs = {
@@ -1139,3 +1147,48 @@ export type FontData = {
     postscriptName: string;
     style: string;
 };
+
+export type ControllerEndpoint = Partial<{
+    addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse | Error>;
+    authenticate: (
+        url: string,
+        body: { password: string; username: string },
+    ) => Promise<AuthenticationResponse | Error>;
+    clearPlaylist: () => void;
+    createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse | Error>;
+    createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse | Error>;
+    deleteFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse | Error>;
+    deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse | Error>;
+    getAlbumArtistDetail: (
+        args: AlbumArtistDetailArgs,
+    ) => Promise<AlbumArtistDetailResponse | Error>;
+    getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse | Error>;
+    getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse | Error>;
+    getAlbumList: (args: AlbumListArgs) => Promise<AlbumListResponse | Error>;
+    getAlbumSongList: (args: AlbumDetailArgs) => Promise<SongListResponse | Error>; // TODO
+    getArtistDetail: () => void;
+    getArtistInfo: (args: any) => void;
+    getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse | Error>;
+    getFavoritesList: () => void;
+    getFolderItemList: () => void;
+    getFolderList: () => void;
+    getFolderSongs: () => void;
+    getGenreList: (args: GenreListArgs) => Promise<GenreListResponse | Error>;
+    getLyrics: (args: LyricsArgs) => Promise<LyricsResponse | Error>;
+    getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse | Error>;
+    getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse | Error>;
+    getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse | Error>;
+    getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse | Error>;
+    getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse | Error>;
+    getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse | Error>;
+    getSongList: (args: SongListArgs) => Promise<SongListResponse | Error>;
+    getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse | Error>;
+    getUserList: (args: UserListArgs) => Promise<UserListResponse | Error>;
+    removeFromPlaylist: (
+        args: RemoveFromPlaylistArgs,
+    ) => Promise<RemoveFromPlaylistResponse | Error>;
+    scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse | Error>;
+    search: (args: SearchArgs) => Promise<SearchResponse | Error>;
+    setRating: (args: SetRatingArgs) => Promise<RatingResponse | Error>;
+    updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse | Error>;
+}>;
