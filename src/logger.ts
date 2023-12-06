@@ -25,7 +25,11 @@ const baseLog = (errorType: 'error' | 'info' | 'success' | 'warn') => {
     return (text: string, options?: { context?: Record<string, any>; toast?: boolean }): void => {
         // const { toast } = options || {};
         const now = dayjs().toISOString();
-        console.log(`${logString}${now}${text}${JSON.stringify(options?.context)}${reset}`);
+        console.log(
+            `${logString}${now}: ${text} | ${
+                options?.context && JSON.stringify(options.context)
+            }${reset}`,
+        );
     };
 };
 
