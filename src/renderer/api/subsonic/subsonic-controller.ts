@@ -193,7 +193,10 @@ export const SubsonicController: ControllerEndpoint = {
             albums: artist.album.map((album) =>
                 subsonicNormalize.album(album, apiClientProps.server),
             ),
-            artistInfo,
+            similarArtists:
+                artistInfo?.similarArtist?.map((artist) =>
+                    subsonicNormalize.albumArtist(artist, apiClientProps.server, 300),
+                ) || null,
         };
     },
     getAlbumArtistList: async (args) => {
