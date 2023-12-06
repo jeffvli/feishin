@@ -17,7 +17,7 @@ const localSettings = isElectron() ? window.electron.localSettings : null;
 const SERVER_TYPES = [
     { label: 'Jellyfin', value: ServerType.JELLYFIN },
     { label: 'Navidrome', value: ServerType.NAVIDROME },
-    // { label: 'Subsonic', value: ServerType.SUBSONIC },
+    { label: 'Subsonic', value: ServerType.SUBSONIC },
 ];
 
 interface AddServerFormProps {
