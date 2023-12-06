@@ -131,6 +131,15 @@ const getAlbumList = async (args: AlbumListArgs) => {
     )?.(args);
 };
 
+const getAlbumListCount = async (args: AlbumListArgs) => {
+    return (
+        apiController(
+            'getAlbumListCount',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getAlbumListCount']
+    )?.(args);
+};
+
 const getAlbumDetail = async (args: AlbumDetailArgs) => {
     return (
         apiController(
@@ -146,6 +155,15 @@ const getSongList = async (args: SongListArgs) => {
             'getSongList',
             args.apiClientProps.server?.type,
         ) as ControllerEndpoint['getSongList']
+    )?.(args);
+};
+
+const getSongListCount = async (args: SongListArgs) => {
+    return (
+        apiController(
+            'getSongListCount',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getSongListCount']
     )?.(args);
 };
 
@@ -194,6 +212,15 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs) => {
     )?.(args);
 };
 
+const getAlbumArtistListCount = async (args: AlbumArtistListArgs) => {
+    return (
+        apiController(
+            'getAlbumArtistListCount',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getAlbumArtistListCount']
+    )?.(args);
+};
+
 const getArtistList = async (args: ArtistListArgs) => {
     return (
         apiController(
@@ -209,6 +236,15 @@ const getPlaylistList = async (args: PlaylistListArgs) => {
             'getPlaylistList',
             args.apiClientProps.server?.type,
         ) as ControllerEndpoint['getPlaylistList']
+    )?.(args);
+};
+
+const getPlaylistListCount = async (args: PlaylistListArgs) => {
+    return (
+        apiController(
+            'getPlaylistListCount',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getPlaylistListCount']
     )?.(args);
 };
 
@@ -362,18 +398,22 @@ export const controller = {
     deletePlaylist,
     getAlbumArtistDetail,
     getAlbumArtistList,
+    getAlbumArtistListCount,
     getAlbumDetail,
     getAlbumList,
+    getAlbumListCount,
     getArtistList,
     getGenreList,
     getLyrics,
     getMusicFolderList,
     getPlaylistDetail,
     getPlaylistList,
+    getPlaylistListCount,
     getPlaylistSongList,
     getRandomSongList,
     getSongDetail,
     getSongList,
+    getSongListCount,
     getTopSongList,
     getUserList,
     removeFromPlaylist,

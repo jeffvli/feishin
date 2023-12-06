@@ -582,7 +582,7 @@ const search3 = {
         artistCount: z.number().optional(),
         artistOffset: z.number().optional(),
         musicFolderId: z.string().optional(),
-        query: z.string(),
+        query: z.string().or(z.literal('""')),
         songCount: z.number().optional(),
         songOffset: z.number().optional(),
     }),

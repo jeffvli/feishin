@@ -182,6 +182,20 @@ export const useVirtualTable = <TFilter>({
                         return;
                     }
 
+                    if (results.totalRecordCount === null) {
+                        const totalRecordCount: number | undefined = itemCount;
+                        const hasMoreRows = results?.items?.length === properties.filter.limit;
+                        const lastRowIndex = hasMoreRows
+                            ? undefined
+                            : properties.filter.offset + results.items.length;
+
+                        params.successCallback(
+                            results?.items || [],
+                            totalRecordCount || lastRowIndex,
+                        );
+                        return;
+                    }
+
                     params.successCallback(results?.items || [], results?.totalRecordCount || 0);
                 },
                 rowCount: undefined,
@@ -198,6 +212,7 @@ export const useVirtualTable = <TFilter>({
             queryClient,
             isClientSideSort,
             queryFn,
+            itemCount,
         ],
     );
 

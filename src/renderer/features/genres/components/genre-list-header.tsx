@@ -34,6 +34,7 @@ export const GenreListHeader = ({ itemCount, gridRef, tableRef }: GenreListHeade
     const { setFilter, setTablePagination } = useListStoreActions();
 
     const { handleRefreshGrid, handleRefreshTable } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.GENRE,
         server,
     });
@@ -89,6 +90,7 @@ export const GenreListHeader = ({ itemCount, gridRef, tableRef }: GenreListHeade
             <FilterBar>
                 <GenreListHeaderFilters
                     gridRef={gridRef}
+                    itemCount={itemCount}
                     tableRef={tableRef}
                 />
             </FilterBar>

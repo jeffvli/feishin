@@ -1,15 +1,20 @@
+import orderBy from 'lodash/orderBy';
+import filter from 'lodash/filter';
 import md5 from 'md5';
+import { fsLog } from '/@/logger';
 import { subsonicApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { subsonicNormalize } from '/@/renderer/api/subsonic/subsonic-normalize';
 import { AlbumListSortType, SubsonicApi } from '/@/renderer/api/subsonic/subsonic-types';
 import {
+    AlbumArtistListSort,
     AlbumListSort,
     AuthenticationResponse,
     ControllerEndpoint,
+    GenreListSort,
     LibraryItem,
+    PlaylistListSort,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
-import { fsLog } from '/@/logger';
 
 const authenticate = async (
     url: string,
@@ -184,7 +189,7 @@ export const SubsonicController: ControllerEndpoint = {
         }
 
         return {
-            ...subsonicNormalize.albumArtist(artist, apiClientProps.server),
+            ...subsonicNormalize.albumArtist(artist, apiClientProps.server, 300),
             albums: artist.album.map((album) =>
                 subsonicNormalize.album(album, apiClientProps.server),
             ),
@@ -193,6 +198,7 @@ export const SubsonicController: ControllerEndpoint = {
     },
     getAlbumArtistList: async (args) => {
         const { query, apiClientProps } = args;
+        const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
 
         const res = await subsonicApiClient(apiClientProps).getArtists({
             query: {
@@ -209,13 +215,78 @@ export const SubsonicController: ControllerEndpoint = {
             (index) => index.artist,
         );
 
+        let results = artists;
+        let totalRecordCount = artists.length;
+
+        if (query.searchTerm) {
+            const searchResults = filter(results, (artist) => {
+                return artist.name.toLowerCase().includes(query.searchTerm!.toLowerCase());
+            });
+
+            results = searchResults;
+            totalRecordCount = searchResults.length;
+        }
+
+        switch (query.sortBy) {
+            case AlbumArtistListSort.ALBUM_COUNT:
+                results = orderBy(
+                    artists,
+                    ['albumCount', (v) => v.name.toLowerCase()],
+                    [sortOrder, 'asc'],
+                );
+                break;
+            case AlbumArtistListSort.NAME:
+                results = orderBy(artists, [(v) => v.name.toLowerCase()], [sortOrder]);
+                break;
+            case AlbumArtistListSort.FAVORITED:
+                results = orderBy(artists, ['starred'], [sortOrder]);
+                break;
+            case AlbumArtistListSort.RATING:
+                results = orderBy(artists, ['userRating'], [sortOrder]);
+                break;
+            default:
+                break;
+        }
+
         return {
-            items: artists.map((artist) =>
+            items: results.map((artist) =>
                 subsonicNormalize.albumArtist(artist, apiClientProps.server),
             ),
             startIndex: query.startIndex,
-            totalRecordCount: null,
+            totalRecordCount,
         };
+    },
+    getAlbumArtistListCount: async (args) => {
+        const { query, apiClientProps } = args;
+
+        const res = await subsonicApiClient(apiClientProps).getArtists({
+            query: {
+                musicFolderId: query.musicFolderId,
+            },
+        });
+
+        if (res.status !== 200) {
+            fsLog.error('Failed to get album artist list count');
+            throw new Error('Failed to get album artist list count');
+        }
+
+        const artists = (res.body['subsonic-response'].artists?.index || []).flatMap(
+            (index) => index.artist,
+        );
+
+        let results = artists;
+        let totalRecordCount = artists.length;
+
+        if (query.searchTerm) {
+            const searchResults = filter(results, (artist) => {
+                return artist.name.toLowerCase().includes(query.searchTerm!.toLowerCase());
+            });
+
+            results = searchResults;
+            totalRecordCount = searchResults.length;
+        }
+
+        return totalRecordCount;
     },
     getAlbumDetail: async (args) => {
         const { query, apiClientProps } = args;
@@ -285,6 +356,73 @@ export const SubsonicController: ControllerEndpoint = {
             totalRecordCount: null,
         };
     },
+    getAlbumListCount: async (args) => {
+        const { query, apiClientProps } = args;
+
+        const sortType: Record<AlbumListSort, AlbumListSortType | undefined> = {
+            [AlbumListSort.RANDOM]: SubsonicApi.getAlbumList2.enum.AlbumListSortType.RANDOM,
+            [AlbumListSort.ALBUM_ARTIST]:
+                SubsonicApi.getAlbumList2.enum.AlbumListSortType.ALPHABETICAL_BY_ARTIST,
+            [AlbumListSort.PLAY_COUNT]: SubsonicApi.getAlbumList2.enum.AlbumListSortType.FREQUENT,
+            [AlbumListSort.RECENTLY_ADDED]: SubsonicApi.getAlbumList2.enum.AlbumListSortType.NEWEST,
+            [AlbumListSort.FAVORITED]: SubsonicApi.getAlbumList2.enum.AlbumListSortType.STARRED,
+            [AlbumListSort.YEAR]: SubsonicApi.getAlbumList2.enum.AlbumListSortType.RECENT,
+            [AlbumListSort.NAME]:
+                SubsonicApi.getAlbumList2.enum.AlbumListSortType.ALPHABETICAL_BY_NAME,
+            [AlbumListSort.COMMUNITY_RATING]: undefined,
+            [AlbumListSort.DURATION]: undefined,
+            [AlbumListSort.CRITIC_RATING]: undefined,
+            [AlbumListSort.RATING]: undefined,
+            [AlbumListSort.ARTIST]: undefined,
+            [AlbumListSort.RECENTLY_PLAYED]: undefined,
+            [AlbumListSort.RELEASE_DATE]: undefined,
+            [AlbumListSort.SONG_COUNT]: undefined,
+        };
+
+        let fetchNextPage = true;
+        let startIndex = 0;
+        let totalRecordCount = 0;
+
+        while (fetchNextPage) {
+            const res = await subsonicApiClient(apiClientProps).getAlbumList2({
+                query: {
+                    fromYear: query.minYear,
+                    genre: query.genre,
+                    musicFolderId: query.musicFolderId,
+                    offset: startIndex,
+                    size: 500,
+                    toYear: query.maxYear,
+                    type:
+                        sortType[query.sortBy] ??
+                        SubsonicApi.getAlbumList2.enum.AlbumListSortType.ALPHABETICAL_BY_NAME,
+                },
+            });
+
+            const headers = res.headers;
+
+            // Navidrome returns the total count in the header
+            if (headers.get('x-total-count')) {
+                fetchNextPage = false;
+                totalRecordCount = Number(headers.get('x-total-count'));
+                break;
+            }
+
+            if (res.status !== 200) {
+                fsLog.error('Failed to get album list count');
+                throw new Error('Failed to get album list count');
+            }
+
+            const albumCount = res.body['subsonic-response'].albumList2.album.length;
+
+            totalRecordCount += albumCount;
+            startIndex += albumCount;
+
+            // The max limit size for Subsonic is 500
+            fetchNextPage = albumCount === 500;
+        }
+
+        return totalRecordCount;
+    },
     getAlbumSongList: async (args) => {
         const { query, apiClientProps } = args;
 
@@ -326,7 +464,8 @@ export const SubsonicController: ControllerEndpoint = {
         return res.body['subsonic-response'].artistInfo;
     },
     getGenreList: async (args) => {
-        const { apiClientProps } = args;
+        const { query, apiClientProps } = args;
+        const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
 
         const res = await subsonicApiClient(apiClientProps).getGenres({});
 
@@ -335,7 +474,31 @@ export const SubsonicController: ControllerEndpoint = {
             throw new Error('Failed to get genre list');
         }
 
-        const genres = res.body['subsonic-response'].genres.genre.map(subsonicNormalize.genre);
+        let results = res.body['subsonic-response'].genres.genre;
+
+        if (query.searchTerm) {
+            const searchResults = filter(results, (genre) =>
+                genre.value.toLowerCase().includes(query.searchTerm!.toLowerCase()),
+            );
+
+            results = searchResults;
+        }
+
+        switch (query.sortBy) {
+            case GenreListSort.NAME:
+                results = orderBy(results, [(v) => v.value.toLowerCase()], [sortOrder]);
+                break;
+            case GenreListSort.ALBUM_COUNT:
+                results = orderBy(results, ['albumCount'], [sortOrder]);
+                break;
+            case GenreListSort.SONG_COUNT:
+                results = orderBy(results, ['songCount'], [sortOrder]);
+                break;
+            default:
+                break;
+        }
+
+        const genres = results.map(subsonicNormalize.genre);
 
         return {
             items: genres,
@@ -360,6 +523,70 @@ export const SubsonicController: ControllerEndpoint = {
             startIndex: 0,
             totalRecordCount: res.body['subsonic-response'].musicFolders.musicFolder.length,
         };
+    },
+    getPlaylistList: async (args) => {
+        const { query, apiClientProps } = args;
+        const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
+
+        const res = await subsonicApiClient(apiClientProps).getPlaylists({});
+
+        if (res.status !== 200) {
+            fsLog.error('Failed to get playlist list');
+            throw new Error('Failed to get playlist list');
+        }
+
+        let results = res.body['subsonic-response'].playlists.playlist;
+
+        if (query.searchTerm) {
+            const searchResults = filter(results, (playlist) => {
+                return playlist.name.toLowerCase().includes(query.searchTerm!.toLowerCase());
+            });
+
+            results = searchResults;
+        }
+
+        switch (query.sortBy) {
+            case PlaylistListSort.DURATION:
+                results = orderBy(results, ['duration'], [sortOrder]);
+                break;
+            case PlaylistListSort.NAME:
+                results = orderBy(results, [(v) => v.name?.toLowerCase()], [sortOrder]);
+                break;
+            case PlaylistListSort.OWNER:
+                results = orderBy(results, [(v) => v.owner?.toLowerCase()], [sortOrder]);
+                break;
+            case PlaylistListSort.PUBLIC:
+                results = orderBy(results, ['public'], [sortOrder]);
+                break;
+            case PlaylistListSort.SONG_COUNT:
+                results = orderBy(results, ['songCount'], [sortOrder]);
+                break;
+            case PlaylistListSort.UPDATED_AT:
+                results = orderBy(results, ['changed'], [sortOrder]);
+                break;
+            default:
+                break;
+        }
+
+        return {
+            items: results.map((playlist) =>
+                subsonicNormalize.playlist(playlist, apiClientProps.server),
+            ),
+            startIndex: 0,
+            totalRecordCount: res.body['subsonic-response'].playlists.playlist.length,
+        };
+    },
+    getPlaylistListCount: async (args) => {
+        const { apiClientProps } = args;
+
+        const res = await subsonicApiClient(apiClientProps).getPlaylists({});
+
+        if (res.status !== 200) {
+            fsLog.error('Failed to get playlist list count');
+            throw new Error('Failed to get playlist list count');
+        }
+
+        return res.body['subsonic-response'].playlists.playlist.length;
     },
     getRandomSongList: async (args) => {
         const { query, apiClientProps } = args;
@@ -406,6 +633,259 @@ export const SubsonicController: ControllerEndpoint = {
             apiClientProps.server,
             '',
         );
+    },
+    getSongList: async (args) => {
+        const { query, apiClientProps } = args;
+
+        const fromAlbumPromises = [];
+        const artistDetailPromises = [];
+        let results: any[] = [];
+
+        if (query.genreId) {
+            const res = await subsonicApiClient(apiClientProps).getSongsByGenre({
+                query: {
+                    count: query.limit,
+                    genre: query.genreId,
+                    musicFolderId: query.musicFolderId,
+                    offset: query.startIndex,
+                },
+            });
+
+            if (res.status !== 200) {
+                fsLog.error('Failed to get song list');
+                throw new Error('Failed to get song list');
+            }
+
+            return {
+                items: res.body['subsonic-response'].songsByGenre.song.map((song) =>
+                    subsonicNormalize.song(song, apiClientProps.server, ''),
+                ),
+                startIndex: 0,
+                totalRecordCount: null,
+            };
+        }
+
+        if (query.albumIds || query.artistIds) {
+            if (query.albumIds) {
+                for (const albumId of query.albumIds) {
+                    fromAlbumPromises.push(
+                        subsonicApiClient(apiClientProps).getAlbum({
+                            query: {
+                                id: albumId,
+                            },
+                        }),
+                    );
+                }
+            }
+
+            if (query.artistIds) {
+                for (const artistId of query.artistIds) {
+                    artistDetailPromises.push(
+                        subsonicApiClient(apiClientProps).getArtist({
+                            query: {
+                                id: artistId,
+                            },
+                        }),
+                    );
+                }
+
+                const artistResult = await Promise.all(artistDetailPromises);
+
+                const albums = artistResult.flatMap((artist) => {
+                    if (artist.status !== 200) {
+                        fsLog.warn('Failed to get artist detail', { context: { artist } });
+                        return [];
+                    }
+
+                    return artist.body['subsonic-response'].artist.album;
+                });
+
+                const albumIds = albums.map((album) => album.id);
+
+                for (const albumId of albumIds) {
+                    fromAlbumPromises.push(
+                        subsonicApiClient(apiClientProps).getAlbum({
+                            query: {
+                                id: albumId,
+                            },
+                        }),
+                    );
+                }
+            }
+
+            if (fromAlbumPromises) {
+                const albumsResult = await Promise.all(fromAlbumPromises);
+
+                results = albumsResult.flatMap((album) => {
+                    if (album.status !== 200) {
+                        fsLog.warn('Failed to get album detail', { context: { album } });
+                        return [];
+                    }
+
+                    return album.body['subsonic-response'].album.song;
+                });
+            }
+
+            return {
+                items: results.map((song) =>
+                    subsonicNormalize.song(song, apiClientProps.server, ''),
+                ),
+                startIndex: 0,
+                totalRecordCount: results.length,
+            };
+        }
+
+        const res = await subsonicApiClient(apiClientProps).search3({
+            query: {
+                albumCount: 0,
+                albumOffset: 0,
+                artistCount: 0,
+                artistOffset: 0,
+                query: query.searchTerm || '""',
+                songCount: query.limit,
+                songOffset: query.startIndex,
+            },
+        });
+
+        if (res.status !== 200) {
+            fsLog.error('Failed to get song list');
+            throw new Error('Failed to get song list');
+        }
+
+        return {
+            items:
+                res.body['subsonic-response'].searchResult3?.song?.map((song) =>
+                    subsonicNormalize.song(song, apiClientProps.server, ''),
+                ) || [],
+            startIndex: 0,
+            totalRecordCount: null,
+        };
+    },
+    getSongListCount: async (args) => {
+        const { query, apiClientProps } = args;
+
+        let fetchNextPage = true;
+        let startIndex = 0;
+
+        let fetchNextSection = true;
+        let sectionIndex = 0;
+
+        if (query.genreId) {
+            let totalRecordCount = 0;
+            while (fetchNextSection) {
+                const res = await subsonicApiClient(apiClientProps).getSongsByGenre({
+                    query: {
+                        count: 1,
+                        genre: query.genreId,
+                        musicFolderId: query.musicFolderId,
+                        offset: sectionIndex,
+                    },
+                });
+
+                if (res.status !== 200) {
+                    fsLog.error('Failed to get song list count');
+                    throw new Error('Failed to get song list count');
+                }
+
+                const numberOfResults =
+                    res.body['subsonic-response'].songsByGenre.song?.length || 0;
+
+                if (numberOfResults !== 1) {
+                    fetchNextSection = false;
+                    startIndex = sectionIndex === 0 ? 0 : sectionIndex - 5000;
+                    break;
+                } else {
+                    sectionIndex += 5000;
+                }
+            }
+
+            while (fetchNextPage) {
+                const res = await subsonicApiClient(apiClientProps).getSongsByGenre({
+                    query: {
+                        count: 500,
+                        genre: query.genreId,
+                        musicFolderId: query.musicFolderId,
+                        offset: startIndex,
+                    },
+                });
+
+                if (res.status !== 200) {
+                    fsLog.error('Failed to get song list count');
+                    throw new Error('Failed to get song list count');
+                }
+
+                const numberOfResults =
+                    res.body['subsonic-response'].songsByGenre.song?.length || 0;
+
+                totalRecordCount = startIndex + numberOfResults;
+                startIndex += numberOfResults;
+
+                fetchNextPage = numberOfResults === 500;
+            }
+
+            return totalRecordCount;
+        }
+
+        let totalRecordCount = 0;
+
+        while (fetchNextSection) {
+            const res = await subsonicApiClient(apiClientProps).search3({
+                query: {
+                    albumCount: 0,
+                    albumOffset: 0,
+                    artistCount: 0,
+                    artistOffset: 0,
+                    query: query.searchTerm || '""',
+                    songCount: 1,
+                    songOffset: sectionIndex,
+                },
+            });
+
+            if (res.status !== 200) {
+                fsLog.error('Failed to get song list count');
+                throw new Error('Failed to get song list count');
+            }
+
+            const numberOfResults = res.body['subsonic-response'].searchResult3.song?.length || 0;
+
+            // Check each batch of 5000 songs to check for data
+            sectionIndex += 5000;
+            fetchNextSection = numberOfResults === 1;
+
+            if (!fetchNextSection) {
+                // fetchNextBlock will be false on the next loop so we need to subtract 5000 * 2
+                startIndex = sectionIndex - 10000;
+            }
+        }
+
+        while (fetchNextPage) {
+            const res = await subsonicApiClient(apiClientProps).search3({
+                query: {
+                    albumCount: 0,
+                    albumOffset: 0,
+                    artistCount: 0,
+                    artistOffset: 0,
+                    query: query.searchTerm || '""',
+                    songCount: 500,
+                    songOffset: startIndex,
+                },
+            });
+
+            if (res.status !== 200) {
+                fsLog.error('Failed to get song list count');
+                throw new Error('Failed to get song list count');
+            }
+
+            const numberOfResults = res.body['subsonic-response'].searchResult3.song?.length || 0;
+
+            totalRecordCount = startIndex + numberOfResults;
+            startIndex += numberOfResults;
+
+            // The max limit size for Subsonic is 500
+            fetchNextPage = numberOfResults === 500;
+        }
+
+        return totalRecordCount;
     },
     getTopSongs: async (args) => {
         const { query, apiClientProps } = args;

@@ -38,6 +38,7 @@ export const AlbumListHeader = ({ itemCount, gridRef, tableRef, title }: AlbumLi
     const playButtonBehavior = usePlayButtonBehavior();
 
     const { handleRefreshGrid, handleRefreshTable } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.ALBUM,
         server,
     });
@@ -94,6 +95,7 @@ export const AlbumListHeader = ({ itemCount, gridRef, tableRef, title }: AlbumLi
             <FilterBar>
                 <AlbumListHeaderFilters
                     gridRef={gridRef}
+                    itemCount={itemCount}
                     tableRef={tableRef}
                 />
             </FilterBar>

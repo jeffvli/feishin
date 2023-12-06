@@ -435,16 +435,21 @@ axiosClient.interceptors.response.use(
     (response) => {
         const data = response.data;
 
-        if (data['subsonic-response'].status !== 'ok') {
+        // Ping endpoint returns a string
+        if (typeof data === 'string') {
+            return response;
+        }
+
+        if (data['subsonic-response']?.status !== 'ok') {
             // Suppress code related to non-linked lastfm or spotify from Navidrome
-            if (data['subsonic-response'].error.code !== 0) {
+            if (data['subsonic-response']?.error.code !== 0) {
                 toast.error({
-                    message: data['subsonic-response'].error.message,
+                    message: data['subsonic-response']?.error.message,
                     title: i18n.t('error.genericError', { postProcess: 'sentenceCase' }) as string,
                 });
             }
 
-            return Promise.reject(data['subsonic-response'].error);
+            return Promise.reject(data['subsonic-response']?.error);
         }
 
         return response;
@@ -513,9 +518,9 @@ export const subsonicApiClient = (args: {
                 });
 
                 return {
-                    body: result.data,
-                    headers: result.headers as any,
-                    status: result.status,
+                    body: result?.data,
+                    headers: result?.headers as any,
+                    status: result?.status,
                 };
             } catch (e: Error | AxiosError | any) {
                 if (isAxiosError(e)) {

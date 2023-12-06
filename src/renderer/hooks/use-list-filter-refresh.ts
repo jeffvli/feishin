@@ -10,6 +10,7 @@ import orderBy from 'lodash/orderBy';
 
 interface UseHandleListFilterChangeProps {
     isClientSideSort?: boolean;
+    itemCount?: number;
     itemType: LibraryItem;
     server: ServerListItem | null;
 }
@@ -18,6 +19,7 @@ export const useListFilterRefresh = ({
     server,
     itemType,
     isClientSideSort,
+    itemCount,
 }: UseHandleListFilterChangeProps) => {
     const queryClient = useQueryClient();
 
@@ -98,11 +100,14 @@ export const useListFilterRefresh = ({
                             filter.sortOrder === 'DESC' ? ['desc'] : ['asc'],
                         );
 
-                        params.successCallback(sortedResults || [], res?.totalRecordCount || 0);
+                        params.successCallback(
+                            sortedResults || [],
+                            res?.totalRecordCount || itemCount,
+                        );
                         return;
                     }
 
-                    params.successCallback(res?.items || [], res?.totalRecordCount || 0);
+                    params.successCallback(res?.items || [], res?.totalRecordCount || itemCount);
                 },
 
                 rowCount: undefined,
@@ -112,7 +117,7 @@ export const useListFilterRefresh = ({
             tableRef.current?.api.purgeInfiniteCache();
             tableRef.current?.api.ensureIndexVisible(0, 'top');
         },
-        [isClientSideSort, queryClient, queryFn, queryKeyFn, server],
+        [isClientSideSort, itemCount, queryClient, queryFn, queryKeyFn, server],
     );
 
     const handleRefreshGrid = useCallback(

@@ -160,14 +160,26 @@ const FILTERS = {
             value: SongListSort.YEAR,
         },
     ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: SongListSort.NAME,
+        },
+    ],
 };
 
 interface SongListHeaderFiltersProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+    itemCount: number | undefined;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFiltersProps) => {
+export const SongListHeaderFilters = ({
+    gridRef,
+    tableRef,
+    itemCount,
+}: SongListHeaderFiltersProps) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
     const { pageKey, handlePlay, customFilters } = useListContext();
@@ -179,6 +191,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
         useListStoreActions();
 
     const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.SONG,
         server,
     });

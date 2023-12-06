@@ -85,6 +85,28 @@ const FILTERS = {
             value: AlbumArtistListSort.SONG_COUNT,
         },
     ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.albumCount', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.ALBUM_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.isFavorited', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.RATING,
+        },
+    ],
 };
 
 interface AlbumArtistListHeaderFiltersProps {

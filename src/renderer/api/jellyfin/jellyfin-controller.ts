@@ -480,7 +480,6 @@ const removeFromPlaylist = async (
     const { query, apiClientProps } = args;
 
     const res = await jfApiClient(apiClientProps).removeFromPlaylist({
-        body: null,
         params: {
             id: query.id,
         },
@@ -648,7 +647,6 @@ const deletePlaylist = async (args: DeletePlaylistArgs): Promise<null> => {
     const { query, apiClientProps } = args;
 
     const res = await jfApiClient(apiClientProps).deletePlaylist({
-        body: null,
         params: {
             id: query.id,
         },

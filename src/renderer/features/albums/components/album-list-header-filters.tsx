@@ -139,14 +139,61 @@ const FILTERS = {
             value: AlbumListSort.YEAR,
         },
     ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+            value: AlbumListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.mostPlayed', { postProcess: 'titleCase' }),
+            value: AlbumListSort.PLAY_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: AlbumListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+            value: AlbumListSort.RANDOM,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
+            value: AlbumListSort.RECENTLY_ADDED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
+            value: AlbumListSort.RECENTLY_PLAYED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.favorited', { postProcess: 'titleCase' }),
+            value: AlbumListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
+            value: AlbumListSort.YEAR,
+        },
+    ],
 };
 
 interface AlbumListHeaderFiltersProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+    itemCount: number | undefined;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFiltersProps) => {
+export const AlbumListHeaderFilters = ({
+    gridRef,
+    tableRef,
+    itemCount,
+}: AlbumListHeaderFiltersProps) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { pageKey, customFilters, handlePlay } = useListContext();
@@ -159,6 +206,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
     const cq = useContainerQuery();
 
     const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.ALBUM,
         server,
     });

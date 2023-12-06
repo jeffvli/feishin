@@ -37,14 +37,36 @@ const FILTERS = {
             value: GenreListSort.NAME,
         },
     ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: GenreListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.albumCount', { postProcess: 'titleCase' }),
+            value: GenreListSort.ALBUM_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: GenreListSort.SONG_COUNT,
+        },
+    ],
 };
 
 interface GenreListHeaderFiltersProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+    itemCount: number | undefined;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFiltersProps) => {
+export const GenreListHeaderFilters = ({
+    gridRef,
+    tableRef,
+    itemCount,
+}: GenreListHeaderFiltersProps) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { pageKey, customFilters } = useListContext();
@@ -54,6 +76,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
     const cq = useContainerQuery();
 
     const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.GENRE,
         server,
     });

@@ -306,7 +306,9 @@ export type GenreListResponse = BasePaginatedResponse<Genre[]> | null | undefine
 export type GenreListArgs = { query: GenreListQuery } & BaseEndpointArgs;
 
 export enum GenreListSort {
+    ALBUM_COUNT = 'albumCount',
     NAME = 'name',
+    SONG_COUNT = 'songCount',
 }
 
 export type GenreListQuery = {
@@ -330,10 +332,14 @@ type GenreListSortMap = {
 
 export const genreListSortMap: GenreListSortMap = {
     jellyfin: {
+        albumCount: undefined,
         name: JFGenreListSort.NAME,
+        songCount: undefined,
     },
     navidrome: {
+        albumCount: undefined,
         name: NDGenreListSort.NAME,
+        songCount: undefined,
     },
     subsonic: {
         name: undefined,
@@ -484,8 +490,11 @@ export type SongListQuery = {
     };
     albumIds?: string[];
     artistIds?: string[];
+    genreId?: string;
     imageSize?: number;
     limit?: number;
+    maxYear?: number;
+    minYear?: number;
     musicFolderId?: string;
     searchTerm?: string;
     sortBy: SongListSort;
@@ -1161,8 +1170,10 @@ export type ControllerEndpoint = Partial<{
     deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
     getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
     getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
+    getAlbumArtistListCount: (args: AlbumArtistListArgs) => Promise<number>;
     getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse>;
     getAlbumList: (args: AlbumListArgs) => Promise<AlbumListResponse>;
+    getAlbumListCount: (args: AlbumListArgs) => Promise<number>;
     getAlbumSongList: (args: AlbumDetailArgs) => Promise<SongListResponse>; // TODO
     getArtistDetail: () => void;
     getArtistInfo: (args: any) => void;
@@ -1176,10 +1187,12 @@ export type ControllerEndpoint = Partial<{
     getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
     getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
     getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
+    getPlaylistListCount: (args: PlaylistListArgs) => Promise<number>;
     getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
     getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
+    getSongListCount: (args: SongListArgs) => Promise<number>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getUserList: (args: UserListArgs) => Promise<UserListResponse>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
