@@ -552,7 +552,7 @@
         "column": {
             "album": "album",
             "albumArtist": "album artist",
-            "albumCount": "$t(entity.album_other)",
+            "albumCount": "$t(entity.album_one)",
             "artist": "$t(entity.artist_one)",
             "biography": "biography",
             "bitrate": "bitrate",
