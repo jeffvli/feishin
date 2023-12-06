@@ -332,6 +332,45 @@ export const SubsonicController: ControllerEndpoint = {
             [AlbumListSort.SONG_COUNT]: undefined,
         };
 
+        if (query.isCompilation) {
+            return {
+                items: [],
+                startIndex: 0,
+                totalRecordCount: 0,
+            };
+        }
+
+        if (query.artistIds) {
+            const promises = [];
+
+            for (const artistId of query.artistIds) {
+                promises.push(
+                    subsonicApiClient(apiClientProps).getArtist({
+                        query: {
+                            id: artistId,
+                        },
+                    }),
+                );
+            }
+
+            const artistResult = await Promise.all(promises);
+
+            const albums = artistResult.flatMap((artist) => {
+                if (artist.status !== 200) {
+                    fsLog.warn('Failed to get artist detail', { context: { artist } });
+                    return [];
+                }
+
+                return artist.body['subsonic-response'].artist.album;
+            });
+
+            return {
+                items: albums.map((album) => subsonicNormalize.album(album, apiClientProps.server)),
+                startIndex: 0,
+                totalRecordCount: albums.length,
+            };
+        }
+
         const res = await subsonicApiClient(apiClientProps).getAlbumList2({
             query: {
                 fromYear: query.minYear,

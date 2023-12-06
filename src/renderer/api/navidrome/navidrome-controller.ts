@@ -233,6 +233,8 @@ const getAlbumList = async (args: AlbumListArgs): Promise<AlbumListResponse> => 
             _sort: albumListSortMap.navidrome[query.sortBy],
             _start: query.startIndex,
             artist_id: query.artistIds?.[0],
+            compilation: query.isCompilation,
+            genre_id: query.genre,
             name: query.searchTerm,
             ...query._custom?.navidrome,
         },

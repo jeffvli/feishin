@@ -333,6 +333,7 @@ const getAlbumList = async (args: AlbumListArgs): Promise<AlbumListResponse> => 
             AlbumArtistIds: query.artistIds
                 ? formatCommaDelimitedString(query.artistIds)
                 : undefined,
+            ContributingArtistIds: query.isCompilation ? query.artistIds?.[0] : undefined,
             IncludeItemTypes: 'MusicAlbum',
             Limit: query.limit,
             ParentId: query.musicFolderId,
