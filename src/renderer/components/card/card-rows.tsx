@@ -275,7 +275,7 @@ export const PLAYLIST_CARD_ROWS: { [key: string]: CardRow<Playlist> } = {
     name: {
         property: 'name',
         route: {
-            route: AppRoute.PLAYLISTS_DETAIL,
+            route: AppRoute.PLAYLISTS_DETAIL_SONGS,
             slugs: [{ idProperty: 'id', slugProperty: 'playlistId' }],
         },
     },

@@ -14,16 +14,12 @@ import { Play } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useHideScrollbar } from '/@/renderer/hooks';
-import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
+import { useCurrentServer } from '/@/renderer/store';
 
 const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
     const { t } = useTranslation();
     const path = data?.items[index].id
-        ? data.defaultFullPlaylist
-            ? generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data.items[index].id })
-            : generatePath(AppRoute.PLAYLISTS_DETAIL, {
-                  playlistId: data?.items[index].id,
-              })
+        ? generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data.items[index].id })
         : undefined;
 
     return (
@@ -120,7 +116,6 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
 export const SidebarPlaylistList = () => {
     const { isScrollbarHidden, hideScrollbarElementProps } = useHideScrollbar(0);
     const handlePlayQueueAdd = usePlayQueueAdd();
-    const { defaultFullPlaylist } = useGeneralSettings();
     const server = useCurrentServer();
 
     const playlistsQuery = usePlaylistList({
@@ -154,11 +149,10 @@ export const SidebarPlaylistList = () => {
 
     const memoizedItemData = useMemo(() => {
         return {
-            defaultFullPlaylist,
             handlePlay: handlePlayPlaylist,
             items: playlistsQuery?.data?.items,
         };
-    }, [playlistsQuery?.data?.items, defaultFullPlaylist, handlePlayPlaylist]);
+    }, [playlistsQuery?.data?.items, handlePlayPlaylist]);
 
     return (
         <Flex

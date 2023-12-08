@@ -385,7 +385,9 @@ export const useVirtualTable = <TFilter>({
                     );
                     break;
                 case LibraryItem.PLAYLIST:
-                    navigate(generatePath(AppRoute.PLAYLISTS_DETAIL, { playlistId: e.data.id }));
+                    navigate(
+                        generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: e.data.id }),
+                    );
                     break;
                 default:
                     break;
