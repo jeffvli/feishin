@@ -32,6 +32,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
             },
             comment: '',
             name: '',
+            public: false,
         },
     });
     const [isSmartPlaylist, setIsSmartPlaylist] = useState(false);
@@ -86,7 +87,8 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
         );
     });
 
-    const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
+    const isPublicDisplayed =
+        server?.type === ServerType.NAVIDROME || server?.type === ServerType.SUBSONIC;
     const isSubmitDisabled = !form.values.name || mutation.isLoading;
 
     return (
@@ -115,7 +117,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                                 context: 'public',
                                 postProcess: 'titleCase',
                             })}
-                            {...form.getInputProps('_custom.navidrome.public', {
+                            {...form.getInputProps('public', {
                                 type: 'checkbox',
                             })}
                         />

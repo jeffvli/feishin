@@ -535,7 +535,6 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<SongList
         query: {
             Fields: 'Genres, DateCreated, MediaSources, UserData, ParentId',
             IncludeItemTypes: 'Audio',
-            Limit: query.limit,
             SortBy: query.sortBy ? songListSortMap.jellyfin[query.sortBy] : undefined,
             SortOrder: query.sortOrder ? sortOrderMap.jellyfin[query.sortOrder] : undefined,
             StartIndex: 0,
@@ -549,7 +548,7 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<SongList
 
     return {
         items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
-        startIndex: query.startIndex,
+        startIndex: 0,
         totalRecordCount: res.body.TotalRecordCount,
     };
 };

@@ -1,5 +1,7 @@
 import orderBy from 'lodash/orderBy';
+import shuffle from 'lodash/shuffle';
 import filter from 'lodash/filter';
+import reverse from 'lodash/reverse';
 import md5 from 'md5';
 import { fsLog } from '/@/logger';
 import { subsonicApiClient } from '/@/renderer/api/subsonic/subsonic-api';
@@ -13,6 +15,7 @@ import {
     GenreListSort,
     LibraryItem,
     PlaylistListSort,
+    SongListSort,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -566,6 +569,25 @@ export const SubsonicController: ControllerEndpoint = {
             totalRecordCount: res.body['subsonic-response'].musicFolders.musicFolder.length,
         };
     },
+    getPlaylistDetail: async (args) => {
+        const { query, apiClientProps } = args;
+
+        const res = await subsonicApiClient(apiClientProps).getPlaylist({
+            query: {
+                id: query.id,
+            },
+        });
+
+        if (res.status !== 200) {
+            fsLog.error('Failed to get playlist detail');
+            throw new Error('Failed to get playlist detail');
+        }
+
+        return subsonicNormalize.playlist(
+            res.body['subsonic-response'].playlist,
+            apiClientProps.server,
+        );
+    },
     getPlaylistList: async (args) => {
         const { query, apiClientProps } = args;
         const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
@@ -619,7 +641,7 @@ export const SubsonicController: ControllerEndpoint = {
         };
     },
     getPlaylistListCount: async (args) => {
-        const { apiClientProps } = args;
+        const { query, apiClientProps } = args;
 
         const res = await subsonicApiClient(apiClientProps).getPlaylists({});
 
@@ -628,7 +650,126 @@ export const SubsonicController: ControllerEndpoint = {
             throw new Error('Failed to get playlist list count');
         }
 
+        if (query.searchTerm) {
+            const searchResults = filter(
+                res.body['subsonic-response'].playlists.playlist,
+                (playlist) => {
+                    return playlist.name.toLowerCase().includes(query.searchTerm!.toLowerCase());
+                },
+            );
+
+            return searchResults.length;
+        }
+
         return res.body['subsonic-response'].playlists.playlist.length;
+    },
+    getPlaylistSongList: async (args) => {
+        const { query, apiClientProps } = args;
+        const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
+
+        const res = await subsonicApiClient(apiClientProps).getPlaylist({
+            query: {
+                id: query.id,
+            },
+        });
+
+        if (res.status !== 200) {
+            fsLog.error('Failed to get playlist song list');
+            throw new Error('Failed to get playlist song list');
+        }
+
+        let results = res.body['subsonic-response'].playlist.entry || [];
+
+        if (query.searchTerm) {
+            const searchResults = filter(results, (entry) => {
+                return entry.title.toLowerCase().includes(query.searchTerm!.toLowerCase());
+            });
+
+            results = searchResults;
+        }
+
+        if (query.sortBy) {
+            switch (query.sortBy) {
+                case SongListSort.ALBUM:
+                    results = orderBy(
+                        results,
+                        [(v) => v.album?.toLowerCase(), 'discNumber', 'track'],
+                        [sortOrder, 'asc', 'asc'],
+                    );
+                    break;
+                case SongListSort.ALBUM_ARTIST:
+                    results = orderBy(
+                        results,
+                        ['albumArtist', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
+                        [sortOrder, sortOrder, 'asc', 'asc'],
+                    );
+                    break;
+                case SongListSort.ARTIST:
+                    results = orderBy(
+                        results,
+                        ['artist', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
+                        [sortOrder, sortOrder, 'asc', 'asc'],
+                    );
+                    break;
+                case SongListSort.DURATION:
+                    results = orderBy(results, ['duration'], [sortOrder]);
+                    break;
+                case SongListSort.FAVORITED:
+                    results = orderBy(
+                        results,
+                        ['starred', (v) => v.title.toLowerCase()],
+                        [sortOrder],
+                    );
+                    break;
+                case SongListSort.GENRE:
+                    results = orderBy(
+                        results,
+                        ['genre', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
+                        [sortOrder, sortOrder, 'asc', 'asc'],
+                    );
+                    break;
+                case SongListSort.ID:
+                    if (sortOrder === 'desc') {
+                        results = reverse(results);
+                    }
+                    break;
+                case SongListSort.NAME:
+                    results = orderBy(results, [(v) => v.title.toLowerCase()], [sortOrder]);
+                    break;
+                case SongListSort.PLAY_COUNT:
+                    results = orderBy(results, ['playCount'], [sortOrder]);
+                    break;
+                case SongListSort.RANDOM:
+                    results = shuffle(results);
+                    break;
+                case SongListSort.RATING:
+                    results = orderBy(
+                        results,
+                        ['userRating', (v) => v.title.toLowerCase()],
+                        [sortOrder],
+                    );
+                    break;
+                case SongListSort.RECENTLY_ADDED:
+                    results = orderBy(results, ['created'], [sortOrder]);
+                    break;
+                case SongListSort.YEAR:
+                    results = orderBy(
+                        results,
+                        ['year', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
+                        [sortOrder, 'asc', 'asc', 'asc'],
+                    );
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        return {
+            items: results?.map((song) => subsonicNormalize.song(song, apiClientProps.server, '')),
+            startIndex: 0,
+            totalRecordCount: results?.length || 0,
+        };
     },
     getRandomSongList: async (args) => {
         const { query, apiClientProps } = args;

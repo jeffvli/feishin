@@ -136,7 +136,6 @@ export const AddToPlaylistContextModal = ({
             if (values.skipDuplicates) {
                 const query = {
                     id: playlistId,
-                    startIndex: 0,
                 };
 
                 const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, query);
@@ -151,7 +150,11 @@ export const AddToPlaylistContextModal = ({
                             server,
                             signal,
                         },
-                        query: { id: playlistId, startIndex: 0 },
+                        query: {
+                            id: playlistId,
+                            sortBy: SongListSort.ID,
+                            sortOrder: SortOrder.ASC,
+                        },
                     });
                 });
 

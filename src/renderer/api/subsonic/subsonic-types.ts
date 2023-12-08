@@ -109,7 +109,7 @@ const playlist = z.object({
     coverArt: z.string().optional(),
     created: z.string(),
     duration: z.number(),
-    entry: z.array(song),
+    entry: z.array(song).optional(),
     id: z.string(),
     name: z.string(),
     owner: z.string(),

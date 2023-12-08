@@ -2,25 +2,15 @@ import type {
     BodyScrollEvent,
     ColDef,
     GridReadyEvent,
-    IDatasource,
     PaginationChangedEvent,
     RowDoubleClickedEvent,
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { useParams } from 'react-router';
-import { api } from '/@/renderer/api';
-import { queryKeys } from '/@/renderer/api/query-keys';
-import {
-    LibraryItem,
-    PlaylistSongListQuery,
-    QueueSong,
-    SongListSort,
-    SortOrder,
-} from '/@/renderer/api/types';
+import { LibraryItem, QueueSong, Song } from '/@/renderer/api/types';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 import { TablePagination, VirtualTable, getColumnDefs } from '/@/renderer/components/virtual-table';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
@@ -31,7 +21,7 @@ import {
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
-import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
+import { useAppFocus } from '/@/renderer/hooks';
 import {
     useCurrentServer,
     useCurrentSong,
@@ -43,26 +33,19 @@ import {
 } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { ListDisplayType } from '/@/renderer/types';
-import { useAppFocus } from '/@/renderer/hooks';
 
 interface PlaylistDetailContentProps {
+    songs: Song[];
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailContentProps) => {
+export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetailContentProps) => {
     const { playlistId } = useParams() as { playlistId: string };
-    const queryClient = useQueryClient();
     const status = useCurrentStatus();
     const isFocused = useAppFocus();
     const currentSong = useCurrentSong();
     const server = useCurrentServer();
     const page = usePlaylistDetailStore();
-    const filters: Partial<PlaylistSongListQuery> = useMemo(() => {
-        return {
-            sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
-            sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
-        };
-    }, [page?.table.id, playlistId]);
 
     const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
 
@@ -82,15 +65,6 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
 
     const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
 
-    const checkPlaylistList = usePlaylistSongList({
-        query: {
-            id: playlistId,
-            limit: 1,
-            startIndex: 0,
-        },
-        serverId: server?.id,
-    });
-
     const columnDefs: ColDef[] = useMemo(
         () => getColumnDefs(page.table.columns, false, 'generic'),
         [page.table.columns],
@@ -98,44 +72,9 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
 
     const onGridReady = useCallback(
         (params: GridReadyEvent) => {
-            const dataSource: IDatasource = {
-                getRows: async (params) => {
-                    const limit = params.endRow - params.startRow;
-                    const startIndex = params.startRow;
-
-                    const query: PlaylistSongListQuery = {
-                        id: playlistId,
-                        limit,
-                        startIndex,
-                        ...filters,
-                    };
-
-                    const queryKey = queryKeys.playlists.songList(
-                        server?.id || '',
-                        playlistId,
-                        query,
-                    );
-
-                    if (!server) return;
-
-                    const songsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-                        api.controller.getPlaylistSongList({
-                            apiClientProps: {
-                                server,
-                                signal,
-                            },
-                            query,
-                        }),
-                    );
-
-                    params.successCallback(songsRes?.items || [], songsRes?.totalRecordCount || 0);
-                },
-                rowCount: undefined,
-            };
-            params.api.setDatasource(dataSource);
             params.api?.ensureIndexVisible(pagination.scrollOffset, 'top');
         },
-        [filters, pagination.scrollOffset, playlistId, queryClient, server],
+        [pagination.scrollOffset],
     );
 
     const handleGridSizeChange = () => {
@@ -249,13 +188,13 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                         status,
                     }}
                     getRowId={(data) => data.data.uniqueId}
-                    infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 100}
                     pagination={isPaginationEnabled}
                     paginationAutoPageSize={isPaginationEnabled}
                     paginationPageSize={pagination.itemsPerPage || 100}
                     rowClassRules={rowClassRules}
+                    rowData={songs}
                     rowHeight={page.table.rowHeight || 40}
-                    rowModelType="infinite"
+                    rowModelType="clientSide"
                     onBodyScrollEnd={handleScroll}
                     onCellContextMenu={handleContextMenu}
                     onColumnMoved={handleColumnChange}

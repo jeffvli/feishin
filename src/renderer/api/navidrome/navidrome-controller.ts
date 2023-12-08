@@ -303,7 +303,7 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
         body: {
             comment: body.comment,
             name: body.name,
-            public: body._custom?.navidrome?.public,
+            public: body.public,
             rules: body._custom?.navidrome?.rules,
             sync: body._custom?.navidrome?.sync,
         },
@@ -410,12 +410,11 @@ const getPlaylistSongList = async (
             id: query.id,
         },
         query: {
-            _end: query.startIndex + (query.limit || 0),
             _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : 'ASC',
             _sort: query.sortBy
                 ? songListSortMap.navidrome[query.sortBy]
                 : ndType._enum.songList.ID,
-            _start: query.startIndex,
+            _start: 0,
         },
     });
 
@@ -425,7 +424,7 @@ const getPlaylistSongList = async (
 
     return {
         items: res.body.data.map((item) => ndNormalize.song(item, apiClientProps.server, '')),
-        startIndex: query?.startIndex || 0,
+        startIndex: 0,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };
 };

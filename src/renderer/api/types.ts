@@ -815,6 +815,7 @@ export type CreatePlaylistBody = {
     };
     comment?: string;
     name: string;
+    public?: boolean;
 };
 
 export type CreatePlaylistArgs = { body: CreatePlaylistBody; serverId?: string } & BaseEndpointArgs;
@@ -935,10 +936,9 @@ export type PlaylistSongListResponse = BasePaginatedResponse<Song[]> | null | un
 
 export type PlaylistSongListQuery = {
     id: string;
-    limit?: number;
-    sortBy?: SongListSort;
-    sortOrder?: SortOrder;
-    startIndex: number;
+    searchTerm?: string;
+    sortBy: SongListSort;
+    sortOrder: SortOrder;
 };
 
 export type PlaylistSongListArgs = { query: PlaylistSongListQuery } & BaseEndpointArgs;
