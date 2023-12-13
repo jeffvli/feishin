@@ -45,6 +45,14 @@ const getCoverArtUrl = (args: {
     );
 };
 
+interface WithDate {
+    playDate?: string;
+}
+
+const normalizePlayDate = (item: WithDate): string | null => {
+    return !item.playDate || item.playDate.includes('0001-') ? null : item.playDate;
+};
+
 const normalizeSong = (
     item: z.infer<typeof ndType._response.song> | z.infer<typeof ndType._response.playlistSong>,
     server: ServerListItem | null,
@@ -100,7 +108,7 @@ const normalizeSong = (
         imagePlaceholderUrl,
         imageUrl,
         itemType: LibraryItem.SONG,
-        lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
+        lastPlayedAt: normalizePlayDate(item),
         lyrics: item.lyrics ? item.lyrics : null,
         name: item.title,
         path: item.path,
@@ -159,7 +167,7 @@ const normalizeAlbum = (
         imageUrl,
         isCompilation: item.compilation,
         itemType: LibraryItem.ALBUM,
-        lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
+        lastPlayedAt: normalizePlayDate(item),
         name: item.name,
         playCount: item.playCount,
         releaseDate: new Date(item.minYear, 0, 1).toISOString(),
@@ -207,7 +215,7 @@ const normalizeAlbumArtist = (
         id: item.id,
         imageUrl: imageUrl || null,
         itemType: LibraryItem.ALBUM_ARTIST,
-        lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
+        lastPlayedAt: normalizePlayDate(item),
         name: item.name,
         playCount: item.playCount,
         serverId: server?.id || 'unknown',
