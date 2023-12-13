@@ -250,7 +250,18 @@
         "config": {
             "view": {
                 "table": "Tabelle"
+            },
+            "general": {
+                "tableColumns": "Tabellenspalten"
             }
+        },
+        "column": {
+            "releaseYear": "Jahr",
+            "biography": "Biografie",
+            "releaseDate": "Veröffentlichungsdatum",
+            "bitrate": "Bitrate",
+            "title": "Titel",
+            "path": "Pfad"
         }
     },
     "page": {
@@ -537,6 +548,9 @@
         "fontType": "Schriftartenquelle",
         "followLyric": "Songtext synchronisieren",
         "floatingQueueArea_description": "Zeige ein Icon auf der rechten Seite, um beim Darüberfahren die Wartschlange anzuzeigen",
-        "font_description": "Wähle die Schriftart für die Anwendung"
+        "font_description": "Wähle die Schriftart für die Anwendung",
+        "themeLight": "Thema (hell)",
+        "sidePlayQueueStyle_optionDetached": "lösgelöst",
+        "windowBarStyle_description": "Wähle den Stil der Windows-Leiste"
     }
 }
