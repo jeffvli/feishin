@@ -95,7 +95,8 @@
         "random": "slumpmässig",
         "size": "storlek",
         "biography": "biografi",
-        "note": "anteckning"
+        "note": "anteckning",
+        "center": "center"
     },
     "error": {
         "remotePortWarning": "starta om servern för att tillämpa den nya porten",
@@ -157,7 +158,9 @@
         "toYear": "till år",
         "fromYear": "från år",
         "album": "$t(entity.album_one)",
-        "trackNumber": "spår"
+        "trackNumber": "spår",
+        "songCount": "sångräkning",
+        "criticRating": "kritikerbetyg"
     },
     "form": {
         "deletePlaylist": {
@@ -218,8 +221,13 @@
                 "opacity": "ogenomskinlighet",
                 "lyricSize": "låttext storlek",
                 "lyricAlignment": "låttext justering",
-                "lyricGap": "låttext mellanrum"
-            }
+                "lyricGap": "låttext mellanrum",
+                "synchronized": "synkroniserad",
+                "showLyricProvider": "visa sångtextleverantör",
+                "unsynchronized": "osynkroniserad"
+            },
+            "lyrics": "sångtext",
+            "related": "relaterad"
         },
         "appMenu": {
             "selectServer": "välj server",
@@ -230,7 +238,8 @@
             "openBrowserDevtools": "öppna webbläsarens utvecklingsverktyg",
             "quit": "$t(common.quit)",
             "goBack": "gå tillbaka",
-            "goForward": "gå framåt"
+            "goForward": "gå framåt",
+            "collapseSidebar": "växla sidofältet"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -251,7 +260,7 @@
             "removeFromQueue": "$t(action.removeFromQueue)"
         },
         "albumDetail": {
-            "moreFromArtist": "Mer från $t(entity.genre_one)",
+            "moreFromArtist": "mer från $t(entity.genre_one)",
             "moreFromGeneric": "mer från {{item}}"
         },
         "albumArtistList": {
@@ -259,6 +268,29 @@
         },
         "albumList": {
             "title": "$t(entity.album_other)"
+        },
+        "sidebar": {
+            "nowPlaying": "nu spelas"
+        },
+        "home": {
+            "mostPlayed": "mest spelade",
+            "newlyAdded": "nytillkomna utgåvor",
+            "explore": "utforska från ditt bibliotek",
+            "recentlyPlayed": "nyligen spelat"
+        },
+        "setting": {
+            "playbackTab": "uppspelning",
+            "generalTab": "allmänt",
+            "hotkeysTab": "snabbtangenter",
+            "windowTab": "fönster"
+        },
+        "globalSearch": {
+            "commands": {
+                "serverCommands": "serverkommandon",
+                "goToPage": "gå till sidan",
+                "searchFor": "sök efter {{query}}"
+            },
+            "title": "kommandon"
         }
     },
     "entity": {
@@ -277,6 +309,37 @@
         "folder_one": "mapp",
         "folder_other": "mappar",
         "album_one": "album",
-        "album_other": "album"
+        "album_other": "album",
+        "playlistWithCount_one": "{{count}} spellista",
+        "playlistWithCount_other": "{{count}} spellistor",
+        "folderWithCount_one": "{{count}} mapp",
+        "folderWithCount_other": "{{count}} mappar",
+        "track_one": "spår",
+        "track_other": "spår",
+        "trackWithCount_one": "{{count}} spår",
+        "trackWithCount_other": "{{count}} spår"
+    },
+    "player": {
+        "repeat_all": "repetera alla",
+        "repeat": "repetera",
+        "queue_remove": "ta bort markerad",
+        "playRandom": "spela slumpmässigt",
+        "previous": "föregående",
+        "favorite": "favorit",
+        "next": "nästa",
+        "shuffle": "blanda",
+        "playbackFetchNoResults": "inga låtar hittades",
+        "playbackFetchInProgress": "laddar låtar…",
+        "addNext": "lägg till nästa",
+        "playbackSpeed": "uppspelningshastighet",
+        "playbackFetchCancel": "det här tar ett tag... stäng aviseringen för att avbryta",
+        "play": "spela",
+        "repeat_off": "repetera inaktiverad",
+        "queue_clear": "rensa kö",
+        "muted": "mutad",
+        "queue_moveToTop": "flytta markerad till botten",
+        "queue_moveToBottom": "flytta markerad till toppen",
+        "addLast": "lägg till sist",
+        "mute": "muta"
     }
 }
