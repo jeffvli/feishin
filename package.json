@@ -129,6 +129,8 @@
         "linux": {
             "target": [
                 "AppImage",
+                "deb",
+                "rpm",
                 "tar.xz"
             ],
             "icon": "assets/icons/icon.png",
