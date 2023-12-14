@@ -129,7 +129,6 @@
         "linux": {
             "target": [
                 "AppImage",
-                "deb",
                 "rpm",
                 "tar.xz"
             ],
