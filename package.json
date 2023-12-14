@@ -56,7 +56,7 @@
             "package.json"
         ],
         "afterSign": ".erb/scripts/notarize.js",
-        "electronVersion": "27.1.0",
+        "electronVersion": "27.1.3",
         "mac": {
             "target": {
                 "target": "default",
@@ -231,8 +231,8 @@
         "css-loader": "^6.7.1",
         "css-minimizer-webpack-plugin": "^3.4.1",
         "detect-port": "^1.3.0",
-        "electron": "^27.1.0",
-        "electron-builder": "^24.9.0",
+        "electron": "^27.1.3",
+        "electron-builder": "^24.9.1",
         "electron-devtools-installer": "^3.2.0",
         "electron-notarize": "^1.2.1",
         "electronmon": "^2.0.2",
