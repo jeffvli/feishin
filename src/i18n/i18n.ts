@@ -14,6 +14,8 @@ import ptBr from './locales/pt-BR.json';
 import sr from './locales/sr.json';
 import sv from './locales/sv.json';
 import cs from './locales/cs.json';
+import nbNO from './locales/nb-NO.json';
+import nl from './locales/nl.json';
 
 const resources = {
     en: { translation: en },
@@ -29,6 +31,8 @@ const resources = {
     sr: { translation: sr },
     sv: { translation: sv },
     cs: { translation: cs },
+    nl: { translation: nl },
+    'nb-NO': { translation: nbNO },
 };
 
 export const languages = [
@@ -61,9 +65,14 @@ export const languages = [
         value: 'ja',
     },
     {
-        label: 'Русский',
-        value: 'ru',
+        label: 'Nederlands',
+        value: 'nl',
     },
+    {
+        label: 'Norsk (Bokmål)',
+        value: 'nb-NO',
+    },
+
     {
         label: 'Português (Brasil)',
         value: 'pt-BR',
@@ -71,6 +80,10 @@ export const languages = [
     {
         label: 'Polski',
         value: 'pl',
+    },
+    {
+        label: 'Русский',
+        value: 'ru',
     },
     {
         label: 'Srpski',
