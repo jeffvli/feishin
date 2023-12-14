@@ -1,22 +1,19 @@
-import orderBy from 'lodash/orderBy';
-import shuffle from 'lodash/shuffle';
 import filter from 'lodash/filter';
-import reverse from 'lodash/reverse';
+import orderBy from 'lodash/orderBy';
 import md5 from 'md5';
 import { fsLog } from '/@/logger';
 import { subsonicApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { subsonicNormalize } from '/@/renderer/api/subsonic/subsonic-normalize';
 import { AlbumListSortType, SubsonicApi } from '/@/renderer/api/subsonic/subsonic-types';
 import {
-    AlbumArtistListSort,
     AlbumListSort,
     AuthenticationResponse,
     ControllerEndpoint,
     GenreListSort,
     LibraryItem,
     PlaylistListSort,
-    SongListSort,
 } from '/@/renderer/api/types';
+import { sortAlbumArtistList, sortSongList } from '/@/renderer/api/utils';
 import { randomString } from '/@/renderer/utils';
 
 const authenticate = async (
@@ -204,7 +201,6 @@ export const SubsonicController: ControllerEndpoint = {
     },
     getAlbumArtistList: async (args) => {
         const { query, apiClientProps } = args;
-        const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
 
         const res = await subsonicApiClient(apiClientProps).getArtists({
             query: {
@@ -221,8 +217,9 @@ export const SubsonicController: ControllerEndpoint = {
             (index) => index.artist,
         );
 
-        let results = artists;
-        let totalRecordCount = artists.length;
+        let results = artists.map((artist) =>
+            subsonicNormalize.albumArtist(artist, apiClientProps.server),
+        );
 
         if (query.searchTerm) {
             const searchResults = filter(results, (artist) => {
@@ -230,36 +227,16 @@ export const SubsonicController: ControllerEndpoint = {
             });
 
             results = searchResults;
-            totalRecordCount = searchResults.length;
         }
 
-        switch (query.sortBy) {
-            case AlbumArtistListSort.ALBUM_COUNT:
-                results = orderBy(
-                    artists,
-                    ['albumCount', (v) => v.name.toLowerCase()],
-                    [sortOrder, 'asc'],
-                );
-                break;
-            case AlbumArtistListSort.NAME:
-                results = orderBy(artists, [(v) => v.name.toLowerCase()], [sortOrder]);
-                break;
-            case AlbumArtistListSort.FAVORITED:
-                results = orderBy(artists, ['starred'], [sortOrder]);
-                break;
-            case AlbumArtistListSort.RATING:
-                results = orderBy(artists, ['userRating'], [sortOrder]);
-                break;
-            default:
-                break;
+        if (query.sortBy) {
+            sortAlbumArtistList(results, query.sortBy, query.sortOrder);
         }
 
         return {
-            items: results.map((artist) =>
-                subsonicNormalize.albumArtist(artist, apiClientProps.server),
-            ),
+            items: results,
             startIndex: query.startIndex,
-            totalRecordCount,
+            totalRecordCount: results?.length || 0,
         };
     },
     getAlbumArtistListCount: async (args) => {
@@ -665,7 +642,6 @@ export const SubsonicController: ControllerEndpoint = {
     },
     getPlaylistSongList: async (args) => {
         const { query, apiClientProps } = args;
-        const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
 
         const res = await subsonicApiClient(apiClientProps).getPlaylist({
             query: {
@@ -678,95 +654,25 @@ export const SubsonicController: ControllerEndpoint = {
             throw new Error('Failed to get playlist song list');
         }
 
-        let results = res.body['subsonic-response'].playlist.entry || [];
+        let results =
+            res.body['subsonic-response'].playlist.entry?.map((song) =>
+                subsonicNormalize.song(song, apiClientProps.server, ''),
+            ) || [];
 
         if (query.searchTerm) {
             const searchResults = filter(results, (entry) => {
-                return entry.title.toLowerCase().includes(query.searchTerm!.toLowerCase());
+                return entry.name.toLowerCase().includes(query.searchTerm!.toLowerCase());
             });
 
             results = searchResults;
         }
 
         if (query.sortBy) {
-            switch (query.sortBy) {
-                case SongListSort.ALBUM:
-                    results = orderBy(
-                        results,
-                        [(v) => v.album?.toLowerCase(), 'discNumber', 'track'],
-                        [sortOrder, 'asc', 'asc'],
-                    );
-                    break;
-                case SongListSort.ALBUM_ARTIST:
-                    results = orderBy(
-                        results,
-                        ['albumArtist', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
-                        [sortOrder, sortOrder, 'asc', 'asc'],
-                    );
-                    break;
-                case SongListSort.ARTIST:
-                    results = orderBy(
-                        results,
-                        ['artist', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
-                        [sortOrder, sortOrder, 'asc', 'asc'],
-                    );
-                    break;
-                case SongListSort.DURATION:
-                    results = orderBy(results, ['duration'], [sortOrder]);
-                    break;
-                case SongListSort.FAVORITED:
-                    results = orderBy(
-                        results,
-                        ['starred', (v) => v.title.toLowerCase()],
-                        [sortOrder],
-                    );
-                    break;
-                case SongListSort.GENRE:
-                    results = orderBy(
-                        results,
-                        ['genre', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
-                        [sortOrder, sortOrder, 'asc', 'asc'],
-                    );
-                    break;
-                case SongListSort.ID:
-                    if (sortOrder === 'desc') {
-                        results = reverse(results);
-                    }
-                    break;
-                case SongListSort.NAME:
-                    results = orderBy(results, [(v) => v.title.toLowerCase()], [sortOrder]);
-                    break;
-                case SongListSort.PLAY_COUNT:
-                    results = orderBy(results, ['playCount'], [sortOrder]);
-                    break;
-                case SongListSort.RANDOM:
-                    results = shuffle(results);
-                    break;
-                case SongListSort.RATING:
-                    results = orderBy(
-                        results,
-                        ['userRating', (v) => v.title.toLowerCase()],
-                        [sortOrder],
-                    );
-                    break;
-                case SongListSort.RECENTLY_ADDED:
-                    results = orderBy(results, ['created'], [sortOrder]);
-                    break;
-                case SongListSort.YEAR:
-                    results = orderBy(
-                        results,
-                        ['year', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
-                        [sortOrder, 'asc', 'asc', 'asc'],
-                    );
-                    break;
-
-                default:
-                    break;
-            }
+            sortSongList(results, query.sortBy, query.sortOrder);
         }
 
         return {
-            items: results?.map((song) => subsonicNormalize.song(song, apiClientProps.server, '')),
+            items: results,
             startIndex: 0,
             totalRecordCount: results?.length || 0,
         };
