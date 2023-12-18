@@ -12,7 +12,10 @@ export const getAlbumListCountQuery = (query: AlbumListQuery) => {
     if (query.maxYear) filter.maxYear = query.maxYear;
     if (query.minYear) filter.minYear = query.minYear;
     if (query.searchTerm) filter.searchTerm = query.searchTerm;
+    if (query.genre) filter.genre = query.genre;
     if (query.musicFolderId) filter.musicFolderId = query.musicFolderId;
+    if (query.isCompilation) filter.isCompilation = query.isCompilation;
+    if (query.isFavorite) filter.isCompilation = query.isFavorite;
 
     if (Object.keys(filter).length === 0) return undefined;
 

@@ -378,6 +378,7 @@ export type AlbumListQuery = {
     artistIds?: string[];
     genre?: string;
     isCompilation?: boolean;
+    isFavorite?: boolean;
     limit?: number;
     maxYear?: number;
     minYear?: number;

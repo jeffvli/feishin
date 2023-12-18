@@ -80,7 +80,7 @@ export const useListFilterRefresh = ({
 
                     const queryKey = queryKeyFn(server?.id || '', query);
 
-                    const res = await queryClient.fetchQuery({
+                    const results = (await queryClient.fetchQuery({
                         queryFn: async ({ signal }) => {
                             return queryFn({
                                 apiClientProps: {
@@ -91,23 +91,39 @@ export const useListFilterRefresh = ({
                             });
                         },
                         queryKey,
-                    });
+                    })) as BasePaginatedResponse<any>;
 
-                    if (isClientSideSort && res?.items) {
+                    if (isClientSideSort && results?.items) {
                         const sortedResults = orderBy(
-                            res.items,
+                            results.items,
                             [(item) => String(item[filter.sortBy]).toLowerCase()],
                             filter.sortOrder === 'DESC' ? ['desc'] : ['asc'],
                         );
 
                         params.successCallback(
                             sortedResults || [],
-                            res?.totalRecordCount || itemCount,
+                            results?.totalRecordCount || itemCount,
                         );
                         return;
                     }
 
-                    params.successCallback(res?.items || [], res?.totalRecordCount || itemCount);
+                    if (results.totalRecordCount === null) {
+                        const hasMoreRows = results?.items?.length === filter.limit;
+                        const lastRowIndex = hasMoreRows
+                            ? undefined
+                            : (filter.offset || 0) + results.items.length;
+
+                        params.successCallback(
+                            results?.items || [],
+                            hasMoreRows ? undefined : lastRowIndex,
+                        );
+                        return;
+                    }
+
+                    params.successCallback(
+                        results?.items || [],
+                        results?.totalRecordCount || itemCount,
+                    );
                 },
 
                 rowCount: undefined,

@@ -3,8 +3,10 @@ import { toast } from '/@/renderer/components';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem } from '/@/renderer/types';
 import {
+    Album,
     AlbumArtist,
     AlbumArtistListSort,
+    AlbumListSort,
     QueueSong,
     SongListSort,
     SortOrder,
@@ -47,6 +49,56 @@ export const authenticationFailure = (currentServer: ServerListItem | null) => {
         useAuthStore.getState().actions.updateServer(serverId, { ndCredential: undefined });
         useAuthStore.getState().actions.setCurrentServer(null);
     }
+};
+
+export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder: SortOrder) => {
+    let results = albums;
+
+    const order = sortOrder === SortOrder.ASC ? 'asc' : 'desc';
+
+    switch (sortBy) {
+        case AlbumListSort.ALBUM_ARTIST:
+            results = orderBy(
+                results,
+                ['albumArtist', (v) => v.name.toLowerCase()],
+                [order, 'asc'],
+            );
+            break;
+        case AlbumListSort.DURATION:
+            results = orderBy(results, ['duration'], [order]);
+            break;
+        case AlbumListSort.FAVORITED:
+            results = orderBy(results, ['starred'], [order]);
+            break;
+        case AlbumListSort.NAME:
+            results = orderBy(results, [(v) => v.name.toLowerCase()], [order]);
+            break;
+        case AlbumListSort.PLAY_COUNT:
+            results = orderBy(results, ['playCount'], [order]);
+            break;
+        case AlbumListSort.RANDOM:
+            results = shuffle(results);
+            break;
+        case AlbumListSort.RECENTLY_ADDED:
+            results = orderBy(results, ['createdAt'], [order]);
+            break;
+        case AlbumListSort.RECENTLY_PLAYED:
+            results = orderBy(results, ['lastPlayedAt'], [order]);
+            break;
+        case AlbumListSort.RATING:
+            results = orderBy(results, ['userRating'], [order]);
+            break;
+        case AlbumListSort.YEAR:
+            results = orderBy(results, ['releaseYear'], [order]);
+            break;
+        case AlbumListSort.SONG_COUNT:
+            results = orderBy(results, ['songCount'], [order]);
+            break;
+        default:
+            break;
+    }
+
+    return results;
 };
 
 export const sortSongList = (songs: QueueSong[], sortBy: SongListSort, sortOrder: SortOrder) => {

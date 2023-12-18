@@ -22,6 +22,7 @@ import { ALBUM_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
 import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
 import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
+import { SubsonicAlbumFilters } from '/@/renderer/features/albums/components/subsonic-album-filters';
 import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
@@ -233,27 +234,35 @@ export const AlbumListHeaderFilters = ({
     );
 
     const handleOpenFiltersModal = () => {
+        let FilterComponent;
+
+        switch (server?.type) {
+            case ServerType.NAVIDROME:
+                FilterComponent = NavidromeAlbumFilters;
+                break;
+            case ServerType.JELLYFIN:
+                FilterComponent = JellyfinAlbumFilters;
+                break;
+            case ServerType.SUBSONIC:
+                FilterComponent = SubsonicAlbumFilters;
+                break;
+            default:
+                break;
+        }
+
+        if (!FilterComponent) {
+            return;
+        }
+
         openModal({
             children: (
-                <>
-                    {server?.type === ServerType.NAVIDROME ? (
-                        <NavidromeAlbumFilters
-                            customFilters={customFilters}
-                            disableArtistFilter={!!customFilters}
-                            pageKey={pageKey}
-                            serverId={server?.id}
-                            onFilterChange={onFilterChange}
-                        />
-                    ) : (
-                        <JellyfinAlbumFilters
-                            customFilters={customFilters}
-                            disableArtistFilter={!!customFilters}
-                            pageKey={pageKey}
-                            serverId={server?.id}
-                            onFilterChange={onFilterChange}
-                        />
-                    )}
-                </>
+                <FilterComponent
+                    customFilters={customFilters}
+                    disableArtistFilter={!!customFilters}
+                    pageKey={pageKey}
+                    serverId={server?.id}
+                    onFilterChange={onFilterChange}
+                />
             ),
             title: 'Album Filters',
         });
@@ -389,8 +398,20 @@ export const AlbumListHeaderFilters = ({
             filter?._custom?.jellyfin &&
             Object.values(filter?._custom?.jellyfin).some((value) => value !== undefined);
 
-        return isNavidromeFilterApplied || isJellyfinFilterApplied;
-    }, [filter?._custom?.jellyfin, filter?._custom?.navidrome, server?.type]);
+        const isSubsonicFilterApplied =
+            server?.type === ServerType.SUBSONIC &&
+            (filter.maxYear || filter.minYear || filter.genre || filter.isFavorite);
+
+        return isNavidromeFilterApplied || isJellyfinFilterApplied || isSubsonicFilterApplied;
+    }, [
+        filter?._custom?.jellyfin,
+        filter?._custom?.navidrome,
+        filter.genre,
+        filter.isFavorite,
+        filter.maxYear,
+        filter.minYear,
+        server?.type,
+    ]);
 
     const isFolderFilterApplied = useMemo(() => {
         return filter.musicFolderId !== undefined;

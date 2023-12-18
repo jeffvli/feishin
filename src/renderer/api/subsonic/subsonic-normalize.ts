@@ -153,13 +153,14 @@ const normalizeAlbum = (
         | z.infer<typeof SubsonicApi._baseTypes.album>
         | z.infer<typeof SubsonicApi._baseTypes.albumListEntry>,
     server: ServerListItem | null,
+    size?: number,
 ): Album => {
     const imageUrl =
         getCoverArtUrl({
             baseUrl: server?.url,
             coverArtId: item.coverArt,
             credential: server?.credential,
-            size: 300,
+            size: size || 300,
         }) || null;
 
     return {
