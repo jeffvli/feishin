@@ -1,6 +1,6 @@
 import { RandomSongListArgs } from './types';
 import i18n from '/@/i18n/i18n';
-import { jfController } from '/@/renderer/api/jellyfin/jellyfin-controller';
+import { JellyfinController } from '/@/renderer/api/jellyfin/jellyfin-controller';
 import { NavidromeController } from '/@/renderer/api/navidrome/navidrome-controller';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
 import type {
@@ -41,42 +41,7 @@ type ApiController = {
 };
 
 const endpoints: ApiController = {
-    jellyfin: {
-        addToPlaylist: jfController.addToPlaylist,
-        authenticate: jfController.authenticate,
-        clearPlaylist: undefined,
-        createFavorite: jfController.createFavorite,
-        createPlaylist: jfController.createPlaylist,
-        deleteFavorite: jfController.deleteFavorite,
-        deletePlaylist: jfController.deletePlaylist,
-        getAlbumArtistDetail: jfController.getAlbumArtistDetail,
-        getAlbumArtistList: jfController.getAlbumArtistList,
-        getAlbumDetail: jfController.getAlbumDetail,
-        getAlbumList: jfController.getAlbumList,
-        getArtistDetail: undefined,
-        getArtistInfo: undefined,
-        getArtistList: undefined,
-        getFavoritesList: undefined,
-        getFolderItemList: undefined,
-        getFolderList: undefined,
-        getFolderSongs: undefined,
-        getGenreList: jfController.getGenreList,
-        getLyrics: jfController.getLyrics,
-        getMusicFolderList: jfController.getMusicFolderList,
-        getPlaylistDetail: jfController.getPlaylistDetail,
-        getPlaylistList: jfController.getPlaylistList,
-        getPlaylistSongList: jfController.getPlaylistSongList,
-        getRandomSongList: jfController.getRandomSongList,
-        getSongDetail: jfController.getSongDetail,
-        getSongList: jfController.getSongList,
-        getTopSongs: jfController.getTopSongList,
-        getUserList: undefined,
-        removeFromPlaylist: jfController.removeFromPlaylist,
-        scrobble: jfController.scrobble,
-        search: jfController.search,
-        setRating: undefined,
-        updatePlaylist: jfController.updatePlaylist,
-    },
+    jellyfin: JellyfinController,
     navidrome: NavidromeController,
     subsonic: SubsonicController,
 };
