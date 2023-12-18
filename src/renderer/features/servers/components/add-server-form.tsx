@@ -33,11 +33,11 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const form = useForm({
         initialValues: {
             legacyAuth: false,
-            name: '',
+            name: !isElectron() ? window.SERVER_NAME : process?.env.SERVER_NAME?? '' ,
             password: '',
             savePassword: false,
-            type: ServerType.JELLYFIN,
-            url: 'http://',
+            type: !isElectron() ? window.SERVER_TYPE.toLowerCase() : process?.env.SERVER_TYPE?.toLowerCase() ?? ServerType.JELLYFIN,
+            url: !isElectron() ? window.SERVER_URL : process?.env.SERVER_URL ?? 'https://',
             username: '',
         },
     });
@@ -62,7 +62,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     password: values.password,
                     username: values.username,
                 },
-                values.type,
+                values.type as ServerType,
             );
 
             if (!data) {
@@ -76,7 +76,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 id: nanoid(),
                 name: values.name,
                 ndCredential: data.ndCredential,
-                type: values.type,
+                type: values.type as ServerType,
                 url: values.url.replace(/\/$/, ''),
                 userId: data.userId,
                 username: data.username,
@@ -117,6 +117,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             >
                 <SegmentedControl
                     data={SERVER_TYPES}
+                    disabled = {!isElectron() ? !!window.SERVER_LOCK : !!process?.env.SERVER_LOCK ?? false}
                     {...form.getInputProps('type')}
                 />
                 <Group grow>
@@ -126,6 +127,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             context: 'name',
                             postProcess: 'titleCase',
                         })}
+                        disabled = {!isElectron() ? !!window.SERVER_LOCK : !!process?.env.SERVER_LOCK ?? false}
                         {...form.getInputProps('name')}
                     />
                     <TextInput
@@ -133,6 +135,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             context: 'url',
                             postProcess: 'titleCase',
                         })}
+                        disabled = {!isElectron() ? !!window.SERVER_LOCK : !!process?.env.SERVER_LOCK ?? false}
                         {...form.getInputProps('url')}
                     />
                 </Group>

@@ -14,8 +14,10 @@ RUN npm run build:web
 FROM nginx:alpine-slim
 
 COPY --chown=nginx:nginx --from=builder /app/release/app/dist/web /usr/share/nginx/html
+COPY ./settings.js.template /settings.js.template
+RUN envsubst < /settings.js.template > /usr/share/nginx/html/settings.js
 COPY ng.conf.template /etc/nginx/templates/default.conf.template
 
 ENV PUBLIC_PATH="/"
 EXPOSE 9180
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/bin/sh", "-c", "envsubst < /settings.js.template > /usr/share/nginx/html/settings.js && envsubst '${PUBLIC_PATH}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
