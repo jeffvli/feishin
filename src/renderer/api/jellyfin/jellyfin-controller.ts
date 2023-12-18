@@ -1,62 +1,64 @@
+import isElectron from 'is-electron';
+import { z } from 'zod';
+import packageJson from '../../../../package.json';
+import { jfNormalize } from './jellyfin-normalize';
+import { JFSongListSort, JFSortOrder } from '/@/renderer/api/jellyfin.types';
+import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
+import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
 import {
-    AuthenticationResponse,
-    MusicFolderListArgs,
-    MusicFolderListResponse,
-    GenreListArgs,
-    AlbumArtistDetailArgs,
-    AlbumArtistListArgs,
-    albumArtistListSortMap,
-    sortOrderMap,
-    ArtistListArgs,
-    artistListSortMap,
-    AlbumDetailArgs,
-    AlbumListArgs,
-    albumListSortMap,
-    TopSongListArgs,
-    SongListArgs,
-    songListSortMap,
     AddToPlaylistArgs,
-    RemoveFromPlaylistArgs,
-    PlaylistDetailArgs,
-    PlaylistSongListArgs,
-    PlaylistListArgs,
-    playlistListSortMap,
+    AddToPlaylistResponse,
+    AlbumArtistDetailArgs,
+    AlbumArtistDetailResponse,
+    AlbumArtistListArgs,
+    AlbumArtistListResponse,
+    AlbumDetailArgs,
+    AlbumDetailResponse,
+    AlbumListArgs,
+    AlbumListResponse,
+    AuthenticationResponse,
+    ControllerEndpoint,
     CreatePlaylistArgs,
     CreatePlaylistResponse,
-    UpdatePlaylistArgs,
-    UpdatePlaylistResponse,
     DeletePlaylistArgs,
     FavoriteArgs,
     FavoriteResponse,
-    ScrobbleArgs,
-    ScrobbleResponse,
+    GenreListArgs,
     GenreListResponse,
-    AlbumArtistDetailResponse,
-    AlbumArtistListResponse,
-    AlbumDetailResponse,
-    AlbumListResponse,
-    SongListResponse,
-    AddToPlaylistResponse,
-    RemoveFromPlaylistResponse,
-    PlaylistDetailResponse,
-    PlaylistListResponse,
-    SearchArgs,
-    SearchResponse,
-    RandomSongListResponse,
-    RandomSongListArgs,
     LyricsArgs,
     LyricsResponse,
-    genreListSortMap,
+    MusicFolderListArgs,
+    MusicFolderListResponse,
+    PlaylistDetailArgs,
+    PlaylistDetailResponse,
+    PlaylistListArgs,
+    PlaylistListResponse,
+    PlaylistSongListArgs,
+    RandomSongListArgs,
+    RandomSongListResponse,
+    RemoveFromPlaylistArgs,
+    RemoveFromPlaylistResponse,
+    ScrobbleArgs,
+    ScrobbleResponse,
+    SearchArgs,
+    SearchResponse,
     SongDetailArgs,
     SongDetailResponse,
+    SongListArgs,
+    SongListResponse,
+    SongListSort,
+    SortOrder,
+    TopSongListArgs,
+    UpdatePlaylistArgs,
+    UpdatePlaylistResponse,
+    albumArtistListSortMap,
+    albumListSortMap,
+    genreListSortMap,
+    playlistListSortMap,
+    songListSortMap,
+    sortOrderMap,
 } from '/@/renderer/api/types';
-import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
-import { jfNormalize } from './jellyfin-normalize';
-import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
-import packageJson from '../../../../package.json';
-import { z } from 'zod';
-import { JFSongListSort, JFSortOrder } from '/@/renderer/api/jellyfin.types';
-import isElectron from 'is-electron';
+import { sortSongList } from '/@/renderer/api/utils';
 
 const formatCommaDelimitedString = (value: string[]) => {
     return value.join(',');
@@ -244,30 +246,55 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<AlbumArtis
     };
 };
 
-const getArtistList = async (args: ArtistListArgs): Promise<AlbumArtistListResponse> => {
+const getAlbumArtistListCount = async (args: AlbumArtistListArgs): Promise<number> => {
     const { query, apiClientProps } = args;
 
     const res = await jfApiClient(apiClientProps).getAlbumArtistList({
         query: {
-            Limit: query.limit,
+            Fields: 'Genres, DateCreated, ExternalUrls, Overview',
+            ImageTypeLimit: 1,
+            Limit: 1,
             ParentId: query.musicFolderId,
             Recursive: true,
-            SortBy: artistListSortMap.jellyfin[query.sortBy] || 'Name,SortName',
+            SearchTerm: query.searchTerm,
+            SortBy: albumArtistListSortMap.jellyfin[query.sortBy] || 'Name,SortName',
             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
-            StartIndex: query.startIndex,
+            StartIndex: 0,
+            UserId: apiClientProps.server?.userId || undefined,
         },
     });
 
     if (res.status !== 200) {
-        throw new Error('Failed to get artist list');
+        throw new Error('Failed to get album artist list count');
     }
 
-    return {
-        items: res.body.Items.map((item) => jfNormalize.albumArtist(item, apiClientProps.server)),
-        startIndex: query.startIndex,
-        totalRecordCount: res.body.TotalRecordCount,
-    };
+    return res.body.TotalRecordCount;
 };
+
+// const getArtistList = async (args: ArtistListArgs): Promise<ArtistListResponse> => {
+//     const { query, apiClientProps } = args;
+
+//     const res = await jfApiClient(apiClientProps).getAlbumArtistList({
+//         query: {
+//             Limit: query.limit,
+//             ParentId: query.musicFolderId,
+//             Recursive: true,
+//             SortBy: artistListSortMap.jellyfin[query.sortBy] || 'Name,SortName',
+//             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
+//             StartIndex: query.startIndex,
+//         },
+//     });
+
+//     if (res.status !== 200) {
+//         throw new Error('Failed to get artist list');
+//     }
+
+//     return {
+//         items: res.body.Items.map((item) => jfNormalize.albumArtist(item, apiClientProps.server)),
+//         startIndex: query.startIndex,
+//         totalRecordCount: res.body.TotalRecordCount,
+//     };
+// };
 
 const getAlbumDetail = async (args: AlbumDetailArgs): Promise<AlbumDetailResponse> => {
     const { query, apiClientProps } = args;
@@ -358,6 +385,55 @@ const getAlbumList = async (args: AlbumListArgs): Promise<AlbumListResponse> => 
     };
 };
 
+const getAlbumListCount = async (args: AlbumListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    if (!apiClientProps.server?.userId) {
+        throw new Error('No userId found');
+    }
+
+    const yearsGroup = [];
+    if (query._custom?.jellyfin?.minYear && query._custom?.jellyfin?.maxYear) {
+        for (
+            let i = Number(query._custom?.jellyfin?.minYear);
+            i <= Number(query._custom?.jellyfin?.maxYear);
+            i += 1
+        ) {
+            yearsGroup.push(String(i));
+        }
+    }
+
+    const yearsFilter = yearsGroup.length ? yearsGroup.join(',') : undefined;
+
+    const res = await jfApiClient(apiClientProps).getAlbumList({
+        params: {
+            userId: apiClientProps.server?.userId,
+        },
+        query: {
+            AlbumArtistIds: query.artistIds
+                ? formatCommaDelimitedString(query.artistIds)
+                : undefined,
+            ContributingArtistIds: query.isCompilation ? query.artistIds?.[0] : undefined,
+            IncludeItemTypes: 'MusicAlbum',
+            Limit: 1,
+            ParentId: query.musicFolderId,
+            Recursive: true,
+            SearchTerm: query.searchTerm,
+            SortBy: albumListSortMap.jellyfin[query.sortBy] || 'SortName',
+            SortOrder: sortOrderMap.jellyfin[query.sortOrder],
+            StartIndex: 0,
+            ...query._custom?.jellyfin,
+            Years: yearsFilter,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get album list count');
+    }
+
+    return res.body.TotalRecordCount;
+};
+
 const getTopSongList = async (args: TopSongListArgs): Promise<SongListResponse> => {
     const { apiClientProps, query } = args;
 
@@ -385,8 +461,11 @@ const getTopSongList = async (args: TopSongListArgs): Promise<SongListResponse> 
         throw new Error('Failed to get top song list');
     }
 
+    const songs = res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server, ''));
+    const songsByPlayCount = sortSongList(songs, SongListSort.PLAY_COUNT, SortOrder.DESC);
+
     return {
-        items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
+        items: songsByPlayCount,
         startIndex: 0,
         totalRecordCount: res.body.TotalRecordCount,
     };
@@ -450,6 +529,58 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
     };
 };
 
+const getSongListCount = async (args: SongListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    if (!apiClientProps.server?.userId) {
+        throw new Error('No userId found');
+    }
+
+    const yearsGroup = [];
+    if (query._custom?.jellyfin?.minYear && query._custom?.jellyfin?.maxYear) {
+        for (
+            let i = Number(query._custom?.jellyfin?.minYear);
+            i <= Number(query._custom?.jellyfin?.maxYear);
+            i += 1
+        ) {
+            yearsGroup.push(String(i));
+        }
+    }
+
+    const yearsFilter = yearsGroup.length ? formatCommaDelimitedString(yearsGroup) : undefined;
+    const albumIdsFilter = query.albumIds ? formatCommaDelimitedString(query.albumIds) : undefined;
+    const artistIdsFilter = query.artistIds
+        ? formatCommaDelimitedString(query.artistIds)
+        : undefined;
+
+    const res = await jfApiClient(apiClientProps).getSongList({
+        params: {
+            userId: apiClientProps.server?.userId,
+        },
+        query: {
+            AlbumIds: albumIdsFilter,
+            ArtistIds: artistIdsFilter,
+            Fields: 'Genres, DateCreated, MediaSources, ParentId',
+            IncludeItemTypes: 'Audio',
+            Limit: 1,
+            ParentId: query.musicFolderId,
+            Recursive: true,
+            SearchTerm: query.searchTerm,
+            SortBy: songListSortMap.jellyfin[query.sortBy] || 'Album,SortName',
+            SortOrder: sortOrderMap.jellyfin[query.sortOrder],
+            StartIndex: 0,
+            ...query._custom?.jellyfin,
+            Years: yearsFilter,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get song list count');
+    }
+
+    return res.body.TotalRecordCount;
+};
+
 const addToPlaylist = async (args: AddToPlaylistArgs): Promise<AddToPlaylistResponse> => {
     const { query, body, apiClientProps } = args;
 
@@ -481,6 +612,7 @@ const removeFromPlaylist = async (
     const { query, apiClientProps } = args;
 
     const res = await jfApiClient(apiClientProps).removeFromPlaylist({
+        body: null,
         params: {
             id: query.id,
         },
@@ -588,6 +720,37 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
     };
 };
 
+const getPlaylistListCount = async (args: PlaylistListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    if (!apiClientProps.server?.userId) {
+        throw new Error('No userId found');
+    }
+
+    const res = await jfApiClient(apiClientProps).getPlaylistList({
+        params: {
+            userId: apiClientProps.server?.userId,
+        },
+        query: {
+            Fields: 'ChildCount, Genres, DateCreated, ParentId, Overview',
+            IncludeItemTypes: 'Playlist',
+            Limit: 1,
+            MediaTypes: 'Audio',
+            Recursive: true,
+            SearchTerm: query.searchTerm,
+            SortBy: playlistListSortMap.jellyfin[query.sortBy],
+            SortOrder: sortOrderMap.jellyfin[query.sortOrder],
+            StartIndex: 0,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get playlist list count');
+    }
+
+    return res.body.TotalRecordCount;
+};
+
 const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistResponse> => {
     const { body, apiClientProps } = args;
 
@@ -647,6 +810,7 @@ const deletePlaylist = async (args: DeletePlaylistArgs): Promise<null> => {
     const { query, apiClientProps } = args;
 
     const res = await jfApiClient(apiClientProps).deletePlaylist({
+        body: null,
         params: {
             id: query.id,
         },
@@ -944,7 +1108,7 @@ const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> 
     return jfNormalize.song(res.body, apiClientProps.server, '');
 };
 
-export const jfController = {
+export const JellyfinController: ControllerEndpoint = {
     addToPlaylist,
     authenticate,
     createFavorite,
@@ -953,19 +1117,22 @@ export const jfController = {
     deletePlaylist,
     getAlbumArtistDetail,
     getAlbumArtistList,
+    getAlbumArtistListCount,
     getAlbumDetail,
     getAlbumList,
-    getArtistList,
+    getAlbumListCount,
     getGenreList,
     getLyrics,
     getMusicFolderList,
     getPlaylistDetail,
     getPlaylistList,
+    getPlaylistListCount,
     getPlaylistSongList,
     getRandomSongList,
     getSongDetail,
     getSongList,
-    getTopSongList,
+    getSongListCount,
+    getTopSongs: getTopSongList,
     removeFromPlaylist,
     scrobble,
     search,

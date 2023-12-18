@@ -194,6 +194,27 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<AlbumArtis
     };
 };
 
+const getAlbumArtistListCount = async (args: AlbumArtistListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    const res = await ndApiClient(apiClientProps).getAlbumArtistList({
+        query: {
+            _end: 1,
+            _order: sortOrderMap.navidrome[query.sortOrder],
+            _sort: albumArtistListSortMap.navidrome[query.sortBy],
+            _start: 0,
+            name: query.searchTerm,
+            ...query._custom?.navidrome,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get album artist list count');
+    }
+
+    return Number(res.body.headers.get('x-total-count') || 0);
+};
+
 const getAlbumDetail = async (args: AlbumDetailArgs): Promise<AlbumDetailResponse> => {
     const { query, apiClientProps } = args;
 
@@ -251,6 +272,30 @@ const getAlbumList = async (args: AlbumListArgs): Promise<AlbumListResponse> => 
     };
 };
 
+const getAlbumListCount = async (args: AlbumListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    const res = await ndApiClient(apiClientProps).getAlbumList({
+        query: {
+            _end: 1,
+            _order: sortOrderMap.navidrome[query.sortOrder],
+            _sort: albumListSortMap.navidrome[query.sortBy],
+            _start: 0,
+            artist_id: query.artistIds?.[0],
+            compilation: query.isCompilation,
+            genre_id: query.genre,
+            name: query.searchTerm,
+            ...query._custom?.navidrome,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get album list');
+    }
+
+    return Number(res.body.headers.get('x-total-count') || 0);
+};
+
 const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
     const { query, apiClientProps } = args;
 
@@ -278,6 +323,29 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
         startIndex: query?.startIndex || 0,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };
+};
+
+const getSongListCount = async (args: SongListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    const res = await ndApiClient(apiClientProps).getSongList({
+        query: {
+            _end: 1,
+            _order: sortOrderMap.navidrome[query.sortOrder],
+            _sort: songListSortMap.navidrome[query.sortBy],
+            _start: 0,
+            album_artist_id: query.artistIds,
+            album_id: query.albumIds,
+            title: query.searchTerm,
+            ...query._custom?.navidrome,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get song list count');
+    }
+
+    return Number(res.body.headers.get('x-total-count') || 0);
 };
 
 const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> => {
@@ -345,6 +413,7 @@ const deletePlaylist = async (args: DeletePlaylistArgs): Promise<DeletePlaylistR
     const { query, apiClientProps } = args;
 
     const res = await ndApiClient(apiClientProps).deletePlaylist({
+        body: null,
         params: {
             id: query.id,
         },
@@ -382,6 +451,29 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
         startIndex: query?.startIndex || 0,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };
+};
+
+const getPlaylistListCount = async (args: PlaylistListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    const res = await ndApiClient(apiClientProps).getPlaylistList({
+        query: {
+            _end: 1,
+            _order: sortOrderMap.navidrome[query.sortOrder],
+            _sort: query.sortBy
+                ? playlistListSortMap.navidrome[query.sortBy]
+                : playlistListSortMap.navidrome.name,
+            _start: 0,
+            q: query.searchTerm,
+            ...query._custom?.navidrome,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get playlist list count');
+    }
+
+    return Number(res.body.headers.get('x-total-count') || 0);
 };
 
 const getPlaylistDetail = async (args: PlaylistDetailArgs): Promise<PlaylistDetailResponse> => {
@@ -454,6 +546,7 @@ const removeFromPlaylist = async (
     const { query, apiClientProps } = args;
 
     const res = await ndApiClient(apiClientProps).removeFromPlaylist({
+        body: null,
         params: {
             id: query.id,
         },
@@ -479,8 +572,10 @@ export const NavidromeController: ControllerEndpoint = {
     deletePlaylist,
     getAlbumArtistDetail,
     getAlbumArtistList,
+    getAlbumArtistListCount,
     getAlbumDetail,
     getAlbumList,
+    getAlbumListCount,
     getArtistDetail: undefined,
     getArtistInfo: undefined,
     getFavoritesList: undefined,
@@ -491,35 +586,17 @@ export const NavidromeController: ControllerEndpoint = {
     getMusicFolderList: SubsonicController.getMusicFolderList,
     getPlaylistDetail,
     getPlaylistList,
+    getPlaylistListCount,
     getPlaylistSongList,
     getRandomSongList: SubsonicController.getRandomSongList,
     getSongDetail,
     getSongList,
+    getSongListCount,
     getTopSongs: SubsonicController.getTopSongs,
     getUserList,
     removeFromPlaylist,
     scrobble: SubsonicController.scrobble,
     search: SubsonicController.search,
     setRating: SubsonicController.setRating,
-    updatePlaylist,
-};
-
-export const ndController = {
-    addToPlaylist,
-    authenticate,
-    createPlaylist,
-    deletePlaylist,
-    getAlbumArtistDetail,
-    getAlbumArtistList,
-    getAlbumDetail,
-    getAlbumList,
-    getGenreList,
-    getPlaylistDetail,
-    getPlaylistList,
-    getPlaylistSongList,
-    getSongDetail,
-    getSongList,
-    getUserList,
-    removeFromPlaylist,
     updatePlaylist,
 };
