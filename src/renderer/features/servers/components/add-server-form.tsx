@@ -36,7 +36,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             name: !isElectron() ? window.SERVER_NAME : process?.env.SERVER_NAME?? '' ,
             password: '',
             savePassword: false,
-            type: !isElectron() ? window.SERVER_TYPE.toLowerCase() : process?.env.SERVER_TYPE?.toLowerCase() ?? ServerType.JELLYFIN,
+            type: !isElectron() ? window.SERVER_TYPE?.toLowerCase() : process?.env.SERVER_TYPE?.toLowerCase() ?? ServerType.JELLYFIN,
             url: !isElectron() ? window.SERVER_URL : process?.env.SERVER_URL ?? 'https://',
             username: '',
         },
