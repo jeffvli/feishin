@@ -15,7 +15,6 @@ FROM nginx:alpine-slim
 
 COPY --chown=nginx:nginx --from=builder /app/release/app/dist/web /usr/share/nginx/html
 COPY ./settings.js.template /settings.js.template
-RUN envsubst < /settings.js.template > /usr/share/nginx/html/settings.js
 COPY ng.conf.template /etc/nginx/templates/default.conf.template
 
 ENV PUBLIC_PATH="/"
