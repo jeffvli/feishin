@@ -231,7 +231,7 @@ export const SubsonicController: ControllerEndpoint = {
         }
 
         if (query.sortBy) {
-            sortAlbumArtistList(results, query.sortBy, query.sortOrder);
+            results = sortAlbumArtistList(results, query.sortBy, query.sortOrder);
         }
 
         return {
@@ -818,7 +818,7 @@ export const SubsonicController: ControllerEndpoint = {
         }
 
         if (query.sortBy) {
-            sortSongList(results, query.sortBy, query.sortOrder);
+            results = sortSongList(results, query.sortBy, query.sortOrder);
         }
 
         return {
