@@ -36,6 +36,7 @@ const TrackListRoute = () => {
                         genre_id: genreId,
                     },
                 },
+                genre: genreId,
                 genreId,
             }),
         };

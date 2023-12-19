@@ -492,8 +492,10 @@ export type SongListQuery = {
     };
     albumIds?: string[];
     artistIds?: string[];
+    genre?: string;
     genreId?: string;
     imageSize?: number;
+    isFavorite?: boolean;
     limit?: number;
     maxYear?: number;
     minYear?: number;

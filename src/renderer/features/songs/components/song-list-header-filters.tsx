@@ -29,6 +29,7 @@ import { queryClient } from '/@/renderer/lib/react-query';
 import { SongListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { ListDisplayType, Play, ServerType, TableColumn } from '/@/renderer/types';
 import i18n from '/@/i18n/i18n';
+import { SubsonicSongFilters } from '/@/renderer/features/songs/components/subsonic-song-filters';
 
 const FILTERS = {
     jellyfin: [
@@ -400,25 +401,34 @@ export const SongListHeaderFilters = ({
     };
 
     const handleOpenFiltersModal = () => {
+        let FilterComponent;
+
+        switch (server?.type) {
+            case ServerType.NAVIDROME:
+                FilterComponent = NavidromeSongFilters;
+                break;
+            case ServerType.JELLYFIN:
+                FilterComponent = JellyfinSongFilters;
+                break;
+            case ServerType.SUBSONIC:
+                FilterComponent = SubsonicSongFilters;
+                break;
+            default:
+                break;
+        }
+
+        if (!FilterComponent) {
+            return;
+        }
+
         openModal({
             children: (
-                <>
-                    {server?.type === ServerType.NAVIDROME ? (
-                        <NavidromeSongFilters
-                            customFilters={customFilters}
-                            pageKey={pageKey}
-                            serverId={server?.id}
-                            onFilterChange={onFilterChange}
-                        />
-                    ) : (
-                        <JellyfinSongFilters
-                            customFilters={customFilters}
-                            pageKey={pageKey}
-                            serverId={server?.id}
-                            onFilterChange={onFilterChange}
-                        />
-                    )}
-                </>
+                <FilterComponent
+                    customFilters={customFilters}
+                    pageKey={pageKey}
+                    serverId={server?.id}
+                    onFilterChange={onFilterChange}
+                />
             ),
             title: 'Song Filters',
         });
@@ -437,8 +447,17 @@ export const SongListHeaderFilters = ({
                 .filter((value) => value !== 'Audio') // Don't account for includeItemTypes: Audio
                 .some((value) => value !== undefined);
 
-        return isNavidromeFilterApplied || isJellyfinFilterApplied;
-    }, [filter?._custom?.jellyfin, filter?._custom?.navidrome, server?.type]);
+        const isSubsonicFilterApplied =
+            server?.type === ServerType.SUBSONIC && (filter?.isFavorite || filter?.genre);
+
+        return isNavidromeFilterApplied || isJellyfinFilterApplied || isSubsonicFilterApplied;
+    }, [
+        filter._custom?.jellyfin,
+        filter._custom?.navidrome,
+        filter?.genre,
+        filter?.isFavorite,
+        server?.type,
+    ]);
 
     const isFolderFilterApplied = useMemo(() => {
         return filter.musicFolderId !== undefined;
@@ -475,11 +494,15 @@ export const SongListHeaderFilters = ({
                         ))}
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
-                <Divider orientation="vertical" />
-                <OrderToggleButton
-                    sortOrder={filter.sortOrder}
-                    onToggle={handleToggleSortOrder}
-                />
+                {server?.type !== ServerType.SUBSONIC && (
+                    <>
+                        <Divider orientation="vertical" />
+                        <OrderToggleButton
+                            sortOrder={filter.sortOrder}
+                            onToggle={handleToggleSortOrder}
+                        />
+                    </>
+                )}
                 {server?.type === ServerType.JELLYFIN && (
                     <>
                         <Divider orientation="vertical" />

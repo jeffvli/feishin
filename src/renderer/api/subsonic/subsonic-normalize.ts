@@ -38,13 +38,14 @@ const normalizeSong = (
     item: z.infer<typeof SubsonicApi._baseTypes.song>,
     server: ServerListItem | null,
     deviceId: string,
+    size?: number,
 ): QueueSong => {
     const imageUrl =
         getCoverArtUrl({
             baseUrl: server?.url,
             coverArtId: item.coverArt,
             credential: server?.credential,
-            size: 100,
+            size: size || 300,
         }) || null;
 
     const streamUrl = `${server?.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=feishin_${deviceId}&${server?.credential}`;

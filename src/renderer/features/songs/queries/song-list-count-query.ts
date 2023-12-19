@@ -11,6 +11,8 @@ export const getSongListCountQuery = (query: SongListQuery) => {
     if (query.searchTerm) filter.searchTerm = query.searchTerm;
     if (query.genreId) filter.genreId = query.genreId;
     if (query.musicFolderId) filter.musicFolderId = query.musicFolderId;
+    if (query.isFavorite) filter.isFavorite = query.isFavorite;
+    if (query.genre) filter.genre = query.genre;
 
     if (Object.keys(filter).length === 0) return undefined;
 

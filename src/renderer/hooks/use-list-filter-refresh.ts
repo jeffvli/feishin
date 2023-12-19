@@ -15,6 +15,8 @@ interface UseHandleListFilterChangeProps {
     server: ServerListItem | null;
 }
 
+const BLOCK_SIZE = 500;
+
 export const useListFilterRefresh = ({
     server,
     itemType,
@@ -108,7 +110,7 @@ export const useListFilterRefresh = ({
                     }
 
                     if (results.totalRecordCount === null) {
-                        const hasMoreRows = results?.items?.length === filter.limit;
+                        const hasMoreRows = results?.items?.length === BLOCK_SIZE;
                         const lastRowIndex = hasMoreRows
                             ? undefined
                             : (filter.offset || 0) + results.items.length;
