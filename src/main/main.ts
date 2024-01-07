@@ -438,7 +438,10 @@ const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
 
 let mpvInstance: MpvAPI | null = null;
 
-const createMpv = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
+const createMpv = async (data: {
+    extraParameters?: string[];
+    properties?: Record<string, any>;
+}): Promise<MpvAPI> => {
     const { extraParameters, properties } = data;
 
     const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
@@ -457,15 +460,14 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
         params,
     );
 
-    // eslint-disable-next-line promise/catch-or-return
-    mpv.start()
-        .catch((error) => {
-            console.log('MPV failed to start', error);
-        })
-        .finally(() => {
-            console.log('Setting MPV properties: ', properties);
-            mpv.setMultipleProperties(properties || {});
-        });
+    try {
+        await mpv.start();
+    } catch (error) {
+        console.log('MPV failed to start', error);
+    } finally {
+        console.log('Setting MPV properties: ', properties);
+        await mpv.setMultipleProperties(properties || {});
+    }
 
     mpv.on('status', (status, ...rest) => {
         console.log('MPV Event: status', status.property, status.value, rest);
@@ -530,15 +532,15 @@ ipcMain.on(
     'player-restart',
     async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
         mpvInstance?.quit();
-        mpvInstance = createMpv(data);
+        mpvInstance = await createMpv(data);
     },
 );
 
-ipcMain.on(
+ipcMain.handle(
     'player-initialize',
     async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
         console.log('Initializing MPV with data: ', data);
-        mpvInstance = createMpv(data);
+        mpvInstance = await createMpv(data);
     },
 );
 
