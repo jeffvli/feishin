@@ -235,24 +235,30 @@ export const RightControls = () => {
                         />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        <DropdownMenu.Item closeMenuOnClick={false}>
-                            <Slider
-                                label={formatPlaybackSpeedSliderLabel}
-                                marks={[
-                                    { label: '0.5', value: 0.5 },
-                                    { label: '0.75', value: 0.75 },
-                                    { label: '1', value: 1 },
-                                    { label: '1.25', value: 1.25 },
-                                    { label: '1.5', value: 1.5 },
-                                ]}
-                                max={1.5}
-                                min={0.5}
-                                step={0.01}
-                                value={speed}
-                                onChange={handleSpeed}
-                                onDoubleClick={() => handleSpeed(1)}
-                            />
-                        </DropdownMenu.Item>
+                        <Slider
+                            label={formatPlaybackSpeedSliderLabel}
+                            marks={[
+                                { label: '0.5', value: 0.5 },
+                                { label: '0.75', value: 0.75 },
+                                { label: '1', value: 1 },
+                                { label: '1.25', value: 1.25 },
+                                { label: '1.5', value: 1.5 },
+                            ]}
+                            max={1.5}
+                            min={0.5}
+                            step={0.01}
+                            styles={{
+                                markLabel: {
+                                    paddingTop: '0.5rem',
+                                },
+                                root: {
+                                    margin: '1rem 1rem 2rem 1rem',
+                                },
+                            }}
+                            value={speed}
+                            onChange={handleSpeed}
+                            onDoubleClick={() => handleSpeed(1)}
+                        />
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
                 <PlayerButton
