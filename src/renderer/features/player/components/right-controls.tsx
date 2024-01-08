@@ -28,11 +28,10 @@ import { LibraryItem, QueueSong, ServerType, Song } from '/@/renderer/api/types'
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
 import { DropdownMenu, Rating } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
+import { Slider } from '/@/renderer/components/slider';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
-
-const PLAYBACK_SPEEDS = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
 export const RightControls = () => {
     const { t } = useTranslation();
@@ -210,7 +209,10 @@ export const RightControls = () => {
                 align="center"
                 spacing="xs"
             >
-                <DropdownMenu>
+                <DropdownMenu
+                    position="top-end"
+                    width={425}
+                >
                     <DropdownMenu.Target>
                         <PlayerButton
                             icon={<>{speed} x</>}
@@ -222,14 +224,15 @@ export const RightControls = () => {
                         />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        {PLAYBACK_SPEEDS.map((speed) => (
-                            <DropdownMenu.Item
-                                key={`speed-select-${speed}`}
-                                onClick={() => handleSpeed(Number(speed))}
-                            >
-                                {speed}
-                            </DropdownMenu.Item>
-                        ))}
+                        <DropdownMenu.Item closeMenuOnClick={false}>
+                            <Slider
+                                defaultValue={speed}
+                                max={2}
+                                min={0.25}
+                                step={0.05}
+                                onChange={handleSpeed}
+                            />
+                        </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
                 <PlayerButton
