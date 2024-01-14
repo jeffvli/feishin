@@ -9,6 +9,7 @@ jobs:
         strategy:
             matrix:
                 os: [ubuntu-latest]
+                arch: ['--linux', '--arm64']
 
         steps:
             - name: Checkout git repo
@@ -24,32 +25,11 @@ jobs:
               run: |
                   npm install --legacy-peer-deps
 
-            - name: Publish releases
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  EP_RELEASE: true
-              uses: nick-invision/retry@v2.8.2
+            - name: Electron Builder Action
+              uses: samuelmeuli/action-electron-builder@v1
               with:
-                  timeout_minutes: 30
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
                   max_attempts: 3
-                  retry_on: error
-                  command: |
-                      npm run postinstall
-                      npm run build
-                      npm exec electron-builder -- --publish always --linux
-                  on_retry_command: npm cache clean --force
-
-            - name: Publish releases (arm64)
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  EP_RELEASE: true
-              uses: nick-invision/retry@v2.8.2
-              with:
-                  timeout_minutes: 30
-                  max_attempts: 3
-                  retry_on: error
-                  command: |
-                      npm run postinstall
-                      npm run build
-                      npm exec electron-builder -- --publish always --arm64
-                  on_retry_command: npm cache clean --force
+                  build_script_name: 'build'
+                  release: true
+                  args: ${{ matrix.arch }}
