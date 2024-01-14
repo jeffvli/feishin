@@ -1,4 +1,4 @@
-name: Publish Windows and macOS Draft (Manual)
+name: Publish Linux Release (Manual)
 
 on: workflow_dispatch
 
@@ -8,7 +8,7 @@ jobs:
 
         strategy:
             matrix:
-                os: [macos-latest]
+                os: [ubuntu-latest]
 
         steps:
             - name: Checkout git repo
@@ -27,6 +27,7 @@ jobs:
             - name: Publish releases
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  EP_RELEASE: true
               uses: nick-invision/retry@v2.8.2
               with:
                   timeout_minutes: 30
@@ -35,5 +36,20 @@ jobs:
                   command: |
                       npm run postinstall
                       npm run build
-                      npm exec electron-builder -- --publish always --win --mac
+                      npm exec electron-builder -- --publish always --linux
+                  on_retry_command: npm cache clean --force
+
+            - name: Publish releases (arm64)
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  EP_RELEASE: true
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      npm run postinstall
+                      npm run build
+                      npm exec electron-builder -- --publish always --arm64
                   on_retry_command: npm cache clean --force

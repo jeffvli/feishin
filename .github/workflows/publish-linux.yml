@@ -1,4 +1,4 @@
-name: Publish Linux (Manual)
+name: Publish Linux Draft (Manual)
 
 on: workflow_dispatch
 
