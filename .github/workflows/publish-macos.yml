@@ -1,4 +1,4 @@
-name: Publish Windows and macOS Draft (Manual)
+name: Publish Windows and macOS (Manual)
 
 on: workflow_dispatch
 
