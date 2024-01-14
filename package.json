@@ -145,7 +145,8 @@
         "publish": {
             "provider": "github",
             "owner": "jeffvli",
-            "repo": "feishin"
+            "repo": "feishin",
+            "releaseType": "release"
         }
     },
     "repository": {
