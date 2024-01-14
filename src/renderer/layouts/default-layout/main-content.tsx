@@ -10,6 +10,7 @@ import { LeftSidebar } from '/@/renderer/layouts/default-layout/left-sidebar';
 import { FullScreenOverlay } from '/@/renderer/layouts/default-layout/full-screen-overlay';
 import { RightSidebar } from '/@/renderer/layouts/default-layout/right-sidebar';
 import { Spinner } from '/@/renderer/components';
+import { LyricsOverlay } from '/@/renderer/layouts/default-layout/lyrics-overlay';
 
 const SideDrawerQueue = lazy(() =>
     import('/@/renderer/layouts/default-layout/side-drawer-queue').then((module) => ({
@@ -113,6 +114,7 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
                         isResizing={isResizing}
                         startResizing={startResizing}
                     />
+                    <LyricsOverlay />
                     <RightSidebar
                         ref={rightSidebarRef}
                         isResizing={isResizingRight}

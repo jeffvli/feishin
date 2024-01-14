@@ -1,5 +1,5 @@
-import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { forwardRef, Ref } from 'react';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { useLocation } from 'react-router';
 import styled from 'styled-components';
 import { SidebarPlayQueue, DrawerPlayQueue } from '/@/renderer/features/now-playing';
@@ -77,7 +77,6 @@ const queueDrawerVariants: Variants = {
         zIndex: 120,
     }),
 };
-
 interface RightSidebarProps {
     isResizing: boolean;
     startResizing: (direction: 'left' | 'right') => void;

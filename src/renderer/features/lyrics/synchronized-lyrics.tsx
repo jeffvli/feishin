@@ -165,7 +165,12 @@ export const SynchronizedLyrics = ({
             currentLyric.classList.add('active');
 
             if (followRef.current) {
-                doc?.scroll({ behavior: 'smooth', top: offsetTop });
+                // Have smooth scrolling for line-by-line, instant for large jumps
+                const behavior =
+                    Math.abs(doc.scrollTop - offsetTop) > 8 * settings.fontSize
+                        ? 'instant'
+                        : 'smooth';
+                doc?.scroll({ behavior, top: offsetTop });
             }
 
             if (index !== lyricRef.current!.length - 1) {
@@ -178,7 +183,7 @@ export const SynchronizedLyrics = ({
                 }, nextTime - timeInMs - elapsed);
             }
         },
-        [],
+        [settings.fontSize],
     );
 
     useEffect(() => {
