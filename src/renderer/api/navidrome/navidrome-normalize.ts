@@ -154,6 +154,7 @@ const normalizeAlbum = (
         albumArtists: [{ id: item.albumArtistId, imageUrl: null, name: item.albumArtist }],
         artists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
         backdropImageUrl: imageBackdropUrl,
+        comment: item.comment || null,
         createdAt: item.createdAt.split('T')[0],
         duration: item.duration * 1000 || null,
         genres: item.genres?.map((genre) => ({

@@ -1,7 +1,7 @@
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Box, Group, Stack } from '@mantine/core';
+import { Box, Group, Spoiler, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { RiHeartFill, RiHeartLine, RiMoreFill, RiSettings2Fill } from 'react-icons/ri';
@@ -41,6 +41,7 @@ import {
     useTableSettings,
 } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
+import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 
 const isFullWidthRow = (node: RowNode) => {
     return node.id?.startsWith('disc-');
@@ -279,6 +280,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     };
 
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
+    const comment = detailQuery?.data?.comment;
 
     const handleGeneralContextMenu = useHandleGeneralContextMenu(
         LibraryItem.ALBUM,
@@ -393,6 +395,18 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                                 </Button>
                             ))}
                         </Group>
+                    </Box>
+                )}
+                {comment && (
+                    <Box component="section">
+                        <Spoiler
+                            hideLabel={t('common.collapse')}
+                            maxHeight={60}
+                            mb={20}
+                            showLabel={t('common.expand')}
+                        >
+                            {replaceURLWithHTMLLinks(comment)}
+                        </Spoiler>
                     </Box>
                 )}
                 <Box style={{ minHeight: '300px' }}>
