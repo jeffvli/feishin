@@ -4,7 +4,9 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { Box, Group, Spoiler, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
+import { FaLastfmSquare } from 'react-icons/fa';
 import { RiHeartFill, RiHeartLine, RiMoreFill, RiSettings2Fill } from 'react-icons/ri';
+import { SiMusicbrainz } from 'react-icons/si';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -36,6 +38,7 @@ import { useAppFocus, useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useCurrentSong, useCurrentStatus } from '/@/renderer/store';
 import {
+    useGeneralSettings,
     usePlayButtonBehavior,
     useSettingsStoreActions,
     useTableSettings,
@@ -76,6 +79,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     const status = useCurrentStatus();
     const isFocused = useAppFocus();
     const currentSong = useCurrentSong();
+    const { externalLinks } = useGeneralSettings();
 
     const columnDefs = useMemo(
         () => getColumnDefs(tableConfig.columns, false, 'albumDetail'),
@@ -315,6 +319,8 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
+    const mbzId = detailQuery?.data?.mbzId;
+
     return (
         <ContentContainer>
             <LibraryBackgroundOverlay $backgroundColor={background} />
@@ -397,6 +403,46 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         </Group>
                     </Box>
                 )}
+                {externalLinks ? (
+                    <Box component="section">
+                        <Group spacing="sm">
+                            <Button
+                                compact
+                                component="a"
+                                href={`https://www.last.fm/music/${encodeURIComponent(
+                                    detailQuery?.data?.albumArtist || '',
+                                )}/${encodeURIComponent(detailQuery.data?.name || '')}`}
+                                radius="md"
+                                rel="noopener noreferrer"
+                                size="md"
+                                target="_blank"
+                                tooltip={{
+                                    label: t('action.openIn.lastfm'),
+                                }}
+                                variant="subtle"
+                            >
+                                <FaLastfmSquare size={25} />
+                            </Button>
+                            {mbzId ? (
+                                <Button
+                                    compact
+                                    component="a"
+                                    href={`https://musicbrainz.org/release/${mbzId}`}
+                                    radius="md"
+                                    rel="noopener noreferrer"
+                                    size="md"
+                                    target="_blank"
+                                    tooltip={{
+                                        label: t('action.openIn.musicbrainz'),
+                                    }}
+                                    variant="subtle"
+                                >
+                                    <SiMusicbrainz size={25} />
+                                </Button>
+                            ) : null}
+                        </Group>
+                    </Box>
+                ) : null}
                 {comment && (
                     <Box component="section">
                         <Spoiler

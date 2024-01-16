@@ -151,6 +151,7 @@ const normalizeAlbum = (
     const imageBackdropUrl = imageUrl?.replace(/size=\d+/, 'size=1000') || null;
 
     return {
+        albumArtist: item.albumArtist,
         albumArtists: [{ id: item.albumArtistId, imageUrl: null, name: item.albumArtist }],
         artists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
         backdropImageUrl: imageBackdropUrl,
@@ -169,6 +170,7 @@ const normalizeAlbum = (
         isCompilation: item.compilation,
         itemType: LibraryItem.ALBUM,
         lastPlayedAt: normalizePlayDate(item),
+        mbzId: item.mbzAlbumId || null,
         name: item.name,
         playCount: item.playCount,
         releaseDate: new Date(item.minYear, 0, 1).toISOString(),
@@ -217,6 +219,7 @@ const normalizeAlbumArtist = (
         imageUrl: imageUrl || null,
         itemType: LibraryItem.ALBUM_ARTIST,
         lastPlayedAt: normalizePlayDate(item),
+        mbz: item.mbzArtistId || null,
         name: item.name,
         playCount: item.playCount,
         serverId: server?.id || 'unknown',

@@ -268,6 +268,26 @@ export const ControlSettings = () => {
             isHidden: false,
             title: t('setting.skipPlaylistPage', { postProcess: 'sentenceCase' }),
         },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.externalLinks}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                externalLinks: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.externalLinks', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.externalLinks', { postProcess: 'sentenceCase' }),
+        },
     ];
 
     return <SettingsSection options={controlOptions} />;

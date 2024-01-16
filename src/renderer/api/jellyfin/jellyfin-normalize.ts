@@ -202,6 +202,7 @@ const normalizeAlbum = (
     imageSize?: number,
 ): Album => {
     return {
+        albumArtist: item.AlbumArtist,
         albumArtists:
             item.AlbumArtists.map((entry) => ({
                 id: entry.Id,
@@ -233,6 +234,7 @@ const normalizeAlbum = (
         isCompilation: null,
         itemType: LibraryItem.ALBUM,
         lastPlayedAt: null,
+        mbzId: item.ProviderIds?.MusicBrainzAlbum || null,
         name: item.Name,
         playCount: item.UserData?.PlayCount || 0,
         releaseDate: item.PremiereDate?.split('T')[0] || null,
@@ -288,6 +290,7 @@ const normalizeAlbumArtist = (
         }),
         itemType: LibraryItem.ALBUM_ARTIST,
         lastPlayedAt: null,
+        mbz: item.ProviderIds?.MusicBrainzArtist || null,
         name: item.Name,
         playCount: item.UserData?.PlayCount || 0,
         serverId: server?.id || '',

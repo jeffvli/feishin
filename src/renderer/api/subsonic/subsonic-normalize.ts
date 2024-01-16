@@ -126,6 +126,7 @@ const normalizeAlbumArtist = (
         imageUrl,
         itemType: LibraryItem.ALBUM_ARTIST,
         lastPlayedAt: null,
+        mbz: null,
         name: item.name,
         playCount: null,
         serverId: server?.id || 'unknown',
@@ -150,6 +151,7 @@ const normalizeAlbum = (
         }) || null;
 
     return {
+        albumArtist: item.artist,
         albumArtists: item.artistId
             ? [{ id: item.artistId, imageUrl: null, name: item.artist }]
             : [],
@@ -174,6 +176,7 @@ const normalizeAlbum = (
         isCompilation: null,
         itemType: LibraryItem.ALBUM,
         lastPlayedAt: null,
+        mbzId: null,
         name: item.name,
         playCount: null,
         releaseDate: item.year ? new Date(item.year, 0, 1).toISOString() : null,
