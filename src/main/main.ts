@@ -20,6 +20,7 @@ import {
     Tray,
     Menu,
     nativeImage,
+    nativeTheme,
     BrowserWindowConstructorOptions,
     protocol,
     net,
@@ -413,6 +414,11 @@ const createWindow = async () => {
     if (store.get('disable_auto_updates') !== true) {
         // eslint-disable-next-line
         new AppUpdater();
+    }
+
+    const theme = store.get('theme') as 'dark' | 'light' | 'system' | undefined;
+    if (theme) {
+        nativeTheme.themeSource = theme;
     }
 };
 

@@ -43,6 +43,10 @@ const fontError = (cb: (event: IpcRendererEvent, file: string) => void) => {
     ipcRenderer.on('custom-font-error', cb);
 };
 
+const themeSet = (theme: 'dark' | 'light' | 'system'): void => {
+    ipcRenderer.send('theme-set', theme);
+};
+
 export const localSettings = {
     disableMediaKeys,
     enableMediaKeys,
@@ -54,6 +58,7 @@ export const localSettings = {
     restart,
     set,
     setZoomFactor,
+    themeSet,
 };
 
 export type LocalSettings = typeof localSettings;

@@ -1,4 +1,4 @@
-import { ipcMain, safeStorage } from 'electron';
+import { ipcMain, nativeTheme, safeStorage } from 'electron';
 import Store from 'electron-store';
 
 export const store = new Store();
@@ -47,4 +47,9 @@ ipcMain.handle('password-set', (_event, password: string, server: string) => {
         return true;
     }
     return false;
+});
+
+ipcMain.on('theme-set', (_event, theme: 'dark' | 'light' | 'system') => {
+    store.set('theme', theme);
+    nativeTheme.themeSource = theme;
 });
