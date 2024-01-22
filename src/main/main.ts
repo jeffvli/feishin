@@ -417,9 +417,7 @@ const createWindow = async () => {
     }
 
     const theme = store.get('theme') as 'dark' | 'light' | 'system' | undefined;
-    if (theme) {
-        nativeTheme.themeSource = theme;
-    }
+    nativeTheme.themeSource = theme || 'dark';
 };
 
 app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
