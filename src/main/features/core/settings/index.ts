@@ -1,5 +1,5 @@
-import Store from 'electron-store';
 import { ipcMain, safeStorage } from 'electron';
+import Store from 'electron-store';
 
 export const store = new Store();
 

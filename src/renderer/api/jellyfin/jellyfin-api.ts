@@ -7,6 +7,7 @@ import { ServerListItem } from '/@/renderer/types';
 import omitBy from 'lodash/omitBy';
 import { z } from 'zod';
 import { authenticationFailure } from '/@/renderer/api/utils';
+import i18n from '/@/i18n/i18n';
 
 const c = initContract();
 
@@ -160,7 +161,7 @@ export const contract = c.router({
     },
     getSongDetail: {
         method: 'GET',
-        path: 'song/:id',
+        path: 'users/:userId/items/:id',
         responses: {
             200: jfType._response.song,
             400: jfType._response.error,
@@ -272,6 +273,12 @@ axiosClient.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             const currentServer = useAuthStore.getState().currentServer;
 
+            if (currentServer) {
+                useAuthStore
+                    .getState()
+                    .actions.updateServer(currentServer.id, { credential: undefined });
+            }
+
             authenticationFailure(currentServer);
         }
 
@@ -331,6 +338,14 @@ export const jfApiClient = (args: {
                 };
             } catch (e: Error | AxiosError | any) {
                 if (isAxiosError(e)) {
+                    if (e.code === 'ERR_NETWORK') {
+                        throw new Error(
+                            i18n.t('error.networkError', {
+                                postProcess: 'sentenceCase',
+                            }) as string,
+                        );
+                    }
+
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
                     return {

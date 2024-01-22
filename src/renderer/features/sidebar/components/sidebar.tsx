@@ -2,44 +2,20 @@ import { MouseEvent, useMemo } from 'react';
 import { Box, Center, Divider, Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
-import { IconType } from 'react-icons';
-import {
-    RiAddFill,
-    RiAlbumFill,
-    RiAlbumLine,
-    RiArrowDownSLine,
-    RiDiscLine,
-    RiFlag2Fill,
-    RiFlagLine,
-    RiFolder3Fill,
-    RiFolder3Line,
-    RiHome6Fill,
-    RiHome6Line,
-    RiListUnordered,
-    RiMusic2Fill,
-    RiMusic2Line,
-    RiPlayLine,
-    RiSearchFill,
-    RiUserVoiceFill,
-    RiUserVoiceLine,
-    RiSearchLine,
-    RiPlayFill,
-    RiSettings2Line,
-    RiSettings2Fill,
-    RiPlayListLine,
-    RiPlayListFill,
-} from 'react-icons/ri';
-import { generatePath, Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { RiAddFill, RiArrowDownSLine, RiDiscLine, RiListUnordered } from 'react-icons/ri';
+import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import {
     SidebarItemType,
     useGeneralSettings,
     useWindowSettings,
 } from '../../../store/settings.store';
-import { LibraryItem, PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
+import { PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
 import { Button, MotionStack, Spinner, Tooltip } from '/@/renderer/components';
 import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
+import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import { SidebarPlaylistList } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -55,11 +31,11 @@ import {
 import { fadeIn } from '/@/renderer/styles';
 import { Platform } from '/@/renderer/types';
 
-const SidebarContainer = styled.div<{ windowBarStyle: Platform }>`
+const SidebarContainer = styled.div<{ $windowBarStyle: Platform }>`
     height: 100%;
     max-height: ${
         (props) =>
-            props.windowBarStyle === Platform.WEB || props.windowBarStyle === Platform.LINUX
+            props.$windowBarStyle === Platform.WEB || props.$windowBarStyle === Platform.LINUX
                 ? 'calc(100vh - 160px)' // Playerbar (90px) & ActionBar (70px)
                 : 'calc(100vh - 190px)' // plus windowbar (30px) if the windowBarStyle is Windows/Mac
         // We use the height of the SidebarContainer to keep the Stack below the ActionBar at the correct height
@@ -92,50 +68,8 @@ const SidebarImage = styled.img`
     background: var(--placeholder-bg);
 `;
 
-const sidebarItemMap = {
-    [AppRoute.HOME]: {
-        activeIcon: RiHome6Fill,
-        icon: RiHome6Line,
-    },
-    [AppRoute.LIBRARY_ALBUMS]: {
-        activeIcon: RiAlbumFill,
-        icon: RiAlbumLine,
-    },
-    [AppRoute.LIBRARY_ALBUM_ARTISTS]: {
-        activeIcon: RiUserVoiceFill,
-        icon: RiUserVoiceLine,
-    },
-    [AppRoute.PLAYLISTS]: {
-        activeIcon: RiPlayListFill,
-        icon: RiPlayListLine,
-    },
-    [AppRoute.LIBRARY_SONGS]: {
-        activeIcon: RiMusic2Fill,
-        icon: RiMusic2Line,
-    },
-    [AppRoute.LIBRARY_FOLDERS]: {
-        activeIcon: RiFolder3Fill,
-        icon: RiFolder3Line,
-    },
-    [AppRoute.LIBRARY_GENRES]: {
-        activeIcon: RiFlag2Fill,
-        icon: RiFlagLine,
-    },
-    [generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG })]: {
-        activeIcon: RiSearchFill,
-        icon: RiSearchLine,
-    },
-    [AppRoute.SETTINGS]: {
-        activeIcon: RiSettings2Fill,
-        icon: RiSettings2Line,
-    },
-    [AppRoute.NOW_PLAYING]: {
-        activeIcon: RiPlayFill,
-        icon: RiPlayLine,
-    },
-};
-
 export const Sidebar = () => {
+    const { t } = useTranslation();
     const location = useLocation();
     const sidebar = useSidebarStore();
     const { setSideBar } = useAppStoreActions();
@@ -144,10 +78,25 @@ export const Sidebar = () => {
     const imageUrl = useCurrentSong()?.imageUrl;
     const server = useCurrentServer();
 
+    const translatedSidebarItemMap = useMemo(
+        () => ({
+            Albums: t('page.sidebar.albums', { postProcess: 'titleCase' }),
+            Artists: t('page.sidebar.artists', { postProcess: 'titleCase' }),
+            Folders: t('page.sidebar.folders', { postProcess: 'titleCase' }),
+            Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
+            Home: t('page.sidebar.home', { postProcess: 'titleCase' }),
+            'Now Playing': t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
+            Playlists: t('page.sidebar.playlists', { postProcess: 'titleCase' }),
+            Search: t('page.sidebar.search', { postProcess: 'titleCase' }),
+            Settings: t('page.sidebar.settings', { postProcess: 'titleCase' }),
+            Tracks: t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+        }),
+        [t],
+    );
     const upsizedImageUrl = imageUrl
-        ?.replace(/size=\d+/, 'size=300')
-        .replace(/width=\d+/, 'width=300')
-        .replace(/height=\d+/, 'height=300');
+        ?.replace(/size=\d+/, 'size=450')
+        .replace(/width=\d+/, 'width=450')
+        .replace(/height=\d+/, 'height=450');
 
     const showImage = sidebar.image;
 
@@ -157,7 +106,7 @@ export const Sidebar = () => {
         openModal({
             children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
             size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
-            title: 'Create Playlist',
+            title: t('form.createPlaylist.title', { postProcess: 'titleCase' }),
         });
     };
 
@@ -180,26 +129,25 @@ export const Sidebar = () => {
 
     const { sidebarItems } = useGeneralSettings();
 
-    const sidebarItemsWithRoute: (SidebarItemType & {
-        activeIcon: IconType;
-        icon: IconType;
-    })[] = useMemo(() => {
+    const sidebarItemsWithRoute: SidebarItemType[] = useMemo(() => {
         if (!sidebarItems) return [];
 
         const items = sidebarItems
             .filter((item) => !item.disabled)
             .map((item) => ({
                 ...item,
-                ...sidebarItemMap[item.route as keyof typeof sidebarItemMap],
+                label:
+                    translatedSidebarItemMap[item.id as keyof typeof translatedSidebarItemMap] ??
+                    item.label,
             }));
 
         return items;
-    }, [sidebarItems]);
+    }, [sidebarItems, translatedSidebarItemMap]);
 
     return (
         <SidebarContainer
             ref={cq.ref}
-            windowBarStyle={windowBarStyle}
+            $windowBarStyle={windowBarStyle}
         >
             <ActionBar />
             <Stack
@@ -214,21 +162,23 @@ export const Sidebar = () => {
                     sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
                 >
                     <Stack spacing={0}>
-                        {sidebarItemsWithRoute.map((item) => (
-                            <SidebarItem
-                                key={`sidebar-${item.route}`}
-                                to={item.route}
-                            >
-                                <Group spacing="sm">
-                                    {location.pathname === item.route ? (
-                                        <item.activeIcon size="1.1em" />
-                                    ) : (
-                                        <item.icon size="1.1em" />
-                                    )}
-                                    {item.label}
-                                </Group>
-                            </SidebarItem>
-                        ))}
+                        {sidebarItemsWithRoute.map((item) => {
+                            return (
+                                <SidebarItem
+                                    key={`sidebar-${item.route}`}
+                                    to={item.route}
+                                >
+                                    <Group spacing="sm">
+                                        <SidebarIcon
+                                            active={location.pathname === item.route}
+                                            route={item.route}
+                                            size="1.1em"
+                                        />
+                                        {item.label}
+                                    </Group>
+                                </SidebarItem>
+                            );
+                        })}
                     </Stack>
                     <Divider
                         mx="1rem"
@@ -246,7 +196,7 @@ export const Sidebar = () => {
                                         fw="600"
                                         sx={{ fontSize: '1.2rem' }}
                                     >
-                                        Playlists
+                                        {t('page.sidebar.playlists', { postProcess: 'titleCase' })}
                                     </Box>
                                     {playlistsQuery.isLoading && <Spinner />}
                                 </Group>
@@ -254,7 +204,12 @@ export const Sidebar = () => {
                                     <Button
                                         compact
                                         size="md"
-                                        tooltip={{ label: 'Create playlist', openDelay: 500 }}
+                                        tooltip={{
+                                            label: t('action.createPlaylist', {
+                                                postProcess: 'sentenceCase',
+                                            }),
+                                            openDelay: 500,
+                                        }}
                                         variant="default"
                                         onClick={handleCreatePlaylistModal}
                                     >
@@ -265,7 +220,12 @@ export const Sidebar = () => {
                                         component={Link}
                                         size="md"
                                         to={AppRoute.PLAYLISTS}
-                                        tooltip={{ label: 'Playlist list', openDelay: 500 }}
+                                        tooltip={{
+                                            label: t('action.viewPlaylists', {
+                                                postProcess: 'sentenceCase',
+                                            }),
+                                            openDelay: 500,
+                                        }}
                                         variant="default"
                                         onClick={(e) => e.stopPropagation()}
                                     >
@@ -293,7 +253,9 @@ export const Sidebar = () => {
                             onClick={expandFullScreenPlayer}
                         >
                             <Tooltip
-                                label="Toggle fullscreen player"
+                                label={t('player.toggleFullscreenPlayer', {
+                                    postProcess: 'sentenceCase',
+                                })}
                                 openDelay={500}
                             >
                                 {upsizedImageUrl ? (
@@ -318,7 +280,10 @@ export const Sidebar = () => {
                                 radius={100}
                                 size="md"
                                 sx={{ cursor: 'default', position: 'absolute', right: 5, top: 5 }}
-                                tooltip={{ label: 'Collapse', openDelay: 500 }}
+                                tooltip={{
+                                    label: t('common.collapse', { postProcess: 'titleCase' }),
+                                    openDelay: 500,
+                                }}
                                 variant="default"
                                 onClick={(e) => {
                                     e.stopPropagation();

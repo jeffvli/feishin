@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
 import { ServerListItem } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components/toast/index';
+import i18n from '/@/i18n/i18n';
 
 const c = initContract();
 
@@ -106,7 +107,7 @@ axiosClient.interceptors.response.use(
             if (data['subsonic-response'].error.code !== 0) {
                 toast.error({
                     message: data['subsonic-response'].error.message,
-                    title: 'Issue from Subsonic API',
+                    title: i18n.t('error.genericError', { postProcess: 'sentenceCase' }) as string,
                 });
             }
         }
@@ -184,9 +185,15 @@ export const ssApiClient = (args: {
                     status: result.status,
                 };
             } catch (e: Error | AxiosError | any) {
-                console.log('CATCH ERR');
-
                 if (isAxiosError(e)) {
+                    if (e.code === 'ERR_NETWORK') {
+                        throw new Error(
+                            i18n.t('error.networkError', {
+                                postProcess: 'sentenceCase',
+                            }) as string,
+                        );
+                    }
+
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
 

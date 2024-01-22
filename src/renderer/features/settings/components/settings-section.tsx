@@ -1,8 +1,9 @@
+import { ReactNode } from 'react';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 
 export type SettingOption = {
-    control: JSX.Element;
-    description: string | JSX.Element;
+    control: ReactNode;
+    description: string | ReactNode;
     isHidden?: boolean;
     note?: string;
     title: string;
@@ -19,7 +20,7 @@ export const SettingsSection = ({ options }: SettingsSectionProps) => {
                 .filter((o) => !o.isHidden)
                 .map((option) => (
                     <SettingsOptions
-                        key={`general-${option.title}`}
+                        key={`option-${option.title}`}
                         {...option}
                     />
                 ))}

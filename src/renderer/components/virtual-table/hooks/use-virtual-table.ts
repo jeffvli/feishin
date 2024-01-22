@@ -31,6 +31,7 @@ export type AgGridFetchFn<TResponse, TFilter> = (
 ) => Promise<TResponse>;
 
 interface UseAgGridProps<TFilter> {
+    columnType?: 'albumDetail' | 'generic';
     contextMenu: SetContextMenuItems;
     customFilters?: Partial<TFilter>;
     isClientSideSort?: boolean;
@@ -52,6 +53,7 @@ export const useVirtualTable = <TFilter>({
     customFilters,
     isSearchParams,
     isClientSideSort,
+    columnType,
 }: UseAgGridProps<TFilter>) => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -75,8 +77,8 @@ export const useVirtualTable = <TFilter>({
     const isPaginationEnabled = properties.display === ListDisplayType.TABLE_PAGINATED;
 
     const columnDefs: ColDef[] = useMemo(() => {
-        return getColumnDefs(properties.table.columns, true);
-    }, [properties.table.columns]);
+        return getColumnDefs(properties.table.columns, true, columnType);
+    }, [columnType, properties.table.columns]);
 
     const defaultColumnDefs: ColDef = useMemo(() => {
         return {

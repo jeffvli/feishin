@@ -1,5 +1,6 @@
-import isElectron from 'is-electron';
 import { Group } from '@mantine/core';
+import { t } from 'i18next';
+import isElectron from 'is-electron';
 import { Select, Tooltip, NumberInput, Switch, Slider } from '/@/renderer/components';
 import { SettingsSection } from '/@/renderer/features/settings/components/settings-section';
 import {
@@ -8,15 +9,29 @@ import {
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
+import { useTranslation } from 'react-i18next';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const SIDE_QUEUE_OPTIONS = [
-    { label: 'Fixed', value: 'sideQueue' },
-    { label: 'Floating', value: 'sideDrawerQueue' },
+    {
+        label: t('setting.sidePlayQueueStyle', {
+            context: 'optionAttached',
+            postProcess: 'sentenceCase',
+        }),
+        value: 'sideQueue',
+    },
+    {
+        label: t('setting.sidePlayQueueStyle', {
+            context: 'optionDetached',
+            postProcess: 'sentenceCase',
+        }),
+        value: 'sideDrawerQueue',
+    },
 ];
 
 export const ControlSettings = () => {
+    const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -39,14 +54,17 @@ export const ControlSettings = () => {
                     }
                 />
             ),
-            description: 'Show or hide the skip buttons on the playerbar',
+            description: t('setting.showSkipButtons', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Show skip buttons',
+            title: t('setting.showSkipButtons', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <Group>
-                    <Tooltip label="Backward">
+                    <Tooltip label={t('common.backward', { postProcess: 'titleCase' })}>
                         <NumberInput
                             defaultValue={settings.skipButtons.skipBackwardSeconds}
                             min={0}
@@ -66,7 +84,7 @@ export const ControlSettings = () => {
                             }
                         />
                     </Tooltip>
-                    <Tooltip label="Forward">
+                    <Tooltip label={t('common.forward', { postProcess: 'titleCase' })}>
                         <NumberInput
                             defaultValue={settings.skipButtons.skipForwardSeconds}
                             min={0}
@@ -88,18 +106,38 @@ export const ControlSettings = () => {
                     </Tooltip>
                 </Group>
             ),
-            description:
-                'The number (in seconds) to skip forward or backward when using the skip buttons',
+            description: t('setting.skipDuration', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Skip duration',
+            title: t('setting.skipDuration', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <Select
                     data={[
-                        { label: 'Now', value: Play.NOW },
-                        { label: 'Next', value: Play.NEXT },
-                        { label: 'Last', value: Play.LAST },
+                        {
+                            label: t('setting.playButtonBehavior', {
+                                context: 'optionPlay',
+                                postProcess: 'titleCase',
+                            }),
+                            value: Play.NOW,
+                        },
+                        {
+                            label: t('setting.playButtonBehavior', {
+                                context: 'optionAddNext',
+                                postProcess: 'titleCase',
+                            }),
+                            value: Play.NEXT,
+                        },
+                        {
+                            label: t('setting.playButtonBehavior', {
+                                context: 'optionAddLast',
+                                postProcess: 'titleCase',
+                            }),
+                            value: Play.LAST,
+                        },
                     ]}
                     defaultValue={settings.playButtonBehavior}
                     onChange={(e) =>
@@ -112,9 +150,12 @@ export const ControlSettings = () => {
                     }
                 />
             ),
-            description: 'The default behavior of the play button when adding songs to the queue',
+            description: t('setting.playButtonBehavior', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Play button behavior',
+            title: t('setting.playButtonBehavior', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -131,9 +172,12 @@ export const ControlSettings = () => {
                     }}
                 />
             ),
-            description: 'The style of the sidebar play queue',
+            description: t('setting.sidePlayQueueStyle', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Side play queue style',
+            title: t('setting.sidePlayQueueStyle', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -149,10 +193,12 @@ export const ControlSettings = () => {
                     }}
                 />
             ),
-            description:
-                'Display a hover icon on the right side of the application view the play queue',
+            description: t('setting.sidePlayQueueStyle', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Show floating queue hover area',
+            title: t('setting.floatingQueueArea', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -171,10 +217,12 @@ export const ControlSettings = () => {
                     }}
                 />
             ),
-            description:
-                'The amount of volume to change when scrolling the mouse wheel on the volume slider',
+            description: t('setting.volumeWheelStep', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Volume wheel step',
+            title: t('setting.volumeWheelStep', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -191,9 +239,12 @@ export const ControlSettings = () => {
                     }}
                 />
             ),
-            description: 'When exiting, save the current play queue and restore it when reopening',
+            description: t('setting.savePlayQueue', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Save play queue',
+            title: t('setting.savePlayQueue', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -210,10 +261,12 @@ export const ControlSettings = () => {
                     }
                 />
             ),
-            description:
-                'When navigating to a playlist, go to the playlist song list page instead of the default page',
+            description: t('setting.skipPlaylistPage', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Go to playlist songs page by default',
+            title: t('setting.skipPlaylistPage', { postProcess: 'sentenceCase' }),
         },
     ];
 

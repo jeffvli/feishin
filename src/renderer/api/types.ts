@@ -171,6 +171,11 @@ export type Album = {
     userRating: number | null;
 } & { songs?: Song[] };
 
+export type GainInfo = {
+    album?: number;
+    track?: number;
+};
+
 export type Song = {
     album: string | null;
     albumArtists: RelatedArtist[];
@@ -185,7 +190,9 @@ export type Song = {
     container: string | null;
     createdAt: string;
     discNumber: number;
+    discSubtitle: string | null;
     duration: number;
+    gain: GainInfo | null;
     genres: Genre[];
     id: string;
     imagePlaceholderUrl: string | null;
@@ -195,6 +202,7 @@ export type Song = {
     lyrics: string | null;
     name: string;
     path: string | null;
+    peak: GainInfo | null;
     playCount: number;
     playlistItemId?: string;
     releaseDate: string | null;
@@ -387,7 +395,7 @@ export const albumListSortMap: AlbumListSortMap = {
         duration: undefined,
         favorited: undefined,
         name: JFAlbumListSort.NAME,
-        playCount: undefined,
+        playCount: JFAlbumListSort.PLAY_COUNT,
         random: JFAlbumListSort.RANDOM,
         rating: undefined,
         recentlyAdded: JFAlbumListSort.RECENTLY_ADDED,
@@ -473,6 +481,7 @@ export type SongListQuery = {
     };
     albumIds?: string[];
     artistIds?: string[];
+    imageSize?: number;
     limit?: number;
     musicFolderId?: string;
     searchTerm?: string;
@@ -1121,3 +1130,12 @@ export enum LyricSource {
 }
 
 export type LyricsOverride = Omit<FullLyricsMetadata, 'lyrics'> & { id: string };
+
+// This type from https://wicg.github.io/local-font-access/#fontdata
+// NOTE: it is still experimental, so this should be updates as appropriate
+export type FontData = {
+    family: string;
+    fullName: string;
+    postscriptName: string;
+    style: string;
+};

@@ -5,7 +5,7 @@ import type { SongListQuery } from '/@/renderer/api/types';
 import { getServerById } from '/@/renderer/store';
 import type { QueryHookArgs } from '/@/renderer/lib/react-query';
 
-export const useSongList = (args: QueryHookArgs<SongListQuery>) => {
+export const useSongList = (args: QueryHookArgs<SongListQuery>, imageSize?: number) => {
     const { query, options, serverId } = args || {};
     const server = getServerById(serverId);
 
@@ -13,9 +13,12 @@ export const useSongList = (args: QueryHookArgs<SongListQuery>) => {
         enabled: !!server?.id,
         queryFn: ({ signal }) => {
             if (!server) throw new Error('Server not found');
-            return controller.getSongList({ apiClientProps: { server, signal }, query });
+            return controller.getSongList({
+                apiClientProps: { server, signal },
+                query: { ...query, imageSize },
+            });
         },
-        queryKey: queryKeys.songs.list(server?.id || '', query),
+        queryKey: queryKeys.songs.list(server?.id || '', { ...query, imageSize }),
         ...options,
     });
 };

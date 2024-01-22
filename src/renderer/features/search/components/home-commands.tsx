@@ -1,6 +1,7 @@
+import { Dispatch, useCallback } from 'react';
 import { openModal, closeAllModals } from '@mantine/modals';
 import { nanoid } from 'nanoid/non-secure';
-import { Dispatch, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router';
 import { createSearchParams } from 'react-router-dom';
 import { LibraryItem } from '/@/renderer/api/types';
@@ -25,6 +26,7 @@ export const HomeCommands = ({
     setPages,
     handleClose,
 }: HomeCommandsProps) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const server = useCurrentServer();
 
@@ -34,9 +36,9 @@ export const HomeCommands = ({
         openModal({
             children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
             size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
-            title: 'Create Playlist',
+            title: t('form.createPlaylist.title', { postProcess: 'sentenceCase' }),
         });
-    }, [handleClose, server?.type]);
+    }, [handleClose, server?.type, t]);
 
     const handleSearch = () => {
         navigate(
@@ -58,21 +60,31 @@ export const HomeCommands = ({
 
     return (
         <>
-            <Command.Group heading="Commands">
+            <Command.Group heading={t('page.globalSearch.title', { postProcess: 'titleCase' })}>
                 <Command.Item
-                    value="Search"
+                    value={t('common.search', { postProcess: 'sentenceCase' })}
                     onSelect={handleSearch}
                 >
-                    {query ? `Search for "${query}"...` : 'Search...'}
+                    {query
+                        ? t('page.globalSearch.commands.searchFor', {
+                              postProcess: 'sentenceCase',
+                              query,
+                          })
+                        : `${t('common.search', { postProcess: 'sentenceCase' })}...`}
                 </Command.Item>
-                <Command.Item onSelect={handleCreatePlaylistModal}>Create playlist...</Command.Item>
+                <Command.Item onSelect={handleCreatePlaylistModal}>
+                    {t('action.createPlaylist', { postProcess: 'sentenceCase' })}...
+                </Command.Item>
                 <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.GO_TO])}>
-                    Go to page...
+                    {t('page.globalSearch.commands.goToPage', { postProcess: 'sentenceCase' })}...
                 </Command.Item>
                 <Command.Item
                     onSelect={() => setPages([...pages, CommandPalettePages.MANAGE_SERVERS])}
                 >
-                    Server commands...
+                    {t('page.globalSearch.commands.serverCommands', {
+                        postProcess: 'sentenceCase',
+                    })}
+                    ...
                 </Command.Item>
             </Command.Group>
         </>

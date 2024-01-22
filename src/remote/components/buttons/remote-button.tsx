@@ -1,13 +1,13 @@
-import { Ref, forwardRef } from 'react';
+import { MouseEvent, ReactNode, Ref, forwardRef } from 'react';
 import { Button, type ButtonProps as MantineButtonProps } from '@mantine/core';
 import { Tooltip } from '/@/renderer/components/tooltip';
 import styled from 'styled-components';
 
 interface StyledButtonProps extends MantineButtonProps {
     $active?: boolean;
-    children: React.ReactNode;
-    onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-    onMouseDown?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    children: ReactNode;
+    onClick?: (e: MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    onMouseDown?: (e: MouseEvent<HTMLButtonElement, MouseEvent>) => void;
     ref: Ref<HTMLButtonElement>;
 }
 

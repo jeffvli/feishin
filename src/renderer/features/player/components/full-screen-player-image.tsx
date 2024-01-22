@@ -1,7 +1,7 @@
 import { Flex, Stack, Group, Center } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useRef, useLayoutEffect, useState, useCallback } from 'react';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -18,33 +18,41 @@ import {
 } from '/@/renderer/store';
 
 const Image = styled(motion.img)<{ $useAspectRatio: boolean }>`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: ${({ $useAspectRatio }) => ($useAspectRatio ? 'contain' : 'cover')}};
-  object-position: 50% 100%;
-  border-radius: 5px;
-  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 40%)) drop-shadow(0 0 5px rgba(0, 0, 0, 40%));
+    position: absolute;
+    max-width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 5px rgb(0 0 0 / 40%)) drop-shadow(0 0 5px rgb(0 0 0 / 40%));
+    border-radius: 5px;
+    object-fit: ${({ $useAspectRatio }) => ($useAspectRatio ? 'contain' : 'cover')};
+    object-position: 50% 100%;
 `;
 
 const ImageContainer = styled(motion.div)`
     position: relative;
     display: flex;
     align-items: flex-end;
+    justify-content: center;
     max-width: 100%;
-    aspect-ratio: 1/1;
     height: 65%;
+    aspect-ratio: 1/1;
     margin-bottom: 1rem;
 `;
 
-const MetadataContainer = styled(Stack)`
+interface TransparentMetadataContainer {
+    opacity: number;
+}
+
+const MetadataContainer = styled(Stack)<TransparentMetadataContainer>`
+    padding: 1rem;
+    border-radius: 5px;
+
     h1 {
         font-size: 3.5vh;
     }
 `;
 
 const PlayerContainer = styled(Flex)`
-    @media screen and (max-height: 640px) {
+    @media screen and (height <= 640px) {
         .full-screen-player-image-metadata {
             display: none;
             height: 100%;
@@ -81,11 +89,11 @@ const imageVariants: Variants = {
     },
 };
 
-const scaleImageUrl = (url?: string | null) => {
+const scaleImageUrl = (imageSize: number, url?: string | null) => {
     return url
-        ?.replace(/&size=\d+/, '&size=500')
-        .replace(/\?width=\d+/, '?width=500')
-        .replace(/&height=\d+/, '&height=500');
+        ?.replace(/&size=\d+/, `&size=${imageSize}`)
+        .replace(/\?width=\d+/, `?width=${imageSize}`)
+        .replace(/&height=\d+/, `&height=${imageSize}`);
 };
 
 const ImageWithPlaceholder = ({
@@ -119,8 +127,11 @@ const ImageWithPlaceholder = ({
 };
 
 export const FullScreenPlayerImage = () => {
+    const mainImageRef = useRef<HTMLImageElement | null>(null);
+    const [mainImageDimensions, setMainImageDimensions] = useState({ idealSize: 1 });
+
     const { queue } = usePlayerData();
-    const useImageAspectRatio = useFullScreenPlayerStore((state) => state.useImageAspectRatio);
+    const { opacity, useImageAspectRatio } = useFullScreenPlayerStore();
     const currentSong = queue.current;
     const { color: background } = useFastAverageColor({
         algorithm: 'dominant',
@@ -128,12 +139,30 @@ export const FullScreenPlayerImage = () => {
         srcLoaded: true,
     });
     const imageKey = `image-${background}`;
-
     const [imageState, setImageState] = useSetState({
-        bottomImage: scaleImageUrl(queue.next?.imageUrl),
+        bottomImage: scaleImageUrl(mainImageDimensions.idealSize, queue.next?.imageUrl),
         current: 0,
-        topImage: scaleImageUrl(queue.current?.imageUrl),
+        topImage: scaleImageUrl(mainImageDimensions.idealSize, queue.current?.imageUrl),
     });
+
+    const updateImageSize = useCallback(() => {
+        if (mainImageRef.current) {
+            setMainImageDimensions({
+                idealSize:
+                    Math.ceil((mainImageRef.current as HTMLDivElement).offsetHeight / 100) * 100,
+            });
+
+            setImageState({
+                bottomImage: scaleImageUrl(mainImageDimensions.idealSize, queue.next?.imageUrl),
+                current: 0,
+                topImage: scaleImageUrl(mainImageDimensions.idealSize, queue.current?.imageUrl),
+            });
+        }
+    }, [mainImageDimensions.idealSize, queue, setImageState]);
+
+    useLayoutEffect(() => {
+        updateImageSize();
+    }, [updateImageSize]);
 
     useEffect(() => {
         const unsubSongChange = usePlayerStore.subscribe(
@@ -142,8 +171,14 @@ export const FullScreenPlayerImage = () => {
                 const isTop = imageState.current === 0;
                 const queue = state[1] as PlayerData['queue'];
 
-                const currentImageUrl = scaleImageUrl(queue.current?.imageUrl);
-                const nextImageUrl = scaleImageUrl(queue.next?.imageUrl);
+                const currentImageUrl = scaleImageUrl(
+                    mainImageDimensions.idealSize,
+                    queue.current?.imageUrl,
+                );
+                const nextImageUrl = scaleImageUrl(
+                    mainImageDimensions.idealSize,
+                    queue.next?.imageUrl,
+                );
 
                 setImageState({
                     bottomImage: isTop ? currentImageUrl : nextImageUrl,
@@ -157,7 +192,7 @@ export const FullScreenPlayerImage = () => {
         return () => {
             unsubSongChange();
         };
-    }, [imageState, queue, setImageState]);
+    }, [imageState, mainImageDimensions.idealSize, queue, setImageState]);
 
     return (
         <PlayerContainer
@@ -167,7 +202,10 @@ export const FullScreenPlayerImage = () => {
             justify="flex-start"
             p="1rem"
         >
-            <ImageContainer>
+            <ImageContainer
+                ref={mainImageRef}
+                onLoad={updateImageSize}
+            >
                 <AnimatePresence
                     initial={false}
                     mode="sync"
@@ -208,12 +246,17 @@ export const FullScreenPlayerImage = () => {
             <MetadataContainer
                 className="full-screen-player-image-metadata"
                 maw="100%"
+                opacity={opacity}
                 spacing="xs"
             >
                 <TextTitle
                     align="center"
                     order={1}
                     overflow="hidden"
+                    pb="0.5rem"
+                    style={{
+                        textShadow: 'var(--fullscreen-player-text-shadow)',
+                    }}
                     w="100%"
                     weight={900}
                 >
@@ -221,14 +264,17 @@ export const FullScreenPlayerImage = () => {
                 </TextTitle>
                 <TextTitle
                     $link
-                    $secondary
                     align="center"
                     component={Link}
-                    order={2}
+                    order={3}
                     overflow="hidden"
+                    style={{
+                        textShadow: 'var(--fullscreen-player-text-shadow)',
+                    }}
                     to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
                         albumId: currentSong?.albumId || '',
                     })}
+                    transform="uppercase"
                     w="100%"
                     weight={600}
                 >
@@ -237,9 +283,12 @@ export const FullScreenPlayerImage = () => {
                 {currentSong?.artists?.map((artist, index) => (
                     <TextTitle
                         key={`fs-artist-${artist.id}`}
-                        $secondary
                         align="center"
-                        order={4}
+                        order={3}
+                        style={{
+                            textShadow: 'var(--fullscreen-player-text-shadow)',
+                        }}
+                        transform="uppercase"
                     >
                         {index > 0 && (
                             <Text
@@ -253,11 +302,14 @@ export const FullScreenPlayerImage = () => {
                         )}
                         <Text
                             $link
-                            $secondary
                             component={Link}
+                            style={{
+                                textShadow: 'var(--fullscreen-player-text-shadow)',
+                            }}
                             to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                 albumArtistId: artist.id,
                             })}
+                            transform="uppercase"
                             weight={600}
                         >
                             {artist.name}

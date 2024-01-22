@@ -4,6 +4,7 @@ import { Accordion, Button, ContextModalVars, Switch } from '/@/renderer/compone
 import { useLocalStorage } from '@mantine/hooks';
 import { openContextModal } from '@mantine/modals';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiServerFill } from 'react-icons/ri';
 import { AddServerForm } from '/@/renderer/features/servers/components/add-server-form';
 import { ServerListItem } from '/@/renderer/features/servers/components/server-list-item';
@@ -13,17 +14,19 @@ import { titleCase } from '/@/renderer/utils';
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const ServerList = () => {
+    const { t } = useTranslation();
     const serverListQuery = useServerList();
 
     const handleAddServerModal = () => {
         openContextModal({
             innerProps: {
+                // eslint-disable-next-line react/no-unstable-nested-components
                 modalBody: (vars: ContextModalVars) => (
                     <AddServerForm onCancel={() => vars.context.closeModal(vars.id)} />
                 ),
             },
             modal: 'base',
-            title: 'Add server',
+            title: t('form.addServer.title', { postProcess: 'titleCase' }),
         });
     };
 
@@ -73,7 +76,7 @@ export const ServerList = () => {
                     variant="filled"
                     onClick={handleAddServerModal}
                 >
-                    Add server
+                    {t('form.addServer.title', { postProcess: 'titleCase' })}
                 </Button>
             </Group>
             <Stack>
@@ -97,21 +100,29 @@ export const ServerList = () => {
                         );
                     })}
                 </Accordion>
-                <Divider />
-                <Group>
-                    <Switch
-                        checked={ignoreCORS === 'true'}
-                        label="Ignore CORS (requires restart)"
-                        onChange={handleUpdateIgnoreCORS}
-                    />
-                </Group>
-                <Group>
-                    <Switch
-                        checked={ignoreSSL === 'true'}
-                        label="Ignore SSL (requires restart)"
-                        onChange={handleUpdateIgnoreSSL}
-                    />
-                </Group>
+                {isElectron() && (
+                    <>
+                        <Divider />
+                        <Group>
+                            <Switch
+                                checked={ignoreCORS === 'true'}
+                                label={t('form.addServer.ignoreCors', {
+                                    postProcess: 'sentenceCase',
+                                })}
+                                onChange={handleUpdateIgnoreCORS}
+                            />
+                        </Group>
+                        <Group>
+                            <Switch
+                                checked={ignoreSSL === 'true'}
+                                label={t('form.addServer.ignoreSsl', {
+                                    postProcess: 'sentenceCase',
+                                })}
+                                onChange={handleUpdateIgnoreSSL}
+                            />
+                        </Group>
+                    </>
+                )}
             </Stack>
         </>
     );

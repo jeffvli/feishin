@@ -38,11 +38,11 @@ const DefaultCardContainer = styled.div<{ $isHidden?: boolean; $itemGap: number 
     height: calc(100% - 2rem);
     margin: ${({ $itemGap }) => $itemGap}px;
     overflow: hidden;
+    pointer-events: auto;
+    cursor: pointer;
     background: var(--card-default-bg);
     border-radius: var(--card-default-radius);
-    cursor: pointer;
     opacity: ${({ $isHidden }) => ($isHidden ? 0 : 1)};
-    pointer-events: auto;
 
     &:hover {
         background: var(--card-default-bg-hover);
@@ -89,11 +89,11 @@ const ImageContainer = styled.div<{ $isFavorite?: boolean }>`
         z-index: 1;
         width: 100%;
         height: 100%;
-        background: linear-gradient(0deg, rgba(0, 0, 0, 100%) 35%, rgba(0, 0, 0, 0%) 100%);
-        opacity: 0;
-        transition: all 0.2s ease-in-out;
         content: '';
         user-select: none;
+        background: linear-gradient(0deg, rgb(0 0 0 / 100%) 35%, rgb(0 0 0 / 0%) 100%);
+        opacity: 0;
+        transition: all 0.2s ease-in-out;
     }
     ${(props) =>
         props.$isFavorite &&

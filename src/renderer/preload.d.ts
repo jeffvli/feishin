@@ -1,6 +1,6 @@
 import { IpcRendererEvent } from 'electron';
 import { PlayerData, PlayerState } from './store';
-import { InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
+import { FontData, InternetProviderLyricResponse, QueueSong } from '/@/renderer/api/types';
 import { Remote } from '/@/main/preload/remote';
 import { Mpris } from '/@/main/preload/mpris';
 import { MpvPLayer, MpvPlayerListener } from '/@/main/preload/mpv-player';
@@ -8,11 +8,13 @@ import { Lyrics } from '/@/main/preload/lyrics';
 import { Utils } from '/@/main/preload/utils';
 import { LocalSettings } from '/@/main/preload/local-settings';
 import { Ipc } from '/@/main/preload/ipc';
+import { DiscordRpc } from '/@/main/preload/discord-rpc';
 
 declare global {
     interface Window {
         electron: {
             browser: any;
+            discordRpc: DiscordRpc;
             ipc?: Ipc;
             ipcRenderer: {
                 APP_RESTART(): void;
@@ -76,6 +78,7 @@ declare global {
             remote?: Remote;
             utils?: Utils;
         };
+        queryLocalFonts?: () => Promise<FontData[]>;
     }
 }
 

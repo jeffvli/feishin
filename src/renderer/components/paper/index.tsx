@@ -1,9 +1,10 @@
+import { ReactNode } from 'react';
 import type { PaperProps as MantinePaperProps } from '@mantine/core';
 import { Paper as MantinePaper } from '@mantine/core';
 import styled from 'styled-components';
 
 export interface PaperProps extends MantinePaperProps {
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 const StyledPaper = styled(MantinePaper)<PaperProps>`

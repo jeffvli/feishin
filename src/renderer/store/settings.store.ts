@@ -19,8 +19,10 @@ import {
     PlaybackType,
     TableType,
     Platform,
+    FontType,
 } from '/@/renderer/types';
 import { randomString } from '/@/renderer/utils';
+import i18n from '/@/i18n/i18n';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -32,26 +34,61 @@ export type SidebarItemType = {
 };
 
 export const sidebarItems = [
-    { disabled: true, id: 'Now Playing', label: 'Now Playing', route: AppRoute.NOW_PLAYING },
+    {
+        disabled: true,
+        id: 'Now Playing',
+        label: i18n.t('page.sidebar.nowPlaying'),
+        route: AppRoute.NOW_PLAYING,
+    },
     {
         disabled: true,
         id: 'Search',
-        label: 'Search',
+        label: i18n.t('page.sidebar.search'),
         route: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
     },
-    { disabled: false, id: 'Home', label: 'Home', route: AppRoute.HOME },
-    { disabled: false, id: 'Albums', label: 'Albums', route: AppRoute.LIBRARY_ALBUMS },
-    { disabled: false, id: 'Tracks', label: 'Tracks', route: AppRoute.LIBRARY_SONGS },
+    { disabled: false, id: 'Home', label: i18n.t('page.sidebar.home'), route: AppRoute.HOME },
+    {
+        disabled: false,
+        id: 'Albums',
+        label: i18n.t('page.sidebar.albums'),
+        route: AppRoute.LIBRARY_ALBUMS,
+    },
+    {
+        disabled: false,
+        id: 'Tracks',
+        label: i18n.t('page.sidebar.tracks'),
+        route: AppRoute.LIBRARY_SONGS,
+    },
     {
         disabled: false,
         id: 'Artists',
-        label: 'Artists',
+        label: i18n.t('page.sidebar.artists'),
         route: AppRoute.LIBRARY_ALBUM_ARTISTS,
     },
-    { disabled: false, id: 'Genres', label: 'Genres', route: AppRoute.LIBRARY_GENRES },
-    { disabled: true, id: 'Folders', label: 'Folders', route: AppRoute.LIBRARY_FOLDERS },
-    { disabled: true, id: 'Playlists', label: 'Playlists', route: AppRoute.PLAYLISTS },
-    { disabled: true, id: 'Settings', label: 'Settings', route: AppRoute.SETTINGS },
+    {
+        disabled: false,
+        id: 'Genres',
+        label: i18n.t('page.sidebar.genres'),
+        route: AppRoute.LIBRARY_GENRES,
+    },
+    {
+        disabled: true,
+        id: 'Folders',
+        label: i18n.t('page.sidebar.folders'),
+        route: AppRoute.LIBRARY_FOLDERS,
+    },
+    {
+        disabled: true,
+        id: 'Playlists',
+        label: i18n.t('page.sidebar.playlists'),
+        route: AppRoute.PLAYLISTS,
+    },
+    {
+        disabled: true,
+        id: 'Settings',
+        label: i18n.t('page.sidebar.settings'),
+        route: AppRoute.SETTINGS,
+    },
 ];
 
 export type PersistedTableColumn = {
@@ -81,6 +118,14 @@ type MpvSettings = {
 };
 
 export enum BindingActions {
+    BROWSER_BACK = 'browserBack',
+    BROWSER_FORWARD = 'browserForward',
+    FAVORITE_CURRENT_ADD = 'favoriteCurrentAdd',
+    FAVORITE_CURRENT_REMOVE = 'favoriteCurrentRemove',
+    FAVORITE_CURRENT_TOGGLE = 'favoriteCurrentToggle',
+    FAVORITE_PREVIOUS_ADD = 'favoritePreviousAdd',
+    FAVORITE_PREVIOUS_REMOVE = 'favoritePreviousRemove',
+    FAVORITE_PREVIOUS_TOGGLE = 'favoritePreviousToggle',
     GLOBAL_SEARCH = 'globalSearch',
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
@@ -89,6 +134,12 @@ export enum BindingActions {
     PLAY = 'play',
     PLAY_PAUSE = 'playPause',
     PREVIOUS = 'previous',
+    RATE_0 = 'rate0',
+    RATE_1 = 'rate1',
+    RATE_2 = 'rate2',
+    RATE_3 = 'rate3',
+    RATE_4 = 'rate4',
+    RATE_5 = 'rate5',
     SHUFFLE = 'toggleShuffle',
     SKIP_BACKWARD = 'skipBackward',
     SKIP_FORWARD = 'skipForward',
@@ -103,14 +154,29 @@ export enum BindingActions {
 }
 
 export interface SettingsState {
+    discord: {
+        clientId: string;
+        enableIdle: boolean;
+        enabled: boolean;
+        showServerImage: boolean;
+        updateInterval: number;
+    };
+    font: {
+        builtIn: string;
+        custom: string | null;
+        system: string | null;
+        type: FontType;
+    };
     general: {
+        accent: string;
         defaultFullPlaylist: boolean;
         followSystemTheme: boolean;
-        fontContent: string;
+        language: string;
         playButtonBehavior: Play;
         resume: boolean;
         showQueueDrawerButton: boolean;
         sideQueueType: SideQueueType;
+        sidebarCollapsedNavigation: boolean;
         sidebarItems: SidebarItemType[];
         sidebarPlaylistList: boolean;
         skipButtons: {
@@ -187,6 +253,7 @@ export interface SettingsSlice extends SettingsState {
         reset: () => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
+        setTable: (type: TableType, data: DataTableProps) => void;
     };
 }
 
@@ -198,14 +265,29 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    discord: {
+        clientId: '1165957668758900787',
+        enableIdle: false,
+        enabled: false,
+        showServerImage: false,
+        updateInterval: 15,
+    },
+    font: {
+        builtIn: 'Inter',
+        custom: null,
+        system: null,
+        type: FontType.BUILT_IN,
+    },
     general: {
+        accent: 'rgb(53, 116, 252)',
         defaultFullPlaylist: true,
         followSystemTheme: false,
-        fontContent: 'Inter',
+        language: 'en',
         playButtonBehavior: Play.NOW,
         resume: false,
         showQueueDrawerButton: false,
         sideQueueType: 'sideQueue',
+        sidebarCollapsedNavigation: true,
         sidebarItems,
         sidebarPlaylistList: true,
         skipButtons: {
@@ -221,6 +303,14 @@ const initialState: SettingsState = {
     },
     hotkeys: {
         bindings: {
+            browserBack: { allowGlobal: false, hotkey: '', isGlobal: false },
+            browserForward: { allowGlobal: false, hotkey: '', isGlobal: false },
+            favoriteCurrentAdd: { allowGlobal: true, hotkey: '', isGlobal: false },
+            favoriteCurrentRemove: { allowGlobal: true, hotkey: '', isGlobal: false },
+            favoriteCurrentToggle: { allowGlobal: true, hotkey: '', isGlobal: false },
+            favoritePreviousAdd: { allowGlobal: true, hotkey: '', isGlobal: false },
+            favoritePreviousRemove: { allowGlobal: true, hotkey: '', isGlobal: false },
+            favoritePreviousToggle: { allowGlobal: true, hotkey: '', isGlobal: false },
             globalSearch: { allowGlobal: false, hotkey: 'mod+k', isGlobal: false },
             localSearch: { allowGlobal: false, hotkey: 'mod+f', isGlobal: false },
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
@@ -228,6 +318,12 @@ const initialState: SettingsState = {
             play: { allowGlobal: true, hotkey: '', isGlobal: false },
             playPause: { allowGlobal: true, hotkey: '', isGlobal: false },
             previous: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate0: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate1: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate2: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate3: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate4: { allowGlobal: true, hotkey: '', isGlobal: false },
+            rate5: { allowGlobal: true, hotkey: '', isGlobal: false },
             skipBackward: { allowGlobal: true, hotkey: '', isGlobal: false },
             skipForward: { allowGlobal: true, hotkey: '', isGlobal: false },
             stop: { allowGlobal: true, hotkey: '', isGlobal: false },
@@ -326,6 +422,10 @@ const initialState: SettingsState = {
             autoFit: true,
             columns: [
                 {
+                    column: TableColumn.ROW_INDEX,
+                    width: 80,
+                },
+                {
                     column: TableColumn.TITLE_COMBINED,
                     width: 500,
                 },
@@ -346,7 +446,7 @@ const initialState: SettingsState = {
             columns: [
                 {
                     column: TableColumn.ROW_INDEX,
-                    width: 50,
+                    width: 80,
                 },
                 {
                     column: TableColumn.TITLE,
@@ -475,6 +575,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                             state.general.sidebarItems = items;
                         });
                     },
+                    setTable: (type: TableType, data: DataTableProps) => {
+                        set((state) => {
+                            state.tables[type] = data;
+                        });
+                    },
                 },
                 ...initialState,
             })),
@@ -514,3 +619,7 @@ export const useMpvSettings = () =>
 export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics, shallow);
 
 export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);
+
+export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
+
+export const useDiscordSetttings = () => useSettingsStore((state) => state.discord, shallow);

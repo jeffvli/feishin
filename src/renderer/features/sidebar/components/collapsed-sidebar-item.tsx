@@ -1,6 +1,6 @@
 import { createPolymorphicComponent, Flex } from '@mantine/core';
 import { motion } from 'framer-motion';
-import { forwardRef } from 'react';
+import { forwardRef, ReactNode } from 'react';
 import { useMatch } from 'react-router';
 import styled from 'styled-components';
 import { Text } from '/@/renderer/components';
@@ -9,11 +9,11 @@ const Container = styled(Flex)<{ $active?: boolean; $disabled?: boolean }>`
     position: relative;
     width: 100%;
     padding: 0.9rem 0.3rem;
-    border-right: var(--sidebar-border);
-    cursor: ${(props) => (props.$disabled ? 'default' : 'pointer')};
-    opacity: ${(props) => props.$disabled && 0.6};
-    user-select: ${(props) => (props.$disabled ? 'none' : 'initial')};
     pointer-events: ${(props) => (props.$disabled ? 'none' : 'all')};
+    cursor: ${(props) => (props.$disabled ? 'default' : 'pointer')};
+    user-select: ${(props) => (props.$disabled ? 'none' : 'initial')};
+    border-right: var(--sidebar-border);
+    opacity: ${(props) => props.$disabled && 0.6};
 
     svg {
         fill: ${(props) => (props.$active ? 'var(--primary-color)' : 'var(--sidebar-fg)')};
@@ -44,9 +44,9 @@ const Container = styled(Flex)<{ $active?: boolean; $disabled?: boolean }>`
 const TextWrapper = styled.div`
     width: 100%;
     overflow: hidden;
-    white-space: nowrap;
     text-align: center;
     text-overflow: ellipsis;
+    white-space: nowrap;
 `;
 
 const ActiveTabIndicator = styled(motion.div)`
@@ -63,9 +63,9 @@ const ActiveTabIndicator = styled(motion.div)`
 `;
 
 interface CollapsedSidebarItemProps {
-    activeIcon: React.ReactNode;
+    activeIcon: ReactNode;
     disabled?: boolean;
-    icon: React.ReactNode;
+    icon: ReactNode;
     label: string;
     route?: string;
 }

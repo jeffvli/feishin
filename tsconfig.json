@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "es2021",
         "module": "commonjs",
-        "lib": ["dom", "es2021"],
+        "lib": ["dom", "es2021", "WebWorker"],
         "baseUrl": "./src",
         "paths": {
             "/@/*": ["*"]
@@ -10,7 +10,6 @@
         "declaration": true,
         "declarationMap": true,
         "jsx": "react-jsx",
-        "jsxImportSource": "@emotion/react",
         "strict": true,
         "pretty": true,
         "sourceMap": true,

@@ -1,4 +1,4 @@
-import { forwardRef, ReactNode, Ref } from 'react';
+import { ComponentPropsWithoutRef, forwardRef, ReactNode, Ref } from 'react';
 import { Box, Group, UnstyledButton, UnstyledButtonProps } from '@mantine/core';
 import { motion, Variants } from 'framer-motion';
 import styled from 'styled-components';
@@ -20,7 +20,7 @@ const ContextMenuContainer = styled(motion.div)<Omit<ContextMenuProps, 'children
     max-width: ${({ maxWidth }) => maxWidth}px;
     background: var(--dropdown-menu-bg);
     border-radius: var(--dropdown-menu-border-radius);
-    box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 40%);
+    box-shadow: 2px 2px 10px 2px rgb(0 0 0 / 40%);
 
     button:first-child {
         border-top-left-radius: var(--dropdown-menu-border-radius);
@@ -35,13 +35,13 @@ const ContextMenuContainer = styled(motion.div)<Omit<ContextMenuProps, 'children
 
 export const StyledContextMenuButton = styled(UnstyledButton)`
     padding: var(--dropdown-menu-item-padding);
-    color: var(--dropdown-menu-fg);
-    font-weight: 500;
     font-family: var(--content-font-family);
+    font-weight: 500;
+    color: var(--dropdown-menu-fg);
     text-align: left;
+    cursor: default;
     background: var(--dropdown-menu-bg);
     border: none;
-    cursor: default;
 
     & .mantine-Button-inner {
         justify-content: flex-start;
@@ -65,7 +65,7 @@ export const ContextMenuButton = forwardRef(
             leftIcon,
             ...props
         }: UnstyledButtonProps &
-            React.ComponentPropsWithoutRef<'button'> & {
+            ComponentPropsWithoutRef<'button'> & {
                 leftIcon?: ReactNode;
                 rightIcon?: ReactNode;
             },

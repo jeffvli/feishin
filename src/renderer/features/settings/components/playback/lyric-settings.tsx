@@ -7,6 +7,7 @@ import { MultiSelect, MultiSelectProps, NumberInput, Switch } from '/@/renderer/
 import isElectron from 'is-electron';
 import styled from 'styled-components';
 import { LyricSource } from '/@/renderer/api/types';
+import { useTranslation } from 'react-i18next';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -17,6 +18,7 @@ const WorkingButtonSelect = styled(MultiSelect)<MultiSelectProps>`
 `;
 
 export const LyricSettings = () => {
+    const { t } = useTranslation();
     const settings = useLyricsSettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -36,8 +38,11 @@ export const LyricSettings = () => {
                     }}
                 />
             ),
-            description: 'Enable or disable following of current lyric',
-            title: 'Follow current lyric',
+            description: t('setting.followLyric', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.followLyric', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -54,9 +59,12 @@ export const LyricSettings = () => {
                     }}
                 />
             ),
-            description: 'Enable or disable fetching lyrics for the current song',
+            description: t('setting.lyricFetch', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Fetch lyrics from the internet',
+            title: t('setting.lyricFetch', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -77,10 +85,12 @@ export const LyricSettings = () => {
                     }}
                 />
             ),
-            description:
-                'Lyric fetchers should be added in order of preference. This is the order in which they will be queried.',
+            description: t('setting.lyricFetchProvider', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Providers to fetch lyrics',
+            title: t('setting.lyricFetchProvider', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -99,10 +109,12 @@ export const LyricSettings = () => {
                     }}
                 />
             ),
-            description:
-                'Lyric offset (in milliseconds). Positive values mean that lyrics are shown later, and negative mean that lyrics are shown earlier',
+            description: t('setting.lyricOffset', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Lyric offset',
+            title: t('setting.lyricOffset', { postProcess: 'sentenceCase' }),
         },
     ];
 

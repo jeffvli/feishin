@@ -1,3 +1,4 @@
+import { MutableRefObject } from 'react';
 import { RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { generatePath, useNavigate } from 'react-router';
@@ -11,7 +12,7 @@ import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
 
 interface PlaylistListTableViewProps {
     itemCount?: number;
-    tableRef: React.MutableRefObject<AgGridReactType | null>;
+    tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const PlaylistListTableView = ({ tableRef, itemCount }: PlaylistListTableViewProps) => {

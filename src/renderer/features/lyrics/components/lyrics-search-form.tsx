@@ -4,6 +4,7 @@ import { useForm } from '@mantine/form';
 import { useDebouncedValue } from '@mantine/hooks';
 import { openModal } from '@mantine/modals';
 import orderBy from 'lodash/orderBy';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import {
     InternetProviderLyricSearchResponse,
@@ -12,13 +13,14 @@ import {
 } from '../../../api/types';
 import { useLyricSearch } from '../queries/lyric-search-query';
 import { ScrollArea, Spinner, Text, TextInput } from '/@/renderer/components';
+import i18n from '/@/i18n/i18n';
 
 const SearchItem = styled.button`
     all: unset;
     box-sizing: border-box !important;
     padding: 0.5rem;
-    border-radius: 5px;
     cursor: pointer;
+    border-radius: 5px;
 
     &:hover,
     &:focus-visible {
@@ -84,6 +86,7 @@ interface LyricSearchFormProps {
 }
 
 export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearchFormProps) => {
+    const { t } = useTranslation();
     const form = useForm({
         initialValues: {
             artist: artist || '',
@@ -117,11 +120,17 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
                 <Group grow>
                     <TextInput
                         data-autofocus
-                        label="Name"
+                        label={t('form.lyricSearch.input', {
+                            context: 'name',
+                            postProcess: 'titleCase',
+                        })}
                         {...form.getInputProps('name')}
                     />
                     <TextInput
-                        label="Artist"
+                        label={t('form.lyricSearch.input', {
+                            context: 'artist',
+                            postProcess: 'titleCase',
+                        })}
                         {...form.getInputProps('artist')}
                     />
                 </Group>
@@ -170,6 +179,6 @@ export const openLyricSearchModal = ({ artist, name, onSearchOverride }: LyricSe
             />
         ),
         size: 'lg',
-        title: 'Lyrics Search',
+        title: i18n.t('form.lyricSearch.title', { postProcess: 'titleCase' }) as string,
     });
 };

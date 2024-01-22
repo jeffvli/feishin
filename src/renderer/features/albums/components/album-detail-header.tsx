@@ -37,8 +37,7 @@ export const AlbumDetailHeader = forwardRef(
                 id: 'duration',
                 secondary: false,
                 value:
-                    detailQuery?.data?.duration &&
-                    formatDurationString(detailQuery.data.duration * 1000),
+                    detailQuery?.data?.duration && formatDurationString(detailQuery.data.duration),
             },
         ];
 
@@ -51,18 +50,6 @@ export const AlbumDetailHeader = forwardRef(
                 query: {
                     item: [detailQuery.data],
                     rating,
-                },
-                serverId: detailQuery.data.serverId,
-            });
-        };
-
-        const handleClearRating = () => {
-            if (!detailQuery?.data || !detailQuery?.data.userRating) return;
-
-            updateRatingMutation.mutate({
-                query: {
-                    item: [detailQuery.data],
-                    rating: 0,
                 },
                 serverId: detailQuery.data.serverId,
             });
@@ -97,7 +84,6 @@ export const AlbumDetailHeader = forwardRef(
                                         }
                                         value={detailQuery?.data?.userRating || 0}
                                         onChange={handleUpdateRating}
-                                        onClick={handleClearRating}
                                     />
                                 </>
                             )}

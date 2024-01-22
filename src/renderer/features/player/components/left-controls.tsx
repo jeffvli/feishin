@@ -2,6 +2,7 @@ import React, { MouseEvent } from 'react';
 import { Center, Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { RiArrowUpSLine, RiDiscLine, RiMore2Fill } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -41,9 +42,9 @@ const Image = styled(motion.div)`
     position: relative;
     width: 60px;
     height: 60px;
-    background-color: var(--placeholder-bg);
     cursor: pointer;
-    filter: drop-shadow(0 5px 6px rgb(0, 0, 0, 50%));
+    background-color: var(--placeholder-bg);
+    filter: drop-shadow(0 5px 6px rgb(0 0 0 / 50%));
 
     ${fadeIn};
     animation: fadein 0.2s ease-in-out;
@@ -68,10 +69,10 @@ const LineItem = styled.div<{ $secondary?: boolean }>`
     width: 95%;
     max-width: 20vw;
     overflow: hidden;
-    color: ${(props) => props.$secondary && 'var(--main-fg-secondary)'};
     line-height: 1.3;
-    white-space: nowrap;
+    color: ${(props) => props.$secondary && 'var(--main-fg-secondary)'};
     text-overflow: ellipsis;
+    white-space: nowrap;
 
     a {
         color: ${(props) => props.$secondary && 'var(--text-secondary)'};
@@ -84,7 +85,7 @@ const LeftControlsContainer = styled.div`
     height: 100%;
     padding-left: 1rem;
 
-    @media (max-width: 640px) {
+    @media (width <= 640px) {
         ${ImageWrapper} {
             display: none;
         }
@@ -92,6 +93,7 @@ const LeftControlsContainer = styled.div`
 `;
 
 export const LeftControls = () => {
+    const { t } = useTranslation();
     const { setSideBar } = useAppStoreActions();
     const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
@@ -147,7 +149,9 @@ export const LeftControls = () => {
                                 onClick={handleToggleFullScreenPlayer}
                             >
                                 <Tooltip
-                                    label="Toggle fullscreen player"
+                                    label={t('player.toggleFullscreenPlayer', {
+                                        postProcess: 'sentenceCase',
+                                    })}
                                     openDelay={500}
                                 >
                                     {currentSong?.imageUrl ? (
@@ -182,7 +186,12 @@ export const LeftControls = () => {
                                             right: 2,
                                             top: 2,
                                         }}
-                                        tooltip={{ label: 'Expand', openDelay: 500 }}
+                                        tooltip={{
+                                            label: t('common.expand', {
+                                                postProcess: 'titleCase',
+                                            }),
+                                            openDelay: 500,
+                                        }}
                                         variant="default"
                                         onClick={handleToggleSidebarImage}
                                     >

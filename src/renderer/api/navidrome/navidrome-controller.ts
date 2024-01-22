@@ -267,7 +267,9 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
     }
 
     return {
-        items: res.body.data.map((song) => ndNormalize.song(song, apiClientProps.server, '')),
+        items: res.body.data.map((song) =>
+            ndNormalize.song(song, apiClientProps.server, '', query.imageSize),
+        ),
         startIndex: query?.startIndex || 0,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };

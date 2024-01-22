@@ -1,5 +1,6 @@
-import { Center, Flex } from '@mantine/core';
 import { useCallback, MouseEvent } from 'react';
+import { Center, Flex } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import {
     RiAddBoxFill,
     RiAddCircleFill,
@@ -17,10 +18,10 @@ const Item = styled(Flex)``;
 
 const ItemGrid = styled.div<{ height: number }>`
     display: grid;
-    grid-auto-columns: 1fr;
     grid-template-areas: 'image info';
     grid-template-rows: 1fr;
     grid-template-columns: ${(props) => props.height}px minmax(0, 1fr);
+    grid-auto-columns: 1fr;
     gap: 0.5rem;
     width: 100%;
     max-width: 100%;
@@ -68,6 +69,7 @@ export const LibraryCommandItem = ({
     itemType,
     handlePlayQueueAdd,
 }: LibraryCommandItemProps) => {
+    const { t } = useTranslation();
     let Placeholder = RiAlbumFill;
 
     switch (itemType) {
@@ -153,7 +155,10 @@ export const LibraryCommandItem = ({
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Play', openDelay: 500 }}
+                    tooltip={{
+                        label: t('player.play', { postProcess: 'sentenceCase' }),
+                        openDelay: 500,
+                    }}
                     variant="default"
                     onClick={(e) => handlePlay(e, id, Play.NOW)}
                 >
@@ -162,7 +167,11 @@ export const LibraryCommandItem = ({
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Add to queue', openDelay: 500 }}
+                    tooltip={{
+                        label: t('player.addLast', { postProcess: 'sentenceCase' }),
+
+                        openDelay: 500,
+                    }}
                     variant="default"
                     onClick={(e) => handlePlay(e, id, Play.LAST)}
                 >
@@ -171,7 +180,10 @@ export const LibraryCommandItem = ({
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Play next', openDelay: 500 }}
+                    tooltip={{
+                        label: t('player.addNext', { postProcess: 'sentenceCase' }),
+                        openDelay: 500,
+                    }}
                     variant="default"
                     onClick={(e) => handlePlay(e, id, Play.NEXT)}
                 >

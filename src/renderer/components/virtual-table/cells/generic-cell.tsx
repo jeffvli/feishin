@@ -4,13 +4,13 @@ import styled from 'styled-components';
 import { Skeleton } from '/@/renderer/components/skeleton';
 import { Text } from '/@/renderer/components/text';
 
-export const CellContainer = styled.div<{ position?: 'left' | 'center' | 'right' }>`
+export const CellContainer = styled.div<{ $position?: 'left' | 'center' | 'right' }>`
     display: flex;
     align-items: center;
     justify-content: ${(props) =>
-        props.position === 'right'
+        props.$position === 'right'
             ? 'flex-end'
-            : props.position === 'center'
+            : props.$position === 'center'
             ? 'center'
             : 'flex-start'};
     width: 100%;
@@ -34,7 +34,7 @@ export const GenericCell = (
 
     if (value === undefined) {
         return (
-            <CellContainer position={position || 'left'}>
+            <CellContainer $position={position || 'left'}>
                 <Skeleton
                     height="1rem"
                     width="80%"
@@ -44,7 +44,7 @@ export const GenericCell = (
     }
 
     return (
-        <CellContainer position={position || 'left'}>
+        <CellContainer $position={position || 'left'}>
             {isLink ? (
                 <Text
                     $link={isLink}
@@ -58,6 +58,7 @@ export const GenericCell = (
                 </Text>
             ) : (
                 <Text
+                    $noSelect={false}
                     $secondary={!primary}
                     overflow="hidden"
                     size="md"

@@ -38,7 +38,7 @@ const configuration: webpack.Configuration = {
 
     output: {
         path: webpackPaths.distWebPath,
-        publicPath: '/',
+        publicPath: 'auto',
         filename: 'renderer.js',
         library: {
             type: 'umd',
@@ -120,6 +120,7 @@ const configuration: webpack.Configuration = {
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
+            favicon: path.join(webpackPaths.assetsPath, 'icons', 'favicon.ico'),
             minify: {
                 collapseWhitespace: true,
                 removeAttributeQuotes: true,

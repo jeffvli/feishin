@@ -18,6 +18,7 @@ import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
 import debounce from 'lodash/debounce';
 import { QueueSong } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components';
+import { useTranslation } from 'react-i18next';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
@@ -28,6 +29,7 @@ const remote = isElectron() ? window.electron.remote : null;
 const mediaSession = !isElectron() || !utils?.isLinux() ? navigator.mediaSession : null;
 
 export const useCenterControls = (args: { playersRef: any }) => {
+    const { t } = useTranslation();
     const { playersRef } = args;
 
     const settings = useSettingsStore((state) => state.playback);
@@ -191,8 +193,9 @@ export const useCenterControls = (args: { playersRef: any }) => {
             return mpvPlayer?.setQueueNext(playerData);
         }
 
+        const playerData = setRepeat(PlayerRepeat.NONE);
         remote?.updateRepeat(PlayerRepeat.NONE);
-        return setRepeat(PlayerRepeat.NONE);
+        return mpvPlayer?.setQueueNext(playerData);
     }, [repeatStatus, setRepeat]);
 
     const checkIsLastTrack = useCallback(() => {
@@ -612,11 +615,15 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
     const handleError = useCallback(
         (message: string) => {
-            toast.error({ id: 'mpv-error', message, title: 'An error occurred during playback' });
+            toast.error({
+                id: 'mpv-error',
+                message,
+                title: t('error.playbackError', { postProcess: 'sentenceCase' }),
+            });
             pause();
             mpvPlayer!.pause();
         },
-        [pause],
+        [pause, t],
     );
 
     useEffect(() => {

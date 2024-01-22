@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
@@ -23,8 +23,10 @@ import { PlayQueueHandlerContext } from '/@/renderer/features/player';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
 import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
-import { PlaybackType, PlayerStatus } from '/@/renderer/types';
+import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
 import '@ag-grid-community/styles/ag-grid.css';
+import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
+import i18n from '/@/i18n/i18n';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -37,17 +39,56 @@ const remote = isElectron() ? window.electron.remote : null;
 
 export const App = () => {
     const theme = useTheme();
-    const contentFont = useSettingsStore((state) => state.general.fontContent);
+    const accent = useSettingsStore((store) => store.general.accent);
+    const language = useSettingsStore((store) => store.general.language);
+    const { builtIn, custom, system, type } = useSettingsStore((state) => state.font);
     const { type: playbackType } = usePlaybackSettings();
     const { bindings } = useHotkeySettings();
     const handlePlayQueueAdd = useHandlePlayQueueAdd();
     const { clearQueue, restoreQueue } = useQueueControls();
     const remoteSettings = useRemoteSettings();
+    const textStyleRef = useRef<HTMLStyleElement>();
+    useDiscordRpc();
+
+    useEffect(() => {
+        if (type === FontType.SYSTEM && system) {
+            const root = document.documentElement;
+            root.style.setProperty('--content-font-family', 'dynamic-font');
+
+            if (!textStyleRef.current) {
+                textStyleRef.current = document.createElement('style');
+                document.body.appendChild(textStyleRef.current);
+            }
+
+            textStyleRef.current.textContent = `
+            @font-face {
+                font-family: "dynamic-font";
+                src: local("${system}");
+            }`;
+        } else if (type === FontType.CUSTOM && custom) {
+            const root = document.documentElement;
+            root.style.setProperty('--content-font-family', 'dynamic-font');
+
+            if (!textStyleRef.current) {
+                textStyleRef.current = document.createElement('style');
+                document.body.appendChild(textStyleRef.current);
+            }
+
+            textStyleRef.current.textContent = `
+            @font-face {
+                font-family: "dynamic-font";
+                src: url("feishin://${custom}");
+            }`;
+        } else {
+            const root = document.documentElement;
+            root.style.setProperty('--content-font-family', builtIn);
+        }
+    }, [builtIn, custom, system, type]);
 
     useEffect(() => {
         const root = document.documentElement;
-        root.style.setProperty('--content-font-family', contentFont);
-    }, [contentFont]);
+        root.style.setProperty('--primary-color', accent);
+    }, [accent]);
 
     const providerValue = useMemo(() => {
         return { handlePlayQueueAdd };
@@ -62,7 +103,8 @@ export const App = () => {
 
             if (!isRunning) {
                 const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
-                const properties = {
+                const properties: Record<string, any> = {
+                    speed: usePlayerStore.getState().current.speed,
                     ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
                 };
 
@@ -73,6 +115,7 @@ export const App = () => {
 
                 mpvPlayer?.volume(properties.volume);
             }
+            mpvPlayer?.restoreQueue();
         };
 
         if (isElectron() && playbackType === PlaybackType.LOCAL) {
@@ -94,8 +137,6 @@ export const App = () => {
 
     useEffect(() => {
         if (isElectron()) {
-            mpvPlayer!.restoreQueue();
-
             mpvPlayerListener!.rendererSaveQueue(() => {
                 const { current, queue } = usePlayerStore.getState();
                 const stateToSave: Partial<Pick<PlayerState, 'current' | 'queue'>> = {
@@ -138,6 +179,12 @@ export const App = () => {
         // We only want to fire this once
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (language) {
+            i18n.changeLanguage(language);
+        }
+    }, [language]);
 
     return (
         <MantineProvider

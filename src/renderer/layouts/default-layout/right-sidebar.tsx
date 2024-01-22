@@ -115,8 +115,8 @@ export const RightSidebar = forwardRef(
                             >
                                 <ResizeHandle
                                     ref={ref}
-                                    isResizing={isResizingRight}
-                                    placement="left"
+                                    $isResizing={isResizingRight}
+                                    $placement="left"
                                     onMouseDown={(e) => {
                                         e.preventDefault();
                                         startResizing('right');

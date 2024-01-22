@@ -27,8 +27,8 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     transition: background 0.2s ease-in-out, color 0.2s ease-in-out, border 0.2s ease-in-out;
 
     svg {
-        transition: fill 0.2s ease-in-out;
         fill: ${(props) => `var(--btn-${props.variant}-fg)`};
+        transition: fill 0.2s ease-in-out;
     }
 
     &:disabled {
@@ -39,8 +39,9 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     }
 
     &:not([data-disabled])&:hover {
-        color: ${(props) => `var(--btn-${props.variant}-fg-hover) !important`};
-        background: ${(props) => `var(--btn-${props.variant}-bg-hover)`};
+        color: ${(props) => `var(--btn-${props.variant}-fg) !important`};
+        background: ${(props) => `var(--btn-${props.variant}-bg)`};
+        filter: brightness(85%);
         border: ${(props) => `var(--btn-${props.variant}-border-hover)`};
 
         svg {
@@ -50,11 +51,8 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
 
     &:not([data-disabled])&:focus-visible {
         color: ${(props) => `var(--btn-${props.variant}-fg-hover)`};
-        background: ${(props) => `var(--btn-${props.variant}-bg-hover)`};
-    }
-
-    &:active {
-        transform: none;
+        background: ${(props) => `var(--btn-${props.variant}-bg)`};
+        filter: brightness(85%);
     }
 
     & .mantine-Button-centerLoader {
@@ -65,7 +63,6 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
         display: flex;
         height: 100%;
         margin-right: 0.5rem;
-        transform: translateY(-0.1rem);
     }
 
     .mantine-Button-rightIcon {

@@ -6,14 +6,21 @@ import { Button } from '/@/renderer/components/button';
 import { DropdownMenu } from '/@/renderer/components/dropdown-menu';
 import { QueryBuilderOption } from '/@/renderer/components/query-builder/query-builder-option';
 import { QueryBuilderGroup, QueryBuilderRule } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 const FILTER_GROUP_OPTIONS_DATA = [
     {
-        label: 'Match all',
+        label: i18n.t('form.queryEditor.input', {
+            context: 'optionMatchAll',
+            postProcess: 'sentenceCase',
+        }),
         value: 'all',
     },
     {
-        label: 'Match any',
+        label: i18n.t('form.queryEditor.input', {
+            context: 'optionMatchAny',
+            postProcess: 'sentenceCase',
+        }),
         value: 'any',
     },
 ];

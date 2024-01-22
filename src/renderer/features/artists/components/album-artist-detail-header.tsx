@@ -1,4 +1,4 @@
-import { forwardRef, Fragment, Ref, MouseEvent } from 'react';
+import { forwardRef, Fragment, Ref } from 'react';
 import { Group, Rating, Stack } from '@mantine/core';
 import { useParams } from 'react-router';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
@@ -55,21 +55,6 @@ export const AlbumArtistDetailHeader = forwardRef(
             });
         };
 
-        const handleClearRating = (_e: MouseEvent<HTMLDivElement>, rating?: number) => {
-            if (!detailQuery?.data || !detailQuery?.data.userRating) return;
-
-            const isSameRatingAsPrevious = rating === detailQuery.data.userRating;
-            if (!isSameRatingAsPrevious) return;
-
-            updateRatingMutation.mutate({
-                query: {
-                    item: [detailQuery.data],
-                    rating: 0,
-                },
-                serverId: detailQuery.data.serverId,
-            });
-        };
-
         const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
 
         return (
@@ -99,7 +84,6 @@ export const AlbumArtistDetailHeader = forwardRef(
                                     }
                                     value={detailQuery?.data?.userRating || 0}
                                     onChange={handleUpdateRating}
-                                    onClick={handleClearRating}
                                 />
                             </>
                         )}

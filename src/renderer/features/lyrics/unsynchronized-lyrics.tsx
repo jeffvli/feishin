@@ -18,15 +18,23 @@ const UnsynchronizedLyricsContainer = styled.div<{ $gap: number }>`
     overflow: scroll;
     transform: translateY(-2rem);
 
-    mask-image: linear-gradient(
+    -webkit-mask-image: linear-gradient(
         180deg,
         transparent 5%,
-        rgba(0, 0, 0, 100%) 20%,
-        rgba(0, 0, 0, 100%) 85%,
+        rgb(0 0 0 / 100%) 20%,
+        rgb(0 0 0 / 100%) 85%,
         transparent 95%
     );
 
-    @media screen and (max-width: 768px) {
+    mask-image: linear-gradient(
+        180deg,
+        transparent 5%,
+        rgb(0 0 0 / 100%) 20%,
+        rgb(0 0 0 / 100%) 85%,
+        transparent 95%
+    );
+
+    @media screen and (width <= 768px) {
         padding: 5vh 0;
     }
 `;

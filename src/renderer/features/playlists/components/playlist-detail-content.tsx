@@ -1,8 +1,9 @@
+import { MutableRefObject, useMemo, useRef } from 'react';
 import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
-import { MutableRefObject, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiMoreFill } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -36,7 +37,7 @@ const ContentContainer = styled.div`
     overflow: hidden;
 
     .ag-theme-alpine-dark {
-        --ag-header-background-color: rgba(0, 0, 0, 0%) !important;
+        --ag-header-background-color: rgb(0 0 0 / 0%) !important;
     }
 `;
 
@@ -45,6 +46,7 @@ interface PlaylistDetailContentProps {
 }
 
 export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { playlistId } = useParams() as { playlistId: string };
     const { table } = useListStoreByKey({ key: LibraryItem.SONG });
@@ -102,13 +104,10 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                 onError: (err) => {
                     toast.error({
                         message: err.message,
-                        title: 'Error deleting playlist',
+                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
                     });
                 },
                 onSuccess: () => {
-                    toast.success({
-                        message: `Playlist has been deleted`,
-                    });
                     closeAllModals();
                     navigate(AppRoute.PLAYLISTS);
                 },
@@ -126,7 +125,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                     Are you sure you want to delete this playlist?
                 </ConfirmModal>
             ),
-            title: 'Delete playlist',
+            title: t('form.deletePlaylist.title', { postProcess: 'sentenceCase' }),
         });
     };
 

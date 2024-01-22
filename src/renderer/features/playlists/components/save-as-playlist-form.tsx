@@ -4,6 +4,7 @@ import { CreatePlaylistBody, CreatePlaylistResponse, ServerType } from '/@/rende
 import { Button, Switch, TextInput, toast } from '/@/renderer/components';
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { useCurrentServer } from '/@/renderer/store';
+import { useTranslation } from 'react-i18next';
 
 interface SaveAsPlaylistFormProps {
     body: Partial<CreatePlaylistBody>;
@@ -18,6 +19,7 @@ export const SaveAsPlaylistForm = ({
     onSuccess,
     onCancel,
 }: SaveAsPlaylistFormProps) => {
+    const { t } = useTranslation();
     const mutation = useCreatePlaylist({});
     const server = useCurrentServer();
 
@@ -40,10 +42,15 @@ export const SaveAsPlaylistForm = ({
             { body: values, serverId },
             {
                 onError: (err) => {
-                    toast.error({ message: err.message, title: 'Error creating playlist' });
+                    toast.error({
+                        message: err.message,
+                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                    });
                 },
                 onSuccess: (data) => {
-                    toast.success({ message: `Playlist has been created` });
+                    toast.success({
+                        message: t('form.createPlaylist.success', { postProcess: 'sentenceCase' }),
+                    });
                     onSuccess(data);
                     onCancel();
                 },
@@ -60,16 +67,25 @@ export const SaveAsPlaylistForm = ({
                 <TextInput
                     data-autofocus
                     required
-                    label="Name"
+                    label={t('form.createPlaylist.input', {
+                        context: 'name',
+                        postProcess: 'titleCase',
+                    })}
                     {...form.getInputProps('name')}
                 />
                 <TextInput
-                    label="Description"
+                    label={t('form.createPlaylist.input', {
+                        context: 'description',
+                        postProcess: 'titleCase',
+                    })}
                     {...form.getInputProps('comment')}
                 />
                 {isPublicDisplayed && (
                     <Switch
-                        label="Is Public?"
+                        label={t('form.createPlaylist.input', {
+                            context: 'public',
+                            postProcess: 'titleCase',
+                        })}
                         {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
                     />
                 )}
@@ -78,7 +94,7 @@ export const SaveAsPlaylistForm = ({
                         variant="subtle"
                         onClick={onCancel}
                     >
-                        Cancel
+                        {t('common.cancel', { postProcess: 'titleCase' })}
                     </Button>
                     <Button
                         disabled={isSubmitDisabled}
@@ -86,7 +102,7 @@ export const SaveAsPlaylistForm = ({
                         type="submit"
                         variant="filled"
                     >
-                        Save
+                        {t('common.save', { postProcess: 'titleCase' })}
                     </Button>
                 </Group>
             </Stack>

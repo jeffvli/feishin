@@ -20,20 +20,20 @@ const SideDrawerQueue = lazy(() =>
 const MINIMUM_SIDEBAR_WIDTH = 260;
 
 const MainContentContainer = styled.div<{
-    leftSidebarWidth: string;
-    rightExpanded?: boolean;
-    rightSidebarWidth?: string;
-    shell?: boolean;
-    sidebarCollapsed?: boolean;
+    $leftSidebarWidth: string;
+    $rightExpanded?: boolean;
+    $rightSidebarWidth?: string;
+    $shell?: boolean;
+    $sidebarCollapsed?: boolean;
 }>`
     position: relative;
-    display: ${(props) => (props.shell ? 'flex' : 'grid')};
+    display: ${(props) => (props.$shell ? 'flex' : 'grid')};
     grid-area: main-content;
     grid-template-areas: 'sidebar . right-sidebar';
     grid-template-rows: 1fr;
-    grid-template-columns: ${(props) => (props.sidebarCollapsed ? '80px' : props.leftSidebarWidth)} 1fr ${(
-            props,
-        ) => props.rightExpanded && props.rightSidebarWidth};
+    grid-template-columns: ${(props) =>
+            props.$sidebarCollapsed ? '80px' : props.$leftSidebarWidth} 1fr ${(props) =>
+            props.$rightExpanded && props.$rightSidebarWidth};
 
     gap: 0;
     background: var(--main-bg);
@@ -96,12 +96,12 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
 
     return (
         <MainContentContainer
+            $leftSidebarWidth={leftWidth}
+            $rightExpanded={showSideQueue && sideQueueType === 'sideQueue'}
+            $rightSidebarWidth={rightWidth}
+            $shell={shell}
+            $sidebarCollapsed={collapsed}
             id="main-content"
-            leftSidebarWidth={leftWidth}
-            rightExpanded={showSideQueue && sideQueueType === 'sideQueue'}
-            rightSidebarWidth={rightWidth}
-            shell={shell}
-            sidebarCollapsed={collapsed}
         >
             {!shell && (
                 <>

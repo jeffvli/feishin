@@ -50,7 +50,7 @@ const DetailContainer = styled.div`
     overflow: hidden;
 
     .ag-theme-alpine-dark {
-        --ag-header-background-color: rgba(0, 0, 0, 0%) !important;
+        --ag-header-background-color: rgb(0 0 0 / 0%) !important;
     }
 `;
 
@@ -333,7 +333,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
 
     return (
         <ContentContainer ref={cq.ref}>
-            <LibraryBackgroundOverlay backgroundColor={background} />
+            <LibraryBackgroundOverlay $backgroundColor={background} />
             <DetailContainer>
                 <Stack spacing="lg">
                     <Group spacing="md">

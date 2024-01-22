@@ -12,8 +12,8 @@ interface ListItemProps extends FlexProps {
 
 const StyledItem = styled(Flex)`
     width: 100%;
-    font-weight: 600;
     font-family: var(--content-font-family);
+    font-weight: 600;
 
     &:focus-visible {
         border: 1px solid var(--primary-color);
@@ -34,8 +34,8 @@ const ItemStyle = css`
 `;
 
 const _ItemLink = styled(StyledItem)<LinkProps & { disabled?: boolean }>`
-    opacity: ${(props) => props.disabled && 0.6};
     pointer-events: ${(props) => props.disabled && 'none'};
+    opacity: ${(props) => props.disabled && 0.6};
 
     &:focus-visible {
         border: 1px solid var(--primary-color);

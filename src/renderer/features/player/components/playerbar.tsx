@@ -30,7 +30,7 @@ const PlayerbarControlsGrid = styled.div`
     gap: 1rem;
     height: 100%;
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
         grid-template-columns: minmax(0, 0.5fr) minmax(0, 1fr) minmax(0, 0.5fr);
     }
 `;
@@ -73,8 +73,9 @@ export const Playerbar = () => {
     const { autoNext } = usePlayerControls();
 
     const autoNextFn = useCallback(() => {
+        const playerData = autoNext();
+
         if (remote) {
-            const playerData = autoNext();
             remote.updateSong({
                 currentTime: 0,
                 song: playerData.current.song,

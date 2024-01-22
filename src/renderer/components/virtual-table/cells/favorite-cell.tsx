@@ -46,7 +46,7 @@ export const FavoriteCell = ({ value, data, node }: ICellRendererParams) => {
     };
 
     return (
-        <CellContainer position="center">
+        <CellContainer $position="center">
             <Button
                 compact
                 sx={{

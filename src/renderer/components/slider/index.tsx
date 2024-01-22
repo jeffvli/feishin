@@ -23,8 +23,8 @@ const StyledSlider = styled(MantineSlider)`
 
     & .mantine-Slider-label {
         padding: 0 1rem;
-        color: var(--tooltip-fg);
         font-size: 1em;
+        color: var(--tooltip-fg);
         background: var(--tooltip-bg);
     }
 `;

@@ -53,4 +53,14 @@ export interface ClientVolume {
     volume: number;
 }
 
-export type ClientEvent = ClientSimpleEvent | ClientFavorite | ClientRating | ClientVolume;
+export interface ClientAuth {
+    event: 'authenticate';
+    header: string;
+}
+
+export type ClientEvent =
+    | ClientAuth
+    | ClientSimpleEvent
+    | ClientFavorite
+    | ClientRating
+    | ClientVolume;

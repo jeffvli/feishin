@@ -23,7 +23,7 @@ const PlayButton = styled.button<PlayButtonType>`
     justify-content: center;
     width: 50px;
     height: 50px;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(255 255 255);
     border: none;
     border-radius: 50%;
     opacity: 0.8;
@@ -41,8 +41,8 @@ const PlayButton = styled.button<PlayButtonType>`
     }
 
     svg {
-        fill: rgb(0, 0, 0);
-        stroke: rgb(0, 0, 0);
+        fill: rgb(0 0 0);
+        stroke: rgb(0 0 0);
     }
 `;
 
@@ -79,11 +79,11 @@ const FavoriteBanner = styled.div`
     left: -50px;
     width: 80px;
     height: 80px;
-    background-color: var(--primary-color);
-    box-shadow: 0 0 10px 8px rgba(0, 0, 0, 80%);
-    transform: rotate(-45deg);
-    content: '';
     pointer-events: none;
+    content: '';
+    background-color: var(--primary-color);
+    box-shadow: 0 0 10px 8px rgb(0 0 0 / 80%);
+    transform: rotate(-45deg);
 `;
 
 const ControlsRow = styled.div`

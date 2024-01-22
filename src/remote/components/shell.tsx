@@ -26,7 +26,6 @@ export const Shell = () => {
                         <Grid.Col span="auto">
                             <div>
                                 <Image
-                                    bg="rgb(25, 25, 25)"
                                     fit="contain"
                                     height={60}
                                     src="/favicon.ico"

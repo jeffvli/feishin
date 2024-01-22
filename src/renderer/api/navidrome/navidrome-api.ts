@@ -9,6 +9,7 @@ import { authenticationFailure, resultWithHeaders } from '/@/renderer/api/utils'
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem } from '/@/renderer/types';
 import { toast } from '/@/renderer/components';
+import i18n from '/@/i18n/i18n';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -276,9 +277,12 @@ axiosClient.interceptors.response.use(
 
                         if (res.status === 429) {
                             toast.error({
-                                message:
-                                    'you have exceeded the number of allowed login requests. Please wait before logging, or consider tweaking AuthRequestLimit',
-                                title: 'Your session has expired.',
+                                message: i18n.t('error.loginRateError', {
+                                    postProcess: 'sentenceCase',
+                                }) as string,
+                                title: i18n.t('error.sessionExpiredError', {
+                                    postProcess: 'sentenceCase',
+                                }) as string,
                             });
 
                             const serverId = currentServer.id;
@@ -292,7 +296,11 @@ axiosClient.interceptors.response.use(
                             throw TIMEOUT_ERROR;
                         }
                         if (res.status !== 200) {
-                            throw new Error('Failed to authenticate');
+                            throw new Error(
+                                i18n.t('error.authenticatedFailed', {
+                                    postProcess: 'sentenceCase',
+                                }) as string,
+                            );
                         }
 
                         const newCredential = res.data.token;
@@ -372,12 +380,20 @@ export const ndApiClient = (args: {
                 };
             } catch (e: Error | AxiosError | any) {
                 if (isAxiosError(e)) {
+                    if (e.code === 'ERR_NETWORK') {
+                        throw new Error(
+                            i18n.t('error.networkError', {
+                                postProcess: 'sentenceCase',
+                            }) as string,
+                        );
+                    }
+
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
                     return {
-                        body: { data: response.data, headers: response.headers },
-                        headers: response.headers as any,
-                        status: response.status,
+                        body: { data: response?.data, headers: response?.headers },
+                        headers: response?.headers as any,
+                        status: response?.status,
                     };
                 }
                 throw e;

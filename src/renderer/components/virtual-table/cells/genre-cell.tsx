@@ -8,7 +8,7 @@ import { AppRoute } from '/@/renderer/router/routes';
 
 export const GenreCell = ({ value, data }: ICellRendererParams) => {
     return (
-        <CellContainer position="left">
+        <CellContainer $position="left">
             <Text
                 $secondary
                 overflow="hidden"

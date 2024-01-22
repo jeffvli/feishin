@@ -6,6 +6,7 @@ import { deflate, gzip } from 'zlib';
 import axios from 'axios';
 import { app, ipcMain } from 'electron';
 import { Server as WsServer, WebSocketServer, WebSocket } from 'ws';
+import manifest from './manifest.json';
 import { ClientEvent, ServerEvent } from '../../../../remote/types';
 import { PlayerRepeat, SongUpdate } from '../../../../renderer/types';
 import { getMainWindow } from '../../../main';
@@ -34,6 +35,7 @@ interface MimeType {
 
 interface StatefulWebSocket extends WebSocket {
     alive: boolean;
+    auth: boolean;
 }
 
 let server: Server | undefined;
@@ -52,7 +54,9 @@ type SendData = ServerEvent & {
 
 function send({ client, event, data }: SendData): void {
     if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ data, event }));
+        if (client.alive && client.auth) {
+            client.send(JSON.stringify({ data, event }));
+        }
     }
 }
 
@@ -141,17 +145,9 @@ async function serveFile(
     res: ServerResponse,
 ): Promise<void> {
     const fileName = `${file}.${extension}`;
-    let path: string;
-
-    if (extension === 'ico') {
-        path = app.isPackaged
-            ? join(process.resourcesPath, 'assets', fileName)
-            : join(__dirname, '../../../../../assets', fileName);
-    } else {
-        path = app.isPackaged
-            ? join(__dirname, '../remote', fileName)
-            : join(__dirname, '../../../../../.erb/dll', fileName);
-    }
+    const path = app.isPackaged
+        ? join(__dirname, '../remote', fileName)
+        : join(__dirname, '../../../../../.erb/dll', fileName);
 
     let stats: Stats;
 
@@ -291,7 +287,7 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                             break;
                         }
                         case '/favicon.ico': {
-                            await serveFile(req, 'icon', 'ico', res);
+                            await serveFile(req, 'favicon', 'ico', res);
                             break;
                         }
                         case '/remote.css': {
@@ -302,10 +298,26 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                             await serveFile(req, 'remote', 'js', res);
                             break;
                         }
-                        default: {
-                            res.statusCode = 404;
+                        case '/manifest.json': {
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.end(JSON.stringify(manifest));
+                            break;
+                        }
+                        case '/credentials': {
+                            res.statusCode = 200;
                             res.setHeader('Content-Type', 'text/plain');
-                            res.end('Not FOund');
+                            res.end(req.headers.authorization);
+                            break;
+                        }
+                        default: {
+                            if (req.url?.startsWith('/worker.js')) {
+                                await serveFile(req, 'worker', 'js', res);
+                            } else {
+                                res.statusCode = 404;
+                                res.setHeader('Content-Type', 'text/plain');
+                                res.end('Not Found');
+                            }
                         }
                     }
                 } catch (error) {
@@ -318,13 +330,19 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
             server.listen(config.port, resolve);
             wsServer = new WebSocketServer({ server });
 
-            wsServer.on('connection', (ws, req) => {
-                if (!authorize(req)) {
-                    ws.close(4003);
-                    return;
-                }
-
+            wsServer.on('connection', (ws) => {
+                let authFail: number | undefined;
                 ws.alive = true;
+
+                if (!settings.username && !settings.password) {
+                    ws.auth = true;
+                } else {
+                    authFail = setTimeout(() => {
+                        if (!ws.auth) {
+                            ws.close();
+                        }
+                    }, 10000) as unknown as number;
+                }
 
                 ws.on('error', console.error);
 
@@ -332,6 +350,25 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                     try {
                         const json = JSON.parse(data.toString()) as ClientEvent;
                         const event = json.event;
+
+                        if (!ws.auth) {
+                            if (event === 'authenticate') {
+                                const auth = json.header.split(' ')[1];
+                                const [login, password] = Buffer.from(auth, 'base64')
+                                    .toString()
+                                    .split(':');
+
+                                if (login === settings.username && password === settings.password) {
+                                    ws.auth = true;
+                                } else {
+                                    ws.close();
+                                }
+
+                                clearTimeout(authFail);
+                            } else {
+                                return;
+                            }
+                        }
 
                         switch (event) {
                             case 'pause': {

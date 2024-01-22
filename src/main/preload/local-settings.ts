@@ -1,5 +1,5 @@
+import { IpcRendererEvent, ipcRenderer, webFrame } from 'electron';
 import Store from 'electron-store';
-import { ipcRenderer, webFrame } from 'electron';
 
 const store = new Store();
 
@@ -39,9 +39,14 @@ const setZoomFactor = (zoomFactor: number) => {
     webFrame.setZoomFactor(zoomFactor / 100);
 };
 
+const fontError = (cb: (event: IpcRendererEvent, file: string) => void) => {
+    ipcRenderer.on('custom-font-error', cb);
+};
+
 export const localSettings = {
     disableMediaKeys,
     enableMediaKeys,
+    fontError,
     get,
     passwordGet,
     passwordRemove,

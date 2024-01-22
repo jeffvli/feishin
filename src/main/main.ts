@@ -21,6 +21,8 @@ import {
     Menu,
     nativeImage,
     BrowserWindowConstructorOptions,
+    protocol,
+    net,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log';
@@ -42,6 +44,8 @@ export default class AppUpdater {
         autoUpdater.checkForUpdatesAndNotify();
     }
 }
+
+protocol.registerSchemesAsPrivileged([{ privileges: { bypassCSP: true }, scheme: 'feishin' }]);
 
 process.on('uncaughtException', (error: any) => {
     console.log('Error in main process', error);
@@ -79,16 +83,6 @@ const installExtensions = async () => {
         )
         .catch(console.log);
 };
-
-const singleInstance = app.requestSingleInstanceLock();
-
-if (!singleInstance) {
-    app.quit();
-} else {
-    app.on('second-instance', () => {
-        mainWindow?.show();
-    });
-}
 
 const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
@@ -129,7 +123,9 @@ const createTray = () => {
         return;
     }
 
-    tray = isLinux() ? new Tray(getAssetPath('icon.png')) : new Tray(getAssetPath('icon.ico'));
+    tray = isLinux()
+        ? new Tray(getAssetPath('icons/icon.png'))
+        : new Tray(getAssetPath('icons/icon.ico'));
     const contextMenu = Menu.buildFromTemplate([
         {
             click: () => {
@@ -212,7 +208,7 @@ const createWindow = async () => {
         autoHideMenuBar: true,
         frame: false,
         height: 900,
-        icon: getAssetPath('icon.png'),
+        icon: getAssetPath('icons/icon.png'),
         minHeight: 640,
         minWidth: 480,
         show: false,
@@ -255,6 +251,11 @@ const createWindow = async () => {
 
     ipcMain.on('window-close', () => {
         mainWindow?.close();
+    });
+
+    ipcMain.on('window-quit', () => {
+        mainWindow?.close();
+        app.exit();
     });
 
     ipcMain.on('app-restart', () => {
@@ -426,7 +427,7 @@ const prefetchPlaylistParams = [
 ];
 
 const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
-    const parameters = ['--idle=yes'];
+    const parameters = ['--idle=yes', '--no-config', '--load-scripts=no'];
 
     if (!extraParameters?.some((param) => prefetchPlaylistParams.includes(param))) {
         parameters.push('--prefetch-playlist=yes');
@@ -443,22 +444,28 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
     const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
     console.log('Setting mpv params: ', params);
 
+    const extra = isDevelopment ? '-dev' : '';
+
     const mpv = new MpvAPI(
         {
             audio_only: true,
             auto_restart: false,
             binary: MPV_BINARY_PATH || '',
+            socket: isWindows() ? `\\\\.\\pipe\\mpvserver${extra}` : `/tmp/node-mpv${extra}.sock`,
             time_update: 1,
         },
         params,
     );
 
-    console.log('Setting MPV properties: ', properties);
-    mpv.setMultipleProperties(properties || {});
-
-    mpv.start().catch((error) => {
-        console.log('MPV failed to start', error);
-    });
+    // eslint-disable-next-line promise/catch-or-return
+    mpv.start()
+        .catch((error) => {
+            console.log('MPV failed to start', error);
+        })
+        .finally(() => {
+            console.log('Setting MPV properties: ', properties);
+            mpv.setMultipleProperties(properties || {});
+        });
 
     mpv.on('status', (status, ...rest) => {
         console.log('MPV Event: status', status.property, status.value, rest);
@@ -640,14 +647,56 @@ app.on('window-all-closed', () => {
     }
 });
 
-app.whenReady()
-    .then(() => {
-        createWindow();
-        createTray();
-        app.on('activate', () => {
-            // On macOS it's common to re-create a window in the app when the
-            // dock icon is clicked and there are no other windows open.
-            if (mainWindow === null) createWindow();
-        });
-    })
-    .catch(console.log);
+const FONT_HEADERS = [
+    'font/collection',
+    'font/otf',
+    'font/sfnt',
+    'font/ttf',
+    'font/woff',
+    'font/woff2',
+];
+
+const singleInstance = app.requestSingleInstanceLock();
+
+if (!singleInstance) {
+    app.quit();
+} else {
+    app.on('second-instance', () => {
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) {
+                mainWindow.restore();
+            }
+
+            mainWindow.focus();
+        }
+    });
+
+    app.whenReady()
+        .then(() => {
+            protocol.handle('feishin', async (request) => {
+                const filePath = `file://${request.url.slice('feishin://'.length)}`;
+                const response = await net.fetch(filePath);
+                const contentType = response.headers.get('content-type');
+
+                if (!contentType || !FONT_HEADERS.includes(contentType)) {
+                    getMainWindow()?.webContents.send('custom-font-error', filePath);
+
+                    return new Response(null, {
+                        status: 403,
+                        statusText: 'Forbidden',
+                    });
+                }
+
+                return response;
+            });
+
+            createWindow();
+            createTray();
+            app.on('activate', () => {
+                // On macOS it's common to re-create a window in the app when the
+                // dock icon is clicked and there are no other windows open.
+                if (mainWindow === null) createWindow();
+            });
+        })
+        .catch(console.log);
+}

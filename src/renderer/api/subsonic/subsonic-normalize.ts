@@ -67,7 +67,9 @@ const normalizeSong = (
         container: item.contentType,
         createdAt: item.created,
         discNumber: item.discNumber || 1,
-        duration: item.duration || 0,
+        discSubtitle: null,
+        duration: item.duration ? item.duration * 1000 : 0,
+        gain: null,
         genres: item.genre
             ? [
                   {
@@ -86,6 +88,7 @@ const normalizeSong = (
         lyrics: null,
         name: item.title,
         path: item.path,
+        peak: null,
         playCount: item?.playCount || 0,
         releaseDate: null,
         releaseYear: item.year ? String(item.year) : null,

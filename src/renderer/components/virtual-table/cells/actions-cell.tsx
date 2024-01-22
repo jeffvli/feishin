@@ -5,7 +5,7 @@ import { CellContainer } from '/@/renderer/components/virtual-table/cells/generi
 
 export const ActionsCell = ({ context, api }: ICellRendererParams) => {
     return (
-        <CellContainer position="center">
+        <CellContainer $position="center">
             <Button
                 compact
                 variant="subtle"

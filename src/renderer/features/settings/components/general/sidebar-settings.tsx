@@ -2,10 +2,25 @@ import { ChangeEvent, useCallback, useState } from 'react';
 import { Group } from '@mantine/core';
 import { Reorder, useDragControls } from 'framer-motion';
 import isEqual from 'lodash/isEqual';
+import { useTranslation } from 'react-i18next';
 import { MdDragIndicator } from 'react-icons/md';
 import { Button, Checkbox, Switch } from '/@/renderer/components';
 import { useSettingsStoreActions, useGeneralSettings } from '../../../../store/settings.store';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
+import i18n from '/@/i18n/i18n';
+
+const translatedSidebarItemMap = {
+    Albums: i18n.t('page.sidebar.albums', { postProcess: 'titleCase' }),
+    Artists: i18n.t('page.sidebar.artists', { postProcess: 'titleCase' }),
+    Folders: i18n.t('page.sidebar.folders', { postProcess: 'titleCase' }),
+    Genres: i18n.t('page.sidebar.genres', { postProcess: 'titleCase' }),
+    Home: i18n.t('page.sidebar.home', { postProcess: 'titleCase' }),
+    'Now Playing': i18n.t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
+    Playlists: i18n.t('page.sidebar.playlists', { postProcess: 'titleCase' }),
+    Search: i18n.t('page.sidebar.search', { postProcess: 'titleCase' }),
+    Settings: i18n.t('page.sidebar.settings', { postProcess: 'titleCase' }),
+    Tracks: i18n.t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+};
 
 const DragHandle = ({ dragControls }: any) => {
     return (
@@ -47,13 +62,14 @@ const DraggableSidebarItem = ({ item, handleChangeDisabled }: DraggableSidebarIt
                     onChange={(e) => handleChangeDisabled(item.id, e.target.checked)}
                 />
                 <DragHandle dragControls={dragControls} />
-                {item.id}
+                {translatedSidebarItemMap[item.id as keyof typeof translatedSidebarItemMap]}
             </Group>
         </Reorder.Item>
     );
 };
 
 export const SidebarSettings = () => {
+    const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSidebarItems, setSettings } = useSettingsStoreActions();
 
@@ -87,6 +103,15 @@ export const SidebarSettings = () => {
         });
     };
 
+    const handleSetSidebarCollapsedNavigation = (e: ChangeEvent<HTMLInputElement>) => {
+        setSettings({
+            general: {
+                ...settings,
+                sidebarCollapsedNavigation: e.target.checked,
+            },
+        });
+    };
+
     const isSaveButtonDisabled = isEqual(settings.sidebarItems, localSidebarItems);
 
     return (
@@ -98,8 +123,24 @@ export const SidebarSettings = () => {
                         onChange={handleSetSidebarPlaylistList}
                     />
                 }
-                description="Show playlist list in sidebar"
-                title="Sidebar playlist list"
+                description={t('setting.sidebarPlaylistList', {
+                    context: 'description',
+                    postProcess: 'sentenceCase',
+                })}
+                title={t('setting.sidebarPlaylistList', { postProcess: 'sentenceCase' })}
+            />
+            <SettingsOptions
+                control={
+                    <Switch
+                        checked={settings.sidebarCollapsedNavigation}
+                        onChange={handleSetSidebarCollapsedNavigation}
+                    />
+                }
+                description={t('setting.sidebarPlaylistList', {
+                    context: 'description',
+                    postProcess: 'sentenceCase',
+                })}
+                title={t('setting.sidebarCollapsedNavigation', { postProcess: 'sentenceCase' })}
             />
             <SettingsOptions
                 control={
@@ -109,11 +150,14 @@ export const SidebarSettings = () => {
                         variant="filled"
                         onClick={handleSave}
                     >
-                        Save sidebar configuration
+                        {t('common.save', { postProcess: 'titleCase' })}
                     </Button>
                 }
-                description="Select the items and order in which they appear in the sidebar"
-                title="Sidebar configuration"
+                description={t('setting.sidebarCollapsedNavigation', {
+                    context: 'description',
+                    postProcess: 'sentenceCase',
+                })}
+                title={t('setting.sidebarConfiguration', { postProcess: 'sentenceCase' })}
             />
             <Reorder.Group
                 axis="y"

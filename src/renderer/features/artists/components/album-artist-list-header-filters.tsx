@@ -1,9 +1,10 @@
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiFolder2Line, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
 import { useListContext } from '../../../context/list-context';
 import { api } from '/@/renderer/api';
@@ -21,16 +22,33 @@ import {
     useListStoreByKey,
 } from '/@/renderer/store';
 import { ListDisplayType, ServerType, TableColumn } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
     jellyfin: [
-        { defaultOrder: SortOrder.ASC, name: 'Album', value: AlbumArtistListSort.ALBUM },
-        { defaultOrder: SortOrder.DESC, name: 'Duration', value: AlbumArtistListSort.DURATION },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: AlbumArtistListSort.NAME },
-        { defaultOrder: SortOrder.ASC, name: 'Random', value: AlbumArtistListSort.RANDOM },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.album', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.ALBUM,
+        },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Recently Added',
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.RANDOM,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
             value: AlbumArtistListSort.RECENTLY_ADDED,
         },
         // { defaultOrder: SortOrder.DESC, name: 'Release Date', value: AlbumArtistListSort.RELEASE_DATE },
@@ -38,18 +56,34 @@ const FILTERS = {
     navidrome: [
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Album Count',
+            name: i18n.t('filter.albumCount', { postProcess: 'titleCase' }),
             value: AlbumArtistListSort.ALBUM_COUNT,
         },
-        { defaultOrder: SortOrder.DESC, name: 'Favorited', value: AlbumArtistListSort.FAVORITED },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Most Played',
+            name: i18n.t('filter.isFavorited', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.mostPlayed', { postProcess: 'titleCase' }),
             value: AlbumArtistListSort.PLAY_COUNT,
         },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: AlbumArtistListSort.NAME },
-        { defaultOrder: SortOrder.DESC, name: 'Rating', value: AlbumArtistListSort.RATING },
-        { defaultOrder: SortOrder.DESC, name: 'Song Count', value: AlbumArtistListSort.SONG_COUNT },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.RATING,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.SONG_COUNT,
+        },
     ],
 };
 
@@ -62,6 +96,7 @@ export const AlbumArtistListHeaderFilters = ({
     gridRef,
     tableRef,
 }: AlbumArtistListHeaderFiltersProps) => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const server = useCurrentServer();
     const { pageKey } = useListContext();
@@ -77,7 +112,7 @@ export const AlbumArtistListHeaderFilters = ({
         (server?.type &&
             FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filter.sortBy)
                 ?.name) ||
-        'Unknown';
+        t('common.unknown', { postProcess: 'titleCase' });
 
     const handleItemSize = (e: number) => {
         if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
@@ -356,6 +391,16 @@ export const AlbumArtistListHeaderFilters = ({
                     </>
                 )}
                 <Divider orientation="vertical" />
+                <Button
+                    compact
+                    size="md"
+                    tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
+                    variant="subtle"
+                    onClick={handleRefresh}
+                >
+                    <RiRefreshLine size="1.3rem" />
+                </Button>
+                <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
@@ -397,21 +442,27 @@ export const AlbumArtistListHeaderFilters = ({
                             value={ListDisplayType.CARD}
                             onClick={handleSetViewType}
                         >
-                            Card
+                            {t('table.config.view.card', {
+                                postProcess: 'sentenceCase',
+                            })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.POSTER}
                             value={ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                         >
-                            Poster
+                            {t('table.config.view.poster', {
+                                postProcess: 'sentenceCase',
+                            })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                         >
-                            Table
+                            {t('table.config.view.table', {
+                                postProcess: 'sentenceCase',
+                            })}
                         </DropdownMenu.Item>
                         {/* <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE_PAGINATED}
@@ -455,7 +506,11 @@ export const AlbumArtistListHeaderFilters = ({
                         )}
                         {!isGrid && (
                             <>
-                                <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.tableColumns', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
@@ -472,7 +527,11 @@ export const AlbumArtistListHeaderFilters = ({
                                             onChange={handleTableColumns}
                                         />
                                         <Group position="apart">
-                                            <Text>Auto Fit Columns</Text>
+                                            <Text>
+                                                {t('table.config.general.autoFitColumns', {
+                                                    postProcess: 'sentenceCase',
+                                                })}
+                                            </Text>
                                             <Switch
                                                 defaultChecked={table.autoFit}
                                                 onChange={handleAutoFitColumns}

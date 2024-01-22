@@ -1,17 +1,17 @@
 import console from 'console';
 import { ipcMain } from 'electron';
-import { getMainWindow, getMpvInstance } from '../../../main';
+import { getMpvInstance } from '../../../main';
 import { PlayerData } from '/@/renderer/store';
 
 declare module 'node-mpv';
 
-function wait(timeout: number) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve('resolved');
-        }, timeout);
-    });
-}
+// function wait(timeout: number) {
+//     return new Promise((resolve) => {
+//         setTimeout(() => {
+//             resolve('resolved');
+//         }, timeout);
+//     });
+// }
 
 ipcMain.handle('player-is-running', async () => {
     return getMpvInstance()?.isRunning();
@@ -101,6 +101,7 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
             .catch((err) => {
                 console.log('MPV failed to clear playlist', err);
             });
+
         await getMpvInstance()
             ?.pause()
             .catch((err) => {
@@ -109,42 +110,25 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
         return;
     }
 
-    let complete = false;
-    let tryAttempts = 0;
+    try {
+        if (data.queue.current) {
+            await getMpvInstance()
+                ?.load(data.queue.current.streamUrl, 'replace')
+                .catch((err) => {
+                    console.log('MPV failed to load song', err);
+                    getMpvInstance()?.play();
+                });
 
-    while (!complete) {
-        if (tryAttempts > 3) {
-            getMainWindow()?.webContents.send('renderer-player-error', 'Failed to load song');
-            complete = true;
-        } else {
-            try {
-                if (data.queue.current) {
-                    await getMpvInstance()
-                        ?.load(data.queue.current.streamUrl, 'replace')
-                        .catch((err) => {
-                            console.log('MPV failed to load song', err);
-                        });
-                }
-
-                if (data.queue.next) {
-                    await getMpvInstance()
-                        ?.load(data.queue.next.streamUrl, 'append')
-                        .catch((err) => {
-                            console.log('MPV failed to load next song', err);
-                        });
-                }
-
-                complete = true;
-            } catch (err) {
-                console.error(err);
-                tryAttempts += 1;
-                await wait(500);
+            if (data.queue.next) {
+                await getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
             }
         }
+    } catch (err) {
+        console.error(err);
     }
 
     if (pause) {
-        await getMpvInstance()?.pause();
+        getMpvInstance()?.pause();
     }
 });
 
@@ -186,6 +170,7 @@ ipcMain.on('player-auto-next', async (_event, data: PlayerData) => {
         ?.playlistRemove(0)
         .catch((err) => {
             console.log('MPV failed to remove song from playlist', err);
+            getMpvInstance()?.pause();
         });
 
     if (data.queue.next) {
