@@ -132,7 +132,7 @@
                 "tar.xz"
             ],
             "icon": "assets/icons/icon.png",
-            "category": "Development"
+            "category": "AudioVideo;Audio;Player"
         },
         "directories": {
             "app": "release/app",
