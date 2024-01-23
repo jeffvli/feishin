@@ -1,5 +1,6 @@
 import { IpcRendererEvent, ipcRenderer, webFrame } from 'electron';
 import Store from 'electron-store';
+import type { TitleTheme } from '/@/renderer/types';
 
 const store = new Store();
 
@@ -43,7 +44,7 @@ const fontError = (cb: (event: IpcRendererEvent, file: string) => void) => {
     ipcRenderer.on('custom-font-error', cb);
 };
 
-const themeSet = (theme: 'dark' | 'light' | 'system'): void => {
+const themeSet = (theme: TitleTheme): void => {
     ipcRenderer.send('theme-set', theme);
 };
 

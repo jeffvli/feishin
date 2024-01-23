@@ -62,7 +62,6 @@ export const ThemeSettings = () => {
                             },
                         });
                         if (localSettings) {
-                            console.log(theme);
                             localSettings.themeSet(
                                 theme === AppTheme.DEFAULT_DARK ? 'dark' : 'light',
                             );

@@ -35,6 +35,7 @@ import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
 import { hotkeyToElectronAccelerator, isLinux, isMacOS, isWindows, resolveHtmlPath } from './utils';
 import './features';
+import type { TitleTheme } from '/@/renderer/types';
 
 declare module 'node-mpv';
 
@@ -416,7 +417,7 @@ const createWindow = async () => {
         new AppUpdater();
     }
 
-    const theme = store.get('theme') as 'dark' | 'light' | 'system' | undefined;
+    const theme = store.get('theme') as TitleTheme | undefined;
     nativeTheme.themeSource = theme || 'dark';
 };
 

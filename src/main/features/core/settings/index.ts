@@ -1,5 +1,6 @@
 import { ipcMain, nativeTheme, safeStorage } from 'electron';
 import Store from 'electron-store';
+import type { TitleTheme } from '/@/renderer/types';
 
 export const store = new Store();
 
@@ -49,7 +50,7 @@ ipcMain.handle('password-set', (_event, password: string, server: string) => {
     return false;
 });
 
-ipcMain.on('theme-set', (_event, theme: 'dark' | 'light' | 'system') => {
+ipcMain.on('theme-set', (_event, theme: TitleTheme) => {
     store.set('theme', theme);
     nativeTheme.themeSource = theme;
 });
