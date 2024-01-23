@@ -1,3 +1,4 @@
+import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import {
     PersistedClient,
@@ -8,7 +9,6 @@ import { get, set, del } from 'idb-keyval';
 import { createRoot } from 'react-dom/client';
 import { App } from './app';
 import { queryClient } from './lib/react-query';
-
 import 'overlayscrollbars/overlayscrollbars.css';
 
 export function createIDBPersister(idbValidKey: IDBValidKey = 'reactQuery') {
@@ -59,10 +59,51 @@ root.render(
             persister: indexedDbPersister,
         }}
     >
-        <Notifications
-            containerWidth="300px"
-            position="bottom-center"
-        />
-        <App />
+        <MantineProvider
+            theme={{
+                components: {
+                    Modal: {
+                        styles: {
+                            body: { background: 'var(--modal-bg)', padding: '1rem !important' },
+                            close: { marginRight: '0.5rem' },
+                            content: { borderRadius: '5px' },
+                            header: {
+                                background: 'var(--modal-header-bg)',
+                                paddingBottom: '1rem',
+                            },
+                            title: { fontSize: 'medium', fontWeight: 500 },
+                        },
+                    },
+                },
+                defaultRadius: 'xs',
+                focusRing: 'auto',
+                fontFamily: 'var(--content-font-family)',
+                fontSizes: {
+                    lg: '1.1rem',
+                    md: '1rem',
+                    sm: '0.9rem',
+                    xl: '1.5rem',
+                    xs: '0.8rem',
+                },
+                headings: {
+                    fontFamily: 'var(--content-font-family)',
+                    fontWeight: '700',
+                },
+                other: {},
+                spacing: {
+                    lg: '2rem',
+                    md: '1rem',
+                    sm: '0.5rem',
+                    xl: '4rem',
+                    xs: '0rem',
+                },
+            }}
+        >
+            <Notifications
+                containerWidth="300px"
+                position="bottom-center"
+            />
+            <App />
+        </MantineProvider>
     </PersistQueryClientProvider>,
 );

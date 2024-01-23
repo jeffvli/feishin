@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef } from 'react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
-import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { initSimpleImg } from 'react-simple-img';
@@ -39,7 +38,6 @@ const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
 
 export const App = () => {
-    const theme = useTheme();
     const accent = useSettingsStore((store) => store.general.accent);
     const language = useSettingsStore((store) => store.general.language);
     const { builtIn, custom, system, type } = useSettingsStore((state) => state.font);
@@ -188,60 +186,7 @@ export const App = () => {
     }, [language]);
 
     return (
-        <MantineProvider
-            withGlobalStyles
-            withNormalizeCSS
-            theme={{
-                colorScheme: theme as 'light' | 'dark',
-                components: {
-                    Modal: {
-                        styles: {
-                            body: { background: 'var(--modal-bg)', padding: '1rem !important' },
-                            close: { marginRight: '0.5rem' },
-                            content: { borderRadius: '5px' },
-                            header: {
-                                background: 'var(--modal-header-bg)',
-                                paddingBottom: '1rem',
-                            },
-                            title: { fontSize: 'medium', fontWeight: 500 },
-                        },
-                    },
-                },
-                defaultRadius: 'xs',
-                dir: 'ltr',
-                focusRing: 'auto',
-                focusRingStyles: {
-                    inputStyles: () => ({
-                        border: '1px solid var(--primary-color)',
-                    }),
-                    resetStyles: () => ({ outline: 'none' }),
-                    styles: () => ({
-                        outline: '1px solid var(--primary-color)',
-                        outlineOffset: '-1px',
-                    }),
-                },
-                fontFamily: 'var(--content-font-family)',
-                fontSizes: {
-                    lg: '1.1rem',
-                    md: '1rem',
-                    sm: '0.9rem',
-                    xl: '1.5rem',
-                    xs: '0.8rem',
-                },
-                headings: {
-                    fontFamily: 'var(--content-font-family)',
-                    fontWeight: 700,
-                },
-                other: {},
-                spacing: {
-                    lg: '2rem',
-                    md: '1rem',
-                    sm: '0.5rem',
-                    xl: '4rem',
-                    xs: '0rem',
-                },
-            }}
-        >
+        <>
             <ModalsProvider
                 modalProps={{
                     centered: true,
@@ -264,6 +209,6 @@ export const App = () => {
                 </PlayQueueHandlerContext.Provider>
             </ModalsProvider>
             <IsUpdatedDialog />
-        </MantineProvider>
+        </>
     );
 };
