@@ -335,10 +335,10 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         <ContentContainer ref={cq.ref}>
             <LibraryBackgroundOverlay $backgroundColor={background} />
             <DetailContainer>
-                <Stack spacing="lg">
-                    <Group spacing="md">
+                <Stack gap="lg">
+                    <Group gap="md">
                         <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-                        <Group spacing="xs">
+                        <Group gap="xs">
                             <Button
                                 compact
                                 loading={
@@ -369,7 +369,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             </Button>
                         </Group>
                     </Group>
-                    <Group spacing="md">
+                    <Group gap="md">
                         <Button
                             compact
                             uppercase
@@ -392,7 +392,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 </Stack>
                 {showGenres ? (
                     <Box component="section">
-                        <Group spacing="sm">
+                        <Group gap="sm">
                             {detailQuery?.data?.genres?.map((genre) => (
                                 <Button
                                     key={`genre-${genre.id}`}
@@ -426,7 +426,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             $secondary
                             component="p"
                             dangerouslySetInnerHTML={{ __html: detailQuery?.data?.biography || '' }}
-                            sx={{ textAlign: 'justify' }}
+                            style={{ textAlign: 'justify' }}
                         />
                     </Box>
                 ) : null}
@@ -434,7 +434,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                     <Box component="section">
                         <Group
                             noWrap
-                            position="apart"
+                            justify="space-between"
                         >
                             <Group
                                 noWrap
@@ -483,7 +483,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                     </Box>
                 ) : null}
                 <Box component="section">
-                    <Stack spacing="xl">
+                    <Stack gap="xl">
                         {carousels
                             .filter((c) => !c.isHidden)
                             .map((carousel) => (

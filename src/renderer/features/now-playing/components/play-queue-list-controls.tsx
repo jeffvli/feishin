@@ -107,13 +107,13 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
 
     return (
         <Group
-            position="apart"
+            justify="space-between"
             px="1rem"
             py="1rem"
-            sx={{ alignItems: 'center' }}
+            style={{ alignItems: 'center' }}
             w="100%"
         >
-            <Group spacing="sm">
+            <Group gap="sm">
                 <Button
                     compact
                     size="md"

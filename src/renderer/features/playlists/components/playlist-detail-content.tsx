@@ -160,7 +160,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
         <ContentContainer>
             <Group
                 p="1rem"
-                position="apart"
+                justify="space-between"
             >
                 <Group>
                     <PlayButton onClick={() => handlePlay()} />

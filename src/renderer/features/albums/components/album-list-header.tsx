@@ -61,7 +61,7 @@ export const AlbumListHeader = ({ itemCount, gridRef, tableRef, title }: AlbumLi
     return (
         <Stack
             ref={cq.ref}
-            spacing={0}
+            gap={0}
         >
             <PageHeader backgroundColor="var(--titlebar-bg)">
                 <Flex

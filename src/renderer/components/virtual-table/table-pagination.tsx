@@ -78,7 +78,7 @@ export const TablePagination = ({
             initial={{ y: 50 }}
             justify="space-between"
             p="1rem"
-            sx={{ borderTop: '1px solid var(--generic-border-color)' }}
+            style={{ borderTop: '1px solid var(--generic-border-color)' }}
         >
             <Text
                 $secondary
@@ -104,7 +104,7 @@ export const TablePagination = ({
             <Group
                 ref={containerQuery.ref}
                 noWrap
-                spacing="sm"
+                gap="sm"
             >
                 <Popover
                     trapFocus
@@ -116,7 +116,7 @@ export const TablePagination = ({
                         <Button
                             radius="sm"
                             size="sm"
-                            sx={{ height: '26px', padding: '0', width: '26px' }}
+                            style={{ height: '26px', padding: '0', width: '26px' }}
                             tooltip={{
                                 label: t('action.goToPage', { postProcess: 'sentenceCase' }),
                             }}

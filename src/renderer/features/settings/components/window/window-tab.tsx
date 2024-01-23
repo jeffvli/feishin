@@ -5,7 +5,7 @@ import { DiscordSettings } from '/@/renderer/features/settings/components/window
 
 export const WindowTab = () => {
     return (
-        <Stack spacing="md">
+        <Stack gap="md">
             <WindowSettings />
             <Divider />
             <DiscordSettings />

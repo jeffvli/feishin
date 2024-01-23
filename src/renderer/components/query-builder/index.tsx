@@ -96,9 +96,9 @@ export const QueryBuilder = ({
     return (
         <Stack
             ml={`${level * 10}px`}
-            spacing="sm"
+            gap="sm"
         >
-            <Group spacing="sm">
+            <Group gap="sm">
                 <Select
                     data={FILTER_GROUP_OPTIONS_DATA}
                     maxWidth={175}

@@ -97,8 +97,8 @@ const Controls = () => {
         <Group
             p="1rem"
             pos="absolute"
-            spacing="sm"
-            sx={{
+            gap="sm"
+            style={{
                 left: 0,
                 top: 10,
             }}

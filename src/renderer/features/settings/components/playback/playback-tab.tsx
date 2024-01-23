@@ -16,7 +16,7 @@ export const PlaybackTab = () => {
         return isElectron() || 'AudioContext' in window;
     }, []);
     return (
-        <Stack spacing="md">
+        <Stack gap="md">
             <AudioSettings />
             <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
             <Divider />

@@ -282,7 +282,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
                 ref={ref}
                 spellCheck={false}
                 {...props}
-                sx={{ maxWidth, width }}
+                style={{ maxWidth, width }}
             >
                 {children}
             </StyledTextInput>
@@ -298,7 +298,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 hideControls
                 spellCheck={false}
                 {...props}
-                sx={{ maxWidth, width }}
+                style={{ maxWidth, width }}
             >
                 {children}
             </StyledNumberInput>
@@ -312,7 +312,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             <StyledPasswordInput
                 ref={ref}
                 {...props}
-                sx={{ maxWidth, width }}
+                style={{ maxWidth, width }}
             >
                 {children}
             </StyledPasswordInput>
@@ -326,12 +326,12 @@ export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
             <StyledFileInput
                 ref={ref}
                 {...props}
+                style={{ maxWidth, width }}
                 styles={{
                     placeholder: {
                         color: 'var(--input-placeholder-fg)',
                     },
                 }}
-                sx={{ maxWidth, width }}
             >
                 {children}
             </StyledFileInput>
@@ -345,7 +345,7 @@ export const JsonInput = forwardRef<HTMLTextAreaElement, JsonInputProps>(
             <StyledJsonInput
                 ref={ref}
                 {...props}
-                sx={{ maxWidth, width }}
+                style={{ maxWidth, width }}
             >
                 {children}
             </StyledJsonInput>
@@ -359,7 +359,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             <StyledTextarea
                 ref={ref}
                 {...props}
-                sx={{ maxWidth, width }}
+                style={{ maxWidth, width }}
             >
                 {children}
             </StyledTextarea>

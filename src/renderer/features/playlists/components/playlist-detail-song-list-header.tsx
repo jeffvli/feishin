@@ -43,7 +43,7 @@ export const PlaylistDetailSongListHeader = ({
     const isSmartPlaylist = detailQuery?.data?.rules;
 
     return (
-        <Stack spacing={0}>
+        <Stack gap={0}>
             <PageHeader backgroundColor="var(--titlebar-bg)">
                 <LibraryHeaderBar>
                     <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />

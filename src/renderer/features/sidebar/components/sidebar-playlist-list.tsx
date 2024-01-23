@@ -36,8 +36,8 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                 noWrap
                 className="sidebar-playlist-item"
                 pos="relative"
-                position="apart"
-                sx={{
+                justify="space-between"
+                style={{
                     '&:hover': {
                         '.sidebar-playlist-controls': {
                             display: 'flex',
@@ -53,7 +53,7 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                     component={Link}
                     overflow="hidden"
                     size="md"
-                    sx={{
+                    style={{
                         color: 'var(--sidebar-fg) !important',
                         cursor: 'default',
                         width: '100%',
@@ -66,9 +66,9 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                     noWrap
                     className="sidebar-playlist-controls"
                     display="none"
+                    gap="sm"
                     pos="absolute"
                     right="0"
-                    spacing="sm"
                 >
                     <Button
                         compact

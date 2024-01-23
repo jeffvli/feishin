@@ -41,6 +41,7 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
     return (
         <StyledSelect
             withinPortal
+            style={{ maxWidth, width }}
             styles={{
                 dropdown: {
                     background: 'var(--dropdown-menu-bg)',
@@ -68,7 +69,6 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
                     padding: '.3rem',
                 },
             }}
-            sx={{ maxWidth, width }}
             transitionProps={{ duration: 100, transition: 'fade' }}
             {...props}
         />
@@ -96,6 +96,7 @@ export const MultiSelect = ({ width, maxWidth, ...props }: MultiSelectProps) => 
     return (
         <StyledMultiSelect
             withinPortal
+            style={{ maxWidth, width }}
             styles={{
                 dropdown: {
                     background: 'var(--dropdown-menu-bg)',
@@ -129,7 +130,6 @@ export const MultiSelect = ({ width, maxWidth, ...props }: MultiSelectProps) => 
                     paddingTop: '1rem',
                 },
             }}
-            sx={{ maxWidth, width }}
             transitionProps={{ duration: 100, transition: 'fade' }}
             {...props}
         />

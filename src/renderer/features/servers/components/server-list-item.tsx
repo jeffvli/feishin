@@ -53,7 +53,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
         <Stack>
             <ServerSection
                 title={
-                    <Group position="apart">
+                    <Group justify="space-between">
                         <Text>Server details</Text>
                     </Group>
                 }

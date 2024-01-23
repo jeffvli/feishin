@@ -103,7 +103,7 @@ const ImageWithPlaceholder = ({
     if (!props.src) {
         return (
             <Center
-                sx={{
+                style={{
                     background: 'var(--placeholder-bg)',
                     borderRadius: 'var(--card-default-radius)',
                     height: '100%',
@@ -247,7 +247,7 @@ export const FullScreenPlayerImage = () => {
                 className="full-screen-player-image-metadata"
                 maw="100%"
                 opacity={opacity}
-                spacing="xs"
+                gap="xs"
             >
                 <TextTitle
                     align="center"
@@ -292,7 +292,7 @@ export const FullScreenPlayerImage = () => {
                     >
                         {index > 0 && (
                             <Text
-                                sx={{
+                                style={{
                                     display: 'inline-block',
                                     padding: '0 0.5rem',
                                 }}

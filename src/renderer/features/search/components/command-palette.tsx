@@ -94,7 +94,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
         >
             <Group
                 mb="1rem"
-                spacing="sm"
+                gap="sm"
             >
                 {pages.map((page, index) => (
                     <Fragment key={page}>
@@ -261,11 +261,11 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                 mt="0.5rem"
                 p="0.5rem"
             >
-                <Group position="apart">
+                <Group justify="space-between">
                     <Command.Loading>
                         {isHome && isLoading && query !== '' && <Spinner />}
                     </Command.Loading>
-                    <Group spacing="sm">
+                    <Group gap="sm">
                         <Kbd size="md">ESC</Kbd>
                         <Kbd size="md">↑</Kbd>
                         <Kbd size="md">↓</Kbd>

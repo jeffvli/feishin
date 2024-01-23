@@ -40,7 +40,7 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                                         <Text
                                             $noSelect
                                             $secondary
-                                            sx={{
+                                            style={{
                                                 display: 'inline-block',
                                                 padding: '0 2px 0 1px',
                                             }}

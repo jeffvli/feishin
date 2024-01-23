@@ -61,7 +61,7 @@ export const ServerList = () => {
             <Group
                 mb={10}
                 position="right"
-                sx={{
+                style={{
                     position: 'absolute',
                     right: 55,
                     transform: 'translateY(-3.5rem)',
@@ -89,7 +89,7 @@ export const ServerList = () => {
                                 value={server.name}
                             >
                                 <Accordion.Control icon={<RiServerFill size={15} />}>
-                                    <Group position="apart">
+                                    <Group justify="space-between">
                                         {titleCase(server?.type)} - {server?.name}
                                     </Group>
                                 </Accordion.Control>

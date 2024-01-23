@@ -352,7 +352,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
         <Flex justify="space-between">
             <Group
                 ref={cq.ref}
-                spacing="sm"
+                gap="sm"
                 w="100%"
             >
                 <DropdownMenu position="bottom-start">
@@ -393,7 +393,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                                     compact
                                     fw={600}
                                     size="md"
-                                    sx={{
+                                    style={{
                                         svg: {
                                             fill: isFolderFilterApplied
                                                 ? 'var(--primary-color) !important'
@@ -424,7 +424,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                 <Button
                     compact
                     size="md"
-                    sx={{
+                    style={{
                         svg: {
                             fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
                         },
@@ -489,7 +489,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
             </Group>
             <Group
                 noWrap
-                spacing="sm"
+                gap="sm"
             >
                 <DropdownMenu
                     position="bottom-end"
@@ -567,7 +567,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
                                     <Stack>
                                         <MultiSelect
@@ -579,7 +579,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                                             width={300}
                                             onChange={handleTableColumns}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>Auto Fit Columns</Text>
                                             <Switch
                                                 defaultChecked={table.autoFit}

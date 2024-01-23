@@ -402,11 +402,11 @@ export const PlaylistQueryBuilder = forwardRef(
                     noWrap
                     align="flex-end"
                     m="1rem"
-                    position="apart"
+                    justify="space-between"
                 >
                     <Group
                         noWrap
-                        spacing="sm"
+                        gap="sm"
                         w="100%"
                     >
                         <Select
@@ -443,7 +443,7 @@ export const PlaylistQueryBuilder = forwardRef(
                     {onSave && onSaveAs && (
                         <Group
                             noWrap
-                            spacing="sm"
+                            gap="sm"
                         >
                             <Button
                                 loading={isSaving}

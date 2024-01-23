@@ -171,7 +171,7 @@ export const TimeoutButton = ({ timeoutProps, ...props }: HoldButtonProps) => {
 
     return (
         <Button
-            sx={{ color: 'var(--danger-color)' }}
+            style={{ color: 'var(--danger-color)' }}
             onClick={startTimeout}
             {...props}
         >

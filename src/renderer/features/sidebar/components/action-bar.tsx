@@ -52,7 +52,7 @@ export const ActionBar = () => {
                         <Group
                             grow
                             noWrap
-                            spacing="sm"
+                            gap="sm"
                         >
                             <DropdownMenu position="bottom-start">
                                 <DropdownMenu.Target>
@@ -91,7 +91,7 @@ export const ActionBar = () => {
                 <Group
                     grow
                     px="1rem"
-                    spacing="sm"
+                    gap="sm"
                     w="100%"
                 >
                     <Button

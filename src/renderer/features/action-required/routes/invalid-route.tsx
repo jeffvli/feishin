@@ -10,7 +10,7 @@ const InvalidRoute = () => {
 
     return (
         <AnimatedPage>
-            <Center sx={{ height: '100%', width: '100%' }}>
+            <Center style={{ height: '100%', width: '100%' }}>
                 <Stack>
                     <Group
                         noWrap

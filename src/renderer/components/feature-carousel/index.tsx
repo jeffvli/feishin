@@ -164,21 +164,21 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                     placeholder="var(--card-default-bg)"
                                     radius="md"
                                     src={data[itemIndex]?.imageUrl}
-                                    sx={{ objectFit: 'cover' }}
+                                    style={{ objectFit: 'cover' }}
                                     width={225}
                                 />
                             </ImageColumn>
                             <InfoColumn>
                                 <Stack
-                                    spacing="md"
-                                    sx={{ width: '100%' }}
+                                    gap="md"
+                                    style={{ width: '100%' }}
                                 >
                                     <TitleWrapper>
                                         <TextTitle
                                             lh="3.5rem"
                                             order={1}
                                             overflow="hidden"
-                                            sx={{ fontSize: '3.5rem' }}
+                                            style={{ fontSize: '3.5rem' }}
                                             weight={900}
                                         >
                                             {currentItem?.name}
@@ -207,7 +207,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                         <Badge size="lg">{currentItem?.releaseYear}</Badge>
                                         <Badge size="lg">{currentItem?.songCount} tracks</Badge>
                                     </Group>
-                                    <Group position="apart">
+                                    <Group justify="space-between">
                                         <Button
                                             size="lg"
                                             style={{ borderRadius: '5rem' }}
@@ -228,7 +228,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                         >
                                             {t('player.play', { postProcess: 'titleCase' })}
                                         </Button>
-                                        <Group spacing="sm">
+                                        <Group gap="sm">
                                             <Button
                                                 radius="lg"
                                                 size="sm"

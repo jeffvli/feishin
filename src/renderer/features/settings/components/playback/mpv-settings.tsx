@@ -128,7 +128,7 @@ export const MpvSettings = () => {
         },
         {
             control: (
-                <Stack spacing="xs">
+                <Stack gap="xs">
                     <Textarea
                         autosize
                         defaultValue={settings.mpvExtraParameters.join('\n')}
@@ -145,7 +145,7 @@ export const MpvSettings = () => {
                 </Stack>
             ),
             description: (
-                <Stack spacing={0}>
+                <Stack gap={0}>
                     <Text
                         $noSelect
                         $secondary

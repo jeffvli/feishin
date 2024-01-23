@@ -15,12 +15,12 @@ export const SettingsOptions = ({ title, description, control, note }: SettingsO
         <>
             <Group
                 noWrap
-                position="apart"
-                sx={{ alignItems: 'center' }}
+                justify="space-between"
+                style={{ alignItems: 'center' }}
             >
                 <Stack
-                    spacing="xs"
-                    sx={{
+                    gap="xs"
+                    style={{
                         alignSelf: 'flex-start',
                         display: 'flex',
                         maxWidth: '50%',

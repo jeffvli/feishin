@@ -184,7 +184,7 @@ export const QueryBuilderOption = ({
     return (
         <Group
             ml={ml}
-            spacing="sm"
+            gap="sm"
         >
             <Select
                 searchable

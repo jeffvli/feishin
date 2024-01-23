@@ -49,7 +49,7 @@ export const Titlebar = ({ children }: TitlebarProps) => {
             <TitlebarContainer>
                 <Right>
                     {children}
-                    <Group spacing="xs">
+                    <Group gap="xs">
                         <WindowControls />
                     </Group>
                 </Right>

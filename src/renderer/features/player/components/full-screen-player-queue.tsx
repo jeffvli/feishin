@@ -102,7 +102,7 @@ export const FullScreenPlayerQueue = () => {
                             fw="600"
                             pos="relative"
                             size="lg"
-                            sx={{
+                            style={{
                                 alignItems: 'center',
                                 color: item.active
                                     ? 'var(--main-fg) !important'

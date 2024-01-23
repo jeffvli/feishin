@@ -137,11 +137,11 @@ export const CardControls = ({
                 <PlayButton onClick={handlePlay}>
                     <RiPlayFill size={25} />
                 </PlayButton>
-                <Group spacing="xs">
+                <Group gap="xs">
                     <SecondaryButton
                         disabled
                         p={5}
-                        sx={{ svg: { fill: 'white !important' } }}
+                        style={{ svg: { fill: 'white !important' } }}
                         variant="subtle"
                     >
                         <FavoriteWrapper isFavorite={itemData?.isFavorite}>
@@ -157,7 +157,7 @@ export const CardControls = ({
                     </SecondaryButton>
                     <SecondaryButton
                         p={5}
-                        sx={{ svg: { fill: 'white !important' } }}
+                        style={{ svg: { fill: 'white !important' } }}
                         variant="subtle"
                         onClick={(e) => {
                             e.preventDefault();

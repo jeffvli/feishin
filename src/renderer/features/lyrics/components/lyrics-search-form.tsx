@@ -48,11 +48,11 @@ const SearchResult = ({ data, onClick }: SearchResultProps) => {
         <SearchItem onClick={onClick}>
             <Group
                 noWrap
-                position="apart"
+                justify="space-between"
             >
                 <Stack
                     maw="65%"
-                    spacing={0}
+                    gap={0}
                 >
                     <Text
                         size="md"
@@ -63,7 +63,7 @@ const SearchResult = ({ data, onClick }: SearchResultProps) => {
                     <Text $secondary>{artist}</Text>
                     <Group
                         noWrap
-                        spacing="sm"
+                        gap="sm"
                     >
                         <Text
                             $secondary
@@ -146,7 +146,7 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
                     type="auto"
                     w="100%"
                 >
-                    <Stack spacing="md">
+                    <Stack gap="md">
                         {searchResults.map((result) => (
                             <SearchResult
                                 key={`${result.source}-${result.id}`}

@@ -66,8 +66,8 @@ export const AlbumDetailHeader = forwardRef(
                     item={{ route: AppRoute.LIBRARY_ALBUMS, type: LibraryItem.ALBUM }}
                     title={detailQuery?.data?.name || ''}
                 >
-                    <Stack spacing="sm">
-                        <Group spacing="sm">
+                    <Stack gap="sm">
+                        <Group gap="sm">
                             {metadataItems.map((item, index) => (
                                 <Fragment key={`item-${item.id}-${index}`}>
                                     {index > 0 && <Text $noSelect>•</Text>}
@@ -90,8 +90,8 @@ export const AlbumDetailHeader = forwardRef(
                         </Group>
                         <Group
                             mah="4rem"
-                            spacing="md"
-                            sx={{
+                            gap="md"
+                            style={{
                                 WebkitBoxOrient: 'vertical',
                                 WebkitLineClamp: 2,
                                 overflow: 'hidden',

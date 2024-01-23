@@ -173,7 +173,7 @@ export const PosterCard = ({
                             />
                         ) : (
                             <Center
-                                sx={{
+                                style={{
                                     background: 'var(--placeholder-bg)',
                                     borderRadius: 'var(--card-default-radius)',
                                     height: '100%',
@@ -218,7 +218,7 @@ export const PosterCard = ({
                 <ImageContainer />
             </Skeleton>
             <DetailContainer>
-                <Stack spacing="sm">
+                <Stack gap="sm">
                     {controls.cardRows.map((row, index) => (
                         <Skeleton
                             key={`${index}-${columnIndex}-${row.arrayProperty}`}

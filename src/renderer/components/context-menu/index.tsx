@@ -80,8 +80,8 @@ export const ContextMenuButton = forwardRef(
                 disabled={props.disabled}
                 onClick={props.onClick}
             >
-                <Group position="apart">
-                    <Group spacing="md">
+                <Group justify="space-between">
+                    <Group gap="md">
                         <Box>{leftIcon}</Box>
                         <Box mr="2rem">{children}</Box>
                     </Group>

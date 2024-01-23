@@ -161,7 +161,7 @@ export const LeftControls = () => {
                                         />
                                     ) : (
                                         <Center
-                                            sx={{
+                                            style={{
                                                 background: 'var(--placeholder-bg)',
                                                 height: '100%',
                                             }}
@@ -180,7 +180,7 @@ export const LeftControls = () => {
                                         opacity={0.8}
                                         radius={50}
                                         size="md"
-                                        sx={{
+                                        style={{
                                             cursor: 'default',
                                             position: 'absolute',
                                             right: 2,
@@ -210,7 +210,7 @@ export const LeftControls = () => {
                         <Group
                             noWrap
                             align="flex-start"
-                            spacing="xs"
+                            gap="xs"
                         >
                             <Text
                                 $link

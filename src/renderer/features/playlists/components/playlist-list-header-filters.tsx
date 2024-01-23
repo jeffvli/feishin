@@ -288,7 +288,7 @@ export const PlaylistListHeaderFilters = ({
         <Flex justify="space-between">
             <Group
                 ref={cq.ref}
-                spacing="sm"
+                gap="sm"
                 w="100%"
             >
                 <DropdownMenu position="bottom-start">
@@ -431,7 +431,7 @@ export const PlaylistListHeaderFilters = ({
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
                                     <Stack>
                                         <MultiSelect
@@ -443,7 +443,7 @@ export const PlaylistListHeaderFilters = ({
                                             width={300}
                                             onChange={handleTableColumns}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>
                                                 {t('table.config.general.autoFitColumns', {
                                                     postProcess: 'titleCase',

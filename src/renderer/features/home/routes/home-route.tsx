@@ -229,7 +229,7 @@ const HomeRoute = () => {
                     mb="5rem"
                     pt={windowBarStyle === Platform.WEB ? '5rem' : '3rem'}
                     px="2rem"
-                    spacing="lg"
+                    gap="lg"
                 >
                     <FeatureCarousel data={featureItemsWithImage} />
                     {carousels

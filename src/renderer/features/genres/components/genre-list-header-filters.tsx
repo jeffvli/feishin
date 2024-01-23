@@ -212,7 +212,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
         <Flex justify="space-between">
             <Group
                 ref={cq.ref}
-                spacing="sm"
+                gap="sm"
                 w="100%"
             >
                 <DropdownMenu position="bottom-start">
@@ -253,7 +253,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                                     compact
                                     fw={600}
                                     size="md"
-                                    sx={{
+                                    style={{
                                         svg: {
                                             fill: isFolderFilterApplied
                                                 ? 'var(--primary-color) !important'
@@ -313,7 +313,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
             </Group>
             <Group
                 noWrap
-                spacing="sm"
+                gap="sm"
             >
                 <DropdownMenu
                     position="bottom-end"
@@ -392,7 +392,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
                                     <Stack>
                                         <MultiSelect
@@ -404,7 +404,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                                             width={300}
                                             onChange={handleTableColumns}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>
                                                 {t('table.config.general.autoFitColumns', {
                                                     postProcess: 'titleCase',

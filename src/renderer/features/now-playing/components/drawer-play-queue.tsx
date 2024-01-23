@@ -15,7 +15,7 @@ export const DrawerPlayQueue = () => {
         >
             <Box
                 bg="var(--main-bg)"
-                sx={{ borderRadius: '10px' }}
+                style={{ borderRadius: '10px' }}
             >
                 <PlayQueueListControls
                     tableRef={queueRef}

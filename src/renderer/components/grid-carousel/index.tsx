@@ -52,7 +52,7 @@ interface TitleProps {
 
 const Title = ({ label, handleNext, handlePrev, pagination }: TitleProps) => {
     return (
-        <Group position="apart">
+        <Group justify="space-between">
             {isValidElement(label) ? (
                 label
             ) : (
@@ -64,7 +64,7 @@ const Title = ({ label, handleNext, handlePrev, pagination }: TitleProps) => {
                 </TextTitle>
             )}
 
-            <Group spacing="sm">
+            <Group gap="sm">
                 <Button
                     compact
                     disabled={!pagination.hasPreviousPage}
@@ -252,7 +252,7 @@ export const SwiperGridCarousel = ({
     return (
         <CarouselContainer
             className="grid-carousel"
-            spacing="md"
+            gap="md"
         >
             {title ? (
                 <Title

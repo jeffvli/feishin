@@ -36,7 +36,7 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
     return (
         <Stack
             ref={cq.ref}
-            spacing={0}
+            gap={0}
         >
             <PageHeader>
                 <Flex

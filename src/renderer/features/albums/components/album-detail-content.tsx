@@ -319,9 +319,9 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
             <DetailContainer>
                 <Box component="section">
                     <Group
-                        position="apart"
+                        justify="space-between"
                         py="1rem"
-                        spacing="sm"
+                        gap="sm"
                     >
                         <Group>
                             <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
@@ -376,7 +376,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         component="section"
                         py="1rem"
                     >
-                        <Group spacing="sm">
+                        <Group gap="sm">
                             {detailQuery?.data?.genres?.map((genre) => (
                                 <Button
                                     key={`genre-${genre.id}`}
@@ -434,7 +434,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 <Stack
                     ref={cq.ref}
                     mt="3rem"
-                    spacing="lg"
+                    gap="lg"
                 >
                     {cq.height || cq.width ? (
                         <>

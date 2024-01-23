@@ -49,7 +49,7 @@ export const FavoriteCell = ({ value, data, node }: ICellRendererParams) => {
         <CellContainer $position="center">
             <Button
                 compact
-                sx={{
+                style={{
                     svg: {
                         fill: !value
                             ? 'var(--main-fg-secondary) !important'

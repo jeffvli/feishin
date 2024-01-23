@@ -215,7 +215,7 @@ export const RightControls = () => {
             <Group
                 noWrap
                 align="center"
-                spacing="xs"
+                gap="xs"
             >
                 <DropdownMenu
                     withArrow
@@ -272,7 +272,7 @@ export const RightControls = () => {
                             <RiHeartLine size="1.1rem" />
                         )
                     }
-                    sx={{
+                    style={{
                         svg: {
                             fill: !currentSong?.userFavorite
                                 ? undefined
@@ -298,7 +298,7 @@ export const RightControls = () => {
                 ) : null}
                 <Group
                     noWrap
-                    spacing="xs"
+                    gap="xs"
                 >
                     <PlayerButton
                         icon={

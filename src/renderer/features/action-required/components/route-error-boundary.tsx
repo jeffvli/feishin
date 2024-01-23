@@ -24,8 +24,8 @@ const RouteErrorBoundary = () => {
 
     return (
         <Box bg="var(--main-bg)">
-            <Center sx={{ height: '100vh' }}>
-                <Stack sx={{ maxWidth: '50%' }}>
+            <Center style={{ height: '100vh' }}>
+                <Stack style={{ maxWidth: '50%' }}>
                     <Group>
                         <Button
                             px={10}
@@ -44,12 +44,12 @@ const RouteErrorBoundary = () => {
                     <Text size="sm">{error?.message}</Text>
                     <Group
                         grow
-                        spacing="sm"
+                        gap="sm"
                     >
                         <Button
                             leftIcon={<RiHome4Line />}
                             size="md"
-                            sx={{ flex: 0.5 }}
+                            style={{ flex: 0.5 }}
                             variant="default"
                             onClick={handleHome}
                         >
@@ -60,7 +60,7 @@ const RouteErrorBoundary = () => {
                                 <Button
                                     leftIcon={<RiMenuFill />}
                                     size="md"
-                                    sx={{ flex: 0.5 }}
+                                    style={{ flex: 0.5 }}
                                     variant="default"
                                 >
                                     Menu
