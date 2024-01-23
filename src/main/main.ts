@@ -20,6 +20,7 @@ import {
     Tray,
     Menu,
     nativeImage,
+    nativeTheme,
     BrowserWindowConstructorOptions,
     protocol,
     net,
@@ -34,6 +35,7 @@ import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
 import { hotkeyToElectronAccelerator, isLinux, isMacOS, isWindows, resolveHtmlPath } from './utils';
 import './features';
+import type { TitleTheme } from '/@/renderer/types';
 
 declare module 'node-mpv';
 
@@ -194,8 +196,8 @@ const createWindow = async () => {
         },
         macOS: {
             autoHideMenuBar: true,
-            frame: false,
-            titleBarStyle: 'hidden',
+            frame: true,
+            titleBarStyle: 'default',
             trafficLightPosition: { x: 10, y: 10 },
         },
         windows: {
@@ -414,6 +416,9 @@ const createWindow = async () => {
         // eslint-disable-next-line
         new AppUpdater();
     }
+
+    const theme = store.get('theme') as TitleTheme | undefined;
+    nativeTheme.themeSource = theme || 'dark';
 };
 
 app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');

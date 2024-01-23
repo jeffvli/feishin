@@ -7,7 +7,10 @@ import {
 import { THEME_DATA } from '/@/renderer/hooks';
 import { useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { AppTheme } from '/@/renderer/themes/types';
+import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
+
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const ThemeSettings = () => {
     const { t } = useTranslation();
@@ -26,6 +29,15 @@ export const ThemeSettings = () => {
                                 followSystemTheme: e.currentTarget.checked,
                             },
                         });
+                        if (localSettings) {
+                            localSettings.themeSet(
+                                e.currentTarget.checked
+                                    ? 'system'
+                                    : settings.theme === AppTheme.DEFAULT_DARK
+                                    ? 'dark'
+                                    : 'light',
+                            );
+                        }
                     }}
                 />
             ),
@@ -42,12 +54,18 @@ export const ThemeSettings = () => {
                     data={THEME_DATA}
                     defaultValue={settings.theme}
                     onChange={(e) => {
+                        const theme = e as AppTheme;
                         setSettings({
                             general: {
                                 ...settings,
-                                theme: e as AppTheme,
+                                theme,
                             },
                         });
+                        if (localSettings) {
+                            localSettings.themeSet(
+                                theme === AppTheme.DEFAULT_DARK ? 'dark' : 'light',
+                            );
+                        }
                     }}
                 />
             ),
