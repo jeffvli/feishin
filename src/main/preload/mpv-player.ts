@@ -2,11 +2,11 @@ import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { PlayerData, PlayerState } from '/@/renderer/store';
 
 const initialize = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-    ipcRenderer.send('player-initialize', data);
+    return ipcRenderer.invoke('player-initialize', data);
 };
 
 const restart = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-    ipcRenderer.send('player-restart', data);
+    return ipcRenderer.invoke('player-restart', data);
 };
 
 const isRunning = () => {
