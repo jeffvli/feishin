@@ -510,7 +510,7 @@
         "replayGainPreamp": "{{ReplayGain}} preamp (dB)",
         "replayGainPreamp_description": "adjust the preamp gain applied to the {{ReplayGain}} values",
         "sampleRate": "sample rate",
-        "sampleRate_description": "select the output sample rate to be used if the sample frequency selected is different from that of the current media",
+        "sampleRate_description": "select the output sample rate to be used if the sample frequency selected is different from that of the current media. a value less than 8000 will use the default frequency",
         "savePlayQueue": "save play queue",
         "savePlayQueue_description": "save the play queue when the application is closed and restore it when the application is opened",
         "scrobble": "scrobble",
