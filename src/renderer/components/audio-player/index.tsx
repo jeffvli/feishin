@@ -81,7 +81,7 @@ export const AudioPlayer = forwardRef(
         const calculateReplayGain = useCallback(
             (song: Song): number => {
                 if (playback.replayGainMode === 'no') {
-                    return 1;
+                    return volume;
                 }
 
                 let gain: number | undefined;
@@ -99,7 +99,7 @@ export const AudioPlayer = forwardRef(
                     gain = playback.replayGainFallbackDB;
 
                     if (!gain) {
-                        return 1;
+                        return volume;
                     }
                 }
 
@@ -116,13 +116,14 @@ export const AudioPlayer = forwardRef(
                 if (playback.replayGainClip) {
                     return Math.min(expectedGain, 1 / peak);
                 }
-                return expectedGain;
+                return expectedGain * volume;
             },
             [
                 playback.replayGainClip,
                 playback.replayGainFallbackDB,
                 playback.replayGainMode,
                 playback.replayGainPreampDB,
+                volume,
             ],
         );
 
@@ -311,6 +312,9 @@ export const AudioPlayer = forwardRef(
             [player2Source, webAudio],
         );
 
+        // Bugfix for Safari: rather than use the `<audio>` volume (which doesn't work),
+        // use the GainNode to scale the volume. In this case, for compatibility with
+        // other browsers, set the `<audio>` volume to 1
         return (
             <>
                 <ReactPlayer
@@ -324,7 +328,7 @@ export const AudioPlayer = forwardRef(
                     playing={currentPlayer === 1 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
                     url={player1?.streamUrl || EMPTY_SOURCE}
-                    volume={volume}
+                    volume={webAudio ? 1 : volume}
                     width={0}
                     onEnded={handleOnEnded}
                     onProgress={
@@ -343,7 +347,7 @@ export const AudioPlayer = forwardRef(
                     playing={currentPlayer === 2 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
                     url={player2?.streamUrl || EMPTY_SOURCE}
-                    volume={volume}
+                    volume={webAudio ? 1 : volume}
                     width={0}
                     onEnded={handleOnEnded}
                     onProgress={
