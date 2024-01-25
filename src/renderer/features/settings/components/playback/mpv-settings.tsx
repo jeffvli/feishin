@@ -206,11 +206,16 @@ export const MpvSettings = () => {
         {
             control: (
                 <NumberInput
-                    defaultValue={settings.mpvProperties.audioSampleRateHz}
+                    defaultValue={settings.mpvProperties.audioSampleRateHz || undefined}
+                    max={192000}
+                    min={0}
+                    placeholder="48000"
+                    rightSection="Hz"
                     width={100}
                     onBlur={(e) => {
                         const value = Number(e.currentTarget.value);
-                        handleSetMpvProperty('audioSampleRateHz', value > 0 ? value : undefined);
+                        // Setting a value of `undefined` causes an error for MPV. Use 0 instead
+                        handleSetMpvProperty('audioSampleRateHz', value >= 8000 ? value : value);
                     }}
                 />
             ),

@@ -7,10 +7,11 @@ import {
     crossfadeHandler,
     gaplessHandler,
 } from '/@/renderer/components/audio-player/utils/list-handlers';
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
 import { useSpeed } from '/@/renderer/store';
+import { toast } from '/@/renderer/components/toast';
 
 interface AudioPlayerProps extends ReactPlayerProps {
     crossfadeDuration: number;
@@ -60,6 +61,7 @@ export const AudioPlayer = forwardRef(
         const [isTransitioning, setIsTransitioning] = useState(false);
         const audioDeviceId = useSettingsStore((state) => state.playback.audioDeviceId);
         const playback = useSettingsStore((state) => state.playback.mpvProperties);
+        const { resetSampleRate } = useSettingsStoreActions();
         const playbackSpeed = useSpeed();
 
         const [webAudio, setWebAudio] = useState<WebAudio | null>(null);
@@ -119,10 +121,21 @@ export const AudioPlayer = forwardRef(
 
         useEffect(() => {
             if ('AudioContext' in window) {
-                const context = new AudioContext({
-                    latencyHint: 'playback',
-                    sampleRate: playback.audioSampleRateHz || undefined,
-                });
+                let context: AudioContext;
+
+                try {
+                    context = new AudioContext({
+                        latencyHint: 'playback',
+                        sampleRate: playback.audioSampleRateHz || undefined,
+                    });
+                } catch (error) {
+                    // In practice, this should never be hit because the UI should validate
+                    // the range. However, the actual supported range is not guaranteed
+                    toast.error({ message: (error as Error).message });
+                    context = new AudioContext({ latencyHint: 'playback' });
+                    resetSampleRate();
+                }
+
                 const gain = context.createGain();
                 gain.connect(context.destination);
 
