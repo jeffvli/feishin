@@ -39,6 +39,11 @@ type WebAudio = {
     gain: GainNode;
 };
 
+// Credits: http://stackoverflow.com/questions/12150729/ddg
+// This is used so that the player will always have an <audio> element. This means that
+// player1Source and player2Source are connected BEFORE the user presses play for
+// the first time. This workaround is important for Safari, which seems to require the
+// source to be connected PRIOR to resuming audio context
 const EMPTY_SOURCE =
     'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==';
 
@@ -266,6 +271,8 @@ export const AudioPlayer = forwardRef(
             async (player: ReactPlayer) => {
                 if (!webAudio) return;
                 if (player1Source) {
+                    // This should fire once, only if the source is real (meaning we
+                    // saw the dummy source) and the context is not ready
                     if (webAudio.context.state !== 'running') {
                         await webAudio.context.resume();
                     }
