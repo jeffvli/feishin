@@ -39,6 +39,9 @@ type WebAudio = {
     gain: GainNode;
 };
 
+const EMPTY_SOURCE =
+    'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==';
+
 export const AudioPlayer = forwardRef(
     (
         {
@@ -69,6 +72,7 @@ export const AudioPlayer = forwardRef(
         const [player2Source, setPlayer2Source] = useState<MediaElementAudioSourceNode | null>(
             null,
         );
+
         const calculateReplayGain = useCallback(
             (song: Song): number => {
                 if (playback.replayGainMode === 'no') {
@@ -244,10 +248,7 @@ export const AudioPlayer = forwardRef(
 
         useEffect(() => {
             if (webAudio && player1Source) {
-                if (player1 === undefined) {
-                    player1Source.disconnect();
-                    setPlayer1Source(null);
-                } else if (currentPlayer === 1) {
+                if (player1 && currentPlayer === 1) {
                     webAudio.gain.gain.setValueAtTime(calculateReplayGain(player1), 0);
                 }
             }
@@ -255,10 +256,7 @@ export const AudioPlayer = forwardRef(
 
         useEffect(() => {
             if (webAudio && player2Source) {
-                if (player2 === undefined) {
-                    player2Source.disconnect();
-                    setPlayer2Source(null);
-                } else if (currentPlayer === 2) {
+                if (player2 && currentPlayer === 2) {
                     webAudio.gain.gain.setValueAtTime(calculateReplayGain(player2), 0);
                 }
             }
@@ -266,9 +264,12 @@ export const AudioPlayer = forwardRef(
 
         const handlePlayer1Start = useCallback(
             async (player: ReactPlayer) => {
-                if (!webAudio || player1Source) return;
-                if (webAudio.context.state !== 'running') {
-                    await webAudio.context.resume();
+                if (!webAudio) return;
+                if (player1Source) {
+                    if (webAudio.context.state !== 'running') {
+                        await webAudio.context.resume();
+                    }
+                    return;
                 }
 
                 const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
@@ -284,9 +285,12 @@ export const AudioPlayer = forwardRef(
 
         const handlePlayer2Start = useCallback(
             async (player: ReactPlayer) => {
-                if (!webAudio || player2Source) return;
-                if (webAudio.context.state !== 'running') {
-                    await webAudio.context.resume();
+                if (!webAudio) return;
+                if (player2Source) {
+                    if (webAudio.context.state !== 'running') {
+                        await webAudio.context.resume();
+                    }
+                    return;
                 }
 
                 const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
@@ -312,7 +316,7 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 1 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player1?.streamUrl}
+                    url={player1?.streamUrl || EMPTY_SOURCE}
                     volume={volume}
                     width={0}
                     onEnded={handleOnEnded}
@@ -331,7 +335,7 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 2 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player2?.streamUrl}
+                    url={player2?.streamUrl || EMPTY_SOURCE}
                     volume={volume}
                     width={0}
                     onEnded={handleOnEnded}
