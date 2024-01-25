@@ -173,7 +173,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
     const handleGridSizeChange = () => {
         if (tableConfig.autoFit) {
-            tableRef?.current?.api.sizeColumnsToFit();
+            tableRef?.current?.api?.sizeColumnsToFit();
         }
     };
 

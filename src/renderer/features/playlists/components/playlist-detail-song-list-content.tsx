@@ -140,7 +140,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
 
     const handleGridSizeChange = () => {
         if (page.table.autoFit) {
-            tableRef?.current?.api.sizeColumnsToFit();
+            tableRef?.current?.api?.sizeColumnsToFit();
         }
     };
 
