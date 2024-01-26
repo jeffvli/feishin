@@ -559,7 +559,7 @@
             "error_savePassword": "došlo je do greške prilikom pokušaja čuvanja lozinke"
         },
         "addToPlaylist": {
-            "success": "dodato {{message}} $t(entity.song_other) u {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "dodato {{message}} $t(entity.track_other) u {{numOfPlaylists}} $t(entity.playlist_other)",
             "title": "dodaj u $t(entity.playlist_one)",
             "input_skipDuplicates": "preskoči duplikate",
             "input_playlists": "$t(entity.playlist_other)"

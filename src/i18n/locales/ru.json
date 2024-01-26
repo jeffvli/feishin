@@ -434,7 +434,7 @@
             "error_savePassword": "произошла ошибка во время попытки сохранения пароля"
         },
         "addToPlaylist": {
-            "success": "добавлено(а) {{message}} $t(entity.song_other) в {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "добавлено(а) {{message}} $t(entity.track_other) в {{numOfPlaylists}} $t(entity.playlist_other)",
             "title": "добавить в $t(entity.playlist_one)",
             "input_skipDuplicates": "пропустить дубликаты",
             "input_playlists": "$t(entity.playlist_other)"

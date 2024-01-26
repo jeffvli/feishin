@@ -559,7 +559,7 @@
             "error_savePassword": "při ukládání hesla se vyskytla chyba"
         },
         "addToPlaylist": {
-            "success": "přidáno {{message}} $t(entity.song_other) do {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "přidáno {{message}} $t(entity.track_other) do {{numOfPlaylists}} $t(entity.playlist_other)",
             "title": "přidat do $t(entity.playlist_one)",
             "input_skipDuplicates": "přeskočit duplicity",
             "input_playlists": "$t(entity.playlist_other)"

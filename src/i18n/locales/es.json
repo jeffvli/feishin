@@ -491,7 +491,7 @@
             "error_savePassword": "un error ocurrió cuando se intentó guardar la contraseña"
         },
         "addToPlaylist": {
-            "success": "añadido {{message}} $t(entity.song_other) a {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "añadido {{message}} $t(entity.track_other) a {{numOfPlaylists}} $t(entity.playlist_other)",
             "title": "añadir a $t(entity.playlist_one)",
             "input_skipDuplicates": "saltar duplicados",
             "input_playlists": "$t(entity.playlist_other)"
