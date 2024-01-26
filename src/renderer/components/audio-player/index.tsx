@@ -80,6 +80,7 @@ export const AudioPlayer = forwardRef(
 
         const calculateReplayGain = useCallback(
             (song: Song): number => {
+                console.log("ignoreme i'm trying to test if vercel is doing a thing", volume);
                 if (playback.replayGainMode === 'no') {
                     return volume;
                 }
