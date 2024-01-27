@@ -317,7 +317,7 @@ const initialState: SettingsState = {
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
             pause: { allowGlobal: true, hotkey: '', isGlobal: false },
             play: { allowGlobal: true, hotkey: '', isGlobal: false },
-            playPause: { allowGlobal: true, hotkey: '', isGlobal: false },
+            playPause: { allowGlobal: true, hotkey: 'space', isGlobal: false },
             previous: { allowGlobal: true, hotkey: '', isGlobal: false },
             rate0: { allowGlobal: true, hotkey: '', isGlobal: false },
             rate1: { allowGlobal: true, hotkey: '', isGlobal: false },
