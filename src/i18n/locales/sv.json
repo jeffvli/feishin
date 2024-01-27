@@ -190,7 +190,7 @@
             "error_savePassword": "ett fel uppstod när lösenordet skulle sparas"
         },
         "addToPlaylist": {
-            "success": "tillade {{message}} $t(entity.song_other) til {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "tillade {{message}} $t(entity.track_other) til {{numOfPlaylists}} $t(entity.playlist_other)",
             "title": "lägg till i $t(entity.playlist_one)",
             "input_skipDuplicates": "hoppa över dubbletter",
             "input_playlists": "$t(entity.playlist_other)"

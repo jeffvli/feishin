@@ -216,7 +216,7 @@
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist_other)",
             "input_skipDuplicates": "skip duplicates",
-            "success": "added {{message}} $t(entity.song_other) to {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "added $t(entity.trackWithCount, {\"count\": {{message}} }) to $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "title": "add to $t(entity.playlist_one)"
         },
         "createPlaylist": {

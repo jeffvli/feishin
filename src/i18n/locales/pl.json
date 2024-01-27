@@ -242,7 +242,7 @@
             "error_savePassword": "wystąpił błąd podczas próby zapisania hasła"
         },
         "addToPlaylist": {
-            "success": "dodano {{message}} $t(entity.song_other) do {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "dodano {{message}} $t(entity.track_other) do {{numOfPlaylists}} $t(entity.playlist_other)",
             "title": "dodano do $t(entity.playlist_one)",
             "input_skipDuplicates": "pomiń duplikaty",
             "input_playlists": "$t(entity.playlist_other)"

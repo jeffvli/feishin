@@ -483,7 +483,7 @@
             "error_savePassword": "une erreur s’est produite lors de la tentative de sauvegarde du mot de passe"
         },
         "addToPlaylist": {
-            "success": "{{message}} $t(entity.song_other) ajouté à {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "{{message}} $t(entity.track_other) ajouté à {{numOfPlaylists}} $t(entity.playlist_other)",
             "title": "ajouter à $t(entity.playlist_one)",
             "input_skipDuplicates": "sauter les doublons",
             "input_playlists": "$t(entity.playlist_other)"
