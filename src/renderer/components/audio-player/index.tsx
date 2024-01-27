@@ -81,7 +81,7 @@ export const AudioPlayer = forwardRef(
         const calculateReplayGain = useCallback(
             (song: Song): number => {
                 if (playback.replayGainMode === 'no') {
-                    return volume;
+                    return 1;
                 }
 
                 let gain: number | undefined;
@@ -99,7 +99,7 @@ export const AudioPlayer = forwardRef(
                     gain = playback.replayGainFallbackDB;
 
                     if (!gain) {
-                        return volume;
+                        return 1;
                     }
                 }
 
@@ -116,14 +116,13 @@ export const AudioPlayer = forwardRef(
                 if (playback.replayGainClip) {
                     return Math.min(expectedGain, 1 / peak);
                 }
-                return expectedGain * volume;
+                return expectedGain;
             },
             [
                 playback.replayGainClip,
                 playback.replayGainFallbackDB,
                 playback.replayGainMode,
                 playback.replayGainPreampDB,
-                volume,
             ],
         );
 
@@ -253,20 +252,18 @@ export const AudioPlayer = forwardRef(
         }, [audioDeviceId]);
 
         useEffect(() => {
-            if (webAudio && player1Source) {
-                if (player1 && currentPlayer === 1) {
-                    webAudio.gain.gain.setValueAtTime(calculateReplayGain(player1), 0);
-                }
+            if (webAudio && player1Source && player1 && currentPlayer === 1) {
+                const newVolume = calculateReplayGain(player1) * volume;
+                webAudio.gain.gain.setValueAtTime(newVolume, 0);
             }
-        }, [calculateReplayGain, currentPlayer, player1, player1Source, webAudio]);
+        }, [calculateReplayGain, currentPlayer, player1, player1Source, volume, webAudio]);
 
         useEffect(() => {
-            if (webAudio && player2Source) {
-                if (player2 && currentPlayer === 2) {
-                    webAudio.gain.gain.setValueAtTime(calculateReplayGain(player2), 0);
-                }
+            if (webAudio && player2Source && player2 && currentPlayer === 2) {
+                const newVolume = calculateReplayGain(player2) * volume;
+                webAudio.gain.gain.setValueAtTime(newVolume, 0);
             }
-        }, [calculateReplayGain, currentPlayer, player2, player2Source, webAudio]);
+        }, [calculateReplayGain, currentPlayer, player2, player2Source, volume, webAudio]);
 
         const handlePlayer1Start = useCallback(
             async (player: ReactPlayer) => {
