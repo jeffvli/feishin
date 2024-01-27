@@ -40,6 +40,14 @@ type WebAudio = {
     gain: GainNode;
 };
 
+// Credits: http://stackoverflow.com/questions/12150729/ddg
+// This is used so that the player will always have an <audio> element. This means that
+// player1Source and player2Source are connected BEFORE the user presses play for
+// the first time. This workaround is important for Safari, which seems to require the
+// source to be connected PRIOR to resuming audio context
+const EMPTY_SOURCE =
+    'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==';
+
 export const AudioPlayer = forwardRef(
     (
         {
@@ -71,6 +79,7 @@ export const AudioPlayer = forwardRef(
         const [player2Source, setPlayer2Source] = useState<MediaElementAudioSourceNode | null>(
             null,
         );
+
         const calculateReplayGain = useCallback(
             (song: Song): number => {
                 if (playback.replayGainMode === 'no') {
@@ -256,32 +265,29 @@ export const AudioPlayer = forwardRef(
         }, [audioDeviceId]);
 
         useEffect(() => {
-            if (webAudio && player1Source) {
-                if (player1 === undefined) {
-                    player1Source.disconnect();
-                    setPlayer1Source(null);
-                } else if (currentPlayer === 1) {
-                    webAudio.gain.gain.setValueAtTime(calculateReplayGain(player1), 0);
-                }
+            if (webAudio && player1Source && player1 && currentPlayer === 1) {
+                const newVolume = calculateReplayGain(player1) * volume;
+                webAudio.gain.gain.setValueAtTime(newVolume, 0);
             }
-        }, [calculateReplayGain, currentPlayer, player1, player1Source, webAudio]);
+        }, [calculateReplayGain, currentPlayer, player1, player1Source, volume, webAudio]);
 
         useEffect(() => {
-            if (webAudio && player2Source) {
-                if (player2 === undefined) {
-                    player2Source.disconnect();
-                    setPlayer2Source(null);
-                } else if (currentPlayer === 2) {
-                    webAudio.gain.gain.setValueAtTime(calculateReplayGain(player2), 0);
-                }
+            if (webAudio && player2Source && player2 && currentPlayer === 2) {
+                const newVolume = calculateReplayGain(player2) * volume;
+                webAudio.gain.gain.setValueAtTime(newVolume, 0);
             }
-        }, [calculateReplayGain, currentPlayer, player2, player2Source, webAudio]);
+        }, [calculateReplayGain, currentPlayer, player2, player2Source, volume, webAudio]);
 
         const handlePlayer1Start = useCallback(
             async (player: ReactPlayer) => {
-                if (!webAudio || player1Source) return;
-                if (webAudio.context.state !== 'running') {
-                    await webAudio.context.resume();
+                if (!webAudio) return;
+                if (player1Source) {
+                    // This should fire once, only if the source is real (meaning we
+                    // saw the dummy source) and the context is not ready
+                    if (webAudio.context.state !== 'running') {
+                        await webAudio.context.resume();
+                    }
+                    return;
                 }
 
                 const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
@@ -297,9 +303,12 @@ export const AudioPlayer = forwardRef(
 
         const handlePlayer2Start = useCallback(
             async (player: ReactPlayer) => {
-                if (!webAudio || player2Source) return;
-                if (webAudio.context.state !== 'running') {
-                    await webAudio.context.resume();
+                if (!webAudio) return;
+                if (player2Source) {
+                    if (webAudio.context.state !== 'running') {
+                        await webAudio.context.resume();
+                    }
+                    return;
                 }
 
                 const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
@@ -313,6 +322,9 @@ export const AudioPlayer = forwardRef(
             [player2Source, webAudio],
         );
 
+        // Bugfix for Safari: rather than use the `<audio>` volume (which doesn't work),
+        // use the GainNode to scale the volume. In this case, for compatibility with
+        // other browsers, set the `<audio>` volume to 1
         return (
             <>
                 <ReactPlayer
@@ -325,8 +337,8 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 1 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player1?.streamUrl}
-                    volume={volume}
+                    url={player1?.streamUrl || EMPTY_SOURCE}
+                    volume={webAudio ? 1 : volume}
                     width={0}
                     onEnded={handleOnEnded}
                     onProgress={
@@ -344,8 +356,8 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 2 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player2?.streamUrl}
-                    volume={volume}
+                    url={player2?.streamUrl || EMPTY_SOURCE}
+                    volume={webAudio ? 1 : volume}
                     width={0}
                     onEnded={handleOnEnded}
                     onProgress={
