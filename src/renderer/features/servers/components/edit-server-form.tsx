@@ -152,11 +152,11 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                 />
                 <PasswordInput
                     data-autofocus
-                    required
                     label={t('form.addServer.input', {
                         context: 'password',
                         postProcess: 'titleCase',
                     })}
+                    required={isNavidrome || isSubsonic}
                     {...form.getInputProps('password')}
                 />
                 {localSettings && isNavidrome && (
