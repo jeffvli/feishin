@@ -154,12 +154,19 @@ ipcMain.on('update-song', (_event, args: SongUpdate) => {
                 ? song.albumArtists.map((artist) => artist.name)
                 : null,
             'xesam:artist': song.artists?.length ? song.artists.map((artist) => artist.name) : null,
+            'xesam:audioBpm': song.bpm,
+            // Comment is a `list of strings` type
+            'xesam:comment': song.comment ? [song.comment] : null,
+            'xesam:contentCreated': song.releaseDate,
             'xesam:discNumber': song.discNumber ? song.discNumber : null,
             'xesam:genre': song.genres?.length ? song.genres.map((genre: any) => genre.name) : null,
+            'xesam:lastUsed': song.lastPlayedAt,
             'xesam:title': song.name || null,
             'xesam:trackNumber': song.trackNumber ? song.trackNumber : null,
             'xesam:useCount':
                 song.playCount !== null && song.playCount !== undefined ? song.playCount : null,
+            // User ratings are only on Navidrome/Subsonic and are on a scale of 1-5
+            'xesam:userRating': song.userRating ? song.userRating / 5 : null,
         };
     } catch (err) {
         console.log(err);
