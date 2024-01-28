@@ -176,9 +176,18 @@ export const AudioPlayer = forwardRef(
         useEffect(() => {
             if (status === PlayerStatus.PLAYING) {
                 if (currentPlayer === 1) {
-                    player1Ref.current?.getInternalPlayer()?.play();
+                    // calling play() is not necessarily a safe option (https://developer.chrome.com/blog/play-request-was-interrupted)
+                    // In practice, this failure is only likely to happen when using the 0-second wav:
+                    // play() + play() in rapid succession will cause problems as the frist one ends the track.
+                    player1Ref.current
+                        ?.getInternalPlayer()
+                        ?.play()
+                        .catch(() => {});
                 } else {
-                    player2Ref.current?.getInternalPlayer()?.play();
+                    player2Ref.current
+                        ?.getInternalPlayer()
+                        ?.play()
+                        .catch(() => {});
                 }
             } else {
                 player1Ref.current?.getInternalPlayer()?.pause();
@@ -340,7 +349,8 @@ export const AudioPlayer = forwardRef(
                     url={player1?.streamUrl || EMPTY_SOURCE}
                     volume={webAudio ? 1 : volume}
                     width={0}
-                    onEnded={handleOnEnded}
+                    // If there is no stream url, we do not need to handle when the audio finishes
+                    onEnded={player1?.streamUrl ? handleOnEnded : undefined}
                     onProgress={
                         playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1
                     }
@@ -359,7 +369,7 @@ export const AudioPlayer = forwardRef(
                     url={player2?.streamUrl || EMPTY_SOURCE}
                     volume={webAudio ? 1 : volume}
                     width={0}
-                    onEnded={handleOnEnded}
+                    onEnded={player2?.streamUrl ? handleOnEnded : undefined}
                     onProgress={
                         playbackStyle === PlaybackStyle.GAPLESS ? handleGapless2 : handleCrossfade2
                     }
