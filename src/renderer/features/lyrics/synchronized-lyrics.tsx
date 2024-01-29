@@ -21,7 +21,7 @@ const SynchronizedLyricsContainer = styled.div<{ $gap: number }>`
     gap: ${(props) => props.$gap || 5}px;
     width: 100%;
     height: 100%;
-    padding: 10vh 0 6vh;
+    padding: 10vh 0 50vh;
     overflow: scroll;
     transform: translateY(-2rem);
 
