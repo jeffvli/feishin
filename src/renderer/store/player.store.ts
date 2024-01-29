@@ -342,13 +342,14 @@ export const usePlayerStore = create<PlayerSlice>()(
                                     else previousSongIndex = shuffledIndex - 1;
                                 }
 
-                                const next = nextSongIndex
-                                    ? (queue.find(
-                                          (song) =>
-                                              song.uniqueId ===
-                                              shuffledQueue[nextSongIndex as number],
-                                      ) as QueueSong)
-                                    : undefined;
+                                const next =
+                                    nextSongIndex !== undefined
+                                        ? (queue.find(
+                                              (song) =>
+                                                  song.uniqueId ===
+                                                  shuffledQueue[nextSongIndex as number],
+                                          ) as QueueSong)
+                                        : undefined;
 
                                 const previous = queue.find(
                                     (song) => song.uniqueId === shuffledQueue[shuffledIndex - 1],

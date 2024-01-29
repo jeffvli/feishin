@@ -129,11 +129,10 @@
         "linux": {
             "target": [
                 "AppImage",
-                "rpm",
                 "tar.xz"
             ],
             "icon": "assets/icons/icon.png",
-            "category": "Development"
+            "category": "AudioVideo;Audio;Player"
         },
         "directories": {
             "app": "release/app",
@@ -308,7 +307,7 @@
         "@tanstack/react-query-persist-client": "^4.32.1",
         "@ts-rest/core": "^3.23.0",
         "@xhayper/discord-rpc": "^1.0.24",
-        "axios": "^1.4.0",
+        "axios": "^1.6.0",
         "clsx": "^2.0.0",
         "cmdk": "^0.2.0",
         "dayjs": "^1.11.6",
@@ -348,7 +347,7 @@
         "react-window-infinite-loader": "^1.0.9",
         "styled-components": "^6.0.8",
         "swiper": "^9.3.1",
-        "zod": "^3.21.4",
+        "zod": "^3.22.3",
         "zustand": "^4.3.9"
     },
     "resolutions": {

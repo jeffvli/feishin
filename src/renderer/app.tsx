@@ -108,7 +108,7 @@ export const App = () => {
                     ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
                 };
 
-                mpvPlayer?.initialize({
+                await mpvPlayer?.initialize({
                     extraParameters,
                     properties,
                 });

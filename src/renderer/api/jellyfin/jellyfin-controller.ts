@@ -538,7 +538,7 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<SongList
             Limit: query.limit,
             SortBy: query.sortBy ? songListSortMap.jellyfin[query.sortBy] : undefined,
             SortOrder: query.sortOrder ? sortOrderMap.jellyfin[query.sortOrder] : undefined,
-            StartIndex: 0,
+            StartIndex: query.startIndex,
             UserId: apiClientProps.server?.userId,
         },
     });

@@ -251,6 +251,7 @@ export interface SettingsState {
 export interface SettingsSlice extends SettingsState {
     actions: {
         reset: () => void;
+        resetSampleRate: () => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
         setTable: (type: TableType, data: DataTableProps) => void;
@@ -316,7 +317,7 @@ const initialState: SettingsState = {
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
             pause: { allowGlobal: true, hotkey: '', isGlobal: false },
             play: { allowGlobal: true, hotkey: '', isGlobal: false },
-            playPause: { allowGlobal: true, hotkey: '', isGlobal: false },
+            playPause: { allowGlobal: true, hotkey: 'space', isGlobal: false },
             previous: { allowGlobal: true, hotkey: '', isGlobal: false },
             rate0: { allowGlobal: true, hotkey: '', isGlobal: false },
             rate1: { allowGlobal: true, hotkey: '', isGlobal: false },
@@ -566,6 +567,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                         } else {
                             set(initialState);
                         }
+                    },
+                    resetSampleRate: () => {
+                        set((state) => {
+                            state.playback.mpvProperties.audioSampleRateHz = 0;
+                        });
                     },
                     setSettings: (data) => {
                         set({ ...get(), ...data });

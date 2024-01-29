@@ -209,3 +209,5 @@ export enum FontType {
     CUSTOM = 'custom',
     SYSTEM = 'system',
 }
+
+export type TitleTheme = 'dark' | 'light' | 'system';

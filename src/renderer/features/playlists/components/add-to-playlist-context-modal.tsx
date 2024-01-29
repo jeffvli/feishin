@@ -191,12 +191,12 @@ export const AddToPlaylistContextModal = ({
         const addMessage =
             values.skipDuplicates &&
             allSongIds.length * values.playlistId.length !== totalUniquesAdded
-                ? `${Math.floor(totalUniquesAdded / values.playlistId.length)}`
+                ? Math.floor(totalUniquesAdded / values.playlistId.length)
                 : allSongIds.length;
 
         setIsLoading(false);
         toast.success({
-            message: t('form.addToPlaylist', {
+            message: t('form.addToPlaylist.success', {
                 message: addMessage,
                 numOfPlaylists: values.playlistId.length,
                 postProcess: 'sentenceCase',

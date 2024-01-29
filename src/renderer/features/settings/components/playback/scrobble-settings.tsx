@@ -83,7 +83,7 @@ export const ScrobbleSettings = () => {
                     }}
                 />
             ),
-            description: t('setting.minimumScrobblePercentage', {
+            description: t('setting.minimumScrobbleSeconds', {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),

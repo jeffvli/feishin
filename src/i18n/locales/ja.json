@@ -553,7 +553,7 @@
             "error_savePassword": "パスワードを保存する際にエラーが発生しました"
         },
         "addToPlaylist": {
-            "success": "{{message}} $t(entity.song_other) を {{numOfPlaylists}} $t(entity.playlist_other) に追加しました",
+            "success": "{{message}} $t(entity.track_other) を {{numOfPlaylists}} $t(entity.playlist_other) に追加しました",
             "title": "$t(entity.playlist_one) に追加",
             "input_skipDuplicates": "重複をスキップ",
             "input_playlists": "$t(entity.playlist_other)"

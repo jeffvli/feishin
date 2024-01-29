@@ -20,6 +20,7 @@ import {
     Tray,
     Menu,
     nativeImage,
+    nativeTheme,
     BrowserWindowConstructorOptions,
     protocol,
     net,
@@ -34,6 +35,7 @@ import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
 import { hotkeyToElectronAccelerator, isLinux, isMacOS, isWindows, resolveHtmlPath } from './utils';
 import './features';
+import type { TitleTheme } from '/@/renderer/types';
 
 declare module 'node-mpv';
 
@@ -194,8 +196,8 @@ const createWindow = async () => {
         },
         macOS: {
             autoHideMenuBar: true,
-            frame: false,
-            titleBarStyle: 'hidden',
+            frame: true,
+            titleBarStyle: 'default',
             trafficLightPosition: { x: 10, y: 10 },
         },
         windows: {
@@ -414,6 +416,9 @@ const createWindow = async () => {
         // eslint-disable-next-line
         new AppUpdater();
     }
+
+    const theme = store.get('theme') as TitleTheme | undefined;
+    nativeTheme.themeSource = theme || 'dark';
 };
 
 app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
@@ -438,7 +443,10 @@ const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
 
 let mpvInstance: MpvAPI | null = null;
 
-const createMpv = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
+const createMpv = async (data: {
+    extraParameters?: string[];
+    properties?: Record<string, any>;
+}): Promise<MpvAPI> => {
     const { extraParameters, properties } = data;
 
     const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
@@ -457,15 +465,14 @@ const createMpv = (data: { extraParameters?: string[]; properties?: Record<strin
         params,
     );
 
-    // eslint-disable-next-line promise/catch-or-return
-    mpv.start()
-        .catch((error) => {
-            console.log('MPV failed to start', error);
-        })
-        .finally(() => {
-            console.log('Setting MPV properties: ', properties);
-            mpv.setMultipleProperties(properties || {});
-        });
+    try {
+        await mpv.start();
+    } catch (error) {
+        console.log('MPV failed to start', error);
+    } finally {
+        console.log('Setting MPV properties: ', properties);
+        await mpv.setMultipleProperties(properties || {});
+    }
 
     mpv.on('status', (status, ...rest) => {
         console.log('MPV Event: status', status.property, status.value, rest);
@@ -530,15 +537,15 @@ ipcMain.on(
     'player-restart',
     async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
         mpvInstance?.quit();
-        mpvInstance = createMpv(data);
+        mpvInstance = await createMpv(data);
     },
 );
 
-ipcMain.on(
+ipcMain.handle(
     'player-initialize',
     async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
         console.log('Initializing MPV with data: ', data);
-        mpvInstance = createMpv(data);
+        mpvInstance = await createMpv(data);
     },
 );
 

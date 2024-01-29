@@ -49,5 +49,5 @@ jobs:
                   command: |
                       npm run postinstall
                       npm run build
-                      npm exec electron-builder -- --publish always --linux
+                      npm exec electron-builder -- --publish always --arm64
                   on_retry_command: npm cache clean --force

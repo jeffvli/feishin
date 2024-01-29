@@ -73,7 +73,7 @@ const FILTERS = {
         },
         {
             defaultOrder: SortOrder.DESC,
-            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
+            name: i18n.t('filter.releaseDate', { postProcess: 'titleCase' }),
             value: AlbumListSort.RELEASE_DATE,
         },
     ],

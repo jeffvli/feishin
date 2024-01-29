@@ -495,7 +495,7 @@
             "input_url": "url"
         },
         "addToPlaylist": {
-            "success": "添加 {{message}} $t(entity.song_other) 到 {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "添加 {{message}} $t(entity.track_other) 到 {{numOfPlaylists}} $t(entity.playlist_other)",
             "title": "添加到$t(entity.playlist_one)",
             "input_skipDuplicates": "跳过重复",
             "input_playlists": "$t(entity.playlist_other)"
