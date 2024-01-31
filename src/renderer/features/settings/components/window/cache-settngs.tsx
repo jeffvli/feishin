@@ -47,7 +47,7 @@ export const CacheSettings = () => {
                     {t(`common.areYouSure`, { postProcess: 'sentenceCase' })}
                 </ConfirmModal>
             ),
-            title: t(`setting.${key}`, { postProcess: 'sentenceCase' }),
+            title: t(`setting.${key}`),
         });
     };
 
@@ -66,11 +66,8 @@ export const CacheSettings = () => {
                 }
                 description={t('setting.clearQueryCache', {
                     context: 'description',
-                    postProcess: 'sentenceCase',
                 })}
-                title={t('setting.clearQueryCache', {
-                    postProcess: 'sentenceCase',
-                })}
+                title={t('setting.clearQueryCache')}
             />
             {browser && (
                 <SettingsOptions
@@ -86,11 +83,8 @@ export const CacheSettings = () => {
                     }
                     description={t('setting.clearCache', {
                         context: 'description',
-                        postProcess: 'sentenceCase',
                     })}
-                    title={t('setting.clearCache', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    title={t('setting.clearCache')}
                 />
             )}
         </>
