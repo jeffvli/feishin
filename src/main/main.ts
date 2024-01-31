@@ -260,6 +260,10 @@ const createWindow = async () => {
         app.exit();
     });
 
+    ipcMain.handle('window-clear-cache', async () => {
+        return mainWindow?.webContents.session.clearCache();
+    });
+
     ipcMain.on('app-restart', () => {
         // Fix for .AppImage
         if (process.env.APPIMAGE) {

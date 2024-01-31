@@ -9,11 +9,12 @@ import { Utils } from '/@/main/preload/utils';
 import { LocalSettings } from '/@/main/preload/local-settings';
 import { Ipc } from '/@/main/preload/ipc';
 import { DiscordRpc } from '/@/main/preload/discord-rpc';
+import { Browser } from '/@/main/preload/browser';
 
 declare global {
     interface Window {
         electron: {
-            browser: any;
+            browser: Browser;
             discordRpc: DiscordRpc;
             ipc?: Ipc;
             ipcRenderer: {
