@@ -1,0 +1,9 @@
+.control {
+    color: var(--btn-subtle-fg);
+    font-weight: 600;
+}
+
+.control:hover {
+    color: var(--btn-subtle-fg-hover);
+    text-decoration: none;
+}
