@@ -48,7 +48,7 @@ const ContentContainer = styled.div`
 const DetailContainer = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 2rem;
     padding: 1rem 2rem 5rem;
     overflow: hidden;
 
@@ -341,61 +341,58 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         <ContentContainer ref={cq.ref}>
             <LibraryBackgroundOverlay $backgroundColor={background} />
             <DetailContainer>
-                <Stack spacing="lg">
-                    <Group spacing="md">
-                        <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-                        <Group spacing="xs">
-                            <Button
-                                compact
-                                loading={
-                                    createFavoriteMutation.isLoading ||
-                                    deleteFavoriteMutation.isLoading
-                                }
-                                variant="subtle"
-                                onClick={handleFavorite}
-                            >
-                                {detailQuery?.data?.userFavorite ? (
-                                    <RiHeartFill
-                                        color="red"
-                                        size={20}
-                                    />
-                                ) : (
-                                    <RiHeartLine size={20} />
-                                )}
-                            </Button>
-                            <Button
-                                compact
-                                variant="subtle"
-                                onClick={(e) => {
-                                    if (!detailQuery?.data) return;
-                                    handleGeneralContextMenu(e, [detailQuery.data!]);
-                                }}
-                            >
-                                <RiMoreFill size={20} />
-                            </Button>
-                        </Group>
-                    </Group>
-                    <Group spacing="md">
+                <Group spacing="md">
+                    <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+                    <Group spacing="xs">
                         <Button
                             compact
-                            uppercase
-                            component={Link}
-                            to={artistDiscographyLink}
+                            loading={
+                                createFavoriteMutation.isLoading || deleteFavoriteMutation.isLoading
+                            }
                             variant="subtle"
+                            onClick={handleFavorite}
                         >
-                            View discography
+                            {detailQuery?.data?.userFavorite ? (
+                                <RiHeartFill
+                                    color="red"
+                                    size={20}
+                                />
+                            ) : (
+                                <RiHeartLine size={20} />
+                            )}
                         </Button>
                         <Button
                             compact
-                            uppercase
-                            component={Link}
-                            to={artistSongsLink}
                             variant="subtle"
+                            onClick={(e) => {
+                                if (!detailQuery?.data) return;
+                                handleGeneralContextMenu(e, [detailQuery.data!]);
+                            }}
                         >
-                            View all songs
+                            <RiMoreFill size={20} />
                         </Button>
                     </Group>
-                </Stack>
+                </Group>
+                <Group spacing="md">
+                    <Button
+                        compact
+                        uppercase
+                        component={Link}
+                        to={artistDiscographyLink}
+                        variant="subtle"
+                    >
+                        View discography
+                    </Button>
+                    <Button
+                        compact
+                        uppercase
+                        component={Link}
+                        to={artistSongsLink}
+                        variant="subtle"
+                    >
+                        View all songs
+                    </Button>
+                </Group>
                 {showGenres ? (
                     <Box component="section">
                         <Group spacing="sm">
@@ -418,11 +415,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                     </Box>
                 ) : null}
                 {externalLinks ? (
-                    <Box
-                        component="section"
-                        mb={-20}
-                        mt={-20}
-                    >
+                    <Box component="section">
                         <Group spacing="sm">
                             <Button
                                 compact

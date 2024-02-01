@@ -1,7 +1,7 @@
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Box, Group, Spoiler, Stack } from '@mantine/core';
+import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { FaLastfmSquare } from 'react-icons/fa';
@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
-import { Button, Popover } from '/@/renderer/components';
+import { Button, Popover, Spoiler } from '/@/renderer/components';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import {
     TableConfigDropdown,
@@ -58,6 +58,7 @@ const ContentContainer = styled.div`
 const DetailContainer = styled.div`
     display: flex;
     flex-direction: column;
+    gap: 2rem;
     padding: 1rem 2rem 5rem;
     overflow: hidden;
 `;
@@ -328,7 +329,6 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 <Box component="section">
                     <Group
                         position="apart"
-                        py="1rem"
                         spacing="sm"
                     >
                         <Group>
@@ -380,10 +380,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                     </Group>
                 </Box>
                 {showGenres && (
-                    <Box
-                        component="section"
-                        py="1rem"
-                    >
+                    <Box component="section">
                         <Group spacing="sm">
                             {detailQuery?.data?.genres?.map((genre) => (
                                 <Button
@@ -445,14 +442,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 ) : null}
                 {comment && (
                     <Box component="section">
-                        <Spoiler
-                            hideLabel={t('common.collapse')}
-                            maxHeight={60}
-                            mb={20}
-                            showLabel={t('common.expand')}
-                        >
-                            {replaceURLWithHTMLLinks(comment)}
-                        </Spoiler>
+                        <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
                     </Box>
                 )}
                 <Box style={{ minHeight: '300px' }}>
