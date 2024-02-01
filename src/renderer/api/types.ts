@@ -1139,3 +1139,17 @@ export type FontData = {
     postscriptName: string;
     style: string;
 };
+
+export type ServerInfoArgs = BaseEndpointArgs;
+
+export enum SubsonicExtensions {
+    FORM_POST = 'formPost',
+    SONG_LYRICS = 'songLyrics',
+    TRANSCODE_OFFSET = 'transcodeOffset',
+}
+
+export type ServerInfo = {
+    features?: Record<string, number[]>;
+    id?: string;
+    version: string;
+};

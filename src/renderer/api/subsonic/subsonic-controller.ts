@@ -21,6 +21,8 @@ import {
     SearchResponse,
     RandomSongListResponse,
     RandomSongListArgs,
+    ServerInfo,
+    ServerInfoArgs,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -368,12 +370,40 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
     };
 };
 
+const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
+    const { apiClientProps } = args;
+
+    const ping = await ssApiClient(apiClientProps).ping();
+
+    if (ping.status !== 200) {
+        throw new Error('Failed to ping server');
+    }
+
+    if (!ping.body.openSubsonic || !ping.body.serverVersion) {
+        return { version: ping.body.version };
+    }
+
+    const res = await ssApiClient(apiClientProps).getServerInfo();
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get server extensions');
+    }
+
+    const features: Record<string, number[]> = {};
+    for (const extension of res.body.openSubsonicExtensions) {
+        features[extension.name] = extension.versions;
+    }
+
+    return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };
+};
+
 export const ssController = {
     authenticate,
     createFavorite,
     getArtistInfo,
     getMusicFolderList,
     getRandomSongList,
+    getServerInfo,
     getTopSongList,
     removeFavorite,
     scrobble,

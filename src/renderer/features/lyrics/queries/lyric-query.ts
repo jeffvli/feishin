@@ -6,6 +6,7 @@ import {
     InternetProviderLyricResponse,
     FullLyricsMetadata,
     LyricGetQuery,
+    SubsonicExtensions,
 } from '/@/renderer/api/types';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useLyricsSettings } from '/@/renderer/store';
@@ -93,16 +94,6 @@ export const useSongLyricsBySong = (
             if (!server) throw new Error('Server not found');
             if (!song) return null;
 
-            if (song.lyrics) {
-                return {
-                    artist: song.artists?.[0]?.name,
-                    lyrics: formatLyrics(song.lyrics),
-                    name: song.name,
-                    remote: false,
-                    source: server?.name ?? 'music server',
-                };
-            }
-
             if (server.type === ServerType.JELLYFIN) {
                 const jfLyrics = await api.controller
                     .getLyrics({
@@ -120,6 +111,16 @@ export const useSongLyricsBySong = (
                         source: server?.name ?? 'music server',
                     };
                 }
+            } else if (server.features && SubsonicExtensions.SONG_LYRICS in server.features) {
+                console.log(1234);
+            } else if (song.lyrics) {
+                return {
+                    artist: song.artists?.[0]?.name,
+                    lyrics: formatLyrics(song.lyrics),
+                    name: song.name,
+                    remote: false,
+                    source: server?.name ?? 'music server',
+                };
             }
 
             if (fetch) {

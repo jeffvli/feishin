@@ -206,6 +206,21 @@ const randomSongList = z.object({
     }),
 });
 
+const ping = z.object({
+    openSubsonic: z.boolean().optional(),
+    serverVersion: z.string().optional(),
+    version: z.string(),
+});
+
+const extension = z.object({
+    name: z.string(),
+    versions: z.number().array(),
+});
+
+const serverInfo = z.object({
+    openSubsonicExtensions: z.array(extension),
+});
+
 export const ssType = {
     _parameters: {
         albumList: albumListParameters,
@@ -229,10 +244,12 @@ export const ssType = {
         baseResponse,
         createFavorite,
         musicFolderList,
+        ping,
         randomSongList,
         removeFavorite,
         scrobble,
         search3,
+        serverInfo,
         setRating,
         song,
         topSongsList,

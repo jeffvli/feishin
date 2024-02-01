@@ -150,6 +150,14 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    getServerInfo: {
+        method: 'GET',
+        path: 'system/info',
+        responses: {
+            200: jfType._response.serverInfo,
+            400: jfType._response.error,
+        },
+    },
     getSimilarArtistList: {
         method: 'GET',
         path: 'artists/:id/similar',
