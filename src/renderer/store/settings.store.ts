@@ -282,7 +282,7 @@ const initialState: SettingsState = {
     general: {
         accent: 'rgb(53, 116, 252)',
         defaultFullPlaylist: true,
-        externalLinks: false,
+        externalLinks: true,
         followSystemTheme: false,
         language: 'en',
         playButtonBehavior: Play.NOW,
