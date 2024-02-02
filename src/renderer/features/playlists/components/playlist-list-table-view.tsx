@@ -8,7 +8,7 @@ import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { useVirtualTable } from '/@/renderer/components/virtual-table/hooks/use-virtual-table';
 import { PLAYLIST_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
+import { useCurrentServer } from '/@/renderer/store';
 
 interface PlaylistListTableViewProps {
     itemCount?: number;
@@ -18,16 +18,11 @@ interface PlaylistListTableViewProps {
 export const PlaylistListTableView = ({ tableRef, itemCount }: PlaylistListTableViewProps) => {
     const navigate = useNavigate();
     const server = useCurrentServer();
-    const { defaultFullPlaylist } = useGeneralSettings();
     const pageKey = 'playlist';
 
     const handleRowDoubleClick = (e: RowDoubleClickedEvent) => {
         if (!e.data) return;
-        if (defaultFullPlaylist) {
-            navigate(generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: e.data.id }));
-        } else {
-            navigate(generatePath(AppRoute.PLAYLISTS_DETAIL, { playlistId: e.data.id }));
-        }
+        navigate(generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: e.data.id }));
     };
 
     const tableProps = useVirtualTable({

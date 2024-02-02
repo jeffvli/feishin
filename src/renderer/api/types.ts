@@ -124,7 +124,7 @@ export interface BasePaginatedResponse<T> {
     error?: string | any;
     items: T;
     startIndex: number;
-    totalRecordCount: number;
+    totalRecordCount: number | null;
 }
 
 export type AuthenticationResponse = {
@@ -306,7 +306,9 @@ export type GenreListResponse = BasePaginatedResponse<Genre[]> | null | undefine
 export type GenreListArgs = { query: GenreListQuery } & BaseEndpointArgs;
 
 export enum GenreListSort {
+    ALBUM_COUNT = 'albumCount',
     NAME = 'name',
+    SONG_COUNT = 'songCount',
 }
 
 export type GenreListQuery = {
@@ -330,10 +332,14 @@ type GenreListSortMap = {
 
 export const genreListSortMap: GenreListSortMap = {
     jellyfin: {
+        albumCount: undefined,
         name: JFGenreListSort.NAME,
+        songCount: undefined,
     },
     navidrome: {
+        albumCount: undefined,
         name: NDGenreListSort.NAME,
+        songCount: undefined,
     },
     subsonic: {
         name: undefined,
@@ -370,7 +376,12 @@ export type AlbumListQuery = {
         navidrome?: Partial<z.infer<typeof ndType._parameters.albumList>>;
     };
     artistIds?: string[];
+    genre?: string;
+    isCompilation?: boolean;
+    isFavorite?: boolean;
     limit?: number;
+    maxYear?: number;
+    minYear?: number;
     musicFolderId?: string;
     searchTerm?: string;
     sortBy: AlbumListSort;
@@ -481,8 +492,13 @@ export type SongListQuery = {
     };
     albumIds?: string[];
     artistIds?: string[];
+    genre?: string;
+    genreId?: string;
     imageSize?: number;
+    isFavorite?: boolean;
     limit?: number;
+    maxYear?: number;
+    minYear?: number;
     musicFolderId?: string;
     searchTerm?: string;
     sortBy: SongListSort;
@@ -802,6 +818,7 @@ export type CreatePlaylistBody = {
     };
     comment?: string;
     name: string;
+    public?: boolean;
 };
 
 export type CreatePlaylistArgs = { body: CreatePlaylistBody; serverId?: string } & BaseEndpointArgs;
@@ -826,6 +843,11 @@ export type UpdatePlaylistBody = {
     comment?: string;
     genres?: Genre[];
     name: string;
+    owner?: string;
+    ownerId?: string;
+    public?: boolean;
+    rules?: Record<string, any>;
+    sync?: boolean;
 };
 
 export type UpdatePlaylistArgs = {
@@ -917,10 +939,9 @@ export type PlaylistSongListResponse = BasePaginatedResponse<Song[]> | null | un
 
 export type PlaylistSongListQuery = {
     id: string;
-    limit?: number;
-    sortBy?: SongListSort;
-    sortOrder?: SortOrder;
-    startIndex: number;
+    searchTerm?: string;
+    sortBy: SongListSort;
+    sortOrder: SortOrder;
 };
 
 export type PlaylistSongListArgs = { query: PlaylistSongListQuery } & BaseEndpointArgs;
@@ -1014,7 +1035,7 @@ export type SearchQuery = {
     albumLimit?: number;
     albumStartIndex?: number;
     musicFolderId?: string;
-    query?: string;
+    query: string;
     songLimit?: number;
     songStartIndex?: number;
 };
@@ -1139,3 +1160,48 @@ export type FontData = {
     postscriptName: string;
     style: string;
 };
+
+export type ControllerEndpoint = Partial<{
+    addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
+    authenticate: (
+        url: string,
+        body: { password: string; username: string },
+    ) => Promise<AuthenticationResponse>;
+    clearPlaylist: () => void;
+    createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
+    createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse>;
+    deleteFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
+    deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
+    getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
+    getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
+    getAlbumArtistListCount: (args: AlbumArtistListArgs) => Promise<number>;
+    getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse>;
+    getAlbumList: (args: AlbumListArgs) => Promise<AlbumListResponse>;
+    getAlbumListCount: (args: AlbumListArgs) => Promise<number>;
+    getAlbumSongList: (args: AlbumDetailArgs) => Promise<SongListResponse>; // TODO
+    getArtistDetail: () => void;
+    getArtistInfo: (args: any) => void;
+    getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse>;
+    getFavoritesList: () => void;
+    getFolderItemList: () => void;
+    getFolderList: () => void;
+    getFolderSongs: () => void;
+    getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
+    getLyrics: (args: LyricsArgs) => Promise<LyricsResponse>;
+    getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
+    getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
+    getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
+    getPlaylistListCount: (args: PlaylistListArgs) => Promise<number>;
+    getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
+    getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
+    getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
+    getSongList: (args: SongListArgs) => Promise<SongListResponse>;
+    getSongListCount: (args: SongListArgs) => Promise<number>;
+    getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
+    getUserList: (args: UserListArgs) => Promise<UserListResponse>;
+    removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
+    scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
+    search: (args: SearchArgs) => Promise<SearchResponse>;
+    setRating: (args: SetRatingArgs) => Promise<RatingResponse>;
+    updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
+}>;

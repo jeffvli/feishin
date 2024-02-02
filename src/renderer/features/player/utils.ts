@@ -23,7 +23,6 @@ export const getPlaylistSongsById = async (args: {
         id,
         sortBy: SongListSort.ID,
         sortOrder: SortOrder.ASC,
-        startIndex: 0,
         ...query,
     };
 
@@ -139,7 +138,9 @@ export const getGenreSongsById = async (args: {
         );
 
         data.items.push(...res!.items);
-        data.totalRecordCount += res!.totalRecordCount;
+        if (data.totalRecordCount) {
+            data.totalRecordCount += res!.totalRecordCount || 0;
+        }
     }
 
     return data;

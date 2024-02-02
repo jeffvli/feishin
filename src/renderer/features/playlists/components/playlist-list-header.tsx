@@ -44,6 +44,7 @@ export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistLis
     };
 
     const { handleRefreshGrid, handleRefreshTable } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.PLAYLIST,
         server,
     });

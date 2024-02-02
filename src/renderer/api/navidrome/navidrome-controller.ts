@@ -39,11 +39,13 @@ import {
     RemoveFromPlaylistResponse,
     RemoveFromPlaylistArgs,
     genreListSortMap,
+    ControllerEndpoint,
 } from '../types';
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
 import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
-import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import { subsonicApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
 
 const authenticate = async (
     url: string,
@@ -129,7 +131,7 @@ const getAlbumArtistDetail = async (
         },
     });
 
-    const artistInfoRes = await ssApiClient(apiClientProps).getArtistInfo({
+    const artistInfoRes = await subsonicApiClient(apiClientProps).getArtistInfo({
         query: {
             count: 10,
             id: query.id,
@@ -148,15 +150,16 @@ const getAlbumArtistDetail = async (
         {
             ...res.body.data,
             ...(artistInfoRes.status === 200 && {
-                similarArtists: artistInfoRes.body.artistInfo.similarArtist,
+                similarArtists: artistInfoRes.body['subsonic-response'].artistInfo.similarArtist,
                 ...(!res.body.data.largeImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.largeImageUrl,
+                    largeImageUrl: artistInfoRes.body['subsonic-response'].artistInfo.largeImageUrl,
                 }),
                 ...(!res.body.data.mediumImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.mediumImageUrl,
+                    largeImageUrl:
+                        artistInfoRes.body['subsonic-response'].artistInfo.mediumImageUrl,
                 }),
                 ...(!res.body.data.smallImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.smallImageUrl,
+                    largeImageUrl: artistInfoRes.body['subsonic-response'].artistInfo.smallImageUrl,
                 }),
             }),
         },
@@ -189,6 +192,27 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<AlbumArtis
         startIndex: query.startIndex,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };
+};
+
+const getAlbumArtistListCount = async (args: AlbumArtistListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    const res = await ndApiClient(apiClientProps).getAlbumArtistList({
+        query: {
+            _end: 1,
+            _order: sortOrderMap.navidrome[query.sortOrder],
+            _sort: albumArtistListSortMap.navidrome[query.sortBy],
+            _start: 0,
+            name: query.searchTerm,
+            ...query._custom?.navidrome,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get album artist list count');
+    }
+
+    return Number(res.body.headers.get('x-total-count') || 0);
 };
 
 const getAlbumDetail = async (args: AlbumDetailArgs): Promise<AlbumDetailResponse> => {
@@ -230,6 +254,8 @@ const getAlbumList = async (args: AlbumListArgs): Promise<AlbumListResponse> => 
             _sort: albumListSortMap.navidrome[query.sortBy],
             _start: query.startIndex,
             artist_id: query.artistIds?.[0],
+            compilation: query.isCompilation,
+            genre_id: query.genre,
             name: query.searchTerm,
             ...query._custom?.navidrome,
         },
@@ -244,6 +270,30 @@ const getAlbumList = async (args: AlbumListArgs): Promise<AlbumListResponse> => 
         startIndex: query?.startIndex || 0,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };
+};
+
+const getAlbumListCount = async (args: AlbumListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    const res = await ndApiClient(apiClientProps).getAlbumList({
+        query: {
+            _end: 1,
+            _order: sortOrderMap.navidrome[query.sortOrder],
+            _sort: albumListSortMap.navidrome[query.sortBy],
+            _start: 0,
+            artist_id: query.artistIds?.[0],
+            compilation: query.isCompilation,
+            genre_id: query.genre,
+            name: query.searchTerm,
+            ...query._custom?.navidrome,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get album list');
+    }
+
+    return Number(res.body.headers.get('x-total-count') || 0);
 };
 
 const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
@@ -275,6 +325,29 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
     };
 };
 
+const getSongListCount = async (args: SongListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    const res = await ndApiClient(apiClientProps).getSongList({
+        query: {
+            _end: 1,
+            _order: sortOrderMap.navidrome[query.sortOrder],
+            _sort: songListSortMap.navidrome[query.sortBy],
+            _start: 0,
+            album_artist_id: query.artistIds,
+            album_id: query.albumIds,
+            title: query.searchTerm,
+            ...query._custom?.navidrome,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get song list count');
+    }
+
+    return Number(res.body.headers.get('x-total-count') || 0);
+};
+
 const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> => {
     const { query, apiClientProps } = args;
 
@@ -298,7 +371,7 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
         body: {
             comment: body.comment,
             name: body.name,
-            public: body._custom?.navidrome?.public,
+            public: body.public,
             rules: body._custom?.navidrome?.rules,
             sync: body._custom?.navidrome?.sync,
         },
@@ -322,7 +395,7 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
             name: body.name,
             public: body._custom?.navidrome?.public || false,
             rules: body._custom?.navidrome?.rules ? body._custom.navidrome.rules : undefined,
-            sync: body._custom?.navidrome?.sync || undefined,
+            sync: body._custom?.navidrome?.sync,
         },
         params: {
             id: query.id,
@@ -360,7 +433,9 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
         query: {
             _end: query.startIndex + (query.limit || 0),
             _order: sortOrderMap.navidrome[query.sortOrder],
-            _sort: query.sortBy ? playlistListSortMap.navidrome[query.sortBy] : undefined,
+            _sort: query.sortBy
+                ? playlistListSortMap.navidrome[query.sortBy]
+                : playlistListSortMap.navidrome.name,
             _start: query.startIndex,
             q: query.searchTerm,
             ...query._custom?.navidrome,
@@ -376,6 +451,29 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
         startIndex: query?.startIndex || 0,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };
+};
+
+const getPlaylistListCount = async (args: PlaylistListArgs): Promise<number> => {
+    const { query, apiClientProps } = args;
+
+    const res = await ndApiClient(apiClientProps).getPlaylistList({
+        query: {
+            _end: 1,
+            _order: sortOrderMap.navidrome[query.sortOrder],
+            _sort: query.sortBy
+                ? playlistListSortMap.navidrome[query.sortBy]
+                : playlistListSortMap.navidrome.name,
+            _start: 0,
+            q: query.searchTerm,
+            ...query._custom?.navidrome,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get playlist list count');
+    }
+
+    return Number(res.body.headers.get('x-total-count') || 0);
 };
 
 const getPlaylistDetail = async (args: PlaylistDetailArgs): Promise<PlaylistDetailResponse> => {
@@ -404,12 +502,11 @@ const getPlaylistSongList = async (
             id: query.id,
         },
         query: {
-            _end: query.startIndex + (query.limit || 0),
             _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : 'ASC',
             _sort: query.sortBy
                 ? songListSortMap.navidrome[query.sortBy]
                 : ndType._enum.songList.ID,
-            _start: query.startIndex,
+            _start: 0,
         },
     });
 
@@ -419,7 +516,7 @@ const getPlaylistSongList = async (
 
     return {
         items: res.body.data.map((item) => ndNormalize.song(item, apiClientProps.server, '')),
-        startIndex: query?.startIndex || 0,
+        startIndex: 0,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };
 };
@@ -465,22 +562,41 @@ const removeFromPlaylist = async (
     return null;
 };
 
-export const ndController = {
+export const NavidromeController: ControllerEndpoint = {
     addToPlaylist,
     authenticate,
+    clearPlaylist: undefined,
+    createFavorite: SubsonicController.createFavorite,
     createPlaylist,
+    deleteFavorite: SubsonicController.deleteFavorite,
     deletePlaylist,
     getAlbumArtistDetail,
     getAlbumArtistList,
+    getAlbumArtistListCount,
     getAlbumDetail,
     getAlbumList,
+    getAlbumListCount,
+    getArtistDetail: undefined,
+    getArtistInfo: undefined,
+    getFavoritesList: undefined,
+    getFolderItemList: undefined,
+    getFolderList: undefined,
+    getFolderSongs: undefined,
     getGenreList,
+    getMusicFolderList: SubsonicController.getMusicFolderList,
     getPlaylistDetail,
     getPlaylistList,
+    getPlaylistListCount,
     getPlaylistSongList,
+    getRandomSongList: SubsonicController.getRandomSongList,
     getSongDetail,
     getSongList,
+    getSongListCount,
+    getTopSongs: SubsonicController.getTopSongs,
     getUserList,
     removeFromPlaylist,
+    scrobble: SubsonicController.scrobble,
+    search: SubsonicController.search,
+    setRating: SubsonicController.setRating,
     updatePlaylist,
 };

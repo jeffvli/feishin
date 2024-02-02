@@ -139,28 +139,20 @@ const PlaylistDetailSongListRoute = () => {
 
     const page = usePlaylistDetailStore();
     const filters: Partial<PlaylistSongListQuery> = {
-        sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
-        sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
+        sortBy: page?.table.id[playlistId]?.filter?.sortBy,
+        sortOrder: page?.table.id[playlistId]?.filter?.sortOrder,
     };
 
-    const itemCountCheck = usePlaylistSongList({
-        options: {
-            cacheTime: 1000 * 60 * 60 * 2,
-            staleTime: 1000 * 60 * 60 * 2,
-        },
+    const { data } = usePlaylistSongList({
         query: {
             id: playlistId,
-            limit: 1,
-            startIndex: 0,
-            ...filters,
+            sortBy: filters.sortBy || SongListSort.ID,
+            sortOrder: filters.sortOrder || SortOrder.ASC,
         },
         serverId: server?.id,
     });
 
-    const itemCount =
-        itemCountCheck.data?.totalRecordCount === null
-            ? undefined
-            : itemCountCheck.data?.totalRecordCount;
+    const itemCount = data?.items.length;
 
     return (
         <AnimatedPage key={`playlist-detail-songList-${playlistId}`}>
@@ -206,7 +198,10 @@ const PlaylistDetailSongListRoute = () => {
                     </Paper>
                 </Box>
             )}
-            <PlaylistDetailSongListContent tableRef={tableRef} />
+            <PlaylistDetailSongListContent
+                songs={data?.items || []}
+                tableRef={tableRef}
+            />
         </AnimatedPage>
     );
 };

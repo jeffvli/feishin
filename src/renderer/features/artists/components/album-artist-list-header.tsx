@@ -35,6 +35,7 @@ export const AlbumArtistListHeader = ({
     const cq = useContainerQuery();
 
     const { handleRefreshGrid, handleRefreshTable } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.ALBUM_ARTIST,
         server,
     });

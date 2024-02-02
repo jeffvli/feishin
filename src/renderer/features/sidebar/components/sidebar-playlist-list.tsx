@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { RiAddBoxFill, RiAddCircleFill, RiPlayFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
-import { LibraryItem } from '/@/renderer/api/types';
+import { LibraryItem, PlaylistListSort, SortOrder } from '/@/renderer/api/types';
 import { Button, Text } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlaylistList } from '/@/renderer/features/playlists';
@@ -14,20 +14,12 @@ import { Play } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useHideScrollbar } from '/@/renderer/hooks';
-import { useGeneralSettings } from '/@/renderer/store';
-
-interface SidebarPlaylistListProps {
-    data: ReturnType<typeof usePlaylistList>['data'];
-}
+import { useCurrentServer } from '/@/renderer/store';
 
 const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
     const { t } = useTranslation();
     const path = data?.items[index].id
-        ? data.defaultFullPlaylist
-            ? generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data.items[index].id })
-            : generatePath(AppRoute.PLAYLISTS_DETAIL, {
-                  playlistId: data?.items[index].id,
-              })
+        ? generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data.items[index].id })
         : undefined;
 
     return (
@@ -121,10 +113,19 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
     );
 };
 
-export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
+export const SidebarPlaylistList = () => {
     const { isScrollbarHidden, hideScrollbarElementProps } = useHideScrollbar(0);
     const handlePlayQueueAdd = usePlayQueueAdd();
-    const { defaultFullPlaylist } = useGeneralSettings();
+    const server = useCurrentServer();
+
+    const playlistsQuery = usePlaylistList({
+        query: {
+            sortBy: PlaylistListSort.NAME,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+        },
+        serverId: server?.id,
+    });
 
     const [rect, setRect] = useState({
         height: 0,
@@ -148,11 +149,10 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
 
     const memoizedItemData = useMemo(() => {
         return {
-            defaultFullPlaylist,
             handlePlay: handlePlayPlaylist,
-            items: data?.items,
+            items: playlistsQuery?.data?.items,
         };
-    }, [data?.items, defaultFullPlaylist, handlePlayPlaylist]);
+    }, [playlistsQuery?.data?.items, handlePlayPlaylist]);
 
     return (
         <Flex
@@ -168,7 +168,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
                                 : 'overlay-scrollbar'
                         }
                         height={debounced.height}
-                        itemCount={data?.items?.length || 0}
+                        itemCount={playlistsQuery?.data?.items?.length || 0}
                         itemData={memoizedItemData}
                         itemSize={25}
                         overscanCount={20}

@@ -34,6 +34,7 @@ interface UseAgGridProps<TFilter> {
     columnType?: 'albumDetail' | 'generic';
     contextMenu: SetContextMenuItems;
     customFilters?: Partial<TFilter>;
+    isClientSide?: boolean;
     isClientSideSort?: boolean;
     isSearchParams?: boolean;
     itemCount?: number;
@@ -42,6 +43,8 @@ interface UseAgGridProps<TFilter> {
     server: ServerListItem | null;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
+
+const BLOCK_SIZE = 500;
 
 export const useVirtualTable = <TFilter>({
     server,
@@ -52,6 +55,7 @@ export const useVirtualTable = <TFilter>({
     itemCount,
     customFilters,
     isSearchParams,
+    isClientSide,
     isClientSideSort,
     columnType,
 }: UseAgGridProps<TFilter>) => {
@@ -179,6 +183,19 @@ export const useVirtualTable = <TFilter>({
                         );
 
                         params.successCallback(sortedResults || [], results?.totalRecordCount || 0);
+                        return;
+                    }
+
+                    if (results.totalRecordCount === null) {
+                        const hasMoreRows = results?.items?.length === BLOCK_SIZE;
+                        const lastRowIndex = hasMoreRows
+                            ? undefined
+                            : (properties.filter.offset || 0) + results.items.length;
+
+                        params.successCallback(
+                            results?.items || [],
+                            hasMoreRows ? undefined : lastRowIndex,
+                        );
                         return;
                     }
 
@@ -321,6 +338,7 @@ export const useVirtualTable = <TFilter>({
             alwaysShowHorizontalScroll: true,
             autoFitColumns: properties.table.autoFit,
             blockLoadDebounceMillis: 200,
+            cacheBlockSize: 500,
             getRowId: (data: GetRowIdParams<any>) => data.data.id,
             infiniteInitialRowCount: itemCount || 100,
             pagination: isPaginationEnabled,
@@ -335,10 +353,11 @@ export const useVirtualTable = <TFilter>({
                 : undefined,
             rowBuffer: 20,
             rowHeight: properties.table.rowHeight || 40,
-            rowModelType: 'infinite' as RowModelType,
+            rowModelType: isClientSide ? 'clientSide' : ('infinite' as RowModelType),
             suppressRowDrag: true,
         };
     }, [
+        isClientSide,
         isPaginationEnabled,
         isSearchParams,
         itemCount,
@@ -370,7 +389,9 @@ export const useVirtualTable = <TFilter>({
                     );
                     break;
                 case LibraryItem.PLAYLIST:
-                    navigate(generatePath(AppRoute.PLAYLISTS_DETAIL, { playlistId: e.data.id }));
+                    navigate(
+                        generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: e.data.id }),
+                    );
                     break;
                 default:
                     break;

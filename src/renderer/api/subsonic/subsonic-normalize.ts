@@ -1,7 +1,15 @@
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
-import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
-import { QueueSong, LibraryItem, AlbumArtist, Album } from '/@/renderer/api/types';
+import { SubsonicApi } from '/@/renderer/api/subsonic/subsonic-types';
+import {
+    QueueSong,
+    LibraryItem,
+    AlbumArtist,
+    Album,
+    Genre,
+    MusicFolder,
+    Playlist,
+} from '/@/renderer/api/types';
 import { ServerListItem, ServerType } from '/@/renderer/types';
 
 const getCoverArtUrl = (args: {
@@ -27,16 +35,17 @@ const getCoverArtUrl = (args: {
 };
 
 const normalizeSong = (
-    item: z.infer<typeof ssType._response.song>,
+    item: z.infer<typeof SubsonicApi._baseTypes.song>,
     server: ServerListItem | null,
     deviceId: string,
+    size?: number,
 ): QueueSong => {
     const imageUrl =
         getCoverArtUrl({
             baseUrl: server?.url,
             coverArtId: item.coverArt,
             credential: server?.credential,
-            size: 100,
+            size: size || 300,
         }) || null;
 
     const streamUrl = `${server?.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=feishin_${deviceId}&${server?.credential}`;
@@ -105,15 +114,18 @@ const normalizeSong = (
 };
 
 const normalizeAlbumArtist = (
-    item: z.infer<typeof ssType._response.albumArtist>,
+    item:
+        | z.infer<typeof SubsonicApi._baseTypes.artist>
+        | z.infer<typeof SubsonicApi._baseTypes.artistListEntry>,
     server: ServerListItem | null,
+    imageSize?: number,
 ): AlbumArtist => {
     const imageUrl =
         getCoverArtUrl({
             baseUrl: server?.url,
             coverArtId: item.coverArt,
             credential: server?.credential,
-            size: 100,
+            size: imageSize || 100,
         }) || null;
 
     return {
@@ -138,15 +150,18 @@ const normalizeAlbumArtist = (
 };
 
 const normalizeAlbum = (
-    item: z.infer<typeof ssType._response.album>,
+    item:
+        | z.infer<typeof SubsonicApi._baseTypes.album>
+        | z.infer<typeof SubsonicApi._baseTypes.albumListEntry>,
     server: ServerListItem | null,
+    size?: number,
 ): Album => {
     const imageUrl =
         getCoverArtUrl({
             baseUrl: server?.url,
             coverArtId: item.coverArt,
             credential: server?.credential,
-            size: 300,
+            size: size || 300,
         }) || null;
 
     return {
@@ -156,7 +171,7 @@ const normalizeAlbum = (
         artists: item.artistId ? [{ id: item.artistId, imageUrl: null, name: item.artist }] : [],
         backdropImageUrl: null,
         createdAt: item.created,
-        duration: item.duration,
+        duration: item.duration * 1000,
         genres: item.genre
             ? [
                   {
@@ -181,7 +196,10 @@ const normalizeAlbum = (
         serverType: ServerType.SUBSONIC,
         size: null,
         songCount: item.songCount,
-        songs: [],
+        songs:
+            (item as z.infer<typeof SubsonicApi._baseTypes.album>).song?.map((song) =>
+                normalizeSong(song, server, ''),
+            ) || [],
         uniqueId: nanoid(),
         updatedAt: item.created,
         userFavorite: item.starred || false,
@@ -189,8 +207,61 @@ const normalizeAlbum = (
     };
 };
 
-export const ssNormalize = {
+const normalizeGenre = (item: z.infer<typeof SubsonicApi._baseTypes.genre>): Genre => {
+    return {
+        albumCount: item.albumCount,
+        id: item.value,
+        imageUrl: null,
+        itemType: LibraryItem.GENRE,
+        name: item.value,
+        songCount: item.songCount,
+    };
+};
+
+const normalizeMusicFolder = (
+    item: z.infer<typeof SubsonicApi._baseTypes.musicFolder>,
+): MusicFolder => {
+    return {
+        id: item.id,
+        name: item.name,
+    };
+};
+
+const normalizePlaylist = (
+    item:
+        | z.infer<typeof SubsonicApi._baseTypes.playlist>
+        | z.infer<typeof SubsonicApi._baseTypes.playlistListEntry>,
+    server: ServerListItem | null,
+): Playlist => {
+    return {
+        description: item.comment || null,
+        duration: item.duration,
+        genres: [],
+        id: item.id,
+        imagePlaceholderUrl: null,
+        imageUrl: getCoverArtUrl({
+            baseUrl: server?.url,
+            coverArtId: item.coverArt,
+            credential: server?.credential,
+            size: 300,
+        }),
+        itemType: LibraryItem.PLAYLIST,
+        name: item.name,
+        owner: item.owner,
+        ownerId: item.owner,
+        public: item.public,
+        serverId: server?.id || 'unknown',
+        serverType: ServerType.SUBSONIC,
+        size: null,
+        songCount: item.songCount,
+    };
+};
+
+export const subsonicNormalize = {
     album: normalizeAlbum,
     albumArtist: normalizeAlbumArtist,
+    genre: normalizeGenre,
+    musicFolder: normalizeMusicFolder,
+    playlist: normalizePlaylist,
     song: normalizeSong,
 };

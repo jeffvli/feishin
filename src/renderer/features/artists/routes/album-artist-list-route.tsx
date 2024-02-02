@@ -7,7 +7,7 @@ import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ListContext } from '/@/renderer/context/list-context';
 import { AlbumArtistListContent } from '/@/renderer/features/artists/components/album-artist-list-content';
 import { AlbumArtistListHeader } from '/@/renderer/features/artists/components/album-artist-list-header';
-import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
+import { useAlbumArtistListCount } from '/@/renderer/features/artists/queries/album-artist-list-count-query';
 import { AnimatedPage } from '/@/renderer/features/shared';
 
 const AlbumArtistListRoute = () => {
@@ -18,23 +18,18 @@ const AlbumArtistListRoute = () => {
 
     const albumArtistListFilter = useListFilterByKey({ key: pageKey });
 
-    const itemCountCheck = useAlbumArtistList({
+    const itemCountCheck = useAlbumArtistListCount({
         options: {
             cacheTime: 1000 * 60,
             staleTime: 1000 * 60,
         },
         query: {
-            limit: 1,
-            startIndex: 0,
             ...albumArtistListFilter,
         },
         serverId: server?.id,
     });
 
-    const itemCount =
-        itemCountCheck.data?.totalRecordCount === null
-            ? undefined
-            : itemCountCheck.data?.totalRecordCount;
+    const itemCount = itemCountCheck.data === null ? undefined : itemCountCheck.data;
 
     const providerValue = useMemo(() => {
         return {

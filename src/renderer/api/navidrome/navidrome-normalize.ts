@@ -11,8 +11,8 @@ import {
 import { ServerListItem, ServerType } from '/@/renderer/types';
 import z from 'zod';
 import { ndType } from './navidrome-types';
-import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
 import { NDGenre } from '/@/renderer/api/navidrome.types';
+import { SubsonicApi } from '/@/renderer/api/subsonic/subsonic-types';
 
 const getImageUrl = (args: { url: string | null }) => {
     const { url } = args;
@@ -186,7 +186,9 @@ const normalizeAlbum = (
 
 const normalizeAlbumArtist = (
     item: z.infer<typeof ndType._response.albumArtist> & {
-        similarArtists?: z.infer<typeof ssType._response.artistInfo>['artistInfo']['similarArtist'];
+        similarArtists?: z.infer<
+            typeof SubsonicApi.getArtistInfo2.response
+        >['subsonic-response']['artistInfo2']['similarArtist'];
     },
     server: ServerListItem | null,
 ): AlbumArtist => {

@@ -32,6 +32,7 @@ export const SongListHeader = ({ gridRef, title, itemCount, tableRef }: SongList
     const cq = useContainerQuery();
 
     const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.SONG,
         server,
     });
@@ -94,6 +95,7 @@ export const SongListHeader = ({ gridRef, title, itemCount, tableRef }: SongList
             <FilterBar>
                 <SongListHeaderFilters
                     gridRef={gridRef}
+                    itemCount={itemCount}
                     tableRef={tableRef}
                 />
             </FilterBar>

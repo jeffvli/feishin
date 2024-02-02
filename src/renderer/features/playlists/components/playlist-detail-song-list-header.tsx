@@ -1,6 +1,6 @@
 import { MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Stack } from '@mantine/core';
+import { Flex, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { LibraryItem } from '/@/renderer/api/types';
@@ -45,23 +45,30 @@ export const PlaylistDetailSongListHeader = ({
     return (
         <Stack spacing={0}>
             <PageHeader backgroundColor="var(--titlebar-bg)">
-                <LibraryHeaderBar>
-                    <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-                    <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
-                    <Paper
-                        fw="600"
-                        px="1rem"
-                        py="0.3rem"
-                        radius="sm"
-                    >
-                        {itemCount === null || itemCount === undefined ? (
-                            <SpinnerIcon />
-                        ) : (
-                            itemCount
-                        )}
-                    </Paper>
-                    {isSmartPlaylist && <Badge size="lg">{t('entity.smartPlaylist')}</Badge>}
-                </LibraryHeaderBar>
+                <Flex
+                    justify="space-between"
+                    w="100%"
+                >
+                    <LibraryHeaderBar>
+                        <LibraryHeaderBar.PlayButton
+                            onClick={() => handlePlay(playButtonBehavior)}
+                        />
+                        <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
+                        <Paper
+                            fw="600"
+                            px="1rem"
+                            py="0.3rem"
+                            radius="sm"
+                        >
+                            {itemCount === null || itemCount === undefined ? (
+                                <SpinnerIcon />
+                            ) : (
+                                itemCount
+                            )}
+                        </Paper>
+                        {isSmartPlaylist && <Badge size="lg">{t('entity.smartPlaylist')}</Badge>}
+                    </LibraryHeaderBar>
+                </Flex>
             </PageHeader>
             <Paper p="1rem">
                 <PlaylistDetailSongListHeaderFilters

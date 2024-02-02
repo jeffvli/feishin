@@ -1,53 +1,50 @@
-import { useCallback, ChangeEvent, MutableRefObject, MouseEvent } from 'react';
-import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-    RiMoreFill,
-    RiSettings3Fill,
-    RiPlayFill,
-    RiAddCircleFill,
     RiAddBoxFill,
-    RiEditFill,
+    RiAddCircleFill,
     RiDeleteBinFill,
+    RiEditFill,
+    RiMoreFill,
+    RiPlayFill,
     RiRefreshLine,
+    RiSettings3Fill,
 } from 'react-icons/ri';
-import { api } from '/@/renderer/api';
+import { useNavigate, useParams } from 'react-router';
+import i18n from '/@/i18n/i18n';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { LibraryItem, PlaylistSongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
 import {
-    DropdownMenu,
     Button,
-    Slider,
+    ConfirmModal,
+    DropdownMenu,
     MultiSelect,
+    Slider,
     Switch,
     Text,
-    ConfirmModal,
     toast,
 } from '/@/renderer/components';
+import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { openUpdatePlaylistModal } from '/@/renderer/features/playlists/components/update-playlist-form';
+import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
+import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
+import { OrderToggleButton } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
+import { AppRoute } from '/@/renderer/router/routes';
 import {
     useCurrentServer,
-    SongListFilter,
     usePlaylistDetailStore,
     useSetPlaylistDetailFilters,
     useSetPlaylistDetailTable,
     useSetPlaylistStore,
     useSetPlaylistTablePagination,
 } from '/@/renderer/store';
-import { ListDisplayType, ServerType, Play, TableColumn } from '/@/renderer/types';
-import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
-import { useParams, useNavigate } from 'react-router';
-import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
-import { openUpdatePlaylistModal } from '/@/renderer/features/playlists/components/update-playlist-form';
-import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
-import { AppRoute } from '/@/renderer/router/routes';
-import { OrderToggleButton } from '/@/renderer/features/shared';
-import i18n from '/@/i18n/i18n';
+import { ListDisplayType, Play, ServerType, TableColumn } from '/@/renderer/types';
 
 const FILTERS = {
     jellyfin: [
@@ -150,7 +147,7 @@ const FILTERS = {
         },
         {
             defaultOrder: SortOrder.ASC,
-            name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+            name: i18n.t('filter.genre', { postProcess: 'titleCase' }),
             value: SongListSort.GENRE,
         },
         {
@@ -162,6 +159,68 @@ const FILTERS = {
             defaultOrder: SortOrder.DESC,
             name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
             value: SongListSort.PLAY_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
+            value: SongListSort.RATING,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
+            value: SongListSort.RECENTLY_ADDED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
+            value: SongListSort.RECENTLY_PLAYED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
+            value: SongListSort.YEAR,
+        },
+    ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: SongListSort.ID,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.album', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.artist', { postProcess: 'titleCase' }),
+            value: SongListSort.ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: SongListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.isFavorited', { postProcess: 'titleCase' }),
+            value: SongListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.genre', { postProcess: 'titleCase' }),
+            value: SongListSort.GENRE,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: SongListSort.NAME,
         },
         {
             defaultOrder: SortOrder.DESC,
@@ -228,56 +287,18 @@ export const PlaylistDetailSongListHeaderFilters = ({
         setTable({ rowHeight: e });
     };
 
-    const handleFilterChange = useCallback(
-        async (filters: SongListFilter) => {
-            const dataSource: IDatasource = {
-                getRows: async (params) => {
-                    const limit = params.endRow - params.startRow;
-                    const startIndex = params.startRow;
+    const handleFilterChange = useCallback(async () => {
+        tableRef.current?.api.redrawRows();
+        tableRef.current?.api.ensureIndexVisible(0, 'top');
 
-                    const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, {
-                        id: playlistId,
-                        limit,
-                        startIndex,
-                        ...filters,
-                    });
-
-                    const songsRes = await queryClient.fetchQuery(
-                        queryKey,
-                        async ({ signal }) =>
-                            api.controller.getPlaylistSongList({
-                                apiClientProps: {
-                                    server,
-                                    signal,
-                                },
-                                query: {
-                                    id: playlistId,
-                                    limit,
-                                    startIndex,
-                                    ...filters,
-                                },
-                            }),
-                        { cacheTime: 1000 * 60 * 1 },
-                    );
-
-                    params.successCallback(songsRes?.items || [], songsRes?.totalRecordCount || 0);
-                },
-                rowCount: undefined,
-            };
-            tableRef.current?.api.setDatasource(dataSource);
-            tableRef.current?.api.purgeInfiniteCache();
-            tableRef.current?.api.ensureIndexVisible(0, 'top');
-
-            if (page.display === ListDisplayType.TABLE_PAGINATED) {
-                setPagination({ data: { currentPage: 0 } });
-            }
-        },
-        [tableRef, page.display, server, playlistId, queryClient, setPagination],
-    );
+        if (page.display === ListDisplayType.TABLE_PAGINATED) {
+            setPagination({ data: { currentPage: 0 } });
+        }
+    }, [tableRef, page.display, setPagination]);
 
     const handleRefresh = () => {
         queryClient.invalidateQueries(queryKeys.albums.list(server?.id || ''));
-        handleFilterChange({ ...page?.table.id[playlistId].filter, ...filters });
+        handleFilterChange();
     };
 
     const handleSetSortBy = useCallback(
@@ -288,20 +309,20 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 (f) => f.value === e.currentTarget.value,
             )?.defaultOrder;
 
-            const updatedFilters = setFilter(playlistId, {
+            setFilter(playlistId, {
                 sortBy: e.currentTarget.value as SongListSort,
                 sortOrder: sortOrder || SortOrder.ASC,
             });
 
-            handleFilterChange(updatedFilters);
+            handleFilterChange();
         },
         [handleFilterChange, playlistId, server?.type, setFilter],
     );
 
     const handleToggleSortOrder = useCallback(() => {
         const newSortOrder = filters.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
-        const updatedFilters = setFilter(playlistId, { sortOrder: newSortOrder });
-        handleFilterChange(updatedFilters);
+        setFilter(playlistId, { sortOrder: newSortOrder });
+        handleFilterChange();
     }, [filters.sortOrder, handleFilterChange, playlistId, setFilter]);
 
     const handleSetViewType = useCallback(
