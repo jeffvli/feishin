@@ -16,7 +16,11 @@
         "removeFromQueue": "remove from queue",
         "setRating": "set rating",
         "toggleSmartPlaylistEditor": "toggle $t(entity.smartPlaylist) editor",
-        "viewPlaylists": "view $t(entity.playlist_other)"
+        "viewPlaylists": "view $t(entity.playlist_other)",
+        "openIn": {
+            "lastfm": "Open in Last.fm",
+            "musicbrainz": "Open in MusicBrainz"
+        }
     },
     "common": {
         "action_one": "action",
@@ -419,6 +423,8 @@
         "discordUpdateInterval_description": "the time in seconds between each update (minimum 15 seconds)",
         "enableRemote": "enable remote control server",
         "enableRemote_description": "enables the remote control server to allow other devices to control the application",
+        "externalLinks": "show external links",
+        "externalLinks_description": "enables showing external links (Last.fm, MusicBrainz) on artist/album pages",
         "exitToTray": "exit to tray",
         "exitToTray_description": "exit the application to the system tray",
         "floatingQueueArea": "show floating queue hover area",

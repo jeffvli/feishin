@@ -111,6 +111,7 @@ const album = z.object({
     allArtistIds: z.string(),
     artist: z.string(),
     artistId: z.string(),
+    comment: z.string().optional(),
     compilation: z.boolean(),
     coverArtId: z.string().optional(), // Removed after v0.48.0
     coverArtPath: z.string().optional(), // Removed after v0.48.0

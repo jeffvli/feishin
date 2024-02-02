@@ -1,7 +1,10 @@
+import { useMemo } from 'react';
 import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { Box, Group, Stack } from '@mantine/core';
-import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FaLastfmSquare } from 'react-icons/fa';
 import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
+import { SiMusicbrainz } from 'react-icons/si';
 import { generatePath, useParams } from 'react-router';
 import { createSearchParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -14,7 +17,7 @@ import {
     ServerType,
     SortOrder,
 } from '/@/renderer/api/types';
-import { Button, Text, TextTitle } from '/@/renderer/components';
+import { Button, Spoiler, TextTitle } from '/@/renderer/components';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
@@ -34,7 +37,7 @@ import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { CardRow, Play, TableColumn } from '/@/renderer/types';
 
 const ContentContainer = styled.div`
@@ -45,7 +48,7 @@ const ContentContainer = styled.div`
 const DetailContainer = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 2rem;
     padding: 1rem 2rem 5rem;
     overflow: hidden;
 
@@ -59,6 +62,8 @@ interface AlbumArtistDetailContentProps {
 }
 
 export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailContentProps) => {
+    const { t } = useTranslation();
+    const { externalLinks } = useGeneralSettings();
     const { albumArtistId } = useParams() as { albumArtistId: string };
     const cq = useContainerQuery();
     const handlePlayQueueAdd = usePlayQueueAdd();
@@ -324,6 +329,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         detailQuery?.data?.biography !== undefined && detailQuery?.data?.biography !== null;
     const showTopSongs = topSongsQuery?.data?.items?.length;
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
+    const mbzId = detailQuery?.data?.mbz;
 
     const isLoading =
         detailQuery?.isLoading ||
@@ -335,61 +341,58 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         <ContentContainer ref={cq.ref}>
             <LibraryBackgroundOverlay $backgroundColor={background} />
             <DetailContainer>
-                <Stack spacing="lg">
-                    <Group spacing="md">
-                        <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-                        <Group spacing="xs">
-                            <Button
-                                compact
-                                loading={
-                                    createFavoriteMutation.isLoading ||
-                                    deleteFavoriteMutation.isLoading
-                                }
-                                variant="subtle"
-                                onClick={handleFavorite}
-                            >
-                                {detailQuery?.data?.userFavorite ? (
-                                    <RiHeartFill
-                                        color="red"
-                                        size={20}
-                                    />
-                                ) : (
-                                    <RiHeartLine size={20} />
-                                )}
-                            </Button>
-                            <Button
-                                compact
-                                variant="subtle"
-                                onClick={(e) => {
-                                    if (!detailQuery?.data) return;
-                                    handleGeneralContextMenu(e, [detailQuery.data!]);
-                                }}
-                            >
-                                <RiMoreFill size={20} />
-                            </Button>
-                        </Group>
-                    </Group>
-                    <Group spacing="md">
+                <Group spacing="md">
+                    <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+                    <Group spacing="xs">
                         <Button
                             compact
-                            uppercase
-                            component={Link}
-                            to={artistDiscographyLink}
+                            loading={
+                                createFavoriteMutation.isLoading || deleteFavoriteMutation.isLoading
+                            }
                             variant="subtle"
+                            onClick={handleFavorite}
                         >
-                            View discography
+                            {detailQuery?.data?.userFavorite ? (
+                                <RiHeartFill
+                                    color="red"
+                                    size={20}
+                                />
+                            ) : (
+                                <RiHeartLine size={20} />
+                            )}
                         </Button>
                         <Button
                             compact
-                            uppercase
-                            component={Link}
-                            to={artistSongsLink}
                             variant="subtle"
+                            onClick={(e) => {
+                                if (!detailQuery?.data) return;
+                                handleGeneralContextMenu(e, [detailQuery.data!]);
+                            }}
                         >
-                            View all songs
+                            <RiMoreFill size={20} />
                         </Button>
                     </Group>
-                </Stack>
+                </Group>
+                <Group spacing="md">
+                    <Button
+                        compact
+                        uppercase
+                        component={Link}
+                        to={artistDiscographyLink}
+                        variant="subtle"
+                    >
+                        View discography
+                    </Button>
+                    <Button
+                        compact
+                        uppercase
+                        component={Link}
+                        to={artistSongsLink}
+                        variant="subtle"
+                    >
+                        View all songs
+                    </Button>
+                </Group>
                 {showGenres ? (
                     <Box component="section">
                         <Group spacing="sm">
@@ -411,6 +414,46 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         </Group>
                     </Box>
                 ) : null}
+                {externalLinks ? (
+                    <Box component="section">
+                        <Group spacing="sm">
+                            <Button
+                                compact
+                                component="a"
+                                href={`https://www.last.fm/music/${encodeURIComponent(
+                                    detailQuery?.data?.name || '',
+                                )}`}
+                                radius="md"
+                                rel="noopener noreferrer"
+                                size="md"
+                                target="_blank"
+                                tooltip={{
+                                    label: t('action.openIn.lastfm'),
+                                }}
+                                variant="subtle"
+                            >
+                                <FaLastfmSquare size={25} />
+                            </Button>
+                            {mbzId ? (
+                                <Button
+                                    compact
+                                    component="a"
+                                    href={`https://musicbrainz.org/artist/${mbzId}`}
+                                    radius="md"
+                                    rel="noopener noreferrer"
+                                    size="md"
+                                    target="_blank"
+                                    tooltip={{
+                                        label: t('action.openIn.musicbrainz'),
+                                    }}
+                                    variant="subtle"
+                                >
+                                    <SiMusicbrainz size={25} />
+                                </Button>
+                            ) : null}
+                        </Group>
+                    </Box>
+                ) : null}
                 {showBiography ? (
                     <Box
                         component="section"
@@ -422,11 +465,8 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         >
                             About {detailQuery?.data?.name}
                         </TextTitle>
-                        <Text
-                            $secondary
-                            component="p"
+                        <Spoiler
                             dangerouslySetInnerHTML={{ __html: detailQuery?.data?.biography || '' }}
-                            sx={{ textAlign: 'justify' }}
                         />
                     </Box>
                 ) : null}

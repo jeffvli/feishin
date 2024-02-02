@@ -144,9 +144,11 @@ export type Genre = {
 };
 
 export type Album = {
+    albumArtist: string;
     albumArtists: RelatedArtist[];
     artists: RelatedArtist[];
     backdropImageUrl: string | null;
+    comment: string | null;
     createdAt: string;
     duration: number | null;
     genres: Genre[];
@@ -156,6 +158,7 @@ export type Album = {
     isCompilation: boolean | null;
     itemType: LibraryItem.ALBUM;
     lastPlayedAt: string | null;
+    mbzId: string | null;
     name: string;
     playCount: number | null;
     releaseDate: string | null;
@@ -228,6 +231,7 @@ export type AlbumArtist = {
     imageUrl: string | null;
     itemType: LibraryItem.ALBUM_ARTIST;
     lastPlayedAt: string | null;
+    mbz: string | null;
     name: string;
     playCount: number | null;
     serverId: string;

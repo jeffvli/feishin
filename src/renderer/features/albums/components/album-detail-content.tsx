@@ -4,13 +4,15 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
+import { FaLastfmSquare } from 'react-icons/fa';
 import { RiHeartFill, RiHeartLine, RiMoreFill, RiSettings2Fill } from 'react-icons/ri';
+import { SiMusicbrainz } from 'react-icons/si';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
-import { Button, Popover } from '/@/renderer/components';
+import { Button, Popover, Spoiler } from '/@/renderer/components';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import {
     TableConfigDropdown,
@@ -36,11 +38,13 @@ import { useAppFocus, useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useCurrentSong, useCurrentStatus } from '/@/renderer/store';
 import {
+    useGeneralSettings,
     usePlayButtonBehavior,
     useSettingsStoreActions,
     useTableSettings,
 } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
+import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 
 const isFullWidthRow = (node: RowNode) => {
     return node.id?.startsWith('disc-');
@@ -54,6 +58,7 @@ const ContentContainer = styled.div`
 const DetailContainer = styled.div`
     display: flex;
     flex-direction: column;
+    gap: 2rem;
     padding: 1rem 2rem 5rem;
     overflow: hidden;
 `;
@@ -75,6 +80,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     const status = useCurrentStatus();
     const isFocused = useAppFocus();
     const currentSong = useCurrentSong();
+    const { externalLinks } = useGeneralSettings();
 
     const columnDefs = useMemo(
         () => getColumnDefs(tableConfig.columns, false, 'albumDetail'),
@@ -279,6 +285,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     };
 
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
+    const comment = detailQuery?.data?.comment;
 
     const handleGeneralContextMenu = useHandleGeneralContextMenu(
         LibraryItem.ALBUM,
@@ -313,6 +320,8 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
+    const mbzId = detailQuery?.data?.mbzId;
+
     return (
         <ContentContainer>
             <LibraryBackgroundOverlay $backgroundColor={background} />
@@ -320,7 +329,6 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 <Box component="section">
                     <Group
                         position="apart"
-                        py="1rem"
                         spacing="sm"
                     >
                         <Group>
@@ -372,10 +380,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                     </Group>
                 </Box>
                 {showGenres && (
-                    <Box
-                        component="section"
-                        py="1rem"
-                    >
+                    <Box component="section">
                         <Group spacing="sm">
                             {detailQuery?.data?.genres?.map((genre) => (
                                 <Button
@@ -393,6 +398,51 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                                 </Button>
                             ))}
                         </Group>
+                    </Box>
+                )}
+                {externalLinks ? (
+                    <Box component="section">
+                        <Group spacing="sm">
+                            <Button
+                                compact
+                                component="a"
+                                href={`https://www.last.fm/music/${encodeURIComponent(
+                                    detailQuery?.data?.albumArtist || '',
+                                )}/${encodeURIComponent(detailQuery.data?.name || '')}`}
+                                radius="md"
+                                rel="noopener noreferrer"
+                                size="md"
+                                target="_blank"
+                                tooltip={{
+                                    label: t('action.openIn.lastfm'),
+                                }}
+                                variant="subtle"
+                            >
+                                <FaLastfmSquare size={25} />
+                            </Button>
+                            {mbzId ? (
+                                <Button
+                                    compact
+                                    component="a"
+                                    href={`https://musicbrainz.org/release/${mbzId}`}
+                                    radius="md"
+                                    rel="noopener noreferrer"
+                                    size="md"
+                                    target="_blank"
+                                    tooltip={{
+                                        label: t('action.openIn.musicbrainz'),
+                                    }}
+                                    variant="subtle"
+                                >
+                                    <SiMusicbrainz size={25} />
+                                </Button>
+                            ) : null}
+                        </Group>
+                    </Box>
+                ) : null}
+                {comment && (
+                    <Box component="section">
+                        <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
                     </Box>
                 )}
                 <Box style={{ minHeight: '300px' }}>

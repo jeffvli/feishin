@@ -170,6 +170,7 @@ export interface SettingsState {
     general: {
         accent: string;
         defaultFullPlaylist: boolean;
+        externalLinks: boolean;
         followSystemTheme: boolean;
         language: string;
         playButtonBehavior: Play;
@@ -282,6 +283,7 @@ const initialState: SettingsState = {
     general: {
         accent: 'rgb(53, 116, 252)',
         defaultFullPlaylist: true,
+        externalLinks: true,
         followSystemTheme: false,
         language: 'en',
         playButtonBehavior: Play.NOW,
