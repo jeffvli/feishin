@@ -1,41 +1,39 @@
-import { ReactNode } from 'react';
-import { Spoiler as MantineSpoiler } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
+import clsx from 'clsx';
+import { HTMLAttributes, ReactNode, useRef, useState } from 'react';
 import styles from './spoiler.module.scss';
+import { useIsOverflow } from '/@/renderer/hooks';
 
-type SpoilerProps = {
-    children: ReactNode;
-    hideLabel?: boolean;
-    initialState?: boolean;
-    maxHeight: number;
-    showLabel?: ReactNode;
-    transitionDuration?: number;
-};
+interface SpoilerProps extends HTMLAttributes<HTMLDivElement> {
+    children?: ReactNode;
+    defaultOpened?: boolean;
+    maxHeight?: number;
+}
 
-export const Spoiler = ({
-    hideLabel,
-    initialState,
-    maxHeight,
-    showLabel,
-    transitionDuration,
-    children,
-}: SpoilerProps) => {
-    const { t } = useTranslation();
+export const Spoiler = ({ maxHeight, defaultOpened, children, ...props }: SpoilerProps) => {
+    const ref = useRef(null);
+    const isOverflow = useIsOverflow(ref);
+    const [isExpanded, setIsExpanded] = useState(!!defaultOpened);
+
+    const spoilerClassNames = clsx(styles.spoiler, {
+        [styles.canExpand]: isOverflow,
+        [styles.isExpanded]: isExpanded,
+    });
+
+    const handleToggleExpand = () => {
+        setIsExpanded((val) => !val);
+    };
 
     return (
-        <MantineSpoiler
-            classNames={{
-                content: styles.content,
-                control: styles.control,
-                root: styles.root,
-            }}
-            hideLabel={hideLabel ?? t('common.collapse', { postProcess: 'sentenceCase' })}
-            initialState={initialState}
-            maxHeight={maxHeight ?? 75}
-            showLabel={showLabel ?? t('common.expand', { postProcess: 'sentenceCase' })}
-            transitionDuration={transitionDuration}
+        <div
+            ref={ref}
+            className={spoilerClassNames}
+            role="button"
+            style={{ maxHeight: maxHeight ?? '100px' }}
+            tabIndex={-1}
+            onClick={handleToggleExpand}
+            {...props}
         >
             {children}
-        </MantineSpoiler>
+        </div>
     );
 };
