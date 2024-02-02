@@ -23,6 +23,8 @@ import {
     RandomSongListArgs,
     ServerInfo,
     ServerInfoArgs,
+    StructuredLyricsArgs,
+    StructuredLyric,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 
@@ -397,6 +399,51 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };
 };
 
+export const getStructuredLyrics = async (
+    args: StructuredLyricsArgs,
+): Promise<StructuredLyric[]> => {
+    const { query, apiClientProps } = args;
+
+    const res = await ssApiClient(apiClientProps).getStructuredLyrics({
+        query: {
+            id: query.songId,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get server extensions');
+    }
+
+    const lyrics = res.body.lyricsList?.structuredLyrics;
+
+    if (!lyrics) {
+        return [];
+    }
+
+    return lyrics.map((lyric) => {
+        const baseLyric = {
+            artist: lyric.displayArtist || '',
+            lang: lyric.lang,
+            name: lyric.displayTitle || '',
+            remote: false,
+            source: apiClientProps.server?.name || 'music server',
+        };
+
+        if (lyric.synced) {
+            return {
+                ...baseLyric,
+                lyrics: lyric.line.map((line) => [line.start!, line.value]),
+                synced: true,
+            };
+        }
+        return {
+            ...baseLyric,
+            lyrics: lyric.line.map((line) => [line.value]).join('\n'),
+            synced: false,
+        };
+    });
+};
+
 export const ssController = {
     authenticate,
     createFavorite,
@@ -404,6 +451,7 @@ export const ssController = {
     getMusicFolderList,
     getRandomSongList,
     getServerInfo,
+    getStructuredLyrics,
     getTopSongList,
     removeFavorite,
     scrobble,

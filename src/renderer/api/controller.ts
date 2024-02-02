@@ -50,6 +50,8 @@ import type {
     LyricsResponse,
     ServerInfo,
     ServerInfoArgs,
+    StructuredLyricsArgs,
+    StructuredLyric,
 } from '/@/renderer/api/types';
 import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
@@ -90,6 +92,7 @@ export type ControllerEndpoint = Partial<{
     getServerInfo: (args: ServerInfoArgs) => Promise<ServerInfo>;
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
+    getStructuredLyrics: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getUserList: (args: UserListArgs) => Promise<UserListResponse>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
@@ -135,6 +138,7 @@ const endpoints: ApiController = {
         getServerInfo: jfController.getServerInfo,
         getSongDetail: jfController.getSongDetail,
         getSongList: jfController.getSongList,
+        getStructuredLyrics: undefined,
         getTopSongs: jfController.getTopSongList,
         getUserList: undefined,
         removeFromPlaylist: jfController.removeFromPlaylist,
@@ -172,6 +176,7 @@ const endpoints: ApiController = {
         getServerInfo: ssController.getServerInfo,
         getSongDetail: ndController.getSongDetail,
         getSongList: ndController.getSongList,
+        getStructuredLyrics: ssController.getStructuredLyrics,
         getTopSongs: ssController.getTopSongList,
         getUserList: ndController.getUserList,
         removeFromPlaylist: ndController.removeFromPlaylist,
@@ -206,6 +211,7 @@ const endpoints: ApiController = {
         getServerInfo: ssController.getServerInfo,
         getSongDetail: undefined,
         getSongList: undefined,
+        getStructuredLyrics: ssController.getStructuredLyrics,
         getTopSongs: ssController.getTopSongList,
         getUserList: undefined,
         scrobble: ssController.scrobble,
@@ -496,6 +502,15 @@ const getServerInfo = async (args: ServerInfoArgs) => {
     )?.(args);
 };
 
+const getStructuredLyrics = async (args: StructuredLyricsArgs) => {
+    return (
+        apiController(
+            'getStructuredLyrics',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getStructuredLyrics']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -518,6 +533,7 @@ export const controller = {
     getServerInfo,
     getSongDetail,
     getSongList,
+    getStructuredLyrics,
     getTopSongList,
     getUserList,
     removeFromPlaylist,

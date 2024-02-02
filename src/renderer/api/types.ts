@@ -1092,17 +1092,11 @@ export type InternetProviderLyricSearchResponse = {
     source: LyricSource;
 };
 
-export type SynchronizedLyricMetadata = {
-    lyrics: SynchronizedLyricsArray;
+export type FullLyricsMetadata = {
+    lyrics: LyricsResponse;
     remote: boolean;
-} & Omit<InternetProviderLyricResponse, 'lyrics'>;
-
-export type UnsynchronizedLyricMetadata = {
-    lyrics: string;
-    remote: boolean;
-} & Omit<InternetProviderLyricResponse, 'lyrics'>;
-
-export type FullLyricsMetadata = SynchronizedLyricMetadata | UnsynchronizedLyricMetadata;
+    source: string;
+} & Omit<InternetProviderLyricResponse, 'id' | 'lyrics' | 'source'>;
 
 export type LyricOverride = Omit<InternetProviderLyricResponse, 'lyrics'>;
 
@@ -1153,3 +1147,21 @@ export type ServerInfo = {
     id?: string;
     version: string;
 };
+
+export type StructuredLyricsArgs = {
+    query: LyricsQuery;
+} & BaseEndpointArgs;
+
+export type StructuredUnsyncedLyric = {
+    lyrics: string;
+    synced: false;
+} & Omit<FullLyricsMetadata, 'lyrics'>;
+
+export type StructuredSyncedLyric = {
+    lyrics: SynchronizedLyricsArray;
+    synced: true;
+} & Omit<FullLyricsMetadata, 'lyrics'>;
+
+export type StructuredLyric = {
+    lang: string;
+} & (StructuredUnsyncedLyric | StructuredSyncedLyric);

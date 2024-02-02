@@ -1,21 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Center, Group } from '@mantine/core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
-import { SynchronizedLyrics } from './synchronized-lyrics';
-import { Spinner, TextTitle } from '/@/renderer/components';
+import { SynchronizedLyrics, SynchronizedLyricsProps } from './synchronized-lyrics';
+import { Select, Spinner, TextTitle } from '/@/renderer/components';
 import { ErrorFallback } from '/@/renderer/features/action-required';
-import { UnsynchronizedLyrics } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
-import { useCurrentSong, usePlayerStore } from '/@/renderer/store';
 import {
-    FullLyricsMetadata,
-    LyricsOverride,
-    SynchronizedLyricMetadata,
-    UnsynchronizedLyricMetadata,
-} from '/@/renderer/api/types';
+    UnsynchronizedLyrics,
+    UnsynchronizedLyricsProps,
+} from '/@/renderer/features/lyrics/unsynchronized-lyrics';
+import { useCurrentSong, usePlayerStore } from '/@/renderer/store';
+import { FullLyricsMetadata, LyricSource, LyricsOverride } from '/@/renderer/api/types';
 import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { queryClient } from '/@/renderer/lib/react-query';
@@ -84,17 +82,9 @@ const ScrollContainer = styled(motion.div)`
     }
 `;
 
-function isSynchronized(
-    data: Partial<FullLyricsMetadata> | undefined,
-): data is SynchronizedLyricMetadata {
-    // Type magic. The only difference between Synchronized and Unsynchhronized is
-    // the datatype of lyrics. This makes Typescript happier later...
-    if (!data) return false;
-    return Array.isArray(data.lyrics);
-}
-
 export const Lyrics = () => {
     const currentSong = useCurrentSong();
+    const [index, setIndex] = useState(0);
 
     const { data, isInitialLoading } = useSongLyricsBySong(
         {
@@ -139,7 +129,7 @@ export const Lyrics = () => {
         },
         query: {
             remoteSongId: override?.id,
-            remoteSource: override?.source,
+            remoteSource: override?.source as LyricSource | undefined,
             song: currentSong,
         },
         serverId: currentSong?.serverId,
@@ -150,6 +140,7 @@ export const Lyrics = () => {
             (state) => state.current.song,
             () => {
                 setOverride(undefined);
+                setIndex(0);
             },
             { equalityFn: (a, b) => a?.id === b?.id },
         );
@@ -159,16 +150,29 @@ export const Lyrics = () => {
         };
     }, []);
 
+    const [lyrics, synced] = useMemo(() => {
+        if (Array.isArray(data)) {
+            if (data.length > 0) {
+                const selectedLyric = data[Math.min(index, data.length)];
+                return [selectedLyric, selectedLyric.synced];
+            }
+        } else if (data?.lyrics) {
+            return [data, Array.isArray(data.lyrics)];
+        }
+
+        return [undefined, false];
+    }, [data, index]);
+
+    const languages = useMemo(() => {
+        if (Array.isArray(data)) {
+            return data.map((lyric, idx) => ({ label: lyric.lang, value: idx.toString() }));
+        }
+        return [];
+    }, [data]);
+
     const isLoadingLyrics = isInitialLoading || isOverrideLoading;
 
-    const hasNoLyrics = !data?.lyrics;
-
-    const lyricsMetadata:
-        | Partial<SynchronizedLyricMetadata>
-        | Partial<UnsynchronizedLyricMetadata>
-        | undefined = data;
-
-    const isSynchronizedLyrics = isSynchronized(lyricsMetadata);
+    const hasNoLyrics = !lyrics;
 
     return (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -198,11 +202,11 @@ export const Lyrics = () => {
                                 initial={{ opacity: 0 }}
                                 transition={{ duration: 0.5 }}
                             >
-                                {isSynchronizedLyrics ? (
-                                    <SynchronizedLyrics {...lyricsMetadata} />
+                                {synced ? (
+                                    <SynchronizedLyrics {...(lyrics as SynchronizedLyricsProps)} />
                                 ) : (
                                     <UnsynchronizedLyrics
-                                        {...(lyricsMetadata as UnsynchronizedLyricMetadata)}
+                                        {...(lyrics as UnsynchronizedLyricsProps)}
                                     />
                                 )}
                             </ScrollContainer>
@@ -210,6 +214,16 @@ export const Lyrics = () => {
                     </AnimatePresence>
                 )}
                 <ActionsContainer>
+                    {languages.length > 1 && (
+                        <Select
+                            clearable={false}
+                            data={languages}
+                            style={{ bottom: 50, position: 'absolute' }}
+                            value={index.toString()}
+                            onChange={(value) => setIndex(parseInt(value!, 10))}
+                        />
+                    )}
+
                     <LyricsActions
                         onRemoveLyric={handleOnRemoveLyric}
                         onResetLyric={handleOnResetLyric}
