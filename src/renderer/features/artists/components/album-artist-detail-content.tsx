@@ -17,7 +17,7 @@ import {
     ServerType,
     SortOrder,
 } from '/@/renderer/api/types';
-import { Button, Text, TextTitle } from '/@/renderer/components';
+import { Button, Spoiler, TextTitle } from '/@/renderer/components';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
@@ -465,11 +465,8 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         >
                             About {detailQuery?.data?.name}
                         </TextTitle>
-                        <Text
-                            $secondary
-                            component="p"
+                        <Spoiler
                             dangerouslySetInnerHTML={{ __html: detailQuery?.data?.biography || '' }}
-                            sx={{ textAlign: 'justify' }}
                         />
                     </Box>
                 ) : null}
