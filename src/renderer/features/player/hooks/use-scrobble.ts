@@ -315,12 +315,19 @@ export const useScrobble = () => {
 
     useEffect(() => {
         const unsubSongChange = usePlayerStore.subscribe(
-            (state) => [state.current.song, state.current.time],
+            (state) => [state.current.song, state.current.time, state.current.player],
             handleScrobbleFromSongChange,
             {
                 // We need the current time to check the scrobble condition, but we only want to
                 // trigger the callback when the song changes
-                equalityFn: (a, b) => (a[0] as QueueSong)?.id === (b[0] as QueueSong)?.id,
+                // There are two conditions where this should trigger:
+                // 1. The song actually changes (the common case)
+                // 2. The song does not change, but the player dows. This would either be
+                //    a single track on repeat one, or one track added to the queue
+                //    multiple times in a row and playback goes normally (no next/previous)
+                equalityFn: (a, b) =>
+                    (a[0] as QueueSong)?.uniqueId === (b[0] as QueueSong)?.uniqueId &&
+                    a[2] === b[2],
             },
         );
 
