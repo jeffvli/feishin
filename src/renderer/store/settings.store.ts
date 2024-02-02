@@ -169,6 +169,7 @@ export interface SettingsState {
     };
     general: {
         accent: string;
+        buttonSize: number;
         defaultFullPlaylist: boolean;
         externalLinks: boolean;
         followSystemTheme: boolean;
@@ -282,6 +283,7 @@ const initialState: SettingsState = {
     },
     general: {
         accent: 'rgb(53, 116, 252)',
+        buttonSize: 20,
         defaultFullPlaylist: true,
         externalLinks: true,
         followSystemTheme: false,
