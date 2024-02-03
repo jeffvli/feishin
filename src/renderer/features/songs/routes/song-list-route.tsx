@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import isEmpty from 'lodash/isEmpty';
+import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { GenreListSort, LibraryItem, SongListQuery, SortOrder } from '/@/renderer/api/types';
 import { ListContext } from '/@/renderer/context/list-context';
@@ -16,6 +17,7 @@ import { titleCase } from '/@/renderer/utils';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 
 const TrackListRoute = () => {
+    const { t } = useTranslation();
     const gridRef = useRef<VirtualInfiniteGridRef | null>(null);
     const tableRef = useRef<AgGridReactType | null>(null);
     const server = useCurrentServer();
@@ -132,6 +134,13 @@ const TrackListRoute = () => {
         };
     }, [albumArtistId, customFilters, genreId, handlePlay, pageKey]);
 
+    const artist = searchParams.get('artistName');
+    const title = artist
+        ? t('page.trackList.artistTracks', { artist })
+        : genreId
+        ? t('page.trackList.genreTracks', { genre: titleCase(genreTitle) })
+        : undefined;
+
     return (
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
@@ -139,11 +148,7 @@ const TrackListRoute = () => {
                     gridRef={gridRef}
                     itemCount={itemCount}
                     tableRef={tableRef}
-                    title={
-                        searchParams.get('artistName') || genreId
-                            ? `"${titleCase(genreTitle)}" Tracks`
-                            : undefined
-                    }
+                    title={title}
                 />
                 <SongListContent
                     gridRef={gridRef}

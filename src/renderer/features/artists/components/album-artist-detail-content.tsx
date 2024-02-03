@@ -213,7 +213,9 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             order={2}
                             weight={700}
                         >
-                            Recent releases
+                            {t('page.albumArtistDetail.recentReleases', {
+                                postProcess: 'sentenceCase',
+                            })}
                         </TextTitle>
                         <Button
                             compact
@@ -222,7 +224,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             to={artistDiscographyLink}
                             variant="subtle"
                         >
-                            View discography
+                            {t('page.albumArtistDetail.viewDiscography')}
                         </Button>
                     </Group>
                 ),
@@ -238,7 +240,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         order={2}
                         weight={700}
                     >
-                        Appears on
+                        {t('page.albumArtistDetail.appearsOn', { postProcess: 'sentenceCase' })}
                     </TextTitle>
                 ),
                 uniqueId: 'compilationAlbums',
@@ -252,7 +254,9 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         order={2}
                         weight={700}
                     >
-                        Related artists
+                        {t('page.albumArtistDetail.relatedArtists', {
+                            postProcess: 'sentenceCase',
+                        })}
                     </TextTitle>
                 ),
                 uniqueId: 'similarArtists',
@@ -267,6 +271,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         recentAlbumsQuery?.data?.items,
         recentAlbumsQuery.isFetching,
         recentAlbumsQuery?.isLoading,
+        t,
     ]);
 
     const playButtonBehavior = usePlayButtonBehavior();
@@ -381,7 +386,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         to={artistDiscographyLink}
                         variant="subtle"
                     >
-                        View discography
+                        {t('page.albumArtistDetail.viewDiscography')}
                     </Button>
                     <Button
                         compact
@@ -390,7 +395,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         to={artistSongsLink}
                         variant="subtle"
                     >
-                        View all songs
+                        {t('page.albumArtistDetail.viewAllTracks')}
                     </Button>
                 </Group>
                 {showGenres ? (
@@ -463,7 +468,9 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             order={2}
                             weight={700}
                         >
-                            About {detailQuery?.data?.name}
+                            {t('page.albumArtistDetail.about', {
+                                artist: detailQuery?.data?.name,
+                            })}
                         </TextTitle>
                         <Spoiler
                             dangerouslySetInnerHTML={{ __html: detailQuery?.data?.biography || '' }}
@@ -484,7 +491,9 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     order={2}
                                     weight={700}
                                 >
-                                    Top Songs
+                                    {t('page.albumArtistDetail.topSongs', {
+                                        postProcess: 'sentenceCase',
+                                    })}
                                 </TextTitle>
                                 <Button
                                     compact
@@ -498,7 +507,9 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     )}
                                     variant="subtle"
                                 >
-                                    View all
+                                    {t('page.albumArtistDetail.viewAll', {
+                                        postProcess: 'sentenceCase',
+                                    })}
                                 </Button>
                             </Group>
                         </Group>

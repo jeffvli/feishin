@@ -421,7 +421,8 @@ export const albumListSortMap: AlbumListSortMap = {
         rating: NDAlbumListSort.RATING,
         recentlyAdded: NDAlbumListSort.RECENTLY_ADDED,
         recentlyPlayed: NDAlbumListSort.PLAY_DATE,
-        releaseDate: undefined,
+        // Recent versions of Navidrome support release date, but fallback to year for now
+        releaseDate: NDAlbumListSort.YEAR,
         songCount: NDAlbumListSort.SONG_COUNT,
         year: NDAlbumListSort.YEAR,
     },

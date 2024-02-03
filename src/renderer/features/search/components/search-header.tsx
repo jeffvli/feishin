@@ -1,7 +1,8 @@
+import { ChangeEvent, MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, MutableRefObject } from 'react';
+import { useTranslation } from 'react-i18next';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router-dom';
 import { useCurrentServer } from '../../../store/auth.store';
 import { LibraryItem } from '/@/renderer/api/types';
@@ -17,6 +18,7 @@ interface SearchHeaderProps {
 }
 
 export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
+    const { t } = useTranslation();
     const { itemType } = useParams() as { itemType: LibraryItem };
     const [searchParams, setSearchParams] = useSearchParams();
     const cq = useContainerQuery();
@@ -70,7 +72,7 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
                         }}
                         variant={itemType === LibraryItem.SONG ? 'filled' : 'subtle'}
                     >
-                        Tracks
+                        {t('entity.track_other', { postProcess: 'sentenceCase' })}
                     </Button>
                     <Button
                         compact
@@ -87,7 +89,7 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
                         }}
                         variant={itemType === LibraryItem.ALBUM ? 'filled' : 'subtle'}
                     >
-                        Albums
+                        {t('entity.album_other', { postProcess: 'sentenceCase' })}
                     </Button>
                     <Button
                         compact
@@ -104,7 +106,7 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
                         }}
                         variant={itemType === LibraryItem.ALBUM_ARTIST ? 'filled' : 'subtle'}
                     >
-                        Artists
+                        {t('entity.artist_other', { postProcess: 'sentenceCase' })}
                     </Button>
                 </Group>
             </FilterBar>

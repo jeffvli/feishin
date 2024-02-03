@@ -254,6 +254,17 @@
         }
     },
     "page": {
+        "albumArtistDetail": {
+            "about": "About {{artist}}",
+            "appearsOn": "appears on",
+            "recentReleases": "recent releases",
+            "viewDiscography": "view discography",
+            "relatedArtists": "related $t(entity.artist_other)",
+            "topSongs": "top songs",
+            "topSongsFrom": "Top songs from {{title}}",
+            "viewAll": "view all",
+            "viewAllTracks": "view all $t(entity.track_other)"
+        },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
         },
@@ -353,6 +364,8 @@
             "tracks": "$t(entity.track_other)"
         },
         "trackList": {
+            "artistTracks": "Tracks by {{artist}}",
+            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
             "title": "$t(entity.track_other)"
         }
     },
