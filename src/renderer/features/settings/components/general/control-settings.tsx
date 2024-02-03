@@ -39,9 +39,11 @@ export const ControlSettings = () => {
         {
             control: (
                 <NumberInput
+                    defaultValue={settings.buttonSize || 20}
                     max={30}
                     min={15}
-                    value={settings.buttonSize}
+                    rightSection="px"
+                    width={75}
                     onBlur={(e) => {
                         if (!e) return;
                         const newVal = e.currentTarget.value
