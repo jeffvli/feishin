@@ -400,7 +400,7 @@
         "audioExclusiveMode_description": "enable exclusive output mode. In this mode, the system is usually locked out, and only mpv will be able to output audio",
         "audioPlayer": "audio player",
         "audioPlayer_description": "select the audio player to use for playback",
-        "buttonSize": "Button size",
+        "buttonSize": "Player bar button size",
         "buttonSize_description": "The size of the player bar buttons",
         "clearCache": "Clear browser cache",
         "clearCache_description": "A 'hard clear' of Feishin. In addition to clearing Feishin's cache, empty the browser cache (saved images and other assets). Server credentials and settings are preserved.",
