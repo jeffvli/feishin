@@ -374,7 +374,7 @@ const getTopSongList = async (args: TopSongListArgs): Promise<SongListResponse> 
             IncludeItemTypes: 'Audio',
             Limit: query.limit,
             Recursive: true,
-            SortBy: 'CommunityRating,SortName',
+            SortBy: 'PlayCount,SortName',
             SortOrder: 'Descending',
             UserId: apiClientProps.server?.userId,
         },
