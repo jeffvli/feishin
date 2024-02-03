@@ -38,6 +38,35 @@ export const ControlSettings = () => {
     const controlOptions = [
         {
             control: (
+                <NumberInput
+                    defaultValue={settings.buttonSize}
+                    max={30}
+                    min={15}
+                    rightSection="px"
+                    width={75}
+                    onBlur={(e) => {
+                        if (!e) return;
+                        const newVal = e.currentTarget.value
+                            ? Math.min(Math.max(Number(e.currentTarget.value), 15), 30)
+                            : settings.buttonSize;
+                        setSettings({
+                            general: {
+                                ...settings,
+                                buttonSize: newVal,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.buttonSize', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.buttonSize', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
                 <Switch
                     aria-label="Toggle skip buttons"
                     defaultChecked={settings.skipButtons?.enabled}
