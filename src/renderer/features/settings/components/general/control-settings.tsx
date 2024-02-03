@@ -39,7 +39,7 @@ export const ControlSettings = () => {
         {
             control: (
                 <NumberInput
-                    defaultValue={settings.buttonSize || 20}
+                    defaultValue={settings.buttonSize}
                     max={30}
                     min={15}
                     rightSection="px"
