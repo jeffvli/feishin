@@ -600,7 +600,7 @@ export const useSettingsStore = create<SettingsSlice>()(
                 return merge(currentState, persistedState);
             },
             name: 'store_settings',
-            version: 6,
+            version: 7,
         },
     ),
 );
