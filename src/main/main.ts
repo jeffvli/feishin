@@ -635,7 +635,7 @@ ipcMain.on(
 
         const globalMediaKeysEnabled = store.get('global_media_hotkeys') as boolean;
 
-        if (globalMediaKeysEnabled) {
+        if (globalMediaKeysEnabled !== false) {
             enableMediaKeys(mainWindow);
         }
     },
