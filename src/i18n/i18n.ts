@@ -125,16 +125,18 @@ const titleCasePostProcessor: PostProcessorModule = {
     },
 };
 
+const ignoreSentenceCaseLanguages = ['de']
+
 const sentenceCasePostProcessor: PostProcessorModule = {
     type: 'postProcessor',
     name: 'sentenceCase',
-    process: (value: string, _: string, __: TOptions<StringMap>, translator: any) => {
+    process: (value: string, _key: string, _options: TOptions<StringMap>, translator: any) => {
         const sentences = value.split('. ');
 
         return sentences
             .map((sentence) => {
                 return (
-                    sentence.charAt(0).toLocaleUpperCase() + (translator.language !== 'de' ? sentence.slice(1).toLocaleLowerCase() : sentence.slice(1))
+                    sentence.charAt(0).toLocaleUpperCase() + (!ignoreSentenceCaseLanguages.includes(translator.language) ? sentence.slice(1).toLocaleLowerCase() : sentence.slice(1))
                 );
             })
             .join('. ');
