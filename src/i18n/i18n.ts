@@ -125,25 +125,9 @@ const titleCasePostProcessor: PostProcessorModule = {
     },
 };
 
-const sentenceCasePostProcessor: PostProcessorModule = {
-    type: 'postProcessor',
-    name: 'sentenceCase',
-    process: (value: string) => {
-        const sentences = value.split('. ');
-
-        return sentences
-            .map((sentence) => {
-                return (
-                    sentence.charAt(0).toLocaleUpperCase() + sentence.slice(1).toLocaleLowerCase()
-                );
-            })
-            .join('. ');
-    },
-};
 i18n.use(lowerCasePostProcessor)
     .use(upperCasePostProcessor)
     .use(titleCasePostProcessor)
-    .use(sentenceCasePostProcessor)
     .use(initReactI18next) // passes i18n down to react-i18next
     .init({
         fallbackLng: 'en',
