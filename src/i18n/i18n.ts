@@ -1,4 +1,4 @@
-import { PostProcessorModule } from 'i18next';
+import { PostProcessorModule, TOptions, StringMap } from 'i18next';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import en from './locales/en.json';
@@ -125,16 +125,18 @@ const titleCasePostProcessor: PostProcessorModule = {
     },
 };
 
+const ignoreSentenceCaseLanguages = ['de']
+
 const sentenceCasePostProcessor: PostProcessorModule = {
     type: 'postProcessor',
     name: 'sentenceCase',
-    process: (value: string) => {
+    process: (value: string, _key: string, _options: TOptions<StringMap>, translator: any) => {
         const sentences = value.split('. ');
 
         return sentences
             .map((sentence) => {
                 return (
-                    sentence.charAt(0).toLocaleUpperCase() + sentence.slice(1).toLocaleLowerCase()
+                    sentence.charAt(0).toLocaleUpperCase() + (!ignoreSentenceCaseLanguages.includes(translator.language) ? sentence.slice(1).toLocaleLowerCase() : sentence.slice(1))
                 );
             })
             .join('. ');
