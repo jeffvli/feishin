@@ -38,3 +38,20 @@ export const authenticationFailure = (currentServer: ServerListItem | null) => {
         useAuthStore.getState().actions.setCurrentServer(null);
     }
 };
+
+export const hasFeature = (
+    server: ServerListItem | null,
+    feature: string,
+    version = 1,
+): boolean => {
+    if (!server || !server.features) {
+        return false;
+    }
+
+    const versions = server.features[feature];
+    if (!versions || versions.length === 0) {
+        return false;
+    }
+
+    return versions.includes(version);
+};

@@ -342,6 +342,10 @@ const removeFromPlaylistParameters = z.object({
     id: z.array(z.string()),
 });
 
+export enum NavidromeExtensions {
+    SMART_PLAYLISTS = 'smartPlaylists',
+}
+
 export const ndType = {
     _enum: {
         albumArtistList: ndAlbumArtistListSort,

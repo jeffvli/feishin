@@ -54,25 +54,7 @@ export enum Platform {
     WINDOWS = 'windows',
 }
 
-export enum ServerType {
-    JELLYFIN = 'jellyfin',
-    NAVIDROME = 'navidrome',
-    SUBSONIC = 'subsonic',
-}
-
-export type ServerListItem = {
-    credential: string;
-    features?: Record<string, number[]>;
-    id: string;
-    name: string;
-    ndCredential?: string;
-    savePassword?: boolean;
-    type: ServerType;
-    url: string;
-    userId: string | null;
-    username: string;
-    version?: string;
-};
+export { ServerType, ServerListItem } from '/@/renderer/api/types';
 
 export enum PlayerStatus {
     PAUSED = 'paused',

@@ -57,13 +57,16 @@ export type User = {
 
 export type ServerListItem = {
     credential: string;
+    features?: Record<string, number[]>;
     id: string;
     name: string;
     ndCredential?: string;
+    savePassword?: boolean;
     type: ServerType;
     url: string;
     userId: string | null;
     username: string;
+    version?: string;
 };
 
 export enum ServerType {
