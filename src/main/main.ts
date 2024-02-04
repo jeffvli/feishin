@@ -317,9 +317,9 @@ const createWindow = async () => {
         }
     });
 
-    const globalMediaKeysEnabled = store.get('global_media_hotkeys') as boolean;
+    const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
 
-    if (globalMediaKeysEnabled !== false) {
+    if (globalMediaKeysEnabled) {
         enableMediaKeys(mainWindow);
     }
 
@@ -633,7 +633,7 @@ ipcMain.on(
             }
         }
 
-        const globalMediaKeysEnabled = store.get('global_media_hotkeys') as boolean;
+        const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
 
         if (globalMediaKeysEnabled) {
             enableMediaKeys(mainWindow);
