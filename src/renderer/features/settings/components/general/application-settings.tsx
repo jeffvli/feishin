@@ -94,7 +94,7 @@ export const ApplicationSettings = () => {
             localSettings.fontError(onFontError);
 
             return () => {
-                ipc!.removeAllListeners('custom-font-error');
+                ipc?.removeAllListeners('custom-font-error');
             };
         }
 

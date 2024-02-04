@@ -174,6 +174,7 @@ export interface SettingsState {
         externalLinks: boolean;
         followSystemTheme: boolean;
         language: string;
+        passwordStore?: string;
         playButtonBehavior: Play;
         resume: boolean;
         showQueueDrawerButton: boolean;
@@ -288,6 +289,7 @@ const initialState: SettingsState = {
         externalLinks: true,
         followSystemTheme: false,
         language: 'en',
+        passwordStore: undefined,
         playButtonBehavior: Play.NOW,
         resume: false,
         showQueueDrawerButton: false,
@@ -600,7 +602,7 @@ export const useSettingsStore = create<SettingsSlice>()(
                 return merge(currentState, persistedState);
             },
             name: 'store_settings',
-            version: 7,
+            version: 8,
         },
     ),
 );
