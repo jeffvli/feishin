@@ -8,7 +8,7 @@ import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
 import { AuthenticationResponse } from '/@/renderer/api/types';
 import { useAuthStoreActions } from '/@/renderer/store';
-import { ServerType } from '/@/renderer/types';
+import { ServerType, toServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
 import { useTranslation } from 'react-i18next';
 
@@ -33,14 +33,20 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const form = useForm({
         initialValues: {
             legacyAuth: false,
-            name: !isElectron() ? window.SERVER_NAME : process?.env.SERVER_NAME?? '' ,
+            name: (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) ?? '',
             password: '',
             savePassword: false,
-            type: !isElectron() ? window.SERVER_TYPE?.toLowerCase() : process?.env.SERVER_TYPE?.toLowerCase() ?? ServerType.JELLYFIN,
-            url: !isElectron() ? window.SERVER_URL : process?.env.SERVER_URL ?? 'https://',
+            type:
+                (localSettings
+                    ? localSettings.env.SERVER_TYPE
+                    : toServerType(window.SERVER_TYPE)) ?? ServerType.JELLYFIN,
+            url: (localSettings ? localSettings.env.SERVER_URL : window.SERVER_URL) ?? 'https://',
             username: '',
         },
     });
+
+    const serverLock =
+        (localSettings ? !!localSettings.env.SERVER_LOCK : !!window.SERVER_LOCK) ?? false;
 
     const isSubmitDisabled = !form.values.name || !form.values.url || !form.values.username;
 
@@ -117,25 +123,25 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             >
                 <SegmentedControl
                     data={SERVER_TYPES}
-                    disabled = {!isElectron() ? !!window.SERVER_LOCK : !!process?.env.SERVER_LOCK ?? false}
+                    disabled={serverLock}
                     {...form.getInputProps('type')}
                 />
                 <Group grow>
                     <TextInput
                         data-autofocus
+                        disabled={serverLock}
                         label={t('form.addServer.input', {
                             context: 'name',
                             postProcess: 'titleCase',
                         })}
-                        disabled = {!isElectron() ? !!window.SERVER_LOCK : !!process?.env.SERVER_LOCK ?? false}
                         {...form.getInputProps('name')}
                     />
                     <TextInput
+                        disabled={serverLock}
                         label={t('form.addServer.input', {
                             context: 'url',
                             postProcess: 'titleCase',
                         })}
-                        disabled = {!isElectron() ? !!window.SERVER_LOCK : !!process?.env.SERVER_LOCK ?? false}
                         {...form.getInputProps('url')}
                     />
                 </Group>

@@ -60,6 +60,17 @@ export enum ServerType {
     SUBSONIC = 'subsonic',
 }
 
+export const toServerType = (value?: string): ServerType | null => {
+    switch (value?.toLowerCase()) {
+        case ServerType.JELLYFIN:
+            return ServerType.JELLYFIN;
+        case ServerType.NAVIDROME:
+            return ServerType.NAVIDROME;
+        default:
+            return null;
+    }
+};
+
 export type ServerListItem = {
     credential: string;
     id: string;
