@@ -411,7 +411,7 @@ export const getStructuredLyrics = async (
     });
 
     if (res.status !== 200) {
-        throw new Error('Failed to get server extensions');
+        throw new Error('Failed to get structured lyrics');
     }
 
     const lyrics = res.body.lyricsList?.structuredLyrics;

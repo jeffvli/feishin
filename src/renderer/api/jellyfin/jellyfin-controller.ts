@@ -954,7 +954,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const res = await jfApiClient(apiClientProps).getServerInfo();
 
     if (res.status !== 200) {
-        throw new Error('Failed to get song detail');
+        throw new Error('Failed to get server info');
     }
 
     return { id: apiClientProps.server?.id, version: res.body.Version };

@@ -6,7 +6,7 @@ import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
 import { SynchronizedLyrics, SynchronizedLyricsProps } from './synchronized-lyrics';
-import { Select, Spinner, TextTitle } from '/@/renderer/components';
+import { Spinner, TextTitle } from '/@/renderer/components';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import {
     UnsynchronizedLyrics,
@@ -214,17 +214,10 @@ export const Lyrics = () => {
                     </AnimatePresence>
                 )}
                 <ActionsContainer>
-                    {languages.length > 1 && (
-                        <Select
-                            clearable={false}
-                            data={languages}
-                            style={{ bottom: 50, position: 'absolute' }}
-                            value={index.toString()}
-                            onChange={(value) => setIndex(parseInt(value!, 10))}
-                        />
-                    )}
-
                     <LyricsActions
+                        index={index}
+                        languages={languages}
+                        setIndex={setIndex}
                         onRemoveLyric={handleOnRemoveLyric}
                         onResetLyric={handleOnResetLyric}
                         onSearchOverride={handleOnSearchOverride}
