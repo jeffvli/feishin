@@ -18,12 +18,10 @@ server {
   }
 
   location ${PUBLIC_PATH}settings.js {
-    add_header Content-Type application/javascript;
     alias /etc/nginx/conf.d/settings.js;
   }
 
   location ${PUBLIC_PATH}/settings.js {
-    add_header Content-Type application/javascript;
     alias /etc/nginx/conf.d/settings.js;
   }
 }
