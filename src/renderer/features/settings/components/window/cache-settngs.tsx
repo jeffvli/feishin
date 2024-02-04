@@ -1,9 +1,8 @@
-import { Button } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
-import { ConfirmModal, toast } from '/@/renderer/components';
+import { Button, ConfirmModal, toast } from '/@/renderer/components';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 import { useCallback, useState } from 'react';
 
