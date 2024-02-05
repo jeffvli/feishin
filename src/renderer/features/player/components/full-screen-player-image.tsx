@@ -16,6 +16,7 @@ import {
     usePlayerData,
     usePlayerStore,
 } from '/@/renderer/store';
+import { useSettingsStore } from '/@/renderer/store/settings.store';
 
 const Image = styled(motion.img)<{ $useAspectRatio: boolean }>`
     position: absolute;
@@ -147,8 +148,11 @@ export const FullScreenPlayerImage = () => {
 
     const updateImageSize = useCallback(() => {
         if (mainImageRef.current) {
+            const imageSizeOverride = useSettingsStore.getState().general.albumArtRes;
+
             setMainImageDimensions({
                 idealSize:
+                    imageSizeOverride ||
                     Math.ceil((mainImageRef.current as HTMLDivElement).offsetHeight / 100) * 100,
             });
 
