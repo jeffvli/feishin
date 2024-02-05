@@ -78,12 +78,7 @@ export const ControlSettings = () => {
                         const newVal = e.currentTarget.value
                             ? Math.min(Math.max(Number(e.currentTarget.value), 175), 2500)
                             : null;
-                        setSettings({
-                            general: {
-                                ...settings,
-                                albumArtRes: newVal,
-                            },
-                        });
+                        setSettings({ general: { ...settings, albumArtRes: newVal } });
                     }}
                 />
             ),
