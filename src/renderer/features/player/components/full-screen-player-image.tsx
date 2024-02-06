@@ -131,6 +131,8 @@ export const FullScreenPlayerImage = () => {
     const mainImageRef = useRef<HTMLImageElement | null>(null);
     const [mainImageDimensions, setMainImageDimensions] = useState({ idealSize: 1 });
 
+    const albumArtRes = useSettingsStore((store) => store.general.albumArtRes);
+
     const { queue } = usePlayerData();
     const { opacity, useImageAspectRatio } = useFullScreenPlayerStore();
     const currentSong = queue.current;
@@ -148,11 +150,9 @@ export const FullScreenPlayerImage = () => {
 
     const updateImageSize = useCallback(() => {
         if (mainImageRef.current) {
-            const imageSizeOverride = useSettingsStore.getState().general.albumArtRes;
-
             setMainImageDimensions({
                 idealSize:
-                    imageSizeOverride ||
+                    albumArtRes ||
                     Math.ceil((mainImageRef.current as HTMLDivElement).offsetHeight / 100) * 100,
             });
 
@@ -162,7 +162,7 @@ export const FullScreenPlayerImage = () => {
                 topImage: scaleImageUrl(mainImageDimensions.idealSize, queue.current?.imageUrl),
             });
         }
-    }, [mainImageDimensions.idealSize, queue, setImageState]);
+    }, [mainImageDimensions.idealSize, queue, setImageState, albumArtRes]);
 
     useLayoutEffect(() => {
         updateImageSize();
