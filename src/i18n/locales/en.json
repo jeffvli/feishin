@@ -518,6 +518,8 @@
         "playButtonBehavior_optionAddLast": "$t(player.addLast)",
         "playButtonBehavior_optionAddNext": "$t(player.addNext)",
         "playButtonBehavior_optionPlay": "$t(player.play)",
+        "playerAlbumArtResolution": "Player Album Art Resolution",
+        "playerAlbumArtResolution_description": "The resolution for the large player's album art preview. Larger makes it look more crisp, but may slow loading down. Defaults to 0, meaning auto",
         "remotePassword": "remote control server password",
         "remotePassword_description": "sets the password for the remote control server. These credentials are by default transferred insecurely, so you should use a unique password that you do not care about",
         "remotePort": "remote control server port",
