@@ -70,6 +70,8 @@ mprisPlayer.on('volume', (vol: number) => {
     getMainWindow()?.webContents.send('request-volume', {
         volume,
     });
+
+    mprisPlayer.volume = volume / 100;
 });
 
 mprisPlayer.on('shuffle', (event: boolean) => {
