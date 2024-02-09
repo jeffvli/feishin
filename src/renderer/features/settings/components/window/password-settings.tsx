@@ -11,10 +11,10 @@ import { Select } from '/@/renderer/components';
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const PASSWORD_SETTINGS: SelectItem[] = [
-    { label: 'Gnome (libsecret)', value: 'gnome_libsecret' },
-    { label: 'KDE 4', value: 'kwallet' },
-    { label: 'KDE 5', value: 'kwallet5' },
-    { label: 'KDE 6', value: 'kwallet6' },
+    { label: 'libsecret', value: 'gnome_libsecret' },
+    { label: 'KDE 4 (kwallet4)', value: 'kwallet' },
+    { label: 'KDE 5 (kwallet5)', value: 'kwallet5' },
+    { label: 'KDE 6 (kwallet6)', value: 'kwallet6' },
 ];
 
 export const PasswordSettings = () => {
