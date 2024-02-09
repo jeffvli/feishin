@@ -509,6 +509,8 @@
         "mpvExecutablePath_description": "sets the path to the mpv executable",
         "mpvExecutablePath_help": "one per line",
         "mpvExtraParameters": "mpv parameters",
+        "passwordStore": "passwords/secret store",
+        "passwordStore_description": "what password/secret store to use. change this if you are having issues storing passwords.",
         "playbackStyle": "playback style",
         "playbackStyle_description": "select the playback style to use for the audio player",
         "playbackStyle_optionCrossFade": "crossfade",
