@@ -167,6 +167,7 @@ export const useHandlePlayQueueAdd = () => {
                 initialSongIndex = songs.findIndex((song) => song.id === initialSongId);
             }
 
+            const hadSong = usePlayerStore.getState().queue.default.length > 0;
             const playerData = addToQueue({ initialIndex: initialSongIndex, playType, songs });
 
             if (playerType === PlaybackType.LOCAL) {
@@ -183,7 +184,11 @@ export const useHandlePlayQueueAdd = () => {
                 }
             }
 
-            play();
+            // We should only play if the queue was empty, or we are doing play NOW
+            // (override the queue).
+            if (playType === Play.NOW || !hadSong) {
+                play();
+            }
 
             remote?.updateSong({
                 currentTime: usePlayerStore.getState().current.time,

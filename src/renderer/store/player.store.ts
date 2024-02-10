@@ -111,8 +111,10 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 ...song,
                                 uniqueId: nanoid(),
                             }));
+                            const queue = get().queue.default;
 
-                            if (playType === Play.NOW) {
+                            // If the queue is empty, next/last should behave the same as now
+                            if (playType === Play.NOW || queue.length === 0) {
                                 if (get().shuffle === PlayerShuffle.TRACK) {
                                     const index = initialIndex || 0;
                                     const initialSong = songsToAddToQueue[index];
@@ -172,7 +174,6 @@ export const usePlayerStore = create<PlayerSlice>()(
                                     state.queue.shuffled = shuffledQueueWithNewSongs;
                                 });
                             } else if (playType === Play.NEXT) {
-                                const queue = get().queue.default;
                                 const currentIndex = get().current.index;
 
                                 if (get().shuffle === PlayerShuffle.TRACK) {
