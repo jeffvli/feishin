@@ -1,5 +1,5 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
-import { PlayerData, PlayerState } from '/@/renderer/store';
+import { PlayerData } from '/@/renderer/store';
 
 const initialize = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
     return ipcRenderer.invoke('player-initialize', data);
@@ -48,14 +48,6 @@ const play = () => {
 
 const previous = () => {
     ipcRenderer.send('player-previous');
-};
-
-const restoreQueue = () => {
-    ipcRenderer.send('player-restore-queue');
-};
-
-const saveQueue = (data: Record<string, any>) => {
-    ipcRenderer.send('player-save-queue', data);
 };
 
 const seek = (seconds: number) => {
@@ -154,16 +146,6 @@ const rendererQuit = (cb: (event: IpcRendererEvent) => void) => {
     ipcRenderer.on('renderer-player-quit', cb);
 };
 
-const rendererSaveQueue = (cb: (event: IpcRendererEvent) => void) => {
-    ipcRenderer.on('renderer-player-save-queue', cb);
-};
-
-const rendererRestoreQueue = (
-    cb: (event: IpcRendererEvent, data: Partial<PlayerState>) => void,
-) => {
-    ipcRenderer.on('renderer-player-restore-queue', cb);
-};
-
 const rendererError = (cb: (event: IpcRendererEvent, data: string) => void) => {
     ipcRenderer.on('renderer-player-error', cb);
 };
@@ -182,8 +164,6 @@ export const mpvPlayer = {
     previous,
     quit,
     restart,
-    restoreQueue,
-    saveQueue,
     seek,
     seekTo,
     setProperties,
@@ -203,8 +183,6 @@ export const mpvPlayerListener = {
     rendererPlayPause,
     rendererPrevious,
     rendererQuit,
-    rendererRestoreQueue,
-    rendererSaveQueue,
     rendererSkipBackward,
     rendererSkipForward,
     rendererStop,

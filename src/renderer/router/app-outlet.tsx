@@ -13,8 +13,12 @@ export const AppOutlet = () => {
         const isMpvRequired = () => {
             if (!localSettings) return false;
             const mpvPath = localSettings.get('mpv_path');
-            if (mpvPath) return false;
-            return true;
+            if (mpvPath) {
+                return false;
+            }
+
+            const mpvDisabled = localSettings.get('disable_mpv');
+            return !mpvDisabled;
         };
 
         const isServerRequired = !currentServer;

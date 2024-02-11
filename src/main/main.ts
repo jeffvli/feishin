@@ -316,7 +316,7 @@ const createWindow = async () => {
                         }
 
                         const queue = JSON.parse(data.toString());
-                        getMainWindow()?.webContents.send('renderer-player-restore-queue', queue);
+                        getMainWindow()?.webContents.send('renderer-restore-queue', queue);
                     });
                 });
             });
@@ -362,7 +362,7 @@ const createWindow = async () => {
             event.preventDefault();
             saved = true;
 
-            getMainWindow()?.webContents.send('renderer-player-save-queue');
+            getMainWindow()?.webContents.send('renderer-save-queue');
 
             ipcMain.once('player-save-queue', async (_event, data: Record<string, any>) => {
                 const queueLocation = join(app.getPath('userData'), 'queue');

@@ -9,6 +9,8 @@ import { mpvPlayer, mpvPlayerListener } from './preload/mpv-player';
 import { remote } from './preload/remote';
 import { utils } from './preload/utils';
 
+const disableMpv = localSettings.get('disable_mpv');
+
 contextBridge.exposeInMainWorld('electron', {
     browser,
     discordRpc,
@@ -16,8 +18,8 @@ contextBridge.exposeInMainWorld('electron', {
     localSettings,
     lyrics,
     mpris,
-    mpvPlayer,
-    mpvPlayerListener,
+    mpvPlayer: disableMpv ? undefined : mpvPlayer,
+    mpvPlayerListener: disableMpv ? undefined : mpvPlayerListener,
     remote,
     utils,
 });

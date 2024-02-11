@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { Center, Group, Stack } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
@@ -18,23 +18,19 @@ const localSettings = isElectron() ? window.electron.localSettings : null;
 const ActionRequiredRoute = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServer();
-    const [isMpvRequired, setIsMpvRequired] = useState(false);
     const isServerRequired = !currentServer;
     const isCredentialRequired = false;
 
-    useEffect(() => {
-        const getMpvPath = async () => {
-            if (!localSettings) return setIsMpvRequired(false);
-            const mpvPath = await localSettings.get('mpv_path');
+    const isMpvRequired = useMemo(() => {
+        if (!localSettings) return false;
 
-            if (mpvPath) {
-                return setIsMpvRequired(false);
-            }
+        const mpvPath = localSettings.get('mpv_path');
+        if (mpvPath) {
+            return false;
+        }
 
-            return setIsMpvRequired(true);
-        };
-
-        getMpvPath();
+        const mpvDisabled = localSettings.get('disable_mpv');
+        return !mpvDisabled;
     }, []);
 
     const checks = [

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SelectItem } from '@mantine/core';
 import isElectron from 'is-electron';
-import { Select, Slider, toast } from '/@/renderer/components';
+import { Checkbox, Select, Slider, toast } from '/@/renderer/components';
 import {
     SettingsSection,
     SettingOption,
@@ -12,11 +12,14 @@ import { PlaybackType, PlayerStatus, PlaybackStyle, CrossfadeStyle } from '/@/re
 import { useTranslation } from 'react-i18next';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const getAudioDevice = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
     return (devices || []).filter((dev: MediaDeviceInfo) => dev.kind === 'audiooutput');
 };
+
+const initialDisable = (localSettings?.get('disable_mpv') as boolean | undefined) ?? false;
 
 export const AudioSettings = () => {
     const { t } = useTranslation();
@@ -25,6 +28,18 @@ export const AudioSettings = () => {
     const status = useCurrentStatus();
 
     const [audioDevices, setAudioDevices] = useState<SelectItem[]>([]);
+    const [disableMpv, setDisableMpv] = useState(initialDisable);
+
+    const handleSetDisableMpv = (disabled: boolean) => {
+        setDisableMpv(disabled);
+        localSettings?.set('disable_mpv', disabled);
+
+        if (disabled) {
+            setSettings({
+                playback: { ...settings, type: disabled ? PlaybackType.WEB : PlaybackType.LOCAL },
+            });
+        }
+    };
 
     useEffect(() => {
         const getAudioDevices = () => {
@@ -45,6 +60,18 @@ export const AudioSettings = () => {
     }, [settings.type, t]);
 
     const audioOptions: SettingOption[] = [
+        {
+            control: (
+                <Checkbox
+                    defaultChecked={disableMpv}
+                    onChange={(e) => handleSetDisableMpv(e.currentTarget.checked)}
+                />
+            ),
+            description: t('setting.disableMpv', { context: 'description' }),
+            isHidden: !isElectron(),
+            note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
+            title: t('setting.disableMpv'),
+        },
         {
             control: (
                 <Select
@@ -71,7 +98,7 @@ export const AudioSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: !isElectron(),
+            isHidden: !isElectron() || initialDisable || disableMpv,
             note:
                 status === PlayerStatus.PLAYING
                     ? t('common.playerMustBePaused', { postProcess: 'sentenceCase' })

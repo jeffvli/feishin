@@ -428,6 +428,8 @@
         "customFontPath_description": "sets the path to the custom font to use for the application",
         "disableAutomaticUpdates": "disable automatic updates",
         "disableLibraryUpdateOnStartup": "disable checking for new versions on startup",
+        "disableMpv": "Disable MPV",
+        "disableMpv_description": "If checked, prevent MPV from starting and bypass MPV requirement.",
         "discordApplicationId": "{{discord}} application id",
         "discordApplicationId_description": "the application id for {{discord}} rich presence (defaults to {{defaultId}})",
         "discordIdleStatus": "show rich presence idle status",
