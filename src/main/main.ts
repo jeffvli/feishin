@@ -109,6 +109,19 @@ export const getMainWindow = () => {
     return mainWindow;
 };
 
+export const sendToastToRenderer = ({
+    message,
+    type,
+}: {
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+}) => {
+    getMainWindow()?.webContents.send('toast-from-main', {
+        message,
+        type,
+    });
+};
+
 const createWinThumbarButtons = () => {
     if (isWindows()) {
         getMainWindow()?.setThumbarButtons([
