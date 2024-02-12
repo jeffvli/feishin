@@ -2,6 +2,7 @@
 import path from 'path';
 import process from 'process';
 import { URL } from 'url';
+import log from 'electron-log/main';
 
 export let resolveHtmlPath: (htmlFileName: string) => string;
 
@@ -49,4 +50,20 @@ export const hotkeyToElectronAccelerator = (hotkey: string) => {
     });
 
     return accelerator;
+};
+
+const logInstance = {
+    debug: log.debug,
+    error: log.error,
+    info: log.info,
+    success: log.info,
+    verbose: log.verbose,
+    warning: log.warn,
+};
+
+export const createLog = (data: {
+    message: string;
+    type: 'debug' | 'verbose' | 'success' | 'error' | 'warning' | 'info';
+}) => {
+    logInstance[data.type](data.message);
 };
