@@ -1,19 +1,14 @@
-import { useMemo } from 'react';
 import { Center, Group, Stack } from '@mantine/core';
-import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { RiCheckFill } from 'react-icons/ri';
 import { Link, Navigate } from 'react-router-dom';
 import { Button, PageHeader, Text } from '/@/renderer/components';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
-import { MpvRequired } from '/@/renderer/features/action-required/components/mpv-required';
 import { ServerCredentialRequired } from '/@/renderer/features/action-required/components/server-credential-required';
 import { ServerRequired } from '/@/renderer/features/action-required/components/server-required';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-
-const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const ActionRequiredRoute = () => {
     const { t } = useTranslation();
@@ -21,24 +16,7 @@ const ActionRequiredRoute = () => {
     const isServerRequired = !currentServer;
     const isCredentialRequired = false;
 
-    const isMpvRequired = useMemo(() => {
-        if (!localSettings) return false;
-
-        const mpvPath = localSettings.get('mpv_path');
-        if (mpvPath) {
-            return false;
-        }
-
-        const mpvDisabled = localSettings.get('disable_mpv');
-        return !mpvDisabled;
-    }, []);
-
     const checks = [
-        {
-            component: <MpvRequired />,
-            title: t('error.mpvRequired', { postProcess: 'sentenceCase' }),
-            valid: !isMpvRequired,
-        },
         {
             component: <ServerCredentialRequired />,
             title: t('error.credentialsRequired', { postProcess: 'sentenceCase' }),

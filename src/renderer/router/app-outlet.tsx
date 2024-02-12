@@ -5,7 +5,6 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { toast } from '/@/renderer/components';
 
-const localSettings = isElectron() ? window.electron.localSettings : null;
 const ipc = isElectron() ? window.electron.ipc : null;
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -13,20 +12,9 @@ export const AppOutlet = () => {
     const currentServer = useCurrentServer();
 
     const isActionsRequired = useMemo(() => {
-        const isMpvRequired = () => {
-            if (!localSettings) return false;
-            const mpvPath = localSettings.get('mpv_path');
-            if (mpvPath) {
-                return false;
-            }
-
-            const mpvDisabled = localSettings.get('disable_mpv');
-            return !mpvDisabled;
-        };
-
         const isServerRequired = !currentServer;
 
-        const actions = [isServerRequired, isMpvRequired()];
+        const actions = [isServerRequired];
         const isActionRequired = actions.some((c) => c);
 
         return isActionRequired;
