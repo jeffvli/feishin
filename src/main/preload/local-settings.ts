@@ -4,7 +4,15 @@ import type { TitleTheme } from '/@/renderer/types';
 
 const store = new Store();
 
-const set = (property: string, value: string | Record<string, unknown> | boolean | string[]) => {
+const set = (
+    property: string,
+    value: string | Record<string, unknown> | boolean | string[] | undefined,
+) => {
+    if (value === undefined) {
+        store.delete(property);
+        return;
+    }
+
     store.set(`${property}`, value);
 };
 
