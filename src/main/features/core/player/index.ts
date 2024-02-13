@@ -81,10 +81,11 @@ const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
 };
 
 const createMpv = async (data: {
+    binaryPath?: string;
     extraParameters?: string[];
     properties?: Record<string, any>;
 }): Promise<MpvAPI> => {
-    const { extraParameters, properties } = data;
+    const { extraParameters, properties, binaryPath } = data;
 
     const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
 
@@ -94,7 +95,7 @@ const createMpv = async (data: {
         {
             audio_only: true,
             auto_restart: false,
-            binary: MPV_BINARY_PATH || undefined,
+            binary: binaryPath || MPV_BINARY_PATH || undefined,
             socket: isWindows() ? `\\\\.\\pipe\\mpvserver${extra}` : `/tmp/node-mpv${extra}.sock`,
             time_update: 1,
         },
@@ -168,15 +169,20 @@ ipcMain.on('player-set-properties', async (_event, data: Record<string, any>) =>
 ipcMain.handle(
     'player-restart',
     async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-        mpvInstance?.quit();
         try {
             mpvLog({
                 action: `Attempting to initialize mpv with parameters: ${JSON.stringify(data)}`,
             });
+
+            // Clean up previous mpv instance
+            getMpvInstance()?.stop();
+            getMpvInstance()?.quit();
+            mpvInstance = null;
+
             mpvInstance = await createMpv(data);
             mpvLog({ action: 'Restarted mpv', toast: 'success' });
         } catch (err: NodeMpvError | any) {
-            mpvLog({ action: 'Failed to initialize mpv' }, err);
+            mpvLog({ action: 'Failed to restart mpv' }, err);
         }
     },
 );
@@ -197,8 +203,8 @@ ipcMain.handle(
 
 ipcMain.on('player-quit', async () => {
     try {
-        mpvInstance?.stop();
-        mpvInstance?.quit();
+        getMpvInstance()?.stop();
+        getMpvInstance()?.quit();
         mpvInstance = null;
     } catch (err: NodeMpvError | any) {
         mpvLog({ action: 'Failed to quit mpv' }, err);
@@ -382,7 +388,12 @@ ipcMain.on('player-mute', async (_event, mute: boolean) => {
 });
 
 ipcMain.handle('player-get-time', async (): Promise<number | undefined> => {
-    return getMpvInstance()?.getTimePosition();
+    try {
+        return getMpvInstance()?.getTimePosition();
+    } catch (err: NodeMpvError | any) {
+        mpvLog({ action: `Failed to get current time` }, err);
+        return 0;
+    }
 });
 
 app.on('before-quit', () => {

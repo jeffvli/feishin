@@ -5,7 +5,11 @@ const initialize = (data: { extraParameters?: string[]; properties?: Record<stri
     return ipcRenderer.invoke('player-initialize', data);
 };
 
-const restart = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
+const restart = (data: {
+    binaryPath?: string;
+    extraParameters?: string[];
+    properties?: Record<string, any>;
+}) => {
     return ipcRenderer.invoke('player-restart', data);
 };
 

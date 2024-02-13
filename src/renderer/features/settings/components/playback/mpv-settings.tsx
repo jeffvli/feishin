@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Divider, Stack } from '@mantine/core';
+import { Divider, Group, Stack } from '@mantine/core';
 import isElectron from 'is-electron';
-import { FileInput, Textarea, Text, Select, NumberInput, Switch } from '/@/renderer/components';
+import {
+    FileInput,
+    Textarea,
+    Text,
+    Select,
+    NumberInput,
+    Switch,
+    Button,
+} from '/@/renderer/components';
 import {
     SettingsSection,
     SettingOption,
@@ -9,10 +17,13 @@ import {
 import {
     SettingsState,
     usePlaybackSettings,
+    useSettingsStore,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { PlaybackType } from '/@/renderer/types';
 import { useTranslation } from 'react-i18next';
+import { RiCloseLine, RiRestartLine } from 'react-icons/ri';
+import { usePlayerControls, usePlayerStore, useQueueControls } from '/@/renderer/store';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
@@ -64,11 +75,20 @@ export const MpvSettings = () => {
     const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
+    const { pause } = usePlayerControls();
+    const { clearQueue } = useQueueControls();
 
     const [mpvPath, setMpvPath] = useState('');
 
-    const handleSetMpvPath = (e: File) => {
+    const handleSetMpvPath = (e: File | null) => {
+        if (e === null) {
+            localSettings?.set('mpv_path', undefined);
+            setMpvPath('');
+            return;
+        }
+
         localSettings?.set('mpv_path', e.path);
+        setMpvPath(e.path);
     };
 
     useEffect(() => {
@@ -100,6 +120,22 @@ export const MpvSettings = () => {
         mpvPlayer?.setProperties(mpvSetting);
     };
 
+    const handleReloadMpv = () => {
+        pause();
+        clearQueue();
+
+        const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
+        const properties: Record<string, any> = {
+            speed: usePlayerStore.getState().current.speed,
+            ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
+        };
+        mpvPlayer?.restart({
+            binaryPath: mpvPath || undefined,
+            extraParameters,
+            properties,
+        });
+    };
+
     const handleSetExtraParameters = (data: string[]) => {
         setSettings({
             playback: {
@@ -112,11 +148,35 @@ export const MpvSettings = () => {
     const options: SettingOption[] = [
         {
             control: (
-                <FileInput
-                    placeholder={mpvPath}
-                    width={225}
-                    onChange={handleSetMpvPath}
-                />
+                <Group spacing="sm">
+                    <Button
+                        tooltip={{
+                            label: t('common.reload', { postProcess: 'titleCase' }),
+                            openDelay: 0,
+                        }}
+                        variant="subtle"
+                        onClick={handleReloadMpv}
+                    >
+                        <RiRestartLine />
+                    </Button>
+                    <FileInput
+                        placeholder={mpvPath}
+                        width={200}
+                        onChange={handleSetMpvPath}
+                    />
+                    {mpvPath && (
+                        <Button
+                            tooltip={{
+                                label: t('common.clear', { postProcess: 'titleCase' }),
+                                openDelay: 0,
+                            }}
+                            variant="default"
+                            onClick={() => handleSetMpvPath(null)}
+                        >
+                            <RiCloseLine />
+                        </Button>
+                    )}
+                </Group>
             ),
             description: t('setting.mpvExecutablePath', {
                 context: 'description',
