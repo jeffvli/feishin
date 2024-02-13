@@ -173,14 +173,12 @@ export const useHandlePlayQueueAdd = () => {
             if (playerType === PlaybackType.LOCAL) {
                 mpvPlayer!.volume(usePlayerStore.getState().volume);
 
-                if (playType === Play.NEXT || playType === Play.LAST) {
-                    mpvPlayer!.setQueueNext(playerData);
-                }
-
-                if (playType === Play.NOW) {
+                if (playType === Play.NOW || !hadSong) {
                     mpvPlayer!.pause();
                     mpvPlayer!.setQueue(playerData);
                     mpvPlayer!.play();
+                } else {
+                    mpvPlayer!.setQueueNext(playerData);
                 }
             }
 
