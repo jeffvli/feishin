@@ -18,7 +18,6 @@ const cleanup = () => {
 };
 
 const setProperties = (data: Record<string, any>) => {
-    console.log('Setting property :>>', data);
     ipcRenderer.send('player-set-properties', data);
 };
 

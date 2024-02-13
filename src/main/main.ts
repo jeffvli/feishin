@@ -38,6 +38,7 @@ import {
     isWindows,
     resolveHtmlPath,
     createLog,
+    autoUpdaterLogInterface,
 } from './utils';
 import './features';
 import type { TitleTheme } from '/@/renderer/types';
@@ -47,7 +48,7 @@ declare module 'node-mpv';
 export default class AppUpdater {
     constructor() {
         log.transports.file.level = 'info';
-        autoUpdater.logger = log;
+        autoUpdater.logger = autoUpdaterLogInterface;
         autoUpdater.checkForUpdatesAndNotify();
     }
 }
