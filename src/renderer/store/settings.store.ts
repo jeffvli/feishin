@@ -382,7 +382,7 @@ const initialState: SettingsState = {
             scrobbleAtPercentage: 75,
         },
         style: PlaybackStyle.GAPLESS,
-        type: PlaybackType.LOCAL,
+        type: PlaybackType.WEB,
     },
     remote: {
         enabled: false,
