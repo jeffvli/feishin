@@ -51,7 +51,7 @@ import {
     usePlayerStore,
     useQueueControls,
 } from '/@/renderer/store';
-import { usePlayerType } from '/@/renderer/store/settings.store';
+import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { Play, PlaybackType } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
@@ -575,7 +575,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         [ctx.data, ctx.dataNodes, updateRatingMutation],
     );
 
-    const playerType = usePlayerType();
+    const playbackType = usePlaybackType();
     const { moveToBottomOfQueue, moveToTopOfQueue, removeFromQueue } = useQueueControls();
 
     const handleMoveToBottom = useCallback(() => {
@@ -584,10 +584,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         const playerData = moveToBottomOfQueue(uniqueIds);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.setQueueNext(playerData);
         }
-    }, [ctx.dataNodes, moveToBottomOfQueue, playerType]);
+    }, [ctx.dataNodes, moveToBottomOfQueue, playbackType]);
 
     const handleMoveToTop = useCallback(() => {
         const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
@@ -595,10 +595,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         const playerData = moveToTopOfQueue(uniqueIds);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.setQueueNext(playerData);
         }
-    }, [ctx.dataNodes, moveToTopOfQueue, playerType]);
+    }, [ctx.dataNodes, moveToTopOfQueue, playbackType]);
 
     const handleRemoveSelected = useCallback(() => {
         const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
@@ -608,7 +608,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         const playerData = removeFromQueue(uniqueIds);
         const isCurrentSongRemoved = currentSong && uniqueIds.includes(currentSong?.uniqueId);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             if (isCurrentSongRemoved) {
                 mpvPlayer!.setQueue(playerData);
             } else {
@@ -621,7 +621,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         if (isCurrentSongRemoved) {
             remote?.updateSong({ song: playerData.current.song });
         }
-    }, [ctx.dataNodes, ctx.tableApi, playerType, removeFromQueue]);
+    }, [ctx.dataNodes, ctx.tableApi, playbackType, removeFromQueue]);
 
     const handleDeselectAll = useCallback(() => {
         ctx.tableApi?.deselectAll();

@@ -161,21 +161,24 @@ export const MpvSettings = () => {
                     </Button>
                     <FileInput
                         placeholder={mpvPath}
+                        rightSection={
+                            mpvPath && (
+                                <Button
+                                    compact
+                                    tooltip={{
+                                        label: t('common.clear', { postProcess: 'titleCase' }),
+                                        openDelay: 0,
+                                    }}
+                                    variant="subtle"
+                                    onClick={() => handleSetMpvPath(null)}
+                                >
+                                    <RiCloseLine />
+                                </Button>
+                            )
+                        }
                         width={200}
                         onChange={handleSetMpvPath}
                     />
-                    {mpvPath && (
-                        <Button
-                            tooltip={{
-                                label: t('common.clear', { postProcess: 'titleCase' }),
-                                openDelay: 0,
-                            }}
-                            variant="default"
-                            onClick={() => handleSetMpvPath(null)}
-                        >
-                            <RiCloseLine />
-                        </Button>
-                    )}
                 </Group>
             ),
             description: t('setting.mpvExecutablePath', {

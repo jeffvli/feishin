@@ -153,6 +153,10 @@ const rendererError = (cb: (event: IpcRendererEvent, data: string) => void) => {
     ipcRenderer.on('renderer-player-error', cb);
 };
 
+const rendererPlayerFallback = (cb: (event: IpcRendererEvent, data: boolean) => void) => {
+    ipcRenderer.on('renderer-player-fallback', cb);
+};
+
 export const mpvPlayer = {
     autoNext,
     cleanup,
@@ -184,6 +188,7 @@ export const mpvPlayerListener = {
     rendererPause,
     rendererPlay,
     rendererPlayPause,
+    rendererPlayerFallback,
     rendererPrevious,
     rendererQuit,
     rendererSkipBackward,

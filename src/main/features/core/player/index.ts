@@ -149,6 +149,10 @@ export const getMpvInstance = () => {
     return mpvInstance;
 };
 
+const setAudioPlayerFallback = (isError: boolean) => {
+    getMainWindow()?.webContents.send('renderer-player-fallback', isError);
+};
+
 ipcMain.on('player-set-properties', async (_event, data: Record<string, any>) => {
     mpvLog({ action: `Setting properties: ${JSON.stringify(data)}` });
     if (data.length === 0) {
@@ -181,8 +185,10 @@ ipcMain.handle(
 
             mpvInstance = await createMpv(data);
             mpvLog({ action: 'Restarted mpv', toast: 'success' });
+            setAudioPlayerFallback(false);
         } catch (err: NodeMpvError | any) {
-            mpvLog({ action: 'Failed to restart mpv' }, err);
+            mpvLog({ action: 'Failed to restart mpv, falling back to web player' }, err);
+            setAudioPlayerFallback(true);
         }
     },
 );
@@ -195,8 +201,10 @@ ipcMain.handle(
                 action: `Attempting to initialize mpv with parameters: ${JSON.stringify(data)}`,
             });
             mpvInstance = await createMpv(data);
+            setAudioPlayerFallback(false);
         } catch (err: NodeMpvError | any) {
-            mpvLog({ action: 'Failed to initialize mpv' }, err);
+            mpvLog({ action: 'Failed to initialize mpv, falling back to web player' }, err);
+            setAudioPlayerFallback(true);
         }
     },
 );
