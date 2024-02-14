@@ -80,7 +80,6 @@ export const HomeSettings = () => {
                     context: 'description',
                     postProcess: 'sentenceCase',
                 })}
-                note={t('setting.homeConfigurationNote')}
                 title={t('setting.homeConfiguration', { postProcess: 'sentenceCase' })}
             />
             {open && (

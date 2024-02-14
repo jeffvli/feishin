@@ -461,7 +461,6 @@
         "globalMediaHotkeys_description": "enable or disable the usage of your system media hotkeys to control playback",
         "homeConfiguration": "home page configuration",
         "homeConfiguration_description": "configure what items are shown, and in what order, on the home page",
-        "homeConfigurationNote": "Recently played not available for Jellyfin",
         "hotkey_browserBack": "browser back",
         "hotkey_browserForward": "browser forward",
         "hotkey_favoriteCurrentSong": "favorite $t(common.currentSong)",
