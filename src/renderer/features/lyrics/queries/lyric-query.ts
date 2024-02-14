@@ -6,6 +6,8 @@ import {
     InternetProviderLyricResponse,
     FullLyricsMetadata,
     LyricGetQuery,
+    SubsonicExtensions,
+    StructuredLyric,
 } from '/@/renderer/api/types';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useLyricsSettings } from '/@/renderer/store';
@@ -80,7 +82,7 @@ export const useServerLyrics = (
 export const useSongLyricsBySong = (
     args: QueryHookArgs<LyricsQuery>,
     song: QueueSong | undefined,
-): UseQueryResult<FullLyricsMetadata> => {
+): UseQueryResult<FullLyricsMetadata | StructuredLyric[]> => {
     const { query } = args;
     const { fetch } = useLyricsSettings();
     const server = getServerById(song?.serverId);
@@ -89,19 +91,9 @@ export const useSongLyricsBySong = (
         cacheTime: Infinity,
         enabled: !!song && !!server,
         onError: () => {},
-        queryFn: async ({ signal }) => {
+        queryFn: async ({ signal }): Promise<FullLyricsMetadata | StructuredLyric[] | null> => {
             if (!server) throw new Error('Server not found');
             if (!song) return null;
-
-            if (song.lyrics) {
-                return {
-                    artist: song.artists?.[0]?.name,
-                    lyrics: formatLyrics(song.lyrics),
-                    name: song.name,
-                    remote: false,
-                    source: server?.name ?? 'music server',
-                };
-            }
 
             if (server.type === ServerType.JELLYFIN) {
                 const jfLyrics = await api.controller
@@ -120,6 +112,25 @@ export const useSongLyricsBySong = (
                         source: server?.name ?? 'music server',
                     };
                 }
+            } else if (server.features && SubsonicExtensions.SONG_LYRICS in server.features) {
+                const subsonicLyrics = await api.controller
+                    .getStructuredLyrics({
+                        apiClientProps: { server, signal },
+                        query: { songId: song.id },
+                    })
+                    .catch(console.error);
+
+                if (subsonicLyrics) {
+                    return subsonicLyrics;
+                }
+            } else if (song.lyrics) {
+                return {
+                    artist: song.artists?.[0]?.name,
+                    lyrics: formatLyrics(song.lyrics),
+                    name: song.name,
+                    remote: false,
+                    source: server?.name ?? 'music server',
+                };
             }
 
             if (fetch) {

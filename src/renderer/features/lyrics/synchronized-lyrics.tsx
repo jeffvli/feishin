@@ -46,7 +46,7 @@ const SynchronizedLyricsContainer = styled.div<{ $gap: number }>`
     }
 `;
 
-interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
+export interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: SynchronizedLyricsArray;
 }
 

@@ -1,4 +1,4 @@
-import { Box, Group } from '@mantine/core';
+import { Box, Center, Group, Select, SelectItem } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
@@ -13,15 +13,22 @@ import {
 } from '/@/renderer/store';
 
 interface LyricsActionsProps {
+    index: number;
+    languages: SelectItem[];
+
     onRemoveLyric: () => void;
     onResetLyric: () => void;
     onSearchOverride: (params: LyricsOverride) => void;
+    setIndex: (idx: number) => void;
 }
 
 export const LyricsActions = ({
+    index,
+    languages,
     onRemoveLyric,
     onResetLyric,
     onSearchOverride,
+    setIndex,
 }: LyricsActionsProps) => {
     const { t } = useTranslation();
     const currentSong = useCurrentSong();
@@ -42,6 +49,18 @@ export const LyricsActions = ({
 
     return (
         <Box style={{ position: 'relative', width: '100%' }}>
+            {languages.length > 1 && (
+                <Center>
+                    <Select
+                        clearable={false}
+                        data={languages}
+                        style={{ bottom: 30, position: 'absolute' }}
+                        value={index.toString()}
+                        onChange={(value) => setIndex(parseInt(value!, 10))}
+                    />
+                </Center>
+            )}
+
             <Group position="center">
                 {isDesktop && sources.length ? (
                     <Button

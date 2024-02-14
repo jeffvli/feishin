@@ -27,6 +27,7 @@ import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
 import '@ag-grid-community/styles/ag-grid.css';
 import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
 import i18n from '/@/i18n/i18n';
+import { useServerVersion } from '/@/renderer/hooks/use-server-version';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -49,6 +50,7 @@ export const App = () => {
     const remoteSettings = useRemoteSettings();
     const textStyleRef = useRef<HTMLStyleElement>();
     useDiscordRpc();
+    useServerVersion();
 
     useEffect(() => {
         if (type === FontType.SYSTEM && system) {

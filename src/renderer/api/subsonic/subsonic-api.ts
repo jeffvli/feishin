@@ -50,12 +50,34 @@ export const contract = c.router({
             200: ssType._response.randomSongList,
         },
     },
+    getServerInfo: {
+        method: 'GET',
+        path: 'getOpenSubsonicExtensions.view',
+        responses: {
+            200: ssType._response.serverInfo,
+        },
+    },
+    getStructuredLyrics: {
+        method: 'GET',
+        path: 'getLyricsBySongId.view',
+        query: ssType._parameters.structuredLyrics,
+        responses: {
+            200: ssType._response.structuredLyrics,
+        },
+    },
     getTopSongsList: {
         method: 'GET',
         path: 'getTopSongs.view',
         query: ssType._parameters.topSongsList,
         responses: {
             200: ssType._response.topSongsList,
+        },
+    },
+    ping: {
+        method: 'GET',
+        path: 'ping.view',
+        responses: {
+            200: ssType._response.ping,
         },
     },
     removeFavorite: {

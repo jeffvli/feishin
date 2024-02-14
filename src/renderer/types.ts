@@ -62,6 +62,7 @@ export enum ServerType {
 
 export type ServerListItem = {
     credential: string;
+    features?: Record<string, number[]>;
     id: string;
     name: string;
     ndCredential?: string;
@@ -70,6 +71,7 @@ export type ServerListItem = {
     url: string;
     userId: string | null;
     username: string;
+    version?: string;
 };
 
 export enum PlayerStatus {
