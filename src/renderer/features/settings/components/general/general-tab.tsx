@@ -6,6 +6,7 @@ import { ThemeSettings } from '/@/renderer/features/settings/components/general/
 import { RemoteSettings } from '/@/renderer/features/settings/components/general/remote-settings';
 import { CacheSettings } from '/@/renderer/features/settings/components/window/cache-settngs';
 import isElectron from 'is-electron';
+import { HomeSettings } from '/@/renderer/features/settings/components/general/home-settings';
 
 export const GeneralTab = () => {
     return (
@@ -15,6 +16,8 @@ export const GeneralTab = () => {
             <ThemeSettings />
             <Divider />
             <ControlSettings />
+            <Divider />
+            <HomeSettings />
             <Divider />
             <SidebarSettings />
             {isElectron() && (

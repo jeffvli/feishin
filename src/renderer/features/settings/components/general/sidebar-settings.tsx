@@ -1,77 +1,33 @@
-import { ChangeEvent, useCallback, useState } from 'react';
-import { Group } from '@mantine/core';
-import { Reorder, useDragControls } from 'framer-motion';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { Reorder } from 'framer-motion';
 import isEqual from 'lodash/isEqual';
 import { useTranslation } from 'react-i18next';
-import { MdDragIndicator } from 'react-icons/md';
-import { Button, Checkbox, Switch } from '/@/renderer/components';
+import { Button, Switch } from '/@/renderer/components';
 import { useSettingsStoreActions, useGeneralSettings } from '../../../../store/settings.store';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
-import i18n from '/@/i18n/i18n';
-
-const translatedSidebarItemMap = {
-    Albums: i18n.t('page.sidebar.albums', { postProcess: 'titleCase' }),
-    Artists: i18n.t('page.sidebar.artists', { postProcess: 'titleCase' }),
-    Folders: i18n.t('page.sidebar.folders', { postProcess: 'titleCase' }),
-    Genres: i18n.t('page.sidebar.genres', { postProcess: 'titleCase' }),
-    Home: i18n.t('page.sidebar.home', { postProcess: 'titleCase' }),
-    'Now Playing': i18n.t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
-    Playlists: i18n.t('page.sidebar.playlists', { postProcess: 'titleCase' }),
-    Search: i18n.t('page.sidebar.search', { postProcess: 'titleCase' }),
-    Settings: i18n.t('page.sidebar.settings', { postProcess: 'titleCase' }),
-    Tracks: i18n.t('page.sidebar.tracks', { postProcess: 'titleCase' }),
-};
-
-const DragHandle = ({ dragControls }: any) => {
-    return (
-        <MdDragIndicator
-            color="white"
-            style={{ cursor: 'grab' }}
-            onPointerDown={(event) => dragControls.start(event)}
-        />
-    );
-};
-
-interface SidebarItem {
-    disabled: boolean;
-    id: string;
-}
-
-interface DraggableSidebarItemProps {
-    handleChangeDisabled: (id: string, e: boolean) => void;
-    item: SidebarItem;
-}
-
-const DraggableSidebarItem = ({ item, handleChangeDisabled }: DraggableSidebarItemProps) => {
-    const dragControls = useDragControls();
-
-    return (
-        <Reorder.Item
-            as="div"
-            dragControls={dragControls}
-            dragListener={false}
-            value={item}
-        >
-            <Group
-                noWrap
-                h="3rem"
-                style={{ boxShadow: '0 1px 3px rgba(0,0,0,.1)' }}
-            >
-                <Checkbox
-                    checked={!item.disabled}
-                    onChange={(e) => handleChangeDisabled(item.id, e.target.checked)}
-                />
-                <DragHandle dragControls={dragControls} />
-                {translatedSidebarItemMap[item.id as keyof typeof translatedSidebarItemMap]}
-            </Group>
-        </Reorder.Item>
-    );
-};
+import { DraggableItem } from '/@/renderer/features/settings/components/general/draggable-item';
 
 export const SidebarSettings = () => {
     const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSidebarItems, setSettings } = useSettingsStoreActions();
+    const [open, setOpen] = useState(false);
+
+    const translatedSidebarItemMap = useMemo(
+        () => ({
+            Albums: t('page.sidebar.albums', { postProcess: 'titleCase' }),
+            Artists: t('page.sidebar.artists', { postProcess: 'titleCase' }),
+            Folders: t('page.sidebar.folders', { postProcess: 'titleCase' }),
+            Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
+            Home: t('page.sidebar.home', { postProcess: 'titleCase' }),
+            'Now Playing': t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
+            Playlists: t('page.sidebar.playlists', { postProcess: 'titleCase' }),
+            Search: t('page.sidebar.search', { postProcess: 'titleCase' }),
+            Settings: t('page.sidebar.settings', { postProcess: 'titleCase' }),
+            Tracks: t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+        }),
+        [t],
+    );
 
     const [localSidebarItems, setLocalSidebarItems] = useState(settings.sidebarItems);
 
@@ -144,14 +100,25 @@ export const SidebarSettings = () => {
             />
             <SettingsOptions
                 control={
-                    <Button
-                        compact
-                        disabled={isSaveButtonDisabled}
-                        variant="filled"
-                        onClick={handleSave}
-                    >
-                        {t('common.save', { postProcess: 'titleCase' })}
-                    </Button>
+                    <>
+                        {open && (
+                            <Button
+                                compact
+                                disabled={isSaveButtonDisabled}
+                                variant="filled"
+                                onClick={handleSave}
+                            >
+                                {t('common.save', { postProcess: 'titleCase' })}
+                            </Button>
+                        )}
+                        <Button
+                            compact
+                            variant="filled"
+                            onClick={() => setOpen(!open)}
+                        >
+                            {t(open ? 'common.close' : 'common.edit', { postProcess: 'titleCase' })}
+                        </Button>
+                    </>
                 }
                 description={t('setting.sidebarCollapsedNavigation', {
                     context: 'description',
@@ -159,19 +126,26 @@ export const SidebarSettings = () => {
                 })}
                 title={t('setting.sidebarConfiguration', { postProcess: 'sentenceCase' })}
             />
-            <Reorder.Group
-                axis="y"
-                values={localSidebarItems}
-                onReorder={setLocalSidebarItems}
-            >
-                {localSidebarItems.map((item) => (
-                    <DraggableSidebarItem
-                        key={item.id}
-                        handleChangeDisabled={handleChangeDisabled}
-                        item={item}
-                    />
-                ))}
-            </Reorder.Group>
+            {open && (
+                <Reorder.Group
+                    axis="y"
+                    values={localSidebarItems}
+                    onReorder={setLocalSidebarItems}
+                >
+                    {localSidebarItems.map((item) => (
+                        <DraggableItem
+                            key={item.id}
+                            handleChangeDisabled={handleChangeDisabled}
+                            item={item}
+                            value={
+                                translatedSidebarItemMap[
+                                    item.id as keyof typeof translatedSidebarItemMap
+                                ]
+                            }
+                        />
+                    ))}
+                </Reorder.Group>
+            )}
         </>
     );
 };

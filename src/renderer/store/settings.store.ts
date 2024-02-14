@@ -92,6 +92,23 @@ export const sidebarItems = [
     },
 ];
 
+export type SortableItem<T> = {
+    disabled: boolean;
+    id: T;
+};
+
+export enum HomeItem {
+    MOST_PLAYED = 'mostPlayed',
+    RANDOM = 'random',
+    RECENTLY_ADDED = 'recentlyAdded',
+    RECENTLY_PLAYED = 'recentlyPlayed',
+}
+
+export const homeItems = Object.values(HomeItem).map((item) => ({
+    disabled: false,
+    id: item,
+}));
+
 export type PersistedTableColumn = {
     column: TableColumn;
     extraProps?: Partial<ColDef>;
@@ -174,6 +191,7 @@ export interface SettingsState {
         defaultFullPlaylist: boolean;
         externalLinks: boolean;
         followSystemTheme: boolean;
+        homeItems: SortableItem<HomeItem>[];
         language: string;
         passwordStore?: string;
         playButtonBehavior: Play;
@@ -256,6 +274,7 @@ export interface SettingsSlice extends SettingsState {
     actions: {
         reset: () => void;
         resetSampleRate: () => void;
+        setHomeItems: (item: SortableItem<HomeItem>[]) => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
         setTable: (type: TableType, data: DataTableProps) => void;
@@ -289,6 +308,7 @@ const initialState: SettingsState = {
         defaultFullPlaylist: true,
         externalLinks: true,
         followSystemTheme: false,
+        homeItems,
         language: 'en',
         passwordStore: undefined,
         playButtonBehavior: Play.NOW,
@@ -578,6 +598,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                     resetSampleRate: () => {
                         set((state) => {
                             state.playback.mpvProperties.audioSampleRateHz = 0;
+                        });
+                    },
+                    setHomeItems: (items: SortableItem<HomeItem>[]) => {
+                        set((state) => {
+                            state.general.homeItems = items;
                         });
                     },
                     setSettings: (data) => {
