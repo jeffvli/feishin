@@ -19,7 +19,7 @@ import {
     useVolume,
 } from '/@/renderer/store';
 import {
-    usePlayerType,
+    usePlaybackType,
     useSettingsStore,
     useSettingsStoreActions,
     useTableSettings,
@@ -56,7 +56,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     const { setAppStore } = useAppStoreActions();
     const tableConfig = useTableSettings(type);
     const [gridApi, setGridApi] = useState<AgGridReactType | undefined>();
-    const playerType = usePlayerType();
+    const playbackType = usePlaybackType();
     const { play } = usePlayerControls();
     const volume = useVolume();
     const isFocused = useAppFocus();
@@ -87,7 +87,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
             status: PlayerStatus.PLAYING,
         });
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.volume(volume);
             mpvPlayer!.setQueue(playerData);
             mpvPlayer!.play();
@@ -111,7 +111,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
         const playerData = reorderQueue(selectedUniqueIds as string[], e.overNode?.data?.uniqueId);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.setQueueNext(playerData);
         }
 

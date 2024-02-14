@@ -30,7 +30,7 @@ const showToast = ({ type, ...props }: NotificationProps) => {
             ? 'Error'
             : 'Info';
 
-    const defaultDuration = type === 'error' ? 2000 : 1000;
+    const defaultDuration = type === 'error' ? 5000 : 2000;
 
     return showNotification({
         autoClose: defaultDuration,

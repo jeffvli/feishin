@@ -23,6 +23,7 @@ import {
 } from '/@/renderer/types';
 import { randomString } from '/@/renderer/utils';
 import i18n from '/@/i18n/i18n';
+import { usePlayerStore } from '/@/renderer/store/player.store';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -381,7 +382,7 @@ const initialState: SettingsState = {
             scrobbleAtPercentage: 75,
         },
         style: PlaybackStyle.GAPLESS,
-        type: PlaybackType.LOCAL,
+        type: PlaybackType.WEB,
     },
     remote: {
         enabled: false,
@@ -616,7 +617,16 @@ export const useTableSettings = (type: TableType) =>
 
 export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
 
-export const usePlayerType = () => useSettingsStore((state) => state.playback.type, shallow);
+export const usePlaybackType = () =>
+    useSettingsStore((state) => {
+        const isFallback = usePlayerStore.getState().fallback;
+
+        if (isFallback) {
+            return PlaybackType.WEB;
+        }
+
+        return state.playback.type;
+    });
 
 export const usePlayButtonBehavior = () =>
     useSettingsStore((state) => state.general.playButtonBehavior, shallow);

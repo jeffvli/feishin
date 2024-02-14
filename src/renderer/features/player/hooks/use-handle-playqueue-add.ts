@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentServer, usePlayerControls, usePlayerStore } from '/@/renderer/store';
-import { usePlayerType } from '/@/renderer/store/settings.store';
+import { usePlaybackType } from '/@/renderer/store/settings.store';
 import {
     PlayQueueAddOptions,
     Play,
@@ -65,7 +65,7 @@ const addToQueue = usePlayerStore.getState().actions.addToQueue;
 export const useHandlePlayQueueAdd = () => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
-    const playerType = usePlayerType();
+    const playbackType = usePlaybackType();
     const server = useCurrentServer();
     const { play } = usePlayerControls();
     const timeoutIds = useRef<Record<string, ReturnType<typeof setTimeout>> | null>({});
@@ -170,7 +170,7 @@ export const useHandlePlayQueueAdd = () => {
             const hadSong = usePlayerStore.getState().queue.default.length > 0;
             const playerData = addToQueue({ initialIndex: initialSongIndex, playType, songs });
 
-            if (playerType === PlaybackType.LOCAL) {
+            if (playbackType === PlaybackType.LOCAL) {
                 mpvPlayer!.volume(usePlayerStore.getState().volume);
 
                 if (playType === Play.NOW || !hadSong) {
@@ -198,7 +198,7 @@ export const useHandlePlayQueueAdd = () => {
 
             return null;
         },
-        [play, playerType, queryClient, server, t],
+        [play, playbackType, queryClient, server, t],
     );
 
     return handlePlayQueueAdd;

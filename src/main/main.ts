@@ -26,14 +26,20 @@ import {
     net,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
-import log from 'electron-log';
+import log from 'electron-log/main';
 import { autoUpdater } from 'electron-updater';
-import uniq from 'lodash/uniq';
-import MpvAPI from 'node-mpv';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
-import { hotkeyToElectronAccelerator, isLinux, isMacOS, isWindows, resolveHtmlPath } from './utils';
+import {
+    hotkeyToElectronAccelerator,
+    isLinux,
+    isMacOS,
+    isWindows,
+    resolveHtmlPath,
+    createLog,
+    autoUpdaterLogInterface,
+} from './utils';
 import './features';
 import type { TitleTheme } from '/@/renderer/types';
 
@@ -42,7 +48,7 @@ declare module 'node-mpv';
 export default class AppUpdater {
     constructor() {
         log.transports.file.level = 'info';
-        autoUpdater.logger = log;
+        autoUpdater.logger = autoUpdaterLogInterface;
         autoUpdater.checkForUpdatesAndNotify();
     }
 }
@@ -102,6 +108,19 @@ const getAssetPath = (...paths: string[]): string => {
 
 export const getMainWindow = () => {
     return mainWindow;
+};
+
+export const sendToastToRenderer = ({
+    message,
+    type,
+}: {
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+}) => {
+    getMainWindow()?.webContents.send('toast-from-main', {
+        message,
+        type,
+    });
 };
 
 const createWinThumbarButtons = () => {
@@ -316,7 +335,7 @@ const createWindow = async () => {
                         }
 
                         const queue = JSON.parse(data.toString());
-                        getMainWindow()?.webContents.send('renderer-player-restore-queue', queue);
+                        getMainWindow()?.webContents.send('renderer-restore-queue', queue);
                     });
                 });
             });
@@ -362,7 +381,7 @@ const createWindow = async () => {
             event.preventDefault();
             saved = true;
 
-            getMainWindow()?.webContents.send('renderer-player-save-queue');
+            getMainWindow()?.webContents.send('renderer-save-queue');
 
             ipcMain.once('player-save-queue', async (_event, data: Record<string, any>) => {
                 const queueLocation = join(app.getPath('userData'), 'queue');
@@ -432,138 +451,6 @@ const createWindow = async () => {
 };
 
 app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
-
-const MPV_BINARY_PATH = store.get('mpv_path') as string | undefined;
-
-const prefetchPlaylistParams = [
-    '--prefetch-playlist=no',
-    '--prefetch-playlist=yes',
-    '--prefetch-playlist',
-];
-
-const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
-    const parameters = ['--idle=yes', '--no-config', '--load-scripts=no'];
-
-    if (!extraParameters?.some((param) => prefetchPlaylistParams.includes(param))) {
-        parameters.push('--prefetch-playlist=yes');
-    }
-
-    return parameters;
-};
-
-let mpvInstance: MpvAPI | null = null;
-
-const createMpv = async (data: {
-    extraParameters?: string[];
-    properties?: Record<string, any>;
-}): Promise<MpvAPI> => {
-    const { extraParameters, properties } = data;
-
-    const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
-    console.log('Setting mpv params: ', params);
-
-    const extra = isDevelopment ? '-dev' : '';
-
-    const mpv = new MpvAPI(
-        {
-            audio_only: true,
-            auto_restart: false,
-            binary: MPV_BINARY_PATH || '',
-            socket: isWindows() ? `\\\\.\\pipe\\mpvserver${extra}` : `/tmp/node-mpv${extra}.sock`,
-            time_update: 1,
-        },
-        params,
-    );
-
-    try {
-        await mpv.start();
-    } catch (error) {
-        console.log('MPV failed to start', error);
-    } finally {
-        console.log('Setting MPV properties: ', properties);
-        await mpv.setMultipleProperties(properties || {});
-    }
-
-    mpv.on('status', (status, ...rest) => {
-        console.log('MPV Event: status', status.property, status.value, rest);
-        if (status.property === 'playlist-pos') {
-            if (status.value === -1) {
-                mpv?.stop();
-            }
-
-            if (status.value !== 0) {
-                getMainWindow()?.webContents.send('renderer-player-auto-next');
-            }
-        }
-    });
-
-    // Automatically updates the play button when the player is playing
-    mpv.on('resumed', () => {
-        console.log('MPV Event: resumed');
-        getMainWindow()?.webContents.send('renderer-player-play');
-    });
-
-    // Automatically updates the play button when the player is stopped
-    mpv.on('stopped', () => {
-        console.log('MPV Event: stopped');
-        getMainWindow()?.webContents.send('renderer-player-stop');
-    });
-
-    // Automatically updates the play button when the player is paused
-    mpv.on('paused', () => {
-        console.log('MPV Event: paused');
-        getMainWindow()?.webContents.send('renderer-player-pause');
-    });
-
-    // Event output every interval set by time_update, used to update the current time
-    mpv.on('timeposition', (time: number) => {
-        getMainWindow()?.webContents.send('renderer-player-current-time', time);
-    });
-
-    mpv.on('quit', () => {
-        console.log('MPV Event: quit');
-    });
-
-    return mpv;
-};
-
-export const getMpvInstance = () => {
-    return mpvInstance;
-};
-
-ipcMain.on('player-set-properties', async (_event, data: Record<string, any>) => {
-    if (data.length === 0) {
-        return;
-    }
-
-    if (data.length === 1) {
-        getMpvInstance()?.setProperty(Object.keys(data)[0], Object.values(data)[0]);
-    } else {
-        getMpvInstance()?.setMultipleProperties(data);
-    }
-});
-
-ipcMain.on(
-    'player-restart',
-    async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-        mpvInstance?.quit();
-        mpvInstance = await createMpv(data);
-    },
-);
-
-ipcMain.handle(
-    'player-initialize',
-    async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-        console.log('Initializing MPV with data: ', data);
-        mpvInstance = await createMpv(data);
-    },
-);
-
-ipcMain.on('player-quit', async () => {
-    mpvInstance?.stop();
-    mpvInstance?.quit();
-    mpvInstance = null;
-});
 
 // Must duplicate with the one in renderer process settings.store.ts
 enum BindingActions {
@@ -647,14 +534,21 @@ ipcMain.on(
     },
 );
 
-app.on('before-quit', () => {
-    getMpvInstance()?.stop();
-    getMpvInstance()?.quit();
-});
+ipcMain.on(
+    'logger',
+    (
+        _event,
+        data: {
+            message: string;
+            type: 'debug' | 'verbose' | 'success' | 'error' | 'warning' | 'info';
+        },
+    ) => {
+        createLog(data);
+    },
+);
 
 app.on('window-all-closed', () => {
     globalShortcut.unregisterAll();
-    getMpvInstance()?.quit();
     // Respect the OSX convention of having the application in memory even
     // after all windows have been closed
     if (isMacOS()) {

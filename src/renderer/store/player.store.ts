@@ -22,6 +22,7 @@ export interface PlayerState {
         status: PlayerStatus;
         time: number;
     };
+    fallback: boolean | null;
     muted: boolean;
     queue: {
         default: QueueSong[];
@@ -85,6 +86,7 @@ export interface PlayerSlice extends PlayerState {
         setCurrentSpeed: (speed: number) => void;
         setCurrentTime: (time: number, seek?: boolean) => void;
         setCurrentTrack: (uniqueId: string) => PlayerData;
+        setFallback: (fallback: boolean | null) => boolean;
         setFavorite: (ids: string[], favorite: boolean) => string[];
         setMuted: (muted: boolean) => void;
         setRating: (ids: string[], rating: number | null) => string[];
@@ -806,6 +808,13 @@ export const usePlayerStore = create<PlayerSlice>()(
 
                             return get().actions.getPlayerData();
                         },
+                        setFallback: (fallback) => {
+                            set((state) => {
+                                state.fallback = fallback;
+                            });
+
+                            return fallback || false;
+                        },
                         setFavorite: (ids, favorite) => {
                             const { default: queue } = get().queue;
                             const foundUniqueIds = [];
@@ -953,6 +962,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                         status: PlayerStatus.PAUSED,
                         time: 0,
                     },
+                    fallback: null,
                     muted: false,
                     queue: {
                         default: [],
@@ -973,7 +983,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                 },
                 name: 'store_player',
                 partialize: (state) => {
-                    const notPersisted = ['queue', 'current', 'entry'];
+                    const notPersisted = ['queue', 'current', 'entry', 'fallback'];
                     return Object.fromEntries(
                         Object.entries(state).filter(([key]) => !notPersisted.includes(key)),
                     );
@@ -1065,6 +1075,10 @@ export const useVolume = () => usePlayerStore((state) => state.volume);
 export const useMuted = () => usePlayerStore((state) => state.muted);
 
 export const useSpeed = () => usePlayerStore((state) => state.current.speed);
+
+export const usePlayerFallback = () => usePlayerStore((state) => state.fallback);
+
+export const useSetPlayerFallback = () => usePlayerStore((state) => state.actions.setFallback);
 
 export const useSetCurrentSpeed = () => usePlayerStore((state) => state.actions.setCurrentSpeed);
 

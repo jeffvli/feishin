@@ -1,5 +1,3 @@
-// import { write, writeFile } from 'fs';
-// import { deflate } from 'zlib';
 import { useCallback, useEffect } from 'react';
 import isElectron from 'is-electron';
 import { PlaybackType, PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/renderer/types';
@@ -13,7 +11,7 @@ import {
     useSetCurrentTime,
     useShuffleStatus,
 } from '/@/renderer/store';
-import { usePlayerType, useSettingsStore } from '/@/renderer/store/settings.store';
+import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
 import debounce from 'lodash/debounce';
 import { QueueSong } from '/@/renderer/api/types';
@@ -32,7 +30,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
     const { t } = useTranslation();
     const { playersRef } = args;
 
-    const settings = useSettingsStore((state) => state.playback);
     const currentPlayer = useCurrentPlayer();
     const { setShuffle, setRepeat, play, pause, previous, next, setCurrentIndex, autoNext } =
         usePlayerControls();
@@ -41,7 +38,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     const playerStatus = useCurrentStatus();
     const repeatStatus = useRepeatStatus();
     const shuffleStatus = useShuffleStatus();
-    const playerType = usePlayerType();
+    const playbackType = usePlaybackType();
     const player1Ref = playersRef?.current?.player1;
     const player2Ref = playersRef?.current?.player2;
     const currentPlayerRef = currentPlayer === 1 ? player1Ref : player2Ref;
@@ -77,7 +74,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
         resetPlayers();
     }, [player1Ref, player2Ref, resetPlayers]);
 
-    const isMpvPlayer = isElectron() && settings.type === PlaybackType.LOCAL;
+    const isMpvPlayer = isElectron() && playbackType === PlaybackType.LOCAL;
 
     const mprisUpdateSong = (args?: {
         currentTime?: number;
@@ -282,13 +279,13 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
         switch (repeatStatus) {
             case PlayerRepeat.NONE:
-                handleRepeatNone[playerType]();
+                handleRepeatNone[playbackType]();
                 break;
             case PlayerRepeat.ALL:
-                handleRepeatAll[playerType]();
+                handleRepeatAll[playbackType]();
                 break;
             case PlayerRepeat.ONE:
-                handleRepeatOne[playerType]();
+                handleRepeatOne[playbackType]();
                 break;
 
             default:
@@ -299,7 +296,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
         checkIsLastTrack,
         pause,
         play,
-        playerType,
+        playbackType,
         repeatStatus,
         resetPlayers,
         setCurrentIndex,
@@ -380,13 +377,13 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
         switch (repeatStatus) {
             case PlayerRepeat.NONE:
-                handleRepeatNone[playerType]();
+                handleRepeatNone[playbackType]();
                 break;
             case PlayerRepeat.ALL:
-                handleRepeatAll[playerType]();
+                handleRepeatAll[playbackType]();
                 break;
             case PlayerRepeat.ONE:
-                handleRepeatOne[playerType]();
+                handleRepeatOne[playbackType]();
                 break;
 
             default:
@@ -398,7 +395,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
         checkIsLastTrack,
         next,
         pause,
-        playerType,
+        playbackType,
         repeatStatus,
         resetPlayers,
         setCurrentIndex,
@@ -511,13 +508,13 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
         switch (repeatStatus) {
             case PlayerRepeat.NONE:
-                handleRepeatNone[playerType]();
+                handleRepeatNone[playbackType]();
                 break;
             case PlayerRepeat.ALL:
-                handleRepeatAll[playerType]();
+                handleRepeatAll[playbackType]();
                 break;
             case PlayerRepeat.ONE:
-                handleRepeatOne[playerType]();
+                handleRepeatOne[playbackType]();
                 break;
 
             default:
@@ -531,7 +528,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
         handleScrobbleFromSongRestart,
         isMpvPlayer,
         pause,
-        playerType,
+        playbackType,
         previous,
         queue.length,
         repeatStatus,

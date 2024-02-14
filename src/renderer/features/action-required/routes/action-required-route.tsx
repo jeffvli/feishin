@@ -1,48 +1,22 @@
-import { useState, useEffect } from 'react';
 import { Center, Group, Stack } from '@mantine/core';
-import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { RiCheckFill } from 'react-icons/ri';
 import { Link, Navigate } from 'react-router-dom';
 import { Button, PageHeader, Text } from '/@/renderer/components';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
-import { MpvRequired } from '/@/renderer/features/action-required/components/mpv-required';
 import { ServerCredentialRequired } from '/@/renderer/features/action-required/components/server-credential-required';
 import { ServerRequired } from '/@/renderer/features/action-required/components/server-required';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 
-const localSettings = isElectron() ? window.electron.localSettings : null;
-
 const ActionRequiredRoute = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServer();
-    const [isMpvRequired, setIsMpvRequired] = useState(false);
     const isServerRequired = !currentServer;
     const isCredentialRequired = false;
 
-    useEffect(() => {
-        const getMpvPath = async () => {
-            if (!localSettings) return setIsMpvRequired(false);
-            const mpvPath = await localSettings.get('mpv_path');
-
-            if (mpvPath) {
-                return setIsMpvRequired(false);
-            }
-
-            return setIsMpvRequired(true);
-        };
-
-        getMpvPath();
-    }, []);
-
     const checks = [
-        {
-            component: <MpvRequired />,
-            title: t('error.mpvRequired', { postProcess: 'sentenceCase' }),
-            valid: !isMpvRequired,
-        },
         {
             component: <ServerCredentialRequired />,
             title: t('error.credentialsRequired', { postProcess: 'sentenceCase' }),
