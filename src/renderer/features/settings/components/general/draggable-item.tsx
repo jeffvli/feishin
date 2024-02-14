@@ -1,6 +1,7 @@
-import { Group, Checkbox } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { useDragControls, Reorder } from 'framer-motion';
 import { MdDragIndicator } from 'react-icons/md';
+import { Checkbox } from '/@/renderer/components';
 
 const DragHandle = ({ dragControls }: any) => {
     return (
