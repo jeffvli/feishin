@@ -935,17 +935,19 @@ export const usePlayerStore = create<PlayerSlice>()(
                         },
                         shuffleQueue: () => {
                             const queue = get().queue.default;
-                            const shuffledQueue = shuffle(queue);
 
-                            const currentSongUniqueId = get().current.song?.uniqueId;
-                            const newCurrentSongIndex = shuffledQueue.findIndex(
-                                (song) => song.uniqueId === currentSongUniqueId,
-                            );
+                            if (queue.length > 2) {
+                                const index = get().current.index;
 
-                            set((state) => {
-                                state.current.index = newCurrentSongIndex;
-                                state.queue.default = shuffledQueue;
-                            });
+                                const first = queue.slice(0, index);
+                                const second = queue.slice(index + 1);
+                                const shuffledQueue = shuffle(first.concat(second));
+                                shuffledQueue.splice(index, 0, queue[index]);
+
+                                set((state) => {
+                                    state.queue.default = shuffledQueue;
+                                });
+                            }
 
                             return get().actions.getPlayerData();
                         },
