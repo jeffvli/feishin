@@ -126,7 +126,7 @@ const FILTERS = {
         },
         {
             defaultOrder: SortOrder.ASC,
-            name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+            name: i18n.t('filter.genre', { postProcess: 'titleCase' }),
             value: SongListSort.GENRE,
         },
         {
