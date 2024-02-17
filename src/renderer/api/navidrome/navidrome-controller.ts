@@ -1,3 +1,9 @@
+import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
+import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
+import { NavidromeExtensions, ndType } from '/@/renderer/api/navidrome/navidrome-types';
+import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import semverCoerce from 'semver/functions/coerce';
+import semverGte from 'semver/functions/gte';
 import {
     AlbumArtistDetailArgs,
     AlbumArtistDetailResponse,
@@ -39,11 +45,10 @@ import {
     RemoveFromPlaylistResponse,
     RemoveFromPlaylistArgs,
     genreListSortMap,
+    ServerInfo,
+    ServerInfoArgs,
 } from '../types';
-import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
-import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
-import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
-import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import { hasFeature } from '/@/renderer/api/utils';
 
 const authenticate = async (
     url: string,
@@ -355,6 +360,16 @@ const deletePlaylist = async (args: DeletePlaylistArgs): Promise<DeletePlaylistR
 
 const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResponse> => {
     const { query, apiClientProps } = args;
+    const customQuery = query._custom?.navidrome;
+
+    // Smart playlists only became available in 0.48.0. Do not filter for previous versions
+    if (
+        customQuery &&
+        customQuery.smart !== undefined &&
+        !hasFeature(apiClientProps.server, NavidromeExtensions.SMART_PLAYLISTS)
+    ) {
+        customQuery.smart = undefined;
+    }
 
     const res = await ndApiClient(apiClientProps).getPlaylistList({
         query: {
@@ -363,7 +378,7 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
             _sort: query.sortBy ? playlistListSortMap.navidrome[query.sortBy] : undefined,
             _start: query.startIndex,
             q: query.searchTerm,
-            ...query._custom?.navidrome,
+            ...customQuery,
         },
     });
 
@@ -465,6 +480,61 @@ const removeFromPlaylist = async (
     return null;
 };
 
+const VERSION_INFO: Array<[string, Record<string, number[]>]> = [
+    ['0.48.0', { [NavidromeExtensions.SMART_PLAYLISTS]: [1] }],
+];
+
+const getFeatures = (version: string): Record<string, number[]> => {
+    const cleanVersion = semverCoerce(version);
+    const features: Record<string, number[]> = {};
+    let matched = cleanVersion === null;
+
+    for (const [version, supportedFeatures] of VERSION_INFO) {
+        if (!matched) {
+            matched = semverGte(cleanVersion!, version);
+        }
+
+        if (matched) {
+            for (const [feature, feat] of Object.entries(supportedFeatures)) {
+                if (feature in features) {
+                    features[feature].push(...feat);
+                } else {
+                    features[feature] = feat;
+                }
+            }
+        }
+    }
+
+    return features;
+};
+
+const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
+    const { apiClientProps } = args;
+
+    // Navidrome will always populate serverVersion
+    const ping = await ssApiClient(apiClientProps).ping();
+
+    if (ping.status !== 200) {
+        throw new Error('Failed to ping server');
+    }
+
+    const features: Record<string, number[]> = getFeatures(ping.body.serverVersion!);
+
+    if (ping.body.openSubsonic) {
+        const res = await ssApiClient(apiClientProps).getServerInfo();
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get server extensions');
+        }
+
+        for (const extension of res.body.openSubsonicExtensions) {
+            features[extension.name] = extension.versions;
+        }
+    }
+
+    return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
+};
+
 export const ndController = {
     addToPlaylist,
     authenticate,
@@ -478,6 +548,7 @@ export const ndController = {
     getPlaylistDetail,
     getPlaylistList,
     getPlaylistSongList,
+    getServerInfo,
     getSongDetail,
     getSongList,
     getUserList,

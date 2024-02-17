@@ -2,7 +2,7 @@ import { AxiosHeaders } from 'axios';
 import { z } from 'zod';
 import { toast } from '/@/renderer/components';
 import { useAuthStore } from '/@/renderer/store';
-import { ServerListItem } from '/@/renderer/types';
+import { ServerListItem } from '/@/renderer/api/types';
 
 // Since ts-rest client returns a strict response type, we need to add the headers to the body object
 export const resultWithHeaders = <ItemType extends z.ZodTypeAny>(itemSchema: ItemType) => {
@@ -37,4 +37,21 @@ export const authenticationFailure = (currentServer: ServerListItem | null) => {
         useAuthStore.getState().actions.updateServer(serverId, { ndCredential: undefined });
         useAuthStore.getState().actions.setCurrentServer(null);
     }
+};
+
+export const hasFeature = (
+    server: ServerListItem | null,
+    feature: string,
+    version = 1,
+): boolean => {
+    if (!server || !server.features) {
+        return false;
+    }
+
+    const versions = server.features[feature];
+    if (!versions || versions.length === 0) {
+        return false;
+    }
+
+    return versions.includes(version);
 };

@@ -10,8 +10,9 @@ import {
     Playlist,
     MusicFolder,
     Genre,
+    ServerListItem,
+    ServerType,
 } from '/@/renderer/api/types';
-import { ServerListItem, ServerType } from '/@/renderer/types';
 
 const getStreamUrl = (args: {
     container?: string;

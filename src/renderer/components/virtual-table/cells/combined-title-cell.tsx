@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import type { AlbumArtist, Artist } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components/text';
 import { AppRoute } from '/@/renderer/router/routes';
-import { ServerType } from '/@/renderer/types';
+import { ServerType } from '/@/renderer/api/types';
 import { Skeleton } from '/@/renderer/components/skeleton';
 
 const CellContainer = styled(motion.div)<{ height: number }>`

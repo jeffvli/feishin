@@ -9,7 +9,7 @@ import { RiFolder2Line, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react
 import { useListContext } from '../../../context/list-context';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { AlbumArtistListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
@@ -21,7 +21,7 @@ import {
     useListStoreActions,
     useListStoreByKey,
 } from '/@/renderer/store';
-import { ListDisplayType, ServerType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, TableColumn } from '/@/renderer/types';
 import i18n from '/@/i18n/i18n';
 
 const FILTERS = {

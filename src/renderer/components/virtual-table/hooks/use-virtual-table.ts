@@ -16,12 +16,12 @@ import orderBy from 'lodash/orderBy';
 import { generatePath, useNavigate } from 'react-router';
 import { api } from '/@/renderer/api';
 import { QueryPagination, queryKeys } from '/@/renderer/api/query-keys';
-import { BasePaginatedResponse, LibraryItem } from '/@/renderer/api/types';
+import { BasePaginatedResponse, LibraryItem, ServerListItem } from '/@/renderer/api/types';
 import { getColumnDefs, VirtualTableProps } from '/@/renderer/components/virtual-table';
 import { SetContextMenuItems, useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useListStoreActions } from '/@/renderer/store';
-import { ListDisplayType, ServerListItem, TablePagination } from '/@/renderer/types';
+import { ListDisplayType, TablePagination } from '/@/renderer/types';
 import { useSearchParams } from 'react-router-dom';
 import { ListKey, useListStoreByKey } from '../../../store/list.store';
 
