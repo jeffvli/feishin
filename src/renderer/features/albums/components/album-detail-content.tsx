@@ -81,6 +81,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     const isFocused = useAppFocus();
     const currentSong = useCurrentSong();
     const { externalLinks } = useGeneralSettings();
+    const { hide1DiscLabel } = useTableSettings('albumDetail');
 
     const columnDefs = useMemo(
         () => getColumnDefs(tableConfig.columns, false, 'albumDetail'),
@@ -116,15 +117,17 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 .filter(Boolean)
                 .join(': ');
 
-            rowData.push({
-                id: `disc-${discNumber}`,
-                name: discName,
-            });
+            if (!(uniqueDiscNumbers.size === 1 && hide1DiscLabel)) {
+                rowData.push({
+                    id: `disc-${discNumber}`,
+                    name: discName,
+                });
+            }
             rowData.push(...songsByDiscNumber);
         }
 
         return rowData;
-    }, [detailQuery.data?.songs]);
+    }, [detailQuery.data?.songs, hide1DiscLabel]);
 
     const [pagination, setPagination] = useSetState({
         artist: 0,

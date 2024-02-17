@@ -119,6 +119,7 @@ export type DataTableProps = {
     autoFit: boolean;
     columns: PersistedTableColumn[];
     followCurrentSong?: boolean;
+    hide1DiscLabel?: boolean;
     rowHeight: number;
 };
 
@@ -446,6 +447,7 @@ const initialState: SettingsState = {
                     width: 100,
                 },
             ],
+            hide1DiscLabel: true,
             rowHeight: 60,
         },
         fullScreen: {

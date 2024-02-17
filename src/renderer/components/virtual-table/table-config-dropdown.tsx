@@ -367,6 +367,18 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
         });
     };
 
+    const handleUpdateDiscLabel = (e: ChangeEvent<HTMLInputElement>) => {
+        setSettings({
+            tables: {
+                ...useSettingsStore.getState().tables,
+                [type]: {
+                    ...useSettingsStore.getState().tables[type],
+                    hide1DiscLabel: e.currentTarget.checked,
+                },
+            },
+        });
+    };
+
     return (
         <>
             <Option>
@@ -378,6 +390,17 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
                     />
                 </Option.Control>
             </Option>
+            {type === 'albumDetail' && (
+                <Option>
+                    <Option.Label>Hide disc label for 1-disc albums</Option.Label>
+                    <Option.Control>
+                        <Switch
+                            defaultChecked={tableConfig[type]?.hide1DiscLabel}
+                            onChange={handleUpdateDiscLabel}
+                        />
+                    </Option.Control>
+                </Option>
+            )}
             {type !== 'albumDetail' && (
                 <Option>
                     <Option.Label>Follow current song</Option.Label>
