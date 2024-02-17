@@ -72,7 +72,7 @@ export const VirtualInfiniteGrid = forwardRef(
         const [itemData, setItemData] = useState<any[]>(fetchInitialData?.() || []);
 
         const { itemHeight, rowCount, columnCount } = useMemo(() => {
-            const itemsPerRow = width ? Math.floor(width / itemSize) : 5;
+            const itemsPerRow = width ? Math.floor(width / (itemSize + itemGap * 2)) : 5;
             const widthPerItem = Number(width) / itemsPerRow;
             const itemHeight = widthPerItem + cardRows.length * 26;
 
@@ -81,7 +81,7 @@ export const VirtualInfiniteGrid = forwardRef(
                 itemHeight,
                 rowCount: Math.ceil(itemCount / itemsPerRow),
             };
-        }, [cardRows.length, itemCount, itemSize, width]);
+        }, [cardRows.length, itemCount, itemGap, itemSize, width]);
 
         const isItemLoaded = useCallback(
             (index: number) => {

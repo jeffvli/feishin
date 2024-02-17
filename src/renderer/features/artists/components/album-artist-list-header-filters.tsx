@@ -472,7 +472,9 @@ export const AlbumArtistListHeaderFilters = ({
                             Table (paginated)
                         </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>Item size</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             {display === ListDisplayType.CARD ||
                             display === ListDisplayType.POSTER ? (
@@ -493,7 +495,11 @@ export const AlbumArtistListHeaderFilters = ({
                         </DropdownMenu.Item>
                         {isGrid && (
                             <>
-                                <DropdownMenu.Label>Item gap</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.itemGap', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item closeMenuOnClick={false}>
                                     <Slider
                                         defaultValue={grid?.itemGap || 0}

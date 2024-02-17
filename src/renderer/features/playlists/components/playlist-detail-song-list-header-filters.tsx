@@ -523,7 +523,9 @@ export const PlaylistDetailSongListHeaderFilters = ({
                             Table (paginated)
                         </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>Item size</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
                                 defaultValue={page.table.rowHeight}

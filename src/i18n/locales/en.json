@@ -612,6 +612,8 @@
                 "autoFitColumns": "auto fit columns",
                 "displayType": "display type",
                 "gap": "$t(common.gap)",
+                "itemGap": "item gap (px)",
+                "itemSize": "item size (px)",
                 "size": "$t(common.size)",
                 "tableColumns": "table columns"
             },
