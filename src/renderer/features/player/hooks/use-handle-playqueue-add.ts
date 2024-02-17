@@ -175,8 +175,7 @@ export const useHandlePlayQueueAdd = () => {
 
                 if (playType === Play.NOW || !hadSong) {
                     mpvPlayer!.pause();
-                    mpvPlayer!.setQueue(playerData);
-                    mpvPlayer!.play();
+                    mpvPlayer!.setQueue(playerData, false);
                 } else {
                     mpvPlayer!.setQueueNext(playerData);
                 }
