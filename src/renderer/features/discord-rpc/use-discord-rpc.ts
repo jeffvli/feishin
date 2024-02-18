@@ -36,7 +36,7 @@ export const useDiscordRpc = () => {
         const activity: SetActivity = {
             details: currentSong?.name.padEnd(2, ' ') || 'Idle',
             instance: false,
-            largeImageKey: undefined,
+            largeImageKey: currentSong?.imageUrl || 'icon',
             largeImageText: currentSong?.album || 'Unknown album',
             smallImageKey: undefined,
             smallImageText: currentStatus,
@@ -52,19 +52,6 @@ export const useDiscordRpc = () => {
             activity.smallImageKey = 'playing';
         } else {
             activity.smallImageKey = 'paused';
-        }
-
-        if (
-            currentSong?.serverType === ServerType.JELLYFIN &&
-            discordSettings.showServerImage &&
-            currentSong?.imageUrl
-        ) {
-            activity.largeImageKey = currentSong?.imageUrl;
-        }
-
-        // Fall back to default icon if not set
-        if (!activity.largeImageKey) {
-            activity.largeImageKey = 'icon';
         }
 
         discordRpc?.setActivity(activity);
@@ -89,8 +76,8 @@ export const useDiscordRpc = () => {
     useEffect(() => {
         if (discordSettings.enabled) {
             let intervalSeconds = discordSettings.updateInterval;
-            if (intervalSeconds < 15) {
-                intervalSeconds = 15;
+            if (intervalSeconds < 10) {
+                intervalSeconds = 10;
             }
 
             intervalRef.current = window.setInterval(setActivity, intervalSeconds * 1000);
