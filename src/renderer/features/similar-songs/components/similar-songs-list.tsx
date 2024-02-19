@@ -52,10 +52,12 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
     };
 
     return songQuery.isLoading ? (
-        <Spinner
-            container
-            size={25}
-        />
+        song ? (
+            <Spinner
+                container
+                size={25}
+            />
+        ) : undefined
     ) : (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <VirtualGridAutoSizerContainer>
