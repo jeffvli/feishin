@@ -4,7 +4,7 @@ import { useCurrentSong } from '/@/renderer/store';
 export const FullScreenSimilarSongs = () => {
     const currentSong = useCurrentSong();
 
-    return currentSong ? (
+    return currentSong?.id ? (
         <SimilarSongsList
             fullScreen
             song={currentSong}
