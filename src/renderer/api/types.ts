@@ -1173,7 +1173,7 @@ export type StructuredLyric = {
 
 export type SimilarSongsQuery = {
     count?: number;
-    song: Song;
+    songId: string;
 };
 
 export type SimilarSongsArgs = {

@@ -967,7 +967,7 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
 
     const res = await jfApiClient(apiClientProps).getSimilarSongs({
         params: {
-            itemId: query.song.id,
+            itemId: query.songId,
         },
         query: {
             Fields: 'Genres, DateCreated, MediaSources, ParentId',

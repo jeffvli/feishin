@@ -5,19 +5,18 @@ import { getServerById } from '/@/renderer/store';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { api } from '/@/renderer/api';
 
-export const useSimilarSongs = (args: QueryHookArgs<Partial<SimilarSongsQuery>>) => {
-    const { options, query } = args || {};
-    const server = getServerById(query.song?.serverId);
+export const useSimilarSongs = (args: QueryHookArgs<SimilarSongsQuery>) => {
+    const { options, query, serverId } = args || {};
+    const server = getServerById(serverId);
 
     return useQuery({
-        enabled: !!server?.id && !!query.song,
+        enabled: !!server,
         queryFn: ({ signal }) => {
             if (!server) throw new Error('Server not found');
-            if (!query.song) return undefined;
 
             return api.controller.getSimilarSongs({
                 apiClientProps: { server, signal },
-                query: { count: query.count ?? 50, song: query.song },
+                query: { count: query.count ?? 50, songId: query.songId },
             });
         },
         queryKey: queryKeys.albumArtists.detail(server?.id || '', query),

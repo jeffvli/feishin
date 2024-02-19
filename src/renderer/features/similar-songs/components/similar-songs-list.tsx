@@ -16,7 +16,7 @@ import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-han
 export type SimilarSongsListProps = {
     count?: number;
     fullScreen?: boolean;
-    song?: Song;
+    song: Song;
 };
 
 export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListProps) => {
@@ -30,8 +30,8 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
             cacheTime: 1000 * 60 * 2,
             staleTime: 1000 * 60 * 1,
         },
-        query: { count, song },
-        serverId: undefined,
+        query: { count, songId: song.id },
+        serverId: song?.serverId,
     });
 
     const columnDefs = useMemo(
@@ -52,12 +52,10 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
     };
 
     return songQuery.isLoading ? (
-        song ? (
-            <Spinner
-                container
-                size={25}
-            />
-        ) : undefined
+        <Spinner
+            container
+            size={25}
+        />
     ) : (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
             <VirtualGridAutoSizerContainer>

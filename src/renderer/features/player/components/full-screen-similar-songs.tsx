@@ -4,10 +4,10 @@ import { useCurrentSong } from '/@/renderer/store';
 export const FullScreenSimilarSongs = () => {
     const currentSong = useCurrentSong();
 
-    return (
+    return currentSong ? (
         <SimilarSongsList
             fullScreen
             song={currentSong}
         />
-    );
+    ) : null;
 };

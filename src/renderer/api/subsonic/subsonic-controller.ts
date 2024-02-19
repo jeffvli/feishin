@@ -452,7 +452,7 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
     const res = await ssApiClient(apiClientProps).getSimilarSongs({
         query: {
             count: query.count,
-            id: query.song.id,
+            id: query.songId,
         },
     });
 
