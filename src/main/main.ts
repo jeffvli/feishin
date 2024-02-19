@@ -363,6 +363,7 @@ const createWindow = async () => {
     });
 
     mainWindow.on('closed', () => {
+        ipcMain.removeHandler('window-clear-cache');
         mainWindow = null;
     });
 
@@ -552,6 +553,7 @@ app.on('window-all-closed', () => {
     // Respect the OSX convention of having the application in memory even
     // after all windows have been closed
     if (isMacOS()) {
+        ipcMain.removeHandler('window-clear-cache');
         mainWindow = null;
     } else {
         app.quit();
