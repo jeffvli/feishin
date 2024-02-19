@@ -460,9 +460,17 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
         throw new Error('Failed to get similar songs');
     }
 
-    return res.body.similarSongs.song.map((song) =>
-        ssNormalize.song(song, apiClientProps.server, ''),
-    );
+    if (!res.body.similarSongs) {
+        return [];
+    }
+
+    return res.body.similarSongs.song.reduce<Song[]>((acc, song) => {
+        if (song.id !== query.songId) {
+            acc.push(ssNormalize.song(song, apiClientProps.server, ''));
+        }
+
+        return acc;
+    }, []);
 };
 
 export const ssController = {

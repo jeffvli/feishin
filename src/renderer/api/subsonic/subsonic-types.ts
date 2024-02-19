@@ -253,9 +253,11 @@ const similarSongsParameters = z.object({
 });
 
 const similarSongs = z.object({
-    similarSongs: z.object({
-        song: z.array(song),
-    }),
+    similarSongs: z
+        .object({
+            song: z.array(song),
+        })
+        .optional(),
 });
 
 export const ssType = {

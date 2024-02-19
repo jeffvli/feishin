@@ -980,7 +980,13 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
         throw new Error('Failed to get similar songs');
     }
 
-    return res.body.Items.map((song) => jfNormalize.song(song, apiClientProps.server, ''));
+    return res.body.Items.reduce<Song[]>((acc, song) => {
+        if (song.Id !== query.songId) {
+            acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+        }
+
+        return acc;
+    }, []);
 };
 
 export const jfController = {
