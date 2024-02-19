@@ -10,6 +10,7 @@ export const useSongList = (args: QueryHookArgs<SongListQuery>, imageSize?: numb
     const server = getServerById(serverId);
 
     return useQuery({
+        cacheTime: 1000 * 60,
         enabled: !!server?.id,
         queryFn: ({ signal }) => {
             if (!server) throw new Error('Server not found');

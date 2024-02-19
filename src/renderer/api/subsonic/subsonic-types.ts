@@ -247,6 +247,17 @@ const structuredLyrics = z.object({
         .optional(),
 });
 
+const similarSongsParameters = z.object({
+    count: z.number().optional(),
+    id: z.string(),
+});
+
+const similarSongs = z.object({
+    similarSongs: z.object({
+        song: z.array(song),
+    }),
+});
+
 export const ssType = {
     _parameters: {
         albumList: albumListParameters,
@@ -258,6 +269,7 @@ export const ssType = {
         scrobble: scrobbleParameters,
         search3: search3Parameters,
         setRating: setRatingParameters,
+        similarSongs: similarSongsParameters,
         structuredLyrics: structuredLyricsParameters,
         topSongsList: topSongsListParameters,
     },
@@ -278,6 +290,7 @@ export const ssType = {
         search3,
         serverInfo,
         setRating,
+        similarSongs,
         song,
         structuredLyrics,
         topSongsList,

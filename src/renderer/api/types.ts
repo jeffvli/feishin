@@ -1170,3 +1170,12 @@ export type StructuredSyncedLyric = {
 export type StructuredLyric = {
     lang: string;
 } & (StructuredUnsyncedLyric | StructuredSyncedLyric);
+
+export type SimilarSongsQuery = {
+    count?: number;
+    song: Song;
+};
+
+export type SimilarSongsArgs = {
+    query: SimilarSongsQuery;
+} & BaseEndpointArgs;
