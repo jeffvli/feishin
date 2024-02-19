@@ -977,7 +977,7 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
     });
 
     if (res.status !== 200) {
-        throw new Error('Failed to get music folder list');
+        throw new Error('Failed to get similar songs');
     }
 
     return res.body.Items.map((song) => jfNormalize.song(song, apiClientProps.server, ''));
