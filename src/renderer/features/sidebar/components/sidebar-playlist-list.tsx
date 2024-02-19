@@ -1,20 +1,20 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Flex, Group } from '@mantine/core';
+import { Box, Flex, Group } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { RiAddBoxFill, RiAddCircleFill, RiPlayFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
-import { LibraryItem } from '/@/renderer/api/types';
+import { LibraryItem, Playlist } from '/@/renderer/api/types';
 import { Button, Text } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlaylistList } from '/@/renderer/features/playlists';
 import { AppRoute } from '/@/renderer/router/routes';
-import { Play } from '/@/renderer/types';
+import { Play, ServerType } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useHideScrollbar } from '/@/renderer/hooks';
-import { useGeneralSettings } from '/@/renderer/store';
+import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
 
 interface SidebarPlaylistListProps {
     data: ReturnType<typeof usePlaylistList>['data'];
@@ -22,6 +22,20 @@ interface SidebarPlaylistListProps {
 
 const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
     const { t } = useTranslation();
+
+    if (data?.items[index] === null) {
+        return (
+            <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
+                <Box
+                    fw="600"
+                    sx={{ fontSize: '1.2rem' }}
+                >
+                    {t('page.sidebar.shared', { postProcess: 'titleCase' })}
+                </Box>
+            </div>
+        );
+    }
+
     const path = data?.items[index].id
         ? data.defaultFullPlaylist
             ? generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data.items[index].id })
@@ -125,6 +139,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
     const { isScrollbarHidden, hideScrollbarElementProps } = useHideScrollbar(0);
     const handlePlayQueueAdd = usePlayQueueAdd();
     const { defaultFullPlaylist } = useGeneralSettings();
+    const { type, username } = useCurrentServer() || {};
 
     const [rect, setRect] = useState({
         height: 0,
@@ -147,12 +162,30 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
     );
 
     const memoizedItemData = useMemo(() => {
-        return {
-            defaultFullPlaylist,
-            handlePlay: handlePlayPlaylist,
-            items: data?.items,
-        };
-    }, [data?.items, defaultFullPlaylist, handlePlayPlaylist]);
+        const base = { defaultFullPlaylist, handlePlay: handlePlayPlaylist };
+
+        if (!type || !username || type === ServerType.JELLYFIN || !data?.items) {
+            return { ...base, items: data?.items };
+        }
+
+        const owned: Array<Playlist | null> = [];
+        const shared: Playlist[] = [];
+
+        for (const playlist of data.items) {
+            if (playlist.owner !== username) {
+                shared.push(playlist);
+            } else {
+                owned.push(playlist);
+            }
+        }
+
+        if (shared.length > 0) {
+            // Use `null` as a separator between owned and shared playlists
+            owned.push(null);
+        }
+
+        return { ...base, items: owned.concat(shared) };
+    }, [data?.items, defaultFullPlaylist, handlePlayPlaylist, type, username]);
 
     return (
         <Flex
@@ -168,7 +201,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
                                 : 'overlay-scrollbar'
                         }
                         height={debounced.height}
-                        itemCount={data?.items?.length || 0}
+                        itemCount={memoizedItemData?.items?.length || 0}
                         itemData={memoizedItemData}
                         itemSize={25}
                         overscanCount={20}

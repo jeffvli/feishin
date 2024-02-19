@@ -364,6 +364,7 @@
             "playlists": "$t(entity.playlist_other)",
             "search": "$t(common.search)",
             "settings": "$t(common.setting_other)",
+            "shared": "shared $t(entity.playlist_other)",
             "tracks": "$t(entity.track_other)"
         },
         "trackList": {
