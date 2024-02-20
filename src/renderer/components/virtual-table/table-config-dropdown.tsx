@@ -61,6 +61,10 @@ export const SONG_TABLE_COLUMNS = [
         value: TableColumn.BIT_RATE,
     },
     {
+        label: i18n.t('table.config.label.codec', { postProcess: 'titleCase' }),
+        value: TableColumn.CODEC,
+    },
+    {
         label: i18n.t('table.config.label.lastPlayed', { postProcess: 'titleCase' }),
         value: TableColumn.LAST_PLAYED,
     },

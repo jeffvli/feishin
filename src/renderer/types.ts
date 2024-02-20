@@ -144,6 +144,7 @@ export enum TableColumn {
     BIT_RATE = 'bitRate',
     BPM = 'bpm',
     CHANNELS = 'channels',
+    CODEC = 'codec',
     COMMENT = 'comment',
     DATE_ADDED = 'dateAdded',
     DISC_NUMBER = 'discNumber',

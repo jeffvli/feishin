@@ -158,6 +158,14 @@ const tableColumns: { [key: string]: ColDef } = {
             params.data ? params.data.channels : undefined,
         width: 100,
     },
+    codec: {
+        cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+        colId: TableColumn.CODEC,
+        headerName: i18n.t('table.column.codec'),
+        valueGetter: (params: ValueGetterParams) =>
+            params.data ? params.data.container : undefined,
+        width: 60,
+    },
     comment: {
         cellRenderer: NoteCell,
         colId: TableColumn.COMMENT,
