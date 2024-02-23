@@ -131,6 +131,31 @@ export const WindowSettings = () => {
             isHidden: !isElectron(),
             title: t('setting.exitToTray', { postProcess: 'sentenceCase' }),
         },
+        {
+            control: (
+                <Switch
+                    aria-label="Toggle start in tray"
+                    defaultChecked={settings.startMinimized}
+                    disabled={!isElectron()}
+                    onChange={(e) => {
+                        if (!e) return;
+                        localSettings?.set('window_start_minimized', e.currentTarget.checked);
+                        setSettings({
+                            window: {
+                                ...settings,
+                                startMinimized: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.startMinimized', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.startMinimized', { postProcess: 'sentenceCase' }),
+        },
     ];
 
     return <SettingsSection options={windowOptions} />;

@@ -568,6 +568,8 @@
         "skipDuration_description": "sets the duration to skip when using the skip buttons on the player bar",
         "skipPlaylistPage": "skip playlist page",
         "skipPlaylistPage_description": "when navigating to a playlist, go to the playlist song list page instead of the default page",
+        "startMinimized": "start minimized",
+        "startMinimized_description": "start the application in system tray",
         "theme": "theme",
         "theme_description": "sets the theme to use for the application",
         "themeDark": "theme (dark)",
