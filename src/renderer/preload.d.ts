@@ -12,10 +12,10 @@ import { DiscordRpc } from '/@/main/preload/discord-rpc';
 
 declare global {
     interface Window {
-        SERVER_NAME: string;
-        SERVER_LOCK: boolean;
-        SERVER_TYPE: string;
-        SERVER_URL: string;
+        SERVER_LOCK?: boolean;
+        SERVER_NAME?: string;
+        SERVER_TYPE?: string;
+        SERVER_URL?: string;
         electron: {
             browser: any;
             discordRpc: DiscordRpc;
