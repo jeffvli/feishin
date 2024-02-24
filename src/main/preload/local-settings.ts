@@ -1,6 +1,6 @@
 import { IpcRendererEvent, ipcRenderer, webFrame } from 'electron';
 import Store from 'electron-store';
-import { toServerType, type TitleTheme, ServerType } from '/@/renderer/types';
+import { toServerType, type TitleTheme } from '/@/renderer/types';
 
 const store = new Store();
 
@@ -52,9 +52,7 @@ const SERVER_TYPE = toServerType(process.env.SERVER_TYPE);
 
 const env = {
     SERVER_LOCK:
-        SERVER_TYPE !== null
-            ? process.env.SERVER_LOCK?.toLocaleLowerCase() === 'true'
-            : ServerType.JELLYFIN,
+        SERVER_TYPE !== null ? process.env.SERVER_LOCK?.toLocaleLowerCase() === 'true' : false,
     SERVER_NAME: process.env.SERVER_NAME ?? '',
     SERVER_TYPE,
     SERVER_URL: process.env.SERVER_URL ?? 'http://',
