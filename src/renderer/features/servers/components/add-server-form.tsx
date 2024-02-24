@@ -45,8 +45,14 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         },
     });
 
+    // server lock for web is only true if lock is true *and* all other properties are set
     const serverLock =
-        (localSettings ? !!localSettings.env.SERVER_LOCK : !!window.SERVER_LOCK) ?? false;
+        (localSettings
+            ? !!localSettings.env.SERVER_LOCK
+            : !!window.SERVER_LOCK &&
+              window.SERVER_TYPE &&
+              window.SERVER_NAME &&
+              window.SERVER_URL) || false;
 
     const isSubmitDisabled = !form.values.name || !form.values.url || !form.values.username;
 
