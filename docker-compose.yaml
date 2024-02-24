@@ -9,6 +9,6 @@ services:
         environment:
             - SERVER_NAME=jellyfin # pre defined server name
             - SERVER_LOCK=true # When true only username and password fields will be enabled
-            - SERVER_TYPE=navidrome #NAVIDROME also works
+            - SERVER_TYPE=jellyfin #navidrome also works
             - SERVER_URL= #http://address:port
 
