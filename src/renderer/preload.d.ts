@@ -13,6 +13,10 @@ import { Browser } from '/@/main/preload/browser';
 
 declare global {
     interface Window {
+        SERVER_LOCK?: boolean;
+        SERVER_NAME?: string;
+        SERVER_TYPE?: string;
+        SERVER_URL?: string;
         electron: {
             browser: Browser;
             discordRpc: DiscordRpc;
