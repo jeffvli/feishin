@@ -1,5 +1,6 @@
 import { Group, Center } from '@mantine/core';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import { RiFileMusicLine, RiFileTextLine, RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
@@ -50,11 +51,13 @@ const GridContainer = styled.div<TransparendGridContainerProps>`
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-columns: 1fr;
     padding: 1rem;
+    /* stylelint-disable-next-line color-function-notation */
     background: rgb(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     border-radius: 5px;
 `;
 
 export const FullScreenPlayerQueue = () => {
+    const { t } = useTranslation();
     const { activeTab, opacity } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
 
@@ -62,22 +65,24 @@ export const FullScreenPlayerQueue = () => {
         {
             active: activeTab === 'queue',
             icon: <RiFileMusicLine size="1.5rem" />,
-            label: 'Up Next',
+            label: t('page.fullscreenPlayer.upNext'),
             onClick: () => setStore({ activeTab: 'queue' }),
         },
         {
             active: activeTab === 'related',
             icon: <HiOutlineQueueList size="1.5rem" />,
-            label: 'Related',
+            label: t('page.fullscreenPlayer.related'),
             onClick: () => setStore({ activeTab: 'related' }),
         },
         {
             active: activeTab === 'lyrics',
             icon: <RiFileTextLine size="1.5rem" />,
-            label: 'Lyrics',
+            label: t('page.fullscreenPlayer.lyrics'),
             onClick: () => setStore({ activeTab: 'lyrics' }),
         },
     ];
+
+    console.log('opacity', opacity);
 
     return (
         <GridContainer
@@ -125,7 +130,7 @@ export const FullScreenPlayerQueue = () => {
                             order={3}
                             weight={700}
                         >
-                            COMING SOON
+                            {t('common.comingSoon', { postProcess: 'upperCase' })}
                         </TextTitle>
                     </Group>
                 </Center>

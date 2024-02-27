@@ -20,12 +20,8 @@ export const PlaybackTab = () => {
             <AudioSettings />
             <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
             <Divider />
-            {isElectron() && (
-                <>
-                    <ScrobbleSettings />
-                    <Divider />
-                </>
-            )}
+            <ScrobbleSettings />
+            <Divider />
             <LyricSettings />
         </Stack>
     );

@@ -1,24 +1,39 @@
 import { useMemo, useRef } from 'react';
 import { ActionIcon, Group, Stack } from '@mantine/core';
-import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
+import {
+    AlbumListSort,
+    LibraryItem,
+    ServerType,
+    SongListSort,
+    SortOrder,
+} from '/@/renderer/api/types';
 import { FeatureCarousel, NativeScrollArea, Spinner, TextTitle } from '/@/renderer/components';
 import { useAlbumList } from '/@/renderer/features/albums';
 import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-played-query';
 import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useWindowSettings } from '/@/renderer/store';
+import {
+    HomeItem,
+    useCurrentServer,
+    useGeneralSettings,
+    useWindowSettings,
+} from '/@/renderer/store';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import { Platform } from '/@/renderer/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { useTranslation } from 'react-i18next';
 import { RiRefreshLine } from 'react-icons/ri';
+import { useSongList } from '/@/renderer/features/songs';
 
 const HomeRoute = () => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const server = useCurrentServer();
     const itemsPerPage = 15;
     const { windowBarStyle } = useWindowSettings();
+    const { homeItems } = useGeneralSettings();
 
     const feature = useAlbumList({
         options: {
@@ -77,8 +92,9 @@ const HomeRoute = () => {
         serverId: server?.id,
     });
 
-    const mostPlayed = useAlbumList({
+    const mostPlayedAlbums = useAlbumList({
         options: {
+            enabled: server?.type === ServerType.SUBSONIC || server?.type === ServerType.NAVIDROME,
             staleTime: 1000 * 60 * 5,
         },
         query: {
@@ -90,55 +106,126 @@ const HomeRoute = () => {
         serverId: server?.id,
     });
 
+    const mostPlayedSongs = useSongList(
+        {
+            options: {
+                enabled: server?.type === ServerType.JELLYFIN,
+                staleTime: 1000 * 60 * 5,
+            },
+            query: {
+                limit: itemsPerPage,
+                sortBy: SongListSort.PLAY_COUNT,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        },
+        300,
+    );
+
     const isLoading =
         random.isLoading ||
         recentlyPlayed.isLoading ||
         recentlyAdded.isLoading ||
-        mostPlayed.isLoading;
+        (server?.type === ServerType.JELLYFIN && mostPlayedSongs.isLoading) ||
+        ((server?.type === ServerType.SUBSONIC || server?.type === ServerType.NAVIDROME) &&
+            mostPlayedAlbums.isLoading);
 
     if (isLoading) {
         return <Spinner container />;
     }
 
-    const carousels = [
-        {
+    const carousels = {
+        [HomeItem.RANDOM]: {
             data: random?.data?.items,
+            itemType: LibraryItem.ALBUM,
             sortBy: AlbumListSort.RANDOM,
             sortOrder: SortOrder.ASC,
-            title: 'Explore from your library',
-            uniqueId: 'random',
+            title: t('page.home.explore', { postProcess: 'sentenceCase' }),
         },
-        {
+        [HomeItem.RECENTLY_PLAYED]: {
             data: recentlyPlayed?.data?.items,
+            itemType: LibraryItem.ALBUM,
             pagination: {
                 itemsPerPage,
             },
             sortBy: AlbumListSort.RECENTLY_PLAYED,
             sortOrder: SortOrder.DESC,
-            title: 'Recently played',
-            uniqueId: 'recentlyPlayed',
+            title: t('page.home.recentlyPlayed', { postProcess: 'sentenceCase' }),
         },
-        {
+        [HomeItem.RECENTLY_ADDED]: {
             data: recentlyAdded?.data?.items,
+            itemType: LibraryItem.ALBUM,
             pagination: {
                 itemsPerPage,
             },
             sortBy: AlbumListSort.RECENTLY_ADDED,
             sortOrder: SortOrder.DESC,
-            title: 'Newly added releases',
-            uniqueId: 'recentlyAdded',
+            title: t('page.home.newlyAdded', { postProcess: 'sentenceCase' }),
         },
-        {
-            data: mostPlayed?.data?.items,
+        [HomeItem.MOST_PLAYED]: {
+            data:
+                server?.type === ServerType.JELLYFIN
+                    ? mostPlayedSongs?.data?.items
+                    : mostPlayedAlbums?.data?.items,
+            itemType: server?.type === ServerType.JELLYFIN ? LibraryItem.SONG : LibraryItem.ALBUM,
             pagination: {
                 itemsPerPage,
             },
-            sortBy: AlbumListSort.PLAY_COUNT,
+            sortBy:
+                server?.type === ServerType.JELLYFIN
+                    ? SongListSort.PLAY_COUNT
+                    : AlbumListSort.PLAY_COUNT,
             sortOrder: SortOrder.DESC,
-            title: 'Most played',
-            uniqueId: 'mostPlayed',
+            title: t('page.home.mostPlayed', { postProcess: 'sentenceCase' }),
         },
-    ];
+    };
+
+    const sortedCarousel = homeItems
+        .filter((item) => {
+            if (item.disabled) {
+                return false;
+            }
+            if (server?.type === ServerType.JELLYFIN && item.id === HomeItem.RECENTLY_PLAYED) {
+                return false;
+            }
+
+            return true;
+        })
+        .map((item) => ({
+            ...carousels[item.id],
+            uniqueId: item.id,
+        }));
+
+    const invalidateCarouselQuery = (carousel: {
+        itemType: LibraryItem;
+        sortBy: SongListSort | AlbumListSort;
+        sortOrder: SortOrder;
+    }) => {
+        if (carousel.itemType === LibraryItem.ALBUM) {
+            queryClient.invalidateQueries({
+                exact: false,
+                queryKey: queryKeys.albums.list(server?.id, {
+                    limit: itemsPerPage,
+                    sortBy: carousel.sortBy,
+                    sortOrder: carousel.sortOrder,
+                    startIndex: 0,
+                }),
+            });
+        }
+
+        if (carousel.itemType === LibraryItem.SONG) {
+            queryClient.invalidateQueries({
+                exact: false,
+                queryKey: queryKeys.songs.list(server?.id, {
+                    limit: itemsPerPage,
+                    sortBy: carousel.sortBy,
+                    sortOrder: carousel.sortOrder,
+                    startIndex: 0,
+                }),
+            });
+        }
+    };
 
     return (
         <AnimatedPage>
@@ -148,7 +235,9 @@ const HomeRoute = () => {
                     backgroundColor: 'var(--titlebar-bg)',
                     children: (
                         <LibraryHeaderBar>
-                            <LibraryHeaderBar.Title>Home</LibraryHeaderBar.Title>
+                            <LibraryHeaderBar.Title>
+                                {t('page.home.title', { postProcess: 'titleCase' })}
+                            </LibraryHeaderBar.Title>
                         </LibraryHeaderBar>
                     ),
                     offset: 200,
@@ -161,82 +250,76 @@ const HomeRoute = () => {
                     spacing="lg"
                 >
                     <FeatureCarousel data={featureItemsWithImage} />
-                    {carousels
-                        .filter((carousel) => {
-                            if (
-                                server?.type === ServerType.JELLYFIN &&
-                                carousel.uniqueId === 'recentlyPlayed'
-                            ) {
-                                return null;
-                            }
-
-                            return carousel;
-                        })
-                        .map((carousel) => (
-                            <MemoizedSwiperGridCarousel
-                                key={`carousel-${carousel.uniqueId}`}
-                                cardRows={[
-                                    {
-                                        property: 'name',
-                                        route: {
-                                            route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                                            slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
-                                        },
+                    {sortedCarousel.map((carousel) => (
+                        <MemoizedSwiperGridCarousel
+                            key={`carousel-${carousel.uniqueId}`}
+                            cardRows={[
+                                {
+                                    property: 'name',
+                                    route: {
+                                        route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                                        slugs: [
+                                            {
+                                                idProperty:
+                                                    server?.type === ServerType.JELLYFIN &&
+                                                    carousel.itemType === LibraryItem.SONG
+                                                        ? 'albumId'
+                                                        : 'id',
+                                                slugProperty: 'albumId',
+                                            },
+                                        ],
                                     },
-                                    {
-                                        arrayProperty: 'name',
-                                        property: 'albumArtists',
-                                        route: {
-                                            route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
-                                            slugs: [
-                                                {
-                                                    idProperty: 'id',
-                                                    slugProperty: 'albumArtistId',
-                                                },
-                                            ],
-                                        },
+                                },
+                                {
+                                    arrayProperty: 'name',
+                                    property: 'albumArtists',
+                                    route: {
+                                        route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
+                                        slugs: [
+                                            {
+                                                idProperty: 'id',
+                                                slugProperty: 'albumArtistId',
+                                            },
+                                        ],
                                     },
-                                ]}
-                                data={carousel.data}
-                                itemType={LibraryItem.ALBUM}
-                                route={{
-                                    route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                                    slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
-                                }}
-                                title={{
-                                    label: (
-                                        <Group>
-                                            <TextTitle
-                                                order={2}
-                                                weight={700}
-                                            >
-                                                {carousel.title}
-                                            </TextTitle>
+                                },
+                            ]}
+                            data={carousel.data}
+                            itemType={carousel.itemType}
+                            route={{
+                                route: AppRoute.LIBRARY_ALBUMS_DETAIL,
+                                slugs: [
+                                    {
+                                        idProperty:
+                                            server?.type === ServerType.JELLYFIN &&
+                                            carousel.itemType === LibraryItem.SONG
+                                                ? 'albumId'
+                                                : 'id',
+                                        slugProperty: 'albumId',
+                                    },
+                                ],
+                            }}
+                            title={{
+                                label: (
+                                    <Group>
+                                        <TextTitle
+                                            order={2}
+                                            weight={700}
+                                        >
+                                            {carousel.title}
+                                        </TextTitle>
 
-                                            <ActionIcon
-                                                onClick={() =>
-                                                    queryClient.invalidateQueries({
-                                                        exact: false,
-                                                        queryKey: queryKeys.albums.list(
-                                                            server?.id,
-                                                            {
-                                                                limit: itemsPerPage,
-                                                                sortBy: carousel.sortBy,
-                                                                sortOrder: carousel.sortOrder,
-                                                                startIndex: 0,
-                                                            },
-                                                        ),
-                                                    })
-                                                }
-                                            >
-                                                <RiRefreshLine />
-                                            </ActionIcon>
-                                        </Group>
-                                    ),
-                                }}
-                                uniqueId={carousel.uniqueId}
-                            />
-                        ))}
+                                        <ActionIcon
+                                            onClick={() => invalidateCarouselQuery(carousel)}
+                                        >
+                                            <RiRefreshLine />
+                                        </ActionIcon>
+                                    </Group>
+                                ),
+                            }}
+                            uniqueId={carousel.uniqueId}
+                        />
+                    ))}
                 </Stack>
             </NativeScrollArea>
         </AnimatedPage>

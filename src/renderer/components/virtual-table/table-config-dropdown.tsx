@@ -5,85 +5,278 @@ import { Switch } from '/@/renderer/components/switch';
 import { useSettingsStoreActions, useSettingsStore } from '/@/renderer/store/settings.store';
 import { TableColumn, TableType } from '/@/renderer/types';
 import { Option } from '/@/renderer/components/option';
+import i18n from '/@/i18n/i18n';
 
 export const SONG_TABLE_COLUMNS = [
-    { label: 'Row Index', value: TableColumn.ROW_INDEX },
-    { label: 'Title', value: TableColumn.TITLE },
-    { label: 'Title (Combined)', value: TableColumn.TITLE_COMBINED },
-    { label: 'Duration', value: TableColumn.DURATION },
-    { label: 'Album', value: TableColumn.ALBUM },
-    { label: 'Album Artist', value: TableColumn.ALBUM_ARTIST },
-    { label: 'Artist', value: TableColumn.ARTIST },
-    { label: 'Genre', value: TableColumn.GENRE },
-    { label: 'Year', value: TableColumn.YEAR },
-    { label: 'Release Date', value: TableColumn.RELEASE_DATE },
-    { label: 'Disc Number', value: TableColumn.DISC_NUMBER },
-    { label: 'Track Number', value: TableColumn.TRACK_NUMBER },
-    { label: 'Bitrate', value: TableColumn.BIT_RATE },
-    { label: 'Last Played', value: TableColumn.LAST_PLAYED },
-    { label: 'Note', value: TableColumn.COMMENT },
-    { label: 'Channels', value: TableColumn.CHANNELS },
-    { label: 'BPM', value: TableColumn.BPM },
-    { label: 'Date Added', value: TableColumn.DATE_ADDED },
-    { label: 'Path', value: TableColumn.PATH },
-    { label: 'Plays', value: TableColumn.PLAY_COUNT },
-    { label: 'Size', value: TableColumn.SIZE },
-    { label: 'Favorite', value: TableColumn.USER_FAVORITE },
-    { label: 'Rating', value: TableColumn.USER_RATING },
-    { label: 'Actions', value: TableColumn.ACTIONS },
+    {
+        label: i18n.t('table.config.label.rowIndex', { postProcess: 'titleCase' }),
+        value: TableColumn.ROW_INDEX,
+    },
+    {
+        label: i18n.t('table.config.label.title', { postProcess: 'titleCase' }),
+        value: TableColumn.TITLE,
+    },
+    {
+        label: i18n.t('table.config.label.titleCombined', { postProcess: 'titleCase' }),
+        value: TableColumn.TITLE_COMBINED,
+    },
+    {
+        label: i18n.t('table.config.label.duration', { postProcess: 'titleCase' }),
+        value: TableColumn.DURATION,
+    },
+    {
+        label: i18n.t('table.config.label.album', { postProcess: 'titleCase' }),
+        value: TableColumn.ALBUM,
+    },
+    {
+        label: i18n.t('table.config.label.albumArtist', { postProcess: 'titleCase' }),
+        value: TableColumn.ALBUM_ARTIST,
+    },
+    {
+        label: i18n.t('table.config.label.artist', { postProcess: 'titleCase' }),
+        value: TableColumn.ARTIST,
+    },
+    {
+        label: i18n.t('table.config.label.genre', { postProcess: 'titleCase' }),
+        value: TableColumn.GENRE,
+    },
+    {
+        label: i18n.t('table.config.label.year', { postProcess: 'titleCase' }),
+        value: TableColumn.YEAR,
+    },
+    {
+        label: i18n.t('table.config.label.releaseDate', { postProcess: 'titleCase' }),
+        value: TableColumn.RELEASE_DATE,
+    },
+    {
+        label: i18n.t('table.config.label.discNumber', { postProcess: 'titleCase' }),
+        value: TableColumn.DISC_NUMBER,
+    },
+    {
+        label: i18n.t('table.config.label.trackNumber', { postProcess: 'titleCase' }),
+        value: TableColumn.TRACK_NUMBER,
+    },
+    {
+        label: i18n.t('table.config.label.bitrate', { postProcess: 'titleCase' }),
+        value: TableColumn.BIT_RATE,
+    },
+    {
+        label: i18n.t('table.config.label.codec', { postProcess: 'titleCase' }),
+        value: TableColumn.CODEC,
+    },
+    {
+        label: i18n.t('table.config.label.lastPlayed', { postProcess: 'titleCase' }),
+        value: TableColumn.LAST_PLAYED,
+    },
+    {
+        label: i18n.t('table.config.label.note', { postProcess: 'titleCase' }),
+        value: TableColumn.COMMENT,
+    },
+    {
+        label: i18n.t('table.config.label.channels', { postProcess: 'titleCase' }),
+        value: TableColumn.CHANNELS,
+    },
+    {
+        label: i18n.t('table.config.label.bpm', { postProcess: 'titleCase' }),
+        value: TableColumn.BPM,
+    },
+    {
+        label: i18n.t('table.config.label.dateAdded', { postProcess: 'titleCase' }),
+        value: TableColumn.DATE_ADDED,
+    },
+    {
+        label: i18n.t('table.config.label.path', { postProcess: 'titleCase' }),
+        value: TableColumn.PATH,
+    },
+    {
+        label: i18n.t('table.config.label.playCount', { postProcess: 'titleCase' }),
+        value: TableColumn.PLAY_COUNT,
+    },
+    {
+        label: i18n.t('table.config.label.size', { postProcess: 'titleCase' }),
+        value: TableColumn.SIZE,
+    },
+    {
+        label: i18n.t('table.config.label.favorite', { postProcess: 'titleCase' }),
+        value: TableColumn.USER_FAVORITE,
+    },
+    {
+        label: i18n.t('table.config.label.rating', { postProcess: 'titleCase' }),
+        value: TableColumn.USER_RATING,
+    },
+    {
+        label: i18n.t('table.config.label.actions', { postProcess: 'titleCase' }),
+        value: TableColumn.ACTIONS,
+    },
     // { label: 'Skip', value: TableColumn.SKIP },
 ];
 
 export const ALBUM_TABLE_COLUMNS = [
-    { label: 'Row Index', value: TableColumn.ROW_INDEX },
-    { label: 'Title', value: TableColumn.TITLE },
-    { label: 'Title (Combined)', value: TableColumn.TITLE_COMBINED },
-    { label: 'Duration', value: TableColumn.DURATION },
-    { label: 'Album Artist', value: TableColumn.ALBUM_ARTIST },
-    { label: 'Artist', value: TableColumn.ARTIST },
-    { label: 'Song Count', value: TableColumn.SONG_COUNT },
-    { label: 'Genre', value: TableColumn.GENRE },
-    { label: 'Year', value: TableColumn.YEAR },
-    { label: 'Release Date', value: TableColumn.RELEASE_DATE },
-    { label: 'Last Played', value: TableColumn.LAST_PLAYED },
-    { label: 'Date Added', value: TableColumn.DATE_ADDED },
-    { label: 'Plays', value: TableColumn.PLAY_COUNT },
-    { label: 'Favorite', value: TableColumn.USER_FAVORITE },
-    { label: 'Rating', value: TableColumn.USER_RATING },
-    { label: 'Actions', value: TableColumn.ACTIONS },
+    {
+        label: i18n.t('table.config.label.rowIndex', { postProcess: 'titleCase' }),
+        value: TableColumn.ROW_INDEX,
+    },
+    {
+        label: i18n.t('table.config.label.title', { postProcess: 'titleCase' }),
+        value: TableColumn.TITLE,
+    },
+    {
+        label: i18n.t('table.config.label.titleCombined', { postProcess: 'titleCase' }),
+        value: TableColumn.TITLE_COMBINED,
+    },
+    {
+        label: i18n.t('table.config.label.duration', { postProcess: 'titleCase' }),
+        value: TableColumn.DURATION,
+    },
+    {
+        label: i18n.t('table.config.label.albumArtist', { postProcess: 'titleCase' }),
+        value: TableColumn.ALBUM_ARTIST,
+    },
+    {
+        label: i18n.t('table.config.label.artist', { postProcess: 'titleCase' }),
+        value: TableColumn.ARTIST,
+    },
+    {
+        label: i18n.t('table.config.label.songCount', { postProcess: 'titleCase' }),
+        value: TableColumn.SONG_COUNT,
+    },
+    {
+        label: i18n.t('table.config.label.genre', { postProcess: 'titleCase' }),
+        value: TableColumn.GENRE,
+    },
+    {
+        label: i18n.t('table.config.label.year', { postProcess: 'titleCase' }),
+        value: TableColumn.YEAR,
+    },
+    {
+        label: i18n.t('table.config.label.releaseDate', { postProcess: 'titleCase' }),
+        value: TableColumn.RELEASE_DATE,
+    },
+    {
+        label: i18n.t('table.config.label.lastPlayed', { postProcess: 'titleCase' }),
+        value: TableColumn.LAST_PLAYED,
+    },
+    {
+        label: i18n.t('table.config.label.dateAdded', { postProcess: 'titleCase' }),
+        value: TableColumn.DATE_ADDED,
+    },
+    {
+        label: i18n.t('table.config.label.playCount', { postProcess: 'titleCase' }),
+        value: TableColumn.PLAY_COUNT,
+    },
+    {
+        label: i18n.t('table.config.label.favorite', { postProcess: 'titleCase' }),
+        value: TableColumn.USER_FAVORITE,
+    },
+    {
+        label: i18n.t('table.config.label.rating', { postProcess: 'titleCase' }),
+        value: TableColumn.USER_RATING,
+    },
+    {
+        label: i18n.t('table.config.label.actions', { postProcess: 'titleCase' }),
+        value: TableColumn.ACTIONS,
+    },
 ];
 
 export const ALBUMARTIST_TABLE_COLUMNS = [
-    { label: 'Row Index', value: TableColumn.ROW_INDEX },
-    { label: 'Title', value: TableColumn.TITLE },
-    { label: 'Title (Combined)', value: TableColumn.TITLE_COMBINED },
-    { label: 'Duration', value: TableColumn.DURATION },
-    { label: 'Biography', value: TableColumn.BIOGRAPHY },
-    { label: 'Genre', value: TableColumn.GENRE },
-    { label: 'Last Played', value: TableColumn.LAST_PLAYED },
-    { label: 'Plays', value: TableColumn.PLAY_COUNT },
-    { label: 'Album Count', value: TableColumn.ALBUM_COUNT },
-    { label: 'Song Count', value: TableColumn.SONG_COUNT },
-    { label: 'Favorite', value: TableColumn.USER_FAVORITE },
-    { label: 'Rating', value: TableColumn.USER_RATING },
-    { label: 'Actions', value: TableColumn.ACTIONS },
+    {
+        label: i18n.t('table.config.label.rowIndex', { postProcess: 'titleCase' }),
+        value: TableColumn.ROW_INDEX,
+    },
+    {
+        label: i18n.t('table.config.label.title', { postProcess: 'titleCase' }),
+        value: TableColumn.TITLE,
+    },
+    {
+        label: i18n.t('table.config.label.titleCombined', { postProcess: 'titleCase' }),
+        value: TableColumn.TITLE_COMBINED,
+    },
+    {
+        label: i18n.t('table.config.label.duration', { postProcess: 'titleCase' }),
+        value: TableColumn.DURATION,
+    },
+    {
+        label: i18n.t('table.config.label.biography', { postProcess: 'titleCase' }),
+        value: TableColumn.BIOGRAPHY,
+    },
+    {
+        label: i18n.t('table.config.label.genre', { postProcess: 'titleCase' }),
+        value: TableColumn.GENRE,
+    },
+    {
+        label: i18n.t('table.config.label.lastPlayed', { postProcess: 'titleCase' }),
+        value: TableColumn.LAST_PLAYED,
+    },
+    {
+        label: i18n.t('table.config.label.playCount', { postProcess: 'titleCase' }),
+        value: TableColumn.PLAY_COUNT,
+    },
+    {
+        label: i18n.t('table.config.label.albumCount', { postProcess: 'titleCase' }),
+        value: TableColumn.ALBUM_COUNT,
+    },
+    {
+        label: i18n.t('table.config.label.songCount', { postProcess: 'titleCase' }),
+        value: TableColumn.SONG_COUNT,
+    },
+    {
+        label: i18n.t('table.config.label.favorite', { postProcess: 'titleCase' }),
+        value: TableColumn.USER_FAVORITE,
+    },
+    {
+        label: i18n.t('table.config.label.rating', { postProcess: 'titleCase' }),
+        value: TableColumn.USER_RATING,
+    },
+    {
+        label: i18n.t('table.config.label.actions', { postProcess: 'titleCase' }),
+        value: TableColumn.ACTIONS,
+    },
 ];
 
 export const PLAYLIST_TABLE_COLUMNS = [
-    { label: 'Row Index', value: TableColumn.ROW_INDEX },
-    { label: 'Title', value: TableColumn.TITLE },
-    { label: 'Title (Combined)', value: TableColumn.TITLE_COMBINED },
-    { label: 'Duration', value: TableColumn.DURATION },
-    { label: 'Owner', value: TableColumn.OWNER },
-    // { label: 'Genre', value: TableColumn.GENRE },
-    { label: 'Song Count', value: TableColumn.SONG_COUNT },
-    { label: 'Actions', value: TableColumn.ACTIONS },
+    {
+        label: i18n.t('table.config.label.rowIndex', { postProcess: 'titleCase' }),
+        value: TableColumn.ROW_INDEX,
+    },
+    {
+        label: i18n.t('table.config.label.title', { postProcess: 'titleCase' }),
+        value: TableColumn.TITLE,
+    },
+    {
+        label: i18n.t('table.config.label.titleCombined', { postProcess: 'titleCase' }),
+        value: TableColumn.TITLE_COMBINED,
+    },
+    {
+        label: i18n.t('table.config.label.duration', { postProcess: 'titleCase' }),
+        value: TableColumn.DURATION,
+    },
+    {
+        label: i18n.t('table.config.label.owner', { postProcess: 'titleCase' }),
+        value: TableColumn.OWNER,
+    },
+    {
+        label: i18n.t('table.config.label.songCount', { postProcess: 'titleCase' }),
+        value: TableColumn.SONG_COUNT,
+    },
+    {
+        label: i18n.t('table.config.label.actions', { postProcess: 'titleCase' }),
+        value: TableColumn.ACTIONS,
+    },
 ];
 
 export const GENRE_TABLE_COLUMNS = [
-    { label: 'Row Index', value: TableColumn.ROW_INDEX },
-    { label: 'Title', value: TableColumn.TITLE },
-    { label: 'Actions', value: TableColumn.ACTIONS },
+    {
+        label: i18n.t('table.config.label.rowIndex', { postProcess: 'titleCase' }),
+        value: TableColumn.ROW_INDEX,
+    },
+    {
+        label: i18n.t('table.config.label.title', { postProcess: 'titleCase' }),
+        value: TableColumn.TITLE,
+    },
+    {
+        label: i18n.t('table.config.label.actions', { postProcess: 'titleCase' }),
+        value: TableColumn.ACTIONS,
+    },
 ];
 
 interface TableConfigDropdownProps {

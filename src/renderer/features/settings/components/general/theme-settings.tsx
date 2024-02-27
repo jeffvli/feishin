@@ -1,3 +1,4 @@
+import { ColorInput, Stack } from '@mantine/core';
 import { Switch, Select } from '/@/renderer/components';
 import {
     SettingsSection,
@@ -6,8 +7,13 @@ import {
 import { THEME_DATA } from '/@/renderer/hooks';
 import { useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { AppTheme } from '/@/renderer/themes/types';
+import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
+
+const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const ThemeSettings = () => {
+    const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -23,12 +29,24 @@ export const ThemeSettings = () => {
                                 followSystemTheme: e.currentTarget.checked,
                             },
                         });
+                        if (localSettings) {
+                            localSettings.themeSet(
+                                e.currentTarget.checked
+                                    ? 'system'
+                                    : settings.theme === AppTheme.DEFAULT_DARK
+                                    ? 'dark'
+                                    : 'light',
+                            );
+                        }
                     }}
                 />
             ),
-            description: 'Follows the system-defined light or dark preference',
+            description: t('setting.useSystemTheme', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Use system theme',
+            title: t('setting.useSystemTheme', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -36,18 +54,27 @@ export const ThemeSettings = () => {
                     data={THEME_DATA}
                     defaultValue={settings.theme}
                     onChange={(e) => {
+                        const theme = e as AppTheme;
                         setSettings({
                             general: {
                                 ...settings,
-                                theme: e as AppTheme,
+                                theme,
                             },
                         });
+                        if (localSettings) {
+                            localSettings.themeSet(
+                                theme === AppTheme.DEFAULT_DARK ? 'dark' : 'light',
+                            );
+                        }
                     }}
                 />
             ),
-            description: 'Sets the default theme',
+            description: t('setting.theme', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: settings.followSystemTheme,
-            title: 'Theme',
+            title: t('setting.theme', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -64,9 +91,12 @@ export const ThemeSettings = () => {
                     }}
                 />
             ),
-            description: 'Sets the dark theme',
+            description: t('setting.themeDark', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !settings.followSystemTheme,
-            title: 'Theme (dark)',
+            title: t('setting.themeDark', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -83,9 +113,44 @@ export const ThemeSettings = () => {
                     }}
                 />
             ),
-            description: 'Sets the light theme',
+            description: t('setting.themeLight', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !settings.followSystemTheme,
-            title: 'Theme (light)',
+            title: t('setting.themeLight', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Stack align="center">
+                    <ColorInput
+                        defaultValue={settings.accent}
+                        format="rgb"
+                        swatches={[
+                            'rgb(53, 116, 252)',
+                            'rgb(240, 170, 22)',
+                            'rgb(29, 185, 84)',
+                            'rgb(214, 81, 63)',
+                            'rgb(170, 110, 216)',
+                        ]}
+                        swatchesPerRow={5}
+                        withEyeDropper={false}
+                        onChangeEnd={(e) => {
+                            setSettings({
+                                general: {
+                                    ...settings,
+                                    accent: e,
+                                },
+                            });
+                        }}
+                    />
+                </Stack>
+            ),
+            description: t('setting.accentColor', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.accentColor', { postProcess: 'sentenceCase' }),
         },
     ];
 

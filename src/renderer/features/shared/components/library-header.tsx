@@ -1,5 +1,6 @@
+import { forwardRef, ReactNode, Ref, useState } from 'react';
 import { Group } from '@mantine/core';
-import { forwardRef, ReactNode, Ref } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styles from './library-header.module.scss';
 import { LibraryItem } from '/@/renderer/api/types';
@@ -20,6 +21,30 @@ export const LibraryHeader = forwardRef(
         { imageUrl, imagePlaceholderUrl, background, title, item, children }: LibraryHeaderProps,
         ref: Ref<HTMLDivElement>,
     ) => {
+        const { t } = useTranslation();
+        const [isImageError, setIsImageError] = useState<boolean | null>(false);
+
+        const onImageError = () => {
+            setIsImageError(true);
+        };
+
+        const itemTypeString = () => {
+            switch (item.type) {
+                case LibraryItem.ALBUM:
+                    return t('entity.album', { count: 1 });
+                case LibraryItem.ARTIST:
+                    return t('entity.artist', { count: 1 });
+                case LibraryItem.ALBUM_ARTIST:
+                    return t('entity.albumArtist', { count: 1 });
+                case LibraryItem.PLAYLIST:
+                    return t('entity.playlist', { count: 1 });
+                case LibraryItem.SONG:
+                    return t('entity.track', { count: 1 });
+                default:
+                    return t('common.unknown');
+            }
+        };
+
         return (
             <div
                 ref={ref}
@@ -31,13 +56,14 @@ export const LibraryHeader = forwardRef(
                 />
                 <div className={styles.backgroundOverlay} />
                 <div className={styles.imageSection}>
-                    {imageUrl ? (
+                    {imageUrl && !isImageError ? (
                         <img
                             alt="cover"
                             className={styles.image}
                             placeholder={imagePlaceholderUrl || 'var(--placeholder-bg)'}
                             src={imageUrl}
                             style={{ height: '' }}
+                            onError={onImageError}
                         />
                     ) : (
                         <ItemImagePlaceholder itemType={item.type} />
@@ -52,7 +78,7 @@ export const LibraryHeader = forwardRef(
                             tt="uppercase"
                             weight={600}
                         >
-                            {item.type}
+                            {itemTypeString()}
                         </Text>
                     </Group>
                     <h1 className={styles.title}>{title}</h1>

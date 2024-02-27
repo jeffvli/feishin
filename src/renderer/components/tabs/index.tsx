@@ -42,6 +42,7 @@ const StyledTabs = styled(MantineTabs)`
 
         &:hover {
             background: none;
+            border-color: var(--primary-color);
         }
     }
 `;

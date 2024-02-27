@@ -222,7 +222,9 @@ export const WindowBar = () => {
     const statusString = playerStatus === PlayerStatus.PAUSED ? '(Paused) ' : '';
     const queueString = length ? `(${index + 1} / ${length}) ` : '';
     const title = length
-        ? `${statusString}${queueString}${currentSong?.name} — ${currentSong?.artistName}`
+        ? currentSong?.artistName
+            ? `${statusString}${queueString}${currentSong?.name} — ${currentSong?.artistName}`
+            : `${statusString}${queueString}${currentSong?.name}`
         : 'Feishin';
     document.title = title;
 

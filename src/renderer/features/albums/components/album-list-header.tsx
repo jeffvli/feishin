@@ -1,7 +1,8 @@
+import type { ChangeEvent, MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import type { ChangeEvent, MutableRefObject } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useListFilterRefresh } from '../../../hooks/use-list-filter-refresh';
 import { LibraryItem } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
@@ -18,6 +19,7 @@ import {
     usePlayButtonBehavior,
 } from '/@/renderer/store';
 import { ListDisplayType } from '/@/renderer/types';
+import { titleCase } from '/@/renderer/utils';
 
 interface AlbumListHeaderProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -27,6 +29,7 @@ interface AlbumListHeaderProps {
 }
 
 export const AlbumListHeader = ({ itemCount, gridRef, tableRef, title }: AlbumListHeaderProps) => {
+    const { t } = useTranslation();
     const server = useCurrentServer();
     const { setFilter, setTablePagination } = useListStoreActions();
     const cq = useContainerQuery();
@@ -69,7 +72,10 @@ export const AlbumListHeader = ({ itemCount, gridRef, tableRef, title }: AlbumLi
                         <LibraryHeaderBar.PlayButton
                             onClick={() => handlePlay?.({ playType: playButtonBehavior })}
                         />
-                        <LibraryHeaderBar.Title>{title || 'Albums'}</LibraryHeaderBar.Title>
+                        <LibraryHeaderBar.Title>
+                            {title ||
+                                titleCase(t('page.albumList.title', { postProcess: 'titleCase' }))}
+                        </LibraryHeaderBar.Title>
                         <LibraryHeaderBar.Badge
                             isLoading={itemCount === null || itemCount === undefined}
                         >

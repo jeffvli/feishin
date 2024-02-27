@@ -1,4 +1,5 @@
 import { Grid, Group } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { RiSearchLine, RiMenuFill, RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
@@ -19,6 +20,7 @@ const ActionsContainer = styled.div`
 `;
 
 export const ActionBar = () => {
+    const { t } = useTranslation();
     const cq = useContainerQuery({ md: 300 });
     const navigate = useNavigate();
     const { open } = useCommandPalette();
@@ -36,7 +38,7 @@ export const ActionBar = () => {
                         <TextInput
                             readOnly
                             icon={<RiSearchLine />}
-                            placeholder="Search"
+                            placeholder={t('common.search', { postProcess: 'titleCase' })}
                             size="md"
                             onClick={open}
                             onKeyDown={(e) => {

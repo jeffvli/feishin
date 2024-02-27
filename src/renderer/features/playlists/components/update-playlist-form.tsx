@@ -18,6 +18,8 @@ import { Button, Select, Switch, TextInput, toast } from '/@/renderer/components
 import { useUpdatePlaylist } from '/@/renderer/features/playlists/mutations/update-playlist-mutation';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer } from '/@/renderer/store';
+import { useTranslation } from 'react-i18next';
+import i18n from '/@/i18n/i18n';
 
 interface UpdatePlaylistFormProps {
     body: Partial<UpdatePlaylistBody>;
@@ -27,6 +29,7 @@ interface UpdatePlaylistFormProps {
 }
 
 export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlaylistFormProps) => {
+    const { t } = useTranslation();
     const mutation = useUpdatePlaylist({});
     const server = useCurrentServer();
 
@@ -60,10 +63,12 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
             },
             {
                 onError: (err) => {
-                    toast.error({ message: err.message, title: 'Error updating playlist' });
+                    toast.error({
+                        message: err.message,
+                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                    });
                 },
                 onSuccess: () => {
-                    toast.success({ message: `Playlist has been saved` });
                     onCancel();
                 },
             },
@@ -71,6 +76,7 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
     });
 
     const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
+    const isOwnerDisplayed = server?.type === ServerType.NAVIDROME;
     const isSubmitDisabled = !form.values.name || mutation.isLoading;
 
     return (
@@ -79,21 +85,35 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                 <TextInput
                     data-autofocus
                     required
-                    label="Name"
+                    label={t('form.createPlaylist.input', {
+                        context: 'name',
+                        postProcess: 'titleCase',
+                    })}
                     {...form.getInputProps('name')}
                 />
                 <TextInput
-                    label="Description"
+                    label={t('form.createPlaylist.input', {
+                        context: 'description',
+                        postProcess: 'titleCase',
+                    })}
                     {...form.getInputProps('comment')}
                 />
-                <Select
-                    data={userList || []}
-                    {...form.getInputProps('_custom.navidrome.ownerId')}
-                    label="Owner"
-                />
+                {isOwnerDisplayed && (
+                    <Select
+                        data={userList || []}
+                        {...form.getInputProps('_custom.navidrome.ownerId')}
+                        label={t('form.createPlaylist.input', {
+                            context: 'owner',
+                            postProcess: 'titleCase',
+                        })}
+                    />
+                )}
                 {isPublicDisplayed && (
                     <Switch
-                        label="Is Public?"
+                        label={t('form.createPlaylist.input', {
+                            context: 'public',
+                            postProcess: 'titleCase',
+                        })}
                         {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
                     />
                 )}
@@ -102,7 +122,7 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                         variant="subtle"
                         onClick={onCancel}
                     >
-                        Cancel
+                        {t('common.cancel', { postProcess: 'titleCase' })}
                     </Button>
                     <Button
                         disabled={isSubmitDisabled}
@@ -110,7 +130,7 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                         type="submit"
                         variant="filled"
                     >
-                        Save
+                        {t('common.save', { postProcess: 'titleCase' })}
                     </Button>
                 </Group>
             </Stack>
@@ -132,11 +152,14 @@ export const openUpdatePlaylistModal = async (args: {
 
     if (!server) return;
 
-    const users = await queryClient.fetchQuery({
-        queryFn: ({ signal }) =>
-            api.controller.getUserList({ apiClientProps: { server, signal }, query }),
-        queryKey: queryKeys.users.list(server?.id || '', query),
-    });
+    const users =
+        server?.type === ServerType.NAVIDROME
+            ? await queryClient.fetchQuery({
+                  queryFn: ({ signal }) =>
+                      api.controller.getUserList({ apiClientProps: { server, signal }, query }),
+                  queryKey: queryKeys.users.list(server?.id || '', query),
+              })
+            : null;
 
     openModal({
         children: (
@@ -160,6 +183,6 @@ export const openUpdatePlaylistModal = async (args: {
                 onCancel={closeAllModals}
             />
         ),
-        title: 'Edit playlist',
+        title: i18n.t('form.editPlaylist.title', { postProcess: 'titleCase' }) as string,
     });
 };

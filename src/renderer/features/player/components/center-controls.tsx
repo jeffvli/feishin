@@ -3,9 +3,9 @@ import { useHotkeys } from '@mantine/hooks';
 import { useQueryClient } from '@tanstack/react-query';
 import formatDuration from 'format-duration';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { IoIosPause } from 'react-icons/io';
 import {
-    RiMenuAddFill,
     RiPlayFill,
     RiRepeat2Line,
     RiRepeatOneLine,
@@ -16,6 +16,7 @@ import {
     RiSpeedFill,
     RiStopFill,
 } from 'react-icons/ri';
+import { BsDice3 } from 'react-icons/bs';
 import styled from 'styled-components';
 import { Text } from '/@/renderer/components';
 import { useCenterControls } from '../hooks/use-center-controls';
@@ -31,7 +32,7 @@ import {
 } from '/@/renderer/store';
 import {
     useHotkeySettings,
-    usePlayerType,
+    usePlaybackType,
     useSettingsStore,
 } from '/@/renderer/store/settings.store';
 import { PlayerStatus, PlaybackType, PlayerShuffle, PlayerRepeat } from '/@/renderer/types';
@@ -92,11 +93,13 @@ const ControlsContainer = styled.div`
 `;
 
 export const CenterControls = ({ playersRef }: CenterControlsProps) => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const [isSeeking, setIsSeeking] = useState(false);
     const currentSong = useCurrentSong();
     const skip = useSettingsStore((state) => state.general.skipButtons);
-    const playerType = usePlayerType();
+    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const playbackType = usePlaybackType();
     const player1 = playersRef?.current?.player1;
     const player2 = playersRef?.current?.player2;
     const status = useCurrentStatus();
@@ -131,7 +134,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
         let interval: any;
 
         if (status === PlayerStatus.PLAYING && !isSeeking) {
-            if (!isElectron() || playerType === PlaybackType.WEB) {
+            if (!isElectron() || playbackType === PlaybackType.WEB) {
                 interval = setInterval(() => {
                     setCurrentTime(currentPlayerRef.getCurrentTime());
                 }, 1000);
@@ -141,7 +144,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
         }
 
         return () => clearInterval(interval);
-    }, [currentPlayerRef, isSeeking, setCurrentTime, playerType, status]);
+    }, [currentPlayerRef, isSeeking, setCurrentTime, playbackType, status]);
 
     const [seekValue, setSeekValue] = useState(0);
 
@@ -169,75 +172,85 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             <ControlsContainer>
                 <ButtonsContainer>
                     <PlayerButton
-                        icon={<RiStopFill size={15} />}
+                        icon={<RiStopFill size={buttonSize} />}
                         tooltip={{
-                            label: 'Stop',
-                            openDelay: 500,
+                            label: t('player.stop', { postProcess: 'sentenceCase' }),
                         }}
                         variant="tertiary"
                         onClick={handleStop}
                     />
                     <PlayerButton
                         $isActive={shuffle !== PlayerShuffle.NONE}
-                        icon={<RiShuffleFill size={15} />}
+                        icon={<RiShuffleFill size={buttonSize} />}
                         tooltip={{
                             label:
                                 shuffle === PlayerShuffle.NONE
-                                    ? 'Shuffle disabled'
-                                    : shuffle === PlayerShuffle.TRACK
-                                    ? 'Shuffle tracks'
-                                    : 'Shuffle albums',
-                            openDelay: 500,
+                                    ? t('player.shuffle', {
+                                          context: 'off',
+                                          postProcess: 'sentenceCase',
+                                      })
+                                    : t('player.shuffle', { postProcess: 'sentenceCase' }),
                         }}
                         variant="tertiary"
                         onClick={handleToggleShuffle}
                     />
                     <PlayerButton
-                        icon={<RiSkipBackFill size={15} />}
-                        tooltip={{ label: 'Previous track', openDelay: 500 }}
+                        icon={<RiSkipBackFill size={buttonSize} />}
+                        tooltip={{
+                            label: t('player.previous', { postProcess: 'sentenceCase' }),
+                        }}
                         variant="secondary"
                         onClick={handlePrevTrack}
                     />
                     {skip?.enabled && (
                         <PlayerButton
-                            icon={<RiRewindFill size={15} />}
+                            icon={<RiRewindFill size={buttonSize} />}
                             tooltip={{
-                                label: `Skip backwards ${skip?.skipBackwardSeconds} seconds`,
-                                openDelay: 500,
+                                label: t('player.skip', {
+                                    context: 'back',
+                                    postProcess: 'sentenceCase',
+                                }),
                             }}
                             variant="secondary"
                             onClick={() => handleSkipBackward(skip?.skipBackwardSeconds)}
                         />
                     )}
                     <PlayerButton
+                        disabled={currentSong?.id === undefined}
                         icon={
                             status === PlayerStatus.PAUSED ? (
-                                <RiPlayFill size={20} />
+                                <RiPlayFill size={buttonSize} />
                             ) : (
-                                <IoIosPause size={20} />
+                                <IoIosPause size={buttonSize} />
                             )
                         }
                         tooltip={{
-                            label: status === PlayerStatus.PAUSED ? 'Play' : 'Pause',
-                            openDelay: 500,
+                            label:
+                                status === PlayerStatus.PAUSED
+                                    ? t('player.play', { postProcess: 'sentenceCase' })
+                                    : t('player.pause', { postProcess: 'sentenceCase' }),
                         }}
                         variant="main"
                         onClick={handlePlayPause}
                     />
                     {skip?.enabled && (
                         <PlayerButton
-                            icon={<RiSpeedFill size={15} />}
+                            icon={<RiSpeedFill size={buttonSize} />}
                             tooltip={{
-                                label: `Skip forwards ${skip?.skipForwardSeconds} seconds`,
-                                openDelay: 500,
+                                label: t('player.skip', {
+                                    context: 'forward',
+                                    postProcess: 'sentenceCase',
+                                }),
                             }}
                             variant="secondary"
                             onClick={() => handleSkipForward(skip?.skipForwardSeconds)}
                         />
                     )}
                     <PlayerButton
-                        icon={<RiSkipForwardFill size={15} />}
-                        tooltip={{ label: 'Next track', openDelay: 500 }}
+                        icon={<RiSkipForwardFill size={buttonSize} />}
+                        tooltip={{
+                            label: t('player.next', { postProcess: 'sentenceCase' }),
+                        }}
                         variant="secondary"
                         onClick={handleNextTrack}
                     />
@@ -245,30 +258,37 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         $isActive={repeat !== PlayerRepeat.NONE}
                         icon={
                             repeat === PlayerRepeat.ONE ? (
-                                <RiRepeatOneLine size={15} />
+                                <RiRepeatOneLine size={buttonSize} />
                             ) : (
-                                <RiRepeat2Line size={15} />
+                                <RiRepeat2Line size={buttonSize} />
                             )
                         }
                         tooltip={{
                             label: `${
                                 repeat === PlayerRepeat.NONE
-                                    ? 'Repeat disabled'
+                                    ? t('player.repeat', {
+                                          context: 'off',
+                                          postProcess: 'sentenceCase',
+                                      })
                                     : repeat === PlayerRepeat.ALL
-                                    ? 'Repeat all'
-                                    : 'Repeat one'
+                                    ? t('player.repeat', {
+                                          context: 'all',
+                                          postProcess: 'sentenceCase',
+                                      })
+                                    : t('player.repeat', {
+                                          context: 'one',
+                                          postProcess: 'sentenceCase',
+                                      })
                             }`,
-                            openDelay: 500,
                         }}
                         variant="tertiary"
                         onClick={handleToggleRepeat}
                     />
 
                     <PlayerButton
-                        icon={<RiMenuAddFill size={15} />}
+                        icon={<BsDice3 size={buttonSize} />}
                         tooltip={{
-                            label: 'Shuffle all',
-                            openDelay: 500,
+                            label: t('player.playRandom', { postProcess: 'sentenceCase' }),
                         }}
                         variant="tertiary"
                         onClick={() =>

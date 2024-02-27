@@ -1,7 +1,7 @@
+import { ChangeEvent, MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, MutableRefObject } from 'react';
 import { LibraryItem } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
@@ -17,6 +17,7 @@ import {
     useListStoreByKey,
 } from '/@/renderer/store';
 import { ListDisplayType } from '/@/renderer/types';
+import { useTranslation } from 'react-i18next';
 
 interface GenreListHeaderProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -25,6 +26,7 @@ interface GenreListHeaderProps {
 }
 
 export const GenreListHeader = ({ itemCount, gridRef, tableRef }: GenreListHeaderProps) => {
+    const { t } = useTranslation();
     const cq = useContainerQuery();
     const server = useCurrentServer();
     const { pageKey } = useListContext();
@@ -66,7 +68,9 @@ export const GenreListHeader = ({ itemCount, gridRef, tableRef }: GenreListHeade
                     w="100%"
                 >
                     <LibraryHeaderBar>
-                        <LibraryHeaderBar.Title>Genres</LibraryHeaderBar.Title>
+                        <LibraryHeaderBar.Title>
+                            {t('page.genreList.title', { postProcess: 'titleCase' })}
+                        </LibraryHeaderBar.Title>
                         <LibraryHeaderBar.Badge
                             isLoading={itemCount === null || itemCount === undefined}
                         >

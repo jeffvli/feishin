@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
+import { useTranslation } from 'react-i18next';
 import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { PlaylistDetailSongListContent } from '../components/playlist-detail-song-list-content';
@@ -19,6 +20,7 @@ import { PlaylistSongListQuery, ServerType, SongListSort, SortOrder } from '/@/r
 import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
 
 const PlaylistDetailSongListRoute = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const tableRef = useRef<AgGridReactType | null>(null);
     const { playlistId } = useParams() as { playlistId: string };
@@ -114,7 +116,7 @@ const PlaylistDetailSongListRoute = () => {
                     }
                 />
             ),
-            title: 'Save as',
+            title: t('common.saveAs', { postProcess: 'sentenceCase' }),
         });
     };
 
@@ -189,20 +191,18 @@ const PlaylistDetailSongListRoute = () => {
                             </Button>
                             <Text>Query Editor</Text>
                         </Group>
-                        <Box>
-                            {isQueryBuilderExpanded && (
-                                <PlaylistQueryBuilder
-                                    key={JSON.stringify(detailQuery?.data?.rules)}
-                                    isSaving={createPlaylistMutation?.isLoading}
-                                    limit={detailQuery?.data?.rules?.limit}
-                                    query={detailQuery?.data?.rules}
-                                    sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
-                                    sortOrder={detailQuery?.data?.rules?.order || 'asc'}
-                                    onSave={handleSave}
-                                    onSaveAs={handleSaveAs}
-                                />
-                            )}
-                        </Box>
+                        {isQueryBuilderExpanded && (
+                            <PlaylistQueryBuilder
+                                key={JSON.stringify(detailQuery?.data?.rules)}
+                                isSaving={createPlaylistMutation?.isLoading}
+                                limit={detailQuery?.data?.rules?.limit}
+                                query={detailQuery?.data?.rules}
+                                sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
+                                sortOrder={detailQuery?.data?.rules?.order || 'asc'}
+                                onSave={handleSave}
+                                onSaveAs={handleSaveAs}
+                            />
+                        )}
                     </Paper>
                 </Box>
             )}

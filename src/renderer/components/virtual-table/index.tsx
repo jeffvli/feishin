@@ -42,6 +42,7 @@ import { TitleCell } from '/@/renderer/components/virtual-table/cells/title-cell
 import { useFixedTableHeader } from '/@/renderer/components/virtual-table/hooks/use-fixed-table-header';
 import { NoteCell } from '/@/renderer/components/virtual-table/cells/note-cell';
 import { RowIndexCell } from '/@/renderer/components/virtual-table/cells/row-index-cell';
+import i18n from '/@/i18n/i18n';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -77,7 +78,7 @@ const tableColumns: { [key: string]: ColDef } = {
         cellRenderer: (params: ICellRendererParams) =>
             GenericCell(params, { isLink: true, position: 'left' }),
         colId: TableColumn.ALBUM,
-        headerName: 'Album',
+        headerName: i18n.t('table.column.album'),
         valueGetter: (params: ValueGetterParams) =>
             params.data
                 ? {
@@ -92,7 +93,7 @@ const tableColumns: { [key: string]: ColDef } = {
     albumArtist: {
         cellRenderer: AlbumArtistCell,
         colId: TableColumn.ALBUM_ARTIST,
-        headerName: 'Album Artist',
+        headerName: i18n.t('table.column.albumArtist'),
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.albumArtists : undefined,
         width: 150,
@@ -103,7 +104,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'albumCount',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'Albums',
+        headerName: i18n.t('table.column.albumCount'),
         suppressSizeToFit: true,
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.albumCount : undefined,
@@ -112,7 +113,7 @@ const tableColumns: { [key: string]: ColDef } = {
     artist: {
         cellRenderer: ArtistCell,
         colId: TableColumn.ARTIST,
-        headerName: 'Artist',
+        headerName: i18n.t('table.column.artist'),
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data.artists : undefined),
         width: 150,
     },
@@ -120,7 +121,7 @@ const tableColumns: { [key: string]: ColDef } = {
         cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
         colId: TableColumn.BIOGRAPHY,
         field: 'biography',
-        headerName: 'Biography',
+        headerName: i18n.t('table.column.biography'),
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data.biography : ''),
         width: 200,
     },
@@ -130,6 +131,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'bitRate',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
+        headerName: i18n.t('table.column.bitrate'),
         suppressSizeToFit: true,
         valueFormatter: (params: ValueFormatterParams) => `${params.value} kbps`,
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data.bitRate : undefined),
@@ -140,7 +142,7 @@ const tableColumns: { [key: string]: ColDef } = {
         colId: TableColumn.BPM,
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'BPM',
+        headerName: i18n.t('table.column.bpm'),
         suppressSizeToFit: true,
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data.bpm : undefined),
         width: 60,
@@ -151,14 +153,23 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'channels',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
+        headerName: i18n.t('table.column.channels'),
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.channels : undefined,
         width: 100,
     },
+    codec: {
+        cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+        colId: TableColumn.CODEC,
+        headerName: i18n.t('table.column.codec'),
+        valueGetter: (params: ValueGetterParams) =>
+            params.data ? params.data.container : undefined,
+        width: 60,
+    },
     comment: {
         cellRenderer: NoteCell,
         colId: TableColumn.COMMENT,
-        headerName: 'Note',
+        headerName: i18n.t('table.column.comment'),
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data.comment : undefined),
         width: 150,
     },
@@ -168,7 +179,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'createdAt',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'Date Added',
+        headerName: i18n.t('table.column.dateAdded'),
         suppressSizeToFit: true,
         valueFormatter: (params: ValueFormatterParams) =>
             params.value ? dayjs(params.value).format('MMM D, YYYY') : '',
@@ -182,7 +193,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'discNumber',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'Disc',
+        headerName: i18n.t('table.column.discNumber'),
         suppressSizeToFit: true,
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.discNumber : undefined,
@@ -203,7 +214,7 @@ const tableColumns: { [key: string]: ColDef } = {
     genre: {
         cellRenderer: GenreCell,
         colId: TableColumn.GENRE,
-        headerName: 'Genre',
+        headerName: i18n.t('table.column.genre'),
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data.genres : undefined),
         width: 100,
     },
@@ -212,7 +223,7 @@ const tableColumns: { [key: string]: ColDef } = {
         colId: TableColumn.LAST_PLAYED,
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'Last Played',
+        headerName: i18n.t('table.column.lastPlayed'),
         valueFormatter: (params: ValueFormatterParams) =>
             params.value ? dayjs(params.value).fromNow() : '',
         valueGetter: (params: ValueGetterParams) =>
@@ -222,7 +233,7 @@ const tableColumns: { [key: string]: ColDef } = {
     path: {
         cellRenderer: GenericCell,
         colId: TableColumn.PATH,
-        headerName: 'Path',
+        headerName: i18n.t('table.column.path'),
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data.path : undefined),
         width: 200,
     },
@@ -232,7 +243,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'playCount',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'Plays',
+        headerName: i18n.t('table.column.playCount'),
         suppressSizeToFit: true,
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.playCount : undefined,
@@ -244,7 +255,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'releaseDate',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'Release Date',
+        headerName: i18n.t('table.column.releaseDate'),
         suppressSizeToFit: true,
         valueFormatter: (params: ValueFormatterParams) =>
             params.value ? dayjs(params.value).format('MMM D, YYYY') : '',
@@ -258,7 +269,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'releaseYear',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'Year',
+        headerName: i18n.t('table.column.releaseYear'),
         suppressSizeToFit: true,
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.releaseYear : undefined,
@@ -280,10 +291,14 @@ const tableColumns: { [key: string]: ColDef } = {
         cellClass: 'row-index',
         cellClassRules: {
             'current-playlist-song-cell': (params) => {
-                return params.data?.uniqueId === params.context?.currentSong?.uniqueId;
+                return (
+                    params.context?.currentSong?.uniqueId !== undefined &&
+                    params.data?.uniqueId === params.context?.currentSong?.uniqueId
+                );
             },
             'current-song-cell': (params) => {
                 return (
+                    params.context?.currentSong?.id !== undefined &&
                     params.data?.id === params.context?.currentSong?.id &&
                     params.data?.albumId === params.context?.currentSong?.albumId
                 );
@@ -311,7 +326,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'songCount',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'Songs',
+        headerName: i18n.t('table.column.songCount'),
         suppressSizeToFit: true,
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.songCount : undefined,
@@ -321,14 +336,14 @@ const tableColumns: { [key: string]: ColDef } = {
         cellRenderer: TitleCell,
         colId: TableColumn.TITLE,
         field: 'name',
-        headerName: 'Title',
+        headerName: i18n.t('table.column.title'),
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data.name : undefined),
         width: 250,
     },
     titleCombined: {
         cellRenderer: CombinedTitleCell,
         colId: TableColumn.TITLE_COMBINED,
-        headerName: 'Title',
+        headerName: i18n.t('table.column.title'),
         initialWidth: 500,
         minWidth: 150,
         valueGetter: (params: ValueGetterParams) =>
@@ -352,7 +367,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'trackNumber',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'Track',
+        headerName: i18n.t('table.column.trackNumber'),
         suppressSizeToFit: true,
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.trackNumber : undefined,
@@ -363,6 +378,7 @@ const tableColumns: { [key: string]: ColDef } = {
         cellClassRules: {
             'current-song-cell': (params) => {
                 return (
+                    params.context?.currentSong?.id !== undefined &&
                     params.data?.id === params.context?.currentSong?.id &&
                     params.data?.albumId === params.context?.currentSong?.albumId
                 );
@@ -379,7 +395,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'trackNumber',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
-        headerName: 'Track',
+        headerName: i18n.t('table.column.trackNumber'),
         suppressSizeToFit: true,
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.trackNumber : undefined,
@@ -392,7 +408,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'userFavorite',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center', preset: 'userFavorite' }),
-        headerName: 'Favorite',
+        headerName: i18n.t('table.column.favorite'),
         suppressSizeToFit: true,
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.userFavorite : undefined,
@@ -406,7 +422,7 @@ const tableColumns: { [key: string]: ColDef } = {
         field: 'userRating',
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center', preset: 'userRating' }),
-        headerName: 'Rating',
+        headerName: i18n.t('table.column.rating'),
         suppressSizeToFit: true,
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data : undefined),
         width: 95,

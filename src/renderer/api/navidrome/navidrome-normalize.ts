@@ -20,10 +20,6 @@ const getImageUrl = (args: { url: string | null }) => {
         return null;
     }
 
-    if (url?.match('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9')) {
-        return null;
-    }
-
     return url;
 };
 
@@ -47,6 +43,14 @@ const getCoverArtUrl = (args: {
         '&c=feishin' +
         `&size=${size}`
     );
+};
+
+interface WithDate {
+    playDate?: string;
+}
+
+const normalizePlayDate = (item: WithDate): string | null => {
+    return !item.playDate || item.playDate.includes('0001-') ? null : item.playDate;
 };
 
 const normalizeSong = (
@@ -104,7 +108,7 @@ const normalizeSong = (
         imagePlaceholderUrl,
         imageUrl,
         itemType: LibraryItem.SONG,
-        lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
+        lastPlayedAt: normalizePlayDate(item),
         lyrics: item.lyrics ? item.lyrics : null,
         name: item.title,
         path: item.path,
@@ -147,9 +151,11 @@ const normalizeAlbum = (
     const imageBackdropUrl = imageUrl?.replace(/size=\d+/, 'size=1000') || null;
 
     return {
+        albumArtist: item.albumArtist,
         albumArtists: [{ id: item.albumArtistId, imageUrl: null, name: item.albumArtist }],
         artists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
         backdropImageUrl: imageBackdropUrl,
+        comment: item.comment || null,
         createdAt: item.createdAt.split('T')[0],
         duration: item.duration * 1000 || null,
         genres: item.genres?.map((genre) => ({
@@ -163,7 +169,8 @@ const normalizeAlbum = (
         imageUrl,
         isCompilation: item.compilation,
         itemType: LibraryItem.ALBUM,
-        lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
+        lastPlayedAt: normalizePlayDate(item),
+        mbzId: item.mbzAlbumId || null,
         name: item.name,
         playCount: item.playCount,
         releaseDate: new Date(item.minYear, 0, 1).toISOString(),
@@ -186,7 +193,16 @@ const normalizeAlbumArtist = (
     },
     server: ServerListItem | null,
 ): AlbumArtist => {
-    const imageUrl = getImageUrl({ url: item?.largeImageUrl || null });
+    let imageUrl = getImageUrl({ url: item?.largeImageUrl || null });
+
+    if (!imageUrl) {
+        imageUrl = getCoverArtUrl({
+            baseUrl: server?.url,
+            coverArtId: `ar-${item.id}`,
+            credential: server?.credential,
+            size: 300,
+        });
+    }
 
     return {
         albumCount: item.albumCount,
@@ -202,7 +218,8 @@ const normalizeAlbumArtist = (
         id: item.id,
         imageUrl: imageUrl || null,
         itemType: LibraryItem.ALBUM_ARTIST,
-        lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
+        lastPlayedAt: normalizePlayDate(item),
+        mbz: item.mbzArtistId || null,
         name: item.name,
         playCount: item.playCount,
         serverId: server?.id || 'unknown',

@@ -1,61 +1,34 @@
-import { ChangeEvent, useCallback, useState } from 'react';
-import { Group } from '@mantine/core';
-import { Reorder, useDragControls } from 'framer-motion';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { Reorder } from 'framer-motion';
 import isEqual from 'lodash/isEqual';
-import { MdDragIndicator } from 'react-icons/md';
-import { Button, Checkbox, Switch } from '/@/renderer/components';
+import { useTranslation } from 'react-i18next';
+import { Button, Switch } from '/@/renderer/components';
 import { useSettingsStoreActions, useGeneralSettings } from '../../../../store/settings.store';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
-
-const DragHandle = ({ dragControls }: any) => {
-    return (
-        <MdDragIndicator
-            color="white"
-            style={{ cursor: 'grab' }}
-            onPointerDown={(event) => dragControls.start(event)}
-        />
-    );
-};
-
-interface SidebarItem {
-    disabled: boolean;
-    id: string;
-}
-
-interface DraggableSidebarItemProps {
-    handleChangeDisabled: (id: string, e: boolean) => void;
-    item: SidebarItem;
-}
-
-const DraggableSidebarItem = ({ item, handleChangeDisabled }: DraggableSidebarItemProps) => {
-    const dragControls = useDragControls();
-
-    return (
-        <Reorder.Item
-            as="div"
-            dragControls={dragControls}
-            dragListener={false}
-            value={item}
-        >
-            <Group
-                noWrap
-                h="3rem"
-                style={{ boxShadow: '0 1px 3px rgba(0,0,0,.1)' }}
-            >
-                <Checkbox
-                    checked={!item.disabled}
-                    onChange={(e) => handleChangeDisabled(item.id, e.target.checked)}
-                />
-                <DragHandle dragControls={dragControls} />
-                {item.id}
-            </Group>
-        </Reorder.Item>
-    );
-};
+import { DraggableItem } from '/@/renderer/features/settings/components/general/draggable-item';
 
 export const SidebarSettings = () => {
+    const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSidebarItems, setSettings } = useSettingsStoreActions();
+    const [open, setOpen] = useState(false);
+
+    const translatedSidebarItemMap = useMemo(
+        () => ({
+            Albums: t('page.sidebar.albums', { postProcess: 'titleCase' }),
+            Artists: t('page.sidebar.artists', { postProcess: 'titleCase' }),
+            Folders: t('page.sidebar.folders', { postProcess: 'titleCase' }),
+            Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
+            Home: t('page.sidebar.home', { postProcess: 'titleCase' }),
+            'Now Playing': t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
+            Playlists: t('page.sidebar.playlists', { postProcess: 'titleCase' }),
+            Rescan: t('page.sidebar.rescan', { postProcess: 'titleCase' }),
+            Search: t('page.sidebar.search', { postProcess: 'titleCase' }),
+            Settings: t('page.sidebar.settings', { postProcess: 'titleCase' }),
+            Tracks: t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+        }),
+        [t],
+    );
 
     const [localSidebarItems, setLocalSidebarItems] = useState(settings.sidebarItems);
 
@@ -107,8 +80,11 @@ export const SidebarSettings = () => {
                         onChange={handleSetSidebarPlaylistList}
                     />
                 }
-                description="Show playlist list in sidebar"
-                title="Sidebar playlist list"
+                description={t('setting.sidebarPlaylistList', {
+                    context: 'description',
+                    postProcess: 'sentenceCase',
+                })}
+                title={t('setting.sidebarPlaylistList', { postProcess: 'sentenceCase' })}
             />
             <SettingsOptions
                 control={
@@ -117,36 +93,60 @@ export const SidebarSettings = () => {
                         onChange={handleSetSidebarCollapsedNavigation}
                     />
                 }
-                description="Show navigation buttons in the collapsed sidebar"
-                title="Sidebar (collapsed) navigation"
+                description={t('setting.sidebarPlaylistList', {
+                    context: 'description',
+                    postProcess: 'sentenceCase',
+                })}
+                title={t('setting.sidebarCollapsedNavigation', { postProcess: 'sentenceCase' })}
             />
             <SettingsOptions
                 control={
-                    <Button
-                        compact
-                        disabled={isSaveButtonDisabled}
-                        variant="filled"
-                        onClick={handleSave}
-                    >
-                        Save sidebar configuration
-                    </Button>
+                    <>
+                        {open && (
+                            <Button
+                                compact
+                                disabled={isSaveButtonDisabled}
+                                variant="filled"
+                                onClick={handleSave}
+                            >
+                                {t('common.save', { postProcess: 'titleCase' })}
+                            </Button>
+                        )}
+                        <Button
+                            compact
+                            variant="filled"
+                            onClick={() => setOpen(!open)}
+                        >
+                            {t(open ? 'common.close' : 'common.edit', { postProcess: 'titleCase' })}
+                        </Button>
+                    </>
                 }
-                description="Select the items and order in which they appear in the sidebar"
-                title="Sidebar configuration"
+                description={t('setting.sidebarCollapsedNavigation', {
+                    context: 'description',
+                    postProcess: 'sentenceCase',
+                })}
+                title={t('setting.sidebarConfiguration', { postProcess: 'sentenceCase' })}
             />
-            <Reorder.Group
-                axis="y"
-                values={localSidebarItems}
-                onReorder={setLocalSidebarItems}
-            >
-                {localSidebarItems.map((item) => (
-                    <DraggableSidebarItem
-                        key={item.id}
-                        handleChangeDisabled={handleChangeDisabled}
-                        item={item}
-                    />
-                ))}
-            </Reorder.Group>
+            {open && (
+                <Reorder.Group
+                    axis="y"
+                    values={localSidebarItems}
+                    onReorder={setLocalSidebarItems}
+                >
+                    {localSidebarItems.map((item) => (
+                        <DraggableItem
+                            key={item.id}
+                            handleChangeDisabled={handleChangeDisabled}
+                            item={item}
+                            value={
+                                translatedSidebarItemMap[
+                                    item.id as keyof typeof translatedSidebarItemMap
+                                ]
+                            }
+                        />
+                    ))}
+                </Reorder.Group>
+            )}
         </>
     );
 };

@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentServer, usePlayerControls, usePlayerStore } from '/@/renderer/store';
-import { usePlayerType } from '/@/renderer/store/settings.store';
+import { usePlaybackType } from '/@/renderer/store/settings.store';
 import {
     PlayQueueAddOptions,
     Play,
@@ -28,6 +28,7 @@ import {
     getGenreSongsById,
 } from '/@/renderer/features/player/utils';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { useTranslation } from 'react-i18next';
 
 const getRootQueryKey = (itemType: LibraryItem, serverId: string) => {
     let queryKey;
@@ -62,8 +63,9 @@ const remote = isElectron() ? window.electron.remote : null;
 const addToQueue = usePlayerStore.getState().actions.addToQueue;
 
 export const useHandlePlayQueueAdd = () => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
-    const playerType = usePlayerType();
+    const playbackType = usePlaybackType();
     const server = useCurrentServer();
     const { play } = usePlayerControls();
     const timeoutIds = useRef<Record<string, ReturnType<typeof setTimeout>> | null>({});
@@ -86,15 +88,18 @@ export const useHandlePlayQueueAdd = () => {
                         toast.info({
                             autoClose: false,
                             id: fetchId,
-                            message:
-                                'This is taking a while... close the notification to cancel the request',
+                            message: t('player.playbackFetchCancel', {
+                                postProcess: 'sentenceCase',
+                            }),
                             onClose: () => {
                                 queryClient.cancelQueries({
                                     exact: false,
                                     queryKey: getRootQueryKey(itemType, server?.id),
                                 });
                             },
-                            title: 'Adding to queue',
+                            title: t('player.playbackFetchInProgress', {
+                                postProcess: 'sentenceCase',
+                            }),
                         });
                     }, 2000),
                 };
@@ -140,7 +145,7 @@ export const useHandlePlayQueueAdd = () => {
 
                     return toast.error({
                         message: err.message,
-                        title: 'Play queue add failed',
+                        title: t('error.genericError', { postProcess: 'sentenceCase' }) as string,
                     });
                 }
 
@@ -152,8 +157,8 @@ export const useHandlePlayQueueAdd = () => {
 
             if (!songs || songs?.length === 0)
                 return toast.warn({
-                    message: 'The query returned no results',
-                    title: 'No tracks added',
+                    message: t('common.noResultsFromQuery', { postProcess: 'sentenceCase' }),
+                    title: t('player.playbackFetchNoResults'),
                 });
 
             if (initialIndex) {
@@ -162,23 +167,25 @@ export const useHandlePlayQueueAdd = () => {
                 initialSongIndex = songs.findIndex((song) => song.id === initialSongId);
             }
 
+            const hadSong = usePlayerStore.getState().queue.default.length > 0;
             const playerData = addToQueue({ initialIndex: initialSongIndex, playType, songs });
 
-            if (playerType === PlaybackType.LOCAL) {
+            if (playbackType === PlaybackType.LOCAL) {
                 mpvPlayer!.volume(usePlayerStore.getState().volume);
 
-                if (playType === Play.NEXT || playType === Play.LAST) {
-                    mpvPlayer!.setQueueNext(playerData);
-                }
-
-                if (playType === Play.NOW) {
+                if (playType === Play.NOW || !hadSong) {
                     mpvPlayer!.pause();
-                    mpvPlayer!.setQueue(playerData);
-                    mpvPlayer!.play();
+                    mpvPlayer!.setQueue(playerData, false);
+                } else {
+                    mpvPlayer!.setQueueNext(playerData);
                 }
             }
 
-            play();
+            // We should only play if the queue was empty, or we are doing play NOW
+            // (override the queue).
+            if (playType === Play.NOW || !hadSong) {
+                play();
+            }
 
             remote?.updateSong({
                 currentTime: usePlayerStore.getState().current.time,
@@ -190,7 +197,7 @@ export const useHandlePlayQueueAdd = () => {
 
             return null;
         },
-        [play, playerType, queryClient, server],
+        [play, playbackType, queryClient, server, t],
     );
 
     return handlePlayQueueAdd;

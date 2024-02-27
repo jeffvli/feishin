@@ -60,8 +60,20 @@ export enum ServerType {
     SUBSONIC = 'subsonic',
 }
 
+export const toServerType = (value?: string): ServerType | null => {
+    switch (value?.toLowerCase()) {
+        case ServerType.JELLYFIN:
+            return ServerType.JELLYFIN;
+        case ServerType.NAVIDROME:
+            return ServerType.NAVIDROME;
+        default:
+            return null;
+    }
+};
+
 export type ServerListItem = {
     credential: string;
+    features?: Record<string, number[]>;
     id: string;
     name: string;
     ndCredential?: string;
@@ -70,6 +82,7 @@ export type ServerListItem = {
     url: string;
     userId: string | null;
     username: string;
+    version?: string;
 };
 
 export enum PlayerStatus {
@@ -142,6 +155,7 @@ export enum TableColumn {
     BIT_RATE = 'bitRate',
     BPM = 'bpm',
     CHANNELS = 'channels',
+    CODEC = 'codec',
     COMMENT = 'comment',
     DATE_ADDED = 'dateAdded',
     DISC_NUMBER = 'discNumber',
@@ -203,3 +217,11 @@ export type SongUpdate = {
     /** This volume is in range 0-100 */
     volume?: number;
 };
+
+export enum FontType {
+    BUILT_IN = 'builtIn',
+    CUSTOM = 'custom',
+    SYSTEM = 'system',
+}
+
+export type TitleTheme = 'dark' | 'light' | 'system';

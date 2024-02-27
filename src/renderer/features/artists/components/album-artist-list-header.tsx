@@ -1,7 +1,8 @@
+import type { ChangeEvent, MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import type { ChangeEvent, MutableRefObject } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useListContext } from '../../../context/list-context';
 import { useListStoreByKey } from '../../../store/list.store';
 import { FilterBar } from '../../shared/components/filter-bar';
@@ -26,6 +27,7 @@ export const AlbumArtistListHeader = ({
     gridRef,
     tableRef,
 }: AlbumArtistListHeaderProps) => {
+    const { t } = useTranslation();
     const server = useCurrentServer();
     const { pageKey } = useListContext();
     const { display, filter } = useListStoreByKey({ key: pageKey });
@@ -64,7 +66,9 @@ export const AlbumArtistListHeader = ({
                     w="100%"
                 >
                     <LibraryHeaderBar>
-                        <LibraryHeaderBar.Title>Album Artists</LibraryHeaderBar.Title>
+                        <LibraryHeaderBar.Title>
+                            {t('page.albumArtistList.title', { postProcess: 'titleCase' })}
+                        </LibraryHeaderBar.Title>
                         <LibraryHeaderBar.Badge
                             isLoading={itemCount === null || itemCount === undefined}
                         >

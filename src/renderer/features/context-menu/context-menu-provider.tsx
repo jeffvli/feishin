@@ -11,6 +11,7 @@ import {
 import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
 import { AnimatePresence } from 'framer-motion';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import {
     RiAddBoxFill,
     RiAddCircleFill,
@@ -50,7 +51,7 @@ import {
     usePlayerStore,
     useQueueControls,
 } from '/@/renderer/store';
-import { usePlayerType } from '/@/renderer/store/settings.store';
+import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { Play, PlaybackType } from '/@/renderer/types';
 
 type ContextMenuContextProps = {
@@ -87,6 +88,7 @@ export interface ContextMenuProviderProps {
 }
 
 export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
+    const { t } = useTranslation();
     const [opened, setOpened] = useState(false);
     const clickOutsideRef = useClickOutside(() => setOpened(false));
 
@@ -229,7 +231,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     onError: (err) => {
                         toast.error({
                             message: err.message,
-                            title: 'Error deleting playlist',
+                            title: t('error.genericError', { postProcess: 'sentenceCase' }),
                         });
                     },
                     onSuccess: () => {
@@ -245,14 +247,14 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         }
 
         closeAllModals();
-    }, [ctx, deletePlaylistMutation]);
+    }, [ctx, deletePlaylistMutation, t]);
 
     const openDeletePlaylistModal = useCallback(() => {
         openModal({
             children: (
                 <ConfirmModal onConfirm={handleDeletePlaylist}>
                     <Stack>
-                        <Text>Are you sure you want to delete the following playlist(s)?</Text>
+                        <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
                         <ul>
                             {ctx.data.map((item) => (
                                 <li key={item.id}>
@@ -265,9 +267,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     </Stack>
                 </ConfirmModal>
             ),
-            title: 'Delete playlist(s)',
+            title: t('page.contextMenu.deletePlaylist', { postProcess: 'titleCase' }),
         });
-    }, [ctx.data, handleDeletePlaylist]);
+    }, [ctx.data, handleDeletePlaylist, t]);
 
     const createFavoriteMutation = useCreateFavorite({});
     const deleteFavoriteMutation = useDeleteFavorite({});
@@ -301,7 +303,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                         onError: (err) => {
                             toast.error({
                                 message: err.message,
-                                title: 'Error adding to favorites',
+                                title: t('error.genericError', { postProcess: 'sentenceCase' }),
                             });
                         },
                         onSuccess: () => {
@@ -337,14 +339,14 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                         onError: (err) => {
                             toast.error({
                                 message: err.message,
-                                title: 'Error adding to favorites',
+                                title: t('error.genericError', { postProcess: 'sentenceCase' }),
                             });
                         },
                     },
                 );
             }
         }
-    }, [createFavoriteMutation, ctx.data, ctx.dataNodes, ctx.type]);
+    }, [createFavoriteMutation, ctx.data, ctx.dataNodes, ctx.type, t]);
 
     const handleRemoveFromFavorites = useCallback(() => {
         if (!ctx.dataNodes && !ctx.data) return;
@@ -434,6 +436,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     case LibraryItem.ALBUM:
                         albumId.push(item.id);
                         break;
+                    case LibraryItem.ALBUM_ARTIST:
+                        artistId.push(item.id);
+                        break;
                     case LibraryItem.ARTIST:
                         artistId.push(item.id);
                         break;
@@ -456,9 +461,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             },
             modal: 'addToPlaylist',
             size: 'md',
-            title: 'Add to playlist',
+            title: t('page.contextMenu.addToPlaylist', { postProcess: 'sentenceCase' }),
         });
-    }, [ctx.data, ctx.dataNodes]);
+    }, [ctx.data, ctx.dataNodes, t]);
 
     const removeFromPlaylistMutation = useRemoveFromPlaylist();
 
@@ -481,13 +486,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     onError: (err) => {
                         toast.error({
                             message: err.message,
-                            title: 'Error removing song(s) from playlist',
+                            title: t('error.genericError', { postProcess: 'sentenceCase' }),
                         });
                     },
                     onSuccess: () => {
-                        toast.success({
-                            message: `${songId.length} song(s) were removed from the playlist`,
-                        });
                         ctx.context?.tableRef?.current?.api?.refreshInfiniteCache();
                         closeAllModals();
                     },
@@ -501,10 +503,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     loading={removeFromPlaylistMutation.isLoading}
                     onConfirm={confirm}
                 >
-                    Are you sure you want to remove the following song(s) from the playlist?
+                    {t('common.areYouSure', { postProcess: 'sentenceCase' })}
                 </ConfirmModal>
             ),
-            title: 'Remove song(s) from playlist',
+            title: t('page.contextMenu.removeFromPlaylist', { postProcess: 'sentenceCase' }),
         });
     }, [
         ctx.context?.playlistId,
@@ -513,6 +515,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         ctx.dataNodes,
         removeFromPlaylistMutation,
         serverType,
+        t,
     ]);
 
     const updateRatingMutation = useSetRating({});
@@ -572,7 +575,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         [ctx.data, ctx.dataNodes, updateRatingMutation],
     );
 
-    const playerType = usePlayerType();
+    const playbackType = usePlaybackType();
     const { moveToBottomOfQueue, moveToTopOfQueue, removeFromQueue } = useQueueControls();
 
     const handleMoveToBottom = useCallback(() => {
@@ -581,10 +584,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         const playerData = moveToBottomOfQueue(uniqueIds);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.setQueueNext(playerData);
         }
-    }, [ctx.dataNodes, moveToBottomOfQueue, playerType]);
+    }, [ctx.dataNodes, moveToBottomOfQueue, playbackType]);
 
     const handleMoveToTop = useCallback(() => {
         const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
@@ -592,10 +595,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         const playerData = moveToTopOfQueue(uniqueIds);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.setQueueNext(playerData);
         }
-    }, [ctx.dataNodes, moveToTopOfQueue, playerType]);
+    }, [ctx.dataNodes, moveToTopOfQueue, playbackType]);
 
     const handleRemoveSelected = useCallback(() => {
         const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
@@ -605,7 +608,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         const playerData = removeFromQueue(uniqueIds);
         const isCurrentSongRemoved = currentSong && uniqueIds.includes(currentSong?.uniqueId);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             if (isCurrentSongRemoved) {
                 mpvPlayer!.setQueue(playerData);
             } else {
@@ -613,10 +616,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             }
         }
 
+        ctx.tableApi?.redrawRows();
+
         if (isCurrentSongRemoved) {
             remote?.updateSong({ song: playerData.current.song });
         }
-    }, [ctx.dataNodes, playerType, removeFromQueue]);
+    }, [ctx.dataNodes, ctx.tableApi, playbackType, removeFromQueue]);
 
     const handleDeselectAll = useCallback(() => {
         ctx.tableApi?.deselectAll();
@@ -626,74 +631,78 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         return {
             addToFavorites: {
                 id: 'addToFavorites',
-                label: 'Add favorite',
+                label: t('page.contextMenu.addToFavorites', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiHeartFill size="1.1rem" />,
                 onClick: handleAddToFavorites,
             },
             addToPlaylist: {
                 id: 'addToPlaylist',
-                label: 'Add to playlist',
+                label: t('page.contextMenu.addToPlaylist', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiPlayListAddFill size="1.1rem" />,
                 onClick: handleAddToPlaylist,
             },
-            createPlaylist: { id: 'createPlaylist', label: 'Create playlist', onClick: () => {} },
+            createPlaylist: {
+                id: 'createPlaylist',
+                label: t('page.contextMenu.createPlaylist', { postProcess: 'sentenceCase' }),
+                onClick: () => {},
+            },
             deletePlaylist: {
                 id: 'deletePlaylist',
-                label: 'Delete playlist',
+                label: t('page.contextMenu.deletePlaylist', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiDeleteBinFill size="1.1rem" />,
                 onClick: openDeletePlaylistModal,
             },
             deselectAll: {
                 id: 'deselectAll',
-                label: 'Deselect all',
+                label: t('page.contextMenu.deselectAll', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiCloseCircleLine size="1.1rem" />,
                 onClick: handleDeselectAll,
             },
             moveToBottomOfQueue: {
                 id: 'moveToBottomOfQueue',
-                label: 'Move to bottom',
+                label: t('page.contextMenu.moveToBottom', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiArrowDownLine size="1.1rem" />,
                 onClick: handleMoveToBottom,
             },
             moveToTopOfQueue: {
                 id: 'moveToTopOfQueue',
-                label: 'Move to top',
+                label: t('page.contextMenu.moveToTop', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiArrowUpLine size="1.1rem" />,
                 onClick: handleMoveToTop,
             },
             play: {
                 id: 'play',
-                label: 'Play',
+                label: t('page.contextMenu.play', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiPlayFill size="1.1rem" />,
                 onClick: () => handlePlay(Play.NOW),
             },
             playLast: {
                 id: 'playLast',
-                label: 'Add to queue',
+                label: t('page.contextMenu.addLast', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiAddBoxFill size="1.1rem" />,
                 onClick: () => handlePlay(Play.LAST),
             },
             playNext: {
                 id: 'playNext',
-                label: 'Add to queue next',
+                label: t('page.contextMenu.addNext', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiAddCircleFill size="1.1rem" />,
                 onClick: () => handlePlay(Play.NEXT),
             },
             removeFromFavorites: {
                 id: 'removeFromFavorites',
-                label: 'Remove favorite',
+                label: t('page.contextMenu.removeFromFavorites', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiDislikeFill size="1.1rem" />,
                 onClick: handleRemoveFromFavorites,
             },
             removeFromPlaylist: {
                 id: 'removeFromPlaylist',
-                label: 'Remove from playlist',
+                label: t('page.contextMenu.removeFromPlaylist', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiDeleteBinFill size="1.1rem" />,
                 onClick: handleRemoveFromPlaylist,
             },
             removeFromQueue: {
-                id: 'moveToBottomOfQueue',
-                label: 'Remove songs',
+                id: 'removeSongs',
+                label: t('page.contextMenu.removeFromQueue', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiDeleteBinFill size="1.1rem" />,
                 onClick: handleRemoveSelected,
             },
@@ -705,7 +714,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={0}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(0),
@@ -716,7 +724,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={1}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(1),
@@ -727,7 +734,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={2}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(2),
@@ -738,7 +744,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={3}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(3),
@@ -749,7 +754,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={4}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(4),
@@ -760,7 +764,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={5}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(5),
@@ -785,6 +788,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         handleRemoveSelected,
         handleUpdateRating,
         openDeletePlaylistModal,
+        t,
     ]);
 
     const mergedRef = useMergedRef(ref, clickOutsideRef);
@@ -889,7 +893,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                     size="sm"
                                 />
                                 <ContextMenuButton disabled>
-                                    {ctx.data?.length} selected
+                                    {t('page.contextMenu.numberSelected', {
+                                        count: ctx.data?.length || 0,
+                                        postProcess: 'lowerCase',
+                                    })}
                                 </ContextMenuButton>
                             </Stack>
                         </ContextMenu>

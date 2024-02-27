@@ -51,12 +51,17 @@ import type {
     RescanArgs,
     ScanStatus,
     ScanStatusArgs,
+    ServerInfo,
+    ServerInfoArgs,
+    StructuredLyricsArgs,
+    StructuredLyric,
 } from '/@/renderer/api/types';
 import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
 import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
 import { ssController } from '/@/renderer/api/subsonic/subsonic-controller';
 import { jfController } from '/@/renderer/api/jellyfin/jellyfin-controller';
+import i18n from '/@/i18n/i18n';
 
 export type ControllerEndpoint = Partial<{
     addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
@@ -88,8 +93,10 @@ export type ControllerEndpoint = Partial<{
     getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
     getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
     getScanStatus: (args: ScanStatusArgs) => Promise<ScanStatus>;
+    getServerInfo: (args: ServerInfoArgs) => Promise<ServerInfo>;
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
+    getStructuredLyrics: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getUserList: (args: UserListArgs) => Promise<UserListResponse>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
@@ -134,8 +141,10 @@ const endpoints: ApiController = {
         getPlaylistSongList: jfController.getPlaylistSongList,
         getRandomSongList: jfController.getRandomSongList,
         getScanStatus: undefined,
+        getServerInfo: jfController.getServerInfo,
         getSongDetail: jfController.getSongDetail,
         getSongList: jfController.getSongList,
+        getStructuredLyrics: undefined,
         getTopSongs: jfController.getTopSongList,
         getUserList: undefined,
         removeFromPlaylist: jfController.removeFromPlaylist,
@@ -172,8 +181,10 @@ const endpoints: ApiController = {
         getPlaylistSongList: ndController.getPlaylistSongList,
         getRandomSongList: ssController.getRandomSongList,
         getScanStatus: ssController.getScanStatus,
+        getServerInfo: ssController.getServerInfo,
         getSongDetail: ndController.getSongDetail,
         getSongList: ndController.getSongList,
+        getStructuredLyrics: ssController.getStructuredLyrics,
         getTopSongs: ssController.getTopSongList,
         getUserList: ndController.getUserList,
         removeFromPlaylist: ndController.removeFromPlaylist,
@@ -207,8 +218,10 @@ const endpoints: ApiController = {
         getPlaylistDetail: undefined,
         getPlaylistList: undefined,
         getScanStatus: ssController.getScanStatus,
+        getServerInfo: ssController.getServerInfo,
         getSongDetail: undefined,
         getSongList: undefined,
+        getStructuredLyrics: ssController.getStructuredLyrics,
         getTopSongs: ssController.getTopSongList,
         getUserList: undefined,
         rescan: ssController.rescan,
@@ -223,7 +236,12 @@ const apiController = (endpoint: keyof ControllerEndpoint, type?: ServerType) =>
     const serverType = type || useAuthStore.getState().currentServer?.type;
 
     if (!serverType) {
-        toast.error({ message: 'No server selected', title: 'Unable to route request' });
+        toast.error({
+            message: i18n.t('error.serverNotSelectedError', {
+                postProcess: 'sentenceCase',
+            }) as string,
+            title: i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' }) as string,
+        });
         throw new Error(`No server selected`);
     }
 
@@ -232,10 +250,16 @@ const apiController = (endpoint: keyof ControllerEndpoint, type?: ServerType) =>
     if (typeof controllerFn !== 'function') {
         toast.error({
             message: `Endpoint ${endpoint} is not implemented for ${serverType}`,
-            title: 'Unable to route request',
+            title: i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' }) as string,
         });
 
-        throw new Error(`Endpoint ${endpoint} is not implemented for ${serverType}`);
+        throw new Error(
+            i18n.t('error.endpointNotImplementedError', {
+                endpoint,
+                postProcess: 'sentenceCase',
+                serverType,
+            }) as string,
+        );
     }
 
     return endpoints[serverType][endpoint];
@@ -495,6 +519,24 @@ const getScanStatus = async (args: RescanArgs) => {
     )?.(args);
 };
 
+const getServerInfo = async (args: ServerInfoArgs) => {
+    return (
+        apiController(
+            'getServerInfo',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getServerInfo']
+    )?.(args);
+};
+
+const getStructuredLyrics = async (args: StructuredLyricsArgs) => {
+    return (
+        apiController(
+            'getStructuredLyrics',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getStructuredLyrics']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -515,8 +557,10 @@ export const controller = {
     getPlaylistSongList,
     getRandomSongList,
     getScanStatus,
+    getServerInfo,
     getSongDetail,
     getSongList,
+    getStructuredLyrics,
     getTopSongList,
     getUserList,
     removeFromPlaylist,

@@ -95,6 +95,7 @@ body[data-theme='defaultLight'] {
     --table-fg: rgb(179, 179, 179);
     --table-row-hover-bg: rgba(150, 150, 150, 20%);
     --table-row-selected-bg: rgba(150, 150, 150, 30%);
+    --fullscreen-player-text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
 
     .ag-theme-alpine-dark {
         --ag-font-family: var(--content-font-family);

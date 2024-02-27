@@ -16,6 +16,7 @@ import {
     usePlayerData,
     usePlayerStore,
 } from '/@/renderer/store';
+import { useSettingsStore } from '/@/renderer/store/settings.store';
 
 const Image = styled(motion.img)<{ $useAspectRatio: boolean }>`
     position: absolute;
@@ -130,6 +131,8 @@ export const FullScreenPlayerImage = () => {
     const mainImageRef = useRef<HTMLImageElement | null>(null);
     const [mainImageDimensions, setMainImageDimensions] = useState({ idealSize: 1 });
 
+    const albumArtRes = useSettingsStore((store) => store.general.albumArtRes);
+
     const { queue } = usePlayerData();
     const { opacity, useImageAspectRatio } = useFullScreenPlayerStore();
     const currentSong = queue.current;
@@ -149,6 +152,7 @@ export const FullScreenPlayerImage = () => {
         if (mainImageRef.current) {
             setMainImageDimensions({
                 idealSize:
+                    albumArtRes ||
                     Math.ceil((mainImageRef.current as HTMLDivElement).offsetHeight / 100) * 100,
             });
 
@@ -158,7 +162,7 @@ export const FullScreenPlayerImage = () => {
                 topImage: scaleImageUrl(mainImageDimensions.idealSize, queue.current?.imageUrl),
             });
         }
-    }, [mainImageDimensions.idealSize, queue, setImageState]);
+    }, [mainImageDimensions.idealSize, queue, setImageState, albumArtRes]);
 
     useLayoutEffect(() => {
         updateImageSize();
@@ -255,7 +259,7 @@ export const FullScreenPlayerImage = () => {
                     overflow="hidden"
                     pb="0.5rem"
                     style={{
-                        textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                        textShadow: 'var(--fullscreen-player-text-shadow)',
                     }}
                     w="100%"
                     weight={900}
@@ -269,7 +273,7 @@ export const FullScreenPlayerImage = () => {
                     order={3}
                     overflow="hidden"
                     style={{
-                        textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                        textShadow: 'var(--fullscreen-player-text-shadow)',
                     }}
                     to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
                         albumId: currentSong?.albumId || '',
@@ -286,7 +290,7 @@ export const FullScreenPlayerImage = () => {
                         align="center"
                         order={3}
                         style={{
-                            textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                            textShadow: 'var(--fullscreen-player-text-shadow)',
                         }}
                         transform="uppercase"
                     >
@@ -304,7 +308,7 @@ export const FullScreenPlayerImage = () => {
                             $link
                             component={Link}
                             style={{
-                                textShadow: '0 0 5px rgb(0 0 0 / 100%)',
+                                textShadow: 'var(--fullscreen-player-text-shadow)',
                             }}
                             to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                 albumArtistId: artist.id,

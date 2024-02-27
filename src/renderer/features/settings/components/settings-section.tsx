@@ -20,7 +20,7 @@ export const SettingsSection = ({ options }: SettingsSectionProps) => {
                 .filter((o) => !o.isHidden)
                 .map((option) => (
                     <SettingsOptions
-                        key={`general-${option.title}`}
+                        key={`option-${option.title}`}
                         {...option}
                     />
                 ))}

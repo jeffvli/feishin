@@ -1,7 +1,7 @@
+import { useMemo, useState } from 'react';
 import { Box, Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { closeModal, ContextModalProps } from '@mantine/modals';
-import { useMemo, useState } from 'react';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { PlaylistListSort, SongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
@@ -11,6 +11,7 @@ import { useAddToPlaylist } from '/@/renderer/features/playlists/mutations/add-t
 import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer } from '/@/renderer/store';
+import { useTranslation } from 'react-i18next';
 
 export const AddToPlaylistContextModal = ({
     id,
@@ -21,6 +22,7 @@ export const AddToPlaylistContextModal = ({
     genreId?: string[];
     songId?: string[];
 }>) => {
+    const { t } = useTranslation();
     const { albumId, artistId, genreId, songId } = innerProps;
     const server = useCurrentServer();
     const [isLoading, setIsLoading] = useState(false);
@@ -140,7 +142,10 @@ export const AddToPlaylistContextModal = ({
                 const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, query);
 
                 const playlistSongsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
-                    if (!server) throw new Error('No server');
+                    if (!server)
+                        throw new Error(
+                            t('error.serverNotSelectedError', { postProcess: 'sentenceCase' }),
+                        );
                     return api.controller.getPlaylistSongList({
                         apiClientProps: {
                             server,
@@ -175,7 +180,7 @@ export const AddToPlaylistContextModal = ({
                                     playlistSelect.find((playlist) => playlist.value === playlistId)
                                         ?.label
                                 }] ${err.message}`,
-                                title: 'Failed to add songs to playlist',
+                                title: t('error.genericError', { postProcess: 'sentenceCase' }),
                             });
                         },
                     },
@@ -186,12 +191,16 @@ export const AddToPlaylistContextModal = ({
         const addMessage =
             values.skipDuplicates &&
             allSongIds.length * values.playlistId.length !== totalUniquesAdded
-                ? `around ${Math.floor(totalUniquesAdded / values.playlistId.length)}`
+                ? Math.floor(totalUniquesAdded / values.playlistId.length)
                 : allSongIds.length;
 
         setIsLoading(false);
         toast.success({
-            message: `Added ${addMessage} songs to ${values.playlistId.length} playlist(s)`,
+            message: t('form.addToPlaylist.success', {
+                message: addMessage,
+                numOfPlaylists: values.playlistId.length,
+                postProcess: 'sentenceCase',
+            }),
         });
         closeModal(id);
         return null;
@@ -206,12 +215,18 @@ export const AddToPlaylistContextModal = ({
                         searchable
                         data={playlistSelect}
                         disabled={playlistList.isLoading}
-                        label="Playlists"
+                        label={t('form.addToPlaylist.input', {
+                            context: 'playlists',
+                            postProcess: 'titleCase',
+                        })}
                         size="md"
                         {...form.getInputProps('playlistId')}
                     />
                     <Switch
-                        label="Skip duplicates"
+                        label={t('form.addToPlaylist.input', {
+                            context: 'skipDuplicates',
+                            postProcess: 'titleCase',
+                        })}
                         {...form.getInputProps('skipDuplicates', { type: 'checkbox' })}
                     />
                     <Group position="right">
@@ -222,7 +237,7 @@ export const AddToPlaylistContextModal = ({
                                 variant="subtle"
                                 onClick={() => closeModal(id)}
                             >
-                                Cancel
+                                {t('common.cancel', { postProcess: 'titleCase' })}
                             </Button>
                             <Button
                                 disabled={isSubmitDisabled}
@@ -231,7 +246,7 @@ export const AddToPlaylistContextModal = ({
                                 type="submit"
                                 variant="filled"
                             >
-                                Add
+                                {t('common.add', { postProcess: 'titleCase' })}
                             </Button>
                         </Group>
                     </Group>

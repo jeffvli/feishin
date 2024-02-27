@@ -1,10 +1,11 @@
+import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, useMemo } from 'react';
 import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { MultiSelect, NumberInput, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
+import { useTranslation } from 'react-i18next';
 
 interface JellyfinSongFiltersProps {
     customFilters?: Partial<SongListFilter>;
@@ -19,6 +20,7 @@ export const JellyfinSongFilters = ({
     onFilterChange,
     serverId,
 }: JellyfinSongFiltersProps) => {
+    const { t } = useTranslation();
     const { setFilter } = useListStoreActions();
     const filter = useListFilterByKey({ key: pageKey });
 
@@ -49,7 +51,7 @@ export const JellyfinSongFilters = ({
 
     const toggleFilters = [
         {
-            label: 'Is favorited',
+            label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
                     customFilters,
@@ -151,14 +153,14 @@ export const JellyfinSongFilters = ({
                 <NumberInput
                     required
                     defaultValue={filter?._custom?.jellyfin?.minYear}
-                    label="From year"
+                    label={t('filter.fromYear', { postProcess: 'sentenceCase' })}
                     max={2300}
                     min={1700}
                     onChange={handleMinYearFilter}
                 />
                 <NumberInput
                     defaultValue={filter?._custom?.jellyfin?.maxYear}
-                    label="To year"
+                    label={t('filter.toYear', { postProcess: 'sentenceCase' })}
                     max={2300}
                     min={1700}
                     onChange={handleMaxYearFilter}
@@ -171,7 +173,7 @@ export const JellyfinSongFilters = ({
                         searchable
                         data={genreList}
                         defaultValue={selectedGenres}
-                        label="Genres"
+                        label={t('entity.genre', { count: 1, postProcess: 'sentenceCase' })}
                         width={250}
                         onChange={handleGenresFilter}
                     />

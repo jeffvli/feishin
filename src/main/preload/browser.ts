@@ -24,7 +24,12 @@ const devtools = () => {
     ipcRenderer.send('window-dev-tools');
 };
 
+const clearCache = (): Promise<void> => {
+    return ipcRenderer.invoke('window-clear-cache');
+};
+
 export const browser = {
+    clearCache,
     devtools,
     exit,
     maximize,
@@ -32,3 +37,5 @@ export const browser = {
     quit,
     unmaximize,
 };
+
+export type Browser = typeof browser;

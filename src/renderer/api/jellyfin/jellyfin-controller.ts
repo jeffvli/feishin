@@ -51,6 +51,8 @@ import {
     ScanStatus,
     SongDetailArgs,
     SongDetailResponse,
+    ServerInfo,
+    ServerInfoArgs,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -104,9 +106,9 @@ const authenticate = async (
             Username: body.username,
         },
         headers: {
-            'x-emby-authorization': `MediaBrowser Client="Feishin", Device="${getHostname()}", DeviceId="Feishin-${getHostname()}-${
-                body.username
-            }", Version="${packageJson.version}"`,
+            'x-emby-authorization': `MediaBrowser Client="Feishin", Device="${getHostname()}", DeviceId="Feishin-${getHostname()}-${encodeURIComponent(
+                body.username,
+            )}", Version="${packageJson.version}"`,
         },
     });
 
@@ -376,7 +378,7 @@ const getTopSongList = async (args: TopSongListArgs): Promise<SongListResponse> 
             IncludeItemTypes: 'Audio',
             Limit: query.limit,
             Recursive: true,
-            SortBy: 'CommunityRating,SortName',
+            SortBy: 'PlayCount,SortName',
             SortOrder: 'Descending',
             UserId: apiClientProps.server?.userId,
         },
@@ -540,7 +542,7 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<SongList
             Limit: query.limit,
             SortBy: query.sortBy ? songListSortMap.jellyfin[query.sortBy] : undefined,
             SortOrder: query.sortOrder ? sortOrderMap.jellyfin[query.sortOrder] : undefined,
-            StartIndex: 0,
+            StartIndex: query.startIndex,
             UserId: apiClientProps.server?.userId,
         },
     });
@@ -563,20 +565,6 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
         throw new Error('No userId found');
     }
 
-    const musicFoldersRes = await jfApiClient(apiClientProps).getMusicFolderList({
-        params: {
-            userId: apiClientProps.server?.userId,
-        },
-    });
-
-    if (musicFoldersRes.status !== 200) {
-        throw new Error('Failed playlist folder');
-    }
-
-    const playlistFolder = musicFoldersRes.body.Items.filter(
-        (folder) => folder.CollectionType === jfType._enum.collection.PLAYLISTS,
-    )?.[0];
-
     const res = await jfApiClient(apiClientProps).getPlaylistList({
         params: {
             userId: apiClientProps.server?.userId,
@@ -585,7 +573,8 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
             Fields: 'ChildCount, Genres, DateCreated, ParentId, Overview',
             IncludeItemTypes: 'Playlist',
             Limit: query.limit,
-            ParentId: playlistFolder?.Id,
+            MediaTypes: 'Audio',
+            Recursive: true,
             SearchTerm: query.searchTerm,
             SortBy: playlistListSortMap.jellyfin[query.sortBy],
             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
@@ -979,6 +968,18 @@ const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> 
     return jfNormalize.song(res.body, apiClientProps.server, '');
 };
 
+const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
+    const { apiClientProps } = args;
+
+    const res = await jfApiClient(apiClientProps).getServerInfo();
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get server info');
+    }
+
+    return { id: apiClientProps.server?.id, version: res.body.Version };
+};
+
 export const jfController = {
     addToPlaylist,
     authenticate,
@@ -998,6 +999,7 @@ export const jfController = {
     getPlaylistList,
     getPlaylistSongList,
     getRandomSongList,
+    getServerInfo,
     getSongDetail,
     getSongList,
     getTopSongList,

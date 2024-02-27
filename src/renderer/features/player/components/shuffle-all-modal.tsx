@@ -20,6 +20,7 @@ import { api } from '/@/renderer/api';
 import { useAuthStore } from '/@/renderer/store';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { Play, PlayQueueAddOptions, ServerListItem } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 interface ShuffleAllSlice extends RandomSongListQuery {
     actions: {
@@ -260,6 +261,6 @@ export const openShuffleAllModal = async (
             />
         ),
         size: 'sm',
-        title: 'Shuffle all',
+        title: i18n.t('player.playRandom', { postProcess: 'sentenceCase' }) as string,
     });
 };

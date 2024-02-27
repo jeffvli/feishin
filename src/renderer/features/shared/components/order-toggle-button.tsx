@@ -1,4 +1,5 @@
 import { ButtonProps } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { RiSortAsc, RiSortDesc } from 'react-icons/ri';
 import { SortOrder } from '/@/renderer/api/types';
 import { Button, Tooltip } from '/@/renderer/components';
@@ -10,8 +11,15 @@ interface OrderToggleButtonProps {
 }
 
 export const OrderToggleButton = ({ sortOrder, onToggle, buttonProps }: OrderToggleButtonProps) => {
+    const { t } = useTranslation();
     return (
-        <Tooltip label={sortOrder}>
+        <Tooltip
+            label={
+                sortOrder === SortOrder.ASC
+                    ? t('common.ascending', { postProcess: 'titleCase' })
+                    : t('common.descending', { postProcess: 'titleCase' })
+            }
+        >
             <Button
                 compact
                 fw="600"

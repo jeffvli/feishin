@@ -19,6 +19,7 @@ import {
     convertQueryGroupToNDQuery,
 } from '/@/renderer/features/playlists/utils';
 import { QueryBuilderGroup, QueryBuilderRule } from '/@/renderer/types';
+import { useTranslation } from 'react-i18next';
 import { RiMore2Fill, RiSaveLine } from 'react-icons/ri';
 import { SongListSort } from '/@/renderer/api/types';
 import {
@@ -86,6 +87,7 @@ export const PlaylistQueryBuilder = forwardRef(
         { sortOrder, sortBy, limit, isSaving, query, onSave, onSaveAs }: PlaylistQueryBuilderProps,
         ref: Ref<PlaylistQueryBuilderRef>,
     ) => {
+        const { t } = useTranslation();
         const [filters, setFilters] = useState<QueryBuilderGroup>(
             query ? convertNDQueryToQueryGroup(query) : DEFAULT_QUERY,
         );
@@ -354,7 +356,11 @@ export const PlaylistQueryBuilder = forwardRef(
         };
 
         const sortOptions = [
-            { label: 'Random', type: 'string', value: 'random' },
+            {
+                label: t('filter.random', { postProcess: 'titleCase' }),
+                type: 'string',
+                value: 'random',
+            },
             ...NDSongQueryFields,
         ];
 
@@ -414,21 +420,21 @@ export const PlaylistQueryBuilder = forwardRef(
                         <Select
                             data={[
                                 {
-                                    label: 'Ascending',
+                                    label: t('common.ascending', { postProcess: 'titleCase' }),
                                     value: 'asc',
                                 },
                                 {
-                                    label: 'Descending',
+                                    label: t('common.descending', { postProcess: 'titleCase' }),
                                     value: 'desc',
                                 },
                             ]}
-                            label="Order"
+                            label={t('common.order', { postProcess: 'titleCase' })}
                             maxWidth="20%"
                             width={125}
                             {...extraFiltersForm.getInputProps('sortOrder')}
                         />
                         <NumberInput
-                            label="Limit"
+                            label={t('common.limit', { postProcess: 'titleCase' })}
                             maxWidth="20%"
                             width={75}
                             {...extraFiltersForm.getInputProps('limit')}
@@ -444,7 +450,7 @@ export const PlaylistQueryBuilder = forwardRef(
                                 variant="filled"
                                 onClick={handleSaveAs}
                             >
-                                Save as
+                                {t('common.saveAs', { postProcess: 'titleCase' })}
                             </Button>
                             <DropdownMenu position="bottom-end">
                                 <DropdownMenu.Target>
@@ -462,7 +468,7 @@ export const PlaylistQueryBuilder = forwardRef(
                                         icon={<RiSaveLine color="var(--danger-color)" />}
                                         onClick={handleSave}
                                     >
-                                        Save and replace
+                                        {t('common.saveAndReplace', { postProcess: 'titleCase' })}
                                     </DropdownMenu.Item>
                                 </DropdownMenu.Dropdown>
                             </DropdownMenu>

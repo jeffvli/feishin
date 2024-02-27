@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Group, Image, Stack } from '@mantine/core';
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { Link, generatePath } from 'react-router-dom';
 import styled from 'styled-components';
@@ -109,6 +110,7 @@ interface FeatureCarouselProps {
 }
 
 export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
+    const { t } = useTranslation();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const [itemIndex, setItemIndex] = useState(0);
     const [direction, setDirection] = useState(0);
@@ -224,7 +226,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                                 });
                                             }}
                                         >
-                                            Play
+                                            {t('player.play', { postProcess: 'titleCase' })}
                                         </Button>
                                         <Group spacing="sm">
                                             <Button

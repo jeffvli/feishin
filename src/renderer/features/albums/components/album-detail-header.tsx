@@ -55,18 +55,6 @@ export const AlbumDetailHeader = forwardRef(
             });
         };
 
-        const handleClearRating = () => {
-            if (!detailQuery?.data || !detailQuery?.data.userRating) return;
-
-            updateRatingMutation.mutate({
-                query: {
-                    item: [detailQuery.data],
-                    rating: 0,
-                },
-                serverId: detailQuery.data.serverId,
-            });
-        };
-
         const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
 
         return (
@@ -96,7 +84,6 @@ export const AlbumDetailHeader = forwardRef(
                                         }
                                         value={detailQuery?.data?.userRating || 0}
                                         onChange={handleUpdateRating}
-                                        onClick={handleClearRating}
                                     />
                                 </>
                             )}
