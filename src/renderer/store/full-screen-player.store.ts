@@ -6,6 +6,7 @@ import { immer } from 'zustand/middleware/immer';
 interface FullScreenPlayerState {
     activeTab: string | 'queue' | 'related' | 'lyrics';
     dynamicBackground?: boolean;
+    dynamicIsImage?: boolean;
     expanded: boolean;
     opacity: number;
     useImageAspectRatio: boolean;
@@ -28,6 +29,7 @@ export const useFullScreenPlayerStore = create<FullScreenPlayerSlice>()(
                 },
                 activeTab: 'queue',
                 dynamicBackground: true,
+                dynamicIsImage: false,
                 expanded: false,
                 opacity: 60,
                 useImageAspectRatio: false,

@@ -68,11 +68,12 @@ const BackgroundImageOverlay = styled.div`
     width: 100%;
     height: 100%;
     background: var(--bg-header-overlay);
+    backdrop-filter: blur(1.5rem);
 `;
 
 const Controls = () => {
     const { t } = useTranslation();
-    const { dynamicBackground, expanded, opacity, useImageAspectRatio } =
+    const { dynamicBackground, dynamicIsImage, expanded, opacity, useImageAspectRatio } =
         useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { setSettings } = useSettingsStoreActions();
@@ -141,6 +142,25 @@ const Controls = () => {
                             />
                         </Option.Control>
                     </Option>
+                    {dynamicBackground && (
+                        <Option>
+                            <Option.Label>
+                                {t('page.fullscreenPlayer.config.dynamicIsImage', {
+                                    postProcess: 'sentenceCase',
+                                })}
+                            </Option.Label>
+                            <Option.Control>
+                                <Switch
+                                    defaultChecked={dynamicIsImage}
+                                    onChange={(e) =>
+                                        setStore({
+                                            dynamicIsImage: e.target.checked,
+                                        })
+                                    }
+                                />
+                            </Option.Control>
+                        </Option>
+                    )}
                     {dynamicBackground && (
                         <Option>
                             <Option.Label>
@@ -368,9 +388,10 @@ const containerVariants: Variants = {
         };
     },
     open: (custom) => {
-        const { dynamicBackground, background, windowBarStyle } = custom;
+        const { dynamicBackground, parsedBackground, windowBarStyle } = custom;
         return {
-            background: dynamicBackground ? background : 'var(--main-bg)',
+            background: dynamicBackground ? parsedBackground : 'var(--main-bg)',
+            backgroundSize: 'cover',
             height:
                 windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS
                     ? 'calc(100vh - 120px)'
@@ -394,7 +415,7 @@ const containerVariants: Variants = {
 };
 
 export const FullScreenPlayer = () => {
-    const { dynamicBackground } = useFullScreenPlayerStore();
+    const { dynamicBackground, dynamicIsImage } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { windowBarStyle } = useWindowSettings();
 
@@ -416,10 +437,18 @@ export const FullScreenPlayer = () => {
         srcLoaded: true,
     });
 
+    const imageUrl = currentSong?.imageUrl;
+    const parsedBackground =
+        imageUrl && dynamicIsImage
+            ? `url("${imageUrl
+                  .replace(/size=\d+/g, 'size=500')
+                  .replace(currentSong.id, currentSong.albumId)}") no-repeat fixed`
+            : background;
+
     return (
         <Container
             animate="open"
-            custom={{ background, dynamicBackground, windowBarStyle }}
+            custom={{ dynamicBackground, parsedBackground, windowBarStyle }}
             exit="closed"
             initial="closed"
             transition={{ duration: 2 }}
