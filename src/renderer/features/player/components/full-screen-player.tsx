@@ -392,11 +392,7 @@ const containerVariants: Variants = {
     open: (custom) => {
         const { background, backgroundImage, dynamicBackground, windowBarStyle } = custom;
         return {
-            // If dynamic background is enabled:
-            //   Use the background image (if enabled, else use the default background color)
-            // Else:
-            //   Use the default background color
-            background: dynamicBackground ? backgroundImage || mainBackground : mainBackground,
+            background: dynamicBackground ? backgroundImage : mainBackground,
             backgroundColor: dynamicBackground ? background : mainBackground,
             backgroundPosition: 'center',
             backgroundSize: 'cover',
@@ -451,7 +447,7 @@ export const FullScreenPlayer = () => {
             ? `url("${imageUrl
                   .replace(/size=\d+/g, 'size=500')
                   .replace(currentSong.id, currentSong.albumId)}") no-repeat fixed`
-            : null;
+            : mainBackground;
 
     return (
         <Container
