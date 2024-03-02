@@ -60,7 +60,11 @@ const ResponsiveContainer = styled.div`
     }
 `;
 
-const BackgroundImageOverlay = styled.div`
+interface BackgroundImageOverlayProps {
+    $blur: number;
+}
+
+const BackgroundImageOverlay = styled.div<BackgroundImageOverlayProps>`
     position: absolute;
     top: 0;
     left: 0;
@@ -68,15 +72,21 @@ const BackgroundImageOverlay = styled.div`
     width: 100%;
     height: 100%;
     background: var(--bg-header-overlay);
-    backdrop-filter: blur(1.5rem);
+    backdrop-filter: blur(${({ $blur }) => $blur}rem);
 `;
 
 const mainBackground = 'var(--main-bg)';
 
 const Controls = () => {
     const { t } = useTranslation();
-    const { dynamicBackground, dynamicIsImage, expanded, opacity, useImageAspectRatio } =
-        useFullScreenPlayerStore();
+    const {
+        dynamicBackground,
+        dynamicImageBlur,
+        dynamicIsImage,
+        expanded,
+        opacity,
+        useImageAspectRatio,
+    } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { setSettings } = useSettingsStoreActions();
     const lyricConfig = useLyricsSettings();
@@ -159,6 +169,26 @@ const Controls = () => {
                                             dynamicIsImage: e.target.checked,
                                         })
                                     }
+                                />
+                            </Option.Control>
+                        </Option>
+                    )}
+                    {dynamicIsImage && (
+                        <Option>
+                            <Option.Label>
+                                {t('page.fullscreenPlayer.config.dynamicImageBlur', {
+                                    postProcess: 'sentenceCase',
+                                })}
+                            </Option.Label>
+                            <Option.Control>
+                                <Slider
+                                    defaultValue={dynamicImageBlur}
+                                    label={(e) => `${e} rem`}
+                                    max={6}
+                                    min={0}
+                                    step={0.5}
+                                    w="100%"
+                                    onChangeEnd={(e) => setStore({ dynamicImageBlur: Number(e) })}
                                 />
                             </Option.Control>
                         </Option>
@@ -419,7 +449,7 @@ const containerVariants: Variants = {
 };
 
 export const FullScreenPlayer = () => {
-    const { dynamicBackground, dynamicIsImage } = useFullScreenPlayerStore();
+    const { dynamicBackground, dynamicImageBlur, dynamicIsImage } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { windowBarStyle } = useWindowSettings();
 
@@ -459,7 +489,7 @@ export const FullScreenPlayer = () => {
             variants={containerVariants}
         >
             <Controls />
-            {dynamicBackground && <BackgroundImageOverlay />}
+            {dynamicBackground && <BackgroundImageOverlay $blur={dynamicImageBlur} />}
             <ResponsiveContainer>
                 <FullScreenPlayerImage />
                 <FullScreenPlayerQueue />
