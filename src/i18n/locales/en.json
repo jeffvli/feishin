@@ -311,6 +311,7 @@
         "fullscreenPlayer": {
             "config": {
                 "dynamicBackground": "dynamic background",
+                "dynamicImageBlur": "image blur size",
                 "dynamicIsImage": "enable background image",
                 "followCurrentLyric": "follow current lyric",
                 "lyricAlignment": "lyric alignment",
