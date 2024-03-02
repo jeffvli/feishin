@@ -71,6 +71,8 @@ const BackgroundImageOverlay = styled.div`
     backdrop-filter: blur(1.5rem);
 `;
 
+const mainBackground = 'var(--main-bg)';
+
 const Controls = () => {
     const { t } = useTranslation();
     const { dynamicBackground, dynamicIsImage, expanded, opacity, useImageAspectRatio } =
@@ -388,9 +390,15 @@ const containerVariants: Variants = {
         };
     },
     open: (custom) => {
-        const { dynamicBackground, parsedBackground, windowBarStyle } = custom;
+        const { background, backgroundImage, dynamicBackground, windowBarStyle } = custom;
         return {
-            background: dynamicBackground ? parsedBackground : 'var(--main-bg)',
+            // If dynamic background is enabled:
+            //   Use the background image (if enabled, else use the default background color)
+            // Else:
+            //   Use the default background color
+            background: dynamicBackground ? backgroundImage || mainBackground : mainBackground,
+            backgroundColor: dynamicBackground ? background : mainBackground,
+            backgroundPosition: 'center',
             backgroundSize: 'cover',
             height:
                 windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS
@@ -438,17 +446,17 @@ export const FullScreenPlayer = () => {
     });
 
     const imageUrl = currentSong?.imageUrl;
-    const parsedBackground =
+    const backgroundImage =
         imageUrl && dynamicIsImage
             ? `url("${imageUrl
                   .replace(/size=\d+/g, 'size=500')
                   .replace(currentSong.id, currentSong.albumId)}") no-repeat fixed`
-            : background;
+            : null;
 
     return (
         <Container
             animate="open"
-            custom={{ dynamicBackground, parsedBackground, windowBarStyle }}
+            custom={{ background, backgroundImage, dynamicBackground, windowBarStyle }}
             exit="closed"
             initial="closed"
             transition={{ duration: 2 }}
