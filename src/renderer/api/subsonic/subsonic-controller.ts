@@ -21,6 +21,9 @@ import {
     SearchResponse,
     RandomSongListResponse,
     RandomSongListArgs,
+    RescanArgs,
+    ScanStatus,
+    ScanStatusArgs,
     ServerInfo,
     ServerInfoArgs,
     StructuredLyricsArgs,
@@ -372,6 +375,56 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
     };
 };
 
+const rescan = async (args: RescanArgs): Promise<ScanStatus> => {
+    const { full, apiClientProps } = args;
+
+    if (!apiClientProps.server?.userId) {
+        throw new Error('No userId found');
+    }
+
+    const res = await ssApiClient(apiClientProps).startScan({
+        query:
+            full !== undefined
+                ? {
+                      fullScan: full,
+                  }
+                : undefined,
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Could not start scan');
+    }
+
+    const { scanning, count, folderCount } = res.body.scanStatus;
+
+    return {
+        folders: folderCount,
+        scanning,
+        tracks: count,
+    };
+};
+
+const getScanStatus = async (args: ScanStatusArgs): Promise<ScanStatus> => {
+    const { apiClientProps } = args;
+
+    if (!apiClientProps.server?.userId) {
+        throw new Error('No userId found');
+    }
+
+    const res = await ssApiClient(apiClientProps).getScanStatus();
+    if (res.status !== 200) {
+        throw new Error('Could not start scan');
+    }
+
+    const { scanning, count, folderCount } = res.body.scanStatus;
+
+    return {
+        folders: folderCount,
+        scanning,
+        tracks: count,
+    };
+};
+
 const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const { apiClientProps } = args;
 
@@ -450,10 +503,12 @@ export const ssController = {
     getArtistInfo,
     getMusicFolderList,
     getRandomSongList,
+    getScanStatus,
     getServerInfo,
     getStructuredLyrics,
     getTopSongList,
     removeFavorite,
+    rescan,
     scrobble,
     search3,
     setRating,

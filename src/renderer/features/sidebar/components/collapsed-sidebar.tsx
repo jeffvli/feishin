@@ -8,10 +8,12 @@ import styled from 'styled-components';
 import { DropdownMenu, ScrollArea } from '/@/renderer/components';
 import { CollapsedSidebarButton } from '/@/renderer/features/sidebar/components/collapsed-sidebar-button';
 import { CollapsedSidebarItem } from '/@/renderer/features/sidebar/components/collapsed-sidebar-item';
-import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 import { SidebarItemType, useGeneralSettings, useWindowSettings } from '/@/renderer/store';
 import { Platform } from '/@/renderer/types';
+import { RescanButton } from '/@/renderer/features/sidebar/components/rescan';
+import { AppRoute } from '/@/renderer/router/routes';
+import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 
 const SidebarContainer = styled(motion.div)<{ $windowBarStyle: Platform }>`
     display: flex;
@@ -102,28 +104,32 @@ export const CollapsedSidebar = () => {
                         <AppMenu />
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
-                {sidebarItemsWithRoute.map((item) => (
-                    <CollapsedSidebarItem
-                        key={item.id}
-                        activeIcon={
-                            <SidebarIcon
-                                active
-                                route={item.route}
-                                size="25"
-                            />
-                        }
-                        component={NavLink}
-                        icon={
-                            <SidebarIcon
-                                route={item.route}
-                                size="25"
-                            />
-                        }
-                        label={item.label}
-                        route={item.route}
-                        to={item.route}
-                    />
-                ))}
+                {sidebarItemsWithRoute.map((item) =>
+                    item.route === AppRoute.RESCAN ? (
+                        <RescanButton />
+                    ) : (
+                        <CollapsedSidebarItem
+                            key={item.id}
+                            activeIcon={
+                                <SidebarIcon
+                                    active
+                                    route={item.route}
+                                    size="25"
+                                />
+                            }
+                            component={NavLink}
+                            icon={
+                                <SidebarIcon
+                                    route={item.route}
+                                    size="25"
+                                />
+                            }
+                            label={item.label}
+                            route={item.route}
+                            to={item.route}
+                        />
+                    ),
+                )}
             </ScrollArea>
         </SidebarContainer>
     );

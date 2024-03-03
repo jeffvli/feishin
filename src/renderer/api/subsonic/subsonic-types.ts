@@ -206,6 +206,19 @@ const randomSongList = z.object({
     }),
 });
 
+const scanParameters = z.object({
+    fullScan: z.boolean().optional(),
+});
+
+const scanStatus = z.object({
+    scanStatus: z.object({
+        count: z.number().optional(),
+        folderCount: z.number().optional(),
+        lastScan: z.string().optional(),
+        scanning: z.boolean(),
+    }),
+});
+
 const ping = z.object({
     openSubsonic: z.boolean().optional(),
     serverVersion: z.string().optional(),
@@ -240,11 +253,9 @@ const structuredLyric = z.object({
 });
 
 const structuredLyrics = z.object({
-    lyricsList: z
-        .object({
-            structuredLyrics: z.array(structuredLyric).optional(),
-        })
-        .optional(),
+    lyricsList: z.object({
+        structuredLyrics: z.array(structuredLyric).optional(),
+    }),
 });
 
 export const ssType = {
@@ -255,6 +266,7 @@ export const ssType = {
         createFavorite: createFavoriteParameters,
         randomSongList: randomSongListParameters,
         removeFavorite: removeFavoriteParameters,
+        scan: scanParameters,
         scrobble: scrobbleParameters,
         search3: search3Parameters,
         setRating: setRatingParameters,
@@ -274,6 +286,7 @@ export const ssType = {
         ping,
         randomSongList,
         removeFavorite,
+        scanStatus,
         scrobble,
         search3,
         serverInfo,

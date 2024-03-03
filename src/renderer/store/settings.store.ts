@@ -90,6 +90,12 @@ export const sidebarItems = [
         label: i18n.t('page.sidebar.settings'),
         route: AppRoute.SETTINGS,
     },
+    {
+        disabled: true,
+        id: 'Rescan',
+        label: i18n.t('page.sidebar.rescan'),
+        route: AppRoute.RESCAN,
+    },
 ];
 
 export type SortableItem<T> = {

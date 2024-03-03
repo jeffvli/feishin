@@ -40,7 +40,7 @@ export const useDiscordRpc = () => {
             largeImageText: currentSong?.album || 'Unknown album',
             smallImageKey: undefined,
             smallImageText: currentStatus,
-            state: artists && `By ${artists}` || "Unknown artist",
+            state: (artists && `By ${artists}`) || 'Unknown artist',
         };
 
         if (currentStatus === PlayerStatus.PLAYING) {

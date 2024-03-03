@@ -1130,6 +1130,17 @@ export enum LyricSource {
 
 export type LyricsOverride = Omit<FullLyricsMetadata, 'lyrics'> & { id: string };
 
+export type RescanArgs = {
+    full?: boolean;
+} & BaseEndpointArgs;
+
+export type ScanStatus = {
+    folders?: number;
+    scanning: boolean;
+    tracks?: number;
+};
+
+export type ScanStatusArgs = BaseEndpointArgs;
 // This type from https://wicg.github.io/local-font-access/#fontdata
 // NOTE: it is still experimental, so this should be updates as appropriate
 export type FontData = {

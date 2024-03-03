@@ -4,6 +4,7 @@ import { ResizeHandle } from '/@/renderer/features/shared';
 import { CollapsedSidebar } from '/@/renderer/features/sidebar/components/collapsed-sidebar';
 import { Sidebar } from '/@/renderer/features/sidebar/components/sidebar';
 import { useSidebarStore } from '/@/renderer/store';
+import { RescanProvider } from '/@/renderer/features/sidebar/components/rescan';
 
 const SidebarContainer = styled.aside`
     position: relative;
@@ -32,7 +33,7 @@ export const LeftSidebar = ({ isResizing, startResizing }: LeftSidebarProps) => 
                     startResizing('left');
                 }}
             />
-            {collapsed ? <CollapsedSidebar /> : <Sidebar />}
+            <RescanProvider>{collapsed ? <CollapsedSidebar /> : <Sidebar />}</RescanProvider>
         </SidebarContainer>
     );
 };

@@ -362,6 +362,7 @@
             "home": "$t(common.home)",
             "nowPlaying": "now playing",
             "playlists": "$t(entity.playlist_other)",
+            "rescan": "rescan",
             "search": "$t(common.search)",
             "settings": "$t(common.setting_other)",
             "tracks": "$t(entity.track_other)"
