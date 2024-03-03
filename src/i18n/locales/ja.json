@@ -41,7 +41,6 @@
         "hotkey_playbackPause": "一時停止",
         "replayGainFallback": "{{ReplayGain}} フォールバック",
         "sidebarCollapsedNavigation_description": "折りたたみサイドバーのナビゲーションを表示/非表示にします",
-        "mpvExecutablePath_help": "1行ごとに1アイテム",
         "hotkey_volumeUp": "音量を上げる",
         "skipDuration": "スキップの長さ",
         "discordIdleStatus_description": "プレイヤーがアイドル状態でもステータスを更新します",
