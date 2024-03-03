@@ -143,7 +143,54 @@
     },
     "page": {
         "contextMenu": {
-            "setRating": "$t(action.setRating)"
+            "setRating": "$t(action.setRating)",
+            "addToPlaylist": "$t(action.addToPlaylist)",
+            "addToFavorites": "$t(action.addToFavorites)",
+            "moveToTop": "$t(action.moveToTop)",
+            "deletePlaylist": "$t(action.deletePlaylist)",
+            "moveToBottom": "$t(action.moveToBottom)",
+            "createPlaylist": "$t(action.createPlaylist)",
+            "removeFromPlaylist": "$t(action.removeFromPlaylist)",
+            "removeFromFavorites": "$t(action.removeFromFavorites)",
+            "addNext": "$t(player.addNext)",
+            "deselectAll": "$t(action.deselectAll)",
+            "addLast": "$t(player.addLast)",
+            "addFavorite": "$t(action.addToFavorites)",
+            "play": "$t(player.play)",
+            "numberSelected": "{{count}} geselecteerd",
+            "removeFromQueue": "$t(action.removeFromQueue)"
+        },
+        "appMenu": {
+            "selectServer": "selecteer server",
+            "version": "versie {{version}}",
+            "settings": "$t(common.setting_other)",
+            "manageServers": "beheer servers",
+            "expandSidebar": "sidebar uitklappen",
+            "collapseSidebar": "sidebar inklappen",
+            "openBrowserDevtools": "open browser devtools",
+            "quit": "$t(common.quit)",
+            "goBack": "terug",
+            "goForward": "vooruit"
+        },
+        "albumDetail": {
+            "moreFromArtist": "meer van deze $t(entity.artist_one)",
+            "moreFromGeneric": "meer van {{item}}"
+        },
+        "fullscreenPlayer": {
+            "config": {
+                "dynamicBackground": "dynamische achtergrond",
+                "followCurrentLyric": "volg de actuele songtekst",
+                "opacity": "opaciteit",
+                "lyricSize": "tekstgrootte",
+                "lyricAlignment": "songtekst uitlijning",
+                "lyricGap": "tekstkloof"
+            }
+        },
+        "albumArtistList": {
+            "title": "$t(entity.albumArtist_other)"
+        },
+        "albumList": {
+            "title": "$t(entity.album_other)"
         }
     },
     "error": {
@@ -227,6 +274,41 @@
             "ignoreSsl": "negeer ssl $t(common.restartRequired)",
             "ignoreCors": "negeer cors $t(common.restartRequired)",
             "error_savePassword": "er is iets mis gegaan met het opslaan van het wachtwoord"
+        },
+        "deletePlaylist": {
+            "title": "verwijder $t(entity.playlist_one)",
+            "success": "$t(entity.playlist_one) succesvol verwijdert",
+            "input_confirm": "Typ de naam van $t(entity.playlist_one) om te bevestigen"
+        },
+        "createPlaylist": {
+            "input_description": "$t(common.description)",
+            "title": "$t(entity.playlist_one) aanmaken",
+            "input_public": "publiek",
+            "input_name": "$t(common.name)",
+            "success": "$t(entity.playlist_one) aangemaakt",
+            "input_owner": "$t(common.owner)"
+        },
+        "addToPlaylist": {
+            "success": "{{message}}$t(entity.song_other) aan {{numOfPlaylists}} $t(entity.playlist_other) toegevoegd",
+            "title": "aan $t(entity.playlist_one) toevoegen",
+            "input_skipDuplicates": "duplicaten overslaan",
+            "input_playlists": "$t(entity.playlist_other)"
+        },
+        "queryEditor": {
+            "input_optionMatchAll": "alles matchen",
+            "input_optionMatchAny": "elke match"
+        },
+        "lyricSearch": {
+            "input_name": "$t(common.name)",
+            "input_artist": "$t(entity.artist_one)",
+            "title": "tekst zoeken"
+        },
+        "editPlaylist": {
+            "title": "$t(entity.playlist_one) aanpassen"
+        },
+        "updateServer": {
+            "title": "update server",
+            "success": "server succesvol geüpdatet"
         }
     }
 }
