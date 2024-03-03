@@ -41,7 +41,6 @@
         "hotkey_playbackPause": "pauza",
         "replayGainFallback": "{{ReplayGain}} alternativa",
         "sidebarCollapsedNavigation_description": "prikaži ili sakrij navigaciju u sklopljenoj bočnoj traci",
-        "mpvExecutablePath_help": "po jedna po liniji",
         "hotkey_volumeUp": "pojačaj glasnoću",
         "skipDuration": "dužina preskakanja",
         "discordIdleStatus_description": "kada je omogućeno, ažurira status dok je plejer u mirovanju",
