@@ -140,7 +140,6 @@
         "audioDevice_description": "seleziona il device audioda usare per la riproduzione (solo web player)",
         "theme_description": "imposta il tema da usare per l'applicazione",
         "hotkey_playbackPause": "pausa",
-        "mpvExecutablePath_help": "uno per linea",
         "hotkey_volumeUp": "alza volume",
         "skipDuration": "salta durata",
         "discordIdleStatus_description": "quando è attivo, aggiorna lo stato mentre il player è inattivo",
