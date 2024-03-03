@@ -62,6 +62,7 @@
         "cancel": "Abbrechen",
         "forceRestartRequired": "Neustarten um die Änderungen zu übernehmen... Schließe die Benachrichtigung zum Neustarten",
         "setting": "Einstellungen",
+        "setting_one": "",
         "setting_other": "Einstellungen",
         "version": "Version",
         "title": "Titel",
@@ -250,10 +251,41 @@
     "table": {
         "config": {
             "view": {
-                "table": "Tabelle"
+                "table": "Tabelle",
+                "card": "Karte",
+                "poster": "Poster"
             },
             "general": {
-                "tableColumns": "Tabellenspalten"
+                "tableColumns": "Tabellenspalten",
+                "gap": "$t(common.gap)",
+                "size": "$t(common.size)",
+                "displayType": "Anzeigestil"
+            },
+            "label": {
+                "dateAdded": "Hinzugefügt am",
+                "lastPlayed": "zuletzt gespielt",
+                "rowIndex": "Reihenindex",
+                "trackNumber": "Tracknummer",
+                "biography": "$t(common.biography)",
+                "bitrate": "$t(common.bitrate)",
+                "albumArtist": "$t(entity.albumArtist_one)",
+                "artist": "$t(entity.artist_one)",
+                "favorite": "$t(common.favorite)",
+                "actions": "$t(common.action_other)",
+                "genre": "$t(entity.genre_one)",
+                "album": "$t(entity.album_one)",
+                "size": "$t(common.size)",
+                "bpm": "$t(common.bpm)",
+                "titleCombined": "$t(common.title) (kombiniert)",
+                "channels": "$t(common.channel_other)",
+                "duration": "$t(common.duration)",
+                "note": "$t(common.note)",
+                "owner": "$t(common.owner)",
+                "path": "$t(common.path)",
+                "rating": "$t(common.rating)",
+                "releaseDate": "Veröffentlichungsdatum",
+                "title": "$t(common.title)",
+                "year": "$t(common.year)"
             }
         },
         "column": {
@@ -262,7 +294,23 @@
             "releaseDate": "Veröffentlichungsdatum",
             "bitrate": "Bitrate",
             "title": "Titel",
-            "path": "Pfad"
+            "path": "Pfad",
+            "album": "Album",
+            "albumArtist": "Albenkünstler",
+            "bpm": "bpm",
+            "favorite": "Favorit",
+            "lastPlayed": "zuletzt gespielt",
+            "rating": "Bewertung",
+            "albumCount": "$t(entity.album_other)",
+            "artist": "$t(entity.artist_one)",
+            "channels": "$t(common.channel_other)",
+            "comment": "Kommentar",
+            "dateAdded": "hinzugefügt am",
+            "playCount": "Abgespielt",
+            "discNumber": "Disk",
+            "genre": "$t(entity.genre_one)",
+            "songCount": "$t(entity.track_other)",
+            "trackNumber": "Nr."
         }
     },
     "page": {
@@ -304,7 +352,7 @@
             "title": "$t(common.home)"
         },
         "albumDetail": {
-            "moreFromArtist": "Mehr von diesem $t(entity.genre_one)",
+            "moreFromArtist": "Mehr von diesem $t(entity.artist_one)",
             "moreFromGeneric": "Mehr von {{item}}"
         },
         "globalSearch": {
@@ -401,7 +449,7 @@
     },
     "setting": {
         "audioDevice_description": "Wählen Sie das Audiogerät aus, das für die Wiedergabe verwendet werden soll (nur Webplayer).",
-        "audioExclusiveMode": "Audio Exklusiver Modus",
+        "audioExclusiveMode": "Audio-Exklusivmodus",
         "audioDevice": "Audiogerät",
         "accentColor": "Akzentfarbe",
         "accentColor_description": "Legt die Akzentfarbe für die Anwendung fest",
@@ -430,7 +478,6 @@
         "theme_description": "Legt das für die Anwendung zu verwendende Thema fest",
         "hotkey_playbackPause": "Pause",
         "sidebarCollapsedNavigation_description": "Zeigt die Navigation in der minimierten Seitenleiste an oder verbirgt sie",
-        "mpvExecutablePath_help": "eine pro Zeile",
         "hotkey_volumeUp": "Lauter",
         "skipDuration": "Sprungdauer",
         "showSkipButtons": "Schaltflächen zum Überspringen anzeigen",
@@ -439,14 +486,14 @@
         "lyricFetch": "Songtexte aus dem Internet abrufen",
         "scrobble": "Scrobbeln",
         "skipDuration_description": "Legt die zu überspringende Dauer fest, wenn die Überspringen-Schaltflächen in der Player-Leiste verwendet werden",
-        "mpvExecutablePath_description": "Legt den Pfad zur ausführbaren MPV-Datei fest",
+        "mpvExecutablePath_description": "Legt den Pfad zur ausführbaren MPV-Datei fest. Wenn leer gelassen, wird der Standard-Pfad verwendet",
         "replayGainClipping_description": "Verhindern Sie durch {{ReplayGain}} verursachtes Clipping, indem Sie die Verstärkung automatisch verringern",
         "replayGainPreamp": "{{ReplayGain}} Vorverstärker (db)",
         "hotkey_favoriteCurrentSong": "Favorit $t(common.currentSong)",
         "sampleRate": "Abtastrate",
         "sidePlayQueueStyle_optionAttached": "angefügt",
         "sidebarConfiguration": "Seitenleistenkonfiguration",
-        "sampleRate_description": "Wählen Sie die auszugebende Abtastrate aus, wenn sich die ausgewählte Abtastfrequenz von der des aktuellen Mediums unterscheidet",
+        "sampleRate_description": "Wähle die auszugebende Abtastrate aus, wenn sich die ausgewählte Abtastfrequenz von der des aktuellen Mediums unterscheidet. Ein Wert unter 8000 wird die Standard-Frequenz verwenden",
         "replayGainMode_optionNone": "$t(common.none)",
         "hotkey_zoomIn": "Hineinzoomen",
         "scrobble_description": "Scrobble wird auf Ihrem Medienserver abgespielt",
@@ -552,6 +599,15 @@
         "font_description": "Wähle die Schriftart für die Anwendung",
         "themeLight": "Thema (hell)",
         "sidePlayQueueStyle_optionDetached": "lösgelöst",
-        "windowBarStyle_description": "Wähle den Stil der Windows-Leiste"
+        "windowBarStyle_description": "Wähle den Stil der Windows-Leiste",
+        "hotkey_toggleCurrentSongFavorite": "$t(common.currentSong) zu Favoriten hinzufügen",
+        "clearQueryCache_description": "\"Weiches\" Zurücksetzen. Dies wird Playlisten, Musik-Metadaten und gespeicherte Liedtexte zurücksetzen, Zugangsinformationen und zwischengespeicherte Bilder werden behalten",
+        "discordRichPresence_description": "Zeige deinen Wiedergabe-Status in {{discord}} als rich presence an. Angezeigte Bilder sind: {{icon}}, {{playing}}, und {{paused}} ",
+        "clearCache": "Browser-Zwischenspeicher löschen",
+        "clearQueryCache": "feishins Zwischenspeicher leeren",
+        "clearCache_description": "Hartes Zurücksetzen. Neben feishins Zwischenspeicher wird auch der des Browsers gelöscht (Bilder und andere Daten). Zugangsinformationen und Einstellungen werden behalten",
+        "sidePlayQueueStyle": "Wiedergabelistenstil in der Seitenleiste",
+        "zoom_description": "Setzt den Zoom (in %) für das Programm",
+        "zoom": "Zoom"
     }
 }
