@@ -41,7 +41,6 @@
         "hotkey_playbackPause": "pozastavení",
         "replayGainFallback": "fallback {{ReplayGain}}",
         "sidebarCollapsedNavigation_description": "zobrazit nebo skrýt navigaci ve sbaleném postranním panelu",
-        "mpvExecutablePath_help": "jedna na řádek",
         "hotkey_volumeUp": "zvýšení hlasitosti",
         "skipDuration": "doba k přeskočení",
         "discordIdleStatus_description": "při povolení bude upraven stav když je přehrávač nečinný",
@@ -53,7 +52,7 @@
         "skipDuration_description": "nastavení doby k přeskočení při použití tlačítek k přeskočení na liště přehrávače",
         "enableRemote_description": "povolí vzdálený ovládací server pro umožnění ostatním zařízením ovládat aplikaci",
         "fontType_optionSystem": "systémové písmo",
-        "mpvExecutablePath_description": "nastavení cesty ke spustitelnému souboru mpv",
+        "mpvExecutablePath_description": "nastavení cesty ke spustitelnému souboru mpv. pokud je prázdné, bude použita výchozí cesta",
         "replayGainClipping_description": "Zabránění clippingu způsobenému funkcí {{ReplayGain}} automatickým snížením zesílení",
         "replayGainPreamp": "před-zesílení {{ReplayGain}} (dB)",
         "hotkey_favoriteCurrentSong": "oblíbit $t(common.currentSong)",
@@ -61,7 +60,7 @@
         "crossfadeStyle": "způsob prolnutí",
         "sidePlayQueueStyle_optionAttached": "připojené",
         "sidebarConfiguration": "nastavení postranního panelu",
-        "sampleRate_description": "vyberte výstupní vzorkovací frekvenci k použití, když je vybraná vzorkovací frekvence jiná, než ta u aktuálního média",
+        "sampleRate_description": "vyberte výstupní vzorkovací frekvenci k použití, když je vybraná vzorkovací frekvence jiná, než ta u aktuálního média. hodnota nižší než 8000 použije výchozí frekvenci",
         "replayGainMode_optionNone": "$t(common.none)",
         "replayGainClipping": "clipping {{ReplayGain}}",
         "hotkey_zoomIn": "přiblížení",
@@ -191,7 +190,13 @@
         "discordRichPresence": "{{discord}} rich presence",
         "font_description": "nastavení písma použitého v aplikaci",
         "savePlayQueue_description": "uložit frontu přehrávání, když je aplikace zavřena a obnovit ji při otevření aplikace",
-        "useSystemTheme": "použít systémový motiv"
+        "useSystemTheme": "použít systémový motiv",
+        "buttonSize": "velikost tlačítek lišty přehrávače",
+        "buttonSize_description": "velikost tlačítek na liště přehrávače",
+        "clearCache": "vymazat mezipaměť prohlížeče",
+        "clearCache_description": "„tvrdé pročištění“ aplikace feishin. kromě mezipaměti aplikace feishin vymaže i mezipaměť prohlížeče (uložené obrázky a další zdroje). přihlašovací údaje k serveru a nastavení nebudou ovlivněny",
+        "clearQueryCache": "vymazat mezipaměť aplikace feishin",
+        "clearQueryCache_description": "„lehké pročištění“ aplikace feishin. tímto obnovíte seznamy skladeb, metadata skladeb a resetujete uložené texty. nastavení, přihlašovací údaje k serveru a obrázky v mezipaměti nebudou ovlivněny"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -559,7 +564,7 @@
             "error_savePassword": "při ukládání hesla se vyskytla chyba"
         },
         "addToPlaylist": {
-            "success": "přidáno {{message}} $t(entity.track_other) do {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "přidáno $t(entity.trackWithCount, {\"count\": {{message}} }) do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "title": "přidat do $t(entity.playlist_one)",
             "input_skipDuplicates": "přeskočit duplicity",
             "input_playlists": "$t(entity.playlist_other)"
@@ -617,7 +622,7 @@
         "artistWithCount_other": "{{count}} umělců",
         "folder_one": "složka",
         "folder_few": "složky",
-        "folder_other": "složek",
+        "folder_other": "složky",
         "smartPlaylist": "chytrý $t(entity.playlist_one)",
         "album_one": "album",
         "album_few": "alba",
