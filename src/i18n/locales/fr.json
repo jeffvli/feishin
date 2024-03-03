@@ -320,7 +320,6 @@
         "remotePort_description": "définit le port du serveur de contrôle à distance",
         "hotkey_skipBackward": "reculer",
         "hotkey_playbackPause": "pause",
-        "mpvExecutablePath_help": "line par line",
         "hotkey_volumeUp": "monter le volume",
         "discordIdleStatus_description": "quand activé, mettre à jour le status pendant que le lecteur est inactif",
         "showSkipButtons": "affiche les boutons suivants et précédents",
