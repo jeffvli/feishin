@@ -40,7 +40,6 @@
         "hotkey_playbackPause": "pausa",
         "replayGainFallback": "{{ReplayGain}} alternativa",
         "sidebarCollapsedNavigation_description": "mostrar u ocultar la navegación en la barra lateral contraída",
-        "mpvExecutablePath_help": "uno por línea",
         "hotkey_volumeUp": "subir volumen",
         "skipDuration": "duración de salto",
         "discordIdleStatus_description": "cuando se activa, actualiza el estado mientras el reproductor está inactivo",
@@ -52,7 +51,7 @@
         "skipDuration_description": "establece la duración a saltar cuando se usa los botones de saltar en la barra del reproductor",
         "enableRemote_description": "activa el control remoto del servidor para permitir a otros dispositivos controlar la aplicación",
         "fontType_optionSystem": "fuente del sistema",
-        "mpvExecutablePath_description": "establece la ruta del ejecutable mpv",
+        "mpvExecutablePath_description": "establece la ruta del ejecutable mpv. si se deja vacío, se usará la ruta predeterminada",
         "replayGainClipping_description": "previene el recorte causado por {{ReplayGain}} bajando automáticamente la ganancia",
         "replayGainPreamp": "preamplificador (dB) de {{ReplayGain}}",
         "hotkey_favoriteCurrentSong": "$t(common.currentSong) favorita",
@@ -60,7 +59,7 @@
         "crossfadeStyle": "estilo de crossfade",
         "sidePlayQueueStyle_optionAttached": "acoplada",
         "sidebarConfiguration": "configuración de la barra lateral",
-        "sampleRate_description": "selecciona el ratio de muestreo de salida a ser usado si la frecuencia de muestreo seleccionada es diferente de la del medio actual",
+        "sampleRate_description": "selecciona el ratio de muestreo de salida a ser usado si la frecuencia de muestreo seleccionada es diferente de la del medio actual. un valor inferior a 8000 usará la frecuencia predeterminada",
         "replayGainMode_optionNone": "$t(common.none)",
         "replayGainClipping": "recortar {{ReplayGain}}",
         "hotkey_zoomIn": "ampliar",
@@ -191,7 +190,13 @@
         "accentColor_description": "establece el color de realce de la aplicación",
         "skipPlaylistPage": "saltar página de lista de reproducción",
         "hotkey_browserForward": "avance",
-        "hotkey_browserBack": "retroceso"
+        "hotkey_browserBack": "retroceso",
+        "clearCache": "limpiar la caché del navegador",
+        "clearQueryCache": "limpiar la caché de feishin",
+        "clearQueryCache_description": "una 'limpieza suave' de feishin. esto refrescará las listas de reproducción, metadatos de pistas y restablece las letras guardadas. se mantienen los ajustes, credenciales del servidor y las imágenes en caché",
+        "buttonSize": "tamaño del botón de la barra de reproducción",
+        "clearCache_description": "una 'limpieza fuerte' de feishin. para limpiar la caché de feishin, vacía la caché del navegador (imágenes guardadas y otros elementos). se mantienen las credenciales y ajustes del servidor",
+        "buttonSize_description": "el tamaño de los botones de la barra de reproducción"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -491,7 +496,7 @@
             "error_savePassword": "un error ocurrió cuando se intentó guardar la contraseña"
         },
         "addToPlaylist": {
-            "success": "añadido {{message}} $t(entity.track_other) a {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "añadido $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "title": "añadir a $t(entity.playlist_one)",
             "input_skipDuplicates": "saltar duplicados",
             "input_playlists": "$t(entity.playlist_other)"
