@@ -20,6 +20,7 @@ import {
     NDUserListSort,
     NDGenreListSort,
 } from './navidrome.types';
+import { ServerFeatures } from '/@/renderer/api/features.types';
 
 export enum LibraryItem {
     ALBUM = 'album',
@@ -57,7 +58,7 @@ export type User = {
 
 export type ServerListItem = {
     credential: string;
-    features?: Record<string, number[]>;
+    features?: ServerFeatures;
     id: string;
     name: string;
     ndCredential?: string;
@@ -1144,14 +1145,8 @@ export type FontData = {
 
 export type ServerInfoArgs = BaseEndpointArgs;
 
-export enum SubsonicExtensions {
-    FORM_POST = 'formPost',
-    SONG_LYRICS = 'songLyrics',
-    TRANSCODE_OFFSET = 'transcodeOffset',
-}
-
 export type ServerInfo = {
-    features?: Record<string, number[]>;
+    features: ServerFeatures;
     id?: string;
     version: string;
 };

@@ -49,6 +49,7 @@ import {
     ServerInfoArgs,
 } from '../types';
 import { hasFeature } from '/@/renderer/api/utils';
+import { ServerFeature, ServerFeatures } from '/@/renderer/api/features.types';
 
 const authenticate = async (
     url: string,
@@ -366,7 +367,7 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
     if (
         customQuery &&
         customQuery.smart !== undefined &&
-        !hasFeature(apiClientProps.server, NavidromeExtensions.SMART_PLAYLISTS)
+        !hasFeature(apiClientProps.server, ServerFeature.SMART_PLAYLISTS)
     ) {
         customQuery.smart = undefined;
     }
@@ -481,7 +482,7 @@ const removeFromPlaylist = async (
 };
 
 const VERSION_INFO: Array<[string, Record<string, number[]>]> = [
-    ['0.48.0', { [NavidromeExtensions.SMART_PLAYLISTS]: [1] }],
+    ['0.48.0', { [ServerFeature.SMART_PLAYLISTS]: [1] }],
 ];
 
 const getFeatures = (version: string): Record<string, number[]> => {
@@ -518,7 +519,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
         throw new Error('Failed to ping server');
     }
 
-    const features: Record<string, number[]> = getFeatures(ping.body.serverVersion!);
+    const navidromeFeatures: Record<string, number[]> = getFeatures(ping.body.serverVersion!);
 
     if (ping.body.openSubsonic) {
         const res = await ssApiClient(apiClientProps).getServerInfo();
@@ -528,8 +529,17 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
         }
 
         for (const extension of res.body.openSubsonicExtensions) {
-            features[extension.name] = extension.versions;
+            navidromeFeatures[extension.name] = extension.versions;
         }
+    }
+
+    const features: ServerFeatures = {
+        smartPlaylists: false,
+        songLyrics: true,
+    };
+
+    if (navidromeFeatures[NavidromeExtensions.SMART_PLAYLISTS]) {
+        features[ServerFeature.SMART_PLAYLISTS] = true;
     }
 
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
