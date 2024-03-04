@@ -18,6 +18,7 @@ import type {
     LyricsQuery,
     LyricSearchQuery,
     GenreListQuery,
+    SimilarSongsQuery,
 } from './types';
 
 export const splitPaginatedQuery = (key: any) => {
@@ -239,6 +240,10 @@ export const queryKeys: Record<
             return [serverId, 'songs', 'randomSongList'] as const;
         },
         root: (serverId: string) => [serverId, 'songs'] as const,
+        similar: (serverId: string, query?: SimilarSongsQuery) => {
+            if (query) return [serverId, 'song', 'similar', query] as const;
+            return [serverId, 'song', 'similar'] as const;
+        },
     },
     users: {
         list: (serverId: string, query?: UserListQuery) => {

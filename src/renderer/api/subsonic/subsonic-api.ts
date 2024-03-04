@@ -57,6 +57,14 @@ export const contract = c.router({
             200: ssType._response.serverInfo,
         },
     },
+    getSimilarSongs: {
+        method: 'GET',
+        path: 'getSimilarSongs',
+        query: ssType._parameters.similarSongs,
+        responses: {
+            200: ssType._response.similarSongs,
+        },
+    },
     getStructuredLyrics: {
         method: 'GET',
         path: 'getLyricsBySongId.view',

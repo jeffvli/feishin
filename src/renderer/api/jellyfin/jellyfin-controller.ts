@@ -51,6 +51,8 @@ import {
     SongDetailResponse,
     ServerInfo,
     ServerInfoArgs,
+    SimilarSongsArgs,
+    Song,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -970,6 +972,33 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     };
 };
 
+const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
+    const { apiClientProps, query } = args;
+
+    const res = await jfApiClient(apiClientProps).getSimilarSongs({
+        params: {
+            itemId: query.songId,
+        },
+        query: {
+            Fields: 'Genres, DateCreated, MediaSources, ParentId',
+            Limit: query.count,
+            UserId: apiClientProps.server?.userId || undefined,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get similar songs');
+    }
+
+    return res.body.Items.reduce<Song[]>((acc, song) => {
+        if (song.Id !== query.songId) {
+            acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+        }
+
+        return acc;
+    }, []);
+};
+
 export const jfController = {
     addToPlaylist,
     authenticate,
@@ -990,6 +1019,7 @@ export const jfController = {
     getPlaylistSongList,
     getRandomSongList,
     getServerInfo,
+    getSimilarSongs,
     getSongDetail,
     getSongList,
     getTopSongList,

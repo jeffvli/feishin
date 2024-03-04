@@ -25,6 +25,8 @@ import {
     ServerInfoArgs,
     StructuredLyricsArgs,
     StructuredLyric,
+    SimilarSongsArgs,
+    Song,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 import { ServerFeatures } from '/@/renderer/api/features.types';
@@ -454,6 +456,33 @@ export const getStructuredLyrics = async (
     });
 };
 
+const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
+    const { apiClientProps, query } = args;
+
+    const res = await ssApiClient(apiClientProps).getSimilarSongs({
+        query: {
+            count: query.count,
+            id: query.songId,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get similar songs');
+    }
+
+    if (!res.body.similarSongs) {
+        return [];
+    }
+
+    return res.body.similarSongs.song.reduce<Song[]>((acc, song) => {
+        if (song.id !== query.songId) {
+            acc.push(ssNormalize.song(song, apiClientProps.server, ''));
+        }
+
+        return acc;
+    }, []);
+};
+
 export const ssController = {
     authenticate,
     createFavorite,
@@ -461,6 +490,7 @@ export const ssController = {
     getMusicFolderList,
     getRandomSongList,
     getServerInfo,
+    getSimilarSongs,
     getStructuredLyrics,
     getTopSongList,
     removeFavorite,

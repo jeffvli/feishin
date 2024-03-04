@@ -665,6 +665,16 @@ const serverInfo = z.object({
     Version: z.string(),
 });
 
+const similarSongsParameters = z.object({
+    Fields: z.string().optional(),
+    Limit: z.number().optional(),
+    UserId: z.string().optional(),
+});
+
+const similarSongs = pagination.extend({
+    Items: z.array(song),
+});
+
 export enum JellyfinExtensions {
     SONG_LYRICS = 'songLyrics',
 }
@@ -698,6 +708,7 @@ export const jfType = {
         scrobble: scrobbleParameters,
         search: searchParameters,
         similarArtistList: similarArtistListParameters,
+        similarSongs: similarSongsParameters,
         songList: songListParameters,
         updatePlaylist: updatePlaylistParameters,
     },
@@ -723,6 +734,7 @@ export const jfType = {
         scrobble,
         search,
         serverInfo,
+        similarSongs,
         song,
         songList,
         topSongsList,
