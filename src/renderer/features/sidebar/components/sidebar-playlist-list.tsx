@@ -10,7 +10,7 @@ import { Button, Text } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlaylistList } from '/@/renderer/features/playlists';
 import { AppRoute } from '/@/renderer/router/routes';
-import { Play, ServerType } from '/@/renderer/types';
+import { Play } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useHideScrollbar } from '/@/renderer/hooks';
@@ -164,7 +164,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
     const memoizedItemData = useMemo(() => {
         const base = { defaultFullPlaylist, handlePlay: handlePlayPlaylist };
 
-        if (!type || !username || type === ServerType.JELLYFIN || !data?.items) {
+        if (!type || !username || !data?.items) {
             return { ...base, items: data?.items };
         }
 
