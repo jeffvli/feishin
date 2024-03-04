@@ -6,9 +6,9 @@ import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
-import { AuthenticationResponse } from '/@/renderer/api/types';
+import { AuthenticationResponse, ServerType } from '/@/renderer/api/types';
 import { useAuthStoreActions } from '/@/renderer/store';
-import { ServerType } from '/@/renderer/types';
+import { ServerType, toServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
 import { useTranslation } from 'react-i18next';
 
@@ -33,14 +33,26 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const form = useForm({
         initialValues: {
             legacyAuth: false,
-            name: '',
+            name: (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) ?? '',
             password: '',
             savePassword: false,
-            type: ServerType.JELLYFIN,
-            url: 'http://',
+            type:
+                (localSettings
+                    ? localSettings.env.SERVER_TYPE
+                    : toServerType(window.SERVER_TYPE)) ?? ServerType.JELLYFIN,
+            url: (localSettings ? localSettings.env.SERVER_URL : window.SERVER_URL) ?? 'https://',
             username: '',
         },
     });
+
+    // server lock for web is only true if lock is true *and* all other properties are set
+    const serverLock =
+        (localSettings
+            ? !!localSettings.env.SERVER_LOCK
+            : !!window.SERVER_LOCK &&
+              window.SERVER_TYPE &&
+              window.SERVER_NAME &&
+              window.SERVER_URL) || false;
 
     const isSubmitDisabled = !form.values.name || !form.values.url || !form.values.username;
 
@@ -62,7 +74,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     password: values.password,
                     username: values.username,
                 },
-                values.type,
+                values.type as ServerType,
             );
 
             if (!data) {
@@ -76,7 +88,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 id: nanoid(),
                 name: values.name,
                 ndCredential: data.ndCredential,
-                type: values.type,
+                type: values.type as ServerType,
                 url: values.url.replace(/\/$/, ''),
                 userId: data.userId,
                 username: data.username,
@@ -117,11 +129,13 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             >
                 <SegmentedControl
                     data={SERVER_TYPES}
+                    disabled={serverLock}
                     {...form.getInputProps('type')}
                 />
                 <Group grow>
                     <TextInput
                         data-autofocus
+                        disabled={serverLock}
                         label={t('form.addServer.input', {
                             context: 'name',
                             postProcess: 'titleCase',
@@ -129,6 +143,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                         {...form.getInputProps('name')}
                     />
                     <TextInput
+                        disabled={serverLock}
                         label={t('form.addServer.input', {
                             context: 'url',
                             postProcess: 'titleCase',

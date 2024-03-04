@@ -3,7 +3,7 @@ import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { AxiosError, AxiosResponse, isAxiosError, Method } from 'axios';
 import qs from 'qs';
-import { ServerListItem } from '/@/renderer/types';
+import { ServerListItem } from '/@/renderer/api/types';
 import omitBy from 'lodash/omitBy';
 import { z } from 'zod';
 import { authenticationFailure } from '/@/renderer/api/utils';

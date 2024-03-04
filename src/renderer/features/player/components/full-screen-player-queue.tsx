@@ -43,11 +43,11 @@ const HeaderItemWrapper = styled.div`
     z-index: 2;
 `;
 
-interface TransparendGridContainerProps {
+interface TransparentGridContainerProps {
     opacity: number;
 }
 
-const GridContainer = styled.div<TransparendGridContainerProps>`
+const GridContainer = styled.div<TransparentGridContainerProps>`
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-columns: 1fr;

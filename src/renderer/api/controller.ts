@@ -54,8 +54,8 @@ import type {
     StructuredLyric,
     SimilarSongsArgs,
     Song,
+    ServerType,
 } from '/@/renderer/api/types';
-import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
 import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
 import { ssController } from '/@/renderer/api/subsonic/subsonic-controller';
@@ -177,7 +177,7 @@ const endpoints: ApiController = {
         getPlaylistList: ndController.getPlaylistList,
         getPlaylistSongList: ndController.getPlaylistSongList,
         getRandomSongList: ssController.getRandomSongList,
-        getServerInfo: ssController.getServerInfo,
+        getServerInfo: ndController.getServerInfo,
         getSimilarSongs: ssController.getSimilarSongs,
         getSongDetail: ndController.getSongDetail,
         getSongList: ndController.getSongList,

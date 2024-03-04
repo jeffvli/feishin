@@ -11,6 +11,8 @@ import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/crea
 import { convertQueryGroupToNDQuery } from '/@/renderer/features/playlists/utils';
 import { useCurrentServer } from '/@/renderer/store';
 import { useTranslation } from 'react-i18next';
+import { hasFeature } from '/@/renderer/api/utils';
+import { ServerFeature } from '/@/renderer/api/features.types';
 
 interface CreatePlaylistFormProps {
     onCancel: () => void;
@@ -120,12 +122,13 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                             })}
                         />
                     )}
-                    {server?.type === ServerType.NAVIDROME && (
-                        <Switch
-                            label="Is smart playlist?"
-                            onChange={(e) => setIsSmartPlaylist(e.currentTarget.checked)}
-                        />
-                    )}
+                    {server?.type === ServerType.NAVIDROME &&
+                        hasFeature(server, ServerFeature.SMART_PLAYLISTS) && (
+                            <Switch
+                                label="Is smart playlist?"
+                                onChange={(e) => setIsSmartPlaylist(e.currentTarget.checked)}
+                            />
+                        )}
                 </Group>
                 {server?.type === ServerType.NAVIDROME && isSmartPlaylist && (
                     <Stack pt="1rem">

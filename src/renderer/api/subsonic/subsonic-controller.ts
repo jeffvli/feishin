@@ -2,7 +2,7 @@ import md5 from 'md5';
 import { z } from 'zod';
 import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { ssNormalize } from '/@/renderer/api/subsonic/subsonic-normalize';
-import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
+import { SubsonicExtensions, ssType } from '/@/renderer/api/subsonic/subsonic-types';
 import {
     ArtistInfoArgs,
     AuthenticationResponse,
@@ -29,6 +29,7 @@ import {
     Song,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
+import { ServerFeatures } from '/@/renderer/api/features.types';
 
 const authenticate = async (
     url: string,
@@ -383,8 +384,13 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
         throw new Error('Failed to ping server');
     }
 
+    const features: ServerFeatures = {
+        smartPlaylists: false,
+        songLyrics: false,
+    };
+
     if (!ping.body.openSubsonic || !ping.body.serverVersion) {
-        return { version: ping.body.version };
+        return { features, version: ping.body.version };
     }
 
     const res = await ssApiClient(apiClientProps).getServerInfo();
@@ -393,9 +399,13 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
         throw new Error('Failed to get server extensions');
     }
 
-    const features: Record<string, number[]> = {};
+    const subsonicFeatures: Record<string, number[]> = {};
     for (const extension of res.body.openSubsonicExtensions) {
-        features[extension.name] = extension.versions;
+        subsonicFeatures[extension.name] = extension.versions;
+    }
+
+    if (subsonicFeatures[SubsonicExtensions.SONG_LYRICS]) {
+        features.songLyrics = true;
     }
 
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };

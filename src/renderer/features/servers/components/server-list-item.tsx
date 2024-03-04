@@ -7,7 +7,7 @@ import { RiDeleteBin2Line, RiEdit2Fill } from 'react-icons/ri';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { ServerSection } from '/@/renderer/features/servers/components/server-section';
 import { useAuthStoreActions } from '/@/renderer/store';
-import { ServerListItem as ServerItem } from '/@/renderer/types';
+import { ServerListItem as ServerItem } from '/@/renderer/api/types';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 

@@ -38,6 +38,9 @@ export const SidebarIcon = ({ active, route, size }: SidebarIconProps) => {
         case AppRoute.LIBRARY_ALBUMS:
             if (active) return <RiAlbumFill size={size} />;
             return <RiAlbumLine size={size} />;
+        case AppRoute.LIBRARY_ALBUM_ARTISTS:
+            if (active) return <RiUserVoiceFill size={size} />;
+            return <RiUserVoiceLine size={size} />;
         case AppRoute.LIBRARY_ARTISTS:
             if (active) return <RiUserVoiceFill size={size} />;
             return <RiUserVoiceLine size={size} />;

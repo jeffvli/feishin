@@ -6,7 +6,7 @@ import { immer } from 'zustand/middleware/immer';
 import { useAlbumArtistListDataStore } from '/@/renderer/store/album-artist-list-data.store';
 import { useAlbumListDataStore } from '/@/renderer/store/album-list-data.store';
 import { useListStore } from '/@/renderer/store/list.store';
-import { ServerListItem } from '/@/renderer/types';
+import { ServerListItem } from '/@/renderer/api/types';
 
 export interface AuthState {
     currentServer: ServerListItem | null;

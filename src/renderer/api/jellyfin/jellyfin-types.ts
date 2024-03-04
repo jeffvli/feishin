@@ -675,6 +675,10 @@ const similarSongs = pagination.extend({
     Items: z.array(song),
 });
 
+export enum JellyfinExtensions {
+    SONG_LYRICS = 'songLyrics',
+}
+
 export const jfType = {
     _enum: {
         albumArtistList: albumArtistListSort,

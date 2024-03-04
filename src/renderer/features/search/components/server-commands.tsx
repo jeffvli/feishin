@@ -3,7 +3,7 @@ import { openModal } from '@mantine/modals';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { ServerList } from '/@/renderer/features/servers';
 import { useAuthStoreActions, useServerList } from '/@/renderer/store';
-import { ServerListItem } from '/@/renderer/types';
+import { ServerListItem } from '/@/renderer/api/types';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { AppRoute } from '/@/renderer/router/routes';

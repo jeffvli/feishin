@@ -61,6 +61,7 @@ import packageJson from '../../../../package.json';
 import { z } from 'zod';
 import { JFSongListSort, JFSortOrder } from '/@/renderer/api/jellyfin.types';
 import isElectron from 'is-electron';
+import { ServerFeatures } from '/@/renderer/api/features.types';
 
 const formatCommaDelimitedString = (value: string[]) => {
     return value.join(',');
@@ -959,7 +960,16 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
         throw new Error('Failed to get server info');
     }
 
-    return { id: apiClientProps.server?.id, version: res.body.Version };
+    const features: ServerFeatures = {
+        smartPlaylists: false,
+        songLyrics: true,
+    };
+
+    return {
+        features,
+        id: apiClientProps.server?.id,
+        version: res.body.Version,
+    };
 };
 
 const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {

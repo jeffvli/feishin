@@ -1,8 +1,14 @@
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
-import { QueueSong, LibraryItem, AlbumArtist, Album } from '/@/renderer/api/types';
-import { ServerListItem, ServerType } from '/@/renderer/types';
+import {
+    QueueSong,
+    LibraryItem,
+    AlbumArtist,
+    Album,
+    ServerListItem,
+    ServerType,
+} from '/@/renderer/api/types';
 
 const getCoverArtUrl = (args: {
     baseUrl: string | undefined;

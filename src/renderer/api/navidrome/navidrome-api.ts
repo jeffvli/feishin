@@ -7,7 +7,7 @@ import qs from 'qs';
 import { ndType } from './navidrome-types';
 import { authenticationFailure, resultWithHeaders } from '/@/renderer/api/utils';
 import { useAuthStore } from '/@/renderer/store';
-import { ServerListItem } from '/@/renderer/types';
+import { ServerListItem } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components';
 import i18n from '/@/i18n/i18n';
 

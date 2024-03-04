@@ -11,9 +11,9 @@ import {
     LibraryItem,
     AnyLibraryItems,
     RatingResponse,
+    ServerType,
 } from '/@/renderer/api/types';
 import { useSetAlbumListItemDataById, useSetQueueRating, getServerById } from '/@/renderer/store';
-import { ServerType } from '/@/renderer/types';
 
 export const useUpdateRating = () => {
     const queryClient = useQueryClient();
