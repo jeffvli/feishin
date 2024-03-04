@@ -12,7 +12,7 @@ import { convertQueryGroupToNDQuery } from '/@/renderer/features/playlists/utils
 import { useCurrentServer } from '/@/renderer/store';
 import { useTranslation } from 'react-i18next';
 import { hasFeature } from '/@/renderer/api/utils';
-import { NavidromeExtensions } from '/@/renderer/api/navidrome/navidrome-types';
+import { ServerFeature } from '/@/renderer/api/features.types';
 
 interface CreatePlaylistFormProps {
     onCancel: () => void;
@@ -123,7 +123,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                         />
                     )}
                     {server?.type === ServerType.NAVIDROME &&
-                        hasFeature(server, NavidromeExtensions.SMART_PLAYLISTS) && (
+                        hasFeature(server, ServerFeature.SMART_PLAYLISTS) && (
                             <Switch
                                 label="Is smart playlist?"
                                 onChange={(e) => setIsSmartPlaylist(e.currentTarget.checked)}
