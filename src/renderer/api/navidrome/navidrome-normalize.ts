@@ -7,8 +7,9 @@ import {
     User,
     AlbumArtist,
     Genre,
+    ServerListItem,
+    ServerType,
 } from '/@/renderer/api/types';
-import { ServerListItem, ServerType } from '/@/renderer/types';
 import z from 'zod';
 import { ndType } from './navidrome-types';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';

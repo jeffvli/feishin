@@ -4,12 +4,11 @@ import { nanoid } from 'nanoid/non-secure';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router';
 import { createSearchParams } from 'react-router-dom';
-import { LibraryItem } from '/@/renderer/api/types';
+import { LibraryItem, ServerType } from '/@/renderer/api/types';
 import { CreatePlaylistForm } from '/@/renderer/features/playlists';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { ServerType } from '/@/renderer/types';
 
 interface HomeCommandsProps {
     handleClose: () => void;

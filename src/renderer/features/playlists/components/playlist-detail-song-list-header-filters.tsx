@@ -17,7 +17,13 @@ import {
 } from 'react-icons/ri';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { LibraryItem, PlaylistSongListQuery, SongListSort, SortOrder } from '/@/renderer/api/types';
+import {
+    LibraryItem,
+    PlaylistSongListQuery,
+    ServerType,
+    SongListSort,
+    SortOrder,
+} from '/@/renderer/api/types';
 import {
     DropdownMenu,
     Button,
@@ -39,7 +45,7 @@ import {
     useSetPlaylistStore,
     useSetPlaylistTablePagination,
 } from '/@/renderer/store';
-import { ListDisplayType, ServerType, Play, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, Play, TableColumn } from '/@/renderer/types';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { useParams, useNavigate } from 'react-router';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';

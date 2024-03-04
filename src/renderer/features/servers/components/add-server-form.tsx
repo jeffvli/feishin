@@ -6,7 +6,7 @@ import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
-import { AuthenticationResponse } from '/@/renderer/api/types';
+import { AuthenticationResponse, ServerType } from '/@/renderer/api/types';
 import { useAuthStoreActions } from '/@/renderer/store';
 import { ServerType, toServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';

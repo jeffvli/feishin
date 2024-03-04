@@ -247,6 +247,12 @@ const structuredLyrics = z.object({
         .optional(),
 });
 
+export enum SubsonicExtensions {
+    FORM_POST = 'formPost',
+    SONG_LYRICS = 'songLyrics',
+    TRANSCODE_OFFSET = 'transcodeOffset',
+}
+
 export const ssType = {
     _parameters: {
         albumList: albumListParameters,

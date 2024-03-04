@@ -29,7 +29,7 @@ import {
     useSidebarStore,
     useAppStoreActions,
 } from '/@/renderer/store';
-import { ServerListItem, ServerType } from '/@/renderer/types';
+import { ServerListItem, ServerType } from '/@/renderer/api/types';
 import packageJson from '../../../../../package.json';
 
 const browser = isElectron() ? window.electron.browser : null;

@@ -345,6 +345,7 @@
         "react-virtualized-auto-sizer": "^1.0.17",
         "react-window": "^1.8.9",
         "react-window-infinite-loader": "^1.0.9",
+        "semver": "^7.5.4",
         "styled-components": "^6.0.8",
         "swiper": "^9.3.1",
         "zod": "^3.22.3",

@@ -6,15 +6,16 @@ import {
     InternetProviderLyricResponse,
     FullLyricsMetadata,
     LyricGetQuery,
-    SubsonicExtensions,
     StructuredLyric,
+    ServerType,
 } from '/@/renderer/api/types';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useLyricsSettings } from '/@/renderer/store';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
 import isElectron from 'is-electron';
+import { hasFeature } from '/@/renderer/api/utils';
+import { ServerFeature } from '/@/renderer/api/features.types';
 
 const lyricsIpc = isElectron() ? window.electron.lyrics : null;
 
@@ -112,7 +113,7 @@ export const useSongLyricsBySong = (
                         source: server?.name ?? 'music server',
                     };
                 }
-            } else if (server.features && SubsonicExtensions.SONG_LYRICS in server.features) {
+            } else if (hasFeature(server, ServerFeature.SONG_LYRICS)) {
                 const subsonicLyrics = await api.controller
                     .getStructuredLyrics({
                         apiClientProps: { server, signal },
