@@ -3,7 +3,9 @@ import isElectron from 'is-electron';
 import { Navigate, Outlet } from 'react-router-dom';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useSetPlayerFallback } from '/@/renderer/store';
-import { toast } from '/@/renderer/components';
+import { Spinner, toast } from '/@/renderer/components';
+import { useServerAuthenticated } from '/@/renderer/hooks/use-server-authenticated';
+import { AuthState } from '/@/renderer/types';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 const utils = isElectron() ? window.electron.utils : null;
@@ -12,6 +14,7 @@ const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : nul
 export const AppOutlet = () => {
     const currentServer = useCurrentServer();
     const setFallback = useSetPlayerFallback();
+    const authState = useServerAuthenticated();
 
     const isActionsRequired = useMemo(() => {
         const isServerRequired = !currentServer;
@@ -37,7 +40,11 @@ export const AppOutlet = () => {
         };
     }, [setFallback]);
 
-    if (isActionsRequired) {
+    if (authState === AuthState.LOADING) {
+        return <Spinner container />;
+    }
+
+    if (isActionsRequired || authState === AuthState.INVALID) {
         return (
             <Navigate
                 replace

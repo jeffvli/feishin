@@ -225,3 +225,9 @@ export enum FontType {
 }
 
 export type TitleTheme = 'dark' | 'light' | 'system';
+
+export enum AuthState {
+    INVALID = 'invalid',
+    LOADING = 'loading',
+    VALID = 'valid',
+}
