@@ -23,14 +23,18 @@ export const useServerVersion = () => {
     });
 
     useEffect(() => {
-        if (server && server.id === serverInfo.data?.id) {
-            const { version, features } = serverInfo.data;
-            if (version !== server.version || !isEqual(features, server.features)) {
+        if (!server?.id) {
+            return;
+        }
+
+        if (server?.id === serverInfo.data?.id) {
+            const { version, features } = serverInfo.data || {};
+            if (version !== server?.version || !isEqual(features, server?.features)) {
                 updateServer(server.id, {
                     features,
                     version,
                 });
             }
         }
-    }, [server, serverInfo.data, updateServer]);
+    }, [serverInfo?.data, server?.features, server?.id, server?.version, updateServer]);
 };
