@@ -206,7 +206,7 @@ const createTray = () => {
     tray.setContextMenu(contextMenu);
 };
 
-const createWindow = async () => {
+const createWindow = async (first = true) => {
     if (isDevelopment) {
         await installExtensions();
     }
@@ -350,19 +350,21 @@ const createWindow = async () => {
 
     mainWindow.loadURL(resolveHtmlPath('index.html'));
 
+    const startWindowMinimized = store.get('window_start_minimized', false) as boolean;
+
     mainWindow.on('ready-to-show', () => {
         if (!mainWindow) {
             throw new Error('"mainWindow" is not defined');
         }
-        if (process.env.START_MINIMIZED) {
-            mainWindow.minimize();
-        } else {
+
+        if (!first || !startWindowMinimized) {
             mainWindow.show();
             createWinThumbarButtons();
         }
     });
 
     mainWindow.on('closed', () => {
+        ipcMain.removeHandler('window-clear-cache');
         mainWindow = null;
     });
 
@@ -552,6 +554,7 @@ app.on('window-all-closed', () => {
     // Respect the OSX convention of having the application in memory even
     // after all windows have been closed
     if (isMacOS()) {
+        ipcMain.removeHandler('window-clear-cache');
         mainWindow = null;
     } else {
         app.quit();
@@ -606,7 +609,11 @@ if (!singleInstance) {
             app.on('activate', () => {
                 // On macOS it's common to re-create a window in the app when the
                 // dock icon is clicked and there are no other windows open.
-                if (mainWindow === null) createWindow();
+                if (mainWindow === null) createWindow(false);
+                else if (!mainWindow.isVisible()) {
+                    mainWindow.show();
+                    createWinThumbarButtons();
+                }
             });
         })
         .catch(console.log);

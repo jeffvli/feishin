@@ -89,8 +89,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
         if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.volume(volume);
-            mpvPlayer!.setQueue(playerData);
-            mpvPlayer!.play();
+            mpvPlayer!.setQueue(playerData, false);
         }
 
         play();

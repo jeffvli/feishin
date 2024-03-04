@@ -522,7 +522,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
     const handleUpdateRating = useCallback(
         (rating: number) => {
-            if (!ctx.dataNodes || !ctx.data) return;
+            if (!ctx.dataNodes && !ctx.data) return;
 
             let uniqueServerIds: string[] = [];
             let items: AnyLibraryItems = [];

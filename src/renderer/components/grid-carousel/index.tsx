@@ -4,6 +4,7 @@ import {
     ReactNode,
     useCallback,
     useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -114,9 +115,11 @@ export const SwiperGridCarousel = ({
     isLoading,
     uniqueId,
 }: SwiperGridCarouselProps) => {
+    const containerRef = useRef<HTMLDivElement>(null);
     const swiperRef = useRef<SwiperCore | any>(null);
     const playButtonBehavior = usePlayButtonBehavior();
     const handlePlayQueueAdd = usePlayQueueAdd();
+    const [slideCount, setSlideCount] = useState(4);
 
     useEffect(() => {
         swiperRef.current?.slideTo(0, 0);
@@ -191,23 +194,24 @@ export const SwiperGridCarousel = ({
 
     const handleNext = useCallback(() => {
         const activeIndex = swiperRef?.current?.activeIndex || 0;
-        const slidesPerView = Math.round(Number(swiperProps?.slidesPerView || 4));
+        const slidesPerView = Math.round(Number(swiperProps?.slidesPerView || slideCount));
         swiperRef?.current?.slideTo(activeIndex + slidesPerView);
-    }, [swiperProps?.slidesPerView]);
+    }, [slideCount, swiperProps?.slidesPerView]);
 
     const handlePrev = useCallback(() => {
         const activeIndex = swiperRef?.current?.activeIndex || 0;
-        const slidesPerView = Math.round(Number(swiperProps?.slidesPerView || 4));
+        const slidesPerView = Math.round(Number(swiperProps?.slidesPerView || slideCount));
         swiperRef?.current?.slideTo(activeIndex - slidesPerView);
-    }, [swiperProps?.slidesPerView]);
+    }, [slideCount, swiperProps?.slidesPerView]);
 
     const handleOnSlideChange = useCallback((e: SwiperCore) => {
         const { slides, isEnd, isBeginning, params } = e;
         if (isEnd || isBeginning) return;
 
+        const slideCount = (params.slidesPerView as number | undefined) || 4;
         setPagination({
-            hasNextPage: (params?.slidesPerView || 4) < slides.length,
-            hasPreviousPage: (params?.slidesPerView || 4) < slides.length,
+            hasNextPage: slideCount < slides.length,
+            hasPreviousPage: slideCount < slides.length,
         });
     }, []);
 
@@ -215,82 +219,106 @@ export const SwiperGridCarousel = ({
         const { slides, isEnd, isBeginning, params } = e;
         if (isEnd || isBeginning) return;
 
+        const slideCount = (params.slidesPerView as number | undefined) || 4;
         setPagination({
-            hasNextPage: (params.slidesPerView || 4) < slides.length,
-            hasPreviousPage: (params.slidesPerView || 4) < slides.length,
+            hasNextPage: slideCount < slides.length,
+            hasPreviousPage: slideCount < slides.length,
         });
     }, []);
 
     const handleOnReachEnd = useCallback((e: SwiperCore) => {
         const { slides, params } = e;
 
+        const slideCount = (params.slidesPerView as number | undefined) || 4;
         setPagination({
             hasNextPage: false,
-            hasPreviousPage: (params.slidesPerView || 4) < slides.length,
+            hasPreviousPage: slideCount < slides.length,
         });
     }, []);
 
     const handleOnReachBeginning = useCallback((e: SwiperCore) => {
         const { slides, params } = e;
 
+        const slideCount = (params.slidesPerView as number | undefined) || 4;
         setPagination({
-            hasNextPage: (params.slidesPerView || 4) < slides.length,
+            hasNextPage: slideCount < slides.length,
             hasPreviousPage: false,
         });
     }, []);
 
-    const handleOnResize = useCallback((e: SwiperCore) => {
-        if (!e) return;
-        const { width } = e;
-        const slidesPerView = getSlidesPerView(width);
-        if (!e.params) return;
-        e.params.slidesPerView = slidesPerView;
-    }, []);
+    useLayoutEffect(() => {
+        const handleResize = () => {
+            // Use the container div ref and not swiper width, as this value is more accurate
+            const width = containerRef.current?.clientWidth;
+            const { activeIndex, params, slides } =
+                (swiperRef.current as SwiperCore | undefined) ?? {};
 
-    const throttledOnResize = throttle(handleOnResize, 200);
+            if (width) {
+                const slidesPerView = getSlidesPerView(width);
+                setSlideCount(slidesPerView);
+            }
+
+            if (activeIndex !== undefined && slides && params?.slidesPerView) {
+                const slideCount = (params.slidesPerView as number | undefined) || 4;
+                setPagination({
+                    hasNextPage: activeIndex + slideCount < slides.length,
+                    hasPreviousPage: activeIndex > 0,
+                });
+            }
+        };
+
+        handleResize();
+
+        const throttledResize = throttle(handleResize, 200);
+        window.addEventListener('resize', throttledResize);
+
+        return () => {
+            window.removeEventListener('resize', throttledResize);
+        };
+    }, []);
 
     return (
         <CarouselContainer
             className="grid-carousel"
             spacing="md"
         >
-            {title ? (
-                <Title
-                    {...title}
-                    handleNext={handleNext}
-                    handlePrev={handlePrev}
-                    pagination={pagination}
-                />
-            ) : null}
-            <Swiper
-                ref={swiperRef}
-                resizeObserver
-                modules={[Virtual]}
-                slidesPerView={4}
-                spaceBetween={20}
-                style={{ height: '100%', width: '100%' }}
-                onBeforeInit={(swiper) => {
-                    swiperRef.current = swiper;
-                }}
-                onBeforeResize={handleOnResize}
-                onReachBeginning={handleOnReachBeginning}
-                onReachEnd={handleOnReachEnd}
-                onResize={throttledOnResize}
-                onSlideChange={handleOnSlideChange}
-                onZoomChange={handleOnZoomChange}
-                {...swiperProps}
-            >
-                {slides.map((slideContent, index) => {
-                    return (
-                        <SwiperSlide
-                            key={`${uniqueId}-${slideContent?.props?.data?.id}-${index}`}
-                            virtualIndex={index}
-                        >
-                            {slideContent}
-                        </SwiperSlide>
-                    );
-                })}
-            </Swiper>
+            <div ref={containerRef}>
+                {title ? (
+                    <Title
+                        {...title}
+                        handleNext={handleNext}
+                        handlePrev={handlePrev}
+                        pagination={pagination}
+                    />
+                ) : null}
+                <Swiper
+                    ref={swiperRef}
+                    resizeObserver
+                    modules={[Virtual]}
+                    slidesPerView={slideCount}
+                    spaceBetween={20}
+                    style={{ height: '100%', width: '100%' }}
+                    onBeforeInit={(swiper) => {
+                        swiperRef.current = swiper;
+                    }}
+                    onReachBeginning={handleOnReachBeginning}
+                    onReachEnd={handleOnReachEnd}
+                    onSlideChange={handleOnSlideChange}
+                    onZoomChange={handleOnZoomChange}
+                    {...swiperProps}
+                >
+                    {slides.map((slideContent, index) => {
+                        return (
+                            <SwiperSlide
+                                key={`${uniqueId}-${slideContent?.props?.data?.id}-${index}`}
+                                virtualIndex={index}
+                            >
+                                {slideContent}
+                            </SwiperSlide>
+                        );
+                    })}
+                </Swiper>
+            </div>
         </CarouselContainer>
     );
 };

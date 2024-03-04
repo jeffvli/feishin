@@ -323,12 +323,15 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
                 await getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
             }
         }
+
+        if (pause) {
+            await getMpvInstance()?.pause();
+        } else if (pause === false) {
+            // Only force play if pause is explicitly false
+            await getMpvInstance()?.play();
+        }
     } catch (err: NodeMpvError | any) {
         mpvLog({ action: `Failed to set play queue` }, err);
-    }
-
-    if (pause) {
-        getMpvInstance()?.pause();
     }
 });
 
