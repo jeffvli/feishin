@@ -1,6 +1,7 @@
 export enum ServerFeature {
+    MULTIPLE_STRUCTURED_LYRICS = 'multipleStructuredLyrics',
+    SINGLE_STRUCTURED_LYRIC = 'singleStructuredLyric',
     SMART_PLAYLISTS = 'smartPlaylists',
-    SONG_LYRICS = 'songLyrics',
 }
 
-export type ServerFeatures = Record<Partial<ServerFeature>, boolean>;
+export type ServerFeatures = Partial<Record<ServerFeature, boolean>>;

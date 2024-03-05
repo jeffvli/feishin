@@ -961,8 +961,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     }
 
     const features: ServerFeatures = {
-        smartPlaylists: false,
-        songLyrics: true,
+        singleStructuredLyric: true,
     };
 
     return {
