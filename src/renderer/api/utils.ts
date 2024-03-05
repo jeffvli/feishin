@@ -45,5 +45,5 @@ export const hasFeature = (server: ServerListItem | null, feature: ServerFeature
         return false;
     }
 
-    return server.features[feature];
+    return server.features[feature] ?? false;
 };

@@ -96,7 +96,18 @@ export const useSongLyricsBySong = (
             if (!server) throw new Error('Server not found');
             if (!song) return null;
 
-            if (server.type === ServerType.JELLYFIN) {
+            if (hasFeature(server, ServerFeature.MULTIPLE_STRUCTURED_LYRICS)) {
+                const subsonicLyrics = await api.controller
+                    .getStructuredLyrics({
+                        apiClientProps: { server, signal },
+                        query: { songId: song.id },
+                    })
+                    .catch(console.error);
+
+                if (subsonicLyrics) {
+                    return subsonicLyrics;
+                }
+            } else if (hasFeature(server, ServerFeature.SINGLE_STRUCTURED_LYRIC)) {
                 const jfLyrics = await api.controller
                     .getLyrics({
                         apiClientProps: { server, signal },
@@ -112,17 +123,6 @@ export const useSongLyricsBySong = (
                         remote: false,
                         source: server?.name ?? 'music server',
                     };
-                }
-            } else if (hasFeature(server, ServerFeature.SONG_LYRICS)) {
-                const subsonicLyrics = await api.controller
-                    .getStructuredLyrics({
-                        apiClientProps: { server, signal },
-                        query: { songId: song.id },
-                    })
-                    .catch(console.error);
-
-                if (subsonicLyrics) {
-                    return subsonicLyrics;
                 }
             } else if (song.lyrics) {
                 return {

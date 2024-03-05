@@ -50,6 +50,7 @@ import {
 } from '../types';
 import { hasFeature } from '/@/renderer/api/utils';
 import { ServerFeature, ServerFeatures } from '/@/renderer/api/features.types';
+import { SubsonicExtensions } from '/@/renderer/api/subsonic/subsonic-types';
 
 const authenticate = async (
     url: string,
@@ -528,19 +529,20 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
             throw new Error('Failed to get server extensions');
         }
 
-        for (const extension of res.body.openSubsonicExtensions) {
-            navidromeFeatures[extension.name] = extension.versions;
+        // The type here isn't necessarily an array (even though it's supposed to be). This is
+        // an implementation detail of Navidrome 0.50. Do a type check to make sure it's actually
+        // an array, and not an empty object.
+        if (Array.isArray(res.body.openSubsonicExtensions)) {
+            for (const extension of res.body.openSubsonicExtensions) {
+                navidromeFeatures[extension.name] = extension.versions;
+            }
         }
     }
 
     const features: ServerFeatures = {
-        smartPlaylists: false,
-        songLyrics: true,
+        multipleStructuredLyrics: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
+        smartPlaylists: !!navidromeFeatures[NavidromeExtensions.SMART_PLAYLISTS],
     };
-
-    if (navidromeFeatures[NavidromeExtensions.SMART_PLAYLISTS]) {
-        features[ServerFeature.SMART_PLAYLISTS] = true;
-    }
 
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
 };

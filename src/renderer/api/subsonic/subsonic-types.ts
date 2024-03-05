@@ -218,7 +218,7 @@ const extension = z.object({
 });
 
 const serverInfo = z.object({
-    openSubsonicExtensions: z.array(extension),
+    openSubsonicExtensions: z.array(extension).optional(),
 });
 
 const structuredLyricsParameters = z.object({
@@ -265,7 +265,6 @@ export enum SubsonicExtensions {
     SONG_LYRICS = 'songLyrics',
     TRANSCODE_OFFSET = 'transcodeOffset',
 }
-
 
 export const ssType = {
     _parameters: {
