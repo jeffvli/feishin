@@ -60,10 +60,10 @@ const PlayerStatusContainer = styled.div`
 `;
 
 const browser = isElectron() ? window.electron.browser : null;
-const close = () => browser.exit();
-const minimize = () => browser.minimize();
-const maximize = () => browser.maximize();
-const unmaximize = () => browser.unmaximize();
+const close = () => browser?.exit();
+const minimize = () => browser?.minimize();
+const maximize = () => browser?.maximize();
+const unmaximize = () => browser?.unmaximize();
 
 interface WindowBarControlsProps {
     controls: {

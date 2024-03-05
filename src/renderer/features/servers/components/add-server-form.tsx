@@ -6,7 +6,7 @@ import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
-import { AuthenticationResponse, ServerType } from '/@/renderer/api/types';
+import { AuthenticationResponse } from '/@/renderer/api/types';
 import { useAuthStoreActions } from '/@/renderer/store';
 import { ServerType, toServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
@@ -129,13 +129,13 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             >
                 <SegmentedControl
                     data={SERVER_TYPES}
-                    disabled={serverLock}
+                    disabled={Boolean(serverLock)}
                     {...form.getInputProps('type')}
                 />
                 <Group grow>
                     <TextInput
                         data-autofocus
-                        disabled={serverLock}
+                        disabled={Boolean(serverLock)}
                         label={t('form.addServer.input', {
                             context: 'name',
                             postProcess: 'titleCase',
@@ -143,7 +143,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                         {...form.getInputProps('name')}
                     />
                     <TextInput
-                        disabled={serverLock}
+                        disabled={Boolean(serverLock)}
                         label={t('form.addServer.input', {
                             context: 'url',
                             postProcess: 'titleCase',

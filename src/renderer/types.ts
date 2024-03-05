@@ -1,3 +1,4 @@
+import { ServerFeatures } from '/@/renderer/api/features-types';
 import {
     Album,
     AlbumArtist,
@@ -73,7 +74,7 @@ export const toServerType = (value?: string): ServerType | null => {
 
 export type ServerListItem = {
     credential: string;
-    features?: Record<string, number[]>;
+    features?: ServerFeatures;
     id: string;
     name: string;
     ndCredential?: string;
