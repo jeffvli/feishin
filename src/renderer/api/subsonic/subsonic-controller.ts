@@ -29,7 +29,7 @@ import {
     Song,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
-import { ServerFeatures } from '/@/renderer/api/features.types';
+import { ServerFeatures } from '/@/renderer/api/features-types';
 
 const authenticate = async (
     url: string,

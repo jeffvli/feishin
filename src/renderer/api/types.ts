@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ServerFeatures } from './features-types';
 import { jfType } from './jellyfin/jellyfin-types';
 import {
     JFSortOrder,
@@ -20,7 +21,6 @@ import {
     NDUserListSort,
     NDGenreListSort,
 } from './navidrome.types';
-import { ServerFeatures } from '/@/renderer/api/features.types';
 
 export enum LibraryItem {
     ALBUM = 'album',

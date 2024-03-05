@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { toast } from '/@/renderer/components';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem } from '/@/renderer/api/types';
-import { ServerFeature } from '/@/renderer/api/features.types';
+import { ServerFeature } from '/@/renderer/api/features-types';
 
 // Since ts-rest client returns a strict response type, we need to add the headers to the body object
 export const resultWithHeaders = <ItemType extends z.ZodTypeAny>(itemSchema: ItemType) => {

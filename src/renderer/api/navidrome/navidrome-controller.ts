@@ -49,7 +49,7 @@ import {
     ServerInfoArgs,
 } from '../types';
 import { hasFeature } from '/@/renderer/api/utils';
-import { ServerFeature, ServerFeatures } from '/@/renderer/api/features.types';
+import { ServerFeature, ServerFeatures } from '/@/renderer/api/features-types';
 import { SubsonicExtensions } from '/@/renderer/api/subsonic/subsonic-types';
 
 const authenticate = async (

@@ -12,7 +12,7 @@ import { convertQueryGroupToNDQuery } from '/@/renderer/features/playlists/utils
 import { useCurrentServer } from '/@/renderer/store';
 import { useTranslation } from 'react-i18next';
 import { hasFeature } from '/@/renderer/api/utils';
-import { ServerFeature } from '/@/renderer/api/features.types';
+import { ServerFeature } from '/@/renderer/api/features-types';
 
 interface CreatePlaylistFormProps {
     onCancel: () => void;

@@ -15,7 +15,7 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { api } from '/@/renderer/api';
 import isElectron from 'is-electron';
 import { hasFeature } from '/@/renderer/api/utils';
-import { ServerFeature } from '/@/renderer/api/features.types';
+import { ServerFeature } from '/@/renderer/api/features-types';
 
 const lyricsIpc = isElectron() ? window.electron.lyrics : null;
 

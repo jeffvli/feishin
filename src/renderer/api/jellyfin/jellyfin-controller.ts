@@ -61,7 +61,7 @@ import packageJson from '../../../../package.json';
 import { z } from 'zod';
 import { JFSongListSort, JFSortOrder } from '/@/renderer/api/jellyfin.types';
 import isElectron from 'is-electron';
-import { ServerFeatures } from '/@/renderer/api/features.types';
+import { ServerFeatures } from '/@/renderer/api/features-types';
 
 const formatCommaDelimitedString = (value: string[]) => {
     return value.join(',');
