@@ -1,7 +1,7 @@
 import { Flex, Stack, Group, Center } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'framer-motion';
-import { useEffect, useRef, useLayoutEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useLayoutEffect, useState, useCallback, Fragment } from 'react';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -292,7 +292,7 @@ export const FullScreenPlayerImage = () => {
                     }}
                 >
                     {currentSong?.artists?.map((artist, index) => (
-                        <>
+                        <Fragment key={`fs-artist-${artist.id}`}>
                             {index > 0 && (
                                 <Text
                                     $secondary
@@ -318,7 +318,7 @@ export const FullScreenPlayerImage = () => {
                             >
                                 {artist.name}
                             </Text>
-                        </>
+                        </Fragment>
                     ))}
                 </TextTitle>
                 <Group
