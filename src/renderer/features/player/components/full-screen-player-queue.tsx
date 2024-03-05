@@ -82,8 +82,6 @@ export const FullScreenPlayerQueue = () => {
         },
     ];
 
-    console.log('opacity', opacity);
-
     return (
         <GridContainer
             className="full-screen-player-queue-container"
