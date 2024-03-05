@@ -1,4 +1,5 @@
 import { useMemo, useEffect } from 'react';
+import { Center } from '@mantine/core';
 import isElectron from 'is-electron';
 import { Navigate, Outlet } from 'react-router-dom';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -41,7 +42,14 @@ export const AppOutlet = () => {
     }, [setFallback]);
 
     if (authState === AuthState.LOADING) {
-        return <Spinner container />;
+        return (
+            <Center
+                h="100vh"
+                w="100%"
+            >
+                <Spinner container />
+            </Center>
+        );
     }
 
     if (isActionsRequired || authState === AuthState.INVALID) {
