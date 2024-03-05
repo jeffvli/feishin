@@ -404,7 +404,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     }
 
     if (subsonicFeatures[SubsonicExtensions.SONG_LYRICS]) {
-        features.multipleStructuredLyrics = true;
+        features.lyricsMultipleStructured = true;
     }
 
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };

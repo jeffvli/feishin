@@ -123,7 +123,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                         />
                     )}
                     {server?.type === ServerType.NAVIDROME &&
-                        hasFeature(server, ServerFeature.SMART_PLAYLISTS) && (
+                        hasFeature(server, ServerFeature.PLAYLISTS_SMART) && (
                             <Switch
                                 label="Is smart playlist?"
                                 onChange={(e) => setIsSmartPlaylist(e.currentTarget.checked)}

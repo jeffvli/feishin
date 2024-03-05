@@ -368,7 +368,7 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
     if (
         customQuery &&
         customQuery.smart !== undefined &&
-        !hasFeature(apiClientProps.server, ServerFeature.SMART_PLAYLISTS)
+        !hasFeature(apiClientProps.server, ServerFeature.PLAYLISTS_SMART)
     ) {
         customQuery.smart = undefined;
     }
@@ -483,7 +483,7 @@ const removeFromPlaylist = async (
 };
 
 const VERSION_INFO: Array<[string, Record<string, number[]>]> = [
-    ['0.48.0', { [ServerFeature.SMART_PLAYLISTS]: [1] }],
+    ['0.48.0', { [ServerFeature.PLAYLISTS_SMART]: [1] }],
 ];
 
 const getFeatures = (version: string): Record<string, number[]> => {
@@ -540,8 +540,8 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     }
 
     const features: ServerFeatures = {
-        multipleStructuredLyrics: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
-        smartPlaylists: !!navidromeFeatures[NavidromeExtensions.SMART_PLAYLISTS],
+        lyricsMultipleStructured: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
+        playlistsSmart: !!navidromeFeatures[NavidromeExtensions.SMART_PLAYLISTS],
     };
 
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
