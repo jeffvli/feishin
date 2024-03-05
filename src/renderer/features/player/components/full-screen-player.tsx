@@ -173,7 +173,7 @@ const Controls = () => {
                             </Option.Control>
                         </Option>
                     )}
-                    {dynamicIsImage && (
+                    {dynamicBackground && dynamicIsImage && (
                         <Option>
                             <Option.Label>
                                 {t('page.fullscreenPlayer.config.dynamicImageBlur', {
