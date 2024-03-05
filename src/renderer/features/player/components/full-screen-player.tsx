@@ -425,6 +425,7 @@ const containerVariants: Variants = {
             background: dynamicBackground ? backgroundImage : mainBackground,
             backgroundColor: dynamicBackground ? background : mainBackground,
             backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             height:
                 windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS
@@ -474,9 +475,7 @@ export const FullScreenPlayer = () => {
     const imageUrl = currentSong?.imageUrl;
     const backgroundImage =
         imageUrl && dynamicIsImage
-            ? `url("${imageUrl
-                  .replace(/size=\d+/g, 'size=500')
-                  .replace(currentSong.id, currentSong.albumId)}") no-repeat fixed`
+            ? `url("${imageUrl.replace(/size=\d+/g, 'size=500')}`
             : mainBackground;
 
     return (
