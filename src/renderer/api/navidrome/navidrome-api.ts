@@ -286,9 +286,10 @@ axiosClient.interceptors.response.use(
                             });
 
                             const serverId = currentServer.id;
-                            useAuthStore
-                                .getState()
-                                .actions.updateServer(serverId, { ndCredential: undefined });
+                            useAuthStore.getState().actions.updateServer(serverId, {
+                                credential: undefined,
+                                ndCredential: undefined,
+                            });
                             useAuthStore.getState().actions.setCurrentServer(null);
 
                             // special error to prevent sending a second message, and stop other messages that could be enqueued
