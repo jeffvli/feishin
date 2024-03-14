@@ -1,3 +1,4 @@
+import { use } from 'i18next';
 import map from 'lodash/map';
 import merge from 'lodash/merge';
 import shuffle from 'lodash/shuffle';
@@ -8,10 +9,15 @@ import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
 import { QueueSong } from '/@/renderer/api/types';
 import { PlayerStatus, PlayerRepeat, PlayerShuffle, Play } from '/@/renderer/types';
+import { getMostSimilarSong } from '/@/renderer/features/similar-songs/queries/similar-song-queries';
 
 export interface PlayerState {
     current: {
+        history: Array<QueueSong> = [];
+        historyIndex: -1;
+        historyLimit: 10000;
         index: number;
+        isSimilar: boolean;
         nextIndex: number;
         player: 1 | 2;
         previousIndex: number;
@@ -65,6 +71,7 @@ export interface PlayerSlice extends PlayerState {
             songs: QueueSong[];
         }) => PlayerData;
         autoNext: () => PlayerData;
+        backtraceHistory: () => void;
         checkIsFirstTrack: () => boolean;
         checkIsLastTrack: (type?: 'next' | 'prev') => boolean;
         clearQueue: () => PlayerData;
@@ -76,6 +83,7 @@ export interface PlayerSlice extends PlayerState {
         next: () => PlayerData;
         pause: () => void;
         play: () => void;
+        playSimilar: () => boolean;
         player1: () => QueueSong | undefined;
         player2: () => QueueSong | undefined;
         previous: () => PlayerData;
@@ -96,6 +104,7 @@ export interface PlayerSlice extends PlayerState {
         setStore: (data: Partial<PlayerState>) => void;
         setVolume: (volume: number) => void;
         shuffleQueue: () => PlayerData;
+        updateHistory: (song: QueueSong) => void;
     };
 }
 
@@ -215,6 +224,9 @@ export const usePlayerStore = create<PlayerSlice>()(
                             const isLastTrack = get().actions.checkIsLastTrack();
                             const { repeat } = get();
 
+                            const currentSong = get().current.song;
+                            if (currentSong) get().actions.updateHistory(currentSong);
+
                             if (repeat === PlayerRepeat.ONE) {
                                 const nextIndex = get().current.index;
 
@@ -264,16 +276,32 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 });
                             }
 
-                            if (isLastTrack && repeat === PlayerRepeat.NONE) {
-                                set((state) => {
-                                    state.current.time = 0;
-                                    state.current.status = PlayerStatus.PAUSED;
-                                });
-                            }
+                            if (isLastTrack && repeat === PlayerRepeat.NONE)
+                                get().actions.playSimilar();
 
                             return get().actions.getPlayerData();
                         },
+                        backtraceHistory: () => {
+                            console.log(
+                                `We have ${get().current.historyIndex} songs left in history`,
+                            );
+                            const song = get().current.history[get().current.historyIndex - 2];
+                            const song2 = get().current.history[get().current.historyIndex - 3];
+
+                            console.log(get().current.history);
+                            console.log(`Going back to song: `, song);
+                            console.log(`Going backback to song2: `, song2);
+                            if (!song) return;
+                            set((state) => {
+                                state.current.time = 0;
+                                state.current.index = 0;
+                                state.current.player = 1;
+                                state.current.song = song;
+                                state.queue.previousNode = song2 || get().current.song;
+                            });
+                        },
                         checkIsFirstTrack: () => {
+                            if (get().current.isSimilar) return false;
                             const currentIndex =
                                 get().shuffle === PlayerShuffle.TRACK
                                     ? get().current.shuffledIndex
@@ -530,6 +558,9 @@ export const usePlayerStore = create<PlayerSlice>()(
                             const isLastTrack = get().actions.checkIsLastTrack();
                             const { repeat } = get();
 
+                            const currentSong = get().current.song;
+                            if (currentSong) get().actions.updateHistory(currentSong);
+
                             if (get().shuffle === PlayerShuffle.TRACK) {
                                 const nextShuffleIndex = isLastTrack
                                     ? 0
@@ -558,13 +589,25 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 }
                             } else {
                                 let nextIndex = 0;
+                                const oldIndex = get().current.index;
+
+                                // get number of songs in album
+                                const albumLength = get().queue.default.length;
 
                                 if (repeat === PlayerRepeat.ALL) {
-                                    nextIndex = isLastTrack ? 0 : get().current.index + 1;
+                                    console.log('albumLength', albumLength);
+                                    console.log('oldIndex', oldIndex);
+                                    nextIndex = isLastTrack ? 0 : oldIndex + 1;
                                 } else {
-                                    nextIndex = isLastTrack
-                                        ? get().current.index
-                                        : get().current.index + 1;
+                                    nextIndex = isLastTrack ? oldIndex : oldIndex + 1;
+                                }
+
+                                if (
+                                    oldIndex === albumLength - 1 &&
+                                    repeat === PlayerRepeat.NONE &&
+                                    get().shuffle !== PlayerShuffle.TRACK
+                                ) {
+                                    get().actions.playSimilar();
                                 }
 
                                 set((state) => {
@@ -584,9 +627,46 @@ export const usePlayerStore = create<PlayerSlice>()(
                             });
                         },
                         play: () => {
+                            const currentSong = get().current.song;
+                            if (currentSong) get().actions.updateHistory(currentSong);
                             set((state) => {
                                 state.current.status = PlayerStatus.PLAYING;
                             });
+                        },
+                        playSimilar: () => {
+                            const currentSong = get().current.song;
+                            console.log(`Last song: ${currentSong?.name}`);
+                            if (currentSong) {
+                                if (get().current.history.length > get().current.historyIndex) {
+                                    set((state) => {
+                                        state.current.historyIndex += 1;
+                                    });
+                                    return true;
+                                }
+
+                                (async () => {
+                                    const nextSong = await getMostSimilarSong(
+                                        currentSong,
+                                        get().current.history,
+                                    );
+                                    if (!nextSong) return false;
+                                    console.log(`Next song: ${nextSong?.name}`);
+
+                                    set((state) => {
+                                        state.current.index = 0;
+                                        state.current.isSimilar = true;
+                                        state.current.song = nextSong;
+                                        state.queue.previousNode = currentSong;
+                                        state.current.time = 0;
+                                        state.current.player = 1;
+                                        state.current.status = PlayerStatus.PLAYING;
+                                        state.queue.default = [nextSong];
+                                    });
+                                    return true;
+                                })();
+                                return true;
+                            }
+                            return false;
                         },
                         player1: () => {
                             return get().actions.getPlayerData().player1;
@@ -597,8 +677,13 @@ export const usePlayerStore = create<PlayerSlice>()(
                         previous: () => {
                             const isFirstTrack = get().actions.checkIsFirstTrack();
                             const { repeat } = get();
+                            console.log('Going to previous song');
 
+                            if (get().current.isSimilar) {
+                                get().actions.backtraceHistory();
+                            }
                             if (get().shuffle === PlayerShuffle.TRACK) {
+                                console.log('Shuffle is on');
                                 const prevShuffleIndex = isFirstTrack
                                     ? 0
                                     : get().current.shuffledIndex - 1;
@@ -951,9 +1036,36 @@ export const usePlayerStore = create<PlayerSlice>()(
 
                             return get().actions.getPlayerData();
                         },
+                        updateHistory: (song: QueueSong) => {
+                            let { history, historyLimit, historyIndex } = get().current;
+                            history = [...history];
+                            const songIndex = history.indexOf(song);
+                            if (historyIndex < history.length) {
+                                if (songIndex === -1) {
+                                    // We have broken the history, create true chain
+                                    history.splice(historyIndex, history.length - historyIndex);
+                                }
+                            } else if (songIndex !== -1) history.splice(songIndex, 1);
+
+                            console.log('Adding to history', song.name, songIndex, historyIndex);
+
+                            const newHistory = [...history, song];
+                            const isLimited = newHistory.length > historyLimit;
+                            if (isLimited) newHistory.shift();
+                            console.log('newHistory', newHistory);
+
+                            set((state) => {
+                                state.current.history = newHistory;
+                                state.current.historyIndex += isLimited ? 0 : 1;
+                            });
+                        },
                     },
                     current: {
+                        history: [] as QueueSong[],
+                        historyIndex: 0,
+                        historyLimit: 10000,
                         index: 0,
+                        isSimilar: false,
                         nextIndex: 0,
                         player: 1,
                         previousIndex: 0,
@@ -1005,6 +1117,7 @@ export const usePlayerControls = () =>
             next: state.actions.next,
             pause: state.actions.pause,
             play: state.actions.play,
+            playSimilar: state.actions.playSimilar,
             previous: state.actions.previous,
             setCurrentIndex: state.actions.setCurrentIndex,
             setMuted: state.actions.setMuted,

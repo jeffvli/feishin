@@ -31,8 +31,17 @@ export const useCenterControls = (args: { playersRef: any }) => {
     const { playersRef } = args;
 
     const currentPlayer = useCurrentPlayer();
-    const { setShuffle, setRepeat, play, pause, previous, next, setCurrentIndex, autoNext } =
-        usePlayerControls();
+    const {
+        setShuffle,
+        setRepeat,
+        play,
+        playSimilar,
+        pause,
+        previous,
+        next,
+        setCurrentIndex,
+        autoNext,
+    } = usePlayerControls();
     const setCurrentTime = useSetCurrentTime();
     const queue = useDefaultQueue();
     const playerStatus = useCurrentStatus();
@@ -322,11 +331,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
         const handleRepeatNone = {
             local: () => {
                 if (isLastTrack) {
-                    const playerData = setCurrentIndex(0);
+                    playSimilar();
+                    /* const playerData = setCurrentIndex(0);
                     mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PAUSED });
                     mpvPlayer!.setQueue(playerData);
                     mpvPlayer!.pause();
-                    pause();
+                    pause(); */
                 } else {
                     const playerData = next();
                     mprisUpdateSong({
@@ -339,6 +349,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
             },
             web: () => {
                 if (isLastTrack) {
+                    playSimilar();
+                    /*
                     const playerData = setCurrentIndex(0);
                     mprisUpdateSong({
                         song: playerData.current.song,
@@ -346,6 +358,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
                     });
                     resetPlayers();
                     pause();
+                    */
                 } else {
                     const playerData = next();
                     mprisUpdateSong({
@@ -476,6 +489,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
                     pause();
                 } else {
                     const playerData = previous();
+                    if (playerData === null) return;
                     mprisUpdateSong({
                         song: playerData.current.song,
                         status: PlayerStatus.PLAYING,
