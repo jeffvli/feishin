@@ -282,7 +282,7 @@
         "typescript": "^5.2.2",
         "typescript-plugin-styled-components": "^3.0.0",
         "url-loader": "^4.1.1",
-        "webpack": "^5.71.0",
+        "webpack": "^5.90.3",
         "webpack-bundle-analyzer": "^4.5.0",
         "webpack-cli": "^4.9.2",
         "webpack-dev-server": "^4.8.0",

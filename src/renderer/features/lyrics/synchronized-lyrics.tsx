@@ -79,6 +79,7 @@ export const SynchronizedLyrics = ({
 
     const delayMsRef = useRef(settings.delayMs);
     const followRef = useRef(settings.follow);
+    const lyricLengthInMs = useRef(0);
 
     const getCurrentLyric = (timeInMs: number) => {
         if (lyricRef.current) {
@@ -118,6 +119,8 @@ export const SynchronizedLyrics = ({
         return player.currentTime;
     }, [playbackType, playersRef]);
 
+    const prevLyric = useRef<HTMLElement | null>(null);
+
     const setCurrentLyric = useCallback(
         (timeInMs: number, epoch?: number, targetIndex?: number) => {
             const start = performance.now();
@@ -140,11 +143,6 @@ export const SynchronizedLyrics = ({
                 index = targetIndex;
             }
 
-            // Directly modify the dom instead of using react to prevent rerender
-            document
-                .querySelectorAll('.synchronized-lyrics .active')
-                .forEach((node) => node.classList.remove('active'));
-
             if (index === -1) {
                 lyricRef.current = undefined;
                 return;
@@ -163,6 +161,11 @@ export const SynchronizedLyrics = ({
             }
 
             currentLyric.classList.add('active');
+            console.log(`Active lyric: ${currentLyric.textContent}`);
+
+            if (prevLyric.current) prevLyric.current.classList.remove('active');
+
+            prevLyric.current = currentLyric;
 
             if (followRef.current) {
                 doc?.scroll({ behavior: 'smooth', top: offsetTop });
@@ -170,6 +173,9 @@ export const SynchronizedLyrics = ({
 
             if (index !== lyricRef.current!.length - 1) {
                 const nextTime = lyricRef.current![index + 1][0];
+
+                lyricLengthInMs.current = nextTime - timeInMs;
+                console.log(lyricLengthInMs.current);
 
                 const elapsed = performance.now() - start;
 
@@ -313,6 +319,7 @@ export const SynchronizedLyrics = ({
             {settings.showProvider && source && (
                 <LyricLine
                     alignment={settings.alignment}
+                    animationDuration={lyricLengthInMs.current.toString()}
                     className="lyric-credit"
                     fontSize={settings.fontSize}
                     text={`Provided by ${source}`}
@@ -321,6 +328,7 @@ export const SynchronizedLyrics = ({
             {settings.showMatch && remote && (
                 <LyricLine
                     alignment={settings.alignment}
+                    animationDuration={lyricLengthInMs.current.toString()}
                     className="lyric-credit"
                     fontSize={settings.fontSize}
                     text={`"${name} by ${artist}"`}
@@ -330,6 +338,7 @@ export const SynchronizedLyrics = ({
                 <LyricLine
                     key={idx}
                     alignment={settings.alignment}
+                    animationDuration={lyricLengthInMs.current.toString()}
                     className="lyric-line synchronized"
                     fontSize={settings.fontSize}
                     id={`lyric-${idx}`}
