@@ -1,4 +1,4 @@
-## A shit mod that adds features that I wanted
+## A shit mod that adds features I wanted
 
 <img src="assets/icons/icon.png" alt="logo" title="feishin" align="right" height="60px" />
 
