@@ -24,18 +24,23 @@ const StyledText = styled(TextTitle)<StyledTextProps>`
     opacity: 0.5;
 
     &.active {
-        opacity: 1;
         text-shadow: 0 0 5px var(--main-fg);
+        opacity: 1;
         animation: fadeIn 500ms ease-in-out forwards;
 
         @keyframes fadeIn {
-            from { opacity: 0.5; }
-            to { opacity: 1; }
+            from {
+                opacity: 0.5;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
     }
 
     &.unsynchronized {
-        opacity: 1;s
+        opacity: 1;
     }
 `;
 

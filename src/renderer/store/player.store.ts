@@ -289,15 +289,20 @@ export const usePlayerStore = create<PlayerSlice>()(
                             const song2 = get().current.history[get().current.historyIndex - 3];
 
                             console.log(get().current.history);
-                            console.log(`Going back to song: `, song);
-                            console.log(`Going backback to song2: `, song2);
                             if (!song) return;
+                            console.log(`Going back to song: `, song);
+
                             set((state) => {
-                                state.current.time = 0;
+                                state.current.history.pop();
+                                state.current.historyIndex -= 1;
                                 state.current.index = 0;
-                                state.current.player = 1;
+                                state.current.isSimilar = true;
                                 state.current.song = song;
-                                state.queue.previousNode = song2 || get().current.song;
+                                state.queue.previousNode = song2;
+                                state.current.time = 0;
+                                state.current.player = 1;
+                                state.current.status = PlayerStatus.PLAYING;
+                                state.queue.default = [song];
                             });
                         },
                         checkIsFirstTrack: () => {
@@ -636,6 +641,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                         playSimilar: () => {
                             const currentSong = get().current.song;
                             console.log(`Last song: ${currentSong?.name}`);
+                            if (currentSong) get().actions.updateHistory(currentSong);
                             if (currentSong) {
                                 if (get().current.history.length > get().current.historyIndex) {
                                     set((state) => {
@@ -681,8 +687,7 @@ export const usePlayerStore = create<PlayerSlice>()(
 
                             if (get().current.isSimilar) {
                                 get().actions.backtraceHistory();
-                            }
-                            if (get().shuffle === PlayerShuffle.TRACK) {
+                            } else if (get().shuffle === PlayerShuffle.TRACK) {
                                 console.log('Shuffle is on');
                                 const prevShuffleIndex = isFirstTrack
                                     ? 0
@@ -1045,19 +1050,26 @@ export const usePlayerStore = create<PlayerSlice>()(
                                     // We have broken the history, create true chain
                                     history.splice(historyIndex, history.length - historyIndex);
                                 }
-                            } else if (songIndex !== -1) history.splice(songIndex, 1);
+                            }
+                            if (songIndex !== -1) {
+                                history.splice(songIndex, 1);
+                                historyIndex -= 1;
+                            }
 
                             console.log('Adding to history', song.name, songIndex, historyIndex);
 
-                            const newHistory = [...history, song];
-                            const isLimited = newHistory.length > historyLimit;
-                            if (isLimited) newHistory.shift();
-                            console.log('newHistory', newHistory);
+                            // Only add the song to the history if it doesn't already exist in the history
+                            if (history.indexOf(song) === -1) {
+                                const newHistory = [...history, song];
+                                const isLimited = newHistory.length > historyLimit;
+                                if (isLimited) newHistory.shift();
+                                console.log('newHistory', newHistory);
 
-                            set((state) => {
-                                state.current.history = newHistory;
-                                state.current.historyIndex += isLimited ? 0 : 1;
-                            });
+                                set((state) => {
+                                    state.current.history = newHistory;
+                                    state.current.historyIndex += isLimited ? 0 : 1;
+                                });
+                            }
                         },
                     },
                     current: {

@@ -445,7 +445,8 @@ const createWindow = async (first = true) => {
 
     if (store.get('disable_auto_updates') !== true) {
         // eslint-disable-next-line
-        new AppUpdater();
+        // fuck this, gotta keep the mods
+        // new AppUpdater();
     }
 
     const theme = store.get('theme') as TitleTheme | undefined;
