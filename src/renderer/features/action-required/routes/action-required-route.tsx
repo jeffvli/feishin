@@ -1,7 +1,7 @@
 import { Center, Group, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { RiCheckFill } from 'react-icons/ri';
-import { Link, Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button, PageHeader, Text } from '/@/renderer/components';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
 import { ServerCredentialRequired } from '/@/renderer/features/action-required/components/server-credential-required';
@@ -14,7 +14,7 @@ const ActionRequiredRoute = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServer();
     const isServerRequired = !currentServer;
-    const isCredentialRequired = false;
+    const isCredentialRequired = currentServer && !currentServer.credential;
 
     const checks = [
         {
@@ -50,7 +50,6 @@ const ActionRequiredRoute = () => {
                     <Stack mt="2rem">
                         {canReturnHome && (
                             <>
-                                <Navigate to={AppRoute.HOME} />
                                 <Group
                                     noWrap
                                     position="center"

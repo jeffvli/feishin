@@ -2,7 +2,7 @@
     "name": "feishin",
     "productName": "Feishin",
     "description": "Feishin music server",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "scripts": {
         "build": "concurrently \"npm run build:main\" \"npm run build:renderer\" \"npm run build:remote\"",
         "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
@@ -230,7 +230,7 @@
         "css-loader": "^6.7.1",
         "css-minimizer-webpack-plugin": "^3.4.1",
         "detect-port": "^1.3.0",
-        "electron": "^27.1.0",
+        "electron": "^26.6.10",
         "electron-builder": "^24.9.0",
         "electron-devtools-installer": "^3.2.0",
         "electron-notarize": "^1.2.1",
