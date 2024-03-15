@@ -1,5 +1,12 @@
 ## A shit mod that adds features I wanted
 
+# Mods
+- Custom lyric animations
+   - Edit the CSS "StyledText1" in src\renderer\features\lyrics\lyric-line.tsx to change the animations
+- Settings tab to configure mods
+- Automatically play similar songs not already heard
+
+<br><br><br><br><br>
 <img src="assets/icons/icon.png" alt="logo" title="feishin" align="right" height="60px" />
 
 # Feishin
