@@ -236,6 +236,7 @@ export interface SettingsState {
     modshin: {
         autoPlay: boolean;
         historyLength: number;
+        lyricAnimations: boolean;
     };
     playback: {
         audioDeviceId?: string | null;
@@ -390,6 +391,7 @@ const initialState: SettingsState = {
     modshin: {
         autoPlay: true,
         historyLength: 10000,
+        lyricAnimations: true,
     },
     playback: {
         audioDeviceId: undefined,
@@ -648,7 +650,7 @@ export const useSettingsStore = create<SettingsSlice>()(
 export const modshinSettings = () => {
     // return an always up-to-date version of the settings
     return useSettingsStore.getState().modshin;
-}
+};
 
 export const useSettingsStoreActions = () => useSettingsStore((state) => state.actions);
 

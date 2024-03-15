@@ -589,9 +589,11 @@
         "zoom": "zoom percentage",
         "zoom_description": "sets the zoom percentage for the application",
         "autoPlay": "Autoplay",
-        "autoPlay_description": "Automatically play similar songs when the current track or album ends. Forces WEB player",
+        "autoPlay_description": "Automatically play similar songs when the current track or album ends. Forces WEB player $t(common.restartRequired)",
         "historyLength": "History length",
-        "historyLength_description": "The number of songs to keep in the history, autoplay skips over any songs in the history. Overrides eldest first $t(common.restartRequired)"
+        "historyLength_description": "The number of songs to keep in the history, autoplay skips over any songs in the history. Overrides eldest first $t(common.restartRequired)",
+        "lyricAnimations": "Lyric animations",
+        "lyricAnimations_description": "Enables custom lyric animations $t(common.restartRequired)"
     },
     "table": {
         "column": {

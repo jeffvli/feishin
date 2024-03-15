@@ -17,7 +17,6 @@ export const ModSettings = () => {
         {
             control: (
                 <Switch
-                    aria-label="Toggle start in tray"
                     defaultChecked={settings.autoPlay}
                     onChange={(e) => {
                         if (!e) return;
@@ -35,6 +34,27 @@ export const ModSettings = () => {
                 postProcess: 'sentenceCase',
             }),
             title: t('setting.autoPlay', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.lyricAnimations}
+                    onChange={(e) => {
+                        if (!e) return;
+                        setSettings({
+                            modshin: {
+                                ...settings,
+                                lyricAnimations: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.lyricAnimations', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.lyricAnimations', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
