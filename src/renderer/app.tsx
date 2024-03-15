@@ -51,6 +51,7 @@ export const App = () => {
     const textStyleRef = useRef<HTMLStyleElement>();
     useDiscordRpc();
     useServerVersion();
+    usePlayerStore.getState().actions.modsInit();
 
     useEffect(() => {
         if (type === FontType.SYSTEM && system) {

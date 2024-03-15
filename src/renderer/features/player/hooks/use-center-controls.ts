@@ -331,12 +331,16 @@ export const useCenterControls = (args: { playersRef: any }) => {
         const handleRepeatNone = {
             local: () => {
                 if (isLastTrack) {
-                    playSimilar();
-                    /* const playerData = setCurrentIndex(0);
+                    if (playSimilar()) {
+                        mpvPlayer!.pause();
+                        pause();
+                        return;
+                    }
+                    const playerData = setCurrentIndex(0);
                     mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PAUSED });
                     mpvPlayer!.setQueue(playerData);
                     mpvPlayer!.pause();
-                    pause(); */
+                    pause();
                 } else {
                     const playerData = next();
                     mprisUpdateSong({
@@ -349,8 +353,10 @@ export const useCenterControls = (args: { playersRef: any }) => {
             },
             web: () => {
                 if (isLastTrack) {
-                    playSimilar();
-                    /*
+                    if (playSimilar()) {
+                        pause();
+                        return;
+                    }
                     const playerData = setCurrentIndex(0);
                     mprisUpdateSong({
                         song: playerData.current.song,
@@ -358,7 +364,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
                     });
                     resetPlayers();
                     pause();
-                    */
                 } else {
                     const playerData = next();
                     mprisUpdateSong({

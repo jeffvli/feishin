@@ -233,6 +233,10 @@ export interface SettingsState {
         showProvider: boolean;
         sources: LyricSource[];
     };
+    modshin: {
+        autoPlay: boolean;
+        historyLength: number;
+    };
     playback: {
         audioDeviceId?: string | null;
         crossfadeDuration: number;
@@ -382,6 +386,10 @@ const initialState: SettingsState = {
         showMatch: true,
         showProvider: true,
         sources: [],
+    },
+    modshin: {
+        autoPlay: true,
+        historyLength: 10000,
     },
     playback: {
         audioDeviceId: undefined,
@@ -637,6 +645,11 @@ export const useSettingsStore = create<SettingsSlice>()(
     ),
 );
 
+export const modshinSettings = () => {
+    // return an always up-to-date version of the settings
+    return useSettingsStore.getState().modshin;
+}
+
 export const useSettingsStoreActions = () => useSettingsStore((state) => state.actions);
 
 export const usePlaybackSettings = () => useSettingsStore((state) => state.playback, shallow);
@@ -645,6 +658,8 @@ export const useTableSettings = (type: TableType) =>
     useSettingsStore((state) => state.tables[type]);
 
 export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
+
+export const useModshinSettings = () => useSettingsStore((state) => state.modshin, shallow);
 
 export const usePlaybackType = () =>
     useSettingsStore((state) => {

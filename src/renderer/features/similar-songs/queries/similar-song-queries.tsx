@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { SimilarSongsQuery, QueueSong } from '/@/renderer/api/types';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
-import { getServerById } from '/@/renderer/store';
+import { getServerById, modshinSettings } from '/@/renderer/store';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { api } from '/@/renderer/api';
 
@@ -25,6 +25,8 @@ export const useSimilarSongs = (args: QueryHookArgs<SimilarSongsQuery>) => {
 };
 
 export const getMostSimilarSong = async (song: QueueSong, history: Array<QueueSong> = []) => {
+    if (modshinSettings().autoPlay === false) return null;
+
     const serverId = song.serverId;
     const server = getServerById(serverId);
 

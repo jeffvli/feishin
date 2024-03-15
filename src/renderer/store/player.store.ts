@@ -10,12 +10,14 @@ import { shallow } from 'zustand/shallow';
 import { QueueSong } from '/@/renderer/api/types';
 import { PlayerStatus, PlayerRepeat, PlayerShuffle, Play } from '/@/renderer/types';
 import { getMostSimilarSong } from '/@/renderer/features/similar-songs/queries/similar-song-queries';
+import { modshinSettings } from '/@/renderer/store';
 
 export interface PlayerState {
     current: {
-        history: Array<QueueSong> = [];
-        historyIndex: -1;
-        historyLimit: 10000;
+        didModInit: boolean;
+        history: Array<QueueSong>;
+        historyIndex: number;
+        historyLimit: number;
         index: number;
         isSimilar: boolean;
         nextIndex: number;
@@ -78,6 +80,7 @@ export interface PlayerSlice extends PlayerState {
         getPlayerData: () => PlayerData;
         getQueueData: () => QueueData;
         incrementPlayCount: (ids: string[]) => string[];
+        modsInit: () => void;
         moveToBottomOfQueue: (uniqueIds: string[]) => PlayerData;
         moveToTopOfQueue: (uniqueIds: string[]) => PlayerData;
         next: () => PlayerData;
@@ -221,11 +224,25 @@ export const usePlayerStore = create<PlayerSlice>()(
                             return get().actions.getPlayerData();
                         },
                         autoNext: () => {
+                            console.log('Autonext');
                             const isLastTrack = get().actions.checkIsLastTrack();
                             const { repeat } = get();
 
                             const currentSong = get().current.song;
                             if (currentSong) get().actions.updateHistory(currentSong);
+
+                            if (
+                                isLastTrack &&
+                                repeat === PlayerRepeat.NONE &&
+                                !modshinSettings().autoPlay
+                            ) {
+                                set((state) => {
+                                    state.current.status = PlayerStatus.PAUSED;
+                                    state.current.time = 0;
+                                    state.current.song = currentSong;
+                                });
+                                return get().actions.getPlayerData();
+                            }
 
                             if (repeat === PlayerRepeat.ONE) {
                                 const nextIndex = get().current.index;
@@ -276,8 +293,11 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 });
                             }
 
-                            if (isLastTrack && repeat === PlayerRepeat.NONE)
-                                get().actions.playSimilar();
+                            if (isLastTrack && repeat === PlayerRepeat.NONE) {
+                                if (!get().actions.playSimilar()) {
+                                    get().actions.pause();
+                                }
+                            }
 
                             return get().actions.getPlayerData();
                         },
@@ -511,6 +531,16 @@ export const usePlayerStore = create<PlayerSlice>()(
 
                             return foundUniqueIds;
                         },
+                        modsInit: () => {
+                            if (get().current.didModInit) return;
+                            console.log("Initializing player store's mods");
+                            const historyLimit = modshinSettings().historyLength;
+                            console.log('historyLimit', historyLimit);
+                            set((state) => {
+                                state.current.didModInit = true;
+                                state.current.historyLimit = historyLimit;
+                            });
+                        },
                         moveToBottomOfQueue: (uniqueIds) => {
                             const queue = get().queue.default;
 
@@ -560,6 +590,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                             return get().actions.getPlayerData();
                         },
                         next: () => {
+                            console.log('next');
                             const isLastTrack = get().actions.checkIsLastTrack();
                             const { repeat } = get();
 
@@ -655,7 +686,12 @@ export const usePlayerStore = create<PlayerSlice>()(
                                         currentSong,
                                         get().current.history,
                                     );
-                                    if (!nextSong) return false;
+                                    if (!nextSong) {
+                                        set((state) => {
+                                            state.current.isSimilar = false;
+                                        });
+                                        return false;
+                                    }
                                     console.log(`Next song: ${nextSong?.name}`);
 
                                     set((state) => {
@@ -1073,9 +1109,10 @@ export const usePlayerStore = create<PlayerSlice>()(
                         },
                     },
                     current: {
+                        didModInit: false,
                         history: [] as QueueSong[],
                         historyIndex: 0,
-                        historyLimit: 10000,
+                        historyLimit: 100,
                         index: 0,
                         isSimilar: false,
                         nextIndex: 0,

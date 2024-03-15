@@ -352,6 +352,7 @@
         "setting": {
             "generalTab": "general",
             "hotkeysTab": "hotkeys",
+            "modshinTab": "mods",
             "playbackTab": "playback",
             "windowTab": "window"
         },
@@ -586,7 +587,11 @@
         "windowBarStyle": "window bar style",
         "windowBarStyle_description": "select the style of the window bar",
         "zoom": "zoom percentage",
-        "zoom_description": "sets the zoom percentage for the application"
+        "zoom_description": "sets the zoom percentage for the application",
+        "autoPlay": "Autoplay",
+        "autoPlay_description": "Automatically play similar songs when the current track or album ends. Forces WEB player",
+        "historyLength": "History length",
+        "historyLength_description": "The number of songs to keep in the history, autoplay skips over any songs in the history. Overrides eldest first $t(common.restartRequired)"
     },
     "table": {
         "column": {
