@@ -1,8 +1,8 @@
 {
-    "name": "feishin",
+    "name": "feishin-dev",
     "productName": "Feishin",
     "description": "Feishin music server",
-    "version": "0.6.1",
+    "version": "0.6.1-dev",
     "scripts": {
         "build": "concurrently \"npm run build:main\" \"npm run build:renderer\" \"npm run build:remote\"",
         "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",

@@ -144,6 +144,7 @@
         "apiRouteError": "unable to route request",
         "audioDeviceFetchError": "an error occurred when trying to get audio devices",
         "authenticationFailed": "authentication failed",
+        "badAlbum": "you are seeing this page because this song is not part of an album. you are most likely seeing this issue if you have a song at the top level of your music folder. jellyfin only groups tracks if they are are in a folder.",
         "credentialsRequired": "credentials required",
         "endpointNotImplementedError": "endpoint {{endpoint}} is not implemented for {{serverType}}",
         "genericError": "an error occurred",
