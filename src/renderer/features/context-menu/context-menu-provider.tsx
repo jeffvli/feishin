@@ -25,6 +25,7 @@ import {
     RiPlayListAddFill,
     RiStarFill,
     RiCloseCircleLine,
+    RiShareForwardFill,
 } from 'react-icons/ri';
 import { AnyLibraryItems, LibraryItem, ServerType, AnyLibraryItem } from '/@/renderer/api/types';
 import {
@@ -600,6 +601,22 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         }
     }, [ctx.dataNodes, moveToTopOfQueue, playbackType]);
 
+    const handleShareItem = useCallback(() => {
+        if (!ctx.dataNodes && !ctx.data) return;
+
+        const uniqueIds = ctx.data.map((node) => node.id);
+
+        openContextModal({
+            innerProps: {
+                itemIds: uniqueIds,
+                resourceType: ctx.data[0].itemType,
+            },
+            modal: 'shareItem',
+            size: 'md',
+            title: t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' }),
+        });
+    }, [ctx.data, ctx.dataNodes, t]);
+
     const handleRemoveSelected = useCallback(() => {
         const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
         if (!uniqueIds?.length) return;
@@ -775,6 +792,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 onClick: () => {},
                 rightIcon: <RiArrowRightSFill size="1.2rem" />,
             },
+            shareItem: {
+                id: 'shareItem',
+                label: t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiShareForwardFill size="1.1rem" />,
+                onClick: handleShareItem,
+            },
         };
     }, [
         handleAddToFavorites,
@@ -788,6 +811,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         handleRemoveSelected,
         handleUpdateRating,
         openDeletePlaylistModal,
+        handleShareItem,
         t,
     ]);
 

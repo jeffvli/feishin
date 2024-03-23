@@ -47,6 +47,8 @@ import {
     genreListSortMap,
     ServerInfo,
     ServerInfoArgs,
+    ShareItemArgs,
+    ShareItemResponse,
 } from '../types';
 import { hasFeature } from '/@/renderer/api/utils';
 import { ServerFeature, ServerFeatures } from '/@/renderer/api/features-types';
@@ -547,6 +549,27 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
 };
 
+const shareItem = async (args: ShareItemArgs): Promise<ShareItemResponse> => {
+    const { body, apiClientProps } = args;
+
+    const res = await ndApiClient(apiClientProps).shareItem({
+        body: {
+            description: body.description,
+            downloadable: body.downloadable,
+            resourceIds: body.resourceIds,
+            resourceType: body.resourceType,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to share item');
+    }
+
+    return {
+        id: res.body.data.id,
+    };
+};
+
 export const ndController = {
     addToPlaylist,
     authenticate,
@@ -565,5 +588,6 @@ export const ndController = {
     getSongList,
     getUserList,
     removeFromPlaylist,
+    shareItem,
     updatePlaylist,
 };

@@ -98,6 +98,7 @@
         "setting": "setting",
         "setting_one": "setting",
         "setting_other": "settings",
+        "share": "share",
         "size": "size",
         "sortOrder": "order",
         "title": "title",
@@ -251,6 +252,11 @@
             "input_optionMatchAll": "match all",
             "input_optionMatchAny": "match any"
         },
+        "shareItem": {
+            "allowDownloading": "allow downloading",
+            "description": "description",
+            "success": "share link copied to clipboard"
+        },
         "updateServer": {
             "success": "server updated successfully",
             "title": "update server"
@@ -306,7 +312,8 @@
             "removeFromFavorites": "$t(action.removeFromFavorites)",
             "removeFromPlaylist": "$t(action.removeFromPlaylist)",
             "removeFromQueue": "$t(action.removeFromQueue)",
-            "setRating": "$t(action.setRating)"
+            "setRating": "$t(action.setRating)",
+            "shareItem": "share item"
         },
         "fullscreenPlayer": {
             "config": {

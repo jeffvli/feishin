@@ -157,6 +157,15 @@ export const contract = c.router({
             500: resultWithHeaders(ndType._response.error),
         },
     },
+    shareItem: {
+        body: ndType._parameters.shareItem,
+        method: 'POST',
+        path: 'share',
+        responses: {
+            200: resultWithHeaders(ndType._response.shareItem),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
     updatePlaylist: {
         body: ndType._parameters.updatePlaylist,
         method: 'PUT',

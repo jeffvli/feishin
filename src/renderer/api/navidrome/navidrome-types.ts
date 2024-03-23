@@ -343,6 +343,17 @@ const removeFromPlaylistParameters = z.object({
     id: z.array(z.string()),
 });
 
+const shareItem = z.object({
+    id: z.string(),
+});
+
+const shareItemParameters = z.object({
+    description: z.string(),
+    downloadable: z.boolean(),
+    resourceIds: z.string(),
+    resourceType: z.string(),
+});
+
 export enum NavidromeExtensions {
     SMART_PLAYLISTS = 'smartPlaylists',
 }
@@ -365,6 +376,7 @@ export const ndType = {
         genreList: genreListParameters,
         playlistList: playlistListParameters,
         removeFromPlaylist: removeFromPlaylistParameters,
+        shareItem: shareItemParameters,
         songList: songListParameters,
         updatePlaylist: updatePlaylistParameters,
         userList: userListParameters,
@@ -386,6 +398,7 @@ export const ndType = {
         playlistSong,
         playlistSongList,
         removeFromPlaylist,
+        shareItem,
         song,
         songList,
         updatePlaylist,

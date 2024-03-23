@@ -21,6 +21,7 @@ import { ContextMenuProvider } from '/@/renderer/features/context-menu';
 import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { PlayQueueHandlerContext } from '/@/renderer/features/player';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
+import { ShareItemContextModal } from '/@/renderer/features/sharing';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
 import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
 import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
@@ -259,7 +260,11 @@ export const App = () => {
                         transition: 'fade',
                     },
                 }}
-                modals={{ addToPlaylist: AddToPlaylistContextModal, base: BaseContextModal }}
+                modals={{
+                    addToPlaylist: AddToPlaylistContextModal,
+                    base: BaseContextModal,
+                    shareItem: ShareItemContextModal,
+                }}
             >
                 <PlayQueueHandlerContext.Provider value={providerValue}>
                     <ContextMenuProvider>
