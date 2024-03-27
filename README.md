@@ -1,4 +1,4 @@
-## A shit mod that adds features I wanted
+# A shit mod that adds features I wanted
 
 # Mods
 - Custom lyric animations
