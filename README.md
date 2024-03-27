@@ -5,8 +5,15 @@
    - Edit the CSS "StyledText1" in src\renderer\features\lyrics\lyric-line.tsx to change the animations
 - Settings tab to configure mods
 - Automatically play similar songs not already heard
+- Patches (hopefully) freezing
+- Dedicated modshin settings tab
+- Expanded center controls with modshin features
 
-<br><br><br><br><br>
+<br><br>
+
+<img src="https://raw.githubusercontent.com/pbhLBOLBvZSH/Modshin/development/imgs/modshin1.png" width="90%"/><img src="https://raw.githubusercontent.com/pbhLBOLBvZSH/Modshin/development/imgs/modshin2.png" width="90%"/>
+
+<br><br><br>
 <img src="assets/icons/icon.png" alt="logo" title="feishin" align="right" height="60px" />
 
 # Feishin
