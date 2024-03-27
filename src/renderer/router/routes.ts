@@ -2,6 +2,7 @@ export enum AppRoute {
     ACTION_REQUIRED = '/action-required',
     EXPLORE = '/explore',
     HOME = '/',
+    JUKEBOX = '/jukebox',
     LIBRARY_ALBUMS = '/library/albums',
     LIBRARY_ALBUMS_DETAIL = '/library/albums/:albumId',
     LIBRARY_ALBUM_ARTISTS = '/library/album-artists',
@@ -24,4 +25,5 @@ export enum AppRoute {
     SEARCH = '/search/:itemType',
     SERVERS = '/servers',
     SETTINGS = '/settings',
+    VISUALISER = '/visualiser',
 }

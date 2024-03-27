@@ -225,7 +225,7 @@ export const WindowBar = () => {
         ? currentSong?.artistName
             ? `${statusString}${queueString}${currentSong?.name} — ${currentSong?.artistName}`
             : `${statusString}${queueString}${currentSong?.name}`
-        : 'Feishin';
+        : 'Modshin';
     document.title = title;
 
     const [max, setMax] = useState(false);

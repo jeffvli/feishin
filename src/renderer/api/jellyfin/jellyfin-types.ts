@@ -669,6 +669,7 @@ const similarSongsParameters = z.object({
     Fields: z.string().optional(),
     Limit: z.number().optional(),
     UserId: z.string().optional(),
+    excludeArtistIds: z.string().optional(),
 });
 
 const similarSongs = pagination.extend({

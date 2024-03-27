@@ -202,7 +202,7 @@ const createTray = () => {
         createWinThumbarButtons();
     });
 
-    tray.setToolTip('Feishin');
+    tray.setToolTip('Modshin');
     tray.setContextMenu(contextMenu);
 };
 

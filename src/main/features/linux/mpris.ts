@@ -4,10 +4,10 @@ import { PlayerRepeat, PlayerStatus, SongUpdate } from '../../../renderer/types'
 import { getMainWindow } from '../../main';
 
 const mprisPlayer = Player({
-    identity: 'Feishin',
+    identity: 'Modshin',
     maximumRate: 1.0,
     minimumRate: 1.0,
-    name: 'Feishin',
+    name: 'Modshin',
     rate: 1.0,
     supportedInterfaces: ['player'],
     supportedMimeTypes: ['audio/mpeg', 'application/ogg'],

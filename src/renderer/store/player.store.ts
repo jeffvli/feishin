@@ -84,6 +84,7 @@ export interface PlayerSlice extends PlayerState {
         moveToBottomOfQueue: (uniqueIds: string[]) => PlayerData;
         moveToTopOfQueue: (uniqueIds: string[]) => PlayerData;
         next: () => PlayerData;
+        onSongPlay: (song: QueueSong) => void;
         pause: () => void;
         play: () => void;
         playSimilar: () => boolean;
@@ -107,7 +108,6 @@ export interface PlayerSlice extends PlayerState {
         setStore: (data: Partial<PlayerState>) => void;
         setVolume: (volume: number) => void;
         shuffleQueue: () => PlayerData;
-        updateHistory: (song: QueueSong) => void;
     };
 }
 
@@ -229,7 +229,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                             const { repeat } = get();
 
                             const currentSong = get().current.song;
-                            if (currentSong) get().actions.updateHistory(currentSong);
+                            if (currentSong) get().actions.onSongPlay(currentSong);
 
                             if (
                                 isLastTrack &&
@@ -595,7 +595,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                             const { repeat } = get();
 
                             const currentSong = get().current.song;
-                            if (currentSong) get().actions.updateHistory(currentSong);
+                            if (currentSong) get().actions.onSongPlay(currentSong);
 
                             if (get().shuffle === PlayerShuffle.TRACK) {
                                 const nextShuffleIndex = isLastTrack
@@ -657,6 +657,57 @@ export const usePlayerStore = create<PlayerSlice>()(
 
                             return get().actions.getPlayerData();
                         },
+                        onSongPlay: (song: QueueSong) => {
+                            // Updating this history
+                            let { history, historyLimit, historyIndex } = get().current;
+                            history = [...history];
+                            const songIndex = history.indexOf(song);
+                            if (historyIndex < history.length) {
+                                if (songIndex === -1) {
+                                    // We have broken the history, create true chain
+                                    history.splice(historyIndex, history.length - historyIndex);
+                                }
+                            }
+                            if (songIndex !== -1) {
+                                history.splice(songIndex, 1);
+                                historyIndex -= 1;
+                            }
+
+                            console.log('Adding to history', song.name, songIndex, historyIndex);
+
+                            // Only add the song to the history if it doesn't already exist in the history
+                            if (history.indexOf(song) === -1) {
+                                const newHistory = [...history, song];
+                                const isLimited = newHistory.length > historyLimit;
+                                if (isLimited) newHistory.shift();
+                                console.log('newHistory', newHistory);
+
+                                set((state) => {
+                                    state.current.history = newHistory;
+                                    state.current.historyIndex += isLimited ? 0 : 1;
+                                });
+                            }
+
+                            // Ensure the song actually starts playing
+
+                            (async () => {
+                                // eslint-disable-next-line no-constant-condition
+                                while (true) {
+                                    const first = get().current.time;
+
+                                    // eslint-disable-next-line no-promise-executor-return
+                                    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+                                    if (first === get().current.time) {
+                                        console.log('Song is not playing?');
+                                        // eslint-disable-next-line no-promise-executor-return
+                                        await new Promise((resolve) => setTimeout(resolve, 5000));
+                                    } else {
+                                        break;
+                                    }
+                                }
+                            })();
+                        },
                         pause: () => {
                             set((state) => {
                                 state.current.status = PlayerStatus.PAUSED;
@@ -664,7 +715,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                         },
                         play: () => {
                             const currentSong = get().current.song;
-                            if (currentSong) get().actions.updateHistory(currentSong);
+                            if (currentSong) get().actions.onSongPlay(currentSong);
                             set((state) => {
                                 state.current.status = PlayerStatus.PLAYING;
                             });
@@ -672,7 +723,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                         playSimilar: () => {
                             const currentSong = get().current.song;
                             console.log(`Last song: ${currentSong?.name}`);
-                            if (currentSong) get().actions.updateHistory(currentSong);
+                            if (currentSong) get().actions.onSongPlay(currentSong);
                             if (currentSong) {
                                 if (get().current.history.length > get().current.historyIndex) {
                                     set((state) => {
@@ -1076,36 +1127,6 @@ export const usePlayerStore = create<PlayerSlice>()(
                             }
 
                             return get().actions.getPlayerData();
-                        },
-                        updateHistory: (song: QueueSong) => {
-                            let { history, historyLimit, historyIndex } = get().current;
-                            history = [...history];
-                            const songIndex = history.indexOf(song);
-                            if (historyIndex < history.length) {
-                                if (songIndex === -1) {
-                                    // We have broken the history, create true chain
-                                    history.splice(historyIndex, history.length - historyIndex);
-                                }
-                            }
-                            if (songIndex !== -1) {
-                                history.splice(songIndex, 1);
-                                historyIndex -= 1;
-                            }
-
-                            console.log('Adding to history', song.name, songIndex, historyIndex);
-
-                            // Only add the song to the history if it doesn't already exist in the history
-                            if (history.indexOf(song) === -1) {
-                                const newHistory = [...history, song];
-                                const isLimited = newHistory.length > historyLimit;
-                                if (isLimited) newHistory.shift();
-                                console.log('newHistory', newHistory);
-
-                                set((state) => {
-                                    state.current.history = newHistory;
-                                    state.current.historyIndex += isLimited ? 0 : 1;
-                                });
-                            }
                         },
                     },
                     current: {

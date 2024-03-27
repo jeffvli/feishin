@@ -90,6 +90,18 @@ export const sidebarItems = [
         label: i18n.t('page.sidebar.settings'),
         route: AppRoute.SETTINGS,
     },
+    {
+        disabled: true,
+        id: 'Jukebox',
+        label: i18n.t('page.sidebar.jukebox'),
+        route: AppRoute.JUKEBOX,
+    },
+    {
+        disabled: true,
+        id: 'Visualiser',
+        label: i18n.t('page.sidebar.visualiser'),
+        route: AppRoute.VISUALISER,
+    },
 ];
 
 export type SortableItem<T> = {

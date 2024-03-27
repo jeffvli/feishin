@@ -5,7 +5,8 @@
         "lib": ["dom", "es2021", "WebWorker"],
         "baseUrl": "./src",
         "paths": {
-            "/@/*": ["*"]
+            "/@/*": ["*"],
+            "@shared/*": ["shared/*"]
         },
         "declaration": true,
         "declarationMap": true,

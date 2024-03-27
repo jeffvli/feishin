@@ -32,33 +32,51 @@ export const getMostSimilarSong = async (song: QueueSong, history: Array<QueueSo
 
     if (!server) throw new Error('Server not found');
 
-    const query = { count: 100, songId: song.id };
+    let attempts = 0;
+    let newSong = null;
+    const excludeArtistIds: string[] = [];
 
-    try {
+    do {
+        const query = {
+            excludeArtistIds: excludeArtistIds.join(','),
+            songId: song.id,
+        };
+
+        console.log('query', query);
+
         const response = await api.controller.getSimilarSongs({
             apiClientProps: { server },
-            query: { count: query.count ?? 50, songId: query.songId },
+            query,
         });
+
+        console.log('response', response);
 
         if (!response || response.length === 0) return null;
 
         console.log('response', response);
 
         // Try to find a song that is not in the history
-        const newSong = response.find((songItem) => {
+        newSong = response.find((songItem) => {
             return (
                 !history.some((historyItem) => historyItem.id === songItem.id) &&
                 songItem.id !== song.id
             );
         });
 
-        // If a new song is found, return it
-        if (newSong) return newSong;
+        // If no new song is found, add the artist of the current song to the exclude list
+        if (!newSong) {
+            const artist = song.artists[0];
+            if (excludeArtistIds.indexOf(artist.id) === -1) {
+                excludeArtistIds.push(artist.id);
+            }
+        }
 
-        // If no new song is found, return null
-        return null;
-    } catch (error) {
-        console.error(error);
-        return null;
-    }
+        attempts += 1;
+    } while (!newSong && attempts < 25); // Limit the number of attempts to prevent infinite loops
+
+    // If a new song is found, return it
+    if (newSong) return newSong;
+
+    // If no new song is found, return null
+    return null;
 };

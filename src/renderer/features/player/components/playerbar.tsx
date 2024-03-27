@@ -26,12 +26,12 @@ const PlayerbarContainer = styled.div`
 
 const PlayerbarControlsGrid = styled.div`
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
     gap: 1rem;
     height: 100%;
 
     @media (width <= 768px) {
-        grid-template-columns: minmax(0, 0.5fr) minmax(0, 1fr) minmax(0, 0.5fr);
+        grid-template-columns: minmax(0, 0.5fr) minmax(0, 2fr) minmax(0, 0.5fr);
     }
 `;
 

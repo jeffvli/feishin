@@ -1,0 +1,159 @@
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.jukebox-header {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+
+    width: 100%;
+
+    .side {
+        flex-grow: 1;
+
+        display: flex;
+        align-items: start;
+        justify-content: end;
+
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+
+    .center {
+        * {
+            text-align: center;
+        }
+    }
+}
+
+.container {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+}
+
+.full-size-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding-top: 64px;
+}
+
+.empty-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding-top: 64px;
+
+    .elements-container {
+        height: 100%;
+        position: relative;
+
+        button {
+            position: absolute;
+            top: 0;
+            right: 2rem;
+        }
+
+        div {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    }
+}
+
+.visualizer-container {
+    flex-grow: 1;
+}
+
+.stats {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+
+    span {
+        flex-grow: 1;
+        flex-basis: 0;
+        text-align: center;
+    }
+}
+
+.jukebox-graph {
+    .edge-path {
+        stroke-opacity: 0.7;
+
+        &:hover {
+            stroke-opacity: 1;
+        }
+    }
+}
+
+.settings-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--spice-subtext);
+    background-color: var(--spice-sidebar);
+
+    border: none;
+
+    &:hover {
+        transition: background-color 0.5s ease;
+        background-color: var(--spice-button-disabled);
+        cursor: pointer;
+    }
+}
+
+.settings-modal {
+    input[type='range'] {
+        padding: 0;
+        accent-color: var(--spice-text);
+        width: 300px;
+    }
+
+    button {
+        background-color: var(--spice-button);
+        color: var(--spice-text);
+
+        padding: 0.5rem 1rem;
+        border-style: none;
+        border-radius: 20px;
+        font-size: 1rem;
+        font-weight: bold;
+
+        margin-top: 2rem;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
+
+.range-subtext {
+    display: flex;
+    justify-content: space-between;
+    width: 300px;
+}
+
+.small-text {
+    font-size: small;
+}
+
+.checkbox-container {
+    display: flex;
+}

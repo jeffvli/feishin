@@ -276,7 +276,7 @@ export const contract = c.router({
     },
 });
 
-const axiosClient = axios.create({});
+let axiosClient = axios.create({});
 
 axiosClient.defaults.paramsSerializer = (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' });
@@ -337,17 +337,42 @@ export const jfApiClient = (args: {
             }
 
             try {
-                const result = await axiosClient.request({
-                    data: body,
-                    headers: {
-                        ...headers,
-                        ...(token && { 'X-MediaBrowser-Token': token }),
-                    },
-                    method: method as Method,
-                    params,
-                    signal,
-                    url: `${baseUrl}/${api}`,
-                });
+                let result;
+                let errorOccurred;
+
+                do {
+                    errorOccurred = false;
+                    try {
+                        result = await axiosClient.request({
+                            data: body,
+                            headers: {
+                                ...headers,
+                                ...(token && { 'X-MediaBrowser-Token': token }),
+                            },
+                            method: method as Method,
+                            params,
+                            signal,
+                            url: `${baseUrl}/${api}`,
+                        });
+                    } catch (error) {
+                        // rebuild axiosClient
+                        axiosClient = axios.create({});
+                        console.log(result);
+                        console.error(error);
+                        errorOccurred = true;
+                        // eslint-disable-next-line no-promise-executor-return
+                        await new Promise((resolve) => setTimeout(resolve, 1000));
+                    }
+                } while (errorOccurred);
+
+                if (!result) {
+                    throw new Error(
+                        i18n.t('error.networkError', {
+                            postProcess: 'sentenceCase',
+                        }) as string,
+                    );
+                }
+
                 return {
                     body: result.data,
                     headers: result.headers as any,

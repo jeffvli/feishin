@@ -43,6 +43,8 @@ const AlbumArtistListRoute = () => {
         };
     }, [pageKey]);
 
+    console.log('returning AlbumArtistListRoute');
+
     return (
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>

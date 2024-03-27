@@ -10,6 +10,11 @@ import { DefaultLayout } from '/@/renderer/layouts';
 import { AppOutlet } from '/@/renderer/router/app-outlet';
 import { TitlebarOutlet } from '/@/renderer/router/titlebar-outlet';
 
+const JukeboxRoute = lazy(() => import('/@/renderer/features/jukebox/routes/jukebox-route'));
+const VisualiserRoute = lazy(
+    () => import('/@/renderer/features/visualiser/routes/visualiser-route'),
+);
+
 const NowPlayingRoute = lazy(
     () => import('/@/renderer/features/now-playing/routes/now-playing-route'),
 );
@@ -114,6 +119,20 @@ export const AppRouter = () => {
                                 <Route
                                     element={<SongListRoute />}
                                     path={AppRoute.LIBRARY_GENRES_SONGS}
+                                />
+                            </Route>
+                            <Route path={AppRoute.JUKEBOX}>
+                                <Route
+                                    index
+                                    element={<JukeboxRoute />}
+                                    errorElement={<RouteErrorBoundary />}
+                                />
+                            </Route>
+                            <Route path={AppRoute.VISUALISER}>
+                                <Route
+                                    index
+                                    element={<VisualiserRoute />}
+                                    errorElement={<RouteErrorBoundary />}
                                 />
                             </Route>
                             <Route

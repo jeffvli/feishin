@@ -363,6 +363,8 @@
             "folders": "$t(entity.folder_other)",
             "genres": "$t(entity.genre_other)",
             "home": "$t(common.home)",
+            "jukebox": "jukebox",
+            "visualiser": "visualiser",
             "nowPlaying": "now playing",
             "playlists": "$t(entity.playlist_other)",
             "search": "$t(common.search)",
@@ -407,7 +409,9 @@
         "stop": "stop",
         "toggleFullscreenPlayer": "toggle fullscreen player",
         "unfavorite": "unfavorite",
-        "pause": "pause"
+        "pause": "pause",
+        "autoplay": "Autoplay similar songs",
+        "syncplay": "Syncplay"
     },
     "setting": {
         "accentColor": "accent color",
@@ -593,7 +597,7 @@
         "historyLength": "History length",
         "historyLength_description": "The number of songs to keep in the history, autoplay skips over any songs in the history. Overrides eldest first $t(common.restartRequired)",
         "lyricAnimations": "Lyric animations",
-        "lyricAnimations_description": "Enables custom lyric animations $t(common.restartRequired)"
+        "lyricAnimations_description": "Enables custom lyric animations"
     },
     "table": {
         "column": {

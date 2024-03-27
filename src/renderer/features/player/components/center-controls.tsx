@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import formatDuration from 'format-duration';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
-import { IoIosPause } from 'react-icons/io';
+import { IoIosPause, IoIosPeople } from 'react-icons/io';
 import {
     RiPlayFill,
     RiRepeat2Line,
@@ -16,7 +16,7 @@ import {
     RiSpeedFill,
     RiStopFill,
 } from 'react-icons/ri';
-import { BsDice3 } from 'react-icons/bs';
+import { BsDice3, BsDice3Fill } from 'react-icons/bs';
 import styled from 'styled-components';
 import { Text } from '/@/renderer/components';
 import { useCenterControls } from '../hooks/use-center-controls';
@@ -29,11 +29,13 @@ import {
     useRepeatStatus,
     useShuffleStatus,
     useCurrentTime,
+    modshinSettings,
 } from '/@/renderer/store';
 import {
     useHotkeySettings,
     usePlaybackType,
     useSettingsStore,
+    useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { PlayerStatus, PlaybackType, PlayerShuffle, PlayerRepeat } from '/@/renderer/types';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
@@ -108,6 +110,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const repeat = useRepeatStatus();
     const shuffle = useShuffleStatus();
     const { bindings } = useHotkeySettings();
+    const { setSettings } = useSettingsStoreActions();
 
     const {
         handleNextTrack,
@@ -129,6 +132,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const currentPlayerRef = player === 1 ? player1 : player2;
     const duration = formatDuration(songDuration * 1000 || 0);
     const formattedTime = formatDuration(currentTime * 1000 || 0);
+
+    const [autoPlay, setAutoPlay] = useState(modshinSettings().autoPlay);
 
     useEffect(() => {
         let interval: any;
@@ -171,6 +176,14 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
         <>
             <ControlsContainer>
                 <ButtonsContainer>
+                    <PlayerButton
+                        icon={<IoIosPeople size={buttonSize} />}
+                        tooltip={{
+                            label: t('player.syncplay', { postProcess: 'sentenceCase' }),
+                        }}
+                        variant="tertiary"
+                        onClick={handleStop}
+                    />
                     <PlayerButton
                         icon={<RiStopFill size={buttonSize} />}
                         tooltip={{
@@ -284,7 +297,6 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         variant="tertiary"
                         onClick={handleToggleRepeat}
                     />
-
                     <PlayerButton
                         icon={<BsDice3 size={buttonSize} />}
                         tooltip={{
@@ -297,6 +309,30 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                                 queryClient,
                             })
                         }
+                    />
+                    <PlayerButton
+                        icon={
+                            autoPlay ? (
+                                <BsDice3Fill size={buttonSize} />
+                            ) : (
+                                <BsDice3 size={buttonSize} />
+                            )
+                        }
+                        tooltip={{
+                            label: t('player.autoplay', { postProcess: 'sentenceCase' }),
+                        }}
+                        variant="tertiary"
+                        onClick={() => {
+                            const value = !autoPlay;
+                            console.log('value', value);
+                            setSettings({
+                                modshin: {
+                                    ...modshinSettings(),
+                                    autoPlay: value,
+                                },
+                            });
+                            setAutoPlay(value);
+                        }}
                     />
                 </ButtonsContainer>
             </ControlsContainer>
