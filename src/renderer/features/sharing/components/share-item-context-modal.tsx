@@ -63,11 +63,25 @@ export const ShareItemContextModal = ({
                 onSuccess: (_data) => {
                     if (!server) throw new Error('Server not found');
                     if (!_data?.id) throw new Error('Failed to share item');
-                    navigator.clipboard.writeText(`${server.url}/share/${_data.id}`);
+
+                    const shareUrl = `${server.url}/share/${_data.id}`;
+
+                    navigator.clipboard.writeText(shareUrl);
                     toast.success({
+                        autoClose: 5000,
+                        id: 'share-item-toast',
                         message: t('form.shareItem.success', {
                             postProcess: 'sentenceCase',
                         }),
+                        onClick: (a) => {
+                            if (!(a.target instanceof HTMLElement)) return;
+
+                            // Make sure we weren't clicking close (otherwise clicking close /also/ opens the url)
+                            if (a.target.nodeName !== 'svg') {
+                                window.open(shareUrl);
+                                toast.hide('share-item-toast');
+                            }
+                        },
                     });
                 },
             },

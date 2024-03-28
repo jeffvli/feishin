@@ -256,7 +256,7 @@
             "allowDownloading": "allow downloading",
             "description": "description",
             "setExpiration": "set expiration",
-            "success": "share link copied to clipboard",
+            "success": "share link copied to clipboard (or click here to open)",
             "expireInvalid": "expiration must be in the future",
             "createFailed": "failed to create share (is sharing enabled?)"
         },
