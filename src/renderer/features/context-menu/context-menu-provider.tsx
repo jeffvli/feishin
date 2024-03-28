@@ -11,6 +11,8 @@ import {
 import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
 import { AnimatePresence } from 'framer-motion';
 import isElectron from 'is-electron';
+import { ServerFeature } from '/@/renderer/api/features-types';
+import { hasFeature } from '/@/renderer/api/utils';
 import { useTranslation } from 'react-i18next';
 import {
     RiAddBoxFill,
@@ -793,6 +795,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 rightIcon: <RiArrowRightSFill size="1.2rem" />,
             },
             shareItem: {
+                disabled: !(
+                    server?.type === ServerType.NAVIDROME &&
+                    hasFeature(server, ServerFeature.SHARING_ALBUM_SONG)
+                ),
                 id: 'shareItem',
                 label: t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiShareForwardFill size="1.1rem" />,
@@ -812,6 +818,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         handleUpdateRating,
         openDeletePlaylistModal,
         handleShareItem,
+        server,
         t,
     ]);
 

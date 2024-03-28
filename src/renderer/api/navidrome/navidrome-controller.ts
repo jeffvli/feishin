@@ -486,6 +486,7 @@ const removeFromPlaylist = async (
 
 const VERSION_INFO: Array<[string, Record<string, number[]>]> = [
     ['0.48.0', { [ServerFeature.PLAYLISTS_SMART]: [1] }],
+    ['0.49.3', { [ServerFeature.SHARING_ALBUM_SONG]: [1] }],
 ];
 
 const getFeatures = (version: string): Record<string, number[]> => {
@@ -544,6 +545,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const features: ServerFeatures = {
         lyricsMultipleStructured: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
         playlistsSmart: !!navidromeFeatures[NavidromeExtensions.SMART_PLAYLISTS],
+        sharingAlbumSong: !!navidromeFeatures[NavidromeExtensions.SHARING],
     };
 
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
@@ -556,6 +558,7 @@ const shareItem = async (args: ShareItemArgs): Promise<ShareItemResponse> => {
         body: {
             description: body.description,
             downloadable: body.downloadable,
+            expires: body.expires,
             resourceIds: body.resourceIds,
             resourceType: body.resourceType,
         },

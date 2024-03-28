@@ -163,6 +163,7 @@ export const contract = c.router({
         path: 'share',
         responses: {
             200: resultWithHeaders(ndType._response.shareItem),
+            404: resultWithHeaders(ndType._response.error),
             500: resultWithHeaders(ndType._response.error),
         },
     },

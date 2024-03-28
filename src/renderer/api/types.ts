@@ -772,6 +772,7 @@ export type ShareItemResponse = { id: string } | undefined;
 export type ShareItemBody = {
     description: string;
     downloadable: boolean;
+    expires: number;
     resourceIds: string;
     resourceType: string;
 };

@@ -255,7 +255,10 @@
         "shareItem": {
             "allowDownloading": "allow downloading",
             "description": "description",
-            "success": "share link copied to clipboard"
+            "setExpiration": "set expiration",
+            "success": "share link copied to clipboard",
+            "expireInvalid": "expiration must be in the future",
+            "createFailed": "failed to create share (is sharing enabled?)"
         },
         "updateServer": {
             "success": "server updated successfully",

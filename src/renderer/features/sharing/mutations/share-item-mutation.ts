@@ -19,12 +19,6 @@ export const useShareItem = (args: MutationHookArgs) => {
             if (!server) throw new Error('Server not found');
             return api.controller.shareItem({ ...args, apiClientProps: { server } });
         },
-        onSuccess: (_data, variables) => {
-            if (!_data?.id) throw new Error('Failed to share item');
-            const server = getServerById(variables.serverId);
-            if (!server) throw new Error('Server not found');
-            navigator.clipboard.writeText(`${server.url}/share/${_data.id}`);
-        },
         ...options,
     });
 };

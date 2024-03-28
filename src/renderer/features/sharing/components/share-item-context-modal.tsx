@@ -1,4 +1,5 @@
 import { Box, Group, Stack, TextInput } from '@mantine/core';
+import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { closeModal, ContextModalProps } from '@mantine/modals';
 import { Button, Switch, toast } from '/@/renderer/components';
@@ -19,29 +20,59 @@ export const ShareItemContextModal = ({
 
     const shareItemMutation = useShareItem({});
 
+    // Uses the same default as Navidrome: 1 year
+    const defaultDate = new Date();
+    defaultDate.setFullYear(defaultDate.getFullYear() + 1);
+
     const form = useForm({
         initialValues: {
             allowDownloading: false,
             description: '',
+            expires: defaultDate,
+        },
+        validate: {
+            expires: (value) =>
+                value > new Date()
+                    ? null
+                    : t('form.shareItem.expireInvalid', {
+                          postProcess: 'sentenceCase',
+                      }),
         },
     });
 
     const handleSubmit = form.onSubmit(async (values) => {
-        shareItemMutation.mutate({
-            body: {
-                description: values.description,
-                downloadable: values.allowDownloading,
-                resourceIds: itemIds.join(),
-                resourceType,
+        shareItemMutation.mutate(
+            {
+                body: {
+                    description: values.description,
+                    downloadable: values.allowDownloading,
+                    expires: values.expires.getTime(),
+                    resourceIds: itemIds.join(),
+                    resourceType,
+                },
+                serverId: server?.id,
             },
-            serverId: server?.id,
-        });
+            {
+                onError: () => {
+                    toast.error({
+                        message: t('form.shareItem.createFailed', {
+                            postProcess: 'sentenceCase',
+                        }),
+                    });
+                },
+                onSuccess: (_data) => {
+                    if (!server) throw new Error('Server not found');
+                    if (!_data?.id) throw new Error('Failed to share item');
+                    navigator.clipboard.writeText(`${server.url}/share/${_data.id}`);
+                    toast.success({
+                        message: t('form.shareItem.success', {
+                            postProcess: 'sentenceCase',
+                        }),
+                    });
+                },
+            },
+        );
 
-        toast.success({
-            message: t('form.shareItem.success', {
-                postProcess: 'sentenceCase',
-            }),
-        });
         closeModal(id);
         return null;
     });
@@ -62,6 +93,17 @@ export const ShareItemContextModal = ({
                             postProcess: 'titleCase',
                         })}
                         {...form.getInputProps('allowDownloading')}
+                    />
+                    <DateTimePicker
+                        clearable
+                        label={t('form.shareItem.setExpiration', {
+                            postProcess: 'titleCase',
+                        })}
+                        minDate={new Date()}
+                        placeholder={defaultDate.toLocaleDateString()}
+                        popoverProps={{ withinPortal: true }}
+                        valueFormat="MM/DD/YYYY HH:mm"
+                        {...form.getInputProps('expires')}
                     />
                     <Group position="right">
                         <Group>
