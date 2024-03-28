@@ -28,6 +28,7 @@ export type ContextMenuItemType =
     | 'addToFavorites'
     | 'removeFromFavorites'
     | 'setRating'
+    | 'shareItem'
     | 'deletePlaylist'
     | 'createPlaylist'
     | 'moveToBottomOfQueue'

@@ -11,6 +11,8 @@ import {
 import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
 import { AnimatePresence } from 'framer-motion';
 import isElectron from 'is-electron';
+import { ServerFeature } from '/@/renderer/api/features-types';
+import { hasFeature } from '/@/renderer/api/utils';
 import { useTranslation } from 'react-i18next';
 import {
     RiAddBoxFill,
@@ -25,6 +27,7 @@ import {
     RiPlayListAddFill,
     RiStarFill,
     RiCloseCircleLine,
+    RiShareForwardFill,
 } from 'react-icons/ri';
 import { AnyLibraryItems, LibraryItem, ServerType, AnyLibraryItem } from '/@/renderer/api/types';
 import {
@@ -76,7 +79,7 @@ const ContextMenuContext = createContext<ContextMenuContextProps>({
     },
 });
 
-const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating'];
+const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating', 'shareItem'];
 // const NAVIDROME_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 // const SUBSONIC_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 
@@ -600,6 +603,22 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         }
     }, [ctx.dataNodes, moveToTopOfQueue, playbackType]);
 
+    const handleShareItem = useCallback(() => {
+        if (!ctx.dataNodes && !ctx.data) return;
+
+        const uniqueIds = ctx.data.map((node) => node.id);
+
+        openContextModal({
+            innerProps: {
+                itemIds: uniqueIds,
+                resourceType: ctx.data[0].itemType,
+            },
+            modal: 'shareItem',
+            size: 'md',
+            title: t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' }),
+        });
+    }, [ctx.data, ctx.dataNodes, t]);
+
     const handleRemoveSelected = useCallback(() => {
         const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
         if (!uniqueIds?.length) return;
@@ -775,6 +794,13 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 onClick: () => {},
                 rightIcon: <RiArrowRightSFill size="1.2rem" />,
             },
+            shareItem: {
+                disabled: !hasFeature(server, ServerFeature.SHARING_ALBUM_SONG),
+                id: 'shareItem',
+                label: t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiShareForwardFill size="1.1rem" />,
+                onClick: handleShareItem,
+            },
         };
     }, [
         handleAddToFavorites,
@@ -788,6 +814,8 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         handleRemoveSelected,
         handleUpdateRating,
         openDeletePlaylistModal,
+        handleShareItem,
+        server,
         t,
     ]);
 
@@ -827,7 +855,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                     >
                                                         <HoverCard.Target>
                                                             <ContextMenuButton
-                                                                disabled={item.disabled}
+                                                                disabled={
+                                                                    contextMenuItems[item.id]
+                                                                        .disabled
+                                                                }
                                                                 leftIcon={
                                                                     contextMenuItems[item.id]
                                                                         .leftIcon
@@ -864,7 +895,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                     </HoverCard>
                                                 ) : (
                                                     <ContextMenuButton
-                                                        disabled={item.disabled}
+                                                        disabled={
+                                                            contextMenuItems[item.id].disabled
+                                                        }
                                                         leftIcon={
                                                             contextMenuItems[item.id].leftIcon
                                                         }
