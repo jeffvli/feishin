@@ -79,7 +79,7 @@ const ContextMenuContext = createContext<ContextMenuContextProps>({
     },
 });
 
-const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating'];
+const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating', 'shareItem'];
 // const NAVIDROME_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 // const SUBSONIC_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 
@@ -795,10 +795,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 rightIcon: <RiArrowRightSFill size="1.2rem" />,
             },
             shareItem: {
-                disabled: !(
-                    server?.type === ServerType.NAVIDROME &&
-                    hasFeature(server, ServerFeature.SHARING_ALBUM_SONG)
-                ),
+                disabled: !hasFeature(server, ServerFeature.SHARING_ALBUM_SONG),
                 id: 'shareItem',
                 label: t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiShareForwardFill size="1.1rem" />,
@@ -858,7 +855,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                     >
                                                         <HoverCard.Target>
                                                             <ContextMenuButton
-                                                                disabled={item.disabled}
+                                                                disabled={
+                                                                    contextMenuItems[item.id]
+                                                                        .disabled
+                                                                }
                                                                 leftIcon={
                                                                     contextMenuItems[item.id]
                                                                         .leftIcon
@@ -895,7 +895,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                     </HoverCard>
                                                 ) : (
                                                     <ContextMenuButton
-                                                        disabled={item.disabled}
+                                                        disabled={
+                                                            contextMenuItems[item.id].disabled
+                                                        }
                                                         leftIcon={
                                                             contextMenuItems[item.id].leftIcon
                                                         }

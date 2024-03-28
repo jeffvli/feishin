@@ -356,7 +356,6 @@ const shareItemParameters = z.object({
 });
 
 export enum NavidromeExtensions {
-    SHARING = 'sharing',
     SMART_PLAYLISTS = 'smartPlaylists',
 }
 

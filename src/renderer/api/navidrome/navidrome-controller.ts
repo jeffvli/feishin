@@ -484,9 +484,11 @@ const removeFromPlaylist = async (
     return null;
 };
 
+// The order should be in decreasing version, as the highest version match
+// will automatically consider all lower versions matched
 const VERSION_INFO: Array<[string, Record<string, number[]>]> = [
-    ['0.48.0', { [ServerFeature.PLAYLISTS_SMART]: [1] }],
     ['0.49.3', { [ServerFeature.SHARING_ALBUM_SONG]: [1] }],
+    ['0.48.0', { [ServerFeature.PLAYLISTS_SMART]: [1] }],
 ];
 
 const getFeatures = (version: string): Record<string, number[]> => {
@@ -545,7 +547,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const features: ServerFeatures = {
         lyricsMultipleStructured: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
         playlistsSmart: !!navidromeFeatures[NavidromeExtensions.SMART_PLAYLISTS],
-        sharingAlbumSong: !!navidromeFeatures[NavidromeExtensions.SHARING],
+        sharingAlbumSong: !!navidromeFeatures[ServerFeature.SHARING_ALBUM_SONG],
     };
 
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
