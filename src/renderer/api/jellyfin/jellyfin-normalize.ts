@@ -134,7 +134,7 @@ const normalizeSong = (
             imageUrl: null,
             name: entry.Name,
         })),
-        albumId: item.AlbumId,
+        albumId: item.AlbumId || `dummy/${item.Id}`,
         artistName: item?.ArtistItems?.[0]?.Name,
         artists: item?.ArtistItems?.map((entry) => ({
             id: entry.Id,
