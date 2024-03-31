@@ -287,6 +287,77 @@ export const AudioPlayer = forwardRef(
             }
         }, [calculateReplayGain, currentPlayer, player2, player2Source, volume, webAudio]);
 
+        const tc = (fn: Function) => {
+            return (...args: any[]) => {
+                try {
+                    fn(...args);
+                } catch(e){
+                    console.error(e)
+                }
+            }
+        }
+
+        const [player1Progress, setPlayer1Progress] = useState<number>(0);
+        const [player2Progress, setPlayer2Progress] = useState<number>(0);
+
+        useEffect(tc(() => {
+            const getMetadata = () => ({
+                title: currentPlayer === 1 ? player1?.name : player2?.name,
+                artist: currentPlayer === 1 ? player1?.artists[0]?.name : player2?.artists[0]?.name,
+                album: currentPlayer === 1 ? player1?.album : player2?.album,
+                artwork: [
+                    {
+                        src: currentPlayer === 1 ? player1?.imageUrl : player2?.imageUrl,
+                        sizes: '100x100',
+                        type: 'image/png',
+                    },
+                ],
+            })
+            const meta = getMetadata();
+            const posState = {
+                position: currentPlayer === 1 ? player1Progress : player2Progress,
+                duration: currentPlayer === 1 ? player1?.duration : player2?.duration,
+            };
+            console.log("META", meta, navigator?.mediaSession)
+            if ('mediaSession' in navigator && ['title', 'artist', 'album', 'artwork'].every(i => meta[i]) && posState.position > 1 && posState.duration > 1) {
+                console.log("Running mediaSession")
+                // Set metadata
+                navigator.mediaSession.metadata = new MediaMetadata(meta);
+
+                // Set action handlers
+                navigator.mediaSession.setActionHandler('play', () => {
+                    // Handle play action
+                });
+
+                navigator.mediaSession.setActionHandler('pause', () => {
+                    // Handle pause action
+                });
+
+                navigator.mediaSession.setActionHandler('seekbackward', () => {
+                    // Handle seek backward action
+                });
+
+                navigator.mediaSession.setActionHandler('seekforward', () => {
+                    // Handle seek forward action
+                });
+
+                navigator.mediaSession.setActionHandler('previoustrack', () => {
+                    // Handle previous track action
+                });
+
+                navigator.mediaSession.setActionHandler('nexttrack', () => {
+                    // Handle next track action
+                });
+
+                // Set playback state
+                navigator.mediaSession.playbackState =
+                    status === PlayerStatus.PLAYING ? 'playing' : 'paused';
+
+                // Set position state
+                navigator.mediaSession.setPositionState(posState);
+            }
+        }), [currentPlayer, player1, player2, status, player1Progress, player2Progress]);
+
         const handlePlayer1Start = useCallback(
             async (player: ReactPlayer) => {
                 if (!webAudio) return;
@@ -351,9 +422,7 @@ export const AudioPlayer = forwardRef(
                     width={0}
                     // If there is no stream url, we do not need to handle when the audio finishes
                     onEnded={player1?.streamUrl ? handleOnEnded : undefined}
-                    onProgress={
-                        playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1
-                    }
+                    onProgress={(e) => (setPlayer1Progress(e.playedSeconds),(playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1)(e))}
                     onReady={handlePlayer1Start}
                 />
                 <ReactPlayer
@@ -370,9 +439,7 @@ export const AudioPlayer = forwardRef(
                     volume={webAudio ? 1 : volume}
                     width={0}
                     onEnded={player2?.streamUrl ? handleOnEnded : undefined}
-                    onProgress={
-                        playbackStyle === PlaybackStyle.GAPLESS ? handleGapless2 : handleCrossfade2
-                    }
+                    onProgress={(e) => (setPlayer2Progress(e.playedSeconds),(playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1)(e))}
                     onReady={handlePlayer2Start}
                 />
             </>
