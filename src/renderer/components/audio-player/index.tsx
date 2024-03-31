@@ -1,4 +1,4 @@
-import { useImperativeHandle, forwardRef, useRef, useState, useCallback, useEffect } from 'react';
+import { useImperativeHandle, forwardRef, useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import isElectron from 'is-electron';
 import type { ReactPlayerProps } from 'react-player';
 import ReactPlayer from 'react-player/lazy';
@@ -300,22 +300,33 @@ export const AudioPlayer = forwardRef(
         const [player1Progress, setPlayer1Progress] = useState<number>(0);
         const [player2Progress, setPlayer2Progress] = useState<number>(0);
 
-        useEffect(tc(() => {
+        const controls = usePlayerControls();
+
+        const DEFAULT_URL = '';
+        const artworkBlobUrl = useMemo(async () => {
+          if (!(player1 || player2)){return DEFAULT_URL}
+          const imageUrl : string = currentPlayer === 1 ? player1?.imageUrl! : player2?.imageUrl!;
+          return await fetch(imageUrl)
+              .then(response => response.blob())
+              .then(blob => URL.createObjectURL(blob));
+      }, [currentPlayer, player1, player2]);
+
+        useEffect(tc(async () => {
+            const navigator = window.navigator;
             const playerData = currentPlayer === 1 ? player1 : player2;
             const progress = currentPlayer === 1 ? player1Progress : player2Progress;
-            const getMetadata = () => ({
+            if (!(playerData && progress)){return}
+            const getMetadata = async () => ({
                 title: playerData.name,
                 artist: playerData.artistName,
                 album: playerData.album,
                 artwork: [
                     {
-                        src: playerData.imageUrl,
-                        sizes: '100x100',
-                        type: 'image/png',
+                        src: await artworkBlobUrl
                     },
                 ],
             })
-            const meta = getMetadata();
+            const meta = await getMetadata();
             const posState = {
                 position: progress,
                 duration: playerData.duration,
@@ -323,9 +334,8 @@ export const AudioPlayer = forwardRef(
             console.log("META", meta, navigator?.mediaSession)
 
             if ('mediaSession' in navigator && ['title', 'artist', 'album', 'artwork'].every(i => meta[i]) && posState.position > 1 && posState.duration > 1) {
-              const controls = usePlayerControls();
               console.log("Running mediaSession")
-                navigator.mediaSession.metadata = new MediaMetadata(meta);
+                navigator.mediaSession.metadata = new window.MediaMetadata(meta);
 
                 navigator.mediaSession.setActionHandler('play', () => {
                     status = PlayerStatus.PLAYING;
@@ -356,7 +366,7 @@ export const AudioPlayer = forwardRef(
 
                 navigator.mediaSession.setPositionState(posState);
             }
-        }), [currentPlayer, player1, player2, status, player1Progress, player2Progress]);
+        }), [artworkBlobUrl, currentPlayer, player1, player2, status, player1Progress, player2Progress]);
 
         const handlePlayer1Start = useCallback(
             async (player: ReactPlayer) => {
