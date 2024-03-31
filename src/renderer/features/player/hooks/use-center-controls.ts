@@ -311,7 +311,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
                 const playerData = next();
                 mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
                 mpvPlayer!.setQueue(playerData);
-                mpvPlayer!.next();
             },
             web: () => {
                 const playerData = next();
@@ -324,8 +323,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
                 if (isLastTrack) {
                     const playerData = setCurrentIndex(0);
                     mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PAUSED });
-                    mpvPlayer!.setQueue(playerData);
-                    mpvPlayer!.pause();
+                    mpvPlayer!.setQueue(playerData, true);
                     pause();
                 } else {
                     const playerData = next();
@@ -334,7 +332,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
                         status: PlayerStatus.PLAYING,
                     });
                     mpvPlayer!.setQueue(playerData);
-                    mpvPlayer!.next();
                 }
             },
             web: () => {
@@ -359,10 +356,14 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
         const handleRepeatOne = {
             local: () => {
-                const playerData = next();
-                mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
-                mpvPlayer!.setQueue(playerData);
-                mpvPlayer!.next();
+                if (!isLastTrack) {
+                    const playerData = next();
+                    mprisUpdateSong({
+                        song: playerData.current.song,
+                        status: PlayerStatus.PLAYING,
+                    });
+                    mpvPlayer!.setQueue(playerData);
+                }
             },
             web: () => {
                 if (!isLastTrack) {
@@ -429,7 +430,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
                         status: PlayerStatus.PLAYING,
                     });
                     mpvPlayer!.setQueue(playerData);
-                    mpvPlayer!.previous();
                 } else {
                     const playerData = setCurrentIndex(queue.length - 1);
                     mprisUpdateSong({
@@ -437,7 +437,6 @@ export const useCenterControls = (args: { playersRef: any }) => {
                         status: PlayerStatus.PLAYING,
                     });
                     mpvPlayer!.setQueue(playerData);
-                    mpvPlayer!.previous();
                 }
             },
             web: () => {
@@ -461,13 +460,19 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
         const handleRepeatNone = {
             local: () => {
-                const playerData = previous();
-                remote?.updateSong({
-                    currentTime: usePlayerStore.getState().current.time,
-                    song: playerData.current.song,
-                });
-                mpvPlayer!.setQueue(playerData);
-                mpvPlayer!.previous();
+                if (isFirstTrack) {
+                    const playerData = setCurrentIndex(0);
+                    mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PAUSED });
+                    mpvPlayer!.setQueue(playerData, true);
+                    pause();
+                } else {
+                    const playerData = previous();
+                    remote?.updateSong({
+                        currentTime: usePlayerStore.getState().current.time,
+                        song: playerData.current.song,
+                    });
+                    mpvPlayer!.setQueue(playerData);
+                }
             },
             web: () => {
                 if (isFirstTrack) {
@@ -487,17 +492,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
         const handleRepeatOne = {
             local: () => {
-                if (!isFirstTrack) {
-                    const playerData = previous();
-                    mprisUpdateSong({
-                        song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
-                    });
-                    mpvPlayer!.setQueue(playerData);
-                    mpvPlayer!.previous();
-                } else {
-                    mpvPlayer!.stop();
-                }
+                const playerData = previous();
+                mprisUpdateSong({
+                    song: playerData.current.song,
+                    status: PlayerStatus.PLAYING,
+                });
+                mpvPlayer!.setQueue(playerData);
             },
             web: () => {
                 const playerData = previous();
