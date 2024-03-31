@@ -10,7 +10,7 @@ import {
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
-import { useSpeed } from '/@/renderer/store';
+import { usePlayerControls, useSpeed } from '/@/renderer/store';
 import { toast } from '/@/renderer/components/toast';
 
 interface AudioPlayerProps extends ReactPlayerProps {
@@ -301,13 +301,15 @@ export const AudioPlayer = forwardRef(
         const [player2Progress, setPlayer2Progress] = useState<number>(0);
 
         useEffect(tc(() => {
+            const playerData = currentPlayer === 1 ? player1 : player2;
+            const progress = currentPlayer === 1 ? player1Progress : player2Progress;
             const getMetadata = () => ({
-                title: currentPlayer === 1 ? player1?.name : player2?.name,
-                artist: currentPlayer === 1 ? player1?.artists[0]?.name : player2?.artists[0]?.name,
-                album: currentPlayer === 1 ? player1?.album : player2?.album,
+                title: playerData.name,
+                artist: playerData.artistName,
+                album: playerData.album,
                 artwork: [
                     {
-                        src: currentPlayer === 1 ? player1?.imageUrl : player2?.imageUrl,
+                        src: playerData.imageUrl,
                         sizes: '100x100',
                         type: 'image/png',
                     },
@@ -315,45 +317,43 @@ export const AudioPlayer = forwardRef(
             })
             const meta = getMetadata();
             const posState = {
-                position: currentPlayer === 1 ? player1Progress : player2Progress,
-                duration: currentPlayer === 1 ? player1?.duration : player2?.duration,
+                position: progress,
+                duration: playerData.duration,
             };
             console.log("META", meta, navigator?.mediaSession)
+
             if ('mediaSession' in navigator && ['title', 'artist', 'album', 'artwork'].every(i => meta[i]) && posState.position > 1 && posState.duration > 1) {
-                console.log("Running mediaSession")
-                // Set metadata
+              const controls = usePlayerControls();
+              console.log("Running mediaSession")
                 navigator.mediaSession.metadata = new MediaMetadata(meta);
 
-                // Set action handlers
                 navigator.mediaSession.setActionHandler('play', () => {
-                    // Handle play action
+                    status = PlayerStatus.PLAYING;
                 });
 
                 navigator.mediaSession.setActionHandler('pause', () => {
-                    // Handle pause action
+                    status = PlayerStatus.PAUSED;
                 });
 
                 navigator.mediaSession.setActionHandler('seekbackward', () => {
-                    // Handle seek backward action
+                    controls.previous();
                 });
 
                 navigator.mediaSession.setActionHandler('seekforward', () => {
-                    // Handle seek forward action
+                    controls.next();
                 });
 
                 navigator.mediaSession.setActionHandler('previoustrack', () => {
-                    // Handle previous track action
+                    controls.previous();
                 });
 
                 navigator.mediaSession.setActionHandler('nexttrack', () => {
-                    // Handle next track action
+                    controls.next();
                 });
 
-                // Set playback state
                 navigator.mediaSession.playbackState =
                     status === PlayerStatus.PLAYING ? 'playing' : 'paused';
 
-                // Set position state
                 navigator.mediaSession.setPositionState(posState);
             }
         }), [currentPlayer, player1, player2, status, player1Progress, player2Progress]);
