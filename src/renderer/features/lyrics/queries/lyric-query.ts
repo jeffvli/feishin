@@ -104,7 +104,7 @@ export const useSongLyricsBySong = (
                     })
                     .catch(console.error);
 
-                if (subsonicLyrics) {
+                if (subsonicLyrics?.length) {
                     return subsonicLyrics;
                 }
             } else if (hasFeature(server, ServerFeature.LYRICS_SINGLE_STRUCTURED)) {
