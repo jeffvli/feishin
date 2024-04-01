@@ -14,6 +14,7 @@ import { Badge } from '/@/renderer/components/badge';
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { Play } from '/@/renderer/types';
+import { usePlayButtonBehavior } from '/@/renderer/store';
 
 const Carousel = styled(motion.div)`
     position: relative;
@@ -114,6 +115,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
     const handlePlayQueueAdd = usePlayQueueAdd();
     const [itemIndex, setItemIndex] = useState(0);
     const [direction, setDirection] = useState(0);
+    const playType = usePlayButtonBehavior();
 
     const currentItem = data?.[itemIndex];
 
@@ -222,11 +224,18 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                                         id: [currentItem.id],
                                                         type: LibraryItem.ALBUM,
                                                     },
-                                                    playType: Play.NOW,
+                                                    playType,
                                                 });
                                             }}
                                         >
-                                            {t('player.play', { postProcess: 'titleCase' })}
+                                            {t(
+                                                playType === Play.NOW
+                                                    ? 'player.play'
+                                                    : playType === Play.NEXT
+                                                    ? 'player.addNext'
+                                                    : 'player.addLast',
+                                                { postProcess: 'titleCase' },
+                                            )}
                                         </Button>
                                         <Group spacing="sm">
                                             <Button

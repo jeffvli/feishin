@@ -1,6 +1,6 @@
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
-import { NavidromeExtensions, ndType } from '/@/renderer/api/navidrome/navidrome-types';
+import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
 import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import semverCoerce from 'semver/functions/coerce';
 import semverGte from 'semver/functions/gte';
@@ -546,7 +546,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
 
     const features: ServerFeatures = {
         lyricsMultipleStructured: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
-        playlistsSmart: !!navidromeFeatures[NavidromeExtensions.SMART_PLAYLISTS],
+        playlistsSmart: !!navidromeFeatures[ServerFeature.PLAYLISTS_SMART],
         sharingAlbumSong: !!navidromeFeatures[ServerFeature.SHARING_ALBUM_SONG],
     };
 
