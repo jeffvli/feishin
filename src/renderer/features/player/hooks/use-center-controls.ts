@@ -17,16 +17,19 @@ import debounce from 'lodash/debounce';
 import { QueueSong } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components';
 import { useTranslation } from 'react-i18next';
+import nowPlayingManager from '/@/renderer/features/player/mac/nowPlaying';
 
-const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
-const ipc = isElectron() ? window.electron.ipc : null;
-const utils = isElectron() ? window.electron.utils : null;
-const mpris = isElectron() && utils?.isLinux() ? window.electron.mpris : null;
-const remote = isElectron() ? window.electron.remote : null;
-const mediaSession = !isElectron() || !utils?.isLinux() ? navigator.mediaSession : null;
+const is_electron = isElectron();
+const mpvPlayer = is_electron ? window.electron.mpvPlayer : null;
+const mpvPlayerListener = is_electron ? window.electron.mpvPlayerListener : null;
+const ipc = is_electron ? window.electron.ipc : null;
+const utils = is_electron ? window.electron.utils : null;
+const mpris = is_electron && utils?.isLinux() ? window.electron.mpris : null;
+const remote = is_electron ? window.electron.remote : null;
+const mediaSession = !is_electron || !utils?.isLinux() ? navigator.mediaSession : null;
 
 export const useCenterControls = (args: { playersRef: any }) => {
+    console.log('useCenterControls', args);
     const { t } = useTranslation();
     const { playersRef } = args;
 
@@ -81,6 +84,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
         song?: QueueSong;
         status?: PlayerStatus;
     }) => {
+      console.log(nowPlayingManager);
         const { song, currentTime, status } = args || {};
 
         const time = currentTime || usePlayerStore.getState().current.time;
@@ -95,6 +99,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
             status: playStatus,
         });
 
+        console.log('Update song', args, mediaSession);
         if (mediaSession) {
             mediaSession.playbackState = playStatus === PlayerStatus.PLAYING ? 'playing' : 'paused';
 
@@ -102,7 +107,8 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
             if (track) {
                 let artwork: MediaImage[];
-
+                // TODO: Use Blob URL instead - CORS errors + slow loading and other errors according to StackOverflow
+                // sizes and type can also be omitted - iirc navidrome might also be jpg
                 if (track.imageUrl) {
                     const image300 = track.imageUrl
                         ?.replace(/&size=\d+/, '&size=300')
@@ -111,9 +117,10 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
                     artwork = [{ sizes: '300x300', src: image300, type: 'image/png' }];
                 } else {
+                    // TODO: Not sure if artwork can be optional - Use default img instead?
                     artwork = [];
                 }
-
+                console.log('Updating', track);
                 metadata = new MediaMetadata({
                     album: track.album ?? '',
                     artist: track.artistName,
@@ -121,6 +128,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
                     title: track.name,
                 });
             } else {
+                console.log('No mediasession');
                 metadata = new MediaMetadata();
             }
 
@@ -708,7 +716,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     ]);
 
     useEffect(() => {
-        if (!isElectron() && mediaSession) {
+        if (mediaSession) {
             mediaSession.setActionHandler('nexttrack', () => {
                 handleNextTrack();
             });
@@ -758,21 +766,29 @@ export const useCenterControls = (args: { playersRef: any }) => {
         setCurrentTime,
     ]);
 
+    const player = usePlayerStore();
     useEffect(() => {
-        if (utils?.isLinux()) {
-            const unsubCurrentTime = usePlayerStore.subscribe(
-                (state) => state.current.time,
-                (time) => {
-                    mpris?.updatePosition(time);
-                },
-            );
+      mprisUpdateSong({
+        currentTime: player.current.time,
+        song: player.current.song,
+        status: player.current.status,
+      })
+    }, [player]);
+    useEffect(() => {
+        // if (utils?.isLinux()) {
+        const unsubCurrentTime = usePlayerStore.subscribe(
+            (state) => state.current.time,
+            (time) => {
+                mpris?.updatePosition(time);
+            },
+        );
 
-            return () => {
-                unsubCurrentTime();
-            };
-        }
+        return () => {
+            unsubCurrentTime();
+        };
+        // }
 
-        return () => {};
+        // return () => {};
     }, []);
 
     useEffect(() => {

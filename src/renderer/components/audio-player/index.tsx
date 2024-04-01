@@ -312,6 +312,7 @@ export const AudioPlayer = forwardRef(
       }, [currentPlayer, player1, player2]);
 
         useEffect(tc(async () => {
+          return;
             const navigator = window.navigator;
             const playerData = currentPlayer === 1 ? player1 : player2;
             const progress = currentPlayer === 1 ? player1Progress : player2Progress;
