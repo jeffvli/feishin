@@ -172,7 +172,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
         const shared: Playlist[] = [];
 
         for (const playlist of data.items) {
-            if (playlist.owner !== username) {
+            if (playlist.owner && playlist.owner !== username) {
                 shared.push(playlist);
             } else {
                 owned.push(playlist);
