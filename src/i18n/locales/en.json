@@ -306,7 +306,8 @@
             "removeFromFavorites": "$t(action.removeFromFavorites)",
             "removeFromPlaylist": "$t(action.removeFromPlaylist)",
             "removeFromQueue": "$t(action.removeFromQueue)",
-            "setRating": "$t(action.setRating)"
+            "setRating": "$t(action.setRating)",
+            "showDetails": "get info"
         },
         "fullscreenPlayer": {
             "config": {

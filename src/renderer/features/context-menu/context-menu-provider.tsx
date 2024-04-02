@@ -25,6 +25,7 @@ import {
     RiPlayListAddFill,
     RiStarFill,
     RiCloseCircleLine,
+    RiInformationFill,
 } from 'react-icons/ri';
 import { AnyLibraryItems, LibraryItem, ServerType, AnyLibraryItem } from '/@/renderer/api/types';
 import {
@@ -53,6 +54,7 @@ import {
 } from '/@/renderer/store';
 import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { Play, PlaybackType } from '/@/renderer/types';
+import { ItemDetailsModal } from '/@/renderer/features/item-details/components/item-details-modal';
 
 type ContextMenuContextProps = {
     closeContextMenu: () => void;
@@ -627,6 +629,17 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         ctx.tableApi?.deselectAll();
     }, [ctx.tableApi]);
 
+    const handleOpenItemDetails = useCallback(() => {
+        const item = ctx.dataNodes ? ctx.dataNodes[0] : ctx.data[0];
+        console.log(item);
+
+        openModal({
+            children: <ItemDetailsModal item={item.data} />,
+            size: 'xl',
+            title: t('page.contextMenu.showDetails', { postProcess: 'titleCase' }),
+        });
+    }, [ctx.data, ctx.dataNodes, t]);
+
     const contextMenuItems: Record<ContextMenuItemType, ContextMenuItem> = useMemo(() => {
         return {
             addToFavorites: {
@@ -775,20 +788,29 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 onClick: () => {},
                 rightIcon: <RiArrowRightSFill size="1.2rem" />,
             },
+            showDetails: {
+                disabled: ctx.data?.length !== 1,
+                id: 'showDetails',
+                label: t('page.contextMenu.showDetails', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiInformationFill />,
+                onClick: handleOpenItemDetails,
+            },
         };
     }, [
+        t,
         handleAddToFavorites,
         handleAddToPlaylist,
+        openDeletePlaylistModal,
         handleDeselectAll,
         handleMoveToBottom,
         handleMoveToTop,
-        handlePlay,
         handleRemoveFromFavorites,
         handleRemoveFromPlaylist,
         handleRemoveSelected,
+        ctx.data?.length,
+        handleOpenItemDetails,
+        handlePlay,
         handleUpdateRating,
-        openDeletePlaylistModal,
-        t,
     ]);
 
     const mergedRef = useMergedRef(ref, clickOutsideRef);
@@ -827,7 +849,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                     >
                                                         <HoverCard.Target>
                                                             <ContextMenuButton
-                                                                disabled={item.disabled}
+                                                                disabled={
+                                                                    contextMenuItems[item.id]
+                                                                        .disabled
+                                                                }
                                                                 leftIcon={
                                                                     contextMenuItems[item.id]
                                                                         .leftIcon
@@ -851,7 +876,11 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                                 ].children?.map((child) => (
                                                                     <ContextMenuButton
                                                                         key={`sub-${child.id}`}
-                                                                        disabled={child.disabled}
+                                                                        disabled={
+                                                                            contextMenuItems[
+                                                                                item.id
+                                                                            ].disabled
+                                                                        }
                                                                         leftIcon={child.leftIcon}
                                                                         rightIcon={child.rightIcon}
                                                                         onClick={child.onClick}
@@ -864,7 +893,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                     </HoverCard>
                                                 ) : (
                                                     <ContextMenuButton
-                                                        disabled={item.disabled}
+                                                        disabled={
+                                                            contextMenuItems[item.id].disabled
+                                                        }
                                                         leftIcon={
                                                             contextMenuItems[item.id].leftIcon
                                                         }

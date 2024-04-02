@@ -33,7 +33,8 @@ export type ContextMenuItemType =
     | 'moveToBottomOfQueue'
     | 'moveToTopOfQueue'
     | 'removeFromQueue'
-    | 'deselectAll';
+    | 'deselectAll'
+    | 'showDetails';
 
 export type SetContextMenuItems = {
     children?: boolean;
