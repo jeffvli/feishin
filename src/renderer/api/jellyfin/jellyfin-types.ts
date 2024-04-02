@@ -676,6 +676,23 @@ const similarSongs = pagination.extend({
     Items: z.array(song),
 });
 
+const syncPlayList = z.object({
+    GroupId: z.string().uuid(),
+    GroupName: z.string(),
+    LastUpdatedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+    // Add more states if needed
+    Participants: z.array(z.string()),
+
+    State: z.enum(['Idle', 'Active', 'Paused']),
+});
+
+const syncPlayBufferingParameters = z.object({
+    IsPlaying: z.boolean(),
+    PlaylistItemId: z.string(),
+    PositionTicks: z.number(),
+    When: z.string(),
+});
+
 export enum JellyfinExtensions {
     SONG_LYRICS = 'songLyrics',
 }
@@ -711,6 +728,7 @@ export const jfType = {
         similarArtistList: similarArtistListParameters,
         similarSongs: similarSongsParameters,
         songList: songListParameters,
+        syncPlayBuffering: syncPlayBufferingParameters,
         updatePlaylist: updatePlaylistParameters,
     },
     _response: {
@@ -738,6 +756,7 @@ export const jfType = {
         similarSongs,
         song,
         songList,
+        syncPlayList,
         topSongsList,
         updatePlaylist,
         user,

@@ -96,6 +96,7 @@ export type ControllerEndpoint = Partial<{
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
     getStructuredLyrics: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
+    getSyncPlayList: (args: any) => Promise<any>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getUserList: (args: UserListArgs) => Promise<UserListResponse>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
@@ -143,6 +144,7 @@ const endpoints: ApiController = {
         getSongDetail: jfController.getSongDetail,
         getSongList: jfController.getSongList,
         getStructuredLyrics: undefined,
+        getSyncPlayList: jfController.getSyncPlayList,
         getTopSongs: jfController.getTopSongList,
         getUserList: undefined,
         removeFromPlaylist: jfController.removeFromPlaylist,
@@ -526,6 +528,134 @@ const getSimilarSongs = async (args: SimilarSongsArgs) => {
     )?.(args);
 };
 
+const getSyncPlayList = async (args: BaseEndpointArgs) => {
+    return (
+        apiController(
+            'getSyncPlayList',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getSyncPlayList']
+    )?.(args);
+};
+
+// fuck it, ANY
+
+const postSyncPlayBuffering = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayBuffering',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayBuffering']
+    )?.(args);
+};
+
+const postSyncPlayJoin = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayJoin',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayJoin']
+    )?.(args);
+};
+
+const postSyncPlayLeave = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayLeave',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayLeave']
+    )?.(args);
+};
+
+const postSyncPlayNew = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayNew',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayNew']
+    )?.(args);
+};
+
+const postSyncPlayNextItem = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayNextItem',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayNextItem']
+    )?.(args);
+};
+
+const postSyncPlayPause = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayPause',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayPause']
+    )?.(args);
+};
+
+const postSyncPlayPing = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayPing',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayPing']
+    )?.(args);
+};
+
+const postSyncPlayQueue = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayQueue',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayQueue']
+    )?.(args);
+};
+
+const postSyncPlayReady = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayReady',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayReady']
+    )?.(args);
+};
+
+const postSyncPlaySeek = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlaySeek',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlaySeek']
+    )?.(args);
+};
+
+const postSyncPlaySetRepeatMode = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlaySetRepeatMode',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlaySetRepeatMode']
+    )?.(args);
+};
+
+const postSyncPlayStop = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayStop',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayStop']
+    )?.(args);
+};
+
+const postSyncPlayUnpause = async (args: any) => {
+    return (
+        apiController(
+            'postSyncPlayUnpause',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['postSyncPlayUnpause']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -550,11 +680,25 @@ export const controller = {
     getSongDetail,
     getSongList,
     getStructuredLyrics,
+    getSyncPlayList,
     getTopSongList,
     getUserList,
+    postSyncPlayBuffering,
+    postSyncPlayJoin,
+    postSyncPlayLeave,
+    postSyncPlayNew,
+    postSyncPlayNextItem,
+    postSyncPlayPause,
     removeFromPlaylist,
+    postSyncPlayPing,
     scrobble,
+    postSyncPlayQueue,
     search,
+    postSyncPlayReady,
     updatePlaylist,
+    postSyncPlaySeek,
     updateRating,
+    postSyncPlaySetRepeatMode,
+    postSyncPlayStop,
+    postSyncPlayUnpause,
 };

@@ -249,6 +249,7 @@ export interface SettingsState {
         autoPlay: boolean;
         historyLength: number;
         lyricAnimations: boolean;
+        steelseriesPort: number;
     };
     playback: {
         audioDeviceId?: string | null;
@@ -404,6 +405,7 @@ const initialState: SettingsState = {
         autoPlay: true,
         historyLength: 10000,
         lyricAnimations: true,
+        steelseriesPort: 0,
     },
     playback: {
         audioDeviceId: undefined,

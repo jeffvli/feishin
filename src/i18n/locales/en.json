@@ -391,6 +391,7 @@
         "playbackFetchNoResults": "no songs found",
         "playbackSpeed": "playback speed",
         "playRandom": "play random",
+        "syncPlay": "Join a group",
         "previous": "previous",
         "queue_clear": "clear queue",
         "queue_moveToBottom": "move selected to top",
@@ -593,11 +594,13 @@
         "zoom": "zoom percentage",
         "zoom_description": "sets the zoom percentage for the application",
         "autoPlay": "Autoplay",
-        "autoPlay_description": "Automatically play similar songs when the current track or album ends. Forces WEB player $t(common.restartRequired)",
+        "autoPlay_description": "Automatically play similar songs when the current track or album ends. Forces WEB player ($t(common.restartRequired))",
         "historyLength": "History length",
         "historyLength_description": "The number of songs to keep in the history, autoplay skips over any songs in the history. Overrides eldest first $t(common.restartRequired)",
         "lyricAnimations": "Lyric animations",
-        "lyricAnimations_description": "Enables custom lyric animations"
+        "lyricAnimations_description": "Enables custom lyric animations",
+        "steelseries": "Steelseries GameSense Port",
+        "steelseries_description": "Enables Steelseries GameSense integration. 0 for disabled. (%PROGRAMDATA%/SteelSeries/SteelSeries Engine 3/coreProps.json) ($t(common.restartRequired))"
     },
     "table": {
         "column": {

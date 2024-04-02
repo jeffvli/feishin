@@ -245,6 +245,10 @@ export const queryKeys: Record<
             return [serverId, 'song', 'similar'] as const;
         },
     },
+    syncPlay: {
+        // dosent actually do anything
+        list: (serverId: string) => [serverId, 'syncPlay'] as const,
+    },
     users: {
         list: (serverId: string, query?: UserListQuery) => {
             if (query) return [serverId, 'users', 'list', query] as const;

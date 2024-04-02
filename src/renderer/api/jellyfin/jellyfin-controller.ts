@@ -53,6 +53,7 @@ import {
     ServerInfoArgs,
     SimilarSongsArgs,
     Song,
+    SyncPlayList,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -998,6 +999,21 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
     }, []);
 };
 
+const getSyncPlayList = async (args: BaseEndpointArgs): Promise<SyncPlayList> => {
+    const { apiClientProps } = args;
+    const userId = apiClientProps.server?.userId;
+
+    if (!userId) throw new Error('No userId found');
+
+    const res = await jfApiClient(apiClientProps).getSyncPlayList();
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get sync playlist');
+    }
+
+    return [res.body];
+};
+
 export const jfController = {
     addToPlaylist,
     authenticate,
@@ -1021,6 +1037,7 @@ export const jfController = {
     getSimilarSongs,
     getSongDetail,
     getSongList,
+    getSyncPlayList,
     getTopSongList,
     removeFromPlaylist,
     scrobble,

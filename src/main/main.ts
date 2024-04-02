@@ -230,7 +230,6 @@ const createWindow = async (first = true) => {
             frame: true,
         },
     };
-
     mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
         frame: false,
@@ -248,7 +247,7 @@ const createWindow = async (first = true) => {
             preload: app.isPackaged
                 ? path.join(__dirname, 'preload.js')
                 : path.join(__dirname, '../../.erb/dll/preload.js'),
-            webSecurity: !store.get('ignore_cors'),
+            webSecurity: false, // \!store.get('ignore_cors'),
         },
         width: 1440,
         ...(nativeFrame && isLinux() && nativeFrameConfig.linux),

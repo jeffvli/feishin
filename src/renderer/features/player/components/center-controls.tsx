@@ -40,6 +40,7 @@ import {
 import { PlayerStatus, PlaybackType, PlayerShuffle, PlayerRepeat } from '/@/renderer/types';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { openShuffleAllModal } from './shuffle-all-modal';
+import { SyncPlayModal, openSyncPlayModal } from './sync-play-modal';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 
 interface CenterControlsProps {
@@ -182,7 +183,11 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                             label: t('player.syncplay', { postProcess: 'sentenceCase' }),
                         }}
                         variant="tertiary"
-                        onClick={handleStop}
+                        onClick={() =>
+                            openSyncPlayModal({
+                                queryClient,
+                            })
+                        }
                     />
                     <PlayerButton
                         icon={<RiStopFill size={buttonSize} />}

@@ -76,6 +76,26 @@ export const ModSettings = () => {
             }),
             title: t('setting.historyLength', { postProcess: 'sentenceCase' }),
         },
+        {
+            control: (
+                <NumberInput
+                    defaultValue={settings.steelseriesPort}
+                    onBlur={(e) => {
+                        setSettings({
+                            modshin: {
+                                ...settings,
+                                steelseriesPort: parseInt(e.currentTarget.value, 10),
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.steelseries', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.steelseries', { postProcess: 'sentenceCase' }),
+        },
         // Add more options as needed
     ];
 

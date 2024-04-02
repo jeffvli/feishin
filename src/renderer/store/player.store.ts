@@ -1,3 +1,5 @@
+/* eslint-disable promise/always-return */
+import axios from 'axios';
 import { use } from 'i18next';
 import map from 'lodash/map';
 import merge from 'lodash/merge';
@@ -10,6 +12,7 @@ import { shallow } from 'zustand/shallow';
 import { QueueSong } from '/@/renderer/api/types';
 import { PlayerStatus, PlayerRepeat, PlayerShuffle, Play } from '/@/renderer/types';
 import { getMostSimilarSong } from '/@/renderer/features/similar-songs/queries/similar-song-queries';
+import { joinSyncPlay } from '/@/renderer/features/sync-play/queries/sync-play-queries';
 import { modshinSettings } from '/@/renderer/store';
 
 export interface PlayerState {
@@ -20,6 +23,8 @@ export interface PlayerState {
         historyLimit: number;
         index: number;
         isSimilar: boolean;
+        isSyncPlay: boolean;
+        isSyncPlayHost: boolean;
         nextIndex: number;
         player: 1 | 2;
         previousIndex: number;
@@ -108,6 +113,8 @@ export interface PlayerSlice extends PlayerState {
         setStore: (data: Partial<PlayerState>) => void;
         setVolume: (volume: number) => void;
         shuffleQueue: () => PlayerData;
+        syncPlayStart: (group: any) => void;
+        syncPlayStop: () => void;
     };
 }
 
@@ -540,6 +547,157 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 state.current.didModInit = true;
                                 state.current.historyLimit = historyLimit;
                             });
+
+                            (async () => {
+                                try {
+                                    const port = modshinSettings().steelseriesPort;
+                                    if (!port) return;
+                                    console.log(
+                                        'Registering modshin with SteelSeries on port',
+                                        port,
+                                    );
+
+                                    const register = {
+                                        game: 'MODSHIN',
+                                        game_display_name: 'Modshin',
+                                    };
+
+                                    const registerEvent = {
+                                        event: 'PROGRESS',
+                                        game: 'MODSHIN',
+                                        handlers: [
+                                            {
+                                                color: {
+                                                    gradient: {
+                                                        hundred: { blue: 128, green: 0, red: 128 },
+                                                        zero: { blue: 128, green: 0, red: 128 },
+                                                    },
+                                                },
+                                                'device-type': 'rgb-per-key-zones',
+                                                mode: 'percent',
+                                                zone: 'function-keys',
+                                            },
+                                        ],
+                                        icon_id: 23,
+                                        max_value: 100,
+                                        min_value: 0,
+                                    };
+
+                                    const registerEvent2 = {
+                                        event: 'MESSAGE',
+                                        game: 'MODSHIN',
+                                        handlers: [
+                                            {
+                                                datas: [
+                                                    {
+                                                        'icon-id': 23,
+                                                        lines: [
+                                                            {
+                                                                'context-frame-key': 'first-line',
+                                                                'has-text': true,
+                                                                wrap: 1,
+                                                            },
+                                                            {
+                                                                'context-frame-key': 'second-line',
+                                                                'has-text': true,
+                                                                wrap: 1,
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                                'device-type': 'screened',
+                                                mode: 'screen',
+                                            },
+                                        ],
+                                        value_optional: true,
+                                    };
+
+                                    const messageEvent = {
+                                        data: {
+                                            frame: {
+                                                'first-line': '',
+                                                'second-line': '',
+                                            },
+                                            value: 99,
+                                        },
+                                        event: 'MESSAGE',
+                                        game: 'MODSHIN',
+                                    };
+
+                                    const progressEvent = {
+                                        data: {
+                                            value: 75,
+                                        },
+                                        event: 'PROGRESS',
+                                        game: 'MODSHIN',
+                                    };
+
+                                    const heartbeat = {
+                                        game: 'MODSHIN',
+                                    };
+
+                                    // Create an axios client
+                                    const axiosClient = axios.create({
+                                        baseURL: `http://127.0.0.1:${port}`,
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                    });
+
+                                    setInterval(() => {
+                                        axiosClient.post('/game_heartbeat', heartbeat);
+                                    }, 600000);
+
+                                    const registerResp = await axiosClient.post(
+                                        '/game_metadata',
+                                        register,
+                                    );
+
+                                    const bindEventResp = await axiosClient.post(
+                                        '/bind_game_event',
+                                        registerEvent,
+                                    );
+
+                                    const registerEventResp = await axiosClient.post(
+                                        '/register_game_event',
+                                        registerEvent,
+                                    );
+
+                                    const bindEvent2Resp = await axiosClient.post(
+                                        '/bind_game_event',
+                                        registerEvent2,
+                                    );
+
+                                    const registerEvent2Resp = await axiosClient.post(
+                                        '/register_game_event',
+                                        registerEvent2,
+                                    );
+                                    setInterval(async () => {
+                                        try {
+                                            const screen = messageEvent;
+                                            const state = usePlayerStore.getState(); // Get the current state
+                                            if (state.current.song === undefined) return;
+                                            screen.data.value = Math.floor(Math.random() * 100);
+                                            screen.data.frame['first-line'] =
+                                                `${state.current.song?.name} ` || '';
+                                            screen.data.frame['second-line'] =
+                                                `${state.current.song?.artists[0].name} ` || '';
+                                            await axiosClient.post('/game_event', screen);
+
+                                            const progress = progressEvent;
+                                            progress.data.value =
+                                                (state.current.time /
+                                                    (state.current.song.duration / 1000)) *
+                                                100;
+                                            await axiosClient.post('/game_event', progress);
+                                        } catch (error) {
+                                            // do nothing
+                                        }
+                                    }, 1000);
+                                } catch (e) {
+                                    console.error('Failed to register modshin with SteelSeries', e);
+                                }
+                            })();
                         },
                         moveToBottomOfQueue: (uniqueIds) => {
                             const queue = get().queue.default;
@@ -1128,6 +1286,20 @@ export const usePlayerStore = create<PlayerSlice>()(
 
                             return get().actions.getPlayerData();
                         },
+                        syncPlayStart: (group) => {
+                            if (group) {
+                                // Join group
+                                (async () => {})();
+                            } else {
+                                // Create group
+                            }
+                        },
+                        syncPlayStop: () => {
+                            set((state) => {
+                                state.current.isSyncPlay = false;
+                                state.current.isSyncPlayHost = false;
+                            });
+                        },
                     },
                     current: {
                         didModInit: false,
@@ -1136,6 +1308,8 @@ export const usePlayerStore = create<PlayerSlice>()(
                         historyLimit: 100,
                         index: 0,
                         isSimilar: false,
+                        isSyncPlay: false,
+                        isSyncPlayHost: false,
                         nextIndex: 0,
                         player: 1,
                         previousIndex: 0,
@@ -1195,6 +1369,8 @@ export const usePlayerControls = () =>
             setShuffle: state.actions.setShuffle,
             setShuffledIndex: state.actions.setShuffledIndex,
             setVolume: state.actions.setVolume,
+            syncPlayStart: state.actions.syncPlayStart,
+            syncPlayStop: state.actions.syncPlayStop,
         }),
         shallow,
     );

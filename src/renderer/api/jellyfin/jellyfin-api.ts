@@ -201,6 +201,15 @@ export const contract = c.router({
             404: jfType._response.error,
         },
     },
+    getSyncPlayList: {
+        method: 'GET',
+        path: 'SyncPlay/List',
+        responses: {
+            200: jfType._response.syncPlayList,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
     getTopSongsList: {
         method: 'GET',
         path: 'users/:userId/items',
@@ -208,6 +217,147 @@ export const contract = c.router({
         responses: {
             200: jfType._response.topSongsList,
             400: jfType._response.error,
+        },
+    },
+    postSyncPlayBuffering: {
+        body: jfType._parameters.syncPlayBuffering,
+        method: 'POST',
+        path: 'SyncPlay/Buffering',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlayJoin: {
+        body: z.object({
+            GroupId: z.string(),
+        }),
+        method: 'POST',
+        path: 'SyncPlay/Join',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlayLeave: {
+        method: 'POST',
+        path: 'SyncPlay/Leave',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlayNew: {
+        body: z.object({
+            GroupName: z.string(),
+        }),
+        method: 'POST',
+        path: 'SyncPlay/New',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlayNextItem: {
+        body: z.object({
+            PlaylistItemId: z.string(),
+        }),
+        method: 'POST',
+        path: 'SyncPlay/NextItem',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlayPause: {
+        method: 'POST',
+        path: 'SyncPlay/Pause',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlayPing: {
+        body: z.object({
+            Ping: z.number(),
+        }),
+        method: 'POST',
+        path: 'SyncPlay/Ping',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlayQueue: {
+        body: z.object({
+            ItemIds: z.array(z.string()),
+            Mode: z.string(),
+        }),
+        method: 'POST',
+        path: 'SyncPlay/Queue',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlayReady: {
+        body: jfType._parameters.syncPlayBuffering,
+        method: 'POST',
+        path: 'SyncPlay/Ready',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlaySeek: {
+        body: z.object({
+            PositionTicks: z.number(),
+        }),
+        method: 'POST',
+        path: 'SyncPlay/Seek',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlaySetRepeatMode: {
+        body: z.object({
+            RepeatMode: z.string(),
+        }),
+        method: 'POST',
+        path: 'SyncPlay/SetRepeatMode',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlayStop: {
+        method: 'POST',
+        path: 'SyncPlay/Stop',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
+        },
+    },
+    postSyncPlayUnpause: {
+        method: 'POST',
+        path: 'SyncPlay/Unpause',
+        responses: {
+            204: null,
+            401: jfType._response.error,
+            403: jfType._response.error,
         },
     },
     removeFavorite: {
@@ -357,8 +507,6 @@ export const jfApiClient = (args: {
                     } catch (error) {
                         // rebuild axiosClient
                         axiosClient = axios.create({});
-                        console.log(result);
-                        console.error(error);
                         errorOccurred = true;
                         // eslint-disable-next-line no-promise-executor-return
                         await new Promise((resolve) => setTimeout(resolve, 1000));

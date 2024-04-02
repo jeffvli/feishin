@@ -301,12 +301,13 @@ export type MusicFoldersResponse = MusicFolder[];
 
 export type ListSortOrder = NDOrder | JFSortOrder;
 
-type BaseEndpointArgs = {
+export type BaseEndpointArgs = {
     apiClientProps: {
         server: ServerListItem | null;
         signal?: AbortSignal;
     };
 };
+export type BaseEndpointArgs = BaseEndpointArgs;
 
 // Genre List
 export type GenreListResponse = BasePaginatedResponse<Genre[]> | null | undefined;
@@ -1177,3 +1178,13 @@ export type SimilarSongsQuery = {
 export type SimilarSongsArgs = {
     query: SimilarSongsQuery;
 } & BaseEndpointArgs;
+
+export type SyncPlayGroup = {
+    GroupId: string;
+    GroupName: string;
+    LastUpdatedAt: string;
+    Participants: string[];
+    State: string;
+};
+
+export type SyncPlayList = SyncPlayGroup[];
