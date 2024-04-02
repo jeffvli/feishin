@@ -595,7 +595,8 @@
             "albumArtist": "专辑艺术家",
             "path": "路径",
             "channels": "$t(common.channel_other)",
-            "discNumber": "盘"
+            "discNumber": "盘",
+            "size": "$t(common.size)"
         }
     }
 }

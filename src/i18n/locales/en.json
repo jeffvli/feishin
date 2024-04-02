@@ -610,6 +610,7 @@
             "rating": "rating",
             "releaseDate": "release date",
             "releaseYear": "year",
+            "size": "$t(common.size)",
             "songCount": "$t(entity.track_other)",
             "title": "title",
             "trackNumber": "track"

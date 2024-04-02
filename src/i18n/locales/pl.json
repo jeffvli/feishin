@@ -625,7 +625,8 @@
             "albumArtist": "artysta albumu",
             "path": "ścieżka",
             "discNumber": "płyta",
-            "channels": "$t(common.channel_other)"
+            "channels": "$t(common.channel_other)",
+            "size": "$t(common.size)"
         }
     }
 }

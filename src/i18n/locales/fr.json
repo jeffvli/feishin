@@ -625,7 +625,8 @@
             "artist": "$t(entity.artist_one)",
             "genre": "$t(entity.genre_one)",
             "songCount": "$t(entity.track_other)",
-            "channels": "$t(common.channel_other)"
+            "channels": "$t(common.channel_other)",
+            "size": "$t(common.size)"
         }
     }
 }
