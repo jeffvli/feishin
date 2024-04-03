@@ -472,12 +472,10 @@ export const FullScreenPlayer = () => {
         srcLoaded: true,
     });
 
-    const imageUrl = currentSong?.imageUrl;
+    const imageUrl = currentSong?.imageUrl && currentSong.imageUrl.replace(/size=\d+/g, 'size=500');
     const backgroundImage =
         imageUrl && dynamicIsImage
-            ? `url("${imageUrl
-                  .replace(/size=\d+/g, 'size=500')
-                  .replace(currentSong.id, currentSong.albumId)}`
+            ? `url("${imageUrl.replace(currentSong.id, currentSong.albumId)}"), url("${imageUrl}")`
             : mainBackground;
 
     return (
