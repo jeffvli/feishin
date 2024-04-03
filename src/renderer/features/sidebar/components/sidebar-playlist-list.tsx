@@ -202,16 +202,17 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
                             title: t('error.genericError', { postProcess: 'sentenceCase' }),
                         });
                     },
+                    onSuccess: () => {
+                        toast.success({
+                            message: t('form.addToPlaylist.success', {
+                                message: 1,
+                                numOfPlaylists: 1,
+                                postProcess: 'sentenceCase',
+                            }),
+                        });
+                    },
                 },
             );
-
-            toast.success({
-                message: t('form.addToPlaylist.success', {
-                    message: 1,
-                    numOfPlaylists: 1,
-                    postProcess: 'sentenceCase',
-                }),
-            });
         },
         [addToPlaylistMutation, currentSong, serverID, t],
     );
