@@ -80,19 +80,23 @@ const ActionRequiredRoute = () => {
                                 </Button>
                             </>
                         )}
-                        <Group
-                            noWrap
-                            position="center"
-                        >
-                            <Button
-                                fullWidth
-                                leftIcon={<RiEdit2Line />}
-                                variant="filled"
-                                onClick={handleManageServersModal}
+                        {!displayedCheck && (
+                            <Group
+                                noWrap
+                                position="center"
                             >
-                                {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}
-                            </Button>
-                        </Group>
+                                <Button
+                                    fullWidth
+                                    leftIcon={<RiEdit2Line />}
+                                    variant="filled"
+                                    onClick={handleManageServersModal}
+                                >
+                                    {t('page.appMenu.manageServers', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </Button>
+                            </Group>
+                        )}
                     </Stack>
                 </Stack>
             </Center>
