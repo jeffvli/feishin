@@ -26,6 +26,8 @@
         "action_one": "action",
         "action_other": "actions",
         "add": "add",
+        "albumGain": "album gain",
+        "albumPeak": "album peak",
         "areYouSure": "are you sure?",
         "ascending": "ascending",
         "backward": "backward",
@@ -72,6 +74,7 @@
         "menu": "menu",
         "minimize": "minimize",
         "modified": "modified",
+        "mbid": "MusicBrainz ID",
         "name": "name",
         "no": "no",
         "none": "none",
@@ -102,6 +105,8 @@
         "sortOrder": "order",
         "title": "title",
         "trackNumber": "track",
+        "trackGain": "track gain",
+        "trackPeak": "track peak",
         "unknown": "unknown",
         "version": "version",
         "year": "year",
@@ -306,7 +311,8 @@
             "removeFromFavorites": "$t(action.removeFromFavorites)",
             "removeFromPlaylist": "$t(action.removeFromPlaylist)",
             "removeFromQueue": "$t(action.removeFromQueue)",
-            "setRating": "$t(action.setRating)"
+            "setRating": "$t(action.setRating)",
+            "showDetails": "get info"
         },
         "fullscreenPlayer": {
             "config": {
