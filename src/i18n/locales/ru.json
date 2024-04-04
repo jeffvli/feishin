@@ -204,7 +204,8 @@
             "trackNumber": "трек",
             "genre": "$t(entity.genre_one)",
             "path": "путь",
-            "discNumber": "диск"
+            "discNumber": "диск",
+            "size": "$t(common.size)"
         }
     },
     "error": {

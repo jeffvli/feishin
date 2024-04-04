@@ -463,7 +463,8 @@
             "bpm": "bpm",
             "songCount": "$t(entity.track_other)",
             "title": "標題",
-            "trackNumber": "音軌編號"
+            "trackNumber": "音軌編號",
+            "size": "$t(common.size)"
         }
     },
     "action": {

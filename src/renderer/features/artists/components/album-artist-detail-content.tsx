@@ -39,6 +39,7 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { CardRow, Play, TableColumn } from '/@/renderer/types';
+import { sanitize } from '/@/renderer/utils/sanitize';
 
 const ContentContainer = styled.div`
     position: relative;
@@ -330,8 +331,13 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
 
     const topSongs = topSongsQuery?.data?.items?.slice(0, 10);
 
-    const showBiography =
-        detailQuery?.data?.biography !== undefined && detailQuery?.data?.biography !== null;
+    const biography = useMemo(() => {
+        const bio = detailQuery?.data?.biography;
+
+        if (!bio) return null;
+        return sanitize(bio);
+    }, [detailQuery?.data?.biography]);
+
     const showTopSongs = topSongsQuery?.data?.items?.length;
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
     const mbzId = detailQuery?.data?.mbz;
@@ -459,7 +465,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         </Group>
                     </Box>
                 ) : null}
-                {showBiography ? (
+                {biography ? (
                     <Box
                         component="section"
                         maw="1280px"
@@ -472,9 +478,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                 artist: detailQuery?.data?.name,
                             })}
                         </TextTitle>
-                        <Spoiler
-                            dangerouslySetInnerHTML={{ __html: detailQuery?.data?.biography || '' }}
-                        />
+                        <Spoiler dangerouslySetInnerHTML={{ __html: biography }} />
                     </Box>
                 ) : null}
                 {showTopSongs ? (

@@ -310,7 +310,8 @@
             "discNumber": "Disk",
             "genre": "$t(entity.genre_one)",
             "songCount": "$t(entity.track_other)",
-            "trackNumber": "Nr."
+            "trackNumber": "Nr.",
+            "size": "$t(common.size)"
         }
     },
     "page": {
