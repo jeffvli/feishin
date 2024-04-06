@@ -9,6 +9,7 @@ import { formatSizeString } from '/@/renderer/utils/format-size-string';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { Rating, Spoiler } from '/@/renderer/components';
 import { sanitize } from '/@/renderer/utils/sanitize';
+import { SongPath } from '/@/renderer/features/item-details/components/song-path';
 
 export type ItemDetailsModalProps = {
     item: Album | AlbumArtist | Song;
@@ -156,7 +157,7 @@ const AlbumArtistPropertyMapping: ItemDetailRow<AlbumArtist>[] = [
 
 const SongPropertyMapping: ItemDetailRow<Song>[] = [
     { key: 'name', label: 'common.title' },
-    { key: 'path', label: 'common.path' },
+    { key: 'path', label: 'common.path', render: SongPath },
     { label: 'entity.albumArtist_one', render: formatArtists },
     { key: 'album', label: 'entity.album_one' },
     { key: 'discNumber', label: 'common.disc' },

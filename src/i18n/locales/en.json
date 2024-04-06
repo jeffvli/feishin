@@ -157,6 +157,7 @@
         "loginRateError": "too many login attempts, please try again in a few seconds",
         "mpvRequired": "MPV required",
         "networkError": "a network error occurred",
+        "openError": "could not open file",
         "playbackError": "an error occurred when trying to play the media",
         "remoteDisableError": "an error occurred when trying to $t(common.disable) the remote server",
         "remoteEnableError": "an error occurred when trying to $t(common.enable) the remote server",
@@ -351,6 +352,11 @@
             "newlyAdded": "newly added releases",
             "recentlyPlayed": "recently played",
             "title": "$t(common.home)"
+        },
+        "itemDetail": {
+            "copyPath": "copy path to clipboard",
+            "copiedPath": "path copied successfully",
+            "openFile": "show track in file manager"
         },
         "playlistList": {
             "title": "$t(entity.playlist_other)"

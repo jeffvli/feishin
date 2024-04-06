@@ -342,6 +342,20 @@ const createWindow = async (first = true) => {
         }
     });
 
+    ipcMain.handle('open-item', async (_event, path: string) => {
+        return new Promise<void>((resolve, reject) => {
+            access(path, constants.F_OK, (error) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                shell.showItemInFolder(path);
+                resolve();
+            });
+        });
+    });
+
     const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
 
     if (globalMediaKeysEnabled) {
