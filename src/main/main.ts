@@ -24,6 +24,8 @@ import {
     BrowserWindowConstructorOptions,
     protocol,
     net,
+    Rectangle,
+    screen,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log/main';
@@ -256,6 +258,26 @@ const createWindow = async (first = true) => {
         ...(nativeFrame && isWindows() && nativeFrameConfig.windows),
     });
 
+    // From https://github.com/electron/electron/issues/526#issuecomment-1663959513
+    const bounds = store.get('bounds') as Rectangle | undefined;
+    if (bounds) {
+        const screenArea = screen.getDisplayMatching(bounds).workArea;
+        if (
+            bounds.x > screenArea.x + screenArea.width ||
+            bounds.x < screenArea.x ||
+            bounds.y < screenArea.y ||
+            bounds.y > screenArea.y + screenArea.height
+        ) {
+            if (bounds.width < screenArea.width && bounds.height < screenArea.height) {
+                mainWindow.setBounds({ height: bounds.height, width: bounds.width });
+            } else {
+                mainWindow.setBounds({ height: 900, width: 1440 });
+            }
+        } else {
+            mainWindow.setBounds(bounds);
+        }
+    }
+
     electronLocalShortcut.register(mainWindow, 'Ctrl+Shift+I', () => {
         mainWindow?.webContents.openDevTools();
     });
@@ -385,6 +407,7 @@ const createWindow = async (first = true) => {
     let saved = false;
 
     mainWindow.on('close', (event) => {
+        store.set('bounds', mainWindow?.getBounds());
         if (!exitFromTray && store.get('window_exit_to_tray')) {
             if (isMacOS() && !forceQuit) {
                 exitFromTray = true;
