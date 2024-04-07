@@ -394,6 +394,16 @@ const createWindow = async (first = true) => {
         }
 
         if (!first || !startWindowMinimized) {
+            const maximized = store.get('maximized');
+            const fullScreen = store.get('fullscreen');
+
+            if (maximized) {
+                mainWindow.maximize();
+            }
+            if (fullScreen) {
+                mainWindow.setFullScreen(true);
+            }
+
             mainWindow.show();
             createWinThumbarButtons();
         }
@@ -407,7 +417,10 @@ const createWindow = async (first = true) => {
     let saved = false;
 
     mainWindow.on('close', (event) => {
-        store.set('bounds', mainWindow?.getBounds());
+        store.set('bounds', mainWindow?.getNormalBounds());
+        store.set('maximized', mainWindow?.isMaximized());
+        store.set('fullscreen', mainWindow?.isFullScreen());
+
         if (!exitFromTray && store.get('window_exit_to_tray')) {
             if (isMacOS() && !forceQuit) {
                 exitFromTray = true;

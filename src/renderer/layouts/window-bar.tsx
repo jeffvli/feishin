@@ -13,6 +13,8 @@ import macMinHover from './assets/min-mac-hover.png';
 import macMin from './assets/min-mac.png';
 import appIcon from '../../../assets/icons/32x32.png';
 
+const localSettings = isElectron() ? window.electron.localSettings : null;
+
 const WindowsContainer = styled.div`
     display: flex;
     align-items: center;
@@ -228,7 +230,7 @@ export const WindowBar = () => {
         : 'Feishin';
     document.title = title;
 
-    const [max, setMax] = useState(false);
+    const [max, setMax] = useState(localSettings?.env.START_MAXIMIZED || false);
 
     const handleMinimize = () => minimize();
 

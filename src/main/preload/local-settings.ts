@@ -64,6 +64,7 @@ const env = {
     SERVER_NAME: process.env.SERVER_NAME ?? '',
     SERVER_TYPE,
     SERVER_URL: process.env.SERVER_URL ?? 'http://',
+    START_MAXIMIZED: store.get('maximized'),
 };
 
 export const localSettings = {
