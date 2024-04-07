@@ -151,20 +151,18 @@ const getAlbumArtistDetail = async (
         throw new Error('Server is required');
     }
 
+    // Prefer images from getArtistInfo first (which should be proxied)
+    // Prioritize large > medium > small
     return ndNormalize.albumArtist(
         {
             ...res.body.data,
             ...(artistInfoRes.status === 200 && {
+                largeImageUrl:
+                    artistInfoRes.body.artistInfo.largeImageUrl ||
+                    artistInfoRes.body.artistInfo.mediumImageUrl ||
+                    artistInfoRes.body.artistInfo.smallImageUrl ||
+                    res.body.data.largeImageUrl,
                 similarArtists: artistInfoRes.body.artistInfo.similarArtist,
-                ...(!res.body.data.largeImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.largeImageUrl,
-                }),
-                ...(!res.body.data.mediumImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.mediumImageUrl,
-                }),
-                ...(!res.body.data.smallImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.smallImageUrl,
-                }),
             }),
         },
         apiClientProps.server,
