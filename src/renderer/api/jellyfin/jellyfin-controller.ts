@@ -974,6 +974,8 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
 const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
     const { apiClientProps, query } = args;
 
+    // Prefer getSimilarSongs, where possible. Fallback to InstantMix
+    // where no similar songs were found.
     const res = await jfApiClient(apiClientProps).getSimilarSongs({
         params: {
             itemId: query.songId,
@@ -985,11 +987,36 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
         },
     });
 
-    if (res.status !== 200) {
+    if (res.status === 200 && res.body.Items.length) {
+        const results = res.body.Items.reduce<Song[]>((acc, song) => {
+            if (song.Id !== query.songId) {
+                acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+            }
+
+            return acc;
+        }, []);
+
+        if (results.length > 0) {
+            return results;
+        }
+    }
+
+    const mix = await jfApiClient(apiClientProps).getInstantMix({
+        params: {
+            itemId: query.songId,
+        },
+        query: {
+            Fields: 'Genres, DateCreated, MediaSources, ParentId',
+            Limit: query.count,
+            UserId: apiClientProps.server?.userId || undefined,
+        },
+    });
+
+    if (mix.status !== 200) {
         throw new Error('Failed to get similar songs');
     }
 
-    return res.body.Items.reduce<Song[]>((acc, song) => {
+    return mix.body.Items.reduce<Song[]>((acc, song) => {
         if (song.Id !== query.songId) {
             acc.push(jfNormalize.song(song, apiClientProps.server, ''));
         }

@@ -81,7 +81,7 @@ const normalizeSong = (
     const imagePlaceholderUrl = null;
     return {
         album: item.album,
-        albumArtists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
+        albumArtists: [{ id: item.albumArtistId, imageUrl: null, name: item.albumArtist }],
         albumId: item.albumId,
         artistName: item.artist,
         artists: [{ id: item.artistId, imageUrl: null, name: item.artist }],

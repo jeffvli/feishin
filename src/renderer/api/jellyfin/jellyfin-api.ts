@@ -115,6 +115,15 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    getInstantMix: {
+        method: 'GET',
+        path: 'songs/:itemId/InstantMix',
+        query: jfType._parameters.similarSongs,
+        responses: {
+            200: jfType._response.songList,
+            400: jfType._response.error,
+        },
+    },
     getMusicFolderList: {
         method: 'GET',
         path: 'users/:userId/items',

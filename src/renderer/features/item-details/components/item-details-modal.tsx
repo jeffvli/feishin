@@ -159,6 +159,11 @@ const SongPropertyMapping: ItemDetailRow<Song>[] = [
     { key: 'name', label: 'common.title' },
     { key: 'path', label: 'common.path', render: SongPath },
     { label: 'entity.albumArtist_one', render: formatArtists },
+    {
+        key: 'artists',
+        label: 'entity.artist_other',
+        render: (song) => song.artists.map((artist) => artist.name).join(' · '),
+    },
     { key: 'album', label: 'entity.album_one' },
     { key: 'discNumber', label: 'common.disc' },
     { key: 'trackNumber', label: 'common.trackNumber' },
@@ -229,6 +234,7 @@ export const ItemDetailsModal = ({ item }: ItemDetailsModalProps) => {
             <Table
                 highlightOnHover
                 horizontalSpacing="sm"
+                sx={{ userSelect: 'text' }}
                 verticalSpacing="sm"
             >
                 <tbody>{body}</tbody>

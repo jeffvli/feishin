@@ -47,10 +47,14 @@ import {
     genreListSortMap,
     ServerInfo,
     ServerInfoArgs,
+    SimilarSongsArgs,
+    Song,
 } from '../types';
 import { hasFeature } from '/@/renderer/api/utils';
 import { ServerFeature, ServerFeatures } from '/@/renderer/api/features-types';
 import { SubsonicExtensions } from '/@/renderer/api/subsonic/subsonic-types';
+import { NDSongListSort } from '/@/renderer/api/navidrome.types';
+import { ssNormalize } from '/@/renderer/api/subsonic/subsonic-normalize';
 
 const authenticate = async (
     url: string,
@@ -545,6 +549,58 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
 };
 
+const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
+    const { apiClientProps, query } = args;
+
+    // Prefer getSimilarSongs (which queries last.fm) where available
+    // otherwise find other tracks by the same album artist
+    const res = await ssApiClient({
+        ...apiClientProps,
+        silent: true,
+    }).getSimilarSongs({
+        query: {
+            count: query.count,
+            id: query.songId,
+        },
+    });
+
+    if (res.status === 200 && res.body.similarSongs?.song) {
+        const similar = res.body.similarSongs.song.reduce<Song[]>((acc, song) => {
+            if (song.id !== query.songId) {
+                acc.push(ssNormalize.song(song, apiClientProps.server, ''));
+            }
+
+            return acc;
+        }, []);
+
+        if (similar.length > 0) {
+            return similar;
+        }
+    }
+
+    const fallback = await ndApiClient(apiClientProps).getSongList({
+        query: {
+            _end: 50,
+            _order: 'ASC',
+            _sort: NDSongListSort.RANDOM,
+            _start: 0,
+            album_artist_id: query.albumArtistIds,
+        },
+    });
+
+    if (fallback.status !== 200) {
+        throw new Error('Failed to get similar songs');
+    }
+
+    return fallback.body.data.reduce<Song[]>((acc, song) => {
+        if (song.id !== query.songId) {
+            acc.push(ndNormalize.song(song, apiClientProps.server, ''));
+        }
+
+        return acc;
+    }, []);
+};
+
 export const ndController = {
     addToPlaylist,
     authenticate,
@@ -559,6 +615,7 @@ export const ndController = {
     getPlaylistList,
     getPlaylistSongList,
     getServerInfo,
+    getSimilarSongs,
     getSongDetail,
     getSongList,
     getUserList,
