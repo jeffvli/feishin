@@ -50,7 +50,7 @@ const StyledImage = styled(SimpleImg)`
 export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams) => {
     const artists = useMemo(() => {
         if (!value) return null;
-        return value.artists.length ? value.artists : value.albumArtists;
+        return value.artists?.length ? value.artists : value.albumArtists;
     }, [value]);
 
     if (value === undefined) {

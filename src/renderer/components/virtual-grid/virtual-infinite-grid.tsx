@@ -19,6 +19,7 @@ export type VirtualInfiniteGridRef = {
     resetLoadMoreItemsCache: () => void;
     scrollTo: (index: number) => void;
     setItemData: (data: any[]) => void;
+    updateItemData: (rule: (item: any) => any) => void;
 };
 
 interface VirtualGridProps
@@ -134,6 +135,9 @@ export const VirtualInfiniteGrid = forwardRef(
             },
             setItemData: (data: any[]) => {
                 setItemData(data);
+            },
+            updateItemData: (rule) => {
+                setItemData((data) => data.map(rule));
             },
         }));
 

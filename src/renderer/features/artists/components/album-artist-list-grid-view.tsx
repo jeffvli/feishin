@@ -20,6 +20,7 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { CardRow, ListDisplayType } from '/@/renderer/types';
+import { useHandleFavorite } from '/@/renderer/features/shared/hooks/use-handle-favorite';
 
 interface AlbumArtistListGridViewProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -34,6 +35,7 @@ export const AlbumArtistListGridView = ({ itemCount, gridRef }: AlbumArtistListG
     const { pageKey } = useListContext();
     const { grid, display, filter } = useListStoreByKey({ key: pageKey });
     const { setGrid } = useListStoreActions();
+    const handleFavorite = useHandleFavorite({ gridRef, server });
 
     const fetchInitialData = useCallback(() => {
         const query: Omit<AlbumArtistListQuery, 'startIndex' | 'limit'> = {
@@ -154,6 +156,7 @@ export const AlbumArtistListGridView = ({ itemCount, gridRef }: AlbumArtistListG
                         display={display || ListDisplayType.CARD}
                         fetchFn={fetch}
                         fetchInitialData={fetchInitialData}
+                        handleFavorite={handleFavorite}
                         handlePlayQueueAdd={handlePlayQueueAdd}
                         height={height}
                         initialScrollOffset={grid?.scrollOffset || 0}
