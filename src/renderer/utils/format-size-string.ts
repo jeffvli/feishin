@@ -1,8 +1,8 @@
 const SIZES = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
 
-export const formatSizeString = (size: number): string => {
+export const formatSizeString = (size?: number): string => {
     let count = 0;
-    let finalSize = size;
+    let finalSize = size ?? 0;
     while (finalSize > 1024) {
         finalSize /= 1024;
         count += 1;
