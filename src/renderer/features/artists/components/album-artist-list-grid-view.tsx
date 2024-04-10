@@ -11,6 +11,7 @@ import {
     AlbumArtistListQuery,
     AlbumArtistListResponse,
     AlbumArtistListSort,
+    ArtistListQuery,
     LibraryItem,
 } from '/@/renderer/api/types';
 import { ALBUMARTIST_CARD_ROWS } from '/@/renderer/components';
@@ -72,16 +73,13 @@ export const AlbumArtistListGridView = ({ itemCount, gridRef }: AlbumArtistListG
 
     const fetch = useCallback(
         async ({ skip: startIndex, take: limit }: { skip: number; take: number }) => {
-            const queryKey = queryKeys.albumArtists.list(
-                server?.id || '',
-                {
-                    ...filter,
-                },
-                {
-                    limit,
-                    startIndex,
-                },
-            );
+            const query: ArtistListQuery = {
+                ...filter,
+                limit,
+                startIndex,
+            };
+
+            const queryKey = queryKeys.albumArtists.list(server?.id || '', query);
 
             const albumArtistsRes = await queryClient.fetchQuery(
                 queryKey,

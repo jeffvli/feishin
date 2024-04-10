@@ -108,17 +108,19 @@ export const VirtualInfiniteGrid = forwardRef(
                     take: end - start,
                 });
 
-                const newData: any[] = [...itemData];
+                setItemData((itemData) => {
+                    const newData: any[] = [...itemData];
 
-                let itemIndex = 0;
-                for (let rowIndex = start; rowIndex < end; rowIndex += 1) {
-                    newData[rowIndex] = data.items[itemIndex];
-                    itemIndex += 1;
-                }
+                    let itemIndex = 0;
+                    for (let rowIndex = start; rowIndex < itemCount; rowIndex += 1) {
+                        newData[rowIndex] = data.items[itemIndex];
+                        itemIndex += 1;
+                    }
 
-                setItemData(newData);
+                    return newData;
+                });
             },
-            [columnCount, fetchFn, itemData, setItemData],
+            [columnCount, fetchFn, itemCount],
         );
 
         const debouncedLoadMoreItems = debounce(loadMoreItems, 500);
