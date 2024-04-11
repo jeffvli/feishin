@@ -324,8 +324,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                             setSeekValue(e);
                         }}
                         onChangeEnd={(e) => {
-                            handleSeekSlider(e);
-                            setIsSeeking(false);
+                            // There is a timing bug in Mantine in which the onChangeEnd
+                            // event fires before onChange. Add a small delay to force
+                            // onChangeEnd to happen after onCHange
+                            setTimeout(() => {
+                                handleSeekSlider(e);
+                                setIsSeeking(false);
+                            }, 50);
                         }}
                     />
                 </SliderWrapper>
