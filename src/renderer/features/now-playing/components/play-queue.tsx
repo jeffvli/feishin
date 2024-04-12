@@ -36,6 +36,7 @@ import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 import { useAppFocus } from '/@/renderer/hooks';
+import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const remote = isElectron() ? window.electron.remote : null;
@@ -90,6 +91,15 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
         if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.volume(volume);
             mpvPlayer!.setQueue(playerData, false);
+        } else {
+            const player =
+                playerData.current.player === 1
+                    ? PlayersRef.current.player1
+                    : PlayersRef.current.player2;
+            const underlying = player?.getInternalPlayer();
+            if (underlying) {
+                underlying.currentTime = 0;
+            }
         }
 
         play();
