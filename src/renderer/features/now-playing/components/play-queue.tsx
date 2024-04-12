@@ -94,8 +94,8 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
         } else {
             const player =
                 playerData.current.player === 1
-                    ? PlayersRef.current.player1
-                    : PlayersRef.current.player2;
+                    ? PlayersRef.current?.player1
+                    : PlayersRef.current?.player2;
             const underlying = player?.getInternalPlayer();
             if (underlying) {
                 underlying.currentTime = 0;
