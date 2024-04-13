@@ -445,8 +445,26 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
         throw new Error('Failed to get song list');
     }
 
+    let items: z.infer<typeof jfType._response.song>[];
+
+    // Jellyfin Bodge because of code from https://github.com/jellyfin/jellyfin/blob/c566ccb63bf61f9c36743ddb2108a57c65a2519b/Emby.Server.Implementations/Data/SqliteItemRepository.cs#L3622
+    // If the Album ID filter is passed, Jellyfin will search for
+    //  1. the matching album id
+    //  2. An album with the name of the album.
+    // It is this second condition causing issues,
+    if (query.albumIds) {
+        const albumIdSet = new Set(query.albumIds);
+        items = res.body.Items.filter((item) => albumIdSet.has(item.AlbumId));
+
+        if (items.length < res.body.Items.length) {
+            res.body.TotalRecordCount -= res.body.Items.length - items.length;
+        }
+    } else {
+        items = res.body.Items;
+    }
+
     return {
-        items: res.body.Items.map((item) =>
+        items: items.map((item) =>
             jfNormalize.song(item, apiClientProps.server, '', query.imageSize),
         ),
         startIndex: query.startIndex,
