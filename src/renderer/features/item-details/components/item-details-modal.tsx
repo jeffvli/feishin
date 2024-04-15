@@ -10,6 +10,7 @@ import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { Rating, Spoiler } from '/@/renderer/components';
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { SongPath } from '/@/renderer/features/item-details/components/song-path';
+import { SEPARATOR_STRING } from '/@/renderer/api/utils';
 
 export type ItemDetailsModalProps = {
     item: Album | AlbumArtist | Song;
@@ -43,7 +44,7 @@ const handleRow = <T extends AnyLibraryItem>(t: TFunction, item: T, rule: ItemDe
 };
 
 const formatArtists = (item: Album | Song) =>
-    item.albumArtists?.map((artist) => artist.name).join(' · ');
+    item.albumArtists?.map((artist) => artist.name).join(SEPARATOR_STRING);
 
 const formatComment = (item: Album | Song) =>
     item.comment ? <Spoiler maxHeight={50}>{replaceURLWithHTMLLinks(item.comment)}</Spoiler> : null;
@@ -51,7 +52,7 @@ const formatComment = (item: Album | Song) =>
 const formatDate = (key: string | null) => (key ? dayjs(key).fromNow() : '');
 
 const formatGenre = (item: Album | AlbumArtist | Song) =>
-    item.genres?.map((genre) => genre.name).join(' · ');
+    item.genres?.map((genre) => genre.name).join(SEPARATOR_STRING);
 
 const formatRating = (item: Album | AlbumArtist | Song) =>
     item.userRating !== null ? (
@@ -162,7 +163,7 @@ const SongPropertyMapping: ItemDetailRow<Song>[] = [
     {
         key: 'artists',
         label: 'entity.artist_other',
-        render: (song) => song.artists.map((artist) => artist.name).join(' · '),
+        render: (song) => song.artists.map((artist) => artist.name).join(SEPARATOR_STRING),
     },
     { key: 'album', label: 'entity.album_one' },
     { key: 'discNumber', label: 'common.disc' },

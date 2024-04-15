@@ -47,3 +47,5 @@ export const hasFeature = (server: ServerListItem | null, feature: ServerFeature
 
     return server.features[feature] ?? false;
 };
+
+export const SEPARATOR_STRING = ' · ';

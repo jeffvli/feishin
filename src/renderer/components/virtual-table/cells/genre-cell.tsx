@@ -5,6 +5,7 @@ import type { AlbumArtist, Artist } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components/text';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 import { AppRoute } from '/@/renderer/router/routes';
+import { Separator } from '/@/renderer/components/separator';
 
 export const GenreCell = ({ value, data }: ICellRendererParams) => {
     return (
@@ -16,15 +17,7 @@ export const GenreCell = ({ value, data }: ICellRendererParams) => {
             >
                 {value?.map((item: Artist | AlbumArtist, index: number) => (
                     <React.Fragment key={`row-${item.id}-${data.uniqueId}`}>
-                        {index > 0 && (
-                            <Text
-                                $secondary
-                                size="md"
-                                style={{ display: 'inline-block' }}
-                            >
-                                ,
-                            </Text>
-                        )}{' '}
+                        {index > 0 && <Separator />}
                         <Text
                             $link
                             $secondary
