@@ -7,10 +7,13 @@ import { Album, AlbumArtist, AnyLibraryItem, LibraryItem, Song } from '/@/render
 import { formatDurationString } from '/@/renderer/utils';
 import { formatSizeString } from '/@/renderer/utils/format-size-string';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
-import { Rating, Spoiler } from '/@/renderer/components';
+import { Rating, Spoiler, Text } from '/@/renderer/components';
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { SongPath } from '/@/renderer/features/item-details/components/song-path';
-import { SEPARATOR_STRING } from '/@/renderer/api/utils';
+import { generatePath } from 'react-router';
+import { Link } from 'react-router-dom';
+import { AppRoute } from '/@/renderer/router/routes';
+import { Separator } from '/@/renderer/components/separator';
 
 export type ItemDetailsModalProps = {
     item: Album | AlbumArtist | Song;
@@ -43,8 +46,28 @@ const handleRow = <T extends AnyLibraryItem>(t: TFunction, item: T, rule: ItemDe
     );
 };
 
-const formatArtists = (item: Album | Song) =>
-    item.albumArtists?.map((artist) => artist.name).join(SEPARATOR_STRING);
+const formatArtists = (isAlbumArtist: boolean) => (item: Album | Song) =>
+    (isAlbumArtist ? item.albumArtists : item.artists)?.map((artist, index) => (
+        <span key={artist.id}>
+            {index > 0 && <Separator />}
+            <Text
+                $link
+                component={Link}
+                overflow="visible"
+                size="md"
+                to={
+                    artist.id
+                        ? generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                              albumArtistId: artist.id,
+                          })
+                        : ''
+                }
+                weight={500}
+            >
+                {artist.name || '—'}
+            </Text>
+        </span>
+    ));
 
 const formatComment = (item: Album | Song) =>
     item.comment ? <Spoiler maxHeight={50}>{replaceURLWithHTMLLinks(item.comment)}</Spoiler> : null;
@@ -52,7 +75,27 @@ const formatComment = (item: Album | Song) =>
 const formatDate = (key: string | null) => (key ? dayjs(key).fromNow() : '');
 
 const formatGenre = (item: Album | AlbumArtist | Song) =>
-    item.genres?.map((genre) => genre.name).join(SEPARATOR_STRING);
+    item.genres?.map((genre, index) => (
+        <span key={genre.id}>
+            {index > 0 && <Separator />}
+            <Text
+                $link
+                component={Link}
+                overflow="visible"
+                size="md"
+                to={
+                    genre.id
+                        ? generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
+                              genreId: genre.id,
+                          })
+                        : ''
+                }
+                weight={500}
+            >
+                {genre.name || '—'}
+            </Text>
+        </span>
+    ));
 
 const formatRating = (item: Album | AlbumArtist | Song) =>
     item.userRating !== null ? (
@@ -67,7 +110,7 @@ const BoolField = (key: boolean) =>
 
 const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
     { key: 'name', label: 'common.title' },
-    { label: 'entity.albumArtist_one', render: formatArtists },
+    { label: 'entity.albumArtist_one', render: formatArtists(true) },
     { label: 'entity.genre_other', render: formatGenre },
     {
         label: 'common.duration',
@@ -159,13 +202,32 @@ const AlbumArtistPropertyMapping: ItemDetailRow<AlbumArtist>[] = [
 const SongPropertyMapping: ItemDetailRow<Song>[] = [
     { key: 'name', label: 'common.title' },
     { key: 'path', label: 'common.path', render: SongPath },
-    { label: 'entity.albumArtist_one', render: formatArtists },
+    { label: 'entity.albumArtist_one', render: formatArtists(true) },
+    { key: 'artists', label: 'entity.artist_other', render: formatArtists(false) },
     {
-        key: 'artists',
-        label: 'entity.artist_other',
-        render: (song) => song.artists.map((artist) => artist.name).join(SEPARATOR_STRING),
+        key: 'album',
+        label: 'entity.album_one',
+        render: (song) =>
+            song.albumId &&
+            song.album && (
+                <Text
+                    $link
+                    component={Link}
+                    overflow="visible"
+                    size="md"
+                    to={
+                        song.albumId
+                            ? generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                                  albumId: song.albumId,
+                              })
+                            : ''
+                    }
+                    weight={500}
+                >
+                    {song.album}
+                </Text>
+            ),
     },
-    { key: 'album', label: 'entity.album_one' },
     { key: 'discNumber', label: 'common.disc' },
     { key: 'trackNumber', label: 'common.trackNumber' },
     { key: 'releaseYear', label: 'filter.releaseYear' },
