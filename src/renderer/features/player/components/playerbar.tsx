@@ -30,7 +30,7 @@ const PlayerbarControlsGrid = styled.div`
     gap: 1rem;
     height: 100%;
 
-    @media (orientation: portrait) {
+    @media (width <= 768px) {
         grid-template-columns: minmax(0, 0.5fr) minmax(0, 1fr) minmax(0, 0.5fr);
     }
 `;

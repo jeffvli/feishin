@@ -63,7 +63,7 @@ const SliderValueWrapper = styled.div<{ $position: 'left' | 'right' }>`
     justify-content: center;
     max-width: 50px;
 
-    @media (orientation: portrait) {
+    @media (width <= 768px) {
         display: none;
     }
 `;
@@ -81,7 +81,7 @@ const ControlsContainer = styled.div`
     justify-content: center;
     height: 35px;
 
-    @media (orientation: portrait) {
+    @media (width <= 768px) {
         ${ButtonsContainer} {
             gap: 0;
         }

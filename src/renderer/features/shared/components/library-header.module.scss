@@ -58,7 +58,7 @@
         }
     }
 
-    @container (orientation: portrait) {
+    @container (min-width: 768px) {
         grid-template-columns: 225px minmax(0, 1fr);
 
         h1 {
