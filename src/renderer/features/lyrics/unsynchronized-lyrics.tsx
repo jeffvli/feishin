@@ -34,7 +34,7 @@ const UnsynchronizedLyricsContainer = styled.div<{ $gap: number }>`
         transparent 95%
     );
 
-    @media screen and (width <= 768px) {
+    @media screen and (orientation: portrait) {
         padding: 5vh 0;
     }
 `;
