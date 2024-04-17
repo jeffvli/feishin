@@ -48,8 +48,14 @@ import type {
     SearchResponse,
     LyricsArgs,
     LyricsResponse,
+    ServerInfo,
+    ServerInfoArgs,
+    StructuredLyricsArgs,
+    StructuredLyric,
+    SimilarSongsArgs,
+    Song,
+    ServerType,
 } from '/@/renderer/api/types';
-import { ServerType } from '/@/renderer/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
 import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
 import { ssController } from '/@/renderer/api/subsonic/subsonic-controller';
@@ -85,8 +91,11 @@ export type ControllerEndpoint = Partial<{
     getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
     getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
     getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
+    getServerInfo: (args: ServerInfoArgs) => Promise<ServerInfo>;
+    getSimilarSongs: (args: SimilarSongsArgs) => Promise<Song[]>;
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
+    getStructuredLyrics: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getUserList: (args: UserListArgs) => Promise<UserListResponse>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
@@ -129,8 +138,11 @@ const endpoints: ApiController = {
         getPlaylistList: jfController.getPlaylistList,
         getPlaylistSongList: jfController.getPlaylistSongList,
         getRandomSongList: jfController.getRandomSongList,
+        getServerInfo: jfController.getServerInfo,
+        getSimilarSongs: jfController.getSimilarSongs,
         getSongDetail: jfController.getSongDetail,
         getSongList: jfController.getSongList,
+        getStructuredLyrics: undefined,
         getTopSongs: jfController.getTopSongList,
         getUserList: undefined,
         removeFromPlaylist: jfController.removeFromPlaylist,
@@ -165,8 +177,11 @@ const endpoints: ApiController = {
         getPlaylistList: ndController.getPlaylistList,
         getPlaylistSongList: ndController.getPlaylistSongList,
         getRandomSongList: ssController.getRandomSongList,
+        getServerInfo: ndController.getServerInfo,
+        getSimilarSongs: ndController.getSimilarSongs,
         getSongDetail: ndController.getSongDetail,
         getSongList: ndController.getSongList,
+        getStructuredLyrics: ssController.getStructuredLyrics,
         getTopSongs: ssController.getTopSongList,
         getUserList: ndController.getUserList,
         removeFromPlaylist: ndController.removeFromPlaylist,
@@ -198,8 +213,11 @@ const endpoints: ApiController = {
         getMusicFolderList: ssController.getMusicFolderList,
         getPlaylistDetail: undefined,
         getPlaylistList: undefined,
+        getServerInfo: ssController.getServerInfo,
+        getSimilarSongs: ssController.getSimilarSongs,
         getSongDetail: undefined,
         getSongList: undefined,
+        getStructuredLyrics: ssController.getStructuredLyrics,
         getTopSongs: ssController.getTopSongList,
         getUserList: undefined,
         scrobble: ssController.scrobble,
@@ -481,6 +499,33 @@ const getLyrics = async (args: LyricsArgs) => {
     )?.(args);
 };
 
+const getServerInfo = async (args: ServerInfoArgs) => {
+    return (
+        apiController(
+            'getServerInfo',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getServerInfo']
+    )?.(args);
+};
+
+const getStructuredLyrics = async (args: StructuredLyricsArgs) => {
+    return (
+        apiController(
+            'getStructuredLyrics',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getStructuredLyrics']
+    )?.(args);
+};
+
+const getSimilarSongs = async (args: SimilarSongsArgs) => {
+    return (
+        apiController(
+            'getSimilarSongs',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getSimilarSongs']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -500,8 +545,11 @@ export const controller = {
     getPlaylistList,
     getPlaylistSongList,
     getRandomSongList,
+    getServerInfo,
+    getSimilarSongs,
     getSongDetail,
     getSongList,
+    getStructuredLyrics,
     getTopSongList,
     getUserList,
     removeFromPlaylist,

@@ -15,7 +15,7 @@ import {
 import { Song } from '/@/renderer/api/types';
 import { usePlayerControls, useQueueControls } from '/@/renderer/store';
 import { PlaybackType, TableType } from '/@/renderer/types';
-import { usePlayerType } from '/@/renderer/store/settings.store';
+import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { usePlayerStore, useSetCurrentTime } from '../../../store/player.store';
 import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 
@@ -34,7 +34,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
 
     const { pause } = usePlayerControls();
 
-    const playerType = usePlayerType();
+    const playbackType = usePlaybackType();
     const setCurrentTime = useSetCurrentTime();
 
     const handleMoveToBottom = () => {
@@ -44,7 +44,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
 
         const playerData = moveToBottomOfQueue(uniqueIds);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.setQueueNext(playerData);
         }
     };
@@ -56,7 +56,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
 
         const playerData = moveToTopOfQueue(uniqueIds);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.setQueueNext(playerData);
         }
     };
@@ -70,7 +70,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         const playerData = removeFromQueue(uniqueIds);
         const isCurrentSongRemoved = currentSong && uniqueIds.includes(currentSong.uniqueId);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             if (isCurrentSongRemoved) {
                 mpvPlayer!.setQueue(playerData);
             } else {
@@ -86,7 +86,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
     const handleClearQueue = () => {
         const playerData = clearQueue();
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.setQueue(playerData);
             mpvPlayer!.pause();
         }
@@ -100,7 +100,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
     const handleShuffleQueue = () => {
         const playerData = shuffleQueue();
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.setQueueNext(playerData);
         }
     };

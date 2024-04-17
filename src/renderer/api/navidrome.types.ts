@@ -242,6 +242,7 @@ export enum NDSongListSort {
     ID = 'id',
     PLAY_COUNT = 'playCount',
     PLAY_DATE = 'playDate',
+    RANDOM = 'random',
     RATING = 'rating',
     RECENTLY_ADDED = 'createdAt',
     TITLE = 'title',

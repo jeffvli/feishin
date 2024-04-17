@@ -49,6 +49,10 @@ import {
     genreListSortMap,
     SongDetailArgs,
     SongDetailResponse,
+    ServerInfo,
+    ServerInfoArgs,
+    SimilarSongsArgs,
+    Song,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -57,6 +61,7 @@ import packageJson from '../../../../package.json';
 import { z } from 'zod';
 import { JFSongListSort, JFSortOrder } from '/@/renderer/api/jellyfin.types';
 import isElectron from 'is-electron';
+import { ServerFeatures } from '/@/renderer/api/features-types';
 
 const formatCommaDelimitedString = (value: string[]) => {
     return value.join(',');
@@ -102,9 +107,9 @@ const authenticate = async (
             Username: body.username,
         },
         headers: {
-            'x-emby-authorization': `MediaBrowser Client="Feishin", Device="${getHostname()}", DeviceId="Feishin-${getHostname()}-${
-                body.username
-            }", Version="${packageJson.version}"`,
+            'x-emby-authorization': `MediaBrowser Client="Feishin", Device="${getHostname()}", DeviceId="Feishin-${getHostname()}-${encodeURIComponent(
+                body.username,
+            )}", Version="${packageJson.version}"`,
         },
     });
 
@@ -374,7 +379,7 @@ const getTopSongList = async (args: TopSongListArgs): Promise<SongListResponse> 
             IncludeItemTypes: 'Audio',
             Limit: query.limit,
             Recursive: true,
-            SortBy: 'CommunityRating,SortName',
+            SortBy: 'PlayCount,SortName',
             SortOrder: 'Descending',
             UserId: apiClientProps.server?.userId,
         },
@@ -440,8 +445,26 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
         throw new Error('Failed to get song list');
     }
 
+    let items: z.infer<typeof jfType._response.song>[];
+
+    // Jellyfin Bodge because of code from https://github.com/jellyfin/jellyfin/blob/c566ccb63bf61f9c36743ddb2108a57c65a2519b/Emby.Server.Implementations/Data/SqliteItemRepository.cs#L3622
+    // If the Album ID filter is passed, Jellyfin will search for
+    //  1. the matching album id
+    //  2. An album with the name of the album.
+    // It is this second condition causing issues,
+    if (query.albumIds) {
+        const albumIdSet = new Set(query.albumIds);
+        items = res.body.Items.filter((item) => albumIdSet.has(item.AlbumId));
+
+        if (items.length < res.body.Items.length) {
+            res.body.TotalRecordCount -= res.body.Items.length - items.length;
+        }
+    } else {
+        items = res.body.Items;
+    }
+
     return {
-        items: res.body.Items.map((item) =>
+        items: items.map((item) =>
             jfNormalize.song(item, apiClientProps.server, '', query.imageSize),
         ),
         startIndex: query.startIndex,
@@ -538,7 +561,7 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<SongList
             Limit: query.limit,
             SortBy: query.sortBy ? songListSortMap.jellyfin[query.sortBy] : undefined,
             SortOrder: query.sortOrder ? sortOrderMap.jellyfin[query.sortOrder] : undefined,
-            StartIndex: 0,
+            StartIndex: query.startIndex,
             UserId: apiClientProps.server?.userId,
         },
     });
@@ -946,6 +969,80 @@ const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> 
     return jfNormalize.song(res.body, apiClientProps.server, '');
 };
 
+const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
+    const { apiClientProps } = args;
+
+    const res = await jfApiClient(apiClientProps).getServerInfo();
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get server info');
+    }
+
+    const features: ServerFeatures = {
+        lyricsSingleStructured: true,
+    };
+
+    return {
+        features,
+        id: apiClientProps.server?.id,
+        version: res.body.Version,
+    };
+};
+
+const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
+    const { apiClientProps, query } = args;
+
+    // Prefer getSimilarSongs, where possible. Fallback to InstantMix
+    // where no similar songs were found.
+    const res = await jfApiClient(apiClientProps).getSimilarSongs({
+        params: {
+            itemId: query.songId,
+        },
+        query: {
+            Fields: 'Genres, DateCreated, MediaSources, ParentId',
+            Limit: query.count,
+            UserId: apiClientProps.server?.userId || undefined,
+        },
+    });
+
+    if (res.status === 200 && res.body.Items.length) {
+        const results = res.body.Items.reduce<Song[]>((acc, song) => {
+            if (song.Id !== query.songId) {
+                acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+            }
+
+            return acc;
+        }, []);
+
+        if (results.length > 0) {
+            return results;
+        }
+    }
+
+    const mix = await jfApiClient(apiClientProps).getInstantMix({
+        params: {
+            itemId: query.songId,
+        },
+        query: {
+            Fields: 'Genres, DateCreated, MediaSources, ParentId',
+            Limit: query.count,
+            UserId: apiClientProps.server?.userId || undefined,
+        },
+    });
+
+    if (mix.status !== 200) {
+        throw new Error('Failed to get similar songs');
+    }
+
+    return mix.body.Items.reduce<Song[]>((acc, song) => {
+        if (song.Id !== query.songId) {
+            acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+        }
+
+        return acc;
+    }, []);
+};
+
 export const jfController = {
     addToPlaylist,
     authenticate,
@@ -965,6 +1062,8 @@ export const jfController = {
     getPlaylistList,
     getPlaylistSongList,
     getRandomSongList,
+    getServerInfo,
+    getSimilarSongs,
     getSongDetail,
     getSongList,
     getTopSongList,

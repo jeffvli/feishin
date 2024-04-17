@@ -109,7 +109,7 @@
         "favorite_other": "收藏",
         "artistWithCount_other": "{{count}} 位艺术家",
         "folder_other": "文件夹",
-        "smartPlaylist": "智能 $t(entity.playlist_one)",
+        "smartPlaylist": "智能$t(entity.playlist_one)",
         "genreWithCount_other": "{{count}} 种流派",
         "trackWithCount_other": "{{count}} 首乐曲"
     },
@@ -120,7 +120,7 @@
         "queue_remove": "移除所选",
         "playRandom": "随机播放",
         "skip": "跳过",
-        "previous": "前一首",
+        "previous": "上一首",
         "toggleFullscreenPlayer": "全屏",
         "skip_back": "向后跳过",
         "favorite": "收藏",
@@ -192,11 +192,11 @@
         "scrobble": "记录播放信息（Scrobble）",
         "skipDuration_description": "设置每次按下跳过按钮将会跳过的时长",
         "fontType_optionSystem": "系统字体",
-        "mpvExecutablePath_description": "设置 mpv 二进制文件的路径",
+        "mpvExecutablePath_description": "设置 mpv 二进制文件的路径。如果留空，则使用默认路径",
         "sampleRate": "采样率",
         "sidePlayQueueStyle_optionAttached": "吸附",
         "sidebarConfiguration": "侧边栏设定",
-        "sampleRate_description": "所选的采样率与当前媒体的频率不同时，用于输出的采样率",
+        "sampleRate_description": "如果选择的采样频率与当前媒体的采样频率不同，请选择要使用的输出采样率。小于 8000 的值将使用默认频率",
         "replayGainMode_optionNone": "$t(common.none)",
         "hotkey_zoomIn": "放大",
         "scrobble_description": "在你的社交媒体中记录播放信息",
@@ -208,7 +208,7 @@
         "hotkey_skipForward": "向后跳过",
         "sidePlayQueueStyle": "侧边播放列表样式",
         "playButtonBehavior_optionAddLast": "$t(player.addLast)",
-        "zoom": "放大率",
+        "zoom": "缩放率",
         "minimizeToTray_description": "将应用程序最小化到系统托盘",
         "hotkey_playbackPlay": "播放",
         "hotkey_togglePreviousSongFavorite": "收藏 / 取消收藏$t(common.previousSong)",
@@ -233,7 +233,7 @@
         "hotkey_toggleFullScreenPlayer": "全屏播放",
         "hotkey_localSearch": "页面内搜索",
         "hotkey_toggleQueue": "显示 / 隐藏播放队列",
-        "zoom_description": "设置应用的放大率",
+        "zoom_description": "设置应用程序的缩放率",
         "remotePassword_description": "设置远程控制服务器的密码。这些凭据默认以不安全的方式传输，因此您应该使用一个您不在意的唯一密码",
         "hotkey_rate5": "评为 5 星",
         "hotkey_playbackPrevious": "上一曲",
@@ -292,7 +292,6 @@
         "windowBarStyle_description": "选择窗口顶栏的风格",
         "savePlayQueue_description": "当应用程序关闭时保存播放队列，并在应用程序打开时恢复它",
         "useSystemTheme": "跟随系统",
-        "mpvExecutablePath_help": "每行一个",
         "discordIdleStatus_description": "启用后将会在播放器闲置时更新状态",
         "replayGainClipping_description": "自动降低增益以防止{{ReplayGain}}造成削波",
         "replayGainPreamp": "{{ReplayGain}}前置放大（分贝）",
@@ -305,7 +304,13 @@
         "accentColor_description": "设置应用的强调色",
         "replayGainPreamp_description": "调整应用在{{ReplayGain}}值上的前置放大增益",
         "discordIdleStatus": "显示 rich presence 闲置状态",
-        "discordRichPresence": "{{discord}} rich presence"
+        "discordRichPresence": "{{discord}} rich presence",
+        "clearCache": "清除浏览器缓存",
+        "buttonSize": "播放器栏按钮大小",
+        "buttonSize_description": "播放器栏按钮大小",
+        "clearCache_description": "feishin的“硬清除”。除了清除feishin的缓存，清空浏览器缓存（保存的图像和其他资源）。会保留服务器凭据和设置",
+        "clearQueryCache_description": "feishin的“软清除”。这将会刷新播放列表、元数据并重置保存的歌词。会保留设置、服务器凭据和缓存图像",
+        "clearQueryCache": "清除feishin缓存"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -424,7 +429,7 @@
             "title": "$t(common.home)"
         },
         "albumDetail": {
-            "moreFromArtist": "更多该$t(entity.genre_one)作品",
+            "moreFromArtist": "更多该$t(entity.artist_one)作品",
             "moreFromGeneric": "更多{{item}}作品"
         },
         "setting": {
@@ -495,7 +500,7 @@
             "input_url": "url"
         },
         "addToPlaylist": {
-            "success": "添加 {{message}} $t(entity.song_other) 到 {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "添加 $t(entity.trackWithCount, {\"count\": {{message}} }) 到 $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "title": "添加到$t(entity.playlist_one)",
             "input_skipDuplicates": "跳过重复",
             "input_playlists": "$t(entity.playlist_other)"
@@ -590,7 +595,8 @@
             "albumArtist": "专辑艺术家",
             "path": "路径",
             "channels": "$t(common.channel_other)",
-            "discNumber": "盘"
+            "discNumber": "盘",
+            "size": "$t(common.size)"
         }
     }
 }

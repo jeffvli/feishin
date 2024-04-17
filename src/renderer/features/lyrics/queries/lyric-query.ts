@@ -6,13 +6,16 @@ import {
     InternetProviderLyricResponse,
     FullLyricsMetadata,
     LyricGetQuery,
+    StructuredLyric,
+    ServerType,
 } from '/@/renderer/api/types';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useLyricsSettings } from '/@/renderer/store';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
 import isElectron from 'is-electron';
+import { hasFeature } from '/@/renderer/api/utils';
+import { ServerFeature } from '/@/renderer/api/features-types';
 
 const lyricsIpc = isElectron() ? window.electron.lyrics : null;
 
@@ -80,7 +83,7 @@ export const useServerLyrics = (
 export const useSongLyricsBySong = (
     args: QueryHookArgs<LyricsQuery>,
     song: QueueSong | undefined,
-): UseQueryResult<FullLyricsMetadata> => {
+): UseQueryResult<FullLyricsMetadata | StructuredLyric[]> => {
     const { query } = args;
     const { fetch } = useLyricsSettings();
     const server = getServerById(song?.serverId);
@@ -89,21 +92,22 @@ export const useSongLyricsBySong = (
         cacheTime: Infinity,
         enabled: !!song && !!server,
         onError: () => {},
-        queryFn: async ({ signal }) => {
+        queryFn: async ({ signal }): Promise<FullLyricsMetadata | StructuredLyric[] | null> => {
             if (!server) throw new Error('Server not found');
             if (!song) return null;
 
-            if (song.lyrics) {
-                return {
-                    artist: song.artists?.[0]?.name,
-                    lyrics: formatLyrics(song.lyrics),
-                    name: song.name,
-                    remote: false,
-                    source: server?.name ?? 'music server',
-                };
-            }
+            if (hasFeature(server, ServerFeature.LYRICS_MULTIPLE_STRUCTURED)) {
+                const subsonicLyrics = await api.controller
+                    .getStructuredLyrics({
+                        apiClientProps: { server, signal },
+                        query: { songId: song.id },
+                    })
+                    .catch(console.error);
 
-            if (server.type === ServerType.JELLYFIN) {
+                if (subsonicLyrics?.length) {
+                    return subsonicLyrics;
+                }
+            } else if (hasFeature(server, ServerFeature.LYRICS_SINGLE_STRUCTURED)) {
                 const jfLyrics = await api.controller
                     .getLyrics({
                         apiClientProps: { server, signal },
@@ -120,6 +124,14 @@ export const useSongLyricsBySong = (
                         source: server?.name ?? 'music server',
                     };
                 }
+            } else if (song.lyrics) {
+                return {
+                    artist: song.artists?.[0]?.name,
+                    lyrics: formatLyrics(song.lyrics),
+                    name: song.name,
+                    remote: false,
+                    source: server?.name ?? 'music server',
+                };
             }
 
             if (fetch) {

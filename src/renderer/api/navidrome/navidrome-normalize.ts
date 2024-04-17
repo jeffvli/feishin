@@ -7,8 +7,9 @@ import {
     User,
     AlbumArtist,
     Genre,
+    ServerListItem,
+    ServerType,
 } from '/@/renderer/api/types';
-import { ServerListItem, ServerType } from '/@/renderer/types';
 import z from 'zod';
 import { ndType } from './navidrome-types';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
@@ -45,6 +46,14 @@ const getCoverArtUrl = (args: {
     );
 };
 
+interface WithDate {
+    playDate?: string;
+}
+
+const normalizePlayDate = (item: WithDate): string | null => {
+    return !item.playDate || item.playDate.includes('0001-') ? null : item.playDate;
+};
+
 const normalizeSong = (
     item: z.infer<typeof ndType._response.song> | z.infer<typeof ndType._response.playlistSong>,
     server: ServerListItem | null,
@@ -72,7 +81,7 @@ const normalizeSong = (
     const imagePlaceholderUrl = null;
     return {
         album: item.album,
-        albumArtists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
+        albumArtists: [{ id: item.albumArtistId, imageUrl: null, name: item.albumArtist }],
         albumId: item.albumId,
         artistName: item.artist,
         artists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
@@ -100,7 +109,7 @@ const normalizeSong = (
         imagePlaceholderUrl,
         imageUrl,
         itemType: LibraryItem.SONG,
-        lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
+        lastPlayedAt: normalizePlayDate(item),
         lyrics: item.lyrics ? item.lyrics : null,
         name: item.title,
         path: item.path,
@@ -143,9 +152,11 @@ const normalizeAlbum = (
     const imageBackdropUrl = imageUrl?.replace(/size=\d+/, 'size=1000') || null;
 
     return {
+        albumArtist: item.albumArtist,
         albumArtists: [{ id: item.albumArtistId, imageUrl: null, name: item.albumArtist }],
         artists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
         backdropImageUrl: imageBackdropUrl,
+        comment: item.comment || null,
         createdAt: item.createdAt.split('T')[0],
         duration: item.duration * 1000 || null,
         genres: item.genres?.map((genre) => ({
@@ -159,7 +170,8 @@ const normalizeAlbum = (
         imageUrl,
         isCompilation: item.compilation,
         itemType: LibraryItem.ALBUM,
-        lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
+        lastPlayedAt: normalizePlayDate(item),
+        mbzId: item.mbzAlbumId || null,
         name: item.name,
         playCount: item.playCount,
         releaseDate: new Date(item.minYear, 0, 1).toISOString(),
@@ -189,7 +201,7 @@ const normalizeAlbumArtist = (
             baseUrl: server?.url,
             coverArtId: `ar-${item.id}`,
             credential: server?.credential,
-            size: 100,
+            size: 300,
         });
     }
 
@@ -207,7 +219,8 @@ const normalizeAlbumArtist = (
         id: item.id,
         imageUrl: imageUrl || null,
         itemType: LibraryItem.ALBUM_ARTIST,
-        lastPlayedAt: item.playDate.includes('0001-') ? null : item.playDate,
+        lastPlayedAt: normalizePlayDate(item),
+        mbz: item.mbzArtistId || null,
         name: item.name,
         playCount: item.playCount,
         serverId: server?.id || 'unknown',

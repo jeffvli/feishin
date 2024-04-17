@@ -3,7 +3,7 @@ import {
     useCurrentStatus,
     useCurrentTime,
     useLyricsSettings,
-    usePlayerType,
+    usePlaybackType,
     useSeeked,
 } from '/@/renderer/store';
 import { PlaybackType, PlayerStatus } from '/@/renderer/types';
@@ -21,7 +21,7 @@ const SynchronizedLyricsContainer = styled.div<{ $gap: number }>`
     gap: ${(props) => props.$gap || 5}px;
     width: 100%;
     height: 100%;
-    padding: 10vh 0 6vh;
+    padding: 10vh 0 50vh;
     overflow: scroll;
     transform: translateY(-2rem);
 
@@ -41,12 +41,12 @@ const SynchronizedLyricsContainer = styled.div<{ $gap: number }>`
         transparent 95%
     );
 
-    @media screen and (width <= 768px) {
+    @media screen and (orientation: portrait) {
         padding: 5vh 0;
     }
 `;
 
-interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
+export interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: SynchronizedLyricsArray;
 }
 
@@ -59,7 +59,7 @@ export const SynchronizedLyrics = ({
 }: SynchronizedLyricsProps) => {
     const playersRef = PlayersRef;
     const status = useCurrentStatus();
-    const playerType = usePlayerType();
+    const playbackType = usePlaybackType();
     const now = useCurrentTime();
     const settings = useLyricsSettings();
 
@@ -96,7 +96,7 @@ export const SynchronizedLyrics = ({
     };
 
     const getCurrentTime = useCallback(async () => {
-        if (isElectron() && playerType !== PlaybackType.WEB) {
+        if (isElectron() && playbackType !== PlaybackType.WEB) {
             if (mpvPlayer) {
                 return mpvPlayer.getCurrentTime();
             }
@@ -116,7 +116,7 @@ export const SynchronizedLyrics = ({
         if (!player) return 0;
 
         return player.currentTime;
-    }, [playerType, playersRef]);
+    }, [playbackType, playersRef]);
 
     const setCurrentLyric = useCallback(
         (timeInMs: number, epoch?: number, targetIndex?: number) => {
@@ -222,7 +222,7 @@ export const SynchronizedLyrics = ({
         }
 
         return () => {};
-    }, [getCurrentTime, lyrics, playerType, setCurrentLyric, status]);
+    }, [getCurrentTime, lyrics, playbackType, setCurrentLyric, status]);
 
     useEffect(() => {
         // This handler is used to deal with changes to the current delay. If the offset
@@ -271,7 +271,12 @@ export const SynchronizedLyrics = ({
 
             return;
         }
-        if (!seeked) {
+
+        // If the time goes back to 0 and we are still playing, this suggests that
+        // we may be playing the same track (repeat one). In this case, we also
+        // need to restart playback
+        const restarted = status === PlayerStatus.PLAYING && now === 0;
+        if (!seeked && !restarted) {
             return;
         }
 

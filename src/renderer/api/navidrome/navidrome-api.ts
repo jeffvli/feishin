@@ -7,7 +7,7 @@ import qs from 'qs';
 import { ndType } from './navidrome-types';
 import { authenticationFailure, resultWithHeaders } from '/@/renderer/api/utils';
 import { useAuthStore } from '/@/renderer/store';
-import { ServerListItem } from '/@/renderer/types';
+import { ServerListItem } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components';
 import i18n from '/@/i18n/i18n';
 
@@ -286,9 +286,10 @@ axiosClient.interceptors.response.use(
                             });
 
                             const serverId = currentServer.id;
-                            useAuthStore
-                                .getState()
-                                .actions.updateServer(serverId, { ndCredential: undefined });
+                            useAuthStore.getState().actions.updateServer(serverId, {
+                                credential: undefined,
+                                ndCredential: undefined,
+                            });
                             useAuthStore.getState().actions.setCurrentServer(null);
 
                             // special error to prevent sending a second message, and stop other messages that could be enqueued
@@ -380,12 +381,20 @@ export const ndApiClient = (args: {
                 };
             } catch (e: Error | AxiosError | any) {
                 if (isAxiosError(e)) {
+                    if (e.code === 'ERR_NETWORK') {
+                        throw new Error(
+                            i18n.t('error.networkError', {
+                                postProcess: 'sentenceCase',
+                            }) as string,
+                        );
+                    }
+
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
                     return {
-                        body: { data: response.data, headers: response.headers },
-                        headers: response.headers as any,
-                        status: response.status,
+                        body: { data: response?.data, headers: response?.headers },
+                        headers: response?.headers as any,
+                        status: response?.status,
                     };
                 }
                 throw e;

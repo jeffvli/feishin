@@ -15,7 +15,7 @@ import {
     RiSettings3Fill,
 } from 'react-icons/ri';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUM_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
@@ -31,7 +31,7 @@ import {
     useListStoreActions,
     useListStoreByKey,
 } from '/@/renderer/store';
-import { ListDisplayType, Play, ServerType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, Play, TableColumn } from '/@/renderer/types';
 import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
@@ -73,7 +73,7 @@ const FILTERS = {
         },
         {
             defaultOrder: SortOrder.DESC,
-            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
+            name: i18n.t('filter.releaseDate', { postProcess: 'titleCase' }),
             value: AlbumListSort.RELEASE_DATE,
         },
     ],
@@ -538,7 +538,9 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                             Table (paginated)
                         </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>Item size</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
                                 defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
@@ -549,7 +551,11 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                         </DropdownMenu.Item>
                         {isGrid && (
                             <>
-                                <DropdownMenu.Label>Item gap</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.itemGap', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item closeMenuOnClick={false}>
                                     <Slider
                                         defaultValue={grid?.itemGap || 0}

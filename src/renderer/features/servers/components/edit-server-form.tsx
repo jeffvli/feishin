@@ -7,11 +7,12 @@ import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { RiInformationLine } from 'react-icons/ri';
-import { AuthenticationResponse } from '/@/renderer/api/types';
+import { AuthenticationResponse, ServerListItem, ServerType } from '/@/renderer/api/types';
 import { useAuthStoreActions } from '/@/renderer/store';
-import { ServerListItem, ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
 import i18n from '/@/i18n/i18n';
+import { queryClient } from '/@/renderer/lib/react-query';
+import { queryKeys } from '/@/renderer/api/query-keys';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -111,6 +112,8 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                     localSettings.passwordRemove(server.id);
                 }
             }
+
+            queryClient.invalidateQueries({ queryKey: queryKeys.server.root(server.id) });
         } catch (err: any) {
             setIsLoading(false);
             return toast.error({ message: err?.message });
@@ -152,11 +155,11 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                 />
                 <PasswordInput
                     data-autofocus
-                    required
                     label={t('form.addServer.input', {
                         context: 'password',
                         postProcess: 'titleCase',
                     })}
+                    required={isNavidrome || isSubsonic}
                     {...form.getInputProps('password')}
                 />
                 {localSettings && isNavidrome && (

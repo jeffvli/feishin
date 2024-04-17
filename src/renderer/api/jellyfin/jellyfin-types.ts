@@ -422,6 +422,11 @@ const song = z.object({
     UserData: userData.optional(),
 });
 
+const providerIds = z.object({
+    MusicBrainzAlbum: z.string().optional(),
+    MusicBrainzArtist: z.string().optional(),
+});
+
 const albumArtist = z.object({
     BackdropImageTags: z.array(z.string()),
     ChannelId: z.null(),
@@ -435,6 +440,7 @@ const albumArtist = z.object({
     LocationType: z.string(),
     Name: z.string(),
     Overview: z.string(),
+    ProviderIds: providerIds.optional(),
     RunTimeTicks: z.number(),
     ServerId: z.string(),
     Type: z.string(),
@@ -466,6 +472,7 @@ const album = z.object({
     ParentLogoItemId: z.string(),
     PremiereDate: z.string().optional(),
     ProductionYear: z.number(),
+    ProviderIds: providerIds.optional(),
     RunTimeTicks: z.number(),
     ServerId: z.string(),
     Songs: z.array(song).optional(), // This is not a native Jellyfin property -- this is used for combined album detail
@@ -654,6 +661,24 @@ const lyrics = z.object({
     Lyrics: z.array(lyricText),
 });
 
+const serverInfo = z.object({
+    Version: z.string(),
+});
+
+const similarSongsParameters = z.object({
+    Fields: z.string().optional(),
+    Limit: z.number().optional(),
+    UserId: z.string().optional(),
+});
+
+const similarSongs = pagination.extend({
+    Items: z.array(song),
+});
+
+export enum JellyfinExtensions {
+    SONG_LYRICS = 'songLyrics',
+}
+
 export const jfType = {
     _enum: {
         albumArtistList: albumArtistListSort,
@@ -683,6 +708,7 @@ export const jfType = {
         scrobble: scrobbleParameters,
         search: searchParameters,
         similarArtistList: similarArtistListParameters,
+        similarSongs: similarSongsParameters,
         songList: songListParameters,
         updatePlaylist: updatePlaylistParameters,
     },
@@ -707,6 +733,8 @@ export const jfType = {
         removeFromPlaylist,
         scrobble,
         search,
+        serverInfo,
+        similarSongs,
         song,
         songList,
         topSongsList,

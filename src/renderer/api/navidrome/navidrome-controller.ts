@@ -1,3 +1,9 @@
+import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
+import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
+import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
+import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import semverCoerce from 'semver/functions/coerce';
+import semverGte from 'semver/functions/gte';
 import {
     AlbumArtistDetailArgs,
     AlbumArtistDetailResponse,
@@ -39,11 +45,16 @@ import {
     RemoveFromPlaylistResponse,
     RemoveFromPlaylistArgs,
     genreListSortMap,
+    ServerInfo,
+    ServerInfoArgs,
+    SimilarSongsArgs,
+    Song,
 } from '../types';
-import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
-import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
-import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
-import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import { hasFeature } from '/@/renderer/api/utils';
+import { ServerFeature, ServerFeatures } from '/@/renderer/api/features-types';
+import { SubsonicExtensions } from '/@/renderer/api/subsonic/subsonic-types';
+import { NDSongListSort } from '/@/renderer/api/navidrome.types';
+import { ssNormalize } from '/@/renderer/api/subsonic/subsonic-normalize';
 
 const authenticate = async (
     url: string,
@@ -144,20 +155,18 @@ const getAlbumArtistDetail = async (
         throw new Error('Server is required');
     }
 
+    // Prefer images from getArtistInfo first (which should be proxied)
+    // Prioritize large > medium > small
     return ndNormalize.albumArtist(
         {
             ...res.body.data,
             ...(artistInfoRes.status === 200 && {
+                largeImageUrl:
+                    artistInfoRes.body.artistInfo.largeImageUrl ||
+                    artistInfoRes.body.artistInfo.mediumImageUrl ||
+                    artistInfoRes.body.artistInfo.smallImageUrl ||
+                    res.body.data.largeImageUrl,
                 similarArtists: artistInfoRes.body.artistInfo.similarArtist,
-                ...(!res.body.data.largeImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.largeImageUrl,
-                }),
-                ...(!res.body.data.mediumImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.mediumImageUrl,
-                }),
-                ...(!res.body.data.smallImageUrl && {
-                    largeImageUrl: artistInfoRes.body.artistInfo.smallImageUrl,
-                }),
             }),
         },
         apiClientProps.server,
@@ -355,6 +364,16 @@ const deletePlaylist = async (args: DeletePlaylistArgs): Promise<DeletePlaylistR
 
 const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResponse> => {
     const { query, apiClientProps } = args;
+    const customQuery = query._custom?.navidrome;
+
+    // Smart playlists only became available in 0.48.0. Do not filter for previous versions
+    if (
+        customQuery &&
+        customQuery.smart !== undefined &&
+        !hasFeature(apiClientProps.server, ServerFeature.PLAYLISTS_SMART)
+    ) {
+        customQuery.smart = undefined;
+    }
 
     const res = await ndApiClient(apiClientProps).getPlaylistList({
         query: {
@@ -363,7 +382,7 @@ const getPlaylistList = async (args: PlaylistListArgs): Promise<PlaylistListResp
             _sort: query.sortBy ? playlistListSortMap.navidrome[query.sortBy] : undefined,
             _start: query.startIndex,
             q: query.searchTerm,
-            ...query._custom?.navidrome,
+            ...customQuery,
         },
     });
 
@@ -465,6 +484,123 @@ const removeFromPlaylist = async (
     return null;
 };
 
+const VERSION_INFO: Array<[string, Record<string, number[]>]> = [
+    ['0.48.0', { [ServerFeature.PLAYLISTS_SMART]: [1] }],
+];
+
+const getFeatures = (version: string): Record<string, number[]> => {
+    const cleanVersion = semverCoerce(version);
+    const features: Record<string, number[]> = {};
+    let matched = cleanVersion === null;
+
+    for (const [version, supportedFeatures] of VERSION_INFO) {
+        if (!matched) {
+            matched = semverGte(cleanVersion!, version);
+        }
+
+        if (matched) {
+            for (const [feature, feat] of Object.entries(supportedFeatures)) {
+                if (feature in features) {
+                    features[feature].push(...feat);
+                } else {
+                    features[feature] = feat;
+                }
+            }
+        }
+    }
+
+    return features;
+};
+
+const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
+    const { apiClientProps } = args;
+
+    // Navidrome will always populate serverVersion
+    const ping = await ssApiClient(apiClientProps).ping();
+
+    if (ping.status !== 200) {
+        throw new Error('Failed to ping server');
+    }
+
+    const navidromeFeatures: Record<string, number[]> = getFeatures(ping.body.serverVersion!);
+
+    if (ping.body.openSubsonic) {
+        const res = await ssApiClient(apiClientProps).getServerInfo();
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get server extensions');
+        }
+
+        // The type here isn't necessarily an array (even though it's supposed to be). This is
+        // an implementation detail of Navidrome 0.50. Do a type check to make sure it's actually
+        // an array, and not an empty object.
+        if (Array.isArray(res.body.openSubsonicExtensions)) {
+            for (const extension of res.body.openSubsonicExtensions) {
+                navidromeFeatures[extension.name] = extension.versions;
+            }
+        }
+    }
+
+    const features: ServerFeatures = {
+        lyricsMultipleStructured: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
+        playlistsSmart: !!navidromeFeatures[ServerFeature.PLAYLISTS_SMART],
+    };
+
+    return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
+};
+
+const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
+    const { apiClientProps, query } = args;
+
+    // Prefer getSimilarSongs (which queries last.fm) where available
+    // otherwise find other tracks by the same album artist
+    const res = await ssApiClient({
+        ...apiClientProps,
+        silent: true,
+    }).getSimilarSongs({
+        query: {
+            count: query.count,
+            id: query.songId,
+        },
+    });
+
+    if (res.status === 200 && res.body.similarSongs?.song) {
+        const similar = res.body.similarSongs.song.reduce<Song[]>((acc, song) => {
+            if (song.id !== query.songId) {
+                acc.push(ssNormalize.song(song, apiClientProps.server, ''));
+            }
+
+            return acc;
+        }, []);
+
+        if (similar.length > 0) {
+            return similar;
+        }
+    }
+
+    const fallback = await ndApiClient(apiClientProps).getSongList({
+        query: {
+            _end: 50,
+            _order: 'ASC',
+            _sort: NDSongListSort.RANDOM,
+            _start: 0,
+            album_artist_id: query.albumArtistIds,
+        },
+    });
+
+    if (fallback.status !== 200) {
+        throw new Error('Failed to get similar songs');
+    }
+
+    return fallback.body.data.reduce<Song[]>((acc, song) => {
+        if (song.id !== query.songId) {
+            acc.push(ndNormalize.song(song, apiClientProps.server, ''));
+        }
+
+        return acc;
+    }, []);
+};
+
 export const ndController = {
     addToPlaylist,
     authenticate,
@@ -478,6 +614,8 @@ export const ndController = {
     getPlaylistDetail,
     getPlaylistList,
     getPlaylistSongList,
+    getServerInfo,
+    getSimilarSongs,
     getSongDetail,
     getSongList,
     getUserList,

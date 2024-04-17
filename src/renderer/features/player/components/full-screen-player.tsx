@@ -39,7 +39,7 @@ const Container = styled(motion.div)`
     justify-content: center;
     padding: 2rem;
 
-    @media screen and (width <= 768px) {
+    @media screen and (orientation: portrait) {
         padding: 2rem 2rem 1rem;
     }
 `;
@@ -53,14 +53,18 @@ const ResponsiveContainer = styled.div`
     max-width: 2560px;
     margin-top: 5rem;
 
-    @media screen and (width <= 768px) {
+    @media screen and (orientation: portrait) {
         grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
         grid-template-columns: minmax(0, 1fr);
         margin-top: 0;
     }
 `;
 
-const BackgroundImageOverlay = styled.div`
+interface BackgroundImageOverlayProps {
+    $blur: number;
+}
+
+const BackgroundImageOverlay = styled.div<BackgroundImageOverlayProps>`
     position: absolute;
     top: 0;
     left: 0;
@@ -68,12 +72,21 @@ const BackgroundImageOverlay = styled.div`
     width: 100%;
     height: 100%;
     background: var(--bg-header-overlay);
+    backdrop-filter: blur(${({ $blur }) => $blur}rem);
 `;
+
+const mainBackground = 'var(--main-bg)';
 
 const Controls = () => {
     const { t } = useTranslation();
-    const { dynamicBackground, expanded, opacity, useImageAspectRatio } =
-        useFullScreenPlayerStore();
+    const {
+        dynamicBackground,
+        dynamicImageBlur,
+        dynamicIsImage,
+        expanded,
+        opacity,
+        useImageAspectRatio,
+    } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { setSettings } = useSettingsStoreActions();
     const lyricConfig = useLyricsSettings();
@@ -144,6 +157,45 @@ const Controls = () => {
                     {dynamicBackground && (
                         <Option>
                             <Option.Label>
+                                {t('page.fullscreenPlayer.config.dynamicIsImage', {
+                                    postProcess: 'sentenceCase',
+                                })}
+                            </Option.Label>
+                            <Option.Control>
+                                <Switch
+                                    defaultChecked={dynamicIsImage}
+                                    onChange={(e) =>
+                                        setStore({
+                                            dynamicIsImage: e.target.checked,
+                                        })
+                                    }
+                                />
+                            </Option.Control>
+                        </Option>
+                    )}
+                    {dynamicBackground && dynamicIsImage && (
+                        <Option>
+                            <Option.Label>
+                                {t('page.fullscreenPlayer.config.dynamicImageBlur', {
+                                    postProcess: 'sentenceCase',
+                                })}
+                            </Option.Label>
+                            <Option.Control>
+                                <Slider
+                                    defaultValue={dynamicImageBlur}
+                                    label={(e) => `${e} rem`}
+                                    max={6}
+                                    min={0}
+                                    step={0.5}
+                                    w="100%"
+                                    onChangeEnd={(e) => setStore({ dynamicImageBlur: Number(e) })}
+                                />
+                            </Option.Control>
+                        </Option>
+                    )}
+                    {dynamicBackground && (
+                        <Option>
+                            <Option.Label>
                                 {t('page.fullscreenPlayer.config.opacity', {
                                     postProcess: 'sentenceCase',
                                 })}
@@ -153,7 +205,7 @@ const Controls = () => {
                                     defaultValue={opacity}
                                     label={(e) => `${e} %`}
                                     max={100}
-                                    min={1}
+                                    min={0}
                                     w="100%"
                                     onChangeEnd={(e) => setStore({ opacity: Number(e) })}
                                 />
@@ -225,7 +277,7 @@ const Controls = () => {
                     </Option>
                     <Option>
                         <Option.Label>
-                            {t('page.fullscreenPlayer.config.lyric', {
+                            {t('page.fullscreenPlayer.config.lyricSize', {
                                 postProcess: 'sentenceCase',
                             })}
                         </Option.Label>
@@ -368,9 +420,13 @@ const containerVariants: Variants = {
         };
     },
     open: (custom) => {
-        const { dynamicBackground, background, windowBarStyle } = custom;
+        const { background, backgroundImage, dynamicBackground, windowBarStyle } = custom;
         return {
-            background: dynamicBackground ? background : 'var(--main-bg)',
+            background: dynamicBackground ? backgroundImage : mainBackground,
+            backgroundColor: dynamicBackground ? background : mainBackground,
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
             height:
                 windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS
                     ? 'calc(100vh - 120px)'
@@ -394,7 +450,7 @@ const containerVariants: Variants = {
 };
 
 export const FullScreenPlayer = () => {
-    const { dynamicBackground } = useFullScreenPlayerStore();
+    const { dynamicBackground, dynamicImageBlur, dynamicIsImage } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { windowBarStyle } = useWindowSettings();
 
@@ -416,17 +472,23 @@ export const FullScreenPlayer = () => {
         srcLoaded: true,
     });
 
+    const imageUrl = currentSong?.imageUrl && currentSong.imageUrl.replace(/size=\d+/g, 'size=500');
+    const backgroundImage =
+        imageUrl && dynamicIsImage
+            ? `url("${imageUrl.replace(currentSong.id, currentSong.albumId)}"), url("${imageUrl}")`
+            : mainBackground;
+
     return (
         <Container
             animate="open"
-            custom={{ background, dynamicBackground, windowBarStyle }}
+            custom={{ background, backgroundImage, dynamicBackground, windowBarStyle }}
             exit="closed"
             initial="closed"
             transition={{ duration: 2 }}
             variants={containerVariants}
         >
             <Controls />
-            {dynamicBackground && <BackgroundImageOverlay />}
+            {dynamicBackground && <BackgroundImageOverlay $blur={dynamicImageBlur} />}
             <ResponsiveContainer>
                 <FullScreenPlayerImage />
                 <FullScreenPlayerQueue />

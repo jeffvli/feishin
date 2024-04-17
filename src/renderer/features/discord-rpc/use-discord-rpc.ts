@@ -8,7 +8,8 @@ import {
     usePlayerStore,
 } from '/@/renderer/store';
 import { SetActivity } from '@xhayper/discord-rpc';
-import { PlayerStatus, ServerType } from '/@/renderer/types';
+import { PlayerStatus } from '/@/renderer/types';
+import { ServerType } from '/@/renderer/api/types';
 
 const discordRpc = isElectron() ? window.electron.discordRpc : null;
 
@@ -40,7 +41,7 @@ export const useDiscordRpc = () => {
             largeImageText: currentSong?.album || 'Unknown album',
             smallImageKey: undefined,
             smallImageText: currentStatus,
-            state: artists && `By ${artists}`,
+            state: (artists && `By ${artists}`) || 'Unknown artist',
         };
 
         if (currentStatus === PlayerStatus.PLAYING) {

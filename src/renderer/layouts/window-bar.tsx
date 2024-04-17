@@ -13,6 +13,8 @@ import macMinHover from './assets/min-mac-hover.png';
 import macMin from './assets/min-mac.png';
 import appIcon from '../../../assets/icons/32x32.png';
 
+const localSettings = isElectron() ? window.electron.localSettings : null;
+
 const WindowsContainer = styled.div`
     display: flex;
     align-items: center;
@@ -60,10 +62,10 @@ const PlayerStatusContainer = styled.div`
 `;
 
 const browser = isElectron() ? window.electron.browser : null;
-const close = () => browser.exit();
-const minimize = () => browser.minimize();
-const maximize = () => browser.maximize();
-const unmaximize = () => browser.unmaximize();
+const close = () => browser?.exit();
+const minimize = () => browser?.minimize();
+const maximize = () => browser?.maximize();
+const unmaximize = () => browser?.unmaximize();
 
 interface WindowBarControlsProps {
     controls: {
@@ -222,11 +224,13 @@ export const WindowBar = () => {
     const statusString = playerStatus === PlayerStatus.PAUSED ? '(Paused) ' : '';
     const queueString = length ? `(${index + 1} / ${length}) ` : '';
     const title = length
-        ? `${statusString}${queueString}${currentSong?.name} — ${currentSong?.artistName}`
+        ? currentSong?.artistName
+            ? `${statusString}${queueString}${currentSong?.name} — ${currentSong?.artistName}`
+            : `${statusString}${queueString}${currentSong?.name}`
         : 'Feishin';
     document.title = title;
 
-    const [max, setMax] = useState(false);
+    const [max, setMax] = useState(localSettings?.env.START_MAXIMIZED || false);
 
     const handleMinimize = () => minimize();
 

@@ -1,8 +1,14 @@
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
-import { QueueSong, LibraryItem, AlbumArtist, Album } from '/@/renderer/api/types';
-import { ServerListItem, ServerType } from '/@/renderer/types';
+import {
+    QueueSong,
+    LibraryItem,
+    AlbumArtist,
+    Album,
+    ServerListItem,
+    ServerType,
+} from '/@/renderer/api/types';
 
 const getCoverArtUrl = (args: {
     baseUrl: string | undefined;
@@ -126,6 +132,7 @@ const normalizeAlbumArtist = (
         imageUrl,
         itemType: LibraryItem.ALBUM_ARTIST,
         lastPlayedAt: null,
+        mbz: null,
         name: item.name,
         playCount: null,
         serverId: server?.id || 'unknown',
@@ -150,11 +157,13 @@ const normalizeAlbum = (
         }) || null;
 
     return {
+        albumArtist: item.artist,
         albumArtists: item.artistId
             ? [{ id: item.artistId, imageUrl: null, name: item.artist }]
             : [],
         artists: item.artistId ? [{ id: item.artistId, imageUrl: null, name: item.artist }] : [],
         backdropImageUrl: null,
+        comment: null,
         createdAt: item.created,
         duration: item.duration,
         genres: item.genre
@@ -173,6 +182,7 @@ const normalizeAlbum = (
         isCompilation: null,
         itemType: LibraryItem.ALBUM,
         lastPlayedAt: null,
+        mbzId: null,
         name: item.name,
         playCount: null,
         releaseDate: item.year ? new Date(item.year, 0, 1).toISOString() : null,

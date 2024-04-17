@@ -35,13 +35,13 @@ export const WindowsButton = styled.div<{ $exit?: boolean }>`
     }
 `;
 
-const close = () => browser.exit();
+const close = () => browser?.exit();
 
-const minimize = () => browser.minimize();
+const minimize = () => browser?.minimize();
 
-const maximize = () => browser.maximize();
+const maximize = () => browser?.maximize();
 
-const unmaximize = () => browser.unmaximize();
+const unmaximize = () => browser?.unmaximize();
 
 export const WindowControls = ({ style }: WindowControlsProps) => {
     const [max, setMax] = useState(false);

@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Divider, Stack } from '@mantine/core';
+import { Divider, Group, Stack } from '@mantine/core';
 import isElectron from 'is-electron';
-import { FileInput, Textarea, Text, Select, NumberInput, Switch } from '/@/renderer/components';
+import {
+    FileInput,
+    Textarea,
+    Text,
+    Select,
+    NumberInput,
+    Switch,
+    Button,
+} from '/@/renderer/components';
 import {
     SettingsSection,
     SettingOption,
@@ -9,10 +17,13 @@ import {
 import {
     SettingsState,
     usePlaybackSettings,
+    useSettingsStore,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { PlaybackType } from '/@/renderer/types';
 import { useTranslation } from 'react-i18next';
+import { RiCloseLine, RiRestartLine } from 'react-icons/ri';
+import { usePlayerControls, usePlayerStore, useQueueControls } from '/@/renderer/store';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
@@ -64,11 +75,20 @@ export const MpvSettings = () => {
     const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
+    const { pause } = usePlayerControls();
+    const { clearQueue } = useQueueControls();
 
     const [mpvPath, setMpvPath] = useState('');
 
-    const handleSetMpvPath = (e: File) => {
+    const handleSetMpvPath = (e: File | null) => {
+        if (e === null) {
+            localSettings?.set('mpv_path', undefined);
+            setMpvPath('');
+            return;
+        }
+
         localSettings?.set('mpv_path', e.path);
+        setMpvPath(e.path);
     };
 
     useEffect(() => {
@@ -100,6 +120,22 @@ export const MpvSettings = () => {
         mpvPlayer?.setProperties(mpvSetting);
     };
 
+    const handleReloadMpv = () => {
+        pause();
+        clearQueue();
+
+        const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
+        const properties: Record<string, any> = {
+            speed: usePlayerStore.getState().current.speed,
+            ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
+        };
+        mpvPlayer?.restart({
+            binaryPath: mpvPath || undefined,
+            extraParameters,
+            properties,
+        });
+    };
+
     const handleSetExtraParameters = (data: string[]) => {
         setSettings({
             playback: {
@@ -112,11 +148,38 @@ export const MpvSettings = () => {
     const options: SettingOption[] = [
         {
             control: (
-                <FileInput
-                    placeholder={mpvPath}
-                    width={225}
-                    onChange={handleSetMpvPath}
-                />
+                <Group spacing="sm">
+                    <Button
+                        tooltip={{
+                            label: t('common.reload', { postProcess: 'titleCase' }),
+                            openDelay: 0,
+                        }}
+                        variant="subtle"
+                        onClick={handleReloadMpv}
+                    >
+                        <RiRestartLine />
+                    </Button>
+                    <FileInput
+                        placeholder={mpvPath}
+                        rightSection={
+                            mpvPath && (
+                                <Button
+                                    compact
+                                    tooltip={{
+                                        label: t('common.clear', { postProcess: 'titleCase' }),
+                                        openDelay: 0,
+                                    }}
+                                    variant="subtle"
+                                    onClick={() => handleSetMpvPath(null)}
+                                >
+                                    <RiCloseLine />
+                                </Button>
+                            )
+                        }
+                        width={200}
+                        onChange={handleSetMpvPath}
+                    />
+                </Group>
             ),
             description: t('setting.mpvExecutablePath', {
                 context: 'description',
@@ -206,11 +269,16 @@ export const MpvSettings = () => {
         {
             control: (
                 <NumberInput
-                    defaultValue={settings.mpvProperties.audioSampleRateHz}
+                    defaultValue={settings.mpvProperties.audioSampleRateHz || undefined}
+                    max={192000}
+                    min={0}
+                    placeholder="48000"
+                    rightSection="Hz"
                     width={100}
                     onBlur={(e) => {
                         const value = Number(e.currentTarget.value);
-                        handleSetMpvProperty('audioSampleRateHz', value > 0 ? value : undefined);
+                        // Setting a value of `undefined` causes an error for MPV. Use 0 instead
+                        handleSetMpvProperty('audioSampleRateHz', value >= 8000 ? value : value);
                     }}
                 />
             ),
@@ -314,6 +382,7 @@ export const MpvSettings = () => {
             ),
             description: t('setting.replayGainClipping', {
                 ReplayGain: 'ReplayGain',
+                context: 'description',
                 postProcess: 'sentenceCase',
             }),
             title: t('setting.replayGainClipping', {
@@ -326,7 +395,9 @@ export const MpvSettings = () => {
                 <NumberInput
                     defaultValue={settings.mpvProperties.replayGainFallbackDB}
                     width={75}
-                    onBlur={(e) => handleSetMpvProperty('replayGainFallbackDB', e)}
+                    onBlur={(e) =>
+                        handleSetMpvProperty('replayGainFallbackDB', Number(e.currentTarget.value))
+                    }
                 />
             ),
             description: t('setting.replayGainFallback', {

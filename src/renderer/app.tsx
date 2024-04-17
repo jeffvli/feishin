@@ -27,15 +27,16 @@ import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
 import '@ag-grid-community/styles/ag-grid.css';
 import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
 import i18n from '/@/i18n/i18n';
+import { useServerVersion } from '/@/renderer/hooks/use-server-version';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
 initSimpleImg({ threshold: 0.05 }, true);
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
 const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
+const utils = isElectron() ? window.electron.utils : null;
 
 export const App = () => {
     const theme = useTheme();
@@ -49,6 +50,7 @@ export const App = () => {
     const remoteSettings = useRemoteSettings();
     const textStyleRef = useRef<HTMLStyleElement>();
     useDiscordRpc();
+    useServerVersion();
 
     useEffect(() => {
         if (type === FontType.SYSTEM && system) {
@@ -97,28 +99,31 @@ export const App = () => {
     // Start the mpv instance on startup
     useEffect(() => {
         const initializeMpv = async () => {
-            const isRunning: boolean | undefined = await mpvPlayer?.isRunning();
+            if (playbackType === PlaybackType.LOCAL) {
+                const isRunning: boolean | undefined = await mpvPlayer?.isRunning();
 
-            mpvPlayer?.stop();
+                mpvPlayer?.stop();
 
-            if (!isRunning) {
-                const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
-                const properties: Record<string, any> = {
-                    speed: usePlayerStore.getState().current.speed,
-                    ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
-                };
+                if (!isRunning) {
+                    const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
+                    const properties: Record<string, any> = {
+                        speed: usePlayerStore.getState().current.speed,
+                        ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
+                    };
 
-                mpvPlayer?.initialize({
-                    extraParameters,
-                    properties,
-                });
+                    await mpvPlayer?.initialize({
+                        extraParameters,
+                        properties,
+                    });
 
-                mpvPlayer?.volume(properties.volume);
+                    mpvPlayer?.volume(properties.volume);
+                }
             }
-            mpvPlayer?.restoreQueue();
+
+            utils?.restoreQueue();
         };
 
-        if (isElectron() && playbackType === PlaybackType.LOCAL) {
+        if (isElectron()) {
             initializeMpv();
         }
 
@@ -136,8 +141,8 @@ export const App = () => {
     }, [bindings]);
 
     useEffect(() => {
-        if (isElectron()) {
-            mpvPlayerListener!.rendererSaveQueue(() => {
+        if (utils) {
+            utils.onSaveQueue(() => {
                 const { current, queue } = usePlayerStore.getState();
                 const stateToSave: Partial<Pick<PlayerState, 'current' | 'queue'>> = {
                     current: {
@@ -146,10 +151,10 @@ export const App = () => {
                     },
                     queue,
                 };
-                mpvPlayer!.saveQueue(stateToSave);
+                utils.saveQueue(stateToSave);
             });
 
-            mpvPlayerListener!.rendererRestoreQueue((_event: any, data) => {
+            utils.onRestoreQueue((_event: any, data) => {
                 const playerData = restoreQueue(data);
                 if (playbackType === PlaybackType.LOCAL) {
                     mpvPlayer!.setQueue(playerData, true);
@@ -158,8 +163,8 @@ export const App = () => {
         }
 
         return () => {
-            ipc?.removeAllListeners('renderer-player-restore-queue');
-            ipc?.removeAllListeners('renderer-player-save-queue');
+            ipc?.removeAllListeners('renderer-restore-queue');
+            ipc?.removeAllListeners('renderer-save-queue');
         };
     }, [playbackType, restoreQueue]);
 

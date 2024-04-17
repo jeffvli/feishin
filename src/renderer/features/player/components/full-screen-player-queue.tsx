@@ -1,16 +1,17 @@
-import { Group, Center } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineQueueList } from 'react-icons/hi2';
-import { RiFileMusicLine, RiFileTextLine, RiInformationFill } from 'react-icons/ri';
+import { RiFileMusicLine, RiFileTextLine } from 'react-icons/ri';
 import styled from 'styled-components';
-import { Button, TextTitle } from '/@/renderer/components';
+import { Button } from '/@/renderer/components';
 import { PlayQueue } from '/@/renderer/features/now-playing';
 import {
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
 } from '/@/renderer/store/full-screen-player.store';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
+import { FullScreenSimilarSongs } from '/@/renderer/features/player/components/full-screen-similar-songs';
 
 const QueueContainer = styled.div`
     position: relative;
@@ -42,11 +43,11 @@ const HeaderItemWrapper = styled.div`
     z-index: 2;
 `;
 
-interface TransparendGridContainerProps {
+interface TransparentGridContainerProps {
     opacity: number;
 }
 
-const GridContainer = styled.div<TransparendGridContainerProps>`
+const GridContainer = styled.div<TransparentGridContainerProps>`
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-columns: 1fr;
@@ -81,8 +82,6 @@ export const FullScreenPlayerQueue = () => {
             onClick: () => setStore({ activeTab: 'lyrics' }),
         },
     ];
-
-    console.log('opacity', opacity);
 
     return (
         <GridContainer
@@ -123,17 +122,9 @@ export const FullScreenPlayerQueue = () => {
                     <PlayQueue type="fullScreen" />
                 </QueueContainer>
             ) : activeTab === 'related' ? (
-                <Center>
-                    <Group>
-                        <RiInformationFill size="2rem" />
-                        <TextTitle
-                            order={3}
-                            weight={700}
-                        >
-                            {t('common.comingSoon', { postProcess: 'upperCase' })}
-                        </TextTitle>
-                    </Group>
-                </Center>
+                <QueueContainer>
+                    <FullScreenSimilarSongs />
+                </QueueContainer>
             ) : activeTab === 'lyrics' ? (
                 <Lyrics />
             ) : null}

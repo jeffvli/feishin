@@ -9,8 +9,78 @@
         "bitrate": "taxa de bits",
         "action_one": "ação",
         "action_many": "ações",
-        "action_other": "(n == 0 || n == 1) ? ação : ações",
-        "biography": "biografia"
+        "action_other": "ações",
+        "biography": "biografia",
+        "bpm": "bpm",
+        "edit": "editar",
+        "favorite": "favorito",
+        "currentSong": "$t(entity.track_one) atual",
+        "descending": "abaixar",
+        "dismiss": "liberar",
+        "duration": "duração",
+        "decrease": "diminuir",
+        "description": "descrição",
+        "configure": "configurar",
+        "enable": "habilitar",
+        "clear": "limpar",
+        "delete": "deletar",
+        "title": "titulo",
+        "create": "criar",
+        "confirm": "confirmar",
+        "home": "inicio",
+        "comingSoon": "em breve…",
+        "channel_one": "canal",
+        "channel_many": "canais",
+        "channel_other": "canais",
+        "disable": "desabilitar",
+        "expand": "expandir",
+        "disc": "disco",
+        "increase": "incrementar",
+        "rating": "classificação",
+        "refresh": "atualizar",
+        "unknown": "desconhecido",
+        "left": "esquerda",
+        "save": "salvar",
+        "right": "direita",
+        "collapse": "minimizar",
+        "trackNumber": "faixa",
+        "gap": "intervalo",
+        "year": "ano",
+        "manage": "gerenciar",
+        "limit": "limite",
+        "minimize": "minimizar",
+        "modified": "modificado",
+        "name": "nome",
+        "maximize": "maximizar",
+        "ok": "ok",
+        "path": "caminho",
+        "no": "não",
+        "owner": "dono",
+        "forward": "avançar",
+        "forceRestartRequired": "reinicie para aplicar as alterações… feche a notificação para reiniciar",
+        "setting": "contexto",
+        "version": "versão",
+        "filter_one": "filtro",
+        "filter_many": "filtros",
+        "filter_other": "filtros",
+        "filters": "filtros",
+        "saveAndReplace": "salvar e substituir",
+        "playerMustBePaused": "o player deve estar pausado",
+        "resetToDefault": "restaurar ao padrão",
+        "reset": "reiniciar",
+        "sortOrder": "ordem",
+        "none": "nenhum",
+        "menu": "menu",
+        "restartRequired": "é necessário reiniciar",
+        "previousSong": "anterior $t(entity.track_one)",
+        "noResultsFromQuery": "a consulta não retornou resultados",
+        "quit": "abandonar",
+        "search": "procurar",
+        "saveAs": "salvar como",
+        "yes": "sim",
+        "random": "aleatório",
+        "size": "tamanho",
+        "note": "observação"
     },
     "action": {
         "goToPage": "vá para página",
@@ -20,6 +90,158 @@
         "moveToTop": "mover para o topo",
         "refresh": "$t(common.refresh)",
         "removeFromQueue": "remover da fila",
-        "moveToBottom": "mover para baixo"
+        "moveToBottom": "mover para baixo",
+        "editPlaylist": "editar $t(entity.playlist_one)",
+        "clearQueue": "limpar fila",
+        "addToPlaylist": "adicionar à $t(entity.playlist_one)",
+        "createPlaylist": "criar $t(entity.playlist_one)",
+        "removeFromPlaylist": "remover da $t(entity.playlist_one)",
+        "deletePlaylist": "deletar $t(entity.playlist_one)",
+        "deselectAll": "desmarcar todos",
+        "removeFromFavorites": "remover de $t(entity.favorite_other)"
+    },
+    "form": {
+        "deletePlaylist": {
+            "title": "deletar $t(entity.playlist_one)"
+        },
+        "addServer": {
+            "title": "adicionar servidor"
+        },
+        "createPlaylist": {
+            "title": "criar $t(entity.playlist_one)"
+        },
+        "updateServer": {
+            "title": "atualizar servidor"
+        },
+        "editPlaylist": {
+            "title": "editar $t(entity.playlist_one)"
+        },
+        "addToPlaylist": {
+            "title": "adicionar à $t(entity.playlist_one)"
+        },
+        "lyricSearch": {
+            "title": "pesquisa de letras"
+        }
+    },
+    "setting": {
+        "discordIdleStatus_description": "quando ativado, atualiza o status enquanto o player está ocioso",
+        "discordUpdateInterval_description": "o tempo em segundos entre cada atualização (mínimo 15 segundos)",
+        "playButtonBehavior_description": "define o comportamento padrão do botão play ao adicionar músicas à fila",
+        "discordApplicationId": "{{discord}} ID do aplicativo"
+    },
+    "table": {
+        "config": {
+            "label": {
+                "title": "$t(common.title)",
+                "titleCombined": "$t(common.title) (combinado)",
+                "discNumber": "numero do disco"
+            }
+        },
+        "column": {
+            "title": "titulo",
+            "discNumber": "disco",
+            "size": "$t(common.size)"
+        }
+    },
+    "page": {
+        "home": {
+            "mostPlayed": "mais tocado",
+            "newlyAdded": "lançamentos recém-adicionados",
+            "title": "$t(common.home)",
+            "explore": "explore a sua biblioteca",
+            "recentlyPlayed": "tocado recentemente"
+        },
+        "albumArtistList": {
+            "title": "$t(entity.albumArtist_other)"
+        },
+        "genreList": {
+            "title": "$t(entity.genre_other)"
+        },
+        "trackList": {
+            "title": "$t(entity.track_other)"
+        },
+        "globalSearch": {
+            "title": "comandos"
+        },
+        "sidebar": {
+            "home": "$t(common.home)"
+        },
+        "playlistList": {
+            "title": "$t(entity.playlist_other)"
+        },
+        "albumList": {
+            "title": "$t(entity.album_other)"
+        }
+    },
+    "filter": {
+        "title": "titulo",
+        "disc": "disco",
+        "mostPlayed": "mais tocado"
+    },
+    "player": {
+        "playbackFetchNoResults": "nenhuma música encontrada",
+        "playbackFetchInProgress": "carregando músicas…"
+    },
+    "entity": {
+        "albumArtist_one": "artista do álbum",
+        "albumArtist_many": "artistas do álbum",
+        "albumArtist_other": "artistas do álbum",
+        "albumArtistCount_one": "{{count}} artista do álbum",
+        "albumArtistCount_many": "{{count}} artistas do álbum",
+        "albumArtistCount_other": "{{count}} artistas do álbum",
+        "album_one": "álbum",
+        "album_many": "álbuns",
+        "album_other": "álbuns",
+        "artist_one": "artista",
+        "artist_many": "artistas",
+        "artist_other": "artistas",
+        "albumWithCount_one": "{{count}} álbum",
+        "albumWithCount_many": "{{count}} álbuns",
+        "albumWithCount_other": "{{count}} álbuns",
+        "favorite_one": "favorito",
+        "favorite_many": "favoritos",
+        "favorite_other": "favoritos",
+        "artistWithCount_one": "{{count}} artista",
+        "artistWithCount_many": "{{count}} artistas",
+        "artistWithCount_other": "{{count}} artistas",
+        "folder_one": "pasta",
+        "folder_many": "pastas",
+        "folder_other": "pastas",
+        "genre_one": "gênero",
+        "genre_many": "gêneros",
+        "genre_other": "gêneros",
+        "playlistWithCount_one": "{{count}} playlist",
+        "playlistWithCount_many": "{{count}} playlists",
+        "playlistWithCount_other": "{{count}} playlists",
+        "playlist_one": "playlist",
+        "playlist_many": "playlists",
+        "playlist_other": "playlists",
+        "folderWithCount_one": "{{count}} pasta",
+        "folderWithCount_many": "{{count}} pastas",
+        "folderWithCount_other": "{{count}} pastas",
+        "genreWithCount_one": "{{count}} gênero",
+        "genreWithCount_many": "{{count}} gêneros",
+        "genreWithCount_other": "{{count}} gêneros"
+    },
+    "error": {
+        "remotePortWarning": "reinicie o servidor para aplicar a nova porta",
+        "systemFontError": "ocorreu um erro ao tentar obter fontes do sistema",
+        "playbackError": "ocorreu um erro ao tentar reproduzir a mídia",
+        "endpointNotImplementedError": "endpoint {{endpoint}} não está implementado para {{serverType}}",
+        "remotePortError": "ocorreu um erro ao tentar definir a porta do servidor remoto",
+        "serverRequired": "servidor necessário",
+        "authenticationFailed": "falha na autenticação",
+        "apiRouteError": "não é possível encaminhar a solicitação",
+        "genericError": "um erro ocorreu",
+        "credentialsRequired": "credenciais necessárias",
+        "sessionExpiredError": "sua sessão expirou",
+        "remoteEnableError": "ocorreu um erro ao tentar $t(common.enable) o servidor remoto",
+        "localFontAccessDenied": "acesso negado a fontes locais",
+        "serverNotSelectedError": "nenhum servidor selecionado",
+        "remoteDisableError": "ocorreu um erro ao tentar $t(common.disable) o servidor remoto",
+        "mpvRequired": "MPV necessário",
+        "audioDeviceFetchError": "ocorreu um erro ao tentar obter dispositivos de áudio",
+        "invalidServer": "servidor inválido",
+        "loginRateError": "muitas tentativas de login, tente novamente em alguns segundos"
     }
 }

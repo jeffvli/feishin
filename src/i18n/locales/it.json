@@ -29,7 +29,7 @@
         "action_other": "azioni",
         "biography": "biografia",
         "bpm": "bpm",
-        "center": "centro",
+        "center": "centrale",
         "cancel": "annulla",
         "channel_one": "canale",
         "channel_many": "canali",
@@ -46,7 +46,7 @@
         "left": "sinistra",
         "save": "salva",
         "right": "destra",
-        "currentSong": "$t(entity.track_one) corrent",
+        "currentSong": "$t(entity.track_one) corrente",
         "trackNumber": "traccia",
         "descending": "decrescente",
         "gap": "gap",
@@ -102,9 +102,9 @@
         "note": "nota"
     },
     "player": {
-        "repeat_all": "ripeti tutto",
+        "repeat_all": "ripeti coda",
         "stop": "ferma",
-        "repeat": "ripeti",
+        "repeat": "ripeti traccia",
         "queue_remove": "rimuovi selezionati",
         "playRandom": "riproduci casuale",
         "skip": "salta",
@@ -113,21 +113,21 @@
         "skip_back": "salta indietro",
         "favorite": "preferito",
         "next": "successivo",
-        "shuffle": "mischia",
+        "shuffle": "mescola",
         "playbackFetchNoResults": "nessuna canzone trovata",
         "playbackFetchInProgress": "caricamento canzoni…",
         "addNext": "aggiungi successivo",
-        "playbackSpeed": "velocità riproduzione",
+        "playbackSpeed": "velocità di riproduzione",
         "playbackFetchCancel": "ci sta mettendo un po'... chiudi la notifica per annullare",
         "play": "riproduci",
-        "repeat_off": "ripeti disabilitato",
+        "repeat_off": "non ripetere",
         "pause": "pausa",
         "queue_clear": "cancella coda",
         "muted": "silenziato",
         "unfavorite": "togli dai preferiti",
         "queue_moveToTop": "sposta selezionati in fondo",
         "queue_moveToBottom": "sposta selezionati in cima",
-        "shuffle_off": "mischia disabilitato",
+        "shuffle_off": "non mescolare",
         "addLast": "aggiungi in coda",
         "mute": "silenzia",
         "skip_forward": "salta avanti"
@@ -140,7 +140,6 @@
         "audioDevice_description": "seleziona il device audioda usare per la riproduzione (solo web player)",
         "theme_description": "imposta il tema da usare per l'applicazione",
         "hotkey_playbackPause": "pausa",
-        "mpvExecutablePath_help": "uno per linea",
         "hotkey_volumeUp": "alza volume",
         "skipDuration": "salta durata",
         "discordIdleStatus_description": "quando è attivo, aggiorna lo stato mentre il player è inattivo",
@@ -156,8 +155,8 @@
         "crossfadeStyle": "stile dissolvenza",
         "sidebarConfiguration": "configurazione barra laterale",
         "replayGainMode_optionNone": "$t(common.none)",
-        "hotkey_zoomIn": "ingrandisci",
-        "scrobble_description": "esegui scrobble delle riproduzioni al tuo media server",
+        "hotkey_zoomIn": "ingrandisci layout",
+        "scrobble_description": "invia lo scrobble delle riproduzioni al tuo media server",
         "audioExclusiveMode_description": "abilità modalità output esclusiva. In questa modalità il sistema è di solito chiuso fuori, e solo mpv potrà riprodurre audio",
         "discordUpdateInterval": "intervallo aggiornamento stato attività {{discord}}",
         "themeLight": "tema (chiaro)",
@@ -207,7 +206,7 @@
         "crossfadeDuration_description": "imposta la durata dell'effetto di dissolvenza",
         "language": "lingua",
         "playbackStyle": "stile riproduzione",
-        "hotkey_toggleShuffle": "attiva/disattiva mischia",
+        "hotkey_toggleShuffle": "attiva/disattiva mescolamento",
         "theme": "tema",
         "playbackStyle_description": "selezione lo stile di riproduzione da usare per il player audio",
         "discordRichPresence_description": "abilita lo status del playback nello stato attività di {{discord}}. Le chiavi immagine sono: {{icon}}, {{playing}} e {{paused}} ",
@@ -221,7 +220,7 @@
         "enableRemote": "abilita controllo remoto server",
         "savePlayQueue": "salva coda di riproduzione",
         "minimumScrobbleSeconds_description": "la minima durata in secondi di una canzone che deve essere riprodutta prima di eseguire lo scrobble",
-        "fontType_description": "Font built-in selezionana uno dei font forniti da Feishin. Font di sistema ti permette di selezionare ogni fonti fornito dal tuo sistema operativo. Custom ti permette di fornire il tuo font",
+        "fontType_description": "Font built-in seleziona uno dei font forniti da Feishin. Font di sistema ti permette di selezionare ogni font fornito dal tuo sistema operativo. Custom ti permette di fornire il tuo font",
         "playButtonBehavior": "comportamento pulsante riproduzione",
         "volumeWheelStep": "step rotellina volume",
         "sidebarPlaylistList_description": "mostra o nascondi la lista delle playlist nella barra laterale",
@@ -247,7 +246,7 @@
         "crossfadeDuration": "durata dissolvenza",
         "discordIdleStatus": "visualizza lo stato attività in stato inattivo",
         "audioPlayer": "player audio",
-        "hotkey_zoomOut": "rimpicciolisci",
+        "hotkey_zoomOut": "rimpicciolisci layout",
         "hotkey_rate0": "rimuovi voto",
         "discordApplicationId": "application id {{discord}}",
         "applicationHotkeys_description": "configura tasti a scelta rapida dell'applicazione. attiva/disattiva la casella per impostare un tasto a scelta rapida globale (solo desktop)",
@@ -265,13 +264,37 @@
         "discordRichPresence": "stato attività {{discord}}",
         "font_description": "imposta il font da usare per l'applicazione",
         "savePlayQueue_description": "salva la coda di riproduzione quando l'applicazione viene chiusa e ripristina quando l'applicazione viene riaperta",
-        "useSystemTheme": "usa il tema di sistema"
+        "useSystemTheme": "usa il tema di sistema",
+        "replayGainMode_description": "aggiusta il volume secondo i valori {{ReplayGain}} salvati nei metadati del file",
+        "showSkipButtons": "mostra pulsanti per saltare",
+        "sampleRate": "frequenza di campionamento",
+        "sampleRate_description": "seleziona la frequenza di campionamento di output da usare se la frequenza di campionamento selezionata è diversa da quella della del media attuale",
+        "hotkey_togglePreviousSongFavorite": "imposta/rimuovi $t(common.previousSong) favorito",
+        "hotkey_unfavoritePreviousSong": "rimuovi $t(common.previousSong) dai preferiti",
+        "showSkipButton_description": "mostra o nascondi i pulsanti per saltare nella barra del player",
+        "hotkey_unfavoriteCurrentSong": "rimuovi $t(common.currentSong) dai preferiti",
+        "hotkey_toggleCurrentSongFavorite": "imposta/rimuovi $t(common.currentSong) favorito",
+        "showSkipButton": "mostra pulsanti per saltare",
+        "hotkey_browserForward": "Vai avanti di una pagina",
+        "hotkey_browserBack": "Torna indietro di una pagina",
+        "sidebarCollapsedNavigation_description": "mostra o nascondi la navigazione nella barra laterale collassata",
+        "replayGainClipping_description": "Previeni il clipping causato da {{ReplayGain}} abbassando automaticamente il gain",
+        "replayGainPreamp": "preamplificazione {{ReplayGain}} (dB)",
+        "sidePlayQueueStyle": "stile della coda di riproduzione laterale",
+        "showSkipButtons_description": "mostra o nascondi i pulsanti per saltare dalla barra di riproduzione",
+        "skipPlaylistPage_description": "quando si naviga in una playlist, si va alla pagina dell'elenco dei brani della playlist invece che alla pagina predefinita",
+        "sidePlayQueueStyle_description": "imposta lo stile della coda di riproduzione laterale",
+        "replayGainMode": "modalità {{ReplayGain}}",
+        "replayGainFallback_description": "gain in db da applicare se il file non possiede tag {{ReplayGain}}",
+        "replayGainPreamp_description": "aggiusta la preamplificazione del gain applicato sui valori {{ReplayGain}}",
+        "skipPlaylistPage": "Salta la pagina playlist",
+        "sidebarCollapsedNavigation": "navigazione con barra laterale (collassata)"
     },
     "error": {
         "remotePortWarning": "riavvia il server per applicare la nuova porta",
         "systemFontError": "si è verificato un errore nell'otternere i font di sistema",
         "playbackError": "si è verificato un errore nel provare a riprodurre il media",
-        "endpointNotImplementedError": "l'endpoint {{endpoint} is not implemented for {{serverType}}",
+        "endpointNotImplementedError": "l'endpoint {{endpoint}} non è implementato per {{serverType}}",
         "remotePortError": "si è verificato un errore nel provare a impostare la porta del server remoto",
         "serverRequired": "server richiesto",
         "authenticationFailed": "autenticazione fallita",
@@ -368,7 +391,7 @@
             "selectServer": "seleziona server",
             "version": "versione {{version}}",
             "settings": "$t(common.setting_other)",
-            "manageServers": "gestisci sever",
+            "manageServers": "gestisci server",
             "expandSidebar": "espandi barra laterale",
             "collapseSidebar": "collassa barra laterale",
             "openBrowserDevtools": "apri devtools browser",
@@ -402,7 +425,7 @@
             "recentlyPlayed": "riprodotti recentemente"
         },
         "albumDetail": {
-            "moreFromArtist": "di più da questo $t(entity.genre_one)",
+            "moreFromArtist": "di più da questo $t(entity.artist_one)",
             "moreFromGeneric": "di più da {{item}}"
         },
         "setting": {
@@ -463,7 +486,7 @@
             "error_savePassword": "si è verificato un errore quando si è provato a salvare la password"
         },
         "addToPlaylist": {
-            "success": "aggiunto {{message}} $t(entity.song_other) a {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "aggiunto {{message}} $t(entity.track_other) a {{numOfPlaylists}} $t(entity.playlist_other)",
             "title": "aggiungi a $t(entity.playlist_one)",
             "input_skipDuplicates": "salta duplicati",
             "input_playlists": "$t(entity.playlist_other)"
@@ -495,7 +518,8 @@
                 "size": "$t(common.size)"
             },
             "view": {
-                "table": "tabella"
+                "table": "tabella",
+                "card": "Scheda"
             },
             "label": {
                 "releaseDate": "data rilascio",
@@ -548,7 +572,8 @@
             "albumArtist": "artista album",
             "path": "percorso",
             "discNumber": "disco",
-            "channels": "$t(common.channel_other)"
+            "channels": "$t(common.channel_other)",
+            "size": "$t(common.size)"
         }
     },
     "entity": {

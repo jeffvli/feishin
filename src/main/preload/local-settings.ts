@@ -1,9 +1,18 @@
 import { IpcRendererEvent, ipcRenderer, webFrame } from 'electron';
 import Store from 'electron-store';
+import { toServerType, type TitleTheme } from '/@/renderer/types';
 
 const store = new Store();
 
-const set = (property: string, value: string | Record<string, unknown> | boolean | string[]) => {
+const set = (
+    property: string,
+    value: string | Record<string, unknown> | boolean | string[] | undefined,
+) => {
+    if (value === undefined) {
+        store.delete(property);
+        return;
+    }
+
     store.set(`${property}`, value);
 };
 
@@ -43,9 +52,25 @@ const fontError = (cb: (event: IpcRendererEvent, file: string) => void) => {
     ipcRenderer.on('custom-font-error', cb);
 };
 
+const themeSet = (theme: TitleTheme): void => {
+    ipcRenderer.send('theme-set', theme);
+};
+
+const SERVER_TYPE = toServerType(process.env.SERVER_TYPE);
+
+const env = {
+    SERVER_LOCK:
+        SERVER_TYPE !== null ? process.env.SERVER_LOCK?.toLocaleLowerCase() === 'true' : false,
+    SERVER_NAME: process.env.SERVER_NAME ?? '',
+    SERVER_TYPE,
+    SERVER_URL: process.env.SERVER_URL ?? 'http://',
+    START_MAXIMIZED: store.get('maximized'),
+};
+
 export const localSettings = {
     disableMediaKeys,
     enableMediaKeys,
+    env,
     fontError,
     get,
     passwordGet,
@@ -54,6 +79,7 @@ export const localSettings = {
     restart,
     set,
     setZoomFactor,
+    themeSet,
 };
 
 export type LocalSettings = typeof localSettings;

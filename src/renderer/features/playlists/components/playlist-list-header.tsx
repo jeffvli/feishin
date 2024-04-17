@@ -9,11 +9,11 @@ import { PlaylistListHeaderFilters } from '/@/renderer/features/playlists/compon
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { PlaylistListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
-import { ListDisplayType, ServerType } from '/@/renderer/types';
+import { ListDisplayType } from '/@/renderer/types';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { RiFileAddFill } from 'react-icons/ri';
-import { LibraryItem } from '/@/renderer/api/types';
+import { LibraryItem, ServerType } from '/@/renderer/api/types';
 import { useListFilterRefresh } from '../../../hooks/use-list-filter-refresh';
 import { useListContext } from '/@/renderer/context/list-context';
 import { useListStoreByKey } from '../../../store/list.store';

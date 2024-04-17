@@ -1,4 +1,4 @@
-import { PostProcessorModule } from 'i18next';
+import { PostProcessorModule, TOptions, StringMap } from 'i18next';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import en from './locales/en.json';
@@ -11,6 +11,11 @@ import de from './locales/de.json';
 import it from './locales/it.json';
 import ru from './locales/ru.json';
 import ptBr from './locales/pt-BR.json';
+import sr from './locales/sr.json';
+import sv from './locales/sv.json';
+import cs from './locales/cs.json';
+import nbNO from './locales/nb-NO.json';
+import nl from './locales/nl.json';
 
 const resources = {
     en: { translation: en },
@@ -23,12 +28,21 @@ const resources = {
     ja: { translation: ja },
     pl: { translation: pl },
     'zh-Hans': { translation: zhHans },
+    sr: { translation: sr },
+    sv: { translation: sv },
+    cs: { translation: cs },
+    nl: { translation: nl },
+    'nb-NO': { translation: nbNO },
 };
 
 export const languages = [
     {
         label: 'English',
         value: 'en',
+    },
+    {
+        label: 'Čeština',
+        value: 'cs',
     },
     {
         label: 'Español',
@@ -51,9 +65,14 @@ export const languages = [
         value: 'ja',
     },
     {
-        label: 'Русский',
-        value: 'ru',
+        label: 'Nederlands',
+        value: 'nl',
     },
+    {
+        label: 'Norsk (Bokmål)',
+        value: 'nb-NO',
+    },
+
     {
         label: 'Português (Brasil)',
         value: 'pt-BR',
@@ -61,6 +80,18 @@ export const languages = [
     {
         label: 'Polski',
         value: 'pl',
+    },
+    {
+        label: 'Русский',
+        value: 'ru',
+    },
+    {
+        label: 'Srpski',
+        value: 'sr',
+    },
+    {
+        label: 'Svenska',
+        value: 'sv',
     },
     {
         label: '简体中文',
@@ -88,21 +119,25 @@ const titleCasePostProcessor: PostProcessorModule = {
     type: 'postProcessor',
     name: 'titleCase',
     process: (value: string) => {
-        return value.replace(/\w\S*/g, (txt) => {
-            return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
+        return value.replace(/\S\S*/g, (txt) => {
+            return txt.charAt(0).toLocaleUpperCase() + txt.slice(1).toLowerCase();
         });
     },
 };
 
+const ignoreSentenceCaseLanguages = ['de']
+
 const sentenceCasePostProcessor: PostProcessorModule = {
     type: 'postProcessor',
     name: 'sentenceCase',
-    process: (value: string) => {
+    process: (value: string, _key: string, _options: TOptions<StringMap>, translator: any) => {
         const sentences = value.split('. ');
 
         return sentences
             .map((sentence) => {
-                return sentence.charAt(0).toUpperCase() + sentence.slice(1).toLocaleLowerCase();
+                return (
+                    sentence.charAt(0).toLocaleUpperCase() + (!ignoreSentenceCaseLanguages.includes(translator.language) ? sentence.slice(1).toLocaleLowerCase() : sentence.slice(1))
+                );
             })
             .join('. ');
     },

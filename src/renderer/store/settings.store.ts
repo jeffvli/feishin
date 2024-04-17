@@ -23,6 +23,7 @@ import {
 } from '/@/renderer/types';
 import { randomString } from '/@/renderer/utils';
 import i18n from '/@/i18n/i18n';
+import { usePlayerStore } from '/@/renderer/store/player.store';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -90,6 +91,23 @@ export const sidebarItems = [
         route: AppRoute.SETTINGS,
     },
 ];
+
+export type SortableItem<T> = {
+    disabled: boolean;
+    id: T;
+};
+
+export enum HomeItem {
+    MOST_PLAYED = 'mostPlayed',
+    RANDOM = 'random',
+    RECENTLY_ADDED = 'recentlyAdded',
+    RECENTLY_PLAYED = 'recentlyPlayed',
+}
+
+export const homeItems = Object.values(HomeItem).map((item) => ({
+    disabled: false,
+    id: item,
+}));
 
 export type PersistedTableColumn = {
     column: TableColumn;
@@ -169,9 +187,14 @@ export interface SettingsState {
     };
     general: {
         accent: string;
+        albumArtRes?: number | null;
+        buttonSize: number;
         defaultFullPlaylist: boolean;
+        externalLinks: boolean;
         followSystemTheme: boolean;
+        homeItems: SortableItem<HomeItem>[];
         language: string;
+        passwordStore?: string;
         playButtonBehavior: Play;
         resume: boolean;
         showQueueDrawerButton: boolean;
@@ -244,6 +267,7 @@ export interface SettingsState {
         disableAutoUpdate: boolean;
         exitToTray: boolean;
         minimizeToTray: boolean;
+        startMinimized: boolean;
         windowBarStyle: Platform;
     };
 }
@@ -251,6 +275,8 @@ export interface SettingsState {
 export interface SettingsSlice extends SettingsState {
     actions: {
         reset: () => void;
+        resetSampleRate: () => void;
+        setHomeItems: (item: SortableItem<HomeItem>[]) => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
         setTable: (type: TableType, data: DataTableProps) => void;
@@ -280,9 +306,14 @@ const initialState: SettingsState = {
     },
     general: {
         accent: 'rgb(53, 116, 252)',
+        albumArtRes: undefined,
+        buttonSize: 20,
         defaultFullPlaylist: true,
+        externalLinks: true,
         followSystemTheme: false,
+        homeItems,
         language: 'en',
+        passwordStore: undefined,
         playButtonBehavior: Play.NOW,
         resume: false,
         showQueueDrawerButton: false,
@@ -316,7 +347,7 @@ const initialState: SettingsState = {
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
             pause: { allowGlobal: true, hotkey: '', isGlobal: false },
             play: { allowGlobal: true, hotkey: '', isGlobal: false },
-            playPause: { allowGlobal: true, hotkey: '', isGlobal: false },
+            playPause: { allowGlobal: true, hotkey: 'space', isGlobal: false },
             previous: { allowGlobal: true, hotkey: '', isGlobal: false },
             rate0: { allowGlobal: true, hotkey: '', isGlobal: false },
             rate1: { allowGlobal: true, hotkey: '', isGlobal: false },
@@ -374,7 +405,7 @@ const initialState: SettingsState = {
             scrobbleAtPercentage: 75,
         },
         style: PlaybackStyle.GAPLESS,
-        type: PlaybackType.LOCAL,
+        type: PlaybackType.WEB,
     },
     remote: {
         enabled: false,
@@ -545,6 +576,7 @@ const initialState: SettingsState = {
         disableAutoUpdate: false,
         exitToTray: false,
         minimizeToTray: false,
+        startMinimized: false,
         windowBarStyle: platformDefaultWindowBarStyle,
     },
 };
@@ -566,6 +598,16 @@ export const useSettingsStore = create<SettingsSlice>()(
                         } else {
                             set(initialState);
                         }
+                    },
+                    resetSampleRate: () => {
+                        set((state) => {
+                            state.playback.mpvProperties.audioSampleRateHz = 0;
+                        });
+                    },
+                    setHomeItems: (items: SortableItem<HomeItem>[]) => {
+                        set((state) => {
+                            state.general.homeItems = items;
+                        });
                     },
                     setSettings: (data) => {
                         set({ ...get(), ...data });
@@ -590,7 +632,7 @@ export const useSettingsStore = create<SettingsSlice>()(
                 return merge(currentState, persistedState);
             },
             name: 'store_settings',
-            version: 6,
+            version: 8,
         },
     ),
 );
@@ -604,7 +646,16 @@ export const useTableSettings = (type: TableType) =>
 
 export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
 
-export const usePlayerType = () => useSettingsStore((state) => state.playback.type, shallow);
+export const usePlaybackType = () =>
+    useSettingsStore((state) => {
+        const isFallback = usePlayerStore.getState().fallback;
+
+        if (isFallback) {
+            return PlaybackType.WEB;
+        }
+
+        return state.playback.type;
+    });
 
 export const usePlayButtonBehavior = () =>
     useSettingsStore((state) => state.general.playButtonBehavior, shallow);

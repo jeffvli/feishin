@@ -15,11 +15,12 @@ import {
     ServerType,
     GenreListSort,
     SortOrder,
+    ServerListItem,
 } from '/@/renderer/api/types';
 import { api } from '/@/renderer/api';
 import { useAuthStore } from '/@/renderer/store';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { Play, PlayQueueAddOptions, ServerListItem } from '/@/renderer/types';
+import { Play, PlayQueueAddOptions } from '/@/renderer/types';
 import i18n from '/@/i18n/i18n';
 
 interface ShuffleAllSlice extends RandomSongListQuery {

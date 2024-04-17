@@ -4,7 +4,7 @@ import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import { FullLyricsMetadata } from '/@/renderer/api/types';
 import { useLyricsSettings } from '/@/renderer/store';
 
-interface UnsynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
+export interface UnsynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: string;
 }
 
@@ -34,7 +34,7 @@ const UnsynchronizedLyricsContainer = styled.div<{ $gap: number }>`
         transparent 95%
     );
 
-    @media screen and (width <= 768px) {
+    @media screen and (orientation: portrait) {
         padding: 5vh 0;
     }
 `;

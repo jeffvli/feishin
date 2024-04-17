@@ -20,6 +20,7 @@ import { fadeIn } from '/@/renderer/styles';
 import { LibraryItem } from '/@/renderer/api/types';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
+import { Separator } from '/@/renderer/components/separator';
 
 const ImageWrapper = styled.div`
     position: relative;
@@ -236,16 +237,7 @@ export const LeftControls = () => {
                     <LineItem $secondary>
                         {artists?.map((artist, index) => (
                             <React.Fragment key={`bar-${artist.id}`}>
-                                {index > 0 && (
-                                    <Text
-                                        $link
-                                        $secondary
-                                        size="md"
-                                        style={{ display: 'inline-block' }}
-                                    >
-                                        ,
-                                    </Text>
-                                )}{' '}
+                                {index > 0 && <Separator />}
                                 <Text
                                     $link
                                     component={Link}

@@ -16,12 +16,18 @@
         "removeFromQueue": "remove from queue",
         "setRating": "set rating",
         "toggleSmartPlaylistEditor": "toggle $t(entity.smartPlaylist) editor",
-        "viewPlaylists": "view $t(entity.playlist_other)"
+        "viewPlaylists": "view $t(entity.playlist_other)",
+        "openIn": {
+            "lastfm": "Open in Last.fm",
+            "musicbrainz": "Open in MusicBrainz"
+        }
     },
     "common": {
         "action_one": "action",
         "action_other": "actions",
         "add": "add",
+        "albumGain": "album gain",
+        "albumPeak": "album peak",
         "areYouSure": "are you sure?",
         "ascending": "ascending",
         "backward": "backward",
@@ -33,6 +39,8 @@
         "channel_one": "channel",
         "channel_other": "channels",
         "clear": "clear",
+        "close": "close",
+        "codec": "codec",
         "collapse": "collapse",
         "comingSoon": "coming soon…",
         "configure": "configure",
@@ -66,6 +74,7 @@
         "menu": "menu",
         "minimize": "minimize",
         "modified": "modified",
+        "mbid": "MusicBrainz ID",
         "name": "name",
         "no": "no",
         "none": "none",
@@ -80,6 +89,7 @@
         "random": "random",
         "rating": "rating",
         "refresh": "refresh",
+        "reload": "reload",
         "reset": "reset",
         "resetToDefault": "reset to default",
         "restartRequired": "restart required",
@@ -95,6 +105,8 @@
         "sortOrder": "order",
         "title": "title",
         "trackNumber": "track",
+        "trackGain": "track gain",
+        "trackPeak": "track peak",
         "unknown": "unknown",
         "version": "version",
         "year": "year",
@@ -144,6 +156,8 @@
         "localFontAccessDenied": "access denied to local fonts",
         "loginRateError": "too many login attempts, please try again in a few seconds",
         "mpvRequired": "MPV required",
+        "networkError": "a network error occurred",
+        "openError": "could not open file",
         "playbackError": "an error occurred when trying to play the media",
         "remoteDisableError": "an error occurred when trying to $t(common.disable) the remote server",
         "remoteEnableError": "an error occurred when trying to $t(common.enable) the remote server",
@@ -215,7 +229,7 @@
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist_other)",
             "input_skipDuplicates": "skip duplicates",
-            "success": "added {{message}} $t(entity.song_other) to {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "added $t(entity.trackWithCount, {\"count\": {{message}} }) to $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "title": "add to $t(entity.playlist_one)"
         },
         "createPlaylist": {
@@ -249,11 +263,22 @@
         }
     },
     "page": {
+        "albumArtistDetail": {
+            "about": "About {{artist}}",
+            "appearsOn": "appears on",
+            "recentReleases": "recent releases",
+            "viewDiscography": "view discography",
+            "relatedArtists": "related $t(entity.artist_other)",
+            "topSongs": "top songs",
+            "topSongsFrom": "Top songs from {{title}}",
+            "viewAll": "view all",
+            "viewAllTracks": "view all $t(entity.track_other)"
+        },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
         },
         "albumDetail": {
-            "moreFromArtist": "more from this $t(entity.genre_one)",
+            "moreFromArtist": "more from this $t(entity.artist_one)",
             "moreFromGeneric": "more from {{item}}"
         },
         "albumList": {
@@ -287,11 +312,14 @@
             "removeFromFavorites": "$t(action.removeFromFavorites)",
             "removeFromPlaylist": "$t(action.removeFromPlaylist)",
             "removeFromQueue": "$t(action.removeFromQueue)",
-            "setRating": "$t(action.setRating)"
+            "setRating": "$t(action.setRating)",
+            "showDetails": "get info"
         },
         "fullscreenPlayer": {
             "config": {
                 "dynamicBackground": "dynamic background",
+                "dynamicImageBlur": "image blur size",
+                "dynamicIsImage": "enable background image",
                 "followCurrentLyric": "follow current lyric",
                 "lyricAlignment": "lyric alignment",
                 "lyricGap": "lyric gap",
@@ -325,6 +353,11 @@
             "recentlyPlayed": "recently played",
             "title": "$t(common.home)"
         },
+        "itemDetail": {
+            "copyPath": "copy path to clipboard",
+            "copiedPath": "path copied successfully",
+            "openFile": "show track in file manager"
+        },
         "playlistList": {
             "title": "$t(entity.playlist_other)"
         },
@@ -345,9 +378,12 @@
             "playlists": "$t(entity.playlist_other)",
             "search": "$t(common.search)",
             "settings": "$t(common.setting_other)",
+            "shared": "shared $t(entity.playlist_other)",
             "tracks": "$t(entity.track_other)"
         },
         "trackList": {
+            "artistTracks": "Tracks by {{artist}}",
+            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
             "title": "$t(entity.track_other)"
         }
     },
@@ -395,6 +431,13 @@
         "audioExclusiveMode_description": "enable exclusive output mode. In this mode, the system is usually locked out, and only mpv will be able to output audio",
         "audioPlayer": "audio player",
         "audioPlayer_description": "select the audio player to use for playback",
+        "buttonSize": "player bar button size",
+        "buttonSize_description": "the size of the player bar buttons",
+        "clearCache": "clear browser cache",
+        "clearCache_description": "a 'hard clear' of feishin. in addition to clearing feishin's cache, empty the browser cache (saved images and other assets). server credentials and settings are preserved",
+        "clearQueryCache": "clear feishin cache",
+        "clearQueryCache_description": "a 'soft clear' of feishin. this will refresh playlists, track metadata, and reset saved lyrics. settings, server credentials and cached images are preserved",
+        "clearCacheSuccess": "cache cleared successfully",
         "crossfadeDuration": "crossfade duration",
         "crossfadeDuration_description": "sets the duration of the crossfade effect",
         "crossfadeStyle": "crossfade style",
@@ -413,6 +456,8 @@
         "discordUpdateInterval_description": "the time in seconds between each update (minimum 15 seconds)",
         "enableRemote": "enable remote control server",
         "enableRemote_description": "enables the remote control server to allow other devices to control the application",
+        "externalLinks": "show external links",
+        "externalLinks_description": "enables showing external links (Last.fm, MusicBrainz) on artist/album pages",
         "exitToTray": "exit to tray",
         "exitToTray_description": "exit the application to the system tray",
         "floatingQueueArea": "show floating queue hover area",
@@ -431,6 +476,8 @@
         "gaplessAudio_optionWeak": "weak (recommended)",
         "globalMediaHotkeys": "global media hotkeys",
         "globalMediaHotkeys_description": "enable or disable the usage of your system media hotkeys to control playback",
+        "homeConfiguration": "home page configuration",
+        "homeConfiguration_description": "configure what items are shown, and in what order, on the home page",
         "hotkey_browserBack": "browser back",
         "hotkey_browserForward": "browser forward",
         "hotkey_favoriteCurrentSong": "favorite $t(common.currentSong)",
@@ -479,9 +526,11 @@
         "minimumScrobbleSeconds": "minimum scrobble (seconds)",
         "minimumScrobbleSeconds_description": "the minimum duration in seconds of the song that must be played before it is scrobbled",
         "mpvExecutablePath": "mpv executable path",
-        "mpvExecutablePath_description": "sets the path to the mpv executable",
-        "mpvExecutablePath_help": "one per line",
+        "mpvExecutablePath_description": "sets the path to the mpv executable. if left empty, the default path will be used",
         "mpvExtraParameters": "mpv parameters",
+        "mpvExtraParameters_help": "one per line",
+        "passwordStore": "passwords/secret store",
+        "passwordStore_description": "what password/secret store to use. change this if you are having issues storing passwords.",
         "playbackStyle": "playback style",
         "playbackStyle_description": "select the playback style to use for the audio player",
         "playbackStyle_optionCrossFade": "crossfade",
@@ -491,6 +540,8 @@
         "playButtonBehavior_optionAddLast": "$t(player.addLast)",
         "playButtonBehavior_optionAddNext": "$t(player.addNext)",
         "playButtonBehavior_optionPlay": "$t(player.play)",
+        "playerAlbumArtResolution": "player album art resolution",
+        "playerAlbumArtResolution_description": "the resolution for the large player's album art preview. larger makes it look more crisp, but may slow loading down. defaults to 0, meaning auto",
         "remotePassword": "remote control server password",
         "remotePassword_description": "sets the password for the remote control server. These credentials are by default transferred insecurely, so you should use a unique password that you do not care about",
         "remotePort": "remote control server port",
@@ -509,7 +560,7 @@
         "replayGainPreamp": "{{ReplayGain}} preamp (dB)",
         "replayGainPreamp_description": "adjust the preamp gain applied to the {{ReplayGain}} values",
         "sampleRate": "sample rate",
-        "sampleRate_description": "select the output sample rate to be used if the sample frequency selected is different from that of the current media",
+        "sampleRate_description": "select the output sample rate to be used if the sample frequency selected is different from that of the current media. a value less than 8000 will use the default frequency",
         "savePlayQueue": "save play queue",
         "savePlayQueue_description": "save the play queue when the application is closed and restore it when the application is opened",
         "scrobble": "scrobble",
@@ -532,6 +583,8 @@
         "skipDuration_description": "sets the duration to skip when using the skip buttons on the player bar",
         "skipPlaylistPage": "skip playlist page",
         "skipPlaylistPage_description": "when navigating to a playlist, go to the playlist song list page instead of the default page",
+        "startMinimized": "start minimized",
+        "startMinimized_description": "start the application in system tray",
         "theme": "theme",
         "theme_description": "sets the theme to use for the application",
         "themeDark": "theme (dark)",
@@ -557,6 +610,7 @@
             "bitrate": "bitrate",
             "bpm": "bpm",
             "channels": "$t(common.channel_other)",
+            "codec": "$t(common.codec)",
             "comment": "comment",
             "dateAdded": "date added",
             "discNumber": "disc",
@@ -568,6 +622,7 @@
             "rating": "rating",
             "releaseDate": "release date",
             "releaseYear": "year",
+            "size": "$t(common.size)",
             "songCount": "$t(entity.track_other)",
             "title": "title",
             "trackNumber": "track"
@@ -577,6 +632,8 @@
                 "autoFitColumns": "auto fit columns",
                 "displayType": "display type",
                 "gap": "$t(common.gap)",
+                "itemGap": "item gap (px)",
+                "itemSize": "item size (px)",
                 "size": "$t(common.size)",
                 "tableColumns": "table columns"
             },
@@ -589,6 +646,7 @@
                 "bitrate": "$t(common.bitrate)",
                 "bpm": "$t(common.bpm)",
                 "channels": "$t(common.channel_other)",
+                "codec": "$t(common.codec)",
                 "dateAdded": "date added",
                 "discNumber": "disc number",
                 "duration": "$t(common.duration)",

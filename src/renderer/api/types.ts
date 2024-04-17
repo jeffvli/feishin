@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ServerFeatures } from './features-types';
 import { jfType } from './jellyfin/jellyfin-types';
 import {
     JFSortOrder,
@@ -57,13 +58,16 @@ export type User = {
 
 export type ServerListItem = {
     credential: string;
+    features?: ServerFeatures;
     id: string;
     name: string;
     ndCredential?: string;
+    savePassword?: boolean;
     type: ServerType;
     url: string;
     userId: string | null;
     username: string;
+    version?: string;
 };
 
 export enum ServerType {
@@ -144,9 +148,11 @@ export type Genre = {
 };
 
 export type Album = {
+    albumArtist: string;
     albumArtists: RelatedArtist[];
     artists: RelatedArtist[];
     backdropImageUrl: string | null;
+    comment: string | null;
     createdAt: string;
     duration: number | null;
     genres: Genre[];
@@ -156,6 +162,7 @@ export type Album = {
     isCompilation: boolean | null;
     itemType: LibraryItem.ALBUM;
     lastPlayedAt: string | null;
+    mbzId: string | null;
     name: string;
     playCount: number | null;
     releaseDate: string | null;
@@ -228,6 +235,7 @@ export type AlbumArtist = {
     imageUrl: string | null;
     itemType: LibraryItem.ALBUM_ARTIST;
     lastPlayedAt: string | null;
+    mbz: string | null;
     name: string;
     playCount: number | null;
     serverId: string;
@@ -417,7 +425,8 @@ export const albumListSortMap: AlbumListSortMap = {
         rating: NDAlbumListSort.RATING,
         recentlyAdded: NDAlbumListSort.RECENTLY_ADDED,
         recentlyPlayed: NDAlbumListSort.PLAY_DATE,
-        releaseDate: undefined,
+        // Recent versions of Navidrome support release date, but fallback to year for now
+        releaseDate: NDAlbumListSort.YEAR,
         songCount: NDAlbumListSort.SONG_COUNT,
         year: NDAlbumListSort.YEAR,
     },
@@ -532,7 +541,7 @@ export const songListSortMap: SongListSortMap = {
         id: NDSongListSort.ID,
         name: NDSongListSort.TITLE,
         playCount: NDSongListSort.PLAY_COUNT,
-        random: undefined,
+        random: NDSongListSort.RANDOM,
         rating: NDSongListSort.RATING,
         recentlyAdded: NDSongListSort.RECENTLY_ADDED,
         recentlyPlayed: NDSongListSort.PLAY_DATE,
@@ -1092,17 +1101,11 @@ export type InternetProviderLyricSearchResponse = {
     source: LyricSource;
 };
 
-export type SynchronizedLyricMetadata = {
-    lyrics: SynchronizedLyricsArray;
+export type FullLyricsMetadata = {
+    lyrics: LyricsResponse;
     remote: boolean;
-} & Omit<InternetProviderLyricResponse, 'lyrics'>;
-
-export type UnsynchronizedLyricMetadata = {
-    lyrics: string;
-    remote: boolean;
-} & Omit<InternetProviderLyricResponse, 'lyrics'>;
-
-export type FullLyricsMetadata = SynchronizedLyricMetadata | UnsynchronizedLyricMetadata;
+    source: string;
+} & Omit<InternetProviderLyricResponse, 'id' | 'lyrics' | 'source'>;
 
 export type LyricOverride = Omit<InternetProviderLyricResponse, 'lyrics'>;
 
@@ -1139,3 +1142,39 @@ export type FontData = {
     postscriptName: string;
     style: string;
 };
+
+export type ServerInfoArgs = BaseEndpointArgs;
+
+export type ServerInfo = {
+    features: ServerFeatures;
+    id?: string;
+    version: string;
+};
+
+export type StructuredLyricsArgs = {
+    query: LyricsQuery;
+} & BaseEndpointArgs;
+
+export type StructuredUnsyncedLyric = {
+    lyrics: string;
+    synced: false;
+} & Omit<FullLyricsMetadata, 'lyrics'>;
+
+export type StructuredSyncedLyric = {
+    lyrics: SynchronizedLyricsArray;
+    synced: true;
+} & Omit<FullLyricsMetadata, 'lyrics'>;
+
+export type StructuredLyric = {
+    lang: string;
+} & (StructuredUnsyncedLyric | StructuredSyncedLyric);
+
+export type SimilarSongsQuery = {
+    albumArtistIds: string[];
+    count?: number;
+    songId: string;
+};
+
+export type SimilarSongsArgs = {
+    query: SimilarSongsQuery;
+} & BaseEndpointArgs;

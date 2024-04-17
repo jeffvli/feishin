@@ -27,6 +27,7 @@ export * from './select';
 export * from './skeleton';
 export * from './slider';
 export * from './spinner';
+export * from './spoiler';
 export * from './switch';
 export * from './tabs';
 export * from './text';

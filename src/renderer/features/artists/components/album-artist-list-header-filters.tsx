@@ -9,7 +9,7 @@ import { RiFolder2Line, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react
 import { useListContext } from '../../../context/list-context';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { AlbumArtistListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
@@ -21,7 +21,7 @@ import {
     useListStoreActions,
     useListStoreByKey,
 } from '/@/renderer/store';
-import { ListDisplayType, ServerType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, TableColumn } from '/@/renderer/types';
 import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
@@ -472,7 +472,9 @@ export const AlbumArtistListHeaderFilters = ({
                             Table (paginated)
                         </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>Item size</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             {display === ListDisplayType.CARD ||
                             display === ListDisplayType.POSTER ? (
@@ -493,7 +495,11 @@ export const AlbumArtistListHeaderFilters = ({
                         </DropdownMenu.Item>
                         {isGrid && (
                             <>
-                                <DropdownMenu.Label>Item gap</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.itemGap', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item closeMenuOnClick={false}>
                                     <Slider
                                         defaultValue={grid?.itemGap || 0}

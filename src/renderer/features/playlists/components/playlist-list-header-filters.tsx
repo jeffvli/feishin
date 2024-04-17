@@ -399,7 +399,9 @@ export const PlaylistListHeaderFilters = ({
                             Table (paginated)
                         </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>Item size</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
                                 defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
@@ -407,20 +409,24 @@ export const PlaylistListHeaderFilters = ({
                                 min={isGrid ? 150 : 25}
                                 onChangeEnd={handleItemSize}
                             />
-                            {isGrid && (
-                                <>
-                                    <DropdownMenu.Label>Item gap</DropdownMenu.Label>
-                                    <DropdownMenu.Item closeMenuOnClick={false}>
-                                        <Slider
-                                            defaultValue={grid?.itemGap || 0}
-                                            max={30}
-                                            min={0}
-                                            onChangeEnd={handleItemGap}
-                                        />
-                                    </DropdownMenu.Item>
-                                </>
-                            )}
                         </DropdownMenu.Item>
+                        {isGrid && (
+                            <>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.itemGap', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </DropdownMenu.Label>
+                                <DropdownMenu.Item closeMenuOnClick={false}>
+                                    <Slider
+                                        defaultValue={grid?.itemGap || 0}
+                                        max={30}
+                                        min={0}
+                                        onChangeEnd={handleItemGap}
+                                    />
+                                </DropdownMenu.Item>
+                            </>
+                        )}
                         {!isGrid && (
                             <>
                                 <DropdownMenu.Label>

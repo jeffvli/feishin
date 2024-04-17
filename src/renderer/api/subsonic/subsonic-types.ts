@@ -206,6 +206,66 @@ const randomSongList = z.object({
     }),
 });
 
+const ping = z.object({
+    openSubsonic: z.boolean().optional(),
+    serverVersion: z.string().optional(),
+    version: z.string(),
+});
+
+const extension = z.object({
+    name: z.string(),
+    versions: z.number().array(),
+});
+
+const serverInfo = z.object({
+    openSubsonicExtensions: z.array(extension).optional(),
+});
+
+const structuredLyricsParameters = z.object({
+    id: z.string(),
+});
+
+const lyricLine = z.object({
+    start: z.number().optional(),
+    value: z.string(),
+});
+
+const structuredLyric = z.object({
+    displayArtist: z.string().optional(),
+    displayTitle: z.string().optional(),
+    lang: z.string(),
+    line: z.array(lyricLine),
+    offset: z.number().optional(),
+    synced: z.boolean(),
+});
+
+const structuredLyrics = z.object({
+    lyricsList: z
+        .object({
+            structuredLyrics: z.array(structuredLyric).optional(),
+        })
+        .optional(),
+});
+
+const similarSongsParameters = z.object({
+    count: z.number().optional(),
+    id: z.string(),
+});
+
+const similarSongs = z.object({
+    similarSongs: z
+        .object({
+            song: z.array(song),
+        })
+        .optional(),
+});
+
+export enum SubsonicExtensions {
+    FORM_POST = 'formPost',
+    SONG_LYRICS = 'songLyrics',
+    TRANSCODE_OFFSET = 'transcodeOffset',
+}
+
 export const ssType = {
     _parameters: {
         albumList: albumListParameters,
@@ -217,6 +277,8 @@ export const ssType = {
         scrobble: scrobbleParameters,
         search3: search3Parameters,
         setRating: setRatingParameters,
+        similarSongs: similarSongsParameters,
+        structuredLyrics: structuredLyricsParameters,
         topSongsList: topSongsListParameters,
     },
     _response: {
@@ -229,12 +291,16 @@ export const ssType = {
         baseResponse,
         createFavorite,
         musicFolderList,
+        ping,
         randomSongList,
         removeFavorite,
         scrobble,
         search3,
+        serverInfo,
         setRating,
+        similarSongs,
         song,
+        structuredLyrics,
         topSongsList,
     },
 };

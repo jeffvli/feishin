@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useState, useRef } from 'react';
 import { QueueSong, ServerType } from '/@/renderer/api/types';
 import { useSendScrobble } from '/@/renderer/features/player/mutations/scrobble-mutation';
-import { useCurrentStatus, usePlayerStore } from '/@/renderer/store';
+import { usePlayerStore } from '/@/renderer/store';
 import { usePlaybackSettings } from '/@/renderer/store/settings.store';
 import { PlayerStatus } from '/@/renderer/types';
 
@@ -52,7 +52,6 @@ const checkScrobbleConditions = (args: {
 };
 
 export const useScrobble = () => {
-    const status = useCurrentStatus();
     const scrobbleSettings = usePlaybackSettings().scrobble;
     const isScrobbleEnabled = scrobbleSettings?.enabled;
     const sendScrobble = useSendScrobble();
@@ -94,6 +93,7 @@ export const useScrobble = () => {
 
             if (progressIntervalId.current) {
                 clearInterval(progressIntervalId.current);
+                progressIntervalId.current = null;
             }
 
             // const currentSong = current[0] as QueueSong | undefined;
@@ -135,9 +135,13 @@ export const useScrobble = () => {
             clearTimeout(songChangeTimeoutId.current as ReturnType<typeof setTimeout>);
             songChangeTimeoutId.current = setTimeout(() => {
                 const currentSong = current[0] as QueueSong | undefined;
+                // Get the current status from the state, not variable. This is because
+                // of a timing issue where, when playing the first track, the first
+                // event is song, and then the event is play
+                const currentStatus = usePlayerStore.getState().current.status;
 
                 // Send start scrobble when song changes and the new song is playing
-                if (status === PlayerStatus.PLAYING && currentSong?.id) {
+                if (currentStatus === PlayerStatus.PLAYING && currentSong?.id) {
                     sendScrobble.mutate({
                         query: {
                             event: 'start',
@@ -149,6 +153,12 @@ export const useScrobble = () => {
                     });
 
                     if (currentSong?.serverType === ServerType.JELLYFIN) {
+                        // It is possible that another function sets an interval.
+                        // We only want one running, so clear the existing interval
+                        if (progressIntervalId.current) {
+                            clearInterval(progressIntervalId.current);
+                        }
+
                         progressIntervalId.current = setInterval(() => {
                             const currentTime = usePlayerStore.getState().current.time;
                             handleScrobbleFromSeek(currentTime);
@@ -163,7 +173,6 @@ export const useScrobble = () => {
             scrobbleSettings?.scrobbleAtPercentage,
             isCurrentSongScrobbled,
             sendScrobble,
-            status,
             handleScrobbleFromSeek,
         ],
     );
@@ -200,8 +209,14 @@ export const useScrobble = () => {
                 });
 
                 if (currentSong?.serverType === ServerType.JELLYFIN) {
+                    // It is possible that another function sets an interval.
+                    // We only want one running, so clear the existing interval
+                    if (progressIntervalId.current) {
+                        clearInterval(progressIntervalId.current);
+                    }
+
                     progressIntervalId.current = setInterval(() => {
-                        const currentTime = currentTimeSec;
+                        const currentTime = usePlayerStore.getState().current.time;
                         handleScrobbleFromSeek(currentTime);
                     }, 10000);
                 }
@@ -220,6 +235,7 @@ export const useScrobble = () => {
 
                 if (progressIntervalId.current) {
                     clearInterval(progressIntervalId.current as ReturnType<typeof setInterval>);
+                    progressIntervalId.current = null;
                 }
             } else {
                 const isLastTrackInQueue = usePlayerStore.getState().actions.checkIsLastTrack();
@@ -315,12 +331,19 @@ export const useScrobble = () => {
 
     useEffect(() => {
         const unsubSongChange = usePlayerStore.subscribe(
-            (state) => [state.current.song, state.current.time],
+            (state) => [state.current.song, state.current.time, state.current.player],
             handleScrobbleFromSongChange,
             {
                 // We need the current time to check the scrobble condition, but we only want to
                 // trigger the callback when the song changes
-                equalityFn: (a, b) => (a[0] as QueueSong)?.id === (b[0] as QueueSong)?.id,
+                // There are two conditions where this should trigger:
+                // 1. The song actually changes (the common case)
+                // 2. The song does not change, but the player dows. This would either be
+                //    a single track on repeat one, or one track added to the queue
+                //    multiple times in a row and playback goes normally (no next/previous)
+                equalityFn: (a, b) =>
+                    (a[0] as QueueSong)?.uniqueId === (b[0] as QueueSong)?.uniqueId &&
+                    a[2] === b[2],
             },
         );
 
