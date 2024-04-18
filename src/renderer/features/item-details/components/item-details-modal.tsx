@@ -48,24 +48,33 @@ const handleRow = <T extends AnyLibraryItem>(t: TFunction, item: T, rule: ItemDe
 
 const formatArtists = (isAlbumArtist: boolean) => (item: Album | Song) =>
     (isAlbumArtist ? item.albumArtists : item.artists)?.map((artist, index) => (
-        <span key={artist.id}>
+        <span key={artist.id || artist.name}>
             {index > 0 && <Separator />}
-            <Text
-                $link
-                component={Link}
-                overflow="visible"
-                size="md"
-                to={
-                    artist.id
-                        ? generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
-                              albumArtistId: artist.id,
-                          })
-                        : ''
-                }
-                weight={500}
-            >
-                {artist.name || '—'}
-            </Text>
+            {artist.id ? (
+                <Text
+                    $link
+                    component={Link}
+                    overflow="visible"
+                    size="md"
+                    to={
+                        artist.id
+                            ? generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                                  albumArtistId: artist.id,
+                              })
+                            : ''
+                    }
+                    weight={500}
+                >
+                    {artist.name || '—'}
+                </Text>
+            ) : (
+                <Text
+                    overflow="visible"
+                    size="md"
+                >
+                    {artist.name || '-'}
+                </Text>
+            )}
         </span>
     ));
 
