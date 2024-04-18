@@ -1,61 +1,66 @@
+import { ChangeEvent, MutableRefObject, useEffect, useRef } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useListStoreByKey } from '../../../store/list.store';
+import { RiAlbumLine } from 'react-icons/ri';
+import { Link, generatePath } from 'react-router-dom';
 import { LibraryItem } from '/@/renderer/api/types';
-import { PageHeader, SearchInput } from '/@/renderer/components';
-import { useListContext } from '/@/renderer/context/list-context';
+import { Button, PageHeader, SearchInput } from '/@/renderer/components';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { SongListHeaderFilters } from '/@/renderer/features/songs/components/song-list-header-filters';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
-import { SongListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
+import { SongListFilter, useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { ListDisplayType } from '/@/renderer/types';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { AppRoute } from '/@/renderer/router/routes';
+import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 
 interface SongListHeaderProps {
+    genreId?: string;
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
     itemCount?: number;
     tableRef: MutableRefObject<AgGridReactType | null>;
     title?: string;
 }
 
-export const SongListHeader = ({ gridRef, title, itemCount, tableRef }: SongListHeaderProps) => {
+export const SongListHeader = ({
+    genreId,
+    gridRef,
+    title,
+    itemCount,
+    tableRef,
+}: SongListHeaderProps) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
-    const { pageKey, handlePlay, customFilters } = useListContext();
-    const { setFilter, setTablePagination } = useListStoreActions();
-    const { display, filter } = useListStoreByKey({ key: pageKey });
     const cq = useContainerQuery();
+    const genreRef = useRef<string>();
 
-    const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
+    const { customFilters, filter, handlePlay, refresh, search } = useDisplayRefresh({
+        gridRef,
         itemType: LibraryItem.SONG,
         server,
+        tableRef,
     });
 
     const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-        const searchTerm = e.target.value === '' ? undefined : e.target.value;
-        const updatedFilters = setFilter({
-            data: { searchTerm },
-            itemType: LibraryItem.SONG,
-            key: pageKey,
-        }) as SongListFilter;
+        const updatedFilters = search(e) as SongListFilter;
 
         const filterWithCustom = {
             ...updatedFilters,
             ...customFilters,
         };
 
-        if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
-            handleRefreshTable(tableRef, filterWithCustom);
-            setTablePagination({ data: { currentPage: 0 }, key: pageKey });
-        } else {
-            handleRefreshGrid(gridRef, filterWithCustom);
-        }
+        refresh(filterWithCustom);
     }, 500);
+
+    useEffect(() => {
+        if (genreRef.current && genreRef.current !== genreId) {
+            refresh(customFilters);
+        }
+
+        genreRef.current = genreId;
+    }, [customFilters, genreId, refresh, tableRef]);
 
     const playButtonBehavior = usePlayButtonBehavior();
 
@@ -81,6 +86,25 @@ export const SongListHeader = ({ gridRef, title, itemCount, tableRef }: SongList
                         >
                             {itemCount}
                         </LibraryHeaderBar.Badge>
+                        {genreId && (
+                            <Button
+                                compact
+                                component={Link}
+                                radius={0}
+                                size="md"
+                                to={generatePath(AppRoute.LIBRARY_GENRES_ALBUMS, {
+                                    genreId,
+                                })}
+                                tooltip={{
+                                    label: t('page.trackList.showAlbums', {
+                                        postProcess: 'sentenceCase',
+                                    }),
+                                }}
+                                variant="filled"
+                            >
+                                <RiAlbumLine />
+                            </Button>
+                        )}
                     </LibraryHeaderBar>
                     <Group>
                         <SearchInput

@@ -282,6 +282,8 @@
             "moreFromGeneric": "more from {{item}}"
         },
         "albumList": {
+            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
+            "showTracks": "show $t(entity.track_other)",
             "title": "$t(entity.album_other)"
         },
         "appMenu": {
@@ -384,6 +386,7 @@
         "trackList": {
             "artistTracks": "Tracks by {{artist}}",
             "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
+            "showAlbums": "show $t(entity.album_other)",
             "title": "$t(entity.track_other)"
         }
     },
@@ -474,6 +477,8 @@
         "gaplessAudio": "gapless audio",
         "gaplessAudio_description": "sets the gapless audio setting for mpv",
         "gaplessAudio_optionWeak": "weak (recommended)",
+        "genreBehavior": "genre page default behavior",
+        "genreBahvior_description": "determines whether clicking on a genre opens by default in track or album list",
         "globalMediaHotkeys": "global media hotkeys",
         "globalMediaHotkeys_description": "enable or disable the usage of your system media hotkeys to control playback",
         "homeConfiguration": "home page configuration",

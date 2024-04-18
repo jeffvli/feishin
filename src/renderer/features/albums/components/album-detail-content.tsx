@@ -45,6 +45,7 @@ import {
 } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
+import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 
 const isFullWidthRow = (node: RowNode) => {
     return node.id?.startsWith('disc-');
@@ -81,6 +82,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     const isFocused = useAppFocus();
     const currentSong = useCurrentSong();
     const { externalLinks } = useGeneralSettings();
+    const genreRoute = useGenreRoute();
 
     const columnDefs = useMemo(
         () => getColumnDefs(tableConfig.columns, false, 'albumDetail'),
@@ -389,7 +391,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                                     component={Link}
                                     radius={0}
                                     size="md"
-                                    to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
+                                    to={generatePath(genreRoute, {
                                         genreId: genre.id,
                                     })}
                                     variant="outline"

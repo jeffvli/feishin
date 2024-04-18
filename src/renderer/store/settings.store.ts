@@ -171,6 +171,11 @@ export enum BindingActions {
     ZOOM_OUT = 'zoomOut',
 }
 
+export enum GenreTarget {
+    ALBUM = 'album',
+    TRACK = 'track',
+}
+
 export interface SettingsState {
     discord: {
         clientId: string;
@@ -192,6 +197,7 @@ export interface SettingsState {
         defaultFullPlaylist: boolean;
         externalLinks: boolean;
         followSystemTheme: boolean;
+        genreTarget: GenreTarget;
         homeItems: SortableItem<HomeItem>[];
         language: string;
         passwordStore?: string;
@@ -311,6 +317,7 @@ const initialState: SettingsState = {
         defaultFullPlaylist: true,
         externalLinks: true,
         followSystemTheme: false,
+        genreTarget: GenreTarget.TRACK,
         homeItems,
         language: 'en',
         passwordStore: undefined,

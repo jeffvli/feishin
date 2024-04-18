@@ -13,9 +13,9 @@ import {
 } from '/@/renderer/components/virtual-grid';
 import { useListContext } from '/@/renderer/context/list-context';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useListStoreActions, useListStoreByKey } from '/@/renderer/store';
 import { CardRow, ListDisplayType } from '/@/renderer/types';
+import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 
 export const GenreListGridView = ({ gridRef, itemCount }: any) => {
     const queryClient = useQueryClient();
@@ -24,6 +24,7 @@ export const GenreListGridView = ({ gridRef, itemCount }: any) => {
     const { pageKey, id } = useListContext();
     const { grid, display, filter } = useListStoreByKey({ key: pageKey });
     const { setGrid } = useListStoreActions();
+    const genrePath = useGenreRoute();
 
     const [searchParams, setSearchParams] = useSearchParams();
     const scrollOffset = searchParams.get('scrollOffset');
@@ -137,7 +138,7 @@ export const GenreListGridView = ({ gridRef, itemCount }: any) => {
                         loading={itemCount === undefined || itemCount === null}
                         minimumBatchSize={40}
                         route={{
-                            route: AppRoute.LIBRARY_GENRES_SONGS,
+                            route: genrePath,
                             slugs: [{ idProperty: 'id', slugProperty: 'genreId' }],
                         }}
                         width={width}

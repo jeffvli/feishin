@@ -37,7 +37,11 @@ import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import {
+    GenreTarget,
+    useGeneralSettings,
+    usePlayButtonBehavior,
+} from '/@/renderer/store/settings.store';
 import { CardRow, Play, TableColumn } from '/@/renderer/types';
 import { sanitize } from '/@/renderer/utils/sanitize';
 
@@ -64,7 +68,7 @@ interface AlbumArtistDetailContentProps {
 
 export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailContentProps) => {
     const { t } = useTranslation();
-    const { externalLinks } = useGeneralSettings();
+    const { externalLinks, genreTarget } = useGeneralSettings();
     const { albumArtistId } = useParams() as { albumArtistId: string };
     const cq = useContainerQuery();
     const handlePlayQueueAdd = usePlayQueueAdd();
@@ -414,9 +418,14 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     component={Link}
                                     radius="md"
                                     size="md"
-                                    to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
-                                        genreId: genre.id,
-                                    })}
+                                    to={generatePath(
+                                        genreTarget === GenreTarget.ALBUM
+                                            ? AppRoute.LIBRARY_GENRES_ALBUMS
+                                            : AppRoute.LIBRARY_GENRES_SONGS,
+                                        {
+                                            genreId: genre.id,
+                                        },
+                                    )}
                                     variant="outline"
                                 >
                                     {genre.name}
