@@ -3,6 +3,7 @@ import { MantineProvider } from '@mantine/core';
 import './styles/global.scss';
 import { useIsDark, useReconnect } from '/@/remote/store';
 import { Shell } from '/@/remote/components/shell';
+import { AppTheme } from '/@/renderer/themes/types';
 
 export const App = () => {
     const isDark = useIsDark();
@@ -11,6 +12,11 @@ export const App = () => {
     useEffect(() => {
         reconnect();
     }, [reconnect]);
+
+    useEffect(() => {
+        const targetTheme: AppTheme = isDark ? AppTheme.DEFAULT_DARK : AppTheme.DEFAULT_LIGHT;
+        document.body.setAttribute('data-theme', targetTheme);
+    }, [isDark]);
 
     return (
         <MantineProvider

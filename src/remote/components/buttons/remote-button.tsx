@@ -12,7 +12,7 @@ interface StyledButtonProps extends MantineButtonProps {
 }
 
 export interface ButtonProps extends StyledButtonProps {
-    tooltip: string;
+    tooltip?: string;
 }
 
 const StyledButton = styled(Button)<StyledButtonProps>`
@@ -37,19 +37,29 @@ const StyledButton = styled(Button)<StyledButtonProps>`
 
 export const RemoteButton = forwardRef<HTMLButtonElement, ButtonProps>(
     ({ children, tooltip, ...props }: ButtonProps, ref) => {
-        return (
-            <Tooltip
-                withinPortal
-                label={tooltip}
+        const button = (
+            <StyledButton
+                fullWidth
+                size="xl"
+                variant="default"
+                {...props}
+                ref={ref}
             >
-                <StyledButton
-                    {...props}
-                    ref={ref}
-                >
-                    {children}
-                </StyledButton>
-            </Tooltip>
+                {children}
+            </StyledButton>
         );
+        if (tooltip) {
+            return (
+                <Tooltip
+                    withinPortal
+                    events={{ focus: true, hover: true, touch: true }}
+                    label={tooltip}
+                >
+                    {button}
+                </Tooltip>
+            );
+        }
+        return button;
     },
 );
 

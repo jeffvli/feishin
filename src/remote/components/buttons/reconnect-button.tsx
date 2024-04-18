@@ -9,10 +9,7 @@ export const ReconnectButton = () => {
     return (
         <RemoteButton
             $active={!connected}
-            mr={5}
-            size="xl"
             tooltip={connected ? 'Reconnect' : 'Not connected. Reconnect.'}
-            variant="default"
             onClick={() => reconnect()}
         >
             <RiRestartLine size={30} />

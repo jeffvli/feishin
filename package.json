@@ -332,6 +332,7 @@
         "nanoid": "^3.3.3",
         "net": "^1.0.2",
         "node-mpv": "github:jeffvli/Node-MPV",
+        "nosleep.js": "^0.12.0",
         "overlayscrollbars": "^2.2.1",
         "overlayscrollbars-react": "^0.5.1",
         "react": "^18.2.0",
