@@ -37,13 +37,10 @@ import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import {
-    GenreTarget,
-    useGeneralSettings,
-    usePlayButtonBehavior,
-} from '/@/renderer/store/settings.store';
+import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { CardRow, Play, TableColumn } from '/@/renderer/types';
 import { sanitize } from '/@/renderer/utils/sanitize';
+import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 
 const ContentContainer = styled.div`
     position: relative;
@@ -68,11 +65,12 @@ interface AlbumArtistDetailContentProps {
 
 export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailContentProps) => {
     const { t } = useTranslation();
-    const { externalLinks, genreTarget } = useGeneralSettings();
+    const { externalLinks } = useGeneralSettings();
     const { albumArtistId } = useParams() as { albumArtistId: string };
     const cq = useContainerQuery();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const server = useCurrentServer();
+    const genrePath = useGenreRoute();
 
     const detailQuery = useAlbumArtistDetail({
         query: { id: albumArtistId },
@@ -418,14 +416,9 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     component={Link}
                                     radius="md"
                                     size="md"
-                                    to={generatePath(
-                                        genreTarget === GenreTarget.ALBUM
-                                            ? AppRoute.LIBRARY_GENRES_ALBUMS
-                                            : AppRoute.LIBRARY_GENRES_SONGS,
-                                        {
-                                            genreId: genre.id,
-                                        },
-                                    )}
+                                    to={generatePath(genrePath, {
+                                        genreId: genre.id,
+                                    })}
                                     variant="outline"
                                 >
                                     {genre.name}
