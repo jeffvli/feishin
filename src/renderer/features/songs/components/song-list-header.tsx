@@ -4,7 +4,7 @@ import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { RiAlbumLine } from 'react-icons/ri';
-import { Link, generatePath } from 'react-router-dom';
+import { Link, createSearchParams, generatePath } from 'react-router-dom';
 import { LibraryItem } from '/@/renderer/api/types';
 import { Button, PageHeader, SearchInput } from '/@/renderer/components';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
@@ -17,6 +17,8 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 
 interface SongListHeaderProps {
+    albumArtist: string | null;
+    albumArtistId?: string;
     genreId?: string;
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
     itemCount?: number;
@@ -25,6 +27,8 @@ interface SongListHeaderProps {
 }
 
 export const SongListHeader = ({
+    albumArtist,
+    albumArtistId,
     genreId,
     gridRef,
     title,
@@ -64,6 +68,17 @@ export const SongListHeader = ({
 
     const playButtonBehavior = usePlayButtonBehavior();
 
+    const albumsLink = albumArtistId
+        ? `${generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY, {
+              albumArtistId,
+          })}?${createSearchParams({
+              artistId: albumArtistId,
+              artistName: albumArtist || '',
+          })}`
+        : genreId
+        ? generatePath(AppRoute.LIBRARY_GENRES_ALBUMS, { genreId })
+        : null;
+
     return (
         <Stack
             ref={cq.ref}
@@ -86,15 +101,13 @@ export const SongListHeader = ({
                         >
                             {itemCount}
                         </LibraryHeaderBar.Badge>
-                        {genreId && (
+                        {albumsLink && (
                             <Button
                                 compact
                                 component={Link}
                                 radius={0}
                                 size="md"
-                                to={generatePath(AppRoute.LIBRARY_GENRES_ALBUMS, {
-                                    genreId,
-                                })}
+                                to={albumsLink}
                                 tooltip={{
                                     label: t('page.trackList.showAlbums', {
                                         postProcess: 'sentenceCase',

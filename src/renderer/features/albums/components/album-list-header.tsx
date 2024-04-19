@@ -13,11 +13,13 @@ import { AlbumListFilter, useCurrentServer, usePlayButtonBehavior } from '/@/ren
 import { titleCase } from '/@/renderer/utils';
 import { RiMusicLine } from 'react-icons/ri';
 import { generatePath } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link, createSearchParams } from 'react-router-dom';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 
 interface AlbumListHeaderProps {
+    albumArtist: string | null;
+    albumArtistId?: string;
     genreId?: string;
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
     itemCount?: number;
@@ -26,6 +28,8 @@ interface AlbumListHeaderProps {
 }
 
 export const AlbumListHeader = ({
+    albumArtist,
+    albumArtistId,
     genreId,
     itemCount,
     gridRef,
@@ -58,6 +62,17 @@ export const AlbumListHeader = ({
         genreRef.current = genreId;
     }, [filter, genreId, refresh, tableRef]);
 
+    const tracksLink = albumArtistId
+        ? `${generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS, {
+              albumArtistId,
+          })}?${createSearchParams({
+              artistId: albumArtistId,
+              artistName: albumArtist || '',
+          })}`
+        : genreId
+        ? generatePath(AppRoute.LIBRARY_GENRES_SONGS, { genreId })
+        : null;
+
     return (
         <Stack
             ref={cq.ref}
@@ -81,15 +96,13 @@ export const AlbumListHeader = ({
                         >
                             {itemCount}
                         </LibraryHeaderBar.Badge>
-                        {genreId && (
+                        {tracksLink && (
                             <Button
                                 compact
                                 component={Link}
                                 radius={0}
                                 size="md"
-                                to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
-                                    genreId,
-                                })}
+                                to={tracksLink}
                                 tooltip={{
                                     label: t('page.albumList.showTracks', {
                                         postProcess: 'sentenceCase',
