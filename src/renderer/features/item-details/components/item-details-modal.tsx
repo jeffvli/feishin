@@ -14,6 +14,7 @@ import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Separator } from '/@/renderer/components/separator';
+import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 
 export type ItemDetailsModalProps = {
     item: Album | AlbumArtist | Song;
@@ -83,8 +84,10 @@ const formatComment = (item: Album | Song) =>
 
 const formatDate = (key: string | null) => (key ? dayjs(key).fromNow() : '');
 
-const formatGenre = (item: Album | AlbumArtist | Song) =>
-    item.genres?.map((genre, index) => (
+const FormatGenre = (item: Album | AlbumArtist | Song) => {
+    const genreRoute = useGenreRoute();
+
+    return item.genres?.map((genre, index) => (
         <span key={genre.id}>
             {index > 0 && <Separator />}
             <Text
@@ -92,19 +95,14 @@ const formatGenre = (item: Album | AlbumArtist | Song) =>
                 component={Link}
                 overflow="visible"
                 size="md"
-                to={
-                    genre.id
-                        ? generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
-                              genreId: genre.id,
-                          })
-                        : ''
-                }
+                to={genre.id ? generatePath(genreRoute, { genreId: genre.id }) : ''}
                 weight={500}
             >
                 {genre.name || '—'}
             </Text>
         </span>
     ));
+};
 
 const formatRating = (item: Album | AlbumArtist | Song) =>
     item.userRating !== null ? (
@@ -120,7 +118,7 @@ const BoolField = (key: boolean) =>
 const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
     { key: 'name', label: 'common.title' },
     { label: 'entity.albumArtist_one', render: formatArtists(true) },
-    { label: 'entity.genre_other', render: formatGenre },
+    { label: 'entity.genre_other', render: FormatGenre },
     {
         label: 'common.duration',
         render: (album) => album.duration && formatDurationString(album.duration),
@@ -166,7 +164,7 @@ const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
 
 const AlbumArtistPropertyMapping: ItemDetailRow<AlbumArtist>[] = [
     { key: 'name', label: 'common.name' },
-    { label: 'entity.genre_other', render: formatGenre },
+    { label: 'entity.genre_other', render: FormatGenre },
     {
         label: 'common.duration',
         render: (artist) => artist.duration && formatDurationString(artist.duration),
@@ -240,7 +238,7 @@ const SongPropertyMapping: ItemDetailRow<Song>[] = [
     { key: 'discNumber', label: 'common.disc' },
     { key: 'trackNumber', label: 'common.trackNumber' },
     { key: 'releaseYear', label: 'filter.releaseYear' },
-    { label: 'entity.genre_other', render: formatGenre },
+    { label: 'entity.genre_other', render: FormatGenre },
     {
         label: 'common.duration',
         render: (song) => formatDurationString(song.duration),
