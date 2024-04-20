@@ -611,6 +611,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                             state.playback.mpvProperties.audioSampleRateHz = 0;
                         });
                     },
+                    setGenreBehavior: (target: GenreTarget) => {
+                        set((state) => {
+                            state.general.genreTarget = target;
+                        });
+                    },
                     setHomeItems: (items: SortableItem<HomeItem>[]) => {
                         set((state) => {
                             state.general.homeItems = items;

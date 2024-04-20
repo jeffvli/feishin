@@ -145,8 +145,6 @@ const TrackListRoute = () => {
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
                 <SongListHeader
-                    albumArtist={artist}
-                    albumArtistId={albumArtistId}
                     genreId={genreId}
                     gridRef={gridRef}
                     itemCount={itemCount}

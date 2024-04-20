@@ -1,18 +1,15 @@
-import { matchRoutes, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
 import { GenreTarget, useSettingsStore } from '/@/renderer/store';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useMemo } from 'react';
 
+const ALBUM_REGEX = /albums$/;
+const SONG_REGEX = /songs$/;
+
 export const useGenreRoute = () => {
-    const location = useLocation();
-    const matchAlbum = matchRoutes(
-        [{ path: AppRoute.LIBRARY_GENRES_ALBUMS }, { path: AppRoute.LIBRARY_ALBUMS }],
-        location,
-    );
-    const matchSongs = matchRoutes(
-        [{ path: AppRoute.LIBRARY_GENRES_SONGS }, { path: AppRoute.LIBRARY_SONGS }],
-        location,
-    );
+    const { pathname } = useLocation();
+    const matchAlbum = ALBUM_REGEX.test(pathname);
+    const matchSongs = SONG_REGEX.test(pathname);
 
     const baseState = useSettingsStore((state) =>
         state.general.genreTarget === GenreTarget.ALBUM

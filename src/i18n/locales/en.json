@@ -284,7 +284,6 @@
         "albumList": {
             "artistAlbums": "Albums by {{artist}}",
             "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
-            "showTracks": "show $t(entity.track_other)",
             "title": "$t(entity.album_other)"
         },
         "appMenu": {
@@ -339,6 +338,8 @@
             "upNext": "up next"
         },
         "genreList": {
+            "showAlbums": "show $t(entity.genre_one) $t(entity.album_other)",
+            "showTracks": "show $t(entity.genre_one) $t(entity.track_other)",
             "title": "$t(entity.genre_other)"
         },
         "globalSearch": {
@@ -387,7 +388,6 @@
         "trackList": {
             "artistTracks": "Tracks by {{artist}}",
             "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
-            "showAlbums": "show $t(entity.album_other)",
             "title": "$t(entity.track_other)"
         }
     },

@@ -31,13 +31,9 @@ export const GenreListHeader = ({ itemCount, gridRef, tableRef }: GenreListHeade
 
     const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
         const updatedFilters = search(e) as GenreListFilter;
-
-        const filterWithCustom = {
-            ...updatedFilters,
-        };
-
-        refresh(filterWithCustom);
+        refresh(updatedFilters);
     }, 500);
+
     return (
         <Stack
             ref={cq.ref}

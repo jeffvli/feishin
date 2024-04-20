@@ -4,22 +4,16 @@ import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { LibraryItem } from '/@/renderer/api/types';
-import { Button, PageHeader, SearchInput } from '/@/renderer/components';
+import { PageHeader, SearchInput } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { AlbumListHeaderFilters } from '/@/renderer/features/albums/components/album-list-header-filters';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AlbumListFilter, useCurrentServer, usePlayButtonBehavior } from '/@/renderer/store';
 import { titleCase } from '/@/renderer/utils';
-import { RiMusicLine } from 'react-icons/ri';
-import { generatePath } from 'react-router';
-import { Link, createSearchParams } from 'react-router-dom';
-import { AppRoute } from '/@/renderer/router/routes';
 import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 
 interface AlbumListHeaderProps {
-    albumArtist: string | null;
-    albumArtistId?: string;
     genreId?: string;
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
     itemCount?: number;
@@ -28,8 +22,6 @@ interface AlbumListHeaderProps {
 }
 
 export const AlbumListHeader = ({
-    albumArtist,
-    albumArtistId,
     genreId,
     itemCount,
     gridRef,
@@ -62,17 +54,6 @@ export const AlbumListHeader = ({
         genreRef.current = genreId;
     }, [filter, genreId, refresh, tableRef]);
 
-    const tracksLink = albumArtistId
-        ? `${generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS, {
-              albumArtistId,
-          })}?${createSearchParams({
-              artistId: albumArtistId,
-              artistName: albumArtist || '',
-          })}`
-        : genreId
-        ? generatePath(AppRoute.LIBRARY_GENRES_SONGS, { genreId })
-        : null;
-
     return (
         <Stack
             ref={cq.ref}
@@ -96,23 +77,6 @@ export const AlbumListHeader = ({
                         >
                             {itemCount}
                         </LibraryHeaderBar.Badge>
-                        {tracksLink && (
-                            <Button
-                                compact
-                                component={Link}
-                                radius={0}
-                                size="md"
-                                to={tracksLink}
-                                tooltip={{
-                                    label: t('page.albumList.showTracks', {
-                                        postProcess: 'sentenceCase',
-                                    }),
-                                }}
-                                variant="filled"
-                            >
-                                <RiMusicLine />
-                            </Button>
-                        )}
                     </LibraryHeaderBar>
                     <Group>
                         <SearchInput
