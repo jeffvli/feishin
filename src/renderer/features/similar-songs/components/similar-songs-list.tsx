@@ -30,7 +30,7 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
             cacheTime: 1000 * 60 * 2,
             staleTime: 1000 * 60 * 1,
         },
-        query: { count, songId: song.id },
+        query: { albumArtistIds: song.albumArtists.map((art) => art.id), count, songId: song.id },
         serverId: song?.serverId,
     });
 

@@ -93,10 +93,19 @@ First thing to do is check that your MPV binary path is correct. Navigate to the
 
 Feishin supports any music server that implements a [Navidrome](https://www.navidrome.org/) or [Jellyfin](https://jellyfin.org/) API. **Subsonic API is not currently supported**. This will likely be added in [later when the new Subsonic API is decided on](https://support.symfonium.app/t/subsonic-servers-participation/1233).
 
--   [Navidrome](https://github.com/navidrome/navidrome) version 0.48.0 and newer
+-   [Navidrome](https://github.com/navidrome/navidrome)
 -   [Jellyfin](https://github.com/jellyfin/jellyfin)
 -   [Funkwhale](https://funkwhale.audio/) - TBD
 -   Subsonic-compatible servers - TBD
+
+### I have the issue "The SUID sandbox helper binary was found, but is not configured correctly" on Linux
+
+This happens when you have user (unprivileged) namespaces disabled (`sysctl kernel.unprivileged_userns_clone` returns 0). You can fix this by either enabling unprivileged namespaces, or by making the `chrome-sandbox` Setuid.
+
+```bash
+chmod 4755 chrome-sandbox
+sudo chown root:root chrome-sandbox
+```
 
 ## Development
 

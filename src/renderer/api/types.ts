@@ -541,7 +541,7 @@ export const songListSortMap: SongListSortMap = {
         id: NDSongListSort.ID,
         name: NDSongListSort.TITLE,
         playCount: NDSongListSort.PLAY_COUNT,
-        random: undefined,
+        random: NDSongListSort.RANDOM,
         rating: NDSongListSort.RATING,
         recentlyAdded: NDSongListSort.RECENTLY_ADDED,
         recentlyPlayed: NDSongListSort.PLAY_DATE,
@@ -1183,6 +1183,7 @@ export type StructuredLyric = {
 } & (StructuredUnsyncedLyric | StructuredSyncedLyric);
 
 export type SimilarSongsQuery = {
+    albumArtistIds: string[];
     count?: number;
     songId: string;
 };

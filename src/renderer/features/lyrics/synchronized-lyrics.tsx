@@ -41,7 +41,7 @@ const SynchronizedLyricsContainer = styled.div<{ $gap: number }>`
         transparent 95%
     );
 
-    @media screen and (width <= 768px) {
+    @media screen and (orientation: portrait) {
         padding: 5vh 0;
     }
 `;
@@ -271,7 +271,12 @@ export const SynchronizedLyrics = ({
 
             return;
         }
-        if (!seeked) {
+
+        // If the time goes back to 0 and we are still playing, this suggests that
+        // we may be playing the same track (repeat one). In this case, we also
+        // need to restart playback
+        const restarted = status === PlayerStatus.PLAYING && now === 0;
+        if (!seeked && !restarted) {
             return;
         }
 

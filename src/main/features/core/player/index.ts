@@ -180,7 +180,11 @@ ipcMain.handle(
 
             // Clean up previous mpv instance
             getMpvInstance()?.stop();
-            getMpvInstance()?.quit();
+            getMpvInstance()
+                ?.quit()
+                .catch((error) => {
+                    mpvLog({ action: 'Failed to quit existing MPV' }, error);
+                });
             mpvInstance = null;
 
             mpvInstance = await createMpv(data);
@@ -211,11 +215,12 @@ ipcMain.handle(
 
 ipcMain.on('player-quit', async () => {
     try {
-        getMpvInstance()?.stop();
-        getMpvInstance()?.quit();
-        mpvInstance = null;
+        await getMpvInstance()?.stop();
+        await getMpvInstance()?.quit();
     } catch (err: NodeMpvError | any) {
         mpvLog({ action: 'Failed to quit mpv' }, err);
+    } finally {
+        mpvInstance = null;
     }
 });
 
@@ -407,11 +412,19 @@ ipcMain.handle('player-get-time', async (): Promise<number | undefined> => {
     }
 });
 
-app.on('before-quit', () => {
-    getMpvInstance()?.stop();
-    getMpvInstance()?.quit();
+app.on('before-quit', async () => {
+    try {
+        await getMpvInstance()?.stop();
+        await getMpvInstance()?.quit();
+    } catch (err: NodeMpvError | any) {
+        mpvLog({ action: `Failed to cleanly before-quit` }, err);
+    }
 });
 
-app.on('window-all-closed', () => {
-    getMpvInstance()?.quit();
+app.on('window-all-closed', async () => {
+    try {
+        await getMpvInstance()?.quit();
+    } catch (err: NodeMpvError | any) {
+        mpvLog({ action: `Failed to cleanly exit` }, err);
+    }
 });

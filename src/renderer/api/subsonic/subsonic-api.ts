@@ -131,7 +131,6 @@ axiosClient.defaults.paramsSerializer = (params) => {
 axiosClient.interceptors.response.use(
     (response) => {
         const data = response.data;
-
         if (data['subsonic-response'].status !== 'ok') {
             // Suppress code related to non-linked lastfm or spotify from Navidrome
             if (data['subsonic-response'].error.code !== 0) {
@@ -161,12 +160,24 @@ const parsePath = (fullPath: string) => {
     };
 };
 
+const silentlyTransformResponse = (data: any) => {
+    const jsonBody = JSON.parse(data);
+    const status = jsonBody ? jsonBody['subsonic-response']?.status : undefined;
+
+    if (status && status !== 'ok') {
+        jsonBody['subsonic-response'].error.code = 0;
+    }
+
+    return jsonBody;
+};
+
 export const ssApiClient = (args: {
     server: ServerListItem | null;
     signal?: AbortSignal;
+    silent?: boolean;
     url?: string;
 }) => {
-    const { server, url, signal } = args;
+    const { server, url, signal, silent } = args;
 
     return initClient(contract, {
         api: async ({ path, method, headers, body }) => {
@@ -206,6 +217,8 @@ export const ssApiClient = (args: {
                         ...params,
                     },
                     signal,
+                    // In cases where we have a fallback, don't notify the error
+                    transformResponse: silent ? silentlyTransformResponse : undefined,
                     url: `${baseUrl}/${api}`,
                 });
 

@@ -43,6 +43,7 @@ import { useFixedTableHeader } from '/@/renderer/components/virtual-table/hooks/
 import { NoteCell } from '/@/renderer/components/virtual-table/cells/note-cell';
 import { RowIndexCell } from '/@/renderer/components/virtual-table/cells/row-index-cell';
 import i18n from '/@/i18n/i18n';
+import { formatSizeString } from '/@/renderer/utils/format-size-string';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -319,6 +320,16 @@ const tableColumns: { [key: string]: ColDef } = {
             return (params.node?.rowIndex || 0) + 1;
         },
         width: 65,
+    },
+    size: {
+        cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),
+        colId: TableColumn.SIZE,
+        headerComponent: (params: IHeaderParams) =>
+            GenericTableHeader(params, { position: 'center' }),
+        headerName: i18n.t('table.column.size'),
+        valueGetter: (params: ValueGetterParams) =>
+            params.data ? formatSizeString(params.data.size) : undefined,
+        width: 80,
     },
     songCount: {
         cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'center' }),

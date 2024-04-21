@@ -309,12 +309,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
         const handleRepeatAll = {
             local: () => {
                 const playerData = next();
-                mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
+                mprisUpdateSong({ song: playerData.current.song });
                 mpvPlayer!.setQueue(playerData);
             },
             web: () => {
                 const playerData = next();
-                mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
+                mprisUpdateSong({ song: playerData.current.song });
             },
         };
 
@@ -327,10 +327,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
                     pause();
                 } else {
                     const playerData = next();
-                    mprisUpdateSong({
-                        song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
-                    });
+                    mprisUpdateSong({ song: playerData.current.song });
                     mpvPlayer!.setQueue(playerData);
                 }
             },
@@ -339,16 +336,13 @@ export const useCenterControls = (args: { playersRef: any }) => {
                     const playerData = setCurrentIndex(0);
                     mprisUpdateSong({
                         song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
+                        status: PlayerStatus.PAUSED,
                     });
                     resetPlayers();
                     pause();
                 } else {
                     const playerData = next();
-                    mprisUpdateSong({
-                        song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
-                    });
+                    mprisUpdateSong({ song: playerData.current.song });
                     resetPlayers();
                 }
             },
@@ -358,20 +352,14 @@ export const useCenterControls = (args: { playersRef: any }) => {
             local: () => {
                 if (!isLastTrack) {
                     const playerData = next();
-                    mprisUpdateSong({
-                        song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
-                    });
+                    mprisUpdateSong({ song: playerData.current.song });
                     mpvPlayer!.setQueue(playerData);
                 }
             },
             web: () => {
                 if (!isLastTrack) {
                     const playerData = next();
-                    mprisUpdateSong({
-                        song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
-                    });
+                    mprisUpdateSong({ song: playerData.current.song });
                 }
             },
         };
@@ -425,34 +413,22 @@ export const useCenterControls = (args: { playersRef: any }) => {
             local: () => {
                 if (!isFirstTrack) {
                     const playerData = previous();
-                    mprisUpdateSong({
-                        song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
-                    });
+                    mprisUpdateSong({ song: playerData.current.song });
                     mpvPlayer!.setQueue(playerData);
                 } else {
                     const playerData = setCurrentIndex(queue.length - 1);
-                    mprisUpdateSong({
-                        song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
-                    });
+                    mprisUpdateSong({ song: playerData.current.song });
                     mpvPlayer!.setQueue(playerData);
                 }
             },
             web: () => {
                 if (isFirstTrack) {
                     const playerData = setCurrentIndex(queue.length - 1);
-                    mprisUpdateSong({
-                        song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
-                    });
+                    mprisUpdateSong({ song: playerData.current.song });
                     resetPlayers();
                 } else {
                     const playerData = previous();
-                    mprisUpdateSong({
-                        song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
-                    });
+                    mprisUpdateSong({ song: playerData.current.song });
                     resetPlayers();
                 }
             },
@@ -467,7 +443,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
                     pause();
                 } else {
                     const playerData = previous();
-                    remote?.updateSong({
+                    mprisUpdateSong({
                         currentTime: usePlayerStore.getState().current.time,
                         song: playerData.current.song,
                     });
@@ -481,10 +457,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
                     pause();
                 } else {
                     const playerData = previous();
-                    mprisUpdateSong({
-                        song: playerData.current.song,
-                        status: PlayerStatus.PLAYING,
-                    });
+                    mprisUpdateSong({ song: playerData.current.song });
                     resetPlayers();
                 }
             },
@@ -493,15 +466,12 @@ export const useCenterControls = (args: { playersRef: any }) => {
         const handleRepeatOne = {
             local: () => {
                 const playerData = previous();
-                mprisUpdateSong({
-                    song: playerData.current.song,
-                    status: PlayerStatus.PLAYING,
-                });
+                mprisUpdateSong({ song: playerData.current.song });
                 mpvPlayer!.setQueue(playerData);
             },
             web: () => {
                 const playerData = previous();
-                mprisUpdateSong({ song: playerData.current.song, status: PlayerStatus.PLAYING });
+                mprisUpdateSong({ song: playerData.current.song });
                 resetPlayers();
             },
         };

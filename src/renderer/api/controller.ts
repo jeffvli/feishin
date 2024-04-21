@@ -182,7 +182,7 @@ const endpoints: ApiController = {
         getPlaylistSongList: ndController.getPlaylistSongList,
         getRandomSongList: ssController.getRandomSongList,
         getServerInfo: ndController.getServerInfo,
-        getSimilarSongs: ssController.getSimilarSongs,
+        getSimilarSongs: ndController.getSimilarSongs,
         getSongDetail: ndController.getSongDetail,
         getSongList: ndController.getSongList,
         getStructuredLyrics: ssController.getStructuredLyrics,
