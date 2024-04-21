@@ -61,6 +61,7 @@ export const RemoteContainer = () => {
                 spacing={0}
             >
                 <RemoteButton
+                    disabled={!song}
                     tooltip="Previous track"
                     variant="default"
                     onClick={() => send({ event: 'previous' })}
@@ -68,7 +69,8 @@ export const RemoteContainer = () => {
                     <RiSkipBackFill size={25} />
                 </RemoteButton>
                 <RemoteButton
-                    tooltip={status === PlayerStatus.PLAYING ? 'Pause' : 'Play'}
+                    disabled={!song}
+                    tooltip={song && status === PlayerStatus.PLAYING ? 'Pause' : 'Play'}
                     variant="default"
                     onClick={() => {
                         if (status === PlayerStatus.PLAYING) {
@@ -78,13 +80,14 @@ export const RemoteContainer = () => {
                         }
                     }}
                 >
-                    {status === PlayerStatus.PLAYING ? (
+                    {song && status === PlayerStatus.PLAYING ? (
                         <RiPauseFill size={25} />
                     ) : (
                         <RiPlayFill size={25} />
                     )}
                 </RemoteButton>
                 <RemoteButton
+                    disabled={!song}
                     tooltip="Next track"
                     variant="default"
                     onClick={() => send({ event: 'next' })}

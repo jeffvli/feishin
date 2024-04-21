@@ -508,7 +508,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
     ]);
 
     const handlePlayPause = useCallback(() => {
-        if (queue) {
+        if (queue.length > 0) {
             if (playerStatus === PlayerStatus.PAUSED) {
                 return handlePlay();
             }

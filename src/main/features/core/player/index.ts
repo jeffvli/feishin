@@ -306,7 +306,7 @@ ipcMain.on('player-seek-to', async (_event, time: number) => {
 
 // Sets the queue in position 0 and 1 to the given data. Used when manually starting a song or using the next/prev buttons
 ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean) => {
-    if (!data.queue.current && !data.queue.next) {
+    if (!data.queue.current?.id && !data.queue.next?.id) {
         try {
             await getMpvInstance()?.clearPlaylist();
             await getMpvInstance()?.pause();
@@ -317,14 +317,14 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
     }
 
     try {
-        if (data.queue.current) {
+        if (data.queue.current?.streamUrl) {
             await getMpvInstance()
                 ?.load(data.queue.current.streamUrl, 'replace')
                 .catch(() => {
                     getMpvInstance()?.play();
                 });
 
-            if (data.queue.next) {
+            if (data.queue.next?.streamUrl) {
                 await getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
             }
         }
@@ -353,7 +353,7 @@ ipcMain.on('player-set-queue-next', async (_event, data: PlayerData) => {
             await getMpvInstance()?.playlistRemove(1);
         }
 
-        if (data.queue.next) {
+        if (data.queue.next?.streamUrl) {
             await getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
         }
     } catch (err: NodeMpvError | any) {
@@ -373,7 +373,7 @@ ipcMain.on('player-auto-next', async (_event, data: PlayerData) => {
                 getMpvInstance()?.pause();
             });
 
-        if (data.queue.next) {
+        if (data.queue.next?.streamUrl) {
             await getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
         }
     } catch (err: NodeMpvError | any) {
