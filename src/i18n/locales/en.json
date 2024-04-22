@@ -101,6 +101,7 @@
         "setting": "setting",
         "setting_one": "setting",
         "setting_other": "settings",
+        "share": "share",
         "size": "size",
         "sortOrder": "order",
         "title": "title",
@@ -257,6 +258,14 @@
             "input_optionMatchAll": "match all",
             "input_optionMatchAny": "match any"
         },
+        "shareItem": {
+            "allowDownloading": "allow downloading",
+            "description": "description",
+            "setExpiration": "set expiration",
+            "success": "share link copied to clipboard (or click here to open)",
+            "expireInvalid": "expiration must be in the future",
+            "createFailed": "failed to create share (is sharing enabled?)"
+        },
         "updateServer": {
             "success": "server updated successfully",
             "title": "update server"
@@ -315,6 +324,7 @@
             "removeFromPlaylist": "$t(action.removeFromPlaylist)",
             "removeFromQueue": "$t(action.removeFromQueue)",
             "setRating": "$t(action.setRating)",
+            "shareItem": "share item",
             "showDetails": "get info"
         },
         "fullscreenPlayer": {

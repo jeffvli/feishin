@@ -47,6 +47,8 @@ import {
     genreListSortMap,
     ServerInfo,
     ServerInfoArgs,
+    ShareItemArgs,
+    ShareItemResponse,
     SimilarSongsArgs,
     Song,
 } from '../types';
@@ -484,7 +486,10 @@ const removeFromPlaylist = async (
     return null;
 };
 
+// The order should be in decreasing version, as the highest version match
+// will automatically consider all lower versions matched
 const VERSION_INFO: Array<[string, Record<string, number[]>]> = [
+    ['0.49.3', { [ServerFeature.SHARING_ALBUM_SONG]: [1] }],
     ['0.48.0', { [ServerFeature.PLAYLISTS_SMART]: [1] }],
 ];
 
@@ -544,9 +549,32 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const features: ServerFeatures = {
         lyricsMultipleStructured: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
         playlistsSmart: !!navidromeFeatures[ServerFeature.PLAYLISTS_SMART],
+        sharingAlbumSong: !!navidromeFeatures[ServerFeature.SHARING_ALBUM_SONG],
     };
 
     return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
+};
+
+const shareItem = async (args: ShareItemArgs): Promise<ShareItemResponse> => {
+    const { body, apiClientProps } = args;
+
+    const res = await ndApiClient(apiClientProps).shareItem({
+        body: {
+            description: body.description,
+            downloadable: body.downloadable,
+            expires: body.expires,
+            resourceIds: body.resourceIds,
+            resourceType: body.resourceType,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to share item');
+    }
+
+    return {
+        id: res.body.data.id,
+    };
 };
 
 const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
@@ -620,5 +648,6 @@ export const ndController = {
     getSongList,
     getUserList,
     removeFromPlaylist,
+    shareItem,
     updatePlaylist,
 };

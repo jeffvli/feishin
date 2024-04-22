@@ -7,6 +7,7 @@ import { TitlebarOutlet } from '/@/renderer/router/titlebar-outlet';
 import { ModalsProvider } from '@mantine/modals';
 import { BaseContextModal } from '/@/renderer/components';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
+import { ShareItemContextModal } from '/@/renderer/features/sharing';
 
 const NowPlayingRoute = lazy(
     () => import('/@/renderer/features/now-playing/routes/now-playing-route'),
@@ -80,7 +81,11 @@ export const AppRouter = () => {
                         transition: 'fade',
                     },
                 }}
-                modals={{ addToPlaylist: AddToPlaylistContextModal, base: BaseContextModal }}
+                modals={{
+                    addToPlaylist: AddToPlaylistContextModal,
+                    base: BaseContextModal,
+                    shareItem: ShareItemContextModal,
+                }}
             >
                 <Routes>
                     <Route element={<TitlebarOutlet />}>
