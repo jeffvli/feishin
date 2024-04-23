@@ -204,7 +204,7 @@ export const contract = c.router({
     },
     getSongLyrics: {
         method: 'GET',
-        path: 'users/:userId/Items/:id/Lyrics',
+        path: 'audio/:id/Lyrics',
         responses: {
             200: jfType._response.lyrics,
             404: jfType._response.error,

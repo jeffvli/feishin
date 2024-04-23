@@ -61,7 +61,8 @@ import packageJson from '../../../../package.json';
 import { z } from 'zod';
 import { JFSongListSort, JFSortOrder } from '/@/renderer/api/jellyfin.types';
 import isElectron from 'is-electron';
-import { ServerFeatures } from '/@/renderer/api/features-types';
+import { ServerFeature } from '/@/renderer/api/features-types';
+import { VersionInfo, getFeatures } from '/@/renderer/api/utils';
 
 const formatCommaDelimitedString = (value: string[]) => {
     return value.join(',');
@@ -937,7 +938,6 @@ const getLyrics = async (args: LyricsArgs): Promise<LyricsResponse> => {
     const res = await jfApiClient(apiClientProps).getSongLyrics({
         params: {
             id: query.songId,
-            userId: apiClientProps.server?.userId,
         },
     });
 
@@ -969,6 +969,8 @@ const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> 
     return jfNormalize.song(res.body, apiClientProps.server, '');
 };
 
+const VERSION_INFO: VersionInfo = [['10.9.0', { [ServerFeature.LYRICS_SINGLE_STRUCTURED]: [1] }]];
+
 const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const { apiClientProps } = args;
 
@@ -978,9 +980,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
         throw new Error('Failed to get server info');
     }
 
-    const features: ServerFeatures = {
-        lyricsSingleStructured: true,
-    };
+    const features = getFeatures(VERSION_INFO, res.body.Version);
 
     return {
         features,

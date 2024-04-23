@@ -2,8 +2,6 @@ import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ndNormalize } from '/@/renderer/api/navidrome/navidrome-normalize';
 import { ndType } from '/@/renderer/api/navidrome/navidrome-types';
 import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
-import semverCoerce from 'semver/functions/coerce';
-import semverGte from 'semver/functions/gte';
 import {
     AlbumArtistDetailArgs,
     AlbumArtistDetailResponse,
@@ -52,7 +50,7 @@ import {
     SimilarSongsArgs,
     Song,
 } from '../types';
-import { hasFeature } from '/@/renderer/api/utils';
+import { VersionInfo, getFeatures, hasFeature } from '/@/renderer/api/utils';
 import { ServerFeature, ServerFeatures } from '/@/renderer/api/features-types';
 import { SubsonicExtensions } from '/@/renderer/api/subsonic/subsonic-types';
 import { NDSongListSort } from '/@/renderer/api/navidrome.types';
@@ -486,36 +484,10 @@ const removeFromPlaylist = async (
     return null;
 };
 
-// The order should be in decreasing version, as the highest version match
-// will automatically consider all lower versions matched
-const VERSION_INFO: Array<[string, Record<string, number[]>]> = [
+const VERSION_INFO: VersionInfo = [
     ['0.49.3', { [ServerFeature.SHARING_ALBUM_SONG]: [1] }],
     ['0.48.0', { [ServerFeature.PLAYLISTS_SMART]: [1] }],
 ];
-
-const getFeatures = (version: string): Record<string, number[]> => {
-    const cleanVersion = semverCoerce(version);
-    const features: Record<string, number[]> = {};
-    let matched = cleanVersion === null;
-
-    for (const [version, supportedFeatures] of VERSION_INFO) {
-        if (!matched) {
-            matched = semverGte(cleanVersion!, version);
-        }
-
-        if (matched) {
-            for (const [feature, feat] of Object.entries(supportedFeatures)) {
-                if (feature in features) {
-                    features[feature].push(...feat);
-                } else {
-                    features[feature] = feat;
-                }
-            }
-        }
-    }
-
-    return features;
-};
 
 const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const { apiClientProps } = args;
@@ -527,7 +499,10 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
         throw new Error('Failed to ping server');
     }
 
-    const navidromeFeatures: Record<string, number[]> = getFeatures(ping.body.serverVersion!);
+    const navidromeFeatures: Record<string, number[]> = getFeatures(
+        VERSION_INFO,
+        ping.body.serverVersion!,
+    );
 
     if (ping.body.openSubsonic) {
         const res = await ssApiClient(apiClientProps).getServerInfo();
