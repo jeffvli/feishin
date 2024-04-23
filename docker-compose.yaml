@@ -2,7 +2,7 @@ version: '3.5'
 services:
     feishin:
         container_name: feishin
-        image: jeffvli/feishin
+        image: ghcr.io/jeffvli/feishin:latest
         restart: unless-stopped
         ports:
             - 9180:9180

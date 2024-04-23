@@ -512,7 +512,7 @@ const albumList = pagination.extend({
 const albumArtistListSort = {
     ALBUM: 'Album,SortName',
     DURATION: 'Runtime,AlbumArtist,Album,SortName',
-    NAME: 'Name,SortName',
+    NAME: 'SortName,Name',
     RANDOM: 'Random,SortName',
     RECENTLY_ADDED: 'DateCreated,SortName',
     RELEASE_DATE: 'PremiereDate,AlbumArtist,Album,SortName',
@@ -542,7 +542,7 @@ const songListSort = {
     ARTIST: 'Artist,Album,SortName',
     COMMUNITY_RATING: 'CommunityRating,SortName',
     DURATION: 'Runtime,AlbumArtist,Album,SortName',
-    NAME: 'Name,SortName',
+    NAME: 'SortName,Name',
     PLAY_COUNT: 'PlayCount,SortName',
     RANDOM: 'Random,SortName',
     RECENTLY_ADDED: 'DateCreated,SortName',

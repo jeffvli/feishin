@@ -3,7 +3,14 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { RiFolder2Fill, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
+import {
+    RiAlbumLine,
+    RiFolder2Fill,
+    RiMoreFill,
+    RiMusic2Line,
+    RiRefreshLine,
+    RiSettings3Fill,
+} from 'react-icons/ri';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { GenreListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
@@ -15,9 +22,12 @@ import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
 import {
     GenreListFilter,
+    GenreTarget,
     useCurrentServer,
+    useGeneralSettings,
     useListStoreActions,
     useListStoreByKey,
+    useSettingsStoreActions,
 } from '/@/renderer/store';
 import { ListDisplayType, TableColumn } from '/@/renderer/types';
 import i18n from '/@/i18n/i18n';
@@ -52,6 +62,8 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
     const { setFilter, setTable, setGrid, setDisplayType } = useListStoreActions();
     const { display, filter, table, grid } = useListStoreByKey({ key: pageKey });
     const cq = useContainerQuery();
+    const { genreTarget } = useGeneralSettings();
+    const { setGenreBehavior } = useSettingsStoreActions();
 
     const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
         itemType: LibraryItem.GENRE,
@@ -208,6 +220,11 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
         return filter.musicFolderId !== undefined;
     }, [filter.musicFolderId]);
 
+    const handleGenreToggle = useCallback(() => {
+        const newState = genreTarget === GenreTarget.ALBUM ? GenreTarget.TRACK : GenreTarget.ALBUM;
+        setGenreBehavior(newState);
+    }, [genreTarget, setGenreBehavior]);
+
     return (
         <Flex justify="space-between">
             <Group
@@ -309,6 +326,23 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                             {t('common.refresh', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
+                    <Divider orientation="vertical" />
+                    <Button
+                        compact
+                        size="md"
+                        tooltip={{
+                            label: t(
+                                genreTarget === GenreTarget.ALBUM
+                                    ? 'page.genreList.showAlbums'
+                                    : 'page.genreList.showTracks',
+                                { postProcess: 'sentenceCase' },
+                            ),
+                        }}
+                        variant="subtle"
+                        onClick={handleGenreToggle}
+                    >
+                        {genreTarget === GenreTarget.ALBUM ? <RiAlbumLine /> : <RiMusic2Line />}
+                    </Button>
                 </DropdownMenu>
             </Group>
             <Group

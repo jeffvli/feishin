@@ -76,7 +76,7 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
     });
 
     const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
-    const isOwnerDisplayed = server?.type === ServerType.NAVIDROME;
+    const isOwnerDisplayed = server?.type === ServerType.NAVIDROME && userList;
     const isSubmitDisabled = !form.values.name || mutation.isLoading;
 
     return (
@@ -154,11 +154,17 @@ export const openUpdatePlaylistModal = async (args: {
 
     const users =
         server?.type === ServerType.NAVIDROME
-            ? await queryClient.fetchQuery({
-                  queryFn: ({ signal }) =>
-                      api.controller.getUserList({ apiClientProps: { server, signal }, query }),
-                  queryKey: queryKeys.users.list(server?.id || '', query),
-              })
+            ? await queryClient
+                  .fetchQuery({
+                      queryFn: ({ signal }) =>
+                          api.controller.getUserList({ apiClientProps: { server, signal }, query }),
+                      queryKey: queryKeys.users.list(server?.id || '', query),
+                  })
+                  .catch((error) => {
+                      // This eror most likely happens if the user is not an admin
+                      console.error(error);
+                      return null;
+                  })
             : null;
 
     openModal({

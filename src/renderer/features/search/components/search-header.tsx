@@ -11,6 +11,7 @@ import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
 import { AppRoute } from '/@/renderer/router/routes';
+import { useListStoreByKey } from '/@/renderer/store';
 
 interface SearchHeaderProps {
     navigationId: string;
@@ -23,6 +24,7 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const cq = useContainerQuery();
     const server = useCurrentServer();
+    const { filter } = useListStoreByKey({ key: itemType });
 
     const { handleRefreshTable } = useListFilterRefresh({
         itemType,
@@ -30,9 +32,8 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
     });
 
     const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.value) return;
         setSearchParams({ query: e.target.value }, { replace: true, state: { navigationId } });
-        handleRefreshTable(tableRef, { searchTerm: e.target.value });
+        handleRefreshTable(tableRef, { ...filter, searchTerm: e.target.value });
     }, 200);
 
     return (

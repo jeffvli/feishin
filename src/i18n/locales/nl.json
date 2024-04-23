@@ -249,7 +249,8 @@
     },
     "table": {
         "column": {
-            "rating": "rating"
+            "rating": "rating",
+            "size": "$t(common.size)"
         },
         "config": {
             "label": {

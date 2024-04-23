@@ -62,7 +62,8 @@ import packageJson from '../../../../package.json';
 import { z } from 'zod';
 import { JFSongListSort, JFSortOrder } from '/@/renderer/api/jellyfin.types';
 import isElectron from 'is-electron';
-import { ServerFeatures } from '/@/renderer/api/features-types';
+import { ServerFeature } from '/@/renderer/api/features-types';
+import { VersionInfo, getFeatures } from '/@/renderer/api/utils';
 
 const formatCommaDelimitedString = (value: string[]) => {
     return value.join(',');
@@ -232,7 +233,7 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<AlbumArtis
             ParentId: query.musicFolderId,
             Recursive: true,
             SearchTerm: query.searchTerm,
-            SortBy: albumArtistListSortMap.jellyfin[query.sortBy] || 'Name,SortName',
+            SortBy: albumArtistListSortMap.jellyfin[query.sortBy] || 'SortName,Name',
             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
             StartIndex: query.startIndex,
             UserId: apiClientProps.server?.userId || undefined,
@@ -258,7 +259,7 @@ const getArtistList = async (args: ArtistListArgs): Promise<AlbumArtistListRespo
             Limit: query.limit,
             ParentId: query.musicFolderId,
             Recursive: true,
-            SortBy: artistListSortMap.jellyfin[query.sortBy] || 'Name,SortName',
+            SortBy: artistListSortMap.jellyfin[query.sortBy] || 'SortName,Name',
             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
             StartIndex: query.startIndex,
         },
@@ -446,8 +447,26 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
         throw new Error('Failed to get song list');
     }
 
+    let items: z.infer<typeof jfType._response.song>[];
+
+    // Jellyfin Bodge because of code from https://github.com/jellyfin/jellyfin/blob/c566ccb63bf61f9c36743ddb2108a57c65a2519b/Emby.Server.Implementations/Data/SqliteItemRepository.cs#L3622
+    // If the Album ID filter is passed, Jellyfin will search for
+    //  1. the matching album id
+    //  2. An album with the name of the album.
+    // It is this second condition causing issues,
+    if (query.albumIds) {
+        const albumIdSet = new Set(query.albumIds);
+        items = res.body.Items.filter((item) => albumIdSet.has(item.AlbumId));
+
+        if (items.length < res.body.Items.length) {
+            res.body.TotalRecordCount -= res.body.Items.length - items.length;
+        }
+    } else {
+        items = res.body.Items;
+    }
+
     return {
-        items: res.body.Items.map((item) =>
+        items: items.map((item) =>
             jfNormalize.song(item, apiClientProps.server, '', query.imageSize),
         ),
         startIndex: query.startIndex,
@@ -920,7 +939,6 @@ const getLyrics = async (args: LyricsArgs): Promise<LyricsResponse> => {
     const res = await jfApiClient(apiClientProps).getSongLyrics({
         params: {
             id: query.songId,
-            userId: apiClientProps.server?.userId,
         },
     });
 
@@ -952,6 +970,8 @@ const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> 
     return jfNormalize.song(res.body, apiClientProps.server, '');
 };
 
+const VERSION_INFO: VersionInfo = [['10.9.0', { [ServerFeature.LYRICS_SINGLE_STRUCTURED]: [1] }]];
+
 const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const { apiClientProps } = args;
 
@@ -961,9 +981,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
         throw new Error('Failed to get server info');
     }
 
-    const features: ServerFeatures = {
-        lyricsSingleStructured: true,
-    };
+    const features = getFeatures(VERSION_INFO, res.body.Version);
 
     return {
         features,
@@ -975,6 +993,8 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
 const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
     const { apiClientProps, query } = args;
 
+    // Prefer getSimilarSongs, where possible. Fallback to InstantMix
+    // where no similar songs were found.
     const res = await jfApiClient(apiClientProps).getSimilarSongs({
         params: {
             itemId: query.songId,
@@ -986,11 +1006,36 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
         },
     });
 
-    if (res.status !== 200) {
+    if (res.status === 200 && res.body.Items.length) {
+        const results = res.body.Items.reduce<Song[]>((acc, song) => {
+            if (song.Id !== query.songId) {
+                acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+            }
+
+            return acc;
+        }, []);
+
+        if (results.length > 0) {
+            return results;
+        }
+    }
+
+    const mix = await jfApiClient(apiClientProps).getInstantMix({
+        params: {
+            itemId: query.songId,
+        },
+        query: {
+            Fields: 'Genres, DateCreated, MediaSources, ParentId',
+            Limit: query.count,
+            UserId: apiClientProps.server?.userId || undefined,
+        },
+    });
+
+    if (mix.status !== 200) {
         throw new Error('Failed to get similar songs');
     }
 
-    return res.body.Items.reduce<Song[]>((acc, song) => {
+    return mix.body.Items.reduce<Song[]>((acc, song) => {
         if (song.Id !== query.songId) {
             acc.push(jfNormalize.song(song, apiClientProps.server, ''));
         }

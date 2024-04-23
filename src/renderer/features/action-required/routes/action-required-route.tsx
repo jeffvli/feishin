@@ -1,6 +1,6 @@
 import { Center, Group, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { RiCheckFill } from 'react-icons/ri';
+import { RiCheckFill, RiEdit2Line, RiHome4Line } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { Button, PageHeader, Text } from '/@/renderer/components';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
@@ -9,6 +9,8 @@ import { ServerRequired } from '/@/renderer/features/action-required/components/
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
+import { openModal } from '@mantine/modals';
+import { ServerList } from '/@/renderer/features/servers';
 
 const ActionRequiredRoute = () => {
     const { t } = useTranslation();
@@ -31,6 +33,13 @@ const ActionRequiredRoute = () => {
 
     const canReturnHome = checks.every((c) => c.valid);
     const displayedCheck = checks.find((c) => !c.valid);
+
+    const handleManageServersModal = () => {
+        openModal({
+            children: <ServerList />,
+            title: 'Manage Servers',
+        });
+    };
 
     return (
         <AnimatedPage>
@@ -63,12 +72,30 @@ const ActionRequiredRoute = () => {
                                 <Button
                                     component={Link}
                                     disabled={!canReturnHome}
+                                    leftIcon={<RiHome4Line />}
                                     to={AppRoute.HOME}
                                     variant="filled"
                                 >
                                     Go back
                                 </Button>
                             </>
+                        )}
+                        {!displayedCheck && (
+                            <Group
+                                noWrap
+                                position="center"
+                            >
+                                <Button
+                                    fullWidth
+                                    leftIcon={<RiEdit2Line />}
+                                    variant="filled"
+                                    onClick={handleManageServersModal}
+                                >
+                                    {t('page.appMenu.manageServers', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </Button>
+                            </Group>
                         )}
                     </Stack>
                 </Stack>

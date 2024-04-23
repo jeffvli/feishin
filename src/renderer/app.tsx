@@ -3,10 +3,9 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import { MantineProvider } from '@mantine/core';
-import { ModalsProvider } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { initSimpleImg } from 'react-simple-img';
-import { BaseContextModal, toast } from './components';
+import { toast } from './components';
 import { useTheme } from './hooks';
 import { IsUpdatedDialog } from './is-updated-dialog';
 import { AppRouter } from './router/app-router';
@@ -20,7 +19,6 @@ import './styles/global.scss';
 import { ContextMenuProvider } from '/@/renderer/features/context-menu';
 import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { PlayQueueHandlerContext } from '/@/renderer/features/player';
-import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
 import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
 import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
@@ -247,27 +245,11 @@ export const App = () => {
                 },
             }}
         >
-            <ModalsProvider
-                modalProps={{
-                    centered: true,
-                    styles: {
-                        body: { position: 'relative' },
-                        content: { overflow: 'auto' },
-                    },
-                    transitionProps: {
-                        duration: 300,
-                        exitDuration: 300,
-                        transition: 'fade',
-                    },
-                }}
-                modals={{ addToPlaylist: AddToPlaylistContextModal, base: BaseContextModal }}
-            >
-                <PlayQueueHandlerContext.Provider value={providerValue}>
-                    <ContextMenuProvider>
-                        <AppRouter />
-                    </ContextMenuProvider>
-                </PlayQueueHandlerContext.Provider>
-            </ModalsProvider>
+            <PlayQueueHandlerContext.Provider value={providerValue}>
+                <ContextMenuProvider>
+                    <AppRouter />
+                </ContextMenuProvider>
+            </PlayQueueHandlerContext.Provider>
             <IsUpdatedDialog />
         </MantineProvider>
     );

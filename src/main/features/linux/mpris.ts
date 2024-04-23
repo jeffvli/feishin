@@ -18,22 +18,29 @@ mprisPlayer.on('quit', () => {
     process.exit();
 });
 
+const hasData = (): boolean => {
+    return mprisPlayer.metadata && !!mprisPlayer.metadata['mpris:length'];
+};
+
 mprisPlayer.on('stop', () => {
     getMainWindow()?.webContents.send('renderer-player-stop');
     mprisPlayer.playbackStatus = 'Paused';
 });
 
 mprisPlayer.on('pause', () => {
+    if (!hasData()) return;
     getMainWindow()?.webContents.send('renderer-player-pause');
     mprisPlayer.playbackStatus = 'Paused';
 });
 
 mprisPlayer.on('play', () => {
+    if (!hasData()) return;
     getMainWindow()?.webContents.send('renderer-player-play');
     mprisPlayer.playbackStatus = 'Playing';
 });
 
 mprisPlayer.on('playpause', () => {
+    if (!hasData()) return;
     getMainWindow()?.webContents.send('renderer-player-play-pause');
     if (mprisPlayer.playbackStatus !== 'Playing') {
         mprisPlayer.playbackStatus = 'Playing';
@@ -43,6 +50,7 @@ mprisPlayer.on('playpause', () => {
 });
 
 mprisPlayer.on('next', () => {
+    if (!hasData()) return;
     getMainWindow()?.webContents.send('renderer-player-next');
 
     if (mprisPlayer.playbackStatus !== 'Playing') {
@@ -51,6 +59,7 @@ mprisPlayer.on('next', () => {
 });
 
 mprisPlayer.on('previous', () => {
+    if (!hasData()) return;
     getMainWindow()?.webContents.send('renderer-player-previous');
 
     if (mprisPlayer.playbackStatus !== 'Playing') {
@@ -136,7 +145,10 @@ ipcMain.on('update-song', (_event, args: SongUpdate) => {
             mprisPlayer.shuffle = shuffle;
         }
 
-        if (!song) return;
+        if (!song) {
+            mprisPlayer.metadata = {};
+            return;
+        }
 
         const upsizedImageUrl = song.imageUrl
             ? song.imageUrl

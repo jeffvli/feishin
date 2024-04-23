@@ -16,10 +16,14 @@ export const useSimilarSongs = (args: QueryHookArgs<SimilarSongsQuery>) => {
 
             return api.controller.getSimilarSongs({
                 apiClientProps: { server, signal },
-                query: { count: query.count ?? 50, songId: query.songId },
+                query: {
+                    albumArtistIds: query.albumArtistIds,
+                    count: query.count ?? 50,
+                    songId: query.songId,
+                },
             });
         },
-        queryKey: queryKeys.albumArtists.detail(server?.id || '', query),
+        queryKey: queryKeys.songs.similar(server?.id || '', query),
         ...options,
     });
 };

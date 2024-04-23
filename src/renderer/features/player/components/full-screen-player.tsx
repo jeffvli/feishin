@@ -39,7 +39,7 @@ const Container = styled(motion.div)`
     justify-content: center;
     padding: 2rem;
 
-    @media screen and (width <= 768px) {
+    @media screen and (orientation: portrait) {
         padding: 2rem 2rem 1rem;
     }
 `;
@@ -53,7 +53,7 @@ const ResponsiveContainer = styled.div`
     max-width: 2560px;
     margin-top: 5rem;
 
-    @media screen and (width <= 768px) {
+    @media screen and (orientation: portrait) {
         grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
         grid-template-columns: minmax(0, 1fr);
         margin-top: 0;
@@ -472,12 +472,10 @@ export const FullScreenPlayer = () => {
         srcLoaded: true,
     });
 
-    const imageUrl = currentSong?.imageUrl;
+    const imageUrl = currentSong?.imageUrl && currentSong.imageUrl.replace(/size=\d+/g, 'size=500');
     const backgroundImage =
         imageUrl && dynamicIsImage
-            ? `url("${imageUrl
-                  .replace(/size=\d+/g, 'size=500')
-                  .replace(currentSong.id, currentSong.albumId)}`
+            ? `url("${imageUrl.replace(currentSong.id, currentSong.albumId)}"), url("${imageUrl}")`
             : mainBackground;
 
     return (

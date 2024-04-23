@@ -469,7 +469,7 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
         throw new Error('Failed to get similar songs');
     }
 
-    if (!res.body.similarSongs) {
+    if (!res.body.similarSongs?.song) {
         return [];
     }
 

@@ -28,12 +28,14 @@ export type ContextMenuItemType =
     | 'addToFavorites'
     | 'removeFromFavorites'
     | 'setRating'
+    | 'shareItem'
     | 'deletePlaylist'
     | 'createPlaylist'
     | 'moveToBottomOfQueue'
     | 'moveToTopOfQueue'
     | 'removeFromQueue'
-    | 'deselectAll';
+    | 'deselectAll'
+    | 'showDetails';
 
 export type SetContextMenuItems = {
     children?: boolean;

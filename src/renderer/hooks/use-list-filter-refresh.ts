@@ -8,7 +8,7 @@ import { BasePaginatedResponse, LibraryItem, ServerListItem } from '/@/renderer/
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import orderBy from 'lodash/orderBy';
 
-interface UseHandleListFilterChangeProps {
+export interface UseHandleListFilterChangeProps {
     isClientSideSort?: boolean;
     itemType: LibraryItem;
     server: ServerListItem | null;

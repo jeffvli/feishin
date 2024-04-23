@@ -4,6 +4,7 @@ import { AuthState, ServerListItem, ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
 import { SongListSort, SortOrder } from '/@/renderer/api/types';
 import { debounce } from 'lodash';
+import { toast } from '/@/renderer/components';
 
 export const useServerAuthenticated = () => {
     const priorServerId = useRef<string>();
@@ -29,6 +30,7 @@ export const useServerAuthenticated = () => {
 
             setReady(AuthState.VALID);
         } catch (error) {
+            toast.error({ message: (error as Error).message });
             setReady(AuthState.INVALID);
         }
     }, []);

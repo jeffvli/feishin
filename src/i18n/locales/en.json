@@ -26,6 +26,8 @@
         "action_one": "action",
         "action_other": "actions",
         "add": "add",
+        "albumGain": "album gain",
+        "albumPeak": "album peak",
         "areYouSure": "are you sure?",
         "ascending": "ascending",
         "backward": "backward",
@@ -72,6 +74,7 @@
         "menu": "menu",
         "minimize": "minimize",
         "modified": "modified",
+        "mbid": "MusicBrainz ID",
         "name": "name",
         "no": "no",
         "none": "none",
@@ -98,10 +101,13 @@
         "setting": "setting",
         "setting_one": "setting",
         "setting_other": "settings",
+        "share": "share",
         "size": "size",
         "sortOrder": "order",
         "title": "title",
         "trackNumber": "track",
+        "trackGain": "track gain",
+        "trackPeak": "track peak",
         "unknown": "unknown",
         "version": "version",
         "year": "year",
@@ -152,6 +158,7 @@
         "loginRateError": "too many login attempts, please try again in a few seconds",
         "mpvRequired": "MPV required",
         "networkError": "a network error occurred",
+        "openError": "could not open file",
         "playbackError": "an error occurred when trying to play the media",
         "remoteDisableError": "an error occurred when trying to $t(common.disable) the remote server",
         "remoteEnableError": "an error occurred when trying to $t(common.enable) the remote server",
@@ -251,6 +258,14 @@
             "input_optionMatchAll": "match all",
             "input_optionMatchAny": "match any"
         },
+        "shareItem": {
+            "allowDownloading": "allow downloading",
+            "description": "description",
+            "setExpiration": "set expiration",
+            "success": "share link copied to clipboard (or click here to open)",
+            "expireInvalid": "expiration must be in the future",
+            "createFailed": "failed to create share (is sharing enabled?)"
+        },
         "updateServer": {
             "success": "server updated successfully",
             "title": "update server"
@@ -276,6 +291,8 @@
             "moreFromGeneric": "more from {{item}}"
         },
         "albumList": {
+            "artistAlbums": "Albums by {{artist}}",
+            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
             "title": "$t(entity.album_other)"
         },
         "appMenu": {
@@ -306,7 +323,9 @@
             "removeFromFavorites": "$t(action.removeFromFavorites)",
             "removeFromPlaylist": "$t(action.removeFromPlaylist)",
             "removeFromQueue": "$t(action.removeFromQueue)",
-            "setRating": "$t(action.setRating)"
+            "setRating": "$t(action.setRating)",
+            "shareItem": "share item",
+            "showDetails": "get info"
         },
         "fullscreenPlayer": {
             "config": {
@@ -329,6 +348,8 @@
             "upNext": "up next"
         },
         "genreList": {
+            "showAlbums": "show $t(entity.genre_one) $t(entity.album_other)",
+            "showTracks": "show $t(entity.genre_one) $t(entity.track_other)",
             "title": "$t(entity.genre_other)"
         },
         "globalSearch": {
@@ -345,6 +366,11 @@
             "newlyAdded": "newly added releases",
             "recentlyPlayed": "recently played",
             "title": "$t(common.home)"
+        },
+        "itemDetail": {
+            "copyPath": "copy path to clipboard",
+            "copiedPath": "path copied successfully",
+            "openFile": "show track in file manager"
         },
         "playlistList": {
             "title": "$t(entity.playlist_other)"
@@ -468,6 +494,8 @@
         "gaplessAudio": "gapless audio",
         "gaplessAudio_description": "sets the gapless audio setting for mpv",
         "gaplessAudio_optionWeak": "weak (recommended)",
+        "genreBehavior": "genre page default behavior",
+        "genreBehavior_description": "determines whether clicking on a genre opens by default in track or album list",
         "globalMediaHotkeys": "global media hotkeys",
         "globalMediaHotkeys_description": "enable or disable the usage of your system media hotkeys to control playback",
         "homeConfiguration": "home page configuration",
@@ -624,6 +652,7 @@
             "rating": "rating",
             "releaseDate": "release date",
             "releaseYear": "year",
+            "size": "$t(common.size)",
             "songCount": "$t(entity.track_other)",
             "title": "title",
             "trackNumber": "track"

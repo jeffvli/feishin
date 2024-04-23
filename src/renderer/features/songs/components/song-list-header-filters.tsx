@@ -140,6 +140,11 @@ const FILTERS = {
             value: SongListSort.PLAY_COUNT,
         },
         {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+            value: SongListSort.RANDOM,
+        },
+        {
             defaultOrder: SortOrder.DESC,
             name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
             value: SongListSort.RATING,

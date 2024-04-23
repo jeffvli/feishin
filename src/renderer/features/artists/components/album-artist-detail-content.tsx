@@ -39,6 +39,8 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { CardRow, Play, TableColumn } from '/@/renderer/types';
+import { sanitize } from '/@/renderer/utils/sanitize';
+import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 
 const ContentContainer = styled.div`
     position: relative;
@@ -68,6 +70,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
     const cq = useContainerQuery();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const server = useCurrentServer();
+    const genrePath = useGenreRoute();
 
     const detailQuery = useAlbumArtistDetail({
         query: { id: albumArtistId },
@@ -330,8 +333,13 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
 
     const topSongs = topSongsQuery?.data?.items?.slice(0, 10);
 
-    const showBiography =
-        detailQuery?.data?.biography !== undefined && detailQuery?.data?.biography !== null;
+    const biography = useMemo(() => {
+        const bio = detailQuery?.data?.biography;
+
+        if (!bio) return null;
+        return sanitize(bio);
+    }, [detailQuery?.data?.biography]);
+
     const showTopSongs = topSongsQuery?.data?.items?.length;
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
     const mbzId = detailQuery?.data?.mbz;
@@ -408,7 +416,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     component={Link}
                                     radius="md"
                                     size="md"
-                                    to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
+                                    to={generatePath(genrePath, {
                                         genreId: genre.id,
                                     })}
                                     variant="outline"
@@ -459,7 +467,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         </Group>
                     </Box>
                 ) : null}
-                {showBiography ? (
+                {biography ? (
                     <Box
                         component="section"
                         maw="1280px"
@@ -472,9 +480,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                 artist: detailQuery?.data?.name,
                             })}
                         </TextTitle>
-                        <Spoiler
-                            dangerouslySetInnerHTML={{ __html: detailQuery?.data?.biography || '' }}
-                        />
+                        <Spoiler dangerouslySetInnerHTML={{ __html: biography }} />
                     </Box>
                 ) : null}
                 {showTopSongs ? (
