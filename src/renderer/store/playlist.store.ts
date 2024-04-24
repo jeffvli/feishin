@@ -1,4 +1,3 @@
-import merge from 'lodash/merge';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -6,6 +5,7 @@ import { PlaylistListSort, SortOrder } from '/@/renderer/api/types';
 import { PlaylistListFilter, SongListFilter } from '/@/renderer/store/list.store';
 import { DataTableProps } from '/@/renderer/store/settings.store';
 import { ListDisplayType, TableColumn, TablePagination } from '/@/renderer/types';
+import { mergeOverridingColumns } from '/@/renderer/store/utils';
 
 type TableProps = {
     pagination: TablePagination;
@@ -187,9 +187,7 @@ export const usePlaylistStore = create<PlaylistSlice>()(
             { name: 'store_playlist' },
         ),
         {
-            merge: (persistedState, currentState) => {
-                return merge(currentState, persistedState);
-            },
+            merge: mergeOverridingColumns,
             name: 'store_playlist',
             version: 1,
         },
