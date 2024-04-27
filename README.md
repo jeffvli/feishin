@@ -3,7 +3,6 @@
 # Mods
 - Custom lyric animations
    - Edit the CSS "StyledText1" in src\renderer\features\lyrics\lyric-line.tsx to change the animations
-- Settings tab to configure mods
 - Automatically play similar songs not already heard
 - Patches (hopefully) freezing
 - Dedicated modshin settings tab
