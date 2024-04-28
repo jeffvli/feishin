@@ -75,7 +75,13 @@ const normalizeSong = (
         discNumber: item.discNumber || 1,
         discSubtitle: null,
         duration: item.duration ? item.duration * 1000 : 0,
-        gain: null,
+        gain:
+            item.replayGain && (item.replayGain.albumGain || item.replayGain.trackGain)
+                ? {
+                      album: item.replayGain.albumGain,
+                      track: item.replayGain.trackGain,
+                  }
+                : null,
         genres: item.genre
             ? [
                   {
@@ -94,7 +100,13 @@ const normalizeSong = (
         lyrics: null,
         name: item.title,
         path: item.path,
-        peak: null,
+        peak:
+            item.replayGain && (item.replayGain.albumPeak || item.replayGain.trackPeak)
+                ? {
+                      album: item.replayGain.albumPeak,
+                      track: item.replayGain.trackPeak,
+                  }
+                : null,
         playCount: item?.playCount || 0,
         releaseDate: null,
         releaseYear: item.year ? String(item.year) : null,
