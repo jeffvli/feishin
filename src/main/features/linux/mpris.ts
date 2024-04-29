@@ -1,9 +1,9 @@
 import { ipcMain } from 'electron';
-import Player from 'mpris-service';
+import Player from '@jellybrick/mpris-service';
 import { PlayerRepeat, PlayerStatus, SongUpdate } from '../../../renderer/types';
 import { getMainWindow } from '../../main';
 
-const mprisPlayer = Player({
+const mprisPlayer = new Player({
     identity: 'Feishin',
     maximumRate: 1.0,
     minimumRate: 1.0,

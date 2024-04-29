@@ -37,7 +37,11 @@ module.exports = {
     output: 'src/renderer/i18n/locales/$LOCALE.json',
     pluralSeparator: '_',
     resetDefaultValueLocale: 'en',
-    skipDefaultValues: false,
+    // Per migration guide, replacement for skipDefaultValues
+    // https://github.com/i18next/i18next-parser/blob/master/docs/migration.md
+    defaultValue: function (locale, namespace, key, value) {
+        return '';
+    },
     sort: true,
     useKeysAsDefaultValue: true,
     verbose: false,

@@ -13,8 +13,8 @@
         "postinstall": "npm run electron-rebuild && npm run link-modules"
     },
     "dependencies": {
+        "@jellybrick/mpris-service": "2.1.4",
         "cheerio": "^1.0.0-rc.12",
-        "mpris-service": "^2.1.2",
         "ws": "^8.13.0"
     },
     "devDependencies": {
