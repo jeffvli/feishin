@@ -1,9 +1,9 @@
 import { Group } from '@mantine/core';
-import { useDragControls, Reorder } from 'framer-motion';
+import { useDragControls, Reorder, DragControls } from 'framer-motion';
 import { MdDragIndicator } from 'react-icons/md';
 import { Checkbox } from '/@/renderer/components';
 
-const DragHandle = ({ dragControls }: any) => {
+const DragHandle = ({ dragControls }: { dragControls: DragControls }) => {
     return (
         <MdDragIndicator
             color="white"
