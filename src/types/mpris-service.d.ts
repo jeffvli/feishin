@@ -1,1 +1,1 @@
-declare module '@jellybrick/mpris-service';
+declare module 'mpris-service';
