@@ -14,7 +14,7 @@ import {
 } from 'react-icons/ri';
 import { Song } from '/@/renderer/api/types';
 import { usePlayerControls, useQueueControls } from '/@/renderer/store';
-import { PlaybackType, TableType } from '/@/renderer/types';
+import { PlaybackType, PlayerStatus, TableType } from '/@/renderer/types';
 import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { usePlayerStore, useSetCurrentTime } from '../../../store/player.store';
 import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
@@ -91,7 +91,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
             mpvPlayer!.pause();
         }
 
-        remote?.updateSong({ song: undefined });
+        remote?.updateSong({ song: undefined, status: PlayerStatus.PAUSED });
 
         setCurrentTime(0);
         pause();

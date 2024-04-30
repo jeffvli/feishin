@@ -1,4 +1,3 @@
-import merge from 'lodash/merge';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -19,6 +18,7 @@ import {
 } from '/@/renderer/api/types';
 import { DataTableProps, PersistedTableColumn } from '/@/renderer/store/settings.store';
 import { ListDisplayType, TableColumn, TablePagination } from '/@/renderer/types';
+import { mergeOverridingColumns } from '/@/renderer/store/utils';
 
 export const generatePageKey = (page: string, id?: string) => {
     return id ? `${page}_${id}` : page;
@@ -613,9 +613,7 @@ export const useListStore = create<ListSlice>()(
             { name: 'store_list' },
         ),
         {
-            merge: (persistedState, currentState) => {
-                return merge(currentState, persistedState);
-            },
+            merge: mergeOverridingColumns,
             name: 'store_list',
             partialize: (state) => {
                 return Object.fromEntries(

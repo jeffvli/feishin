@@ -11,6 +11,8 @@ import {
 import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
 import { AnimatePresence } from 'framer-motion';
 import isElectron from 'is-electron';
+import { ServerFeature } from '/@/renderer/api/features-types';
+import { hasFeature } from '/@/renderer/api/utils';
 import { useTranslation } from 'react-i18next';
 import {
     RiAddBoxFill,
@@ -25,6 +27,8 @@ import {
     RiPlayListAddFill,
     RiStarFill,
     RiCloseCircleLine,
+    RiShareForwardFill,
+    RiInformationFill,
 } from 'react-icons/ri';
 import { AnyLibraryItems, LibraryItem, ServerType, AnyLibraryItem } from '/@/renderer/api/types';
 import {
@@ -53,6 +57,7 @@ import {
 } from '/@/renderer/store';
 import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { Play, PlaybackType } from '/@/renderer/types';
+import { ItemDetailsModal } from '/@/renderer/features/item-details/components/item-details-modal';
 
 type ContextMenuContextProps = {
     closeContextMenu: () => void;
@@ -76,7 +81,7 @@ const ContextMenuContext = createContext<ContextMenuContextProps>({
     },
 });
 
-const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating'];
+const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating', 'shareItem'];
 // const NAVIDROME_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 // const SUBSONIC_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 
@@ -600,6 +605,22 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         }
     }, [ctx.dataNodes, moveToTopOfQueue, playbackType]);
 
+    const handleShareItem = useCallback(() => {
+        if (!ctx.dataNodes && !ctx.data) return;
+
+        const uniqueIds = ctx.data.map((node) => node.id);
+
+        openContextModal({
+            innerProps: {
+                itemIds: uniqueIds,
+                resourceType: ctx.data[0].itemType,
+            },
+            modal: 'shareItem',
+            size: 'md',
+            title: t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' }),
+        });
+    }, [ctx.data, ctx.dataNodes, t]);
+
     const handleRemoveSelected = useCallback(() => {
         const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
         if (!uniqueIds?.length) return;
@@ -626,6 +647,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const handleDeselectAll = useCallback(() => {
         ctx.tableApi?.deselectAll();
     }, [ctx.tableApi]);
+
+    const handleOpenItemDetails = useCallback(() => {
+        const item = ctx.data[0];
+
+        openModal({
+            children: <ItemDetailsModal item={item} />,
+            size: 'xl',
+            title: t('page.contextMenu.showDetails', { postProcess: 'titleCase' }),
+        });
+    }, [ctx.data, t]);
 
     const contextMenuItems: Record<ContextMenuItemType, ContextMenuItem> = useMemo(() => {
         return {
@@ -775,20 +806,38 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 onClick: () => {},
                 rightIcon: <RiArrowRightSFill size="1.2rem" />,
             },
+            shareItem: {
+                disabled: !hasFeature(server, ServerFeature.SHARING_ALBUM_SONG),
+                id: 'shareItem',
+                label: t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiShareForwardFill size="1.1rem" />,
+                onClick: handleShareItem,
+            },
+            showDetails: {
+                disabled: ctx.data?.length !== 1 || !ctx.data[0].itemType,
+                id: 'showDetails',
+                label: t('page.contextMenu.showDetails', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiInformationFill />,
+                onClick: handleOpenItemDetails,
+            },
         };
     }, [
+        t,
         handleAddToFavorites,
         handleAddToPlaylist,
+        openDeletePlaylistModal,
         handleDeselectAll,
         handleMoveToBottom,
         handleMoveToTop,
-        handlePlay,
         handleRemoveFromFavorites,
         handleRemoveFromPlaylist,
         handleRemoveSelected,
+        ctx.data,
+        handleOpenItemDetails,
+        handlePlay,
         handleUpdateRating,
-        openDeletePlaylistModal,
-        t,
+        handleShareItem,
+        server,
     ]);
 
     const mergedRef = useMergedRef(ref, clickOutsideRef);
@@ -819,72 +868,80 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                 >
                                     {ctx.menuItems?.map((item) => {
                                         return (
-                                            <Fragment key={`context-menu-${item.id}`}>
-                                                {item.children ? (
-                                                    <HoverCard
-                                                        offset={5}
-                                                        position="right"
-                                                    >
-                                                        <HoverCard.Target>
-                                                            <ContextMenuButton
-                                                                disabled={item.disabled}
-                                                                leftIcon={
-                                                                    contextMenuItems[item.id]
-                                                                        .leftIcon
-                                                                }
-                                                                rightIcon={
-                                                                    contextMenuItems[item.id]
-                                                                        .rightIcon
-                                                                }
-                                                                onClick={
-                                                                    contextMenuItems[item.id]
-                                                                        .onClick
-                                                                }
-                                                            >
-                                                                {contextMenuItems[item.id].label}
-                                                            </ContextMenuButton>
-                                                        </HoverCard.Target>
-                                                        <HoverCard.Dropdown>
-                                                            <Stack spacing={0}>
-                                                                {contextMenuItems[
-                                                                    item.id
-                                                                ].children?.map((child) => (
-                                                                    <ContextMenuButton
-                                                                        key={`sub-${child.id}`}
-                                                                        disabled={child.disabled}
-                                                                        leftIcon={child.leftIcon}
-                                                                        rightIcon={child.rightIcon}
-                                                                        onClick={child.onClick}
-                                                                    >
-                                                                        {child.label}
-                                                                    </ContextMenuButton>
-                                                                ))}
-                                                            </Stack>
-                                                        </HoverCard.Dropdown>
-                                                    </HoverCard>
-                                                ) : (
-                                                    <ContextMenuButton
-                                                        disabled={item.disabled}
-                                                        leftIcon={
-                                                            contextMenuItems[item.id].leftIcon
-                                                        }
-                                                        rightIcon={
-                                                            contextMenuItems[item.id].rightIcon
-                                                        }
-                                                        onClick={contextMenuItems[item.id].onClick}
-                                                    >
-                                                        {contextMenuItems[item.id].label}
-                                                    </ContextMenuButton>
-                                                )}
+                                            !contextMenuItems[item.id].disabled && (
+                                                <Fragment key={`context-menu-${item.id}`}>
+                                                    {item.children ? (
+                                                        <HoverCard
+                                                            offset={5}
+                                                            position="right"
+                                                        >
+                                                            <HoverCard.Target>
+                                                                <ContextMenuButton
+                                                                    leftIcon={
+                                                                        contextMenuItems[item.id]
+                                                                            .leftIcon
+                                                                    }
+                                                                    rightIcon={
+                                                                        contextMenuItems[item.id]
+                                                                            .rightIcon
+                                                                    }
+                                                                    onClick={
+                                                                        contextMenuItems[item.id]
+                                                                            .onClick
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        contextMenuItems[item.id]
+                                                                            .label
+                                                                    }
+                                                                </ContextMenuButton>
+                                                            </HoverCard.Target>
+                                                            <HoverCard.Dropdown>
+                                                                <Stack spacing={0}>
+                                                                    {contextMenuItems[
+                                                                        item.id
+                                                                    ].children?.map((child) => (
+                                                                        <ContextMenuButton
+                                                                            key={`sub-${child.id}`}
+                                                                            leftIcon={
+                                                                                child.leftIcon
+                                                                            }
+                                                                            rightIcon={
+                                                                                child.rightIcon
+                                                                            }
+                                                                            onClick={child.onClick}
+                                                                        >
+                                                                            {child.label}
+                                                                        </ContextMenuButton>
+                                                                    ))}
+                                                                </Stack>
+                                                            </HoverCard.Dropdown>
+                                                        </HoverCard>
+                                                    ) : (
+                                                        <ContextMenuButton
+                                                            leftIcon={
+                                                                contextMenuItems[item.id].leftIcon
+                                                            }
+                                                            rightIcon={
+                                                                contextMenuItems[item.id].rightIcon
+                                                            }
+                                                            onClick={
+                                                                contextMenuItems[item.id].onClick
+                                                            }
+                                                        >
+                                                            {contextMenuItems[item.id].label}
+                                                        </ContextMenuButton>
+                                                    )}
 
-                                                {item.divider && (
-                                                    <Divider
-                                                        key={`context-menu-divider-${item.id}`}
-                                                        color="rgb(62, 62, 62)"
-                                                        size="sm"
-                                                    />
-                                                )}
-                                            </Fragment>
+                                                    {item.divider && (
+                                                        <Divider
+                                                            key={`context-menu-divider-${item.id}`}
+                                                            color="rgb(62, 62, 62)"
+                                                            size="sm"
+                                                        />
+                                                    )}
+                                                </Fragment>
+                                            )
                                         );
                                     })}
                                 </Stack>

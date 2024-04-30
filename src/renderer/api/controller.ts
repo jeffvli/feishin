@@ -8,6 +8,7 @@ import type {
     AlbumArtistDetailArgs,
     AlbumArtistListArgs,
     SetRatingArgs,
+    ShareItemArgs,
     GenreListArgs,
     CreatePlaylistArgs,
     DeletePlaylistArgs,
@@ -55,6 +56,7 @@ import type {
     SimilarSongsArgs,
     Song,
     ServerType,
+    ShareItemResponse,
 } from '/@/renderer/api/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
 import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
@@ -102,6 +104,7 @@ export type ControllerEndpoint = Partial<{
     scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
     search: (args: SearchArgs) => Promise<SearchResponse>;
     setRating: (args: SetRatingArgs) => Promise<RatingResponse>;
+    shareItem: (args: ShareItemArgs) => Promise<ShareItemResponse>;
     updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
 }>;
 
@@ -149,6 +152,7 @@ const endpoints: ApiController = {
         scrobble: jfController.scrobble,
         search: jfController.search,
         setRating: undefined,
+        shareItem: undefined,
         updatePlaylist: jfController.updatePlaylist,
     },
     navidrome: {
@@ -178,7 +182,7 @@ const endpoints: ApiController = {
         getPlaylistSongList: ndController.getPlaylistSongList,
         getRandomSongList: ssController.getRandomSongList,
         getServerInfo: ndController.getServerInfo,
-        getSimilarSongs: ssController.getSimilarSongs,
+        getSimilarSongs: ndController.getSimilarSongs,
         getSongDetail: ndController.getSongDetail,
         getSongList: ndController.getSongList,
         getStructuredLyrics: ssController.getStructuredLyrics,
@@ -188,6 +192,7 @@ const endpoints: ApiController = {
         scrobble: ssController.scrobble,
         search: ssController.search3,
         setRating: ssController.setRating,
+        shareItem: ndController.shareItem,
         updatePlaylist: ndController.updatePlaylist,
     },
     subsonic: {
@@ -223,6 +228,7 @@ const endpoints: ApiController = {
         scrobble: ssController.scrobble,
         search: ssController.search3,
         setRating: undefined,
+        shareItem: undefined,
         updatePlaylist: undefined,
     },
 };
@@ -457,6 +463,15 @@ const updateRating = async (args: SetRatingArgs) => {
     )?.(args);
 };
 
+const shareItem = async (args: ShareItemArgs) => {
+    return (
+        apiController(
+            'shareItem',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['shareItem']
+    )?.(args);
+};
+
 const getTopSongList = async (args: TopSongListArgs) => {
     return (
         apiController(
@@ -555,6 +570,7 @@ export const controller = {
     removeFromPlaylist,
     scrobble,
     search,
+    shareItem,
     updatePlaylist,
     updateRating,
 };

@@ -14,6 +14,10 @@ const RightSidebarContainer = styled(motion.aside)`
     height: 100%;
     background: var(--sidebar-bg);
     border-left: var(--sidebar-border);
+
+    .current-song-cell:not(.current-playlist-song-cell) svg {
+        display: none;
+    }
 `;
 
 const queueSidebarVariants: Variants = {

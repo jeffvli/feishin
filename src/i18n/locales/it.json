@@ -572,7 +572,8 @@
             "albumArtist": "artista album",
             "path": "percorso",
             "discNumber": "disco",
-            "channels": "$t(common.channel_other)"
+            "channels": "$t(common.channel_other)",
+            "size": "$t(common.size)"
         }
     },
     "entity": {

@@ -359,7 +359,8 @@
             "albumArtist": "album artist",
             "path": "putanja",
             "discNumber": "disk",
-            "channels": "$t(common.channel_other)"
+            "channels": "$t(common.channel_other)",
+            "size": "$t(common.size)"
         }
     },
     "error": {

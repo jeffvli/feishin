@@ -139,7 +139,8 @@
         },
         "column": {
             "title": "titulo",
-            "discNumber": "disco"
+            "discNumber": "disco",
+            "size": "$t(common.size)"
         }
     },
     "page": {

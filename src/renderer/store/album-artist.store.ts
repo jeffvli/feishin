@@ -1,10 +1,10 @@
-import merge from 'lodash/merge';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { AlbumArtistListArgs, AlbumArtistListSort, SortOrder } from '/@/renderer/api/types';
 import { DataTableProps } from '/@/renderer/store/settings.store';
 import { ListDisplayType, TableColumn, TablePagination } from '/@/renderer/types';
+import { mergeOverridingColumns } from '/@/renderer/store/utils';
 
 type TableProps = {
     pagination: TablePagination;
@@ -102,9 +102,7 @@ export const useAlbumArtistStore = create<AlbumArtistSlice>()(
             { name: 'store_album_artist' },
         ),
         {
-            merge: (persistedState, currentState) => {
-                return merge(currentState, persistedState);
-            },
+            merge: mergeOverridingColumns,
             name: 'store_album_artist',
             version: 1,
         },

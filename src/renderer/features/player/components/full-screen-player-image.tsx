@@ -206,10 +206,7 @@ export const FullScreenPlayerImage = () => {
             justify="flex-start"
             p="1rem"
         >
-            <ImageContainer
-                ref={mainImageRef}
-                onLoad={updateImageSize}
-            >
+            <ImageContainer ref={mainImageRef}>
                 <AnimatePresence
                     initial={false}
                     mode="sync"

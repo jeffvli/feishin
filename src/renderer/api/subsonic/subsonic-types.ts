@@ -53,6 +53,13 @@ const musicFolderList = z.object({
     }),
 });
 
+const songGain = z.object({
+    albumGain: z.number().optional(),
+    albumPeak: z.number().optional(),
+    trackGain: z.number().optional(),
+    trackPeak: z.number().optional(),
+});
+
 const song = z.object({
     album: z.string().optional(),
     albumId: z.string().optional(),
@@ -72,6 +79,7 @@ const song = z.object({
     parent: z.string(),
     path: z.string(),
     playCount: z.number().optional(),
+    replayGain: songGain.optional(),
     size: z.number(),
     starred: z.boolean().optional(),
     suffix: z.string(),

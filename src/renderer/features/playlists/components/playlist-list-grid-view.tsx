@@ -20,10 +20,10 @@ import {
     VirtualInfiniteGridRef,
 } from '/@/renderer/components/virtual-grid';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useGeneralSettings, useListStoreByKey } from '/@/renderer/store';
 import { CardRow, ListDisplayType } from '/@/renderer/types';
+import { useHandleFavorite } from '/@/renderer/features/shared/hooks/use-handle-favorite';
 
 interface PlaylistListGridViewProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -38,34 +38,7 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
     const { display, grid, filter } = useListStoreByKey({ key: pageKey });
     const { setGrid } = useListStoreActions();
     const { defaultFullPlaylist } = useGeneralSettings();
-
-    const createFavoriteMutation = useCreateFavorite({});
-    const deleteFavoriteMutation = useDeleteFavorite({});
-
-    const handleFavorite = (options: {
-        id: string[];
-        isFavorite: boolean;
-        itemType: LibraryItem;
-    }) => {
-        const { id, itemType, isFavorite } = options;
-        if (isFavorite) {
-            deleteFavoriteMutation.mutate({
-                query: {
-                    id,
-                    type: itemType,
-                },
-                serverId: server?.id,
-            });
-        } else {
-            createFavoriteMutation.mutate({
-                query: {
-                    id,
-                    type: itemType,
-                },
-                serverId: server?.id,
-            });
-        }
-    };
+    const handleFavorite = useHandleFavorite({ gridRef, server });
 
     const cardRows = useMemo(() => {
         const rows: CardRow<Playlist>[] = defaultFullPlaylist

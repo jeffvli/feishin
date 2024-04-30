@@ -382,6 +382,7 @@ export const MpvSettings = () => {
             ),
             description: t('setting.replayGainClipping', {
                 ReplayGain: 'ReplayGain',
+                context: 'description',
                 postProcess: 'sentenceCase',
             }),
             title: t('setting.replayGainClipping', {

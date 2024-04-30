@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ColDef } from '@ag-grid-community/core';
 import isElectron from 'is-electron';
-import merge from 'lodash/merge';
 import { generatePath } from 'react-router';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -24,6 +23,7 @@ import {
 import { randomString } from '/@/renderer/utils';
 import i18n from '/@/i18n/i18n';
 import { usePlayerStore } from '/@/renderer/store/player.store';
+import { mergeOverridingColumns } from '/@/renderer/store/utils';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -171,6 +171,11 @@ export enum BindingActions {
     ZOOM_OUT = 'zoomOut',
 }
 
+export enum GenreTarget {
+    ALBUM = 'album',
+    TRACK = 'track',
+}
+
 export interface SettingsState {
     discord: {
         clientId: string;
@@ -192,6 +197,7 @@ export interface SettingsState {
         defaultFullPlaylist: boolean;
         externalLinks: boolean;
         followSystemTheme: boolean;
+        genreTarget: GenreTarget;
         homeItems: SortableItem<HomeItem>[];
         language: string;
         passwordStore?: string;
@@ -311,6 +317,7 @@ const initialState: SettingsState = {
         defaultFullPlaylist: true,
         externalLinks: true,
         followSystemTheme: false,
+        genreTarget: GenreTarget.TRACK,
         homeItems,
         language: 'en',
         passwordStore: undefined,
@@ -604,6 +611,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                             state.playback.mpvProperties.audioSampleRateHz = 0;
                         });
                     },
+                    setGenreBehavior: (target: GenreTarget) => {
+                        set((state) => {
+                            state.general.genreTarget = target;
+                        });
+                    },
                     setHomeItems: (items: SortableItem<HomeItem>[]) => {
                         set((state) => {
                             state.general.homeItems = items;
@@ -628,9 +640,7 @@ export const useSettingsStore = create<SettingsSlice>()(
             { name: 'store_settings' },
         ),
         {
-            merge: (persistedState, currentState) => {
-                return merge(currentState, persistedState);
-            },
+            merge: mergeOverridingColumns,
             name: 'store_settings',
             version: 8,
         },

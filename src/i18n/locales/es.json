@@ -541,7 +541,8 @@
             "albumArtist": "artista de álbum",
             "path": "ruta",
             "discNumber": "disco",
-            "channels": "$t(common.channel_other)"
+            "channels": "$t(common.channel_other)",
+            "size": "$t(common.size)"
         },
         "config": {
             "label": {

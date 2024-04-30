@@ -15,7 +15,7 @@ import {
     SONG_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { useCurrentServer, usePlayButtonBehavior } from '/@/renderer/store';
+import { useCurrentServer, useListStoreByKey, usePlayButtonBehavior } from '/@/renderer/store';
 
 interface SearchContentProps {
     tableRef: MutableRefObject<AgGridReactType | null>;
@@ -27,6 +27,10 @@ export const SearchContent = ({ tableRef }: SearchContentProps) => {
     const { itemType } = useParams() as { itemType: LibraryItem };
     const [searchParams] = useSearchParams();
     const pageKey = itemType;
+    const { filter } = useListStoreByKey({
+        filter: { searchTerm: searchParams.get('query') || '' },
+        key: itemType,
+    });
 
     const handlePlayQueueAdd = usePlayQueueAdd();
     const playButtonBehavior = usePlayButtonBehavior();
@@ -59,22 +63,26 @@ export const SearchContent = ({ tableRef }: SearchContentProps) => {
                 break;
             case LibraryItem.SONG:
                 handlePlayQueueAdd?.({
-                    byData: [e.data],
+                    byItemType: {
+                        id: [],
+                        type: LibraryItem.SONG,
+                    },
+                    initialSongId: e.data.id,
                     playType: playButtonBehavior,
+                    query: {
+                        startIndex: 0,
+                        ...filter,
+                    },
                 });
                 break;
         }
-    };
-
-    const customFilters = {
-        searchTerm: searchParams.get('query') || '',
     };
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
     const tableProps = useVirtualTable({
         contextMenu: contextMenuItems(),
-        customFilters,
+        customFilters: filter,
         itemType,
         pageKey,
         server,

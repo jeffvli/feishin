@@ -10,6 +10,10 @@ const restoreQueue = () => {
     ipcRenderer.send('player-restore-queue');
 };
 
+const openItem = async (path: string) => {
+    return ipcRenderer.invoke('open-item', path);
+};
+
 const onSaveQueue = (cb: (event: IpcRendererEvent) => void) => {
     ipcRenderer.on('renderer-save-queue', cb);
 };
@@ -51,6 +55,7 @@ export const utils = {
     mainMessageListener,
     onRestoreQueue,
     onSaveQueue,
+    openItem,
     playerErrorListener,
     restoreQueue,
     saveQueue,

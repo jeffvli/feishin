@@ -24,6 +24,8 @@ import {
     BrowserWindowConstructorOptions,
     protocol,
     net,
+    Rectangle,
+    screen,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log/main';
@@ -256,6 +258,26 @@ const createWindow = async (first = true) => {
         ...(nativeFrame && isWindows() && nativeFrameConfig.windows),
     });
 
+    // From https://github.com/electron/electron/issues/526#issuecomment-1663959513
+    const bounds = store.get('bounds') as Rectangle | undefined;
+    if (bounds) {
+        const screenArea = screen.getDisplayMatching(bounds).workArea;
+        if (
+            bounds.x > screenArea.x + screenArea.width ||
+            bounds.x < screenArea.x ||
+            bounds.y < screenArea.y ||
+            bounds.y > screenArea.y + screenArea.height
+        ) {
+            if (bounds.width < screenArea.width && bounds.height < screenArea.height) {
+                mainWindow.setBounds({ height: bounds.height, width: bounds.width });
+            } else {
+                mainWindow.setBounds({ height: 900, width: 1440 });
+            }
+        } else {
+            mainWindow.setBounds(bounds);
+        }
+    }
+
     electronLocalShortcut.register(mainWindow, 'Ctrl+Shift+I', () => {
         mainWindow?.webContents.openDevTools();
     });
@@ -342,6 +364,20 @@ const createWindow = async (first = true) => {
         }
     });
 
+    ipcMain.handle('open-item', async (_event, path: string) => {
+        return new Promise<void>((resolve, reject) => {
+            access(path, constants.F_OK, (error) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                shell.showItemInFolder(path);
+                resolve();
+            });
+        });
+    });
+
     const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
 
     if (globalMediaKeysEnabled) {
@@ -358,6 +394,16 @@ const createWindow = async (first = true) => {
         }
 
         if (!first || !startWindowMinimized) {
+            const maximized = store.get('maximized');
+            const fullScreen = store.get('fullscreen');
+
+            if (maximized) {
+                mainWindow.maximize();
+            }
+            if (fullScreen) {
+                mainWindow.setFullScreen(true);
+            }
+
             mainWindow.show();
             createWinThumbarButtons();
         }
@@ -371,6 +417,10 @@ const createWindow = async (first = true) => {
     let saved = false;
 
     mainWindow.on('close', (event) => {
+        store.set('bounds', mainWindow?.getNormalBounds());
+        store.set('maximized', mainWindow?.isMaximized());
+        store.set('fullscreen', mainWindow?.isFullScreen());
+
         if (!exitFromTray && store.get('window_exit_to_tray')) {
             if (isMacOS() && !forceQuit) {
                 exitFromTray = true;

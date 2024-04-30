@@ -541,7 +541,7 @@ export const songListSortMap: SongListSortMap = {
         id: NDSongListSort.ID,
         name: NDSongListSort.TITLE,
         playCount: NDSongListSort.PLAY_COUNT,
-        random: undefined,
+        random: NDSongListSort.RANDOM,
         rating: NDSongListSort.RATING,
         recentlyAdded: NDSongListSort.RECENTLY_ADDED,
         recentlyPlayed: NDSongListSort.PLAY_DATE,
@@ -765,6 +765,19 @@ export type RatingQuery = {
 };
 
 export type SetRatingArgs = { query: RatingQuery; serverId?: string } & BaseEndpointArgs;
+
+// Sharing
+export type ShareItemResponse = { id: string } | undefined;
+
+export type ShareItemBody = {
+    description: string;
+    downloadable: boolean;
+    expires: number;
+    resourceIds: string;
+    resourceType: string;
+};
+
+export type ShareItemArgs = { body: ShareItemBody; serverId?: string } & BaseEndpointArgs;
 
 // Add to playlist
 export type AddToPlaylistResponse = null | undefined;
@@ -1170,6 +1183,7 @@ export type StructuredLyric = {
 } & (StructuredUnsyncedLyric | StructuredSyncedLyric);
 
 export type SimilarSongsQuery = {
+    albumArtistIds: string[];
     count?: number;
     songId: string;
 };
