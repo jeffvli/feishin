@@ -387,11 +387,13 @@ const genericItem = z.object({
     Name: z.string(),
 });
 
+const songDetailParameters = baseParameters;
+
 const song = z.object({
     Album: z.string(),
     AlbumArtist: z.string(),
     AlbumArtists: z.array(genericItem),
-    AlbumId: z.string(),
+    AlbumId: z.string().optional(),
     AlbumPrimaryImageTag: z.string(),
     ArtistItems: z.array(genericItem),
     Artists: z.array(z.string()),
@@ -709,6 +711,7 @@ export const jfType = {
         search: searchParameters,
         similarArtistList: similarArtistListParameters,
         similarSongs: similarSongsParameters,
+        songDetail: songDetailParameters,
         songList: songListParameters,
         updatePlaylist: updatePlaylistParameters,
     },

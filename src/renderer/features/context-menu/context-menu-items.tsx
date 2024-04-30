@@ -24,6 +24,13 @@ export const SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { divider: true, id: 'showDetails' },
 ];
 
+export const SONG_ALBUM_PAGE: SetContextMenuItems = [
+    { id: 'play' },
+    { id: 'playLast' },
+    { divider: true, id: 'playNext' },
+    { divider: true, id: 'addToPlaylist' },
+];
+
 export const PLAYLIST_SONG_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { id: 'play' },
     { id: 'playLast' },

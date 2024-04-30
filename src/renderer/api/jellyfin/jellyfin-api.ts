@@ -185,6 +185,15 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    getSongData: {
+        method: 'GET',
+        path: 'users/:userId/items/:id',
+        query: jfType._parameters.songDetail,
+        responses: {
+            200: jfType._response.song,
+            400: jfType._response.error,
+        },
+    },
     getSongDetail: {
         method: 'GET',
         path: 'users/:userId/items/:id',
