@@ -72,7 +72,7 @@ const getRemoteLyrics = async (song: QueueSong) => {
         const params = {
             album: song.album || song.name,
             artist: song.artistName,
-            duration: song.duration,
+            duration: song.duration / 1000.0,
             name: song.name,
         };
         const response = await FETCHERS[source](params);
