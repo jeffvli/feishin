@@ -84,6 +84,7 @@
         "owner": "owner",
         "path": "path",
         "playerMustBePaused": "player must be paused",
+        "preview": "preview",
         "previousSong": "previous $t(entity.track_one)",
         "quit": "quit",
         "random": "random",
