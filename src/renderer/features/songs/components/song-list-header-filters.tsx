@@ -631,7 +631,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                             <Slider
                                 defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
                                 max={isGrid ? 300 : 100}
-                                min={isGrid ? 150 : 25}
+                                min={isGrid ? 100 : 25}
                                 onChangeEnd={handleItemSize}
                             />
                         </DropdownMenu.Item>
