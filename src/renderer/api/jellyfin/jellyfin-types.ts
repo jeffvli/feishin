@@ -609,14 +609,14 @@ const addToPlaylist = z.object({
 });
 
 const addToPlaylistParameters = z.object({
-    Ids: z.array(z.string()),
+    Ids: z.string(),
     UserId: z.string(),
 });
 
 const removeFromPlaylist = z.null();
 
 const removeFromPlaylistParameters = z.object({
-    EntryIds: z.array(z.string()),
+    EntryIds: z.string(),
 });
 
 const deletePlaylist = z.null();
