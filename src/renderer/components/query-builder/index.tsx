@@ -54,8 +54,10 @@ interface QueryBuilderProps {
         boolean: { label: string; value: string }[];
         date: { label: string; value: string }[];
         number: { label: string; value: string }[];
+        playlist: { label: string; value: string }[];
         string: { label: string; value: string }[];
     };
+    playlists?: { label: string; value: string }[];
     uniqueId: string;
 }
 
@@ -73,6 +75,7 @@ export const QueryBuilder = ({
     onChangeValue,
     onClearFilters,
     onResetFilters,
+    playlists,
     groupIndex,
     uniqueId,
     filters,
@@ -180,6 +183,7 @@ export const QueryBuilder = ({
                             level={level}
                             noRemove={data?.rules?.length === 1}
                             operators={operators}
+                            selectData={playlists}
                             onChangeField={onChangeField}
                             onChangeOperator={onChangeOperator}
                             onChangeValue={onChangeValue}
@@ -204,6 +208,7 @@ export const QueryBuilder = ({
                                 groupIndex={[...(groupIndex || []), index]}
                                 level={level + 1}
                                 operators={operators}
+                                playlists={playlists}
                                 uniqueId={group.uniqueId}
                                 onAddRule={onAddRule}
                                 onAddRuleGroup={onAddRuleGroup}
