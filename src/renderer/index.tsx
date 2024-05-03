@@ -1,4 +1,4 @@
-import { Notifications } from '@mantine/notifications';
+import { MantineProvider } from '@mantine/core';
 import {
     PersistedClient,
     Persister,
@@ -8,8 +8,9 @@ import { get, set, del } from 'idb-keyval';
 import { createRoot } from 'react-dom/client';
 import { App } from './app';
 import { queryClient } from './lib/react-query';
-
 import 'overlayscrollbars/overlayscrollbars.css';
+import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
 
 export function createIDBPersister(idbValidKey: IDBValidKey = 'reactQuery') {
     return {
@@ -59,10 +60,8 @@ root.render(
             persister: indexedDbPersister,
         }}
     >
-        <Notifications
-            containerWidth="300px"
-            position="bottom-center"
-        />
-        <App />
+        <MantineProvider>
+            <App />
+        </MantineProvider>
     </PersistQueryClientProvider>,
 );
