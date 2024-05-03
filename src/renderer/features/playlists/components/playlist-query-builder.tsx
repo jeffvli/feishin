@@ -57,6 +57,7 @@ interface PlaylistQueryBuilderProps {
         parsedFilter: any,
         extraFilters: { limit?: number; sortBy?: string; sortOrder?: string },
     ) => void;
+    playlistId?: string;
     query: any;
     sortBy: SongListSort;
     sortOrder: 'asc' | 'desc';
@@ -89,7 +90,16 @@ export type PlaylistQueryBuilderRef = {
 
 export const PlaylistQueryBuilder = forwardRef(
     (
-        { sortOrder, sortBy, limit, isSaving, query, onSave, onSaveAs }: PlaylistQueryBuilderProps,
+        {
+            sortOrder,
+            sortBy,
+            limit,
+            isSaving,
+            query,
+            onSave,
+            onSaveAs,
+            playlistId,
+        }: PlaylistQueryBuilderProps,
         ref: Ref<PlaylistQueryBuilderRef>,
     ) => {
         const { t } = useTranslation();
@@ -105,11 +115,17 @@ export const PlaylistQueryBuilder = forwardRef(
 
         const playlistData = useMemo(() => {
             if (!playlists) return [];
-            return playlists.items.map((p) => ({
-                label: p.name,
-                value: p.id,
-            }));
-        }, [playlists]);
+
+            return playlists.items
+                .filter((p) => {
+                    if (!playlistId) return true;
+                    return p.id !== playlistId;
+                })
+                .map((p) => ({
+                    label: p.name,
+                    value: p.id,
+                }));
+        }, [playlistId, playlists]);
 
         const extraFiltersForm = useForm({
             initialValues: {
