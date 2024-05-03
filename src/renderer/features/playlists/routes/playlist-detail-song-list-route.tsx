@@ -196,6 +196,7 @@ const PlaylistDetailSongListRoute = () => {
                                 key={JSON.stringify(detailQuery?.data?.rules)}
                                 isSaving={createPlaylistMutation?.isLoading}
                                 limit={detailQuery?.data?.rules?.limit}
+                                playlistId={playlistId}
                                 query={detailQuery?.data?.rules}
                                 sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
                                 sortOrder={detailQuery?.data?.rules?.order || 'asc'}
