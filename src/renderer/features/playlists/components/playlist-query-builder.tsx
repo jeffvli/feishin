@@ -1,6 +1,7 @@
 import { forwardRef, Ref, useImperativeHandle, useMemo, useState } from 'react';
 import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { openModal } from '@mantine/modals';
 import clone from 'lodash/clone';
 import get from 'lodash/get';
 import setWith from 'lodash/setWith';
@@ -32,6 +33,7 @@ import {
 } from '/@/renderer/api/navidrome.types';
 import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
 import { useCurrentServer } from '/@/renderer/store';
+import { JsonPreview } from '/@/renderer/features/shared/components/json-preview';
 
 type AddArgs = {
     groupIndex: number[];
@@ -146,6 +148,16 @@ export const PlaylistQueryBuilder = forwardRef(
 
         const handleSaveAs = () => {
             onSaveAs?.(convertQueryGroupToNDQuery(filters), extraFiltersForm.values);
+        };
+
+        const openPreviewModal = () => {
+            const previewValue = convertQueryGroupToNDQuery(filters);
+
+            openModal({
+                children: <JsonPreview value={previewValue} />,
+                size: 'xl',
+                title: t('common.preview', { postProcess: 'titleCase' }),
+            });
         };
 
         const handleAddRuleGroup = (args: AddArgs) => {
@@ -447,7 +459,7 @@ export const PlaylistQueryBuilder = forwardRef(
                                     value: 'desc',
                                 },
                             ]}
-                            label={t('common.order', { postProcess: 'titleCase' })}
+                            label={t('common.sortOrder', { postProcess: 'titleCase' })}
                             maxWidth="20%"
                             width={125}
                             {...extraFiltersForm.getInputProps('sortOrder')}
@@ -470,6 +482,13 @@ export const PlaylistQueryBuilder = forwardRef(
                                 onClick={handleSaveAs}
                             >
                                 {t('common.saveAs', { postProcess: 'titleCase' })}
+                            </Button>
+                            <Button
+                                p="0.5em"
+                                variant="default"
+                                onClick={openPreviewModal}
+                            >
+                                {t('common.preview', { postProcess: 'titleCase' })}
                             </Button>
                             <DropdownMenu position="bottom-end">
                                 <DropdownMenu.Target>
