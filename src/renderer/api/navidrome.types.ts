@@ -400,6 +400,7 @@ export const NDSongQueryFields = [
     { label: 'File Type', type: 'string', value: 'filetype' },
     { label: 'Genre', type: 'string', value: 'genre' },
     { label: 'Has CoverArt', type: 'boolean', value: 'hascoverart' },
+    { label: 'Playlist', type: 'playlist', value: 'id' },
     { label: 'Is Compilation', type: 'boolean', value: 'compilation' },
     { label: 'Is Favorite', type: 'boolean', value: 'loved' },
     { label: 'Lyrics', type: 'string', value: 'lyrics' },
@@ -413,6 +414,11 @@ export const NDSongQueryFields = [
     { label: 'Sort Name', type: 'string', value: 'sorttitle' },
     { label: 'Track Number', type: 'number', value: 'tracknumber' },
     { label: 'Year', type: 'number', value: 'year' },
+];
+
+export const NDSongQueryPlaylistOperators = [
+    { label: 'is in', value: 'inPlaylist' },
+    { label: 'is not in', value: 'notInPlaylist' },
 ];
 
 export const NDSongQueryDateOperators = [

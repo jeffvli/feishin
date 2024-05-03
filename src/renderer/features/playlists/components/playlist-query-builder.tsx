@@ -1,4 +1,4 @@
-import { forwardRef, Ref, useImperativeHandle, useState } from 'react';
+import { forwardRef, Ref, useImperativeHandle, useMemo, useState } from 'react';
 import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import clone from 'lodash/clone';
@@ -21,14 +21,17 @@ import {
 import { QueryBuilderGroup, QueryBuilderRule } from '/@/renderer/types';
 import { useTranslation } from 'react-i18next';
 import { RiMore2Fill, RiSaveLine } from 'react-icons/ri';
-import { SongListSort } from '/@/renderer/api/types';
+import { PlaylistListSort, SongListSort, SortOrder } from '/@/renderer/api/types';
 import {
     NDSongQueryBooleanOperators,
     NDSongQueryDateOperators,
     NDSongQueryFields,
     NDSongQueryNumberOperators,
+    NDSongQueryPlaylistOperators,
     NDSongQueryStringOperators,
 } from '/@/renderer/api/navidrome.types';
+import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
+import { useCurrentServer } from '/@/renderer/store';
 
 type AddArgs = {
     groupIndex: number[];
@@ -88,9 +91,23 @@ export const PlaylistQueryBuilder = forwardRef(
         ref: Ref<PlaylistQueryBuilderRef>,
     ) => {
         const { t } = useTranslation();
+        const server = useCurrentServer();
         const [filters, setFilters] = useState<QueryBuilderGroup>(
             query ? convertNDQueryToQueryGroup(query) : DEFAULT_QUERY,
         );
+
+        const { data: playlists } = usePlaylistList({
+            query: { sortBy: PlaylistListSort.NAME, sortOrder: SortOrder.ASC, startIndex: 0 },
+            serverId: server?.id,
+        });
+
+        const playlistData = useMemo(() => {
+            if (!playlists) return [];
+            return playlists.items.map((p) => ({
+                label: p.name,
+                value: p.id,
+            }));
+        }, [playlists]);
 
         const extraFiltersForm = useForm({
             initialValues: {
@@ -367,7 +384,7 @@ export const PlaylistQueryBuilder = forwardRef(
         return (
             <MotionFlex
                 direction="column"
-                h="calc(100% - 2.5rem)"
+                h="calc(100% - 3.5rem)"
                 justify="space-between"
             >
                 <ScrollArea
@@ -383,8 +400,10 @@ export const PlaylistQueryBuilder = forwardRef(
                             boolean: NDSongQueryBooleanOperators,
                             date: NDSongQueryDateOperators,
                             number: NDSongQueryNumberOperators,
+                            playlist: NDSongQueryPlaylistOperators,
                             string: NDSongQueryStringOperators,
                         }}
+                        playlists={playlistData}
                         uniqueId={filters.uniqueId}
                         onAddRule={handleAddRule}
                         onAddRuleGroup={handleAddRuleGroup}
