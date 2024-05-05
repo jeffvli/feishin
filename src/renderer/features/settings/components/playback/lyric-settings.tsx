@@ -118,5 +118,10 @@ export const LyricSettings = () => {
         },
     ];
 
-    return <SettingsSection options={lyricOptions} />;
+    return (
+        <SettingsSection
+            divider={false}
+            options={lyricOptions}
+        />
+    );
 };

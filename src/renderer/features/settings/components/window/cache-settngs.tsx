@@ -3,8 +3,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { Button, ConfirmModal, toast } from '/@/renderer/components';
-import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 import { useCallback, useState } from 'react';
+import {
+    SettingOption,
+    SettingsSection,
+} from '/@/renderer/features/settings/components/settings-section';
 
 const browser = isElectron() ? window.electron.browser : null;
 
@@ -50,42 +53,46 @@ export const CacheSettings = () => {
         });
     };
 
+    const options: SettingOption[] = [
+        {
+            control: (
+                <Button
+                    compact
+                    disabled={isClearing}
+                    variant="filled"
+                    onClick={() => openResetConfirmModal(false)}
+                >
+                    {t('common.clear', { postProcess: 'sentenceCase' })}
+                </Button>
+            ),
+            description: t('setting.clearQueryCache', {
+                context: 'description',
+            }),
+            title: t('setting.clearQueryCache'),
+        },
+        {
+            control: (
+                <Button
+                    compact
+                    disabled={isClearing}
+                    variant="filled"
+                    onClick={() => openResetConfirmModal(true)}
+                >
+                    {t('common.clear', { postProcess: 'sentenceCase' })}
+                </Button>
+            ),
+            description: t('setting.clearCache', {
+                context: 'description',
+            }),
+            isHidden: !browser,
+            title: t('setting.clearCache'),
+        },
+    ];
+
     return (
-        <>
-            <SettingsOptions
-                control={
-                    <Button
-                        compact
-                        disabled={isClearing}
-                        variant="filled"
-                        onClick={() => openResetConfirmModal(false)}
-                    >
-                        {t('common.clear', { postProcess: 'sentenceCase' })}
-                    </Button>
-                }
-                description={t('setting.clearQueryCache', {
-                    context: 'description',
-                })}
-                title={t('setting.clearQueryCache')}
-            />
-            {browser && (
-                <SettingsOptions
-                    control={
-                        <Button
-                            compact
-                            disabled={isClearing}
-                            variant="filled"
-                            onClick={() => openResetConfirmModal(true)}
-                        >
-                            {t('common.clear', { postProcess: 'sentenceCase' })}
-                        </Button>
-                    }
-                    description={t('setting.clearCache', {
-                        context: 'description',
-                    })}
-                    title={t('setting.clearCache')}
-                />
-            )}
-        </>
+        <SettingsSection
+            divider={false}
+            options={options}
+        />
     );
 };

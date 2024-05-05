@@ -52,5 +52,10 @@ export const PasswordSettings = () => {
         },
     ];
 
-    return <SettingsSection options={updateOptions} />;
+    return (
+        <SettingsSection
+            divider={false}
+            options={updateOptions}
+        />
+    );
 };

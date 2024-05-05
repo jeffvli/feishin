@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Divider, Group, Stack } from '@mantine/core';
+import { Group, Stack } from '@mantine/core';
 import isElectron from 'is-electron';
 import {
     FileInput,
@@ -414,9 +414,7 @@ export const MpvSettings = () => {
     return (
         <>
             <SettingsSection options={options} />
-            <Divider />
             <SettingsSection options={generalOptions} />
-            <Divider />
             <SettingsSection options={replayGainOptions} />
         </>
     );

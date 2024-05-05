@@ -18,7 +18,7 @@ const getAudioDevice = async () => {
     return (devices || []).filter((dev: MediaDeviceInfo) => dev.kind === 'audiooutput');
 };
 
-export const AudioSettings = () => {
+export const AudioSettings = ({ hasFancyAudio }: { hasFancyAudio: boolean }) => {
     const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -201,5 +201,10 @@ export const AudioSettings = () => {
         },
     ];
 
-    return <SettingsSection options={audioOptions} />;
+    return (
+        <SettingsSection
+            divider={!hasFancyAudio}
+            options={audioOptions}
+        />
+    );
 };

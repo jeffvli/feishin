@@ -282,6 +282,7 @@ export interface SettingsSlice extends SettingsState {
     actions: {
         reset: () => void;
         resetSampleRate: () => void;
+        setGenreBehavior: (target: GenreTarget) => void;
         setHomeItems: (item: SortableItem<HomeItem>[]) => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;

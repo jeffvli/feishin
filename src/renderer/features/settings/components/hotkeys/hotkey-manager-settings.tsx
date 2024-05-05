@@ -9,6 +9,7 @@ import { Button, TextInput, Checkbox } from '/@/renderer/components';
 import { BindingActions, useHotkeySettings, useSettingsStoreActions } from '/@/renderer/store';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 import i18n from '/@/i18n/i18n';
+import { useSettingSearchContext } from '/@/renderer/features/settings/context/search-context';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 
@@ -107,6 +108,7 @@ export const HotkeyManagerSettings = () => {
     const { bindings, globalMediaHotkeys } = useHotkeySettings();
     const { setSettings } = useSettingsStoreActions();
     const [selected, setSelected] = useState<BindingActions | null>(null);
+    const keyword = useSettingSearchContext();
 
     const debouncedSetHotkey = debounce(
         (binding: BindingActions, e: KeyboardEvent<HTMLInputElement>) => {
@@ -216,6 +218,21 @@ export const HotkeyManagerSettings = () => {
         return duplicateKeys;
     }, [bindings]);
 
+    const filteredBindings = useMemo(() => {
+        const base = Object.keys(bindings);
+
+        if (keyword === '') {
+            return base.filter((binding) => BINDINGS_MAP[binding as keyof typeof BINDINGS_MAP]);
+        }
+
+        return base.filter((binding) => {
+            const item = BINDINGS_MAP[binding as keyof typeof BINDINGS_MAP];
+            if (!item) return false;
+
+            return item.toLocaleLowerCase().includes(keyword);
+        });
+    }, [bindings, keyword]);
+
     return (
         <>
             <SettingsOptions
@@ -227,76 +244,72 @@ export const HotkeyManagerSettings = () => {
                 title={t('setting.applicationHotkeys', { postProcess: 'sentenceCase' })}
             />
             <HotkeysContainer>
-                {Object.keys(bindings)
-                    .filter((binding) => BINDINGS_MAP[binding as keyof typeof BINDINGS_MAP])
-                    .map((binding) => (
-                        <Group
-                            key={`hotkey-${binding}`}
-                            noWrap
-                        >
-                            <TextInput
-                                readOnly
-                                style={{ userSelect: 'none' }}
-                                value={BINDINGS_MAP[binding as keyof typeof BINDINGS_MAP]}
-                            />
-                            <TextInput
-                                readOnly
-                                icon={<RiKeyboardBoxLine />}
-                                id={`hotkey-${binding}`}
+                {filteredBindings.map((binding) => (
+                    <Group
+                        key={`hotkey-${binding}`}
+                        noWrap
+                    >
+                        <TextInput
+                            readOnly
+                            style={{ userSelect: 'none' }}
+                            value={BINDINGS_MAP[binding as keyof typeof BINDINGS_MAP]}
+                        />
+                        <TextInput
+                            readOnly
+                            icon={<RiKeyboardBoxLine />}
+                            id={`hotkey-${binding}`}
+                            style={{
+                                opacity: selected === (binding as BindingActions) ? 0.8 : 1,
+                                outline: duplicateHotkeyMap.includes(
+                                    bindings[binding as keyof typeof BINDINGS_MAP].hotkey!,
+                                )
+                                    ? '1px dashed red'
+                                    : undefined,
+                            }}
+                            value={bindings[binding as keyof typeof BINDINGS_MAP].hotkey}
+                            onBlur={() => setSelected(null)}
+                            onChange={() => {}}
+                            onKeyDownCapture={(e) => {
+                                if (selected !== (binding as BindingActions)) return;
+                                handleSetHotkey(binding as BindingActions, e);
+                            }}
+                        />
+                        {isElectron() && (
+                            <Checkbox
+                                checked={bindings[binding as keyof typeof BINDINGS_MAP].isGlobal}
+                                disabled={
+                                    bindings[binding as keyof typeof BINDINGS_MAP].hotkey === ''
+                                }
+                                size="xl"
                                 style={{
-                                    opacity: selected === (binding as BindingActions) ? 0.8 : 1,
-                                    outline: duplicateHotkeyMap.includes(
-                                        bindings[binding as keyof typeof BINDINGS_MAP].hotkey!,
-                                    )
-                                        ? '1px dashed red'
-                                        : undefined,
+                                    opacity: bindings[binding as keyof typeof BINDINGS_MAP]
+                                        .allowGlobal
+                                        ? 1
+                                        : 0,
                                 }}
-                                value={bindings[binding as keyof typeof BINDINGS_MAP].hotkey}
-                                onBlur={() => setSelected(null)}
-                                onChange={() => {}}
-                                onKeyDownCapture={(e) => {
-                                    if (selected !== (binding as BindingActions)) return;
-                                    handleSetHotkey(binding as BindingActions, e);
-                                }}
+                                onChange={(e) =>
+                                    handleSetGlobalHotkey(binding as BindingActions, e)
+                                }
                             />
-                            {isElectron() && (
-                                <Checkbox
-                                    checked={
-                                        bindings[binding as keyof typeof BINDINGS_MAP].isGlobal
-                                    }
-                                    disabled={
-                                        bindings[binding as keyof typeof BINDINGS_MAP].hotkey === ''
-                                    }
-                                    size="xl"
-                                    style={{
-                                        opacity: bindings[binding as keyof typeof BINDINGS_MAP]
-                                            .allowGlobal
-                                            ? 1
-                                            : 0,
-                                    }}
-                                    onChange={(e) =>
-                                        handleSetGlobalHotkey(binding as BindingActions, e)
-                                    }
-                                />
-                            )}
-                            <Button
-                                variant="default"
-                                w={100}
-                                onClick={() => {
-                                    setSelected(binding as BindingActions);
-                                    document.getElementById(`hotkey-${binding}`)?.focus();
-                                }}
-                            >
-                                <RiEditLine />
-                            </Button>
-                            <Button
-                                variant="default"
-                                onClick={() => handleClearHotkey(binding as BindingActions)}
-                            >
-                                <RiDeleteBinLine />
-                            </Button>
-                        </Group>
-                    ))}
+                        )}
+                        <Button
+                            variant="default"
+                            w={100}
+                            onClick={() => {
+                                setSelected(binding as BindingActions);
+                                document.getElementById(`hotkey-${binding}`)?.focus();
+                            }}
+                        >
+                            <RiEditLine />
+                        </Button>
+                        <Button
+                            variant="default"
+                            onClick={() => handleClearHotkey(binding as BindingActions)}
+                        >
+                            <RiDeleteBinLine />
+                        </Button>
+                    </Group>
+                ))}
             </HotkeysContainer>
         </>
     );

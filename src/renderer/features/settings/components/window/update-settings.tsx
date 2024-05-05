@@ -8,6 +8,7 @@ import {
 import { Switch } from '/@/renderer/components';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
+const utils = isElectron() ? window.electron.utils : null;
 
 export const UpdateSettings = () => {
     const { t } = useTranslation();
@@ -42,5 +43,10 @@ export const UpdateSettings = () => {
         },
     ];
 
-    return <SettingsSection options={updateOptions} />;
+    return (
+        <SettingsSection
+            divider={utils?.isLinux()}
+            options={updateOptions}
+        />
+    );
 };
