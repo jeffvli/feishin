@@ -18,8 +18,6 @@ export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
     const search = useSettingSearchContext();
     const cq = useContainerQuery();
 
-    console.log(cq);
-
     const handleResetToDefault = () => {
         reset();
         closeAllModals();
