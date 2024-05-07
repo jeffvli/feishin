@@ -16,7 +16,11 @@
         "setRating": "评分",
         "toggleSmartPlaylistEditor": "切换$t(entity.smartPlaylist)编辑器",
         "removeFromFavorites": "从$t(entity.favorite_other)移除",
-        "goToPage": "转到页面"
+        "goToPage": "转到页面",
+        "openIn": {
+            "lastfm": "在 Last.fm 中打开",
+            "musicbrainz": "在 MusicBrainz 中打开"
+        }
     },
     "common": {
         "increase": "增高",
@@ -93,7 +97,17 @@
         "yes": "是",
         "size": "大小",
         "areYouSure": "是否继续？",
-        "note": "注释"
+        "note": "注释",
+        "close": "关闭",
+        "albumPeak": "专辑峰值",
+        "mbid": "MusicBrainz ID",
+        "reload": "重新加载",
+        "trackGain": "音轨增益",
+        "trackPeak": "音轨峰值",
+        "albumGain": "专辑增益",
+        "codec": "编解码器",
+        "share": "分享",
+        "preview": "预览"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -310,7 +324,21 @@
         "buttonSize_description": "播放器栏按钮大小",
         "clearCache_description": "feishin的“硬清除”。除了清除feishin的缓存，清空浏览器缓存（保存的图像和其他资源）。会保留服务器凭据和设置",
         "clearQueryCache_description": "feishin的“软清除”。这将会刷新播放列表、元数据并重置保存的歌词。会保留设置、服务器凭据和缓存图像",
-        "clearQueryCache": "清除feishin缓存"
+        "clearQueryCache": "清除feishin缓存",
+        "externalLinks": "显示外部链接",
+        "externalLinks_description": "允许在艺术家/专辑页面上显示外部链接（Last.fm、MusicBrainz）",
+        "mpvExtraParameters_help": "每行一个",
+        "startMinimized": "启动最小化",
+        "startMinimized_description": "在系统托盘中启动应用程序",
+        "passwordStore_description": "使用什么密码/秘密存储。如果您在存储密码时遇到问题，请更改此设置。",
+        "clearCacheSuccess": "缓存清除成功",
+        "playerAlbumArtResolution": "播放器专辑封面分辨率",
+        "playerAlbumArtResolution_description": "大型播放器专辑封面预览的分辨率。较大使其看起来更清晰，但可能会减慢加载速度。默认为0，表示自动",
+        "genreBehavior": "类型页面默认行为",
+        "genreBehavior_description": "确定单击流派是否默认在曲目或专辑列表中打开",
+        "homeConfiguration": "主页配置",
+        "homeConfiguration_description": "配置主页上显示的项目以及显示顺序",
+        "passwordStore": "密码/秘密存储"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -331,7 +359,10 @@
         "mpvRequired": "需要 MPV",
         "audioDeviceFetchError": "无法获取音频设备",
         "invalidServer": "无效的服务器",
-        "loginRateError": "登录请求尝试次数过多，请稍后再试"
+        "loginRateError": "登录请求尝试次数过多，请稍后再试",
+        "badAlbum": "您看到此页面是因为这首歌不是专辑的一部分。如果您的音乐文件夹顶层有一首歌曲，您很可能会遇到此问题。jellyfin 仅对位于文件夹中的曲目进行分组。",
+        "networkError": "发生网络错误",
+        "openError": "无法打开文件"
     },
     "filter": {
         "mostPlayed": "播放最多",
@@ -389,7 +420,8 @@
             "settings": "$t(common.setting_other)",
             "home": "$t(common.home)",
             "artists": "$t(entity.artist_other)",
-            "albumArtists": "$t(entity.albumArtist_other)"
+            "albumArtists": "$t(entity.albumArtist_other)",
+            "shared": "共享 $t(entity.playlist_other)"
         },
         "fullscreenPlayer": {
             "config": {
@@ -403,7 +435,9 @@
                 "lyricAlignment": "歌词对齐",
                 "useImageAspectRatio": "使用图片纵横比",
                 "lyricGap": "歌词间距",
-                "followCurrentLyric": "跟随当前歌词"
+                "followCurrentLyric": "跟随当前歌词",
+                "dynamicImageBlur": "图像模糊大小",
+                "dynamicIsImage": "启用背景图像"
             },
             "lyrics": "歌词",
             "related": "相关",
@@ -462,22 +496,46 @@
             "addNext": "$t(player.addNext)",
             "deselectAll": "$t(action.deselectAll)",
             "addLast": "$t(player.addLast)",
-            "addFavorite": "$t(action.addToFavorites)"
+            "addFavorite": "$t(action.addToFavorites)",
+            "showDetails": "获取信息",
+            "shareItem": "分享项目"
         },
         "trackList": {
-            "title": "$t(entity.track_other)"
+            "title": "$t(entity.track_other)",
+            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
+            "artistTracks": "{{artist}} 的曲目"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
         },
         "albumList": {
-            "title": "$t(entity.album_other)"
+            "title": "$t(entity.album_other)",
+            "artistAlbums": "{{artist}} 的专辑",
+            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)"
         },
         "genreList": {
-            "title": "$t(entity.genre_other)"
+            "title": "$t(entity.genre_other)",
+            "showAlbums": "显示 $t(entity.genre_one) $t(entity.album_other)",
+            "showTracks": "显示 $t(entity.genre_one) $t(entity.track_other)"
         },
         "playlistList": {
             "title": "$t(entity.playlist_other)"
+        },
+        "albumArtistDetail": {
+            "recentReleases": "最近发布",
+            "viewDiscography": "查看唱片目录",
+            "relatedArtists": "相关 $t(entity.artist_other)",
+            "topSongs": "热门歌曲",
+            "topSongsFrom": "{{title}} 的热门歌曲",
+            "viewAllTracks": "查看所有 $t(entity.track_other)",
+            "about": "关于 {{artist}}",
+            "appearsOn": "出现在",
+            "viewAll": "查看全部"
+        },
+        "itemDetail": {
+            "copyPath": "将路径复制到剪贴板",
+            "copiedPath": "路径复制成功",
+            "openFile": "在文件管理器中显示曲目"
         }
     },
     "form": {
@@ -528,6 +586,14 @@
             "title": "搜索歌词",
             "input_name": "$t(common.name)",
             "input_artist": "$t(entity.artist_one)"
+        },
+        "shareItem": {
+            "expireInvalid": "过期时间必须是将来的时间",
+            "createFailed": "创建共享失败（是否启用共享？）",
+            "allowDownloading": "允许下载",
+            "description": "描述",
+            "setExpiration": "设置过期时间",
+            "success": "共享链接已复制到剪贴板（或单击此处打开）"
         }
     },
     "table": {
@@ -537,7 +603,9 @@
                 "gap": "$t(common.gap)",
                 "tableColumns": "列",
                 "autoFitColumns": "列宽自适应",
-                "size": "$t(common.size)"
+                "size": "$t(common.size)",
+                "itemGap": "项目间隙（px）",
+                "itemSize": "项目大小 (px)"
             },
             "view": {
                 "table": "表格",
@@ -570,7 +638,8 @@
                 "favorite": "$t(common.favorite)",
                 "year": "$t(common.year)",
                 "albumArtist": "$t(entity.albumArtist_one)",
-                "titleCombined": "$t(common.title)（合并）"
+                "titleCombined": "$t(common.title)（合并）",
+                "codec": "$t(common.codec)"
             }
         },
         "column": {
@@ -596,7 +665,8 @@
             "path": "路径",
             "channels": "$t(common.channel_other)",
             "discNumber": "盘",
-            "size": "$t(common.size)"
+            "size": "$t(common.size)",
+            "codec": "$t(common.codec)"
         }
     }
 }
