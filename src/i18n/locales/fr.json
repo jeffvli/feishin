@@ -253,7 +253,7 @@
             "moreFromGeneric": "plus de {{item}}"
         },
         "setting": {
-            "generalTab": "générale",
+            "generalTab": "général",
             "hotkeysTab": "raccourci",
             "windowTab": "fenêtre",
             "playbackTab": "lecteur"
@@ -328,10 +328,10 @@
         "scrobble": "scrobble",
         "enableRemote_description": "activer le serveur de contrôle à distance, qui permet à d'autres appareils de contrôler l'application",
         "fontType_optionSystem": "police système",
-        "mpvExecutablePath_description": "définit le chemin vers l'exécutable mpv",
+        "mpvExecutablePath_description": "définit le chemin vers l'exécutable mpv, si vide, le chemin par défaut sera utilisé",
         "hotkey_favoriteCurrentSong": "favori $t(common.currentSong)",
         "sampleRate": "taux d'échantillonnage",
-        "sampleRate_description": "sélectionnez le taux d'échantillonnage de sortie utilisé si la fréquence d'échantillonnage sélectionnée est différente de celle du média actuel",
+        "sampleRate_description": "sélectionner le taux d'échantillonnage de sortie utilisé si la fréquence d'échantillonnage sélectionnée est différente de celle du média actuel. une valeur en inférieur à 8000 utilisera la fréquence par défaut",
         "hotkey_zoomIn": "zoom avant",
         "scrobble_description": "scrobble les lectures à votre serveur multimédia",
         "hotkey_browserForward": "avancer",
@@ -399,7 +399,7 @@
         "lyricFetchProvider_description": "sélectionnez le fournisseur auprès desquels récupérer les paroles. l'ordre des fournisseurs et l'ordre dans lequel ils seront interrogés",
         "globalMediaHotkeys_description": "active ou désactive l'utilisation des raccourcis clavier multimédia système pour contrôler la lecture",
         "followLyric": "suivre les paroles actuelles",
-        "discordIdleStatus": "afficher l'état d'inactivité dans le status de l'activité",
+        "discordIdleStatus": "afficher l'état d'inactivité dans le statut de l'activité",
         "hotkey_zoomOut": "zoom arrière",
         "hotkey_unfavoriteCurrentSong": "retirer des favoris la $t(common.currentSong)",
         "hotkey_rate0": "supprimer la note",
@@ -437,7 +437,7 @@
         "skipPlaylistPage_description": "lors de la navigation dans une playlist, aller directement vers le liste des morceaux, au lieu de la page par défaut",
         "volumeWheelStep": "valeur du pas de volume",
         "windowBarStyle": "style de la barre de la fenêtre",
-        "useSystemTheme_description": "suivre les préférence du système (sombre ou clair)",
+        "useSystemTheme_description": "suivre les préférences du système (sombre ou clair)",
         "skipPlaylistPage": "sauter la page de playlist",
         "themeDark": "thème (sombre)",
         "windowBarStyle_description": "sélectionner le style de la barre de la fenêtre",
@@ -460,7 +460,13 @@
         "replayGainClipping": "{{ReplayGain}} clipping",
         "replayGainMode": "mode de {{ReplayGain}}",
         "replayGainFallback_description": "gain en dB à appliquer si le fichier n'a pas de tag {{ReplayGain}}",
-        "replayGainPreamp_description": "ajuste le gain de préampli appliqué a la valeur de {{ReplayGain}}"
+        "replayGainPreamp_description": "ajuste le gain de préampli appliqué a la valeur de {{ReplayGain}}",
+        "clearQueryCache": "vide le cache de feishin",
+        "clearCache": "Vider le cache navigateur",
+        "buttonSize_description": "la taille des boutons de la barre de lecture",
+        "clearQueryCache_description": "un 'soft clear' de feishin. cela actualisera les playlists, les métadonnées des pistes, et réinitialisera les paroles enregistrées. les paramètres, identifiants serveurs et les images mises en cache sont conservés",
+        "clearCache_description": "un 'hard clear' de feishin. en plus de vider le cache de feishin, vide le cache du navigateur (images sauvegardées et autres ressources). les identifiants serveurs et paramètres sont conservés",
+        "buttonSize": "taille des boutons de la barre de lecture"
     },
     "form": {
         "deletePlaylist": {
@@ -482,7 +488,7 @@
             "error_savePassword": "une erreur s’est produite lors de la tentative de sauvegarde du mot de passe"
         },
         "addToPlaylist": {
-            "success": "{{message}} $t(entity.track_other) ajouté à {{numOfPlaylists}} $t(entity.playlist_other)",
+            "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) ajouté à $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "title": "ajouter à $t(entity.playlist_one)",
             "input_skipDuplicates": "sauter les doublons",
             "input_playlists": "$t(entity.playlist_other)"
