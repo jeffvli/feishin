@@ -80,7 +80,13 @@
         "yes": "sim",
         "random": "aleatório",
         "size": "tamanho",
-        "note": "observação"
+        "note": "observação",
+        "mbid": "ID no MusicBrainz",
+        "reload": "recarregar",
+        "codec": "codec",
+        "preview": "pré-visualizar",
+        "share": "compartilhar",
+        "close": "fechar"
     },
     "action": {
         "goToPage": "vá para página",
@@ -98,17 +104,34 @@
         "removeFromPlaylist": "remover da $t(entity.playlist_one)",
         "deletePlaylist": "deletar $t(entity.playlist_one)",
         "deselectAll": "desmarcar todos",
-        "removeFromFavorites": "remover de $t(entity.favorite_other)"
+        "removeFromFavorites": "remover de $t(entity.favorite_other)",
+        "openIn": {
+            "lastfm": "Abrir em Last.fm",
+            "musicbrainz": "Abrir em MusicBrainz"
+        }
     },
     "form": {
         "deletePlaylist": {
-            "title": "deletar $t(entity.playlist_one)"
+            "title": "deletar $t(entity.playlist_one)",
+            "input_confirm": "escreva o nome da $t(entity.playlist_one) para confirmar"
         },
         "addServer": {
-            "title": "adicionar servidor"
+            "title": "adicionar servidor",
+            "input_password": "senha",
+            "input_legacyAuthentication": "habilitar autenticação legada",
+            "error_savePassword": "um erro ocorreu ao tentar salvar a senha",
+            "ignoreSsl": "ignorar ssl ($t(common.restartRequired))",
+            "input_savePassword": "salvar senha",
+            "input_url": "url",
+            "success": "servidor adicionado com sucesso",
+            "input_name": "nome do servidor",
+            "input_username": "nome de usuário"
         },
         "createPlaylist": {
-            "title": "criar $t(entity.playlist_one)"
+            "title": "criar $t(entity.playlist_one)",
+            "input_public": "público",
+            "input_description": "$t(common.description)",
+            "success": "$t(entity.playlist_one) criada com sucesso"
         },
         "updateServer": {
             "title": "atualizar servidor"
@@ -117,7 +140,10 @@
             "title": "editar $t(entity.playlist_one)"
         },
         "addToPlaylist": {
-            "title": "adicionar à $t(entity.playlist_one)"
+            "title": "adicionar à $t(entity.playlist_one)",
+            "input_playlists": "$t(entity.playlist_other)",
+            "input_skipDuplicates": "pular duplicadas",
+            "success": "adicionado $t(entity.trackWithCount, {\"count\": {{message}} }) para $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })"
         },
         "lyricSearch": {
             "title": "pesquisa de letras"
@@ -176,7 +202,17 @@
     "filter": {
         "title": "titulo",
         "disc": "disco",
-        "mostPlayed": "mais tocado"
+        "mostPlayed": "mais tocado",
+        "album": "$t(entity.album_one)",
+        "name": "nome",
+        "biography": "bibliografia",
+        "duration": "duração",
+        "favorited": "favoritado",
+        "fromYear": "a partir do ano",
+        "songCount": "contador de músicas",
+        "toYear": "até o ano",
+        "random": "aleatório",
+        "search": "buscar"
     },
     "player": {
         "playbackFetchNoResults": "nenhuma música encontrada",
@@ -242,6 +278,9 @@
         "mpvRequired": "MPV necessário",
         "audioDeviceFetchError": "ocorreu um erro ao tentar obter dispositivos de áudio",
         "invalidServer": "servidor inválido",
-        "loginRateError": "muitas tentativas de login, tente novamente em alguns segundos"
+        "loginRateError": "muitas tentativas de login, tente novamente em alguns segundos",
+        "badAlbum": "você está vendo este erro por que está música não é parte de algum album. um motivo comum para você estar vendo este erro é se a sua música estiver na raiz da sua pasta de músicas. o jellyfin apenas agrupa as músicas se elas estiveram na mesma pasta.",
+        "networkError": "ocorreu um erro na internet",
+        "openError": "não foi possível abrir o arquivo"
     }
 }
