@@ -196,7 +196,21 @@
         "clearQueryCache_description": "una 'limpieza suave' de feishin. esto refrescará las listas de reproducción, metadatos de pistas y restablece las letras guardadas. se mantienen los ajustes, credenciales del servidor y las imágenes en caché",
         "buttonSize": "tamaño del botón de la barra de reproducción",
         "clearCache_description": "una 'limpieza fuerte' de feishin. para limpiar la caché de feishin, vacía la caché del navegador (imágenes guardadas y otros elementos). se mantienen las credenciales y ajustes del servidor",
-        "buttonSize_description": "el tamaño de los botones de la barra de reproducción"
+        "buttonSize_description": "el tamaño de los botones de la barra de reproducción",
+        "passwordStore_description": "qué método de almacenamiento de contraseñas/claves secretas utilizar. cambie esta opción si tiene problemas para guardar contraseñas.",
+        "startMinimized_description": "iniciar la aplicación en la bandeja del sistema",
+        "startMinimized": "iniciar minimizado",
+        "passwordStore": "contraseñas/almacenamiento secreto",
+        "playerAlbumArtResolution_description": "la resolución para la vista previa de la carátula del álbum del reproductor grande. más grande hace que parezca más nítido, pero puede ralentizar la carga. El valor predeterminado es 0, lo que significa automático",
+        "playerAlbumArtResolution": "resolución de la carátula del álbum del reproductor",
+        "homeConfiguration": "Configuración de la página de inicio",
+        "mpvExtraParameters_help": "Uno por línea",
+        "genreBehavior": "Comportamiento predeterminado de la página de géneros",
+        "externalLinks_description": "Permite mostrar enlaces externos (Last.fm, MusicBrainz) en páginas de artista/álbum",
+        "genreBehavior_description": "Determina si al pulsar en un género se abre por defecto la lista de pistas o de álbumes",
+        "homeConfiguration_description": "Configura qué elementos son mostrados y en qué orden en la página de inicio",
+        "clearCacheSuccess": "Caché limpiada correctamente",
+        "externalLinks": "Mostrar enlaces externos"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -215,7 +229,11 @@
         "moveToBottom": "mover al fondo",
         "setRating": "establecer calificación",
         "toggleSmartPlaylistEditor": "cambiar editor $t(entity.smartPlaylist)",
-        "removeFromFavorites": "eliminar de $t(entity.favorite_other)"
+        "removeFromFavorites": "eliminar de $t(entity.favorite_other)",
+        "openIn": {
+            "lastfm": "Abrir en Last.fm",
+            "musicbrainz": "Abrir en MusicBrainz"
+        }
     },
     "common": {
         "backward": "hacia atrás",
@@ -298,7 +316,17 @@
         "action_other": "acciones",
         "channel_one": "Canal",
         "channel_many": "Canales",
-        "channel_other": "Canales"
+        "channel_other": "Canales",
+        "trackPeak": "la más alta de la canción",
+        "albumPeak": "lo más destacado del álbum",
+        "albumGain": "Ganancia de álbum",
+        "mbid": "ID de MusicBrainz",
+        "codec": "Códec",
+        "close": "Cerrar",
+        "reload": "Recargar",
+        "share": "Compartir",
+        "trackGain": "Ganancia de pista",
+        "preview": "Vista previa"
     },
     "error": {
         "remotePortWarning": "reiniciar el servidor para aplicar el nuevo puerto",
@@ -319,7 +347,10 @@
         "mpvRequired": "MPV requerido",
         "audioDeviceFetchError": "un error ocurrió cuando se intentó obtener los dispositivos de audio",
         "invalidServer": "servidor inválido",
-        "loginRateError": "demasiados intentos de inicio de sesión, por favor inténtalo en unos segundos"
+        "loginRateError": "demasiados intentos de inicio de sesión, por favor inténtalo en unos segundos",
+        "badAlbum": "Estás viendo esta página porque esta canción no forma parte de un álbum. Este problema puede ocurrir si tiene una canción en el nivel superior de su carpeta de música. Jellyfin solo agrupa pistas si están en una carpeta.",
+        "networkError": "Ocurrió un error de red",
+        "openError": "No se pudo abrir el archivo"
     },
     "filter": {
         "mostPlayed": "más reproducido",
@@ -377,7 +408,8 @@
             "settings": "$t(common.setting_other)",
             "home": "$t(common.home)",
             "artists": "$t(entity.artist_other)",
-            "albumArtists": "$t(entity.albumArtist_other)"
+            "albumArtists": "$t(entity.albumArtist_other)",
+            "shared": "compartido $t(entity.playlist_other)"
         },
         "appMenu": {
             "selectServer": "seleccionar servidor",
@@ -407,7 +439,9 @@
             "addFavorite": "$t(action.addToFavorites)",
             "play": "$t(player.play)",
             "numberSelected": "{{count}} seleccionado",
-            "removeFromQueue": "$t(action.removeFromQueue)"
+            "removeFromQueue": "$t(action.removeFromQueue)",
+            "shareItem": "Compartir elemento",
+            "showDetails": "Obtener información"
         },
         "home": {
             "mostPlayed": "más reproducidos",
@@ -429,7 +463,9 @@
                 "lyricAlignment": "alineación de letra",
                 "useImageAspectRatio": "usar ratio de aspecto de imagen",
                 "showLyricMatch": "mostrar coincidencia de letras",
-                "lyricGap": "desfase de letra"
+                "lyricGap": "desfase de letra",
+                "dynamicImageBlur": "tamaño de desenfoque de imagen",
+                "dynamicIsImage": "habilitar imagen de fondo"
             },
             "lyrics": "letras",
             "related": "relacionado"
@@ -448,10 +484,14 @@
             "title": "$t(entity.albumArtist_other)"
         },
         "genreList": {
-            "title": "$t(entity.genre_other)"
+            "title": "$t(entity.genre_other)",
+            "showAlbums": "Mostrar $t(entity.genre_one) $t(entity.album_other)",
+            "showTracks": "Mostrar $t(entity.genre_one) $t(entity.track_other)"
         },
         "trackList": {
-            "title": "$t(entity.track_other)"
+            "title": "$t(entity.track_other)",
+            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
+            "artistTracks": "Pistas de {{artist}}"
         },
         "globalSearch": {
             "commands": {
@@ -465,7 +505,25 @@
             "title": "$t(entity.playlist_other)"
         },
         "albumList": {
-            "title": "$t(entity.album_other)"
+            "title": "$t(entity.album_other)",
+            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
+            "artistAlbums": "Álbumes de {{artist}}"
+        },
+        "albumArtistDetail": {
+            "viewAllTracks": "ver todo de $t(entity.track_other)",
+            "relatedArtists": "similar a $t(entity.artist_other)",
+            "topSongs": "mejores canciones",
+            "topSongsFrom": "Las mejores canciones de {{title}}",
+            "viewAll": "Ver todo",
+            "recentReleases": "Lanzamientos recientes",
+            "viewDiscography": "Ver discografía",
+            "about": "Sobre {{artist}}",
+            "appearsOn": "Aparece en"
+        },
+        "itemDetail": {
+            "copiedPath": "Ruta copiada correctamente",
+            "openFile": "Mostrar pista en el gestor de archivos",
+            "copyPath": "Copiar ruta al portapapeles"
         }
     },
     "form": {
@@ -516,6 +574,14 @@
         "queryEditor": {
             "input_optionMatchAll": "coincidir todos",
             "input_optionMatchAny": "coincidir cualquiera"
+        },
+        "shareItem": {
+            "createFailed": "No se pudo crear el recurso compartido (¿está habilitado el uso compartido?)",
+            "allowDownloading": "Permitir la descarga",
+            "description": "Descripción",
+            "setExpiration": "Establecer expiración",
+            "success": "Enlace de compartición copiado al portapapeles (o pulsa aquí para abrir)",
+            "expireInvalid": "La expiración debe ser en el futuro"
         }
     },
     "table": {
@@ -542,7 +608,8 @@
             "path": "ruta",
             "discNumber": "disco",
             "channels": "$t(common.channel_other)",
-            "size": "$t(common.size)"
+            "size": "$t(common.size)",
+            "codec": "$t(common.codec)"
         },
         "config": {
             "label": {
@@ -571,14 +638,17 @@
                 "playCount": "número de reproducción",
                 "genre": "$t(entity.genre_one)",
                 "favorite": "$t(common.favorite)",
-                "year": "$t(common.year)"
+                "year": "$t(common.year)",
+                "codec": "$t(common.codec)"
             },
             "general": {
                 "gap": "$t(common.gap)",
                 "tableColumns": "columnas de la tabla",
                 "autoFitColumns": "ajuste automático de columnas",
                 "size": "$t(common.size)",
-                "displayType": "tipo de visualización"
+                "displayType": "tipo de visualización",
+                "itemGap": "espacio entre elementos (px)",
+                "itemSize": "tamaño del elemento (px)"
             },
             "view": {
                 "card": "tarjeta",
