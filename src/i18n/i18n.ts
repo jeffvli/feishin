@@ -16,6 +16,8 @@ import sv from './locales/sv.json';
 import cs from './locales/cs.json';
 import nbNO from './locales/nb-NO.json';
 import nl from './locales/nl.json';
+import zhHant from './locales/zh-Hant.json';
+import fa from './locales/fa.json';
 
 const resources = {
     en: { translation: en },
@@ -24,10 +26,12 @@ const resources = {
     it: { translation: it },
     ru: { translation: ru },
     'pt-BR': { translation: ptBr },
+    fa: { translation: fa },
     fr: { translation: fr },
     ja: { translation: ja },
     pl: { translation: pl },
     'zh-Hans': { translation: zhHans },
+    'zh-Hant': { translation: zhHant },
     sr: { translation: sr },
     sv: { translation: sv },
     cs: { translation: cs },
@@ -72,7 +76,10 @@ export const languages = [
         label: 'Norsk (Bokmål)',
         value: 'nb-NO',
     },
-
+    {
+        label: 'فارسی',
+        value: 'fa',
+    },
     {
         label: 'Português (Brasil)',
         value: 'pt-BR',
@@ -96,6 +103,10 @@ export const languages = [
     {
         label: '简体中文',
         value: 'zh-Hans',
+    },
+    {
+        label: '繁體中文',
+        value: 'zh-Hant',
     },
 ];
 
@@ -125,7 +136,7 @@ const titleCasePostProcessor: PostProcessorModule = {
     },
 };
 
-const ignoreSentenceCaseLanguages = ['de']
+const ignoreSentenceCaseLanguages = ['de'];
 
 const sentenceCasePostProcessor: PostProcessorModule = {
     type: 'postProcessor',
@@ -136,7 +147,10 @@ const sentenceCasePostProcessor: PostProcessorModule = {
         return sentences
             .map((sentence) => {
                 return (
-                    sentence.charAt(0).toLocaleUpperCase() + (!ignoreSentenceCaseLanguages.includes(translator.language) ? sentence.slice(1).toLocaleLowerCase() : sentence.slice(1))
+                    sentence.charAt(0).toLocaleUpperCase() +
+                    (!ignoreSentenceCaseLanguages.includes(translator.language)
+                        ? sentence.slice(1).toLocaleLowerCase()
+                        : sentence.slice(1))
                 );
             })
             .join('. ');
