@@ -1,4 +1,4 @@
-name: Publish macOS (Manual)
+name: Publish Windows (Manual)
 
 on: workflow_dispatch
 
@@ -8,7 +8,7 @@ jobs:
 
         strategy:
             matrix:
-                os: [macos-latest]
+                os: [windows-latest]
 
         steps:
             - name: Checkout git repo
@@ -35,5 +35,5 @@ jobs:
                   command: |
                       npm run postinstall
                       npm run build
-                      npm exec electron-builder -- --publish always --mac
+                      npm exec electron-builder -- --publish always --win
                   on_retry_command: npm cache clean --force
