@@ -489,7 +489,7 @@
         "font_description": "ustaw czcionkę dla aplikacji",
         "playButtonBehavior_optionPlay": "$t(player.play)",
         "minimumScrobblePercentage": "minimalny czas trwania scrobble (procentowy)",
-        "mpvExecutablePath_description": "ustaw ścieżkę dla plików wykonywalnych mpv",
+        "mpvExecutablePath_description": "ustaw ścieżkę dla plików wykonywalnych mpv. gdy puste, zostanie użyta domyślna ścieżka",
         "playButtonBehavior_optionAddLast": "$t(player.addLast)",
         "minimizeToTray_description": "zminimalizuj aplikację do zasobnika systemowego",
         "remotePassword": "hasło dla serwera zdalnej kontroli",
@@ -518,7 +518,7 @@
         "sampleRate": "częstotliwość próbkowania",
         "sidePlayQueueStyle_optionAttached": "przyłączony",
         "sidebarConfiguration": "konfiguracja paska bocznego",
-        "sampleRate_description": "wybierz wyjściową częstotliwość próbkowania, która ma być używana, jeśli wybrana częstotliwość próbkowania różni się od częstotliwości bieżącego utworu",
+        "sampleRate_description": "wybierz wyjściową częstotliwość próbkowania, która ma być używana, jeśli wybrana częstotliwość próbkowania różni się od częstotliwości bieżącego utworu. wartość mniejsza niż 8000 spowoduje użycie częstotliwości domyślnej",
         "replayGainMode_optionNone": "$t(common.none)",
         "replayGainClipping": "wzmocnienie {{ReplayGain}}",
         "scrobble_description": "odtwarzanie scrobble na serwerze multimediów",
@@ -558,7 +558,13 @@
         "skipPlaylistPage": "pomiń stronę list odtwarzania",
         "themeDark": "motyw (ciemny)",
         "windowBarStyle_description": "wybierz styl paska okna",
-        "useSystemTheme": "użyj motywu systemowego"
+        "useSystemTheme": "użyj motywu systemowego",
+        "buttonSize": "Rozmiar przycisku paska odtwarzacza",
+        "clearQueryCache": "wyczyść pamięć podręczną feishin",
+        "clearCache_description": "\"twarde wyczyszczenie\" feishin. oprócz wyczyszczenia pamięci podręcznej feishin, opróżnij pamięć podręczną przeglądarki (zapisane obrazy i inne zasoby). dane i ustawienia serwera zostaną zachowane",
+        "clearQueryCache_description": "\"miękkie wyczyszczenie\" feishin. spowoduje to odświeżenie list odtwarzania, metadanych utworów i zresetowanie zapisanych tekstów. ustawienia, dane uwierzytelniające serwera i obrazy w pamięci podręcznej zostaną zachowane",
+        "buttonSize_description": "rozmiar przycisków paska odtwarzacza",
+        "clearCache": "wyczyść pamięć podręczną przeglądarki"
     },
     "table": {
         "config": {
