@@ -196,7 +196,21 @@
         "clearCache": "vymazat mezipaměť prohlížeče",
         "clearCache_description": "„tvrdé pročištění“ aplikace feishin. kromě mezipaměti aplikace feishin vymaže i mezipaměť prohlížeče (uložené obrázky a další zdroje). přihlašovací údaje k serveru a nastavení nebudou ovlivněny",
         "clearQueryCache": "vymazat mezipaměť aplikace feishin",
-        "clearQueryCache_description": "„lehké pročištění“ aplikace feishin. tímto obnovíte seznamy skladeb, metadata skladeb a resetujete uložené texty. nastavení, přihlašovací údaje k serveru a obrázky v mezipaměti nebudou ovlivněny"
+        "clearQueryCache_description": "„lehké pročištění“ aplikace feishin. tímto obnovíte seznamy skladeb, metadata skladeb a resetujete uložené texty. nastavení, přihlašovací údaje k serveru a obrázky v mezipaměti nebudou ovlivněny",
+        "startMinimized": "spustit minimalizované",
+        "homeConfiguration_description": "nastavte, které položky a v jakém pořadí mají být zobrazeny na domovské stránce",
+        "passwordStore": "ukládání hesel / tajných klíčů",
+        "mpvExtraParameters_help": "jeden na řádek",
+        "homeConfiguration": "nastavení domovské stránky",
+        "playerAlbumArtResolution_description": "rozlišení náhledu obalu alba ve velkém přehrávači. větší hodnota znamená kvalitnější obrázek, ale může se déle načítat. výchozí hodnota je 0, což znamená automatické rozlišení",
+        "playerAlbumArtResolution": "rozlišení obalu alba v přehrávači",
+        "genreBehavior": "výchozí chování stránky žánrů",
+        "externalLinks_description": "zapne zobrazování externích odkazů (Last.fm, MusicBrainz) na stránce umělce/alba",
+        "genreBehavior_description": "určuje, zda kliknutí na žánr otevře seznam skladeb nebo alb",
+        "clearCacheSuccess": "mezipaměť úspěšně vymazána",
+        "externalLinks": "zobrazit externí odkazy",
+        "startMinimized_description": "spustit aplikaci do systémové lišty",
+        "passwordStore_description": "který způsob ukládání hesel / tajných klíčů použít. změňte tuto možnost, pokud máte problémy s ukládáním hesel."
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -215,7 +229,11 @@
         "moveToBottom": "přesunout dolů",
         "setRating": "nastavit hodnocení",
         "toggleSmartPlaylistEditor": "přepnout editor $t(entity.smartPlaylist)",
-        "removeFromFavorites": "odebrat z $t(entity.favorite_other)"
+        "removeFromFavorites": "odebrat z $t(entity.favorite_other)",
+        "openIn": {
+            "lastfm": "Otevřít v Last.fm",
+            "musicbrainz": "Otevřít v MusicBrainz"
+        }
     },
     "common": {
         "backward": "zpátky",
@@ -298,7 +316,17 @@
         "random": "náhodně",
         "size": "velikost",
         "biography": "biografie",
-        "note": "poznámka"
+        "note": "poznámka",
+        "albumGain": "zisk (gain) alba",
+        "albumPeak": "vrchol alba",
+        "close": "zavřít",
+        "mbid": "ID MusicBrainz",
+        "trackGain": "zisk (gain) skladby",
+        "reload": "znovu načíst",
+        "share": "sdílet",
+        "codec": "kodek",
+        "trackPeak": "vrchol skladby",
+        "preview": "náhled"
     },
     "table": {
         "config": {
@@ -312,7 +340,9 @@
                 "gap": "$t(common.gap)",
                 "tableColumns": "sloupce tabulky",
                 "autoFitColumns": "automaticky přizpůsobit sloupce",
-                "size": "$t(common.size)"
+                "size": "$t(common.size)",
+                "itemGap": "mezera mezi položkami (px)",
+                "itemSize": "velikost položek (px)"
             },
             "label": {
                 "releaseDate": "datum vydání",
@@ -340,7 +370,8 @@
                 "discNumber": "číslo disku",
                 "favorite": "$t(common.favorite)",
                 "year": "$t(common.year)",
-                "albumArtist": "$t(entity.albumArtist_one)"
+                "albumArtist": "$t(entity.albumArtist_one)",
+                "codec": "$t(common.codec)"
             }
         },
         "column": {
@@ -366,7 +397,8 @@
             "path": "cesta",
             "discNumber": "disk",
             "channels": "$t(common.channel_other)",
-            "size": "$t(common.size)"
+            "size": "$t(common.size)",
+            "codec": "$t(common.codec)"
         }
     },
     "error": {
@@ -388,7 +420,10 @@
         "mpvRequired": "vyžadován přehrávač MPV",
         "audioDeviceFetchError": "při pokusu o přístup ke zvukovým zařízením se vyskytla chyba",
         "invalidServer": "neplatný server",
-        "loginRateError": "příliš mnoho pokusů o přihlášení, zkuste to znovu za pár vteřin"
+        "loginRateError": "příliš mnoho pokusů o přihlášení, zkuste to znovu za pár vteřin",
+        "badAlbum": "tuto stránku vidíte, protože tato skladba není součástí alba. tento problém může nastat, pokud máte skladbu na nejvyšší úrovni vaší složky s hudbou. jellyfin seskupuje skladby pouze, pokud se nacházejí ve složce.",
+        "networkError": "vyskytla se chyba sítě",
+        "openError": "nepodařilo se otevřít soubor"
     },
     "filter": {
         "mostPlayed": "nejvíce přehráváno",
@@ -446,7 +481,8 @@
             "settings": "$t(common.setting_other)",
             "home": "$t(common.home)",
             "artists": "$t(entity.artist_other)",
-            "albumArtists": "$t(entity.albumArtist_other)"
+            "albumArtists": "$t(entity.albumArtist_other)",
+            "shared": "$t(entity.playlist_other) sdíleny"
         },
         "fullscreenPlayer": {
             "config": {
@@ -460,7 +496,9 @@
                 "unsynchronized": "nesynchronizováno",
                 "lyricAlignment": "zarovnání textů",
                 "useImageAspectRatio": "použít poměr stran obrázku",
-                "lyricGap": "mezera textů"
+                "lyricGap": "mezera textů",
+                "dynamicImageBlur": "velikost rozostření obrázku",
+                "dynamicIsImage": "povolit obrázek na pozadí"
             },
             "upNext": "další",
             "lyrics": "texty",
@@ -494,7 +532,9 @@
             "addFavorite": "$t(action.addToFavorites)",
             "play": "$t(player.play)",
             "numberSelected": "vybráno {{count}}",
-            "removeFromQueue": "$t(action.removeFromQueue)"
+            "removeFromQueue": "$t(action.removeFromQueue)",
+            "showDetails": "získat informace",
+            "shareItem": "sdílet položku"
         },
         "home": {
             "mostPlayed": "nejpřehrávanější",
@@ -517,10 +557,14 @@
             "title": "$t(entity.albumArtist_other)"
         },
         "genreList": {
-            "title": "$t(entity.genre_other)"
+            "title": "$t(entity.genre_other)",
+            "showTracks": "zobrazit $t(entity.track_other) s žánrem",
+            "showAlbums": "zobrazit $t(entity.album_other) s žánrem"
         },
         "trackList": {
-            "title": "$t(entity.track_other)"
+            "title": "$t(entity.track_other)",
+            "artistTracks": "Skladby od umělce {{artist}}",
+            "genreTracks": "$t(entity.track_other) s žánrem „{{genre}}“"
         },
         "globalSearch": {
             "commands": {
@@ -534,7 +578,25 @@
             "title": "$t(entity.playlist_other)"
         },
         "albumList": {
-            "title": "$t(entity.album_other)"
+            "title": "$t(entity.album_other)",
+            "artistAlbums": "Alba od umělce {{artist}}",
+            "genreAlbums": "$t(entity.album_other) s žánrem „{{genre}}“"
+        },
+        "albumArtistDetail": {
+            "recentReleases": "nedávno vydáno",
+            "viewDiscography": "zobrazit diskografii",
+            "about": "O umělci {{artist}}",
+            "appearsOn": "také v",
+            "topSongs": "nejlepší skladby",
+            "topSongsFrom": "Nejlepší skladby od umělce {{title}}",
+            "relatedArtists": "podobní $t(entity.artist_other)",
+            "viewAllTracks": "zobrazit všechny $t(entity.track_other)",
+            "viewAll": "zobrazit vše"
+        },
+        "itemDetail": {
+            "copiedPath": "cesta úspěšně zkopírována",
+            "copyPath": "kopírovat cestu do schránky",
+            "openFile": "zobrazit skladbu ve správci souborů"
         }
     },
     "form": {
@@ -585,6 +647,14 @@
         },
         "editPlaylist": {
             "title": "upravit $t(entity.playlist_one)"
+        },
+        "shareItem": {
+            "allowDownloading": "umožnit stahování",
+            "success": "odkaz ke sdílení zkopírován do schránky (klikněte sem pro otevření)",
+            "description": "popis",
+            "expireInvalid": "čas vypršení musí být v budoucnosti",
+            "setExpiration": "nastavit vypršení",
+            "createFailed": "nepodařilo se vytvořit sdílení (je sdílení povoleno?)"
         }
     },
     "entity": {
