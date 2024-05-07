@@ -288,7 +288,12 @@
         "replayGainFallback_description": "gain in db da applicare se il file non possiede tag {{ReplayGain}}",
         "replayGainPreamp_description": "aggiusta la preamplificazione del gain applicato sui valori {{ReplayGain}}",
         "skipPlaylistPage": "Salta la pagina playlist",
-        "sidebarCollapsedNavigation": "navigazione con barra laterale (collassata)"
+        "sidebarCollapsedNavigation": "navigazione con barra laterale (collassata)",
+        "clearCache_description": "pulitura \"forzata\" di feishin. Oltre a pulire la cache di feishin, elimina la cache del browser(immagini salvate e altri elementi). credenziali e impostazioni del server saranno mantenute",
+        "clearQueryCache": "pulisci cache di feishin",
+        "buttonSize_description": "Dimensione bottoni nella barra di riproduzione",
+        "clearCache": "pulisci la cache del browser",
+        "clearQueryCache_description": "\"leggera\" pulizia di feishin. verranno aggiornate le playlist, metadata delle tracce e i testi salvati. impostazioni, credenziali del server e le immagini salvate saranno mantenute"
     },
     "error": {
         "remotePortWarning": "riavvia il server per applicare la nuova porta",
