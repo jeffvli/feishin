@@ -13,13 +13,15 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import { VirtualGridWrapper } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
 import type { CardRoute, CardRow, PlayQueueAddOptions } from '/@/renderer/types';
 import { ListDisplayType } from '/@/renderer/types';
-import { LibraryItem } from '/@/renderer/api/types';
+import { AnyLibraryItem, Genre, LibraryItem } from '/@/renderer/api/types';
+
+type LibraryItemOrGenre = AnyLibraryItem | Genre;
 
 export type VirtualInfiniteGridRef = {
     resetLoadMoreItemsCache: () => void;
     scrollTo: (index: number) => void;
-    setItemData: (data: any[]) => void;
-    updateItemData: (rule: (item: any) => any) => void;
+    setItemData: (data: LibraryItemOrGenre[]) => void;
+    updateItemData: (rule: (item: LibraryItemOrGenre) => LibraryItemOrGenre) => void;
 };
 
 interface VirtualGridProps
@@ -27,7 +29,7 @@ interface VirtualGridProps
     cardRows: CardRow<any>[];
     display?: ListDisplayType;
     fetchFn: (options: { columnCount: number; skip: number; take: number }) => Promise<any>;
-    fetchInitialData?: () => any;
+    fetchInitialData?: () => LibraryItemOrGenre[];
     handleFavorite?: (options: {
         id: string[];
         isFavorite: boolean;
@@ -70,7 +72,10 @@ export const VirtualInfiniteGrid = forwardRef(
         const listRef = useRef<any>(null);
         const loader = useRef<InfiniteLoader>(null);
 
-        const [itemData, setItemData] = useState<any[]>(fetchInitialData?.() || []);
+        // itemData can be a sparse array. Treat the intermediate elements as being undefined
+        const [itemData, setItemData] = useState<Array<LibraryItemOrGenre | undefined>>(
+            fetchInitialData?.() || [],
+        );
 
         const { itemHeight, rowCount, columnCount } = useMemo(() => {
             const itemsPerRow = width ? Math.floor(width / (itemSize + itemGap * 2)) : 5;
@@ -109,7 +114,7 @@ export const VirtualInfiniteGrid = forwardRef(
                 });
 
                 setItemData((itemData) => {
-                    const newData: any[] = [...itemData];
+                    const newData = [...itemData];
 
                     let itemIndex = 0;
                     for (let rowIndex = start; rowIndex < itemCount; rowIndex += 1) {
@@ -135,11 +140,11 @@ export const VirtualInfiniteGrid = forwardRef(
             scrollTo: (index: number) => {
                 listRef?.current?.scrollToItem(index);
             },
-            setItemData: (data: any[]) => {
+            setItemData: (data: LibraryItemOrGenre[]) => {
                 setItemData(data);
             },
             updateItemData: (rule) => {
-                setItemData((data) => data.map(rule));
+                setItemData((data) => data.map((item) => item && rule(item)));
             },
         }));
 
