@@ -199,7 +199,7 @@ const createTray = () => {
         },
     ]);
 
-    tray.on('double-click', () => {
+    tray.on('click', () => {
         mainWindow?.show();
         createWinThumbarButtons();
     });
