@@ -496,6 +496,8 @@
         "globalMediaHotkeys_description": "enable or disable the usage of your system media hotkeys to control playback",
         "homeConfiguration": "home page configuration",
         "homeConfiguration_description": "configure what items are shown, and in what order, on the home page",
+        "homeFeature": "home featured carousel",
+        "homeFeature_description": "controls whether to show the large featured carousel on the home page",
         "hotkey_browserBack": "browser back",
         "hotkey_browserForward": "browser forward",
         "hotkey_favoriteCurrentSong": "favorite $t(common.currentSong)",

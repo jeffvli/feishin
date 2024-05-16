@@ -198,6 +198,7 @@ export interface SettingsState {
         externalLinks: boolean;
         followSystemTheme: boolean;
         genreTarget: GenreTarget;
+        homeFeature: boolean;
         homeItems: SortableItem<HomeItem>[];
         language: string;
         passwordStore?: string;
@@ -319,6 +320,7 @@ const initialState: SettingsState = {
         externalLinks: true,
         followSystemTheme: false,
         genreTarget: GenreTarget.TRACK,
+        homeFeature: true,
         homeItems,
         language: 'en',
         passwordStore: undefined,

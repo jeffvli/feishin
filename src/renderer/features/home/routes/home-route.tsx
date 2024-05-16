@@ -33,11 +33,12 @@ const HomeRoute = () => {
     const server = useCurrentServer();
     const itemsPerPage = 15;
     const { windowBarStyle } = useWindowSettings();
-    const { homeItems } = useGeneralSettings();
+    const { homeFeature, homeItems } = useGeneralSettings();
 
     const feature = useAlbumList({
         options: {
             cacheTime: 1000 * 60,
+            enabled: homeFeature,
             staleTime: 1000 * 60,
         },
         query: {
@@ -249,7 +250,7 @@ const HomeRoute = () => {
                     px="2rem"
                     spacing="lg"
                 >
-                    <FeatureCarousel data={featureItemsWithImage} />
+                    {homeFeature && <FeatureCarousel data={featureItemsWithImage} />}
                     {sortedCarousel.map((carousel) => (
                         <MemoizedSwiperGridCarousel
                             key={`carousel-${carousel.uniqueId}`}
