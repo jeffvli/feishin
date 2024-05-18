@@ -681,6 +681,7 @@
                 "releaseDate": "release date",
                 "rowIndex": "row index",
                 "size": "$t(common.size)",
+                "songCount": "$t(entity.track_other)",
                 "title": "$t(common.title)",
                 "titleCombined": "$t(common.title) (combined)",
                 "trackNumber": "track number",
