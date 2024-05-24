@@ -186,7 +186,7 @@ export const useHandlePlayQueueAdd = () => {
                         ? PlayersRef.current?.player1
                         : PlayersRef.current?.player2;
                 const underlying = player?.getInternalPlayer();
-                if (underlying) {
+                if (underlying && playType === Play.NOW) {
                     underlying.currentTime = 0;
                 }
             }
