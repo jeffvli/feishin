@@ -629,6 +629,8 @@ if (!singleInstance) {
         if (mainWindow) {
             if (mainWindow.isMinimized()) {
                 mainWindow.restore();
+            } else if (!mainWindow.isVisible()) {
+                mainWindow.show();
             }
 
             mainWindow.focus();
