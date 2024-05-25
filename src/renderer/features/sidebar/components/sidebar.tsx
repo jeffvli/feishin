@@ -64,7 +64,7 @@ const ImageContainer = styled(motion.div)<{ height: string }>`
 const SidebarImage = styled.img`
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: var(--image-fit);
     background: var(--placeholder-bg);
 `;
 

@@ -62,7 +62,7 @@ const Image = styled(motion.div)`
 const PlayerbarImage = styled.img`
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: var(--image-fit);
 `;
 
 const LineItem = styled.div<{ $secondary?: boolean }>`

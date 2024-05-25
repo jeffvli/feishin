@@ -121,7 +121,7 @@
 }
 
 .image {
-    object-fit: cover;
+    object-fit: var(--image-fit);
     border-radius: 5px;
 }
 

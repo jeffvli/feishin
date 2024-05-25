@@ -40,6 +40,7 @@ export const App = () => {
     const theme = useTheme();
     const accent = useSettingsStore((store) => store.general.accent);
     const language = useSettingsStore((store) => store.general.language);
+    const nativeImageAspect = useSettingsStore((store) => store.general.nativeAspectRatio);
     const { builtIn, custom, system, type } = useSettingsStore((state) => state.font);
     const { type: playbackType } = usePlaybackSettings();
     const { bindings } = useHotkeySettings();
@@ -89,6 +90,11 @@ export const App = () => {
         const root = document.documentElement;
         root.style.setProperty('--primary-color', accent);
     }, [accent]);
+
+    useEffect(() => {
+        const root = document.documentElement;
+        root.style.setProperty('--image-fit', nativeImageAspect ? 'scale-down' : 'cover');
+    }, [nativeImageAspect]);
 
     const providerValue = useMemo(() => {
         return { handlePlayQueueAdd };

@@ -44,7 +44,7 @@ const MetadataWrapper = styled.div`
 
 const StyledImage = styled(SimpleImg)`
     img {
-        object-fit: cover;
+        object-fit: var(--image-fit);
     }
 `;
 

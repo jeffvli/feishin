@@ -63,7 +63,7 @@ const BackgroundImage = styled.img`
     height: 150%;
     user-select: none;
     filter: blur(24px);
-    object-fit: cover;
+    object-fit: var(--image-fit);
     object-position: 0 30%;
 `;
 

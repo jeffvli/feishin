@@ -531,6 +531,8 @@
         "hotkey_volumeUp": "volume up",
         "hotkey_zoomIn": "zoom in",
         "hotkey_zoomOut": "zoom out",
+        "imageAspectRatio": "use native cover art aspect ratio",
+        "imageAspectRatio_description": "if enabled, cover art will be shown using their native aspect ratio. for art that is not 1:1, the remaining space will be empty",
         "language": "language",
         "language_description": "sets the language for the application ($t(common.restartRequired))",
         "lyricFetch": "fetch lyrics from the internet",

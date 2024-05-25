@@ -46,7 +46,7 @@ const MetadataWrapper = styled.div`
 `;
 
 const StyledImage = styled.img`
-    object-fit: cover;
+    object-fit: var(--image-fit);
     border-radius: 4px;
 `;
 
