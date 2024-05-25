@@ -148,7 +148,7 @@ export const MpvSettings = () => {
     const options: SettingOption[] = [
         {
             control: (
-                <Group spacing="sm">
+                <Group gap="sm">
                     <Button
                         tooltip={{
                             label: t('common.reload', { postProcess: 'titleCase' }),
@@ -164,7 +164,7 @@ export const MpvSettings = () => {
                         rightSection={
                             mpvPath && (
                                 <Button
-                                    compact
+                                    size="compact-md"
                                     tooltip={{
                                         label: t('common.clear', { postProcess: 'titleCase' }),
                                         openDelay: 0,
@@ -191,7 +191,7 @@ export const MpvSettings = () => {
         },
         {
             control: (
-                <Stack spacing="xs">
+                <Stack gap="xs">
                     <Textarea
                         autosize
                         defaultValue={settings.mpvExtraParameters.join('\n')}
@@ -208,7 +208,7 @@ export const MpvSettings = () => {
                 </Stack>
             ),
             description: (
-                <Stack spacing={0}>
+                <Stack gap={0}>
                     <Text
                         $noSelect
                         $secondary

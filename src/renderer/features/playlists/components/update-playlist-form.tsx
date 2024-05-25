@@ -117,7 +117,7 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                         {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
                     />
                 )}
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button
                         variant="subtle"
                         onClick={onCancel}

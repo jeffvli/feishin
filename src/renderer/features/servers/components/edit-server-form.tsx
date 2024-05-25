@@ -184,7 +184,7 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                         })}
                     />
                 )}
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button
                         variant="subtle"
                         onClick={onCancel}

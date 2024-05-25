@@ -84,8 +84,8 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
                     <>
                         {open && (
                             <Button
-                                compact
                                 disabled={isSaveButtonDisabled}
+                                size="compact-md"
                                 variant="filled"
                                 onClick={handleSave}
                             >
@@ -93,7 +93,7 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
                             </Button>
                         )}
                         <Button
-                            compact
+                            size="compact-md"
                             variant="filled"
                             onClick={() => setOpen(!open)}
                         >

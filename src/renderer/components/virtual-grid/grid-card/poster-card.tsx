@@ -1,4 +1,3 @@
-import { Center, Stack } from '@mantine/core';
 import { RiAlbumFill, RiPlayListFill, RiUserVoiceFill } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { SimpleImg } from 'react-simple-img';
@@ -9,6 +8,8 @@ import { CardRows } from '/@/renderer/components/card';
 import { Skeleton } from '/@/renderer/components/skeleton';
 import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
 import { CardRow, PlayQueueAddOptions, Play, CardRoute } from '/@/renderer/types';
+import { Center } from '/@/renderer/components/center';
+import { Stack } from '/@/renderer/components/stack';
 
 interface BaseGridCardProps {
     columnIndex: number;
@@ -173,7 +174,7 @@ export const PosterCard = ({
                             />
                         ) : (
                             <Center
-                                sx={{
+                                style={{
                                     background: 'var(--placeholder-bg)',
                                     borderRadius: 'var(--card-default-radius)',
                                     height: '100%',
@@ -218,7 +219,7 @@ export const PosterCard = ({
                 <ImageContainer />
             </Skeleton>
             <DetailContainer>
-                <Stack spacing="sm">
+                <Stack gap="sm">
                     {controls.cardRows.map((row, index) => (
                         <Skeleton
                             key={`${index}-${columnIndex}-${row.arrayProperty}`}

@@ -9,7 +9,6 @@ import {
     useRef,
     useState,
 } from 'react';
-import { Group, Stack } from '@mantine/core';
 import throttle from 'lodash/throttle';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import styled from 'styled-components';
@@ -25,6 +24,8 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
 import { usePlayButtonBehavior } from '/@/renderer/store';
 import { CardRoute, CardRow } from '/@/renderer/types';
+import { Group } from '/@/renderer/components/group';
+import { Stack } from '/@/renderer/components/stack';
 
 const getSlidesPerView = (windowWidth: number) => {
     if (windowWidth < 400) return 2;
@@ -53,7 +54,7 @@ interface TitleProps {
 
 const Title = ({ label, handleNext, handlePrev, pagination }: TitleProps) => {
     return (
-        <Group position="apart">
+        <Group justify="space-between">
             {isValidElement(label) ? (
                 label
             ) : (
@@ -65,20 +66,18 @@ const Title = ({ label, handleNext, handlePrev, pagination }: TitleProps) => {
                 </TextTitle>
             )}
 
-            <Group spacing="sm">
+            <Group gap="sm">
                 <Button
-                    compact
                     disabled={!pagination.hasPreviousPage}
-                    size="lg"
+                    size="compact-lg"
                     variant="default"
                     onClick={handlePrev}
                 >
                     <RiArrowLeftSLine />
                 </Button>
                 <Button
-                    compact
                     disabled={!pagination.hasNextPage}
-                    size="lg"
+                    size="compact-lg"
                     variant="default"
                     onClick={handleNext}
                 >
@@ -280,8 +279,7 @@ export const SwiperGridCarousel = ({
     return (
         <CarouselContainer
             ref={containerRef}
-            className="grid-carousel"
-            spacing="md"
+            gap="md"
         >
             {title ? (
                 <Title

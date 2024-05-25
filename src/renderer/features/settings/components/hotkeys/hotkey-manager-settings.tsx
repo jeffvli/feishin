@@ -247,7 +247,7 @@ export const HotkeyManagerSettings = () => {
                 {filteredBindings.map((binding) => (
                     <Group
                         key={`hotkey-${binding}`}
-                        noWrap
+                        wrap="nowrap"
                     >
                         <TextInput
                             readOnly
@@ -256,8 +256,8 @@ export const HotkeyManagerSettings = () => {
                         />
                         <TextInput
                             readOnly
-                            icon={<RiKeyboardBoxLine />}
                             id={`hotkey-${binding}`}
+                            leftSection={<RiKeyboardBoxLine />}
                             style={{
                                 opacity: selected === (binding as BindingActions) ? 0.8 : 1,
                                 outline: duplicateHotkeyMap.includes(

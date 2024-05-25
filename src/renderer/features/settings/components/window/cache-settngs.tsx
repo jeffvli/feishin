@@ -57,8 +57,8 @@ export const CacheSettings = () => {
         {
             control: (
                 <Button
-                    compact
                     disabled={isClearing}
+                    size="compact-md"
                     variant="filled"
                     onClick={() => openResetConfirmModal(false)}
                 >
@@ -73,8 +73,8 @@ export const CacheSettings = () => {
         {
             control: (
                 <Button
-                    compact
                     disabled={isClearing}
+                    size="compact-md"
                     variant="filled"
                     onClick={() => openResetConfirmModal(true)}
                 >

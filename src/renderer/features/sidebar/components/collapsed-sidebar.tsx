@@ -70,7 +70,7 @@ export const CollapsedSidebar = () => {
                 {sidebarCollapsedNavigation && (
                     <Group
                         grow
-                        spacing={0}
+                        gap={0}
                         style={{
                             borderRight: 'var(--sidebar-border)',
                         }}

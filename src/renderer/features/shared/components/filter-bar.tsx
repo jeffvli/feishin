@@ -1,6 +1,7 @@
 import { PaperProps } from '@mantine/core';
 import styled from 'styled-components';
 import { Paper } from '/@/renderer/components';
+import { ReactNode } from 'react';
 
 const StyledFilterBar = styled(Paper)`
     z-index: 1;
@@ -8,6 +9,10 @@ const StyledFilterBar = styled(Paper)`
     box-shadow: 0 5px 15px rgb(0 0 0 / 65%);
 `;
 
-export const FilterBar = ({ children, ...props }: PaperProps) => {
+interface FilterBarProps extends PaperProps {
+    children: ReactNode;
+}
+
+export const FilterBar = ({ children, ...props }: FilterBarProps) => {
     return <StyledFilterBar {...props}>{children}</StyledFilterBar>;
 };

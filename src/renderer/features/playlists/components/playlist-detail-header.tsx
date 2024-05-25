@@ -51,7 +51,7 @@ export const PlaylistDetailHeader = forwardRef(
                     title={detailQuery?.data?.name || ''}
                 >
                     <Stack>
-                        <Group spacing="sm">
+                        <Group gap="sm">
                             {metadataItems.map((item, index) => (
                                 <Fragment key={`item-${item.id}-${index}`}>
                                     {index > 0 && <Text $noSelect>•</Text>}

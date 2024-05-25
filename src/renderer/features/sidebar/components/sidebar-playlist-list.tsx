@@ -28,7 +28,7 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
             <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
                 <Box
                     fw="600"
-                    sx={{ fontSize: '1.2rem' }}
+                    style={{ fontSize: '1.2rem' }}
                 >
                     {t('page.sidebar.shared', { postProcess: 'titleCase' })}
                 </Box>
@@ -47,11 +47,10 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
     return (
         <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
             <Group
-                noWrap
                 className="sidebar-playlist-item"
+                justify="space-between"
                 pos="relative"
-                position="apart"
-                sx={{
+                style={{
                     '&:hover': {
                         '.sidebar-playlist-controls': {
                             display: 'flex',
@@ -61,13 +60,14 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                         },
                     },
                 }}
+                wrap="nowrap"
             >
                 <Text
                     className="sidebar-playlist-name"
                     component={Link}
                     overflow="hidden"
                     size="md"
-                    sx={{
+                    style={{
                         color: 'var(--sidebar-fg) !important',
                         cursor: 'default',
                         width: '100%',
@@ -77,16 +77,15 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                     {data?.items[index].name}
                 </Text>
                 <Group
-                    noWrap
                     className="sidebar-playlist-controls"
                     display="none"
+                    gap="sm"
                     pos="absolute"
                     right="0"
-                    spacing="sm"
+                    wrap="nowrap"
                 >
                     <Button
-                        compact
-                        size="md"
+                        size="compact-md"
                         tooltip={{
                             label: t('player.play', { postProcess: 'sentenceCase' }),
                             openDelay: 500,
@@ -100,8 +99,7 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                         <RiPlayFill />
                     </Button>
                     <Button
-                        compact
-                        size="md"
+                        size="compact-md"
                         tooltip={{
                             label: t('player.addLast', { postProcess: 'sentenceCase' }),
                             openDelay: 500,
@@ -115,8 +113,7 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                         <RiAddBoxFill />
                     </Button>
                     <Button
-                        compact
-                        size="md"
+                        size="compact-md"
                         tooltip={{
                             label: t('player.addNext', { postProcess: 'sentenceCase' }),
                             openDelay: 500,

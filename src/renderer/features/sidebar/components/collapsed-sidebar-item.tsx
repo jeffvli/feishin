@@ -5,8 +5,11 @@ import { useMatch } from 'react-router';
 import styled from 'styled-components';
 import { Text } from '/@/renderer/components';
 
-const Container = styled(Flex)<{ $active?: boolean; $disabled?: boolean }>`
+const Container = styled(Flex)<any>`
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
     padding: 0.9rem 0.3rem;
     pointer-events: ${(props) => (props.$disabled ? 'none' : 'all')};
@@ -80,8 +83,6 @@ const _CollapsedSidebarItem = forwardRef<HTMLDivElement, CollapsedSidebarItemPro
                 ref={ref}
                 $active={Boolean(match)}
                 $disabled={disabled}
-                align="center"
-                direction="column"
                 {...props}
             >
                 {isMatch ? <ActiveTabIndicator /> : null}

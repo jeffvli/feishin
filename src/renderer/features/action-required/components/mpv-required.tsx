@@ -14,7 +14,8 @@ export const MpvRequired = () => {
     const [disabled, setDisabled] = useState(false);
     const { t } = useTranslation();
 
-    const handleSetMpvPath = (e: File) => {
+    const handleSetMpvPath = (e: File | null) => {
+        if (!e) return;
         localSettings?.set('mpv_path', e.path);
     };
 

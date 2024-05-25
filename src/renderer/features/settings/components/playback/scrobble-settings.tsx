@@ -76,7 +76,7 @@ export const ScrobbleSettings = () => {
                                 ...settings,
                                 scrobble: {
                                     ...settings.scrobble,
-                                    scrobbleAtDuration: e,
+                                    scrobbleAtDuration: Number(e),
                                 },
                             },
                         });

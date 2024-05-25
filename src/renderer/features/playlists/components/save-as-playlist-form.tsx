@@ -89,7 +89,7 @@ export const SaveAsPlaylistForm = ({
                         {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
                     />
                 )}
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button
                         variant="subtle"
                         onClick={onCancel}

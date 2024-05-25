@@ -48,7 +48,7 @@ export const SettingsContent = () => {
                 orientation="horizontal"
                 value={currentTab}
                 variant="default"
-                onTabChange={(e) => e && setSettings({ tab: e })}
+                onChange={(e) => e && setSettings({ tab: e })}
             >
                 <Tabs.List>
                     <Tabs.Tab value="general">

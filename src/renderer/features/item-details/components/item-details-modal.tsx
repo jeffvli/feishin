@@ -304,7 +304,7 @@ export const ItemDetailsModal = ({ item }: ItemDetailsModalProps) => {
             <Table
                 highlightOnHover
                 horizontalSpacing="sm"
-                sx={{ userSelect: 'text' }}
+                style={{ userSelect: 'text' }}
                 verticalSpacing="sm"
             >
                 <tbody>{body}</tbody>

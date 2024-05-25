@@ -37,7 +37,7 @@ export const ActionBar = () => {
                     <Grid.Col span={6}>
                         <TextInput
                             readOnly
-                            icon={<RiSearchLine />}
+                            leftSection={<RiSearchLine />}
                             placeholder={t('common.search', { postProcess: 'titleCase' })}
                             size="md"
                             onClick={open}
@@ -51,8 +51,8 @@ export const ActionBar = () => {
                     <Grid.Col span={6}>
                         <Group
                             grow
-                            noWrap
-                            spacing="sm"
+                            gap="sm"
+                            wrap="nowrap"
                         >
                             <DropdownMenu position="bottom-start">
                                 <DropdownMenu.Target>
@@ -90,8 +90,8 @@ export const ActionBar = () => {
             ) : (
                 <Group
                     grow
+                    gap="sm"
                     px="1rem"
-                    spacing="sm"
                     w="100%"
                 >
                     <Button

@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-import { Group, Image, Stack } from '@mantine/core';
+import { Image } from '@mantine/core';
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +15,8 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { Play } from '/@/renderer/types';
 import { usePlayButtonBehavior } from '/@/renderer/store';
+import { Group } from '/@/renderer/components/group';
+import { Stack } from '/@/renderer/components/stack';
 
 const Carousel = styled(motion.div)`
     position: relative;
@@ -166,21 +168,21 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                     placeholder="var(--card-default-bg)"
                                     radius="md"
                                     src={data[itemIndex]?.imageUrl}
-                                    sx={{ objectFit: 'cover' }}
+                                    style={{ objectFit: 'cover' }}
                                     width={225}
                                 />
                             </ImageColumn>
                             <InfoColumn>
                                 <Stack
-                                    spacing="md"
-                                    sx={{ width: '100%' }}
+                                    gap="md"
+                                    style={{ width: '100%' }}
                                 >
                                     <TitleWrapper>
                                         <TextTitle
                                             lh="3.5rem"
                                             order={1}
                                             overflow="hidden"
-                                            sx={{ fontSize: '3.5rem' }}
+                                            style={{ fontSize: '3.5rem' }}
                                             weight={900}
                                         >
                                             {currentItem?.name}
@@ -209,7 +211,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                         <Badge size="lg">{currentItem?.releaseYear}</Badge>
                                         <Badge size="lg">{currentItem?.songCount} tracks</Badge>
                                     </Group>
-                                    <Group position="apart">
+                                    <Group justify="space-between">
                                         <Button
                                             size="lg"
                                             style={{ borderRadius: '5rem' }}
@@ -237,7 +239,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                                 { postProcess: 'titleCase' },
                                             )}
                                         </Button>
-                                        <Group spacing="sm">
+                                        <Group gap="sm">
                                             <Button
                                                 radius="lg"
                                                 size="sm"

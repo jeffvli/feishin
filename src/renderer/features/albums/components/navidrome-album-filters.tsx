@@ -1,6 +1,14 @@
 import { ChangeEvent, useMemo, useState } from 'react';
-import { Divider, Group, Stack } from '@mantine/core';
-import { NumberInput, Switch, Text, Select, SpinnerIcon } from '/@/renderer/components';
+import {
+    NumberInput,
+    Switch,
+    Text,
+    Select,
+    SpinnerIcon,
+    Divider,
+    Group,
+    Stack,
+} from '/@/renderer/components';
 import { AlbumListFilter, useListStoreActions, useListStoreByKey } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
@@ -210,11 +218,11 @@ export const NavidromeAlbumFilters = ({
     };
 
     return (
-        <Stack p="0.8rem">
+        <Stack style={{ padding: '0.8rem' }}>
             {toggleFilters.map((filter) => (
                 <Group
                     key={`nd-filter-${filter.label}`}
-                    position="apart"
+                    justify="space-between"
                 >
                     <Text>{filter.label}</Text>
                     <Switch
@@ -223,7 +231,7 @@ export const NavidromeAlbumFilters = ({
                     />
                 </Group>
             ))}
-            <Divider my="0.5rem" />
+            <Divider marginY="0.5rem" />
             <Group grow>
                 <NumberInput
                     defaultValue={filter._custom?.navidrome?.year}

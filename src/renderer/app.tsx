@@ -1,30 +1,32 @@
-import { useEffect, useMemo, useRef } from 'react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
+import '@ag-grid-community/styles/ag-grid.css';
+import { MantineProvider } from '@mantine/core';
 import isElectron from 'is-electron';
 import { initSimpleImg } from 'react-simple-img';
-import { toast } from './components';
-import { useTheme } from './hooks';
-import { IsUpdatedDialog } from './is-updated-dialog';
-import { AppRouter } from './router/app-router';
-import {
-    useHotkeySettings,
-    usePlaybackSettings,
-    useRemoteSettings,
-    useSettingsStore,
-} from './store/settings.store';
-import './styles/global.scss';
-import { ContextMenuProvider } from '/@/renderer/features/context-menu';
-import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
-import { PlayQueueHandlerContext } from '/@/renderer/features/player';
-import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
-import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
-import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
-import '@ag-grid-community/styles/ag-grid.css';
-import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
+import { useTheme } from '/@/renderer/hooks';
+import { AppRouter } from '/@/renderer/router/app-router';
+import { useRef, useEffect, useMemo } from 'react';
 import i18n from '/@/i18n/i18n';
+import { toast } from '/@/renderer/components';
+import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
+import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
+import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
 import { useServerVersion } from '/@/renderer/hooks/use-server-version';
+import {
+    useSettingsStore,
+    usePlaybackSettings,
+    useHotkeySettings,
+    useQueueControls,
+    useRemoteSettings,
+    usePlayerStore,
+    PlayerState,
+} from '/@/renderer/store';
+import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
+import { PlayQueueHandlerContext } from '/@/renderer/features/player';
+import { ContextMenuProvider } from '/@/renderer/features/context-menu';
+import { IsUpdatedDialog } from '/@/renderer/is-updated-dialog';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -189,13 +191,13 @@ export const App = () => {
     }, [language]);
 
     return (
-        <>
+        <MantineProvider forceColorScheme={theme as 'light' | 'dark'}>
             <PlayQueueHandlerContext.Provider value={providerValue}>
                 <ContextMenuProvider>
                     <AppRouter />
                 </ContextMenuProvider>
             </PlayQueueHandlerContext.Provider>
             <IsUpdatedDialog />
-        </>
+        </MantineProvider>
     );
 };

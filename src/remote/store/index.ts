@@ -1,5 +1,5 @@
 import { hideNotification, showNotification } from '@mantine/notifications';
-import type { NotificationProps as MantineNotificationProps } from '@mantine/notifications';
+import type { NotificationData as MantineNotificationProps } from '@mantine/notifications';
 import merge from 'lodash/merge';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';

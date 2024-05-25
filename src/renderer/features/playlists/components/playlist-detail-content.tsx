@@ -159,15 +159,15 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
     return (
         <ContentContainer>
             <Group
+                justify="space-between"
                 p="1rem"
-                position="apart"
             >
                 <Group>
                     <PlayButton onClick={() => handlePlay()} />
                     <DropdownMenu position="bottom-start">
                         <DropdownMenu.Target>
                             <Button
-                                compact
+                                size="compact-md"
                                 variant="subtle"
                             >
                                 <RiMoreFill size={20} />
@@ -199,10 +199,10 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                         </DropdownMenu.Dropdown>
                     </DropdownMenu>
                     <Button
-                        compact
-                        uppercase
                         component={Link}
+                        size="compact-md"
                         to={generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId })}
+                        tt="uppercase"
                         variant="subtle"
                     >
                         View full playlist
@@ -234,15 +234,15 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                 />
             </Box>
             <MotionGroup
+                justify="center"
                 p="2rem"
-                position="center"
                 onViewportEnter={handleLoadMore}
             >
                 <Button
                     ref={loadMoreRef}
-                    compact
                     disabled={!playlistSongsQueryInfinite.hasNextPage}
                     loading={playlistSongsQueryInfinite.isFetchingNextPage}
+                    size="compact-md"
                     variant="subtle"
                     onClick={handleLoadMore}
                 >

@@ -1,6 +1,5 @@
 import { MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +13,7 @@ import { Text } from '/@/renderer/components/text';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { TablePagination as TablePaginationType } from '/@/renderer/types';
 import { ListKey } from '/@/renderer/store';
+import { Group } from '/@/renderer/components/group';
 
 interface TablePaginationProps {
     pageKey: ListKey;
@@ -72,13 +72,15 @@ export const TablePagination = ({
         <MotionFlex
             ref={containerQuery.ref}
             layout
-            align="center"
             animate={{ y: 0 }}
             exit={{ y: 50 }}
             initial={{ y: 50 }}
-            justify="space-between"
-            p="1rem"
-            sx={{ borderTop: '1px solid var(--generic-border-color)' }}
+            style={{
+                alignContent: 'center',
+                borderTop: '1px solid var(--generic-border-color)',
+                justifyContent: 'space-between',
+                padding: '1rem',
+            }}
         >
             <Text
                 $secondary
@@ -103,8 +105,8 @@ export const TablePagination = ({
             </Text>
             <Group
                 ref={containerQuery.ref}
-                noWrap
-                spacing="sm"
+                gap="sm"
+                wrap="nowrap"
             >
                 <Popover
                     trapFocus
@@ -116,7 +118,7 @@ export const TablePagination = ({
                         <Button
                             radius="sm"
                             size="sm"
-                            sx={{ height: '26px', padding: '0', width: '26px' }}
+                            style={{ height: '26px', padding: '0', width: '26px' }}
                             tooltip={{
                                 label: t('action.goToPage', { postProcess: 'sentenceCase' }),
                             }}
@@ -147,7 +149,6 @@ export const TablePagination = ({
                     </Popover.Dropdown>
                 </Popover>
                 <Pagination
-                    noWrap
                     $hideDividers={!containerQuery.isSm}
                     boundaries={1}
                     radius="sm"

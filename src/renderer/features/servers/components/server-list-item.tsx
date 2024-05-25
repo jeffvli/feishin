@@ -53,7 +53,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
         <Stack>
             <ServerSection
                 title={
-                    <Group position="apart">
+                    <Group justify="space-between">
                         <Text>Server details</Text>
                     </Group>
                 }
@@ -66,7 +66,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                     />
                 ) : (
                     <Stack>
-                        <Group noWrap>
+                        <Group wrap="nowrap">
                             <Stack>
                                 <Text>URL</Text>
                                 <Text>Username</Text>
@@ -78,7 +78,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                         </Group>
                         <Group grow>
                             <Button
-                                leftIcon={<RiEdit2Fill />}
+                                leftSection={<RiEdit2Fill />}
                                 tooltip={{ label: 'Edit server details' }}
                                 variant="subtle"
                                 onClick={() => handleEdit()}
@@ -91,7 +91,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
             </ServerSection>
             <Divider my="sm" />
             <TimeoutButton
-                leftIcon={<RiDeleteBin2Line />}
+                leftSection={<RiDeleteBin2Line />}
                 timeoutProps={{ callback: handleDeleteServer, duration: 1000 }}
                 variant="subtle"
             >

@@ -1,10 +1,11 @@
 import { ChangeEvent, KeyboardEvent } from 'react';
-import { ActionIcon, TextInputProps } from '@mantine/core';
+import { TextInputProps } from '@mantine/core';
 import { useFocusWithin, useHotkeys, useMergedRef } from '@mantine/hooks';
 import { RiCloseFill, RiSearchLine } from 'react-icons/ri';
 import { TextInput } from '/@/renderer/components/input';
 import { useSettingsStore } from '/@/renderer/store';
 import { shallow } from 'zustand/shallow';
+import { ActionIcon } from '/@/renderer/components/action-icon';
 
 interface SearchInputProps extends TextInputProps {
     initialWidth?: number;
@@ -39,7 +40,7 @@ export const SearchInput = ({
         <TextInput
             ref={mergedRef}
             {...props}
-            icon={showIcon && <RiSearchLine />}
+            leftSection={showIcon && <RiSearchLine />}
             rightSection={
                 isOpened ? (
                     <ActionIcon
@@ -55,13 +56,13 @@ export const SearchInput = ({
             }
             size="md"
             styles={{
-                icon: { svg: { fill: 'var(--titlebar-fg)' } },
                 input: {
                     backgroundColor: isOpened ? 'inherit' : 'transparent !important',
                     border: 'none !important',
                     cursor: isOpened ? 'text' : 'pointer',
                     padding: isOpened ? '10px' : 0,
                 },
+                section: { svg: { fill: 'var(--titlebar-fg)' }, userSelect: 'none' },
             }}
             width={isOpened ? openedWidth || 150 : initialWidth || 35}
             onChange={onChange}

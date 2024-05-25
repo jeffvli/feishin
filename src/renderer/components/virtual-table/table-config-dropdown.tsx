@@ -288,7 +288,7 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
     const { setSettings } = useSettingsStoreActions();
     const tableConfig = useSettingsStore((state) => state.tables);
 
-    const handleAddOrRemoveColumns = (values: TableColumn[]) => {
+    const handleAddOrRemoveColumns = (values: TableColumn[] | any[]) => {
         const existingColumns = tableConfig[type].columns;
 
         if (values.length === 0) {
@@ -409,9 +409,11 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
                 <Option.Control>
                     <MultiSelect
                         clearable
+                        comboboxProps={{
+                            position: 'bottom',
+                        }}
                         data={SONG_TABLE_COLUMNS}
                         defaultValue={tableConfig[type]?.columns.map((column) => column.column)}
-                        dropdownPosition="bottom"
                         width={300}
                         onChange={handleAddOrRemoveColumns}
                     />

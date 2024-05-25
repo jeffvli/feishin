@@ -144,7 +144,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                     </Stack>
                 )}
 
-                <Group position="right">
+                <Group align="flex-end">
                     <Button
                         variant="subtle"
                         onClick={onCancel}

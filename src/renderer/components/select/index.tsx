@@ -40,7 +40,11 @@ const StyledSelect = styled(MantineSelect)`
 export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
     return (
         <StyledSelect
-            withinPortal
+            comboboxProps={{
+                transitionProps: { duration: 100, transition: 'fade' },
+                withinPortal: true,
+            }}
+            style={{ maxWidth, width }}
             styles={{
                 dropdown: {
                     background: 'var(--dropdown-menu-bg)',
@@ -50,14 +54,14 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
                     background: 'var(--input-bg)',
                     color: 'var(--input-fg)',
                 },
-                item: {
+                option: {
                     '&:hover': {
                         background: 'var(--dropdown-menu-bg-hover)',
                     },
-                    '&[data-hovered]': {
+                    '&[dataHovered]': {
                         background: 'var(--dropdown-menu-bg-hover)',
                     },
-                    '&[data-selected="true"]': {
+                    '&[dataSelected="true"]': {
                         '&:hover': {
                             background: 'var(--dropdown-menu-bg-hover)',
                         },
@@ -68,8 +72,6 @@ export const Select = ({ width, maxWidth, ...props }: SelectProps) => {
                     padding: '.3rem',
                 },
             }}
-            sx={{ maxWidth, width }}
-            transitionProps={{ duration: 100, transition: 'fade' }}
             {...props}
         />
     );
@@ -95,7 +97,11 @@ const StyledMultiSelect = styled(MantineMultiSelect)`
 export const MultiSelect = ({ width, maxWidth, ...props }: MultiSelectProps) => {
     return (
         <StyledMultiSelect
-            withinPortal
+            comboboxProps={{
+                transitionProps: { duration: 100, transition: 'fade' },
+                withinPortal: true,
+            }}
+            style={{ maxWidth, width }}
             styles={{
                 dropdown: {
                     background: 'var(--dropdown-menu-bg)',
@@ -105,14 +111,14 @@ export const MultiSelect = ({ width, maxWidth, ...props }: MultiSelectProps) => 
                     background: 'var(--input-bg)',
                     color: 'var(--input-fg)',
                 },
-                item: {
+                option: {
                     '&:hover': {
                         background: 'var(--dropdown-menu-bg-hover)',
                     },
-                    '&[data-hovered]': {
+                    '&[dataHovered]': {
                         background: 'var(--dropdown-menu-bg-hover)',
                     },
-                    '&[data-selected="true"]': {
+                    '&[dataSelected="true"]': {
                         '&:hover': {
                             background: 'var(--dropdown-menu-bg-hover)',
                         },
@@ -122,15 +128,13 @@ export const MultiSelect = ({ width, maxWidth, ...props }: MultiSelectProps) => 
                     color: 'var(--dropdown-menu-fg)',
                     padding: '.5rem .1rem',
                 },
-                value: {
+                pill: {
                     margin: '.2rem',
                     paddingBottom: '1rem',
                     paddingLeft: '1rem',
                     paddingTop: '1rem',
                 },
             }}
-            sx={{ maxWidth, width }}
-            transitionProps={{ duration: 100, transition: 'fade' }}
             {...props}
         />
     );

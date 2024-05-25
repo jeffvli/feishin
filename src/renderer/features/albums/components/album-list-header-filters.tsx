@@ -1,6 +1,5 @@
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +15,18 @@ import {
 } from 'react-icons/ri';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
-import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
+import {
+    Button,
+    Divider,
+    DropdownMenu,
+    Flex,
+    Group,
+    MultiSelect,
+    Slider,
+    Stack,
+    Switch,
+    Text,
+} from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUM_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
@@ -296,7 +306,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
         [pageKey, setDisplayType],
     );
 
-    const handleTableColumns = (values: TableColumn[]) => {
+    const handleTableColumns = (values: TableColumn[] | any[]) => {
         const existingColumns = table.columns;
 
         if (values.length === 0) {
@@ -352,15 +362,14 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
         <Flex justify="space-between">
             <Group
                 ref={cq.ref}
-                spacing="sm"
-                w="100%"
+                gap="sm"
+                style={{ width: '100%' }}
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw={600}
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             {sortByLabel}
@@ -390,10 +399,9 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
                                 <Button
-                                    compact
                                     fw={600}
-                                    size="md"
-                                    sx={{
+                                    size="compact-md"
+                                    style={{
                                         svg: {
                                             fill: isFolderFilterApplied
                                                 ? 'var(--primary-color) !important'
@@ -422,9 +430,8 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                 )}
                 <Divider orientation="vertical" />
                 <Button
-                    compact
-                    size="md"
-                    sx={{
+                    size="compact-md"
+                    style={{
                         svg: {
                             fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
                         },
@@ -439,8 +446,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                 </Button>
                 <Divider orientation="vertical" />
                 <Button
-                    compact
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('common.refresh', { postProcess: 'sentenceCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
@@ -451,8 +457,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiMoreFill size={15} />
@@ -460,26 +465,26 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiPlayFill />}
+                            leftSection={<RiPlayFill />}
                             onClick={() => handlePlay?.({ playType: Play.NOW })}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddBoxFill />}
+                            leftSection={<RiAddBoxFill />}
                             onClick={() => handlePlay?.({ playType: Play.LAST })}
                         >
                             {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddCircleFill />}
+                            leftSection={<RiAddCircleFill />}
                             onClick={() => handlePlay?.({ playType: Play.NEXT })}
                         >
                             {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            icon={<RiRefreshLine />}
+                            leftSection={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
                             {t('common.refresh', { postProcess: 'sentenceCase' })}
@@ -488,8 +493,8 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                 </DropdownMenu>
             </Group>
             <Group
-                noWrap
-                spacing="sm"
+                gap="sm"
+                wrap="nowrap"
             >
                 <DropdownMenu
                     position="bottom-end"
@@ -497,8 +502,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                 >
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             tooltip={{
                                 label: t('common.configure', { postProcess: 'sentenceCase' }),
                             }}
@@ -573,7 +577,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
                                     <Stack>
                                         <MultiSelect
@@ -585,7 +589,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                                             width={300}
                                             onChange={handleTableColumns}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>Auto Fit Columns</Text>
                                             <Switch
                                                 defaultChecked={table.autoFit}

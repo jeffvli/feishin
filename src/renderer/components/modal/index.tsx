@@ -1,13 +1,10 @@
 import React, { ReactNode } from 'react';
-import {
-    ModalProps as MantineModalProps,
-    Stack,
-    Modal as MantineModal,
-    Flex,
-    Group,
-} from '@mantine/core';
+import { ModalProps as MantineModalProps, Modal as MantineModal } from '@mantine/core';
 import { closeAllModals, ContextModalProps } from '@mantine/modals';
 import { Button } from '/@/renderer/components/button';
+import { Flex } from '/@/renderer/components/flex';
+import { Group } from '/@/renderer/components/group';
+import { Stack } from '/@/renderer/components/stack';
 
 export interface ModalProps extends Omit<MantineModalProps, 'onClose'> {
     children?: ReactNode;
@@ -77,7 +74,7 @@ export const ConfirmModal = ({
     return (
         <Stack>
             <Flex>{children}</Flex>
-            <Group position="right">
+            <Group align="flex-end">
                 <Button
                     data-focus
                     variant="default"

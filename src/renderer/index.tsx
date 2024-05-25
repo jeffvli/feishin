@@ -1,4 +1,3 @@
-import { MantineProvider } from '@mantine/core';
 import {
     PersistedClient,
     Persister,
@@ -11,6 +10,7 @@ import { queryClient } from './lib/react-query';
 import 'overlayscrollbars/overlayscrollbars.css';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
+import './styles/global.scss';
 
 export function createIDBPersister(idbValidKey: IDBValidKey = 'reactQuery') {
     return {
@@ -60,8 +60,6 @@ root.render(
             persister: indexedDbPersister,
         }}
     >
-        <MantineProvider>
-            <App />
-        </MantineProvider>
+        <App />
     </PersistQueryClientProvider>,
 );

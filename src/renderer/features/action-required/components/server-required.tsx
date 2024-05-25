@@ -9,7 +9,7 @@ export const ServerRequired = () => {
             <DropdownMenu>
                 <DropdownMenu.Target>
                     <Button
-                        leftIcon={<RiMenuFill />}
+                        leftSection={<RiMenuFill />}
                         variant="filled"
                     >
                         Open menu

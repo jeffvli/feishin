@@ -9,7 +9,7 @@ const utils = isElectron() ? window.electron.utils : null;
 
 export const WindowTab = () => {
     return (
-        <Stack spacing="md">
+        <Stack gap="md">
             <WindowSettings />
             <DiscordSettings />
             <UpdateSettings />

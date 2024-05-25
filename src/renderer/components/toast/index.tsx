@@ -1,4 +1,3 @@
-import type { NotificationProps as MantineNotificationProps } from '@mantine/notifications';
 import {
     showNotification,
     updateNotification,
@@ -7,7 +6,13 @@ import {
     cleanNotificationsQueue,
 } from '@mantine/notifications';
 
-interface NotificationProps extends MantineNotificationProps {
+interface NotificationProps {
+    autoClose?: boolean | number;
+    id?: string;
+    message: string;
+    onClick?: (e: any) => void;
+    onClose?: (e: any) => void;
+    title?: string;
     type?: 'success' | 'error' | 'warning' | 'info';
 }
 

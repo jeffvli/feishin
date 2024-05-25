@@ -39,7 +39,7 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
     return (
         <Stack
             ref={cq.ref}
-            spacing={0}
+            gap={0}
         >
             <PageHeader>
                 <Flex
@@ -61,11 +61,10 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
             <FilterBar>
                 <Group>
                     <Button
-                        compact
                         replace
                         component={Link}
                         fw={600}
-                        size="md"
+                        size="compact-md"
                         state={{ navigationId }}
                         to={{
                             pathname: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
@@ -76,11 +75,10 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
                         {t('entity.track_other', { postProcess: 'sentenceCase' })}
                     </Button>
                     <Button
-                        compact
                         replace
                         component={Link}
                         fw={600}
-                        size="md"
+                        size="compact-md"
                         state={{ navigationId }}
                         to={{
                             pathname: generatePath(AppRoute.SEARCH, {
@@ -93,11 +91,10 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
                         {t('entity.album_other', { postProcess: 'sentenceCase' })}
                     </Button>
                     <Button
-                        compact
                         replace
                         component={Link}
                         fw={600}
-                        size="md"
+                        size="compact-md"
                         state={{ navigationId }}
                         to={{
                             pathname: generatePath(AppRoute.SEARCH, {

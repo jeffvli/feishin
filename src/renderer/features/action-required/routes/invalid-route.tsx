@@ -1,7 +1,6 @@
-import { Center, Group, Stack } from '@mantine/core';
 import { RiQuestionLine } from 'react-icons/ri';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Text } from '/@/renderer/components';
+import { Button, Center, Group, Stack, Text } from '/@/renderer/components';
 import { AnimatedPage } from '/@/renderer/features/shared';
 
 const InvalidRoute = () => {
@@ -10,11 +9,11 @@ const InvalidRoute = () => {
 
     return (
         <AnimatedPage>
-            <Center sx={{ height: '100%', width: '100%' }}>
+            <Center style={{ height: '100%', width: '100%' }}>
                 <Stack>
                     <Group
-                        noWrap
-                        position="center"
+                        justify="center"
+                        wrap="nowrap"
                     >
                         <RiQuestionLine
                             color="var(--warning-color)"

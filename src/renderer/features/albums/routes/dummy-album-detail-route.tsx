@@ -1,4 +1,4 @@
-import { Button, Spinner, Spoiler, Text } from '/@/renderer/components';
+import { Button, Center, Group, Spinner, Spoiler, Stack, Text } from '/@/renderer/components';
 import {
     AnimatedPage,
     LibraryHeader,
@@ -13,7 +13,6 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem, SongDetailResponse } from '/@/renderer/api/types';
 import { useCurrentServer } from '/@/renderer/store';
-import { Stack, Group, Box, Center } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { AppRoute } from '/@/renderer/router/routes';
 import { formatDurationString } from '/@/renderer/utils';
@@ -139,8 +138,8 @@ const DummyAlbumDetailRoute = () => {
                     item={{ route: AppRoute.LIBRARY_SONGS, type: LibraryItem.SONG }}
                     title={detailQuery?.data?.name || ''}
                 >
-                    <Stack spacing="sm">
-                        <Group spacing="sm">
+                    <Stack gap="sm">
+                        <Group gap="sm">
                             {metadataItems.map((item, index) => (
                                 <Fragment key={`item-${item.id}-${index}`}>
                                     {index > 0 && <Text $noSelect>•</Text>}
@@ -149,11 +148,11 @@ const DummyAlbumDetailRoute = () => {
                             ))}
                         </Group>
                         <Group
-                            mah="4rem"
-                            spacing="md"
-                            sx={{
+                            gap="md"
+                            style={{
                                 WebkitBoxOrient: 'vertical',
                                 WebkitLineClamp: 2,
+                                maxHeight: '4rem',
                                 overflow: 'hidden',
                             }}
                         >
@@ -177,19 +176,19 @@ const DummyAlbumDetailRoute = () => {
                 </LibraryHeader>
             </Stack>
             <DetailContainer>
-                <Box component="section">
+                <section>
                     <Group
-                        position="apart"
-                        spacing="sm"
+                        gap="sm"
+                        justify="space-between"
                     >
                         <Group>
                             <PlayButton onClick={() => handlePlay()} />
                             <Button
-                                compact
                                 loading={
                                     createFavoriteMutation.isLoading ||
                                     deleteFavoriteMutation.isLoading
                                 }
+                                size="compact-md"
                                 variant="subtle"
                                 onClick={handleFavorite}
                             >
@@ -203,7 +202,7 @@ const DummyAlbumDetailRoute = () => {
                                 )}
                             </Button>
                             <Button
-                                compact
+                                size="compact-md"
                                 variant="subtle"
                                 onClick={(e) => {
                                     if (!detailQuery?.data) return;
@@ -214,17 +213,16 @@ const DummyAlbumDetailRoute = () => {
                             </Button>
                         </Group>
                     </Group>
-                </Box>
+                </section>
                 {showGenres && (
-                    <Box component="section">
-                        <Group spacing="sm">
+                    <section>
+                        <Group gap="sm">
                             {detailQuery?.data?.genres?.map((genre) => (
                                 <Button
                                     key={`genre-${genre.id}`}
-                                    compact
                                     component={Link}
                                     radius={0}
-                                    size="md"
+                                    size="compact-md"
                                     to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
                                         genreId: genre.id,
                                     })}
@@ -234,16 +232,16 @@ const DummyAlbumDetailRoute = () => {
                                 </Button>
                             ))}
                         </Group>
-                    </Box>
+                    </section>
                 )}
                 {comment && (
-                    <Box component="section">
+                    <section>
                         <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
-                    </Box>
+                    </section>
                 )}
-                <Box component="section">
+                <section>
                     <Center>
-                        <Group mr={5}>
+                        <Group style={{ marginRight: '5px' }}>
                             <RiErrorWarningLine
                                 color="var(--danger-color)"
                                 size={30}
@@ -251,7 +249,7 @@ const DummyAlbumDetailRoute = () => {
                         </Group>
                         <h2>{t('error.badAlbum', { postProcess: 'sentenceCase' })}</h2>
                     </Center>
-                </Box>
+                </section>
             </DetailContainer>
         </AnimatedPage>
     );

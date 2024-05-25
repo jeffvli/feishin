@@ -1,9 +1,9 @@
-import { Box, Center, Group, Select, SelectItem } from '@mantine/core';
+import { ComboboxItem } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
 import { LyricsOverride } from '/@/renderer/api/types';
-import { Button, NumberInput, Tooltip } from '/@/renderer/components';
+import { Box, Button, Center, Group, NumberInput, Select, Tooltip } from '/@/renderer/components';
 import { openLyricSearchModal } from '/@/renderer/features/lyrics/components/lyrics-search-form';
 import {
     useCurrentSong,
@@ -14,7 +14,7 @@ import {
 
 interface LyricsActionsProps {
     index: number;
-    languages: SelectItem[];
+    languages: ComboboxItem[];
 
     onRemoveLyric: () => void;
     onResetLyric: () => void;
@@ -61,11 +61,11 @@ export const LyricsActions = ({
                 </Center>
             )}
 
-            <Group position="center">
+            <Group justify="center">
                 {isDesktop && sources.length ? (
                     <Button
-                        uppercase
                         disabled={isActionsDisabled}
+                        tt="uppercase"
                         variant="subtle"
                         onClick={() =>
                             openLyricSearchModal({
@@ -94,7 +94,7 @@ export const LyricsActions = ({
                         styles={{ input: { textAlign: 'center' } }}
                         value={delayMs || 0}
                         width={55}
-                        onChange={handleLyricOffset}
+                        onChange={(e) => handleLyricOffset(Number(e))}
                     />
                 </Tooltip>
                 <Button
@@ -106,8 +106,8 @@ export const LyricsActions = ({
                 </Button>
                 {isDesktop && sources.length ? (
                     <Button
-                        uppercase
                         disabled={isActionsDisabled}
+                        tt="uppercase"
                         variant="subtle"
                         onClick={onResetLyric}
                     >
@@ -119,9 +119,9 @@ export const LyricsActions = ({
             <Box style={{ position: 'absolute', right: 0, top: 0 }}>
                 {isDesktop && sources.length ? (
                     <Button
-                        uppercase
                         color="red"
                         disabled={isActionsDisabled}
+                        tt="uppercase"
                         variant="subtle"
                         onClick={onRemoveLyric}
                     >

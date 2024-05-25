@@ -1,10 +1,10 @@
-import { Group } from '@mantine/core';
 import { useState } from 'react';
 import { RiSubtractLine } from 'react-icons/ri';
 import { Button } from '/@/renderer/components/button';
 import { NumberInput, TextInput } from '/@/renderer/components/input';
 import { Select } from '/@/renderer/components/select';
 import { QueryBuilderRule } from '/@/renderer/types';
+import { Group } from '/@/renderer/components/group';
 
 type DeleteArgs = {
     groupIndex: number[];
@@ -69,7 +69,7 @@ const QueryValueInput = ({ onChange, type, data, ...props }: any) => {
                         maxWidth={81}
                         width="10%"
                         onChange={(e) => {
-                            const newRange = [e || 0, numberRange[1]];
+                            const newRange = [Number(e) || 0, numberRange[1]];
                             setNumberRange(newRange);
                             onChange(newRange);
                         }}
@@ -80,7 +80,7 @@ const QueryValueInput = ({ onChange, type, data, ...props }: any) => {
                         maxWidth={81}
                         width="10%"
                         onChange={(e) => {
-                            const newRange = [numberRange[0], e || 0];
+                            const newRange = [numberRange[0], Number(e) || 0];
                             setNumberRange(newRange);
                             onChange(newRange);
                         }}
@@ -188,8 +188,8 @@ export const QueryBuilderOption = ({
 
     return (
         <Group
-            ml={ml}
-            spacing="sm"
+            gap="sm"
+            style={{ marginLeft: `${ml}px` }}
         >
             <Select
                 searchable

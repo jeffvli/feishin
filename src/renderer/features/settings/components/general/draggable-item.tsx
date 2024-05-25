@@ -35,7 +35,7 @@ export const DraggableItem = ({ item, value, handleChangeDisabled }: DraggableIt
             value={item}
         >
             <Group
-                noWrap
+                wrap="nowrap"
                 h="3rem"
                 style={{ boxShadow: '0 1px 3px rgba(0,0,0,.1)' }}
             >

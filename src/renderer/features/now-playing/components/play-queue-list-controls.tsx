@@ -1,7 +1,6 @@
 import type { MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Group } from '@mantine/core';
-import { Button, Popover } from '/@/renderer/components';
+import { Button, Group, Popover } from '/@/renderer/components';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import {
@@ -107,16 +106,15 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
 
     return (
         <Group
-            position="apart"
+            justify="space-between"
             px="1rem"
             py="1rem"
-            sx={{ alignItems: 'center' }}
+            style={{ alignItems: 'center' }}
             w="100%"
         >
-            <Group spacing="sm">
+            <Group gap="sm">
                 <Button
-                    compact
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('player.shuffle', { postProcess: 'sentenceCase' }) }}
                     variant="default"
                     onClick={handleShuffleQueue}
@@ -124,8 +122,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                     <RiShuffleLine size="1.1rem" />
                 </Button>
                 <Button
-                    compact
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('action.moveToBottom', { postProcess: 'sentenceCase' }) }}
                     variant="default"
                     onClick={handleMoveToBottom}
@@ -133,8 +130,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                     <RiArrowDownLine size="1.1rem" />
                 </Button>
                 <Button
-                    compact
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('action.moveToTop', { postProcess: 'sentenceCase' }) }}
                     variant="default"
                     onClick={handleMoveToTop}
@@ -142,8 +138,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                     <RiArrowUpLine size="1.1rem" />
                 </Button>
                 <Button
-                    compact
-                    size="md"
+                    size="compact-md"
                     tooltip={{
                         label: t('action.removeFromQueue', { postProcess: 'sentenceCase' }),
                     }}
@@ -153,8 +148,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                     <RiEraserLine size="1.1rem" />
                 </Button>
                 <Button
-                    compact
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('action.clearQueue', { postProcess: 'sentenceCase' }) }}
                     variant="default"
                     onClick={handleClearQueue}
@@ -169,8 +163,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                 >
                     <Popover.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             tooltip={{
                                 label: t('common.configure', { postProcess: 'sentenceCase' }),
                             }}

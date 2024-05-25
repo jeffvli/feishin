@@ -1,5 +1,4 @@
 import { useMemo, useRef } from 'react';
-import { ActionIcon, Group, Stack } from '@mantine/core';
 import {
     AlbumListSort,
     LibraryItem,
@@ -7,7 +6,15 @@ import {
     SongListSort,
     SortOrder,
 } from '/@/renderer/api/types';
-import { FeatureCarousel, NativeScrollArea, Spinner, TextTitle } from '/@/renderer/components';
+import {
+    ActionIcon,
+    FeatureCarousel,
+    Group,
+    NativeScrollArea,
+    Spinner,
+    Stack,
+    TextTitle,
+} from '/@/renderer/components';
 import { useAlbumList } from '/@/renderer/features/albums';
 import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-played-query';
 import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
@@ -244,10 +251,10 @@ const HomeRoute = () => {
                 }}
             >
                 <Stack
+                    gap="lg"
                     mb="5rem"
                     pt={windowBarStyle === Platform.WEB ? '5rem' : '3rem'}
                     px="2rem"
-                    spacing="lg"
                 >
                     <FeatureCarousel data={featureItemsWithImage} />
                     {sortedCarousel.map((carousel) => (

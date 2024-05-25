@@ -1,10 +1,18 @@
 import { ChangeEvent, useMemo, useState } from 'react';
-import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { useListFilterByKey } from '../../../store/list.store';
 import { AlbumArtistListSort, GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
-import { MultiSelect, NumberInput, SpinnerIcon, Switch, Text } from '/@/renderer/components';
+import {
+    Divider,
+    Group,
+    MultiSelect,
+    NumberInput,
+    SpinnerIcon,
+    Stack,
+    Switch,
+    Text,
+} from '/@/renderer/components';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 import { useGenreList } from '/@/renderer/features/genres';
 import { AlbumListFilter, useListStoreActions } from '/@/renderer/store';
@@ -176,11 +184,11 @@ export const JellyfinAlbumFilters = ({
     };
 
     return (
-        <Stack p="0.8rem">
+        <Stack style={{ padding: '0.8rem' }}>
             {toggleFilters.map((filter) => (
                 <Group
                     key={`nd-filter-${filter.label}`}
-                    position="apart"
+                    justify="space-between"
                 >
                     <Text>{filter.label}</Text>
                     <Switch
@@ -190,7 +198,7 @@ export const JellyfinAlbumFilters = ({
                     />
                 </Group>
             ))}
-            <Divider my="0.5rem" />
+            <Divider marginY="0.5rem" />
             <Group grow>
                 <NumberInput
                     defaultValue={filter?._custom?.jellyfin?.minYear}

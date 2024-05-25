@@ -14,10 +14,8 @@ export const App = () => {
 
     return (
         <MantineProvider
-            withGlobalStyles
-            withNormalizeCSS
+            forceColorScheme={isDark ? 'dark' : 'light'}
             theme={{
-                colorScheme: isDark ? 'dark' : 'light',
                 components: {
                     AppShell: {
                         styles: {
@@ -44,18 +42,17 @@ export const App = () => {
                     },
                 },
                 defaultRadius: 'xs',
-                dir: 'ltr',
                 focusRing: 'auto',
-                focusRingStyles: {
-                    inputStyles: () => ({
-                        border: '1px solid var(--primary-color)',
-                    }),
-                    resetStyles: () => ({ outline: 'none' }),
-                    styles: () => ({
-                        outline: '1px solid var(--primary-color)',
-                        outlineOffset: '-1px',
-                    }),
-                },
+                // focusRingStyles: {
+                //     inputStyles: () => ({
+                //         border: '1px solid var(--primary-color)',
+                //     }),
+                //     resetStyles: () => ({ outline: 'none' }),
+                //     styles: () => ({
+                //         outline: '1px solid var(--primary-color)',
+                //         outlineOffset: '-1px',
+                //     }),
+                // },
                 fontFamily: 'var(--content-font-family)',
                 fontSizes: {
                     lg: '1.1rem',
@@ -66,7 +63,7 @@ export const App = () => {
                 },
                 headings: {
                     fontFamily: 'var(--content-font-family)',
-                    fontWeight: 700,
+                    fontWeight: '700',
                 },
                 other: {},
                 spacing: {

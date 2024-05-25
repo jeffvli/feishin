@@ -8,6 +8,7 @@ import { textEllipsis } from '/@/renderer/styles';
 type MantineTextDivProps = MantineTextProps & ComponentPropsWithoutRef<'div'>;
 
 interface TextProps extends MantineTextDivProps {
+    $align?: 'left' | 'center' | 'right' | 'justify';
     $link?: boolean;
     $noSelect?: boolean;
     $secondary?: boolean;
@@ -24,6 +25,7 @@ const StyledText = styled(MantineText)<TextProps>`
     color: ${(props) => (props.$secondary ? 'var(--main-fg-secondary)' : 'var(--main-fg)')};
     cursor: ${(props) => props.$link && 'cursor'};
     user-select: ${(props) => (props.$noSelect ? 'none' : 'auto')};
+    text-align: ${(props) => props.$align};
     ${(props) => props.overflow === 'hidden' && !props.lineClamp && textEllipsis}
 
     &:hover {
@@ -32,9 +34,18 @@ const StyledText = styled(MantineText)<TextProps>`
     }
 `;
 
-export const _Text = ({ children, $secondary, overflow, font, $noSelect, ...rest }: TextProps) => {
+export const _Text = ({
+    children,
+    $secondary,
+    overflow,
+    font,
+    $noSelect,
+    $align,
+    ...rest
+}: TextProps) => {
     return (
         <StyledText
+            $align={$align}
             $noSelect={$noSelect}
             $secondary={$secondary}
             font={font}

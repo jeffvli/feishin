@@ -60,9 +60,9 @@ export const ServerList = () => {
     return (
         <>
             <Group
+                justify="flex-end"
                 mb={10}
-                position="right"
-                sx={{
+                style={{
                     position: 'absolute',
                     right: 55,
                     transform: 'translateY(-3.5rem)',
@@ -71,9 +71,8 @@ export const ServerList = () => {
             >
                 <Button
                     autoFocus
-                    compact
-                    leftIcon={<RiAddFill size={15} />}
-                    size="sm"
+                    leftSection={<RiAddFill size={15} />}
+                    size="compact-sm"
                     variant="filled"
                     onClick={handleAddServerModal}
                 >
@@ -90,7 +89,7 @@ export const ServerList = () => {
                                 value={server.name}
                             >
                                 <Accordion.Control icon={<RiServerFill size={15} />}>
-                                    <Group position="apart">
+                                    <Group justify="space-between">
                                         <Text weight={server.id === currentServer?.id ? 800 : 400}>
                                             {titleCase(server?.type)} - {server?.name}
                                         </Text>

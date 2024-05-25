@@ -38,7 +38,7 @@ export const DatePicker = ({ width, maxWidth, ...props }: DatePickerProps) => {
     return (
         <StyledDatePicker
             {...props}
-            sx={{ maxWidth, width }}
+            style={{ maxWidth, width }}
         />
     );
 };

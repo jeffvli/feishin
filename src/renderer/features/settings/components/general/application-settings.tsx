@@ -144,7 +144,8 @@ export const ApplicationSettings = () => {
         getFonts();
     }, [fontSettings, localFonts, setSettings, t]);
 
-    const handleChangeLanguage = (e: string) => {
+    const handleChangeLanguage = (e: string | null) => {
+        if (!e) return;
         setSettings({
             general: {
                 ...settings,

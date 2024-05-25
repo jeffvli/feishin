@@ -1,4 +1,4 @@
-import { SelectItem } from '@mantine/core';
+import { ComboboxItem } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { useSettingsStoreActions, useGeneralSettings } from '../../../../store/settings.store';
@@ -10,7 +10,7 @@ import { Select } from '/@/renderer/components';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
-const PASSWORD_SETTINGS: SelectItem[] = [
+const PASSWORD_SETTINGS: ComboboxItem[] = [
     { label: 'libsecret', value: 'gnome_libsecret' },
     { label: 'KDE 4 (kwallet4)', value: 'kwallet' },
     { label: 'KDE 5 (kwallet5)', value: 'kwallet5' },

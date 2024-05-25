@@ -93,15 +93,15 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
             size="lg"
         >
             <Group
+                gap="sm"
                 mb="1rem"
-                spacing="sm"
             >
                 {pages.map((page, index) => (
                     <Fragment key={page}>
                         {index > 0 && ' > '}
                         <Button
-                            compact
                             disabled
+                            size="compact-md"
                             variant="default"
                         >
                             {page?.toLocaleUpperCase()}
@@ -122,7 +122,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                 <TextInput
                     ref={searchInputRef}
                     data-autofocus
-                    icon={<RiSearchLine />}
+                    leftSection={<RiSearchLine />}
                     rightSection={
                         <ActionIcon
                             onClick={() => {
@@ -261,11 +261,11 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                 mt="0.5rem"
                 p="0.5rem"
             >
-                <Group position="apart">
+                <Group justify="space-between">
                     <Command.Loading>
                         {isHome && isLoading && query !== '' && <Spinner />}
                     </Command.Loading>
-                    <Group spacing="sm">
+                    <Group gap="sm">
                         <Kbd size="md">ESC</Kbd>
                         <Kbd size="md">↑</Kbd>
                         <Kbd size="md">↓</Kbd>

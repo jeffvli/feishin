@@ -1,10 +1,9 @@
-import { Group } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import { RiFileMusicLine, RiFileTextLine } from 'react-icons/ri';
 import styled from 'styled-components';
-import { Button } from '/@/renderer/components';
+import { Button, Group } from '/@/renderer/components';
 import { PlayQueue } from '/@/renderer/features/now-playing';
 import {
     useFullScreenPlayerStore,
@@ -91,23 +90,23 @@ export const FullScreenPlayerQueue = () => {
             <Group
                 grow
                 align="center"
-                position="center"
+                justify="center"
             >
                 {headerItems.map((item) => (
                     <HeaderItemWrapper key={`tab-${item.label}`}>
                         <Button
                             fullWidth
-                            uppercase
                             fw="600"
                             pos="relative"
                             size="lg"
-                            sx={{
+                            style={{
                                 alignItems: 'center',
                                 color: item.active
                                     ? 'var(--main-fg) !important'
                                     : 'var(--main-fg-secondary) !important',
                                 letterSpacing: '1px',
                             }}
+                            tt="uppercase"
                             variant="subtle"
                             onClick={item.onClick}
                         >

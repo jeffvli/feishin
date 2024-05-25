@@ -1,7 +1,6 @@
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
 import { FaLastfmSquare } from 'react-icons/fa';
@@ -12,7 +11,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
-import { Button, Popover, Spoiler } from '/@/renderer/components';
+import { Button, Group, Popover, Spoiler, Stack } from '/@/renderer/components';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import {
     TableConfigDropdown,
@@ -328,19 +327,19 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
         <ContentContainer>
             <LibraryBackgroundOverlay $backgroundColor={background} />
             <DetailContainer>
-                <Box component="section">
+                <section>
                     <Group
-                        position="apart"
-                        spacing="sm"
+                        gap="sm"
+                        justify="space-between"
                     >
                         <Group>
                             <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
                             <Button
-                                compact
                                 loading={
                                     createFavoriteMutation.isLoading ||
                                     deleteFavoriteMutation.isLoading
                                 }
+                                size="compact-md"
                                 variant="subtle"
                                 onClick={handleFavorite}
                             >
@@ -354,7 +353,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                                 )}
                             </Button>
                             <Button
-                                compact
+                                size="compact-md"
                                 variant="subtle"
                                 onClick={(e) => {
                                     if (!detailQuery?.data) return;
@@ -368,8 +367,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         <Popover position="bottom-end">
                             <Popover.Target>
                                 <Button
-                                    compact
-                                    size="md"
+                                    size="compact-md"
                                     variant="subtle"
                                 >
                                     <RiSettings2Fill size={20} />
@@ -380,17 +378,16 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                             </Popover.Dropdown>
                         </Popover>
                     </Group>
-                </Box>
+                </section>
                 {showGenres && (
-                    <Box component="section">
-                        <Group spacing="sm">
+                    <section>
+                        <Group gap="sm">
                             {detailQuery?.data?.genres?.map((genre) => (
                                 <Button
                                     key={`genre-${genre.id}`}
-                                    compact
                                     component={Link}
                                     radius={0}
-                                    size="md"
+                                    size="compact-md"
                                     to={generatePath(genreRoute, {
                                         genreId: genre.id,
                                     })}
@@ -400,20 +397,19 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                                 </Button>
                             ))}
                         </Group>
-                    </Box>
+                    </section>
                 )}
                 {externalLinks ? (
-                    <Box component="section">
-                        <Group spacing="sm">
+                    <section>
+                        <Group gap="sm">
                             <Button
-                                compact
                                 component="a"
                                 href={`https://www.last.fm/music/${encodeURIComponent(
                                     detailQuery?.data?.albumArtist || '',
                                 )}/${encodeURIComponent(detailQuery.data?.name || '')}`}
                                 radius="md"
                                 rel="noopener noreferrer"
-                                size="md"
+                                size="compact-md"
                                 target="_blank"
                                 tooltip={{
                                     label: t('action.openIn.lastfm'),
@@ -424,12 +420,11 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                             </Button>
                             {mbzId ? (
                                 <Button
-                                    compact
                                     component="a"
                                     href={`https://musicbrainz.org/release/${mbzId}`}
                                     radius="md"
                                     rel="noopener noreferrer"
-                                    size="md"
+                                    size="compact-md"
                                     target="_blank"
                                     tooltip={{
                                         label: t('action.openIn.musicbrainz'),
@@ -440,14 +435,14 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                                 </Button>
                             ) : null}
                         </Group>
-                    </Box>
+                    </section>
                 ) : null}
                 {comment && (
-                    <Box component="section">
+                    <section>
                         <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
-                    </Box>
+                    </section>
                 )}
-                <Box style={{ minHeight: '300px' }}>
+                <div style={{ minHeight: '300px' }}>
                     <VirtualTable
                         key={`table-${tableConfig.rowHeight}`}
                         ref={tableRef}
@@ -482,11 +477,11 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         onColumnMoved={onColumnMoved}
                         onRowDoubleClicked={handleRowDoubleClick}
                     />
-                </Box>
+                </div>
                 <Stack
                     ref={cq.ref}
-                    mt="3rem"
-                    spacing="lg"
+                    gap="lg"
+                    style={{ marginTop: '3rem' }}
                 >
                     {cq.height || cq.width ? (
                         <>

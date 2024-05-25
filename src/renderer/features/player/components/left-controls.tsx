@@ -162,7 +162,7 @@ export const LeftControls = () => {
                                         />
                                     ) : (
                                         <Center
-                                            sx={{
+                                            style={{
                                                 background: 'var(--placeholder-bg)',
                                                 height: '100%',
                                             }}
@@ -177,11 +177,10 @@ export const LeftControls = () => {
 
                                 {!collapsed && (
                                     <Button
-                                        compact
                                         opacity={0.8}
                                         radius={50}
-                                        size="md"
-                                        sx={{
+                                        size="compact-md"
+                                        style={{
                                             cursor: 'default',
                                             position: 'absolute',
                                             right: 2,
@@ -209,9 +208,9 @@ export const LeftControls = () => {
                 <MetadataStack layout="position">
                     <LineItem>
                         <Group
-                            noWrap
                             align="flex-start"
-                            spacing="xs"
+                            gap="xs"
+                            wrap="nowrap"
                         >
                             <Text
                                 $link
@@ -225,7 +224,7 @@ export const LeftControls = () => {
                             </Text>
                             {isSongDefined && (
                                 <Button
-                                    compact
+                                    size="compact-md"
                                     variant="subtle"
                                     onClick={(e) => handleGeneralContextMenu(e, [currentSong!])}
                                 >

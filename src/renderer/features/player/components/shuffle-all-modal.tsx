@@ -129,7 +129,7 @@ export const ShuffleAllModal = ({
     }, [musicFolders]);
 
     return (
-        <Stack spacing="md">
+        <Stack gap="md">
             <NumberInput
                 required
                 label="How many tracks?"
@@ -188,7 +188,7 @@ export const ShuffleAllModal = ({
             <Divider />
             <Group grow>
                 <Button
-                    leftIcon={<RiAddBoxFill size="1rem" />}
+                    leftSection={<RiAddBoxFill size="1rem" />}
                     type="submit"
                     variant="default"
                     onClick={() => handlePlay(Play.LAST)}
@@ -196,7 +196,7 @@ export const ShuffleAllModal = ({
                     Add
                 </Button>
                 <Button
-                    leftIcon={<RiAddCircleFill size="1rem" />}
+                    leftSection={<RiAddCircleFill size="1rem" />}
                     type="submit"
                     variant="default"
                     onClick={() => handlePlay(Play.NEXT)}
@@ -205,7 +205,7 @@ export const ShuffleAllModal = ({
                 </Button>
             </Group>
             <Button
-                leftIcon={<RiPlayFill size="1rem" />}
+                leftSection={<RiPlayFill size="1rem" />}
                 type="submit"
                 variant="filled"
                 onClick={() => handlePlay(Play.NOW)}

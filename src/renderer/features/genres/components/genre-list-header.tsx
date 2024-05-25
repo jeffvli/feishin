@@ -1,9 +1,8 @@
 import { ChangeEvent, MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { LibraryItem } from '/@/renderer/api/types';
-import { PageHeader, SearchInput } from '/@/renderer/components';
+import { Flex, Group, PageHeader, SearchInput, Stack } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { GenreListHeaderFilters } from '/@/renderer/features/genres/components/genre-list-header-filters';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
@@ -37,12 +36,12 @@ export const GenreListHeader = ({ itemCount, gridRef, tableRef }: GenreListHeade
     return (
         <Stack
             ref={cq.ref}
-            spacing={0}
+            gap={0}
         >
             <PageHeader backgroundColor="var(--titlebar-bg)">
                 <Flex
                     justify="space-between"
-                    w="100%"
+                    style={{ width: '100%' }}
                 >
                     <LibraryHeaderBar>
                         <LibraryHeaderBar.Title>

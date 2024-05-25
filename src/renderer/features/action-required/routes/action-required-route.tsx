@@ -1,8 +1,7 @@
-import { Center, Group, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { RiCheckFill, RiEdit2Line, RiHome4Line } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { Button, PageHeader, Text } from '/@/renderer/components';
+import { Button, Center, Group, PageHeader, Stack, Text } from '/@/renderer/components';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
 import { ServerCredentialRequired } from '/@/renderer/features/action-required/components/server-credential-required';
 import { ServerRequired } from '/@/renderer/features/action-required/components/server-required';
@@ -44,24 +43,24 @@ const ActionRequiredRoute = () => {
     return (
         <AnimatedPage>
             <PageHeader />
-            <Center sx={{ height: '100%', width: '100vw' }}>
+            <Center style={{ height: '100%', width: '100vw' }}>
                 <Stack
-                    spacing="xl"
-                    sx={{ maxWidth: '50%' }}
+                    gap="xl"
+                    style={{ maxWidth: '50%' }}
                 >
-                    <Group noWrap>
+                    <Group wrap="nowrap">
                         {displayedCheck && (
                             <ActionRequiredContainer title={displayedCheck.title}>
                                 {displayedCheck?.component}
                             </ActionRequiredContainer>
                         )}
                     </Group>
-                    <Stack mt="2rem">
+                    <Stack style={{ marginTop: '2rem' }}>
                         {canReturnHome && (
                             <>
                                 <Group
-                                    noWrap
-                                    position="center"
+                                    justify="center"
+                                    wrap="nowrap"
                                 >
                                     <RiCheckFill
                                         color="var(--success-color)"
@@ -72,7 +71,7 @@ const ActionRequiredRoute = () => {
                                 <Button
                                     component={Link}
                                     disabled={!canReturnHome}
-                                    leftIcon={<RiHome4Line />}
+                                    leftSection={<RiHome4Line />}
                                     to={AppRoute.HOME}
                                     variant="filled"
                                 >
@@ -82,12 +81,12 @@ const ActionRequiredRoute = () => {
                         )}
                         {!displayedCheck && (
                             <Group
-                                noWrap
-                                position="center"
+                                justify="center"
+                                wrap="nowrap"
                             >
                                 <Button
                                     fullWidth
-                                    leftIcon={<RiEdit2Line />}
+                                    leftSection={<RiEdit2Line />}
                                     variant="filled"
                                     onClick={handleManageServersModal}
                                 >

@@ -6,8 +6,8 @@
 
 * {
     box-sizing: border-box;
-    margin: 0;
     padding: 0;
+    margin: 0;
 }
 
 body,
@@ -18,14 +18,14 @@ html {
     height: 100%;
     overflow-x: hidden;
     overflow-y: hidden;
-    color: var(--content-text-color);
-    background: var(--content-bg);
-    font-family: var(--content-font-family);
+    font-family: var(--content-font-family), sans-serif;
     font-size: var(--root-font-size);
+    color: var(--main-fg) !important;
     user-select: none;
+    background-color: var(--main-bg) !important;
 }
 
-@media only screen and (max-width: 639px) {
+@media only screen and (width <= 639px) {
     body,
     html {
         overflow-x: auto;
@@ -37,11 +37,11 @@ html {
 }
 
 *,
-*:before,
-*:after {
+*::before,
+*::after {
     box-sizing: border-box;
-    text-rendering: optimizeLegibility;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    text-rendering: optimizelegibility;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0%);
     -webkit-text-size-adjust: none;
     outline: none;
 }
@@ -91,6 +91,7 @@ button {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -100,6 +101,7 @@ button {
     from {
         opacity: 1;
     }
+
     to {
         opacity: 0;
     }
@@ -114,108 +116,108 @@ button {
 }
 
 @font-face {
-    font-family: 'Archivo';
+    font-family: Archivo;
+    font-weight: 100 1000;
     src: url('../fonts/Archivo-VariableFont_wdth,wght.ttf') format('truetype-variations');
-    font-weight: 100 1000;
 }
 
 @font-face {
-    font-family: 'Raleway';
+    font-family: Raleway;
+    font-weight: 100 1000;
     src: url('../fonts/Raleway-VariableFont_wght.ttf') format('truetype-variations');
-    font-weight: 100 1000;
 }
 
 @font-face {
-    font-family: 'Fredoka';
-    src: url('../fonts/Fredoka-VariableFont_wdth,wght.ttf') format('truetype-variations');
+    font-family: Fredoka;
     font-weight: 100 1000;
+    src: url('../fonts/Fredoka-VariableFont_wdth,wght.ttf') format('truetype-variations');
 }
 
 @font-face {
     font-family: 'League Spartan';
+    font-weight: 100 1000;
     src: url('../fonts/LeagueSpartan-VariableFont_wght.ttf') format('truetype-variations');
-    font-weight: 100 1000;
 }
 
 @font-face {
-    font-family: 'Lexend';
+    font-family: Lexend;
+    font-weight: 100 1000;
     src: url('../fonts/Lexend-VariableFont_wght.ttf') format('truetype-variations');
-    font-weight: 100 1000;
 }
 
 @font-face {
-    font-family: 'Inter';
+    font-family: Inter;
+    font-weight: 100 1000;
     src: url('../fonts/Inter-VariableFont_slnt,wght.ttf') format('truetype-variations');
-    font-weight: 100 1000;
 }
 
 @font-face {
-    font-family: 'Sora';
-    src: url('../fonts/Sora-VariableFont_wght.ttf') format('truetype-variations');
+    font-family: Sora;
     font-weight: 100 1000;
+    src: url('../fonts/Sora-VariableFont_wght.ttf') format('truetype-variations');
 }
 
 @font-face {
     font-family: 'Work Sans';
-    src: url('../fonts/WorkSans-VariableFont_wght.ttf') format('truetype-variations');
     font-weight: 100 1000;
+    src: url('../fonts/WorkSans-VariableFont_wght.ttf') format('truetype-variations');
 }
 
 @font-face {
-    font-family: 'Poppins';
+    font-family: Poppins;
     font-style: normal;
     font-weight: 400;
-    font-display: swap;
     src: url('../fonts/Poppins-Regular.ttf') format('truetype');
+    font-display: swap;
 }
 
 @font-face {
-    font-family: 'Poppins';
+    font-family: Poppins;
     font-style: normal;
     font-weight: 600;
-    font-display: swap;
     src: url('../fonts/Poppins-SemiBold.ttf') format('truetype');
+    font-display: swap;
 }
 
 @font-face {
-    font-family: 'Poppins';
+    font-family: Poppins;
     font-style: normal;
     font-weight: 700;
-    font-display: swap;
     src: url('../fonts/Poppins-Bold.ttf') format('truetype');
+    font-display: swap;
 }
 
 @font-face {
-    font-family: 'Poppins';
+    font-family: Poppins;
     font-style: normal;
     font-weight: 800;
-    font-display: swap;
     src: url('../fonts/Poppins-ExtraBold.ttf') format('truetype');
+    font-display: swap;
 }
 
 @font-face {
-    font-family: 'Poppins';
+    font-family: Poppins;
     font-style: normal;
     font-weight: 900;
-    font-display: swap;
     src: url('../fonts/Poppins-Black.ttf') format('truetype');
+    font-display: swap;
 }
 
 @font-face {
-    font-family: 'Raleway';
-    src: url('../fonts/Raleway-VariableFont_wght.ttf') format('truetype-variations');
+    font-family: Raleway;
     font-weight: 100 1000;
+    src: url('../fonts/Raleway-VariableFont_wght.ttf') format('truetype-variations');
 }
 
 @font-face {
-    font-family: 'DroidSerif';
+    font-family: DroidSerif;
     src: url('https://rawgit.com/google/fonts/master/ufl/ubuntumono/UbuntuMono-Italic.ttf')
         format('truetype');
     unicode-range: U+000-5FF; /* Latin glyphs */
 }
 
 @font-face {
-    font-family: 'DroidSerif';
+    font-family: DroidSerif;
     src: url('https://fonts.gstatic.com/ea/notosansjp/v5/NotoSansJP-Regular.woff2')
         format('truetype');
     unicode-range: U+3000-9FFF, U+ff??; /* Japanese glyphs */

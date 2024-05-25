@@ -411,9 +411,11 @@ export const PlaylistQueryBuilder = forwardRef(
 
         return (
             <MotionFlex
-                direction="column"
-                h="calc(100% - 3.5rem)"
-                justify="space-between"
+                style={{
+                    flexDirection: 'column',
+                    height: 'calc(100% - 3.5rem)',
+                    justifyContent: 'space-between',
+                }}
             >
                 <ScrollArea
                     h="100%"
@@ -446,15 +448,15 @@ export const PlaylistQueryBuilder = forwardRef(
                     />
                 </ScrollArea>
                 <Group
-                    noWrap
                     align="flex-end"
+                    justify="space-between"
                     m="1rem"
-                    position="apart"
+                    wrap="nowrap"
                 >
                     <Group
-                        noWrap
-                        spacing="sm"
+                        gap="sm"
                         w="100%"
+                        wrap="nowrap"
                     >
                         <Select
                             searchable
@@ -489,8 +491,8 @@ export const PlaylistQueryBuilder = forwardRef(
                     </Group>
                     {onSave && onSaveAs && (
                         <Group
-                            noWrap
-                            spacing="sm"
+                            gap="sm"
+                            wrap="nowrap"
                         >
                             <Button
                                 loading={isSaving}
@@ -519,7 +521,7 @@ export const PlaylistQueryBuilder = forwardRef(
                                 <DropdownMenu.Dropdown>
                                     <DropdownMenu.Item
                                         $danger
-                                        icon={<RiSaveLine color="var(--danger-color)" />}
+                                        leftSection={<RiSaveLine color="var(--danger-color)" />}
                                         onClick={handleSave}
                                     >
                                         {t('common.saveAndReplace', { postProcess: 'titleCase' })}

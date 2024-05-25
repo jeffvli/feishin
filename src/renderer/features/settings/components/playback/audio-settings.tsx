@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SelectItem } from '@mantine/core';
+import { ComboboxItem } from '@mantine/core';
 import isElectron from 'is-electron';
 import { Select, Slider, toast } from '/@/renderer/components';
 import {
@@ -24,7 +24,7 @@ export const AudioSettings = ({ hasFancyAudio }: { hasFancyAudio: boolean }) => 
     const { setSettings } = useSettingsStoreActions();
     const status = useCurrentStatus();
 
-    const [audioDevices, setAudioDevices] = useState<SelectItem[]>([]);
+    const [audioDevices, setAudioDevices] = useState<ComboboxItem[]>([]);
 
     useEffect(() => {
         const getAudioDevices = () => {

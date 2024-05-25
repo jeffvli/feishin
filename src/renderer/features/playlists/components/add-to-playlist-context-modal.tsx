@@ -229,7 +229,7 @@ export const AddToPlaylistContextModal = ({
                         })}
                         {...form.getInputProps('skipDuplicates', { type: 'checkbox' })}
                     />
-                    <Group position="right">
+                    <Group align="flex-end">
                         <Group>
                             <Button
                                 disabled={addToPlaylistMutation.isLoading}

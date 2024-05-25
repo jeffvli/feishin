@@ -74,12 +74,12 @@ export const LyricSettings = () => {
                     data={Object.values(LyricSource)}
                     defaultValue={settings.sources}
                     width={300}
-                    onChange={(e: LyricSource[]) => {
+                    onChange={(e) => {
                         localSettings?.set('lyrics', e);
                         setSettings({
                             lyrics: {
                                 ...settings,
-                                sources: e,
+                                sources: e as LyricSource[],
                             },
                         });
                     }}

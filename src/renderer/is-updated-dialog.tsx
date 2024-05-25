@@ -1,8 +1,7 @@
 import { useCallback } from 'react';
-import { Group, Stack } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { RiExternalLinkLine } from 'react-icons/ri';
-import { Button, Dialog, Text } from './components';
+import { Button, Dialog, Group, Stack, Text } from './components';
 import packageJson from '../../package.json';
 
 export const IsUpdatedDialog = () => {
@@ -27,11 +26,11 @@ export const IsUpdatedDialog = () => {
         >
             <Stack>
                 <Text>A new version of Feishin has been installed ({version})</Text>
-                <Group noWrap>
+                <Group wrap="nowrap">
                     <Button
                         component="a"
                         href={`https://github.com/jeffvli/feishin/releases/tag/v${version}`}
-                        rightIcon={<RiExternalLinkLine />}
+                        rightSection={<RiExternalLinkLine />}
                         target="_blank"
                         variant="filled"
                         onClick={handleDismiss}

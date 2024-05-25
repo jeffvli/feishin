@@ -47,8 +47,8 @@ export const AlbumArtistDetailTopSongsListHeader = ({
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiMoreFill size={15} />
@@ -56,19 +56,19 @@ export const AlbumArtistDetailTopSongsListHeader = ({
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiPlayFill />}
+                            leftSection={<RiPlayFill />}
                             onClick={() => handlePlay(Play.NOW)}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddBoxFill />}
+                            leftSection={<RiAddBoxFill />}
                             onClick={() => handlePlay(Play.LAST)}
                         >
                             {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddCircleFill />}
+                            leftSection={<RiAddCircleFill />}
                             onClick={() => handlePlay(Play.NEXT)}
                         >
                             {t('player.addNext', { postProcess: 'sentenceCase' })}

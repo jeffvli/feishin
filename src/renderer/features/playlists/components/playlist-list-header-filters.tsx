@@ -235,7 +235,7 @@ export const PlaylistListHeaderFilters = ({
         [pageKey, setDisplayType],
     );
 
-    const handleTableColumns = (values: TableColumn[]) => {
+    const handleTableColumns = (values: TableColumn[] | any[]) => {
         const existingColumns = table.columns;
 
         if (values.length === 0) {
@@ -288,15 +288,14 @@ export const PlaylistListHeaderFilters = ({
         <Flex justify="space-between">
             <Group
                 ref={cq.ref}
-                spacing="sm"
+                gap="sm"
                 w="100%"
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             {sortByLabel}
@@ -322,8 +321,7 @@ export const PlaylistListHeaderFilters = ({
                 />
                 <Divider orientation="vertical" />
                 <Button
-                    compact
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
@@ -334,9 +332,8 @@ export const PlaylistListHeaderFilters = ({
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiMoreFill size="1.3rem" />
@@ -344,7 +341,7 @@ export const PlaylistListHeaderFilters = ({
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiRefreshLine />}
+                            leftSection={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
                             {t('common.refresh', { postProcess: 'titleCase' })}
@@ -359,8 +356,7 @@ export const PlaylistListHeaderFilters = ({
                 >
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiSettings3Fill size="1.3rem" />
@@ -437,7 +433,7 @@ export const PlaylistListHeaderFilters = ({
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
                                     <Stack>
                                         <MultiSelect
@@ -449,7 +445,7 @@ export const PlaylistListHeaderFilters = ({
                                             width={300}
                                             onChange={handleTableColumns}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>
                                                 {t('table.config.general.autoFitColumns', {
                                                     postProcess: 'titleCase',

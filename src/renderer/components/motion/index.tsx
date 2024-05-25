@@ -1,7 +1,7 @@
 import { Flex, Group, Stack } from '@mantine/core';
 import { motion } from 'framer-motion';
 
-export const MotionFlex = motion(Flex);
+export const MotionFlex = motion(Flex as any);
 
 export const MotionGroup = motion(Group);
 

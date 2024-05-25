@@ -21,9 +21,8 @@ export const OrderToggleButton = ({ sortOrder, onToggle, buttonProps }: OrderTog
             }
         >
             <Button
-                compact
                 fw="600"
-                size="md"
+                size="compact-md"
                 variant="subtle"
                 onClick={onToggle}
                 {...buttonProps}

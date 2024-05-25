@@ -1,6 +1,5 @@
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
@@ -13,7 +12,18 @@ import {
 } from 'react-icons/ri';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { GenreListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
-import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
+import {
+    Button,
+    Divider,
+    DropdownMenu,
+    Flex,
+    Group,
+    MultiSelect,
+    Slider,
+    Stack,
+    Switch,
+    Text,
+} from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { GENRE_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
@@ -182,7 +192,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
         [pageKey, setDisplayType],
     );
 
-    const handleTableColumns = (values: TableColumn[]) => {
+    const handleTableColumns = (values: TableColumn[] | any[]) => {
         const existingColumns = table.columns;
 
         if (values.length === 0) {
@@ -229,15 +239,14 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
         <Flex justify="space-between">
             <Group
                 ref={cq.ref}
-                spacing="sm"
-                w="100%"
+                gap="sm"
+                style={{ width: '100%' }}
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw={600}
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             {sortByLabel}
@@ -267,10 +276,9 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
                                 <Button
-                                    compact
                                     fw={600}
-                                    size="md"
-                                    sx={{
+                                    size="compact-md"
+                                    style={{
                                         svg: {
                                             fill: isFolderFilterApplied
                                                 ? 'var(--primary-color) !important'
@@ -299,8 +307,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                 )}
                 <Divider orientation="vertical" />
                 <Button
-                    compact
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
@@ -311,8 +318,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiMoreFill size={15} />
@@ -320,7 +326,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiRefreshLine />}
+                            leftSection={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
                             {t('common.refresh', { postProcess: 'titleCase' })}
@@ -328,8 +334,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                     </DropdownMenu.Dropdown>
                     <Divider orientation="vertical" />
                     <Button
-                        compact
-                        size="md"
+                        size="compact-md"
                         tooltip={{
                             label: t(
                                 genreTarget === GenreTarget.ALBUM
@@ -346,8 +351,8 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                 </DropdownMenu>
             </Group>
             <Group
-                noWrap
-                spacing="sm"
+                gap="sm"
+                wrap="nowrap"
             >
                 <DropdownMenu
                     position="bottom-end"
@@ -355,8 +360,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                 >
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             tooltip={{
                                 label: t('common.configure', { postProcess: 'titleCase' }),
                             }}
@@ -426,7 +430,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
                                     <Stack>
                                         <MultiSelect
@@ -438,7 +442,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                                             width={300}
                                             onChange={handleTableColumns}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>
                                                 {t('table.config.general.autoFitColumns', {
                                                     postProcess: 'titleCase',

@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Flex, Group } from '@mantine/core';
 import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +25,7 @@ import { useRightControls } from '../hooks/use-right-controls';
 import { PlayerButton } from './player-button';
 import { LibraryItem, QueueSong, ServerType, Song } from '/@/renderer/api/types';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
-import { DropdownMenu, Rating } from '/@/renderer/components';
+import { DropdownMenu, Flex, Group, Rating } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { Slider } from '/@/renderer/components/slider';
 
@@ -213,9 +212,9 @@ export const RightControls = () => {
                 )}
             </Group>
             <Group
-                noWrap
                 align="center"
-                spacing="xs"
+                gap="xs"
+                wrap="nowrap"
             >
                 <DropdownMenu
                     withArrow
@@ -272,7 +271,7 @@ export const RightControls = () => {
                             <RiHeartLine size="1.1rem" />
                         )
                     }
-                    sx={{
+                    style={{
                         svg: {
                             fill: !currentSong?.userFavorite
                                 ? undefined
@@ -297,8 +296,8 @@ export const RightControls = () => {
                     />
                 ) : null}
                 <Group
-                    noWrap
-                    spacing="xs"
+                    gap="xs"
+                    wrap="nowrap"
                 >
                     <PlayerButton
                         icon={

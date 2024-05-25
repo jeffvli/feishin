@@ -1,5 +1,4 @@
 import { MouseEvent, useMemo } from 'react';
-import { Box, Center, Divider, Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +11,16 @@ import {
     useWindowSettings,
 } from '../../../store/settings.store';
 import { PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
-import { Button, MotionStack, Spinner, Tooltip } from '/@/renderer/components';
+import {
+    Button,
+    Center,
+    Divider,
+    Group,
+    MotionStack,
+    Spinner,
+    Stack,
+    Tooltip,
+} from '/@/renderer/components';
 import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
@@ -151,24 +159,24 @@ export const Sidebar = () => {
         >
             <ActionBar />
             <Stack
-                h="100%"
+                gap={0}
                 justify="space-between"
-                spacing={0}
+                style={{ height: '100%' }}
             >
                 <MotionStack
+                    gap={0}
                     h="100%"
                     layout="position"
-                    spacing={0}
-                    sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
+                    style={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
                 >
-                    <Stack spacing={0}>
+                    <Stack gap={0}>
                         {sidebarItemsWithRoute.map((item) => {
                             return (
                                 <SidebarItem
                                     key={`sidebar-${item.route}`}
                                     to={item.route}
                                 >
-                                    <Group spacing="sm">
+                                    <Group gap="sm">
                                         <SidebarIcon
                                             active={location.pathname === item.route}
                                             route={item.route}
@@ -181,29 +189,24 @@ export const Sidebar = () => {
                         })}
                     </Stack>
                     <Divider
-                        mx="1rem"
-                        my="0.5rem"
+                        marginX="1rem"
+                        marginY="0.5rem"
                     />
                     {sidebarPlaylistList && (
                         <>
                             <Group
-                                position="apart"
-                                pt="1rem"
-                                px="1.5rem"
+                                justify="space-between"
+                                style={{ padding: '1rem 1.5rem 0 1.5rem' }}
                             >
                                 <Group>
-                                    <Box
-                                        fw="600"
-                                        sx={{ fontSize: '1.2rem' }}
-                                    >
+                                    <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>
                                         {t('page.sidebar.playlists', { postProcess: 'titleCase' })}
-                                    </Box>
+                                    </div>
                                     {playlistsQuery.isLoading && <Spinner />}
                                 </Group>
-                                <Group spacing="sm">
+                                <Group gap="sm">
                                     <Button
-                                        compact
-                                        size="md"
+                                        size="compact-md"
                                         tooltip={{
                                             label: t('action.createPlaylist', {
                                                 postProcess: 'sentenceCase',
@@ -216,9 +219,8 @@ export const Sidebar = () => {
                                         <RiAddFill size="1em" />
                                     </Button>
                                     <Button
-                                        compact
                                         component={Link}
-                                        size="md"
+                                        size="compact-md"
                                         to={AppRoute.PLAYLISTS}
                                         tooltip={{
                                             label: t('action.viewPlaylists', {
@@ -265,7 +267,10 @@ export const Sidebar = () => {
                                     />
                                 ) : (
                                     <Center
-                                        sx={{ background: 'var(--placeholder-bg)', height: '100%' }}
+                                        style={{
+                                            background: 'var(--placeholder-bg)',
+                                            height: '100%',
+                                        }}
                                     >
                                         <RiDiscLine
                                             color="var(--placeholder-fg)"
@@ -275,11 +280,15 @@ export const Sidebar = () => {
                                 )}
                             </Tooltip>
                             <Button
-                                compact
                                 opacity={0.8}
                                 radius={100}
-                                size="md"
-                                sx={{ cursor: 'default', position: 'absolute', right: 5, top: 5 }}
+                                size="compact-md"
+                                style={{
+                                    cursor: 'default',
+                                    position: 'absolute',
+                                    right: 5,
+                                    top: 5,
+                                }}
                                 tooltip={{
                                     label: t('common.collapse', { postProcess: 'titleCase' }),
                                     openDelay: 500,

@@ -1,4 +1,3 @@
-import { Flex, Stack, Group, Center } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'framer-motion';
 import { useEffect, useRef, useLayoutEffect, useState, useCallback, Fragment } from 'react';
@@ -7,7 +6,7 @@ import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { QueueSong } from '/@/renderer/api/types';
-import { Badge, Text, TextTitle } from '/@/renderer/components';
+import { Badge, Center, Flex, Group, Stack, Text, TextTitle } from '/@/renderer/components';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
@@ -104,7 +103,7 @@ const ImageWithPlaceholder = ({
     if (!props.src) {
         return (
             <Center
-                sx={{
+                style={{
                     background: 'var(--placeholder-bg)',
                     borderRadius: 'var(--card-default-radius)',
                     height: '100%',
@@ -246,11 +245,10 @@ export const FullScreenPlayerImage = () => {
             </ImageContainer>
             <MetadataContainer
                 className="full-screen-player-image-metadata"
+                gap="xs"
                 maw="100%"
-                spacing="xs"
             >
                 <TextTitle
-                    align="center"
                     order={1}
                     overflow="hidden"
                     style={{
@@ -263,7 +261,6 @@ export const FullScreenPlayerImage = () => {
                 </TextTitle>
                 <TextTitle
                     $link
-                    align="center"
                     component={Link}
                     order={3}
                     overflow="hidden"
@@ -280,7 +277,6 @@ export const FullScreenPlayerImage = () => {
                 </TextTitle>
                 <TextTitle
                     key="fs-artists"
-                    align="center"
                     order={3}
                     style={{
                         textShadow: 'var(--fullscreen-player-text-shadow)',
@@ -291,7 +287,7 @@ export const FullScreenPlayerImage = () => {
                             {index > 0 && (
                                 <Text
                                     $secondary
-                                    sx={{
+                                    style={{
                                         display: 'inline-block',
                                         padding: '0 0.5rem',
                                     }}
@@ -317,8 +313,8 @@ export const FullScreenPlayerImage = () => {
                     ))}
                 </TextTitle>
                 <Group
+                    justify="center"
                     mt="sm"
-                    position="center"
                 >
                     {currentSong?.container && (
                         <Badge size="lg">

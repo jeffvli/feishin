@@ -179,7 +179,7 @@ const PlaylistDetailSongListRoute = () => {
                     >
                         <Group p="1rem">
                             <Button
-                                compact
+                                size="compact-md"
                                 variant="default"
                                 onClick={handleToggleExpand}
                             >

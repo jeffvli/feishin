@@ -43,7 +43,7 @@ export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
                         justify="space-between"
                         w="100%"
                     >
-                        <Group noWrap>
+                        <Group wrap="nowrap">
                             <RiSettings2Fill size="2rem" />
                             <LibraryHeaderBar.Title>
                                 {t('common.setting', { count: 2, postProcess: 'titleCase' })}
@@ -58,7 +58,7 @@ export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
                                 }
                             />
                             <Button
-                                compact
+                                size="compact-md"
                                 variant="default"
                                 onClick={openResetConfirmModal}
                             >

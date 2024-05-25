@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import type { ICellRendererParams } from '@ag-grid-community/core';
-import { Center } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
@@ -12,6 +11,7 @@ import { Text } from '/@/renderer/components/text';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Skeleton } from '/@/renderer/components/skeleton';
 import { SEPARATOR_STRING } from '/@/renderer/api/utils';
+import { Center } from '/@/renderer/components/center';
 
 const CellContainer = styled(motion.div)<{ height: number }>`
     display: grid;
@@ -89,7 +89,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
                     />
                 ) : (
                     <Center
-                        sx={{
+                        style={{
                             background: 'var(--placeholder-bg)',
                             borderRadius: 'var(--card-default-radius)',
                             height: `${(node.rowHeight || 40) - 10}px`,
@@ -127,7 +127,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
                                         component={Link}
                                         overflow="hidden"
                                         size="md"
-                                        sx={{ width: 'fit-content' }}
+                                        style={{ width: 'fit-content' }}
                                         to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                             albumArtistId: artist.id,
                                         })}
@@ -139,7 +139,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
                                         $secondary
                                         overflow="hidden"
                                         size="md"
-                                        sx={{ width: 'fit-content' }}
+                                        style={{ width: 'fit-content' }}
                                     >
                                         {artist.name}
                                     </Text>

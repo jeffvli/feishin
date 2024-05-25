@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Center, Group } from '@mantine/core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
 import { SynchronizedLyrics, SynchronizedLyricsProps } from './synchronized-lyrics';
-import { Spinner, TextTitle } from '/@/renderer/components';
+import { Center, Group, Spinner, TextTitle } from '/@/renderer/components';
 import { ErrorFallback } from '/@/renderer/features/action-required';
 import {
     UnsynchronizedLyrics,

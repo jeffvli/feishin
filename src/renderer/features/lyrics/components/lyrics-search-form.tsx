@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { Divider, Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDebouncedValue } from '@mantine/hooks';
 import { openModal } from '@mantine/modals';
@@ -12,7 +11,15 @@ import {
     LyricsOverride,
 } from '../../../api/types';
 import { useLyricSearch } from '../queries/lyric-search-query';
-import { ScrollArea, Spinner, Text, TextInput } from '/@/renderer/components';
+import {
+    Divider,
+    Group,
+    ScrollArea,
+    Spinner,
+    Stack,
+    Text,
+    TextInput,
+} from '/@/renderer/components';
 import i18n from '/@/i18n/i18n';
 
 const SearchItem = styled.button`
@@ -47,12 +54,12 @@ const SearchResult = ({ data, onClick }: SearchResultProps) => {
     return (
         <SearchItem onClick={onClick}>
             <Group
-                noWrap
-                position="apart"
+                justify="space-between"
+                wrap="nowrap"
             >
                 <Stack
+                    gap={0}
                     maw="65%"
-                    spacing={0}
                 >
                     <Text
                         size="md"
@@ -62,8 +69,8 @@ const SearchResult = ({ data, onClick }: SearchResultProps) => {
                     </Text>
                     <Text $secondary>{artist}</Text>
                     <Group
-                        noWrap
-                        spacing="sm"
+                        gap="sm"
+                        wrap="nowrap"
                     >
                         <Text
                             $secondary
@@ -146,7 +153,7 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
                     type="auto"
                     w="100%"
                 >
-                    <Stack spacing="md">
+                    <Stack gap="md">
                         {searchResults.map((result) => (
                             <SearchResult
                                 key={`${result.source}-${result.id}`}

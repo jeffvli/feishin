@@ -185,7 +185,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                         {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
                     />
                 )}
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button
                         variant="subtle"
                         onClick={onCancel}

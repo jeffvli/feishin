@@ -1,6 +1,5 @@
 import { createContext, Fragment, ReactNode, useState, useMemo, useCallback } from 'react';
 import { RowNode } from '@ag-grid-community/core';
-import { Divider, Group, Portal, Stack } from '@mantine/core';
 import {
     useClickOutside,
     useMergedRef,
@@ -35,8 +34,12 @@ import {
     ConfirmModal,
     ContextMenu,
     ContextMenuButton,
+    Divider,
+    Group,
     HoverCard,
+    Portal,
     Rating,
+    Stack,
     Text,
     toast,
 } from '/@/renderer/components';
@@ -861,9 +864,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             xPos={ctx.xPos}
                             yPos={ctx.yPos}
                         >
-                            <Stack spacing={0}>
+                            <Stack gap={0}>
                                 <Stack
-                                    spacing={0}
+                                    gap={0}
                                     onClick={closeContextMenu}
                                 >
                                     {ctx.menuItems?.map((item) => {
@@ -897,7 +900,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                                 </ContextMenuButton>
                                                             </HoverCard.Target>
                                                             <HoverCard.Dropdown>
-                                                                <Stack spacing={0}>
+                                                                <Stack gap={0}>
                                                                     {contextMenuItems[
                                                                         item.id
                                                                     ].children?.map((child) => (
@@ -937,7 +940,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                         <Divider
                                                             key={`context-menu-divider-${item.id}`}
                                                             color="rgb(62, 62, 62)"
-                                                            size="sm"
                                                         />
                                                     )}
                                                 </Fragment>
@@ -945,10 +947,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                         );
                                     })}
                                 </Stack>
-                                <Divider
-                                    color="rgb(62, 62, 62)"
-                                    size="sm"
-                                />
+                                <Divider color="rgb(62, 62, 62)" />
                                 <ContextMenuButton disabled>
                                     {t('page.contextMenu.numberSelected', {
                                         count: ctx.data?.length || 0,

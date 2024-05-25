@@ -1,6 +1,5 @@
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,7 +15,18 @@ import {
 import { useListStoreByKey } from '../../../store/list.store';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { LibraryItem, ServerType, SongListSort, SortOrder } from '/@/renderer/api/types';
-import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
+import {
+    Button,
+    Divider,
+    DropdownMenu,
+    Flex,
+    Group,
+    MultiSelect,
+    Slider,
+    Stack,
+    Switch,
+    Text,
+} from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
@@ -324,7 +334,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
         [pageKey, setDisplayType, setTablePagination, tableRef],
     );
 
-    const handleTableColumns = (values: TableColumn[]) => {
+    const handleTableColumns = (values: TableColumn[] | any[]) => {
         const existingColumns = table.columns;
 
         if (values.length === 0) {
@@ -440,15 +450,14 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
         <Flex justify="space-between">
             <Group
                 ref={cq.ref}
-                spacing="sm"
+                gap="sm"
                 w="100%"
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             {sortByLabel}
@@ -478,10 +487,9 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
                                 <Button
-                                    compact
                                     fw="600"
-                                    size="md"
-                                    sx={{
+                                    size="compact-md"
+                                    style={{
                                         svg: {
                                             fill: isFolderFilterApplied
                                                 ? 'var(--primary-color) !important'
@@ -510,9 +518,8 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                 )}
                 <Divider orientation="vertical" />
                 <Button
-                    compact
-                    size="md"
-                    sx={{
+                    size="compact-md"
+                    style={{
                         svg: {
                             fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
                         },
@@ -525,8 +532,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                 </Button>
                 <Divider orientation="vertical" />
                 <Button
-                    compact
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
@@ -537,9 +543,8 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiMoreFill size="1.3rem" />
@@ -547,26 +552,26 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiPlayFill />}
+                            leftSection={<RiPlayFill />}
                             onClick={() => handlePlay?.({ playType: Play.NOW })}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddBoxFill />}
+                            leftSection={<RiAddBoxFill />}
                             onClick={() => handlePlay?.({ playType: Play.LAST })}
                         >
                             {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddCircleFill />}
+                            leftSection={<RiAddCircleFill />}
                             onClick={() => handlePlay?.({ playType: Play.NEXT })}
                         >
                             {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            icon={<RiRefreshLine />}
+                            leftSection={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
                             Refresh
@@ -575,8 +580,8 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                 </DropdownMenu>
             </Group>
             <Group
-                noWrap
-                spacing="sm"
+                gap="sm"
+                wrap="nowrap"
             >
                 <DropdownMenu
                     position="bottom-end"
@@ -584,8 +589,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                 >
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiSettings3Fill size="1.3rem" />
@@ -660,7 +664,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                         <DropdownMenu.Item
                             closeMenuOnClick={false}
                             component="div"
-                            sx={{ cursor: 'default' }}
+                            style={{ cursor: 'default' }}
                         >
                             <Stack>
                                 <MultiSelect
@@ -670,7 +674,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                                     width={300}
                                     onChange={handleTableColumns}
                                 />
-                                <Group position="apart">
+                                <Group justify="space-between">
                                     <Text>
                                         {t('table.config.general.autoFitColumns', {
                                             postProcess: 'sentenceCase',

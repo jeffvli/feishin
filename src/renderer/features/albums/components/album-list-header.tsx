@@ -1,10 +1,9 @@
 import { useEffect, useRef, type ChangeEvent, type MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { LibraryItem } from '/@/renderer/api/types';
-import { PageHeader, SearchInput } from '/@/renderer/components';
+import { Flex, Group, PageHeader, SearchInput, Stack } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { AlbumListHeaderFilters } from '/@/renderer/features/albums/components/album-list-header-filters';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
@@ -57,7 +56,7 @@ export const AlbumListHeader = ({
     return (
         <Stack
             ref={cq.ref}
-            spacing={0}
+            gap={0}
         >
             <PageHeader backgroundColor="var(--titlebar-bg)">
                 <Flex

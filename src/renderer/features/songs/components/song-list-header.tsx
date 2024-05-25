@@ -1,10 +1,9 @@
 import { ChangeEvent, MutableRefObject, useEffect, useRef } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { LibraryItem } from '/@/renderer/api/types';
-import { PageHeader, SearchInput } from '/@/renderer/components';
+import { Flex, Group, PageHeader, SearchInput, Stack } from '/@/renderer/components';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { SongListHeaderFilters } from '/@/renderer/features/songs/components/song-list-header-filters';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -64,7 +63,7 @@ export const SongListHeader = ({
     return (
         <Stack
             ref={cq.ref}
-            spacing={0}
+            gap={0}
         >
             <PageHeader backgroundColor="var(--titlebar-bg)">
                 <Flex

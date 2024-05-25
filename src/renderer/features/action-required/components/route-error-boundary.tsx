@@ -1,9 +1,9 @@
-import { Center, Stack, Group, Divider, Box } from '@mantine/core';
 import { RiArrowLeftSLine, RiErrorWarningLine, RiHome4Line, RiMenuFill } from 'react-icons/ri';
 import { useNavigate, useRouteError } from 'react-router';
-import { Button, DropdownMenu, Text } from '/@/renderer/components';
+import { Button, Center, Divider, DropdownMenu, Group, Stack, Text } from '/@/renderer/components';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 import { AppRoute } from '/@/renderer/router/routes';
+import styled from 'styled-components';
 
 const RouteErrorBoundary = () => {
     const navigate = useNavigate();
@@ -23,9 +23,9 @@ const RouteErrorBoundary = () => {
     };
 
     return (
-        <Box bg="var(--main-bg)">
-            <Center sx={{ height: '100vh' }}>
-                <Stack sx={{ maxWidth: '50%' }}>
+        <Container>
+            <Center style={{ height: '100vh' }}>
+                <Stack style={{ maxWidth: '50%' }}>
                     <Group>
                         <Button
                             px={10}
@@ -40,16 +40,16 @@ const RouteErrorBoundary = () => {
                         />
                         <Text size="lg">Something went wrong</Text>
                     </Group>
-                    <Divider my={5} />
+                    <Divider marginY={5} />
                     <Text size="sm">{error?.message}</Text>
                     <Group
                         grow
-                        spacing="sm"
+                        gap="sm"
                     >
                         <Button
-                            leftIcon={<RiHome4Line />}
+                            leftSection={<RiHome4Line />}
                             size="md"
-                            sx={{ flex: 0.5 }}
+                            style={{ flex: 0.5 }}
                             variant="default"
                             onClick={handleHome}
                         >
@@ -58,9 +58,9 @@ const RouteErrorBoundary = () => {
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
                                 <Button
-                                    leftIcon={<RiMenuFill />}
+                                    leftSection={<RiMenuFill />}
                                     size="md"
-                                    sx={{ flex: 0.5 }}
+                                    style={{ flex: 0.5 }}
                                     variant="default"
                                 >
                                     Menu
@@ -82,8 +82,12 @@ const RouteErrorBoundary = () => {
                     </Group>
                 </Stack>
             </Center>
-        </Box>
+        </Container>
     );
 };
 
 export default RouteErrorBoundary;
+
+const Container = styled.div`
+    background: var(--main-bg);
+`;

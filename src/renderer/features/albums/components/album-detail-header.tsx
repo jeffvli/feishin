@@ -1,9 +1,8 @@
-import { Group, Stack } from '@mantine/core';
 import { forwardRef, Fragment, Ref } from 'react';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
-import { Rating, Text } from '/@/renderer/components';
+import { Group, Rating, Stack, Text } from '/@/renderer/components';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
 import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -66,8 +65,8 @@ export const AlbumDetailHeader = forwardRef(
                     item={{ route: AppRoute.LIBRARY_ALBUMS, type: LibraryItem.ALBUM }}
                     title={detailQuery?.data?.name || ''}
                 >
-                    <Stack spacing="sm">
-                        <Group spacing="sm">
+                    <Stack gap="sm">
+                        <Group gap="sm">
                             {metadataItems.map((item, index) => (
                                 <Fragment key={`item-${item.id}-${index}`}>
                                     {index > 0 && <Text $noSelect>•</Text>}
@@ -89,11 +88,11 @@ export const AlbumDetailHeader = forwardRef(
                             )}
                         </Group>
                         <Group
-                            mah="4rem"
-                            spacing="md"
-                            sx={{
+                            gap="md"
+                            style={{
                                 WebkitBoxOrient: 'vertical',
                                 WebkitLineClamp: 2,
+                                maxHeight: '4rem',
                                 overflow: 'hidden',
                             }}
                         >

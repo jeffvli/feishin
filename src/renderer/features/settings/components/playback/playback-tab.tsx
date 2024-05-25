@@ -17,7 +17,7 @@ export const PlaybackTab = () => {
     }, []);
 
     return (
-        <Stack spacing="md">
+        <Stack gap="md">
             <AudioSettings hasFancyAudio={hasFancyAudio} />
             <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
             <ScrobbleSettings />

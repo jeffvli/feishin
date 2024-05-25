@@ -92,7 +92,6 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 >
                     <StyledButton
                         ref={ref}
-                        loaderPosition="center"
                         {...props}
                     >
                         <ButtonChildWrapper $loading={props.loading}>{children}</ButtonChildWrapper>
@@ -109,7 +108,6 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
         return (
             <StyledButton
                 ref={ref}
-                loaderPosition="center"
                 {...props}
             >
                 <ButtonChildWrapper $loading={props.loading}>{children}</ButtonChildWrapper>
@@ -171,7 +169,7 @@ export const TimeoutButton = ({ timeoutProps, ...props }: HoldButtonProps) => {
 
     return (
         <Button
-            sx={{ color: 'var(--danger-color)' }}
+            style={{ color: 'var(--danger-color)' }}
             onClick={startTimeout}
             {...props}
         >

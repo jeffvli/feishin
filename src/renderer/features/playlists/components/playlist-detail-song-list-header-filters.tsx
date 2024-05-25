@@ -318,7 +318,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
         [page, setPage],
     );
 
-    const handleTableColumns = (values: TableColumn[]) => {
+    const handleTableColumns = (values: TableColumn[] | any[]) => {
         const existingColumns = page.table.columns;
 
         if (values.length === 0) {
@@ -394,15 +394,14 @@ export const PlaylistDetailSongListHeaderFilters = ({
         <Flex justify="space-between">
             <Group
                 ref={cq.ref}
-                spacing="sm"
+                gap="sm"
                 w="100%"
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             {sortByLabel}
@@ -430,9 +429,8 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiMoreFill size="1.3rem" />
@@ -440,26 +438,26 @@ export const PlaylistDetailSongListHeaderFilters = ({
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiPlayFill />}
+                            leftSection={<RiPlayFill />}
                             onClick={() => handlePlay(Play.NOW)}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddBoxFill />}
+                            leftSection={<RiAddBoxFill />}
                             onClick={() => handlePlay(Play.LAST)}
                         >
                             {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddCircleFill />}
+                            leftSection={<RiAddCircleFill />}
                             onClick={() => handlePlay(Play.NEXT)}
                         >
                             {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            icon={<RiEditFill />}
+                            leftSection={<RiEditFill />}
                             onClick={() =>
                                 openUpdatePlaylistModal({
                                     playlist: detailQuery.data!,
@@ -470,14 +468,14 @@ export const PlaylistDetailSongListHeaderFilters = ({
                             {t('action.editPlaylist', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiDeleteBinFill />}
+                            leftSection={<RiDeleteBinFill />}
                             onClick={openDeletePlaylistModal}
                         >
                             {t('action.deletePlaylist', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            icon={<RiRefreshLine />}
+                            leftSection={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
                             {t('action.refresh', { postProcess: 'sentenceCase' })}
@@ -505,8 +503,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 >
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiSettings3Fill size="1.3rem" />
@@ -548,7 +545,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
                                     <Stack>
                                         <MultiSelect
@@ -560,7 +557,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                                             width={300}
                                             onChange={handleTableColumns}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>Auto Fit Columns</Text>
                                             <Switch
                                                 defaultChecked={page.table.autoFit}

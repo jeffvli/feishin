@@ -1,4 +1,4 @@
-import { Flex, FlexProps } from '@mantine/core';
+import { FlexProps } from '@mantine/core';
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { ReactNode, useRef } from 'react';
 import styled from 'styled-components';
@@ -6,10 +6,11 @@ import { useShouldPadTitlebar, useTheme } from '/@/renderer/hooks';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/renderer/types';
 
-const Container = styled(motion(Flex))<{
+const Container = styled(motion.div)<{
     $height?: string;
     $position?: string;
 }>`
+    display: flex;
     position: ${(props) => props.$position || 'relative'};
     z-index: 200;
     width: 100%;
@@ -98,7 +99,6 @@ export const PageHeader = ({
     backgroundColor,
     isHidden,
     children,
-    ...props
 }: PageHeaderProps) => {
     const ref = useRef(null);
     const padRight = useShouldPadTitlebar();
@@ -111,7 +111,6 @@ export const PageHeader = ({
                 ref={ref}
                 $height={height}
                 $position={position}
-                {...props}
             >
                 <Header
                     $isDraggable={windowBarStyle === Platform.WEB}

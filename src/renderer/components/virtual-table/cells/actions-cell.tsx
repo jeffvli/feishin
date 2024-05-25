@@ -7,7 +7,7 @@ export const ActionsCell = ({ context, api }: ICellRendererParams) => {
     return (
         <CellContainer $position="center">
             <Button
-                compact
+                size="compact-md"
                 variant="subtle"
                 onClick={(e) => {
                     e.stopPropagation();

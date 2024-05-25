@@ -1,4 +1,3 @@
-import { Group, Stack } from '@mantine/core';
 import { Select } from '/@/renderer/components/select';
 import { AnimatePresence, motion } from 'framer-motion';
 import { RiAddFill, RiAddLine, RiDeleteBinFill, RiMore2Line, RiRestartLine } from 'react-icons/ri';
@@ -7,6 +6,8 @@ import { DropdownMenu } from '/@/renderer/components/dropdown-menu';
 import { QueryBuilderOption } from '/@/renderer/components/query-builder/query-builder-option';
 import { QueryBuilderGroup, QueryBuilderRule } from '/@/renderer/types';
 import i18n from '/@/i18n/i18n';
+import { Group } from '/@/renderer/components/group';
+import { Stack } from '/@/renderer/components/stack';
 
 const FILTER_GROUP_OPTIONS_DATA = [
     {
@@ -98,10 +99,10 @@ export const QueryBuilder = ({
 
     return (
         <Stack
-            ml={`${level * 10}px`}
-            spacing="sm"
+            gap="sm"
+            style={{ marginLeft: `${level * 10}px` }}
         >
-            <Group spacing="sm">
+            <Group gap="sm">
                 <Select
                     data={FILTER_GROUP_OPTIONS_DATA}
                     maxWidth={175}
@@ -131,7 +132,7 @@ export const QueryBuilder = ({
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiAddFill />}
+                            leftSection={<RiAddFill />}
                             onClick={handleAddRuleGroup}
                         >
                             Add rule group
@@ -139,7 +140,7 @@ export const QueryBuilder = ({
 
                         {level > 0 && (
                             <DropdownMenu.Item
-                                icon={<RiDeleteBinFill />}
+                                leftSection={<RiDeleteBinFill />}
                                 onClick={handleDeleteRuleGroup}
                             >
                                 Remove rule group
@@ -150,14 +151,14 @@ export const QueryBuilder = ({
                                 <DropdownMenu.Divider />
                                 <DropdownMenu.Item
                                     $danger
-                                    icon={<RiRestartLine color="var(--danger-color)" />}
+                                    leftSection={<RiRestartLine color="var(--danger-color)" />}
                                     onClick={onResetFilters}
                                 >
                                     Reset to default
                                 </DropdownMenu.Item>
                                 <DropdownMenu.Item
                                     $danger
-                                    icon={<RiDeleteBinFill color="var(--danger-color)" />}
+                                    leftSection={<RiDeleteBinFill color="var(--danger-color)" />}
                                     onClick={onClearFilters}
                                 >
                                     Clear filters

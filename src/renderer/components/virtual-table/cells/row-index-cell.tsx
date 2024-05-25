@@ -149,7 +149,7 @@ export const RowIndexCell = ({ value, eGridCell }: ICellRendererParams) => {
                 ) : null)}
             <Text
                 $secondary
-                align="right"
+                $align="right"
                 className="current-song-child current-song-index"
                 overflow="hidden"
                 size="md"

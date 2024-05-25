@@ -1,18 +1,11 @@
 import { useState } from 'react';
 import { ICellRendererParams } from '@ag-grid-community/core';
-import { Group } from '@mantine/core';
 import { RiCheckboxBlankLine, RiCheckboxLine } from 'react-icons/ri';
 import styled from 'styled-components';
 import { Button } from '/@/renderer/components/button';
 import { Paper } from '/@/renderer/components/paper';
 import { getNodesByDiscNumber, setNodeSelection } from '../utils';
-
-const Container = styled(Paper)`
-    display: flex;
-    height: 100%;
-    padding: 0.5rem 1rem;
-    border: 1px solid transparent;
-`;
+import { Group } from '/@/renderer/components/group';
 
 export const FullWidthDiscCell = ({ node, data, api }: ICellRendererParams) => {
     const [isSelected, setIsSelected] = useState(false);
@@ -28,20 +21,27 @@ export const FullWidthDiscCell = ({ node, data, api }: ICellRendererParams) => {
 
     return (
         <Container>
-            <Group
-                position="apart"
-                w="100%"
-            >
+            <ButtonContainer>
                 <Button
-                    compact
-                    leftIcon={isSelected ? <RiCheckboxLine /> : <RiCheckboxBlankLine />}
-                    size="md"
+                    leftSection={isSelected ? <RiCheckboxLine /> : <RiCheckboxBlankLine />}
+                    size="compact-md"
                     variant="subtle"
                     onClick={handleToggleDiscNodes}
                 >
                     {data.name}
                 </Button>
-            </Group>
+            </ButtonContainer>
         </Container>
     );
 };
+
+const Container = styled(Paper)`
+    display: flex;
+    height: 100%;
+    padding: 0.5rem 1rem;
+    border: 1px solid transparent;
+`;
+
+const ButtonContainer = styled(Group)`
+    width: 100%;
+`;

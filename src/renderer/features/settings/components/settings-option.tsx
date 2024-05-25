@@ -14,13 +14,13 @@ export const SettingsOptions = ({ title, description, control, note }: SettingsO
     return (
         <>
             <Group
-                noWrap
-                position="apart"
-                sx={{ alignItems: 'center' }}
+                justify="space-between"
+                style={{ alignItems: 'center' }}
+                wrap="nowrap"
             >
                 <Stack
-                    spacing="xs"
-                    sx={{
+                    gap="xs"
+                    style={{
                         alignSelf: 'flex-start',
                         display: 'flex',
                         maxWidth: '50%',
@@ -56,7 +56,7 @@ export const SettingsOptions = ({ title, description, control, note }: SettingsO
                         </Text>
                     )}
                 </Stack>
-                <Group position="right">{control}</Group>
+                <Group justify="flex-end">{control}</Group>
             </Group>
         </>
     );

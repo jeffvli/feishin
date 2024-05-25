@@ -1,7 +1,6 @@
 import type { MouseEvent } from 'react';
 import React from 'react';
 import type { UnstyledButtonProps } from '@mantine/core';
-import { Group } from '@mantine/core';
 import { RiPlayFill, RiMore2Fill, RiHeartFill, RiHeartLine } from 'react-icons/ri';
 import styled from 'styled-components';
 import { _Button } from '/@/renderer/components/button';
@@ -14,6 +13,7 @@ import {
     ALBUM_CONTEXT_MENU_ITEMS,
     ARTIST_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
+import { Group } from '/@/renderer/components/group';
 
 type PlayButtonType = UnstyledButtonProps & React.ComponentPropsWithoutRef<'button'>;
 
@@ -137,11 +137,11 @@ export const CardControls = ({
                 <PlayButton onClick={handlePlay}>
                     <RiPlayFill size={25} />
                 </PlayButton>
-                <Group spacing="xs">
+                <Group gap="xs">
                     <SecondaryButton
                         disabled
                         p={5}
-                        sx={{ svg: { fill: 'white !important' } }}
+                        style={{ svg: { fill: 'white !important' } }}
                         variant="subtle"
                     >
                         <FavoriteWrapper isFavorite={itemData?.isFavorite}>
@@ -157,7 +157,7 @@ export const CardControls = ({
                     </SecondaryButton>
                     <SecondaryButton
                         p={5}
-                        sx={{ svg: { fill: 'white !important' } }}
+                        style={{ svg: { fill: 'white !important' } }}
                         variant="subtle"
                         onClick={(e) => {
                             e.preventDefault();

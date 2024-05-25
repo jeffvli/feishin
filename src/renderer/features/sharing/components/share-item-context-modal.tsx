@@ -73,11 +73,11 @@ export const ShareItemContextModal = ({
                         message: t('form.shareItem.success', {
                             postProcess: 'sentenceCase',
                         }),
-                        onClick: (a) => {
-                            if (!(a.target instanceof HTMLElement)) return;
+                        onClick: (e) => {
+                            if (!(e.target instanceof HTMLElement)) return;
 
                             // Make sure we weren't clicking close (otherwise clicking close /also/ opens the url)
-                            if (a.target.nodeName !== 'svg') {
+                            if (e.target.nodeName !== 'svg') {
                                 window.open(shareUrl);
                                 toast.hide('share-item-toast');
                             }
@@ -119,7 +119,7 @@ export const ShareItemContextModal = ({
                         valueFormat="MM/DD/YYYY HH:mm"
                         {...form.getInputProps('expires')}
                     />
-                    <Group position="right">
+                    <Group justify="flex-end">
                         <Group>
                             <Button
                                 size="md"

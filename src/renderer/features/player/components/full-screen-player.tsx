@@ -1,5 +1,4 @@
 import { useLayoutEffect, useRef } from 'react';
-import { Divider, Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { Variants, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +7,8 @@ import { useLocation } from 'react-router';
 import styled from 'styled-components';
 import {
     Button,
+    Divider,
+    Group,
     NumberInput,
     Option,
     Popover,
@@ -108,17 +109,16 @@ const Controls = () => {
 
     return (
         <Group
+            gap="sm"
             p="1rem"
             pos="absolute"
-            spacing="sm"
-            sx={{
+            style={{
                 left: 0,
                 top: 10,
             }}
         >
             <Button
-                compact
-                size="sm"
+                size="compact-sm"
                 tooltip={{ label: t('common.minimize', { postProcess: 'titleCase' }) }}
                 variant="subtle"
                 onClick={handleToggleFullScreenPlayer}
@@ -128,8 +128,7 @@ const Controls = () => {
             <Popover position="bottom-start">
                 <Popover.Target>
                     <Button
-                        compact
-                        size="sm"
+                        size="compact-sm"
                         tooltip={{ label: t('common.configure', { postProcess: 'titleCase' }) }}
                         variant="subtle"
                     >
@@ -229,7 +228,7 @@ const Controls = () => {
                             />
                         </Option.Control>
                     </Option>
-                    <Divider my="sm" />
+                    <Divider marginY="sm" />
                     <Option>
                         <Option.Label>
                             {t('page.fullscreenPlayer.config.followCurrentLyric', {
@@ -283,8 +282,8 @@ const Controls = () => {
                         </Option.Label>
                         <Option.Control>
                             <Group
-                                noWrap
                                 w="100%"
+                                wrap="nowrap"
                             >
                                 <Slider
                                     defaultValue={lyricConfig.fontSize}
@@ -323,8 +322,8 @@ const Controls = () => {
                         </Option.Label>
                         <Option.Control>
                             <Group
-                                noWrap
                                 w="100%"
+                                wrap="nowrap"
                             >
                                 <Slider
                                     defaultValue={lyricConfig.gap}
@@ -393,7 +392,7 @@ const Controls = () => {
                             />
                         </Option.Control>
                     </Option>
-                    <Divider my="sm" />
+                    <Divider marginY="sm" />
                     <TableConfigDropdown type="fullScreen" />
                 </Popover.Dropdown>
             </Popover>

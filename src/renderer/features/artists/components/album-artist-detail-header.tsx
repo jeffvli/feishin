@@ -1,8 +1,7 @@
 import { forwardRef, Fragment, Ref } from 'react';
-import { Group, Rating, Stack } from '@mantine/core';
 import { useParams } from 'react-router';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
-import { Text } from '/@/renderer/components';
+import { Group, Rating, Stack, Text } from '/@/renderer/components';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
 import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';

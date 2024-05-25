@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { Group } from '@mantine/core';
 import styled from 'styled-components';
 import { WindowControls } from '../../window-controls';
+import { Group } from '/@/renderer/components';
 
 interface TitlebarProps {
     children?: ReactNode;
@@ -49,7 +49,7 @@ export const Titlebar = ({ children }: TitlebarProps) => {
             <TitlebarContainer>
                 <Right>
                     {children}
-                    <Group spacing="xs">
+                    <Group gap="xs">
                         <WindowControls />
                     </Group>
                 </Right>
