@@ -153,7 +153,9 @@ const quit = async () => {
     const instance = getMpvInstance();
     if (instance) {
         await instance.quit();
-        await rm(socketPath);
+        if (!isWindows()) {
+            await rm(socketPath);
+        }
     }
 };
 
