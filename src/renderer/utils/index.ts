@@ -5,6 +5,6 @@ export * from './constrain-sidebar-width';
 export * from './title-case';
 export * from './get-header-color';
 export * from './parse-search-params';
-export * from './format-duration-string';
 export * from './rgb-to-rgba';
 export * from './sentence-case';
+export * from './format';

@@ -1,13 +1,11 @@
 import { Group, Table } from '@mantine/core';
-import dayjs from 'dayjs';
 import { RiCheckFill, RiCloseFill } from 'react-icons/ri';
 import { TFunction, useTranslation } from 'react-i18next';
 import { ReactNode } from 'react';
 import { Album, AlbumArtist, AnyLibraryItem, LibraryItem, Song } from '/@/renderer/api/types';
-import { formatDurationString } from '/@/renderer/utils';
-import { formatSizeString } from '/@/renderer/utils/format-size-string';
+import { formatDurationString, formatSizeString } from '/@/renderer/utils';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
-import { Rating, Spoiler, Text } from '/@/renderer/components';
+import { Spoiler, Text } from '/@/renderer/components';
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { SongPath } from '/@/renderer/features/item-details/components/song-path';
 import { generatePath } from 'react-router';
@@ -15,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Separator } from '/@/renderer/components/separator';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
+import { formatDateRelative, formatRating } from '/@/renderer/utils/format';
 
 export type ItemDetailsModalProps = {
     item: Album | AlbumArtist | Song;
@@ -82,8 +81,6 @@ const formatArtists = (isAlbumArtist: boolean) => (item: Album | Song) =>
 const formatComment = (item: Album | Song) =>
     item.comment ? <Spoiler maxHeight={50}>{replaceURLWithHTMLLinks(item.comment)}</Spoiler> : null;
 
-const formatDate = (key: string | null) => (key ? dayjs(key).fromNow() : '');
-
 const FormatGenre = (item: Album | AlbumArtist | Song) => {
     const genreRoute = useGenreRoute();
 
@@ -103,14 +100,6 @@ const FormatGenre = (item: Album | AlbumArtist | Song) => {
         </span>
     ));
 };
-
-const formatRating = (item: Album | AlbumArtist | Song) =>
-    item.userRating !== null ? (
-        <Rating
-            readOnly
-            value={item.userRating}
-        />
-    ) : null;
 
 const BoolField = (key: boolean) =>
     key ? <RiCheckFill size="1.1rem" /> : <RiCloseFill size="1.1rem" />;
@@ -139,11 +128,11 @@ const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
     { key: 'playCount', label: 'filter.playCount' },
     {
         label: 'filter.lastPlayed',
-        render: (song) => formatDate(song.lastPlayedAt),
+        render: (song) => formatDateRelative(song.lastPlayedAt),
     },
     {
         label: 'common.modified',
-        render: (song) => formatDate(song.updatedAt),
+        render: (song) => formatDateRelative(song.updatedAt),
     },
     { label: 'filter.comment', render: formatComment },
     {
@@ -178,7 +167,7 @@ const AlbumArtistPropertyMapping: ItemDetailRow<AlbumArtist>[] = [
     { key: 'playCount', label: 'filter.playCount' },
     {
         label: 'filter.lastPlayed',
-        render: (song) => formatDate(song.lastPlayedAt),
+        render: (song) => formatDateRelative(song.lastPlayedAt),
     },
     {
         label: 'common.mbid',
@@ -256,11 +245,11 @@ const SongPropertyMapping: ItemDetailRow<Song>[] = [
     { key: 'playCount', label: 'filter.playCount' },
     {
         label: 'filter.lastPlayed',
-        render: (song) => formatDate(song.lastPlayedAt),
+        render: (song) => formatDateRelative(song.lastPlayedAt),
     },
     {
         label: 'common.modified',
-        render: (song) => formatDate(song.updatedAt),
+        render: (song) => formatDateRelative(song.updatedAt),
     },
     {
         label: 'common.albumGain',

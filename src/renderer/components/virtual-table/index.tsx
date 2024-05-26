@@ -15,8 +15,6 @@ import type { AgGridReactProps } from '@ag-grid-community/react';
 import { AgGridReact } from '@ag-grid-community/react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useClickOutside, useMergedRef } from '@mantine/hooks';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import formatDuration from 'format-duration';
 import { AnimatePresence } from 'framer-motion';
 import { generatePath } from 'react-router';
@@ -43,7 +41,7 @@ import { useFixedTableHeader } from '/@/renderer/components/virtual-table/hooks/
 import { NoteCell } from '/@/renderer/components/virtual-table/cells/note-cell';
 import { RowIndexCell } from '/@/renderer/components/virtual-table/cells/row-index-cell';
 import i18n from '/@/i18n/i18n';
-import { formatSizeString } from '/@/renderer/utils/format-size-string';
+import { formatDateAbsolute, formatDateRelative, formatSizeString } from '/@/renderer/utils/format';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -63,8 +61,6 @@ const DummyHeader = styled.div<{ height?: number }>`
     position: absolute;
     height: ${({ height }) => height || 36}px;
 `;
-
-dayjs.extend(relativeTime);
 
 const tableColumns: { [key: string]: ColDef } = {
     actions: {
@@ -182,8 +178,7 @@ const tableColumns: { [key: string]: ColDef } = {
             GenericTableHeader(params, { position: 'center' }),
         headerName: i18n.t('table.column.dateAdded'),
         suppressSizeToFit: true,
-        valueFormatter: (params: ValueFormatterParams) =>
-            params.value ? dayjs(params.value).format('MMM D, YYYY') : '',
+        valueFormatter: (params: ValueFormatterParams) => formatDateAbsolute(params.value),
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.createdAt : undefined,
         width: 130,
@@ -225,8 +220,7 @@ const tableColumns: { [key: string]: ColDef } = {
         headerComponent: (params: IHeaderParams) =>
             GenericTableHeader(params, { position: 'center' }),
         headerName: i18n.t('table.column.lastPlayed'),
-        valueFormatter: (params: ValueFormatterParams) =>
-            params.value ? dayjs(params.value).fromNow() : '',
+        valueFormatter: (params: ValueFormatterParams) => formatDateRelative(params.value),
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.lastPlayedAt : undefined,
         width: 130,
@@ -258,8 +252,7 @@ const tableColumns: { [key: string]: ColDef } = {
             GenericTableHeader(params, { position: 'center' }),
         headerName: i18n.t('table.column.releaseDate'),
         suppressSizeToFit: true,
-        valueFormatter: (params: ValueFormatterParams) =>
-            params.value ? dayjs(params.value).format('MMM D, YYYY') : '',
+        valueFormatter: (params: ValueFormatterParams) => formatDateAbsolute(params.value),
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.releaseDate : undefined,
         width: 130,

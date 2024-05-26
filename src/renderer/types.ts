@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { ServerFeatures } from '/@/renderer/api/features-types';
 import {
     Album,
@@ -37,6 +38,7 @@ export type TableType =
 
 export type CardRow<T> = {
     arrayProperty?: string;
+    format?: (value: T) => ReactNode;
     property: keyof T;
     route?: CardRoute;
 };
