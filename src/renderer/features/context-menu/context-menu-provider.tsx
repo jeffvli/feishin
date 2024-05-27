@@ -58,6 +58,7 @@ import {
 import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { Play, PlaybackType } from '/@/renderer/types';
 import { ItemDetailsModal } from '/@/renderer/features/item-details/components/item-details-modal';
+import { updateSong } from '/@/renderer/features/player/update-remote-song';
 
 type ContextMenuContextProps = {
     closeContextMenu: () => void;
@@ -86,7 +87,6 @@ const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating', 'shareI
 // const SUBSONIC_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const remote = isElectron() ? window.electron.remote : null;
 
 export interface ContextMenuProviderProps {
     children: ReactNode;
@@ -640,7 +640,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         ctx.tableApi?.redrawRows();
 
         if (isCurrentSongRemoved) {
-            remote?.updateSong({ song: playerData.current.song });
+            updateSong(playerData.current.song);
         }
     }, [ctx.dataNodes, ctx.tableApi, playbackType, removeFromQueue]);
 

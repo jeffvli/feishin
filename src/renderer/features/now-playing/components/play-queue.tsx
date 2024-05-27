@@ -30,16 +30,16 @@ import debounce from 'lodash/debounce';
 import { ErrorBoundary } from 'react-error-boundary';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required';
-import { PlaybackType, PlayerStatus, TableType } from '/@/renderer/types';
+import { PlaybackType, TableType } from '/@/renderer/types';
 import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 import { useAppFocus } from '/@/renderer/hooks';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
+import { updateSong } from '/@/renderer/features/player/update-remote-song';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const remote = isElectron() ? window.electron.remote : null;
 
 type QueueProps = {
     type: TableType;
@@ -82,11 +82,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
     const handleDoubleClick = (e: CellDoubleClickedEvent) => {
         const playerData = setCurrentTrack(e.data.uniqueId);
-        remote?.updateSong({
-            currentTime: 0,
-            song: playerData.current.song,
-            status: PlayerStatus.PLAYING,
-        });
+        updateSong(playerData.current.song);
 
         if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.volume(volume);

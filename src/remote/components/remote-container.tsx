@@ -18,7 +18,7 @@ import {
 import { PlayerRepeat, PlayerStatus } from '/@/renderer/types';
 import { WrapperSlider } from '/@/remote/components/wrapped-slider';
 import { Tooltip } from '/@/renderer/components/tooltip';
-import { Rating } from '/@/renderer/components';
+import { Rating } from '/@/renderer/components/rating';
 
 export const RemoteContainer = () => {
     const { repeat, shuffle, song, status, volume } = useInfo();
@@ -38,7 +38,7 @@ export const RemoteContainer = () => {
 
     return (
         <>
-            {song && (
+            {id && (
                 <>
                     <Title order={1}>{song.name}</Title>
                     <Group align="flex-end">
@@ -61,7 +61,7 @@ export const RemoteContainer = () => {
                 spacing={0}
             >
                 <RemoteButton
-                    disabled={!song}
+                    disabled={!id}
                     tooltip="Previous track"
                     variant="default"
                     onClick={() => send({ event: 'previous' })}
@@ -69,8 +69,8 @@ export const RemoteContainer = () => {
                     <RiSkipBackFill size={25} />
                 </RemoteButton>
                 <RemoteButton
-                    disabled={!song}
-                    tooltip={song && status === PlayerStatus.PLAYING ? 'Pause' : 'Play'}
+                    disabled={!id}
+                    tooltip={id && status === PlayerStatus.PLAYING ? 'Pause' : 'Play'}
                     variant="default"
                     onClick={() => {
                         if (status === PlayerStatus.PLAYING) {
@@ -80,14 +80,14 @@ export const RemoteContainer = () => {
                         }
                     }}
                 >
-                    {song && status === PlayerStatus.PLAYING ? (
+                    {id && status === PlayerStatus.PLAYING ? (
                         <RiPauseFill size={25} />
                     ) : (
                         <RiPlayFill size={25} />
                     )}
                 </RemoteButton>
                 <RemoteButton
-                    disabled={!song}
+                    disabled={!id}
                     tooltip="Next track"
                     variant="default"
                     onClick={() => send({ event: 'next' })}
@@ -127,7 +127,7 @@ export const RemoteContainer = () => {
                 </RemoteButton>
                 <RemoteButton
                     $active={song?.userFavorite}
-                    disabled={!song}
+                    disabled={!id}
                     tooltip={song?.userFavorite ? 'Unfavorite' : 'Favorite'}
                     variant="default"
                     onClick={() => {

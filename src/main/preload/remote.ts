@@ -1,5 +1,6 @@
 import { IpcRendererEvent, ipcRenderer } from 'electron';
-import { SongUpdate } from '/@/renderer/types';
+import { QueueSong } from '/@/renderer/api/types';
+import { PlayerStatus } from '/@/renderer/types';
 
 const requestFavorite = (
     cb: (
@@ -46,6 +47,10 @@ const updatePassword = (password: string) => {
     ipcRenderer.send('remote-password', password);
 };
 
+const updatePlayback = (playback: PlayerStatus) => {
+    ipcRenderer.send('update-playback', playback);
+};
+
 const updateSetting = (
     enabled: boolean,
     port: number,
@@ -67,7 +72,7 @@ const updateShuffle = (shuffle: boolean) => {
     ipcRenderer.send('update-shuffle', shuffle);
 };
 
-const updateSong = (args: SongUpdate) => {
+const updateSong = (args: QueueSong | undefined) => {
     ipcRenderer.send('update-song', args);
 };
 
@@ -89,6 +94,7 @@ export const remote = {
     setRemotePort,
     updateFavorite,
     updatePassword,
+    updatePlayback,
     updateRating,
     updateRepeat,
     updateSetting,

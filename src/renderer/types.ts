@@ -211,8 +211,7 @@ export type GridCardData = {
     route: CardRoute;
 };
 
-export type SongUpdate = {
-    currentTime?: number;
+export type SongState = {
     repeat?: PlayerRepeat;
     shuffle?: boolean;
     song?: QueueSong;

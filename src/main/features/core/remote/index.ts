@@ -8,9 +8,10 @@ import { app, ipcMain } from 'electron';
 import { Server as WsServer, WebSocketServer, WebSocket } from 'ws';
 import manifest from './manifest.json';
 import { ClientEvent, ServerEvent } from '../../../../remote/types';
-import { PlayerRepeat, SongUpdate } from '../../../../renderer/types';
+import { PlayerRepeat, PlayerStatus, SongState } from '../../../../renderer/types';
 import { getMainWindow } from '../../../main';
 import { isLinux } from '../../../utils';
+import type { QueueSong } from '/@/renderer/api/types';
 
 let mprisPlayer: any | undefined;
 
@@ -100,9 +101,7 @@ enum Encoding {
 const GZIP_REGEX = /\bgzip\b/;
 const ZLIB_REGEX = /bdeflate\b/;
 
-let currentSong: SongUpdate = {
-    currentTime: 0,
-};
+const currentState: SongState = {};
 
 const getEncoding = (encoding: string | string[]): Encoding => {
     const encodingArray = Array.isArray(encoding) ? encoding : [encoding];
@@ -388,7 +387,7 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                                 break;
                             }
                             case 'proxy': {
-                                const toFetch = currentSong.song?.imageUrl?.replaceAll(
+                                const toFetch = currentState.song?.imageUrl?.replaceAll(
                                     /&(size|width|height=\d+)/g,
                                     '',
                                 );
@@ -438,9 +437,9 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                                     volume = 0;
                                 }
 
-                                currentSong.volume = volume;
+                                currentState.volume = volume;
 
-                                broadcast({ data: { volume }, event: 'song' });
+                                broadcast({ data: volume, event: 'volume' });
                                 getMainWindow()?.webContents.send('request-volume', {
                                     volume,
                                 });
@@ -452,22 +451,22 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                             }
                             case 'favorite': {
                                 const { favorite, id } = json;
-                                if (id && id === currentSong.song?.id) {
+                                if (id && id === currentState.song?.id) {
                                     getMainWindow()?.webContents.send('request-favorite', {
                                         favorite,
                                         id,
-                                        serverId: currentSong.song.serverId,
+                                        serverId: currentState.song.serverId,
                                     });
                                 }
                                 break;
                             }
                             case 'rating': {
                                 const { rating, id } = json;
-                                if (id && id === currentSong.song?.id) {
+                                if (id && id === currentState.song?.id) {
                                     getMainWindow()?.webContents.send('request-rating', {
                                         id,
                                         rating,
-                                        serverId: currentSong.song.serverId,
+                                        serverId: currentState.song.serverId,
                                     });
                                 }
                                 break;
@@ -482,7 +481,7 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                     ws.alive = true;
                 });
 
-                ws.send(JSON.stringify({ data: currentSong, event: 'song' }));
+                ws.send(JSON.stringify({ data: currentState, event: 'state' }));
             });
 
             const heartBeat = setInterval(() => {
@@ -564,13 +563,13 @@ ipcMain.on('remote-username', (_event, username: string) => {
 });
 
 ipcMain.on('update-favorite', (_event, favorite: boolean, serverId: string, ids: string[]) => {
-    if (currentSong.song?.serverId !== serverId) return;
+    if (currentState.song?.serverId !== serverId) return;
 
-    const id = currentSong.song.id;
+    const id = currentState.song.id;
 
     for (const songId of ids) {
         if (songId === id) {
-            currentSong.song.userFavorite = favorite;
+            currentState.song.userFavorite = favorite;
             broadcast({ data: { favorite, id: songId }, event: 'favorite' });
             return;
         }
@@ -578,13 +577,13 @@ ipcMain.on('update-favorite', (_event, favorite: boolean, serverId: string, ids:
 });
 
 ipcMain.on('update-rating', (_event, rating: number, serverId: string, ids: string[]) => {
-    if (currentSong.song?.serverId !== serverId) return;
+    if (currentState.song?.serverId !== serverId) return;
 
-    const id = currentSong.song.id;
+    const id = currentState.song.id;
 
     for (const songId of ids) {
         if (songId === id) {
-            currentSong.song.userRating = rating;
+            currentState.song.userRating = rating;
             broadcast({ data: { id: songId, rating }, event: 'rating' });
             return;
         }
@@ -592,42 +591,32 @@ ipcMain.on('update-rating', (_event, rating: number, serverId: string, ids: stri
 });
 
 ipcMain.on('update-repeat', (_event, repeat: PlayerRepeat) => {
-    currentSong.repeat = repeat;
-    broadcast({ data: { repeat }, event: 'song' });
+    currentState.repeat = repeat;
+    broadcast({ data: repeat, event: 'repeat' });
 });
 
 ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
-    currentSong.shuffle = shuffle;
-    broadcast({ data: { shuffle }, event: 'song' });
+    currentState.shuffle = shuffle;
+    broadcast({ data: shuffle, event: 'shuffle' });
 });
 
-ipcMain.on('update-song', (_event, data: SongUpdate) => {
-    const { song, ...rest } = data;
-    const songChanged = song?.id !== currentSong.song?.id;
+ipcMain.on('update-playback', (_event, status: PlayerStatus) => {
+    currentState.status = status;
+    broadcast({ data: status, event: 'playback' });
+});
 
-    if (!song?.id) {
-        currentSong = {
-            ...currentSong,
-            ...data,
-            song: undefined,
-        };
-    } else {
-        currentSong = {
-            ...currentSong,
-            ...data,
-        };
-    }
+ipcMain.on('update-song', (_event, song: QueueSong | undefined) => {
+    const songChanged = song?.id !== currentState.song?.id;
+    currentState.song = song;
 
     if (songChanged) {
-        broadcast({ data: { ...rest, song: song || null }, event: 'song' });
-    } else {
-        broadcast({ data: rest, event: 'song' });
+        broadcast({ data: song || null, event: 'song' });
     }
 });
 
 ipcMain.on('update-volume', (_event, volume: number) => {
-    currentSong.volume = volume;
-    broadcast({ data: { volume }, event: 'song' });
+    currentState.volume = volume;
+    broadcast({ data: volume, event: 'volume' });
 });
 
 if (mprisPlayer) {
@@ -639,13 +628,13 @@ if (mprisPlayer) {
                 ? PlayerRepeat.ONE
                 : PlayerRepeat.NONE;
 
-        currentSong.repeat = repeat;
-        broadcast({ data: { repeat }, event: 'song' });
+        currentState.repeat = repeat;
+        broadcast({ data: repeat, event: 'repeat' });
     });
 
     mprisPlayer.on('shuffle', (shuffle: boolean) => {
-        currentSong.shuffle = shuffle;
-        broadcast({ data: { shuffle }, event: 'song' });
+        currentState.shuffle = shuffle;
+        broadcast({ data: shuffle, event: 'shuffle' });
     });
 
     mprisPlayer.on('volume', (vol: number) => {
@@ -656,7 +645,7 @@ if (mprisPlayer) {
         } else if (volume < 0) {
             volume = 0;
         }
-        currentSong.volume = volume;
-        broadcast({ data: { volume }, event: 'song' });
+        currentState.volume = volume;
+        broadcast({ data: volume, event: 'volume' });
     });
 }
