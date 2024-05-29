@@ -1,0 +1,1 @@
+cmd_Release/NowPlayingManager.node := c++ -bundle -undefined dynamic_lookup -Wl,-search_paths_first -mmacosx-version-min=11.0 -arch arm64 -L./Release -stdlib=libc++ -L/opt/homebrew/opt/libffi/lib -o Release/NowPlayingManager.node  

@@ -1,4 +1,4 @@
-import { useImperativeHandle, forwardRef, useRef, useState, useCallback, useEffect } from 'react';
+import { useImperativeHandle, forwardRef, useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import isElectron from 'is-electron';
 import type { ReactPlayerProps } from 'react-player';
 import ReactPlayer from 'react-player/lazy';
@@ -10,7 +10,7 @@ import {
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
-import { useSpeed } from '/@/renderer/store';
+import { usePlayerControls, useSpeed } from '/@/renderer/store';
 import { toast } from '/@/renderer/components/toast';
 
 interface AudioPlayerProps extends ReactPlayerProps {
@@ -287,6 +287,88 @@ export const AudioPlayer = forwardRef(
             }
         }, [calculateReplayGain, currentPlayer, player2, player2Source, volume, webAudio]);
 
+        const tc = (fn: Function) => {
+            return (...args: any[]) => {
+                try {
+                    fn(...args);
+                } catch(e){
+                    console.error(e)
+                }
+            }
+        }
+
+        const [player1Progress, setPlayer1Progress] = useState<number>(0);
+        const [player2Progress, setPlayer2Progress] = useState<number>(0);
+
+        const controls = usePlayerControls();
+
+        const DEFAULT_URL = '';
+        const artworkBlobUrl = useMemo(async () => {
+          if (!(player1 || player2)){return DEFAULT_URL}
+          const imageUrl : string = currentPlayer === 1 ? player1?.imageUrl! : player2?.imageUrl!;
+          return await fetch(imageUrl)
+              .then(response => response.blob())
+              .then(blob => URL.createObjectURL(blob));
+      }, [currentPlayer, player1, player2]);
+
+        useEffect(tc(async () => {
+          return;
+            const navigator = window.navigator;
+            const playerData = currentPlayer === 1 ? player1 : player2;
+            const progress = currentPlayer === 1 ? player1Progress : player2Progress;
+            if (!(playerData && progress)){return}
+            const getMetadata = async () => ({
+                title: playerData.name,
+                artist: playerData.artistName,
+                album: playerData.album,
+                artwork: [
+                    {
+                        src: await artworkBlobUrl
+                    },
+                ],
+            })
+            const meta = await getMetadata();
+            const posState = {
+                position: progress,
+                duration: playerData.duration,
+            };
+            console.log("META", meta, navigator?.mediaSession)
+
+            if ('mediaSession' in navigator && ['title', 'artist', 'album', 'artwork'].every(i => meta[i]) && posState.position > 1 && posState.duration > 1) {
+              console.log("Running mediaSession")
+                navigator.mediaSession.metadata = new window.MediaMetadata(meta);
+
+                navigator.mediaSession.setActionHandler('play', () => {
+                    status = PlayerStatus.PLAYING;
+                });
+
+                navigator.mediaSession.setActionHandler('pause', () => {
+                    status = PlayerStatus.PAUSED;
+                });
+
+                navigator.mediaSession.setActionHandler('seekbackward', () => {
+                    controls.previous();
+                });
+
+                navigator.mediaSession.setActionHandler('seekforward', () => {
+                    controls.next();
+                });
+
+                navigator.mediaSession.setActionHandler('previoustrack', () => {
+                    controls.previous();
+                });
+
+                navigator.mediaSession.setActionHandler('nexttrack', () => {
+                    controls.next();
+                });
+
+                navigator.mediaSession.playbackState =
+                    status === PlayerStatus.PLAYING ? 'playing' : 'paused';
+
+                navigator.mediaSession.setPositionState(posState);
+            }
+        }), [artworkBlobUrl, currentPlayer, player1, player2, status, player1Progress, player2Progress]);
+
         const handlePlayer1Start = useCallback(
             async (player: ReactPlayer) => {
                 if (!webAudio) return;
@@ -351,9 +433,7 @@ export const AudioPlayer = forwardRef(
                     width={0}
                     // If there is no stream url, we do not need to handle when the audio finishes
                     onEnded={player1?.streamUrl ? handleOnEnded : undefined}
-                    onProgress={
-                        playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1
-                    }
+                    onProgress={(e) => (setPlayer1Progress(e.playedSeconds),(playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1)(e))}
                     onReady={handlePlayer1Start}
                 />
                 <ReactPlayer
@@ -370,9 +450,7 @@ export const AudioPlayer = forwardRef(
                     volume={webAudio ? 1 : volume}
                     width={0}
                     onEnded={player2?.streamUrl ? handleOnEnded : undefined}
-                    onProgress={
-                        playbackStyle === PlaybackStyle.GAPLESS ? handleGapless2 : handleCrossfade2
-                    }
+                    onProgress={(e) => (setPlayer2Progress(e.playedSeconds),(playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1)(e))}
                     onReady={handlePlayer2Start}
                 />
             </>
