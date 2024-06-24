@@ -29,6 +29,7 @@ import {
     RiCloseCircleLine,
     RiShareForwardFill,
     RiInformationFill,
+    RiRadio2Fill,
 } from 'react-icons/ri';
 import { AnyLibraryItems, LibraryItem, ServerType, AnyLibraryItem } from '/@/renderer/api/types';
 import {
@@ -50,6 +51,7 @@ import { useDeletePlaylist } from '/@/renderer/features/playlists';
 import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
 import {
+    getServerById,
     useAuthStore,
     useCurrentServer,
     usePlayerStore,
@@ -58,6 +60,7 @@ import {
 import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { Play, PlaybackType } from '/@/renderer/types';
 import { ItemDetailsModal } from '/@/renderer/features/item-details/components/item-details-modal';
+import { controller } from '/@/renderer/api/controller';
 
 type ContextMenuContextProps = {
     closeContextMenu: () => void;
@@ -658,6 +661,19 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         });
     }, [ctx.data, t]);
 
+    const handleSimilar = useCallback(async () => {
+        const item = ctx.data[0];
+        console.log(ctx);
+        const songs = await controller.getSimilarSongs({
+            apiClientProps: {
+                server: getServerById(item.serverId),
+                signal: undefined,
+            },
+            query: { albumArtistIds: item.albumArtistIds, songId: item.id },
+        });
+        handlePlayQueueAdd?.({ byData: [ctx.data[0], ...songs], playType: Play.NOW });
+    }, [ctx, handlePlayQueueAdd]);
+
     const contextMenuItems: Record<ContextMenuItemType, ContextMenuItem> = useMemo(() => {
         return {
             addToFavorites: {
@@ -718,6 +734,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 label: t('page.contextMenu.addNext', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiAddCircleFill size="1.1rem" />,
                 onClick: () => handlePlay(Play.NEXT),
+            },
+            playSimilarSongs: {
+                id: 'playSimilarSongs',
+                label: t('page.contextMenu.playSimilarSongs', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiRadio2Fill size="1.1rem" />,
+                onClick: handleSimilar,
             },
             removeFromFavorites: {
                 id: 'removeFromFavorites',
@@ -838,6 +860,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         handleUpdateRating,
         handleShareItem,
         server,
+        handleSimilar,
     ]);
 
     const mergedRef = useMergedRef(ref, clickOutsideRef);

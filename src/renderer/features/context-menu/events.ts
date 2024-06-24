@@ -35,7 +35,8 @@ export type ContextMenuItemType =
     | 'moveToTopOfQueue'
     | 'removeFromQueue'
     | 'deselectAll'
-    | 'showDetails';
+    | 'showDetails'
+    | 'playSimilarSongs';
 
 export type SetContextMenuItems = {
     children?: boolean;
