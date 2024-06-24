@@ -663,7 +663,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
     const handleSimilar = useCallback(async () => {
         const item = ctx.data[0];
-        console.log(ctx);
         const songs = await controller.getSimilarSongs({
             apiClientProps: {
                 server: getServerById(item.serverId),
