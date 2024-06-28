@@ -64,6 +64,7 @@ import isElectron from 'is-electron';
 import { ServerFeature } from '/@/renderer/api/features-types';
 import { VersionInfo, getFeatures } from '/@/renderer/api/utils';
 import chunk from 'lodash/chunk';
+import { useAuthStore } from '/@/renderer/store';
 
 const formatCommaDelimitedString = (value: string[]) => {
     return value.join(',');
@@ -109,9 +110,9 @@ const authenticate = async (
             Username: body.username,
         },
         headers: {
-            'x-emby-authorization': `MediaBrowser Client="Feishin", Device="${getHostname()}", DeviceId="Feishin-${getHostname()}-${encodeURIComponent(
-                body.username,
-            )}", Version="${packageJson.version}"`,
+            'x-emby-authorization': `MediaBrowser Client="Feishin", Device="${getHostname()}", DeviceId="${
+                useAuthStore.getState().deviceId
+            }", Version="${packageJson.version}"`,
         },
     });
 
