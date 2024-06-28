@@ -70,6 +70,27 @@ docker build -t feishin .
 docker run --name feishin -p 9180:9180 feishin
 ```
 
+#### Docker Compose
+To install via Docker Compose use the following snippit. This also works on Portainer.
+```
+version: '3'
+services:
+  feishin:
+    container_name: feishin
+    image: 'ghcr.io/jeffvli/feishin:latest'
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=America/Los_Angeles
+    volumes:
+      - /home/Configs/Feishin:/config
+    ports:
+      - 9180:9180
+    restart: unless-stopped
+```
+
+
 ### Configuration
 
 1. Upon startup you will be greeted with a prompt to select the path to your MPV binary. If you do not have MPV installed, you can download it [here](https://mpv.io/installation/) or install it using any package manager supported by your OS. After inputting the path, restart the app.
