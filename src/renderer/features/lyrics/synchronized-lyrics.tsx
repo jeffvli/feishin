@@ -12,6 +12,7 @@ import isElectron from 'is-electron';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 import { FullLyricsMetadata, SynchronizedLyricsArray } from '/@/renderer/api/types';
 import styled from 'styled-components';
+import { useCenterControls } from '/@/renderer/features/player/hooks/use-center-controls';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
@@ -62,6 +63,7 @@ export const SynchronizedLyrics = ({
     const playbackType = usePlaybackType();
     const now = useCurrentTime();
     const settings = useLyricsSettings();
+    const centerControls = useCenterControls({ playersRef });
 
     const seeked = useSeeked();
 
@@ -331,7 +333,7 @@ export const SynchronizedLyrics = ({
                     text={`"${name} by ${artist}"`}
                 />
             )}
-            {lyrics.map(([, text], idx) => (
+            {lyrics.map(([time, text], idx) => (
                 <LyricLine
                     key={idx}
                     alignment={settings.alignment}
@@ -339,6 +341,7 @@ export const SynchronizedLyrics = ({
                     fontSize={settings.fontSize}
                     id={`lyric-${idx}`}
                     text={text}
+                    onClick={() => centerControls.handleSeekSlider(time / 1000)}
                 />
             ))}
         </SynchronizedLyricsContainer>
