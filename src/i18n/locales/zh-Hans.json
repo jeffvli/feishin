@@ -338,7 +338,11 @@
         "genreBehavior_description": "确定单击流派是否默认在曲目或专辑列表中打开",
         "homeConfiguration": "主页配置",
         "homeConfiguration_description": "配置主页上显示的项目以及显示顺序",
-        "passwordStore": "密码/秘密存储"
+        "passwordStore": "密码/秘密存储",
+        "homeFeature_description": "控制是否在主页上显示大型特色轮播",
+        "homeFeature": "首页 精选 轮播",
+        "imageAspectRatio": "使用原生封面艺术纵横比",
+        "imageAspectRatio_description": "如果启用，封面艺术将使用其原生纵横比显示。对于不是1:1的艺术，剩余的空间将是空的"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -639,7 +643,8 @@
                 "year": "$t(common.year)",
                 "albumArtist": "$t(entity.albumArtist_one)",
                 "titleCombined": "$t(common.title)（合并）",
-                "codec": "$t(common.codec)"
+                "codec": "$t(common.codec)",
+                "songCount": "$t(entity.track_other)"
             }
         },
         "column": {
