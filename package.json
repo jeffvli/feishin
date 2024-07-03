@@ -14,12 +14,12 @@
         "lint": "concurrently \"npm run lint:code\" \"npm run lint:styles\"",
         "lint:code": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx --fix",
         "lint:styles": "npx stylelint **/*.tsx --fix",
-        "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
-        "package:pr": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never --win --mac --linux",
-        "package:dev": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never --dir",
-        "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
-        "start": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
-        "start:main": "cross-env NODE_ENV=development electron -r ts-node/register/transpile-only ./src/main/main.ts",
+        "package": "node --import tsx ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
+        "package:pr": "node --import tsx ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never --win --mac --linux",
+        "package:dev": "node --import tsx ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never --dir",
+        "postinstall": "node --import tsx .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
+        "start": "node --import tsx ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
+        "start:main": "cross-env NODE_ENV=development  NODE_OPTIONS=\"--import tsx\" electron -r ts-node/register/transpile-only ./src/main/main.ts",
         "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
         "start:remote": "cross-env NODE_ENV=developemnt TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.remote.dev.ts",
         "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
@@ -199,7 +199,7 @@
         ]
     },
     "devDependencies": {
-        "@electron/rebuild": "^3.2.10",
+        "@electron/rebuild": "^3.6.0",
         "@pmmmwh/react-refresh-webpack-plugin": "0.5.5",
         "@stylelint/postcss-css-in-js": "^0.38.0",
         "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
@@ -278,8 +278,9 @@
         "terser-webpack-plugin": "^5.3.1",
         "ts-jest": "^27.1.4",
         "ts-loader": "^9.2.8",
-        "ts-node": "^10.7.0",
+        "ts-node": "^10.9.2",
         "tsconfig-paths-webpack-plugin": "^4.0.0",
+        "tsx": "^4.16.2",
         "typescript": "^5.2.2",
         "typescript-plugin-styled-components": "^3.0.0",
         "url-loader": "^4.1.1",
@@ -357,7 +358,7 @@
         "styled-components": "^6"
     },
     "devEngines": {
-        "node": ">=14.x",
+        "node": ">=18.x",
         "npm": ">=7.x"
     },
     "browserslist": [],
