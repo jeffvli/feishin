@@ -199,6 +199,7 @@
         ]
     },
     "devDependencies": {
+        "@electron/rebuild": "^3.6.0",
         "@pmmmwh/react-refresh-webpack-plugin": "0.5.5",
         "@stylelint/postcss-css-in-js": "^0.38.0",
         "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
@@ -279,6 +280,7 @@
         "ts-loader": "^9.2.8",
         "ts-node": "^10.9.2",
         "tsconfig-paths-webpack-plugin": "^4.0.0",
+        "tsx": "^4.16.2",
         "typescript": "^5.2.2",
         "typescript-plugin-styled-components": "^3.0.0",
         "url-loader": "^4.1.1",
@@ -294,7 +296,6 @@
         "@ag-grid-community/infinite-row-model": "^28.2.1",
         "@ag-grid-community/react": "^28.2.1",
         "@ag-grid-community/styles": "^28.2.1",
-        "@electron/rebuild": "^3.6.0",
         "@emotion/react": "^11.10.4",
         "@mantine/core": "^6.0.17",
         "@mantine/dates": "^6.0.17",
@@ -350,7 +351,6 @@
         "semver": "^7.5.4",
         "styled-components": "^6.0.8",
         "swiper": "^9.3.1",
-        "tsx": "^4.16.2",
         "zod": "^3.22.3",
         "zustand": "^4.3.9"
     },
