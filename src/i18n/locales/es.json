@@ -28,7 +28,8 @@
         "addLast": "añadir último",
         "mute": "silencio",
         "skip_forward": "saltar hacia delante",
-        "pause": "pausa"
+        "pause": "pausa",
+        "playSimilarSongs": "Reproducir canciones similares"
     },
     "setting": {
         "crossfadeStyle_description": "selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -159,7 +160,7 @@
         "audioPlayer": "reproductor de audio",
         "hotkey_zoomOut": "reducir",
         "hotkey_unfavoriteCurrentSong": "$t(common.currentSong) no favorito",
-        "hotkey_rate0": "limpiar calificación",
+        "hotkey_rate0": "Limpiar calificación",
         "discordApplicationId": "id de aplicación {{discord}}",
         "applicationHotkeys_description": "configura las teclas de acceso rápido de la aplicación. marca la casilla para establecerlas como teclas de acceso rápido globales (solo escritorio)",
         "floatingQueueArea_description": "muestra un icono flotante en el lado derecho de la pantalla para ver la cola de reproducción",
@@ -191,11 +192,11 @@
         "skipPlaylistPage": "saltar página de lista de reproducción",
         "hotkey_browserForward": "avance",
         "hotkey_browserBack": "retroceso",
-        "clearCache": "limpiar la caché del navegador",
-        "clearQueryCache": "limpiar la caché de feishin",
-        "clearQueryCache_description": "una 'limpieza suave' de feishin. esto refrescará las listas de reproducción, metadatos de pistas y restablece las letras guardadas. se mantienen los ajustes, credenciales del servidor y las imágenes en caché",
+        "clearCache": "Limpiar la caché del navegador",
+        "clearQueryCache": "Limpiar la caché de Feishin",
+        "clearQueryCache_description": "Una 'limpieza suave' de Feishin. Esto refrescará las listas de reproducción, metadatos de pistas y restablecerá las letras guardadas. Se mantienen los ajustes, credenciales del servidor y las imágenes en caché",
         "buttonSize": "tamaño del botón de la barra de reproducción",
-        "clearCache_description": "una 'limpieza fuerte' de feishin. para limpiar la caché de feishin, vacía la caché del navegador (imágenes guardadas y otros elementos). se mantienen las credenciales y ajustes del servidor",
+        "clearCache_description": "Una 'limpieza fuerte' de Feishin. Para limpiar la caché de Feishin, vacía la caché del navegador (imágenes guardadas y otros elementos). Se mantienen las credenciales y ajustes del servidor",
         "buttonSize_description": "el tamaño de los botones de la barra de reproducción",
         "passwordStore_description": "qué método de almacenamiento de contraseñas/claves secretas utilizar. cambie esta opción si tiene problemas para guardar contraseñas.",
         "startMinimized_description": "iniciar la aplicación en la bandeja del sistema",
@@ -210,7 +211,11 @@
         "genreBehavior_description": "Determina si al pulsar en un género se abre por defecto la lista de pistas o de álbumes",
         "homeConfiguration_description": "Configura qué elementos son mostrados y en qué orden en la página de inicio",
         "clearCacheSuccess": "Caché limpiada correctamente",
-        "externalLinks": "Mostrar enlaces externos"
+        "externalLinks": "Mostrar enlaces externos",
+        "homeFeature": "Carrusel destacado de inicio",
+        "homeFeature_description": "Controla si se muestra el gran carrusel destacado en la página de inicio",
+        "imageAspectRatio_description": "Si está habilitado, la portada será mostrada usando su relación de aspecto nativa. Para arte que no es 1:1, el espacio restante estará vacío",
+        "imageAspectRatio": "Usar relación de aspecto nativa de portada"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -441,7 +446,8 @@
             "numberSelected": "{{count}} seleccionado",
             "removeFromQueue": "$t(action.removeFromQueue)",
             "shareItem": "Compartir elemento",
-            "showDetails": "Obtener información"
+            "showDetails": "Obtener información",
+            "playSimilarSongs": "$t(player.playSimilarSongs)"
         },
         "home": {
             "mostPlayed": "más reproducidos",
@@ -491,7 +497,7 @@
         "trackList": {
             "title": "$t(entity.track_other)",
             "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
-            "artistTracks": "Pistas de {{artist}}"
+            "artistTracks": "pistas por {{artist}}"
         },
         "globalSearch": {
             "commands": {
@@ -507,13 +513,13 @@
         "albumList": {
             "title": "$t(entity.album_other)",
             "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
-            "artistAlbums": "Álbumes de {{artist}}"
+            "artistAlbums": "álbumes de {{artist}}"
         },
         "albumArtistDetail": {
             "viewAllTracks": "ver todo de $t(entity.track_other)",
             "relatedArtists": "similar a $t(entity.artist_other)",
             "topSongs": "mejores canciones",
-            "topSongsFrom": "Las mejores canciones de {{title}}",
+            "topSongsFrom": "las mejores canciones de {{title}}",
             "viewAll": "Ver todo",
             "recentReleases": "Lanzamientos recientes",
             "viewDiscography": "Ver discografía",
@@ -639,7 +645,8 @@
                 "genre": "$t(entity.genre_one)",
                 "favorite": "$t(common.favorite)",
                 "year": "$t(common.year)",
-                "codec": "$t(common.codec)"
+                "codec": "$t(common.codec)",
+                "songCount": "$t(entity.track_other)"
             },
             "general": {
                 "gap": "$t(common.gap)",
