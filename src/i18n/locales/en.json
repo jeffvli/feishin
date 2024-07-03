@@ -281,7 +281,7 @@
             "viewDiscography": "view discography",
             "relatedArtists": "related $t(entity.artist_other)",
             "topSongs": "top songs",
-            "topSongsFrom": "Top songs from {{title}}",
+            "topSongsFrom": "top songs from {{title}}",
             "viewAll": "view all",
             "viewAllTracks": "view all $t(entity.track_other)"
         },
@@ -293,7 +293,7 @@
             "moreFromGeneric": "more from {{item}}"
         },
         "albumList": {
-            "artistAlbums": "Albums by {{artist}}",
+            "artistAlbums": "albums by {{artist}}",
             "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
             "title": "$t(entity.album_other)"
         },
@@ -399,7 +399,7 @@
             "tracks": "$t(entity.track_other)"
         },
         "trackList": {
-            "artistTracks": "Tracks by {{artist}}",
+            "artistTracks": "tracks by {{artist}}",
             "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
             "title": "$t(entity.track_other)"
         }
