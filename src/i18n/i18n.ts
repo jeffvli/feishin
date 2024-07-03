@@ -18,6 +18,7 @@ import nbNO from './locales/nb-NO.json';
 import nl from './locales/nl.json';
 import zhHant from './locales/zh-Hant.json';
 import fa from './locales/fa.json';
+import ko from './locales/ko.json';
 
 const resources = {
     en: { translation: en },
@@ -29,6 +30,7 @@ const resources = {
     fa: { translation: fa },
     fr: { translation: fr },
     ja: { translation: ja },
+    ko: { translation: ko },
     pl: { translation: pl },
     'zh-Hans': { translation: zhHans },
     'zh-Hant': { translation: zhHant },
@@ -67,6 +69,10 @@ export const languages = [
     {
         label: '日本語',
         value: 'ja',
+    },
+    {
+        label: '한국어',
+        value: 'ko',
     },
     {
         label: 'Nederlands',
