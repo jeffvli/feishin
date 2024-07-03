@@ -87,8 +87,6 @@ services:
       - PGID=1000
       - UMASK=002
       - TZ=America/Los_Angeles
-    volumes:
-      - /home/Configs/Feishin:/config
     ports:
       - 9180:9180
     restart: unless-stopped
