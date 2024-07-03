@@ -28,7 +28,8 @@
         "shuffle_off": "náhodně zakázáno",
         "addLast": "přidat poslední",
         "mute": "ztlumit",
-        "skip_forward": "přeskočit dopředu"
+        "skip_forward": "přeskočit dopředu",
+        "playSimilarSongs": "přehrát podobné skladby"
     },
     "setting": {
         "crossfadeStyle_description": "vyberte způsob prolnutí u přehrávače zvuku",
@@ -210,7 +211,11 @@
         "clearCacheSuccess": "mezipaměť úspěšně vymazána",
         "externalLinks": "zobrazit externí odkazy",
         "startMinimized_description": "spustit aplikaci do systémové lišty",
-        "passwordStore_description": "který způsob ukládání hesel / tajných klíčů použít. změňte tuto možnost, pokud máte problémy s ukládáním hesel."
+        "passwordStore_description": "který způsob ukládání hesel / tajných klíčů použít. změňte tuto možnost, pokud máte problémy s ukládáním hesel.",
+        "homeFeature": "carousel doporučení na domovské stránce",
+        "homeFeature_description": "ovládá, zda se má zobrazovat velký carousel s doporučenými alby na domovské stránce",
+        "imageAspectRatio": "použít nativní poměr stran obalů alb",
+        "imageAspectRatio_description": "pokud je povoleno, budou obaly alb zobrazeny s jejich nativním poměrem stran. u obalů, které nemají poměr 1:1, bude zbývající místo prázdné"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -371,7 +376,8 @@
                 "favorite": "$t(common.favorite)",
                 "year": "$t(common.year)",
                 "albumArtist": "$t(entity.albumArtist_one)",
-                "codec": "$t(common.codec)"
+                "codec": "$t(common.codec)",
+                "songCount": "$t(entity.track_other)"
             }
         },
         "column": {
@@ -534,7 +540,8 @@
             "numberSelected": "vybráno {{count}}",
             "removeFromQueue": "$t(action.removeFromQueue)",
             "showDetails": "získat informace",
-            "shareItem": "sdílet položku"
+            "shareItem": "sdílet položku",
+            "playSimilarSongs": "$t(player.playSimilarSongs)"
         },
         "home": {
             "mostPlayed": "nejpřehrávanější",
@@ -563,7 +570,7 @@
         },
         "trackList": {
             "title": "$t(entity.track_other)",
-            "artistTracks": "Skladby od umělce {{artist}}",
+            "artistTracks": "skladby od umělce {{artist}}",
             "genreTracks": "$t(entity.track_other) s žánrem „{{genre}}“"
         },
         "globalSearch": {
@@ -579,7 +586,7 @@
         },
         "albumList": {
             "title": "$t(entity.album_other)",
-            "artistAlbums": "Alba od umělce {{artist}}",
+            "artistAlbums": "alba od umělce {{artist}}",
             "genreAlbums": "$t(entity.album_other) s žánrem „{{genre}}“"
         },
         "albumArtistDetail": {
@@ -588,7 +595,7 @@
             "about": "O umělci {{artist}}",
             "appearsOn": "také v",
             "topSongs": "nejlepší skladby",
-            "topSongsFrom": "Nejlepší skladby od umělce {{title}}",
+            "topSongsFrom": "nejlepší skladby od umělce {{title}}",
             "relatedArtists": "podobní $t(entity.artist_other)",
             "viewAllTracks": "zobrazit všechny $t(entity.track_other)",
             "viewAll": "zobrazit vše"
