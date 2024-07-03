@@ -212,7 +212,23 @@
         "songCount": "contador de músicas",
         "toYear": "até o ano",
         "random": "aleatório",
-        "search": "buscar"
+        "search": "buscar",
+        "lastPlayed": "última tocada",
+        "isCompilation": "é compilação",
+        "trackNumber": "faixa",
+        "communityRating": "Nota da comunidade",
+        "isPublic": "é público",
+        "playCount": "contador de execuções",
+        "recentlyUpdated": "atualizado recentemente",
+        "dateAdded": "data de adição",
+        "isRecentlyPlayed": "foi tocado recentemente",
+        "albumArtist": "$t(entity.albumArtist_one)",
+        "recentlyAdded": "adicionado recentemente",
+        "releaseDate": "data de lançamento",
+        "recentlyPlayed": "tocado recentemente",
+        "criticRating": "Nota da crítica",
+        "isFavorited": "é favoritado",
+        "releaseYear": "ano de lançamento"
     },
     "player": {
         "playbackFetchNoResults": "nenhuma música encontrada",
@@ -257,7 +273,13 @@
         "folderWithCount_other": "{{count}} pastas",
         "genreWithCount_one": "{{count}} gênero",
         "genreWithCount_many": "{{count}} gêneros",
-        "genreWithCount_other": "{{count}} gêneros"
+        "genreWithCount_other": "{{count}} gêneros",
+        "trackWithCount_one": "faixa",
+        "trackWithCount_many": "faixas",
+        "trackWithCount_other": "faixas",
+        "track_one": "faixa",
+        "track_many": "faixas",
+        "track_other": "faixas"
     },
     "error": {
         "remotePortWarning": "reinicie o servidor para aplicar a nova porta",
