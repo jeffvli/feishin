@@ -1,4 +1,6 @@
 import console from 'console';
+import { rm } from 'fs/promises';
+import { pid } from 'node:process';
 import { app, ipcMain } from 'electron';
 import uniq from 'lodash/uniq';
 import MpvAPI from 'node-mpv';
@@ -18,6 +20,7 @@ declare module 'node-mpv';
 // }
 
 let mpvInstance: MpvAPI | null = null;
+const socketPath = isWindows() ? `\\\\.\\pipe\\mpvserver-${pid}` : `/tmp/node-mpv-${pid}.sock`;
 
 const NodeMpvErrorCode = {
     0: 'Unable to load file or stream',
@@ -62,7 +65,6 @@ const mpvLog = (
 };
 
 const MPV_BINARY_PATH = store.get('mpv_path') as string | undefined;
-const isDevelopment = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
 const prefetchPlaylistParams = [
     '--prefetch-playlist=no',
@@ -89,14 +91,12 @@ const createMpv = async (data: {
 
     const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
 
-    const extra = isDevelopment ? '-dev' : '';
-
     const mpv = new MpvAPI(
         {
             audio_only: true,
             auto_restart: false,
             binary: binaryPath || MPV_BINARY_PATH || undefined,
-            socket: isWindows() ? `\\\\.\\pipe\\mpvserver${extra}` : `/tmp/node-mpv${extra}.sock`,
+            socket: socketPath,
             time_update: 1,
         },
         params,
@@ -147,6 +147,16 @@ const createMpv = async (data: {
 
 export const getMpvInstance = () => {
     return mpvInstance;
+};
+
+const quit = async () => {
+    const instance = getMpvInstance();
+    if (instance) {
+        await instance.quit();
+        if (!isWindows()) {
+            await rm(socketPath);
+        }
+    }
 };
 
 const setAudioPlayerFallback = (isError: boolean) => {
@@ -216,7 +226,7 @@ ipcMain.handle(
 ipcMain.on('player-quit', async () => {
     try {
         await getMpvInstance()?.stop();
-        await getMpvInstance()?.quit();
+        await quit();
     } catch (err: NodeMpvError | any) {
         mpvLog({ action: 'Failed to quit mpv' }, err);
     } finally {
@@ -412,19 +422,34 @@ ipcMain.handle('player-get-time', async (): Promise<number | undefined> => {
     }
 });
 
-app.on('before-quit', async () => {
-    try {
-        await getMpvInstance()?.stop();
-        await getMpvInstance()?.quit();
-    } catch (err: NodeMpvError | any) {
-        mpvLog({ action: `Failed to cleanly before-quit` }, err);
-    }
-});
+enum MpvState {
+    STARTED,
+    IN_PROGRESS,
+    DONE,
+}
 
-app.on('window-all-closed', async () => {
-    try {
-        await getMpvInstance()?.quit();
-    } catch (err: NodeMpvError | any) {
-        mpvLog({ action: `Failed to cleanly exit` }, err);
+let mpvState = MpvState.STARTED;
+
+app.on('before-quit', async (event) => {
+    switch (mpvState) {
+        case MpvState.DONE:
+            return;
+        case MpvState.IN_PROGRESS:
+            event.preventDefault();
+            break;
+        case MpvState.STARTED: {
+            try {
+                mpvState = MpvState.IN_PROGRESS;
+                event.preventDefault();
+                await getMpvInstance()?.stop();
+                await quit();
+            } catch (err: NodeMpvError | any) {
+                mpvLog({ action: `Failed to cleanly before-quit` }, err);
+            } finally {
+                mpvState = MpvState.DONE;
+                app.quit();
+            }
+            break;
+        }
     }
 });
