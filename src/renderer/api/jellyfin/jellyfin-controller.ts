@@ -57,10 +57,8 @@ import {
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
 import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
-import packageJson from '../../../../package.json';
 import { z } from 'zod';
 import { JFSongListSort, JFSortOrder } from '/@/renderer/api/jellyfin.types';
-import isElectron from 'is-electron';
 import { ServerFeature } from '/@/renderer/api/features-types';
 import { VersionInfo, getFeatures } from '/@/renderer/api/utils';
 import chunk from 'lodash/chunk';
@@ -68,31 +66,6 @@ import chunk from 'lodash/chunk';
 const formatCommaDelimitedString = (value: string[]) => {
     return value.join(',');
 };
-
-function getHostname(): string {
-    if (isElectron()) {
-        return 'Desktop Client';
-    }
-    const agent = navigator.userAgent;
-    switch (true) {
-        case agent.toLowerCase().indexOf('edge') > -1:
-            return 'Microsoft Edge';
-        case agent.toLowerCase().indexOf('edg/') > -1:
-            return 'Edge Chromium'; // Match also / to avoid matching for the older Edge
-        case agent.toLowerCase().indexOf('opr') > -1:
-            return 'Opera';
-        case agent.toLowerCase().indexOf('chrome') > -1:
-            return 'Chrome';
-        case agent.toLowerCase().indexOf('trident') > -1:
-            return 'Internet Explorer';
-        case agent.toLowerCase().indexOf('firefox') > -1:
-            return 'Firefox';
-        case agent.toLowerCase().indexOf('safari') > -1:
-            return 'Safari';
-        default:
-            return 'PC';
-    }
-}
 
 const authenticate = async (
     url: string,
@@ -107,11 +80,6 @@ const authenticate = async (
         body: {
             Pw: body.password,
             Username: body.username,
-        },
-        headers: {
-            'x-emby-authorization': `MediaBrowser Client="Feishin", Device="${getHostname()}", DeviceId="Feishin-${getHostname()}-${encodeURIComponent(
-                body.username,
-            )}", Version="${packageJson.version}"`,
         },
     });
 

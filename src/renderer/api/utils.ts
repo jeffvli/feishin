@@ -1,4 +1,5 @@
 import { AxiosHeaders } from 'axios';
+import isElectron from 'is-electron';
 import semverCoerce from 'semver/functions/coerce';
 import semverGte from 'semver/functions/gte';
 import { z } from 'zod';
@@ -97,6 +98,31 @@ export const getFeatures = (
     }
 
     return features;
+};
+
+export const getClientType = (): string => {
+    if (isElectron()) {
+        return 'Desktop Client';
+    }
+    const agent = navigator.userAgent;
+    switch (true) {
+        case agent.toLowerCase().indexOf('edge') > -1:
+            return 'Microsoft Edge';
+        case agent.toLowerCase().indexOf('edg/') > -1:
+            return 'Edge Chromium'; // Match also / to avoid matching for the older Edge
+        case agent.toLowerCase().indexOf('opr') > -1:
+            return 'Opera';
+        case agent.toLowerCase().indexOf('chrome') > -1:
+            return 'Chrome';
+        case agent.toLowerCase().indexOf('trident') > -1:
+            return 'Internet Explorer';
+        case agent.toLowerCase().indexOf('firefox') > -1:
+            return 'Firefox';
+        case agent.toLowerCase().indexOf('safari') > -1:
+            return 'Safari';
+        default:
+            return 'PC';
+    }
 };
 
 export const SEPARATOR_STRING = ' · ';
