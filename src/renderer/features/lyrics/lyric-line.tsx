@@ -26,6 +26,10 @@ const StyledText = styled(TextTitle)<TitleProps & { $alignment: string; $fontSiz
     &.unsynchronized {
         opacity: 1;
     }
+
+    &.synchronized {
+        cursor: pointer;
+    }
 `;
 
 export const LyricLine = ({ text, alignment, fontSize, ...props }: LyricLineProps) => {

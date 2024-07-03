@@ -193,7 +193,16 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<AlbumArtis
 
     return {
         items: res.body.data.map((albumArtist) =>
-            ndNormalize.albumArtist(albumArtist, apiClientProps.server),
+            // Navidrome native API will return only external URL small/medium/large
+            // image URL. Set large image to undefined to force `albumArtist` to use
+            // /rest/getCoverArt.view?id=ar-...
+            ndNormalize.albumArtist(
+                {
+                    ...albumArtist,
+                    largeImageUrl: undefined,
+                },
+                apiClientProps.server,
+            ),
         ),
         startIndex: query.startIndex,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
