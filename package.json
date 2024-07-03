@@ -19,7 +19,7 @@
         "package:dev": "node --import tsx ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never --dir",
         "postinstall": "node --import tsx .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
         "start": "node --import tsx ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
-        "start:main": "cross-env NODE_ENV=development  NODE_OPTIONS=\"--import tsx\" electron ./src/main/main.ts",
+        "start:main": "cross-env NODE_ENV=development  NODE_OPTIONS=\"--import tsx\" electron -r ts-node/register/transpile-only ./src/main/main.ts",
         "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
         "start:remote": "cross-env NODE_ENV=developemnt TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.remote.dev.ts",
         "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
