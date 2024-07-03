@@ -14,13 +14,13 @@ import {
 } from 'react-icons/ri';
 import { Song } from '/@/renderer/api/types';
 import { usePlayerControls, useQueueControls } from '/@/renderer/store';
-import { PlaybackType, PlayerStatus, TableType } from '/@/renderer/types';
+import { PlaybackType, TableType } from '/@/renderer/types';
 import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { usePlayerStore, useSetCurrentTime } from '../../../store/player.store';
 import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
+import { updateSong } from '/@/renderer/features/player/update-remote-song';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const remote = isElectron() ? window.electron.remote : null;
 
 interface PlayQueueListOptionsProps {
     tableRef: MutableRefObject<{ grid: AgGridReactType<Song> } | null>;
@@ -79,7 +79,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         }
 
         if (isCurrentSongRemoved) {
-            remote?.updateSong({ song: playerData.current.song });
+            updateSong(playerData.current.song);
         }
     };
 
@@ -91,7 +91,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
             mpvPlayer!.pause();
         }
 
-        remote?.updateSong({ song: undefined, status: PlayerStatus.PAUSED });
+        updateSong(undefined);
 
         setCurrentTime(0);
         pause();

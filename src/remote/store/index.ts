@@ -4,7 +4,7 @@ import merge from 'lodash/merge';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { ClientEvent, ServerEvent, SongUpdateSocket } from '/@/remote/types';
+import type { ClientEvent, ServerEvent, SongUpdateSocket } from '/@/remote/types';
 
 interface StatefulWebSocket extends WebSocket {
     natural: boolean;
@@ -133,6 +133,12 @@ export const useRemoteStore = create<SettingsSlice>()(
                                         });
                                         break;
                                     }
+                                    case 'playback': {
+                                        set((state) => {
+                                            state.info.status = data;
+                                        });
+                                        break;
+                                    }
                                     case 'proxy': {
                                         set((state) => {
                                             if (state.info.song) {
@@ -149,9 +155,34 @@ export const useRemoteStore = create<SettingsSlice>()(
                                         });
                                         break;
                                     }
+                                    case 'repeat': {
+                                        set((state) => {
+                                            state.info.repeat = data;
+                                        });
+                                        break;
+                                    }
+                                    case 'shuffle': {
+                                        set((state) => {
+                                            state.info.shuffle = data;
+                                        });
+                                        break;
+                                    }
                                     case 'song': {
-                                        set((nested) => {
-                                            nested.info = { ...nested.info, ...data };
+                                        set((state) => {
+                                            console.log(data);
+                                            state.info.song = data;
+                                        });
+                                        break;
+                                    }
+                                    case 'state': {
+                                        set((state) => {
+                                            state.info = data;
+                                        });
+                                        break;
+                                    }
+                                    case 'volume': {
+                                        set((state) => {
+                                            state.info.volume = data;
                                         });
                                     }
                                 }
@@ -212,11 +243,9 @@ export const useRemoteStore = create<SettingsSlice>()(
             { name: 'store_settings' },
         ),
         {
-            merge: (persistedState, currentState) => {
-                return merge(currentState, persistedState);
-            },
+            merge: (persistedState, currentState) => merge(currentState, persistedState),
             name: 'store_settings',
-            version: 6,
+            version: 7,
         },
     ),
 );
