@@ -16,7 +16,11 @@
         "createPlaylist": "utwórz $t(entity.playlist_one)",
         "deletePlaylist": "usuń $t(entity.playlist_one)",
         "moveToBottom": "przesuń na dół",
-        "setRating": "oceń"
+        "setRating": "oceń",
+        "openIn": {
+            "lastfm": "Otwórz w Last.fm",
+            "musicbrainz": "Otwórz w MusicBrainz"
+        }
     },
     "common": {
         "increase": "zwiększ",
@@ -99,7 +103,17 @@
         "decrease": "obniż",
         "path": "ścieżka",
         "center": "środkowy",
-        "note": "notatka"
+        "note": "notatka",
+        "albumPeak": "spadek albumu",
+        "albumGain": "wzrost albumu",
+        "mbid": "ID MusicBrainz",
+        "reload": "przeładuj",
+        "share": "udostępnij",
+        "trackGain": "gain utworu",
+        "trackPeak": "peak utworu",
+        "codec": "kodek",
+        "preview": "podgląd",
+        "close": "zamknij"
     },
     "entity": {
         "genre_one": "gatunek",
@@ -168,7 +182,10 @@
         "mpvRequired": "wymagane MPV",
         "audioDeviceFetchError": "wystąpił błąd podczas próby znalezienia urządzeń dźwiękowych",
         "invalidServer": "nieprawidłowy serwer",
-        "loginRateError": "zbyt dużo prób logowania, poczekaj chwilę i spróbuj ponownie"
+        "loginRateError": "zbyt dużo prób logowania, poczekaj chwilę i spróbuj ponownie",
+        "badAlbum": "ta strona jest wyświetlana, ponieważ ten utwór nie jest częścią albumu. najprawdopodobniej ten problem występuje, jeśli utwór znajduje się w nadrzędnym folderze plików z muzyką. jellyfin grupuje utwory tylko wtedy, gdy znajdują się one w folderze.",
+        "networkError": "wystąpił błąd sieciowy",
+        "openError": "nie można otworzyć pliku"
     },
     "filter": {
         "mostPlayed": "najczęściej odtwarzane",
@@ -262,6 +279,14 @@
         },
         "editPlaylist": {
             "title": "edytuj $t(entity.playlist_one)"
+        },
+        "shareItem": {
+            "allowDownloading": "zezwól na pobieranie",
+            "description": "opis",
+            "setExpiration": "ustaw czas wygaśnięcia",
+            "success": "link do udostępniania skopiowany do schowka (lub kliknij tutaj, aby otworzyć)",
+            "createFailed": "nie udało się utworzyć linku do udostępniania (czy udostępnianie jest włączone?)",
+            "expireInvalid": "ustawiony czas wygaśnięcia musi być w przyszłości"
         }
     },
     "page": {
@@ -277,7 +302,9 @@
                 "unsynchronized": "niezsynchronizowane",
                 "lyricAlignment": "wyrównaj tekst",
                 "useImageAspectRatio": "użyj współczynnika proporcji obrazu",
-                "lyricGap": "odstępy tekstu"
+                "lyricGap": "odstępy tekstu",
+                "dynamicImageBlur": "rozmiar rozmycia obrazu",
+                "dynamicIsImage": "włącz obraz w tle"
             },
             "upNext": "następny",
             "lyrics": "tekst",
@@ -311,7 +338,9 @@
             "addFavorite": "$t(action.addToFavorites)",
             "play": "$t(player.play)",
             "numberSelected": "zaznaczono {{count}}",
-            "removeFromQueue": "$t(action.removeFromQueue)"
+            "removeFromQueue": "$t(action.removeFromQueue)",
+            "shareItem": "udostępnij pozycję",
+            "showDetails": "zobacz informacje"
         },
         "albumDetail": {
             "moreFromArtist": "więcej od $t(entity.artist_one)",
@@ -321,10 +350,14 @@
             "title": "$t(entity.albumArtist_other)"
         },
         "genreList": {
-            "title": "$t(entity.genre_other)"
+            "title": "$t(entity.genre_other)",
+            "showAlbums": "pokaż $t(entity.genre_one) $t(entity.album_other)",
+            "showTracks": "pokaż $t(entity.genre_one) $t(entity.track_other)"
         },
         "albumList": {
-            "title": "$t(entity.album_other)"
+            "title": "$t(entity.album_other)",
+            "artistAlbums": "albumy artysty {{artist}}",
+            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)"
         },
         "sidebar": {
             "nowPlaying": "teraz odtwarzane",
@@ -337,7 +370,8 @@
             "settings": "$t(common.setting_other)",
             "home": "$t(common.home)",
             "artists": "$t(entity.artist_other)",
-            "albumArtists": "$t(entity.albumArtist_other)"
+            "albumArtists": "$t(entity.albumArtist_other)",
+            "shared": "udostępnione $t(entity.playlist_other)"
         },
         "home": {
             "mostPlayed": "najczęściej odtwarzane",
@@ -353,7 +387,9 @@
             "windowTab": "okno"
         },
         "trackList": {
-            "title": "$t(entity.track_other)"
+            "title": "$t(entity.track_other)",
+            "artistTracks": "utwory przez {{artist}}",
+            "genreTracks": "\"{{genre}}\" $t(entity.track_other)"
         },
         "globalSearch": {
             "commands": {
@@ -365,6 +401,22 @@
         },
         "playlistList": {
             "title": "$t(entity.playlist_other)"
+        },
+        "albumArtistDetail": {
+            "topSongs": "popularne utwory",
+            "topSongsFrom": "popularne utwory z {{title}}",
+            "about": "O {{artist}}",
+            "recentReleases": "ostatnie wydania",
+            "viewAll": "zobacz wszystko",
+            "viewDiscography": "przeglądaj dyskografię",
+            "relatedArtists": "powiązane z $t(entity.artist_other)",
+            "appearsOn": "pojawia się na",
+            "viewAllTracks": "zobacz wszystko $t(entity.track_other)"
+        },
+        "itemDetail": {
+            "copyPath": "kopiuj ścieżkę do schowka",
+            "copiedPath": "ścieżka została skopiowana pomyślnie",
+            "openFile": "pokaż utwór w menedżerze plików"
         }
     },
     "player": {
@@ -413,7 +465,7 @@
         "hotkey_zoomIn": "przybliż",
         "hotkey_browserForward": "przeglądarka w przód",
         "audioExclusiveMode_description": "włącz wyłączny tryb wyjścia. W tym trybie, system zwykle jest zablokowany i może odtwarzać tylko poprzez mpv",
-        "discordUpdateInterval": "{{discord}} interwał aktualizacji obszernej obecności",
+        "discordUpdateInterval": "{{discord}} interwał aktualizacji rich presence",
         "fontType_optionBuiltIn": "wbudowana czcionka",
         "hotkey_playbackPlayPause": "odtwarzaj / wstrzymaj",
         "hotkey_rate1": "oceń na 1 gwiazdkę",
@@ -449,7 +501,7 @@
         "crossfadeDuration_description": "ustaw czas trwania efektu przenikania",
         "language": "język",
         "hotkey_toggleShuffle": "przełącz kolejność losową",
-        "discordRichPresence_description": "włącz status odtwarzania w {{discord}} obszernie obecny. Klucze obrazów to {{icon}}, {{playing}} i {{paused}}. ",
+        "discordRichPresence_description": "włącz status odtwarzania w {{discord}} rich presence. Dzięki temu będą wyświetlane informacje takie jak: {{icon}}, {{playing}} i {{paused}}. ",
         "audioDevice": "urządzenia dźwiękowe",
         "hotkey_rate2": "oceń na 2 gwiazdki",
         "exitToTray": "zamknij do zasobnika",
@@ -475,7 +527,7 @@
         "hotkey_zoomOut": "oddal",
         "hotkey_unfavoriteCurrentSong": "usuń $t(common.currentSong) z ulubionych",
         "hotkey_rate0": "wyczyść oceny",
-        "discordApplicationId": "id aplikacji {{discord}}",
+        "discordApplicationId": "ID aplikacji {{discord}}",
         "applicationHotkeys_description": "ustaw skróty klawiszowe aplikacji. przełącz pole wyboru aby ustawić skrót globalny (tylko komputery)",
         "floatingQueueArea_description": "wyświetl ikonę najechania kursorem po prawej stronie ekranu, aby wyświetlić kolejkę odtwarzania",
         "hotkey_volumeMute": "wycisz",
@@ -521,7 +573,7 @@
         "sampleRate_description": "wybierz wyjściową częstotliwość próbkowania, która ma być używana, jeśli wybrana częstotliwość próbkowania różni się od częstotliwości bieżącego utworu. wartość mniejsza niż 8000 spowoduje użycie częstotliwości domyślnej",
         "replayGainMode_optionNone": "$t(common.none)",
         "replayGainClipping": "wzmocnienie {{ReplayGain}}",
-        "scrobble_description": "odtwarzanie scrobble na serwerze multimediów",
+        "scrobble_description": "przekazywanie informacji o odtwarzaniu (scrobbling) do twojego serwera multimediów",
         "sidePlayQueueStyle": "boczny styl kolejki odtwarzania",
         "remoteUsername_description": "ustaw nazwę użytkownika dla serwera zdalnej kontroli. Jeśli nazwa użytkownika i hasło są puste, autoryzacja będzie wyłączona",
         "replayGainMode_optionAlbum": "$t(entity.album_one)",
@@ -564,7 +616,21 @@
         "clearCache_description": "\"twarde wyczyszczenie\" feishin. oprócz wyczyszczenia pamięci podręcznej feishin, opróżnij pamięć podręczną przeglądarki (zapisane obrazy i inne zasoby). dane i ustawienia serwera zostaną zachowane",
         "clearQueryCache_description": "\"miękkie wyczyszczenie\" feishin. spowoduje to odświeżenie list odtwarzania, metadanych utworów i zresetowanie zapisanych tekstów. ustawienia, dane uwierzytelniające serwera i obrazy w pamięci podręcznej zostaną zachowane",
         "buttonSize_description": "rozmiar przycisków paska odtwarzacza",
-        "clearCache": "wyczyść pamięć podręczną przeglądarki"
+        "clearCache": "wyczyść pamięć podręczną przeglądarki",
+        "playerAlbumArtResolution": "rozdzielczość okładki albumu odtwarzacza",
+        "externalLinks": "pokaż zewnętrzne linki",
+        "genreBehavior_description": "określa, czy kliknięcie gatunku domyślnie otwiera listę utworów czy albumów",
+        "mpvExtraParameters_help": "po jednym na linię",
+        "passwordStore": "hasła",
+        "passwordStore_description": "jakie hasło ma być używane. zmień to, jeśli masz problemy z przechowywaniem haseł.",
+        "playerAlbumArtResolution_description": "rozdzielczość podglądu okładki albumu w dużym odtwarzaczu. większa sprawia, że wygląda bardziej wyraziście, ale może spowolnić ładowanie. domyślnie 0, czyli auto",
+        "startMinimized": "uruchom zminimalizowany",
+        "startMinimized_description": "uruchom aplikację w zasobniku systemowym",
+        "clearCacheSuccess": "pamięć podręczna została wyczyszczona pomyślnie",
+        "genreBehavior": "domyślne zachowanie strony gatunek",
+        "externalLinks_description": "umożliwia wyświetlanie linków zewnętrznych (Last.fm, MusicBrainz) na stronach artystów/albumów",
+        "homeConfiguration": "konfiguracja strony głównej",
+        "homeConfiguration_description": "konfiguracja elementów wyświetlanych na stronie głównej i ich kolejności"
     },
     "table": {
         "config": {
@@ -578,7 +644,9 @@
                 "gap": "$t(common.gap)",
                 "tableColumns": "kolumny tabeli",
                 "autoFitColumns": "automatyczne dopasowanie kolumn",
-                "size": "$t(common.size)"
+                "size": "$t(common.size)",
+                "itemSize": "rozmiar elementu (px)",
+                "itemGap": "odstęp między elementami (px)"
             },
             "label": {
                 "releaseDate": "data premiery",
@@ -606,7 +674,8 @@
                 "discNumber": "numer płyty",
                 "favorite": "$t(common.favorite)",
                 "year": "$t(common.year)",
-                "albumArtist": "$t(entity.albumArtist_one)"
+                "albumArtist": "$t(entity.albumArtist_one)",
+                "codec": "$t(common.codec)"
             }
         },
         "column": {
@@ -632,7 +701,8 @@
             "path": "ścieżka",
             "discNumber": "płyta",
             "channels": "$t(common.channel_other)",
-            "size": "$t(common.size)"
+            "size": "$t(common.size)",
+            "codec": "$t(common.codec)"
         }
     }
 }
