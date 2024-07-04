@@ -85,7 +85,7 @@ export const WindowSettings = () => {
             control: (
                 <Switch
                     aria-label="Toggle minimize to tray"
-                    defaultChecked={settings.exitToTray}
+                    defaultChecked={settings.minimizeToTray}
                     disabled={!isElectron()}
                     onChange={(e) => {
                         if (!e) return;
