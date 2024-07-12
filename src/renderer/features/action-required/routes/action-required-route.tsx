@@ -1,6 +1,6 @@
 import { Center, Group, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-import { RiCheckFill, RiEdit2Line, RiHome4Line } from 'react-icons/ri';
+import { RiCheckFill, RiHome4Line } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { Button, PageHeader, Text } from '/@/renderer/components';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
@@ -9,8 +9,6 @@ import { LogonRequired } from '/@/renderer/features/action-required/components/s
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { openModal } from '@mantine/modals';
-import { ServerList } from '/@/renderer/features/servers';
 
 const ActionRequiredRoute = () => {
     const { t } = useTranslation();
@@ -33,13 +31,6 @@ const ActionRequiredRoute = () => {
 
     const canReturnHome = checks.every((c) => c.valid);
     const displayedCheck = checks.find((c) => !c.valid);
-
-    const handleManageServersModal = () => {
-        openModal({
-            children: <ServerList />,
-            title: 'Manage Servers',
-        });
-    };
 
     return (
         <AnimatedPage>

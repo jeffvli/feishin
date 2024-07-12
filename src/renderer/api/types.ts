@@ -60,6 +60,7 @@ export type ServerListItem = {
     credential: string;
     features?: ServerFeatures;
     id: string;
+    isPublic: boolean;
     name: string;
     ndCredential?: string;
     savePassword?: boolean;
@@ -189,6 +190,7 @@ export type Song = {
     albumId: string;
     artistName: string;
     artists: RelatedArtist[];
+    beetId: number | null;
     bitRate: number;
     bpm: number | null;
     channels: number | null;
@@ -204,9 +206,11 @@ export type Song = {
     id: string;
     imagePlaceholderUrl: string | null;
     imageUrl: string | null;
+    isPublic: boolean;
     itemType: LibraryItem.SONG;
     lastPlayedAt: string | null;
     lyrics: string | null;
+    mbzId: string | null;
     name: string;
     path: string | null;
     peak: GainInfo | null;
@@ -576,6 +580,10 @@ export type SongDetailResponse = Song | null | undefined;
 export type SongDetailQuery = { id: string };
 
 export type SongDetailArgs = { query: SongDetailQuery } & BaseEndpointArgs;
+
+export type SongInfoQuery = { id: string };
+
+export type SongInfoArgs = { query: SongInfoQuery } & BaseEndpointArgs;
 
 // Delete Song
 export type DeleteSongResponse = null | undefined;
@@ -1207,3 +1215,38 @@ export type SimilarSongsQuery = {
 export type SimilarSongsArgs = {
     query: SimilarSongsQuery;
 } & BaseEndpointArgs;
+
+export type IderTrack = {
+    artist: string;
+    end: number;
+    mbid: string;
+    start: number;
+    title: string;
+    track_id: number;
+};
+
+export type TrackListResponse = BasePaginatedResponse<IderTrack[]> | null | undefined;
+
+export type TrackListQuery = {
+    track_id: number;
+};
+
+export type TrackListArgs = { query: TrackListQuery } & BaseEndpointArgs;
+
+export type GetBeetTrackQuery = {
+    id: string;
+    user: string;
+};
+
+export type GetBeetTrackArgs = { query: GetBeetTrackQuery } & BaseEndpointArgs;
+
+type BeetTrack = {
+    id: number;
+    length: number;
+};
+
+export type BeetResults = {
+    results: BeetTrack[];
+};
+
+export type GetBeetTrackResponse = BeetResults;

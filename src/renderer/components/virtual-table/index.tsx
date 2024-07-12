@@ -364,8 +364,10 @@ const tableColumns: { [key: string]: ColDef } = {
                       artists: params.data?.artists,
                       imagePlaceholderUrl: params.data?.imagePlaceholderUrl,
                       imageUrl: params.data?.imageUrl,
+                      isPublic: params.data?.isPublic,
                       name: params.data?.name,
                       rowHeight: params.node?.rowHeight,
+                      songId: params.data?.id,
                       type: params.data?.serverType,
                   }
                 : undefined,

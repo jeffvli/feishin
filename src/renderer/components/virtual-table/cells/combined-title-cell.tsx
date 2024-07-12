@@ -104,13 +104,29 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
                 )}
             </ImageWrapper>
             <MetadataWrapper>
-                <Text
-                    className="current-song-child"
-                    overflow="hidden"
-                    size="md"
-                >
-                    {value.name}
-                </Text>
+                {value.isPublic ? (
+                    <Text
+                        $link
+                        $secondary
+                        component={Link}
+                        overflow="hidden"
+                        size="md"
+                        sx={{ width: 'fit-content' }}
+                        to={generatePath(AppRoute.LIBRARY_MIX_INFO, {
+                            songId: value.songId,
+                        })}
+                    >
+                        {value.name}
+                    </Text>
+                ) : (
+                    <Text
+                        className="current-song-child"
+                        overflow="hidden"
+                        size="md"
+                    >
+                        {value.name}
+                    </Text>
+                )}
                 <Text
                     $secondary
                     overflow="hidden"

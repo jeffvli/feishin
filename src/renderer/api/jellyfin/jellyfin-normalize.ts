@@ -141,6 +141,7 @@ const normalizeSong = (
             imageUrl: null,
             name: entry.Name,
         })),
+        beetId: null,
         bitRate:
             item.MediaSources?.[0].Bitrate &&
             Number(Math.trunc(item.MediaSources[0].Bitrate / 1000)),
@@ -167,9 +168,11 @@ const normalizeSong = (
         id: item.Id,
         imagePlaceholderUrl: null,
         imageUrl: getSongCoverArtUrl({ baseUrl: server?.url || '', item, size: imageSize || 100 }),
+        isPublic: false,
         itemType: LibraryItem.SONG,
         lastPlayedAt: null,
         lyrics: null,
+        mbzId: null,
         name: item.Name,
         path: (item.MediaSources && item.MediaSources[0]?.Path) || null,
         peak: null,

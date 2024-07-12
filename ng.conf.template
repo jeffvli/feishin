@@ -17,11 +17,4 @@ server {
     try_files $uri $uri/ /index.html =404;
   }
 
-  location ${PUBLIC_PATH}settings.js {
-    alias /etc/nginx/conf.d/settings.js;
-  }
-
-  location ${PUBLIC_PATH}/settings.js {
-    alias /etc/nginx/conf.d/settings.js;
-  }
 }

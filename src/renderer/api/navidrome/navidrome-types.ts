@@ -339,7 +339,7 @@ const addToPlaylistParameters = z.object({
 
 const deleteSongParameters = z.object({
     ids: z.array(z.string()),
-    user: z.string()
+    user: z.string(),
 });
 
 const removeFromPlaylist = z.object({
@@ -362,6 +362,21 @@ const shareItemParameters = z.object({
     resourceType: z.string(),
 });
 
+const beetTrack = z.object({
+    id: z.number(),
+    length: z.number(),
+    month: z.number(),
+});
+
+const beetResults = z.object({
+    results: z.array(beetTrack),
+});
+
+const beetTrackParameters = z.object({
+    id: z.string(),
+    user: z.string(),
+});
+
 export const ndType = {
     _enum: {
         albumArtistList: ndAlbumArtistListSort,
@@ -376,6 +391,7 @@ export const ndType = {
         albumArtistList: albumArtistListParameters,
         albumList: albumListParameters,
         authenticate: authenticateParameters,
+        beetTrack: beetTrackParameters,
         createPlaylist: createPlaylistParameters,
         deleteSong: deleteSongParameters,
         genreList: genreListParameters,
@@ -393,6 +409,7 @@ export const ndType = {
         albumArtistList,
         albumList,
         authenticate,
+        beetResults,
         createPlaylist,
         deletePlaylist,
         deleteSong,

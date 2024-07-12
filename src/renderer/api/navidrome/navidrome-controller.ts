@@ -51,6 +51,8 @@ import {
     Song,
     DeleteSongArgs,
     DeleteSongResponse,
+    GetBeetTrackArgs,
+    GetBeetTrackResponse,
 } from '../types';
 import { VersionInfo, getFeatures, hasFeature } from '/@/renderer/api/utils';
 import { ServerFeature, ServerFeatures } from '/@/renderer/api/features-types';
@@ -105,6 +107,22 @@ const getUserList = async (args: UserListArgs): Promise<UserListResponse> => {
         startIndex: query?.startIndex || 0,
         totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
     };
+};
+
+const getBeetTrack = async (args: GetBeetTrackArgs): Promise<GetBeetTrackResponse> => {
+    const { query, apiClientProps } = args;
+    const res = await ndApiClient(apiClientProps).getBeetTrack({
+        query: {
+            id: query.id,
+            user: query.user,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get beet track');
+    }
+
+    return res.body.data;
 };
 
 const getGenreList = async (args: GenreListArgs): Promise<GenreListResponse> => {
@@ -299,7 +317,22 @@ const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> 
         throw new Error('Failed to get song detail');
     }
 
-    return ndNormalize.song(res.body.data, apiClientProps.server, '');
+    let beetId;
+    if (apiClientProps.server?.isPublic) {
+        const beetRes = await ndApiClient(apiClientProps).getBeetTrack({
+            query: {
+                id: query.id,
+                user: apiClientProps.server.username,
+            },
+        });
+        if (beetRes.status !== 200) {
+            throw new Error(
+                `Failed to get beet track for song ${query.id} and user ${apiClientProps.server.username}`,
+            );
+        }
+        beetId = beetRes.body?.data.results[0].id;
+    }
+    return ndNormalize.song(res.body.data, apiClientProps.server, '', undefined, beetId);
 };
 
 const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistResponse> => {
@@ -611,7 +644,7 @@ const deleteSong = async (args: DeleteSongArgs): Promise<DeleteSongResponse> => 
     const res = await ndApiClient(apiClientProps).deleteSong({
         body: {
             ids: body.songId,
-            user: body.user
+            user: body.user,
         },
         query: null,
     });
@@ -633,6 +666,7 @@ export const ndController = {
     getAlbumArtistList,
     getAlbumDetail,
     getAlbumList,
+    getBeetTrack,
     getGenreList,
     getPlaylistDetail,
     getPlaylistList,

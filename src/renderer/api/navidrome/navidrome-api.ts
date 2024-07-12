@@ -55,7 +55,7 @@ export const contract = c.router({
     deleteSong: {
         body: ndType._parameters.deleteSong,
         method: 'DELETE',
-        path: 'deleteSong',
+        path: 'delete',
         query: null,
         responses: {
             200: resultWithHeaders(ndType._response.deleteSong),
@@ -93,6 +93,15 @@ export const contract = c.router({
         query: ndType._parameters.albumList,
         responses: {
             200: resultWithHeaders(ndType._response.albumList),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
+    getBeetTrack: {
+        method: 'GET',
+        path: 'getBeetTrack',
+        query: ndType._parameters.beetTrack,
+        responses: {
+            200: resultWithHeaders(ndType._response.beetResults),
             500: resultWithHeaders(ndType._response.error),
         },
     },
@@ -244,15 +253,25 @@ const TIMEOUT_ERROR = Error();
 
 axiosClient.interceptors.response.use(
     (response) => {
-        const serverId = useAuthStore.getState().currentServer?.id;
+        const server = useAuthStore.getState().currentServer;
+        const serverId = server?.id;
+        const publicServer = useAuthStore.getState().publicServer;
+        const publicServerId = publicServer?.id;
 
-        if (serverId) {
+        if (serverId && publicServerId) {
             const headerCredential = response.headers['x-nd-authorization'] as string | undefined;
 
+            const url = response.request.responseURL;
             if (headerCredential) {
-                useAuthStore.getState().actions.updateServer(serverId, {
-                    ndCredential: headerCredential,
-                });
+                if (url === server.url) {
+                    useAuthStore.getState().actions.updateServer(serverId, {
+                        ndCredential: headerCredential,
+                    });
+                } else if (url === publicServer.url) {
+                    useAuthStore.getState().actions.updateServer(serverId, {
+                        ndCredential: headerCredential,
+                    });
+                }
             }
         }
 

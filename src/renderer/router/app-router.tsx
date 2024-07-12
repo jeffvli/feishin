@@ -18,6 +18,8 @@ const AlbumListRoute = lazy(() => import('/@/renderer/features/albums/routes/alb
 
 const SongListRoute = lazy(() => import('/@/renderer/features/songs/routes/song-list-route'));
 
+const MixListRoute = lazy(() => import('/@/renderer/features/mixes/routes/mix-list-route'));
+
 const PlaylistDetailRoute = lazy(
     () => import('/@/renderer/features/playlists/routes/playlist-detail-route'),
 );
@@ -38,6 +40,8 @@ const InvalidRoute = lazy(
     () => import('/@/renderer/features/action-required/routes/invalid-route'),
 );
 
+const AboutRoute = lazy(() => import('/@/renderer/features/about/routes/about-route'));
+
 const HomeRoute = lazy(() => import('/@/renderer/features/home/routes/home-route'));
 
 const AlbumArtistListRoute = lazy(
@@ -56,6 +60,7 @@ const AlbumDetailRoute = lazy(
     () => import('/@/renderer/features/albums/routes/album-detail-route'),
 );
 
+const MixInfoRoute = lazy(() => import('/@/renderer/features/mixes/routes/mix-info-route'));
 const DummyAlbumDetailRoute = lazy(
     () => import('/@/renderer/features/albums/routes/dummy-album-detail-route'),
 );
@@ -88,8 +93,8 @@ export const AppRouter = () => {
                 }}
                 modals={{
                     addToPlaylist: AddToPlaylistContextModal,
-                    deleteSong: DeleteSongContextModal,
                     base: BaseContextModal,
+                    deleteSong: DeleteSongContextModal,
                     shareItem: ShareItemContextModal,
                 }}
             >
@@ -109,6 +114,11 @@ export const AppRouter = () => {
                                     element={<HomeRoute />}
                                     errorElement={<RouteErrorBoundary />}
                                     path={AppRoute.HOME}
+                                />
+                                <Route
+                                    element={<AboutRoute />}
+                                    errorElement={<RouteErrorBoundary />}
+                                    path={AppRoute.ABOUT}
                                 />
                                 <Route
                                     element={<SearchRoute />}
@@ -151,6 +161,11 @@ export const AppRouter = () => {
                                     path={AppRoute.LIBRARY_ALBUMS_DETAIL}
                                 />
                                 <Route
+                                    element={<MixInfoRoute />}
+                                    errorElement={<RouteErrorBoundary />}
+                                    path={AppRoute.LIBRARY_MIX_INFO}
+                                />
+                                <Route
                                     element={<DummyAlbumDetailRoute />}
                                     errorElement={<RouteErrorBoundary />}
                                     path={AppRoute.FAKE_LIBRARY_ALBUM_DETAILS}
@@ -159,6 +174,11 @@ export const AppRouter = () => {
                                     element={<SongListRoute />}
                                     errorElement={<RouteErrorBoundary />}
                                     path={AppRoute.LIBRARY_SONGS}
+                                />
+                                <Route
+                                    element={<MixListRoute />}
+                                    errorElement={<RouteErrorBoundary />}
+                                    path={AppRoute.LIBRARY_MIXES}
                                 />
                                 <Route
                                     element={<PlaylistListRoute />}

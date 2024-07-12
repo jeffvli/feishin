@@ -21,7 +21,6 @@ export const DeleteSongContextModal = ({
 }>) => {
     const { t } = useTranslation();
     const { albumId, artistId, genreId, songId } = innerProps;
-    console.log('lajp pending ids');
     console.log(songId?.length);
     const server = useCurrentServer();
 

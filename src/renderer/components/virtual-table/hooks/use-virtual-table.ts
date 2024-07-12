@@ -133,7 +133,6 @@ export const useVirtualTable = <TFilter>({
             if (itemType === LibraryItem.GENRE) {
                 return api.controller.getGenreList;
             }
-
             return null;
         }, [itemType]);
 

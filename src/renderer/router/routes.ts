@@ -1,4 +1,5 @@
 export enum AppRoute {
+    ABOUT = '/about',
     ACTION_REQUIRED = '/action-required',
     EXPLORE = '/explore',
     FAKE_LIBRARY_ALBUM_DETAILS = '/library/albums/dummy/:albumId',
@@ -16,7 +17,10 @@ export enum AppRoute {
     LIBRARY_GENRES = '/library/genres',
     LIBRARY_GENRES_ALBUMS = '/library/genres/:genreId/albums',
     LIBRARY_GENRES_SONGS = '/library/genres/:genreId/songs',
+    LIBRARY_MIXES = '/library/mixes',
+    LIBRARY_MIX_INFO = '/library/mix/:songId',
     LIBRARY_SONGS = '/library/songs',
+    LIBRARY_SONG_INFO = '/library/song/:songId',
     NOW_PLAYING = '/now-playing',
     PLAYING = '/playing',
     PLAYLISTS = '/playlists',

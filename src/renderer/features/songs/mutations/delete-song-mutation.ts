@@ -19,7 +19,6 @@ export const useDeleteSong = (args: MutationHookArgs) => {
         mutationFn: (args) => {
             const server = getServerById(args.serverId);
             if (!server) throw new Error('Server not found');
-            console.log('lajp mutation delete song');
             return api.controller.deleteSong({ ...args, apiClientProps: { server } });
         },
         onSuccess: (_data, variables) => {
@@ -27,7 +26,6 @@ export const useDeleteSong = (args: MutationHookArgs) => {
 
             if (!serverId) return;
 
-            console.log('lajp invalidating query keys');
             queryClient.invalidateQueries({
                 exact: false,
                 queryKey: queryKeys.songs.list(serverId, {
@@ -37,7 +35,6 @@ export const useDeleteSong = (args: MutationHookArgs) => {
                     startIndex: 0,
                 }),
             });
-            console.log('lajp invalidating query keys all');
             queryClient.invalidateQueries(queryKeys.playlists.list(serverId), { exact: false });
             queryClient.invalidateQueries(queryKeys.songs.list(serverId));
         },

@@ -14,6 +14,7 @@ import z from 'zod';
 import { ndType } from './navidrome-types';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
 import { NDGenre } from '/@/renderer/api/navidrome.types';
+import { getPublicServer } from '/@/renderer/store';
 
 const getImageUrl = (args: { url: string | null }) => {
     const { url } = args;
@@ -59,6 +60,7 @@ const normalizeSong = (
     server: ServerListItem | null,
     deviceId: string,
     imageSize?: number,
+    beetId?: number,
 ): Song => {
     let id;
     let playlistItemId;
@@ -78,6 +80,14 @@ const normalizeSong = (
         size: imageSize || 100,
     });
 
+    let isPublic = false;
+    const publicServer = getPublicServer();
+    if (server) {
+        if (publicServer?.id === server.id) {
+            isPublic = true;
+        }
+    }
+
     const imagePlaceholderUrl = null;
     return {
         album: item.album,
@@ -85,6 +95,7 @@ const normalizeSong = (
         albumId: item.albumId,
         artistName: item.artist,
         artists: [{ id: item.artistId, imageUrl: null, name: item.artist }],
+        beetId: beetId || null,
         bitRate: item.bitRate,
         bpm: item.bpm ? item.bpm : null,
         channels: item.channels ? item.channels : null,
@@ -108,9 +119,11 @@ const normalizeSong = (
         id,
         imagePlaceholderUrl,
         imageUrl,
+        isPublic,
         itemType: LibraryItem.SONG,
         lastPlayedAt: normalizePlayDate(item),
         lyrics: item.lyrics ? item.lyrics : null,
+        mbzId: item.mbzTrackId ? item.mbzTrackId : null,
         name: item.title,
         path: item.path,
         peak:

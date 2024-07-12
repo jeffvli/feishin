@@ -14,7 +14,6 @@ RUN npm run build:web
 FROM nginx:alpine-slim
 
 COPY --chown=nginx:nginx --from=builder /app/release/app/dist/web /usr/share/nginx/html
-COPY ./settings.js.template /etc/nginx/templates/settings.js.template
 COPY ng.conf.template /etc/nginx/templates/default.conf.template
 
 ENV PUBLIC_PATH="/"

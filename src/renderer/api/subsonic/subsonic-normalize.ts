@@ -9,6 +9,7 @@ import {
     ServerListItem,
     ServerType,
 } from '/@/renderer/api/types';
+import { getPublicServer } from '/@/renderer/store';
 
 const getCoverArtUrl = (args: {
     baseUrl: string | undefined;
@@ -45,6 +46,14 @@ const normalizeSong = (
             size: 100,
         }) || null;
 
+    let isPublic = false;
+    const publicServer = getPublicServer();
+    if (server) {
+        if (publicServer?.id === server.id) {
+            isPublic = true;
+        }
+    }
+
     const streamUrl = `${server?.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=feishin_${deviceId}&${server?.credential}`;
 
     return {
@@ -65,6 +74,7 @@ const normalizeSong = (
                 name: item.artist || '',
             },
         ],
+        beetId: null,
         bitRate: item.bitRate || 0,
         bpm: null,
         channels: null,
@@ -95,9 +105,11 @@ const normalizeSong = (
         id: item.id,
         imagePlaceholderUrl: null,
         imageUrl,
+        isPublic,
         itemType: LibraryItem.SONG,
         lastPlayedAt: null,
         lyrics: null,
+        mbzId: null,
         name: item.title,
         path: item.path,
         peak:

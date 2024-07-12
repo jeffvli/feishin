@@ -23,6 +23,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const focusTrapRef = useFocusTrap(true);
     const [isLoading, setIsLoading] = useState(false);
     const { addServer, setCurrentServer } = useAuthStoreActions();
+    const { addPublicServer } = useAuthStoreActions();
 
     const form = useForm({
         initialValues: {
@@ -50,12 +51,11 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             });
         }
 
-        console.log('lajp test');
         // for local testing
         const url = `http://localhost:4533`;
+        const publicUrl = `http://localhost:4534`;
         // for production
-        // todo for production should try going via localhost as that should reduce latency
-        // will probably need to make a request to pymix to get the navidrome port for the user and then use that on localhost
+        // have to go via sub-box internet as this is going to be running from user's browser!
         // const url = `https://www.sub-box.net/navidrome${values.username}`;
 
         try {
@@ -75,10 +75,26 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     message: t('error.authenticationFailed', { postProcess: 'sentenceCase' }),
                 });
             }
+            const publicData: AuthenticationResponse | undefined = await authFunction(
+                publicUrl,
+                {
+                    legacy: values.legacyAuth,
+                    password: 'lajp',
+                    username: 'lajp',
+                },
+                values.type as ServerType,
+            );
+
+            if (!publicData) {
+                return toast.error({
+                    message: t('error.authenticationFailed', { postProcess: 'sentenceCase' }),
+                });
+            }
 
             const serverItem = {
                 credential: data.credential,
                 id: nanoid(),
+                isPublic: false,
                 name: data.username,
                 ndCredential: data.ndCredential,
                 type: values.type as ServerType,
@@ -89,6 +105,19 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
             addServer(serverItem);
             setCurrentServer(serverItem);
+
+            const publicServerItem = {
+                credential: publicData.credential,
+                id: nanoid(),
+                isPublic: true,
+                name: publicData.username,
+                ndCredential: publicData.ndCredential,
+                type: values.type as ServerType,
+                url: publicUrl.replace(/\/$/, ''),
+                userId: publicData.userId,
+                username: publicData.username,
+            };
+            addPublicServer(publicServerItem);
             closeAllModals();
 
             toast.success({
