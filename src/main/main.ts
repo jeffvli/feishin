@@ -405,6 +405,7 @@ const createWindow = async (first = true) => {
             }
 
             mainWindow.show();
+            mainWindow.webContents.openDevTools();
             createWinThumbarButtons();
         }
     });
