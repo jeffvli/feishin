@@ -67,8 +67,8 @@ if (store.get('ignore_ssl')) {
 
 // From https://github.com/tutao/tutanota/commit/92c6ed27625fcf367f0fbcc755d83d7ff8fde94b
 if (isLinux() && !process.argv.some((a) => a.startsWith('--password-store='))) {
-    const paswordStore = store.get('password_store', 'gnome-libsecret') as string;
-    app.commandLine.appendSwitch('password-store', paswordStore);
+    const passwordStore = store.get('password_store', 'gnome-libsecret') as string;
+    app.commandLine.appendSwitch('password-store', passwordStore);
 }
 
 let mainWindow: BrowserWindow | null = null;
@@ -210,7 +210,7 @@ const createTray = () => {
 
 const createWindow = async (first = true) => {
     if (isDevelopment) {
-        await installExtensions();
+        await installExtensions().catch(console.log);
     }
 
     const nativeFrame = store.get('window_window_bar_style') === 'linux';
@@ -258,7 +258,6 @@ const createWindow = async (first = true) => {
         ...(nativeFrame && isWindows() && nativeFrameConfig.windows),
     });
 
-    // From https://github.com/electron/electron/issues/526#issuecomment-1663959513
     const bounds = store.get('bounds') as Rectangle | undefined;
     if (bounds) {
         const screenArea = screen.getDisplayMatching(bounds).workArea;
@@ -312,7 +311,6 @@ const createWindow = async (first = true) => {
     });
 
     ipcMain.on('app-restart', () => {
-        // Fix for .AppImage
         if (process.env.APPIMAGE) {
             app.exit();
             app.relaunch({
@@ -362,20 +360,6 @@ const createWindow = async (first = true) => {
                 });
             });
         }
-    });
-
-    ipcMain.handle('open-item', async (_event, path: string) => {
-        return new Promise<void>((resolve, reject) => {
-            access(path, constants.F_OK, (error) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-
-                shell.showItemInFolder(path);
-                resolve();
-            });
-        });
     });
 
     const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
@@ -487,7 +471,7 @@ const createWindow = async (first = true) => {
     const menuBuilder = new MenuBuilder(mainWindow);
     menuBuilder.buildMenu();
 
-    // Open urls in the user's browser
+    // Open URLs in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
         shell.openExternal(edata.url);
         return { action: 'deny' };
@@ -669,4 +653,21 @@ if (!singleInstance) {
             });
         })
         .catch(console.log);
+}
+
+// Register 'open-item' handler globally, ensuring it is only registered once
+if (!ipcMain.eventNames().includes('open-item')) {
+    ipcMain.handle('open-item', async (_event, path: string) => {
+        return new Promise<void>((resolve, reject) => {
+            access(path, constants.F_OK, (error) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                shell.showItemInFolder(path);
+                resolve();
+            });
+        });
+    });
 }
