@@ -258,6 +258,7 @@ const createWindow = async (first = true) => {
         ...(nativeFrame && isWindows() && nativeFrameConfig.windows),
     });
 
+    // From https://github.com/electron/electron/issues/526#issuecomment-1663959513
     const bounds = store.get('bounds') as Rectangle | undefined;
     if (bounds) {
         const screenArea = screen.getDisplayMatching(bounds).workArea;
@@ -311,6 +312,7 @@ const createWindow = async (first = true) => {
     });
 
     ipcMain.on('app-restart', () => {
+        // Fix for .AppImage
         if (process.env.APPIMAGE) {
             app.exit();
             app.relaunch({
