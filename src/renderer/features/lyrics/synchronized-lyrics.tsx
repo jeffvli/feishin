@@ -4,6 +4,7 @@ import {
     useCurrentTime,
     useLyricsSettings,
     usePlaybackType,
+    usePlayerData,
     useSeeked,
 } from '/@/renderer/store';
 import { PlaybackType, PlayerStatus } from '/@/renderer/types';
@@ -61,6 +62,7 @@ export const SynchronizedLyrics = ({
     const playersRef = PlayersRef;
     const status = useCurrentStatus();
     const playbackType = usePlaybackType();
+    const playerData = usePlayerData();
     const now = useCurrentTime();
     const settings = useLyricsSettings();
     const centerControls = useCenterControls({ playersRef });
@@ -109,16 +111,18 @@ export const SynchronizedLyrics = ({
             return 0;
         }
 
-        const player = (
-            playersRef.current.player1 ?? playersRef.current.player2
-        ).getInternalPlayer();
+        const player =
+            playerData.current.player === 1
+                ? playersRef.current.player1
+                : playersRef.current.player2;
+        const underlying = player?.getInternalPlayer();
 
         // If it is null, this probably means we added a new song while the lyrics tab is open
         // and the queue was previously empty
-        if (!player) return 0;
+        if (!underlying) return 0;
 
-        return player.currentTime;
-    }, [playbackType, playersRef]);
+        return underlying.currentTime;
+    }, [playbackType, playersRef, playerData]);
 
     const setCurrentLyric = useCallback(
         (timeInMs: number, epoch?: number, targetIndex?: number) => {
