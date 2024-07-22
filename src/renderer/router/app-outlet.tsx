@@ -3,28 +3,22 @@ import { Center } from '@mantine/core';
 import isElectron from 'is-electron';
 import { Navigate, Outlet } from 'react-router-dom';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useSetPlayerFallback } from '/@/renderer/store';
+import { getPublicServer, useAuthStoreActions, useCurrentServer, useSetPlayerFallback } from '/@/renderer/store';
 import { Spinner, toast } from '/@/renderer/components';
 import { useServerAuthenticated } from '/@/renderer/hooks/use-server-authenticated';
-import { AuthState } from '/@/renderer/types';
+import { AuthState, ServerType } from '/@/renderer/types';
+import { useAuthenticateServer } from '/@/renderer/hooks/use-authenticate-server';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 const utils = isElectron() ? window.electron.utils : null;
 const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : null;
 
 export const AppOutlet = () => {
-    const currentServer = useCurrentServer();
+    const authState = useAuthenticateServer();
+
+
     const setFallback = useSetPlayerFallback();
-    const authState = useServerAuthenticated();
-
-    const isActionsRequired = useMemo(() => {
-        const isServerRequired = !currentServer;
-
-        const actions = [isServerRequired];
-        const isActionRequired = actions.some((c) => c);
-
-        return isActionRequired;
-    }, [currentServer]);
+    // const authState = useServerAuthenticated();
 
     useEffect(() => {
         utils?.mainMessageListener((_event, data) => {
@@ -52,7 +46,7 @@ export const AppOutlet = () => {
         );
     }
 
-    if (isActionsRequired || authState === AuthState.INVALID) {
+    if (authState === AuthState.INVALID) {
         return (
             <Navigate
                 replace

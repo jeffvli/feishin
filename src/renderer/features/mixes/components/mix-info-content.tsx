@@ -102,7 +102,6 @@ export const MixInfoContent = ({ background }: MixInfoContentProps) => {
         startToIdsMap.set(track.start, makeTrackId(track));
     }
 
-    console.log(startToIdsMap);
     const startToTrackNumberMap: Map<number, number> = new Map();
     let prevValue = null;
     let trackNumber = 0;
@@ -148,9 +147,10 @@ export const MixInfoContent = ({ background }: MixInfoContentProps) => {
                         bulletSize={24}
                         lineWidth={1}
                     >
-                        {trackList.map((track) => (
+                        {trackList.map((track, index: number) => (
                             <Timeline.Item
-                                title={`${track.artist} - ${track.title}`}
+                                key={index}
+                                title={`${index}. ${track.artist} - ${track.title}`}
                                 // bullet={
                                 //    <ThemeIcon
                                 //        size={22}

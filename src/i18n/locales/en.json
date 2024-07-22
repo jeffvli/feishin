@@ -314,6 +314,7 @@
             "goBack": "go back",
             "goForward": "go forward",
             "manageServers": "manage servers",
+            "logon": "log on",
             "openBrowserDevtools": "open browser devtools",
             "quit": "$t(common.quit)",
             "selectServer": "select server",
@@ -379,6 +380,10 @@
             "mostPlayed": "most played",
             "newlyAdded": "newly added releases",
             "recentlyPlayed": "recently played",
+            "exploreMixes": "explore mixes",
+            "mostPlayedMixes": "most played mixes",
+            "newlyAddedMixes": "newly added mixes",
+            "recentlyPlayedMixes": "recently played mixes",
             "title": "$t(common.home)"
         },
         "itemDetail": {

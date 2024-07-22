@@ -27,7 +27,7 @@ import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { SongListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
-import { ListDisplayType, Play, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, Play, ServerListItem, TableColumn } from '/@/renderer/types';
 import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
@@ -169,12 +169,13 @@ const FILTERS = {
 
 interface SongListHeaderFiltersProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+    serv?: ServerListItem | null;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFiltersProps) => {
+export const SongListHeaderFilters = ({ gridRef, serv, tableRef }: SongListHeaderFiltersProps) => {
     const { t } = useTranslation();
-    const server = useCurrentServer();
+    const server = serv ? serv: useCurrentServer();
     const { pageKey, handlePlay, customFilters } = useListContext();
     const { display, table, filter, grid } = useListStoreByKey({
         filter: customFilters,

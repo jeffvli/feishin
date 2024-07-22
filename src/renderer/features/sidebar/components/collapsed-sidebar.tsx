@@ -10,8 +10,9 @@ import { CollapsedSidebarButton } from '/@/renderer/features/sidebar/components/
 import { CollapsedSidebarItem } from '/@/renderer/features/sidebar/components/collapsed-sidebar-item';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
-import { SidebarItemType, useGeneralSettings, useWindowSettings } from '/@/renderer/store';
+import { SidebarItemType, useCurrentServer, useGeneralSettings, useWindowSettings } from '/@/renderer/store';
 import { Platform } from '/@/renderer/types';
+import { enableSideBarItem } from '/@/renderer/api/utils';
 
 const SidebarContainer = styled(motion.div)<{ $windowBarStyle: Platform }>`
     display: flex;
@@ -26,6 +27,7 @@ const SidebarContainer = styled(motion.div)<{ $windowBarStyle: Platform }>`
 
 export const CollapsedSidebar = () => {
     const { t } = useTranslation();
+    const server = useCurrentServer();
     const navigate = useNavigate();
     const { windowBarStyle } = useWindowSettings();
     const { sidebarItems, sidebarCollapsedNavigation } = useGeneralSettings();
@@ -52,7 +54,7 @@ export const CollapsedSidebar = () => {
         if (!sidebarItems) return [];
 
         const items = sidebarItems
-            .filter((item) => !item.disabled)
+            .filter((item) => enableSideBarItem(server, item.disabled, item.requiresUserAccount))
             .map((item) => ({
                 ...item,
                 label:

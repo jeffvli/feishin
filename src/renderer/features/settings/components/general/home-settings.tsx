@@ -10,6 +10,10 @@ const HOME_ITEMS: Array<[string, string]> = [
     [HomeItem.RECENTLY_PLAYED, 'page.home.recentlyPlayed'],
     [HomeItem.RECENTLY_ADDED, 'page.home.newlyAdded'],
     [HomeItem.MOST_PLAYED, 'page.home.mostPlayed'],
+    [HomeItem.RANDOM_MIXES, 'page.home.exploreMixes'],
+    [HomeItem.RECENTLY_PLAYED_MIXES, 'page.home.recentlyPlayedMixes'],
+    [HomeItem.RECENTLY_ADDED_MIXES, 'page.home.newlyAddedMixes'],
+    [HomeItem.MOST_PLAYED_MIXES, 'page.home.mostPlayedMixes'],
 ];
 
 export const HomeSettings = () => {

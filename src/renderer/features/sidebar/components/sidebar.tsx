@@ -29,7 +29,8 @@ import {
     useSidebarStore,
 } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
-import { Platform } from '/@/renderer/types';
+import { Platform, ServerListItem } from '/@/renderer/types';
+import { enableSideBarItem } from '/@/renderer/api/utils';
 
 const SidebarContainer = styled.div<{ $windowBarStyle: Platform }>`
     height: 100%;
@@ -135,7 +136,7 @@ export const Sidebar = () => {
         if (!sidebarItems) return [];
 
         const items = sidebarItems
-            .filter((item) => !item.disabled)
+            .filter((item) => enableSideBarItem(server, item.disabled, item.requiresUserAccount))
             .map((item) => ({
                 ...item,
                 label:
@@ -186,7 +187,7 @@ export const Sidebar = () => {
                         mx="1rem"
                         my="0.5rem"
                     />
-                    {sidebarPlaylistList && (
+                    {server && sidebarPlaylistList && (
                         <>
                             <Group
                                 position="apart"
