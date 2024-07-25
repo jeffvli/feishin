@@ -156,7 +156,8 @@
         "mute": "静音",
         "skip_forward": "向前跳过",
         "playbackSpeed": "播放速度",
-        "pause": "暂停"
+        "pause": "暂停",
+        "playSimilarSongs": "播放类似的曲目"
     },
     "setting": {
         "crossfadeStyle_description": "选择用于音频播放器的淡入淡出风格",
@@ -502,7 +503,8 @@
             "addLast": "$t(player.addLast)",
             "addFavorite": "$t(action.addToFavorites)",
             "showDetails": "获取信息",
-            "shareItem": "分享项目"
+            "shareItem": "分享项目",
+            "playSimilarSongs": "$t(player.playSimilarSongs)"
         },
         "trackList": {
             "title": "$t(entity.track_other)",
