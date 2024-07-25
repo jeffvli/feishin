@@ -6,6 +6,9 @@
         "clearQueue": "대기열 지우기",
         "deletePlaylist": "$t(entity.playlist_one) 삭제",
         "deselectAll": "모두 선택 해제",
-        "editPlaylist": "$t(entity.playlist_one) 편집"
+        "editPlaylist": "$t(entity.playlist_one) 편집",
+        "goToPage": "페이지 이동",
+        "moveToBottom": "맨 아래로 이동",
+        "moveToTop": "맨 위로 이동"
     }
 }
