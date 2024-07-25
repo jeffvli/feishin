@@ -1054,7 +1054,7 @@ export const usePlayerData = () =>
     usePlayerStore(
         (state) => state.actions.getPlayerData(),
         (a, b) => {
-            return a.current.nextIndex === b.current.nextIndex;
+            return a.current.song?.uniqueId === b.current.song?.uniqueId;
         },
     );
 
