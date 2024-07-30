@@ -35,7 +35,7 @@ export const useAuthStore = create<AuthSlice>()(
                     addPublicServer: (args) => {
                         set((state) => {
                             state.publicServer = args;
-                            state.serverList[args.id] = args;
+                            // state.serverList[args.id] = args;
                         });
                     },
                     addServer: (args) => {

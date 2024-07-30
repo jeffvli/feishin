@@ -37,7 +37,7 @@ const HomeRoute = () => {
     const { windowBarStyle } = useWindowSettings();
     const { homeItems } = useGeneralSettings();
 
-    const feature = useAlbumList({
+    const featureTracks = useAlbumList({
         options: {
             cacheTime: 1000 * 60,
             staleTime: 1000 * 60,
@@ -50,6 +50,22 @@ const HomeRoute = () => {
         },
         serverId: server?.id,
     });
+    const featureMixes = useAlbumList({
+        options: {
+            cacheTime: 1000 * 60,
+            staleTime: 1000 * 60,
+        },
+        query: {
+            limit: 20,
+            sortBy: AlbumListSort.RANDOM,
+            sortOrder: SortOrder.DESC,
+            startIndex: 0,
+        },
+        serverId: publicServer?.id,
+    });
+    const publicNd = server ? false : true;
+
+    const feature = publicNd ? featureMixes : featureTracks;
 
     const featureItemsWithImage = useMemo(() => {
         return feature.data?.items?.filter((item) => item.imageUrl) ?? [];
@@ -245,7 +261,7 @@ const HomeRoute = () => {
             itemType: LibraryItem.ALBUM,
             sortBy: AlbumListSort.RANDOM,
             sortOrder: SortOrder.ASC,
-            title: t('page.home.explore', { postProcess: 'sentenceCase' }),
+            title: t('page.home.exploreMixes', { postProcess: 'sentenceCase' }),
         },
         [HomeItem.RECENTLY_PLAYED_MIXES]: {
             data: recentlyPlayedMixes?.data?.items,
@@ -255,7 +271,7 @@ const HomeRoute = () => {
             },
             sortBy: AlbumListSort.RECENTLY_PLAYED,
             sortOrder: SortOrder.DESC,
-            title: t('page.home.recentlyPlayed', { postProcess: 'sentenceCase' }),
+            title: t('page.home.recentlyPlayedMixes', { postProcess: 'sentenceCase' }),
         },
         [HomeItem.RECENTLY_ADDED_MIXES]: {
             data: recentlyAddedMixes?.data?.items,
@@ -265,7 +281,7 @@ const HomeRoute = () => {
             },
             sortBy: AlbumListSort.RECENTLY_ADDED,
             sortOrder: SortOrder.DESC,
-            title: t('page.home.newlyAdded', { postProcess: 'sentenceCase' }),
+            title: t('page.home.newlyAddedMixes', { postProcess: 'sentenceCase' }),
         },
         [HomeItem.MOST_PLAYED_MIXES]: {
             data: mostPlayedMixes?.data?.items,
@@ -275,7 +291,7 @@ const HomeRoute = () => {
             },
             sortBy: SongListSort.PLAY_COUNT,
             sortOrder: SortOrder.DESC,
-            title: t('page.home.mostPlayed', { postProcess: 'sentenceCase' }),
+            title: t('page.home.mostPlayedMixes', { postProcess: 'sentenceCase' }),
         },
     };
 
@@ -347,8 +363,8 @@ const HomeRoute = () => {
                     px="2rem"
                     spacing="lg"
                 >
-                    <FeatureCarousel data={featureItemsWithImage} />
-                    {sortedCarousel.map((carousel) => (
+                    <FeatureCarousel data={featureItemsWithImage} publicNd={publicNd} />
+                    {sortedCarousel.filter((carousel) => { return (carousel.data != null && carousel.data.length > 0)}).map((carousel) => (
                         <MemoizedSwiperGridCarousel
                             key={`carousel-${carousel.uniqueId}`}
                             cardRows={[

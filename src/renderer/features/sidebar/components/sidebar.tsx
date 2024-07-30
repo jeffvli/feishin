@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import {
     SidebarItemType,
     useGeneralSettings,
+    useSettingsStoreActions,
     useWindowSettings,
 } from '../../../store/settings.store';
 import { PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
@@ -21,6 +22,7 @@ import { SidebarPlaylistList } from '/@/renderer/features/sidebar/components/sid
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
+    getPublicServer,
     useAppStoreActions,
     useCurrentServer,
     useCurrentSong,
@@ -77,7 +79,11 @@ export const Sidebar = () => {
     const { windowBarStyle } = useWindowSettings();
     const { sidebarPlaylistList } = useGeneralSettings();
     const imageUrl = useCurrentSong()?.imageUrl;
-    const server = useCurrentServer();
+    const userServer = useCurrentServer();
+    const publicServer = getPublicServer();
+    const { setSettings } = useSettingsStoreActions();
+    const server = userServer ? userServer : publicServer;
+    const { sidebarItems } = useGeneralSettings();
 
     const translatedSidebarItemMap = useMemo(
         () => ({
@@ -130,13 +136,11 @@ export const Sidebar = () => {
 
     const cq = useContainerQuery({ sm: 300 });
 
-    const { sidebarItems } = useGeneralSettings();
-
     const sidebarItemsWithRoute: SidebarItemType[] = useMemo(() => {
         if (!sidebarItems) return [];
 
         const items = sidebarItems
-            .filter((item) => enableSideBarItem(server, item.disabled, item.requiresUserAccount))
+            .filter((item) => enableSideBarItem(userServer, item.disabled, item.requiresUserAccount))
             .map((item) => ({
                 ...item,
                 label:
@@ -145,7 +149,7 @@ export const Sidebar = () => {
             }));
 
         return items;
-    }, [sidebarItems, translatedSidebarItemMap]);
+    }, [sidebarItems, translatedSidebarItemMap, userServer]);
 
     return (
         <SidebarContainer

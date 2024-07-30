@@ -108,9 +108,10 @@ const variants: Variants = {
 
 interface FeatureCarouselProps {
     data: Album[] | undefined;
+    publicNd: boolean;
 }
 
-export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
+export const FeatureCarousel = ({ data, publicNd }: FeatureCarouselProps) => {
     const { t } = useTranslation();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const [itemIndex, setItemIndex] = useState(0);
@@ -225,6 +226,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                                         type: LibraryItem.ALBUM,
                                                     },
                                                     playType,
+                                                    publicNd
                                                 });
                                             }}
                                         >
