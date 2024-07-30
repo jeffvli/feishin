@@ -147,9 +147,9 @@ const MixListRoute = () => {
             <ListContext.Provider value={providerValue}>
                 <SongListHeader
                     genreId={genreId}
-                    serv={server}
                     gridRef={gridRef}
                     itemCount={itemCount}
+                    serv={server}
                     tableRef={tableRef}
                     title={title}
                 />

@@ -226,7 +226,7 @@ export const FeatureCarousel = ({ data, publicNd }: FeatureCarouselProps) => {
                                                         type: LibraryItem.ALBUM,
                                                     },
                                                     playType,
-                                                    publicNd
+                                                    publicNd,
                                                 });
                                             }}
                                         >

@@ -60,7 +60,6 @@ const AlbumDetailRoute = lazy(
     () => import('/@/renderer/features/albums/routes/album-detail-route'),
 );
 
-
 const MixInfoRoute = lazy(() => import('/@/renderer/features/mixes/routes/mix-info-route'));
 const DummyAlbumDetailRoute = lazy(
     () => import('/@/renderer/features/albums/routes/dummy-album-detail-route'),

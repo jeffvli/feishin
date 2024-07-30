@@ -1,12 +1,11 @@
-import { useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Center } from '@mantine/core';
 import isElectron from 'is-electron';
 import { Navigate, Outlet } from 'react-router-dom';
 import { AppRoute } from '/@/renderer/router/routes';
-import { getPublicServer, useAuthStoreActions, useCurrentServer, useSetPlayerFallback } from '/@/renderer/store';
+import { useSetPlayerFallback } from '/@/renderer/store';
 import { Spinner, toast } from '/@/renderer/components';
-import { useServerAuthenticated } from '/@/renderer/hooks/use-server-authenticated';
-import { AuthState, ServerType } from '/@/renderer/types';
+import { AuthState } from '/@/renderer/types';
 import { useAuthenticateServer } from '/@/renderer/hooks/use-authenticate-server';
 
 const ipc = isElectron() ? window.electron.ipc : null;
@@ -15,7 +14,6 @@ const mpvPlayerListener = isElectron() ? window.electron.mpvPlayerListener : nul
 
 export const AppOutlet = () => {
     const authState = useAuthenticateServer();
-
 
     const setFallback = useSetPlayerFallback();
     // const authState = useServerAuthenticated();

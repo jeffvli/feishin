@@ -9,7 +9,6 @@ import {
     RiArrowRightSLine,
     RiLayoutRightLine,
     RiLayoutLeftLine,
-    RiEdit2Line,
     RiSettings3Line,
     RiServerLine,
     RiGithubLine,

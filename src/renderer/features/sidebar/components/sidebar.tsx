@@ -9,7 +9,6 @@ import styled from 'styled-components';
 import {
     SidebarItemType,
     useGeneralSettings,
-    useSettingsStoreActions,
     useWindowSettings,
 } from '../../../store/settings.store';
 import { PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
@@ -31,7 +30,7 @@ import {
     useSidebarStore,
 } from '/@/renderer/store';
 import { fadeIn } from '/@/renderer/styles';
-import { Platform, ServerListItem } from '/@/renderer/types';
+import { Platform } from '/@/renderer/types';
 import { enableSideBarItem } from '/@/renderer/api/utils';
 
 const SidebarContainer = styled.div<{ $windowBarStyle: Platform }>`
@@ -81,8 +80,7 @@ export const Sidebar = () => {
     const imageUrl = useCurrentSong()?.imageUrl;
     const userServer = useCurrentServer();
     const publicServer = getPublicServer();
-    const { setSettings } = useSettingsStoreActions();
-    const server = userServer ? userServer : publicServer;
+    const server = userServer || publicServer;
     const { sidebarItems } = useGeneralSettings();
 
     const translatedSidebarItemMap = useMemo(
@@ -140,7 +138,9 @@ export const Sidebar = () => {
         if (!sidebarItems) return [];
 
         const items = sidebarItems
-            .filter((item) => enableSideBarItem(userServer, item.disabled, item.requiresUserAccount))
+            .filter((item) =>
+                enableSideBarItem(userServer, item.disabled, item.requiresUserAccount),
+            )
             .map((item) => ({
                 ...item,
                 label:

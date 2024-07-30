@@ -175,7 +175,8 @@ interface SongListHeaderFiltersProps {
 
 export const SongListHeaderFilters = ({ gridRef, serv, tableRef }: SongListHeaderFiltersProps) => {
     const { t } = useTranslation();
-    const server = serv ? serv: useCurrentServer();
+    const curServer = useCurrentServer();
+    const server = serv || curServer;
     const { pageKey, handlePlay, customFilters } = useListContext();
     const { display, table, filter, grid } = useListStoreByKey({
         filter: customFilters,

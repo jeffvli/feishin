@@ -42,19 +42,21 @@ export const authenticationFailure = (currentServer: ServerListItem | null) => {
     }
 };
 
-export const enableSideBarItem = (server: ServerListItem | null, disabled: boolean, requiresUserAccount: boolean) => {
+export const enableSideBarItem = (
+    server: ServerListItem | null,
+    disabled: boolean,
+    requiresUserAccount: boolean,
+) => {
     if (disabled) {
-        return false
+        return false;
     }
     if (requiresUserAccount) {
         if (!server) {
-            return false
+            return false;
         }
     }
-    return true
-}
-
-
+    return true;
+};
 
 export const hasFeature = (server: ServerListItem | null, feature: ServerFeature): boolean => {
     if (!server || !server.features) {

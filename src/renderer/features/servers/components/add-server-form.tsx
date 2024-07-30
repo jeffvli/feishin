@@ -74,7 +74,6 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 });
             }
 
-
             const serverItem = {
                 credential: data.credential,
                 id: nanoid(),
@@ -89,7 +88,6 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
             addServer(serverItem);
             setCurrentServer(serverItem);
-
 
             closeAllModals();
 

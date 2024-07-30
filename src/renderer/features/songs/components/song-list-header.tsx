@@ -16,8 +16,8 @@ import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 interface SongListHeaderProps {
     genreId?: string;
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
-    serv?: ServerListItem | null;
     itemCount?: number;
+    serv?: ServerListItem | null;
     tableRef: MutableRefObject<AgGridReactType | null>;
     title?: string;
 }
@@ -31,7 +31,8 @@ export const SongListHeader = ({
     tableRef,
 }: SongListHeaderProps) => {
     const { t } = useTranslation();
-    const server = serv ? serv: useCurrentServer();
+    const curServer = useCurrentServer();
+    const server = serv || curServer;
     const cq = useContainerQuery();
     const genreRef = useRef<string>();
 
@@ -97,8 +98,8 @@ export const SongListHeader = ({
             </PageHeader>
             <FilterBar>
                 <SongListHeaderFilters
-                    serv={server}
                     gridRef={gridRef}
+                    serv={server}
                     tableRef={tableRef}
                 />
             </FilterBar>

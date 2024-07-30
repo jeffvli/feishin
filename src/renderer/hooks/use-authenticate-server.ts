@@ -1,19 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAuthStoreActions, useCurrentServer } from '/@/renderer/store';
-import { AuthState, ServerListItem, ServerType } from '/@/renderer/types';
+import { useCallback, useEffect, useState } from 'react';
+import { useAuthStoreActions } from '/@/renderer/store';
+import { AuthState, ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
-import { AuthenticationResponse, SongListSort, SortOrder } from '/@/renderer/api/types';
+import { AuthenticationResponse } from '/@/renderer/api/types';
 import { debounce } from 'lodash';
 import { toast } from '/@/renderer/components';
 import { nanoid } from 'nanoid';
 import { useTranslation } from 'react-i18next';
 
 export const useAuthenticateServer = () => {
-
     const { t } = useTranslation();
-    const [ready, setReady] = useState(
-        AuthState.LOADING
-    );
+    const [ready, setReady] = useState(AuthState.LOADING);
 
     const { addPublicServer } = useAuthStoreActions();
     const authenticateNavidrome = useCallback(async () => {
@@ -22,39 +19,41 @@ export const useAuthenticateServer = () => {
         // making one request first
         try {
             const publicUrl = `http://localhost:4534`;
-            const publicData: AuthenticationResponse | undefined = await api.controller.authenticate(
-                publicUrl,
-                {
-                    password: 'lajp',
-                    username: 'lajp',
-                },
-                ServerType.NAVIDROME,
-            );
+            const publicData: AuthenticationResponse | undefined =
+                await api.controller.authenticate(
+                    publicUrl,
+                    {
+                        password: 'lajp',
+                        username: 'lajp',
+                    },
+                    ServerType.NAVIDROME,
+                );
 
             if (!publicData) {
-                return toast.error({
+                toast.error({
                     message: t('error.authenticationFailed', { postProcess: 'sentenceCase' }),
                 });
-            }
-            const publicServerItem = {
-                credential: publicData.credential,
-                id: nanoid(),
-                isPublic: true,
-                name: publicData.username,
-                ndCredential: publicData.ndCredential,
-                type: ServerType.NAVIDROME,
-                url: publicUrl.replace(/\/$/, ''),
-                userId: publicData.userId,
-                username: publicData.username,
-            };
-            addPublicServer(publicServerItem);
+            } else {
+                const publicServerItem = {
+                    credential: publicData.credential,
+                    id: nanoid(),
+                    isPublic: true,
+                    name: publicData.username,
+                    ndCredential: publicData.ndCredential,
+                    type: ServerType.NAVIDROME,
+                    url: publicUrl.replace(/\/$/, ''),
+                    userId: publicData.userId,
+                    username: publicData.username,
+                };
+                addPublicServer(publicServerItem);
 
-            setReady(AuthState.VALID);
+                setReady(AuthState.VALID);
+            }
         } catch (error) {
             toast.error({ message: (error as Error).message });
             setReady(AuthState.INVALID);
         }
-    }, []);
+    }, [addPublicServer, t]);
 
     const debouncedAuth = debounce(() => {
         authenticateNavidrome().catch(console.error);
