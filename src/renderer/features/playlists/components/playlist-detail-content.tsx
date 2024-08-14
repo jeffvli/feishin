@@ -215,6 +215,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                     autoFitColumns
                     autoHeight
                     deselectOnClickOutside
+                    shouldUpdateSong
                     stickyHeader
                     suppressCellFocus
                     suppressHorizontalScroll

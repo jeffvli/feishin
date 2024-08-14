@@ -101,6 +101,7 @@ export const SearchContent = ({ tableRef }: SearchContentProps) => {
                 getRowId={(data) => data.data.id}
                 infiniteInitialRowCount={25}
                 rowClassRules={rowClassRules}
+                shouldUpdateSong={itemType === LibraryItem.SONG}
                 onRowDoubleClicked={handleRowDoubleClick}
             />
         </VirtualGridAutoSizerContainer>

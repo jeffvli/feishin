@@ -42,6 +42,8 @@ import { NoteCell } from '/@/renderer/components/virtual-table/cells/note-cell';
 import { RowIndexCell } from '/@/renderer/components/virtual-table/cells/row-index-cell';
 import i18n from '/@/i18n/i18n';
 import { formatDateAbsolute, formatDateRelative, formatSizeString } from '/@/renderer/utils/format';
+import { useTableFavoriteChange } from '/@/renderer/hooks/use-favorite-change';
+import { useTableRatingChange } from '/@/renderer/hooks/use-rating-change';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -475,6 +477,7 @@ export interface VirtualTableProps extends AgGridReactProps {
         pagination: TablePaginationType;
         setPagination: any;
     };
+    shouldUpdateSong?: boolean;
     stickyHeader?: boolean;
     transparentHeader?: boolean;
 }
@@ -492,6 +495,7 @@ export const VirtualTable = forwardRef(
             onGridReady,
             onGridSizeChanged,
             paginationProps,
+            shouldUpdateSong,
             ...rest
         }: VirtualTableProps,
         ref: Ref<AgGridReactType | null>,
@@ -505,6 +509,9 @@ export const VirtualTable = forwardRef(
                 tableRef?.current?.api?.deselectAll();
             }
         });
+
+        useTableFavoriteChange(tableRef, shouldUpdateSong || false);
+        useTableRatingChange(tableRef, shouldUpdateSong || false);
 
         const defaultColumnDefs: ColDef = useMemo(() => {
             return {

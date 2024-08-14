@@ -61,6 +61,7 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
             <VirtualGridAutoSizerContainer>
                 <VirtualTable
                     ref={tableRef}
+                    shouldUpdateSong
                     autoFitColumns={tableConfig.autoFit}
                     columnDefs={columnDefs}
                     context={{
@@ -69,7 +70,7 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
                         song,
                     }}
                     deselectOnClickOutside={fullScreen}
-                    getRowId={(data) => data.data.uniqueId}
+                    getRowId={(data) => data.data.id}
                     rowBuffer={50}
                     rowData={songQuery.data ?? []}
                     rowHeight={tableConfig.rowHeight || 40}
