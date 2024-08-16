@@ -53,7 +53,7 @@ const getAlbumArtistCoverArtUrl = (args: {
         `${args.baseUrl}/Items` +
         `/${args.item.Id}` +
         '/Images/Primary' +
-        `?width=${size}&height=${size}` +
+        `?width=${size}&` +
         '&quality=96'
     );
 };
