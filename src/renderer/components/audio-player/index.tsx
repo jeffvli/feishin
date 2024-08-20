@@ -262,16 +262,19 @@ export const AudioPlayer = forwardRef(
         );
 
         useEffect(() => {
-            if (isElectron()) {
-                if (audioDeviceId) {
-                    player1Ref.current?.getInternalPlayer()?.setSinkId(audioDeviceId);
-                    player2Ref.current?.getInternalPlayer()?.setSinkId(audioDeviceId);
+            // Not standard, just used in chromium-based browsers. See
+            // https://developer.chrome.com/blog/audiocontext-setsinkid/.
+            // If the isElectron() check is every removed, fix this.
+            if (isElectron() && webAudio && 'setSinkId' in webAudio.context) {
+                if (audioDeviceId !== 'default') {
+                    // @ts-ignore
+                    webAudio.context.setSinkId(audioDeviceId);
                 } else {
-                    player1Ref.current?.getInternalPlayer()?.setSinkId('');
-                    player2Ref.current?.getInternalPlayer()?.setSinkId('');
+                    // @ts-ignore
+                    webAudio.context.setSinkId('');
                 }
             }
-        }, [audioDeviceId]);
+        }, [audioDeviceId, webAudio]);
 
         useEffect(() => {
             if (webAudio && player1Source && player1 && currentPlayer === 1) {
