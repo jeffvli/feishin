@@ -26,6 +26,7 @@ const SynchronizedLyricsContainer = styled.div<{ $gap: number }>`
     padding: 10vh 0 50vh;
     overflow: scroll;
     transform: translateY(-2rem);
+    word-break: break-all;
 
     -webkit-mask-image: linear-gradient(
         180deg,
