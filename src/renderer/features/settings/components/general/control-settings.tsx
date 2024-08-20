@@ -235,6 +235,28 @@ export const ControlSettings = () => {
         },
         {
             control: (
+                <Switch
+                    aria-label="Whether double clicking a track should queue all matching songs"
+                    defaultChecked={settings.doubleClickQueueAll}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                doubleClickQueueAll: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.doubleClickBehavior', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.doubleClickBehavior', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
                 <Select
                     data={SIDE_QUEUE_OPTIONS}
                     defaultValue={settings.sideQueueType}

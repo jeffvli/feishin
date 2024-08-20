@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentServer, usePlayerControls, usePlayerStore } from '/@/renderer/store';
-import { usePlaybackType } from '/@/renderer/store/settings.store';
+import { useGeneralSettings, usePlaybackType } from '/@/renderer/store/settings.store';
 import { PlayQueueAddOptions, Play, PlaybackType } from '/@/renderer/types';
 import { toast } from '/@/renderer/components/toast/index';
 import isElectron from 'is-electron';
@@ -65,6 +65,8 @@ export const useHandlePlayQueueAdd = () => {
     const { play } = usePlayerControls();
     const timeoutIds = useRef<Record<string, ReturnType<typeof setTimeout>> | null>({});
 
+    const { doubleClickQueueAll } = useGeneralSettings();
+
     const handlePlayQueueAdd = useCallback(
         async (options: PlayQueueAddOptions) => {
             if (!server) return toast.error({ message: 'No server selected', type: 'error' });
@@ -121,6 +123,12 @@ export const useHandlePlayQueueAdd = () => {
                     } else if (itemType === LibraryItem.SONG) {
                         if (id?.length === 1) {
                             songList = await getSongById({ id: id?.[0], queryClient, server });
+                        } else if (!doubleClickQueueAll && initialSongId) {
+                            songList = await getSongById({
+                                id: initialSongId,
+                                queryClient,
+                                server,
+                            });
                         } else {
                             songList = await getSongsByQuery({ query, queryClient, server });
                         }
@@ -195,7 +203,7 @@ export const useHandlePlayQueueAdd = () => {
 
             return null;
         },
-        [play, playbackType, queryClient, server, t],
+        [doubleClickQueueAll, play, playbackType, queryClient, server, t],
     );
 
     return handlePlayQueueAdd;

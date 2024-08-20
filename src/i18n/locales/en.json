@@ -472,6 +472,8 @@
         "discordRichPresence_description": "enable playback status in {{discord}} rich presence. Image keys are: {{icon}}, {{playing}}, and {{paused}} ",
         "discordUpdateInterval": "{{discord}} rich presence update interval",
         "discordUpdateInterval_description": "the time in seconds between each update (minimum 15 seconds)",
+        "doubleClickBehavior": "queue all tracks when double clicking",
+        "doubleClickBehavior_description": "if true, all matching tracks (e.g. album, playlist, search) will be queued. otherwise, only queue the track clicked",
         "enableRemote": "enable remote control server",
         "enableRemote_description": "enables the remote control server to allow other devices to control the application",
         "externalLinks": "show external links",
