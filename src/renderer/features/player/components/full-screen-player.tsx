@@ -112,8 +112,9 @@ const Controls = () => {
             pos="absolute"
             spacing="sm"
             sx={{
+                background: `rgb(var(--main-bg-transparent), ${opacity}%)`,
                 left: 0,
-                top: 10,
+                top: 0,
             }}
         >
             <Button
