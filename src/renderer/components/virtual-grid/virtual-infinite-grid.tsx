@@ -71,6 +71,7 @@ export const VirtualInfiniteGrid = forwardRef(
     ) => {
         const listRef = useRef<any>(null);
         const loader = useRef<InfiniteLoader>(null);
+        const minItemCount = useRef(0);
 
         // itemData can be a sparse array. Treat the intermediate elements as being undefined
         const [itemData, setItemData] = useState<Array<LibraryItemOrGenre | undefined>>(
@@ -100,8 +101,17 @@ export const VirtualInfiniteGrid = forwardRef(
 
         const loadMoreItems = useCallback(
             async (startIndex: number, stopIndex: number) => {
-                // Fixes a caching bug(?) when switching between filters and the itemCount increases
-                if (startIndex === 1) return;
+                if (
+                    // Fixes a caching bug(?) when switching between filters and the itemCount increases
+                    startIndex === 1 ||
+                    // Fixes a caching bug when refreshing items. Prevents a second
+                    // refetch from happening if:
+                    // 1: we are already in a refresh (-1)
+                    // 2: we just had a refresh, and we are index 0
+                    minItemCount.current === -1 ||
+                    (minItemCount.current > 0 && startIndex === 0)
+                )
+                    return;
 
                 // Need to multiply by columnCount due to the grid layout
                 const start = startIndex * columnCount;
@@ -134,6 +144,7 @@ export const VirtualInfiniteGrid = forwardRef(
             resetLoadMoreItemsCache: () => {
                 if (loader.current) {
                     loader.current.resetloadMoreItemsCache(false);
+                    minItemCount.current = -1;
                     setItemData([]);
                 }
             },
@@ -142,6 +153,7 @@ export const VirtualInfiniteGrid = forwardRef(
             },
             setItemData: (data: LibraryItemOrGenre[]) => {
                 setItemData(data);
+                minItemCount.current = data.length;
             },
             updateItemData: (rule) => {
                 setItemData((data) => data.map((item) => item && rule(item)));

@@ -176,12 +176,18 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
     const onFilterChange = useCallback(
         (filter: AlbumListFilter) => {
             if (isGrid) {
-                handleRefreshGrid(gridRef, filter);
+                handleRefreshGrid(gridRef, {
+                    ...filter,
+                    ...customFilters,
+                });
+            } else {
+                handleRefreshTable(tableRef, {
+                    ...filter,
+                    ...customFilters,
+                });
             }
-
-            handleRefreshTable(tableRef, filter);
         },
-        [gridRef, handleRefreshGrid, handleRefreshTable, isGrid, tableRef],
+        [customFilters, gridRef, handleRefreshGrid, handleRefreshTable, isGrid, tableRef],
     );
 
     const handleOpenFiltersModal = () => {
