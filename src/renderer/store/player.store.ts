@@ -888,8 +888,19 @@ export const usePlayerStore = create<PlayerSlice>()(
                         },
                         setShuffle: (type: PlayerShuffle) => {
                             if (type === PlayerShuffle.NONE) {
+                                const currentSongId = get().current.song?.uniqueId;
+
+                                let currentIndex = 0;
+
+                                if (currentSongId) {
+                                    currentIndex = get().queue.default.findIndex(
+                                        (song) => song.uniqueId === currentSongId,
+                                    );
+                                }
+
                                 set((state) => {
                                     state.shuffle = type;
+                                    state.current.index = currentIndex;
                                     state.queue.shuffled = [];
                                 });
 
