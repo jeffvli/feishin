@@ -71,14 +71,15 @@ export const ControlSettings = () => {
                 <NumberInput
                     defaultValue={settings.albumArtRes || undefined}
                     max={2500}
-                    min={175}
                     placeholder="0"
                     rightSection="px"
+                    value={settings.albumArtRes ?? 0}
                     width={75}
                     onBlur={(e) => {
-                        const newVal = e.currentTarget.value
-                            ? Math.min(Math.max(Number(e.currentTarget.value), 175), 2500)
-                            : null;
+                        const newVal =
+                            e.currentTarget.value !== '0'
+                                ? Math.min(Math.max(Number(e.currentTarget.value), 175), 2500)
+                                : null;
                         setSettings({ general: { ...settings, albumArtRes: newVal } });
                     }}
                 />
@@ -321,6 +322,29 @@ export const ControlSettings = () => {
             }),
             isHidden: false,
             title: t('setting.volumeWheelStep', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <NumberInput
+                    defaultValue={settings.volumeWidth}
+                    max={180}
+                    min={30}
+                    placeholder="0"
+                    rightSection="px"
+                    width={75}
+                    onBlur={(e) => {
+                        setSettings({
+                            general: { ...settings, volumeWidth: Number(e.currentTarget.value) },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.volumeWidth', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.volumeWidth', { postProcess: 'sentenceCase' }),
         },
         {
             control: (

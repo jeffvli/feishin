@@ -220,6 +220,7 @@ export interface SettingsState {
         themeDark: AppTheme;
         themeLight: AppTheme;
         volumeWheelStep: number;
+        volumeWidth: number;
         zoomFactor: number;
     };
     hotkeys: {
@@ -344,6 +345,7 @@ const initialState: SettingsState = {
         themeDark: AppTheme.DEFAULT_DARK,
         themeLight: AppTheme.DEFAULT_LIGHT,
         volumeWheelStep: 5,
+        volumeWidth: 60,
         zoomFactor: 100,
     },
     hotkeys: {

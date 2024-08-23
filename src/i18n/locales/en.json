@@ -621,6 +621,8 @@
         "useSystemTheme_description": "follow the system-defined light or dark preference",
         "volumeWheelStep": "volume wheel step",
         "volumeWheelStep_description": "the amount of volume to change when scrolling the mouse wheel on the volume slider",
+        "volumeWidth": "volume slider width",
+        "volumeWidth_description": "the width of the volume slider",
         "windowBarStyle": "window bar style",
         "windowBarStyle_description": "select the style of the window bar",
         "zoom": "zoom percentage",
