@@ -5,7 +5,9 @@ module.exports = {
     createOldCatalogs: true,
     customValueTemplate: null,
     defaultNamespace: 'translation',
-    defaultValue: '',
+    defaultValue: function (locale, namespace, key, value) {
+        return key;
+    },
     failOnUpdate: false,
     failOnWarnings: false,
     i18nextOptions: null,
@@ -37,8 +39,6 @@ module.exports = {
     output: 'src/renderer/i18n/locales/$LOCALE.json',
     pluralSeparator: '_',
     resetDefaultValueLocale: 'en',
-    skipDefaultValues: false,
     sort: true,
-    useKeysAsDefaultValue: true,
     verbose: false,
 };
