@@ -308,7 +308,7 @@
         "@tanstack/react-query-devtools": "^4.32.1",
         "@tanstack/react-query-persist-client": "^4.32.1",
         "@ts-rest/core": "^3.23.0",
-        "@xhayper/discord-rpc": "^1.0.24",
+        "@xhayper/discord-rpc": "^1.2.0",
         "axios": "^1.6.0",
         "clsx": "^2.0.0",
         "cmdk": "^0.2.0",
