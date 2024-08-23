@@ -45,7 +45,7 @@ export const useDiscordRpc = () => {
             state: (artists && `By ${artists}`) || 'Unknown artist',
             // I would love to use the actual type as opposed to hardcoding to 2,
             // but manually installing the discord-types package appears to break things
-            type: 2,
+            type: discordSettings.showAsListening ? 2 : 0,
         };
 
         if (currentStatus === PlayerStatus.PLAYING) {
@@ -73,7 +73,13 @@ export const useDiscordRpc = () => {
         }
 
         discordRpc?.setActivity(activity);
-    }, [currentSong, currentStatus, discordSettings.enableIdle, discordSettings.showServerImage]);
+    }, [
+        currentSong,
+        currentStatus,
+        discordSettings.enableIdle,
+        discordSettings.showAsListening,
+        discordSettings.showServerImage,
+    ]);
 
     useEffect(() => {
         const initializeDiscordRpc = async () => {

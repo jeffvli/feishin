@@ -181,6 +181,7 @@ export interface SettingsState {
         clientId: string;
         enableIdle: boolean;
         enabled: boolean;
+        showAsListening: boolean;
         showServerImage: boolean;
         updateInterval: number;
     };
@@ -306,6 +307,7 @@ const initialState: SettingsState = {
         clientId: '1165957668758900787',
         enableIdle: false,
         enabled: false,
+        showAsListening: false,
         showServerImage: false,
         updateInterval: 15,
     },

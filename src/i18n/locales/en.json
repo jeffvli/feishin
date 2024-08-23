@@ -468,6 +468,8 @@
         "discordApplicationId_description": "the application id for {{discord}} rich presence (defaults to {{defaultId}})",
         "discordIdleStatus": "show rich presence idle status",
         "discordIdleStatus_description": "when enabled, update status while player is idle",
+        "discordListening": "show status as listening",
+        "discordListening_description": "show status as listening instead of playing. note that this currently breaks timer bar",
         "discordRichPresence": "{{discord}} rich presence",
         "discordRichPresence_description": "enable playback status in {{discord}} rich presence. Image keys are: {{icon}}, {{playing}}, and {{paused}} ",
         "discordUpdateInterval": "{{discord}} rich presence update interval",

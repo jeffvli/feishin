@@ -119,6 +119,29 @@ export const DiscordSettings = () => {
                 postProcess: 'sentenceCase',
             }),
         },
+        {
+            control: (
+                <Switch
+                    checked={settings.showAsListening}
+                    onChange={(e) => {
+                        setSettings({
+                            discord: {
+                                ...settings,
+                                showAsListening: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.discordListening', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.discordListening', {
+                postProcess: 'sentenceCase',
+            }),
+        },
     ];
 
     return <SettingsSection options={discordOptions} />;
