@@ -17,7 +17,9 @@ const CardWrapper = styled.div<{
     cursor: ${({ link }) => link && 'pointer'};
     background: var(--card-default-bg);
     border-radius: var(--card-default-radius);
-    transition: border 0.2s ease-in-out, background 0.2s ease-in-out;
+    transition:
+        border 0.2s ease-in-out,
+        background 0.2s ease-in-out;
 
     &:hover {
         background: var(--card-default-bg-hover);

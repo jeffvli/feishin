@@ -101,10 +101,10 @@ export const crossfadeHandler = (args: {
                 fadeType === 'constantPower'
                     ? 0
                     : fadeType === 'constantPowerSlowFade'
-                    ? 1
-                    : fadeType === 'constantPowerSlowCut'
-                    ? 3
-                    : 10;
+                      ? 1
+                      : fadeType === 'constantPowerSlowCut'
+                        ? 3
+                        : 10;
 
             percentageOfFadeLeft = timeLeft / fadeDuration;
             currentPlayerVolumeCalculation =

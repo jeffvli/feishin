@@ -287,13 +287,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         if (ctx.dataNodes) {
             const nodesToFavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
 
-            const nodesByServerId = nodesToFavorite.reduce((acc, node) => {
-                if (!acc[node.data.serverId]) {
-                    acc[node.data.serverId] = [];
-                }
-                acc[node.data.serverId].push(node);
-                return acc;
-            }, {} as Record<string, RowNode<any>[]>);
+            const nodesByServerId = nodesToFavorite.reduce(
+                (acc, node) => {
+                    if (!acc[node.data.serverId]) {
+                        acc[node.data.serverId] = [];
+                    }
+                    acc[node.data.serverId].push(node);
+                    return acc;
+                },
+                {} as Record<string, RowNode<any>[]>,
+            );
 
             for (const serverId of Object.keys(nodesByServerId)) {
                 const nodes = nodesByServerId[serverId];
@@ -324,13 +327,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             }
         } else {
             const itemsToFavorite = ctx.data.filter((item) => !item.userFavorite);
-            const itemsByServerId = (itemsToFavorite as any[]).reduce((acc, item) => {
-                if (!acc[item.serverId]) {
-                    acc[item.serverId] = [];
-                }
-                acc[item.serverId].push(item);
-                return acc;
-            }, {} as Record<string, AnyLibraryItems>);
+            const itemsByServerId = (itemsToFavorite as any[]).reduce(
+                (acc, item) => {
+                    if (!acc[item.serverId]) {
+                        acc[item.serverId] = [];
+                    }
+                    acc[item.serverId].push(item);
+                    return acc;
+                },
+                {} as Record<string, AnyLibraryItems>,
+            );
 
             for (const serverId of Object.keys(itemsByServerId)) {
                 const items = itemsByServerId[serverId];
@@ -361,13 +367,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         if (ctx.dataNodes) {
             const nodesToUnfavorite = ctx.dataNodes.filter((item) => item.data.userFavorite);
-            const nodesByServerId = nodesToUnfavorite.reduce((acc, node) => {
-                if (!acc[node.data.serverId]) {
-                    acc[node.data.serverId] = [];
-                }
-                acc[node.data.serverId].push(node);
-                return acc;
-            }, {} as Record<string, RowNode<any>[]>);
+            const nodesByServerId = nodesToUnfavorite.reduce(
+                (acc, node) => {
+                    if (!acc[node.data.serverId]) {
+                        acc[node.data.serverId] = [];
+                    }
+                    acc[node.data.serverId].push(node);
+                    return acc;
+                },
+                {} as Record<string, RowNode<any>[]>,
+            );
 
             for (const serverId of Object.keys(nodesByServerId)) {
                 const idsToUnfavorite = nodesByServerId[serverId].map((node) => node.data.id);
@@ -390,13 +399,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             }
         } else {
             const itemsToUnfavorite = ctx.data.filter((item) => item.userFavorite);
-            const itemsByServerId = (itemsToUnfavorite as any[]).reduce((acc, item) => {
-                if (!acc[item.serverId]) {
-                    acc[item.serverId] = [];
-                }
-                acc[item.serverId].push(item);
-                return acc;
-            }, {} as Record<string, AnyLibraryItems>);
+            const itemsByServerId = (itemsToUnfavorite as any[]).reduce(
+                (acc, item) => {
+                    if (!acc[item.serverId]) {
+                        acc[item.serverId] = [];
+                    }
+                    acc[item.serverId].push(item);
+                    return acc;
+                },
+                {} as Record<string, AnyLibraryItems>,
+            );
 
             for (const serverId of Object.keys(itemsByServerId)) {
                 const idsToUnfavorite = itemsByServerId[serverId].map(

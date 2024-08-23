@@ -271,14 +271,14 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                                           postProcess: 'sentenceCase',
                                       })
                                     : repeat === PlayerRepeat.ALL
-                                    ? t('player.repeat', {
-                                          context: 'all',
-                                          postProcess: 'sentenceCase',
-                                      })
-                                    : t('player.repeat', {
-                                          context: 'one',
-                                          postProcess: 'sentenceCase',
-                                      })
+                                      ? t('player.repeat', {
+                                            context: 'all',
+                                            postProcess: 'sentenceCase',
+                                        })
+                                      : t('player.repeat', {
+                                            context: 'one',
+                                            postProcess: 'sentenceCase',
+                                        })
                             }`,
                         }}
                         variant="tertiary"

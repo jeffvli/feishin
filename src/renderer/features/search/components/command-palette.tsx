@@ -18,7 +18,7 @@ import { LibraryItem } from '/@/renderer/api/types';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 
 interface CommandPaletteProps {
-    modalProps: typeof useDisclosure['arguments'];
+    modalProps: (typeof useDisclosure)['arguments'];
 }
 
 const CustomModal = styled(Modal)`

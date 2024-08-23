@@ -24,7 +24,10 @@ const StyledButton = styled(MantineButton)<StyledButtonProps>`
     background: ${(props) => `var(--btn-${props.variant}-bg)`};
     border: ${(props) => `var(--btn-${props.variant}-border)`};
     border-radius: ${(props) => `var(--btn-${props.variant}-radius)`};
-    transition: background 0.2s ease-in-out, color 0.2s ease-in-out, border 0.2s ease-in-out;
+    transition:
+        background 0.2s ease-in-out,
+        color 0.2s ease-in-out,
+        border 0.2s ease-in-out;
 
     svg {
         fill: ${(props) => `var(--btn-${props.variant}-fg)`};

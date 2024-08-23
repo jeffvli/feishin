@@ -25,8 +25,8 @@ const SynchronizedLyricsContainer = styled.div<{ $gap: number }>`
     height: 100%;
     padding: 10vh 0 50vh;
     overflow: scroll;
-    transform: translateY(-2rem);
     word-break: break-word;
+    transform: translateY(-2rem);
 
     -webkit-mask-image: linear-gradient(
         180deg,
@@ -180,9 +180,12 @@ export const SynchronizedLyrics = ({
 
                 const elapsed = performance.now() - start;
 
-                lyricTimer.current = setTimeout(() => {
-                    setCurrentLyric(nextTime, nextEpoch, index + 1);
-                }, nextTime - timeInMs - elapsed);
+                lyricTimer.current = setTimeout(
+                    () => {
+                        setCurrentLyric(nextTime, nextEpoch, index + 1);
+                    },
+                    nextTime - timeInMs - elapsed,
+                );
             }
         },
         [],

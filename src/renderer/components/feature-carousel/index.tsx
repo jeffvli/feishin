@@ -232,8 +232,8 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                                 playType === Play.NOW
                                                     ? 'player.play'
                                                     : playType === Play.NEXT
-                                                    ? 'player.addNext'
-                                                    : 'player.addLast',
+                                                      ? 'player.addNext'
+                                                      : 'player.addLast',
                                                 { postProcess: 'titleCase' },
                                             )}
                                         </Button>

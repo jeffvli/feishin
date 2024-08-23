@@ -200,18 +200,21 @@ export const HotkeyManagerSettings = () => {
     );
 
     const duplicateHotkeyMap = useMemo(() => {
-        const countPerHotkey = Object.values(bindings).reduce((acc, key) => {
-            const hotkey = key.hotkey;
-            if (!hotkey) return acc;
+        const countPerHotkey = Object.values(bindings).reduce(
+            (acc, key) => {
+                const hotkey = key.hotkey;
+                if (!hotkey) return acc;
 
-            if (acc[hotkey]) {
-                acc[hotkey] += 1;
-            } else {
-                acc[hotkey] = 1;
-            }
+                if (acc[hotkey]) {
+                    acc[hotkey] += 1;
+                } else {
+                    acc[hotkey] = 1;
+                }
 
-            return acc;
-        }, {} as Record<string, number>);
+                return acc;
+            },
+            {} as Record<string, number>,
+        );
 
         const duplicateKeys = Object.keys(countPerHotkey).filter((key) => countPerHotkey[key] > 1);
 

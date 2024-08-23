@@ -625,8 +625,8 @@ if (mprisPlayer) {
             event === 'Playlist'
                 ? PlayerRepeat.ALL
                 : event === 'Track'
-                ? PlayerRepeat.ONE
-                : PlayerRepeat.NONE;
+                  ? PlayerRepeat.ONE
+                  : PlayerRepeat.NONE;
 
         currentState.repeat = repeat;
         broadcast({ data: repeat, event: 'repeat' });

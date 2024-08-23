@@ -411,8 +411,8 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 currentPlayer === 1
                                     ? queue[currentIndex]
                                     : nextSongIndex !== undefined
-                                    ? queue[nextSongIndex]
-                                    : undefined;
+                                      ? queue[nextSongIndex]
+                                      : undefined;
 
                             player2 =
                                 currentPlayer === 1

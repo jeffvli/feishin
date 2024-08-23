@@ -116,8 +116,8 @@ const StyledPlayerButton = styled(UnstyledButton)<StyledPlayerButtonProps>`
         variant === 'main'
             ? ButtonMainVariant
             : variant === 'secondary'
-            ? ButtonSecondaryVariant
-            : ButtonTertiaryVariant};
+              ? ButtonSecondaryVariant
+              : ButtonTertiaryVariant};
 `;
 
 export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(

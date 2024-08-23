@@ -113,8 +113,8 @@ export const RemoteContainer = () => {
                         repeat === PlayerRepeat.ONE
                             ? 'One'
                             : repeat === PlayerRepeat.ALL
-                            ? 'all'
-                            : 'none'
+                              ? 'all'
+                              : 'none'
                     }`}
                     variant="default"
                     onClick={() => send({ event: 'repeat' })}
