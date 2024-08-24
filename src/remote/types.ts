@@ -2,6 +2,7 @@ import type { QueueSong } from '/@/renderer/api/types';
 import type { PlayerRepeat, PlayerStatus, SongState } from '/@/renderer/types';
 
 export interface SongUpdateSocket extends Omit<SongState, 'song'> {
+    position?: number;
     song?: QueueSong | null;
 }
 
@@ -20,6 +21,10 @@ export interface ServerPlayStatus {
     event: 'playback';
 }
 
+export interface ServerPosition {
+    data: number;
+    event: 'position';
+}
 export interface ServerProxy {
     data: string;
     event: 'proxy';
@@ -59,6 +64,7 @@ export type ServerEvent =
     | ServerError
     | ServerFavorite
     | ServerPlayStatus
+    | ServerPosition
     | ServerRating
     | ServerRepeat
     | ServerShuffle
@@ -93,8 +99,14 @@ export interface ClientAuth {
     header: string;
 }
 
+export interface ClientPosition {
+    event: 'position';
+    position: number;
+}
+
 export type ClientEvent =
     | ClientAuth
+    | ClientPosition
     | ClientSimpleEvent
     | ClientFavorite
     | ClientRating

@@ -131,16 +131,15 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const formattedTime = formatDuration(currentTime * 1000 || 0);
 
     useEffect(() => {
-        let interval: any;
+        let interval: ReturnType<typeof setInterval>;
 
         if (status === PlayerStatus.PLAYING && !isSeeking) {
             if (!isElectron() || playbackType === PlaybackType.WEB) {
+                // Update twice a second for slightly better performance
                 interval = setInterval(() => {
                     setCurrentTime(currentPlayerRef.getCurrentTime());
-                }, 1000);
+                }, 500);
             }
-        } else {
-            clearInterval(interval);
         }
 
         return () => clearInterval(interval);

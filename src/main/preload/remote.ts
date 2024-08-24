@@ -84,6 +84,10 @@ const updateVolume = (volume: number) => {
     ipcRenderer.send('update-volume', volume);
 };
 
+const updatePosition = (timeSec: number) => {
+    ipcRenderer.send('update-position', timeSec);
+};
+
 export const remote = {
     requestFavorite,
     requestPosition,
@@ -95,6 +99,7 @@ export const remote = {
     updateFavorite,
     updatePassword,
     updatePlayback,
+    updatePosition,
     updateRating,
     updateRepeat,
     updateSetting,

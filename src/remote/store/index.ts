@@ -139,6 +139,12 @@ export const useRemoteStore = create<SettingsSlice>()(
                                         });
                                         break;
                                     }
+                                    case 'position': {
+                                        set((state) => {
+                                            state.info.position = data;
+                                        });
+                                        break;
+                                    }
                                     case 'proxy': {
                                         set((state) => {
                                             if (state.info.song) {

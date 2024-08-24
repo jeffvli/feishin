@@ -21,7 +21,7 @@ import { Tooltip } from '/@/renderer/components/tooltip';
 import { Rating } from '/@/renderer/components/rating';
 
 export const RemoteContainer = () => {
-    const { repeat, shuffle, song, status, volume } = useInfo();
+    const { position, repeat, shuffle, song, status, volume } = useInfo();
     const send = useSend();
     const showImage = useShowImage();
 
@@ -154,6 +154,16 @@ export const RemoteContainer = () => {
                     </div>
                 )}
             </Group>
+            {id && position !== undefined && (
+                <WrapperSlider
+                    label={(value) => formatDuration(value * 1e3)}
+                    leftLabel={formatDuration(position * 1e3)}
+                    max={song.duration / 1e3}
+                    rightLabel={formatDuration(song.duration)}
+                    value={position}
+                    onChangeEnd={(e) => send({ event: 'position', position: e })}
+                />
+            )}
             <WrapperSlider
                 leftLabel={<RiVolumeUpFill size={20} />}
                 max={100}

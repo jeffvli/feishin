@@ -669,11 +669,11 @@ export const useCenterControls = (args: { playersRef: any }) => {
     ]);
 
     useEffect(() => {
-        if (utils?.isLinux()) {
+        if (remote) {
             const unsubCurrentTime = usePlayerStore.subscribe(
                 (state) => state.current.time,
                 (time) => {
-                    mpris?.updatePosition(time);
+                    remote.updatePosition(time);
                 },
             );
 

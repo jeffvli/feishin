@@ -212,6 +212,7 @@ export type GridCardData = {
 };
 
 export type SongState = {
+    position?: number;
     repeat?: PlayerRepeat;
     shuffle?: boolean;
     song?: QueueSong;
