@@ -266,12 +266,16 @@ export const AudioPlayer = forwardRef(
             // https://developer.chrome.com/blog/audiocontext-setsinkid/.
             // If the isElectron() check is every removed, fix this.
             if (isElectron() && webAudio && 'setSinkId' in webAudio.context) {
-                if (audioDeviceId !== 'default') {
-                    // @ts-ignore
-                    webAudio.context.setSinkId(audioDeviceId);
-                } else {
-                    // @ts-ignore
-                    webAudio.context.setSinkId('');
+                try {
+                    if (audioDeviceId !== 'default') {
+                        // @ts-ignore
+                        webAudio.context.setSinkId(audioDeviceId);
+                    } else {
+                        // @ts-ignore
+                        webAudio.context.setSinkId('');
+                    }
+                } catch (error) {
+                    toast.error({ message: `Error setting sink: ${(error as Error).message}` });
                 }
             }
         }, [audioDeviceId, webAudio]);
