@@ -226,6 +226,15 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    movePlaylistItem: {
+        body: null,
+        method: 'POST',
+        path: 'playlists/:playlistId/items/:itemId/move/:newIdx',
+        responses: {
+            200: jfType._response.moveItem,
+            400: jfType._response.error,
+        },
+    },
     removeFavorite: {
         body: jfType._parameters.favorite,
         method: 'DELETE',

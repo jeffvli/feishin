@@ -49,6 +49,7 @@ import {
     ShareItemResponse,
     SimilarSongsArgs,
     Song,
+    MoveItemArgs,
 } from '../types';
 import { VersionInfo, getFeatures, hasFeature } from '/@/renderer/api/utils';
 import { ServerFeature, ServerFeatures } from '/@/renderer/api/features-types';
@@ -613,6 +614,24 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
     }, []);
 };
 
+const movePlaylistItem = async (args: MoveItemArgs): Promise<void> => {
+    const { apiClientProps, query } = args;
+
+    const res = await ndApiClient(apiClientProps).movePlaylistItem({
+        body: {
+            insert_before: (query.endingIndex + 1).toString(),
+        },
+        params: {
+            playlistId: query.playlistId,
+            trackNumber: query.startingIndex.toString(),
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to move item in playlist');
+    }
+};
+
 export const ndController = {
     addToPlaylist,
     authenticate,
@@ -631,6 +650,7 @@ export const ndController = {
     getSongDetail,
     getSongList,
     getUserList,
+    movePlaylistItem,
     removeFromPlaylist,
     shareItem,
     updatePlaylist,

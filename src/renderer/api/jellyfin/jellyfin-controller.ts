@@ -53,6 +53,7 @@ import {
     ServerInfoArgs,
     SimilarSongsArgs,
     Song,
+    MoveItemArgs,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -1025,6 +1026,23 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
     }, []);
 };
 
+const movePlaylistItem = async (args: MoveItemArgs): Promise<void> => {
+    const { apiClientProps, query } = args;
+
+    const res = await jfApiClient(apiClientProps).movePlaylistItem({
+        body: null,
+        params: {
+            itemId: query.trackId,
+            newIdx: query.endingIndex.toString(),
+            playlistId: query.playlistId,
+        },
+    });
+
+    if (res.status !== 204) {
+        throw new Error('Failed to move item in playlist');
+    }
+};
+
 export const jfController = {
     addToPlaylist,
     authenticate,
@@ -1049,6 +1067,7 @@ export const jfController = {
     getSongDetail,
     getSongList,
     getTopSongList,
+    movePlaylistItem,
     removeFromPlaylist,
     scrobble,
     search,

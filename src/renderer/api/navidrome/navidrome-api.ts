@@ -147,6 +147,15 @@ export const contract = c.router({
             500: resultWithHeaders(ndType._response.error),
         },
     },
+    movePlaylistItem: {
+        body: ndType._parameters.moveItem,
+        method: 'PUT',
+        path: 'playlist/:playlistId/tracks/:trackNumber',
+        responses: {
+            200: resultWithHeaders(ndType._response.moveItem),
+            400: resultWithHeaders(ndType._response.error),
+        },
+    },
     removeFromPlaylist: {
         body: null,
         method: 'DELETE',

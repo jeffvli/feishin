@@ -57,6 +57,7 @@ import type {
     Song,
     ServerType,
     ShareItemResponse,
+    MoveItemArgs,
 } from '/@/renderer/api/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
 import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
@@ -100,6 +101,7 @@ export type ControllerEndpoint = Partial<{
     getStructuredLyrics: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getUserList: (args: UserListArgs) => Promise<UserListResponse>;
+    movePlaylistItem: (args: MoveItemArgs) => Promise<void>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
     scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
     search: (args: SearchArgs) => Promise<SearchResponse>;
@@ -148,6 +150,7 @@ const endpoints: ApiController = {
         getStructuredLyrics: undefined,
         getTopSongs: jfController.getTopSongList,
         getUserList: undefined,
+        movePlaylistItem: jfController.movePlaylistItem,
         removeFromPlaylist: jfController.removeFromPlaylist,
         scrobble: jfController.scrobble,
         search: jfController.search,
@@ -188,6 +191,7 @@ const endpoints: ApiController = {
         getStructuredLyrics: ssController.getStructuredLyrics,
         getTopSongs: ssController.getTopSongList,
         getUserList: ndController.getUserList,
+        movePlaylistItem: ndController.movePlaylistItem,
         removeFromPlaylist: ndController.removeFromPlaylist,
         scrobble: ssController.scrobble,
         search: ssController.search3,
@@ -541,6 +545,15 @@ const getSimilarSongs = async (args: SimilarSongsArgs) => {
     )?.(args);
 };
 
+const movePlaylistItem = async (args: MoveItemArgs) => {
+    return (
+        apiController(
+            'movePlaylistItem',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['movePlaylistItem']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -567,6 +580,7 @@ export const controller = {
     getStructuredLyrics,
     getTopSongList,
     getUserList,
+    movePlaylistItem,
     removeFromPlaylist,
     scrobble,
     search,

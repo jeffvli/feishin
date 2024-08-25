@@ -375,6 +375,9 @@
             "copiedPath": "path copied successfully",
             "openFile": "show track in file manager"
         },
+        "playlist": {
+            "reorder": "reordering only enabled when sorting by id"
+        },
         "playlistList": {
             "title": "$t(entity.playlist_other)"
         },
