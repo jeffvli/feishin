@@ -2,19 +2,19 @@ import { useCallback, useMemo, useState } from 'react';
 import { Box, Flex, Group } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useTranslation } from 'react-i18next';
-import { RiAddBoxFill, RiAddCircleFill, RiPlayFill } from 'react-icons/ri';
+import { RiAddBoxFill, RiAddCircleFill, RiPlayFill, RiPlayListAddFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import { LibraryItem, Playlist } from '/@/renderer/api/types';
-import { Button, Text } from '/@/renderer/components';
+import { Button, Text, toast } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { usePlaylistList } from '/@/renderer/features/playlists';
+import { useAddToPlaylist, usePlaylistList } from '/@/renderer/features/playlists';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Play } from '/@/renderer/types';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useHideScrollbar } from '/@/renderer/hooks';
-import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
+import { useCurrentServer, useGeneralSettings, useCurrentSong } from '/@/renderer/store';
 
 interface SidebarPlaylistListProps {
     data: ReturnType<typeof usePlaylistList>['data'];
@@ -84,6 +84,24 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                     right="0"
                     spacing="sm"
                 >
+                    {!data?.items?.[index].rules && ( // hide button on smart playlists
+                        <Button
+                            compact
+                            size="md"
+                            tooltip={{
+                                label: t('action.addCurrentSong', { postProcess: 'sentenceCase' }),
+                                openDelay: 500,
+                            }}
+                            variant="default"
+                            onClick={() => {
+                                if (!data?.items?.[index].id) return;
+                                data.handleAdd(data?.items[index]);
+                            }}
+                        >
+                            <RiPlayListAddFill />
+                        </Button>
+                    )}
+
                     <Button
                         compact
                         size="md"
@@ -136,10 +154,16 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
 };
 
 export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
+    const { t } = useTranslation();
+
     const { isScrollbarHidden, hideScrollbarElementProps } = useHideScrollbar(0);
     const handlePlayQueueAdd = usePlayQueueAdd();
+    const addToPlaylistMutation = useAddToPlaylist({});
+
     const { defaultFullPlaylist } = useGeneralSettings();
-    const { type, username } = useCurrentServer() || {};
+    const { id: serverID, type, username } = useCurrentServer() || {};
+
+    const currentSong = useCurrentSong();
 
     const [rect, setRect] = useState({
         height: 0,
@@ -161,8 +185,44 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
         [handlePlayQueueAdd],
     );
 
+    const handleAddCurrent = useCallback(
+        (playlist: Playlist) => {
+            if (!currentSong) return;
+
+            addToPlaylistMutation.mutate(
+                {
+                    body: { songId: [currentSong.id] },
+                    query: { id: playlist.id },
+                    serverId: serverID,
+                },
+                {
+                    onError: (err) => {
+                        toast.error({
+                            message: `[${playlist?.name}] ${err.message}`,
+                            title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                        });
+                    },
+                    onSuccess: () => {
+                        toast.success({
+                            message: t('form.addToPlaylist.success', {
+                                message: 1,
+                                numOfPlaylists: 1,
+                                postProcess: 'sentenceCase',
+                            }),
+                        });
+                    },
+                },
+            );
+        },
+        [addToPlaylistMutation, currentSong, serverID, t],
+    );
+
     const memoizedItemData = useMemo(() => {
-        const base = { defaultFullPlaylist, handlePlay: handlePlayPlaylist };
+        const base = {
+            defaultFullPlaylist,
+            handleAdd: handleAddCurrent,
+            handlePlay: handlePlayPlaylist,
+        };
 
         if (!type || !username || !data?.items) {
             return { ...base, items: data?.items };
@@ -185,7 +245,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
         }
 
         return { ...base, items: owned.concat(shared) };
-    }, [data?.items, defaultFullPlaylist, handlePlayPlaylist, type, username]);
+    }, [data?.items, defaultFullPlaylist, handleAddCurrent, handlePlayPlaylist, type, username]);
 
     return (
         <Flex
