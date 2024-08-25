@@ -265,18 +265,22 @@ export const AudioPlayer = forwardRef(
             // Not standard, just used in chromium-based browsers. See
             // https://developer.chrome.com/blog/audiocontext-setsinkid/.
             // If the isElectron() check is every removed, fix this.
-            if (isElectron() && webAudio && 'setSinkId' in webAudio.context) {
-                try {
-                    if (audioDeviceId !== 'default') {
-                        // @ts-ignore
-                        webAudio.context.setSinkId(audioDeviceId);
-                    } else {
-                        // @ts-ignore
-                        webAudio.context.setSinkId('');
+            if (isElectron() && webAudio && 'setSinkId' in webAudio.context && audioDeviceId) {
+                const setSink = async () => {
+                    try {
+                        if (audioDeviceId !== 'default') {
+                            // @ts-ignore
+                            await webAudio.context.setSinkId(audioDeviceId);
+                        } else {
+                            // @ts-ignore
+                            await webAudio.context.setSinkId('');
+                        }
+                    } catch (error) {
+                        toast.error({ message: `Error setting sink: ${(error as Error).message}` });
                     }
-                } catch (error) {
-                    toast.error({ message: `Error setting sink: ${(error as Error).message}` });
-                }
+                };
+
+                setSink();
             }
         }, [audioDeviceId, webAudio]);
 
