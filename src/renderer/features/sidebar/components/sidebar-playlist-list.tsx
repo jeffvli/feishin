@@ -7,6 +7,7 @@ import {
     RiAddCircleFill,
     RiArrowDownSLine,
     RiArrowUpSLine,
+    RiMoreFill,
     RiPlayFill,
 } from 'react-icons/ri';
 import { generatePath } from 'react-router';
@@ -21,6 +22,8 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { useHideScrollbar } from '/@/renderer/hooks';
 import { useCurrentServer, useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { openContextMenu } from '/@/renderer/features/context-menu';
+import { PLAYLIST_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 
 interface SidebarPlaylistListProps {
     data: ReturnType<typeof usePlaylistList>['data'];
@@ -155,6 +158,28 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                         }}
                     >
                         <RiAddCircleFill />
+                    </Button>
+                    <Button
+                        compact
+                        size="md"
+                        variant="default"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            if (!data?.items?.[index].id) return;
+
+                            openContextMenu({
+                                data: [data?.items?.[index]],
+                                dataNodes: undefined,
+                                menuItems: PLAYLIST_CONTEXT_MENU_ITEMS,
+                                type: LibraryItem.PLAYLIST,
+                                xPos: e.clientX + 15,
+                                yPos: e.clientY + 5,
+                            });
+                        }}
+                    >
+                        <RiMoreFill color="white" />
                     </Button>
                 </Group>
             </Group>
