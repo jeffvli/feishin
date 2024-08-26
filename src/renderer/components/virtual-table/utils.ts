@@ -1,11 +1,16 @@
 import { GridApi, RowNode } from '@ag-grid-community/core';
 
-export const getNodesByDiscNumber = (args: { api: GridApi; discNumber: number }) => {
-    const { api, discNumber } = args;
+export const getNodesByDiscNumber = (args: {
+    api: GridApi;
+    discNumber: number;
+    subtitle: string | null;
+}) => {
+    const { api, discNumber, subtitle } = args;
 
     const nodes: RowNode<any>[] = [];
     api.forEachNode((node) => {
-        if (node.data.discNumber === discNumber) nodes.push(node);
+        if (node.data.discNumber === discNumber && node.data.discSubtitle === subtitle)
+            nodes.push(node);
     });
 
     return nodes;
