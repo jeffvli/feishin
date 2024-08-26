@@ -22,11 +22,11 @@
         height: 175px;
     }
 
-    @container (min-width: 600px) {
+    @container (max-width: 599px) {
         grid-template-columns: 175px minmax(0, 1fr);
 
         h1 {
-            font-size: 3rem;
+            height: 40px;
         }
 
         .image {
@@ -44,7 +44,7 @@
         grid-template-columns: 200px minmax(0, 1fr);
 
         h1 {
-            font-size: 3.5rem;
+            height: 80px;
         }
 
         .image {
@@ -62,7 +62,7 @@
         grid-template-columns: 225px minmax(0, 1fr);
 
         h1 {
-            font-size: 4.5rem;
+            height: 100px;
         }
 
         .image {
@@ -80,7 +80,7 @@
         grid-template-columns: 250px minmax(0, 1fr);
 
         h1 {
-            font-size: 5rem;
+            height: 150px;
         }
 
         .image {
@@ -96,7 +96,7 @@
 
     @container (min-width: 1500px) {
         h1 {
-            font-size: 5.5rem;
+            height: 150px;
         }
     }
 }
