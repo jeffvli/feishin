@@ -364,6 +364,10 @@ const createWindow = async (first = true) => {
         }
     });
 
+    ipcMain.on('download-url', (_event, url: string) => {
+        mainWindow?.webContents.downloadURL(url);
+    });
+
     const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
 
     if (globalMediaKeysEnabled) {

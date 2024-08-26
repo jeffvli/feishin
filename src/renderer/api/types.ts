@@ -1202,3 +1202,11 @@ export type MoveItemQuery = {
 export type MoveItemArgs = {
     query: MoveItemQuery;
 } & BaseEndpointArgs;
+
+export type DownloadQuery = {
+    id: string;
+};
+
+export type DownloadArgs = {
+    query: DownloadQuery;
+} & BaseEndpointArgs;

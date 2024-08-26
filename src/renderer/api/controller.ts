@@ -58,6 +58,7 @@ import type {
     ServerType,
     ShareItemResponse,
     MoveItemArgs,
+    DownloadArgs,
 } from '/@/renderer/api/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
 import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
@@ -83,6 +84,7 @@ export type ControllerEndpoint = Partial<{
     getArtistDetail: () => void;
     getArtistInfo: (args: any) => void;
     getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse>;
+    getDownloadUrl: (args: DownloadArgs) => string;
     getFavoritesList: () => void;
     getFolderItemList: () => void;
     getFolderList: () => void;
@@ -132,6 +134,7 @@ const endpoints: ApiController = {
         getArtistDetail: undefined,
         getArtistInfo: undefined,
         getArtistList: undefined,
+        getDownloadUrl: jfController.getDownloadUrl,
         getFavoritesList: undefined,
         getFolderItemList: undefined,
         getFolderList: undefined,
@@ -173,6 +176,7 @@ const endpoints: ApiController = {
         getArtistDetail: undefined,
         getArtistInfo: undefined,
         getArtistList: undefined,
+        getDownloadUrl: ssController.getDownloadUrl,
         getFavoritesList: undefined,
         getFolderItemList: undefined,
         getFolderList: undefined,
@@ -213,6 +217,7 @@ const endpoints: ApiController = {
         getArtistDetail: undefined,
         getArtistInfo: undefined,
         getArtistList: undefined,
+        getDownloadUrl: ssController.getDownloadUrl,
         getFavoritesList: undefined,
         getFolderItemList: undefined,
         getFolderList: undefined,
@@ -554,6 +559,15 @@ const movePlaylistItem = async (args: MoveItemArgs) => {
     )?.(args);
 };
 
+const getDownloadUrl = (args: DownloadArgs) => {
+    return (
+        apiController(
+            'getDownloadUrl',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getDownloadUrl']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -566,6 +580,7 @@ export const controller = {
     getAlbumDetail,
     getAlbumList,
     getArtistList,
+    getDownloadUrl,
     getGenreList,
     getLyrics,
     getMusicFolderList,

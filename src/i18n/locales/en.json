@@ -318,6 +318,7 @@
             "createPlaylist": "$t(action.createPlaylist)",
             "deletePlaylist": "$t(action.deletePlaylist)",
             "deselectAll": "$t(action.deselectAll)",
+            "download": "download",
             "moveToBottom": "$t(action.moveToBottom)",
             "moveToTop": "$t(action.moveToTop)",
             "numberSelected": "{{count}} selected",
