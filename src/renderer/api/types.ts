@@ -164,6 +164,7 @@ export type Album = {
     lastPlayedAt: string | null;
     mbzId: string | null;
     name: string;
+    originalDate: string | null;
     playCount: number | null;
     releaseDate: string | null;
     releaseYear: number | null;

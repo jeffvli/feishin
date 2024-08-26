@@ -119,7 +119,10 @@ const normalizeSong = (
                 : null,
         playCount: item.playCount,
         playlistItemId,
-        releaseDate: new Date(item.year, 0, 1).toISOString(),
+        releaseDate: (item.releaseDate
+            ? new Date(item.releaseDate)
+            : new Date(item.year, 0, 1)
+        ).toISOString(),
         releaseYear: String(item.year),
         serverId: server?.id || 'unknown',
         serverType: ServerType.NAVIDROME,
@@ -173,8 +176,16 @@ const normalizeAlbum = (
         lastPlayedAt: normalizePlayDate(item),
         mbzId: item.mbzAlbumId || null,
         name: item.name,
+        originalDate: item.originalDate
+            ? new Date(item.originalDate).toISOString()
+            : item.originalYear
+              ? new Date(item.originalYear, 0, 1).toISOString()
+              : null,
         playCount: item.playCount,
-        releaseDate: new Date(item.minYear, 0, 1).toISOString(),
+        releaseDate: (item.releaseDate
+            ? new Date(item.releaseDate)
+            : new Date(item.minYear, 0, 1)
+        ).toISOString(),
         releaseYear: item.minYear,
         serverId: server?.id || 'unknown',
         serverType: ServerType.NAVIDROME,

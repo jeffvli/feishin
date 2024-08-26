@@ -175,8 +175,11 @@ const normalizeSong = (
         peak: null,
         playCount: (item.UserData && item.UserData.PlayCount) || 0,
         playlistItemId: item.PlaylistItemId,
-        // releaseDate: (item.ProductionYear && new Date(item.ProductionYear, 0, 1).toISOString()) || null,
-        releaseDate: null,
+        releaseDate: item.PremiereDate
+            ? new Date(item.PremiereDate).toISOString()
+            : item.ProductionYear
+              ? new Date(item.ProductionYear, 0, 1).toISOString()
+              : null,
         releaseYear: item.ProductionYear ? String(item.ProductionYear) : null,
         serverId: server?.id || '',
         serverType: ServerType.JELLYFIN,
@@ -237,6 +240,7 @@ const normalizeAlbum = (
         lastPlayedAt: null,
         mbzId: item.ProviderIds?.MusicBrainzAlbum || null,
         name: item.Name,
+        originalDate: null,
         playCount: item.UserData?.PlayCount || 0,
         releaseDate: item.PremiereDate?.split('T')[0] || null,
         releaseYear: item.ProductionYear || null,

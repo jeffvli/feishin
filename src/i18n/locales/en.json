@@ -290,7 +290,8 @@
         },
         "albumDetail": {
             "moreFromArtist": "more from this $t(entity.artist_one)",
-            "moreFromGeneric": "more from {{item}}"
+            "moreFromGeneric": "more from {{item}}",
+            "released": "released"
         },
         "albumList": {
             "artistAlbums": "albums by {{artist}}",
