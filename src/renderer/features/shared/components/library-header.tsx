@@ -1,5 +1,6 @@
 import { forwardRef, ReactNode, Ref, useState } from 'react';
 import { Group } from '@mantine/core';
+import { AutoTextSize } from 'auto-text-size';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styles from './library-header.module.scss';
@@ -81,7 +82,9 @@ export const LibraryHeader = forwardRef(
                             {itemTypeString()}
                         </Text>
                     </Group>
-                    <h1 className={styles.title}>{title}</h1>
+                    <h1 className={styles.title}>
+                        <AutoTextSize mode="box">{title}</AutoTextSize>
+                    </h1>
                     {children}
                 </div>
             </div>
