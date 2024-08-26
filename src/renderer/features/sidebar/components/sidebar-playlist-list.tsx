@@ -7,7 +7,6 @@ import {
     RiAddCircleFill,
     RiArrowDownSLine,
     RiArrowUpSLine,
-    RiMoreFill,
     RiPlayFill,
 } from 'react-icons/ri';
 import { generatePath } from 'react-router';
@@ -75,7 +74,24 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
         : undefined;
 
     return (
-        <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
+        <div
+            style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}
+            onContextMenu={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (!data?.items?.[index].id) return;
+
+                openContextMenu({
+                    data: [data?.items?.[index]],
+                    dataNodes: undefined,
+                    menuItems: PLAYLIST_CONTEXT_MENU_ITEMS,
+                    type: LibraryItem.PLAYLIST,
+                    xPos: e.clientX + 15,
+                    yPos: e.clientY + 5,
+                });
+            }}
+        >
             <Group
                 noWrap
                 className="sidebar-playlist-item"
@@ -158,28 +174,6 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
                         }}
                     >
                         <RiAddCircleFill />
-                    </Button>
-                    <Button
-                        compact
-                        size="md"
-                        variant="default"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-
-                            if (!data?.items?.[index].id) return;
-
-                            openContextMenu({
-                                data: [data?.items?.[index]],
-                                dataNodes: undefined,
-                                menuItems: PLAYLIST_CONTEXT_MENU_ITEMS,
-                                type: LibraryItem.PLAYLIST,
-                                xPos: e.clientX + 15,
-                                yPos: e.clientY + 5,
-                            });
-                        }}
-                    >
-                        <RiMoreFill color="white" />
                     </Button>
                 </Group>
             </Group>
