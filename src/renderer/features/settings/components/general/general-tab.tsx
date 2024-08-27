@@ -8,6 +8,7 @@ import { CacheSettings } from '/@/renderer/features/settings/components/window/c
 import isElectron from 'is-electron';
 import { HomeSettings } from '/@/renderer/features/settings/components/general/home-settings';
 import { SidebarReorder } from '/@/renderer/features/settings/components/general/sidebar-reorder';
+import { ContextMenuSettings } from '/@/renderer/features/settings/components/general/context-menu-settings';
 
 export const GeneralTab = () => {
     return (
@@ -18,6 +19,7 @@ export const GeneralTab = () => {
             <HomeSettings />
             <SidebarReorder />
             <SidebarSettings />
+            <ContextMenuSettings />
             {isElectron() && <RemoteSettings />}
             <CacheSettings />
         </Stack>

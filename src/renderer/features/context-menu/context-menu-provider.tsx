@@ -57,6 +57,7 @@ import {
     useCurrentServer,
     usePlayerStore,
     useQueueControls,
+    useSettingsStore,
 } from '/@/renderer/store';
 import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { Play, PlaybackType } from '/@/renderer/types';
@@ -99,6 +100,7 @@ export interface ContextMenuProviderProps {
 }
 
 export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
+    const disabledItems = useSettingsStore((state) => state.general.disabledContextMenu);
     const { t } = useTranslation();
     const [opened, setOpened] = useState(false);
     const clickOutsideRef = useClickOutside(() => setOpened(false));
@@ -927,7 +929,8 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                 >
                                     {ctx.menuItems?.map((item) => {
                                         return (
-                                            !contextMenuItems[item.id].disabled && (
+                                            !contextMenuItems[item.id].disabled &&
+                                            !disabledItems[item.id] && (
                                                 <Fragment key={`context-menu-${item.id}`}>
                                                     {item.children ? (
                                                         <HoverCard
