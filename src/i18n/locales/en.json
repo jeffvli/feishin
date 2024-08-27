@@ -384,6 +384,7 @@
             "title": "$t(entity.playlist_other)"
         },
         "setting": {
+            "advanced": "advanced",
             "generalTab": "general",
             "hotkeysTab": "hotkeys",
             "playbackTab": "playback",
@@ -467,6 +468,11 @@
         "crossfadeDuration_description": "sets the duration of the crossfade effect",
         "crossfadeStyle": "crossfade style",
         "crossfadeStyle_description": "select the crossfade style to use for the audio player",
+        "customCssEnable": "enable custom css",
+        "customCssEnable_description": "allow for writing custom css.",
+        "customCssNotice": "Warning: while there is some sanitization (disallowing url() and content:), using custom CSS can still pose risks by changing the interface.",
+        "customCss": "custom css",
+        "customCss_description": "custom css content. Note: content and remote urls are disallowed properties. A preview of your content is shown below. Additional fields you didn't set are present due to sanitization.",
         "customFontPath": "custom font path",
         "customFontPath_description": "sets the path to the custom font to use for the application",
         "disableAutomaticUpdates": "disable automatic updates",

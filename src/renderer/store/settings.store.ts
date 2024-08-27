@@ -178,6 +178,10 @@ export enum GenreTarget {
 }
 
 export interface SettingsState {
+    css: {
+        content: string;
+        enabled: boolean;
+    };
     discord: {
         clientId: string;
         enableIdle: boolean;
@@ -308,6 +312,10 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    css: {
+        content: '',
+        enabled: false,
+    },
     discord: {
         clientId: '1165957668758900787',
         enableIdle: false,
@@ -714,3 +722,5 @@ export const useRemoteSettings = () => useSettingsStore((state) => state.remote,
 export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
 
 export const useDiscordSetttings = () => useSettingsStore((state) => state.discord, shallow);
+
+export const useCssSettings = () => useSettingsStore((state) => state.css, shallow);

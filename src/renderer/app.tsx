@@ -20,13 +20,14 @@ import { ContextMenuProvider } from '/@/renderer/features/context-menu';
 import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { PlayQueueHandlerContext } from '/@/renderer/features/player';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
-import { PlayerState, usePlayerStore, useQueueControls } from '/@/renderer/store';
+import { PlayerState, useCssSettings, usePlayerStore, useQueueControls } from '/@/renderer/store';
 import { FontType, PlaybackType, PlayerStatus } from '/@/renderer/types';
 import '@ag-grid-community/styles/ag-grid.css';
 import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
 import i18n from '/@/i18n/i18n';
 import { useServerVersion } from '/@/renderer/hooks/use-server-version';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
+import { sanitizeCss } from '/@/renderer/utils/sanitize';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -43,12 +44,14 @@ export const App = () => {
     const language = useSettingsStore((store) => store.general.language);
     const nativeImageAspect = useSettingsStore((store) => store.general.nativeAspectRatio);
     const { builtIn, custom, system, type } = useSettingsStore((state) => state.font);
+    const { enabled, content } = useCssSettings();
     const { type: playbackType } = usePlaybackSettings();
     const { bindings } = useHotkeySettings();
     const handlePlayQueueAdd = useHandlePlayQueueAdd();
     const { clearQueue, restoreQueue } = useQueueControls();
     const remoteSettings = useRemoteSettings();
     const textStyleRef = useRef<HTMLStyleElement>();
+    const cssRef = useRef<HTMLStyleElement>();
     useDiscordRpc();
     useServerVersion();
 
@@ -86,6 +89,26 @@ export const App = () => {
             root.style.setProperty('--content-font-family', builtIn);
         }
     }, [builtIn, custom, system, type]);
+
+    useEffect(() => {
+        if (enabled && content) {
+            // Yes, CSS is sanitized here as well. Prevent a suer from changing the
+            // localStorage to bypass sanitizing.
+            const sanitized = sanitizeCss(content);
+            if (!cssRef.current) {
+                cssRef.current = document.createElement('style');
+                document.body.appendChild(cssRef.current);
+            }
+
+            cssRef.current.textContent = sanitized;
+
+            return () => {
+                cssRef.current!.textContent = '';
+            };
+        }
+
+        return () => {};
+    }, [content, enabled]);
 
     useEffect(() => {
         const root = document.documentElement;
