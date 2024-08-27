@@ -72,15 +72,17 @@ export const LibraryHeader = forwardRef(
                 </div>
                 <div className={styles.metadataSection}>
                     <Group>
-                        <Text
-                            $link
-                            component={Link}
-                            to={item.route}
-                            tt="uppercase"
-                            weight={600}
-                        >
-                            {itemTypeString()}
-                        </Text>
+                        <h2>
+                            <Text
+                                $link
+                                component={Link}
+                                to={item.route}
+                                tt="uppercase"
+                                weight={600}
+                            >
+                                {itemTypeString()}
+                            </Text>
+                        </h2>
                     </Group>
                     <h1 className={styles.title}>
                         <AutoTextSize mode="box">{title}</AutoTextSize>

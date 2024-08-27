@@ -120,7 +120,6 @@ export const AlbumDetailHeader = forwardRef(
                                     $link
                                     component={Link}
                                     fw={600}
-                                    size="md"
                                     to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                         albumArtistId: artist.id,
                                     })}
