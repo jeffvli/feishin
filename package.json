@@ -334,7 +334,7 @@
         "memoize-one": "^6.0.0",
         "nanoid": "^3.3.3",
         "net": "^1.0.2",
-        "node-mpv": "github:jeffvli/Node-MPV",
+        "node-mpv": "github:jeffvli/Node-MPV#32b4d64395289ad710c41d481d2707a7acfc228f",
         "overlayscrollbars": "^2.2.1",
         "overlayscrollbars-react": "^0.5.1",
         "react": "^18.2.0",
