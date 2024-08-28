@@ -643,14 +643,19 @@ export const usePlayerStore = create<PlayerSlice>()(
                         },
                         removeFromQueue: (uniqueIds) => {
                             const queue = get().queue.default;
-                            const currentSong = get().current.song;
                             const currentPosition = get().current.index;
                             let queueShift = 0;
 
+                            let isCurrentSongRemoved = false;
+
                             const newQueue = queue.filter((song, index) => {
                                 const shouldKeep = !uniqueIds.includes(song.uniqueId);
-                                if (!shouldKeep && index < currentPosition) {
-                                    queueShift += 1;
+                                if (!shouldKeep) {
+                                    if (index < currentPosition) {
+                                        queueShift += 1;
+                                    } else if (index === currentPosition) {
+                                        isCurrentSongRemoved = true;
+                                    }
                                 }
 
                                 return shouldKeep;
@@ -659,15 +664,16 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 (uniqueId) => !uniqueIds.includes(uniqueId),
                             );
 
-                            const isCurrentSongRemoved =
-                                currentSong && uniqueIds.includes(currentSong?.uniqueId);
-
                             set((state) => {
                                 state.queue.default = newQueue;
                                 state.queue.shuffled = newShuffledQueue;
                                 if (isCurrentSongRemoved) {
-                                    state.current.song = newQueue[0];
-                                    state.current.index = 0;
+                                    const newPosition = Math.min(
+                                        newQueue.length - 1,
+                                        currentPosition - queueShift,
+                                    );
+                                    state.current.song = newQueue[newPosition];
+                                    state.current.index = newPosition;
                                 } else {
                                     // if we removed any songs prior to the current one,
                                     // shift the index back as necessary
