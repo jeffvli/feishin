@@ -328,11 +328,11 @@ ipcMain.on('player-set-queue', async (_event, data: PlayerData, pause?: boolean)
 
     try {
         if (data.queue.current?.streamUrl) {
-            await getMpvInstance()
-                ?.load(data.queue.current.streamUrl, 'replace')
-                .catch(() => {
-                    getMpvInstance()?.play();
-                });
+            try {
+                await getMpvInstance()?.load(data.queue.current.streamUrl, 'replace');
+            } catch (error) {
+                await getMpvInstance()?.play();
+            }
 
             if (data.queue.next?.streamUrl) {
                 await getMpvInstance()?.load(data.queue.next.streamUrl, 'append');
