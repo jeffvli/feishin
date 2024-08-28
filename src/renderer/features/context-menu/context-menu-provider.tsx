@@ -137,7 +137,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             } = args;
 
             const serverType = data[0]?.serverType || useAuthStore.getState().currentServer?.type;
-            let validMenuItems = menuItems;
+            let validMenuItems = menuItems.filter((item) => !disabledItems[item.id]);
 
             if (serverType === ServerType.JELLYFIN) {
                 validMenuItems = menuItems.filter(
@@ -147,7 +147,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
             // If the context menu dimension can't be automatically calculated, calculate it manually
             // This is a hacky way since resize observer may not automatically recalculate when not rendered
-            const menuHeight = menuRect.height || (menuItems.length + 1) * 50;
+            const menuHeight = menuRect.height || (validMenuItems.length + 1) * 40;
             const menuWidth = menuRect.width || 220;
 
             const shouldReverseY = yPos + menuHeight > viewport.height;
@@ -169,7 +169,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             });
             setOpened(true);
         },
-        [menuRect.height, menuRect.width, setCtx, viewport.height, viewport.width],
+        [disabledItems, menuRect.height, menuRect.width, setCtx, viewport.height, viewport.width],
     );
 
     const closeContextMenu = useCallback(() => {
@@ -929,8 +929,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                 >
                                     {ctx.menuItems?.map((item) => {
                                         return (
-                                            !contextMenuItems[item.id].disabled &&
-                                            !disabledItems[item.id] && (
+                                            !contextMenuItems[item.id].disabled && (
                                                 <Fragment key={`context-menu-${item.id}`}>
                                                     {item.children ? (
                                                         <HoverCard
