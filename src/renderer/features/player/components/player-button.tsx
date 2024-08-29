@@ -132,6 +132,10 @@ export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
                         <StyledPlayerButton
                             variant={variant}
                             {...rest}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                rest.onClick?.(e);
+                            }}
                         >
                             {icon}
                         </StyledPlayerButton>
@@ -148,6 +152,10 @@ export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
                 <StyledPlayerButton
                     variant={variant}
                     {...rest}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        rest.onClick?.(e);
+                    }}
                 >
                     {icon}
                 </StyledPlayerButton>

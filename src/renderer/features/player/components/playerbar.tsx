@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, MouseEvent } from 'react';
 import styled from 'styled-components';
 import { usePlaybackType, useSettingsStore } from '/@/renderer/store/settings.store';
 import { PlaybackType } from '/@/renderer/types';
@@ -11,6 +11,8 @@ import {
     usePlayer2Data,
     usePlayerControls,
     useVolume,
+    useSetFullScreenPlayerStore,
+    useFullScreenPlayerStore,
 } from '/@/renderer/store';
 import { CenterControls } from './center-controls';
 import { LeftControls } from './left-controls';
@@ -70,6 +72,13 @@ export const Playerbar = () => {
     const player = useCurrentPlayer();
     const muted = useMuted();
     const { autoNext } = usePlayerControls();
+    const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
+    const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
+
+    const handleToggleFullScreenPlayer = (e?: MouseEvent<HTMLDivElement> | KeyboardEvent) => {
+        e?.stopPropagation();
+        setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
+    };
 
     const autoNextFn = useCallback(() => {
         const playerData = autoNext();
@@ -77,7 +86,7 @@ export const Playerbar = () => {
     }, [autoNext]);
 
     return (
-        <PlayerbarContainer>
+        <PlayerbarContainer onClick={handleToggleFullScreenPlayer}>
             <PlayerbarControlsGrid>
                 <LeftGridItem>
                     <LeftControls />
