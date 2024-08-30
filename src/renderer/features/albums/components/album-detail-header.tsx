@@ -48,6 +48,10 @@ export const AlbumDetailHeader = forwardRef(
                 value:
                     detailQuery?.data?.duration && formatDurationString(detailQuery.data.duration),
             },
+            {
+                id: 'playCount',
+                value: `${detailQuery?.data?.playCount} plays`,
+            },
         ];
 
         if (originalDifferentFromRelease) {
