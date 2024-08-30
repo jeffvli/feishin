@@ -265,6 +265,7 @@ export interface SettingsState {
         };
         style: PlaybackStyle;
         type: PlaybackType;
+        webAudio: boolean;
     };
     remote: {
         enabled: boolean;
@@ -439,6 +440,7 @@ const initialState: SettingsState = {
         },
         style: PlaybackStyle.GAPLESS,
         type: PlaybackType.WEB,
+        webAudio: true,
     },
     remote: {
         enabled: false,

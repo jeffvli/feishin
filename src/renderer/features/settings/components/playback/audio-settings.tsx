@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SelectItem } from '@mantine/core';
+import { SelectItem, Switch } from '@mantine/core';
 import isElectron from 'is-electron';
 import { Select, Slider, toast } from '/@/renderer/components';
 import {
@@ -129,6 +129,27 @@ export const AudioSettings = ({ hasFancyAudio }: { hasFancyAudio: boolean }) => 
             note: status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
             title: t('setting.playbackStyle', {
                 context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+        },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.webAudio}
+                    onChange={(e) => {
+                        setSettings({
+                            playback: { ...settings, webAudio: e.currentTarget.checked },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.webAudio', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: settings.type !== PlaybackType.WEB,
+            note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
+            title: t('setting.webAudio', {
                 postProcess: 'sentenceCase',
             }),
         },

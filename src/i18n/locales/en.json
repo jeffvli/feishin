@@ -638,6 +638,8 @@
         "volumeWheelStep_description": "the amount of volume to change when scrolling the mouse wheel on the volume slider",
         "volumeWidth": "volume slider width",
         "volumeWidth_description": "the width of the volume slider",
+        "webAudio": "use web audio",
+        "webAudio_description": "use web audio. this enables advanced features like replaygain. disable if you experience otherwise",
         "windowBarStyle": "window bar style",
         "windowBarStyle_description": "select the style of the window bar",
         "zoom": "zoom percentage",
