@@ -19,6 +19,7 @@ import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { usePlayerStore, useSetCurrentTime } from '../../../store/player.store';
 import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
+import { setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
@@ -45,7 +46,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         const playerData = moveToBottomOfQueue(uniqueIds);
 
         if (playbackType === PlaybackType.LOCAL) {
-            mpvPlayer!.setQueueNext(playerData);
+            setQueueNext(playerData);
         }
     };
 
@@ -57,7 +58,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         const playerData = moveToTopOfQueue(uniqueIds);
 
         if (playbackType === PlaybackType.LOCAL) {
-            mpvPlayer!.setQueueNext(playerData);
+            setQueueNext(playerData);
         }
     };
 
@@ -72,9 +73,9 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
 
         if (playbackType === PlaybackType.LOCAL) {
             if (isCurrentSongRemoved) {
-                mpvPlayer!.setQueue(playerData);
+                setQueue(playerData);
             } else {
-                mpvPlayer!.setQueueNext(playerData);
+                setQueueNext(playerData);
             }
         }
 
@@ -87,7 +88,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         const playerData = clearQueue();
 
         if (playbackType === PlaybackType.LOCAL) {
-            mpvPlayer!.setQueue(playerData);
+            setQueue(playerData);
             mpvPlayer!.pause();
         }
 
@@ -101,7 +102,7 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
         const playerData = shuffleQueue();
 
         if (playbackType === PlaybackType.LOCAL) {
-            mpvPlayer!.setQueueNext(playerData);
+            setQueueNext(playerData);
         }
     };
 

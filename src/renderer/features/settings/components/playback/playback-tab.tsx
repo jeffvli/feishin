@@ -4,6 +4,9 @@ import { AudioSettings } from '/@/renderer/features/settings/components/playback
 import { ScrobbleSettings } from '/@/renderer/features/settings/components/playback/scrobble-settings';
 import isElectron from 'is-electron';
 import { LyricSettings } from '/@/renderer/features/settings/components/playback/lyric-settings';
+import { useSettingsStore } from '/@/renderer/store';
+import { PlaybackType } from '/@/renderer/types';
+import { TranscodeSettings } from '/@/renderer/features/settings/components/playback/transcode-settings';
 
 const MpvSettings = lazy(() =>
     import('/@/renderer/features/settings/components/playback/mpv-settings').then((module) => {
@@ -12,14 +15,21 @@ const MpvSettings = lazy(() =>
 );
 
 export const PlaybackTab = () => {
+    const audioType = useSettingsStore((state) => state.playback.type);
+    const useWebAudio = useSettingsStore((state) => state.playback.webAudio);
+
     const hasFancyAudio = useMemo(() => {
-        return isElectron() || 'AudioContext' in window;
-    }, []);
+        return (
+            (isElectron() && audioType === PlaybackType.LOCAL) ||
+            (useWebAudio && 'AudioContext' in window)
+        );
+    }, [audioType, useWebAudio]);
 
     return (
         <Stack spacing="md">
             <AudioSettings hasFancyAudio={hasFancyAudio} />
             <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
+            <TranscodeSettings />
             <ScrobbleSettings />
             <LyricSettings />
         </Stack>

@@ -65,6 +65,7 @@ import { ItemDetailsModal } from '/@/renderer/features/item-details/components/i
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
 import { controller } from '/@/renderer/api/controller';
 import { api } from '/@/renderer/api';
+import { setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
 
 type ContextMenuContextProps = {
     closeContextMenu: () => void;
@@ -92,7 +93,6 @@ const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating', 'shareI
 // const NAVIDROME_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 // const SUBSONIC_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 
-const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 const utils = isElectron() ? window.electron.utils : null;
 
 export interface ContextMenuProviderProps {
@@ -610,7 +610,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         const playerData = moveToBottomOfQueue(uniqueIds);
 
         if (playbackType === PlaybackType.LOCAL) {
-            mpvPlayer!.setQueueNext(playerData);
+            setQueueNext(playerData);
         }
     }, [ctx.dataNodes, moveToBottomOfQueue, playbackType]);
 
@@ -621,7 +621,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         const playerData = moveToTopOfQueue(uniqueIds);
 
         if (playbackType === PlaybackType.LOCAL) {
-            mpvPlayer!.setQueueNext(playerData);
+            setQueueNext(playerData);
         }
     }, [ctx.dataNodes, moveToTopOfQueue, playbackType]);
 
@@ -651,9 +651,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         if (playbackType === PlaybackType.LOCAL) {
             if (isCurrentSongRemoved) {
-                mpvPlayer!.setQueue(playerData);
+                setQueue(playerData);
             } else {
-                mpvPlayer!.setQueueNext(playerData);
+                setQueueNext(playerData);
             }
         }
 
@@ -687,7 +687,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             },
             query: { albumArtistIds: item.albumArtistIds, songId: item.id },
         });
-        handlePlayQueueAdd?.({ byData: [ctx.data[0], ...songs], playType: Play.NOW });
+        if (songs) {
+            handlePlayQueueAdd?.({ byData: [ctx.data[0], ...songs], playType: Play.NOW });
+        }
     }, [ctx, handlePlayQueueAdd]);
 
     const handleDownload = useCallback(() => {

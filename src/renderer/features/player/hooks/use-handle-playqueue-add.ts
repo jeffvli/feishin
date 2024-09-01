@@ -25,6 +25,7 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { useTranslation } from 'react-i18next';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
+import { setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
 
 const getRootQueryKey = (itemType: LibraryItem, serverId: string) => {
     let queryKey;
@@ -180,9 +181,9 @@ export const useHandlePlayQueueAdd = () => {
 
                 if (playType === Play.NOW || !hadSong) {
                     mpvPlayer!.pause();
-                    mpvPlayer!.setQueue(playerData, false);
+                    setQueue(playerData, false);
                 } else {
-                    mpvPlayer!.setQueueNext(playerData);
+                    setQueueNext(playerData);
                 }
             } else {
                 const player =

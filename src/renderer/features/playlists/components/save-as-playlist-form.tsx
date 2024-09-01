@@ -5,6 +5,8 @@ import { Button, Switch, TextInput, toast } from '/@/renderer/components';
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { useCurrentServer } from '/@/renderer/store';
 import { useTranslation } from 'react-i18next';
+import { ServerFeature } from '/@/renderer/api/features-types';
+import { hasFeature } from '/@/renderer/api/utils';
 
 interface SaveAsPlaylistFormProps {
     body: Partial<CreatePlaylistBody>;
@@ -27,13 +29,13 @@ export const SaveAsPlaylistForm = ({
         initialValues: {
             _custom: {
                 navidrome: {
-                    public: false,
                     rules: undefined,
                     ...body?._custom?.navidrome,
                 },
             },
             comment: body.comment || '',
             name: body.name || '',
+            public: body.public,
         },
     });
 
@@ -58,7 +60,7 @@ export const SaveAsPlaylistForm = ({
         );
     });
 
-    const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
+    const isPublicDisplayed = hasFeature(server, ServerFeature.PUBLIC_PLAYLIST);
     const isSubmitDisabled = !form.values.name || mutation.isLoading;
 
     return (
@@ -73,20 +75,22 @@ export const SaveAsPlaylistForm = ({
                     })}
                     {...form.getInputProps('name')}
                 />
-                <TextInput
-                    label={t('form.createPlaylist.input', {
-                        context: 'description',
-                        postProcess: 'titleCase',
-                    })}
-                    {...form.getInputProps('comment')}
-                />
+                {server?.type === ServerType.NAVIDROME && (
+                    <TextInput
+                        label={t('form.createPlaylist.input', {
+                            context: 'description',
+                            postProcess: 'titleCase',
+                        })}
+                        {...form.getInputProps('comment')}
+                    />
+                )}
                 {isPublicDisplayed && (
                     <Switch
                         label={t('form.createPlaylist.input', {
                             context: 'public',
                             postProcess: 'titleCase',
                         })}
-                        {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
+                        {...form.getInputProps('public', { type: 'checkbox' })}
                     />
                 )}
                 <Group position="right">

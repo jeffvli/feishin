@@ -34,7 +34,7 @@ const getStreamUrl = (args: {
         `&playSessionId=${deviceId}` +
         '&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg' +
         '&transcodingContainer=ts' +
-        '&transcodingProtocol=hls'
+        '&transcodingProtocol=http'
     );
 };
 
