@@ -199,6 +199,8 @@ export interface SettingsState {
     general: {
         accent: string;
         albumArtRes?: number | null;
+        albumBackground: boolean;
+        albumBackgroundBlur: number;
         buttonSize: number;
         defaultFullPlaylist: boolean;
         disabledContextMenu: { [k in ContextMenuItemType]?: boolean };
@@ -333,6 +335,8 @@ const initialState: SettingsState = {
     general: {
         accent: 'rgb(53, 116, 252)',
         albumArtRes: undefined,
+        albumBackground: false,
+        albumBackgroundBlur: 1.5,
         buttonSize: 20,
         defaultFullPlaylist: true,
         disabledContextMenu: {},

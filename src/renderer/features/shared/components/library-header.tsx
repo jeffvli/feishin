@@ -10,6 +10,7 @@ import { ItemImagePlaceholder } from '/@/renderer/features/shared/components/ite
 
 interface LibraryHeaderProps {
     background: string;
+    blur?: number;
     children?: ReactNode;
     imagePlaceholderUrl?: string | null;
     imageUrl?: string | null;
@@ -19,7 +20,15 @@ interface LibraryHeaderProps {
 
 export const LibraryHeader = forwardRef(
     (
-        { imageUrl, imagePlaceholderUrl, background, title, item, children }: LibraryHeaderProps,
+        {
+            imageUrl,
+            imagePlaceholderUrl,
+            background,
+            blur,
+            title,
+            item,
+            children,
+        }: LibraryHeaderProps,
         ref: Ref<HTMLDivElement>,
     ) => {
         const { t } = useTranslation();
@@ -53,7 +62,7 @@ export const LibraryHeader = forwardRef(
             >
                 <div
                     className={styles.background}
-                    style={{ background }}
+                    style={{ background, filter: `blur(${blur ?? 0}rem)` }}
                 />
                 <div className={styles.backgroundOverlay} />
                 <div className={styles.imageSection}>

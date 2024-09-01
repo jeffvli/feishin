@@ -467,6 +467,54 @@ export const ControlSettings = () => {
             isHidden: false,
             title: t('setting.homeFeature', { postProcess: 'sentenceCase' }),
         },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.albumBackground', { postProcess: 'sentenceCase' })}
+                    defaultChecked={settings.albumBackground}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                albumBackground: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.albumBackground', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.albumBackground', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Slider
+                    defaultValue={settings.albumBackgroundBlur}
+                    label={(e) => `${e} rem`}
+                    max={6}
+                    min={0}
+                    step={0.5}
+                    w={100}
+                    onChangeEnd={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                albumBackgroundBlur: e,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.albumBackgroundBlur', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.albumBackgroundBlur', { postProcess: 'sentenceCase' }),
+        },
     ];
 
     return <SettingsSection options={controlOptions} />;

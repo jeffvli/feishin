@@ -10,13 +10,13 @@ import { AlbumDetailHeader } from '/@/renderer/features/albums/components/album-
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem } from '/@/renderer/api/types';
-import { useCurrentServer, useFullScreenPlayerStore } from '/@/renderer/store';
+import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
 
 const AlbumDetailRoute = () => {
     const tableRef = useRef<AgGridReactType | null>(null);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
-    const { dynamicIsImage: useBlur } = useFullScreenPlayerStore();
+    const { albumBackground, albumBackgroundBlur } = useGeneralSettings();
 
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();
@@ -26,7 +26,6 @@ const AlbumDetailRoute = () => {
         src: detailQuery.data?.imageUrl,
         srcLoaded: !detailQuery.isLoading,
     });
-    const backgroundURL = detailQuery.data?.imageUrl || '';
     const handlePlayQueueAdd = usePlayQueueAdd();
     const playButtonBehavior = usePlayButtonBehavior();
 
@@ -43,6 +42,9 @@ const AlbumDetailRoute = () => {
     if (!backgroundColor || colorId !== albumId) {
         return <Spinner container />;
     }
+
+    const backgroundUrl = detailQuery.data?.imageUrl || '';
+    const background = (albumBackground && `url(${backgroundUrl})`) || backgroundColor;
 
     return (
         <AnimatedPage key={`album-detail-${albumId}`}>
@@ -64,10 +66,13 @@ const AlbumDetailRoute = () => {
             >
                 <AlbumDetailHeader
                     ref={headerRef}
-                    background={(useBlur && `url(${backgroundURL})`) || backgroundColor}
+                    background={{
+                        background,
+                        blur: (albumBackground && albumBackgroundBlur) || 0,
+                    }}
                 />
                 <AlbumDetailContent
-                    background={(useBlur && `url(${backgroundURL})`) || backgroundColor}
+                    background={background}
                     tableRef={tableRef}
                 />
             </NativeScrollArea>

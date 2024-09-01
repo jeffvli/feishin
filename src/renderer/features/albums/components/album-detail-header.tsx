@@ -13,7 +13,10 @@ import { useCurrentServer } from '/@/renderer/store';
 import { formatDateAbsolute, formatDurationString } from '/@/renderer/utils';
 
 interface AlbumDetailHeaderProps {
-    background: string;
+    background: {
+        background: string;
+        blur: number;
+    };
 }
 
 export const AlbumDetailHeader = forwardRef(
@@ -78,10 +81,10 @@ export const AlbumDetailHeader = forwardRef(
             <Stack ref={cq.ref}>
                 <LibraryHeader
                     ref={ref}
-                    background={background}
                     imageUrl={detailQuery?.data?.imageUrl}
                     item={{ route: AppRoute.LIBRARY_ALBUMS, type: LibraryItem.ALBUM }}
                     title={detailQuery?.data?.name || ''}
+                    {...background}
                 >
                     <Stack spacing="sm">
                         <Group spacing="sm">
