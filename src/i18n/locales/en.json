@@ -139,6 +139,8 @@
         "genreWithCount_other": "{{count}} genres",
         "playlist_one": "playlist",
         "playlist_other": "playlists",
+        "play_one": "{{count}} play",
+        "play_other": "{{count}} plays",
         "playlistWithCount_one": "{{count}} playlist",
         "playlistWithCount_other": "{{count}} playlists",
         "smartPlaylist": "smart $t(entity.playlist_one)",

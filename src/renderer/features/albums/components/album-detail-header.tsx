@@ -50,7 +50,9 @@ export const AlbumDetailHeader = forwardRef(
             },
             {
                 id: 'playCount',
-                value: `${detailQuery?.data?.playCount} plays`,
+                value: t('entity.play', {
+                    count: detailQuery?.data?.playCount as number,
+                }),
             },
         ];
 
