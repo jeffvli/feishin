@@ -1,6 +1,7 @@
 import { forwardRef, ReactNode, Ref, useState } from 'react';
 import { Group } from '@mantine/core';
 import { AutoTextSize } from 'auto-text-size';
+import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import styles from './library-header.module.scss';
@@ -67,7 +68,9 @@ export const LibraryHeader = forwardRef(
                     style={{ background, filter: `blur(${blur ?? 0}rem)` }}
                 />
                 <div
-                    className={`${styles.backgroundOverlay} ${(albumBackground && styles.opaqueOverlay) || ''}`}
+                    className={clsx(styles.backgroundOverlay, {
+                        [styles.opaqueOverlay]: albumBackground,
+                    })}
                 />
                 <div className={styles.imageSection}>
                     {imageUrl && !isImageError ? (
