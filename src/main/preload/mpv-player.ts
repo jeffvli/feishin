@@ -25,8 +25,8 @@ const setProperties = (data: Record<string, any>) => {
     ipcRenderer.send('player-set-properties', data);
 };
 
-const autoNext = (data: PlayerData) => {
-    ipcRenderer.send('player-auto-next', data);
+const autoNext = (url?: string) => {
+    ipcRenderer.send('player-auto-next', url);
 };
 
 const currentTime = () => {
@@ -61,12 +61,12 @@ const seekTo = (seconds: number) => {
     ipcRenderer.send('player-seek-to', seconds);
 };
 
-const setQueue = (data: PlayerData, pause?: boolean) => {
-    ipcRenderer.send('player-set-queue', data, pause);
+const setQueue = (current?: string, next?: string, pause?: boolean) => {
+    ipcRenderer.send('player-set-queue', current, next, pause);
 };
 
-const setQueueNext = (data: PlayerData) => {
-    ipcRenderer.send('player-set-queue-next', data);
+const setQueueNext = (url?: string) => {
+    ipcRenderer.send('player-set-queue-next', url);
 };
 
 const stop = () => {

@@ -6,6 +6,7 @@ import isElectron from 'is-electron';
 import { LyricSettings } from '/@/renderer/features/settings/components/playback/lyric-settings';
 import { useSettingsStore } from '/@/renderer/store';
 import { PlaybackType } from '/@/renderer/types';
+import { TranscodeSettings } from '/@/renderer/features/settings/components/playback/transcode-settings';
 
 const MpvSettings = lazy(() =>
     import('/@/renderer/features/settings/components/playback/mpv-settings').then((module) => {
@@ -28,6 +29,7 @@ export const PlaybackTab = () => {
         <Stack spacing="md">
             <AudioSettings hasFancyAudio={hasFancyAudio} />
             <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
+            <TranscodeSettings />
             <ScrobbleSettings />
             <LyricSettings />
         </Stack>

@@ -38,6 +38,7 @@ import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-gr
 import { useAppFocus } from '/@/renderer/hooks';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
+import { setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
 
@@ -86,7 +87,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
         if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.volume(volume);
-            mpvPlayer!.setQueue(playerData, false);
+            setQueue(playerData, false);
         } else {
             const player =
                 playerData.current.player === 1
@@ -117,7 +118,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
         const playerData = reorderQueue(selectedUniqueIds as string[], e.overNode?.data?.uniqueId);
 
         if (playbackType === PlaybackType.LOCAL) {
-            mpvPlayer!.setQueueNext(playerData);
+            setQueueNext(playerData);
         }
 
         if (type === 'sideDrawerQueue') {

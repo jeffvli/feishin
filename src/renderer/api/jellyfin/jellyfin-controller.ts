@@ -55,6 +55,7 @@ import {
     Song,
     MoveItemArgs,
     DownloadArgs,
+    TranscodingArgs,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -1050,6 +1051,20 @@ const getDownloadUrl = (args: DownloadArgs) => {
     return `${apiClientProps.server?.url}/items/${query.id}/download?api_key=${apiClientProps.server?.credential}`;
 };
 
+const getTranscodingUrl = (args: TranscodingArgs) => {
+    const { base, format, bitrate } = args.query;
+    let url = base.replace('transcodingProtocol=hls', 'transcodingProtocol=http');
+    if (format) {
+        url = url.replace('audioCodec=aac', `audioCodec=${format}`);
+        url = url.replace('transcodingContainer=ts', `transcodingContainer=${format}`);
+    }
+    if (bitrate !== undefined) {
+        url += `&maxStreamingBitrate=${bitrate * 1000}`;
+    }
+
+    return url;
+};
+
 export const jfController = {
     addToPlaylist,
     authenticate,
@@ -1075,6 +1090,7 @@ export const jfController = {
     getSongDetail,
     getSongList,
     getTopSongList,
+    getTranscodingUrl,
     movePlaylistItem,
     removeFromPlaylist,
     scrobble,

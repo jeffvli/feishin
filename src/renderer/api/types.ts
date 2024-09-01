@@ -1211,3 +1211,13 @@ export type DownloadQuery = {
 export type DownloadArgs = {
     query: DownloadQuery;
 } & BaseEndpointArgs;
+
+export type TranscodingQuery = {
+    base: string;
+    bitrate?: number;
+    format?: string;
+};
+
+export type TranscodingArgs = {
+    query: TranscodingQuery;
+} & BaseEndpointArgs;

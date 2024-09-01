@@ -1,4 +1,12 @@
-import { useImperativeHandle, forwardRef, useRef, useState, useCallback, useEffect } from 'react';
+import {
+    useImperativeHandle,
+    forwardRef,
+    useRef,
+    useState,
+    useCallback,
+    useEffect,
+    useMemo,
+} from 'react';
 import isElectron from 'is-electron';
 import type { ReactPlayerProps } from 'react-player';
 import ReactPlayer from 'react-player/lazy';
@@ -10,16 +18,17 @@ import {
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
-import { useSpeed } from '/@/renderer/store';
+import { getServerById, TranscodingConfig, usePlaybackSettings, useSpeed } from '/@/renderer/store';
 import { toast } from '/@/renderer/components/toast';
+import { api } from '/@/renderer/api';
 
 interface AudioPlayerProps extends ReactPlayerProps {
     crossfadeDuration: number;
     crossfadeStyle: CrossfadeStyle;
     currentPlayer: 1 | 2;
     playbackStyle: PlaybackStyle;
-    player1: Song;
-    player2: Song;
+    player1?: Song;
+    player2?: Song;
     status: PlayerStatus;
     volume: number;
 }
@@ -48,6 +57,44 @@ type WebAudio = {
 const EMPTY_SOURCE =
     'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU2LjM2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU2LjQxAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//MUZAAAAAGkAAAAAAAAA0gAAAAATEFN//MUZAMAAAGkAAAAAAAAA0gAAAAARTMu//MUZAYAAAGkAAAAAAAAA0gAAAAAOTku//MUZAkAAAGkAAAAAAAAA0gAAAAANVVV';
 
+const useSongUrl = (transcode: TranscodingConfig, current: boolean, song?: Song): string | null => {
+    const prior = useRef(['', '']);
+
+    return useMemo(() => {
+        if (song?.serverId) {
+            // If we are the current track, we do not want a transcoding
+            // reconfiguration to force a restart.
+            if (current && prior.current[0] === song.uniqueId) {
+                return prior.current[1];
+            }
+
+            if (!transcode.enabled) {
+                // transcoding disabled; save the result
+                prior.current = [song.uniqueId, song.streamUrl];
+                return song.streamUrl;
+            }
+
+            const result = api.controller.getTranscodingUrl({
+                apiClientProps: {
+                    server: getServerById(song.serverId),
+                },
+                query: {
+                    base: song.streamUrl,
+                    ...transcode,
+                },
+            })!;
+
+            // transcoding enabled; save the updated result
+            prior.current = [song.uniqueId, result];
+            return result;
+        }
+
+        // no track; clear result
+        prior.current = ['', ''];
+        return null;
+    }, [current, song?.uniqueId, song?.serverId, song?.streamUrl, transcode]);
+};
+
 export const AudioPlayer = forwardRef(
     (
         {
@@ -72,6 +119,10 @@ export const AudioPlayer = forwardRef(
         const useWebAudio = useSettingsStore((state) => state.playback.webAudio);
         const { resetSampleRate } = useSettingsStoreActions();
         const playbackSpeed = useSpeed();
+        const { transcode } = usePlaybackSettings();
+
+        const stream1 = useSongUrl(transcode, currentPlayer === 1, player1);
+        const stream2 = useSongUrl(transcode, currentPlayer === 2, player2);
 
         const [webAudio, setWebAudio] = useState<WebAudio | null>(null);
         const [player1Source, setPlayer1Source] = useState<MediaElementAudioSourceNode | null>(
@@ -374,11 +425,11 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 1 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player1?.streamUrl || EMPTY_SOURCE}
+                    url={stream1 || EMPTY_SOURCE}
                     volume={webAudio ? 1 : volume}
                     width={0}
                     // If there is no stream url, we do not need to handle when the audio finishes
-                    onEnded={player1?.streamUrl ? handleOnEnded : undefined}
+                    onEnded={stream1 ? handleOnEnded : undefined}
                     onProgress={
                         playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1
                     }
@@ -394,10 +445,10 @@ export const AudioPlayer = forwardRef(
                     playbackRate={playbackSpeed}
                     playing={currentPlayer === 2 && status === PlayerStatus.PLAYING}
                     progressInterval={isTransitioning ? 10 : 250}
-                    url={player2?.streamUrl || EMPTY_SOURCE}
+                    url={stream2 || EMPTY_SOURCE}
                     volume={webAudio ? 1 : volume}
                     width={0}
-                    onEnded={player2?.streamUrl ? handleOnEnded : undefined}
+                    onEnded={stream2 ? handleOnEnded : undefined}
                     onProgress={
                         playbackStyle === PlaybackStyle.GAPLESS ? handleGapless2 : handleCrossfade2
                     }

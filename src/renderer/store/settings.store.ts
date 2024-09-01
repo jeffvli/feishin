@@ -177,6 +177,12 @@ export enum GenreTarget {
     TRACK = 'track',
 }
 
+export type TranscodingConfig = {
+    bitrate?: number;
+    enabled: boolean;
+    format?: string;
+};
+
 export interface SettingsState {
     css: {
         content: string;
@@ -264,6 +270,7 @@ export interface SettingsState {
             scrobbleAtPercentage: number;
         };
         style: PlaybackStyle;
+        transcode: TranscodingConfig;
         type: PlaybackType;
         webAudio: boolean;
     };
@@ -300,6 +307,7 @@ export interface SettingsSlice extends SettingsState {
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
         setTable: (type: TableType, data: DataTableProps) => void;
+        setTranscodingConfig: (config: TranscodingConfig) => void;
         toggleContextMenuItem: (item: ContextMenuItemType) => void;
         toggleSidebarCollapseShare: () => void;
     };
@@ -439,6 +447,9 @@ const initialState: SettingsState = {
             scrobbleAtPercentage: 75,
         },
         style: PlaybackStyle.GAPLESS,
+        transcode: {
+            enabled: false,
+        },
         type: PlaybackType.WEB,
         webAudio: true,
     },
@@ -660,6 +671,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                     setTable: (type: TableType, data: DataTableProps) => {
                         set((state) => {
                             state.tables[type] = data;
+                        });
+                    },
+                    setTranscodingConfig: (config) => {
+                        set((state) => {
+                            state.playback.transcode = config;
                         });
                     },
                     toggleContextMenuItem: (item: ContextMenuItemType) => {

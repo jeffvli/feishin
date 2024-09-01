@@ -10,8 +10,7 @@ import { useCurrentStatus, usePlayerStore } from '/@/renderer/store';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { PlaybackType, PlayerStatus, PlaybackStyle, CrossfadeStyle } from '/@/renderer/types';
 import { useTranslation } from 'react-i18next';
-
-const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+import { setQueue } from '/@/renderer/utils/set-transcoded-queue-data';
 
 const getAudioDevice = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -62,7 +61,7 @@ export const AudioSettings = ({ hasFancyAudio }: { hasFancyAudio: boolean }) => 
                         setSettings({ playback: { ...settings, type: e as PlaybackType } });
                         if (isElectron() && e === PlaybackType.LOCAL) {
                             const queueData = usePlayerStore.getState().actions.getPlayerData();
-                            mpvPlayer!.setQueue(queueData);
+                            setQueue(queueData);
                         }
                     }}
                 />
