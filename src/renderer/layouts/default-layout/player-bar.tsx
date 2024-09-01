@@ -1,37 +1,33 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 import { Playerbar } from '/@/renderer/features/player';
 import { useGeneralSettings } from '/@/renderer/store/settings.store';
 
 interface PlayerbarContainerProps {
-    barState: string;
+    drawerEffect: boolean;
 }
 
 const PlayerbarContainer = styled.footer<PlayerbarContainerProps>`
     z-index: 200;
     grid-area: player;
-    background: var(--${(props) => props.barState});
-    transition: background 0.2s;
+    background: var(--playerbar-bg);
+    transition: background 0.5s;
+
+    ${(props) =>
+        props.drawerEffect &&
+        `
+        &:hover {
+            background: var(--playerbar-bg-active);
+        }
+    `}
 `;
 
 export const PlayerBar = () => {
     const { playerbarOpenDrawer } = useGeneralSettings();
-    const [barState, setBarState] = useState('playerbar-bg');
-
-    const handleMouseEnter = () => {
-        setBarState('playerbar-bg-active');
-    };
-
-    const handleMouseLeave = () => {
-        setBarState('playerbar-bg');
-    };
 
     return (
         <PlayerbarContainer
-            barState={barState}
+            drawerEffect={playerbarOpenDrawer}
             id="player-bar"
-            onMouseLeave={playerbarOpenDrawer ? handleMouseLeave : undefined}
-            onMouseOver={playerbarOpenDrawer ? handleMouseEnter : undefined}
         >
             <Playerbar />
         </PlayerbarContainer>
