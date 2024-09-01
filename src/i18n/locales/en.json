@@ -457,6 +457,8 @@
         "albumBackgroundBlur_description": "adjusts the amount of blur applied to the album background image",
         "applicationHotkeys": "application hotkeys",
         "applicationHotkeys_description": "configure application hotkeys. toggle the checkbox to set as a global hotkey (desktop only)",
+        "artistConfiguration": "album artist page configuration",
+        "artistConfiguration_description": "configure what items are shown, and in what order, on the album artist page",
         "audioDevice": "audio device",
         "audioDevice_description": "select the audio device to use for playback (web player only)",
         "audioExclusiveMode": "audio exclusive mode",

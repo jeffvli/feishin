@@ -105,7 +105,22 @@ export enum HomeItem {
     RECENTLY_PLAYED = 'recentlyPlayed',
 }
 
-export const homeItems = Object.values(HomeItem).map((item) => ({
+const homeItems = Object.values(HomeItem).map((item) => ({
+    disabled: false,
+    id: item,
+}));
+
+/* eslint-disable typescript-sort-keys/string-enum */
+export enum ArtistItem {
+    BIOGRAPHY = 'biography',
+    TOP_SONGS = 'topSongs',
+    RECENT_ALBUMS = 'recentAlbums',
+    COMPILATIONS = 'compilations',
+    SIMILAR_ARTISTS = 'similarArtists',
+}
+/* eslint-enable typescript-sort-keys/string-enum */
+
+const artistItems = Object.values(ArtistItem).map((item) => ({
     disabled: false,
     id: item,
 }));
@@ -207,6 +222,7 @@ export interface SettingsState {
         albumArtRes?: number | null;
         albumBackground: boolean;
         albumBackgroundBlur: number;
+        artistItems: SortableItem<ArtistItem>[];
         buttonSize: number;
         defaultFullPlaylist: boolean;
         disabledContextMenu: { [k in ContextMenuItemType]?: boolean };
@@ -305,6 +321,7 @@ export interface SettingsSlice extends SettingsState {
     actions: {
         reset: () => void;
         resetSampleRate: () => void;
+        setArtistItems: (item: SortableItem<ArtistItem>[]) => void;
         setGenreBehavior: (target: GenreTarget) => void;
         setHomeItems: (item: SortableItem<HomeItem>[]) => void;
         setSettings: (data: Partial<SettingsState>) => void;
@@ -347,6 +364,7 @@ const initialState: SettingsState = {
         albumArtRes: undefined,
         albumBackground: false,
         albumBackgroundBlur: 6,
+        artistItems,
         buttonSize: 20,
         defaultFullPlaylist: true,
         disabledContextMenu: {},
@@ -654,6 +672,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                     resetSampleRate: () => {
                         set((state) => {
                             state.playback.mpvProperties.audioSampleRateHz = 0;
+                        });
+                    },
+                    setArtistItems: (items) => {
+                        set((state) => {
+                            state.general.artistItems = items;
                         });
                     },
                     setGenreBehavior: (target: GenreTarget) => {

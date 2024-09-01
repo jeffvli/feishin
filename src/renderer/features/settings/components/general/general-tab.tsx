@@ -9,6 +9,7 @@ import isElectron from 'is-electron';
 import { HomeSettings } from '/@/renderer/features/settings/components/general/home-settings';
 import { SidebarReorder } from '/@/renderer/features/settings/components/general/sidebar-reorder';
 import { ContextMenuSettings } from '/@/renderer/features/settings/components/general/context-menu-settings';
+import { ArtistSettings } from '/@/renderer/features/settings/components/general/artist-settings';
 
 export const GeneralTab = () => {
     return (
@@ -17,6 +18,7 @@ export const GeneralTab = () => {
             <ThemeSettings />
             <ControlSettings />
             <HomeSettings />
+            <ArtistSettings />
             <SidebarReorder />
             <SidebarSettings />
             <ContextMenuSettings />
