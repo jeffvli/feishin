@@ -992,6 +992,9 @@ export const usePlayerStore = create<PlayerSlice>()(
                     },
                     repeat: PlayerRepeat.NONE,
                     shuffle: PlayerShuffle.NONE,
+                    transcode: {
+                        enabled: false,
+                    },
                     volume: 50,
                 })),
                 { name: 'store_player' },

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SelectItem } from '@mantine/core';
+import { SelectItem, Switch } from '@mantine/core';
 import isElectron from 'is-electron';
 import { Select, Slider, toast } from '/@/renderer/components';
 import {
@@ -10,8 +10,7 @@ import { useCurrentStatus, usePlayerStore } from '/@/renderer/store';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { PlaybackType, PlayerStatus, PlaybackStyle, CrossfadeStyle } from '/@/renderer/types';
 import { useTranslation } from 'react-i18next';
-
-const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
+import { setQueue } from '/@/renderer/utils/set-transcoded-queue-data';
 
 const getAudioDevice = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -62,7 +61,7 @@ export const AudioSettings = ({ hasFancyAudio }: { hasFancyAudio: boolean }) => 
                         setSettings({ playback: { ...settings, type: e as PlaybackType } });
                         if (isElectron() && e === PlaybackType.LOCAL) {
                             const queueData = usePlayerStore.getState().actions.getPlayerData();
-                            mpvPlayer!.setQueue(queueData);
+                            setQueue(queueData);
                         }
                     }}
                 />
@@ -129,6 +128,27 @@ export const AudioSettings = ({ hasFancyAudio }: { hasFancyAudio: boolean }) => 
             note: status === PlayerStatus.PLAYING ? 'Player must be paused' : undefined,
             title: t('setting.playbackStyle', {
                 context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+        },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.webAudio}
+                    onChange={(e) => {
+                        setSettings({
+                            playback: { ...settings, webAudio: e.currentTarget.checked },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.webAudio', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: settings.type !== PlaybackType.WEB,
+            note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
+            title: t('setting.webAudio', {
                 postProcess: 'sentenceCase',
             }),
         },

@@ -3,7 +3,7 @@ import isElectron from 'is-electron';
 import semverCoerce from 'semver/functions/coerce';
 import semverGte from 'semver/functions/gte';
 import { z } from 'zod';
-import { toast } from '/@/renderer/components';
+import { toast } from '/@/renderer/components/toast';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem } from '/@/renderer/api/types';
 import { ServerFeature } from '/@/renderer/api/features-types';

@@ -28,6 +28,7 @@ import i18n from '/@/i18n/i18n';
 import { useServerVersion } from '/@/renderer/hooks/use-server-version';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
+import { setQueue } from '/@/renderer/utils/set-transcoded-queue-data';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -185,7 +186,7 @@ export const App = () => {
             utils.onRestoreQueue((_event: any, data) => {
                 const playerData = restoreQueue(data);
                 if (playbackType === PlaybackType.LOCAL) {
-                    mpvPlayer!.setQueue(playerData, true);
+                    setQueue(playerData, true);
                 }
                 updateSong(playerData.current.song);
             });
