@@ -67,7 +67,7 @@ const PlayerbarImage = styled.img`
 
 const LineItem = styled.div<{ $secondary?: boolean }>`
     display: inline-block;
-    width: 95%;
+    width: fit-content;
     max-width: 20vw;
     overflow: hidden;
     line-height: 1.3;
@@ -121,6 +121,8 @@ export const LeftControls = () => {
         e?.stopPropagation();
         setSideBar({ image: true });
     };
+
+    const stopPropagation = (e?: MouseEvent) => e?.stopPropagation();
 
     useHotkeys([
         [
@@ -207,7 +209,7 @@ export const LeftControls = () => {
                     )}
                 </AnimatePresence>
                 <MetadataStack layout="position">
-                    <LineItem>
+                    <LineItem onClick={stopPropagation}>
                         <Group
                             noWrap
                             align="flex-start"
@@ -234,7 +236,10 @@ export const LeftControls = () => {
                             )}
                         </Group>
                     </LineItem>
-                    <LineItem $secondary>
+                    <LineItem
+                        $secondary
+                        onClick={stopPropagation}
+                    >
                         {artists?.map((artist, index) => (
                             <React.Fragment key={`bar-${artist.id}`}>
                                 {index > 0 && <Separator />}
@@ -257,7 +262,10 @@ export const LeftControls = () => {
                             </React.Fragment>
                         ))}
                     </LineItem>
-                    <LineItem $secondary>
+                    <LineItem
+                        $secondary
+                        onClick={stopPropagation}
+                    >
                         <Text
                             $link
                             component={Link}

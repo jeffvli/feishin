@@ -205,6 +205,8 @@ export interface SettingsState {
     general: {
         accent: string;
         albumArtRes?: number | null;
+        albumBackground: boolean;
+        albumBackgroundBlur: number;
         buttonSize: number;
         defaultFullPlaylist: boolean;
         disabledContextMenu: { [k in ContextMenuItemType]?: boolean };
@@ -218,6 +220,7 @@ export interface SettingsState {
         nativeAspectRatio: boolean;
         passwordStore?: string;
         playButtonBehavior: Play;
+        playerbarOpenDrawer: boolean;
         resume: boolean;
         showQueueDrawerButton: boolean;
         sideQueueType: SideQueueType;
@@ -342,6 +345,8 @@ const initialState: SettingsState = {
     general: {
         accent: 'rgb(53, 116, 252)',
         albumArtRes: undefined,
+        albumBackground: false,
+        albumBackgroundBlur: 6,
         buttonSize: 20,
         defaultFullPlaylist: true,
         disabledContextMenu: {},
@@ -355,6 +360,7 @@ const initialState: SettingsState = {
         nativeAspectRatio: false,
         passwordStore: undefined,
         playButtonBehavior: Play.NOW,
+        playerbarOpenDrawer: false,
         resume: false,
         showQueueDrawerButton: false,
         sideQueueType: 'sideQueue',

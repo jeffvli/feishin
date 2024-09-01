@@ -123,6 +123,8 @@
     width: 100%;
     height: 100%;
     opacity: 0.9;
+    background-size: cover !important;
+    background-position: center !important;
 }
 
 .background-overlay {
@@ -133,6 +135,10 @@
     width: 100%;
     height: 100%;
     background: var(--bg-header-overlay);
+}
+
+.opaque-overlay {
+    opacity: 0.5;
 }
 
 .title {

@@ -13,7 +13,10 @@ import { useCurrentServer } from '/@/renderer/store';
 import { formatDateAbsolute, formatDurationString } from '/@/renderer/utils';
 
 interface AlbumDetailHeaderProps {
-    background: string;
+    background: {
+        background: string;
+        blur: number;
+    };
 }
 
 export const AlbumDetailHeader = forwardRef(
@@ -23,6 +26,8 @@ export const AlbumDetailHeader = forwardRef(
         const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
         const cq = useContainerQuery();
         const { t } = useTranslation();
+
+        const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
 
         const originalDifferentFromRelease =
             detailQuery.data?.originalDate &&
@@ -78,16 +83,14 @@ export const AlbumDetailHeader = forwardRef(
             });
         };
 
-        const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
-
         return (
             <Stack ref={cq.ref}>
                 <LibraryHeader
                     ref={ref}
-                    background={background}
                     imageUrl={detailQuery?.data?.imageUrl}
                     item={{ route: AppRoute.LIBRARY_ALBUMS, type: LibraryItem.ALBUM }}
                     title={detailQuery?.data?.name || ''}
+                    {...background}
                 >
                     <Stack spacing="sm">
                         <Group spacing="sm">

@@ -41,6 +41,9 @@ export const PlayerbarSlider = ({ ...props }: SliderProps) => {
                 },
             }}
             {...props}
+            onClick={(e) => {
+                e?.stopPropagation();
+            }}
         />
     );
 };

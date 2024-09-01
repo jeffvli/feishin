@@ -517,7 +517,7 @@
         },
         "albumArtistDetail": {
             "viewAllTracks": "ver todo de $t(entity.track_other)",
-            "relatedArtists": "similar a $t(entity.artist_other)",
+            "relatedArtists": "$t(entity.artist_other) similar",
             "topSongs": "mejores canciones",
             "topSongsFrom": "las mejores canciones de {{title}}",
             "viewAll": "Ver todo",
