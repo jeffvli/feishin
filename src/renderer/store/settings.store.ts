@@ -214,6 +214,7 @@ export interface SettingsState {
         nativeAspectRatio: boolean;
         passwordStore?: string;
         playButtonBehavior: Play;
+        playerbarOpenDrawer: boolean;
         resume: boolean;
         showQueueDrawerButton: boolean;
         sideQueueType: SideQueueType;
@@ -350,6 +351,7 @@ const initialState: SettingsState = {
         nativeAspectRatio: false,
         passwordStore: undefined,
         playButtonBehavior: Play.NOW,
+        playerbarOpenDrawer: false,
         resume: false,
         showQueueDrawerButton: false,
         sideQueueType: 'sideQueue',

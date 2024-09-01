@@ -587,6 +587,8 @@
         "playButtonBehavior_optionPlay": "$t(player.play)",
         "playerAlbumArtResolution": "player album art resolution",
         "playerAlbumArtResolution_description": "the resolution for the large player's album art preview. larger makes it look more crisp, but may slow loading down. defaults to 0, meaning auto",
+        "playerbarOpenDrawer": "playerbar fullscreen toggle",
+        "playerbarOpenDrawer_description": "allows clicking of the playerbar to open the full screen player",
         "remotePassword": "remote control server password",
         "remotePassword_description": "sets the password for the remote control server. These credentials are by default transferred insecurely, so you should use a unique password that you do not care about",
         "remotePort": "remote control server port",
