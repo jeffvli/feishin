@@ -28,16 +28,12 @@ export const AlbumArtistDetailHeader = forwardRef(
             {
                 id: 'albumCount',
                 secondary: false,
-                value: `${detailQuery?.data?.albumCount} ${t('entity.album', {
-                    count: detailQuery?.data?.albumCount as number,
-                })}`,
+                value: t('entity.albumWithCount', { count: detailQuery?.data?.albumCount || 0 }),
             },
             {
                 id: 'songCount',
                 secondary: false,
-                value: `${detailQuery?.data?.songCount} ${t('entity.track', {
-                    count: detailQuery?.data?.songCount as number,
-                })}`,
+                value: t('entity.trackWithCount', { count: detailQuery?.data?.songCount || 0 }),
             },
             {
                 id: 'duration',

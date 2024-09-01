@@ -107,6 +107,8 @@ export const LeftControls = () => {
 
     const isSongDefined = Boolean(currentSong?.id);
 
+    const stopPropagation = (e?: MouseEvent) => e?.stopPropagation();
+
     const handleGeneralContextMenu = useHandleGeneralContextMenu(
         LibraryItem.SONG,
         SONG_CONTEXT_MENU_ITEMS,
@@ -207,7 +209,7 @@ export const LeftControls = () => {
                     )}
                 </AnimatePresence>
                 <MetadataStack layout="position">
-                    <LineItem>
+                    <LineItem onClick={stopPropagation}>
                         <Group
                             noWrap
                             align="flex-start"
@@ -234,7 +236,10 @@ export const LeftControls = () => {
                             )}
                         </Group>
                     </LineItem>
-                    <LineItem $secondary>
+                    <LineItem
+                        $secondary
+                        onClick={stopPropagation}
+                    >
                         {artists?.map((artist, index) => (
                             <React.Fragment key={`bar-${artist.id}`}>
                                 {index > 0 && <Separator />}
