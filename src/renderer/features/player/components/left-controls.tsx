@@ -67,7 +67,7 @@ const PlayerbarImage = styled.img`
 
 const LineItem = styled.div<{ $secondary?: boolean }>`
     display: inline-block;
-    width: 95%;
+    width: fit-content;
     max-width: 20vw;
     overflow: hidden;
     line-height: 1.3;
@@ -107,8 +107,6 @@ export const LeftControls = () => {
 
     const isSongDefined = Boolean(currentSong?.id);
 
-    const stopPropagation = (e?: MouseEvent) => e?.stopPropagation();
-
     const handleGeneralContextMenu = useHandleGeneralContextMenu(
         LibraryItem.SONG,
         SONG_CONTEXT_MENU_ITEMS,
@@ -123,6 +121,8 @@ export const LeftControls = () => {
         e?.stopPropagation();
         setSideBar({ image: true });
     };
+
+    const stopPropagation = (e?: MouseEvent) => e?.stopPropagation();
 
     useHotkeys([
         [
@@ -262,7 +262,10 @@ export const LeftControls = () => {
                             </React.Fragment>
                         ))}
                     </LineItem>
-                    <LineItem $secondary>
+                    <LineItem
+                        $secondary
+                        onClick={stopPropagation}
+                    >
                         <Text
                             $link
                             component={Link}
