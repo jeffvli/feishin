@@ -135,7 +135,10 @@
     width: 100%;
     height: 100%;
     background: var(--bg-header-overlay);
-    opacity: 0.6;
+}
+
+.opaque-overlay {
+    opacity: 0.5;
 }
 
 .title {

@@ -7,6 +7,7 @@ import styles from './library-header.module.scss';
 import { LibraryItem } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components';
 import { ItemImagePlaceholder } from '/@/renderer/features/shared/components/item-image-placeholder';
+import { useGeneralSettings } from '/@/renderer/store';
 
 interface LibraryHeaderProps {
     background: string;
@@ -33,6 +34,7 @@ export const LibraryHeader = forwardRef(
     ) => {
         const { t } = useTranslation();
         const [isImageError, setIsImageError] = useState<boolean | null>(false);
+        const { albumBackground } = useGeneralSettings();
 
         const onImageError = () => {
             setIsImageError(true);
@@ -64,7 +66,9 @@ export const LibraryHeader = forwardRef(
                     className={styles.background}
                     style={{ background, filter: `blur(${blur ?? 0}rem)` }}
                 />
-                <div className={styles.backgroundOverlay} />
+                <div
+                    className={`${styles.backgroundOverlay} ${(albumBackground && styles.opaqueOverlay) || ''}`}
+                />
                 <div className={styles.imageSection}>
                     {imageUrl && !isImageError ? (
                         <img

@@ -27,6 +27,8 @@ export const AlbumDetailHeader = forwardRef(
         const cq = useContainerQuery();
         const { t } = useTranslation();
 
+        const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
+
         const originalDifferentFromRelease =
             detailQuery.data?.originalDate &&
             detailQuery.data.originalDate !== detailQuery.data.releaseDate;
@@ -80,8 +82,6 @@ export const AlbumDetailHeader = forwardRef(
                 serverId: detailQuery.data.serverId,
             });
         };
-
-        const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
 
         return (
             <Stack ref={cq.ref}>
