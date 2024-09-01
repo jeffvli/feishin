@@ -68,7 +68,7 @@ const CenterGridItem = styled.div`
 export const Playerbar = () => {
     const playersRef = PlayersRef;
     const settings = useSettingsStore((state) => state.playback);
-    const generalSetings = useGeneralSettings();
+    const { playerbarOpenDrawer } = useGeneralSettings();
     const playbackType = usePlaybackType();
     const volume = useVolume();
     const player1 = usePlayer1Data();
@@ -81,10 +81,8 @@ export const Playerbar = () => {
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
 
     const handleToggleFullScreenPlayer = (e?: MouseEvent<HTMLDivElement> | KeyboardEvent) => {
-        if (generalSetings.playerbarOpenDrawer) {
-            e?.stopPropagation();
-            setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
-        }
+        e?.stopPropagation();
+        setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
     };
 
     const autoNextFn = useCallback(() => {
@@ -93,7 +91,9 @@ export const Playerbar = () => {
     }, [autoNext]);
 
     return (
-        <PlayerbarContainer onClick={handleToggleFullScreenPlayer}>
+        <PlayerbarContainer
+            onClick={playerbarOpenDrawer ? handleToggleFullScreenPlayer : undefined}
+        >
             <PlayerbarControlsGrid>
                 <LeftGridItem>
                     <LeftControls />

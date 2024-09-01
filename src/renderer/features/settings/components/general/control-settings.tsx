@@ -515,6 +515,28 @@ export const ControlSettings = () => {
             isHidden: false,
             title: t('setting.albumBackgroundBlur', { postProcess: 'sentenceCase' }),
         },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.playerbarOpenDrawer ', { postProcess: 'sentenceCase' })}
+                    defaultChecked={settings.playerbarOpenDrawer}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                playerbarOpenDrawer: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.playerbarOpenDrawer', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.playerbarOpenDrawer', { postProcess: 'sentenceCase' }),
+        },
     ];
 
     return <SettingsSection options={controlOptions} />;

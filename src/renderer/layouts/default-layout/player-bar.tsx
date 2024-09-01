@@ -1,15 +1,38 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import { Playerbar } from '/@/renderer/features/player';
+import { useGeneralSettings } from '/@/renderer/store/settings.store';
 
-const PlayerbarContainer = styled.footer`
+interface PlayerbarContainerProps {
+    barState: string;
+}
+
+const PlayerbarContainer = styled.footer<PlayerbarContainerProps>`
     z-index: 200;
     grid-area: player;
-    background: var(--playerbar-bg);
+    background: var(--${(props) => props.barState});
+    transition: background 0.5s;
 `;
 
 export const PlayerBar = () => {
+    const { playerbarOpenDrawer } = useGeneralSettings();
+    const [barState, setBarState] = useState('playerbar-bg');
+
+    const handleMouseEnter = () => {
+        setBarState('playerbar-bg-active');
+    };
+
+    const handleMouseLeave = () => {
+        setBarState('playerbar-bg');
+    };
+
     return (
-        <PlayerbarContainer id="player-bar">
+        <PlayerbarContainer
+            barState={barState}
+            id="player-bar"
+            onMouseLeave={playerbarOpenDrawer ? handleMouseLeave : undefined}
+            onMouseOver={playerbarOpenDrawer ? handleMouseEnter : undefined}
+        >
             <Playerbar />
         </PlayerbarContainer>
     );
