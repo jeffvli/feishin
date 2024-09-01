@@ -607,9 +607,9 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
 
     const res = await jfApiClient(apiClientProps).createPlaylist({
         body: {
+            IsPublic: body.public,
             MediaType: 'Audio',
             Name: body.name,
-            Overview: body.comment || '',
             UserId: apiClientProps.server.userId,
         },
     });
@@ -633,9 +633,9 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
     const res = await jfApiClient(apiClientProps).updatePlaylist({
         body: {
             Genres: body.genres?.map((item) => ({ Id: item.id, Name: item.name })) || [],
+            IsPublic: body.public,
             MediaType: 'Audio',
             Name: body.name,
-            Overview: body.comment || '',
             PremiereDate: null,
             ProviderIds: {},
             Tags: [],
@@ -646,7 +646,7 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
         },
     });
 
-    if (res.status !== 200) {
+    if (res.status !== 204) {
         throw new Error('Failed to update playlist');
     }
 
@@ -954,7 +954,12 @@ const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> 
     return jfNormalize.song(res.body, apiClientProps.server, '');
 };
 
-const VERSION_INFO: VersionInfo = [['10.9.0', { [ServerFeature.LYRICS_SINGLE_STRUCTURED]: [1] }]];
+const VERSION_INFO: VersionInfo = [
+    [
+        '10.9.0',
+        { [ServerFeature.LYRICS_SINGLE_STRUCTURED]: [1], [ServerFeature.PUBLIC_PLAYLIST]: [1] },
+    ],
+];
 
 const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const { apiClientProps } = args;

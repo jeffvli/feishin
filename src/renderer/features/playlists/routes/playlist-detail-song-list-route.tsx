@@ -50,13 +50,13 @@ const PlaylistDetailSongListRoute = () => {
                         navidrome: {
                             owner: detailQuery?.data?.owner || '',
                             ownerId: detailQuery?.data?.ownerId || '',
-                            public: detailQuery?.data?.public || false,
                             rules,
                             sync: detailQuery?.data?.sync || false,
                         },
                     },
                     comment: detailQuery?.data?.description || '',
                     name: detailQuery?.data?.name,
+                    public: detailQuery?.data?.public || false,
                 },
                 serverId: detailQuery?.data?.serverId,
             },
@@ -92,7 +92,6 @@ const PlaylistDetailSongListRoute = () => {
                             navidrome: {
                                 owner: detailQuery?.data?.owner || '',
                                 ownerId: detailQuery?.data?.ownerId || '',
-                                public: detailQuery?.data?.public || false,
                                 rules: {
                                     ...filter,
                                     limit: extraFilters.limit || undefined,
@@ -104,6 +103,7 @@ const PlaylistDetailSongListRoute = () => {
                         },
                         comment: detailQuery?.data?.description || '',
                         name: detailQuery?.data?.name,
+                        public: detailQuery?.data?.public || false,
                     }}
                     serverId={detailQuery?.data?.serverId}
                     onCancel={closeAllModals}

@@ -317,7 +317,7 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
         body: {
             comment: body.comment,
             name: body.name,
-            public: body._custom?.navidrome?.public,
+            public: body.public,
             rules: body._custom?.navidrome?.rules,
             sync: body._custom?.navidrome?.sync,
         },
@@ -339,7 +339,7 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
         body: {
             comment: body.comment || '',
             name: body.name,
-            public: body._custom?.navidrome?.public || false,
+            public: body?.public || false,
             rules: body._custom?.navidrome?.rules ? body._custom.navidrome.rules : undefined,
             sync: body._custom?.navidrome?.sync || undefined,
         },
@@ -534,6 +534,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const features: ServerFeatures = {
         lyricsMultipleStructured: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
         playlistsSmart: !!navidromeFeatures[ServerFeature.PLAYLISTS_SMART],
+        publicPlaylist: true,
         sharingAlbumSong: !!navidromeFeatures[ServerFeature.SHARING_ALBUM_SONG],
     };
 

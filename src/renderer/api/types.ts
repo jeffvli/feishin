@@ -818,13 +818,13 @@ export type CreatePlaylistBody = {
         navidrome?: {
             owner?: string;
             ownerId?: string;
-            public?: boolean;
             rules?: Record<string, any>;
             sync?: boolean;
         };
     };
     comment?: string;
     name: string;
+    public?: boolean;
 };
 
 export type CreatePlaylistArgs = { body: CreatePlaylistBody; serverId?: string } & BaseEndpointArgs;
@@ -841,7 +841,6 @@ export type UpdatePlaylistBody = {
         navidrome?: {
             owner?: string;
             ownerId?: string;
-            public?: boolean;
             rules?: Record<string, any>;
             sync?: boolean;
         };
@@ -849,6 +848,7 @@ export type UpdatePlaylistBody = {
     comment?: string;
     genres?: Genre[];
     name: string;
+    public?: boolean;
 };
 
 export type UpdatePlaylistArgs = {

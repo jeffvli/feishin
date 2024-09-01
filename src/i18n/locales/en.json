@@ -249,6 +249,8 @@
             "title": "delete $t(entity.playlist_one)"
         },
         "editPlaylist": {
+            "publicJellyfinNote": "Jellyfin for some reason does not expose whether a playlist is public or not. If you wish for this to remain public, please have the following input selected",
+            "success": "$t(entity.playlist_one) updated successfully",
             "title": "edit $t(entity.playlist_one)"
         },
         "lyricSearch": {

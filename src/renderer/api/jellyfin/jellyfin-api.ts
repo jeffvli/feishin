@@ -292,8 +292,8 @@ export const contract = c.router({
     },
     updatePlaylist: {
         body: jfType._parameters.updatePlaylist,
-        method: 'PUT',
-        path: 'items/:id',
+        method: 'POST',
+        path: 'playlists/:id',
         responses: {
             200: jfType._response.updatePlaylist,
             400: jfType._response.error,

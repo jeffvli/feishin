@@ -20,6 +20,8 @@ import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer } from '/@/renderer/store';
 import { useTranslation } from 'react-i18next';
 import i18n from '/@/i18n/i18n';
+import { hasFeature } from '/@/renderer/api/utils';
+import { ServerFeature } from '/@/renderer/api/features-types';
 
 interface UpdatePlaylistFormProps {
     body: Partial<UpdatePlaylistBody>;
@@ -44,13 +46,13 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                 navidrome: {
                     owner: body?._custom?.navidrome?.owner || '',
                     ownerId: body?._custom?.navidrome?.ownerId || '',
-                    public: body?._custom?.navidrome?.public || false,
                     rules: undefined,
                     sync: body?._custom?.navidrome?.sync || false,
                 },
             },
             comment: body?.comment || '',
             name: body?.name || '',
+            public: body.public,
         },
     });
 
@@ -69,13 +71,16 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                     });
                 },
                 onSuccess: () => {
+                    toast.success({
+                        message: t('form.editPlaylist.success', { postProcess: 'sentenceCase' }),
+                    });
                     onCancel();
                 },
             },
         );
     });
 
-    const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
+    const isPublicDisplayed = hasFeature(server, ServerFeature.PUBLIC_PLAYLIST);
     const isOwnerDisplayed = server?.type === ServerType.NAVIDROME && userList;
     const isSubmitDisabled = !form.values.name || mutation.isLoading;
 
@@ -91,13 +96,15 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                     })}
                     {...form.getInputProps('name')}
                 />
-                <TextInput
-                    label={t('form.createPlaylist.input', {
-                        context: 'description',
-                        postProcess: 'titleCase',
-                    })}
-                    {...form.getInputProps('comment')}
-                />
+                {server?.type === ServerType.NAVIDROME && (
+                    <TextInput
+                        label={t('form.createPlaylist.input', {
+                            context: 'description',
+                            postProcess: 'titleCase',
+                        })}
+                        {...form.getInputProps('comment')}
+                    />
+                )}
                 {isOwnerDisplayed && (
                     <Select
                         data={userList || []}
@@ -109,13 +116,22 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                     />
                 )}
                 {isPublicDisplayed && (
-                    <Switch
-                        label={t('form.createPlaylist.input', {
-                            context: 'public',
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
-                    />
+                    <>
+                        {server?.type === ServerType.JELLYFIN && (
+                            <div>
+                                {t('form.editPlaylist.publicJellyfinNote', {
+                                    postProcess: 'sentenceCase',
+                                })}
+                            </div>
+                        )}
+                        <Switch
+                            label={t('form.createPlaylist.input', {
+                                context: 'public',
+                                postProcess: 'titleCase',
+                            })}
+                            {...form.getInputProps('public', { type: 'checkbox' })}
+                        />
+                    </>
                 )}
                 <Group position="right">
                     <Button
@@ -175,7 +191,6 @@ export const openUpdatePlaylistModal = async (args: {
                         navidrome: {
                             owner: playlist?.owner || undefined,
                             ownerId: playlist?.ownerId || undefined,
-                            public: playlist?.public || false,
                             rules: playlist?.rules || undefined,
                             sync: playlist?.sync || undefined,
                         },
@@ -183,6 +198,7 @@ export const openUpdatePlaylistModal = async (args: {
                     comment: playlist?.description || undefined,
                     genres: playlist?.genres,
                     name: playlist?.name,
+                    public: playlist?.public || false,
                 }}
                 query={{ id: playlist?.id }}
                 users={users?.items}

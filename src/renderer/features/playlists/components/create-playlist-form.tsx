@@ -28,7 +28,6 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
         initialValues: {
             _custom: {
                 navidrome: {
-                    public: false,
                     rules: undefined,
                 },
             },
@@ -88,7 +87,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
         );
     });
 
-    const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
+    const isPublicDisplayed = hasFeature(server, ServerFeature.PUBLIC_PLAYLIST);
     const isSubmitDisabled = !form.values.name || mutation.isLoading;
 
     return (
@@ -103,13 +102,15 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                     })}
                     {...form.getInputProps('name')}
                 />
-                <TextInput
-                    label={t('form.createPlaylist.input', {
-                        context: 'description',
-                        postProcess: 'titleCase',
-                    })}
-                    {...form.getInputProps('comment')}
-                />
+                {server?.type === ServerType.NAVIDROME && (
+                    <TextInput
+                        label={t('form.createPlaylist.input', {
+                            context: 'description',
+                            postProcess: 'titleCase',
+                        })}
+                        {...form.getInputProps('comment')}
+                    />
+                )}
                 <Group>
                     {isPublicDisplayed && (
                         <Switch
@@ -117,7 +118,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                                 context: 'public',
                                 postProcess: 'titleCase',
                             })}
-                            {...form.getInputProps('_custom.navidrome.public', {
+                            {...form.getInputProps('public', {
                                 type: 'checkbox',
                             })}
                         />

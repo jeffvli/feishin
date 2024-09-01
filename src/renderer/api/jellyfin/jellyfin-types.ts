@@ -581,9 +581,9 @@ const playlistDetailParameters = baseParameters.extend({
 });
 
 const createPlaylistParameters = z.object({
+    IsPublic: z.boolean().optional(),
     MediaType: z.literal('Audio'),
     Name: z.string(),
-    Overview: z.string(),
     UserId: z.string(),
 });
 
@@ -595,9 +595,9 @@ const updatePlaylist = z.null();
 
 const updatePlaylistParameters = z.object({
     Genres: z.array(genreItem),
+    IsPublic: z.boolean().optional(),
     MediaType: z.literal('Audio'),
     Name: z.string(),
-    Overview: z.string(),
     PremiereDate: z.null(),
     ProviderIds: z.object({}),
     Tags: z.array(genericItem),
