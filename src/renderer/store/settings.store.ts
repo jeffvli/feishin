@@ -336,7 +336,7 @@ const initialState: SettingsState = {
         accent: 'rgb(53, 116, 252)',
         albumArtRes: undefined,
         albumBackground: false,
-        albumBackgroundBlur: 1.5,
+        albumBackgroundBlur: 6,
         buttonSize: 20,
         defaultFullPlaylist: true,
         disabledContextMenu: {},
