@@ -1073,12 +1073,19 @@ export type SearchResponse = {
     songs: Song[];
 };
 
+export enum Played {
+    All = 'all',
+    Never = 'never',
+    Played = 'played',
+}
+
 export type RandomSongListQuery = {
     genre?: string;
     limit?: number;
     maxYear?: number;
     minYear?: number;
     musicFolderId?: string;
+    played: Played;
 };
 
 export type RandomSongListArgs = {

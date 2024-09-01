@@ -56,6 +56,7 @@ import {
     MoveItemArgs,
     DownloadArgs,
     TranscodingArgs,
+    Played,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
@@ -892,6 +893,12 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
             Fields: 'Genres, DateCreated, MediaSources, ParentId',
             GenreIds: query.genre ? query.genre : undefined,
             IncludeItemTypes: 'Audio',
+            IsPlayed:
+                query.played === Played.Never
+                    ? false
+                    : query.played === Played.Played
+                      ? true
+                      : undefined,
             Limit: query.limit,
             ParentId: query.musicFolderId,
             Recursive: true,

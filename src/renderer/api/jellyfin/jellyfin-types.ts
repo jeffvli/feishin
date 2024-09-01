@@ -561,6 +561,7 @@ const songListParameters = paginationParameters.merge(
         GenreIds: z.string().optional(),
         Genres: z.string().optional(),
         IsFavorite: z.boolean().optional(),
+        IsPlayed: z.boolean().optional(),
         SearchTerm: z.string().optional(),
         SortBy: z.nativeEnum(songListSort).optional(),
         Tags: z.string().optional(),
