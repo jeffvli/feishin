@@ -11,7 +11,7 @@ const PlayerbarContainer = styled.footer<PlayerbarContainerProps>`
     z-index: 200;
     grid-area: player;
     background: var(--${(props) => props.barState});
-    transition: background 0.5s;
+    transition: background 0.2s;
 `;
 
 export const PlayerBar = () => {
