@@ -474,7 +474,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
             mpvPlayer!.seek(-seconds);
         } else {
             resetNextPlayer();
-            currentPlayerRef.seekTo(newTime);
+            currentPlayerRef.seekTo(newTime, 'seconds');
         }
     };
 
@@ -497,7 +497,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
             resetNextPlayer();
             setCurrentTime(newTime, true);
-            currentPlayerRef.seekTo(newTime);
+            currentPlayerRef.seekTo(newTime, 'seconds');
         }
     };
 
@@ -505,7 +505,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
         if (isMpvPlayer) {
             mpvPlayer!.seekTo(e);
         } else {
-            currentPlayerRef.seekTo(e);
+            currentPlayerRef.seekTo(e, 'seconds');
         }
     }, 100);
 
