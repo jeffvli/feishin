@@ -16,7 +16,11 @@
         "removeFromQueue": "Von Warteschlange entfernen",
         "setRating": "Bewertung festlegen",
         "toggleSmartPlaylistEditor": "Editor $t(entity.smartPlaylist) umschalten",
-        "removeFromFavorites": "Entfernen von $t(entity.favorite_other)"
+        "removeFromFavorites": "Entfernen von $t(entity.favorite_other)",
+        "openIn": {
+            "lastfm": "In Last.fm öffnen",
+            "musicbrainz": "In MusicBrainz öffnen"
+        }
     },
     "common": {
         "backward": "rückwärts",
@@ -98,7 +102,11 @@
         "random": "zufällig",
         "size": "Größe",
         "biography": "Biografie",
-        "note": "Hinweis"
+        "note": "Hinweis",
+        "preview": "Vorschau",
+        "reload": "Neu Laden",
+        "mbid": "MusicBrainz ID",
+        "close": "schliessen"
     },
     "error": {
         "remotePortWarning": "Starten Sie den Server neu, um den neuen Port anzuwenden",
@@ -119,7 +127,10 @@
         "mpvRequired": "MPV benötigt",
         "audioDeviceFetchError": "Beim Versuch, Audiogeräte abzurufen, ist ein Fehler aufgetreten",
         "invalidServer": "Ungültiger Server",
-        "loginRateError": "Zu viele Anmeldeversuche, bitte versuche es in einigen Sekunden erneut"
+        "loginRateError": "Zu viele Anmeldeversuche, bitte versuche es in einigen Sekunden erneut",
+        "badAlbum": "Sie sehen diese Seite, weil dieses Lied nicht Teil eines Albums ist. Wahrscheinlich sehen Sie dieses Problem, wenn Sie einen Song in Ihrem Musikordner auf oberster Ebene haben. Jellyfin gruppiert nur Songs, wenn sie sich in einem Ordner befinden.",
+        "networkError": "ein Netzwerkfehler ist aufgetreten",
+        "openError": "datei kann nicht geöffnet werden"
     },
     "filter": {
         "mostPlayed": "Meistgespielt",
@@ -213,6 +224,9 @@
             "title": "Songtext Suche",
             "input_name": "$t(common.name)",
             "input_artist": "$t(entity.artist_one)"
+        },
+        "shareItem": {
+            "description": "Beschreibung"
         }
     },
     "entity": {
