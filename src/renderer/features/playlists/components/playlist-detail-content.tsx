@@ -1,5 +1,5 @@
-import { MutableRefObject, useMemo, useRef } from 'react';
-import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
+import { MutableRefObject, useCallback, useMemo, useRef } from 'react';
+import { ColDef, GetRowIdParams, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
@@ -9,7 +9,7 @@ import { generatePath, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useListStoreByKey } from '../../../store/list.store';
-import { LibraryItem, QueueSong } from '/@/renderer/api/types';
+import { LibraryItem, QueueSong, ServerType } from '/@/renderer/api/types';
 import { Button, ConfirmModal, DropdownMenu, MotionGroup, toast } from '/@/renderer/components';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
@@ -28,6 +28,7 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
+import { useScanUpdate } from '/@/renderer/features/playlists/hooks/use-scan-update';
 
 const ContentContainer = styled.div`
     position: relative;
@@ -156,6 +157,18 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
 
     const loadMoreRef = useRef<HTMLButtonElement | null>(null);
 
+    // Duplicates are only present if on Navidrome
+    const getId = useCallback(
+        (data: GetRowIdParams<any>): string => {
+            return server?.type === ServerType.JELLYFIN
+                ? data.data.id
+                : `${data.data.id}-${data.data.pageIndex}`;
+        },
+        [server?.type],
+    );
+
+    useScanUpdate(server, tableRef);
+
     return (
         <ContentContainer>
             <Group
@@ -215,21 +228,18 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                     autoFitColumns
                     autoHeight
                     deselectOnClickOutside
-                    shouldUpdateSong
                     stickyHeader
                     suppressCellFocus
                     suppressHorizontalScroll
                     suppressLoadingOverlay
                     suppressRowDrag
                     columnDefs={columnDefs}
-                    getRowId={(data) => {
-                        // It's possible that there are duplicate song ids in a playlist
-                        return `${data.data.id}-${data.data.pageIndex}`;
-                    }}
+                    getRowId={getId}
                     rowClassRules={rowClassRules}
                     rowData={playlistSongData}
                     rowHeight={60}
                     rowSelection="multiple"
+                    shouldUpdateSong={server?.type === ServerType.JELLYFIN}
                     onCellContextMenu={handleContextMenu}
                     onRowDoubleClicked={handleRowDoubleClick}
                 />
