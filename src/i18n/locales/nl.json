@@ -2,7 +2,7 @@
     "action": {
         "editPlaylist": "pas $t(entity.playlist_one) aan",
         "goToPage": "ga naar pagina",
-        "moveToTop": "verplaats naar top",
+        "moveToTop": "verplaats naar boven",
         "addToFavorites": "toevoegen aan $t(entity.favorite_other)",
         "addToPlaylist": "toevoegen aan $t(entity.playlist_one)",
         "createPlaylist": "maak $t(entity.playlist_one)",
@@ -16,7 +16,11 @@
         "setRating": "selecteer rating",
         "toggleSmartPlaylistEditor": "editor $t(entity.smartPlaylist) schakelen",
         "removeFromFavorites": "verwijder van $t(entity.favorite_other)",
-        "clearQueue": "lijst leegmaken"
+        "clearQueue": "verwijder lijst",
+        "openIn": {
+            "lastfm": "Open in Last.fm",
+            "musicbrainz": "Open in MusicBrainz"
+        }
     },
     "common": {
         "backward": "achteruit",
@@ -95,7 +99,10 @@
         "search": "zoeken",
         "saveAs": "opslaan als",
         "yes": "ja",
-        "size": "grootte"
+        "size": "grootte",
+        "reload": "herlaad",
+        "setting": "instelling",
+        "close": "sluiten"
     },
     "filter": {
         "rating": "rating",
