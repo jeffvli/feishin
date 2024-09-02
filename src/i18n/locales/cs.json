@@ -215,7 +215,37 @@
         "homeFeature": "carousel doporučení na domovské stránce",
         "homeFeature_description": "ovládá, zda se má zobrazovat velký carousel s doporučenými alby na domovské stránce",
         "imageAspectRatio": "použít nativní poměr stran obalů alb",
-        "imageAspectRatio_description": "pokud je povoleno, budou obaly alb zobrazeny s jejich nativním poměrem stran. u obalů, které nemají poměr 1:1, bude zbývající místo prázdné"
+        "imageAspectRatio_description": "pokud je povoleno, budou obaly alb zobrazeny s jejich nativním poměrem stran. u obalů, které nemají poměr 1:1, bude zbývající místo prázdné",
+        "doubleClickBehavior": "dvojitým kliknutím zařadit všechny vyhledané skladby do fronty",
+        "doubleClickBehavior_description": "pokud je zapnuto, budou všechny odpovídající skladby ve vyhledávání zařazeny do fronty. v opačném případě bude zařazena pouze ta, na kterou kliknete",
+        "volumeWidth": "šířka posuvníku hlasitosti",
+        "volumeWidth_description": "horizontální velikost posuvníku hlasitosti",
+        "discordListening": "zobrazit stav jako „Poslouchá“",
+        "discordListening_description": "zobrazit stav jako „Poslouchá“ namísto „Hraje“. tato funkce v současné době není kompatibilní s lištou s časem",
+        "contextMenu": "nastavení kontextové nabídky (kliknutí pravým)",
+        "contextMenu_description": "umožňuje skrýt položky, které se zobrazí v nabídce po kliknutí pravým tlačítkem myši na položku. položky, které nejsou zaškrtnuté, se skryjí",
+        "customCssEnable": "povolit vlastní css",
+        "customCssEnable_description": "povolti psaní vlastního css.",
+        "customCssNotice": "Varování: i když provádíme určitou sanitizaci (zakázáním url() a content:), může používání CSS stále představovat riziko změnami rozhraní.",
+        "customCss_description": "vlastní css obsah. Upozornění: vlastnosti content a vzdálené url jsou zakázané. Níže je zobrazen náhled vašeho obsahu. Další pole, která jste nenastavili, jsou přítomna z důvodu sanitizace.",
+        "customCss": "vlastní css",
+        "webAudio": "použít webový zvuk",
+        "webAudio_description": "použít webový zvuk. tím povolíte pokročilé funkce jako replaygain. zakažte, pokud se objeví problémy",
+        "transcodeNote": "projeví se po 1 (web) - 2 (mpv) skladbách",
+        "transcode": "povolit překódování",
+        "transcode_description": "zapnout překódování do různých formátů",
+        "transcodeFormat_description": "vybere formát k překódování. pokud chcete nechat rozhodnout server, ponechte prázdné",
+        "transcodeFormat": "formát k překódování",
+        "transcodeBitrate": "datový tok k překódování",
+        "transcodeBitrate_description": "vybere datový tok k překódování. 0 znamená, že necháte server vybrat",
+        "albumBackground": "obrázek alba na pozadí",
+        "albumBackground_description": "přidá obrázek alba na pozadí pro stránky alba obsahující obrázky alba",
+        "albumBackgroundBlur": "velikost rozostření obrázku alba na pozadí",
+        "albumBackgroundBlur_description": "upraví množství rozostření použité na obrázek alba na pozadí",
+        "playerbarOpenDrawer": "lišta přehrávače jako přepínač celé obrazovky",
+        "playerbarOpenDrawer_description": "umožňuje kliknutí na lištu přehrávače pro otevření celoobrazovkového přehrávače",
+        "artistConfiguration": "nastavení stránky umělce alba",
+        "artistConfiguration_description": "nastavit, které položky na stránce umělce alba budou zobrazeny a v jakém pořadí"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -541,7 +571,8 @@
             "removeFromQueue": "$t(action.removeFromQueue)",
             "showDetails": "získat informace",
             "shareItem": "sdílet položku",
-            "playSimilarSongs": "$t(player.playSimilarSongs)"
+            "playSimilarSongs": "$t(player.playSimilarSongs)",
+            "download": "stáhnout"
         },
         "home": {
             "mostPlayed": "nejpřehrávanější",
@@ -552,13 +583,15 @@
         },
         "albumDetail": {
             "moreFromArtist": "více od tohoto umělce",
-            "moreFromGeneric": "více od {{item}}"
+            "moreFromGeneric": "více od {{item}}",
+            "released": "vydáno"
         },
         "setting": {
             "playbackTab": "přehrávání",
             "generalTab": "obecné",
             "hotkeysTab": "klávesové zkratky",
-            "windowTab": "okno"
+            "windowTab": "okno",
+            "advanced": "pokročilé"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
@@ -604,6 +637,9 @@
             "copiedPath": "cesta úspěšně zkopírována",
             "copyPath": "kopírovat cestu do schránky",
             "openFile": "zobrazit skladbu ve správci souborů"
+        },
+        "playlist": {
+            "reorder": "změna pořadí povolena pouze při řazení podle id"
         }
     },
     "form": {
@@ -653,7 +689,9 @@
             "title": "Hledat texty"
         },
         "editPlaylist": {
-            "title": "upravit $t(entity.playlist_one)"
+            "title": "upravit $t(entity.playlist_one)",
+            "success": "$t(entity.playlist_one) úspěšně aktualizován",
+            "publicJellyfinNote": "Jellyfin z nějakého důvodu neukazuje, zda je seznam skladeb veřejný, nebo ne. Pokud si přejete, aby zůstal veřejný, zvolte prosím následující vstup"
         },
         "shareItem": {
             "allowDownloading": "umožnit stahování",
@@ -710,6 +748,9 @@
         "genreWithCount_other": "{{count}} žánrů",
         "trackWithCount_one": "{{count}} skladba",
         "trackWithCount_few": "{{count}} skladby",
-        "trackWithCount_other": "{{count}} skladeb"
+        "trackWithCount_other": "{{count}} skladeb",
+        "play_one": "{{count}} přehrání",
+        "play_few": "{{count}} přehrání",
+        "play_other": "{{count}} přehrání"
     }
 }
