@@ -143,8 +143,8 @@ const AlbumListRoute = () => {
     const title = artist
         ? t('page.albumList.artistAlbums', { artist })
         : genreId
-        ? t('page.albumList.genreAlbums', { genre: titleCase(genreTitle) })
-        : undefined;
+          ? t('page.albumList.genreAlbums', { genre: titleCase(genreTitle) })
+          : undefined;
 
     return (
         <AnimatedPage>

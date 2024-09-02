@@ -57,6 +57,9 @@ import type {
     Song,
     ServerType,
     ShareItemResponse,
+    MoveItemArgs,
+    DownloadArgs,
+    TranscodingArgs,
 } from '/@/renderer/api/types';
 import { DeletePlaylistResponse, RandomSongListArgs } from './types';
 import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
@@ -82,6 +85,7 @@ export type ControllerEndpoint = Partial<{
     getArtistDetail: () => void;
     getArtistInfo: (args: any) => void;
     getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse>;
+    getDownloadUrl: (args: DownloadArgs) => string;
     getFavoritesList: () => void;
     getFolderItemList: () => void;
     getFolderList: () => void;
@@ -99,7 +103,9 @@ export type ControllerEndpoint = Partial<{
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
     getStructuredLyrics: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
+    getTranscodingUrl: (args: TranscodingArgs) => string;
     getUserList: (args: UserListArgs) => Promise<UserListResponse>;
+    movePlaylistItem: (args: MoveItemArgs) => Promise<void>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
     scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
     search: (args: SearchArgs) => Promise<SearchResponse>;
@@ -130,6 +136,7 @@ const endpoints: ApiController = {
         getArtistDetail: undefined,
         getArtistInfo: undefined,
         getArtistList: undefined,
+        getDownloadUrl: jfController.getDownloadUrl,
         getFavoritesList: undefined,
         getFolderItemList: undefined,
         getFolderList: undefined,
@@ -147,7 +154,9 @@ const endpoints: ApiController = {
         getSongList: jfController.getSongList,
         getStructuredLyrics: undefined,
         getTopSongs: jfController.getTopSongList,
+        getTranscodingUrl: jfController.getTranscodingUrl,
         getUserList: undefined,
+        movePlaylistItem: jfController.movePlaylistItem,
         removeFromPlaylist: jfController.removeFromPlaylist,
         scrobble: jfController.scrobble,
         search: jfController.search,
@@ -170,6 +179,7 @@ const endpoints: ApiController = {
         getArtistDetail: undefined,
         getArtistInfo: undefined,
         getArtistList: undefined,
+        getDownloadUrl: ssController.getDownloadUrl,
         getFavoritesList: undefined,
         getFolderItemList: undefined,
         getFolderList: undefined,
@@ -187,7 +197,9 @@ const endpoints: ApiController = {
         getSongList: ndController.getSongList,
         getStructuredLyrics: ssController.getStructuredLyrics,
         getTopSongs: ssController.getTopSongList,
+        getTranscodingUrl: ssController.getTranscodingUrl,
         getUserList: ndController.getUserList,
+        movePlaylistItem: ndController.movePlaylistItem,
         removeFromPlaylist: ndController.removeFromPlaylist,
         scrobble: ssController.scrobble,
         search: ssController.search3,
@@ -209,6 +221,7 @@ const endpoints: ApiController = {
         getArtistDetail: undefined,
         getArtistInfo: undefined,
         getArtistList: undefined,
+        getDownloadUrl: ssController.getDownloadUrl,
         getFavoritesList: undefined,
         getFolderItemList: undefined,
         getFolderList: undefined,
@@ -224,6 +237,7 @@ const endpoints: ApiController = {
         getSongList: undefined,
         getStructuredLyrics: ssController.getStructuredLyrics,
         getTopSongs: ssController.getTopSongList,
+        getTranscodingUrl: ssController.getTranscodingUrl,
         getUserList: undefined,
         scrobble: ssController.scrobble,
         search: ssController.search3,
@@ -541,6 +555,33 @@ const getSimilarSongs = async (args: SimilarSongsArgs) => {
     )?.(args);
 };
 
+const movePlaylistItem = async (args: MoveItemArgs) => {
+    return (
+        apiController(
+            'movePlaylistItem',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['movePlaylistItem']
+    )?.(args);
+};
+
+const getDownloadUrl = (args: DownloadArgs) => {
+    return (
+        apiController(
+            'getDownloadUrl',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getDownloadUrl']
+    )?.(args);
+};
+
+const getTranscodingUrl = (args: TranscodingArgs) => {
+    return (
+        apiController(
+            'getTranscodingUrl',
+            args.apiClientProps.server?.type,
+        ) as ControllerEndpoint['getTranscodingUrl']
+    )?.(args);
+};
+
 export const controller = {
     addToPlaylist,
     authenticate,
@@ -553,6 +594,7 @@ export const controller = {
     getAlbumDetail,
     getAlbumList,
     getArtistList,
+    getDownloadUrl,
     getGenreList,
     getLyrics,
     getMusicFolderList,
@@ -566,7 +608,9 @@ export const controller = {
     getSongList,
     getStructuredLyrics,
     getTopSongList,
+    getTranscodingUrl,
     getUserList,
+    movePlaylistItem,
     removeFromPlaylist,
     scrobble,
     search,

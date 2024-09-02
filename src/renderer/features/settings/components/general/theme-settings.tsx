@@ -34,8 +34,8 @@ export const ThemeSettings = () => {
                                 e.currentTarget.checked
                                     ? 'system'
                                     : settings.theme === AppTheme.DEFAULT_DARK
-                                    ? 'dark'
-                                    : 'light',
+                                      ? 'dark'
+                                      : 'light',
                             );
                         }
                     }}

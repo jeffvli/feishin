@@ -123,7 +123,6 @@ export const useListFilterRefresh = ({
 
             gridRef.current?.scrollTo(0);
             gridRef.current?.resetLoadMoreItemsCache();
-            gridRef.current?.setItemData([]);
 
             const query = { ...filter, limit: 200, startIndex: 0 };
 

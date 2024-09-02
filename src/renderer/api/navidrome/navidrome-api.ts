@@ -8,7 +8,7 @@ import { ndType } from './navidrome-types';
 import { authenticationFailure, resultWithHeaders } from '/@/renderer/api/utils';
 import { useAuthStore } from '/@/renderer/store';
 import { ServerListItem } from '/@/renderer/api/types';
-import { toast } from '/@/renderer/components';
+import { toast } from '/@/renderer/components/toast';
 import i18n from '/@/i18n/i18n';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
@@ -145,6 +145,15 @@ export const contract = c.router({
         responses: {
             200: resultWithHeaders(ndType._response.userList),
             500: resultWithHeaders(ndType._response.error),
+        },
+    },
+    movePlaylistItem: {
+        body: ndType._parameters.moveItem,
+        method: 'PUT',
+        path: 'playlist/:playlistId/tracks/:trackNumber',
+        responses: {
+            200: resultWithHeaders(ndType._response.moveItem),
+            400: resultWithHeaders(ndType._response.error),
         },
     },
     removeFromPlaylist: {

@@ -138,8 +138,8 @@ const TrackListRoute = () => {
     const title = artist
         ? t('page.trackList.artistTracks', { artist })
         : genreId
-        ? t('page.trackList.genreTracks', { genre: titleCase(genreTitle) })
-        : undefined;
+          ? t('page.trackList.genreTracks', { genre: titleCase(genreTitle) })
+          : undefined;
 
     return (
         <AnimatedPage>

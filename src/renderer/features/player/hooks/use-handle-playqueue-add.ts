@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCurrentServer, usePlayerControls, usePlayerStore } from '/@/renderer/store';
-import { usePlaybackType } from '/@/renderer/store/settings.store';
+import { useGeneralSettings, usePlaybackType } from '/@/renderer/store/settings.store';
 import { PlayQueueAddOptions, Play, PlaybackType } from '/@/renderer/types';
 import { toast } from '/@/renderer/components/toast/index';
 import isElectron from 'is-electron';
@@ -25,6 +25,7 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { useTranslation } from 'react-i18next';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
+import { setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
 
 const getRootQueryKey = (itemType: LibraryItem, serverId: string) => {
     let queryKey;
@@ -64,6 +65,8 @@ export const useHandlePlayQueueAdd = () => {
     const server = useCurrentServer();
     const { play } = usePlayerControls();
     const timeoutIds = useRef<Record<string, ReturnType<typeof setTimeout>> | null>({});
+
+    const { doubleClickQueueAll } = useGeneralSettings();
 
     const handlePlayQueueAdd = useCallback(
         async (options: PlayQueueAddOptions) => {
@@ -121,6 +124,12 @@ export const useHandlePlayQueueAdd = () => {
                     } else if (itemType === LibraryItem.SONG) {
                         if (id?.length === 1) {
                             songList = await getSongById({ id: id?.[0], queryClient, server });
+                        } else if (!doubleClickQueueAll && initialSongId) {
+                            songList = await getSongById({
+                                id: initialSongId,
+                                queryClient,
+                                server,
+                            });
                         } else {
                             songList = await getSongsByQuery({ query, queryClient, server });
                         }
@@ -172,9 +181,9 @@ export const useHandlePlayQueueAdd = () => {
 
                 if (playType === Play.NOW || !hadSong) {
                     mpvPlayer!.pause();
-                    mpvPlayer!.setQueue(playerData, false);
+                    setQueue(playerData, false);
                 } else {
-                    mpvPlayer!.setQueueNext(playerData);
+                    setQueueNext(playerData);
                 }
             } else {
                 const player =
@@ -195,7 +204,7 @@ export const useHandlePlayQueueAdd = () => {
 
             return null;
         },
-        [play, playbackType, queryClient, server, t],
+        [doubleClickQueueAll, play, playbackType, queryClient, server, t],
     );
 
     return handlePlayQueueAdd;

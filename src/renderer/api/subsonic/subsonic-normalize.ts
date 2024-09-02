@@ -196,6 +196,7 @@ const normalizeAlbum = (
         lastPlayedAt: null,
         mbzId: null,
         name: item.name,
+        originalDate: null,
         playCount: null,
         releaseDate: item.year ? new Date(item.year, 0, 1).toISOString() : null,
         releaseYear: item.year ? Number(item.year) : null,

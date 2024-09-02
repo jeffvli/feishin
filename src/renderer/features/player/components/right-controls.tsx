@@ -18,6 +18,7 @@ import {
     useHotkeySettings,
     useMuted,
     usePreviousSong,
+    useSettingsStore,
     useSidebarStore,
     useSpeed,
     useVolume,
@@ -54,6 +55,7 @@ export const RightControls = () => {
     } = useRightControls();
 
     const speed = useSpeed();
+    const volumeWidth = useSettingsStore((state) => state.general.volumeWidth);
 
     const updateRatingMutation = useSetRating({});
     const addToFavoritesMutation = useCreateFavorite({});
@@ -324,7 +326,7 @@ export const RightControls = () => {
                             min={0}
                             size={6}
                             value={volume}
-                            w="60px"
+                            w={volumeWidth}
                             onChange={handleVolumeSlider}
                             onWheel={handleVolumeWheel}
                         />

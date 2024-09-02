@@ -32,7 +32,9 @@ const StyledTabs = styled(MantineTabs)`
             background: var(--btn-subtle-bg-hover);
         }
 
-        transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+        transition:
+            background 0.2s ease-in-out,
+            color 0.2s ease-in-out;
     }
 
     button[data-active] {

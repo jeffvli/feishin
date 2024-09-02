@@ -116,8 +116,8 @@ const StyledPlayerButton = styled(UnstyledButton)<StyledPlayerButtonProps>`
         variant === 'main'
             ? ButtonMainVariant
             : variant === 'secondary'
-            ? ButtonSecondaryVariant
-            : ButtonTertiaryVariant};
+              ? ButtonSecondaryVariant
+              : ButtonTertiaryVariant};
 `;
 
 export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
@@ -132,6 +132,10 @@ export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
                         <StyledPlayerButton
                             variant={variant}
                             {...rest}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                rest.onClick?.(e);
+                            }}
                         >
                             {icon}
                         </StyledPlayerButton>
@@ -148,6 +152,10 @@ export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
                 <StyledPlayerButton
                     variant={variant}
                     {...rest}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        rest.onClick?.(e);
+                    }}
                 >
                     {icon}
                 </StyledPlayerButton>

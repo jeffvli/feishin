@@ -131,16 +131,17 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const formattedTime = formatDuration(currentTime * 1000 || 0);
 
     useEffect(() => {
-        let interval: any;
+        let interval: ReturnType<typeof setInterval>;
 
         if (status === PlayerStatus.PLAYING && !isSeeking) {
             if (!isElectron() || playbackType === PlaybackType.WEB) {
+                // Update twice a second for slightly better performance
                 interval = setInterval(() => {
-                    setCurrentTime(currentPlayerRef.getCurrentTime());
-                }, 1000);
+                    if (currentPlayerRef) {
+                        setCurrentTime(currentPlayerRef.getCurrentTime());
+                    }
+                }, 500);
             }
-        } else {
-            clearInterval(interval);
         }
 
         return () => clearInterval(interval);
@@ -271,14 +272,14 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                                           postProcess: 'sentenceCase',
                                       })
                                     : repeat === PlayerRepeat.ALL
-                                    ? t('player.repeat', {
-                                          context: 'all',
-                                          postProcess: 'sentenceCase',
-                                      })
-                                    : t('player.repeat', {
-                                          context: 'one',
-                                          postProcess: 'sentenceCase',
-                                      })
+                                      ? t('player.repeat', {
+                                            context: 'all',
+                                            postProcess: 'sentenceCase',
+                                        })
+                                      : t('player.repeat', {
+                                            context: 'one',
+                                            postProcess: 'sentenceCase',
+                                        })
                             }`,
                         }}
                         variant="tertiary"

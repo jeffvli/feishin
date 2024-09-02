@@ -1,6 +1,10 @@
-import { useCallback } from 'react';
+import { useCallback, MouseEvent } from 'react';
 import styled from 'styled-components';
-import { usePlaybackType, useSettingsStore } from '/@/renderer/store/settings.store';
+import {
+    usePlaybackType,
+    useSettingsStore,
+    useGeneralSettings,
+} from '/@/renderer/store/settings.store';
 import { PlaybackType } from '/@/renderer/types';
 import { AudioPlayer } from '/@/renderer/components';
 import {
@@ -11,6 +15,8 @@ import {
     usePlayer2Data,
     usePlayerControls,
     useVolume,
+    useSetFullScreenPlayerStore,
+    useFullScreenPlayerStore,
 } from '/@/renderer/store';
 import { CenterControls } from './center-controls';
 import { LeftControls } from './left-controls';
@@ -62,6 +68,7 @@ const CenterGridItem = styled.div`
 export const Playerbar = () => {
     const playersRef = PlayersRef;
     const settings = useSettingsStore((state) => state.playback);
+    const { playerbarOpenDrawer } = useGeneralSettings();
     const playbackType = usePlaybackType();
     const volume = useVolume();
     const player1 = usePlayer1Data();
@@ -70,6 +77,13 @@ export const Playerbar = () => {
     const player = useCurrentPlayer();
     const muted = useMuted();
     const { autoNext } = usePlayerControls();
+    const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
+    const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
+
+    const handleToggleFullScreenPlayer = (e?: MouseEvent<HTMLDivElement> | KeyboardEvent) => {
+        e?.stopPropagation();
+        setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
+    };
 
     const autoNextFn = useCallback(() => {
         const playerData = autoNext();
@@ -77,7 +91,9 @@ export const Playerbar = () => {
     }, [autoNext]);
 
     return (
-        <PlayerbarContainer>
+        <PlayerbarContainer
+            onClick={playerbarOpenDrawer ? handleToggleFullScreenPlayer : undefined}
+        >
             <PlayerbarControlsGrid>
                 <LeftGridItem>
                     <LeftControls />

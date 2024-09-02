@@ -47,7 +47,12 @@ const logger = (
     ipcRenderer.send('logger', cb);
 };
 
+const download = (url: string) => {
+    ipcRenderer.send('download-url', url);
+};
+
 export const utils = {
+    download,
     isLinux,
     isMacOS,
     isWindows,

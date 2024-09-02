@@ -22,11 +22,11 @@
         height: 175px;
     }
 
-    @container (min-width: 600px) {
+    @container (max-width: 599px) {
         grid-template-columns: 175px minmax(0, 1fr);
 
         h1 {
-            font-size: 3rem;
+            height: 40px;
         }
 
         .image {
@@ -44,7 +44,7 @@
         grid-template-columns: 200px minmax(0, 1fr);
 
         h1 {
-            font-size: 3.5rem;
+            height: 80px;
         }
 
         .image {
@@ -62,7 +62,7 @@
         grid-template-columns: 225px minmax(0, 1fr);
 
         h1 {
-            font-size: 4.5rem;
+            height: 100px;
         }
 
         .image {
@@ -79,10 +79,6 @@
     @container (min-width: 1200px) {
         grid-template-columns: 250px minmax(0, 1fr);
 
-        h1 {
-            font-size: 5rem;
-        }
-
         .image {
             width: 250px !important;
             height: 250px;
@@ -91,12 +87,6 @@
         :global(.item-image-placeholder) {
             width: 250px !important;
             height: 250px;
-        }
-    }
-
-    @container (min-width: 1500px) {
-        h1 {
-            font-size: 5.5rem;
         }
     }
 }
@@ -113,6 +103,7 @@
 
 .metadata-section {
     z-index: 15;
+    font-size: 1.15rem;
     display: flex;
     flex-direction: column;
     grid-area: info;
@@ -132,6 +123,8 @@
     width: 100%;
     height: 100%;
     opacity: 0.9;
+    background-size: cover !important;
+    background-position: center !important;
 }
 
 .background-overlay {
@@ -144,12 +137,17 @@
     background: var(--bg-header-overlay);
 }
 
+.opaque-overlay {
+    opacity: 0.5;
+}
+
 .title {
     display: -webkit-box;
     overflow: hidden;
     color: var(--main-fg);
     font-size: 2rem;
     line-height: 1.2;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }

@@ -27,6 +27,8 @@ import {
     StructuredLyric,
     SimilarSongsArgs,
     Song,
+    DownloadArgs,
+    TranscodingArgs,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 import { ServerFeatures } from '/@/renderer/api/features-types';
@@ -482,16 +484,43 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
     }, []);
 };
 
+const getDownloadUrl = (args: DownloadArgs) => {
+    const { apiClientProps, query } = args;
+
+    return (
+        `${apiClientProps.server?.url}/rest/download.view` +
+        `?id=${query.id}` +
+        `&${apiClientProps.server?.credential}` +
+        '&v=1.13.0' +
+        '&c=feishin'
+    );
+};
+
+const getTranscodingUrl = (args: TranscodingArgs) => {
+    const { base, format, bitrate } = args.query;
+    let url = base;
+    if (format) {
+        url += `&format=${format}`;
+    }
+    if (bitrate !== undefined) {
+        url += `&maxBitRate=${bitrate}`;
+    }
+
+    return url;
+};
+
 export const ssController = {
     authenticate,
     createFavorite,
     getArtistInfo,
+    getDownloadUrl,
     getMusicFolderList,
     getRandomSongList,
     getServerInfo,
     getSimilarSongs,
     getStructuredLyrics,
     getTopSongList,
+    getTranscodingUrl,
     removeFavorite,
     scrobble,
     search3,

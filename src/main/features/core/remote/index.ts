@@ -34,13 +34,14 @@ interface MimeType {
     js: string;
 }
 
-interface StatefulWebSocket extends WebSocket {
+declare class StatefulWebSocket extends WebSocket {
     alive: boolean;
+
     auth: boolean;
 }
 
 let server: Server | undefined;
-let wsServer: WsServer<StatefulWebSocket> | undefined;
+let wsServer: WsServer<typeof StatefulWebSocket> | undefined;
 
 const settings: RemoteConfig = {
     enabled: false,
@@ -327,9 +328,9 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
             });
 
             server.listen(config.port, resolve);
-            wsServer = new WebSocketServer({ server });
+            wsServer = new WebSocketServer<typeof StatefulWebSocket>({ server });
 
-            wsServer.on('connection', (ws) => {
+            wsServer!.on('connection', (ws: StatefulWebSocket) => {
                 let authFail: number | undefined;
                 ws.alive = true;
 
@@ -471,6 +472,15 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                                 }
                                 break;
                             }
+                            case 'position': {
+                                const { position } = json;
+                                if (mprisPlayer) {
+                                    mprisPlayer.getPosition = () => position * 1e6;
+                                }
+                                getMainWindow()?.webContents.send('request-position', {
+                                    position,
+                                });
+                            }
                         }
                     } catch (error) {
                         console.error(error);
@@ -496,7 +506,7 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                 });
             }, PING_TIMEOUT_MS);
 
-            wsServer.on('close', () => {
+            wsServer!.on('close', () => {
                 clearInterval(heartBeat);
             });
 
@@ -625,8 +635,8 @@ if (mprisPlayer) {
             event === 'Playlist'
                 ? PlayerRepeat.ALL
                 : event === 'Track'
-                ? PlayerRepeat.ONE
-                : PlayerRepeat.NONE;
+                  ? PlayerRepeat.ONE
+                  : PlayerRepeat.NONE;
 
         currentState.repeat = repeat;
         broadcast({ data: repeat, event: 'repeat' });
@@ -649,3 +659,8 @@ if (mprisPlayer) {
         broadcast({ data: volume, event: 'volume' });
     });
 }
+
+ipcMain.on('update-position', (_event, position: number) => {
+    currentState.position = position;
+    broadcast({ data: position, event: 'position' });
+});

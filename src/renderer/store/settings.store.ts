@@ -24,6 +24,7 @@ import { randomString } from '/@/renderer/utils';
 import i18n from '/@/i18n/i18n';
 import { usePlayerStore } from '/@/renderer/store/player.store';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
+import type { ContextMenuItemType } from '/@/renderer/features/context-menu';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -104,7 +105,22 @@ export enum HomeItem {
     RECENTLY_PLAYED = 'recentlyPlayed',
 }
 
-export const homeItems = Object.values(HomeItem).map((item) => ({
+const homeItems = Object.values(HomeItem).map((item) => ({
+    disabled: false,
+    id: item,
+}));
+
+/* eslint-disable typescript-sort-keys/string-enum */
+export enum ArtistItem {
+    BIOGRAPHY = 'biography',
+    TOP_SONGS = 'topSongs',
+    RECENT_ALBUMS = 'recentAlbums',
+    COMPILATIONS = 'compilations',
+    SIMILAR_ARTISTS = 'similarArtists',
+}
+/* eslint-enable typescript-sort-keys/string-enum */
+
+const artistItems = Object.values(ArtistItem).map((item) => ({
     disabled: false,
     id: item,
 }));
@@ -176,11 +192,22 @@ export enum GenreTarget {
     TRACK = 'track',
 }
 
+export type TranscodingConfig = {
+    bitrate?: number;
+    enabled: boolean;
+    format?: string;
+};
+
 export interface SettingsState {
+    css: {
+        content: string;
+        enabled: boolean;
+    };
     discord: {
         clientId: string;
         enableIdle: boolean;
         enabled: boolean;
+        showAsListening: boolean;
         showServerImage: boolean;
         updateInterval: number;
     };
@@ -193,8 +220,13 @@ export interface SettingsState {
     general: {
         accent: string;
         albumArtRes?: number | null;
+        albumBackground: boolean;
+        albumBackgroundBlur: number;
+        artistItems: SortableItem<ArtistItem>[];
         buttonSize: number;
         defaultFullPlaylist: boolean;
+        disabledContextMenu: { [k in ContextMenuItemType]?: boolean };
+        doubleClickQueueAll: boolean;
         externalLinks: boolean;
         followSystemTheme: boolean;
         genreTarget: GenreTarget;
@@ -204,9 +236,11 @@ export interface SettingsState {
         nativeAspectRatio: boolean;
         passwordStore?: string;
         playButtonBehavior: Play;
+        playerbarOpenDrawer: boolean;
         resume: boolean;
         showQueueDrawerButton: boolean;
         sideQueueType: SideQueueType;
+        sidebarCollapseShared: boolean;
         sidebarCollapsedNavigation: boolean;
         sidebarItems: SidebarItemType[];
         sidebarPlaylistList: boolean;
@@ -219,6 +253,7 @@ export interface SettingsState {
         themeDark: AppTheme;
         themeLight: AppTheme;
         volumeWheelStep: number;
+        volumeWidth: number;
         zoomFactor: number;
     };
     hotkeys: {
@@ -254,7 +289,9 @@ export interface SettingsState {
             scrobbleAtPercentage: number;
         };
         style: PlaybackStyle;
+        transcode: TranscodingConfig;
         type: PlaybackType;
+        webAudio: boolean;
     };
     remote: {
         enabled: boolean;
@@ -284,11 +321,15 @@ export interface SettingsSlice extends SettingsState {
     actions: {
         reset: () => void;
         resetSampleRate: () => void;
+        setArtistItems: (item: SortableItem<ArtistItem>[]) => void;
         setGenreBehavior: (target: GenreTarget) => void;
         setHomeItems: (item: SortableItem<HomeItem>[]) => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
         setTable: (type: TableType, data: DataTableProps) => void;
+        setTranscodingConfig: (config: TranscodingConfig) => void;
+        toggleContextMenuItem: (item: ContextMenuItemType) => void;
+        toggleSidebarCollapseShare: () => void;
     };
 }
 
@@ -300,10 +341,15 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    css: {
+        content: '',
+        enabled: false,
+    },
     discord: {
         clientId: '1165957668758900787',
         enableIdle: false,
         enabled: false,
+        showAsListening: false,
         showServerImage: false,
         updateInterval: 15,
     },
@@ -316,8 +362,13 @@ const initialState: SettingsState = {
     general: {
         accent: 'rgb(53, 116, 252)',
         albumArtRes: undefined,
+        albumBackground: false,
+        albumBackgroundBlur: 6,
+        artistItems,
         buttonSize: 20,
         defaultFullPlaylist: true,
+        disabledContextMenu: {},
+        doubleClickQueueAll: true,
         externalLinks: true,
         followSystemTheme: false,
         genreTarget: GenreTarget.TRACK,
@@ -327,9 +378,11 @@ const initialState: SettingsState = {
         nativeAspectRatio: false,
         passwordStore: undefined,
         playButtonBehavior: Play.NOW,
+        playerbarOpenDrawer: false,
         resume: false,
         showQueueDrawerButton: false,
         sideQueueType: 'sideQueue',
+        sidebarCollapseShared: false,
         sidebarCollapsedNavigation: true,
         sidebarItems,
         sidebarPlaylistList: true,
@@ -342,6 +395,7 @@ const initialState: SettingsState = {
         themeDark: AppTheme.DEFAULT_DARK,
         themeLight: AppTheme.DEFAULT_LIGHT,
         volumeWheelStep: 5,
+        volumeWidth: 60,
         zoomFactor: 100,
     },
     hotkeys: {
@@ -417,7 +471,11 @@ const initialState: SettingsState = {
             scrobbleAtPercentage: 75,
         },
         style: PlaybackStyle.GAPLESS,
+        transcode: {
+            enabled: false,
+        },
         type: PlaybackType.WEB,
+        webAudio: true,
     },
     remote: {
         enabled: false,
@@ -616,6 +674,11 @@ export const useSettingsStore = create<SettingsSlice>()(
                             state.playback.mpvProperties.audioSampleRateHz = 0;
                         });
                     },
+                    setArtistItems: (items) => {
+                        set((state) => {
+                            state.general.artistItems = items;
+                        });
+                    },
                     setGenreBehavior: (target: GenreTarget) => {
                         set((state) => {
                             state.general.genreTarget = target;
@@ -637,6 +700,23 @@ export const useSettingsStore = create<SettingsSlice>()(
                     setTable: (type: TableType, data: DataTableProps) => {
                         set((state) => {
                             state.tables[type] = data;
+                        });
+                    },
+                    setTranscodingConfig: (config) => {
+                        set((state) => {
+                            state.playback.transcode = config;
+                        });
+                    },
+                    toggleContextMenuItem: (item: ContextMenuItemType) => {
+                        set((state) => {
+                            state.general.disabledContextMenu[item] =
+                                !state.general.disabledContextMenu[item];
+                        });
+                    },
+                    toggleSidebarCollapseShare: () => {
+                        set((state) => {
+                            state.general.sidebarCollapseShared =
+                                !state.general.sidebarCollapseShared;
                         });
                     },
                 },
@@ -689,3 +769,5 @@ export const useRemoteSettings = () => useSettingsStore((state) => state.remote,
 export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
 
 export const useDiscordSetttings = () => useSettingsStore((state) => state.discord, shallow);
+
+export const useCssSettings = () => useSettingsStore((state) => state.css, shallow);

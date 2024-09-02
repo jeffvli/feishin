@@ -44,7 +44,7 @@ export const WrapperSlider = ({ leftLabel, rightLabel, value, ...props }: Wrappe
                     {...props}
                     min={0}
                     size={6}
-                    value={!isSeeking ? value ?? 0 : seek}
+                    value={!isSeeking ? (value ?? 0) : seek}
                     w="100%"
                     onChange={(e) => {
                         setIsSeeking(true);

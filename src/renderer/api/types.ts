@@ -164,6 +164,7 @@ export type Album = {
     lastPlayedAt: string | null;
     mbzId: string | null;
     name: string;
+    originalDate: string | null;
     playCount: number | null;
     releaseDate: string | null;
     releaseYear: number | null;
@@ -817,13 +818,13 @@ export type CreatePlaylistBody = {
         navidrome?: {
             owner?: string;
             ownerId?: string;
-            public?: boolean;
             rules?: Record<string, any>;
             sync?: boolean;
         };
     };
     comment?: string;
     name: string;
+    public?: boolean;
 };
 
 export type CreatePlaylistArgs = { body: CreatePlaylistBody; serverId?: string } & BaseEndpointArgs;
@@ -840,7 +841,6 @@ export type UpdatePlaylistBody = {
         navidrome?: {
             owner?: string;
             ownerId?: string;
-            public?: boolean;
             rules?: Record<string, any>;
             sync?: boolean;
         };
@@ -848,6 +848,7 @@ export type UpdatePlaylistBody = {
     comment?: string;
     genres?: Genre[];
     name: string;
+    public?: boolean;
 };
 
 export type UpdatePlaylistArgs = {
@@ -1072,12 +1073,19 @@ export type SearchResponse = {
     songs: Song[];
 };
 
+export enum Played {
+    All = 'all',
+    Never = 'never',
+    Played = 'played',
+}
+
 export type RandomSongListQuery = {
     genre?: string;
     limit?: number;
     maxYear?: number;
     minYear?: number;
     musicFolderId?: string;
+    played: Played;
 };
 
 export type RandomSongListArgs = {
@@ -1190,4 +1198,33 @@ export type SimilarSongsQuery = {
 
 export type SimilarSongsArgs = {
     query: SimilarSongsQuery;
+} & BaseEndpointArgs;
+
+export type MoveItemQuery = {
+    endingIndex: number;
+    playlistId: string;
+    startingIndex: number;
+    trackId: string;
+};
+
+export type MoveItemArgs = {
+    query: MoveItemQuery;
+} & BaseEndpointArgs;
+
+export type DownloadQuery = {
+    id: string;
+};
+
+export type DownloadArgs = {
+    query: DownloadQuery;
+} & BaseEndpointArgs;
+
+export type TranscodingQuery = {
+    base: string;
+    bitrate?: number;
+    format?: string;
+};
+
+export type TranscodingArgs = {
+    query: TranscodingQuery;
 } & BaseEndpointArgs;

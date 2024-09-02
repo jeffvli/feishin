@@ -20,8 +20,8 @@ export const HeaderWrapper = styled.div<{ $position: Options['position'] }>`
         props.$position === 'right'
             ? 'flex-end'
             : props.$position === 'center'
-            ? 'center'
-            : 'flex-start'};
+              ? 'center'
+              : 'flex-start'};
     width: 100%;
     font-family: var(--content-font-family);
     text-transform: uppercase;
@@ -37,8 +37,8 @@ const HeaderText = styled(_Text)<{ $position: Options['position'] }>`
         props.$position === 'right'
             ? 'flex-end'
             : props.$position === 'center'
-            ? 'center'
-            : 'flex-start'};
+              ? 'center'
+              : 'flex-start'};
     text-transform: uppercase;
 `;
 

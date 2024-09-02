@@ -1,5 +1,6 @@
-import { Group, Stack } from '@mantine/core';
 import { forwardRef, Fragment, Ref } from 'react';
+import { Group, Stack } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
@@ -9,10 +10,13 @@ import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { formatDurationString } from '/@/renderer/utils';
+import { formatDateAbsolute, formatDurationString } from '/@/renderer/utils';
 
 interface AlbumDetailHeaderProps {
-    background: string;
+    background: {
+        background: string;
+        blur: number;
+    };
 }
 
 export const AlbumDetailHeader = forwardRef(
@@ -21,25 +25,49 @@ export const AlbumDetailHeader = forwardRef(
         const server = useCurrentServer();
         const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
         const cq = useContainerQuery();
+        const { t } = useTranslation();
+
+        const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
+
+        const originalDifferentFromRelease =
+            detailQuery.data?.originalDate &&
+            detailQuery.data.originalDate !== detailQuery.data.releaseDate;
+
+        const releasePrefix = originalDifferentFromRelease
+            ? t('page.albumDetail.released', { postProcess: 'sentenceCase' })
+            : '♫';
 
         const metadataItems = [
             {
-                id: 'releaseYear',
-                secondary: false,
-                value: detailQuery?.data?.releaseYear,
+                id: 'releaseDate',
+                value:
+                    detailQuery?.data?.releaseDate &&
+                    `${releasePrefix} ${formatDateAbsolute(detailQuery?.data?.releaseDate)}`,
             },
             {
                 id: 'songCount',
-                secondary: false,
                 value: `${detailQuery?.data?.songCount} songs`,
             },
             {
                 id: 'duration',
-                secondary: false,
                 value:
                     detailQuery?.data?.duration && formatDurationString(detailQuery.data.duration),
             },
+            {
+                id: 'playCount',
+                value: t('entity.play', {
+                    count: detailQuery?.data?.playCount as number,
+                }),
+            },
         ];
+
+        if (originalDifferentFromRelease) {
+            const formatted = `♫ ${formatDateAbsolute(detailQuery!.data!.originalDate)}`;
+            metadataItems.splice(0, 0, {
+                id: 'originalDate',
+                value: formatted,
+            });
+        }
 
         const updateRatingMutation = useSetRating({});
 
@@ -55,23 +83,21 @@ export const AlbumDetailHeader = forwardRef(
             });
         };
 
-        const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
-
         return (
             <Stack ref={cq.ref}>
                 <LibraryHeader
                     ref={ref}
-                    background={background}
                     imageUrl={detailQuery?.data?.imageUrl}
                     item={{ route: AppRoute.LIBRARY_ALBUMS, type: LibraryItem.ALBUM }}
                     title={detailQuery?.data?.name || ''}
+                    {...background}
                 >
                     <Stack spacing="sm">
                         <Group spacing="sm">
                             {metadataItems.map((item, index) => (
                                 <Fragment key={`item-${item.id}-${index}`}>
                                     {index > 0 && <Text $noSelect>•</Text>}
-                                    <Text $secondary={item.secondary}>{item.value}</Text>
+                                    <Text>{item.value}</Text>
                                 </Fragment>
                             ))}
                             {showRating && (
@@ -103,7 +129,6 @@ export const AlbumDetailHeader = forwardRef(
                                     $link
                                     component={Link}
                                     fw={600}
-                                    size="md"
                                     to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                         albumArtistId: artist.id,
                                     })}

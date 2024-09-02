@@ -1,5 +1,6 @@
 import { forwardRef, Fragment, Ref } from 'react';
 import { Group, Rating, Stack } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { LibraryItem, ServerType } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components';
@@ -17,6 +18,7 @@ export const AlbumArtistDetailHeader = forwardRef(
     ({ background }: AlbumArtistDetailHeaderProps, ref: Ref<HTMLDivElement>) => {
         const { albumArtistId } = useParams() as { albumArtistId: string };
         const server = useCurrentServer();
+        const { t } = useTranslation();
         const detailQuery = useAlbumArtistDetail({
             query: { id: albumArtistId },
             serverId: server?.id,
@@ -26,12 +28,12 @@ export const AlbumArtistDetailHeader = forwardRef(
             {
                 id: 'albumCount',
                 secondary: false,
-                value: detailQuery?.data?.albumCount && `${detailQuery?.data?.albumCount} albums`,
+                value: t('entity.albumWithCount', { count: detailQuery?.data?.albumCount || 0 }),
             },
             {
                 id: 'songCount',
                 secondary: false,
-                value: detailQuery?.data?.songCount && `${detailQuery?.data?.songCount} songs`,
+                value: t('entity.trackWithCount', { count: detailQuery?.data?.songCount || 0 }),
             },
             {
                 id: 'duration',

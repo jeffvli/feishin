@@ -160,8 +160,8 @@ export const GridCardControls = ({
         itemType === LibraryItem.ALBUM
             ? ALBUM_CONTEXT_MENU_ITEMS
             : itemType === LibraryItem.PLAYLIST
-            ? PLAYLIST_CONTEXT_MENU_ITEMS
-            : ARTIST_CONTEXT_MENU_ITEMS,
+              ? PLAYLIST_CONTEXT_MENU_ITEMS
+              : ARTIST_CONTEXT_MENU_ITEMS,
         resetInfiniteLoaderCache,
     );
 

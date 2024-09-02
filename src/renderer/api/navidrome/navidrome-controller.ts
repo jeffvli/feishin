@@ -49,6 +49,7 @@ import {
     ShareItemResponse,
     SimilarSongsArgs,
     Song,
+    MoveItemArgs,
 } from '../types';
 import { VersionInfo, getFeatures, hasFeature } from '/@/renderer/api/utils';
 import { ServerFeature, ServerFeatures } from '/@/renderer/api/features-types';
@@ -316,7 +317,7 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
         body: {
             comment: body.comment,
             name: body.name,
-            public: body._custom?.navidrome?.public,
+            public: body.public,
             rules: body._custom?.navidrome?.rules,
             sync: body._custom?.navidrome?.sync,
         },
@@ -338,7 +339,7 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
         body: {
             comment: body.comment || '',
             name: body.name,
-            public: body._custom?.navidrome?.public || false,
+            public: body?.public || false,
             rules: body._custom?.navidrome?.rules ? body._custom.navidrome.rules : undefined,
             sync: body._custom?.navidrome?.sync || undefined,
         },
@@ -533,6 +534,7 @@ const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
     const features: ServerFeatures = {
         lyricsMultipleStructured: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
         playlistsSmart: !!navidromeFeatures[ServerFeature.PLAYLISTS_SMART],
+        publicPlaylist: true,
         sharingAlbumSong: !!navidromeFeatures[ServerFeature.SHARING_ALBUM_SONG],
     };
 
@@ -613,6 +615,24 @@ const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
     }, []);
 };
 
+const movePlaylistItem = async (args: MoveItemArgs): Promise<void> => {
+    const { apiClientProps, query } = args;
+
+    const res = await ndApiClient(apiClientProps).movePlaylistItem({
+        body: {
+            insert_before: (query.endingIndex + 1).toString(),
+        },
+        params: {
+            playlistId: query.playlistId,
+            trackNumber: query.startingIndex.toString(),
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to move item in playlist');
+    }
+};
+
 export const ndController = {
     addToPlaylist,
     authenticate,
@@ -631,6 +651,7 @@ export const ndController = {
     getSongDetail,
     getSongList,
     getUserList,
+    movePlaylistItem,
     removeFromPlaylist,
     shareItem,
     updatePlaylist,
