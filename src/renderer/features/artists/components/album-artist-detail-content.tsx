@@ -560,6 +560,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     autoFitColumns
                                     autoHeight
                                     deselectOnClickOutside
+                                    shouldUpdateSong
                                     stickyHeader
                                     suppressCellFocus
                                     suppressHorizontalScroll
