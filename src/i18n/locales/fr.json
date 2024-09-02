@@ -28,7 +28,8 @@
         "mute": "muet",
         "skip_forward": "avancer",
         "pause": "pause",
-        "unfavorite": "dé-favori"
+        "unfavorite": "retirer des favoris",
+        "playSimilarSongs": "jouer des chansons similaires"
     },
     "action": {
         "editPlaylist": "éditer $t(entity.playlist_one)",
@@ -47,16 +48,20 @@
         "moveToBottom": "déplacer en bas",
         "setRating": "noter",
         "toggleSmartPlaylistEditor": "basculer l'éditeur de $t(entity.smartPlaylist)",
-        "removeFromFavorites": "retirer des $t(entity.favorite_other)"
+        "removeFromFavorites": "retirer des $t(entity.favorite_other)",
+        "openIn": {
+            "lastfm": "Ouvrir dans Last.fm",
+            "musicbrainz": "Ouvrir dans MusicBrainz"
+        }
     },
     "common": {
-        "backward": "reculer",
+        "backward": "en arrière",
         "increase": "augmenter",
         "rating": "note",
         "bpm": "bpm",
         "refresh": "rafraichir",
         "unknown": "inconnu",
-        "areYouSure": "êtes vous sûr ?",
+        "areYouSure": "êtes-vous sûr ?",
         "edit": "éditer",
         "favorite": "favoris",
         "left": "gauche",
@@ -130,7 +135,17 @@
         "random": "aléatoire",
         "size": "taille",
         "biography": "biographie",
-        "note": "note"
+        "note": "note",
+        "albumGain": "gain de l'album",
+        "albumPeak": "crête de l'album",
+        "close": "fermer",
+        "mbid": "Identifiants MusicBrainz",
+        "preview": "aperçu",
+        "share": "partager",
+        "reload": "recharger",
+        "trackGain": "gain de la piste",
+        "trackPeak": "crête de la piste",
+        "codec": "codec"
     },
     "error": {
         "remotePortWarning": "redémarrer le serveur pour appliquer le nouveau port",
@@ -151,7 +166,10 @@
         "mpvRequired": "MPV requis",
         "audioDeviceFetchError": "une erreur s’est produite lors de la tentative d’obtenir les périphériques audio",
         "invalidServer": "serveur invalide",
-        "loginRateError": "trop de tentative de connexion, merci d'essayer dans quelque secondes"
+        "loginRateError": "trop de tentative de connexion, merci d'essayer dans quelque secondes",
+        "openError": "impossible d'ouvrir le fichier",
+        "networkError": "une erreur de réseau est survenue",
+        "badAlbum": "vous voyez cette page parce que cette chanson ne fait pas parti d'un album. vous rencontrez probablement cette erreur si vous avez une chanson qui n'est pas dans votre répertoire de musique. jellyfin gère les chansons uniquement si elles sont dans un sous-dossier, qui est lui-même dans un dossier \"Musique(s)\"."
     },
     "filter": {
         "mostPlayed": "plus joués",
@@ -209,7 +227,8 @@
             "settings": "$t(common.setting_other)",
             "home": "$t(common.home)",
             "artists": "$t(entity.artist_other)",
-            "albumArtists": "$t(entity.albumArtist_other)"
+            "albumArtists": "$t(entity.albumArtist_other)",
+            "shared": "partagé $t(entity.playlist_other)"
         },
         "fullscreenPlayer": {
             "config": {
@@ -221,9 +240,11 @@
                 "unsynchronized": "désynchronisé",
                 "lyricAlignment": "alignement des paroles",
                 "useImageAspectRatio": "utiliser le ratio de l'image",
-                "opacity": "opacitée",
+                "opacity": "opacité",
                 "lyricSize": "Taille des paroles",
-                "lyricGap": "espacement des lettres"
+                "lyricGap": "espacement des lettres",
+                "dynamicIsImage": "activer l'image d'arrière-plan",
+                "dynamicImageBlur": "intensité de flou sur image d'arrière-plan"
             },
             "upNext": "à suivre",
             "lyrics": "paroles",
@@ -254,7 +275,7 @@
         },
         "setting": {
             "generalTab": "général",
-            "hotkeysTab": "raccourci",
+            "hotkeysTab": "raccourcis",
             "windowTab": "fenêtre",
             "playbackTab": "lecteur"
         },
@@ -282,22 +303,47 @@
             "addLast": "$t(player.addLast)",
             "addFavorite": "$t(action.addToFavorites)",
             "play": "$t(player.play)",
-            "removeFromQueue": "$t(action.removeFromQueue)"
+            "removeFromQueue": "$t(action.removeFromQueue)",
+            "shareItem": "partager un élément",
+            "playSimilarSongs": "$t(player.playSimilarSongs)",
+            "showDetails": "obtenir des informations"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
         },
         "genreList": {
-            "title": "$t(entity.genre_other)"
+            "title": "$t(entity.genre_other)",
+            "showAlbums": "afficher $t(entity.genre_one) $t(entity.album_other)",
+            "showTracks": "afficher $t(entity.genre_one) $t(entity.track_other)"
         },
         "trackList": {
-            "title": "$t(entity.track_other)"
+            "title": "$t(entity.track_other)",
+            "artistTracks": "pistes par {{artist}}",
+            "genreTracks": "'{{genre}}' $t(entity.track_other)"
         },
         "playlistList": {
             "title": "$t(entity.playlist_other)"
         },
         "albumList": {
-            "title": "$t(entity.album_other)"
+            "title": "$t(entity.album_other)",
+            "artistAlbums": "albums par {{artist}}",
+            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)"
+        },
+        "albumArtistDetail": {
+            "about": "À propos de {{artist}}",
+            "appearsOn": "apparaît sur",
+            "topSongsFrom": "meilleures chansons de {{title}}",
+            "viewAll": "voir tout",
+            "viewAllTracks": "voir tout $t(entity.track_other)",
+            "recentReleases": "sorties récentes",
+            "viewDiscography": "voir la discographie",
+            "relatedArtists": "en rapport avec $t(entity.artist_other)",
+            "topSongs": "meilleures chansons"
+        },
+        "itemDetail": {
+            "copyPath": "copier le chemin dans le presse-papiers",
+            "openFile": "afficher la piste dans le gestionnaire de fichiers",
+            "copiedPath": "chemin copié avec succès"
         }
     },
     "setting": {
@@ -331,7 +377,7 @@
         "mpvExecutablePath_description": "définit le chemin vers l'exécutable mpv, si vide, le chemin par défaut sera utilisé",
         "hotkey_favoriteCurrentSong": "favori $t(common.currentSong)",
         "sampleRate": "taux d'échantillonnage",
-        "sampleRate_description": "sélectionner le taux d'échantillonnage de sortie utilisé si la fréquence d'échantillonnage sélectionnée est différente de celle du média actuel. une valeur en inférieur à 8000 utilisera la fréquence par défaut",
+        "sampleRate_description": "sélectionne le taux d'échantillonnage de sortie utilisé si la fréquence d'échantillonnage sélectionnée est différente de celle du média actuel. une valeur inférieure à 8000 utilisera la fréquence par défaut",
         "hotkey_zoomIn": "zoom avant",
         "scrobble_description": "scrobble les lectures à votre serveur multimédia",
         "hotkey_browserForward": "avancer",
@@ -359,7 +405,7 @@
         "fontType_optionCustom": "police personnalisée",
         "remotePassword": "mot de passe du serveur de contrôle à distance",
         "lyricFetchProvider": "fournisseur depuis lequel récupérer les paroles",
-        "language_description": "définit la langue de l'application $t(common.restartRequired)",
+        "language_description": "définit la langue de l'application ($t(common.restartRequired))",
         "playbackStyle_optionCrossFade": "fondu enchaîné",
         "hotkey_rate3": "noter 3 étoiles",
         "font": "police",
@@ -371,7 +417,7 @@
         "hotkey_rate5": "noter 5 étoiles",
         "hotkey_playbackPrevious": "piste précédente",
         "showSkipButtons_description": "affiche ou cache les boutons suivants et précédents de la barre de lecture",
-        "language": "language",
+        "language": "langage",
         "playbackStyle": "style de lecture",
         "hotkey_toggleShuffle": "basculer la lecture aléatoire",
         "playbackStyle_description": "sélectionnez le style de lecture à utiliser pour le lecteur audio",
@@ -416,7 +462,7 @@
         "savePlayQueue_description": "sauvegarde la liste de lecture quand l'application est fermée et la restaure quand l'application est ouverte",
         "sidebarCollapsedNavigation_description": "affiche ou cache la navigation dans la barre latérale réduite",
         "sidebarConfiguration": "configuration de la barre latérale",
-        "sidebarConfiguration_description": "sélectionnez les items et l'ordre dans lesquels ils seront affichaient dans la barre latérale",
+        "sidebarConfiguration_description": "sélectionnez les éléments et l'ordre dans lequel ils seront affichés dans la barre latérale",
         "sidebarPlaylistList": "liste de playlist de la barre latérale",
         "sidebarCollapsedNavigation": "navigation de la barre latéral (réduite)",
         "skipDuration": "durée de l'avance rapide",
@@ -434,13 +480,13 @@
         "themeLight_description": "définit le thème clair à utiliser pour l'application",
         "zoom_description": "définit le pourcentage de zoom de l'application",
         "theme": "thème",
-        "skipPlaylistPage_description": "lors de la navigation dans une playlist, aller directement vers le liste des morceaux, au lieu de la page par défaut",
+        "skipPlaylistPage_description": "lors de la navigation dans une playlist, aller directement vers la liste des morceaux, au lieu de la page par défaut",
         "volumeWheelStep": "valeur du pas de volume",
         "windowBarStyle": "style de la barre de la fenêtre",
-        "useSystemTheme_description": "suivre les préférences du système (sombre ou clair)",
+        "useSystemTheme_description": "suivre les préférences du système (mode clair ou sombre)",
         "skipPlaylistPage": "sauter la page de playlist",
         "themeDark": "thème (sombre)",
-        "windowBarStyle_description": "sélectionner le style de la barre de la fenêtre",
+        "windowBarStyle_description": "ajuster le style de la barre de la fenêtre",
         "useSystemTheme": "utiliser le thème du système",
         "discordApplicationId_description": "l'identifiant de l'application pour le statut d'activité {{discord}} (par défaut à {{defaultId}})",
         "audioExclusiveMode": "mode de sortie audio exclusif",
@@ -455,18 +501,36 @@
         "playButtonBehavior_optionAddNext": "$t(player.addNext)",
         "replayGainMode_description": "ajuste le gain de volume accordement à la valeur de {{ReplayGain}} sauvegardé dans les métadonnées du fichier",
         "replayGainFallback": "{{ReplayGain}} fallback",
-        "replayGainClipping_description": "Préviens le clipping causé par {{ReplayGain}} en baissant automatiquement le gain",
+        "replayGainClipping_description": "Prévient le clipping causé par {{ReplayGain}} en baissant automatiquement le gain",
         "replayGainPreamp": "préamplificateur (dB) de {{ReplayGain}}",
         "replayGainClipping": "{{ReplayGain}} clipping",
         "replayGainMode": "mode de {{ReplayGain}}",
         "replayGainFallback_description": "gain en dB à appliquer si le fichier n'a pas de tag {{ReplayGain}}",
         "replayGainPreamp_description": "ajuste le gain de préampli appliqué a la valeur de {{ReplayGain}}",
         "clearQueryCache": "vide le cache de feishin",
-        "clearCache": "Vider le cache navigateur",
+        "clearCache": "vider le cache navigateur",
         "buttonSize_description": "la taille des boutons de la barre de lecture",
         "clearQueryCache_description": "un 'soft clear' de feishin. cela actualisera les playlists, les métadonnées des pistes, et réinitialisera les paroles enregistrées. les paramètres, identifiants serveurs et les images mises en cache sont conservés",
         "clearCache_description": "un 'hard clear' de feishin. en plus de vider le cache de feishin, vide le cache du navigateur (images sauvegardées et autres ressources). les identifiants serveurs et paramètres sont conservés",
-        "buttonSize": "taille des boutons de la barre de lecture"
+        "buttonSize": "taille des boutons du lecteur",
+        "clearCacheSuccess": "le cache a été vidé",
+        "externalLinks_description": "activer l'affichage de liens externes (Last.fm, MusicBrainz) sur la page de l'artiste/album",
+        "genreBehavior": "comportement par défaut de la page des genres",
+        "startMinimized_description": "démarrer l'application dans la barre des tâches",
+        "externalLinks": "afficher les liens externes",
+        "homeConfiguration": "configuration de la page d'accueil",
+        "homeFeature": "carrousel de la page d'accueil",
+        "homeFeature_description": "active ou désactive le carrousel sur la page d'accueil",
+        "imageAspectRatio": "utiliser le rapport hauteur/largeur natif de la pochette",
+        "imageAspectRatio_description": "si cette option est activée, les pochettes seront affichées en utilisant leur rapport hauteur/largeur natif. pour les pochettes qui n'ont pas un rapport 1:1 (carré), l'espace restant sera vide",
+        "mpvExtraParameters_help": "un par ligne",
+        "passwordStore_description": "quel mot de passe utiliser. changez cela si vous rencontrez des problèmes pour stocker les mots de passe.",
+        "playerAlbumArtResolution": "résolution de la pochette de l'album du lecteur",
+        "passwordStore": "mots de passe",
+        "playerAlbumArtResolution_description": "la résolution pour l'aperçu de la pochette d'album agrandie du lecteur. plus grand le rend plus net, mais peut ralentir le chargement. la valeur par défaut est 0 (automatique)",
+        "homeConfiguration_description": "configurer quels éléments sont affichés sur la page d'accueil, et dans quel ordre",
+        "startMinimized": "démarrer l'application en mode réduit",
+        "genreBehavior_description": "détermine si cliquer sur un genre ouvre par défaut la liste des pistes ou des albums"
     },
     "form": {
         "deletePlaylist": {
@@ -516,6 +580,14 @@
             "title": "rechercher parole",
             "input_name": "$t(common.name)",
             "input_artist": "$t(entity.artist_one)"
+        },
+        "shareItem": {
+            "allowDownloading": "autoriser le téléchargement",
+            "description": "description",
+            "setExpiration": "définir une expiration",
+            "success": "lien de partage copié dans le presse-papier (ou cliquez ici pour ouvrir)",
+            "expireInvalid": "l'expiration doit être définie à une date ultérieure",
+            "createFailed": "échec de la création du lien de partage (le partage est-il activé ?)"
         }
     },
     "entity": {
@@ -573,7 +645,9 @@
                 "tableColumns": "colonnes de la liste",
                 "autoFitColumns": "colonnes à ajustement automatique",
                 "gap": "$t(common.gap)",
-                "size": "$t(common.size)"
+                "size": "$t(common.size)",
+                "itemGap": "écart entre les éléments (en pixel)",
+                "itemSize": "taille des élements (en pixel)"
             },
             "view": {
                 "table": "liste",
@@ -606,7 +680,9 @@
                 "title": "$t(common.title)",
                 "size": "$t(common.size)",
                 "genre": "$t(entity.genre_one)",
-                "year": "$t(common.year)"
+                "year": "$t(common.year)",
+                "songCount": "$t(entity.track_other)",
+                "codec": "$t(common.codec)"
             }
         },
         "column": {
@@ -632,7 +708,8 @@
             "genre": "$t(entity.genre_one)",
             "songCount": "$t(entity.track_other)",
             "channels": "$t(common.channel_other)",
-            "size": "$t(common.size)"
+            "size": "$t(common.size)",
+            "codec": "$t(common.codec)"
         }
     }
 }
