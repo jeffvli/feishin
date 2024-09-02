@@ -15,6 +15,7 @@ import {
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useSetAlbumListItemDataById, useSetQueueRating } from '/@/renderer/store';
 import isElectron from 'is-electron';
+import { useRatingEvent } from '/@/renderer/store/event.store';
 
 const remote = isElectron() ? window.electron.remote : null;
 
@@ -23,6 +24,7 @@ export const useSetRating = (args: MutationHookArgs) => {
     const queryClient = useQueryClient();
     const setAlbumListData = useSetAlbumListItemDataById();
     const setQueueRating = useSetQueueRating();
+    const setRatingEvent = useRatingEvent();
 
     return useMutation<
         RatingResponse,
@@ -43,25 +45,36 @@ export const useSetRating = (args: MutationHookArgs) => {
                         break;
                     case LibraryItem.SONG:
                         setQueueRating([item.id], item.userRating);
+                        setRatingEvent([item.id], item.userRating);
                         break;
                 }
             }
         },
         onMutate: (variables) => {
+            const songIds: string[] = [];
             for (const item of variables.query.item) {
                 switch (item.itemType) {
                     case LibraryItem.ALBUM:
                         setAlbumListData(item.id, { userRating: variables.query.rating });
                         break;
                     case LibraryItem.SONG:
-                        setQueueRating([item.id], variables.query.rating);
+                        songIds.push(item.id);
+
                         break;
                 }
             }
 
+            if (songIds.length > 0) {
+                setQueueRating(songIds, variables.query.rating);
+                setRatingEvent(songIds, variables.query.rating);
+            }
+
             if (remote) {
-                const ids = variables.query.item.map((item) => item.id);
-                remote.updateRating(variables.query.rating, variables.query.item[0].serverId, ids);
+                remote.updateRating(
+                    variables.query.rating,
+                    variables.query.item[0].serverId,
+                    songIds,
+                );
             }
 
             return { previous: { items: variables.query.item } };

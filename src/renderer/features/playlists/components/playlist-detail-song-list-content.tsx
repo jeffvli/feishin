@@ -279,7 +279,6 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
                     ref={tableRef}
                     alwaysShowHorizontalScroll
-                    shouldUpdateSong
                     autoFitColumns={page.table.autoFit}
                     columnDefs={columnDefs}
                     context={{
@@ -288,7 +287,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                         onCellContextMenu: handleContextMenu,
                         status,
                     }}
-                    getRowId={(data) => data.data.id}
+                    getRowId={(data) => data.data.uniqueId}
                     infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 100}
                     pagination={isPaginationEnabled}
                     paginationAutoPageSize={isPaginationEnabled}

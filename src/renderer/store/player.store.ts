@@ -23,20 +23,12 @@ export interface PlayerState {
         time: number;
     };
     fallback: boolean | null;
-    favorite?: {
-        favorite: boolean;
-        ids: string[];
-    };
     muted: boolean;
     queue: {
         default: QueueSong[];
         previousNode?: QueueSong;
         shuffled: string[];
         sorted: QueueSong[];
-    };
-    rating?: {
-        ids: string[];
-        rating: number | null;
     };
     repeat: PlayerRepeat;
     shuffle: PlayerShuffle;
@@ -861,13 +853,6 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 });
                             }
 
-                            set((state) => {
-                                state.favorite = {
-                                    favorite,
-                                    ids,
-                                };
-                            });
-
                             return foundUniqueIds;
                         },
                         setMuted: (muted: boolean) => {
@@ -897,10 +882,6 @@ export const usePlayerStore = create<PlayerSlice>()(
                                     }
                                 });
                             }
-
-                            set((state) => {
-                                state.rating = { ids, rating };
-                            });
 
                             return foundUniqueIds;
                         },

@@ -42,8 +42,7 @@ import { NoteCell } from '/@/renderer/components/virtual-table/cells/note-cell';
 import { RowIndexCell } from '/@/renderer/components/virtual-table/cells/row-index-cell';
 import i18n from '/@/i18n/i18n';
 import { formatDateAbsolute, formatDateRelative, formatSizeString } from '/@/renderer/utils/format';
-import { useTableFavoriteChange } from '/@/renderer/hooks/use-favorite-change';
-import { useTableRatingChange } from '/@/renderer/hooks/use-rating-change';
+import { useTableChange } from '/@/renderer/hooks/use-song-change';
 
 export * from './table-config-dropdown';
 export * from './table-pagination';
@@ -510,8 +509,7 @@ export const VirtualTable = forwardRef(
             }
         });
 
-        useTableFavoriteChange(tableRef, shouldUpdateSong || false);
-        useTableRatingChange(tableRef, shouldUpdateSong || false);
+        useTableChange(tableRef, shouldUpdateSong === true);
 
         const defaultColumnDefs: ColDef = useMemo(() => {
             return {
