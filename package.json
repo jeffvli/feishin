@@ -319,7 +319,7 @@
         "electron-localshortcut": "^3.2.1",
         "electron-log": "^5.1.1",
         "electron-store": "^8.1.0",
-        "electron-updater": "^6.3.0",
+        "electron-updater": "^6.3.1",
         "fast-average-color": "^9.3.0",
         "format-duration": "^2.0.0",
         "framer-motion": "^11.0.0",
