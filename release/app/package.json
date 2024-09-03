@@ -1,6 +1,6 @@
 {
     "name": "feishin",
-    "version": "0.7.3",
+    "version": "0.8.0",
     "description": "",
     "main": "./dist/main/main.js",
     "author": {
