@@ -175,7 +175,6 @@ export const useRemoteStore = create<SettingsSlice>()(
                                     }
                                     case 'song': {
                                         set((state) => {
-                                            console.log(data);
                                             state.info.song = data;
                                         });
                                         break;

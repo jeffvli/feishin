@@ -279,6 +279,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
                     ref={tableRef}
                     alwaysShowHorizontalScroll
+                    shouldUpdateSong
                     autoFitColumns={page.table.autoFit}
                     columnDefs={columnDefs}
                     context={{

@@ -456,6 +456,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         key={`table-${tableConfig.rowHeight}`}
                         ref={tableRef}
                         autoHeight
+                        shouldUpdateSong
                         stickyHeader
                         suppressCellFocus
                         suppressLoadingOverlay

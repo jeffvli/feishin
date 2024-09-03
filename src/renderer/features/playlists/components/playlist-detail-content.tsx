@@ -215,16 +215,14 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                     autoFitColumns
                     autoHeight
                     deselectOnClickOutside
+                    shouldUpdateSong
                     stickyHeader
                     suppressCellFocus
                     suppressHorizontalScroll
                     suppressLoadingOverlay
                     suppressRowDrag
                     columnDefs={columnDefs}
-                    getRowId={(data) => {
-                        // It's possible that there are duplicate song ids in a playlist
-                        return `${data.data.id}-${data.data.pageIndex}`;
-                    }}
+                    getRowId={(data) => `${data.data.id}-${data.data.pageIndex}`}
                     rowClassRules={rowClassRules}
                     rowData={playlistSongData}
                     rowHeight={60}

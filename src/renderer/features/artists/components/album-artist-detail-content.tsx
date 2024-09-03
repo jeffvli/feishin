@@ -560,6 +560,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     autoFitColumns
                                     autoHeight
                                     deselectOnClickOutside
+                                    shouldUpdateSong
                                     stickyHeader
                                     suppressCellFocus
                                     suppressHorizontalScroll
@@ -567,7 +568,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     suppressRowDrag
                                     columnDefs={topSongsColumnDefs}
                                     enableCellChangeFlash={false}
-                                    getRowId={(data) => data.data.uniqueId}
+                                    getRowId={(data) => data.data.id}
                                     rowData={topSongs}
                                     rowHeight={60}
                                     rowSelection="multiple"

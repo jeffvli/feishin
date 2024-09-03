@@ -1,5 +1,5 @@
 import { QueryKey, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
+import { MutableRefObject, useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 import { ListOnScrollProps } from 'react-window';
@@ -16,6 +16,7 @@ import { SONG_CARD_ROWS } from '/@/renderer/components';
 import {
     VirtualGridAutoSizerContainer,
     VirtualInfiniteGrid,
+    VirtualInfiniteGridRef,
 } from '/@/renderer/components/virtual-grid';
 import { useListContext } from '/@/renderer/context/list-context';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
@@ -23,8 +24,14 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useListStoreActions, useListStoreByKey } from '/@/renderer/store';
 import { CardRow, ListDisplayType } from '/@/renderer/types';
 import { useHandleFavorite } from '/@/renderer/features/shared/hooks/use-handle-favorite';
+import { useEventStore } from '/@/renderer/store/event.store';
 
-export const SongListGridView = ({ gridRef, itemCount }: any) => {
+interface SongListGridViewProps {
+    gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+    itemCount?: number;
+}
+
+export const SongListGridView = ({ gridRef, itemCount }: SongListGridViewProps) => {
     const queryClient = useQueryClient();
     const server = useCurrentServer();
     const handlePlayQueueAdd = usePlayQueueAdd();
@@ -37,6 +44,30 @@ export const SongListGridView = ({ gridRef, itemCount }: any) => {
     const initialScrollOffset = Number(id ? scrollOffset : grid?.scrollOffset) || 0;
 
     const handleFavorite = useHandleFavorite({ gridRef, server });
+
+    useEffect(() => {
+        const unSub = useEventStore.subscribe((state) => {
+            const event = state.event;
+            if (event && event.event === 'favorite') {
+                const idSet = new Set(state.ids);
+                const userFavorite = event.favorite;
+
+                gridRef.current?.updateItemData((data) => {
+                    if (idSet.has(data.id)) {
+                        return {
+                            ...data,
+                            userFavorite,
+                        };
+                    }
+                    return data;
+                });
+            }
+        });
+
+        return () => {
+            unSub();
+        };
+    }, [gridRef]);
 
     const cardRows = useMemo(() => {
         const rows: CardRow<Song>[] = [

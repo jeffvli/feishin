@@ -64,8 +64,9 @@ export const AlbumArtistDetailTopSongsListContent = ({
                 <VirtualTable
                     key={`table-${tableProps.rowHeight}-${server?.id}`}
                     ref={tableRef}
+                    shouldUpdateSong
                     {...tableProps}
-                    getRowId={(data) => data.data.uniqueId}
+                    getRowId={(data) => data.data.id}
                     rowClassRules={rowClassRules}
                     rowData={data}
                     rowModelType="clientSide"
