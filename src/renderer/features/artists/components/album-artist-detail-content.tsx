@@ -373,7 +373,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
 
     const isLoading =
         detailQuery?.isLoading ||
-        (server?.type === ServerType.NAVIDROME && topSongsQuery?.isLoading);
+        (server?.type === ServerType.NAVIDROME && enabledItem.topSongs && topSongsQuery?.isLoading);
 
     if (isLoading) return <ContentContainer ref={cq.ref} />;
 
