@@ -107,6 +107,7 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
             {open && (
                 <Reorder.Group
                     axis="y"
+                    style={{ userSelect: 'none' }}
                     values={localItems}
                     onReorder={setLocalItems}
                 >
