@@ -33,36 +33,37 @@ export const useTableChange = (
             if (!api) return;
 
             const rowNodes: RowNode[] = [];
-            for (const id of ids) {
-                const node: RowNode<Song> | undefined = api.getRowNode(id);
-                if (node && node.data) {
-                    switch (event.event) {
-                        case 'favorite': {
-                            if (node.data.userFavorite !== event.favorite) {
-                                node.setDataValue('userFavorite', event.favorite);
-                            }
-                            break;
+            const idSet = new Set(ids);
+
+            api.forEachNode((node: RowNode<Song>) => {
+                if (!node.data || !idSet.has(node.data.id)) return;
+
+                switch (event.event) {
+                    case 'favorite': {
+                        if (node.data.userFavorite !== event.favorite) {
+                            node.setDataValue('userFavorite', event.favorite);
                         }
-                        case 'play':
-                            if (node.data.lastPlayedAt !== event.timestamp) {
-                                node.setData({
-                                    ...node.data,
-                                    lastPlayedAt: event.timestamp,
-                                    playCount: node.data.playCount + 1,
-                                });
-                            }
-                            node.data.lastPlayedAt = event.timestamp;
-                            break;
-                        case 'rating': {
-                            if (node.data.userRating !== event.rating) {
-                                node.setDataValue('userRating', event.rating);
-                                rowNodes.push(node);
-                            }
-                            break;
+                        break;
+                    }
+                    case 'play':
+                        if (node.data.lastPlayedAt !== event.timestamp) {
+                            node.setData({
+                                ...node.data,
+                                lastPlayedAt: event.timestamp,
+                                playCount: node.data.playCount + 1,
+                            });
                         }
+                        node.data.lastPlayedAt = event.timestamp;
+                        break;
+                    case 'rating': {
+                        if (node.data.userRating !== event.rating) {
+                            node.setDataValue('userRating', event.rating);
+                            rowNodes.push(node);
+                        }
+                        break;
                     }
                 }
-            }
+            });
 
             // This is required to redraw star rows
             if (rowNodes.length > 0) {

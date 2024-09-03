@@ -1,7 +1,6 @@
 import type {
     BodyScrollEvent,
     ColDef,
-    GetRowIdParams,
     GridReadyEvent,
     IDatasource,
     PaginationChangedEvent,
@@ -20,7 +19,6 @@ import {
     LibraryItem,
     PlaylistSongListQuery,
     QueueSong,
-    ServerType,
     Song,
     SongListSort,
     SortOrder,
@@ -49,7 +47,6 @@ import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { ListDisplayType } from '/@/renderer/types';
 import { useAppFocus } from '/@/renderer/hooks';
 import { toast } from '/@/renderer/components';
-import { useScanUpdate } from '/@/renderer/features/playlists/hooks/use-scan-update';
 
 interface PlaylistDetailContentProps {
     tableRef: MutableRefObject<AgGridReactType | null>;
@@ -273,16 +270,6 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
-    // Duplicates are only present if on Navidrome
-    const getId = useCallback(
-        (data: GetRowIdParams<Song>): string => {
-            return server?.type === ServerType.JELLYFIN ? data.data.id : data.data.uniqueId;
-        },
-        [server?.type],
-    );
-
-    useScanUpdate(server, tableRef);
-
     return (
         <>
             <VirtualGridAutoSizerContainer>
@@ -292,6 +279,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
                     ref={tableRef}
                     alwaysShowHorizontalScroll
+                    shouldUpdateSong
                     autoFitColumns={page.table.autoFit}
                     columnDefs={columnDefs}
                     context={{
@@ -300,7 +288,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                         onCellContextMenu: handleContextMenu,
                         status,
                     }}
-                    getRowId={getId}
+                    getRowId={(data) => data.data.uniqueId}
                     infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 100}
                     pagination={isPaginationEnabled}
                     paginationAutoPageSize={isPaginationEnabled}
@@ -311,7 +299,6 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     }
                     rowHeight={page.table.rowHeight || 40}
                     rowModelType="infinite"
-                    shouldUpdateSong={server?.type === ServerType.JELLYFIN}
                     onBodyScrollEnd={handleScroll}
                     onCellContextMenu={handleContextMenu}
                     onColumnMoved={handleColumnChange}
