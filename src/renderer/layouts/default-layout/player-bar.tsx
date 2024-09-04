@@ -3,7 +3,7 @@ import { Playerbar } from '/@/renderer/features/player';
 import { useGeneralSettings } from '/@/renderer/store/settings.store';
 
 interface PlayerbarContainerProps {
-    drawerEffect: boolean;
+    $drawerEffect: boolean;
 }
 
 const PlayerbarContainer = styled.footer<PlayerbarContainerProps>`
@@ -13,7 +13,7 @@ const PlayerbarContainer = styled.footer<PlayerbarContainerProps>`
     transition: background 0.5s;
 
     ${(props) =>
-        props.drawerEffect &&
+        props.$drawerEffect &&
         `
         &:hover {
             background: var(--playerbar-bg-active);
@@ -26,7 +26,7 @@ export const PlayerBar = () => {
 
     return (
         <PlayerbarContainer
-            drawerEffect={playerbarOpenDrawer}
+            $drawerEffect={playerbarOpenDrawer}
             id="player-bar"
         >
             <Playerbar />
