@@ -71,7 +71,9 @@ docker run --name feishin -p 9180:9180 feishin
 ```
 
 #### Docker Compose
+
 To install via Docker Compose use the following snippit. This also works on Portainer.
+
 ```
 version: '3'
 services:
@@ -91,7 +93,6 @@ services:
       - 9180:9180
     restart: unless-stopped
 ```
-
 
 ### Configuration
 
@@ -129,6 +130,8 @@ This happens when you have user (unprivileged) namespaces disabled (`sysctl kern
 chmod 4755 chrome-sandbox
 sudo chown root:root chrome-sandbox
 ```
+
+Ubunutu 24.04 specifically introduced breaking changes that affect how namespaces work. Please see https://discourse.ubuntu.com/t/ubuntu-24-04-lts-noble-numbat-release-notes/39890#:~:text=security%20improvements%20 for possible fixes.
 
 ## Development
 
