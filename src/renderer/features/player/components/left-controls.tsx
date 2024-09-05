@@ -244,8 +244,8 @@ export const LeftControls = () => {
                             <React.Fragment key={`bar-${artist.id}`}>
                                 {index > 0 && <Separator />}
                                 <Text
-                                    $link
-                                    component={Link}
+                                    $link={artist.id !== ''}
+                                    component={artist.id ? Link : undefined}
                                     overflow="hidden"
                                     size="md"
                                     to={
@@ -253,7 +253,7 @@ export const LeftControls = () => {
                                             ? generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                                   albumArtistId: artist.id,
                                               })
-                                            : ''
+                                            : undefined
                                     }
                                     weight={500}
                                 >
