@@ -70,7 +70,7 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
                         song,
                     }}
                     deselectOnClickOutside={fullScreen}
-                    getRowId={(data) => data.data.id}
+                    getRowId={(data) => data.data.uniqueId}
                     rowBuffer={50}
                     rowData={songQuery.data ?? []}
                     rowHeight={tableConfig.rowHeight || 40}

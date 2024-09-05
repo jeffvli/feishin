@@ -66,7 +66,7 @@ export const AlbumArtistDetailTopSongsListContent = ({
                     ref={tableRef}
                     shouldUpdateSong
                     {...tableProps}
-                    getRowId={(data) => data.data.id}
+                    getRowId={(data) => data.data.uniqueId}
                     rowClassRules={rowClassRules}
                     rowData={data}
                     rowModelType="clientSide"

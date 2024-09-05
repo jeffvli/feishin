@@ -568,7 +568,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     suppressRowDrag
                                     columnDefs={topSongsColumnDefs}
                                     enableCellChangeFlash={false}
-                                    getRowId={(data) => data.data.id}
+                                    getRowId={(data) => data.data.uniqueId}
                                     rowData={topSongs}
                                     rowHeight={60}
                                     rowSelection="multiple"
