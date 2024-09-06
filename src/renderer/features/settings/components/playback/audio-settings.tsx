@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { SelectItem, Switch } from '@mantine/core';
+import { SelectItem } from '@mantine/core';
 import isElectron from 'is-electron';
-import { Select, Slider, toast } from '/@/renderer/components';
+import { Select, Slider, Switch, toast } from '/@/renderer/components';
 import {
     SettingsSection,
     SettingOption,
