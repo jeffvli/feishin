@@ -31,6 +31,7 @@ import {
     RiInformationFill,
     RiRadio2Fill,
     RiDownload2Line,
+    RiShuffleFill,
 } from 'react-icons/ri';
 import { AnyLibraryItems, LibraryItem, ServerType, AnyLibraryItem } from '/@/renderer/api/types';
 import {
@@ -773,6 +774,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 label: t('page.contextMenu.addNext', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiAddCircleFill size="1.1rem" />,
                 onClick: () => handlePlay(Play.NEXT),
+            },
+            playShuffled: {
+                id: 'playShuffled',
+                label: t('page.contextMenu.playShuffled', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiShuffleFill size="1.1rem" />,
+                onClick: () => handlePlay(Play.SHUFFLE),
             },
             playSimilarSongs: {
                 id: 'playSimilarSongs',

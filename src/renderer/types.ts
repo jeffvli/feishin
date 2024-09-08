@@ -109,6 +109,7 @@ export enum Play {
     LAST = 'last',
     NEXT = 'next',
     NOW = 'now',
+    SHUFFLE = 'shuffle',
 }
 
 export enum CrossfadeStyle {

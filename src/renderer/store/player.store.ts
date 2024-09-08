@@ -107,18 +107,53 @@ export const usePlayerStore = create<PlayerSlice>()(
                     actions: {
                         addToQueue: (args) => {
                             const { initialIndex, playType, songs } = args;
-                            const { shuffledIndex } = get().current;
-                            const shuffledQueue = get().queue.shuffled;
                             const songsToAddToQueue = map(songs, (song) => ({
                                 ...song,
                                 uniqueId: nanoid(),
                             }));
-                            const queue = get().queue.default;
 
                             // If the queue is empty, next/last should behave the same as now
-                            if (playType === Play.NOW || queue.length === 0) {
+                            if (playType === Play.SHUFFLE) {
+                                const songs = shuffle(songsToAddToQueue);
+                                const initialSong = songs[0];
+
                                 if (get().shuffle === PlayerShuffle.TRACK) {
-                                    const index = initialIndex || 0;
+                                    const shuffledIds = [
+                                        initialSong.uniqueId,
+                                        ...shuffle(songs.slice(1).map((song) => song.uniqueId)),
+                                    ];
+
+                                    set((state) => {
+                                        state.queue.default = songs;
+                                        state.queue.shuffled = shuffledIds;
+                                        state.current.time = 0;
+                                        state.current.player = 1;
+                                        state.current.index = 0;
+                                        state.current.shuffledIndex = 0;
+                                        state.current.song = initialSong;
+                                    });
+                                } else {
+                                    set((state) => {
+                                        state.queue.default = songs;
+                                        state.queue.shuffled = [];
+                                        state.current.time = 0;
+                                        state.current.player = 1;
+                                        state.current.index = 0;
+                                        state.current.shuffledIndex = 0;
+                                        state.current.song = initialSong;
+                                    });
+                                }
+
+                                return get().actions.getPlayerData();
+                            }
+
+                            const shuffledQueue = get().queue.shuffled;
+                            const queue = get().queue.default;
+                            const { shuffledIndex } = get().current;
+
+                            if (playType === Play.NOW || queue.length === 0) {
+                                const index = initialIndex || 0;
+                                if (get().shuffle === PlayerShuffle.TRACK) {
                                     const initialSong = songsToAddToQueue[index];
                                     const queueCopy = [...songsToAddToQueue];
 
@@ -145,7 +180,6 @@ export const usePlayerStore = create<PlayerSlice>()(
                                         state.current.song = initialSong;
                                     });
                                 } else {
-                                    const index = initialIndex || 0;
                                     set((state) => {
                                         state.queue.default = songsToAddToQueue;
                                         state.current.time = 0;

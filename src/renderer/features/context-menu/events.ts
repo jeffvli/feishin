@@ -23,6 +23,7 @@ export type ContextMenuItemType =
     | 'play'
     | 'playLast'
     | 'playNext'
+    | 'playShuffled'
     | 'addToPlaylist'
     | 'removeFromPlaylist'
     | 'addToFavorites'
@@ -45,6 +46,7 @@ export const CONFIGURABLE_CONTEXT_MENU_ITEMS: ContextMenuItemType[] = [
     'play',
     'playLast',
     'playNext',
+    'playShuffled',
     'playSimilarSongs',
     'addToPlaylist',
     'removeFromPlaylist',
