@@ -277,7 +277,8 @@
             "generalTab": "général",
             "hotkeysTab": "raccourcis",
             "windowTab": "fenêtre",
-            "playbackTab": "lecteur"
+            "playbackTab": "lecteur",
+            "advanced": "avancé"
         },
         "globalSearch": {
             "commands": {
@@ -306,7 +307,8 @@
             "removeFromQueue": "$t(action.removeFromQueue)",
             "shareItem": "partager un élément",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
-            "showDetails": "obtenir des informations"
+            "showDetails": "obtenir des informations",
+            "download": "télécharger"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
@@ -530,7 +532,21 @@
         "playerAlbumArtResolution_description": "la résolution pour l'aperçu de la pochette d'album agrandie du lecteur. plus grand le rend plus net, mais peut ralentir le chargement. la valeur par défaut est 0 (automatique)",
         "homeConfiguration_description": "configurer quels éléments sont affichés sur la page d'accueil, et dans quel ordre",
         "startMinimized": "démarrer l'application en mode réduit",
-        "genreBehavior_description": "détermine si cliquer sur un genre ouvre par défaut la liste des pistes ou des albums"
+        "genreBehavior_description": "détermine si cliquer sur un genre ouvre par défaut la liste des pistes ou des albums",
+        "transcode": "activer le transcodage",
+        "transcode_description": "permet le transcodage vers différents formats",
+        "transcodeBitrate_description": "sélectionne le débit du transcodage. 0 signifie que le serveur choisit",
+        "transcodeFormat_description": "sélectionne le format du transcodage. laisser vide pour laisser le serveur décider",
+        "volumeWidth": "largeur de la barre de volume",
+        "volumeWidth_description": "la largeur de la barre de volume",
+        "customCssEnable": "activer le css personnalisé",
+        "customCssEnable_description": "permet d'écrire du css personnalisé.",
+        "customCssNotice": "Attention : bien qu'il y ait un certain assainissement (blocage de url() et de content :), l'utilisation de CSS personnalisé peut toujours présenter des risques en modifiant l'interface.",
+        "customCss": "css personnalisé",
+        "webAudio": "utiliser l'audio web",
+        "transcodeBitrate": "débit binaire du transcodage",
+        "transcodeFormat": "format de transcodage",
+        "webAudio_description": "utiliser l'audio web. cela permet d'utiliser des fonctions avancées comme le replaygain. désactivez si vous rencontrez d'autres problèmes"
     },
     "form": {
         "deletePlaylist": {
@@ -574,7 +590,8 @@
             "input_optionMatchAny": "correspondre à n'importe quel"
         },
         "editPlaylist": {
-            "title": "modifier $t(entity.playlist_one)"
+            "title": "modifier $t(entity.playlist_one)",
+            "publicJellyfinNote": "Jellyfin n'indique pas si une playlist est publique ou non. Si vous souhaitez que cette playlist reste publique, veuillez sélectionner l'entrée suivante"
         },
         "lyricSearch": {
             "title": "rechercher parole",
