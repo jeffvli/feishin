@@ -36,7 +36,6 @@ export const TranscodeSettings = () => {
                     aria-label="Transcode bitrate"
                     defaultValue={transcode.bitrate}
                     min={0}
-                    placeholder="mp3, opus"
                     w={100}
                     onBlur={(e) => {
                         setTranscodingConfig({
@@ -61,6 +60,7 @@ export const TranscodeSettings = () => {
                 <TextInput
                     aria-label="transcoding format"
                     defaultValue={transcode.format}
+                    placeholder="mp3, opus"
                     width={100}
                     onBlur={(e) => {
                         setTranscodingConfig({
