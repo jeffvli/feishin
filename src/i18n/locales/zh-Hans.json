@@ -140,7 +140,7 @@
         "skip_back": "向后跳过",
         "favorite": "收藏",
         "next": "下一首",
-        "shuffle": "随机",
+        "shuffle": "随机播放",
         "playbackFetchNoResults": "未找到歌曲",
         "playbackFetchInProgress": "正在加载歌曲…",
         "addNext": "添加为播放列表下一首",
@@ -152,7 +152,7 @@
         "unfavorite": "取消收藏",
         "queue_moveToTop": "将所选项移至底部",
         "queue_moveToBottom": "将所选项移至顶部",
-        "shuffle_off": "随机关闭",
+        "shuffle_off": "禁用随机播放",
         "addLast": "添加至播放列表末尾",
         "mute": "静音",
         "skip_forward": "向前跳过",
@@ -374,7 +374,10 @@
         "webAudio_description": "使用 web 音频。这将启用重播增益等高级功能。如果您遇到其他情况，请禁用",
         "artistConfiguration_description": "配置专辑艺术家页面上显示的项目及其显示顺序",
         "webAudio": "使用 web 音频",
-        "artistConfiguration": "专辑艺术家页面配置"
+        "artistConfiguration": "专辑艺术家页面配置",
+        "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
+        "trayEnabled_description": "显示/隐藏托盘图标/菜单。如果禁用，也会禁用最小化/退出到托盘",
+        "trayEnabled": "显示托盘"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -538,7 +541,8 @@
             "showDetails": "获取信息",
             "shareItem": "分享项目",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
-            "download": "下载"
+            "download": "下载",
+            "playShuffled": "$t(player.shuffle)"
         },
         "trackList": {
             "title": "$t(entity.track_other)",
