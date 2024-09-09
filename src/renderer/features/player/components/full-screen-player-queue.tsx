@@ -146,7 +146,7 @@ export const FullScreenPlayerQueue = () => {
                 </QueueContainer>
             ) : activeTab === 'lyrics' ? (
                 <Lyrics />
-            ) : activeTab === 'visualizer' && type === PlaybackType.WEB ? (
+            ) : activeTab === 'visualizer' && type === PlaybackType.WEB && webAudio ? (
                 <Visualizer />
             ) : null}
         </GridContainer>
