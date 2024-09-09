@@ -1,7 +1,8 @@
-import { MouseEvent, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Flex, Group } from '@mantine/core';
 import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { HiOutlineQueueList } from 'react-icons/hi2';
 import {
     RiVolumeUpFill,
@@ -17,6 +18,7 @@ import {
     useHotkeySettings,
     useMuted,
     usePreviousSong,
+    useSettingsStore,
     useSidebarStore,
     useSpeed,
     useVolume,
@@ -27,13 +29,13 @@ import { LibraryItem, QueueSong, ServerType, Song } from '/@/renderer/api/types'
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
 import { DropdownMenu, Rating } from '/@/renderer/components';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
+import { Slider } from '/@/renderer/components/slider';
 
 const ipc = isElectron() ? window.electron.ipc : null;
 const remote = isElectron() ? window.electron.remote : null;
 
-const PLAYBACK_SPEEDS = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
-
 export const RightControls = () => {
+    const { t } = useTranslation();
     const isMinWidth = useMediaQuery('(max-width: 480px)');
     const volume = useVolume();
     const muted = useMuted();
@@ -53,6 +55,7 @@ export const RightControls = () => {
     } = useRightControls();
 
     const speed = useSpeed();
+    const volumeWidth = useSettingsStore((state) => state.general.volumeWidth);
 
     const updateRatingMutation = useSetRating({});
     const addToFavoritesMutation = useCreateFavorite({});
@@ -82,18 +85,6 @@ export const RightControls = () => {
         });
     };
 
-    const handleClearRating = (_e: MouseEvent<HTMLDivElement> | null, rating?: number) => {
-        if (!currentSong || !rating) return;
-
-        updateRatingMutation.mutate({
-            query: {
-                item: [currentSong],
-                rating: 0,
-            },
-            serverId: currentSong?.serverId,
-        });
-    };
-
     const handleRemoveFromFavorites = (song: QueueSong | undefined) => {
         if (!song?.id) return;
 
@@ -118,6 +109,14 @@ export const RightControls = () => {
 
     const handleToggleQueue = () => {
         setSideBar({ rightExpanded: !isQueueExpanded });
+    };
+
+    const formatPlaybackSpeedSliderLabel = (value: number) => {
+        const bpm = Number(currentSong?.bpm);
+        if (bpm > 0) {
+            return `${value} x / ${(bpm * value).toFixed(1)} BPM`;
+        }
+        return `${value} x`;
     };
 
     const isSongDefined = Boolean(currentSong?.id);
@@ -152,7 +151,7 @@ export const RightControls = () => {
             bindings.favoritePreviousToggle.isGlobal ? '' : bindings.favoritePreviousToggle.hotkey,
             () => handleToggleFavorite(previousSong),
         ],
-        [bindings.rate0.isGlobal ? '' : bindings.rate0.hotkey, () => handleClearRating(null, 0)],
+        [bindings.rate0.isGlobal ? '' : bindings.rate0.hotkey, () => handleUpdateRating(0)],
         [bindings.rate1.isGlobal ? '' : bindings.rate1.hotkey, () => handleUpdateRating(1)],
         [bindings.rate2.isGlobal ? '' : bindings.rate2.hotkey, () => handleUpdateRating(2)],
         [bindings.rate3.isGlobal ? '' : bindings.rate3.hotkey, () => handleUpdateRating(3)],
@@ -212,7 +211,6 @@ export const RightControls = () => {
                         size="sm"
                         value={currentSong?.userRating || 0}
                         onChange={handleUpdateRating}
-                        onClick={handleClearRating}
                     />
                 )}
             </Group>
@@ -221,26 +219,48 @@ export const RightControls = () => {
                 align="center"
                 spacing="xs"
             >
-                <DropdownMenu>
+                <DropdownMenu
+                    withArrow
+                    arrowOffset={12}
+                    offset={0}
+                    position="top-end"
+                    width={425}
+                >
                     <DropdownMenu.Target>
                         <PlayerButton
                             icon={<>{speed} x</>}
                             tooltip={{
-                                label: 'Playback speed',
+                                label: t('player.playbackSpeed', { postProcess: 'sentenceCase' }),
                                 openDelay: 500,
                             }}
                             variant="secondary"
                         />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        {PLAYBACK_SPEEDS.map((speed) => (
-                            <DropdownMenu.Item
-                                key={`speed-select-${speed}`}
-                                onClick={() => handleSpeed(Number(speed))}
-                            >
-                                {speed}
-                            </DropdownMenu.Item>
-                        ))}
+                        <Slider
+                            label={formatPlaybackSpeedSliderLabel}
+                            marks={[
+                                { label: '0.5', value: 0.5 },
+                                { label: '0.75', value: 0.75 },
+                                { label: '1', value: 1 },
+                                { label: '1.25', value: 1.25 },
+                                { label: '1.5', value: 1.5 },
+                            ]}
+                            max={1.5}
+                            min={0.5}
+                            step={0.01}
+                            styles={{
+                                markLabel: {
+                                    paddingTop: '0.5rem',
+                                },
+                                root: {
+                                    margin: '1rem 1rem 2rem 1rem',
+                                },
+                            }}
+                            value={speed}
+                            onChange={handleSpeed}
+                            onDoubleClick={() => handleSpeed(1)}
+                        />
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
                 <PlayerButton
@@ -262,7 +282,9 @@ export const RightControls = () => {
                         },
                     }}
                     tooltip={{
-                        label: currentSong?.userFavorite ? 'Unfavorite' : 'Favorite',
+                        label: currentSong?.userFavorite
+                            ? t('player.unfavorite', { postProcess: 'titleCase' })
+                            : t('player.favorite', { postProcess: 'titleCase' }),
                         openDelay: 500,
                     }}
                     variant="secondary"
@@ -290,7 +312,10 @@ export const RightControls = () => {
                                 <RiVolumeDownFill size="1.2rem" />
                             )
                         }
-                        tooltip={{ label: muted ? 'Muted' : volume, openDelay: 500 }}
+                        tooltip={{
+                            label: muted ? t('player.muted', { postProcess: 'titleCase' }) : volume,
+                            openDelay: 500,
+                        }}
                         variant="secondary"
                         onClick={handleMute}
                         onWheel={handleVolumeWheel}
@@ -301,7 +326,7 @@ export const RightControls = () => {
                             min={0}
                             size={6}
                             value={volume}
-                            w="60px"
+                            w={volumeWidth}
                             onChange={handleVolumeSlider}
                             onWheel={handleVolumeWheel}
                         />

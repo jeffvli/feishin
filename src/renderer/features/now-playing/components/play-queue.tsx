@@ -19,7 +19,7 @@ import {
     useVolume,
 } from '/@/renderer/store';
 import {
-    usePlayerType,
+    usePlaybackType,
     useSettingsStore,
     useSettingsStoreActions,
     useTableSettings,
@@ -30,15 +30,17 @@ import debounce from 'lodash/debounce';
 import { ErrorBoundary } from 'react-error-boundary';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required';
-import { PlaybackType, PlayerStatus, TableType } from '/@/renderer/types';
+import { PlaybackType, TableType } from '/@/renderer/types';
 import { LibraryItem, QueueSong } from '/@/renderer/api/types';
 import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 import { useAppFocus } from '/@/renderer/hooks';
+import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
+import { updateSong } from '/@/renderer/features/player/update-remote-song';
+import { setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
 
 const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const remote = isElectron() ? window.electron.remote : null;
 
 type QueueProps = {
     type: TableType;
@@ -56,10 +58,11 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     const { setAppStore } = useAppStoreActions();
     const tableConfig = useTableSettings(type);
     const [gridApi, setGridApi] = useState<AgGridReactType | undefined>();
-    const playerType = usePlayerType();
+    const playbackType = usePlaybackType();
     const { play } = usePlayerControls();
     const volume = useVolume();
     const isFocused = useAppFocus();
+    const isFocusedRef = useRef<boolean>(isFocused);
 
     useEffect(() => {
         if (tableRef.current) {
@@ -80,16 +83,20 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
     const handleDoubleClick = (e: CellDoubleClickedEvent) => {
         const playerData = setCurrentTrack(e.data.uniqueId);
-        remote?.updateSong({
-            currentTime: 0,
-            song: playerData.current.song,
-            status: PlayerStatus.PLAYING,
-        });
+        updateSong(playerData.current.song);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             mpvPlayer!.volume(volume);
-            mpvPlayer!.setQueue(playerData);
-            mpvPlayer!.play();
+            setQueue(playerData, false);
+        } else {
+            const player =
+                playerData.current.player === 1
+                    ? PlayersRef.current?.player1
+                    : PlayersRef.current?.player2;
+            const underlying = player?.getInternalPlayer();
+            if (underlying) {
+                underlying.currentTime = 0;
+            }
         }
 
         play();
@@ -110,8 +117,8 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
         const playerData = reorderQueue(selectedUniqueIds as string[], e.overNode?.data?.uniqueId);
 
-        if (playerType === PlaybackType.LOCAL) {
-            mpvPlayer!.setQueueNext(playerData);
+        if (playbackType === PlaybackType.LOCAL) {
+            setQueueNext(playerData);
         }
 
         if (type === 'sideDrawerQueue') {
@@ -172,7 +179,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
 
     const handleGridSizeChange = () => {
         if (tableConfig.autoFit) {
-            tableRef?.current?.api.sizeColumnsToFit();
+            tableRef?.current?.api?.sizeColumnsToFit();
         }
     };
 
@@ -211,7 +218,29 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
                 }
             }
         }
-    }, [currentSong, previousSong, tableConfig.followCurrentSong, status, isFocused]);
+    }, [currentSong, previousSong, tableConfig.followCurrentSong, status]);
+
+    // As a separate rule, update the current row when focus changes. This is
+    // to prevent queue scrolling when the application loses and then gains focus.
+    // The body should only fire when focus changes, even though it depends on current song
+    useEffect(() => {
+        if (isFocused !== isFocusedRef.current && tableRef?.current) {
+            const { api, columnApi } = tableRef.current;
+            if (api == null || columnApi == null) {
+                return;
+            }
+
+            const currentNode = currentSong?.uniqueId
+                ? api.getRowNode(currentSong.uniqueId)
+                : undefined;
+
+            if (currentNode) {
+                api.redrawRows({ rowNodes: [currentNode] });
+            }
+
+            isFocusedRef.current = isFocused;
+        }
+    }, [currentSong, isFocused]);
 
     const onCellContextMenu = useHandleTableContextMenu(LibraryItem.SONG, QUEUE_CONTEXT_MENU_ITEMS);
 

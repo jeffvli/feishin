@@ -1,8 +1,14 @@
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
-import { QueueSong, LibraryItem, AlbumArtist, Album } from '/@/renderer/api/types';
-import { ServerListItem, ServerType } from '/@/renderer/types';
+import {
+    QueueSong,
+    LibraryItem,
+    AlbumArtist,
+    Album,
+    ServerListItem,
+    ServerType,
+} from '/@/renderer/api/types';
 
 const getCoverArtUrl = (args: {
     baseUrl: string | undefined;
@@ -69,7 +75,13 @@ const normalizeSong = (
         discNumber: item.discNumber || 1,
         discSubtitle: null,
         duration: item.duration ? item.duration * 1000 : 0,
-        gain: null,
+        gain:
+            item.replayGain && (item.replayGain.albumGain || item.replayGain.trackGain)
+                ? {
+                      album: item.replayGain.albumGain,
+                      track: item.replayGain.trackGain,
+                  }
+                : null,
         genres: item.genre
             ? [
                   {
@@ -88,7 +100,13 @@ const normalizeSong = (
         lyrics: null,
         name: item.title,
         path: item.path,
-        peak: null,
+        peak:
+            item.replayGain && (item.replayGain.albumPeak || item.replayGain.trackPeak)
+                ? {
+                      album: item.replayGain.albumPeak,
+                      track: item.replayGain.trackPeak,
+                  }
+                : null,
         playCount: item?.playCount || 0,
         releaseDate: null,
         releaseYear: item.year ? String(item.year) : null,
@@ -126,6 +144,7 @@ const normalizeAlbumArtist = (
         imageUrl,
         itemType: LibraryItem.ALBUM_ARTIST,
         lastPlayedAt: null,
+        mbz: null,
         name: item.name,
         playCount: null,
         serverId: server?.id || 'unknown',
@@ -150,11 +169,13 @@ const normalizeAlbum = (
         }) || null;
 
     return {
+        albumArtist: item.artist,
         albumArtists: item.artistId
             ? [{ id: item.artistId, imageUrl: null, name: item.artist }]
             : [],
         artists: item.artistId ? [{ id: item.artistId, imageUrl: null, name: item.artist }] : [],
         backdropImageUrl: null,
+        comment: null,
         createdAt: item.created,
         duration: item.duration,
         genres: item.genre
@@ -173,7 +194,9 @@ const normalizeAlbum = (
         isCompilation: null,
         itemType: LibraryItem.ALBUM,
         lastPlayedAt: null,
+        mbzId: null,
         name: item.name,
+        originalDate: null,
         playCount: null,
         releaseDate: item.year ? new Date(item.year, 0, 1).toISOString() : null,
         releaseYear: item.year ? Number(item.year) : null,

@@ -1,4 +1,5 @@
 import React from 'react';
+import formatDuration from 'format-duration';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -6,6 +7,7 @@ import { Album, AlbumArtist, Artist, Playlist, Song } from '/@/renderer/api/type
 import { Text } from '/@/renderer/components/text';
 import { AppRoute } from '/@/renderer/router/routes';
 import { CardRow } from '/@/renderer/types';
+import { formatDateAbsolute, formatDateRelative, formatRating } from '/@/renderer/utils/format';
 
 const Row = styled.div<{ $secondary?: boolean }>`
     width: 100%;
@@ -69,7 +71,10 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                                         )}
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        {row.arrayProperty && item[row.arrayProperty]}
+                                        {row.arrayProperty &&
+                                            (row.format
+                                                ? row.format(item)
+                                                : item[row.arrayProperty])}
                                     </Text>
                                 </React.Fragment>
                             ))}
@@ -88,7 +93,8 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                                     overflow="hidden"
                                     size={index > 0 ? 'sm' : 'md'}
                                 >
-                                    {row.arrayProperty && item[row.arrayProperty]}
+                                    {row.arrayProperty &&
+                                        (row.format ? row.format(item) : item[row.arrayProperty])}
                                 </Text>
                             ))}
                         </Row>
@@ -114,7 +120,7 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                                 )}
                                 onClick={(e) => e.stopPropagation()}
                             >
-                                {data && data[row.property]}
+                                {data && (row.format ? row.format(data) : data[row.property])}
                             </Text>
                         ) : (
                             <Text
@@ -123,7 +129,7 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                                 overflow="hidden"
                                 size={index > 0 ? 'sm' : 'md'}
                             >
-                                {data && data[row.property]}
+                                {data && (row.format ? row.format(data) : data[row.property])}
                             </Text>
                         )}
                     </Row>
@@ -151,12 +157,15 @@ export const ALBUM_CARD_ROWS: { [key: string]: CardRow<Album> } = {
         },
     },
     createdAt: {
+        format: (song) => formatDateAbsolute(song.createdAt),
         property: 'createdAt',
     },
     duration: {
+        format: (album) => (album.duration === null ? null : formatDuration(album.duration)),
         property: 'duration',
     },
     lastPlayedAt: {
+        format: (album) => formatDateRelative(album.lastPlayedAt),
         property: 'lastPlayedAt',
     },
     name: {
@@ -170,6 +179,7 @@ export const ALBUM_CARD_ROWS: { [key: string]: CardRow<Album> } = {
         property: 'playCount',
     },
     rating: {
+        format: (album) => formatRating(album),
         property: 'userRating',
     },
     releaseDate: {
@@ -208,12 +218,15 @@ export const SONG_CARD_ROWS: { [key: string]: CardRow<Song> } = {
         },
     },
     createdAt: {
+        format: (song) => formatDateAbsolute(song.createdAt),
         property: 'createdAt',
     },
     duration: {
+        format: (song) => (song.duration === null ? null : formatDuration(song.duration)),
         property: 'duration',
     },
     lastPlayedAt: {
+        format: (song) => formatDateRelative(song.lastPlayedAt),
         property: 'lastPlayedAt',
     },
     name: {
@@ -227,6 +240,7 @@ export const SONG_CARD_ROWS: { [key: string]: CardRow<Song> } = {
         property: 'playCount',
     },
     rating: {
+        format: (song) => formatRating(song),
         property: 'userRating',
     },
     releaseDate: {
@@ -242,12 +256,14 @@ export const ALBUMARTIST_CARD_ROWS: { [key: string]: CardRow<AlbumArtist> } = {
         property: 'albumCount',
     },
     duration: {
+        format: (artist) => (artist.duration === null ? null : formatDuration(artist.duration)),
         property: 'duration',
     },
     genres: {
         property: 'genres',
     },
     lastPlayedAt: {
+        format: (artist) => formatDateRelative(artist.lastPlayedAt),
         property: 'lastPlayedAt',
     },
     name: {
@@ -261,6 +277,7 @@ export const ALBUMARTIST_CARD_ROWS: { [key: string]: CardRow<AlbumArtist> } = {
         property: 'playCount',
     },
     rating: {
+        format: (artist) => formatRating(artist),
         property: 'userRating',
     },
     songCount: {
@@ -270,6 +287,8 @@ export const ALBUMARTIST_CARD_ROWS: { [key: string]: CardRow<AlbumArtist> } = {
 
 export const PLAYLIST_CARD_ROWS: { [key: string]: CardRow<Playlist> } = {
     duration: {
+        format: (playlist) =>
+            playlist.duration === null ? null : formatDuration(playlist.duration),
         property: 'duration',
     },
     name: {
@@ -293,9 +312,6 @@ export const PLAYLIST_CARD_ROWS: { [key: string]: CardRow<Playlist> } = {
         property: 'public',
     },
     songCount: {
-        property: 'songCount',
-    },
-    updatedAt: {
         property: 'songCount',
     },
 };

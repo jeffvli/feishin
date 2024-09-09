@@ -1,8 +1,9 @@
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { IDatasource } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
 import { useListContext } from '../../../context/list-context';
 import { useListStoreByKey } from '../../../store/list.store';
@@ -16,20 +17,57 @@ import { OrderToggleButton } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { PlaylistListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { ListDisplayType, TableColumn } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
     jellyfin: [
-        { defaultOrder: SortOrder.DESC, name: 'Duration', value: PlaylistListSort.DURATION },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: PlaylistListSort.NAME },
-        { defaultOrder: SortOrder.DESC, name: 'Song Count', value: PlaylistListSort.SONG_COUNT },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.SONG_COUNT,
+        },
     ],
     navidrome: [
-        { defaultOrder: SortOrder.DESC, name: 'Duration', value: PlaylistListSort.DURATION },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: PlaylistListSort.NAME },
-        { defaultOrder: SortOrder.ASC, name: 'Owner', value: PlaylistListSort.OWNER },
-        { defaultOrder: SortOrder.DESC, name: 'Public', value: PlaylistListSort.PUBLIC },
-        { defaultOrder: SortOrder.DESC, name: 'Song Count', value: PlaylistListSort.SONG_COUNT },
-        { defaultOrder: SortOrder.DESC, name: 'Updated At', value: PlaylistListSort.UPDATED_AT },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.owner', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.OWNER,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.isPublic', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.PUBLIC,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.SONG_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyUpdated', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.UPDATED_AT,
+        },
     ],
 };
 
@@ -42,6 +80,7 @@ export const PlaylistListHeaderFilters = ({
     gridRef,
     tableRef,
 }: PlaylistListHeaderFiltersProps) => {
+    const { t } = useTranslation();
     const { pageKey } = useListContext();
     const queryClient = useQueryClient();
     const server = useCurrentServer();
@@ -285,7 +324,7 @@ export const PlaylistListHeaderFilters = ({
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Refresh' }}
+                    tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >
@@ -308,7 +347,7 @@ export const PlaylistListHeaderFilters = ({
                             icon={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
-                            Refresh
+                            {t('common.refresh', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
@@ -328,27 +367,29 @@ export const PlaylistListHeaderFilters = ({
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        <DropdownMenu.Label>Display type</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.displayType', { postProcess: 'titleCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.CARD}
                             value={ListDisplayType.CARD}
                             onClick={handleSetViewType}
                         >
-                            Card
+                            {t('table.config.view.card', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.POSTER}
                             value={ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                         >
-                            Poster
+                            {t('table.config.view.poster', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                         >
-                            Table
+                            {t('table.config.view.table', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         {/* <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE_PAGINATED}
@@ -358,31 +399,41 @@ export const PlaylistListHeaderFilters = ({
                             Table (paginated)
                         </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>Item size</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
                                 defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
                                 max={isGrid ? 300 : 100}
-                                min={isGrid ? 150 : 25}
+                                min={isGrid ? 100 : 25}
                                 onChangeEnd={handleItemSize}
                             />
-                            {isGrid && (
-                                <>
-                                    <DropdownMenu.Label>Item gap</DropdownMenu.Label>
-                                    <DropdownMenu.Item closeMenuOnClick={false}>
-                                        <Slider
-                                            defaultValue={grid?.itemGap || 0}
-                                            max={30}
-                                            min={0}
-                                            onChangeEnd={handleItemGap}
-                                        />
-                                    </DropdownMenu.Item>
-                                </>
-                            )}
                         </DropdownMenu.Item>
+                        {isGrid && (
+                            <>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.itemGap', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </DropdownMenu.Label>
+                                <DropdownMenu.Item closeMenuOnClick={false}>
+                                    <Slider
+                                        defaultValue={grid?.itemGap || 0}
+                                        max={30}
+                                        min={0}
+                                        onChangeEnd={handleItemGap}
+                                    />
+                                </DropdownMenu.Item>
+                            </>
+                        )}
                         {!isGrid && (
                             <>
-                                <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.generaltableColumns', {
+                                        postProcess: 'titleCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
@@ -399,7 +450,11 @@ export const PlaylistListHeaderFilters = ({
                                             onChange={handleTableColumns}
                                         />
                                         <Group position="apart">
-                                            <Text>Auto Fit Columns</Text>
+                                            <Text>
+                                                {t('table.config.general.autoFitColumns', {
+                                                    postProcess: 'titleCase',
+                                                })}
+                                            </Text>
                                             <Switch
                                                 defaultChecked={table.autoFit}
                                                 onChange={handleAutoFitColumns}

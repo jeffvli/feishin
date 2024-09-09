@@ -20,27 +20,37 @@ import {
     Tray,
     Menu,
     nativeImage,
+    nativeTheme,
     BrowserWindowConstructorOptions,
     protocol,
     net,
+    Rectangle,
+    screen,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
-import log from 'electron-log';
+import log from 'electron-log/main';
 import { autoUpdater } from 'electron-updater';
-import uniq from 'lodash/uniq';
-import MpvAPI from 'node-mpv';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { store } from './features/core/settings/index';
 import MenuBuilder from './menu';
-import { hotkeyToElectronAccelerator, isLinux, isMacOS, isWindows, resolveHtmlPath } from './utils';
+import {
+    hotkeyToElectronAccelerator,
+    isLinux,
+    isMacOS,
+    isWindows,
+    resolveHtmlPath,
+    createLog,
+    autoUpdaterLogInterface,
+} from './utils';
 import './features';
+import type { TitleTheme } from '/@/renderer/types';
 
 declare module 'node-mpv';
 
 export default class AppUpdater {
     constructor() {
         log.transports.file.level = 'info';
-        autoUpdater.logger = log;
+        autoUpdater.logger = autoUpdaterLogInterface;
         autoUpdater.checkForUpdatesAndNotify();
     }
 }
@@ -53,6 +63,12 @@ process.on('uncaughtException', (error: any) => {
 
 if (store.get('ignore_ssl')) {
     app.commandLine.appendSwitch('ignore-certificate-errors');
+}
+
+// From https://github.com/tutao/tutanota/commit/92c6ed27625fcf367f0fbcc755d83d7ff8fde94b
+if (isLinux() && !process.argv.some((a) => a.startsWith('--password-store='))) {
+    const passwordStore = store.get('password_store', 'gnome-libsecret') as string;
+    app.commandLine.appendSwitch('password-store', passwordStore);
 }
 
 let mainWindow: BrowserWindow | null = null;
@@ -84,16 +100,6 @@ const installExtensions = async () => {
         .catch(console.log);
 };
 
-const singleInstance = app.requestSingleInstanceLock();
-
-if (!singleInstance) {
-    app.quit();
-} else {
-    app.on('second-instance', () => {
-        mainWindow?.show();
-    });
-}
-
 const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
@@ -104,6 +110,19 @@ const getAssetPath = (...paths: string[]): string => {
 
 export const getMainWindow = () => {
     return mainWindow;
+};
+
+export const sendToastToRenderer = ({
+    message,
+    type,
+}: {
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+}) => {
+    getMainWindow()?.webContents.send('toast-from-main', {
+        message,
+        type,
+    });
 };
 
 const createWinThumbarButtons = () => {
@@ -180,7 +199,7 @@ const createTray = () => {
         },
     ]);
 
-    tray.on('double-click', () => {
+    tray.on('click', () => {
         mainWindow?.show();
         createWinThumbarButtons();
     });
@@ -189,9 +208,9 @@ const createTray = () => {
     tray.setContextMenu(contextMenu);
 };
 
-const createWindow = async () => {
+const createWindow = async (first = true) => {
     if (isDevelopment) {
-        await installExtensions();
+        await installExtensions().catch(console.log);
     }
 
     const nativeFrame = store.get('window_window_bar_style') === 'linux';
@@ -204,8 +223,8 @@ const createWindow = async () => {
         },
         macOS: {
             autoHideMenuBar: true,
-            frame: false,
-            titleBarStyle: 'hidden',
+            frame: true,
+            titleBarStyle: 'default',
             trafficLightPosition: { x: 10, y: 10 },
         },
         windows: {
@@ -239,6 +258,26 @@ const createWindow = async () => {
         ...(nativeFrame && isWindows() && nativeFrameConfig.windows),
     });
 
+    // From https://github.com/electron/electron/issues/526#issuecomment-1663959513
+    const bounds = store.get('bounds') as Rectangle | undefined;
+    if (bounds) {
+        const screenArea = screen.getDisplayMatching(bounds).workArea;
+        if (
+            bounds.x > screenArea.x + screenArea.width ||
+            bounds.x < screenArea.x ||
+            bounds.y < screenArea.y ||
+            bounds.y > screenArea.y + screenArea.height
+        ) {
+            if (bounds.width < screenArea.width && bounds.height < screenArea.height) {
+                mainWindow.setBounds({ height: bounds.height, width: bounds.width });
+            } else {
+                mainWindow.setBounds({ height: 900, width: 1440 });
+            }
+        } else {
+            mainWindow.setBounds(bounds);
+        }
+    }
+
     electronLocalShortcut.register(mainWindow, 'Ctrl+Shift+I', () => {
         mainWindow?.webContents.openDevTools();
     });
@@ -266,6 +305,10 @@ const createWindow = async () => {
     ipcMain.on('window-quit', () => {
         mainWindow?.close();
         app.exit();
+    });
+
+    ipcMain.handle('window-clear-cache', async () => {
+        return mainWindow?.webContents.session.clearCache();
     });
 
     ipcMain.on('app-restart', () => {
@@ -314,40 +357,60 @@ const createWindow = async () => {
                         }
 
                         const queue = JSON.parse(data.toString());
-                        getMainWindow()?.webContents.send('renderer-player-restore-queue', queue);
+                        getMainWindow()?.webContents.send('renderer-restore-queue', queue);
                     });
                 });
             });
         }
     });
 
-    const globalMediaKeysEnabled = store.get('global_media_hotkeys') as boolean;
+    ipcMain.on('download-url', (_event, url: string) => {
+        mainWindow?.webContents.downloadURL(url);
+    });
 
-    if (globalMediaKeysEnabled !== false) {
+    const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
+
+    if (globalMediaKeysEnabled) {
         enableMediaKeys(mainWindow);
     }
 
     mainWindow.loadURL(resolveHtmlPath('index.html'));
 
+    const startWindowMinimized = store.get('window_start_minimized', false) as boolean;
+
     mainWindow.on('ready-to-show', () => {
         if (!mainWindow) {
             throw new Error('"mainWindow" is not defined');
         }
-        if (process.env.START_MINIMIZED) {
-            mainWindow.minimize();
-        } else {
+
+        if (!first || !startWindowMinimized) {
+            const maximized = store.get('maximized');
+            const fullScreen = store.get('fullscreen');
+
+            if (maximized) {
+                mainWindow.maximize();
+            }
+            if (fullScreen) {
+                mainWindow.setFullScreen(true);
+            }
+
             mainWindow.show();
             createWinThumbarButtons();
         }
     });
 
     mainWindow.on('closed', () => {
+        ipcMain.removeHandler('window-clear-cache');
         mainWindow = null;
     });
 
     let saved = false;
 
     mainWindow.on('close', (event) => {
+        store.set('bounds', mainWindow?.getNormalBounds());
+        store.set('maximized', mainWindow?.isMaximized());
+        store.set('fullscreen', mainWindow?.isFullScreen());
+
         if (!exitFromTray && store.get('window_exit_to_tray')) {
             if (isMacOS() && !forceQuit) {
                 exitFromTray = true;
@@ -360,7 +423,7 @@ const createWindow = async () => {
             event.preventDefault();
             saved = true;
 
-            getMainWindow()?.webContents.send('renderer-player-save-queue');
+            getMainWindow()?.webContents.send('renderer-save-queue');
 
             ipcMain.once('player-save-queue', async (_event, data: Record<string, any>) => {
                 const queueLocation = join(app.getPath('userData'), 'queue');
@@ -414,7 +477,7 @@ const createWindow = async () => {
     const menuBuilder = new MenuBuilder(mainWindow);
     menuBuilder.buildMenu();
 
-    // Open urls in the user's browser
+    // Open URLs in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
         shell.openExternal(edata.url);
         return { action: 'deny' };
@@ -424,139 +487,12 @@ const createWindow = async () => {
         // eslint-disable-next-line
         new AppUpdater();
     }
+
+    const theme = store.get('theme') as TitleTheme | undefined;
+    nativeTheme.themeSource = theme || 'dark';
 };
 
 app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
-
-const MPV_BINARY_PATH = store.get('mpv_path') as string | undefined;
-
-const prefetchPlaylistParams = [
-    '--prefetch-playlist=no',
-    '--prefetch-playlist=yes',
-    '--prefetch-playlist',
-];
-
-const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
-    const parameters = ['--idle=yes', '--no-config', '--load-scripts=no'];
-
-    if (!extraParameters?.some((param) => prefetchPlaylistParams.includes(param))) {
-        parameters.push('--prefetch-playlist=yes');
-    }
-
-    return parameters;
-};
-
-let mpvInstance: MpvAPI | null = null;
-
-const createMpv = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-    const { extraParameters, properties } = data;
-
-    const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
-    console.log('Setting mpv params: ', params);
-
-    const extra = isDevelopment ? '-dev' : '';
-
-    const mpv = new MpvAPI(
-        {
-            audio_only: true,
-            auto_restart: false,
-            binary: MPV_BINARY_PATH || '',
-            socket: isWindows() ? `\\\\.\\pipe\\mpvserver${extra}` : `/tmp/node-mpv${extra}.sock`,
-            time_update: 1,
-        },
-        params,
-    );
-
-    // eslint-disable-next-line promise/catch-or-return
-    mpv.start()
-        .catch((error) => {
-            console.log('MPV failed to start', error);
-        })
-        .finally(() => {
-            console.log('Setting MPV properties: ', properties);
-            mpv.setMultipleProperties(properties || {});
-        });
-
-    mpv.on('status', (status, ...rest) => {
-        console.log('MPV Event: status', status.property, status.value, rest);
-        if (status.property === 'playlist-pos') {
-            if (status.value === -1) {
-                mpv?.stop();
-            }
-
-            if (status.value !== 0) {
-                getMainWindow()?.webContents.send('renderer-player-auto-next');
-            }
-        }
-    });
-
-    // Automatically updates the play button when the player is playing
-    mpv.on('resumed', () => {
-        console.log('MPV Event: resumed');
-        getMainWindow()?.webContents.send('renderer-player-play');
-    });
-
-    // Automatically updates the play button when the player is stopped
-    mpv.on('stopped', () => {
-        console.log('MPV Event: stopped');
-        getMainWindow()?.webContents.send('renderer-player-stop');
-    });
-
-    // Automatically updates the play button when the player is paused
-    mpv.on('paused', () => {
-        console.log('MPV Event: paused');
-        getMainWindow()?.webContents.send('renderer-player-pause');
-    });
-
-    // Event output every interval set by time_update, used to update the current time
-    mpv.on('timeposition', (time: number) => {
-        getMainWindow()?.webContents.send('renderer-player-current-time', time);
-    });
-
-    mpv.on('quit', () => {
-        console.log('MPV Event: quit');
-    });
-
-    return mpv;
-};
-
-export const getMpvInstance = () => {
-    return mpvInstance;
-};
-
-ipcMain.on('player-set-properties', async (_event, data: Record<string, any>) => {
-    if (data.length === 0) {
-        return;
-    }
-
-    if (data.length === 1) {
-        getMpvInstance()?.setProperty(Object.keys(data)[0], Object.values(data)[0]);
-    } else {
-        getMpvInstance()?.setMultipleProperties(data);
-    }
-});
-
-ipcMain.on(
-    'player-restart',
-    async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-        mpvInstance?.quit();
-        mpvInstance = createMpv(data);
-    },
-);
-
-ipcMain.on(
-    'player-initialize',
-    async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-        console.log('Initializing MPV with data: ', data);
-        mpvInstance = createMpv(data);
-    },
-);
-
-ipcMain.on('player-quit', async () => {
-    mpvInstance?.stop();
-    mpvInstance?.quit();
-    mpvInstance = null;
-});
 
 // Must duplicate with the one in renderer process settings.store.ts
 enum BindingActions {
@@ -632,7 +568,7 @@ ipcMain.on(
             }
         }
 
-        const globalMediaKeysEnabled = store.get('global_media_hotkeys') as boolean;
+        const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
 
         if (globalMediaKeysEnabled) {
             enableMediaKeys(mainWindow);
@@ -640,17 +576,25 @@ ipcMain.on(
     },
 );
 
-app.on('before-quit', () => {
-    getMpvInstance()?.stop();
-    getMpvInstance()?.quit();
-});
+ipcMain.on(
+    'logger',
+    (
+        _event,
+        data: {
+            message: string;
+            type: 'debug' | 'verbose' | 'success' | 'error' | 'warning' | 'info';
+        },
+    ) => {
+        createLog(data);
+    },
+);
 
 app.on('window-all-closed', () => {
     globalShortcut.unregisterAll();
-    getMpvInstance()?.quit();
     // Respect the OSX convention of having the application in memory even
     // after all windows have been closed
     if (isMacOS()) {
+        ipcMain.removeHandler('window-clear-cache');
         mainWindow = null;
     } else {
         app.quit();
@@ -666,31 +610,70 @@ const FONT_HEADERS = [
     'font/woff2',
 ];
 
-app.whenReady()
-    .then(() => {
-        protocol.handle('feishin', async (request) => {
-            const filePath = `file://${request.url.slice('feishin://'.length)}`;
-            const response = await net.fetch(filePath);
-            const contentType = response.headers.get('content-type');
+const singleInstance = app.requestSingleInstanceLock();
 
-            if (!contentType || !FONT_HEADERS.includes(contentType)) {
-                getMainWindow()?.webContents.send('custom-font-error', filePath);
-
-                return new Response(null, {
-                    status: 403,
-                    statusText: 'Forbidden',
-                });
+if (!singleInstance) {
+    app.quit();
+} else {
+    app.on('second-instance', () => {
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) {
+                mainWindow.restore();
+            } else if (!mainWindow.isVisible()) {
+                mainWindow.show();
             }
 
-            return response;
-        });
+            mainWindow.focus();
+        }
+    });
 
-        createWindow();
-        createTray();
-        app.on('activate', () => {
-            // On macOS it's common to re-create a window in the app when the
-            // dock icon is clicked and there are no other windows open.
-            if (mainWindow === null) createWindow();
+    app.whenReady()
+        .then(() => {
+            protocol.handle('feishin', async (request) => {
+                const filePath = `file://${request.url.slice('feishin://'.length)}`;
+                const response = await net.fetch(filePath);
+                const contentType = response.headers.get('content-type');
+
+                if (!contentType || !FONT_HEADERS.includes(contentType)) {
+                    getMainWindow()?.webContents.send('custom-font-error', filePath);
+
+                    return new Response(null, {
+                        status: 403,
+                        statusText: 'Forbidden',
+                    });
+                }
+
+                return response;
+            });
+
+            createWindow();
+            createTray();
+            app.on('activate', () => {
+                // On macOS it's common to re-create a window in the app when the
+                // dock icon is clicked and there are no other windows open.
+                if (mainWindow === null) createWindow(false);
+                else if (!mainWindow.isVisible()) {
+                    mainWindow.show();
+                    createWinThumbarButtons();
+                }
+            });
+        })
+        .catch(console.log);
+}
+
+// Register 'open-item' handler globally, ensuring it is only registered once
+if (!ipcMain.eventNames().includes('open-item')) {
+    ipcMain.handle('open-item', async (_event, path: string) => {
+        return new Promise<void>((resolve, reject) => {
+            access(path, constants.F_OK, (error) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+
+                shell.showItemInFolder(path);
+                resolve();
+            });
         });
-    })
-    .catch(console.log);
+    });
+}

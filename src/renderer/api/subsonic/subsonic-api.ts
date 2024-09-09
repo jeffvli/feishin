@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
 import { ServerListItem } from '/@/renderer/api/types';
 import { toast } from '/@/renderer/components/toast/index';
+import i18n from '/@/i18n/i18n';
 
 const c = initContract();
 
@@ -49,12 +50,42 @@ export const contract = c.router({
             200: ssType._response.randomSongList,
         },
     },
+    getServerInfo: {
+        method: 'GET',
+        path: 'getOpenSubsonicExtensions.view',
+        responses: {
+            200: ssType._response.serverInfo,
+        },
+    },
+    getSimilarSongs: {
+        method: 'GET',
+        path: 'getSimilarSongs',
+        query: ssType._parameters.similarSongs,
+        responses: {
+            200: ssType._response.similarSongs,
+        },
+    },
+    getStructuredLyrics: {
+        method: 'GET',
+        path: 'getLyricsBySongId.view',
+        query: ssType._parameters.structuredLyrics,
+        responses: {
+            200: ssType._response.structuredLyrics,
+        },
+    },
     getTopSongsList: {
         method: 'GET',
         path: 'getTopSongs.view',
         query: ssType._parameters.topSongsList,
         responses: {
             200: ssType._response.topSongsList,
+        },
+    },
+    ping: {
+        method: 'GET',
+        path: 'ping.view',
+        responses: {
+            200: ssType._response.ping,
         },
     },
     removeFavorite: {
@@ -100,13 +131,12 @@ axiosClient.defaults.paramsSerializer = (params) => {
 axiosClient.interceptors.response.use(
     (response) => {
         const data = response.data;
-
         if (data['subsonic-response'].status !== 'ok') {
             // Suppress code related to non-linked lastfm or spotify from Navidrome
             if (data['subsonic-response'].error.code !== 0) {
                 toast.error({
                     message: data['subsonic-response'].error.message,
-                    title: 'Issue from Subsonic API',
+                    title: i18n.t('error.genericError', { postProcess: 'sentenceCase' }) as string,
                 });
             }
         }
@@ -130,12 +160,24 @@ const parsePath = (fullPath: string) => {
     };
 };
 
+const silentlyTransformResponse = (data: any) => {
+    const jsonBody = JSON.parse(data);
+    const status = jsonBody ? jsonBody['subsonic-response']?.status : undefined;
+
+    if (status && status !== 'ok') {
+        jsonBody['subsonic-response'].error.code = 0;
+    }
+
+    return jsonBody;
+};
+
 export const ssApiClient = (args: {
     server: ServerListItem | null;
     signal?: AbortSignal;
+    silent?: boolean;
     url?: string;
 }) => {
-    const { server, url, signal } = args;
+    const { server, url, signal, silent } = args;
 
     return initClient(contract, {
         api: async ({ path, method, headers, body }) => {
@@ -175,6 +217,8 @@ export const ssApiClient = (args: {
                         ...params,
                     },
                     signal,
+                    // In cases where we have a fallback, don't notify the error
+                    transformResponse: silent ? silentlyTransformResponse : undefined,
                     url: `${baseUrl}/${api}`,
                 });
 
@@ -184,9 +228,15 @@ export const ssApiClient = (args: {
                     status: result.status,
                 };
             } catch (e: Error | AxiosError | any) {
-                console.log('CATCH ERR');
-
                 if (isAxiosError(e)) {
+                    if (e.code === 'ERR_NETWORK') {
+                        throw new Error(
+                            i18n.t('error.networkError', {
+                                postProcess: 'sentenceCase',
+                            }) as string,
+                        );
+                    }
+
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
 

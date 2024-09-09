@@ -19,8 +19,11 @@ export const FullWidthDiscCell = ({ node, data, api }: ICellRendererParams) => {
 
     const handleToggleDiscNodes = () => {
         if (!data) return;
-        const discNumber = Number(node.data.id.split('-')[1]);
-        const nodes = getNodesByDiscNumber({ api, discNumber });
+        const split: string[] = node.data.id.split('-');
+        const discNumber = Number(split[1]);
+        // the subtitle could have '-' in it; make sure to have all remaining items
+        const subtitle = split.length === 3 ? split.slice(2).join('-') : null;
+        const nodes = getNodesByDiscNumber({ api, discNumber, subtitle });
 
         setNodeSelection({ isSelected: !isSelected, nodes });
         setIsSelected((prev) => !prev);

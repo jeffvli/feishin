@@ -1,6 +1,7 @@
 import { Group } from '@mantine/core';
 import { openModal, closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import {
     RiLockLine,
     RiWindowFill,
@@ -28,13 +29,14 @@ import {
     useSidebarStore,
     useAppStoreActions,
 } from '/@/renderer/store';
-import { ServerListItem, ServerType } from '/@/renderer/types';
+import { ServerListItem, ServerType } from '/@/renderer/api/types';
 import packageJson from '../../../../../package.json';
 
 const browser = isElectron() ? window.electron.browser : null;
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const AppMenu = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const currentServer = useCurrentServer();
     const serverList = useServerList();
@@ -100,27 +102,27 @@ export const AppMenu = () => {
                 icon={<RiArrowLeftSLine />}
                 onClick={() => navigate(-1)}
             >
-                Go back
+                {t('page.appMenu.goBack', { postProcess: 'sentenceCase' })}
             </DropdownMenu.Item>
             <DropdownMenu.Item
                 icon={<RiArrowRightSLine />}
                 onClick={() => navigate(1)}
             >
-                Go forward
+                {t('page.appMenu.goForward', { postProcess: 'sentenceCase' })}
             </DropdownMenu.Item>
             {collapsed ? (
                 <DropdownMenu.Item
                     icon={<RiLayoutRightLine />}
                     onClick={handleExpandSidebar}
                 >
-                    Expand sidebar
+                    {t('page.appMenu.expandSidebar', { postProcess: 'sentenceCase' })}
                 </DropdownMenu.Item>
             ) : (
                 <DropdownMenu.Item
                     icon={<RiLayoutLeftLine />}
                     onClick={handleCollapseSidebar}
                 >
-                    Collapse sidebar
+                    {t('page.appMenu.collapseSidebar', { postProcess: 'sentenceCase' })}
                 </DropdownMenu.Item>
             )}
             <DropdownMenu.Divider />
@@ -129,17 +131,19 @@ export const AppMenu = () => {
                 icon={<RiSettings3Line />}
                 to={AppRoute.SETTINGS}
             >
-                Settings
+                {t('page.appMenu.settings', { postProcess: 'sentenceCase' })}
             </DropdownMenu.Item>
             <DropdownMenu.Item
                 icon={<RiEdit2Line />}
                 onClick={handleManageServersModal}
             >
-                Manage servers
+                {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}
             </DropdownMenu.Item>
 
             <DropdownMenu.Divider />
-            <DropdownMenu.Label>Select a server</DropdownMenu.Label>
+            <DropdownMenu.Label>
+                {t('page.appMenu.selectServer', { postProcess: 'sentenceCase' })}
+            </DropdownMenu.Label>
             {Object.keys(serverList).map((serverId) => {
                 const server = serverList[serverId];
                 const isNavidromeExpired =
@@ -175,7 +179,10 @@ export const AppMenu = () => {
                 rightSection={<RiExternalLinkLine />}
                 target="_blank"
             >
-                Version {packageJson.version}
+                {t('page.appMenu.version', {
+                    postProcess: 'sentenceCase',
+                    version: packageJson.version,
+                })}
             </DropdownMenu.Item>
             {isElectron() && (
                 <>
@@ -184,13 +191,13 @@ export const AppMenu = () => {
                         icon={<RiWindowFill />}
                         onClick={handleBrowserDevTools}
                     >
-                        Open browser devtools
+                        {t('page.appMenu.openBrowserDevtools', { postProcess: 'sentenceCase' })}
                     </DropdownMenu.Item>
                     <DropdownMenu.Item
                         icon={<RiCloseCircleLine />}
                         onClick={handleQuit}
                     >
-                        Quit
+                        {t('page.appMenu.quit', { postProcess: 'sentenceCase' })}
                     </DropdownMenu.Item>
                 </>
             )}

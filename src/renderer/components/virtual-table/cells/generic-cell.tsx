@@ -11,8 +11,8 @@ export const CellContainer = styled.div<{ $position?: 'left' | 'center' | 'right
         props.$position === 'right'
             ? 'flex-end'
             : props.$position === 'center'
-            ? 'center'
-            : 'flex-start'};
+              ? 'center'
+              : 'flex-start'};
     width: 100%;
     height: 100%;
     letter-spacing: 0.5px;

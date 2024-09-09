@@ -1,6 +1,6 @@
 {
     "name": "feishin",
-    "version": "0.4.1",
+    "version": "0.8.1",
     "description": "",
     "main": "./dist/main/main.js",
     "author": {
@@ -15,10 +15,10 @@
     "dependencies": {
         "cheerio": "^1.0.0-rc.12",
         "mpris-service": "^2.1.2",
-        "ws": "^8.13.0"
+        "ws": "^8.18.0"
     },
     "devDependencies": {
-        "electron": "25.3.0"
+        "electron": "31.1.0"
     },
     "license": "GPL-3.0"
 }

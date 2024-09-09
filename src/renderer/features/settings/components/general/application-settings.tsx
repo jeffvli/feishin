@@ -10,8 +10,10 @@ import {
     useGeneralSettings,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FontType } from '/@/renderer/types';
+import i18n, { languages } from '/@/i18n/i18n';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 const ipc = isElectron() ? window.electron.ipc : null;
@@ -33,17 +35,32 @@ const FONT_OPTIONS: Font[] = [
     { label: 'Work Sans', value: 'Work Sans' },
 ];
 
-const FONT_TYPES: Font[] = [{ label: 'Built-in font', value: FontType.BUILT_IN }];
+const FONT_TYPES: Font[] = [
+    {
+        label: i18n.t('setting.fontType', {
+            context: 'optionBuiltIn',
+            postProcess: 'sentenceCase',
+        }),
+        value: FontType.BUILT_IN,
+    },
+];
 
 if (window.queryLocalFonts) {
-    FONT_TYPES.push({ label: 'System font', value: FontType.SYSTEM });
+    FONT_TYPES.push({
+        label: i18n.t('setting.fontType', { context: 'optionSystem', postProcess: 'sentenceCase' }),
+        value: FontType.SYSTEM,
+    });
 }
 
 if (isElectron()) {
-    FONT_TYPES.push({ label: 'Custom font', value: FontType.CUSTOM });
+    FONT_TYPES.push({
+        label: i18n.t('setting.fontType', { context: 'optionCustom', postProcess: 'sentenceCase' }),
+        value: FontType.CUSTOM,
+    });
 }
 
 export const ApplicationSettings = () => {
+    const { t } = useTranslation();
     const settings = useGeneralSettings();
     const fontSettings = useFontSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -51,11 +68,9 @@ export const ApplicationSettings = () => {
 
     const fontList = useMemo(() => {
         if (fontSettings.custom) {
-            const newFile = new File([], fontSettings.custom.split(/(\\|\/)/g).pop()!);
-            newFile.path = fontSettings.custom;
-            return newFile;
+            return fontSettings.custom.split(/(\\|\/)/g).pop()!;
         }
-        return null;
+        return '';
     }, [fontSettings.custom]);
 
     const onFontError = useCallback(
@@ -79,7 +94,7 @@ export const ApplicationSettings = () => {
             localSettings.fontError(onFontError);
 
             return () => {
-                ipc!.removeAllListeners('custom-font-error');
+                ipc?.removeAllListeners('custom-font-error');
             };
         }
 
@@ -100,7 +115,9 @@ export const ApplicationSettings = () => {
                     const status = await navigator.permissions.query({ name: 'local-fonts' });
 
                     if (status.state === 'denied') {
-                        throw new Error('Access denied to local fonts');
+                        throw new Error(
+                            t('error.localFontAccessDenied', { postProcess: 'sentenceCase' }),
+                        );
                     }
 
                     const data = await window.queryLocalFonts();
@@ -112,7 +129,7 @@ export const ApplicationSettings = () => {
                     );
                 } catch (error) {
                     toast.error({
-                        message: 'An error occurred when trying to get system fonts',
+                        message: t('error.systemFontError', { postProcess: 'sentenceCase' }),
                     });
 
                     setSettings({
@@ -125,19 +142,32 @@ export const ApplicationSettings = () => {
             }
         };
         getFonts();
-    }, [fontSettings, localFonts, setSettings]);
+    }, [fontSettings, localFonts, setSettings, t]);
+
+    const handleChangeLanguage = (e: string) => {
+        setSettings({
+            general: {
+                ...settings,
+                language: e,
+            },
+        });
+    };
 
     const options: SettingOption[] = [
         {
             control: (
                 <Select
-                    disabled
-                    data={[]}
+                    data={languages}
+                    value={settings.language}
+                    onChange={handleChangeLanguage}
                 />
             ),
-            description: 'Sets the application language',
+            description: t('setting.language', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Language',
+            title: t('setting.language', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -155,10 +185,12 @@ export const ApplicationSettings = () => {
                     }}
                 />
             ),
-            description:
-                'What font to use. Built-in font selects one of the fonts provided by Feishin. System font allows you to select any font provided by your OS. Custom allows you to provide your own font',
+            description: t('setting.fontType', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: FONT_TYPES.length === 1,
-            title: 'Use system font',
+            title: t('setting.fontType', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -177,9 +209,9 @@ export const ApplicationSettings = () => {
                     }}
                 />
             ),
-            description: 'Sets the application content font',
+            description: t('setting.font', { context: 'description', postProcess: 'sentenceCase' }),
             isHidden: localFonts && fontSettings.type !== FontType.BUILT_IN,
-            title: 'Font (Content)',
+            title: t('setting.font', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -199,15 +231,15 @@ export const ApplicationSettings = () => {
                     }}
                 />
             ),
-            description: 'Sets the application content font',
+            description: t('setting.font', { context: 'description', postProcess: 'sentenceCase' }),
             isHidden: !localFonts || fontSettings.type !== FontType.SYSTEM,
-            title: 'Font (Content)',
+            title: t('setting.font', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <FileInput
                     accept=".ttc,.ttf,.otf,.woff,.woff2"
-                    defaultValue={fontList}
+                    placeholder={fontList}
                     w={300}
                     onChange={(e) =>
                         setSettings({
@@ -219,9 +251,12 @@ export const ApplicationSettings = () => {
                     }
                 />
             ),
-            description: 'Path to custom font',
+            description: t('setting.customFontPath', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: fontSettings.type !== FontType.CUSTOM,
-            title: 'Path to custom font',
+            title: t('setting.customFontPath', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -244,9 +279,14 @@ export const ApplicationSettings = () => {
                     }}
                 />
             ),
-            description: 'Sets the application zoom factor in percent',
+            description: t('setting.zoom', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Zoom factor',
+            title: t('setting.zoom', {
+                postProcess: 'sentenceCase',
+            }),
         },
     ];
 

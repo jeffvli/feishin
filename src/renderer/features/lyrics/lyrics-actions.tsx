@@ -1,5 +1,6 @@
-import { Box, Group } from '@mantine/core';
+import { Box, Center, Group, Select, SelectItem } from '@mantine/core';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
 import { LyricsOverride } from '/@/renderer/api/types';
 import { Button, NumberInput, Tooltip } from '/@/renderer/components';
@@ -12,16 +13,24 @@ import {
 } from '/@/renderer/store';
 
 interface LyricsActionsProps {
+    index: number;
+    languages: SelectItem[];
+
     onRemoveLyric: () => void;
     onResetLyric: () => void;
     onSearchOverride: (params: LyricsOverride) => void;
+    setIndex: (idx: number) => void;
 }
 
 export const LyricsActions = ({
+    index,
+    languages,
     onRemoveLyric,
     onResetLyric,
     onSearchOverride,
+    setIndex,
 }: LyricsActionsProps) => {
+    const { t } = useTranslation();
     const currentSong = useCurrentSong();
     const { setSettings } = useSettingsStoreActions();
     const { delayMs, sources } = useLyricsSettings();
@@ -40,6 +49,18 @@ export const LyricsActions = ({
 
     return (
         <Box style={{ position: 'relative', width: '100%' }}>
+            {languages.length > 1 && (
+                <Center>
+                    <Select
+                        clearable={false}
+                        data={languages}
+                        style={{ bottom: 30, position: 'absolute' }}
+                        value={index.toString()}
+                        onChange={(value) => setIndex(parseInt(value!, 10))}
+                    />
+                </Center>
+            )}
+
             <Group position="center">
                 {isDesktop && sources.length ? (
                     <Button
@@ -54,7 +75,7 @@ export const LyricsActions = ({
                             })
                         }
                     >
-                        Search
+                        {t('common.search', { postProcess: 'titleCase' })}
                     </Button>
                 ) : null}
                 <Button
@@ -65,7 +86,7 @@ export const LyricsActions = ({
                     <RiSubtractFill />
                 </Button>
                 <Tooltip
-                    label="Offset (ms)"
+                    label={t('setting.lyricOffset', { postProcess: 'sentenceCase' })}
                     openDelay={500}
                 >
                     <NumberInput
@@ -90,7 +111,7 @@ export const LyricsActions = ({
                         variant="subtle"
                         onClick={onResetLyric}
                     >
-                        Reset
+                        {t('common.reset', { postProcess: 'sentenceCase' })}
                     </Button>
                 ) : null}
             </Group>
@@ -104,7 +125,7 @@ export const LyricsActions = ({
                         variant="subtle"
                         onClick={onRemoveLyric}
                     >
-                        Clear
+                        {t('common.clear', { postProcess: 'sentenceCase' })}
                     </Button>
                 ) : null}
             </Box>

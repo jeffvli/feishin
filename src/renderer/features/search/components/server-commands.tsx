@@ -3,7 +3,8 @@ import { openModal } from '@mantine/modals';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { ServerList } from '/@/renderer/features/servers';
 import { useAuthStoreActions, useServerList } from '/@/renderer/store';
-import { ServerListItem } from '/@/renderer/types';
+import { ServerListItem } from '/@/renderer/api/types';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { AppRoute } from '/@/renderer/router/routes';
 
@@ -14,6 +15,7 @@ interface ServerCommandsProps {
 }
 
 export const ServerCommands = ({ setQuery, setPages, handleClose }: ServerCommandsProps) => {
+    const { t } = useTranslation();
     const serverList = useServerList();
     const navigate = useNavigate();
     const { setCurrentServer } = useAuthStoreActions();
@@ -21,12 +23,12 @@ export const ServerCommands = ({ setQuery, setPages, handleClose }: ServerComman
     const handleManageServersModal = useCallback(() => {
         openModal({
             children: <ServerList />,
-            title: 'Manage Servers',
+            title: t('page.appMenu.manageServers', { postProcess: 'sentenceCase' }),
         });
         handleClose();
         setQuery('');
         setPages([CommandPalettePages.HOME]);
-    }, [handleClose, setPages, setQuery]);
+    }, [handleClose, setPages, setQuery, t]);
 
     const handleSelectServer = useCallback(
         (server: ServerListItem) => {
@@ -41,16 +43,20 @@ export const ServerCommands = ({ setQuery, setPages, handleClose }: ServerComman
 
     return (
         <>
-            <Command.Group heading="Select a server">
+            <Command.Group
+                heading={t('page.appMenu.selectServer', { postProcess: 'sentenceCase' })}
+            >
                 {Object.keys(serverList).map((key) => (
                     <Command.Item
                         key={key}
                         onSelect={() => handleSelectServer(serverList[key])}
-                    >{`Switch to ${serverList[key].name}...`}</Command.Item>
+                    >{`${serverList[key].name}...`}</Command.Item>
                 ))}
             </Command.Group>
-            <Command.Group heading="Manage">
-                <Command.Item onSelect={handleManageServersModal}>Manage servers...</Command.Item>
+            <Command.Group heading={t('common.manage', { postProcess: 'sentenceCase' })}>
+                <Command.Item onSelect={handleManageServersModal}>
+                    {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}...
+                </Command.Item>
             </Command.Group>
             <Command.Separator />
         </>

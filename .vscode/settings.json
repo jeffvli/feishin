@@ -11,10 +11,10 @@
     ],
     "typescript.tsserver.experimental.enableProjectDiagnostics": true,
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true,
-        "source.fixAll.stylelint": true,
-        "source.organizeImports": false,
-        "source.formatDocument": true
+        "source.fixAll.eslint": "explicit",
+        "source.fixAll.stylelint": "explicit",
+        "source.organizeImports": "never",
+        "source.formatDocument": "explicit"
     },
     "css.validate": true,
     "less.validate": false,

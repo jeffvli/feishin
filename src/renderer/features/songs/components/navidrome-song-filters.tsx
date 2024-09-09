@@ -1,10 +1,11 @@
+import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, useMemo } from 'react';
 import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { NumberInput, Select, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
+import { useTranslation } from 'react-i18next';
 
 interface NavidromeSongFiltersProps {
     customFilters?: Partial<SongListFilter>;
@@ -19,6 +20,7 @@ export const NavidromeSongFilters = ({
     pageKey,
     serverId,
 }: NavidromeSongFiltersProps) => {
+    const { t } = useTranslation();
     const { setFilter } = useListStoreActions();
     const filter = useListFilterByKey({ key: pageKey });
 
@@ -61,7 +63,7 @@ export const NavidromeSongFilters = ({
 
     const toggleFilters = [
         {
-            label: 'Is favorited',
+            label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
                     customFilters,
@@ -119,7 +121,7 @@ export const NavidromeSongFilters = ({
             <Divider my="0.5rem" />
             <Group grow>
                 <NumberInput
-                    label="Year"
+                    label={t('common.year', { postProcess: 'titleCase' })}
                     max={5000}
                     min={0}
                     value={filter._custom?.navidrome?.year}
@@ -132,7 +134,7 @@ export const NavidromeSongFilters = ({
                         searchable
                         data={genreList}
                         defaultValue={filter._custom?.navidrome?.genre_id}
-                        label="Genre"
+                        label={t('entity.genre', { count: 1, postProcess: 'titleCase' })}
                         width={150}
                         onChange={handleGenresFilter}
                     />

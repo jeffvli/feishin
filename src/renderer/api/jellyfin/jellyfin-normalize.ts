@@ -10,8 +10,9 @@ import {
     Playlist,
     MusicFolder,
     Genre,
+    ServerListItem,
+    ServerType,
 } from '/@/renderer/api/types';
-import { ServerListItem, ServerType } from '/@/renderer/types';
 
 const getStreamUrl = (args: {
     container?: string;
@@ -29,11 +30,11 @@ const getStreamUrl = (args: {
         `?userId=${server?.userId}` +
         `&deviceId=${deviceId}` +
         '&audioCodec=aac' +
-        `&api_key=${server?.credential}` +
+        `&apiKey=${server?.credential}` +
         `&playSessionId=${deviceId}` +
         '&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg' +
         '&transcodingContainer=ts' +
-        '&transcodingProtocol=hls'
+        '&transcodingProtocol=http'
     );
 };
 
@@ -52,7 +53,7 @@ const getAlbumArtistCoverArtUrl = (args: {
         `${args.baseUrl}/Items` +
         `/${args.item.Id}` +
         '/Images/Primary' +
-        `?width=${size}&height=${size}` +
+        `?width=${size}` +
         '&quality=96'
     );
 };
@@ -68,7 +69,7 @@ const getAlbumCoverArtUrl = (args: { baseUrl: string; item: JFAlbum; size: numbe
         `${args.baseUrl}/Items` +
         `/${args.item.Id}` +
         '/Images/Primary' +
-        `?width=${size}&height=${size}` +
+        `?width=${size}` +
         '&quality=96'
     );
 };
@@ -85,7 +86,7 @@ const getSongCoverArtUrl = (args: {
             `${args.baseUrl}/Items` +
             `/${args.item.Id}` +
             '/Images/Primary' +
-            `?width=${size}&height=${size}` +
+            `?width=${size}` +
             '&quality=96'
         );
     }
@@ -96,7 +97,7 @@ const getSongCoverArtUrl = (args: {
             `${args.baseUrl}/Items` +
             `/${args.item?.AlbumId}` +
             '/Images/Primary' +
-            `?width=${size}&height=${size}` +
+            `?width=${size}` +
             '&quality=96'
         );
     }
@@ -115,7 +116,7 @@ const getPlaylistCoverArtUrl = (args: { baseUrl: string; item: JFPlaylist; size:
         `${args.baseUrl}/Items` +
         `/${args.item.Id}` +
         '/Images/Primary' +
-        `?width=${size}&height=${size}` +
+        `?width=${size}` +
         '&quality=96'
     );
 };
@@ -133,7 +134,7 @@ const normalizeSong = (
             imageUrl: null,
             name: entry.Name,
         })),
-        albumId: item.AlbumId,
+        albumId: item.AlbumId || `dummy/${item.Id}`,
         artistName: item?.ArtistItems?.[0]?.Name,
         artists: item?.ArtistItems?.map((entry) => ({
             id: entry.Id,
@@ -174,8 +175,11 @@ const normalizeSong = (
         peak: null,
         playCount: (item.UserData && item.UserData.PlayCount) || 0,
         playlistItemId: item.PlaylistItemId,
-        // releaseDate: (item.ProductionYear && new Date(item.ProductionYear, 0, 1).toISOString()) || null,
-        releaseDate: null,
+        releaseDate: item.PremiereDate
+            ? new Date(item.PremiereDate).toISOString()
+            : item.ProductionYear
+              ? new Date(item.ProductionYear, 0, 1).toISOString()
+              : null,
         releaseYear: item.ProductionYear ? String(item.ProductionYear) : null,
         serverId: server?.id || '',
         serverType: ServerType.JELLYFIN,
@@ -202,6 +206,7 @@ const normalizeAlbum = (
     imageSize?: number,
 ): Album => {
     return {
+        albumArtist: item.AlbumArtist,
         albumArtists:
             item.AlbumArtists.map((entry) => ({
                 id: entry.Id,
@@ -214,6 +219,7 @@ const normalizeAlbum = (
             name: entry.Name,
         })),
         backdropImageUrl: null,
+        comment: null,
         createdAt: item.DateCreated,
         duration: item.RunTimeTicks / 10000,
         genres: item.GenreItems?.map((entry) => ({
@@ -232,7 +238,9 @@ const normalizeAlbum = (
         isCompilation: null,
         itemType: LibraryItem.ALBUM,
         lastPlayedAt: null,
+        mbzId: item.ProviderIds?.MusicBrainzAlbum || null,
         name: item.Name,
+        originalDate: null,
         playCount: item.UserData?.PlayCount || 0,
         releaseDate: item.PremiereDate?.split('T')[0] || null,
         releaseYear: item.ProductionYear || null,
@@ -287,6 +295,7 @@ const normalizeAlbumArtist = (
         }),
         itemType: LibraryItem.ALBUM_ARTIST,
         lastPlayedAt: null,
+        mbz: item.ProviderIds?.MusicBrainzArtist || null,
         name: item.Name,
         playCount: item.UserData?.PlayCount || 0,
         serverId: server?.id || '',
@@ -379,7 +388,7 @@ const getGenreCoverArtUrl = (args: {
         `${args.baseUrl}/Items` +
         `/${args.item.Id}` +
         '/Images/Primary' +
-        `?width=${size}&height=${size}` +
+        `?width=${size}` +
         '&quality=96'
     );
 };

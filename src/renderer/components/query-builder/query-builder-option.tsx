@@ -28,9 +28,10 @@ interface QueryOptionProps {
         number: { label: string; value: string }[];
         string: { label: string; value: string }[];
     };
+    selectData?: { label: string; value: string }[];
 }
 
-const QueryValueInput = ({ onChange, type, ...props }: any) => {
+const QueryValueInput = ({ onChange, type, data, ...props }: any) => {
     const [numberRange, setNumberRange] = useState([0, 0]);
 
     switch (type) {
@@ -59,7 +60,6 @@ const QueryValueInput = ({ onChange, type, ...props }: any) => {
                     {...props}
                 />
             );
-
         case 'dateRange':
             return (
                 <>
@@ -87,7 +87,6 @@ const QueryValueInput = ({ onChange, type, ...props }: any) => {
                     />
                 </>
             );
-
         case 'boolean':
             return (
                 <Select
@@ -95,6 +94,14 @@ const QueryValueInput = ({ onChange, type, ...props }: any) => {
                         { label: 'true', value: 'true' },
                         { label: 'false', value: 'false' },
                     ]}
+                    onChange={onChange}
+                    {...props}
+                />
+            );
+        case 'playlist':
+            return (
+                <Select
+                    data={data}
                     onChange={onChange}
                     {...props}
                 />
@@ -116,6 +123,7 @@ export const QueryBuilderOption = ({
     onChangeField,
     onChangeOperator,
     onChangeValue,
+    selectData,
 }: QueryOptionProps) => {
     const { field, operator, uniqueId, value } = data;
 
@@ -133,10 +141,7 @@ export const QueryBuilderOption = ({
 
     const handleChangeValue = (e: any) => {
         const isDirectValue =
-            typeof e === 'string' ||
-            typeof e === 'number' ||
-            typeof e === 'undefined' ||
-            typeof e === null;
+            typeof e === 'string' || typeof e === 'number' || typeof e === 'undefined';
 
         if (isDirectValue) {
             return onChangeValue({
@@ -207,6 +212,7 @@ export const QueryBuilderOption = ({
             />
             {field ? (
                 <QueryValueInput
+                    data={selectData || []}
                     defaultValue={value}
                     maxWidth={170}
                     size="sm"

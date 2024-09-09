@@ -18,6 +18,10 @@ import { Button, Select, Switch, TextInput, toast } from '/@/renderer/components
 import { useUpdatePlaylist } from '/@/renderer/features/playlists/mutations/update-playlist-mutation';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer } from '/@/renderer/store';
+import { useTranslation } from 'react-i18next';
+import i18n from '/@/i18n/i18n';
+import { hasFeature } from '/@/renderer/api/utils';
+import { ServerFeature } from '/@/renderer/api/features-types';
 
 interface UpdatePlaylistFormProps {
     body: Partial<UpdatePlaylistBody>;
@@ -27,6 +31,7 @@ interface UpdatePlaylistFormProps {
 }
 
 export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlaylistFormProps) => {
+    const { t } = useTranslation();
     const mutation = useUpdatePlaylist({});
     const server = useCurrentServer();
 
@@ -41,13 +46,13 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                 navidrome: {
                     owner: body?._custom?.navidrome?.owner || '',
                     ownerId: body?._custom?.navidrome?.ownerId || '',
-                    public: body?._custom?.navidrome?.public || false,
                     rules: undefined,
                     sync: body?._custom?.navidrome?.sync || false,
                 },
             },
             comment: body?.comment || '',
             name: body?.name || '',
+            public: body.public,
         },
     });
 
@@ -60,18 +65,23 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
             },
             {
                 onError: (err) => {
-                    toast.error({ message: err.message, title: 'Error updating playlist' });
+                    toast.error({
+                        message: err.message,
+                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                    });
                 },
                 onSuccess: () => {
-                    toast.success({ message: `Playlist has been saved` });
+                    toast.success({
+                        message: t('form.editPlaylist.success', { postProcess: 'sentenceCase' }),
+                    });
                     onCancel();
                 },
             },
         );
     });
 
-    const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
-    const isOwnerDisplayed = server?.type === ServerType.NAVIDROME;
+    const isPublicDisplayed = hasFeature(server, ServerFeature.PUBLIC_PLAYLIST);
+    const isOwnerDisplayed = server?.type === ServerType.NAVIDROME && userList;
     const isSubmitDisabled = !form.values.name || mutation.isLoading;
 
     return (
@@ -80,32 +90,55 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                 <TextInput
                     data-autofocus
                     required
-                    label="Name"
+                    label={t('form.createPlaylist.input', {
+                        context: 'name',
+                        postProcess: 'titleCase',
+                    })}
                     {...form.getInputProps('name')}
                 />
-                <TextInput
-                    label="Description"
-                    {...form.getInputProps('comment')}
-                />
+                {server?.type === ServerType.NAVIDROME && (
+                    <TextInput
+                        label={t('form.createPlaylist.input', {
+                            context: 'description',
+                            postProcess: 'titleCase',
+                        })}
+                        {...form.getInputProps('comment')}
+                    />
+                )}
                 {isOwnerDisplayed && (
                     <Select
                         data={userList || []}
                         {...form.getInputProps('_custom.navidrome.ownerId')}
-                        label="Owner"
+                        label={t('form.createPlaylist.input', {
+                            context: 'owner',
+                            postProcess: 'titleCase',
+                        })}
                     />
                 )}
                 {isPublicDisplayed && (
-                    <Switch
-                        label="Is Public?"
-                        {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
-                    />
+                    <>
+                        {server?.type === ServerType.JELLYFIN && (
+                            <div>
+                                {t('form.editPlaylist.publicJellyfinNote', {
+                                    postProcess: 'sentenceCase',
+                                })}
+                            </div>
+                        )}
+                        <Switch
+                            label={t('form.createPlaylist.input', {
+                                context: 'public',
+                                postProcess: 'titleCase',
+                            })}
+                            {...form.getInputProps('public', { type: 'checkbox' })}
+                        />
+                    </>
                 )}
                 <Group position="right">
                     <Button
                         variant="subtle"
                         onClick={onCancel}
                     >
-                        Cancel
+                        {t('common.cancel', { postProcess: 'titleCase' })}
                     </Button>
                     <Button
                         disabled={isSubmitDisabled}
@@ -113,7 +146,7 @@ export const UpdatePlaylistForm = ({ users, query, body, onCancel }: UpdatePlayl
                         type="submit"
                         variant="filled"
                     >
-                        Save
+                        {t('common.save', { postProcess: 'titleCase' })}
                     </Button>
                 </Group>
             </Stack>
@@ -137,11 +170,17 @@ export const openUpdatePlaylistModal = async (args: {
 
     const users =
         server?.type === ServerType.NAVIDROME
-            ? await queryClient.fetchQuery({
-                  queryFn: ({ signal }) =>
-                      api.controller.getUserList({ apiClientProps: { server, signal }, query }),
-                  queryKey: queryKeys.users.list(server?.id || '', query),
-              })
+            ? await queryClient
+                  .fetchQuery({
+                      queryFn: ({ signal }) =>
+                          api.controller.getUserList({ apiClientProps: { server, signal }, query }),
+                      queryKey: queryKeys.users.list(server?.id || '', query),
+                  })
+                  .catch((error) => {
+                      // This eror most likely happens if the user is not an admin
+                      console.error(error);
+                      return null;
+                  })
             : null;
 
     openModal({
@@ -152,7 +191,6 @@ export const openUpdatePlaylistModal = async (args: {
                         navidrome: {
                             owner: playlist?.owner || undefined,
                             ownerId: playlist?.ownerId || undefined,
-                            public: playlist?.public || false,
                             rules: playlist?.rules || undefined,
                             sync: playlist?.sync || undefined,
                         },
@@ -160,12 +198,13 @@ export const openUpdatePlaylistModal = async (args: {
                     comment: playlist?.description || undefined,
                     genres: playlist?.genres,
                     name: playlist?.name,
+                    public: playlist?.public || false,
                 }}
                 query={{ id: playlist?.id }}
                 users={users?.items}
                 onCancel={closeAllModals}
             />
         ),
-        title: 'Edit playlist',
+        title: i18n.t('form.editPlaylist.title', { postProcess: 'titleCase' }) as string,
     });
 };

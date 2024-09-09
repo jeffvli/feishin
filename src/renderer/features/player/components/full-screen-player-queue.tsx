@@ -1,9 +1,10 @@
-import { Group, Center } from '@mantine/core';
+import { Group } from '@mantine/core';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { HiOutlineQueueList } from 'react-icons/hi2';
-import { RiFileMusicLine, RiFileTextLine, RiInformationFill } from 'react-icons/ri';
+import { RiFileMusicLine, RiFileTextLine } from 'react-icons/ri';
 import styled from 'styled-components';
-import { Button, TextTitle } from '/@/renderer/components';
+import { Button } from '/@/renderer/components';
 import { PlayQueue } from '/@/renderer/features/now-playing';
 import {
     useFullScreenPlayerStore,
@@ -14,6 +15,7 @@ import { Visualizer } from '/@/renderer/features/player/components/visualizer';
 import { useMemo } from 'react';
 import { usePlaybackSettings } from '/@/renderer/store';
 import { PlaybackType } from '/@/renderer/types';
+import { FullScreenSimilarSongs } from '/@/renderer/features/player/components/full-screen-similar-songs';
 
 const QueueContainer = styled.div`
     position: relative;
@@ -45,47 +47,49 @@ const HeaderItemWrapper = styled.div`
     z-index: 2;
 `;
 
-interface TransparendGridContainerProps {
+interface TransparentGridContainerProps {
     opacity: number;
 }
 
-const GridContainer = styled.div<TransparendGridContainerProps>`
+const GridContainer = styled.div<TransparentGridContainerProps>`
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-columns: 1fr;
     padding: 1rem;
+    /* stylelint-disable-next-line color-function-notation */
     background: rgb(var(--main-bg-transparent), ${({ opacity }) => opacity}%);
     border-radius: 5px;
 `;
 
 export const FullScreenPlayerQueue = () => {
+    const { t } = useTranslation();
     const { activeTab, opacity } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
-    const { type } = usePlaybackSettings();
+    const { type, webAudio } = usePlaybackSettings();
 
     const headerItems = useMemo(() => {
         const items = [
             {
                 active: activeTab === 'queue',
                 icon: <RiFileMusicLine size="1.5rem" />,
-                label: 'Up Next',
+                label: t('page.fullscreenPlayer.upNext'),
                 onClick: () => setStore({ activeTab: 'queue' }),
             },
             {
                 active: activeTab === 'related',
                 icon: <HiOutlineQueueList size="1.5rem" />,
-                label: 'Related',
+                label: t('page.fullscreenPlayer.related'),
                 onClick: () => setStore({ activeTab: 'related' }),
             },
             {
                 active: activeTab === 'lyrics',
                 icon: <RiFileTextLine size="1.5rem" />,
-                label: 'Lyrics',
+                label: t('page.fullscreenPlayer.lyrics'),
                 onClick: () => setStore({ activeTab: 'lyrics' }),
             },
         ];
 
-        if (type === PlaybackType.WEB) {
+        if (type === PlaybackType.WEB && webAudio) {
             items.push({
                 active: activeTab === 'visualizer',
                 icon: <RiFileTextLine size="1.5rem" />,
@@ -95,7 +99,7 @@ export const FullScreenPlayerQueue = () => {
         }
 
         return items;
-    }, [activeTab, setStore, type]);
+    }, [activeTab, setStore, t, type, webAudio]);
 
     return (
         <GridContainer
@@ -137,17 +141,9 @@ export const FullScreenPlayerQueue = () => {
                     <PlayQueue type="fullScreen" />
                 </QueueContainer>
             ) : activeTab === 'related' ? (
-                <Center>
-                    <Group>
-                        <RiInformationFill size="2rem" />
-                        <TextTitle
-                            order={3}
-                            weight={700}
-                        >
-                            COMING SOON
-                        </TextTitle>
-                    </Group>
-                </Center>
+                <QueueContainer>
+                    <FullScreenSimilarSongs />
+                </QueueContainer>
             ) : activeTab === 'lyrics' ? (
                 <Lyrics />
             ) : activeTab === 'visualizer' && type === PlaybackType.WEB ? (

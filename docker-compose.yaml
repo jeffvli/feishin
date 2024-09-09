@@ -1,0 +1,13 @@
+version: '3.5'
+services:
+    feishin:
+        container_name: feishin
+        image: ghcr.io/jeffvli/feishin:latest
+        restart: unless-stopped
+        ports:
+            - 9180:9180
+        environment:
+            - SERVER_NAME=jellyfin # pre defined server name
+            - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
+            - SERVER_TYPE=jellyfin # navidrome also works
+            - SERVER_URL= # http://address:port

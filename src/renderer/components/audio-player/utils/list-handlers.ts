@@ -23,7 +23,10 @@ export const gaplessHandler = (args: {
 
     const durationPadding = isFlac ? 0.065 : 0.116;
     if (currentTime + durationPadding >= duration) {
-        return nextPlayerRef.current.getInternalPlayer()?.play();
+        return nextPlayerRef.current
+            .getInternalPlayer()
+            ?.play()
+            .catch(() => {});
     }
 
     return null;
@@ -57,11 +60,15 @@ export const crossfadeHandler = (args: {
     } = args;
 
     if (!isTransitioning || currentPlayer !== player) {
-        const shouldBeginTransition = currentTime >= duration - fadeDuration;
+        // check for a large-enough duration, as the default audio element has some dummy audio
+        const shouldBeginTransition = duration > 0.5 && currentTime >= duration - fadeDuration;
 
         if (shouldBeginTransition) {
             setIsTransitioning(true);
-            return nextPlayerRef.current.getInternalPlayer().play();
+            return nextPlayerRef.current
+                .getInternalPlayer()
+                ?.play()
+                .catch(() => {});
         }
         return null;
     }
@@ -94,10 +101,10 @@ export const crossfadeHandler = (args: {
                 fadeType === 'constantPower'
                     ? 0
                     : fadeType === 'constantPowerSlowFade'
-                    ? 1
-                    : fadeType === 'constantPowerSlowCut'
-                    ? 3
-                    : 10;
+                      ? 1
+                      : fadeType === 'constantPowerSlowCut'
+                        ? 3
+                        : 10;
 
             percentageOfFadeLeft = timeLeft / fadeDuration;
             currentPlayerVolumeCalculation =

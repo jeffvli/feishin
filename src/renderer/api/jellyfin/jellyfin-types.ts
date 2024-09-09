@@ -387,11 +387,13 @@ const genericItem = z.object({
     Name: z.string(),
 });
 
+const songDetailParameters = baseParameters;
+
 const song = z.object({
     Album: z.string(),
     AlbumArtist: z.string(),
     AlbumArtists: z.array(genericItem),
-    AlbumId: z.string(),
+    AlbumId: z.string().optional(),
     AlbumPrimaryImageTag: z.string(),
     ArtistItems: z.array(genericItem),
     Artists: z.array(z.string()),
@@ -422,6 +424,11 @@ const song = z.object({
     UserData: userData.optional(),
 });
 
+const providerIds = z.object({
+    MusicBrainzAlbum: z.string().optional(),
+    MusicBrainzArtist: z.string().optional(),
+});
+
 const albumArtist = z.object({
     BackdropImageTags: z.array(z.string()),
     ChannelId: z.null(),
@@ -435,6 +442,7 @@ const albumArtist = z.object({
     LocationType: z.string(),
     Name: z.string(),
     Overview: z.string(),
+    ProviderIds: providerIds.optional(),
     RunTimeTicks: z.number(),
     ServerId: z.string(),
     Type: z.string(),
@@ -466,6 +474,7 @@ const album = z.object({
     ParentLogoItemId: z.string(),
     PremiereDate: z.string().optional(),
     ProductionYear: z.number(),
+    ProviderIds: providerIds.optional(),
     RunTimeTicks: z.number(),
     ServerId: z.string(),
     Songs: z.array(song).optional(), // This is not a native Jellyfin property -- this is used for combined album detail
@@ -505,7 +514,7 @@ const albumList = pagination.extend({
 const albumArtistListSort = {
     ALBUM: 'Album,SortName',
     DURATION: 'Runtime,AlbumArtist,Album,SortName',
-    NAME: 'Name,SortName',
+    NAME: 'SortName,Name',
     RANDOM: 'Random,SortName',
     RECENTLY_ADDED: 'DateCreated,SortName',
     RELEASE_DATE: 'PremiereDate,AlbumArtist,Album,SortName',
@@ -535,7 +544,7 @@ const songListSort = {
     ARTIST: 'Artist,Album,SortName',
     COMMUNITY_RATING: 'CommunityRating,SortName',
     DURATION: 'Runtime,AlbumArtist,Album,SortName',
-    NAME: 'Name,SortName',
+    NAME: 'SortName,Name',
     PLAY_COUNT: 'PlayCount,SortName',
     RANDOM: 'Random,SortName',
     RECENTLY_ADDED: 'DateCreated,SortName',
@@ -552,6 +561,7 @@ const songListParameters = paginationParameters.merge(
         GenreIds: z.string().optional(),
         Genres: z.string().optional(),
         IsFavorite: z.boolean().optional(),
+        IsPlayed: z.boolean().optional(),
         SearchTerm: z.string().optional(),
         SortBy: z.nativeEnum(songListSort).optional(),
         Tags: z.string().optional(),
@@ -572,9 +582,9 @@ const playlistDetailParameters = baseParameters.extend({
 });
 
 const createPlaylistParameters = z.object({
+    IsPublic: z.boolean().optional(),
     MediaType: z.literal('Audio'),
     Name: z.string(),
-    Overview: z.string(),
     UserId: z.string(),
 });
 
@@ -586,9 +596,9 @@ const updatePlaylist = z.null();
 
 const updatePlaylistParameters = z.object({
     Genres: z.array(genreItem),
+    IsPublic: z.boolean().optional(),
     MediaType: z.literal('Audio'),
     Name: z.string(),
-    Overview: z.string(),
     PremiereDate: z.null(),
     ProviderIds: z.object({}),
     Tags: z.array(genericItem),
@@ -600,14 +610,14 @@ const addToPlaylist = z.object({
 });
 
 const addToPlaylistParameters = z.object({
-    Ids: z.array(z.string()),
+    Ids: z.string(),
     UserId: z.string(),
 });
 
 const removeFromPlaylist = z.null();
 
 const removeFromPlaylistParameters = z.object({
-    EntryIds: z.array(z.string()),
+    EntryIds: z.string(),
 });
 
 const deletePlaylist = z.null();
@@ -654,6 +664,26 @@ const lyrics = z.object({
     Lyrics: z.array(lyricText),
 });
 
+const serverInfo = z.object({
+    Version: z.string(),
+});
+
+const similarSongsParameters = z.object({
+    Fields: z.string().optional(),
+    Limit: z.number().optional(),
+    UserId: z.string().optional(),
+});
+
+const similarSongs = pagination.extend({
+    Items: z.array(song),
+});
+
+export enum JellyfinExtensions {
+    SONG_LYRICS = 'songLyrics',
+}
+
+const moveItem = z.null();
+
 export const jfType = {
     _enum: {
         albumArtistList: albumArtistListSort,
@@ -683,6 +713,8 @@ export const jfType = {
         scrobble: scrobbleParameters,
         search: searchParameters,
         similarArtistList: similarArtistListParameters,
+        similarSongs: similarSongsParameters,
+        songDetail: songDetailParameters,
         songList: songListParameters,
         updatePlaylist: updatePlaylistParameters,
     },
@@ -700,6 +732,7 @@ export const jfType = {
         genre,
         genreList,
         lyrics,
+        moveItem,
         musicFolderList,
         playlist,
         playlistList,
@@ -707,6 +740,8 @@ export const jfType = {
         removeFromPlaylist,
         scrobble,
         search,
+        serverInfo,
+        similarSongs,
         song,
         songList,
         topSongsList,

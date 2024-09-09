@@ -1,7 +1,8 @@
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     RiAddBoxFill,
     RiAddCircleFill,
@@ -14,7 +15,7 @@ import {
 } from 'react-icons/ri';
 import { useListStoreByKey } from '../../../store/list.store';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { LibraryItem, SongListSort, SortOrder } from '/@/renderer/api/types';
+import { LibraryItem, ServerType, SongListSort, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
@@ -26,49 +27,143 @@ import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { SongListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
-import { ListDisplayType, Play, ServerType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, Play, TableColumn } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
     jellyfin: [
-        { defaultOrder: SortOrder.ASC, name: 'Album', value: SongListSort.ALBUM },
-        { defaultOrder: SortOrder.ASC, name: 'Album Artist', value: SongListSort.ALBUM_ARTIST },
-        { defaultOrder: SortOrder.ASC, name: 'Artist', value: SongListSort.ARTIST },
-        { defaultOrder: SortOrder.ASC, name: 'Duration', value: SongListSort.DURATION },
-        { defaultOrder: SortOrder.ASC, name: 'Most Played', value: SongListSort.PLAY_COUNT },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: SongListSort.NAME },
-        { defaultOrder: SortOrder.ASC, name: 'Random', value: SongListSort.RANDOM },
-        { defaultOrder: SortOrder.ASC, name: 'Recently Added', value: SongListSort.RECENTLY_ADDED },
         {
             defaultOrder: SortOrder.ASC,
-            name: 'Recently Played',
+            name: i18n.t('filter.album', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.artist', { postProcess: 'titleCase' }),
+            value: SongListSort.ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: SongListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+            value: SongListSort.PLAY_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: SongListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+            value: SongListSort.RANDOM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
+            value: SongListSort.RECENTLY_ADDED,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
             value: SongListSort.RECENTLY_PLAYED,
         },
-        { defaultOrder: SortOrder.ASC, name: 'Release Date', value: SongListSort.RELEASE_DATE },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.releaseDate', { postProcess: 'titleCase' }),
+            value: SongListSort.RELEASE_DATE,
+        },
     ],
     navidrome: [
-        { defaultOrder: SortOrder.ASC, name: 'Album', value: SongListSort.ALBUM },
-        { defaultOrder: SortOrder.ASC, name: 'Album Artist', value: SongListSort.ALBUM_ARTIST },
-        { defaultOrder: SortOrder.ASC, name: 'Artist', value: SongListSort.ARTIST },
-        { defaultOrder: SortOrder.DESC, name: 'BPM', value: SongListSort.BPM },
-        { defaultOrder: SortOrder.ASC, name: 'Channels', value: SongListSort.CHANNELS },
-        { defaultOrder: SortOrder.ASC, name: 'Comment', value: SongListSort.COMMENT },
-        { defaultOrder: SortOrder.DESC, name: 'Duration', value: SongListSort.DURATION },
-        { defaultOrder: SortOrder.DESC, name: 'Favorited', value: SongListSort.FAVORITED },
-        { defaultOrder: SortOrder.ASC, name: 'Genre', value: SongListSort.GENRE },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: SongListSort.NAME },
-        { defaultOrder: SortOrder.DESC, name: 'Play Count', value: SongListSort.PLAY_COUNT },
-        { defaultOrder: SortOrder.DESC, name: 'Rating', value: SongListSort.RATING },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.album', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.artist', { postProcess: 'titleCase' }),
+            value: SongListSort.ARTIST,
+        },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Recently Added',
+            name: i18n.t('filter.bpm', { postProcess: 'titleCase' }),
+            value: SongListSort.BPM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('common.channel', { count: 2, postProcess: 'titleCase' }),
+            value: SongListSort.CHANNELS,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.comment', { postProcess: 'titleCase' }),
+            value: SongListSort.COMMENT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: SongListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.isFavorited', { postProcess: 'titleCase' }),
+            value: SongListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.genre', { postProcess: 'titleCase' }),
+            value: SongListSort.GENRE,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: SongListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+            value: SongListSort.PLAY_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+            value: SongListSort.RANDOM,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
+            value: SongListSort.RATING,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
             value: SongListSort.RECENTLY_ADDED,
         },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Recently Played',
+            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
             value: SongListSort.RECENTLY_PLAYED,
         },
-        { defaultOrder: SortOrder.DESC, name: 'Year', value: SongListSort.YEAR },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
+            value: SongListSort.YEAR,
+        },
     ],
 };
 
@@ -78,6 +173,7 @@ interface SongListHeaderFiltersProps {
 }
 
 export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFiltersProps) => {
+    const { t } = useTranslation();
     const server = useCurrentServer();
     const { pageKey, handlePlay, customFilters } = useListContext();
     const { display, table, filter, grid } = useListStoreByKey({
@@ -421,7 +517,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                             fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
                         },
                     }}
-                    tooltip={{ label: 'Filters' }}
+                    tooltip={{ label: t('common.filters', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleOpenFiltersModal}
                 >
@@ -431,7 +527,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Refresh' }}
+                    tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >
@@ -454,19 +550,19 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                             icon={<RiPlayFill />}
                             onClick={() => handlePlay?.({ playType: Play.NOW })}
                         >
-                            Play
+                            {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddBoxFill />}
                             onClick={() => handlePlay?.({ playType: Play.LAST })}
                         >
-                            Add to queue
+                            {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddCircleFill />}
                             onClick={() => handlePlay?.({ playType: Play.NEXT })}
                         >
-                            Add to queue next
+                            {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
@@ -496,27 +592,29 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        <DropdownMenu.Label>Display type</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.CARD}
                             value={ListDisplayType.CARD}
                             onClick={handleSetViewType}
                         >
-                            Card
+                            {t('table.config.view.card', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.POSTER}
                             value={ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                         >
-                            Poster
+                            {t('table.config.view.poster', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                         >
-                            Table
+                            {t('table.config.view.table', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         {/* <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE_PAGINATED}
@@ -526,18 +624,24 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                             Table (paginated)
                         </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>Item Size</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.size', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
                                 defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
                                 max={isGrid ? 300 : 100}
-                                min={isGrid ? 150 : 25}
+                                min={isGrid ? 100 : 25}
                                 onChangeEnd={handleItemSize}
                             />
                         </DropdownMenu.Item>
                         {isGrid && (
                             <>
-                                <DropdownMenu.Label>Item gap</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.gap', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item closeMenuOnClick={false}>
                                     <Slider
                                         defaultValue={grid?.itemGap || 0}
@@ -548,7 +652,11 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                                 </DropdownMenu.Item>
                             </>
                         )}
-                        <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.tableColumns', {
+                                postProcess: 'sentenceCase',
+                            })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item
                             closeMenuOnClick={false}
                             component="div"
@@ -563,7 +671,11 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                                     onChange={handleTableColumns}
                                 />
                                 <Group position="apart">
-                                    <Text>Auto Fit Columns</Text>
+                                    <Text>
+                                        {t('table.config.general.autoFitColumns', {
+                                            postProcess: 'sentenceCase',
+                                        })}
+                                    </Text>
                                     <Switch
                                         defaultChecked={table.autoFit}
                                         onChange={handleAutoFitColumns}

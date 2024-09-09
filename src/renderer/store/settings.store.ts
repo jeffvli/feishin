@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ColDef } from '@ag-grid-community/core';
 import isElectron from 'is-electron';
-import merge from 'lodash/merge';
 import { generatePath } from 'react-router';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
@@ -22,6 +21,10 @@ import {
     FontType,
 } from '/@/renderer/types';
 import { randomString } from '/@/renderer/utils';
+import i18n from '/@/i18n/i18n';
+import { usePlayerStore } from '/@/renderer/store/player.store';
+import { mergeOverridingColumns } from '/@/renderer/store/utils';
+import type { ContextMenuItemType } from '/@/renderer/features/context-menu';
 
 const utils = isElectron() ? window.electron.utils : null;
 
@@ -33,27 +36,94 @@ export type SidebarItemType = {
 };
 
 export const sidebarItems = [
-    { disabled: true, id: 'Now Playing', label: 'Now Playing', route: AppRoute.NOW_PLAYING },
+    {
+        disabled: true,
+        id: 'Now Playing',
+        label: i18n.t('page.sidebar.nowPlaying'),
+        route: AppRoute.NOW_PLAYING,
+    },
     {
         disabled: true,
         id: 'Search',
-        label: 'Search',
+        label: i18n.t('page.sidebar.search'),
         route: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
     },
-    { disabled: false, id: 'Home', label: 'Home', route: AppRoute.HOME },
-    { disabled: false, id: 'Albums', label: 'Albums', route: AppRoute.LIBRARY_ALBUMS },
-    { disabled: false, id: 'Tracks', label: 'Tracks', route: AppRoute.LIBRARY_SONGS },
+    { disabled: false, id: 'Home', label: i18n.t('page.sidebar.home'), route: AppRoute.HOME },
+    {
+        disabled: false,
+        id: 'Albums',
+        label: i18n.t('page.sidebar.albums'),
+        route: AppRoute.LIBRARY_ALBUMS,
+    },
+    {
+        disabled: false,
+        id: 'Tracks',
+        label: i18n.t('page.sidebar.tracks'),
+        route: AppRoute.LIBRARY_SONGS,
+    },
     {
         disabled: false,
         id: 'Artists',
-        label: 'Artists',
+        label: i18n.t('page.sidebar.artists'),
         route: AppRoute.LIBRARY_ALBUM_ARTISTS,
     },
-    { disabled: false, id: 'Genres', label: 'Genres', route: AppRoute.LIBRARY_GENRES },
-    { disabled: true, id: 'Folders', label: 'Folders', route: AppRoute.LIBRARY_FOLDERS },
-    { disabled: true, id: 'Playlists', label: 'Playlists', route: AppRoute.PLAYLISTS },
-    { disabled: true, id: 'Settings', label: 'Settings', route: AppRoute.SETTINGS },
+    {
+        disabled: false,
+        id: 'Genres',
+        label: i18n.t('page.sidebar.genres'),
+        route: AppRoute.LIBRARY_GENRES,
+    },
+    {
+        disabled: true,
+        id: 'Folders',
+        label: i18n.t('page.sidebar.folders'),
+        route: AppRoute.LIBRARY_FOLDERS,
+    },
+    {
+        disabled: true,
+        id: 'Playlists',
+        label: i18n.t('page.sidebar.playlists'),
+        route: AppRoute.PLAYLISTS,
+    },
+    {
+        disabled: true,
+        id: 'Settings',
+        label: i18n.t('page.sidebar.settings'),
+        route: AppRoute.SETTINGS,
+    },
 ];
+
+export type SortableItem<T> = {
+    disabled: boolean;
+    id: T;
+};
+
+export enum HomeItem {
+    MOST_PLAYED = 'mostPlayed',
+    RANDOM = 'random',
+    RECENTLY_ADDED = 'recentlyAdded',
+    RECENTLY_PLAYED = 'recentlyPlayed',
+}
+
+const homeItems = Object.values(HomeItem).map((item) => ({
+    disabled: false,
+    id: item,
+}));
+
+/* eslint-disable typescript-sort-keys/string-enum */
+export enum ArtistItem {
+    BIOGRAPHY = 'biography',
+    TOP_SONGS = 'topSongs',
+    RECENT_ALBUMS = 'recentAlbums',
+    COMPILATIONS = 'compilations',
+    SIMILAR_ARTISTS = 'similarArtists',
+}
+/* eslint-enable typescript-sort-keys/string-enum */
+
+const artistItems = Object.values(ArtistItem).map((item) => ({
+    disabled: false,
+    id: item,
+}));
 
 export type PersistedTableColumn = {
     column: TableColumn;
@@ -117,11 +187,27 @@ export enum BindingActions {
     ZOOM_OUT = 'zoomOut',
 }
 
+export enum GenreTarget {
+    ALBUM = 'album',
+    TRACK = 'track',
+}
+
+export type TranscodingConfig = {
+    bitrate?: number;
+    enabled: boolean;
+    format?: string;
+};
+
 export interface SettingsState {
+    css: {
+        content: string;
+        enabled: boolean;
+    };
     discord: {
         clientId: string;
         enableIdle: boolean;
         enabled: boolean;
+        showAsListening: boolean;
         showServerImage: boolean;
         updateInterval: number;
     };
@@ -133,13 +219,28 @@ export interface SettingsState {
     };
     general: {
         accent: string;
+        albumArtRes?: number | null;
+        albumBackground: boolean;
+        albumBackgroundBlur: number;
+        artistItems: SortableItem<ArtistItem>[];
+        buttonSize: number;
         defaultFullPlaylist: boolean;
+        disabledContextMenu: { [k in ContextMenuItemType]?: boolean };
+        doubleClickQueueAll: boolean;
+        externalLinks: boolean;
         followSystemTheme: boolean;
-
+        genreTarget: GenreTarget;
+        homeFeature: boolean;
+        homeItems: SortableItem<HomeItem>[];
+        language: string;
+        nativeAspectRatio: boolean;
+        passwordStore?: string;
         playButtonBehavior: Play;
+        playerbarOpenDrawer: boolean;
         resume: boolean;
         showQueueDrawerButton: boolean;
         sideQueueType: SideQueueType;
+        sidebarCollapseShared: boolean;
         sidebarCollapsedNavigation: boolean;
         sidebarItems: SidebarItemType[];
         sidebarPlaylistList: boolean;
@@ -152,6 +253,7 @@ export interface SettingsState {
         themeDark: AppTheme;
         themeLight: AppTheme;
         volumeWheelStep: number;
+        volumeWidth: number;
         zoomFactor: number;
     };
     hotkeys: {
@@ -187,7 +289,9 @@ export interface SettingsState {
             scrobbleAtPercentage: number;
         };
         style: PlaybackStyle;
+        transcode: TranscodingConfig;
         type: PlaybackType;
+        webAudio: boolean;
     };
     remote: {
         enabled: boolean;
@@ -208,6 +312,7 @@ export interface SettingsState {
         disableAutoUpdate: boolean;
         exitToTray: boolean;
         minimizeToTray: boolean;
+        startMinimized: boolean;
         windowBarStyle: Platform;
     };
 }
@@ -215,9 +320,16 @@ export interface SettingsState {
 export interface SettingsSlice extends SettingsState {
     actions: {
         reset: () => void;
+        resetSampleRate: () => void;
+        setArtistItems: (item: SortableItem<ArtistItem>[]) => void;
+        setGenreBehavior: (target: GenreTarget) => void;
+        setHomeItems: (item: SortableItem<HomeItem>[]) => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
         setTable: (type: TableType, data: DataTableProps) => void;
+        setTranscodingConfig: (config: TranscodingConfig) => void;
+        toggleContextMenuItem: (item: ContextMenuItemType) => void;
+        toggleSidebarCollapseShare: () => void;
     };
 }
 
@@ -229,10 +341,15 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    css: {
+        content: '',
+        enabled: false,
+    },
     discord: {
         clientId: '1165957668758900787',
         enableIdle: false,
         enabled: false,
+        showAsListening: false,
         showServerImage: false,
         updateInterval: 15,
     },
@@ -244,12 +361,28 @@ const initialState: SettingsState = {
     },
     general: {
         accent: 'rgb(53, 116, 252)',
+        albumArtRes: undefined,
+        albumBackground: false,
+        albumBackgroundBlur: 6,
+        artistItems,
+        buttonSize: 20,
         defaultFullPlaylist: true,
+        disabledContextMenu: {},
+        doubleClickQueueAll: true,
+        externalLinks: true,
         followSystemTheme: false,
+        genreTarget: GenreTarget.TRACK,
+        homeFeature: true,
+        homeItems,
+        language: 'en',
+        nativeAspectRatio: false,
+        passwordStore: undefined,
         playButtonBehavior: Play.NOW,
+        playerbarOpenDrawer: false,
         resume: false,
         showQueueDrawerButton: false,
         sideQueueType: 'sideQueue',
+        sidebarCollapseShared: false,
         sidebarCollapsedNavigation: true,
         sidebarItems,
         sidebarPlaylistList: true,
@@ -262,6 +395,7 @@ const initialState: SettingsState = {
         themeDark: AppTheme.DEFAULT_DARK,
         themeLight: AppTheme.DEFAULT_LIGHT,
         volumeWheelStep: 5,
+        volumeWidth: 60,
         zoomFactor: 100,
     },
     hotkeys: {
@@ -279,7 +413,7 @@ const initialState: SettingsState = {
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
             pause: { allowGlobal: true, hotkey: '', isGlobal: false },
             play: { allowGlobal: true, hotkey: '', isGlobal: false },
-            playPause: { allowGlobal: true, hotkey: '', isGlobal: false },
+            playPause: { allowGlobal: true, hotkey: 'space', isGlobal: false },
             previous: { allowGlobal: true, hotkey: '', isGlobal: false },
             rate0: { allowGlobal: true, hotkey: '', isGlobal: false },
             rate1: { allowGlobal: true, hotkey: '', isGlobal: false },
@@ -337,7 +471,11 @@ const initialState: SettingsState = {
             scrobbleAtPercentage: 75,
         },
         style: PlaybackStyle.GAPLESS,
-        type: PlaybackType.LOCAL,
+        transcode: {
+            enabled: false,
+        },
+        type: PlaybackType.WEB,
+        webAudio: true,
     },
     remote: {
         enabled: false,
@@ -508,6 +646,7 @@ const initialState: SettingsState = {
         disableAutoUpdate: false,
         exitToTray: false,
         minimizeToTray: false,
+        startMinimized: false,
         windowBarStyle: platformDefaultWindowBarStyle,
     },
 };
@@ -530,6 +669,26 @@ export const useSettingsStore = create<SettingsSlice>()(
                             set(initialState);
                         }
                     },
+                    resetSampleRate: () => {
+                        set((state) => {
+                            state.playback.mpvProperties.audioSampleRateHz = 0;
+                        });
+                    },
+                    setArtistItems: (items) => {
+                        set((state) => {
+                            state.general.artistItems = items;
+                        });
+                    },
+                    setGenreBehavior: (target: GenreTarget) => {
+                        set((state) => {
+                            state.general.genreTarget = target;
+                        });
+                    },
+                    setHomeItems: (items: SortableItem<HomeItem>[]) => {
+                        set((state) => {
+                            state.general.homeItems = items;
+                        });
+                    },
                     setSettings: (data) => {
                         set({ ...get(), ...data });
                     },
@@ -543,17 +702,32 @@ export const useSettingsStore = create<SettingsSlice>()(
                             state.tables[type] = data;
                         });
                     },
+                    setTranscodingConfig: (config) => {
+                        set((state) => {
+                            state.playback.transcode = config;
+                        });
+                    },
+                    toggleContextMenuItem: (item: ContextMenuItemType) => {
+                        set((state) => {
+                            state.general.disabledContextMenu[item] =
+                                !state.general.disabledContextMenu[item];
+                        });
+                    },
+                    toggleSidebarCollapseShare: () => {
+                        set((state) => {
+                            state.general.sidebarCollapseShared =
+                                !state.general.sidebarCollapseShared;
+                        });
+                    },
                 },
                 ...initialState,
             })),
             { name: 'store_settings' },
         ),
         {
-            merge: (persistedState, currentState) => {
-                return merge(currentState, persistedState);
-            },
+            merge: mergeOverridingColumns,
             name: 'store_settings',
-            version: 6,
+            version: 8,
         },
     ),
 );
@@ -567,7 +741,16 @@ export const useTableSettings = (type: TableType) =>
 
 export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
 
-export const usePlayerType = () => useSettingsStore((state) => state.playback.type, shallow);
+export const usePlaybackType = () =>
+    useSettingsStore((state) => {
+        const isFallback = usePlayerStore.getState().fallback;
+
+        if (isFallback) {
+            return PlaybackType.WEB;
+        }
+
+        return state.playback.type;
+    });
 
 export const usePlayButtonBehavior = () =>
     useSettingsStore((state) => state.general.playButtonBehavior, shallow);
@@ -586,3 +769,5 @@ export const useRemoteSettings = () => useSettingsStore((state) => state.remote,
 export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
 
 export const useDiscordSetttings = () => useSettingsStore((state) => state.discord, shallow);
+
+export const useCssSettings = () => useSettingsStore((state) => state.css, shallow);

@@ -1,8 +1,9 @@
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     RiAddBoxFill,
     RiAddCircleFill,
@@ -14,7 +15,7 @@ import {
     RiSettings3Fill,
 } from 'react-icons/ri';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUM_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
@@ -30,48 +31,113 @@ import {
     useListStoreActions,
     useListStoreByKey,
 } from '/@/renderer/store';
-import { ListDisplayType, Play, ServerType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, Play, TableColumn } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
     jellyfin: [
-        { defaultOrder: SortOrder.ASC, name: 'Album Artist', value: AlbumListSort.ALBUM_ARTIST },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+            value: AlbumListSort.ALBUM_ARTIST,
+        },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Community Rating',
+            name: i18n.t('filter.communityRating', { postProcess: 'titleCase' }),
             value: AlbumListSort.COMMUNITY_RATING,
         },
-        { defaultOrder: SortOrder.DESC, name: 'Critic Rating', value: AlbumListSort.CRITIC_RATING },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: AlbumListSort.NAME },
-        { defaultOrder: SortOrder.DESC, name: 'Play Count', value: AlbumListSort.PLAY_COUNT },
-        { defaultOrder: SortOrder.ASC, name: 'Random', value: AlbumListSort.RANDOM },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Recently Added',
+            name: i18n.t('filter.criticRating', { postProcess: 'titleCase' }),
+            value: AlbumListSort.CRITIC_RATING,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: AlbumListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+            value: AlbumListSort.PLAY_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+            value: AlbumListSort.RANDOM,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
             value: AlbumListSort.RECENTLY_ADDED,
         },
-        { defaultOrder: SortOrder.DESC, name: 'Release Date', value: AlbumListSort.RELEASE_DATE },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.releaseDate', { postProcess: 'titleCase' }),
+            value: AlbumListSort.RELEASE_DATE,
+        },
     ],
     navidrome: [
-        { defaultOrder: SortOrder.ASC, name: 'Album Artist', value: AlbumListSort.ALBUM_ARTIST },
-        { defaultOrder: SortOrder.ASC, name: 'Artist', value: AlbumListSort.ARTIST },
-        { defaultOrder: SortOrder.DESC, name: 'Duration', value: AlbumListSort.DURATION },
-        { defaultOrder: SortOrder.DESC, name: 'Most Played', value: AlbumListSort.PLAY_COUNT },
-        { defaultOrder: SortOrder.ASC, name: 'Name', value: AlbumListSort.NAME },
-        { defaultOrder: SortOrder.ASC, name: 'Random', value: AlbumListSort.RANDOM },
-        { defaultOrder: SortOrder.DESC, name: 'Rating', value: AlbumListSort.RATING },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+            value: AlbumListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.artist', { postProcess: 'titleCase' }),
+            value: AlbumListSort.ARTIST,
+        },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Recently Added',
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: AlbumListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.mostPlayed', { postProcess: 'titleCase' }),
+            value: AlbumListSort.PLAY_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: AlbumListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+            value: AlbumListSort.RANDOM,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
+            value: AlbumListSort.RATING,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
             value: AlbumListSort.RECENTLY_ADDED,
         },
         {
             defaultOrder: SortOrder.DESC,
-            name: 'Recently Played',
+            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
             value: AlbumListSort.RECENTLY_PLAYED,
         },
-        { defaultOrder: SortOrder.DESC, name: 'Song Count', value: AlbumListSort.SONG_COUNT },
-        { defaultOrder: SortOrder.DESC, name: 'Favorited', value: AlbumListSort.FAVORITED },
-        { defaultOrder: SortOrder.DESC, name: 'Year', value: AlbumListSort.YEAR },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: AlbumListSort.SONG_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.favorited', { postProcess: 'titleCase' }),
+            value: AlbumListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
+            value: AlbumListSort.YEAR,
+        },
     ],
 };
 
@@ -81,6 +147,7 @@ interface AlbumListHeaderFiltersProps {
 }
 
 export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFiltersProps) => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { pageKey, customFilters, handlePlay } = useListContext();
     const server = useCurrentServer();
@@ -109,12 +176,18 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
     const onFilterChange = useCallback(
         (filter: AlbumListFilter) => {
             if (isGrid) {
-                handleRefreshGrid(gridRef, filter);
+                handleRefreshGrid(gridRef, {
+                    ...filter,
+                    ...customFilters,
+                });
+            } else {
+                handleRefreshTable(tableRef, {
+                    ...filter,
+                    ...customFilters,
+                });
             }
-
-            handleRefreshTable(tableRef, filter);
         },
-        [gridRef, handleRefreshGrid, handleRefreshTable, isGrid, tableRef],
+        [customFilters, gridRef, handleRefreshGrid, handleRefreshTable, isGrid, tableRef],
     );
 
     const handleOpenFiltersModal = () => {
@@ -362,7 +435,9 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                             fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
                         },
                     }}
-                    tooltip={{ label: 'Filters' }}
+                    tooltip={{
+                        label: t('common.filter', { count: 2, postProcess: 'sentenceCase' }),
+                    }}
                     variant="subtle"
                     onClick={handleOpenFiltersModal}
                 >
@@ -372,7 +447,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Refresh' }}
+                    tooltip={{ label: t('common.refresh', { postProcess: 'sentenceCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >
@@ -394,26 +469,26 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                             icon={<RiPlayFill />}
                             onClick={() => handlePlay?.({ playType: Play.NOW })}
                         >
-                            Play
+                            {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddBoxFill />}
                             onClick={() => handlePlay?.({ playType: Play.LAST })}
                         >
-                            Add to queue
+                            {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddCircleFill />}
                             onClick={() => handlePlay?.({ playType: Play.NEXT })}
                         >
-                            Add to queue next
+                            {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
                             icon={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
-                            Refresh
+                            {t('common.refresh', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
@@ -430,7 +505,9 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                         <Button
                             compact
                             size="md"
-                            tooltip={{ label: 'Configure' }}
+                            tooltip={{
+                                label: t('common.configure', { postProcess: 'sentenceCase' }),
+                            }}
                             variant="subtle"
                         >
                             <RiSettings3Fill size="1.3rem" />
@@ -443,21 +520,21 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                             value={ListDisplayType.CARD}
                             onClick={handleSetViewType}
                         >
-                            Card
+                            {t('table.config.view.card', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.POSTER}
                             value={ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                         >
-                            Poster
+                            {t('table.config.view.poster', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                         >
-                            Table
+                            {t('table.config.view.table', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         {/* <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE_PAGINATED}
@@ -467,18 +544,24 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                             Table (paginated)
                         </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>Item size</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
                                 defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
                                 max={isGrid ? 300 : 100}
-                                min={isGrid ? 150 : 25}
+                                min={isGrid ? 100 : 25}
                                 onChangeEnd={handleItemSize}
                             />
                         </DropdownMenu.Item>
                         {isGrid && (
                             <>
-                                <DropdownMenu.Label>Item gap</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.itemGap', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item closeMenuOnClick={false}>
                                     <Slider
                                         defaultValue={grid?.itemGap || 0}

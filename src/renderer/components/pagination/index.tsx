@@ -9,7 +9,9 @@ const StyledPagination = styled(MantinePagination)<PaginationProps>`
         color: var(--btn-default-fg);
         background-color: var(--btn-default-bg);
         border: none;
-        transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+        transition:
+            background 0.2s ease-in-out,
+            color 0.2s ease-in-out;
 
         &[data-active] {
             color: var(--btn-primary-fg);

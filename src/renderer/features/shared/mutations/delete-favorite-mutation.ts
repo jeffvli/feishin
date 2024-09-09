@@ -12,6 +12,7 @@ import {
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useSetAlbumListItemDataById, useSetQueueFavorite } from '/@/renderer/store';
 import isElectron from 'is-electron';
+import { useFavoriteEvent } from '/@/renderer/store/event.store';
 
 const remote = isElectron() ? window.electron.remote : null;
 
@@ -20,6 +21,7 @@ export const useDeleteFavorite = (args: MutationHookArgs) => {
     const queryClient = useQueryClient();
     const setAlbumListData = useSetAlbumListItemDataById();
     const setQueueFavorite = useSetQueueFavorite();
+    const setFavoriteEvent = useFavoriteEvent();
 
     return useMutation<
         FavoriteResponse,
@@ -47,6 +49,7 @@ export const useDeleteFavorite = (args: MutationHookArgs) => {
             if (variables.query.type === LibraryItem.SONG) {
                 remote?.updateFavorite(false, serverId, variables.query.id);
                 setQueueFavorite(variables.query.id, false);
+                setFavoriteEvent(variables.query.id, false);
             }
 
             // We only need to set if we're already on the album detail page

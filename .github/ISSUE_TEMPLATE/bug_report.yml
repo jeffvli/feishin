@@ -1,0 +1,63 @@
+name: Bug report
+description: You're having technical issues. 🐞
+labels: ['bug']
+body:
+    - type: textarea
+      attributes:
+          label: Expected Behavior
+          description: What should have happened?
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: Current Behavior
+          description: What went wrong? Add screenshots to help explain your problem. (Open the browser dev tools in the menu or using CTRL + SHIFT + I)
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: Steps to Reproduce
+          placeholder: |
+              <!-- Add relevant code and/or a live example -->
+              <!-- Add stack traces -->
+              1.
+              2.
+              3.
+              4.
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: Possible Solution
+          description: Suggest a reason for the bug or how to fix it.
+      validations:
+          required: false
+    - type: textarea
+      attributes:
+          label: Context
+          description: How has this issue affected you? What are you trying to accomplish?
+      validations:
+          required: false
+    - type: input
+      attributes:
+          label: Application version
+          placeholder: (e.g. v0.1.0)
+      validations:
+          required: true
+    - type: input
+      attributes:
+          label: Operating System and version
+          placeholder: (e.g. Windows 11 desktop, Webapp in Firefox)
+      validations:
+          required: true
+    - type: input
+      attributes:
+          label: Server and Version
+          placeholder: (e.g. Navidrome v0.48.0)
+      validations:
+          required: true
+    - type: input
+      attributes:
+          label: Node Version (if developing locally)
+      validations:
+          required: false

@@ -3,10 +3,12 @@ import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { AxiosError, AxiosResponse, isAxiosError, Method } from 'axios';
 import qs from 'qs';
-import { ServerListItem } from '/@/renderer/types';
+import { ServerListItem } from '/@/renderer/api/types';
 import omitBy from 'lodash/omitBy';
 import { z } from 'zod';
-import { authenticationFailure } from '/@/renderer/api/utils';
+import { authenticationFailure, getClientType } from '/@/renderer/api/utils';
+import i18n from '/@/i18n/i18n';
+import packageJson from '../../../../package.json';
 
 const c = initContract();
 
@@ -23,9 +25,6 @@ export const contract = c.router({
     },
     authenticate: {
         body: jfType._parameters.authenticate,
-        headers: z.object({
-            'X-Emby-Authorization': z.string(),
-        }),
         method: 'POST',
         path: 'users/authenticatebyname',
         responses: {
@@ -114,6 +113,15 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    getInstantMix: {
+        method: 'GET',
+        path: 'songs/:itemId/InstantMix',
+        query: jfType._parameters.similarSongs,
+        responses: {
+            200: jfType._response.songList,
+            400: jfType._response.error,
+        },
+    },
     getMusicFolderList: {
         method: 'GET',
         path: 'users/:userId/items',
@@ -149,12 +157,38 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    getServerInfo: {
+        method: 'GET',
+        path: 'system/info',
+        responses: {
+            200: jfType._response.serverInfo,
+            400: jfType._response.error,
+        },
+    },
     getSimilarArtistList: {
         method: 'GET',
         path: 'artists/:id/similar',
         query: jfType._parameters.similarArtistList,
         responses: {
             200: jfType._response.albumArtistList,
+            400: jfType._response.error,
+        },
+    },
+    getSimilarSongs: {
+        method: 'GET',
+        path: 'items/:itemId/similar',
+        query: jfType._parameters.similarSongs,
+        responses: {
+            200: jfType._response.similarSongs,
+            400: jfType._response.error,
+        },
+    },
+    getSongData: {
+        method: 'GET',
+        path: 'users/:userId/items/:id',
+        query: jfType._parameters.songDetail,
+        responses: {
+            200: jfType._response.song,
             400: jfType._response.error,
         },
     },
@@ -177,7 +211,7 @@ export const contract = c.router({
     },
     getSongLyrics: {
         method: 'GET',
-        path: 'users/:userId/Items/:id/Lyrics',
+        path: 'audio/:id/Lyrics',
         responses: {
             200: jfType._response.lyrics,
             404: jfType._response.error,
@@ -189,6 +223,15 @@ export const contract = c.router({
         query: jfType._parameters.songList,
         responses: {
             200: jfType._response.topSongsList,
+            400: jfType._response.error,
+        },
+    },
+    movePlaylistItem: {
+        body: null,
+        method: 'POST',
+        path: 'playlists/:playlistId/items/:itemId/move/:newIdx',
+        responses: {
+            200: jfType._response.moveItem,
             400: jfType._response.error,
         },
     },
@@ -249,8 +292,8 @@ export const contract = c.router({
     },
     updatePlaylist: {
         body: jfType._parameters.updatePlaylist,
-        method: 'PUT',
-        path: 'items/:id',
+        method: 'POST',
+        path: 'playlists/:id',
         responses: {
             200: jfType._response.updatePlaylist,
             400: jfType._response.error,
@@ -297,6 +340,12 @@ const parsePath = (fullPath: string) => {
     };
 };
 
+export const createAuthHeader = (): string => {
+    return `MediaBrowser Client="Feishin", Device="${getClientType()}", DeviceId="${
+        useAuthStore.getState().deviceId
+    }", Version="${packageJson.version}"`;
+};
+
 export const jfApiClient = (args: {
     server: ServerListItem | null;
     signal?: AbortSignal;
@@ -323,7 +372,9 @@ export const jfApiClient = (args: {
                     data: body,
                     headers: {
                         ...headers,
-                        ...(token && { 'X-MediaBrowser-Token': token }),
+                        ...(token
+                            ? { Authorization: createAuthHeader().concat(`, Token="${token}"`) }
+                            : { Authorization: createAuthHeader() }),
                     },
                     method: method as Method,
                     params,
@@ -337,6 +388,14 @@ export const jfApiClient = (args: {
                 };
             } catch (e: Error | AxiosError | any) {
                 if (isAxiosError(e)) {
+                    if (e.code === 'ERR_NETWORK') {
+                        throw new Error(
+                            i18n.t('error.networkError', {
+                                postProcess: 'sentenceCase',
+                            }) as string,
+                        );
+                    }
+
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
                     return {

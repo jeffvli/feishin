@@ -92,7 +92,7 @@ const Image = styled(SimpleImg)`
 
     img {
         height: 100%;
-        object-fit: cover;
+        object-fit: var(--image-fit);
     }
 `;
 

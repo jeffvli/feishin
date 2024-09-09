@@ -5,11 +5,14 @@ import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { RiInformationLine } from 'react-icons/ri';
-import { AuthenticationResponse } from '/@/renderer/api/types';
+import { AuthenticationResponse, ServerListItem, ServerType } from '/@/renderer/api/types';
 import { useAuthStoreActions } from '/@/renderer/store';
-import { ServerListItem, ServerType } from '/@/renderer/types';
 import { api } from '/@/renderer/api';
+import i18n from '/@/i18n/i18n';
+import { queryClient } from '/@/renderer/lib/react-query';
+import { queryKeys } from '/@/renderer/api/query-keys';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -22,7 +25,7 @@ interface EditServerFormProps {
 
 const ModifiedFieldIndicator = () => {
     return (
-        <Tooltip label="Field has been modified">
+        <Tooltip label={i18n.t('common.modified', { postProcess: 'titleCase' }) as string}>
             <span>
                 <RiInformationLine color="red" />
             </span>
@@ -31,6 +34,7 @@ const ModifiedFieldIndicator = () => {
 };
 
 export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditServerFormProps) => {
+    const { t } = useTranslation();
     const { updateServer } = useAuthStoreActions();
     const focusTrapRef = useFocusTrap();
     const [isLoading, setIsLoading] = useState(false);
@@ -54,7 +58,9 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
         const authFunction = api.controller.authenticate;
 
         if (!authFunction) {
-            return toast.error({ message: 'Selected server type is invalid' });
+            return toast.error({
+                message: t('error.invalidServer', { postProcess: 'sentenceCase' }),
+            });
         }
 
         try {
@@ -70,7 +76,9 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
             );
 
             if (!data) {
-                return toast.error({ message: 'Authentication failed' });
+                return toast.error({
+                    message: t('error.authenticationFailed', { postProcess: 'sentenceCase' }),
+                });
             }
 
             const serverItem = {
@@ -85,18 +93,27 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
             };
 
             updateServer(server.id, serverItem);
-            toast.success({ message: 'Server has been updated' });
+            toast.success({
+                message: t('form.updateServer.title', { postProcess: 'sentenceCase' }),
+            });
 
             if (localSettings) {
                 if (values.savePassword) {
                     const saved = await localSettings.passwordSet(values.password, server.id);
                     if (!saved) {
-                        toast.error({ message: 'Could not save password' });
+                        toast.error({
+                            message: t('form.addServer.error', {
+                                context: 'savePassword',
+                                postProcess: 'sentenceCase',
+                            }),
+                        });
                     }
                 } else {
                     localSettings.passwordRemove(server.id);
                 }
             }
+
+            queryClient.invalidateQueries({ queryKey: queryKeys.server.root(server.id) });
         } catch (err: any) {
             setIsLoading(false);
             return toast.error({ message: err?.message });
@@ -111,31 +128,46 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
             <Stack ref={focusTrapRef}>
                 <TextInput
                     required
-                    label="Name"
+                    label={t('form.addServer.input', {
+                        context: 'name',
+                        postProcess: 'titleCase',
+                    })}
                     rightSection={form.isDirty('name') && <ModifiedFieldIndicator />}
                     {...form.getInputProps('name')}
                 />
                 <TextInput
                     required
-                    label="Url"
+                    label={t('form.addServer.input', {
+                        context: 'url',
+                        postProcess: 'titleCase',
+                    })}
                     rightSection={form.isDirty('url') && <ModifiedFieldIndicator />}
                     {...form.getInputProps('url')}
                 />
                 <TextInput
                     required
-                    label="Username"
+                    label={t('form.addServer.input', {
+                        context: 'username',
+                        postProcess: 'titleCase',
+                    })}
                     rightSection={form.isDirty('username') && <ModifiedFieldIndicator />}
                     {...form.getInputProps('username')}
                 />
                 <PasswordInput
                     data-autofocus
-                    required
-                    label="Password"
+                    label={t('form.addServer.input', {
+                        context: 'password',
+                        postProcess: 'titleCase',
+                    })}
+                    required={isNavidrome || isSubsonic}
                     {...form.getInputProps('password')}
                 />
                 {localSettings && isNavidrome && (
                     <Checkbox
-                        label="Save password"
+                        label={t('form.addServer.input', {
+                            context: 'savePassword',
+                            postProcess: 'titleCase',
+                        })}
                         {...form.getInputProps('savePassword', {
                             type: 'checkbox',
                         })}
@@ -143,7 +175,10 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                 )}
                 {isSubsonic && (
                     <Checkbox
-                        label="Enable legacy authentication"
+                        label={t('form.addServer.input', {
+                            context: 'legacyAuthentication',
+                            postProcess: 'titleCase',
+                        })}
                         {...form.getInputProps('legacyAuth', {
                             type: 'checkbox',
                         })}
@@ -154,14 +189,14 @@ export const EditServerForm = ({ isUpdate, password, server, onCancel }: EditSer
                         variant="subtle"
                         onClick={onCancel}
                     >
-                        Cancel
+                        {t('common.cancel', { postProcess: 'titleCase' })}
                     </Button>
                     <Button
                         loading={isLoading}
                         type="submit"
                         variant="filled"
                     >
-                        Save
+                        {t('common.save', { postProcess: 'titleCase' })}
                     </Button>
                 </Group>
             </Stack>

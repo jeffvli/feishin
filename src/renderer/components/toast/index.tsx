@@ -16,21 +16,21 @@ const showToast = ({ type, ...props }: NotificationProps) => {
         type === 'success'
             ? 'var(--success-color)'
             : type === 'warning'
-            ? 'var(--warning-color)'
-            : type === 'error'
-            ? 'var(--danger-color)'
-            : 'var(--primary-color)';
+              ? 'var(--warning-color)'
+              : type === 'error'
+                ? 'var(--danger-color)'
+                : 'var(--primary-color)';
 
     const defaultTitle =
         type === 'success'
             ? 'Success'
             : type === 'warning'
-            ? 'Warning'
-            : type === 'error'
-            ? 'Error'
-            : 'Info';
+              ? 'Warning'
+              : type === 'error'
+                ? 'Error'
+                : 'Info';
 
-    const defaultDuration = type === 'error' ? 2000 : 1000;
+    const defaultDuration = type === 'error' ? 5000 : 2000;
 
     return showNotification({
         autoClose: defaultDuration,

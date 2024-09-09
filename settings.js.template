@@ -1,0 +1,1 @@
+"use strict";window.SERVER_URL="${SERVER_URL}";window.SERVER_NAME="${SERVER_NAME}";window.SERVER_TYPE="${SERVER_TYPE}";window.SERVER_LOCK=${SERVER_LOCK};

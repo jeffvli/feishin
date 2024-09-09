@@ -1,12 +1,16 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
-import { PlayerData, PlayerState } from '/@/renderer/store';
+import { PlayerData } from '/@/renderer/store';
 
 const initialize = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-    ipcRenderer.send('player-initialize', data);
+    return ipcRenderer.invoke('player-initialize', data);
 };
 
-const restart = (data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
-    ipcRenderer.send('player-restart', data);
+const restart = (data: {
+    binaryPath?: string;
+    extraParameters?: string[];
+    properties?: Record<string, any>;
+}) => {
+    return ipcRenderer.invoke('player-restart', data);
 };
 
 const isRunning = () => {
@@ -18,12 +22,11 @@ const cleanup = () => {
 };
 
 const setProperties = (data: Record<string, any>) => {
-    console.log('Setting property :>>', data);
     ipcRenderer.send('player-set-properties', data);
 };
 
-const autoNext = (data: PlayerData) => {
-    ipcRenderer.send('player-auto-next', data);
+const autoNext = (url?: string) => {
+    ipcRenderer.send('player-auto-next', url);
 };
 
 const currentTime = () => {
@@ -50,14 +53,6 @@ const previous = () => {
     ipcRenderer.send('player-previous');
 };
 
-const restoreQueue = () => {
-    ipcRenderer.send('player-restore-queue');
-};
-
-const saveQueue = (data: Record<string, any>) => {
-    ipcRenderer.send('player-save-queue', data);
-};
-
 const seek = (seconds: number) => {
     ipcRenderer.send('player-seek', seconds);
 };
@@ -66,12 +61,12 @@ const seekTo = (seconds: number) => {
     ipcRenderer.send('player-seek-to', seconds);
 };
 
-const setQueue = (data: PlayerData, pause?: boolean) => {
-    ipcRenderer.send('player-set-queue', data, pause);
+const setQueue = (current?: string, next?: string, pause?: boolean) => {
+    ipcRenderer.send('player-set-queue', current, next, pause);
 };
 
-const setQueueNext = (data: PlayerData) => {
-    ipcRenderer.send('player-set-queue-next', data);
+const setQueueNext = (url?: string) => {
+    ipcRenderer.send('player-set-queue-next', url);
 };
 
 const stop = () => {
@@ -154,18 +149,12 @@ const rendererQuit = (cb: (event: IpcRendererEvent) => void) => {
     ipcRenderer.on('renderer-player-quit', cb);
 };
 
-const rendererSaveQueue = (cb: (event: IpcRendererEvent) => void) => {
-    ipcRenderer.on('renderer-player-save-queue', cb);
-};
-
-const rendererRestoreQueue = (
-    cb: (event: IpcRendererEvent, data: Partial<PlayerState>) => void,
-) => {
-    ipcRenderer.on('renderer-player-restore-queue', cb);
-};
-
 const rendererError = (cb: (event: IpcRendererEvent, data: string) => void) => {
     ipcRenderer.on('renderer-player-error', cb);
+};
+
+const rendererPlayerFallback = (cb: (event: IpcRendererEvent, data: boolean) => void) => {
+    ipcRenderer.on('renderer-player-fallback', cb);
 };
 
 export const mpvPlayer = {
@@ -182,8 +171,6 @@ export const mpvPlayer = {
     previous,
     quit,
     restart,
-    restoreQueue,
-    saveQueue,
     seek,
     seekTo,
     setProperties,
@@ -201,10 +188,9 @@ export const mpvPlayerListener = {
     rendererPause,
     rendererPlay,
     rendererPlayPause,
+    rendererPlayerFallback,
     rendererPrevious,
     rendererQuit,
-    rendererRestoreQueue,
-    rendererSaveQueue,
     rendererSkipBackward,
     rendererSkipForward,
     rendererStop,

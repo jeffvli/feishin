@@ -1,0 +1,22 @@
+name: Feature request
+description: Request a feature to be added to Feishin 🎉
+labels: ['enhancement']
+body:
+    - type: textarea
+      attributes:
+          label: What do you want to be added?
+      validations:
+          required: true
+    - type: textarea
+      attributes:
+          label: Additional context
+      validations:
+          required: false
+    - type: checkboxes
+      attributes:
+          label: Is this a server-specific feature? (e.g. Jellyfin only)
+          options:
+              - label: 'Yes'
+                required: false
+      validations:
+          required: false

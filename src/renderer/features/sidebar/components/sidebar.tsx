@@ -1,7 +1,8 @@
+import { MouseEvent, useMemo } from 'react';
 import { Box, Center, Divider, Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AnimatePresence, motion } from 'framer-motion';
-import { MouseEvent, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiArrowDownSLine, RiDiscLine, RiListUnordered } from 'react-icons/ri';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -63,11 +64,12 @@ const ImageContainer = styled(motion.div)<{ height: string }>`
 const SidebarImage = styled.img`
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: var(--image-fit);
     background: var(--placeholder-bg);
 `;
 
 export const Sidebar = () => {
+    const { t } = useTranslation();
     const location = useLocation();
     const sidebar = useSidebarStore();
     const { setSideBar } = useAppStoreActions();
@@ -76,10 +78,25 @@ export const Sidebar = () => {
     const imageUrl = useCurrentSong()?.imageUrl;
     const server = useCurrentServer();
 
+    const translatedSidebarItemMap = useMemo(
+        () => ({
+            Albums: t('page.sidebar.albums', { postProcess: 'titleCase' }),
+            Artists: t('page.sidebar.artists', { postProcess: 'titleCase' }),
+            Folders: t('page.sidebar.folders', { postProcess: 'titleCase' }),
+            Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
+            Home: t('page.sidebar.home', { postProcess: 'titleCase' }),
+            'Now Playing': t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
+            Playlists: t('page.sidebar.playlists', { postProcess: 'titleCase' }),
+            Search: t('page.sidebar.search', { postProcess: 'titleCase' }),
+            Settings: t('page.sidebar.settings', { postProcess: 'titleCase' }),
+            Tracks: t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+        }),
+        [t],
+    );
     const upsizedImageUrl = imageUrl
-        ?.replace(/size=\d+/, 'size=300')
-        .replace(/width=\d+/, 'width=300')
-        .replace(/height=\d+/, 'height=300');
+        ?.replace(/size=\d+/, 'size=450')
+        .replace(/width=\d+/, 'width=450')
+        .replace(/height=\d+/, 'height=450');
 
     const showImage = sidebar.image;
 
@@ -89,7 +106,7 @@ export const Sidebar = () => {
         openModal({
             children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
             size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
-            title: 'Create Playlist',
+            title: t('form.createPlaylist.title', { postProcess: 'titleCase' }),
         });
     };
 
@@ -119,10 +136,13 @@ export const Sidebar = () => {
             .filter((item) => !item.disabled)
             .map((item) => ({
                 ...item,
+                label:
+                    translatedSidebarItemMap[item.id as keyof typeof translatedSidebarItemMap] ??
+                    item.label,
             }));
 
         return items;
-    }, [sidebarItems]);
+    }, [sidebarItems, translatedSidebarItemMap]);
 
     return (
         <SidebarContainer
@@ -176,7 +196,7 @@ export const Sidebar = () => {
                                         fw="600"
                                         sx={{ fontSize: '1.2rem' }}
                                     >
-                                        Playlists
+                                        {t('page.sidebar.playlists', { postProcess: 'titleCase' })}
                                     </Box>
                                     {playlistsQuery.isLoading && <Spinner />}
                                 </Group>
@@ -184,7 +204,12 @@ export const Sidebar = () => {
                                     <Button
                                         compact
                                         size="md"
-                                        tooltip={{ label: 'Create playlist', openDelay: 500 }}
+                                        tooltip={{
+                                            label: t('action.createPlaylist', {
+                                                postProcess: 'sentenceCase',
+                                            }),
+                                            openDelay: 500,
+                                        }}
                                         variant="default"
                                         onClick={handleCreatePlaylistModal}
                                     >
@@ -195,7 +220,12 @@ export const Sidebar = () => {
                                         component={Link}
                                         size="md"
                                         to={AppRoute.PLAYLISTS}
-                                        tooltip={{ label: 'Playlist list', openDelay: 500 }}
+                                        tooltip={{
+                                            label: t('action.viewPlaylists', {
+                                                postProcess: 'sentenceCase',
+                                            }),
+                                            openDelay: 500,
+                                        }}
                                         variant="default"
                                         onClick={(e) => e.stopPropagation()}
                                     >
@@ -223,7 +253,9 @@ export const Sidebar = () => {
                             onClick={expandFullScreenPlayer}
                         >
                             <Tooltip
-                                label="Toggle fullscreen player"
+                                label={t('player.toggleFullscreenPlayer', {
+                                    postProcess: 'sentenceCase',
+                                })}
                                 openDelay={500}
                             >
                                 {upsizedImageUrl ? (
@@ -248,7 +280,10 @@ export const Sidebar = () => {
                                 radius={100}
                                 size="md"
                                 sx={{ cursor: 'default', position: 'absolute', right: 5, top: 5 }}
-                                tooltip={{ label: 'Collapse', openDelay: 500 }}
+                                tooltip={{
+                                    label: t('common.collapse', { postProcess: 'titleCase' }),
+                                    openDelay: 500,
+                                }}
                                 variant="default"
                                 onClick={(e) => {
                                     e.stopPropagation();

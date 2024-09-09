@@ -8,8 +8,9 @@ import {
     SongListResponse,
     SongListSort,
     SortOrder,
+    ServerListItem,
+    ServerType,
 } from '/@/renderer/api/types';
-import { ServerListItem, ServerType } from '/@/renderer/types';
 
 export const getPlaylistSongsById = async (args: {
     id: string;

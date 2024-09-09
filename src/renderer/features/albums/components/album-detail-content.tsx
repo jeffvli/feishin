@@ -1,15 +1,18 @@
+import { MutableRefObject, useCallback, useMemo } from 'react';
 import { RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
-import { MutableRefObject, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { FaLastfmSquare } from 'react-icons/fa';
 import { RiHeartFill, RiHeartLine, RiMoreFill, RiSettings2Fill } from 'react-icons/ri';
+import { SiMusicbrainz } from 'react-icons/si';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
-import { Button, Popover } from '/@/renderer/components';
+import { Button, Popover, Spoiler } from '/@/renderer/components';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import {
     TableConfigDropdown,
@@ -35,11 +38,14 @@ import { useAppFocus, useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useCurrentSong, useCurrentStatus } from '/@/renderer/store';
 import {
+    useGeneralSettings,
     usePlayButtonBehavior,
     useSettingsStoreActions,
     useTableSettings,
 } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
+import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
+import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 
 const isFullWidthRow = (node: RowNode) => {
     return node.id?.startsWith('disc-');
@@ -53,6 +59,7 @@ const ContentContainer = styled.div`
 const DetailContainer = styled.div`
     display: flex;
     flex-direction: column;
+    gap: 2rem;
     padding: 1rem 2rem 5rem;
     overflow: hidden;
 `;
@@ -63,6 +70,7 @@ interface AlbumDetailContentProps {
 }
 
 export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentProps) => {
+    const { t } = useTranslation();
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();
     const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
@@ -73,6 +81,8 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     const status = useCurrentStatus();
     const isFocused = useAppFocus();
     const currentSong = useCurrentSong();
+    const { externalLinks } = useGeneralSettings();
+    const genreRoute = useGenreRoute();
 
     const columnDefs = useMemo(
         () => getColumnDefs(tableConfig.columns, false, 'albumDetail'),
@@ -95,28 +105,32 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
             return [];
         }
 
-        const uniqueDiscNumbers = new Set(detailQuery.data?.songs.map((s) => s.discNumber));
+        let discNumber = -1;
+        let discSubtitle: string | null = null;
+
         const rowData: (QueueSong | { id: string; name: string })[] = [];
+        const discTranslated = t('common.disc', { postProcess: 'upperCase' });
 
-        for (const discNumber of uniqueDiscNumbers.values()) {
-            const songsByDiscNumber = detailQuery.data?.songs.filter(
-                (s) => s.discNumber === discNumber,
-            );
+        for (const song of detailQuery.data.songs) {
+            if (song.discNumber !== discNumber || song.discSubtitle !== discSubtitle) {
+                discNumber = song.discNumber;
+                discSubtitle = song.discSubtitle;
 
-            const discSubtitle = songsByDiscNumber?.[0]?.discSubtitle;
-            const discName = [`Disc ${discNumber}`.toLocaleUpperCase(), discSubtitle]
-                .filter(Boolean)
-                .join(': ');
+                let id = `disc-${discNumber}`;
+                let name = `${discTranslated} ${discNumber}`;
 
-            rowData.push({
-                id: `disc-${discNumber}`,
-                name: discName,
-            });
-            rowData.push(...songsByDiscNumber);
+                if (discSubtitle) {
+                    id += `-${discSubtitle}`;
+                    name += `: ${discSubtitle}`;
+                }
+
+                rowData.push({ id, name });
+            }
+            rowData.push(song);
         }
 
         return rowData;
-    }, [detailQuery.data?.songs]);
+    }, [detailQuery.data?.songs, t]);
 
     const [pagination, setPagination] = useSetState({
         artist: 0,
@@ -206,7 +220,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 handlePreviousPage: () => handlePreviousPage('artist'),
                 hasPreviousPage: pagination.artist > 0,
             },
-            title: 'More from this artist',
+            title: t('page.albumDetail.moreFromArtist', { postProcess: 'sentenceCase' }),
             uniqueId: 'mostPlayed',
         },
         {
@@ -217,7 +231,10 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 (a) => a.id !== detailQuery?.data?.id,
             ).length,
             loading: relatedAlbumGenresQuery?.isLoading || relatedAlbumGenresQuery.isFetching,
-            title: `More from ${detailQuery?.data?.genres?.[0]?.name}`,
+            title: t('page.albumDetail.moreFromGeneric', {
+                item: detailQuery?.data?.genres?.[0]?.name,
+                postProcess: 'sentenceCase',
+            }),
             uniqueId: 'relatedGenres',
         },
     ];
@@ -274,6 +291,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
     };
 
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
+    const comment = detailQuery?.data?.comment;
 
     const handleGeneralContextMenu = useHandleGeneralContextMenu(
         LibraryItem.ALBUM,
@@ -308,6 +326,8 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
+    const mbzId = detailQuery?.data?.mbzId;
+
     return (
         <ContentContainer>
             <LibraryBackgroundOverlay $backgroundColor={background} />
@@ -315,7 +335,6 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                 <Box component="section">
                     <Group
                         position="apart"
-                        py="1rem"
                         spacing="sm"
                     >
                         <Group>
@@ -367,10 +386,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                     </Group>
                 </Box>
                 {showGenres && (
-                    <Box
-                        component="section"
-                        py="1rem"
-                    >
+                    <Box component="section">
                         <Group spacing="sm">
                             {detailQuery?.data?.genres?.map((genre) => (
                                 <Button
@@ -379,7 +395,7 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                                     component={Link}
                                     radius={0}
                                     size="md"
-                                    to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
+                                    to={generatePath(genreRoute, {
                                         genreId: genre.id,
                                     })}
                                     variant="outline"
@@ -390,11 +406,57 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
                         </Group>
                     </Box>
                 )}
+                {externalLinks ? (
+                    <Box component="section">
+                        <Group spacing="sm">
+                            <Button
+                                compact
+                                component="a"
+                                href={`https://www.last.fm/music/${encodeURIComponent(
+                                    detailQuery?.data?.albumArtist || '',
+                                )}/${encodeURIComponent(detailQuery.data?.name || '')}`}
+                                radius="md"
+                                rel="noopener noreferrer"
+                                size="md"
+                                target="_blank"
+                                tooltip={{
+                                    label: t('action.openIn.lastfm'),
+                                }}
+                                variant="subtle"
+                            >
+                                <FaLastfmSquare size={25} />
+                            </Button>
+                            {mbzId ? (
+                                <Button
+                                    compact
+                                    component="a"
+                                    href={`https://musicbrainz.org/release/${mbzId}`}
+                                    radius="md"
+                                    rel="noopener noreferrer"
+                                    size="md"
+                                    target="_blank"
+                                    tooltip={{
+                                        label: t('action.openIn.musicbrainz'),
+                                    }}
+                                    variant="subtle"
+                                >
+                                    <SiMusicbrainz size={25} />
+                                </Button>
+                            ) : null}
+                        </Group>
+                    </Box>
+                ) : null}
+                {comment && (
+                    <Box component="section">
+                        <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
+                    </Box>
+                )}
                 <Box style={{ minHeight: '300px' }}>
                     <VirtualTable
                         key={`table-${tableConfig.rowHeight}`}
                         ref={tableRef}
                         autoHeight
+                        shouldUpdateSong
                         stickyHeader
                         suppressCellFocus
                         suppressLoadingOverlay

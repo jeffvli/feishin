@@ -49,43 +49,27 @@ import {
     genreListSortMap,
     SongDetailArgs,
     SongDetailResponse,
+    ServerInfo,
+    ServerInfoArgs,
+    SimilarSongsArgs,
+    Song,
+    MoveItemArgs,
+    DownloadArgs,
+    TranscodingArgs,
+    Played,
 } from '/@/renderer/api/types';
 import { jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { jfNormalize } from './jellyfin-normalize';
 import { jfType } from '/@/renderer/api/jellyfin/jellyfin-types';
-import packageJson from '../../../../package.json';
 import { z } from 'zod';
 import { JFSongListSort, JFSortOrder } from '/@/renderer/api/jellyfin.types';
-import isElectron from 'is-electron';
+import { ServerFeature } from '/@/renderer/api/features-types';
+import { VersionInfo, getFeatures } from '/@/renderer/api/utils';
+import chunk from 'lodash/chunk';
 
 const formatCommaDelimitedString = (value: string[]) => {
     return value.join(',');
 };
-
-function getHostname(): string {
-    if (isElectron()) {
-        return 'Desktop Client';
-    }
-    const agent = navigator.userAgent;
-    switch (true) {
-        case agent.toLowerCase().indexOf('edge') > -1:
-            return 'Microsoft Edge';
-        case agent.toLowerCase().indexOf('edg/') > -1:
-            return 'Edge Chromium'; // Match also / to avoid matching for the older Edge
-        case agent.toLowerCase().indexOf('opr') > -1:
-            return 'Opera';
-        case agent.toLowerCase().indexOf('chrome') > -1:
-            return 'Chrome';
-        case agent.toLowerCase().indexOf('trident') > -1:
-            return 'Internet Explorer';
-        case agent.toLowerCase().indexOf('firefox') > -1:
-            return 'Firefox';
-        case agent.toLowerCase().indexOf('safari') > -1:
-            return 'Safari';
-        default:
-            return 'PC';
-    }
-}
 
 const authenticate = async (
     url: string,
@@ -100,11 +84,6 @@ const authenticate = async (
         body: {
             Pw: body.password,
             Username: body.username,
-        },
-        headers: {
-            'x-emby-authorization': `MediaBrowser Client="Feishin", Device="${getHostname()}", DeviceId="Feishin-${getHostname()}-${
-                body.username
-            }", Version="${packageJson.version}"`,
         },
     });
 
@@ -226,7 +205,7 @@ const getAlbumArtistList = async (args: AlbumArtistListArgs): Promise<AlbumArtis
             ParentId: query.musicFolderId,
             Recursive: true,
             SearchTerm: query.searchTerm,
-            SortBy: albumArtistListSortMap.jellyfin[query.sortBy] || 'Name,SortName',
+            SortBy: albumArtistListSortMap.jellyfin[query.sortBy] || 'SortName,Name',
             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
             StartIndex: query.startIndex,
             UserId: apiClientProps.server?.userId || undefined,
@@ -252,7 +231,7 @@ const getArtistList = async (args: ArtistListArgs): Promise<AlbumArtistListRespo
             Limit: query.limit,
             ParentId: query.musicFolderId,
             Recursive: true,
-            SortBy: artistListSortMap.jellyfin[query.sortBy] || 'Name,SortName',
+            SortBy: artistListSortMap.jellyfin[query.sortBy] || 'SortName,Name',
             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
             StartIndex: query.startIndex,
         },
@@ -374,7 +353,7 @@ const getTopSongList = async (args: TopSongListArgs): Promise<SongListResponse> 
             IncludeItemTypes: 'Audio',
             Limit: query.limit,
             Recursive: true,
-            SortBy: 'CommunityRating,SortName',
+            SortBy: 'PlayCount,SortName',
             SortOrder: 'Descending',
             UserId: apiClientProps.server?.userId,
         },
@@ -440,14 +419,37 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
         throw new Error('Failed to get song list');
     }
 
+    let items: z.infer<typeof jfType._response.song>[];
+
+    // Jellyfin Bodge because of code from https://github.com/jellyfin/jellyfin/blob/c566ccb63bf61f9c36743ddb2108a57c65a2519b/Emby.Server.Implementations/Data/SqliteItemRepository.cs#L3622
+    // If the Album ID filter is passed, Jellyfin will search for
+    //  1. the matching album id
+    //  2. An album with the name of the album.
+    // It is this second condition causing issues,
+    if (query.albumIds) {
+        const albumIdSet = new Set(query.albumIds);
+        items = res.body.Items.filter((item) => albumIdSet.has(item.AlbumId));
+
+        if (items.length < res.body.Items.length) {
+            res.body.TotalRecordCount -= res.body.Items.length - items.length;
+        }
+    } else {
+        items = res.body.Items;
+    }
+
     return {
-        items: res.body.Items.map((item) =>
+        items: items.map((item) =>
             jfNormalize.song(item, apiClientProps.server, '', query.imageSize),
         ),
         startIndex: query.startIndex,
         totalRecordCount: res.body.TotalRecordCount,
     };
 };
+
+// Limit the query to 50 at a time to be *extremely* conservative on the
+// length of the full URL, since the ids are part of the query string and
+// not the POST body
+const MAX_ITEMS_PER_PLAYLIST_ADD = 50;
 
 const addToPlaylist = async (args: AddToPlaylistArgs): Promise<AddToPlaylistResponse> => {
     const { query, body, apiClientProps } = args;
@@ -456,19 +458,23 @@ const addToPlaylist = async (args: AddToPlaylistArgs): Promise<AddToPlaylistResp
         throw new Error('No userId found');
     }
 
-    const res = await jfApiClient(apiClientProps).addToPlaylist({
-        body: null,
-        params: {
-            id: query.id,
-        },
-        query: {
-            Ids: body.songId,
-            UserId: apiClientProps.server?.userId,
-        },
-    });
+    const chunks = chunk(body.songId, MAX_ITEMS_PER_PLAYLIST_ADD);
 
-    if (res.status !== 204) {
-        throw new Error('Failed to add to playlist');
+    for (const chunk of chunks) {
+        const res = await jfApiClient(apiClientProps).addToPlaylist({
+            body: null,
+            params: {
+                id: query.id,
+            },
+            query: {
+                Ids: chunk.join(','),
+                UserId: apiClientProps.server?.userId,
+            },
+        });
+
+        if (res.status !== 204) {
+            throw new Error('Failed to add to playlist');
+        }
     }
 
     return null;
@@ -479,18 +485,22 @@ const removeFromPlaylist = async (
 ): Promise<RemoveFromPlaylistResponse> => {
     const { query, apiClientProps } = args;
 
-    const res = await jfApiClient(apiClientProps).removeFromPlaylist({
-        body: null,
-        params: {
-            id: query.id,
-        },
-        query: {
-            EntryIds: query.songId,
-        },
-    });
+    const chunks = chunk(query.songId, MAX_ITEMS_PER_PLAYLIST_ADD);
 
-    if (res.status !== 204) {
-        throw new Error('Failed to remove from playlist');
+    for (const chunk of chunks) {
+        const res = await jfApiClient(apiClientProps).removeFromPlaylist({
+            body: null,
+            params: {
+                id: query.id,
+            },
+            query: {
+                EntryIds: chunk.join(','),
+            },
+        });
+
+        if (res.status !== 204) {
+            throw new Error('Failed to remove from playlist');
+        }
     }
 
     return null;
@@ -538,7 +548,7 @@ const getPlaylistSongList = async (args: PlaylistSongListArgs): Promise<SongList
             Limit: query.limit,
             SortBy: query.sortBy ? songListSortMap.jellyfin[query.sortBy] : undefined,
             SortOrder: query.sortOrder ? sortOrderMap.jellyfin[query.sortOrder] : undefined,
-            StartIndex: 0,
+            StartIndex: query.startIndex,
             UserId: apiClientProps.server?.userId,
         },
     });
@@ -598,9 +608,9 @@ const createPlaylist = async (args: CreatePlaylistArgs): Promise<CreatePlaylistR
 
     const res = await jfApiClient(apiClientProps).createPlaylist({
         body: {
+            IsPublic: body.public,
             MediaType: 'Audio',
             Name: body.name,
-            Overview: body.comment || '',
             UserId: apiClientProps.server.userId,
         },
     });
@@ -624,9 +634,9 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
     const res = await jfApiClient(apiClientProps).updatePlaylist({
         body: {
             Genres: body.genres?.map((item) => ({ Id: item.id, Name: item.name })) || [],
+            IsPublic: body.public,
             MediaType: 'Audio',
             Name: body.name,
-            Overview: body.comment || '',
             PremiereDate: null,
             ProviderIds: {},
             Tags: [],
@@ -637,7 +647,7 @@ const updatePlaylist = async (args: UpdatePlaylistArgs): Promise<UpdatePlaylistR
         },
     });
 
-    if (res.status !== 200) {
+    if (res.status !== 204) {
         throw new Error('Failed to update playlist');
     }
 
@@ -883,6 +893,12 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
             Fields: 'Genres, DateCreated, MediaSources, ParentId',
             GenreIds: query.genre ? query.genre : undefined,
             IncludeItemTypes: 'Audio',
+            IsPlayed:
+                query.played === Played.Never
+                    ? false
+                    : query.played === Played.Played
+                      ? true
+                      : undefined,
             Limit: query.limit,
             ParentId: query.musicFolderId,
             Recursive: true,
@@ -914,7 +930,6 @@ const getLyrics = async (args: LyricsArgs): Promise<LyricsResponse> => {
     const res = await jfApiClient(apiClientProps).getSongLyrics({
         params: {
             id: query.songId,
-            userId: apiClientProps.server?.userId,
         },
     });
 
@@ -946,6 +961,122 @@ const getSongDetail = async (args: SongDetailArgs): Promise<SongDetailResponse> 
     return jfNormalize.song(res.body, apiClientProps.server, '');
 };
 
+const VERSION_INFO: VersionInfo = [
+    [
+        '10.9.0',
+        { [ServerFeature.LYRICS_SINGLE_STRUCTURED]: [1], [ServerFeature.PUBLIC_PLAYLIST]: [1] },
+    ],
+];
+
+const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
+    const { apiClientProps } = args;
+
+    const res = await jfApiClient(apiClientProps).getServerInfo();
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get server info');
+    }
+
+    const features = getFeatures(VERSION_INFO, res.body.Version);
+
+    return {
+        features,
+        id: apiClientProps.server?.id,
+        version: res.body.Version,
+    };
+};
+
+const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
+    const { apiClientProps, query } = args;
+
+    // Prefer getSimilarSongs, where possible. Fallback to InstantMix
+    // where no similar songs were found.
+    const res = await jfApiClient(apiClientProps).getSimilarSongs({
+        params: {
+            itemId: query.songId,
+        },
+        query: {
+            Fields: 'Genres, DateCreated, MediaSources, ParentId',
+            Limit: query.count,
+            UserId: apiClientProps.server?.userId || undefined,
+        },
+    });
+
+    if (res.status === 200 && res.body.Items.length) {
+        const results = res.body.Items.reduce<Song[]>((acc, song) => {
+            if (song.Id !== query.songId) {
+                acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+            }
+
+            return acc;
+        }, []);
+
+        if (results.length > 0) {
+            return results;
+        }
+    }
+
+    const mix = await jfApiClient(apiClientProps).getInstantMix({
+        params: {
+            itemId: query.songId,
+        },
+        query: {
+            Fields: 'Genres, DateCreated, MediaSources, ParentId',
+            Limit: query.count,
+            UserId: apiClientProps.server?.userId || undefined,
+        },
+    });
+
+    if (mix.status !== 200) {
+        throw new Error('Failed to get similar songs');
+    }
+
+    return mix.body.Items.reduce<Song[]>((acc, song) => {
+        if (song.Id !== query.songId) {
+            acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+        }
+
+        return acc;
+    }, []);
+};
+
+const movePlaylistItem = async (args: MoveItemArgs): Promise<void> => {
+    const { apiClientProps, query } = args;
+
+    const res = await jfApiClient(apiClientProps).movePlaylistItem({
+        body: null,
+        params: {
+            itemId: query.trackId,
+            newIdx: query.endingIndex.toString(),
+            playlistId: query.playlistId,
+        },
+    });
+
+    if (res.status !== 204) {
+        throw new Error('Failed to move item in playlist');
+    }
+};
+
+const getDownloadUrl = (args: DownloadArgs) => {
+    const { apiClientProps, query } = args;
+
+    return `${apiClientProps.server?.url}/items/${query.id}/download?api_key=${apiClientProps.server?.credential}`;
+};
+
+const getTranscodingUrl = (args: TranscodingArgs) => {
+    const { base, format, bitrate } = args.query;
+    let url = base.replace('transcodingProtocol=hls', 'transcodingProtocol=http');
+    if (format) {
+        url = url.replace('audioCodec=aac', `audioCodec=${format}`);
+        url = url.replace('transcodingContainer=ts', `transcodingContainer=${format}`);
+    }
+    if (bitrate !== undefined) {
+        url += `&maxStreamingBitrate=${bitrate * 1000}`;
+    }
+
+    return url;
+};
+
 export const jfController = {
     addToPlaylist,
     authenticate,
@@ -958,6 +1089,7 @@ export const jfController = {
     getAlbumDetail,
     getAlbumList,
     getArtistList,
+    getDownloadUrl,
     getGenreList,
     getLyrics,
     getMusicFolderList,
@@ -965,9 +1097,13 @@ export const jfController = {
     getPlaylistList,
     getPlaylistSongList,
     getRandomSongList,
+    getServerInfo,
+    getSimilarSongs,
     getSongDetail,
     getSongList,
     getTopSongList,
+    getTranscodingUrl,
+    movePlaylistItem,
     removeFromPlaylist,
     scrobble,
     search,

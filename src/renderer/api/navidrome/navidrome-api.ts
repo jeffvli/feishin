@@ -7,8 +7,9 @@ import qs from 'qs';
 import { ndType } from './navidrome-types';
 import { authenticationFailure, resultWithHeaders } from '/@/renderer/api/utils';
 import { useAuthStore } from '/@/renderer/store';
-import { ServerListItem } from '/@/renderer/types';
-import { toast } from '/@/renderer/components';
+import { ServerListItem } from '/@/renderer/api/types';
+import { toast } from '/@/renderer/components/toast';
+import i18n from '/@/i18n/i18n';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -146,6 +147,15 @@ export const contract = c.router({
             500: resultWithHeaders(ndType._response.error),
         },
     },
+    movePlaylistItem: {
+        body: ndType._parameters.moveItem,
+        method: 'PUT',
+        path: 'playlist/:playlistId/tracks/:trackNumber',
+        responses: {
+            200: resultWithHeaders(ndType._response.moveItem),
+            400: resultWithHeaders(ndType._response.error),
+        },
+    },
     removeFromPlaylist: {
         body: null,
         method: 'DELETE',
@@ -153,6 +163,16 @@ export const contract = c.router({
         query: ndType._parameters.removeFromPlaylist,
         responses: {
             200: resultWithHeaders(ndType._response.removeFromPlaylist),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
+    shareItem: {
+        body: ndType._parameters.shareItem,
+        method: 'POST',
+        path: 'share',
+        responses: {
+            200: resultWithHeaders(ndType._response.shareItem),
+            404: resultWithHeaders(ndType._response.error),
             500: resultWithHeaders(ndType._response.error),
         },
     },
@@ -276,15 +296,19 @@ axiosClient.interceptors.response.use(
 
                         if (res.status === 429) {
                             toast.error({
-                                message:
-                                    'you have exceeded the number of allowed login requests. Please wait before logging, or consider tweaking AuthRequestLimit',
-                                title: 'Your session has expired.',
+                                message: i18n.t('error.loginRateError', {
+                                    postProcess: 'sentenceCase',
+                                }) as string,
+                                title: i18n.t('error.sessionExpiredError', {
+                                    postProcess: 'sentenceCase',
+                                }) as string,
                             });
 
                             const serverId = currentServer.id;
-                            useAuthStore
-                                .getState()
-                                .actions.updateServer(serverId, { ndCredential: undefined });
+                            useAuthStore.getState().actions.updateServer(serverId, {
+                                credential: undefined,
+                                ndCredential: undefined,
+                            });
                             useAuthStore.getState().actions.setCurrentServer(null);
 
                             // special error to prevent sending a second message, and stop other messages that could be enqueued
@@ -292,7 +316,11 @@ axiosClient.interceptors.response.use(
                             throw TIMEOUT_ERROR;
                         }
                         if (res.status !== 200) {
-                            throw new Error('Failed to authenticate');
+                            throw new Error(
+                                i18n.t('error.authenticatedFailed', {
+                                    postProcess: 'sentenceCase',
+                                }) as string,
+                            );
                         }
 
                         const newCredential = res.data.token;
@@ -372,12 +400,20 @@ export const ndApiClient = (args: {
                 };
             } catch (e: Error | AxiosError | any) {
                 if (isAxiosError(e)) {
+                    if (e.code === 'ERR_NETWORK') {
+                        throw new Error(
+                            i18n.t('error.networkError', {
+                                postProcess: 'sentenceCase',
+                            }) as string,
+                        );
+                    }
+
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
                     return {
-                        body: { data: response.data, headers: response.headers },
-                        headers: response.headers as any,
-                        status: response.status,
+                        body: { data: response?.data, headers: response?.headers },
+                        headers: response?.headers as any,
+                        status: response?.status,
                     };
                 }
                 throw e;

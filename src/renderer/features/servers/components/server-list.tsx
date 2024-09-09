@@ -1,18 +1,21 @@
 import { ChangeEvent } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
-import { Accordion, Button, ContextModalVars, Switch } from '/@/renderer/components';
+import { Accordion, Button, ContextModalVars, Switch, Text } from '/@/renderer/components';
 import { useLocalStorage } from '@mantine/hooks';
 import { openContextModal } from '@mantine/modals';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiServerFill } from 'react-icons/ri';
 import { AddServerForm } from '/@/renderer/features/servers/components/add-server-form';
 import { ServerListItem } from '/@/renderer/features/servers/components/server-list-item';
-import { useServerList } from '/@/renderer/store';
+import { useCurrentServer, useServerList } from '/@/renderer/store';
 import { titleCase } from '/@/renderer/utils';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 export const ServerList = () => {
+    const { t } = useTranslation();
+    const currentServer = useCurrentServer();
     const serverListQuery = useServerList();
 
     const handleAddServerModal = () => {
@@ -24,7 +27,7 @@ export const ServerList = () => {
                 ),
             },
             modal: 'base',
-            title: 'Add server',
+            title: t('form.addServer.title', { postProcess: 'titleCase' }),
         });
     };
 
@@ -74,7 +77,7 @@ export const ServerList = () => {
                     variant="filled"
                     onClick={handleAddServerModal}
                 >
-                    Add server
+                    {t('form.addServer.title', { postProcess: 'titleCase' })}
                 </Button>
             </Group>
             <Stack>
@@ -88,7 +91,9 @@ export const ServerList = () => {
                             >
                                 <Accordion.Control icon={<RiServerFill size={15} />}>
                                     <Group position="apart">
-                                        {titleCase(server?.type)} - {server?.name}
+                                        <Text weight={server.id === currentServer?.id ? 800 : 400}>
+                                            {titleCase(server?.type)} - {server?.name}
+                                        </Text>
                                     </Group>
                                 </Accordion.Control>
                                 <Accordion.Panel>
@@ -104,14 +109,18 @@ export const ServerList = () => {
                         <Group>
                             <Switch
                                 checked={ignoreCORS === 'true'}
-                                label="Ignore CORS (requires restart)"
+                                label={t('form.addServer.ignoreCors', {
+                                    postProcess: 'sentenceCase',
+                                })}
                                 onChange={handleUpdateIgnoreCORS}
                             />
                         </Group>
                         <Group>
                             <Switch
                                 checked={ignoreSSL === 'true'}
-                                label="Ignore SSL (requires restart)"
+                                label={t('form.addServer.ignoreSsl', {
+                                    postProcess: 'sentenceCase',
+                                })}
                                 onChange={handleUpdateIgnoreSSL}
                             />
                         </Group>

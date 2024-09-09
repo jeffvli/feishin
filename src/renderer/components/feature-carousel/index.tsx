@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Group, Image, Stack } from '@mantine/core';
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { Link, generatePath } from 'react-router-dom';
 import styled from 'styled-components';
@@ -13,6 +14,7 @@ import { Badge } from '/@/renderer/components/badge';
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { Play } from '/@/renderer/types';
+import { usePlayButtonBehavior } from '/@/renderer/store';
 
 const Carousel = styled(motion.div)`
     position: relative;
@@ -61,7 +63,7 @@ const BackgroundImage = styled.img`
     height: 150%;
     user-select: none;
     filter: blur(24px);
-    object-fit: cover;
+    object-fit: var(--image-fit);
     object-position: 0 30%;
 `;
 
@@ -109,9 +111,11 @@ interface FeatureCarouselProps {
 }
 
 export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
+    const { t } = useTranslation();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const [itemIndex, setItemIndex] = useState(0);
     const [direction, setDirection] = useState(0);
+    const playType = usePlayButtonBehavior();
 
     const currentItem = data?.[itemIndex];
 
@@ -220,11 +224,18 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                                         id: [currentItem.id],
                                                         type: LibraryItem.ALBUM,
                                                     },
-                                                    playType: Play.NOW,
+                                                    playType,
                                                 });
                                             }}
                                         >
-                                            Play
+                                            {t(
+                                                playType === Play.NOW
+                                                    ? 'player.play'
+                                                    : playType === Play.NEXT
+                                                      ? 'player.addNext'
+                                                      : 'player.addLast',
+                                                { postProcess: 'titleCase' },
+                                            )}
                                         </Button>
                                         <Group spacing="sm">
                                             <Button

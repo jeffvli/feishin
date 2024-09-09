@@ -1,9 +1,8 @@
+import type { ChangeEvent, MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import type { ChangeEvent, MutableRefObject } from 'react';
-import { useListContext } from '../../../context/list-context';
-import { useListStoreByKey } from '../../../store/list.store';
+import { useTranslation } from 'react-i18next';
 import { FilterBar } from '../../shared/components/filter-bar';
 import { LibraryItem } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
@@ -11,9 +10,8 @@ import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { AlbumArtistListHeaderFilters } from '/@/renderer/features/artists/components/album-artist-list-header-filters';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
-import { AlbumArtistListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
-import { ListDisplayType } from '/@/renderer/types';
+import { AlbumArtistListFilter, useCurrentServer } from '/@/renderer/store';
+import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 
 interface AlbumArtistListHeaderProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
@@ -26,31 +24,20 @@ export const AlbumArtistListHeader = ({
     gridRef,
     tableRef,
 }: AlbumArtistListHeaderProps) => {
+    const { t } = useTranslation();
     const server = useCurrentServer();
-    const { pageKey } = useListContext();
-    const { display, filter } = useListStoreByKey({ key: pageKey });
-    const { setFilter, setTablePagination } = useListStoreActions();
     const cq = useContainerQuery();
 
-    const { handleRefreshGrid, handleRefreshTable } = useListFilterRefresh({
+    const { filter, refresh, search } = useDisplayRefresh({
+        gridRef,
         itemType: LibraryItem.ALBUM_ARTIST,
         server,
+        tableRef,
     });
 
     const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-        const searchTerm = e.target.value === '' ? undefined : e.target.value;
-        const updatedFilters = setFilter({
-            data: { searchTerm },
-            itemType: LibraryItem.ALBUM_ARTIST,
-            key: pageKey,
-        }) as AlbumArtistListFilter;
-
-        if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
-            handleRefreshTable(tableRef, updatedFilters);
-            setTablePagination({ data: { currentPage: 0 }, key: pageKey });
-        } else {
-            handleRefreshGrid(gridRef, updatedFilters);
-        }
+        const updatedFilters = search(e) as AlbumArtistListFilter;
+        refresh(updatedFilters);
     }, 500);
 
     return (
@@ -64,7 +51,9 @@ export const AlbumArtistListHeader = ({
                     w="100%"
                 >
                     <LibraryHeaderBar>
-                        <LibraryHeaderBar.Title>Album Artists</LibraryHeaderBar.Title>
+                        <LibraryHeaderBar.Title>
+                            {t('page.albumArtistList.title', { postProcess: 'titleCase' })}
+                        </LibraryHeaderBar.Title>
                         <LibraryHeaderBar.Badge
                             isLoading={itemCount === null || itemCount === undefined}
                         >

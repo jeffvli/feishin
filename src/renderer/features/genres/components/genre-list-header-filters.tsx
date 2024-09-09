@@ -1,10 +1,18 @@
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
-import { RiFolder2Fill, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
+import { useTranslation } from 'react-i18next';
+import {
+    RiAlbumLine,
+    RiFolder2Fill,
+    RiMoreFill,
+    RiMusic2Line,
+    RiRefreshLine,
+    RiSettings3Fill,
+} from 'react-icons/ri';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { GenreListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { GENRE_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
@@ -14,15 +22,31 @@ import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
 import {
     GenreListFilter,
+    GenreTarget,
     useCurrentServer,
+    useGeneralSettings,
     useListStoreActions,
     useListStoreByKey,
+    useSettingsStoreActions,
 } from '/@/renderer/store';
-import { ListDisplayType, ServerType, TableColumn } from '/@/renderer/types';
+import { ListDisplayType, TableColumn } from '/@/renderer/types';
+import i18n from '/@/i18n/i18n';
 
 const FILTERS = {
-    jellyfin: [{ defaultOrder: SortOrder.ASC, name: 'Name', value: GenreListSort.NAME }],
-    navidrome: [{ defaultOrder: SortOrder.ASC, name: 'Name', value: GenreListSort.NAME }],
+    jellyfin: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: GenreListSort.NAME,
+        },
+    ],
+    navidrome: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: GenreListSort.NAME,
+        },
+    ],
 };
 
 interface GenreListHeaderFiltersProps {
@@ -31,12 +55,15 @@ interface GenreListHeaderFiltersProps {
 }
 
 export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFiltersProps) => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { pageKey, customFilters } = useListContext();
     const server = useCurrentServer();
     const { setFilter, setTable, setGrid, setDisplayType } = useListStoreActions();
     const { display, filter, table, grid } = useListStoreByKey({ key: pageKey });
     const cq = useContainerQuery();
+    const { genreTarget } = useGeneralSettings();
+    const { setGenreBehavior } = useSettingsStoreActions();
 
     const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
         itemType: LibraryItem.GENRE,
@@ -193,6 +220,11 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
         return filter.musicFolderId !== undefined;
     }, [filter.musicFolderId]);
 
+    const handleGenreToggle = useCallback(() => {
+        const newState = genreTarget === GenreTarget.ALBUM ? GenreTarget.TRACK : GenreTarget.ALBUM;
+        setGenreBehavior(newState);
+    }, [genreTarget, setGenreBehavior]);
+
     return (
         <Flex justify="space-between">
             <Group
@@ -269,7 +301,7 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                 <Button
                     compact
                     size="md"
-                    tooltip={{ label: 'Refresh' }}
+                    tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                     onClick={handleRefresh}
                 >
@@ -291,9 +323,26 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                             icon={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
-                            Refresh
+                            {t('common.refresh', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
+                    <Divider orientation="vertical" />
+                    <Button
+                        compact
+                        size="md"
+                        tooltip={{
+                            label: t(
+                                genreTarget === GenreTarget.ALBUM
+                                    ? 'page.genreList.showAlbums'
+                                    : 'page.genreList.showTracks',
+                                { postProcess: 'sentenceCase' },
+                            ),
+                        }}
+                        variant="subtle"
+                        onClick={handleGenreToggle}
+                    >
+                        {genreTarget === GenreTarget.ALBUM ? <RiAlbumLine /> : <RiMusic2Line />}
+                    </Button>
                 </DropdownMenu>
             </Group>
             <Group
@@ -308,42 +357,48 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                         <Button
                             compact
                             size="md"
-                            tooltip={{ label: 'Configure' }}
+                            tooltip={{
+                                label: t('common.configure', { postProcess: 'titleCase' }),
+                            }}
                             variant="subtle"
                         >
                             <RiSettings3Fill size="1.3rem" />
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        <DropdownMenu.Label>Display type</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.displayType', { postProcess: 'titleCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.CARD}
                             value={ListDisplayType.CARD}
                             onClick={handleSetViewType}
                         >
-                            Card
+                            {t('table.config.view.card', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.POSTER}
                             value={ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                         >
-                            Poster
+                            {t('table.config.view.poster', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                         >
-                            Table
+                            {t('table.config.view.table', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
-                        <DropdownMenu.Label>Item size</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.size', { postProcess: 'titleCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item closeMenuOnClick={false}>
                             <Slider
                                 defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
                                 max={isGrid ? 300 : 100}
-                                min={isGrid ? 150 : 25}
+                                min={isGrid ? 100 : 25}
                                 onChangeEnd={handleItemSize}
                             />
                         </DropdownMenu.Item>
@@ -363,7 +418,11 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                         {(display === ListDisplayType.TABLE ||
                             display === ListDisplayType.TABLE_PAGINATED) && (
                             <>
-                                <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.tableColumns', {
+                                        postProcess: 'titleCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
@@ -380,7 +439,11 @@ export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFil
                                             onChange={handleTableColumns}
                                         />
                                         <Group position="apart">
-                                            <Text>Auto Fit Columns</Text>
+                                            <Text>
+                                                {t('table.config.general.autoFitColumns', {
+                                                    postProcess: 'titleCase',
+                                                })}
+                                            </Text>
                                             <Switch
                                                 defaultChecked={table.autoFit}
                                                 onChange={handleAutoFitColumns}

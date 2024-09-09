@@ -17,7 +17,7 @@ jobs:
             - name: Install Node and NPM
               uses: actions/setup-node@v1
               with:
-                  node-version: 16
+                  node-version: 18
                   cache: npm
 
             - name: Install dependencies
@@ -36,4 +36,18 @@ jobs:
                       npm run postinstall
                       npm run build
                       npm exec electron-builder -- --publish always --linux
+                  on_retry_command: npm cache clean --force
+
+            - name: Publish releases (arm64)
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      npm run postinstall
+                      npm run build
+                      npm exec electron-builder -- --publish always --arm64
                   on_retry_command: npm cache clean --force

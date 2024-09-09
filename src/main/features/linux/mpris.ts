@@ -1,7 +1,8 @@
 import { ipcMain } from 'electron';
 import Player from 'mpris-service';
-import { PlayerRepeat, PlayerStatus, SongUpdate } from '../../../renderer/types';
+import { PlayerRepeat, PlayerStatus } from '../../../renderer/types';
 import { getMainWindow } from '../../main';
+import { QueueSong } from '/@/renderer/api/types';
 
 const mprisPlayer = Player({
     identity: 'Feishin',
@@ -18,22 +19,29 @@ mprisPlayer.on('quit', () => {
     process.exit();
 });
 
+const hasData = (): boolean => {
+    return mprisPlayer.metadata && !!mprisPlayer.metadata['mpris:length'];
+};
+
 mprisPlayer.on('stop', () => {
     getMainWindow()?.webContents.send('renderer-player-stop');
     mprisPlayer.playbackStatus = 'Paused';
 });
 
 mprisPlayer.on('pause', () => {
+    if (!hasData()) return;
     getMainWindow()?.webContents.send('renderer-player-pause');
     mprisPlayer.playbackStatus = 'Paused';
 });
 
 mprisPlayer.on('play', () => {
+    if (!hasData()) return;
     getMainWindow()?.webContents.send('renderer-player-play');
     mprisPlayer.playbackStatus = 'Playing';
 });
 
 mprisPlayer.on('playpause', () => {
+    if (!hasData()) return;
     getMainWindow()?.webContents.send('renderer-player-play-pause');
     if (mprisPlayer.playbackStatus !== 'Playing') {
         mprisPlayer.playbackStatus = 'Playing';
@@ -43,6 +51,7 @@ mprisPlayer.on('playpause', () => {
 });
 
 mprisPlayer.on('next', () => {
+    if (!hasData()) return;
     getMainWindow()?.webContents.send('renderer-player-next');
 
     if (mprisPlayer.playbackStatus !== 'Playing') {
@@ -51,6 +60,7 @@ mprisPlayer.on('next', () => {
 });
 
 mprisPlayer.on('previous', () => {
+    if (!hasData()) return;
     getMainWindow()?.webContents.send('renderer-player-previous');
 
     if (mprisPlayer.playbackStatus !== 'Playing') {
@@ -70,6 +80,8 @@ mprisPlayer.on('volume', (vol: number) => {
     getMainWindow()?.webContents.send('request-volume', {
         volume,
     });
+
+    mprisPlayer.volume = volume / 100;
 });
 
 mprisPlayer.on('shuffle', (event: boolean) => {
@@ -94,7 +106,7 @@ mprisPlayer.on('seek', (event: number) => {
     });
 });
 
-ipcMain.on('mpris-update-position', (_event, arg) => {
+ipcMain.on('update-position', (_event, arg: number) => {
     mprisPlayer.getPosition = () => arg * 1e6;
 });
 
@@ -104,6 +116,10 @@ ipcMain.on('mpris-update-seek', (_event, arg) => {
 
 ipcMain.on('update-volume', (_event, volume) => {
     mprisPlayer.volume = Number(volume) / 100;
+});
+
+ipcMain.on('update-playback', (_event, status: PlayerStatus) => {
+    mprisPlayer.playbackStatus = status === PlayerStatus.PLAYING ? 'Playing' : 'Paused';
 });
 
 const REPEAT_TO_MPRIS: Record<PlayerRepeat, string> = {
@@ -120,21 +136,12 @@ ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
     mprisPlayer.shuffle = shuffle;
 });
 
-ipcMain.on('update-song', (_event, args: SongUpdate) => {
-    const { song, status, repeat, shuffle } = args || {};
-
+ipcMain.on('update-song', (_event, song: QueueSong | undefined) => {
     try {
-        mprisPlayer.playbackStatus = status === PlayerStatus.PLAYING ? 'Playing' : 'Paused';
-
-        if (repeat) {
-            mprisPlayer.loopStatus = REPEAT_TO_MPRIS[repeat];
+        if (!song?.id) {
+            mprisPlayer.metadata = {};
+            return;
         }
-
-        if (shuffle) {
-            mprisPlayer.shuffle = shuffle;
-        }
-
-        if (!song) return;
 
         const upsizedImageUrl = song.imageUrl
             ? song.imageUrl
@@ -154,12 +161,19 @@ ipcMain.on('update-song', (_event, args: SongUpdate) => {
                 ? song.albumArtists.map((artist) => artist.name)
                 : null,
             'xesam:artist': song.artists?.length ? song.artists.map((artist) => artist.name) : null,
+            'xesam:audioBpm': song.bpm,
+            // Comment is a `list of strings` type
+            'xesam:comment': song.comment ? [song.comment] : null,
+            'xesam:contentCreated': song.releaseDate,
             'xesam:discNumber': song.discNumber ? song.discNumber : null,
             'xesam:genre': song.genres?.length ? song.genres.map((genre: any) => genre.name) : null,
+            'xesam:lastUsed': song.lastPlayedAt,
             'xesam:title': song.name || null,
             'xesam:trackNumber': song.trackNumber ? song.trackNumber : null,
             'xesam:useCount':
                 song.playCount !== null && song.playCount !== undefined ? song.playCount : null,
+            // User ratings are only on Navidrome/Subsonic and are on a scale of 1-5
+            'xesam:userRating': song.userRating ? song.userRating / 5 : null,
         };
     } catch (err) {
         console.log(err);

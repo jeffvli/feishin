@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Box, Group } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
+import { useTranslation } from 'react-i18next';
 import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 import { PlaylistDetailSongListContent } from '../components/playlist-detail-song-list-content';
@@ -19,6 +20,7 @@ import { PlaylistSongListQuery, ServerType, SongListSort, SortOrder } from '/@/r
 import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
 
 const PlaylistDetailSongListRoute = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const tableRef = useRef<AgGridReactType | null>(null);
     const { playlistId } = useParams() as { playlistId: string };
@@ -48,13 +50,13 @@ const PlaylistDetailSongListRoute = () => {
                         navidrome: {
                             owner: detailQuery?.data?.owner || '',
                             ownerId: detailQuery?.data?.ownerId || '',
-                            public: detailQuery?.data?.public || false,
                             rules,
                             sync: detailQuery?.data?.sync || false,
                         },
                     },
                     comment: detailQuery?.data?.description || '',
                     name: detailQuery?.data?.name,
+                    public: detailQuery?.data?.public || false,
                 },
                 serverId: detailQuery?.data?.serverId,
             },
@@ -90,7 +92,6 @@ const PlaylistDetailSongListRoute = () => {
                             navidrome: {
                                 owner: detailQuery?.data?.owner || '',
                                 ownerId: detailQuery?.data?.ownerId || '',
-                                public: detailQuery?.data?.public || false,
                                 rules: {
                                     ...filter,
                                     limit: extraFilters.limit || undefined,
@@ -102,6 +103,7 @@ const PlaylistDetailSongListRoute = () => {
                         },
                         comment: detailQuery?.data?.description || '',
                         name: detailQuery?.data?.name,
+                        public: detailQuery?.data?.public || false,
                     }}
                     serverId={detailQuery?.data?.serverId}
                     onCancel={closeAllModals}
@@ -114,7 +116,7 @@ const PlaylistDetailSongListRoute = () => {
                     }
                 />
             ),
-            title: 'Save as',
+            title: t('common.saveAs', { postProcess: 'sentenceCase' }),
         });
     };
 
@@ -194,6 +196,7 @@ const PlaylistDetailSongListRoute = () => {
                                 key={JSON.stringify(detailQuery?.data?.rules)}
                                 isSaving={createPlaylistMutation?.isLoading}
                                 limit={detailQuery?.data?.rules?.limit}
+                                playlistId={playlistId}
                                 query={detailQuery?.data?.rules}
                                 sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
                                 sortOrder={detailQuery?.data?.rules?.order || 'asc'}

@@ -78,7 +78,7 @@ const albumArtist = z.object({
     name: z.string(),
     orderArtistName: z.string(),
     playCount: z.number(),
-    playDate: z.string(),
+    playDate: z.string().optional(),
     rating: z.number(),
     size: z.number(),
     smallImageUrl: z.string().optional(),
@@ -111,6 +111,7 @@ const album = z.object({
     allArtistIds: z.string(),
     artist: z.string(),
     artistId: z.string(),
+    comment: z.string().optional(),
     compilation: z.boolean(),
     coverArtId: z.string().optional(), // Removed after v0.48.0
     coverArtPath: z.string().optional(), // Removed after v0.48.0
@@ -127,9 +128,12 @@ const album = z.object({
     name: z.string(),
     orderAlbumArtistName: z.string(),
     orderAlbumName: z.string(),
+    originalDate: z.string().optional(),
+    originalYear: z.number().optional(),
     playCount: z.number(),
-    playDate: z.string(),
+    playDate: z.string().optional(),
     rating: z.number().optional(),
+    releaseDate: z.string().optional(),
     size: z.number(),
     songCount: z.number(),
     sortAlbumArtistName: z.string(),
@@ -211,8 +215,9 @@ const song = z.object({
     orderTitle: z.string(),
     path: z.string(),
     playCount: z.number(),
-    playDate: z.string(),
+    playDate: z.string().optional(),
     rating: z.number().optional(),
+    releaseDate: z.string().optional(),
     rgAlbumGain: z.number().optional(),
     rgAlbumPeak: z.number().optional(),
     rgTrackGain: z.number().optional(),
@@ -342,6 +347,24 @@ const removeFromPlaylistParameters = z.object({
     id: z.array(z.string()),
 });
 
+const shareItem = z.object({
+    id: z.string(),
+});
+
+const shareItemParameters = z.object({
+    description: z.string(),
+    downloadable: z.boolean(),
+    expires: z.number(),
+    resourceIds: z.string(),
+    resourceType: z.string(),
+});
+
+const moveItemParameters = z.object({
+    insert_before: z.string(),
+});
+
+const moveItem = z.null();
+
 export const ndType = {
     _enum: {
         albumArtistList: ndAlbumArtistListSort,
@@ -358,8 +381,10 @@ export const ndType = {
         authenticate: authenticateParameters,
         createPlaylist: createPlaylistParameters,
         genreList: genreListParameters,
+        moveItem: moveItemParameters,
         playlistList: playlistListParameters,
         removeFromPlaylist: removeFromPlaylistParameters,
+        shareItem: shareItemParameters,
         songList: songListParameters,
         updatePlaylist: updatePlaylistParameters,
         userList: userListParameters,
@@ -376,11 +401,13 @@ export const ndType = {
         error,
         genre,
         genreList,
+        moveItem,
         playlist,
         playlistList,
         playlistSong,
         playlistSongList,
         removeFromPlaylist,
+        shareItem,
         song,
         songList,
         updatePlaylist,

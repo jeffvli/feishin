@@ -7,6 +7,7 @@ import { Text } from '/@/renderer/components/text';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Skeleton } from '/@/renderer/components/skeleton';
+import { Separator } from '/@/renderer/components/separator';
 
 export const AlbumArtistCell = ({ value, data }: ICellRendererParams) => {
     if (value === undefined) {
@@ -29,15 +30,7 @@ export const AlbumArtistCell = ({ value, data }: ICellRendererParams) => {
             >
                 {value?.map((item: Artist | AlbumArtist, index: number) => (
                     <React.Fragment key={`row-${item.id}-${data.uniqueId}`}>
-                        {index > 0 && (
-                            <Text
-                                $secondary
-                                size="md"
-                                style={{ display: 'inline-block' }}
-                            >
-                                ,
-                            </Text>
-                        )}{' '}
+                        {index > 0 && <Separator />}
                         {item.id ? (
                             <Text
                                 $link

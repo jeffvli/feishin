@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+import { ServerFeatures } from '/@/renderer/api/features-types';
 import {
     Album,
     AlbumArtist,
@@ -36,6 +38,7 @@ export type TableType =
 
 export type CardRow<T> = {
     arrayProperty?: string;
+    format?: (value: T) => ReactNode;
     property: keyof T;
     route?: CardRoute;
 };
@@ -60,8 +63,20 @@ export enum ServerType {
     SUBSONIC = 'subsonic',
 }
 
+export const toServerType = (value?: string): ServerType | null => {
+    switch (value?.toLowerCase()) {
+        case ServerType.JELLYFIN:
+            return ServerType.JELLYFIN;
+        case ServerType.NAVIDROME:
+            return ServerType.NAVIDROME;
+        default:
+            return null;
+    }
+};
+
 export type ServerListItem = {
     credential: string;
+    features?: ServerFeatures;
     id: string;
     name: string;
     ndCredential?: string;
@@ -70,6 +85,7 @@ export type ServerListItem = {
     url: string;
     userId: string | null;
     username: string;
+    version?: string;
 };
 
 export enum PlayerStatus {
@@ -93,6 +109,7 @@ export enum Play {
     LAST = 'last',
     NEXT = 'next',
     NOW = 'now',
+    SHUFFLE = 'shuffle',
 }
 
 export enum CrossfadeStyle {
@@ -142,6 +159,7 @@ export enum TableColumn {
     BIT_RATE = 'bitRate',
     BPM = 'bpm',
     CHANNELS = 'channels',
+    CODEC = 'codec',
     COMMENT = 'comment',
     DATE_ADDED = 'dateAdded',
     DISC_NUMBER = 'discNumber',
@@ -194,8 +212,8 @@ export type GridCardData = {
     route: CardRoute;
 };
 
-export type SongUpdate = {
-    currentTime?: number;
+export type SongState = {
+    position?: number;
     repeat?: PlayerRepeat;
     shuffle?: boolean;
     song?: QueueSong;
@@ -208,6 +226,14 @@ export enum FontType {
     BUILT_IN = 'builtIn',
     CUSTOM = 'custom',
     SYSTEM = 'system',
+}
+
+export type TitleTheme = 'dark' | 'light' | 'system';
+
+export enum AuthState {
+    INVALID = 'invalid',
+    LOADING = 'loading',
+    VALID = 'valid',
 }
 
 export type WebAudio = {

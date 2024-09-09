@@ -3,17 +3,7 @@ import { Skeleton } from '/@/renderer/components/skeleton';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 import { useMemo } from 'react';
 import { Text } from '/@/renderer/components/text';
-
-const URL_REGEX =
-    /((?:https?:\/\/)?(?:[\w-]{1,32}(?:\.[\w-]{1,32})+)(?:\/[\w\-./?%&=][^.|^\s]*)?)/g;
-
-const replaceURLWithHTMLLinks = (text: string) => {
-    const urlRegex = new RegExp(URL_REGEX, 'g');
-    return text.replaceAll(
-        urlRegex,
-        (url) => `<a href="${url}" target="_blank" rel="noreferrer">${url}</a>`,
-    );
-};
+import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 
 export const NoteCell = ({ value }: ICellRendererParams) => {
     const formattedValue = useMemo(() => {
@@ -39,9 +29,10 @@ export const NoteCell = ({ value }: ICellRendererParams) => {
         <CellContainer $position="left">
             <Text
                 $secondary
-                dangerouslySetInnerHTML={{ __html: formattedValue }}
                 overflow="hidden"
-            />
+            >
+                {formattedValue}
+            </Text>
         </CellContainer>
     );
 };

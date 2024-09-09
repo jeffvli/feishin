@@ -8,7 +8,7 @@ import { BasePaginatedResponse, LibraryItem, ServerListItem } from '/@/renderer/
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import orderBy from 'lodash/orderBy';
 
-interface UseHandleListFilterChangeProps {
+export interface UseHandleListFilterChangeProps {
     isClientSideSort?: boolean;
     itemType: LibraryItem;
     server: ServerListItem | null;
@@ -123,7 +123,6 @@ export const useListFilterRefresh = ({
 
             gridRef.current?.scrollTo(0);
             gridRef.current?.resetLoadMoreItemsCache();
-            gridRef.current?.setItemData([]);
 
             const query = { ...filter, limit: 200, startIndex: 0 };
 

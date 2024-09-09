@@ -1,4 +1,4 @@
-name: Publish Windows and macOS (Manual)
+name: Publish macOS (Manual)
 
 on: workflow_dispatch
 
@@ -17,7 +17,7 @@ jobs:
             - name: Install Node and NPM
               uses: actions/setup-node@v1
               with:
-                  node-version: 16
+                  node-version: 18
                   cache: npm
 
             - name: Install dependencies
@@ -35,5 +35,5 @@ jobs:
                   command: |
                       npm run postinstall
                       npm run build
-                      npm exec electron-builder -- --publish always --win --mac
+                      npm exec electron-builder -- --publish always --mac
                   on_retry_command: npm cache clean --force

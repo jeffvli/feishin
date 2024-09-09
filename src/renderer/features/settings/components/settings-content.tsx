@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import { Tabs } from '/@/renderer/components';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import isElectron from 'is-electron';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const GeneralTab = lazy(() =>
@@ -28,6 +29,12 @@ const HotkeysTab = lazy(() =>
     })),
 );
 
+const AdvancedTab = lazy(() =>
+    import('/@/renderer/features/settings/components/advanced/advanced-tab').then((module) => ({
+        default: module.AdvancedTab,
+    })),
+);
+
 const TabContainer = styled.div`
     width: 100%;
     height: 100%;
@@ -36,6 +43,7 @@ const TabContainer = styled.div`
 `;
 
 export const SettingsContent = () => {
+    const { t } = useTranslation();
     const currentTab = useSettingsStore((state) => state.tab);
     const { setSettings } = useSettingsStoreActions();
 
@@ -49,10 +57,23 @@ export const SettingsContent = () => {
                 onTabChange={(e) => e && setSettings({ tab: e })}
             >
                 <Tabs.List>
-                    <Tabs.Tab value="general">General</Tabs.Tab>
-                    <Tabs.Tab value="playback">Playback</Tabs.Tab>
-                    <Tabs.Tab value="hotkeys">Hotkeys</Tabs.Tab>
-                    {isElectron() && <Tabs.Tab value="window">Window</Tabs.Tab>}
+                    <Tabs.Tab value="general">
+                        {t('page.setting.generalTab', { postProcess: 'sentenceCase' })}
+                    </Tabs.Tab>
+                    <Tabs.Tab value="playback">
+                        {t('page.setting.playbackTab', { postProcess: 'sentenceCase' })}
+                    </Tabs.Tab>
+                    <Tabs.Tab value="hotkeys">
+                        {t('page.setting.hotkeysTab', { postProcess: 'sentenceCase' })}
+                    </Tabs.Tab>
+                    {isElectron() && (
+                        <Tabs.Tab value="window">
+                            {t('page.setting.windowTab', { postProcess: 'sentenceCase' })}
+                        </Tabs.Tab>
+                    )}
+                    <Tabs.Tab value="advanced">
+                        {t('page.setting.advanced', { postProcess: 'sentenceCase' })}
+                    </Tabs.Tab>
                 </Tabs.List>
                 <Tabs.Panel value="general">
                     <GeneralTab />
@@ -68,6 +89,9 @@ export const SettingsContent = () => {
                         <ApplicationTab />
                     </Tabs.Panel>
                 )}
+                <Tabs.Panel value="advanced">
+                    <AdvancedTab />
+                </Tabs.Panel>
             </Tabs>
         </TabContainer>
     );

@@ -10,8 +10,8 @@ import styled from 'styled-components';
 import type { AlbumArtist, Artist } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components/text';
 import { AppRoute } from '/@/renderer/router/routes';
-import { ServerType } from '/@/renderer/types';
 import { Skeleton } from '/@/renderer/components/skeleton';
+import { SEPARATOR_STRING } from '/@/renderer/api/utils';
 
 const CellContainer = styled(motion.div)<{ height: number }>`
     display: grid;
@@ -44,14 +44,14 @@ const MetadataWrapper = styled.div`
 
 const StyledImage = styled(SimpleImg)`
     img {
-        object-fit: cover;
+        object-fit: var(--image-fit);
     }
 `;
 
 export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams) => {
     const artists = useMemo(() => {
         if (!value) return null;
-        return value?.type === ServerType.JELLYFIN ? value.artists : value.albumArtists;
+        return value.artists?.length ? value.artists : value.albumArtists;
     }, [value]);
 
     if (value === undefined) {
@@ -119,7 +119,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
                     {artists?.length ? (
                         artists.map((artist: Artist | AlbumArtist, index: number) => (
                             <React.Fragment key={`queue-${rowIndex}-artist-${artist.id}`}>
-                                {index > 0 ? ', ' : null}
+                                {index > 0 ? SEPARATOR_STRING : null}
                                 {artist.id ? (
                                     <Text
                                         $link

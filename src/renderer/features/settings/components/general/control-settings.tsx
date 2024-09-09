@@ -1,26 +1,118 @@
-import isElectron from 'is-electron';
 import { Group } from '@mantine/core';
+import { t } from 'i18next';
+import isElectron from 'is-electron';
 import { Select, Tooltip, NumberInput, Switch, Slider } from '/@/renderer/components';
 import { SettingsSection } from '/@/renderer/features/settings/components/settings-section';
 import {
+    GenreTarget,
     SideQueueType,
     useGeneralSettings,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { Play } from '/@/renderer/types';
+import { useTranslation } from 'react-i18next';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
 const SIDE_QUEUE_OPTIONS = [
-    { label: 'Fixed', value: 'sideQueue' },
-    { label: 'Floating', value: 'sideDrawerQueue' },
+    {
+        label: t('setting.sidePlayQueueStyle', {
+            context: 'optionAttached',
+            postProcess: 'sentenceCase',
+        }),
+        value: 'sideQueue',
+    },
+    {
+        label: t('setting.sidePlayQueueStyle', {
+            context: 'optionDetached',
+            postProcess: 'sentenceCase',
+        }),
+        value: 'sideDrawerQueue',
+    },
 ];
 
 export const ControlSettings = () => {
+    const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
 
     const controlOptions = [
+        {
+            control: (
+                <NumberInput
+                    defaultValue={settings.buttonSize}
+                    max={30}
+                    min={15}
+                    rightSection="px"
+                    width={75}
+                    onBlur={(e) => {
+                        if (!e) return;
+                        const newVal = e.currentTarget.value
+                            ? Math.min(Math.max(Number(e.currentTarget.value), 15), 30)
+                            : settings.buttonSize;
+                        setSettings({
+                            general: {
+                                ...settings,
+                                buttonSize: newVal,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.buttonSize', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.buttonSize', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <NumberInput
+                    defaultValue={settings.albumArtRes || undefined}
+                    max={2500}
+                    placeholder="0"
+                    rightSection="px"
+                    value={settings.albumArtRes ?? 0}
+                    width={75}
+                    onBlur={(e) => {
+                        const newVal =
+                            e.currentTarget.value !== '0'
+                                ? Math.min(Math.max(Number(e.currentTarget.value), 175), 2500)
+                                : null;
+                        setSettings({ general: { ...settings, albumArtRes: newVal } });
+                    }}
+                />
+            ),
+            description: t('setting.playerAlbumArtResolution', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.playerAlbumArtResolution', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label="Toggle using native aspect ratio"
+                    defaultChecked={settings.nativeAspectRatio}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                nativeAspectRatio: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.imageAspectRatio', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.imageAspectRatio', { postProcess: 'sentenceCase' }),
+        },
         {
             control: (
                 <Switch
@@ -39,14 +131,17 @@ export const ControlSettings = () => {
                     }
                 />
             ),
-            description: 'Show or hide the skip buttons on the playerbar',
+            description: t('setting.showSkipButtons', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Show skip buttons',
+            title: t('setting.showSkipButtons', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <Group>
-                    <Tooltip label="Backward">
+                    <Tooltip label={t('common.backward', { postProcess: 'titleCase' })}>
                         <NumberInput
                             defaultValue={settings.skipButtons.skipBackwardSeconds}
                             min={0}
@@ -66,7 +161,7 @@ export const ControlSettings = () => {
                             }
                         />
                     </Tooltip>
-                    <Tooltip label="Forward">
+                    <Tooltip label={t('common.forward', { postProcess: 'titleCase' })}>
                         <NumberInput
                             defaultValue={settings.skipButtons.skipForwardSeconds}
                             min={0}
@@ -88,18 +183,45 @@ export const ControlSettings = () => {
                     </Tooltip>
                 </Group>
             ),
-            description:
-                'The number (in seconds) to skip forward or backward when using the skip buttons',
+            description: t('setting.skipDuration', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Skip duration',
+            title: t('setting.skipDuration', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <Select
                     data={[
-                        { label: 'Now', value: Play.NOW },
-                        { label: 'Next', value: Play.NEXT },
-                        { label: 'Last', value: Play.LAST },
+                        {
+                            label: t('setting.playButtonBehavior', {
+                                context: 'optionPlay',
+                                postProcess: 'titleCase',
+                            }),
+                            value: Play.NOW,
+                        },
+                        {
+                            label: t('setting.playButtonBehavior', {
+                                context: 'optionAddNext',
+                                postProcess: 'titleCase',
+                            }),
+                            value: Play.NEXT,
+                        },
+                        {
+                            label: t('setting.playButtonBehavior', {
+                                context: 'optionAddLast',
+                                postProcess: 'titleCase',
+                            }),
+                            value: Play.LAST,
+                        },
+                        {
+                            label: t('setting.playButtonBehavior', {
+                                context: 'optionPlayShuffled',
+                                postProcess: 'titleCase',
+                            }),
+                            value: Play.SHUFFLE,
+                        },
                     ]}
                     defaultValue={settings.playButtonBehavior}
                     onChange={(e) =>
@@ -112,9 +234,34 @@ export const ControlSettings = () => {
                     }
                 />
             ),
-            description: 'The default behavior of the play button when adding songs to the queue',
+            description: t('setting.playButtonBehavior', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Play button behavior',
+            title: t('setting.playButtonBehavior', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label="Whether double clicking a track should queue all matching songs"
+                    defaultChecked={settings.doubleClickQueueAll}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                doubleClickQueueAll: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.doubleClickBehavior', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.doubleClickBehavior', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -131,9 +278,12 @@ export const ControlSettings = () => {
                     }}
                 />
             ),
-            description: 'The style of the sidebar play queue',
+            description: t('setting.sidePlayQueueStyle', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Side play queue style',
+            title: t('setting.sidePlayQueueStyle', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -149,10 +299,12 @@ export const ControlSettings = () => {
                     }}
                 />
             ),
-            description:
-                'Display a hover icon on the right side of the application view the play queue',
+            description: t('setting.sidePlayQueueStyle', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Show floating queue hover area',
+            title: t('setting.floatingQueueArea', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -171,10 +323,35 @@ export const ControlSettings = () => {
                     }}
                 />
             ),
-            description:
-                'The amount of volume to change when scrolling the mouse wheel on the volume slider',
+            description: t('setting.volumeWheelStep', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Volume wheel step',
+            title: t('setting.volumeWheelStep', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <NumberInput
+                    defaultValue={settings.volumeWidth}
+                    max={180}
+                    min={30}
+                    placeholder="0"
+                    rightSection="px"
+                    width={75}
+                    onBlur={(e) => {
+                        setSettings({
+                            general: { ...settings, volumeWidth: Number(e.currentTarget.value) },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.volumeWidth', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.volumeWidth', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -191,9 +368,12 @@ export const ControlSettings = () => {
                     }}
                 />
             ),
-            description: 'When exiting, save the current play queue and restore it when reopening',
+            description: t('setting.savePlayQueue', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: 'Save play queue',
+            title: t('setting.savePlayQueue', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -210,10 +390,159 @@ export const ControlSettings = () => {
                     }
                 />
             ),
-            description:
-                'When navigating to a playlist, go to the playlist song list page instead of the default page',
+            description: t('setting.skipPlaylistPage', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: false,
-            title: 'Go to playlist songs page by default',
+            title: t('setting.skipPlaylistPage', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.externalLinks}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                externalLinks: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.externalLinks', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.externalLinks', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Select
+                    data={[
+                        {
+                            label: t('entity.album_other', {
+                                postProcess: 'titleCase',
+                            }),
+                            value: GenreTarget.ALBUM,
+                        },
+                        {
+                            label: t('entity.track_other', {
+                                postProcess: 'titleCase',
+                            }),
+                            value: GenreTarget.TRACK,
+                        },
+                    ]}
+                    defaultValue={settings.genreTarget}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                genreTarget: e as GenreTarget,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.genreBehavior', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.genreBehavior', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.homeFeature', { postProcess: 'sentenceCase' })}
+                    defaultChecked={settings.homeFeature}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                homeFeature: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.homeFeature', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.homeFeature', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.albumBackground', { postProcess: 'sentenceCase' })}
+                    defaultChecked={settings.albumBackground}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                albumBackground: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.albumBackground', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.albumBackground', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Slider
+                    defaultValue={settings.albumBackgroundBlur}
+                    label={(e) => `${e} rem`}
+                    max={6}
+                    min={0}
+                    step={0.5}
+                    w={100}
+                    onChangeEnd={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                albumBackgroundBlur: e,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.albumBackgroundBlur', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.albumBackgroundBlur', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.playerbarOpenDrawer ', { postProcess: 'sentenceCase' })}
+                    defaultChecked={settings.playerbarOpenDrawer}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                playerbarOpenDrawer: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.playerbarOpenDrawer', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.playerbarOpenDrawer', { postProcess: 'sentenceCase' }),
         },
     ];
 

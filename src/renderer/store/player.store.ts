@@ -22,6 +22,7 @@ export interface PlayerState {
         status: PlayerStatus;
         time: number;
     };
+    fallback: boolean | null;
     muted: boolean;
     queue: {
         default: QueueSong[];
@@ -85,6 +86,7 @@ export interface PlayerSlice extends PlayerState {
         setCurrentSpeed: (speed: number) => void;
         setCurrentTime: (time: number, seek?: boolean) => void;
         setCurrentTrack: (uniqueId: string) => PlayerData;
+        setFallback: (fallback: boolean | null) => boolean;
         setFavorite: (ids: string[], favorite: boolean) => string[];
         setMuted: (muted: boolean) => void;
         setRating: (ids: string[], rating: number | null) => string[];
@@ -105,16 +107,53 @@ export const usePlayerStore = create<PlayerSlice>()(
                     actions: {
                         addToQueue: (args) => {
                             const { initialIndex, playType, songs } = args;
-                            const { shuffledIndex } = get().current;
-                            const shuffledQueue = get().queue.shuffled;
                             const songsToAddToQueue = map(songs, (song) => ({
                                 ...song,
                                 uniqueId: nanoid(),
                             }));
 
-                            if (playType === Play.NOW) {
+                            // If the queue is empty, next/last should behave the same as now
+                            if (playType === Play.SHUFFLE) {
+                                const songs = shuffle(songsToAddToQueue);
+                                const initialSong = songs[0];
+
                                 if (get().shuffle === PlayerShuffle.TRACK) {
-                                    const index = initialIndex || 0;
+                                    const shuffledIds = [
+                                        initialSong.uniqueId,
+                                        ...shuffle(songs.slice(1).map((song) => song.uniqueId)),
+                                    ];
+
+                                    set((state) => {
+                                        state.queue.default = songs;
+                                        state.queue.shuffled = shuffledIds;
+                                        state.current.time = 0;
+                                        state.current.player = 1;
+                                        state.current.index = 0;
+                                        state.current.shuffledIndex = 0;
+                                        state.current.song = initialSong;
+                                    });
+                                } else {
+                                    set((state) => {
+                                        state.queue.default = songs;
+                                        state.queue.shuffled = [];
+                                        state.current.time = 0;
+                                        state.current.player = 1;
+                                        state.current.index = 0;
+                                        state.current.shuffledIndex = 0;
+                                        state.current.song = initialSong;
+                                    });
+                                }
+
+                                return get().actions.getPlayerData();
+                            }
+
+                            const shuffledQueue = get().queue.shuffled;
+                            const queue = get().queue.default;
+                            const { shuffledIndex } = get().current;
+
+                            if (playType === Play.NOW || queue.length === 0) {
+                                const index = initialIndex || 0;
+                                if (get().shuffle === PlayerShuffle.TRACK) {
                                     const initialSong = songsToAddToQueue[index];
                                     const queueCopy = [...songsToAddToQueue];
 
@@ -141,7 +180,6 @@ export const usePlayerStore = create<PlayerSlice>()(
                                         state.current.song = initialSong;
                                     });
                                 } else {
-                                    const index = initialIndex || 0;
                                     set((state) => {
                                         state.queue.default = songsToAddToQueue;
                                         state.current.time = 0;
@@ -172,7 +210,6 @@ export const usePlayerStore = create<PlayerSlice>()(
                                     state.queue.shuffled = shuffledQueueWithNewSongs;
                                 });
                             } else if (playType === Play.NEXT) {
-                                const queue = get().queue.default;
                                 const currentIndex = get().current.index;
 
                                 if (get().shuffle === PlayerShuffle.TRACK) {
@@ -342,13 +379,14 @@ export const usePlayerStore = create<PlayerSlice>()(
                                     else previousSongIndex = shuffledIndex - 1;
                                 }
 
-                                const next = nextSongIndex
-                                    ? (queue.find(
-                                          (song) =>
-                                              song.uniqueId ===
-                                              shuffledQueue[nextSongIndex as number],
-                                      ) as QueueSong)
-                                    : undefined;
+                                const next =
+                                    nextSongIndex !== undefined
+                                        ? (queue.find(
+                                              (song) =>
+                                                  song.uniqueId ===
+                                                  shuffledQueue[nextSongIndex as number],
+                                          ) as QueueSong)
+                                        : undefined;
 
                                 const previous = queue.find(
                                     (song) => song.uniqueId === shuffledQueue[shuffledIndex - 1],
@@ -407,8 +445,8 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 currentPlayer === 1
                                     ? queue[currentIndex]
                                     : nextSongIndex !== undefined
-                                    ? queue[nextSongIndex]
-                                    : undefined;
+                                      ? queue[nextSongIndex]
+                                      : undefined;
 
                             player2 =
                                 currentPlayer === 1
@@ -639,14 +677,19 @@ export const usePlayerStore = create<PlayerSlice>()(
                         },
                         removeFromQueue: (uniqueIds) => {
                             const queue = get().queue.default;
-                            const currentSong = get().current.song;
                             const currentPosition = get().current.index;
                             let queueShift = 0;
 
+                            let isCurrentSongRemoved = false;
+
                             const newQueue = queue.filter((song, index) => {
                                 const shouldKeep = !uniqueIds.includes(song.uniqueId);
-                                if (!shouldKeep && index < currentPosition) {
-                                    queueShift += 1;
+                                if (!shouldKeep) {
+                                    if (index < currentPosition) {
+                                        queueShift += 1;
+                                    } else if (index === currentPosition) {
+                                        isCurrentSongRemoved = true;
+                                    }
                                 }
 
                                 return shouldKeep;
@@ -655,15 +698,16 @@ export const usePlayerStore = create<PlayerSlice>()(
                                 (uniqueId) => !uniqueIds.includes(uniqueId),
                             );
 
-                            const isCurrentSongRemoved =
-                                currentSong && uniqueIds.includes(currentSong?.uniqueId);
-
                             set((state) => {
                                 state.queue.default = newQueue;
                                 state.queue.shuffled = newShuffledQueue;
                                 if (isCurrentSongRemoved) {
-                                    state.current.song = newQueue[0];
-                                    state.current.index = 0;
+                                    const newPosition = Math.min(
+                                        newQueue.length - 1,
+                                        currentPosition - queueShift,
+                                    );
+                                    state.current.song = newQueue[newPosition];
+                                    state.current.index = newPosition;
                                 } else {
                                     // if we removed any songs prior to the current one,
                                     // shift the index back as necessary
@@ -804,6 +848,13 @@ export const usePlayerStore = create<PlayerSlice>()(
 
                             return get().actions.getPlayerData();
                         },
+                        setFallback: (fallback) => {
+                            set((state) => {
+                                state.fallback = fallback;
+                            });
+
+                            return fallback || false;
+                        },
                         setFavorite: (ids, favorite) => {
                             const { default: queue } = get().queue;
                             const foundUniqueIds = [];
@@ -877,8 +928,19 @@ export const usePlayerStore = create<PlayerSlice>()(
                         },
                         setShuffle: (type: PlayerShuffle) => {
                             if (type === PlayerShuffle.NONE) {
+                                const currentSongId = get().current.song?.uniqueId;
+
+                                let currentIndex = 0;
+
+                                if (currentSongId) {
+                                    currentIndex = get().queue.default.findIndex(
+                                        (song) => song.uniqueId === currentSongId,
+                                    );
+                                }
+
                                 set((state) => {
                                     state.shuffle = type;
+                                    state.current.index = currentIndex;
                                     state.queue.shuffled = [];
                                 });
 
@@ -924,17 +986,19 @@ export const usePlayerStore = create<PlayerSlice>()(
                         },
                         shuffleQueue: () => {
                             const queue = get().queue.default;
-                            const shuffledQueue = shuffle(queue);
 
-                            const currentSongUniqueId = get().current.song?.uniqueId;
-                            const newCurrentSongIndex = shuffledQueue.findIndex(
-                                (song) => song.uniqueId === currentSongUniqueId,
-                            );
+                            if (queue.length > 2) {
+                                const index = get().current.index;
 
-                            set((state) => {
-                                state.current.index = newCurrentSongIndex;
-                                state.queue.default = shuffledQueue;
-                            });
+                                const first = queue.slice(0, index);
+                                const second = queue.slice(index + 1);
+                                const shuffledQueue = shuffle(first.concat(second));
+                                shuffledQueue.splice(index, 0, queue[index]);
+
+                                set((state) => {
+                                    state.queue.default = shuffledQueue;
+                                });
+                            }
 
                             return get().actions.getPlayerData();
                         },
@@ -951,6 +1015,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                         status: PlayerStatus.PAUSED,
                         time: 0,
                     },
+                    fallback: null,
                     muted: false,
                     queue: {
                         default: [],
@@ -961,6 +1026,9 @@ export const usePlayerStore = create<PlayerSlice>()(
                     },
                     repeat: PlayerRepeat.NONE,
                     shuffle: PlayerShuffle.NONE,
+                    transcode: {
+                        enabled: false,
+                    },
                     volume: 50,
                 })),
                 { name: 'store_player' },
@@ -971,7 +1039,7 @@ export const usePlayerStore = create<PlayerSlice>()(
                 },
                 name: 'store_player',
                 partialize: (state) => {
-                    const notPersisted = ['queue', 'current', 'entry'];
+                    const notPersisted = ['queue', 'current', 'entry', 'fallback'];
                     return Object.fromEntries(
                         Object.entries(state).filter(([key]) => !notPersisted.includes(key)),
                     );
@@ -1040,7 +1108,7 @@ export const usePlayerData = () =>
     usePlayerStore(
         (state) => state.actions.getPlayerData(),
         (a, b) => {
-            return a.current.nextIndex === b.current.nextIndex;
+            return a.current.song?.uniqueId === b.current.song?.uniqueId;
         },
     );
 
@@ -1063,6 +1131,10 @@ export const useVolume = () => usePlayerStore((state) => state.volume);
 export const useMuted = () => usePlayerStore((state) => state.muted);
 
 export const useSpeed = () => usePlayerStore((state) => state.current.speed);
+
+export const usePlayerFallback = () => usePlayerStore((state) => state.fallback);
+
+export const useSetPlayerFallback = () => usePlayerStore((state) => state.actions.setFallback);
 
 export const useSetCurrentSpeed = () => usePlayerStore((state) => state.actions.setCurrentSpeed);
 

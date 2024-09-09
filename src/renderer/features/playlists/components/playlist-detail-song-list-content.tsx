@@ -5,6 +5,7 @@ import type {
     IDatasource,
     PaginationChangedEvent,
     RowDoubleClickedEvent,
+    RowDragEvent,
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useQueryClient } from '@tanstack/react-query';
@@ -18,6 +19,7 @@ import {
     LibraryItem,
     PlaylistSongListQuery,
     QueueSong,
+    Song,
     SongListSort,
     SortOrder,
 } from '/@/renderer/api/types';
@@ -44,6 +46,7 @@ import {
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { ListDisplayType } from '/@/renderer/types';
 import { useAppFocus } from '/@/renderer/hooks';
+import { toast } from '/@/renderer/components';
 
 interface PlaylistDetailContentProps {
     tableRef: MutableRefObject<AgGridReactType | null>;
@@ -138,9 +141,45 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
         [filters, pagination.scrollOffset, playlistId, queryClient, server],
     );
 
+    const handleDragEnd = useCallback(
+        async (e: RowDragEvent<Song>) => {
+            if (!e.nodes.length) return;
+
+            const trackId = e.node.data?.playlistItemId;
+            if (trackId && e.node.rowIndex !== null && e.overIndex !== e.node.rowIndex) {
+                try {
+                    await api.controller.movePlaylistItem({
+                        apiClientProps: {
+                            server,
+                        },
+                        query: {
+                            endingIndex: e.overIndex,
+                            playlistId,
+                            startingIndex: e.node.rowIndex + 1,
+                            trackId,
+                        },
+                    });
+
+                    setTimeout(() => {
+                        queryClient.invalidateQueries({
+                            queryKey: queryKeys.playlists.songList(server?.id || '', playlistId),
+                        });
+                        e.api.refreshInfiniteCache();
+                    }, 200);
+                } catch (error) {
+                    toast.error({
+                        message: (error as Error).message,
+                        title: `Failed to move song ${e.node.data?.name} to ${e.overIndex}`,
+                    });
+                }
+            }
+        },
+        [playlistId, queryClient, server],
+    );
+
     const handleGridSizeChange = () => {
         if (page.table.autoFit) {
-            tableRef?.current?.api.sizeColumnsToFit();
+            tableRef?.current?.api?.sizeColumnsToFit();
         }
     };
 
@@ -240,6 +279,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
                     ref={tableRef}
                     alwaysShowHorizontalScroll
+                    shouldUpdateSong
                     autoFitColumns={page.table.autoFit}
                     columnDefs={columnDefs}
                     context={{
@@ -254,6 +294,9 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     paginationAutoPageSize={isPaginationEnabled}
                     paginationPageSize={pagination.itemsPerPage || 100}
                     rowClassRules={rowClassRules}
+                    rowDragEntireRow={
+                        filters.sortBy === SongListSort.ID && !detailQuery?.data?.rules
+                    }
                     rowHeight={page.table.rowHeight || 40}
                     rowModelType="infinite"
                     onBodyScrollEnd={handleScroll}
@@ -264,6 +307,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     onGridSizeChanged={handleGridSizeChange}
                     onPaginationChanged={onPaginationChanged}
                     onRowDoubleClicked={handleRowDoubleClick}
+                    onRowDragEnd={handleDragEnd}
                 />
             </VirtualGridAutoSizerContainer>
             {isPaginationEnabled && (

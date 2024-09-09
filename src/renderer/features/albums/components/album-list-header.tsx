@@ -1,59 +1,58 @@
+import { useEffect, useRef, type ChangeEvent, type MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import type { ChangeEvent, MutableRefObject } from 'react';
-import { useListFilterRefresh } from '../../../hooks/use-list-filter-refresh';
+import { useTranslation } from 'react-i18next';
 import { LibraryItem } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
-import { useListContext } from '/@/renderer/context/list-context';
 import { AlbumListHeaderFilters } from '/@/renderer/features/albums/components/album-list-header-filters';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
-import {
-    AlbumListFilter,
-    useCurrentServer,
-    useListStoreActions,
-    useListStoreByKey,
-    usePlayButtonBehavior,
-} from '/@/renderer/store';
-import { ListDisplayType } from '/@/renderer/types';
+import { AlbumListFilter, useCurrentServer, usePlayButtonBehavior } from '/@/renderer/store';
+import { titleCase } from '/@/renderer/utils';
+import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 
 interface AlbumListHeaderProps {
+    genreId?: string;
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
     itemCount?: number;
     tableRef: MutableRefObject<AgGridReactType | null>;
     title?: string;
 }
 
-export const AlbumListHeader = ({ itemCount, gridRef, tableRef, title }: AlbumListHeaderProps) => {
+export const AlbumListHeader = ({
+    genreId,
+    itemCount,
+    gridRef,
+    tableRef,
+    title,
+}: AlbumListHeaderProps) => {
+    const { t } = useTranslation();
     const server = useCurrentServer();
-    const { setFilter, setTablePagination } = useListStoreActions();
     const cq = useContainerQuery();
-    const { pageKey, handlePlay } = useListContext();
-    const { display, filter } = useListStoreByKey({ key: pageKey });
     const playButtonBehavior = usePlayButtonBehavior();
-
-    const { handleRefreshGrid, handleRefreshTable } = useListFilterRefresh({
+    const genreRef = useRef<string>();
+    const { filter, handlePlay, refresh, search } = useDisplayRefresh({
+        gridRef,
         itemType: LibraryItem.ALBUM,
         server,
+        tableRef,
     });
 
     const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-        const searchTerm = e.target.value === '' ? undefined : e.target.value;
-        const updatedFilters = setFilter({
-            data: { searchTerm },
-            itemType: LibraryItem.ALBUM,
-            key: pageKey,
-        }) as AlbumListFilter;
+        const updatedFilters = search(e) as AlbumListFilter;
 
-        if (display === ListDisplayType.TABLE || display === ListDisplayType.TABLE_PAGINATED) {
-            handleRefreshTable(tableRef, updatedFilters);
-            setTablePagination({ data: { currentPage: 0 }, key: pageKey });
-        } else {
-            handleRefreshGrid(gridRef, updatedFilters);
-        }
+        refresh(updatedFilters);
     }, 500);
+
+    useEffect(() => {
+        if (genreRef.current && genreRef.current !== genreId) {
+            refresh(filter);
+        }
+
+        genreRef.current = genreId;
+    }, [filter, genreId, refresh, tableRef]);
 
     return (
         <Stack
@@ -69,7 +68,10 @@ export const AlbumListHeader = ({ itemCount, gridRef, tableRef, title }: AlbumLi
                         <LibraryHeaderBar.PlayButton
                             onClick={() => handlePlay?.({ playType: playButtonBehavior })}
                         />
-                        <LibraryHeaderBar.Title>{title || 'Albums'}</LibraryHeaderBar.Title>
+                        <LibraryHeaderBar.Title>
+                            {title ||
+                                titleCase(t('page.albumList.title', { postProcess: 'titleCase' }))}
+                        </LibraryHeaderBar.Title>
                         <LibraryHeaderBar.Badge
                             isLoading={itemCount === null || itemCount === undefined}
                         >

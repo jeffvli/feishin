@@ -3,10 +3,12 @@ import { SettingsSection } from '/@/renderer/features/settings/components/settin
 import { useRemoteSettings, useSettingsStoreActions } from '/@/renderer/store';
 import { NumberInput, Switch, Text, TextInput, toast } from '/@/renderer/components';
 import debounce from 'lodash/debounce';
+import { useTranslation } from 'react-i18next';
 
 const remote = isElectron() ? window.electron.remote : null;
 
 export const RemoteSettings = () => {
+    const { t } = useTranslation();
     const settings = useRemoteSettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -25,7 +27,9 @@ export const RemoteSettings = () => {
         } else {
             toast.error({
                 message: errorMsg,
-                title: enabled ? 'Error enabling remote' : 'Error disabling remote',
+                title: enabled
+                    ? t('error.remoteEnableError', { postProcess: 'sentenceCase' })
+                    : t('error.remoteDisableError', { postProcess: 'sentenceCase' }),
             });
         }
     }, 50);
@@ -40,12 +44,12 @@ export const RemoteSettings = () => {
                 },
             });
             toast.warn({
-                message: 'To have your port change take effect, stop and restart the server',
+                message: t('error.remotePortWarning', { postProcess: 'sentenceCase' }),
             });
         } else {
             toast.error({
                 message: errorMsg,
-                title: 'Error setting port',
+                title: t('error.remotePortError', { postProcess: 'sentenceCase' }),
             });
         }
     }, 100);
@@ -56,7 +60,6 @@ export const RemoteSettings = () => {
         {
             control: (
                 <Switch
-                    aria-label="Enable remote control server"
                     defaultChecked={settings.enabled}
                     onChange={async (e) => {
                         const enabled = e.currentTarget.checked;
@@ -65,8 +68,15 @@ export const RemoteSettings = () => {
                 />
             ),
             description: (
-                <div>
-                    Start an HTTP server to remotely control Feishin. This will listen on{' '}
+                <Text
+                    $noSelect
+                    $secondary
+                    size="sm"
+                >
+                    {t('setting.enableRemote', {
+                        context: 'description',
+                        postProcess: 'sentenceCase',
+                    })}{' '}
                     <a
                         href={url}
                         rel="noreferrer noopener"
@@ -74,15 +84,14 @@ export const RemoteSettings = () => {
                     >
                         {url}
                     </a>
-                </div>
+                </Text>
             ),
             isHidden,
-            title: 'Enable remote control',
+            title: t('setting.enableRemote', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <NumberInput
-                    aria-label="Set remote port"
                     max={65535}
                     value={settings.port}
                     onBlur={async (e) => {
@@ -92,15 +101,16 @@ export const RemoteSettings = () => {
                     }}
                 />
             ),
-            description:
-                'Remote server port. Changes here only take effect when you enable the remote',
+            description: t('setting.remotePort', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden,
-            title: 'Remove server port',
+            title: t('setting.remotePort', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <TextInput
-                    aria-label="Set remote username"
                     defaultValue={settings.username}
                     onBlur={(e) => {
                         const username = e.currentTarget.value;
@@ -115,15 +125,16 @@ export const RemoteSettings = () => {
                     }}
                 />
             ),
-            description:
-                'Username that must be provided to access remote. If both username and password are empty, disable authentication',
+            description: t('setting.remoteUsername', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden,
-            title: 'Remote username',
+            title: t('setting.remoteUsername', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <TextInput
-                    aria-label="Set remote password"
                     defaultValue={settings.password}
                     onBlur={(e) => {
                         const password = e.currentTarget.value;
@@ -138,22 +149,14 @@ export const RemoteSettings = () => {
                     }}
                 />
             ),
-            description: 'Password to access remote',
+            description: t('setting.remotePassword', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden,
-            title: 'Remote password',
+            title: t('setting.remotePassword', { postProcess: 'sentenceCase' }),
         },
     ];
 
-    return (
-        <>
-            <SettingsSection options={controlOptions} />
-            <Text size="lg">
-                <b>
-                    NOTE: these credentials are by default transferred insecurely. Do not use a
-                    password you care about. Changing username/password will disconnect clients and
-                    require them to reauthenticate
-                </b>
-            </Text>
-        </>
-    );
+    return <SettingsSection options={controlOptions} />;
 };

@@ -11,6 +11,9 @@ import {
 import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
 import { AnimatePresence } from 'framer-motion';
 import isElectron from 'is-electron';
+import { ServerFeature } from '/@/renderer/api/features-types';
+import { hasFeature } from '/@/renderer/api/utils';
+import { useTranslation } from 'react-i18next';
 import {
     RiAddBoxFill,
     RiAddCircleFill,
@@ -24,6 +27,11 @@ import {
     RiPlayListAddFill,
     RiStarFill,
     RiCloseCircleLine,
+    RiShareForwardFill,
+    RiInformationFill,
+    RiRadio2Fill,
+    RiDownload2Line,
+    RiShuffleFill,
 } from 'react-icons/ri';
 import { AnyLibraryItems, LibraryItem, ServerType, AnyLibraryItem } from '/@/renderer/api/types';
 import {
@@ -45,13 +53,20 @@ import { useDeletePlaylist } from '/@/renderer/features/playlists';
 import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
 import {
+    getServerById,
     useAuthStore,
     useCurrentServer,
     usePlayerStore,
     useQueueControls,
+    useSettingsStore,
 } from '/@/renderer/store';
-import { usePlayerType } from '/@/renderer/store/settings.store';
+import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { Play, PlaybackType } from '/@/renderer/types';
+import { ItemDetailsModal } from '/@/renderer/features/item-details/components/item-details-modal';
+import { updateSong } from '/@/renderer/features/player/update-remote-song';
+import { controller } from '/@/renderer/api/controller';
+import { api } from '/@/renderer/api';
+import { setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
 
 type ContextMenuContextProps = {
     closeContextMenu: () => void;
@@ -75,18 +90,19 @@ const ContextMenuContext = createContext<ContextMenuContextProps>({
     },
 });
 
-const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating'];
+const JELLYFIN_IGNORED_MENU_ITEMS: ContextMenuItemType[] = ['setRating', 'shareItem'];
 // const NAVIDROME_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 // const SUBSONIC_IGNORED_MENU_ITEMS: ContextMenuItemType[] = [];
 
-const mpvPlayer = isElectron() ? window.electron.mpvPlayer : null;
-const remote = isElectron() ? window.electron.remote : null;
+const utils = isElectron() ? window.electron.utils : null;
 
 export interface ContextMenuProviderProps {
     children: ReactNode;
 }
 
 export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
+    const disabledItems = useSettingsStore((state) => state.general.disabledContextMenu);
+    const { t } = useTranslation();
     const [opened, setOpened] = useState(false);
     const clickOutsideRef = useClickOutside(() => setOpened(false));
 
@@ -122,7 +138,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             } = args;
 
             const serverType = data[0]?.serverType || useAuthStore.getState().currentServer?.type;
-            let validMenuItems = menuItems;
+            let validMenuItems = menuItems.filter((item) => !disabledItems[item.id]);
 
             if (serverType === ServerType.JELLYFIN) {
                 validMenuItems = menuItems.filter(
@@ -132,7 +148,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
             // If the context menu dimension can't be automatically calculated, calculate it manually
             // This is a hacky way since resize observer may not automatically recalculate when not rendered
-            const menuHeight = menuRect.height || (menuItems.length + 1) * 50;
+            const menuHeight = menuRect.height || (validMenuItems.length + 1) * 40;
             const menuWidth = menuRect.width || 220;
 
             const shouldReverseY = yPos + menuHeight > viewport.height;
@@ -154,7 +170,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             });
             setOpened(true);
         },
-        [menuRect.height, menuRect.width, setCtx, viewport.height, viewport.width],
+        [disabledItems, menuRect.height, menuRect.width, setCtx, viewport.height, viewport.width],
     );
 
     const closeContextMenu = useCallback(() => {
@@ -229,7 +245,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     onError: (err) => {
                         toast.error({
                             message: err.message,
-                            title: 'Error deleting playlist',
+                            title: t('error.genericError', { postProcess: 'sentenceCase' }),
                         });
                     },
                     onSuccess: () => {
@@ -245,14 +261,14 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         }
 
         closeAllModals();
-    }, [ctx, deletePlaylistMutation]);
+    }, [ctx, deletePlaylistMutation, t]);
 
     const openDeletePlaylistModal = useCallback(() => {
         openModal({
             children: (
                 <ConfirmModal onConfirm={handleDeletePlaylist}>
                     <Stack>
-                        <Text>Are you sure you want to delete the following playlist(s)?</Text>
+                        <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
                         <ul>
                             {ctx.data.map((item) => (
                                 <li key={item.id}>
@@ -265,9 +281,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     </Stack>
                 </ConfirmModal>
             ),
-            title: 'Delete playlist(s)',
+            title: t('page.contextMenu.deletePlaylist', { postProcess: 'titleCase' }),
         });
-    }, [ctx.data, handleDeletePlaylist]);
+    }, [ctx.data, handleDeletePlaylist, t]);
 
     const createFavoriteMutation = useCreateFavorite({});
     const deleteFavoriteMutation = useDeleteFavorite({});
@@ -277,13 +293,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         if (ctx.dataNodes) {
             const nodesToFavorite = ctx.dataNodes.filter((item) => !item.data.userFavorite);
 
-            const nodesByServerId = nodesToFavorite.reduce((acc, node) => {
-                if (!acc[node.data.serverId]) {
-                    acc[node.data.serverId] = [];
-                }
-                acc[node.data.serverId].push(node);
-                return acc;
-            }, {} as Record<string, RowNode<any>[]>);
+            const nodesByServerId = nodesToFavorite.reduce(
+                (acc, node) => {
+                    if (!acc[node.data.serverId]) {
+                        acc[node.data.serverId] = [];
+                    }
+                    acc[node.data.serverId].push(node);
+                    return acc;
+                },
+                {} as Record<string, RowNode<any>[]>,
+            );
 
             for (const serverId of Object.keys(nodesByServerId)) {
                 const nodes = nodesByServerId[serverId];
@@ -301,7 +320,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                         onError: (err) => {
                             toast.error({
                                 message: err.message,
-                                title: 'Error adding to favorites',
+                                title: t('error.genericError', { postProcess: 'sentenceCase' }),
                             });
                         },
                         onSuccess: () => {
@@ -314,13 +333,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             }
         } else {
             const itemsToFavorite = ctx.data.filter((item) => !item.userFavorite);
-            const itemsByServerId = (itemsToFavorite as any[]).reduce((acc, item) => {
-                if (!acc[item.serverId]) {
-                    acc[item.serverId] = [];
-                }
-                acc[item.serverId].push(item);
-                return acc;
-            }, {} as Record<string, AnyLibraryItems>);
+            const itemsByServerId = (itemsToFavorite as any[]).reduce(
+                (acc, item) => {
+                    if (!acc[item.serverId]) {
+                        acc[item.serverId] = [];
+                    }
+                    acc[item.serverId].push(item);
+                    return acc;
+                },
+                {} as Record<string, AnyLibraryItems>,
+            );
 
             for (const serverId of Object.keys(itemsByServerId)) {
                 const items = itemsByServerId[serverId];
@@ -337,27 +359,30 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                         onError: (err) => {
                             toast.error({
                                 message: err.message,
-                                title: 'Error adding to favorites',
+                                title: t('error.genericError', { postProcess: 'sentenceCase' }),
                             });
                         },
                     },
                 );
             }
         }
-    }, [createFavoriteMutation, ctx.data, ctx.dataNodes, ctx.type]);
+    }, [createFavoriteMutation, ctx.data, ctx.dataNodes, ctx.type, t]);
 
     const handleRemoveFromFavorites = useCallback(() => {
         if (!ctx.dataNodes && !ctx.data) return;
 
         if (ctx.dataNodes) {
             const nodesToUnfavorite = ctx.dataNodes.filter((item) => item.data.userFavorite);
-            const nodesByServerId = nodesToUnfavorite.reduce((acc, node) => {
-                if (!acc[node.data.serverId]) {
-                    acc[node.data.serverId] = [];
-                }
-                acc[node.data.serverId].push(node);
-                return acc;
-            }, {} as Record<string, RowNode<any>[]>);
+            const nodesByServerId = nodesToUnfavorite.reduce(
+                (acc, node) => {
+                    if (!acc[node.data.serverId]) {
+                        acc[node.data.serverId] = [];
+                    }
+                    acc[node.data.serverId].push(node);
+                    return acc;
+                },
+                {} as Record<string, RowNode<any>[]>,
+            );
 
             for (const serverId of Object.keys(nodesByServerId)) {
                 const idsToUnfavorite = nodesByServerId[serverId].map((node) => node.data.id);
@@ -380,13 +405,16 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             }
         } else {
             const itemsToUnfavorite = ctx.data.filter((item) => item.userFavorite);
-            const itemsByServerId = (itemsToUnfavorite as any[]).reduce((acc, item) => {
-                if (!acc[item.serverId]) {
-                    acc[item.serverId] = [];
-                }
-                acc[item.serverId].push(item);
-                return acc;
-            }, {} as Record<string, AnyLibraryItems>);
+            const itemsByServerId = (itemsToUnfavorite as any[]).reduce(
+                (acc, item) => {
+                    if (!acc[item.serverId]) {
+                        acc[item.serverId] = [];
+                    }
+                    acc[item.serverId].push(item);
+                    return acc;
+                },
+                {} as Record<string, AnyLibraryItems>,
+            );
 
             for (const serverId of Object.keys(itemsByServerId)) {
                 const idsToUnfavorite = itemsByServerId[serverId].map(
@@ -459,9 +487,9 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
             },
             modal: 'addToPlaylist',
             size: 'md',
-            title: 'Add to playlist',
+            title: t('page.contextMenu.addToPlaylist', { postProcess: 'sentenceCase' }),
         });
-    }, [ctx.data, ctx.dataNodes]);
+    }, [ctx.data, ctx.dataNodes, t]);
 
     const removeFromPlaylistMutation = useRemoveFromPlaylist();
 
@@ -484,13 +512,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     onError: (err) => {
                         toast.error({
                             message: err.message,
-                            title: 'Error removing song(s) from playlist',
+                            title: t('error.genericError', { postProcess: 'sentenceCase' }),
                         });
                     },
                     onSuccess: () => {
-                        toast.success({
-                            message: `${songId.length} song(s) were removed from the playlist`,
-                        });
                         ctx.context?.tableRef?.current?.api?.refreshInfiniteCache();
                         closeAllModals();
                     },
@@ -504,10 +529,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     loading={removeFromPlaylistMutation.isLoading}
                     onConfirm={confirm}
                 >
-                    Are you sure you want to remove the following song(s) from the playlist?
+                    {t('common.areYouSure', { postProcess: 'sentenceCase' })}
                 </ConfirmModal>
             ),
-            title: 'Remove song(s) from playlist',
+            title: t('page.contextMenu.removeFromPlaylist', { postProcess: 'sentenceCase' }),
         });
     }, [
         ctx.context?.playlistId,
@@ -516,13 +541,14 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         ctx.dataNodes,
         removeFromPlaylistMutation,
         serverType,
+        t,
     ]);
 
     const updateRatingMutation = useSetRating({});
 
     const handleUpdateRating = useCallback(
         (rating: number) => {
-            if (!ctx.dataNodes || !ctx.data) return;
+            if (!ctx.dataNodes && !ctx.data) return;
 
             let uniqueServerIds: string[] = [];
             let items: AnyLibraryItems = [];
@@ -575,7 +601,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         [ctx.data, ctx.dataNodes, updateRatingMutation],
     );
 
-    const playerType = usePlayerType();
+    const playbackType = usePlaybackType();
     const { moveToBottomOfQueue, moveToTopOfQueue, removeFromQueue } = useQueueControls();
 
     const handleMoveToBottom = useCallback(() => {
@@ -584,10 +610,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         const playerData = moveToBottomOfQueue(uniqueIds);
 
-        if (playerType === PlaybackType.LOCAL) {
-            mpvPlayer!.setQueueNext(playerData);
+        if (playbackType === PlaybackType.LOCAL) {
+            setQueueNext(playerData);
         }
-    }, [ctx.dataNodes, moveToBottomOfQueue, playerType]);
+    }, [ctx.dataNodes, moveToBottomOfQueue, playbackType]);
 
     const handleMoveToTop = useCallback(() => {
         const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
@@ -595,10 +621,26 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         const playerData = moveToTopOfQueue(uniqueIds);
 
-        if (playerType === PlaybackType.LOCAL) {
-            mpvPlayer!.setQueueNext(playerData);
+        if (playbackType === PlaybackType.LOCAL) {
+            setQueueNext(playerData);
         }
-    }, [ctx.dataNodes, moveToTopOfQueue, playerType]);
+    }, [ctx.dataNodes, moveToTopOfQueue, playbackType]);
+
+    const handleShareItem = useCallback(() => {
+        if (!ctx.dataNodes && !ctx.data) return;
+
+        const uniqueIds = ctx.data.map((node) => node.id);
+
+        openContextModal({
+            innerProps: {
+                itemIds: uniqueIds,
+                resourceType: ctx.data[0].itemType,
+            },
+            modal: 'shareItem',
+            size: 'md',
+            title: t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' }),
+        });
+    }, [ctx.data, ctx.dataNodes, t]);
 
     const handleRemoveSelected = useCallback(() => {
         const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
@@ -608,97 +650,158 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         const playerData = removeFromQueue(uniqueIds);
         const isCurrentSongRemoved = currentSong && uniqueIds.includes(currentSong?.uniqueId);
 
-        if (playerType === PlaybackType.LOCAL) {
+        if (playbackType === PlaybackType.LOCAL) {
             if (isCurrentSongRemoved) {
-                mpvPlayer!.setQueue(playerData);
+                setQueue(playerData);
             } else {
-                mpvPlayer!.setQueueNext(playerData);
+                setQueueNext(playerData);
             }
         }
 
         ctx.tableApi?.redrawRows();
 
         if (isCurrentSongRemoved) {
-            remote?.updateSong({ song: playerData.current.song });
+            updateSong(playerData.current.song);
         }
-    }, [ctx.dataNodes, ctx.tableApi, playerType, removeFromQueue]);
+    }, [ctx.dataNodes, ctx.tableApi, playbackType, removeFromQueue]);
 
     const handleDeselectAll = useCallback(() => {
         ctx.tableApi?.deselectAll();
     }, [ctx.tableApi]);
 
+    const handleOpenItemDetails = useCallback(() => {
+        const item = ctx.data[0];
+
+        openModal({
+            children: <ItemDetailsModal item={item} />,
+            size: 'xl',
+            title: t('page.contextMenu.showDetails', { postProcess: 'titleCase' }),
+        });
+    }, [ctx.data, t]);
+
+    const handleSimilar = useCallback(async () => {
+        const item = ctx.data[0];
+        const songs = await controller.getSimilarSongs({
+            apiClientProps: {
+                server: getServerById(item.serverId),
+                signal: undefined,
+            },
+            query: { albumArtistIds: item.albumArtistIds, songId: item.id },
+        });
+        if (songs) {
+            handlePlayQueueAdd?.({ byData: [ctx.data[0], ...songs], playType: Play.NOW });
+        }
+    }, [ctx, handlePlayQueueAdd]);
+
+    const handleDownload = useCallback(() => {
+        const item = ctx.data[0];
+        const url = api.controller.getDownloadUrl({
+            apiClientProps: { server },
+            query: { id: item.id },
+        });
+
+        if (utils) {
+            utils.download(url!);
+        } else {
+            window.open(url, '_blank');
+        }
+    }, [ctx.data, server]);
+
     const contextMenuItems: Record<ContextMenuItemType, ContextMenuItem> = useMemo(() => {
         return {
             addToFavorites: {
                 id: 'addToFavorites',
-                label: 'Add favorite',
+                label: t('page.contextMenu.addToFavorites', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiHeartFill size="1.1rem" />,
                 onClick: handleAddToFavorites,
             },
             addToPlaylist: {
                 id: 'addToPlaylist',
-                label: 'Add to playlist',
+                label: t('page.contextMenu.addToPlaylist', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiPlayListAddFill size="1.1rem" />,
                 onClick: handleAddToPlaylist,
             },
-            createPlaylist: { id: 'createPlaylist', label: 'Create playlist', onClick: () => {} },
+            createPlaylist: {
+                id: 'createPlaylist',
+                label: t('page.contextMenu.createPlaylist', { postProcess: 'sentenceCase' }),
+                onClick: () => {},
+            },
             deletePlaylist: {
                 id: 'deletePlaylist',
-                label: 'Delete playlist',
+                label: t('page.contextMenu.deletePlaylist', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiDeleteBinFill size="1.1rem" />,
                 onClick: openDeletePlaylistModal,
             },
             deselectAll: {
                 id: 'deselectAll',
-                label: 'Deselect all',
+                label: t('page.contextMenu.deselectAll', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiCloseCircleLine size="1.1rem" />,
                 onClick: handleDeselectAll,
             },
+            download: {
+                disabled: ctx.data?.length !== 1,
+                id: 'download',
+                label: t('page.contextMenu.download', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiDownload2Line size="1.1rem" />,
+                onClick: handleDownload,
+            },
             moveToBottomOfQueue: {
                 id: 'moveToBottomOfQueue',
-                label: 'Move to bottom',
+                label: t('page.contextMenu.moveToBottom', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiArrowDownLine size="1.1rem" />,
                 onClick: handleMoveToBottom,
             },
             moveToTopOfQueue: {
                 id: 'moveToTopOfQueue',
-                label: 'Move to top',
+                label: t('page.contextMenu.moveToTop', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiArrowUpLine size="1.1rem" />,
                 onClick: handleMoveToTop,
             },
             play: {
                 id: 'play',
-                label: 'Play',
+                label: t('page.contextMenu.play', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiPlayFill size="1.1rem" />,
                 onClick: () => handlePlay(Play.NOW),
             },
             playLast: {
                 id: 'playLast',
-                label: 'Add to queue',
+                label: t('page.contextMenu.addLast', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiAddBoxFill size="1.1rem" />,
                 onClick: () => handlePlay(Play.LAST),
             },
             playNext: {
                 id: 'playNext',
-                label: 'Add to queue next',
+                label: t('page.contextMenu.addNext', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiAddCircleFill size="1.1rem" />,
                 onClick: () => handlePlay(Play.NEXT),
             },
+            playShuffled: {
+                id: 'playShuffled',
+                label: t('page.contextMenu.playShuffled', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiShuffleFill size="1.1rem" />,
+                onClick: () => handlePlay(Play.SHUFFLE),
+            },
+            playSimilarSongs: {
+                id: 'playSimilarSongs',
+                label: t('page.contextMenu.playSimilarSongs', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiRadio2Fill size="1.1rem" />,
+                onClick: handleSimilar,
+            },
             removeFromFavorites: {
                 id: 'removeFromFavorites',
-                label: 'Remove favorite',
+                label: t('page.contextMenu.removeFromFavorites', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiDislikeFill size="1.1rem" />,
                 onClick: handleRemoveFromFavorites,
             },
             removeFromPlaylist: {
                 id: 'removeFromPlaylist',
-                label: 'Remove from playlist',
+                label: t('page.contextMenu.removeFromPlaylist', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiDeleteBinFill size="1.1rem" />,
                 onClick: handleRemoveFromPlaylist,
             },
             removeFromQueue: {
-                id: 'moveToBottomOfQueue',
-                label: 'Remove songs',
+                id: 'removeSongs',
+                label: t('page.contextMenu.removeFromQueue', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiDeleteBinFill size="1.1rem" />,
                 onClick: handleRemoveSelected,
             },
@@ -710,7 +813,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={0}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(0),
@@ -721,7 +823,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={1}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(1),
@@ -732,7 +833,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={2}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(2),
@@ -743,7 +843,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={3}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(3),
@@ -754,7 +853,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={4}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(4),
@@ -765,7 +863,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             <Rating
                                 readOnly
                                 value={5}
-                                onClick={() => {}}
                             />
                         ),
                         onClick: () => handleUpdateRating(5),
@@ -777,19 +874,40 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 onClick: () => {},
                 rightIcon: <RiArrowRightSFill size="1.2rem" />,
             },
+            shareItem: {
+                disabled: !hasFeature(server, ServerFeature.SHARING_ALBUM_SONG),
+                id: 'shareItem',
+                label: t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiShareForwardFill size="1.1rem" />,
+                onClick: handleShareItem,
+            },
+            showDetails: {
+                disabled: ctx.data?.length !== 1 || !ctx.data[0].itemType,
+                id: 'showDetails',
+                label: t('page.contextMenu.showDetails', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiInformationFill />,
+                onClick: handleOpenItemDetails,
+            },
         };
     }, [
+        t,
         handleAddToFavorites,
         handleAddToPlaylist,
+        openDeletePlaylistModal,
         handleDeselectAll,
+        ctx.data,
+        handleDownload,
         handleMoveToBottom,
         handleMoveToTop,
-        handlePlay,
+        handleSimilar,
         handleRemoveFromFavorites,
         handleRemoveFromPlaylist,
         handleRemoveSelected,
+        server,
+        handleShareItem,
+        handleOpenItemDetails,
+        handlePlay,
         handleUpdateRating,
-        openDeletePlaylistModal,
     ]);
 
     const mergedRef = useMergedRef(ref, clickOutsideRef);
@@ -820,72 +938,80 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                 >
                                     {ctx.menuItems?.map((item) => {
                                         return (
-                                            <Fragment key={`context-menu-${item.id}`}>
-                                                {item.children ? (
-                                                    <HoverCard
-                                                        offset={5}
-                                                        position="right"
-                                                    >
-                                                        <HoverCard.Target>
-                                                            <ContextMenuButton
-                                                                disabled={item.disabled}
-                                                                leftIcon={
-                                                                    contextMenuItems[item.id]
-                                                                        .leftIcon
-                                                                }
-                                                                rightIcon={
-                                                                    contextMenuItems[item.id]
-                                                                        .rightIcon
-                                                                }
-                                                                onClick={
-                                                                    contextMenuItems[item.id]
-                                                                        .onClick
-                                                                }
-                                                            >
-                                                                {contextMenuItems[item.id].label}
-                                                            </ContextMenuButton>
-                                                        </HoverCard.Target>
-                                                        <HoverCard.Dropdown>
-                                                            <Stack spacing={0}>
-                                                                {contextMenuItems[
-                                                                    item.id
-                                                                ].children?.map((child) => (
-                                                                    <ContextMenuButton
-                                                                        key={`sub-${child.id}`}
-                                                                        disabled={child.disabled}
-                                                                        leftIcon={child.leftIcon}
-                                                                        rightIcon={child.rightIcon}
-                                                                        onClick={child.onClick}
-                                                                    >
-                                                                        {child.label}
-                                                                    </ContextMenuButton>
-                                                                ))}
-                                                            </Stack>
-                                                        </HoverCard.Dropdown>
-                                                    </HoverCard>
-                                                ) : (
-                                                    <ContextMenuButton
-                                                        disabled={item.disabled}
-                                                        leftIcon={
-                                                            contextMenuItems[item.id].leftIcon
-                                                        }
-                                                        rightIcon={
-                                                            contextMenuItems[item.id].rightIcon
-                                                        }
-                                                        onClick={contextMenuItems[item.id].onClick}
-                                                    >
-                                                        {contextMenuItems[item.id].label}
-                                                    </ContextMenuButton>
-                                                )}
+                                            !contextMenuItems[item.id].disabled && (
+                                                <Fragment key={`context-menu-${item.id}`}>
+                                                    {item.children ? (
+                                                        <HoverCard
+                                                            offset={5}
+                                                            position="right"
+                                                        >
+                                                            <HoverCard.Target>
+                                                                <ContextMenuButton
+                                                                    leftIcon={
+                                                                        contextMenuItems[item.id]
+                                                                            .leftIcon
+                                                                    }
+                                                                    rightIcon={
+                                                                        contextMenuItems[item.id]
+                                                                            .rightIcon
+                                                                    }
+                                                                    onClick={
+                                                                        contextMenuItems[item.id]
+                                                                            .onClick
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        contextMenuItems[item.id]
+                                                                            .label
+                                                                    }
+                                                                </ContextMenuButton>
+                                                            </HoverCard.Target>
+                                                            <HoverCard.Dropdown>
+                                                                <Stack spacing={0}>
+                                                                    {contextMenuItems[
+                                                                        item.id
+                                                                    ].children?.map((child) => (
+                                                                        <ContextMenuButton
+                                                                            key={`sub-${child.id}`}
+                                                                            leftIcon={
+                                                                                child.leftIcon
+                                                                            }
+                                                                            rightIcon={
+                                                                                child.rightIcon
+                                                                            }
+                                                                            onClick={child.onClick}
+                                                                        >
+                                                                            {child.label}
+                                                                        </ContextMenuButton>
+                                                                    ))}
+                                                                </Stack>
+                                                            </HoverCard.Dropdown>
+                                                        </HoverCard>
+                                                    ) : (
+                                                        <ContextMenuButton
+                                                            leftIcon={
+                                                                contextMenuItems[item.id].leftIcon
+                                                            }
+                                                            rightIcon={
+                                                                contextMenuItems[item.id].rightIcon
+                                                            }
+                                                            onClick={
+                                                                contextMenuItems[item.id].onClick
+                                                            }
+                                                        >
+                                                            {contextMenuItems[item.id].label}
+                                                        </ContextMenuButton>
+                                                    )}
 
-                                                {item.divider && (
-                                                    <Divider
-                                                        key={`context-menu-divider-${item.id}`}
-                                                        color="rgb(62, 62, 62)"
-                                                        size="sm"
-                                                    />
-                                                )}
-                                            </Fragment>
+                                                    {item.divider && (
+                                                        <Divider
+                                                            key={`context-menu-divider-${item.id}`}
+                                                            color="rgb(62, 62, 62)"
+                                                            size="sm"
+                                                        />
+                                                    )}
+                                                </Fragment>
+                                            )
                                         );
                                     })}
                                 </Stack>
@@ -894,7 +1020,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                     size="sm"
                                 />
                                 <ContextMenuButton disabled>
-                                    {ctx.data?.length} selected
+                                    {t('page.contextMenu.numberSelected', {
+                                        count: ctx.data?.length || 0,
+                                        postProcess: 'lowerCase',
+                                    })}
                                 </ContextMenuButton>
                             </Stack>
                         </ContextMenu>

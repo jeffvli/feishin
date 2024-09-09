@@ -9,7 +9,7 @@ import { useCurrentServer } from '/@/renderer/store';
 import { MutableRefObject, useCallback } from 'react';
 import { RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { generatePath, useNavigate } from 'react-router';
-import { AppRoute } from '/@/renderer/router/routes';
+import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 
 interface GenreListTableViewProps {
     itemCount?: number;
@@ -20,6 +20,7 @@ export const GenreListTableView = ({ tableRef, itemCount }: GenreListTableViewPr
     const server = useCurrentServer();
     const { pageKey, customFilters } = useListContext();
     const navigate = useNavigate();
+    const genrePath = useGenreRoute();
 
     const tableProps = useVirtualTable({
         contextMenu: GENRE_CONTEXT_MENU_ITEMS,
@@ -36,9 +37,9 @@ export const GenreListTableView = ({ tableRef, itemCount }: GenreListTableViewPr
             const { data } = e;
             if (!data) return;
 
-            navigate(generatePath(AppRoute.LIBRARY_GENRES_SONGS, { genreId: data.id }));
+            navigate(generatePath(genrePath, { genreId: data.id }));
         },
-        [navigate],
+        [genrePath, navigate],
     );
 
     return (

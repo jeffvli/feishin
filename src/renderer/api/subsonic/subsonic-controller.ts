@@ -2,7 +2,7 @@ import md5 from 'md5';
 import { z } from 'zod';
 import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { ssNormalize } from '/@/renderer/api/subsonic/subsonic-normalize';
-import { ssType } from '/@/renderer/api/subsonic/subsonic-types';
+import { SubsonicExtensions, ssType } from '/@/renderer/api/subsonic/subsonic-types';
 import {
     ArtistInfoArgs,
     AuthenticationResponse,
@@ -21,8 +21,17 @@ import {
     SearchResponse,
     RandomSongListResponse,
     RandomSongListArgs,
+    ServerInfo,
+    ServerInfoArgs,
+    StructuredLyricsArgs,
+    StructuredLyric,
+    SimilarSongsArgs,
+    Song,
+    DownloadArgs,
+    TranscodingArgs,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
+import { ServerFeatures } from '/@/renderer/api/features-types';
 
 const authenticate = async (
     url: string,
@@ -368,13 +377,150 @@ const getRandomSongList = async (args: RandomSongListArgs): Promise<RandomSongLi
     };
 };
 
+const getServerInfo = async (args: ServerInfoArgs): Promise<ServerInfo> => {
+    const { apiClientProps } = args;
+
+    const ping = await ssApiClient(apiClientProps).ping();
+
+    if (ping.status !== 200) {
+        throw new Error('Failed to ping server');
+    }
+
+    const features: ServerFeatures = {};
+
+    if (!ping.body.openSubsonic || !ping.body.serverVersion) {
+        return { features, version: ping.body.version };
+    }
+
+    const res = await ssApiClient(apiClientProps).getServerInfo();
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get server extensions');
+    }
+
+    const subsonicFeatures: Record<string, number[]> = {};
+    if (Array.isArray(res.body.openSubsonicExtensions)) {
+        for (const extension of res.body.openSubsonicExtensions) {
+            subsonicFeatures[extension.name] = extension.versions;
+        }
+    }
+
+    if (subsonicFeatures[SubsonicExtensions.SONG_LYRICS]) {
+        features.lyricsMultipleStructured = true;
+    }
+
+    return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };
+};
+
+export const getStructuredLyrics = async (
+    args: StructuredLyricsArgs,
+): Promise<StructuredLyric[]> => {
+    const { query, apiClientProps } = args;
+
+    const res = await ssApiClient(apiClientProps).getStructuredLyrics({
+        query: {
+            id: query.songId,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get structured lyrics');
+    }
+
+    const lyrics = res.body.lyricsList?.structuredLyrics;
+
+    if (!lyrics) {
+        return [];
+    }
+
+    return lyrics.map((lyric) => {
+        const baseLyric = {
+            artist: lyric.displayArtist || '',
+            lang: lyric.lang,
+            name: lyric.displayTitle || '',
+            remote: false,
+            source: apiClientProps.server?.name || 'music server',
+        };
+
+        if (lyric.synced) {
+            return {
+                ...baseLyric,
+                lyrics: lyric.line.map((line) => [line.start!, line.value]),
+                synced: true,
+            };
+        }
+        return {
+            ...baseLyric,
+            lyrics: lyric.line.map((line) => [line.value]).join('\n'),
+            synced: false,
+        };
+    });
+};
+
+const getSimilarSongs = async (args: SimilarSongsArgs): Promise<Song[]> => {
+    const { apiClientProps, query } = args;
+
+    const res = await ssApiClient(apiClientProps).getSimilarSongs({
+        query: {
+            count: query.count,
+            id: query.songId,
+        },
+    });
+
+    if (res.status !== 200) {
+        throw new Error('Failed to get similar songs');
+    }
+
+    if (!res.body.similarSongs?.song) {
+        return [];
+    }
+
+    return res.body.similarSongs.song.reduce<Song[]>((acc, song) => {
+        if (song.id !== query.songId) {
+            acc.push(ssNormalize.song(song, apiClientProps.server, ''));
+        }
+
+        return acc;
+    }, []);
+};
+
+const getDownloadUrl = (args: DownloadArgs) => {
+    const { apiClientProps, query } = args;
+
+    return (
+        `${apiClientProps.server?.url}/rest/download.view` +
+        `?id=${query.id}` +
+        `&${apiClientProps.server?.credential}` +
+        '&v=1.13.0' +
+        '&c=feishin'
+    );
+};
+
+const getTranscodingUrl = (args: TranscodingArgs) => {
+    const { base, format, bitrate } = args.query;
+    let url = base;
+    if (format) {
+        url += `&format=${format}`;
+    }
+    if (bitrate !== undefined) {
+        url += `&maxBitRate=${bitrate}`;
+    }
+
+    return url;
+};
+
 export const ssController = {
     authenticate,
     createFavorite,
     getArtistInfo,
+    getDownloadUrl,
     getMusicFolderList,
     getRandomSongList,
+    getServerInfo,
+    getSimilarSongs,
+    getStructuredLyrics,
     getTopSongList,
+    getTranscodingUrl,
     removeFavorite,
     scrobble,
     search3,

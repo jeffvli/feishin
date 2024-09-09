@@ -1,6 +1,7 @@
-import { forwardRef, Ref, useImperativeHandle, useState } from 'react';
+import { forwardRef, Ref, useImperativeHandle, useMemo, useState } from 'react';
 import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { openModal } from '@mantine/modals';
 import clone from 'lodash/clone';
 import get from 'lodash/get';
 import setWith from 'lodash/setWith';
@@ -19,15 +20,20 @@ import {
     convertQueryGroupToNDQuery,
 } from '/@/renderer/features/playlists/utils';
 import { QueryBuilderGroup, QueryBuilderRule } from '/@/renderer/types';
+import { useTranslation } from 'react-i18next';
 import { RiMore2Fill, RiSaveLine } from 'react-icons/ri';
-import { SongListSort } from '/@/renderer/api/types';
+import { PlaylistListSort, SongListSort, SortOrder } from '/@/renderer/api/types';
 import {
     NDSongQueryBooleanOperators,
     NDSongQueryDateOperators,
     NDSongQueryFields,
     NDSongQueryNumberOperators,
+    NDSongQueryPlaylistOperators,
     NDSongQueryStringOperators,
 } from '/@/renderer/api/navidrome.types';
+import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
+import { useCurrentServer } from '/@/renderer/store';
+import { JsonPreview } from '/@/renderer/features/shared/components/json-preview';
 
 type AddArgs = {
     groupIndex: number[];
@@ -51,6 +57,7 @@ interface PlaylistQueryBuilderProps {
         parsedFilter: any,
         extraFilters: { limit?: number; sortBy?: string; sortOrder?: string },
     ) => void;
+    playlistId?: string;
     query: any;
     sortBy: SongListSort;
     sortOrder: 'asc' | 'desc';
@@ -83,12 +90,42 @@ export type PlaylistQueryBuilderRef = {
 
 export const PlaylistQueryBuilder = forwardRef(
     (
-        { sortOrder, sortBy, limit, isSaving, query, onSave, onSaveAs }: PlaylistQueryBuilderProps,
+        {
+            sortOrder,
+            sortBy,
+            limit,
+            isSaving,
+            query,
+            onSave,
+            onSaveAs,
+            playlistId,
+        }: PlaylistQueryBuilderProps,
         ref: Ref<PlaylistQueryBuilderRef>,
     ) => {
+        const { t } = useTranslation();
+        const server = useCurrentServer();
         const [filters, setFilters] = useState<QueryBuilderGroup>(
             query ? convertNDQueryToQueryGroup(query) : DEFAULT_QUERY,
         );
+
+        const { data: playlists } = usePlaylistList({
+            query: { sortBy: PlaylistListSort.NAME, sortOrder: SortOrder.ASC, startIndex: 0 },
+            serverId: server?.id,
+        });
+
+        const playlistData = useMemo(() => {
+            if (!playlists) return [];
+
+            return playlists.items
+                .filter((p) => {
+                    if (!playlistId) return true;
+                    return p.id !== playlistId;
+                })
+                .map((p) => ({
+                    label: p.name,
+                    value: p.id,
+                }));
+        }, [playlistId, playlists]);
 
         const extraFiltersForm = useForm({
             initialValues: {
@@ -127,6 +164,16 @@ export const PlaylistQueryBuilder = forwardRef(
 
         const handleSaveAs = () => {
             onSaveAs?.(convertQueryGroupToNDQuery(filters), extraFiltersForm.values);
+        };
+
+        const openPreviewModal = () => {
+            const previewValue = convertQueryGroupToNDQuery(filters);
+
+            openModal({
+                children: <JsonPreview value={previewValue} />,
+                size: 'xl',
+                title: t('common.preview', { postProcess: 'titleCase' }),
+            });
         };
 
         const handleAddRuleGroup = (args: AddArgs) => {
@@ -354,14 +401,18 @@ export const PlaylistQueryBuilder = forwardRef(
         };
 
         const sortOptions = [
-            { label: 'Random', type: 'string', value: 'random' },
+            {
+                label: t('filter.random', { postProcess: 'titleCase' }),
+                type: 'string',
+                value: 'random',
+            },
             ...NDSongQueryFields,
         ];
 
         return (
             <MotionFlex
                 direction="column"
-                h="calc(100% - 2.5rem)"
+                h="calc(100% - 3.5rem)"
                 justify="space-between"
             >
                 <ScrollArea
@@ -377,8 +428,10 @@ export const PlaylistQueryBuilder = forwardRef(
                             boolean: NDSongQueryBooleanOperators,
                             date: NDSongQueryDateOperators,
                             number: NDSongQueryNumberOperators,
+                            playlist: NDSongQueryPlaylistOperators,
                             string: NDSongQueryStringOperators,
                         }}
+                        playlists={playlistData}
                         uniqueId={filters.uniqueId}
                         onAddRule={handleAddRule}
                         onAddRuleGroup={handleAddRuleGroup}
@@ -414,21 +467,21 @@ export const PlaylistQueryBuilder = forwardRef(
                         <Select
                             data={[
                                 {
-                                    label: 'Ascending',
+                                    label: t('common.ascending', { postProcess: 'titleCase' }),
                                     value: 'asc',
                                 },
                                 {
-                                    label: 'Descending',
+                                    label: t('common.descending', { postProcess: 'titleCase' }),
                                     value: 'desc',
                                 },
                             ]}
-                            label="Order"
+                            label={t('common.sortOrder', { postProcess: 'titleCase' })}
                             maxWidth="20%"
                             width={125}
                             {...extraFiltersForm.getInputProps('sortOrder')}
                         />
                         <NumberInput
-                            label="Limit"
+                            label={t('common.limit', { postProcess: 'titleCase' })}
                             maxWidth="20%"
                             width={75}
                             {...extraFiltersForm.getInputProps('limit')}
@@ -444,7 +497,14 @@ export const PlaylistQueryBuilder = forwardRef(
                                 variant="filled"
                                 onClick={handleSaveAs}
                             >
-                                Save as
+                                {t('common.saveAs', { postProcess: 'titleCase' })}
+                            </Button>
+                            <Button
+                                p="0.5em"
+                                variant="default"
+                                onClick={openPreviewModal}
+                            >
+                                {t('common.preview', { postProcess: 'titleCase' })}
                             </Button>
                             <DropdownMenu position="bottom-end">
                                 <DropdownMenu.Target>
@@ -462,7 +522,7 @@ export const PlaylistQueryBuilder = forwardRef(
                                         icon={<RiSaveLine color="var(--danger-color)" />}
                                         onClick={handleSave}
                                     >
-                                        Save and replace
+                                        {t('common.saveAndReplace', { postProcess: 'titleCase' })}
                                     </DropdownMenu.Item>
                                 </DropdownMenu.Dropdown>
                             </DropdownMenu>

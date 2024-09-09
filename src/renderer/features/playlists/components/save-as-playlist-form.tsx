@@ -4,6 +4,9 @@ import { CreatePlaylistBody, CreatePlaylistResponse, ServerType } from '/@/rende
 import { Button, Switch, TextInput, toast } from '/@/renderer/components';
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { useCurrentServer } from '/@/renderer/store';
+import { useTranslation } from 'react-i18next';
+import { ServerFeature } from '/@/renderer/api/features-types';
+import { hasFeature } from '/@/renderer/api/utils';
 
 interface SaveAsPlaylistFormProps {
     body: Partial<CreatePlaylistBody>;
@@ -18,6 +21,7 @@ export const SaveAsPlaylistForm = ({
     onSuccess,
     onCancel,
 }: SaveAsPlaylistFormProps) => {
+    const { t } = useTranslation();
     const mutation = useCreatePlaylist({});
     const server = useCurrentServer();
 
@@ -25,13 +29,13 @@ export const SaveAsPlaylistForm = ({
         initialValues: {
             _custom: {
                 navidrome: {
-                    public: false,
                     rules: undefined,
                     ...body?._custom?.navidrome,
                 },
             },
             comment: body.comment || '',
             name: body.name || '',
+            public: body.public,
         },
     });
 
@@ -40,10 +44,15 @@ export const SaveAsPlaylistForm = ({
             { body: values, serverId },
             {
                 onError: (err) => {
-                    toast.error({ message: err.message, title: 'Error creating playlist' });
+                    toast.error({
+                        message: err.message,
+                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                    });
                 },
                 onSuccess: (data) => {
-                    toast.success({ message: `Playlist has been created` });
+                    toast.success({
+                        message: t('form.createPlaylist.success', { postProcess: 'sentenceCase' }),
+                    });
                     onSuccess(data);
                     onCancel();
                 },
@@ -51,7 +60,7 @@ export const SaveAsPlaylistForm = ({
         );
     });
 
-    const isPublicDisplayed = server?.type === ServerType.NAVIDROME;
+    const isPublicDisplayed = hasFeature(server, ServerFeature.PUBLIC_PLAYLIST);
     const isSubmitDisabled = !form.values.name || mutation.isLoading;
 
     return (
@@ -60,17 +69,28 @@ export const SaveAsPlaylistForm = ({
                 <TextInput
                     data-autofocus
                     required
-                    label="Name"
+                    label={t('form.createPlaylist.input', {
+                        context: 'name',
+                        postProcess: 'titleCase',
+                    })}
                     {...form.getInputProps('name')}
                 />
-                <TextInput
-                    label="Description"
-                    {...form.getInputProps('comment')}
-                />
+                {server?.type === ServerType.NAVIDROME && (
+                    <TextInput
+                        label={t('form.createPlaylist.input', {
+                            context: 'description',
+                            postProcess: 'titleCase',
+                        })}
+                        {...form.getInputProps('comment')}
+                    />
+                )}
                 {isPublicDisplayed && (
                     <Switch
-                        label="Is Public?"
-                        {...form.getInputProps('_custom.navidrome.public', { type: 'checkbox' })}
+                        label={t('form.createPlaylist.input', {
+                            context: 'public',
+                            postProcess: 'titleCase',
+                        })}
+                        {...form.getInputProps('public', { type: 'checkbox' })}
                     />
                 )}
                 <Group position="right">
@@ -78,7 +98,7 @@ export const SaveAsPlaylistForm = ({
                         variant="subtle"
                         onClick={onCancel}
                     >
-                        Cancel
+                        {t('common.cancel', { postProcess: 'titleCase' })}
                     </Button>
                     <Button
                         disabled={isSubmitDisabled}
@@ -86,7 +106,7 @@ export const SaveAsPlaylistForm = ({
                         type="submit"
                         variant="filled"
                     >
-                        Save
+                        {t('common.save', { postProcess: 'titleCase' })}
                     </Button>
                 </Group>
             </Stack>

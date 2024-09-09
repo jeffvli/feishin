@@ -2,6 +2,7 @@ import React, { MouseEvent } from 'react';
 import { Center, Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { RiArrowUpSLine, RiDiscLine, RiMore2Fill } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -19,6 +20,7 @@ import { fadeIn } from '/@/renderer/styles';
 import { LibraryItem } from '/@/renderer/api/types';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
+import { Separator } from '/@/renderer/components/separator';
 
 const ImageWrapper = styled.div`
     position: relative;
@@ -60,12 +62,12 @@ const Image = styled(motion.div)`
 const PlayerbarImage = styled.img`
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: var(--image-fit);
 `;
 
 const LineItem = styled.div<{ $secondary?: boolean }>`
     display: inline-block;
-    width: 95%;
+    width: fit-content;
     max-width: 20vw;
     overflow: hidden;
     line-height: 1.3;
@@ -92,6 +94,7 @@ const LeftControlsContainer = styled.div`
 `;
 
 export const LeftControls = () => {
+    const { t } = useTranslation();
     const { setSideBar } = useAppStoreActions();
     const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
@@ -118,6 +121,8 @@ export const LeftControls = () => {
         e?.stopPropagation();
         setSideBar({ image: true });
     };
+
+    const stopPropagation = (e?: MouseEvent) => e?.stopPropagation();
 
     useHotkeys([
         [
@@ -147,7 +152,9 @@ export const LeftControls = () => {
                                 onClick={handleToggleFullScreenPlayer}
                             >
                                 <Tooltip
-                                    label="Toggle fullscreen player"
+                                    label={t('player.toggleFullscreenPlayer', {
+                                        postProcess: 'sentenceCase',
+                                    })}
                                     openDelay={500}
                                 >
                                     {currentSong?.imageUrl ? (
@@ -182,7 +189,12 @@ export const LeftControls = () => {
                                             right: 2,
                                             top: 2,
                                         }}
-                                        tooltip={{ label: 'Expand', openDelay: 500 }}
+                                        tooltip={{
+                                            label: t('common.expand', {
+                                                postProcess: 'titleCase',
+                                            }),
+                                            openDelay: 500,
+                                        }}
                                         variant="default"
                                         onClick={handleToggleSidebarImage}
                                     >
@@ -197,7 +209,7 @@ export const LeftControls = () => {
                     )}
                 </AnimatePresence>
                 <MetadataStack layout="position">
-                    <LineItem>
+                    <LineItem onClick={stopPropagation}>
                         <Group
                             noWrap
                             align="flex-start"
@@ -224,22 +236,16 @@ export const LeftControls = () => {
                             )}
                         </Group>
                     </LineItem>
-                    <LineItem $secondary>
+                    <LineItem
+                        $secondary
+                        onClick={stopPropagation}
+                    >
                         {artists?.map((artist, index) => (
                             <React.Fragment key={`bar-${artist.id}`}>
-                                {index > 0 && (
-                                    <Text
-                                        $link
-                                        $secondary
-                                        size="md"
-                                        style={{ display: 'inline-block' }}
-                                    >
-                                        ,
-                                    </Text>
-                                )}{' '}
+                                {index > 0 && <Separator />}
                                 <Text
-                                    $link
-                                    component={Link}
+                                    $link={artist.id !== ''}
+                                    component={artist.id ? Link : undefined}
                                     overflow="hidden"
                                     size="md"
                                     to={
@@ -247,7 +253,7 @@ export const LeftControls = () => {
                                             ? generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                                   albumArtistId: artist.id,
                                               })
-                                            : ''
+                                            : undefined
                                     }
                                     weight={500}
                                 >
@@ -256,7 +262,10 @@ export const LeftControls = () => {
                             </React.Fragment>
                         ))}
                     </LineItem>
-                    <LineItem $secondary>
+                    <LineItem
+                        $secondary
+                        onClick={stopPropagation}
+                    >
                         <Text
                             $link
                             component={Link}
