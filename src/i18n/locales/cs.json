@@ -11,7 +11,7 @@
         "skip_back": "přeskočit dozadu",
         "favorite": "oblíbené",
         "next": "další",
-        "shuffle": "náhodně",
+        "shuffle": "přehrát náhodně",
         "playbackFetchNoResults": "nenalezeny žádné skladby",
         "playbackFetchInProgress": "načítání skladeb…",
         "addNext": "přidat další",
@@ -245,7 +245,10 @@
         "playerbarOpenDrawer": "lišta přehrávače jako přepínač celé obrazovky",
         "playerbarOpenDrawer_description": "umožňuje kliknutí na lištu přehrávače pro otevření celoobrazovkového přehrávače",
         "artistConfiguration": "nastavení stránky umělce alba",
-        "artistConfiguration_description": "nastavit, které položky na stránce umělce alba budou zobrazeny a v jakém pořadí"
+        "artistConfiguration_description": "nastavit, které položky na stránce umělce alba budou zobrazeny a v jakém pořadí",
+        "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
+        "trayEnabled": "zobrazit v oznamovací oblasti",
+        "trayEnabled_description": "zobrazit/skrýt ikonu/nabídku v oznamovací oblasti. pokud je zakázáno, vypne také minimalizaci/ukončení do oznamovací oblasti"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -572,7 +575,8 @@
             "showDetails": "získat informace",
             "shareItem": "sdílet položku",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
-            "download": "stáhnout"
+            "download": "stáhnout",
+            "playShuffled": "$t(player.shuffle)"
         },
         "home": {
             "mostPlayed": "nejpřehrávanější",
