@@ -11,7 +11,16 @@ import {
     useFullScreenPlayerStoreActions,
 } from '/@/renderer/store/full-screen-player.store';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
-import { FullScreenSimilarSongs } from '/@/renderer/features/player/components/full-screen-similar-songs';
+import { Visualizer } from '/@/renderer/features/player/components/visualizer';
+import { lazy, useMemo } from 'react';
+import { usePlaybackSettings } from '/@/renderer/store';
+import { PlaybackType } from '/@/renderer/types';
+
+const FullScreenSimilarSongs = lazy(() =>
+    import('/@/renderer/features/player/components/full-screen-similar-songs').then((module) => ({
+        default: module.FullScreenSimilarSongs,
+    })),
+);
 
 const QueueContainer = styled.div`
     position: relative;
@@ -61,27 +70,41 @@ export const FullScreenPlayerQueue = () => {
     const { t } = useTranslation();
     const { activeTab, opacity } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
+    const { type, webAudio } = usePlaybackSettings();
 
-    const headerItems = [
-        {
-            active: activeTab === 'queue',
-            icon: <RiFileMusicLine size="1.5rem" />,
-            label: t('page.fullscreenPlayer.upNext'),
-            onClick: () => setStore({ activeTab: 'queue' }),
-        },
-        {
-            active: activeTab === 'related',
-            icon: <HiOutlineQueueList size="1.5rem" />,
-            label: t('page.fullscreenPlayer.related'),
-            onClick: () => setStore({ activeTab: 'related' }),
-        },
-        {
-            active: activeTab === 'lyrics',
-            icon: <RiFileTextLine size="1.5rem" />,
-            label: t('page.fullscreenPlayer.lyrics'),
-            onClick: () => setStore({ activeTab: 'lyrics' }),
-        },
-    ];
+    const headerItems = useMemo(() => {
+        const items = [
+            {
+                active: activeTab === 'queue',
+                icon: <RiFileMusicLine size="1.5rem" />,
+                label: t('page.fullscreenPlayer.upNext'),
+                onClick: () => setStore({ activeTab: 'queue' }),
+            },
+            {
+                active: activeTab === 'related',
+                icon: <HiOutlineQueueList size="1.5rem" />,
+                label: t('page.fullscreenPlayer.related'),
+                onClick: () => setStore({ activeTab: 'related' }),
+            },
+            {
+                active: activeTab === 'lyrics',
+                icon: <RiFileTextLine size="1.5rem" />,
+                label: t('page.fullscreenPlayer.lyrics'),
+                onClick: () => setStore({ activeTab: 'lyrics' }),
+            },
+        ];
+
+        if (type === PlaybackType.WEB && webAudio) {
+            items.push({
+                active: activeTab === 'visualizer',
+                icon: <RiFileTextLine size="1.5rem" />,
+                label: 'Visualizer',
+                onClick: () => setStore({ activeTab: 'visualizer' }),
+            });
+        }
+
+        return items;
+    }, [activeTab, setStore, t, type, webAudio]);
 
     return (
         <GridContainer
@@ -91,6 +114,7 @@ export const FullScreenPlayerQueue = () => {
             <Group
                 grow
                 align="center"
+                className="full-screen-player-queue-header"
                 position="center"
             >
                 {headerItems.map((item) => (
@@ -127,6 +151,8 @@ export const FullScreenPlayerQueue = () => {
                 </QueueContainer>
             ) : activeTab === 'lyrics' ? (
                 <Lyrics />
+            ) : activeTab === 'visualizer' && type === PlaybackType.WEB && webAudio ? (
+                <Visualizer />
             ) : null}
         </GridContainer>
     );

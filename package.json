@@ -310,6 +310,7 @@
         "@ts-rest/core": "^3.23.0",
         "@xhayper/discord-rpc": "^1.0.24",
         "auto-text-size": "^0.2.3",
+        "audiomotion-analyzer": "^4.5.0",
         "axios": "^1.6.0",
         "clsx": "^2.0.0",
         "cmdk": "^0.2.0",

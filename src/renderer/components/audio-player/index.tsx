@@ -18,6 +18,7 @@ import {
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import type { CrossfadeStyle } from '/@/renderer/types';
 import { PlaybackStyle, PlayerStatus } from '/@/renderer/types';
+import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import { getServerById, TranscodingConfig, usePlaybackSettings, useSpeed } from '/@/renderer/store';
 import { toast } from '/@/renderer/components/toast';
 import { api } from '/@/renderer/api';
@@ -42,11 +43,6 @@ export type AudioPlayerProgress = {
 
 const getDuration = (ref: any) => {
     return ref.current?.player?.player?.player?.duration;
-};
-
-type WebAudio = {
-    context: AudioContext;
-    gain: GainNode;
 };
 
 // Credits: https://gist.github.com/novwhisky/8a1a0168b94f3b6abfaa?permalink_comment_id=1551393#gistcomment-1551393
@@ -116,7 +112,7 @@ export const AudioPlayer = forwardRef(
         const [isTransitioning, setIsTransitioning] = useState(false);
         const audioDeviceId = useSettingsStore((state) => state.playback.audioDeviceId);
         const playback = useSettingsStore((state) => state.playback.mpvProperties);
-        const useWebAudio = useSettingsStore((state) => state.playback.webAudio);
+        const shouldUseWebAudio = useSettingsStore((state) => state.playback.webAudio);
         const { resetSampleRate } = useSettingsStoreActions();
         const playbackSpeed = useSpeed();
         const { transcode } = usePlaybackSettings();
@@ -124,7 +120,7 @@ export const AudioPlayer = forwardRef(
         const stream1 = useSongUrl(transcode, currentPlayer === 1, player1);
         const stream2 = useSongUrl(transcode, currentPlayer === 2, player2);
 
-        const [webAudio, setWebAudio] = useState<WebAudio | null>(null);
+        const { webAudio, setWebAudio } = useWebAudio();
         const [player1Source, setPlayer1Source] = useState<MediaElementAudioSourceNode | null>(
             null,
         );
@@ -181,7 +177,7 @@ export const AudioPlayer = forwardRef(
         );
 
         useEffect(() => {
-            if (useWebAudio && 'AudioContext' in window) {
+            if (shouldUseWebAudio && 'AudioContext' in window) {
                 let context: AudioContext;
 
                 try {
@@ -200,7 +196,7 @@ export const AudioPlayer = forwardRef(
                 const gain = context.createGain();
                 gain.connect(context.destination);
 
-                setWebAudio({ context, gain });
+                setWebAudio!({ context, gain });
 
                 return () => {
                     return context.close();
