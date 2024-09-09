@@ -413,6 +413,7 @@ const song = z.object({
     MediaSources: z.array(mediaSources),
     MediaType: z.string(),
     Name: z.string(),
+    NormalizationGain: z.number().optional(),
     ParentIndexNumber: z.number(),
     PlaylistItemId: z.string().optional(),
     PremiereDate: z.string().optional(),
