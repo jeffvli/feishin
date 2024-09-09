@@ -66,7 +66,7 @@
         "cancel": "Abbrechen",
         "forceRestartRequired": "Neustarten um die Änderungen zu übernehmen... Schließe die Benachrichtigung zum Neustarten",
         "setting": "Einstellungen",
-        "setting_one": "",
+        "setting_one": "Einstellung",
         "setting_other": "Einstellungen",
         "version": "Version",
         "title": "Titel",
@@ -106,7 +106,8 @@
         "preview": "Vorschau",
         "reload": "Neu Laden",
         "mbid": "MusicBrainz ID",
-        "close": "schliessen"
+        "close": "schliessen",
+        "share": "Teilen"
     },
     "error": {
         "remotePortWarning": "Starten Sie den Server neu, um den neuen Port anzuwenden",
@@ -218,7 +219,8 @@
             "input_optionMatchAny": "Treffer Einige"
         },
         "editPlaylist": {
-            "title": "Bearbeite $t(entity.playlist_one)"
+            "title": "Bearbeite $t(entity.playlist_one)",
+            "success": "$t(entity.playlist_one) erfolgreich aktualisiert"
         },
         "lyricSearch": {
             "title": "Songtext Suche",
@@ -226,7 +228,10 @@
             "input_artist": "$t(entity.artist_one)"
         },
         "shareItem": {
-            "description": "Beschreibung"
+            "description": "Beschreibung",
+            "setExpiration": "Ablaufdatum setzen",
+            "expireInvalid": "Ablaufdatum muss in der Zukunft liegen",
+            "allowDownloading": "Herunterladen zulassen"
         }
     },
     "entity": {
@@ -260,7 +265,9 @@
         "genreWithCount_other": "{{count}} Genres",
         "trackWithCount_one": "{{count}} Track",
         "trackWithCount_other": "{{count}} Tracks",
-        "smartPlaylist": "Smart $t(entity.playlist_one)"
+        "smartPlaylist": "Smart $t(entity.playlist_one)",
+        "play_one": "{{count}} Wiedergabe",
+        "play_other": "{{count}} Wiedergaben"
     },
     "table": {
         "config": {
@@ -429,6 +436,12 @@
         },
         "albumList": {
             "title": "$t(entity.album_other)"
+        },
+        "albumArtistDetail": {
+            "about": "Über {{artist}}",
+            "appearsOn": "erscheint auf",
+            "recentReleases": "Kürzliche Veröffentlichungen",
+            "viewDiscography": "Diskographie ansehen"
         }
     },
     "player": {
