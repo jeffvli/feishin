@@ -12,10 +12,15 @@ import {
 } from '/@/renderer/store/full-screen-player.store';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import { Visualizer } from '/@/renderer/features/player/components/visualizer';
-import { useMemo } from 'react';
+import { lazy, useMemo } from 'react';
 import { usePlaybackSettings } from '/@/renderer/store';
 import { PlaybackType } from '/@/renderer/types';
-import { FullScreenSimilarSongs } from '/@/renderer/features/player/components/full-screen-similar-songs';
+
+const FullScreenSimilarSongs = lazy(() =>
+    import('/@/renderer/features/player/components/full-screen-similar-songs').then((module) => ({
+        default: module.FullScreenSimilarSongs,
+    })),
+);
 
 const QueueContainer = styled.div`
     position: relative;
