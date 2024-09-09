@@ -11,7 +11,7 @@
         "skip_back": "retroceder",
         "favorite": "favorito",
         "next": "siguiente",
-        "shuffle": "mezclar",
+        "shuffle": "Reproducir aleatoriamente",
         "playbackFetchNoResults": "ninguna canción encontrada",
         "playbackFetchInProgress": "cargando canciones…",
         "addNext": "añadir siguiente",
@@ -245,7 +245,10 @@
         "playerbarOpenDrawer": "Cambiar la barra del reproductor a pantalla completa",
         "playerbarOpenDrawer_description": "Permitir hacer clic en la barra del reproductor para abrir el reproductor en pantalla completa",
         "artistConfiguration": "Configuración de la página del artista del álbum",
-        "artistConfiguration_description": "Configurar qué elementos se muestran y en qué orden en la página del artista del álbum"
+        "artistConfiguration_description": "Configurar qué elementos se muestran y en qué orden en la página del artista del álbum",
+        "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
+        "trayEnabled": "Mostrar en el área de notificación",
+        "trayEnabled_description": "mostrar/ocultar el icono/menú del área de notificación. si está deshabilitado, también deshabilita minimizar/salir a la bandeja"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -478,7 +481,8 @@
             "shareItem": "Compartir elemento",
             "showDetails": "Obtener información",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
-            "download": "descargar"
+            "download": "descargar",
+            "playShuffled": "$t(player.shuffle)"
         },
         "home": {
             "mostPlayed": "más reproducidos",
