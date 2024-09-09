@@ -84,8 +84,52 @@ export const WindowSettings = () => {
         {
             control: (
                 <Switch
+                    aria-label="toggle hiding tray"
+                    defaultChecked={settings.tray}
+                    disabled={!isElectron()}
+                    onChange={(e) => {
+                        if (!e) return;
+                        localSettings?.set('window_enable_tray', e.currentTarget.checked);
+                        if (e.currentTarget.checked) {
+                            setSettings({
+                                window: {
+                                    ...settings,
+                                    tray: true,
+                                },
+                            });
+                        } else {
+                            localSettings?.set('window_start_minimized', false);
+                            localSettings?.set('window_exit_to_tray', false);
+                            localSettings?.set('window_minimize_to_tray', false);
+
+                            setSettings({
+                                window: {
+                                    ...settings,
+                                    exitToTray: false,
+                                    minimizeToTray: false,
+                                    startMinimized: false,
+                                    tray: false,
+                                },
+                            });
+                        }
+                    }}
+                />
+            ),
+            description: t('setting.trayEnabled', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            note: t('common.restartRequired', {
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.trayEnabled', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
                     aria-label="Toggle minimize to tray"
-                    defaultChecked={settings.minimizeToTray}
+                    defaultChecked={settings.tray}
                     disabled={!isElectron()}
                     onChange={(e) => {
                         if (!e) return;
@@ -103,7 +147,7 @@ export const WindowSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: !isElectron(),
+            isHidden: !isElectron() || !settings.tray,
             title: t('setting.minimizeToTray', { postProcess: 'sentenceCase' }),
         },
         {
@@ -128,7 +172,7 @@ export const WindowSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: !isElectron(),
+            isHidden: !isElectron() || !settings.tray,
             title: t('setting.exitToTray', { postProcess: 'sentenceCase' }),
         },
         {
@@ -153,7 +197,7 @@ export const WindowSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: !isElectron(),
+            isHidden: !isElectron() || !settings.tray,
             title: t('setting.startMinimized', { postProcess: 'sentenceCase' }),
         },
     ];

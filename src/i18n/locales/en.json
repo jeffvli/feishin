@@ -653,6 +653,8 @@
         "transcodeBitrate_description": "selects the bitrate to transcode. 0 means let the server pick",
         "transcodeFormat": "format to transcode",
         "transcodeFormat_description": "selects the format to transcode. leave empty to let the server decide",
+        "trayEnabled": "show tray",
+        "trayEnabled_description": "show/hide tray icon/menu. if disabled, also disables minimize/exit to tray",
         "useSystemTheme": "use system theme",
         "useSystemTheme_description": "follow the system-defined light or dark preference",
         "volumeWheelStep": "volume wheel step",
