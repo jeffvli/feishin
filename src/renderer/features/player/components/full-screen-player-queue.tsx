@@ -11,14 +11,14 @@ import {
     useFullScreenPlayerStoreActions,
 } from '/@/renderer/store/full-screen-player.store';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
-import { Visualizer } from '/@/renderer/features/player/components/visualizer';
-import { lazy, useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { usePlaybackSettings } from '/@/renderer/store';
 import { PlaybackType } from '/@/renderer/types';
+import { FullScreenSimilarSongs } from '/@/renderer/features/player/components/full-screen-similar-songs';
 
-const FullScreenSimilarSongs = lazy(() =>
-    import('/@/renderer/features/player/components/full-screen-similar-songs').then((module) => ({
-        default: module.FullScreenSimilarSongs,
+const Visualizer = lazy(() =>
+    import('/@/renderer/features/player/components/visualizer').then((module) => ({
+        default: module.Visualizer,
     })),
 );
 
@@ -152,7 +152,9 @@ export const FullScreenPlayerQueue = () => {
             ) : activeTab === 'lyrics' ? (
                 <Lyrics />
             ) : activeTab === 'visualizer' && type === PlaybackType.WEB && webAudio ? (
-                <Visualizer />
+                <Suspense fallback={<></>}>
+                    <Visualizer />
+                </Suspense>
             ) : null}
         </GridContainer>
     );
