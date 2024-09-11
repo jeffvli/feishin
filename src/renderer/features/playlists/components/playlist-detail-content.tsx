@@ -222,7 +222,7 @@ export const PlaylistDetailContent = ({ tableRef }: PlaylistDetailContentProps) 
                     suppressLoadingOverlay
                     suppressRowDrag
                     columnDefs={columnDefs}
-                    getRowId={(data) => `${data.data.id}-${data.data.pageIndex}`}
+                    getRowId={(data) => `${data.data.uniqueId}-${data.data.pageIndex}`}
                     rowClassRules={rowClassRules}
                     rowData={playlistSongData}
                     rowHeight={60}
