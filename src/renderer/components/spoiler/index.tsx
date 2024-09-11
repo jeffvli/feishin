@@ -28,7 +28,7 @@ export const Spoiler = ({ maxHeight, defaultOpened, children, ...props }: Spoile
             ref={ref}
             className={spoilerClassNames}
             role="button"
-            style={{ maxHeight: maxHeight ?? '100px' }}
+            style={{ maxHeight: maxHeight ?? '100px', whiteSpace: 'pre-wrap' }}
             tabIndex={-1}
             onClick={handleToggleExpand}
             {...props}
