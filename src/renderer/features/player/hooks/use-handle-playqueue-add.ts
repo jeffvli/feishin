@@ -176,10 +176,12 @@ export const useHandlePlayQueueAdd = () => {
 
             updateSong(playerData.current.song);
 
+            const replacesQueue = playType === Play.NOW || playType === Play.SHUFFLE;
+
             if (playbackType === PlaybackType.LOCAL) {
                 mpvPlayer!.volume(usePlayerStore.getState().volume);
 
-                if (playType === Play.NOW || !hadSong) {
+                if (replacesQueue || !hadSong) {
                     mpvPlayer!.pause();
                     setQueue(playerData, false);
                 } else {
@@ -191,14 +193,14 @@ export const useHandlePlayQueueAdd = () => {
                         ? PlayersRef.current?.player1
                         : PlayersRef.current?.player2;
                 const underlying = player?.getInternalPlayer();
-                if (underlying && playType === Play.NOW) {
+                if (underlying && replacesQueue) {
                     underlying.currentTime = 0;
                 }
             }
 
             // We should only play if the queue was empty, or we are doing play NOW
             // (override the queue).
-            if (playType === Play.NOW || !hadSong) {
+            if (replacesQueue || !hadSong) {
                 play();
             }
 
