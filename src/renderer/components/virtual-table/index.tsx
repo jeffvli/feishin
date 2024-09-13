@@ -42,6 +42,7 @@ import { NoteCell } from '/@/renderer/components/virtual-table/cells/note-cell';
 import { RowIndexCell } from '/@/renderer/components/virtual-table/cells/row-index-cell';
 import i18n from '/@/i18n/i18n';
 import {
+    formatDateAbsolute,
     formatDateAbsoluteUTC,
     formatDateRelative,
     formatSizeString,
@@ -183,7 +184,7 @@ const tableColumns: { [key: string]: ColDef } = {
             GenericTableHeader(params, { position: 'center' }),
         headerName: i18n.t('table.column.dateAdded'),
         suppressSizeToFit: true,
-        valueFormatter: (params: ValueFormatterParams) => formatDateAbsoluteUTC(params.value),
+        valueFormatter: (params: ValueFormatterParams) => formatDateAbsolute(params.value),
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.createdAt : undefined,
         width: 130,
