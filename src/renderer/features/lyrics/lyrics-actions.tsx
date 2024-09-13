@@ -18,7 +18,9 @@ interface LyricsActionsProps {
 
     onRemoveLyric: () => void;
     onResetLyric: () => void;
+    onRomajiLyric: () => void;
     onSearchOverride: (params: LyricsOverride) => void;
+    onTranslationLyric: () => void;
     setIndex: (idx: number) => void;
 }
 
@@ -27,7 +29,9 @@ export const LyricsActions = ({
     languages,
     onRemoveLyric,
     onResetLyric,
+    onRomajiLyric,
     onSearchOverride,
+    onTranslationLyric,
     setIndex,
 }: LyricsActionsProps) => {
     const { t } = useTranslation();
@@ -120,12 +124,37 @@ export const LyricsActions = ({
                 {isDesktop && sources.length ? (
                     <Button
                         uppercase
-                        color="red"
                         disabled={isActionsDisabled}
                         variant="subtle"
                         onClick={onRemoveLyric}
                     >
                         {t('common.clear', { postProcess: 'sentenceCase' })}
+                    </Button>
+                ) : null}
+            </Box>
+
+            <Box style={{ position: 'absolute', right: 0, top: -50 }}>
+                {isDesktop && sources.length ? (
+                    <Button
+                        uppercase
+                        disabled={isActionsDisabled}
+                        variant="subtle"
+                        onClick={onTranslationLyric}
+                    >
+                        {t('common.translation', { postProcess: 'sentenceCase' })}
+                    </Button>
+                ) : null}
+            </Box>
+
+            <Box style={{ position: 'absolute', right: 0, top: -100 }}>
+                {isDesktop && sources.length ? (
+                    <Button
+                        uppercase
+                        disabled={isActionsDisabled}
+                        variant="subtle"
+                        onClick={onRomajiLyric}
+                    >
+                        {t('common.romaji', { postProcess: 'sentenceCase' })}
                     </Button>
                 ) : null}
             </Box>

@@ -5,12 +5,12 @@ import styled from 'styled-components';
 import { useSettingsStore } from '/@/renderer/store';
 
 const StyledContainer = styled.div`
-    margin: auto;
     max-width: 100%;
+    margin: auto;
 
     canvas {
-        margin: auto;
         width: 100%;
+        margin: auto;
     }
 `;
 

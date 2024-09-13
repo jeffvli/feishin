@@ -96,6 +96,9 @@ export const Lyrics = () => {
 
     const [override, setOverride] = useState<LyricsOverride | undefined>(undefined);
 
+    const [isTranslated, setIsTranslated] = useState(false);
+    const [translatedLyrics] = useState<string[] | null>(null);
+
     const handleOnSearchOverride = useCallback((params: LyricsOverride) => {
         setOverride(params);
     }, []);
@@ -122,6 +125,12 @@ export const Lyrics = () => {
             },
         );
     }, [currentSong?.id, currentSong?.serverId]);
+
+    const handleOnRomajiLyric = useCallback(() => {}, []);
+
+    const handleOnTranslationLyric = useCallback(() => {
+        setIsTranslated((prev) => !prev);
+    }, []);
 
     const { isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
         options: {
@@ -203,10 +212,16 @@ export const Lyrics = () => {
                                 transition={{ duration: 0.5 }}
                             >
                                 {synced ? (
-                                    <SynchronizedLyrics {...(lyrics as SynchronizedLyricsProps)} />
+                                    <SynchronizedLyrics
+                                        {...(lyrics as SynchronizedLyricsProps)}
+                                        isTranslated={isTranslated}
+                                        translatedLyrics={translatedLyrics}
+                                    />
                                 ) : (
                                     <UnsynchronizedLyrics
                                         {...(lyrics as UnsynchronizedLyricsProps)}
+                                        isTranslated={isTranslated}
+                                        translatedLyrics={translatedLyrics}
                                     />
                                 )}
                             </ScrollContainer>
@@ -220,7 +235,9 @@ export const Lyrics = () => {
                         setIndex={setIndex}
                         onRemoveLyric={handleOnRemoveLyric}
                         onResetLyric={handleOnResetLyric}
+                        onRomajiLyric={handleOnRomajiLyric}
                         onSearchOverride={handleOnSearchOverride}
+                        onTranslationLyric={handleOnTranslationLyric}
                     />
                 </ActionsContainer>
             </LyricsContainer>
