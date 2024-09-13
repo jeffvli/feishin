@@ -10,7 +10,7 @@ import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { formatDateAbsolute, formatDurationString } from '/@/renderer/utils';
+import { formatDateAbsoluteUTC, formatDurationString } from '/@/renderer/utils';
 
 interface AlbumDetailHeaderProps {
     background: {
@@ -42,7 +42,7 @@ export const AlbumDetailHeader = forwardRef(
                 id: 'releaseDate',
                 value:
                     detailQuery?.data?.releaseDate &&
-                    `${releasePrefix} ${formatDateAbsolute(detailQuery?.data?.releaseDate)}`,
+                    `${releasePrefix} ${formatDateAbsoluteUTC(detailQuery?.data?.releaseDate)}`,
             },
             {
                 id: 'songCount',
@@ -62,7 +62,7 @@ export const AlbumDetailHeader = forwardRef(
         ];
 
         if (originalDifferentFromRelease) {
-            const formatted = `♫ ${formatDateAbsolute(detailQuery!.data!.originalDate)}`;
+            const formatted = `♫ ${formatDateAbsoluteUTC(detailQuery!.data!.originalDate)}`;
             metadataItems.splice(0, 0, {
                 id: 'originalDate',
                 value: formatted,

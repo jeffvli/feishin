@@ -1,13 +1,20 @@
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import utc from 'dayjs/plugin/utc';
 import formatDuration from 'format-duration';
 import type { Album, AlbumArtist, Song } from '/@/renderer/api/types';
 import { Rating } from '/@/renderer/components/rating';
 
 dayjs.extend(relativeTime);
+dayjs.extend(utc);
+
+const DATE_FORMAT = 'MMM D, YYYY';
 
 export const formatDateAbsolute = (key: string | null) =>
-    key ? dayjs(key).format('MMM D, YYYY') : '';
+    key ? dayjs(key).format(DATE_FORMAT) : '';
+
+export const formatDateAbsoluteUTC = (key: string | null) =>
+    key ? dayjs.utc(key).format(DATE_FORMAT) : '';
 
 export const formatDateRelative = (key: string | null) => (key ? dayjs(key).fromNow() : '');
 
