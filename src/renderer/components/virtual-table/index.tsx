@@ -41,7 +41,11 @@ import { useFixedTableHeader } from '/@/renderer/components/virtual-table/hooks/
 import { NoteCell } from '/@/renderer/components/virtual-table/cells/note-cell';
 import { RowIndexCell } from '/@/renderer/components/virtual-table/cells/row-index-cell';
 import i18n from '/@/i18n/i18n';
-import { formatDateAbsolute, formatDateRelative, formatSizeString } from '/@/renderer/utils/format';
+import {
+    formatDateAbsoluteUTC,
+    formatDateRelative,
+    formatSizeString,
+} from '/@/renderer/utils/format';
 import { useTableChange } from '/@/renderer/hooks/use-song-change';
 
 export * from './table-config-dropdown';
@@ -179,7 +183,7 @@ const tableColumns: { [key: string]: ColDef } = {
             GenericTableHeader(params, { position: 'center' }),
         headerName: i18n.t('table.column.dateAdded'),
         suppressSizeToFit: true,
-        valueFormatter: (params: ValueFormatterParams) => formatDateAbsolute(params.value),
+        valueFormatter: (params: ValueFormatterParams) => formatDateAbsoluteUTC(params.value),
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.createdAt : undefined,
         width: 130,
@@ -253,7 +257,7 @@ const tableColumns: { [key: string]: ColDef } = {
             GenericTableHeader(params, { position: 'center' }),
         headerName: i18n.t('table.column.releaseDate'),
         suppressSizeToFit: true,
-        valueFormatter: (params: ValueFormatterParams) => formatDateAbsolute(params.value),
+        valueFormatter: (params: ValueFormatterParams) => formatDateAbsoluteUTC(params.value),
         valueGetter: (params: ValueGetterParams) =>
             params.data ? params.data.releaseDate : undefined,
         width: 130,

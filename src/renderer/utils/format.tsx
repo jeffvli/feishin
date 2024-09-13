@@ -9,6 +9,9 @@ dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
 export const formatDateAbsolute = (key: string | null) =>
+    key ? dayjs(key).format('MMM D, YYYY') : '';
+
+export const formatDateAbsoluteUTC = (key: string | null) =>
     key ? dayjs.utc(key).format('MMM D, YYYY') : '';
 
 export const formatDateRelative = (key: string | null) => (key ? dayjs(key).fromNow() : '');
