@@ -8,6 +8,7 @@ import isElectron from 'is-electron';
 import styled from 'styled-components';
 import { LyricSource } from '/@/renderer/api/types';
 import { useTranslation } from 'react-i18next';
+import { TextInput, Select } from '@mantine/core';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -115,6 +116,58 @@ export const LyricSettings = () => {
             }),
             isHidden: !isElectron(),
             title: t('setting.lyricOffset', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Select
+                    data={['Azure']}
+                    value={settings.apiProvider}
+                    onChange={(value) => {
+                        setSettings({ lyrics: { ...settings, apiProvider: value } });
+                    }}
+                />
+            ),
+            description: t('API provider for translation'),
+            title: t('API Provider'),
+        },
+        {
+            control: (
+                <TextInput
+                    value={settings.apiKey}
+                    onChange={(e) => {
+                        setSettings({ lyrics: { ...settings, apiKey: e.currentTarget.value } });
+                    }}
+                />
+            ),
+            description: t('API Key for translation'),
+            title: t('API Key'),
+        },
+        {
+            control: (
+                <TextInput
+                    value={settings.resourceLocation}
+                    onChange={(e) => {
+                        setSettings({
+                            lyrics: { ...settings, resourceLocation: e.currentTarget.value },
+                        });
+                    }}
+                />
+            ),
+            description: t('Resource location for translation'),
+            title: t('Resource Location'),
+        },
+        {
+            control: (
+                <Select
+                    data={['en', 'zh']}
+                    value={settings.targetLanguage}
+                    onChange={(value) => {
+                        setSettings({ lyrics: { ...settings, targetLanguage: value } });
+                    }}
+                />
+            ),
+            description: t('Target language for translation'),
+            title: t('Target Language'),
         },
     ];
 

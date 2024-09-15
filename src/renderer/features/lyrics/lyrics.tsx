@@ -96,9 +96,6 @@ export const Lyrics = () => {
 
     const [override, setOverride] = useState<LyricsOverride | undefined>(undefined);
 
-    const [isTranslated, setIsTranslated] = useState(false);
-    const [translatedLyrics] = useState<string[] | null>(null);
-
     const handleOnSearchOverride = useCallback((params: LyricsOverride) => {
         setOverride(params);
     }, []);
@@ -128,9 +125,7 @@ export const Lyrics = () => {
 
     const handleOnRomajiLyric = useCallback(() => {}, []);
 
-    const handleOnTranslationLyric = useCallback(() => {
-        setIsTranslated((prev) => !prev);
-    }, []);
+    const handleOnTranslationLyric = useCallback(() => {}, []);
 
     const { isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
         options: {
@@ -212,16 +207,10 @@ export const Lyrics = () => {
                                 transition={{ duration: 0.5 }}
                             >
                                 {synced ? (
-                                    <SynchronizedLyrics
-                                        {...(lyrics as SynchronizedLyricsProps)}
-                                        isTranslated={isTranslated}
-                                        translatedLyrics={translatedLyrics}
-                                    />
+                                    <SynchronizedLyrics {...(lyrics as SynchronizedLyricsProps)} />
                                 ) : (
                                     <UnsynchronizedLyrics
                                         {...(lyrics as UnsynchronizedLyricsProps)}
-                                        isTranslated={isTranslated}
-                                        translatedLyrics={translatedLyrics}
                                     />
                                 )}
                             </ScrollContainer>
