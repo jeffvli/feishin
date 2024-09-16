@@ -456,7 +456,7 @@ const initialState: SettingsState = {
         showMatch: true,
         showProvider: true,
         sources: [],
-        targetLanguage: undefined,
+        targetLanguage: 'en',
     },
     playback: {
         audioDeviceId: undefined,

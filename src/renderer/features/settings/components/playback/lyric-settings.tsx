@@ -120,6 +120,19 @@ export const LyricSettings = () => {
         {
             control: (
                 <Select
+                    data={['en', 'zh']}
+                    value={settings.targetLanguage}
+                    onChange={(value) => {
+                        setSettings({ lyrics: { ...settings, targetLanguage: value } });
+                    }}
+                />
+            ),
+            description: t('Target language for translation'),
+            title: t('Target Language'),
+        },
+        {
+            control: (
+                <Select
                     data={['Azure']}
                     value={settings.apiProvider}
                     onChange={(value) => {
@@ -141,33 +154,6 @@ export const LyricSettings = () => {
             ),
             description: t('API Key for translation'),
             title: t('API Key'),
-        },
-        {
-            control: (
-                <TextInput
-                    value={settings.resourceLocation}
-                    onChange={(e) => {
-                        setSettings({
-                            lyrics: { ...settings, resourceLocation: e.currentTarget.value },
-                        });
-                    }}
-                />
-            ),
-            description: t('Resource location for translation'),
-            title: t('Resource Location'),
-        },
-        {
-            control: (
-                <Select
-                    data={['en', 'zh']}
-                    value={settings.targetLanguage}
-                    onChange={(value) => {
-                        setSettings({ lyrics: { ...settings, targetLanguage: value } });
-                    }}
-                />
-            ),
-            description: t('Target language for translation'),
-            title: t('Target Language'),
         },
     ];
 
