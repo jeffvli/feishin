@@ -27,7 +27,7 @@ export interface EventState {
 export interface EventSlice extends EventState {
     actions: {
         favorite: (ids: string[], favorite: boolean) => void;
-        play: (ids: string[]) => void;
+        play: (id: string) => void;
         rate: (ids: string[], rating: number | null) => void;
     };
 }
@@ -43,10 +43,10 @@ export const useEventStore = create<EventSlice>()(
                             state.ids = ids;
                         });
                     },
-                    play(ids) {
+                    play(id) {
                         set((state) => {
                             state.event = { event: 'play', timestamp: new Date().toISOString() };
-                            state.ids = ids;
+                            state.ids = [id];
                         });
                     },
                     rate(ids, rating) {

@@ -25,7 +25,7 @@ export const useSendScrobble = (options?: MutationOptions) => {
             // Manually increment the play count for the song in the queue if scrobble was submitted
             if (variables.query.submission) {
                 incrementPlayCount([variables.query.id]);
-                sendPlayEvent([variables.query.id]);
+                sendPlayEvent(variables.query.id);
             }
         },
         ...options,
