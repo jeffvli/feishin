@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
+import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
 import { SynchronizedLyrics, SynchronizedLyricsProps } from './synchronized-lyrics';
 import { Spinner, TextTitle } from '/@/renderer/components';
@@ -12,7 +14,7 @@ import {
     UnsynchronizedLyrics,
     UnsynchronizedLyricsProps,
 } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
-import { useCurrentSong, usePlayerStore } from '/@/renderer/store';
+import { useCurrentSong, usePlayerStore, useLyricsSettings } from '/@/renderer/store';
 import { FullLyricsMetadata, LyricSource, LyricsOverride } from '/@/renderer/api/types';
 import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -84,6 +86,7 @@ const ScrollContainer = styled(motion.div)`
 
 export const Lyrics = () => {
     const currentSong = useCurrentSong();
+    const lyricsSettings = useLyricsSettings();
     const [index, setIndex] = useState(0);
 
     const { data, isInitialLoading } = useSongLyricsBySong(
@@ -123,9 +126,40 @@ export const Lyrics = () => {
         );
     }, [currentSong?.id, currentSong?.serverId]);
 
-    const handleOnRomajiLyric = useCallback(() => {}, []);
+    const handleOnRomajiLyric = useCallback(async () => {}, []);
 
-    const handleOnTranslationLyric = useCallback(() => {}, []);
+    const handleOnTranslationLyric = useCallback(async () => {
+        const { apiKey, targetLanguage } = lyricsSettings;
+        const originalLyrics = data.lyrics;
+        console.log('Original Lyrics:', originalLyrics);
+        const response = await axios({
+            baseURL: 'https://api.cognitive.microsofttranslator.com',
+            data: [
+                {
+                    text: originalLyrics,
+                },
+            ],
+            headers: {
+                'Content-type': 'application/json',
+                'Ocp-Apim-Subscription-Key': apiKey as string,
+                'Ocp-Apim-Subscription-Region': 'global',
+                'X-ClientTraceId': uuidv4().toString(),
+            },
+            method: 'post',
+            params: {
+                'api-version': '3.0',
+                to: targetLanguage,
+            },
+            responseType: 'json',
+            url: '/translate',
+        });
+        const translatedText = response.data[0].translations[0].text;
+        console.log('Translated Lyrics:', translatedText);
+        queryClient.setQueryData(
+            queryKeys.songs.lyrics(currentSong?.serverId, { songId: currentSong?.id }),
+            translatedText,
+        );
+    }, [data, currentSong?.id, currentSong?.serverId, lyricsSettings]);
 
     const { isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
         options: {
