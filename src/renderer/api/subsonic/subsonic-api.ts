@@ -242,7 +242,7 @@ export const ssApiClient = (args: {
 
                     return {
                         body: response?.data,
-                        headers: response.headers as any,
+                        headers: response?.headers as any,
                         status: response?.status,
                     };
                 }
