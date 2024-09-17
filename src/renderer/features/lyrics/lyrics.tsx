@@ -89,6 +89,7 @@ export const Lyrics = () => {
     const lyricsSettings = useLyricsSettings();
     const [index, setIndex] = useState(0);
     const [translatedLyrics, setTranslatedLyrics] = useState<string | null>(null);
+    const [showTranslation, setShowTranslation] = useState<boolean>(false);
 
     const { data, isInitialLoading } = useSongLyricsBySong(
         {
@@ -143,6 +144,10 @@ export const Lyrics = () => {
     const handleOnRomajiLyric = useCallback(async () => {}, []);
 
     const handleOnTranslationLyric = useCallback(async () => {
+        if (translatedLyrics) {
+            setShowTranslation(!showTranslation);
+            return;
+        }
         const { apiKey, targetLanguage } = lyricsSettings;
         if (!lyrics) return;
         const originalLyrics = Array.isArray(lyrics.lyrics)
@@ -171,8 +176,8 @@ export const Lyrics = () => {
         });
         const translatedText = response.data[0].translations[0].text;
         setTranslatedLyrics(translatedText);
-        console.log('Translated Lyrics:', translatedText);
-    }, [lyrics, lyricsSettings]);
+        setShowTranslation(true);
+    }, [lyrics, lyricsSettings, translatedLyrics, showTranslation]);
 
     const { isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
         options: {
@@ -243,12 +248,12 @@ export const Lyrics = () => {
                                 {synced ? (
                                     <SynchronizedLyrics
                                         {...(lyrics as SynchronizedLyricsProps)}
-                                        translatedLyrics={translatedLyrics}
+                                        translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />
                                 ) : (
                                     <UnsynchronizedLyrics
                                         {...(lyrics as UnsynchronizedLyricsProps)}
-                                        translatedLyrics={translatedLyrics}
+                                        translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />
                                 )}
                             </ScrollContainer>
