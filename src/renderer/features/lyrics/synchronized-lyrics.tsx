@@ -55,6 +55,7 @@ const SynchronizedLyricsContainer = styled.div<{ $gap: number }>`
 
 export interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: SynchronizedLyricsArray;
+    translatedLyrics?: string | null;
 }
 
 export const SynchronizedLyrics = ({
@@ -63,6 +64,7 @@ export const SynchronizedLyrics = ({
     name,
     remote,
     source,
+    translatedLyrics,
 }: SynchronizedLyricsProps) => {
     const playersRef = PlayersRef;
     const status = useCurrentStatus();
@@ -364,15 +366,24 @@ export const SynchronizedLyrics = ({
                 />
             )}
             {lyrics.map(([time, text], idx) => (
-                <LyricLine
-                    key={idx}
-                    alignment={settings.alignment}
-                    className="lyric-line synchronized"
-                    fontSize={settings.fontSize}
-                    id={`lyric-${idx}`}
-                    text={text}
-                    onClick={() => handleSeek(time / 1000)}
-                />
+                <div key={idx}>
+                    <LyricLine
+                        alignment={settings.alignment}
+                        className="lyric-line synchronized"
+                        fontSize={settings.fontSize}
+                        id={`lyric-${idx}`}
+                        text={text}
+                        onClick={() => handleSeek(time / 1000)}
+                    />
+                    {translatedLyrics && (
+                        <LyricLine
+                            alignment={settings.alignment}
+                            className="lyric-line synchronized translation"
+                            fontSize={settings.fontSize}
+                            text={translatedLyrics.split('\n')[idx]}
+                        />
+                    )}
+                </div>
             ))}
         </SynchronizedLyricsContainer>
     );

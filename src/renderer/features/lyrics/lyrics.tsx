@@ -88,6 +88,7 @@ export const Lyrics = () => {
     const currentSong = useCurrentSong();
     const lyricsSettings = useLyricsSettings();
     const [index, setIndex] = useState(0);
+    const [translatedLyrics, setTranslatedLyrics] = useState<string | null>(null);
 
     const { data, isInitialLoading } = useSongLyricsBySong(
         {
@@ -98,6 +99,19 @@ export const Lyrics = () => {
     );
 
     const [override, setOverride] = useState<LyricsOverride | undefined>(undefined);
+
+    const [lyrics, synced] = useMemo(() => {
+        if (Array.isArray(data)) {
+            if (data.length > 0) {
+                const selectedLyric = data[Math.min(index, data.length)];
+                return [selectedLyric, selectedLyric.synced];
+            }
+        } else if (data?.lyrics) {
+            return [data, Array.isArray(data.lyrics)];
+        }
+
+        return [undefined, false];
+    }, [data, index]);
 
     const handleOnSearchOverride = useCallback((params: LyricsOverride) => {
         setOverride(params);
@@ -130,8 +144,10 @@ export const Lyrics = () => {
 
     const handleOnTranslationLyric = useCallback(async () => {
         const { apiKey, targetLanguage } = lyricsSettings;
-        const originalLyrics = data.lyrics;
-        console.log('Original Lyrics:', originalLyrics);
+        if (!lyrics) return;
+        const originalLyrics = Array.isArray(lyrics.lyrics)
+            ? lyrics.lyrics.map(([, line]) => line).join('\n')
+            : lyrics.lyrics;
         const response = await axios({
             baseURL: 'https://api.cognitive.microsofttranslator.com',
             data: [
@@ -154,12 +170,9 @@ export const Lyrics = () => {
             url: '/translate',
         });
         const translatedText = response.data[0].translations[0].text;
+        setTranslatedLyrics(translatedText);
         console.log('Translated Lyrics:', translatedText);
-        queryClient.setQueryData(
-            queryKeys.songs.lyrics(currentSong?.serverId, { songId: currentSong?.id }),
-            translatedText,
-        );
-    }, [data, currentSong?.id, currentSong?.serverId, lyricsSettings]);
+    }, [lyrics, lyricsSettings]);
 
     const { isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
         options: {
@@ -187,19 +200,6 @@ export const Lyrics = () => {
             unsubSongChange();
         };
     }, []);
-
-    const [lyrics, synced] = useMemo(() => {
-        if (Array.isArray(data)) {
-            if (data.length > 0) {
-                const selectedLyric = data[Math.min(index, data.length)];
-                return [selectedLyric, selectedLyric.synced];
-            }
-        } else if (data?.lyrics) {
-            return [data, Array.isArray(data.lyrics)];
-        }
-
-        return [undefined, false];
-    }, [data, index]);
 
     const languages = useMemo(() => {
         if (Array.isArray(data)) {
@@ -241,10 +241,14 @@ export const Lyrics = () => {
                                 transition={{ duration: 0.5 }}
                             >
                                 {synced ? (
-                                    <SynchronizedLyrics {...(lyrics as SynchronizedLyricsProps)} />
+                                    <SynchronizedLyrics
+                                        {...(lyrics as SynchronizedLyricsProps)}
+                                        translatedLyrics={translatedLyrics}
+                                    />
                                 ) : (
                                     <UnsynchronizedLyrics
                                         {...(lyrics as UnsynchronizedLyricsProps)}
+                                        translatedLyrics={translatedLyrics}
                                     />
                                 )}
                             </ScrollContainer>
