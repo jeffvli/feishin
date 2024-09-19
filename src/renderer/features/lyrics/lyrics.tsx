@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
+import Kuroshiro from '@sglkc/kuroshiro';
+import KuromojiAnalyzer from '@sglkc/kuroshiro-analyzer-kuromoji';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
@@ -88,6 +90,8 @@ export const Lyrics = () => {
     const currentSong = useCurrentSong();
     const lyricsSettings = useLyricsSettings();
     const [index, setIndex] = useState(0);
+    const [romanizedLyrics, setRomanizedLyrics] = useState<string | null>(null);
+    const [showRomaji, setShowRomaji] = useState<boolean>(false);
     const [translatedLyrics, setTranslatedLyrics] = useState<string | null>(null);
     const [showTranslation, setShowTranslation] = useState<boolean>(false);
 
@@ -141,9 +145,23 @@ export const Lyrics = () => {
         );
     }, [currentSong?.id, currentSong?.serverId]);
 
-    const handleOnRomajiLyric = useCallback(async () => {}, []);
+    const handleOnRomanizeLyric = useCallback(async () => {
+        if (romanizedLyrics) {
+            setShowRomaji(!showRomaji);
+            return;
+        }
+        const kuroshiro = new Kuroshiro();
+        await kuroshiro.init(new KuromojiAnalyzer());
+        if (!lyrics) return;
+        const originalLyrics = Array.isArray(lyrics.lyrics)
+            ? lyrics.lyrics.map(([, line]) => line).join('\n')
+            : lyrics.lyrics;
+        const romanizedText = await kuroshiro.convert(originalLyrics, { to: 'romaji' });
+        setRomanizedLyrics(romanizedText);
+        setShowRomaji(true);
+    }, [lyrics, romanizedLyrics, showRomaji]);
 
-    const handleOnTranslationLyric = useCallback(async () => {
+    const handleOnTranslateLyric = useCallback(async () => {
         if (translatedLyrics) {
             setShowTranslation(!showTranslation);
             return;
@@ -174,8 +192,8 @@ export const Lyrics = () => {
             responseType: 'json',
             url: '/translate',
         });
-        const translatedText = response.data[0].translations[0].text;
-        setTranslatedLyrics(translatedText);
+        const TranslatedText = response.data[0].translations[0].text;
+        setTranslatedLyrics(TranslatedText);
         setShowTranslation(true);
     }, [lyrics, lyricsSettings, translatedLyrics, showTranslation]);
 
@@ -248,11 +266,13 @@ export const Lyrics = () => {
                                 {synced ? (
                                     <SynchronizedLyrics
                                         {...(lyrics as SynchronizedLyricsProps)}
+                                        romanizedLyrics={showRomaji ? romanizedLyrics : null}
                                         translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />
                                 ) : (
                                     <UnsynchronizedLyrics
                                         {...(lyrics as UnsynchronizedLyricsProps)}
+                                        romanizedLyrics={showRomaji ? romanizedLyrics : null}
                                         translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />
                                 )}
@@ -267,9 +287,9 @@ export const Lyrics = () => {
                         setIndex={setIndex}
                         onRemoveLyric={handleOnRemoveLyric}
                         onResetLyric={handleOnResetLyric}
-                        onRomajiLyric={handleOnRomajiLyric}
+                        onRomanizeLyric={handleOnRomanizeLyric}
                         onSearchOverride={handleOnSearchOverride}
-                        onTranslationLyric={handleOnTranslationLyric}
+                        onTranslateLyric={handleOnTranslateLyric}
                     />
                 </ActionsContainer>
             </LyricsContainer>

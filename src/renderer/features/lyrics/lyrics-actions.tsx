@@ -18,9 +18,9 @@ interface LyricsActionsProps {
 
     onRemoveLyric: () => void;
     onResetLyric: () => void;
-    onRomajiLyric: () => void;
+    onRomanizeLyric: () => void;
     onSearchOverride: (params: LyricsOverride) => void;
-    onTranslationLyric: () => void;
+    onTranslateLyric: () => void;
     setIndex: (idx: number) => void;
 }
 
@@ -29,9 +29,9 @@ export const LyricsActions = ({
     languages,
     onRemoveLyric,
     onResetLyric,
-    onRomajiLyric,
+    onRomanizeLyric,
     onSearchOverride,
-    onTranslationLyric,
+    onTranslateLyric,
     setIndex,
 }: LyricsActionsProps) => {
     const { t } = useTranslation();
@@ -139,7 +139,7 @@ export const LyricsActions = ({
                         uppercase
                         disabled={isActionsDisabled}
                         variant="subtle"
-                        onClick={onTranslationLyric}
+                        onClick={onTranslateLyric}
                     >
                         {t('common.translation', { postProcess: 'sentenceCase' })}
                     </Button>
@@ -152,7 +152,7 @@ export const LyricsActions = ({
                         uppercase
                         disabled={isActionsDisabled}
                         variant="subtle"
-                        onClick={onRomajiLyric}
+                        onClick={onRomanizeLyric}
                     >
                         {t('common.romaji', { postProcess: 'sentenceCase' })}
                     </Button>

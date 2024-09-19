@@ -6,6 +6,7 @@ import { useLyricsSettings } from '/@/renderer/store';
 
 export interface UnsynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: string;
+    romanizedLyrics?: string | null;
     translatedLyrics?: string | null;
 }
 
@@ -46,12 +47,17 @@ export const UnsynchronizedLyrics = ({
     name,
     remote,
     source,
+    romanizedLyrics,
     translatedLyrics,
 }: UnsynchronizedLyricsProps) => {
     const settings = useLyricsSettings();
     const lines = useMemo(() => {
         return lyrics.split('\n');
     }, [lyrics]);
+
+    const romanizedLines = useMemo(() => {
+        return romanizedLyrics ? romanizedLyrics.split('\n') : [];
+    }, [romanizedLyrics]);
 
     const translatedLines = useMemo(() => {
         return translatedLyrics ? translatedLyrics.split('\n') : [];
@@ -87,6 +93,14 @@ export const UnsynchronizedLyrics = ({
                         id={`lyric-${idx}`}
                         text={text}
                     />
+                    {romanizedLines[idx] && (
+                        <LyricLine
+                            alignment={settings.alignment}
+                            className="lyric-line unsynchronized romaji"
+                            fontSize={settings.fontSizeUnsync}
+                            text={romanizedLines[idx]}
+                        />
+                    )}
                     {translatedLines[idx] && (
                         <LyricLine
                             alignment={settings.alignment}
