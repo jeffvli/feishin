@@ -150,12 +150,12 @@ export const Lyrics = () => {
             setShowRomaji(!showRomaji);
             return;
         }
-        const kuroshiro = new Kuroshiro();
-        await kuroshiro.init(new KuromojiAnalyzer());
         if (!lyrics) return;
         const originalLyrics = Array.isArray(lyrics.lyrics)
             ? lyrics.lyrics.map(([, line]) => line).join('\n')
             : lyrics.lyrics;
+        const kuroshiro = new Kuroshiro();
+        await kuroshiro.init(new KuromojiAnalyzer());
         const romanizedText = await kuroshiro.convert(originalLyrics, { to: 'romaji' });
         setRomanizedLyrics(romanizedText);
         setShowRomaji(true);
@@ -166,11 +166,11 @@ export const Lyrics = () => {
             setShowTranslation(!showTranslation);
             return;
         }
-        const { apiKey, targetLanguage } = lyricsSettings;
         if (!lyrics) return;
         const originalLyrics = Array.isArray(lyrics.lyrics)
             ? lyrics.lyrics.map(([, line]) => line).join('\n')
             : lyrics.lyrics;
+        const { apiKey, targetLanguage } = lyricsSettings;
         const response = await axios({
             baseURL: 'https://api.cognitive.microsofttranslator.com',
             data: [
