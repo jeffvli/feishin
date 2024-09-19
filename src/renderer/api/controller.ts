@@ -22,97 +22,24 @@ import type {
     FavoriteArgs,
     TopSongListArgs,
     AddToPlaylistArgs,
-    AddToPlaylistResponse,
     RemoveFromPlaylistArgs,
-    RemoveFromPlaylistResponse,
     ScrobbleArgs,
-    ScrobbleResponse,
-    AlbumArtistDetailResponse,
-    FavoriteResponse,
-    CreatePlaylistResponse,
-    AlbumArtistListResponse,
-    AlbumDetailResponse,
-    AlbumListResponse,
-    ArtistListResponse,
-    GenreListResponse,
-    MusicFolderListResponse,
-    PlaylistDetailResponse,
-    PlaylistListResponse,
-    RatingResponse,
-    SongDetailResponse,
-    SongListResponse,
-    TopSongListResponse,
-    UpdatePlaylistResponse,
-    UserListResponse,
-    AuthenticationResponse,
     SearchArgs,
-    SearchResponse,
     LyricsArgs,
-    LyricsResponse,
-    ServerInfo,
     ServerInfoArgs,
     StructuredLyricsArgs,
-    StructuredLyric,
     SimilarSongsArgs,
-    Song,
     ServerType,
-    ShareItemResponse,
     MoveItemArgs,
     DownloadArgs,
     TranscodingArgs,
+    ControllerEndpoint,
 } from '/@/renderer/api/types';
-import { DeletePlaylistResponse, RandomSongListArgs } from './types';
-import { ndController } from '/@/renderer/api/navidrome/navidrome-controller';
-import { ssController } from '/@/renderer/api/subsonic/subsonic-controller';
-import { jfController } from '/@/renderer/api/jellyfin/jellyfin-controller';
+import { RandomSongListArgs } from './types';
+import { NavidromeController } from '/@/renderer/api/navidrome/navidrome-controller';
+import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
+import { JellyfinController } from '/@/renderer/api/jellyfin/jellyfin-controller';
 import i18n from '/@/i18n/i18n';
-
-export type ControllerEndpoint = Partial<{
-    addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
-    authenticate: (
-        url: string,
-        body: { password: string; username: string },
-    ) => Promise<AuthenticationResponse>;
-    clearPlaylist: () => void;
-    createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
-    createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse>;
-    deleteFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
-    deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
-    getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
-    getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
-    getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse>;
-    getAlbumList: (args: AlbumListArgs) => Promise<AlbumListResponse>;
-    getArtistDetail: () => void;
-    getArtistInfo: (args: any) => void;
-    getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse>;
-    getDownloadUrl: (args: DownloadArgs) => string;
-    getFavoritesList: () => void;
-    getFolderItemList: () => void;
-    getFolderList: () => void;
-    getFolderSongs: () => void;
-    getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
-    getLyrics: (args: LyricsArgs) => Promise<LyricsResponse>;
-    getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
-    getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
-    getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
-    getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
-    getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
-    getServerInfo: (args: ServerInfoArgs) => Promise<ServerInfo>;
-    getSimilarSongs: (args: SimilarSongsArgs) => Promise<Song[]>;
-    getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
-    getSongList: (args: SongListArgs) => Promise<SongListResponse>;
-    getStructuredLyrics: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
-    getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
-    getTranscodingUrl: (args: TranscodingArgs) => string;
-    getUserList: (args: UserListArgs) => Promise<UserListResponse>;
-    movePlaylistItem: (args: MoveItemArgs) => Promise<void>;
-    removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
-    scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
-    search: (args: SearchArgs) => Promise<SearchResponse>;
-    setRating: (args: SetRatingArgs) => Promise<RatingResponse>;
-    shareItem: (args: ShareItemArgs) => Promise<ShareItemResponse>;
-    updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
-}>;
 
 type ApiController = {
     jellyfin: ControllerEndpoint;
@@ -121,130 +48,9 @@ type ApiController = {
 };
 
 const endpoints: ApiController = {
-    jellyfin: {
-        addToPlaylist: jfController.addToPlaylist,
-        authenticate: jfController.authenticate,
-        clearPlaylist: undefined,
-        createFavorite: jfController.createFavorite,
-        createPlaylist: jfController.createPlaylist,
-        deleteFavorite: jfController.deleteFavorite,
-        deletePlaylist: jfController.deletePlaylist,
-        getAlbumArtistDetail: jfController.getAlbumArtistDetail,
-        getAlbumArtistList: jfController.getAlbumArtistList,
-        getAlbumDetail: jfController.getAlbumDetail,
-        getAlbumList: jfController.getAlbumList,
-        getArtistDetail: undefined,
-        getArtistInfo: undefined,
-        getArtistList: undefined,
-        getDownloadUrl: jfController.getDownloadUrl,
-        getFavoritesList: undefined,
-        getFolderItemList: undefined,
-        getFolderList: undefined,
-        getFolderSongs: undefined,
-        getGenreList: jfController.getGenreList,
-        getLyrics: jfController.getLyrics,
-        getMusicFolderList: jfController.getMusicFolderList,
-        getPlaylistDetail: jfController.getPlaylistDetail,
-        getPlaylistList: jfController.getPlaylistList,
-        getPlaylistSongList: jfController.getPlaylistSongList,
-        getRandomSongList: jfController.getRandomSongList,
-        getServerInfo: jfController.getServerInfo,
-        getSimilarSongs: jfController.getSimilarSongs,
-        getSongDetail: jfController.getSongDetail,
-        getSongList: jfController.getSongList,
-        getStructuredLyrics: undefined,
-        getTopSongs: jfController.getTopSongList,
-        getTranscodingUrl: jfController.getTranscodingUrl,
-        getUserList: undefined,
-        movePlaylistItem: jfController.movePlaylistItem,
-        removeFromPlaylist: jfController.removeFromPlaylist,
-        scrobble: jfController.scrobble,
-        search: jfController.search,
-        setRating: undefined,
-        shareItem: undefined,
-        updatePlaylist: jfController.updatePlaylist,
-    },
-    navidrome: {
-        addToPlaylist: ndController.addToPlaylist,
-        authenticate: ndController.authenticate,
-        clearPlaylist: undefined,
-        createFavorite: ssController.createFavorite,
-        createPlaylist: ndController.createPlaylist,
-        deleteFavorite: ssController.removeFavorite,
-        deletePlaylist: ndController.deletePlaylist,
-        getAlbumArtistDetail: ndController.getAlbumArtistDetail,
-        getAlbumArtistList: ndController.getAlbumArtistList,
-        getAlbumDetail: ndController.getAlbumDetail,
-        getAlbumList: ndController.getAlbumList,
-        getArtistDetail: undefined,
-        getArtistInfo: undefined,
-        getArtistList: undefined,
-        getDownloadUrl: ssController.getDownloadUrl,
-        getFavoritesList: undefined,
-        getFolderItemList: undefined,
-        getFolderList: undefined,
-        getFolderSongs: undefined,
-        getGenreList: ndController.getGenreList,
-        getLyrics: undefined,
-        getMusicFolderList: ssController.getMusicFolderList,
-        getPlaylistDetail: ndController.getPlaylistDetail,
-        getPlaylistList: ndController.getPlaylistList,
-        getPlaylistSongList: ndController.getPlaylistSongList,
-        getRandomSongList: ssController.getRandomSongList,
-        getServerInfo: ndController.getServerInfo,
-        getSimilarSongs: ndController.getSimilarSongs,
-        getSongDetail: ndController.getSongDetail,
-        getSongList: ndController.getSongList,
-        getStructuredLyrics: ssController.getStructuredLyrics,
-        getTopSongs: ssController.getTopSongList,
-        getTranscodingUrl: ssController.getTranscodingUrl,
-        getUserList: ndController.getUserList,
-        movePlaylistItem: ndController.movePlaylistItem,
-        removeFromPlaylist: ndController.removeFromPlaylist,
-        scrobble: ssController.scrobble,
-        search: ssController.search3,
-        setRating: ssController.setRating,
-        shareItem: ndController.shareItem,
-        updatePlaylist: ndController.updatePlaylist,
-    },
-    subsonic: {
-        authenticate: ssController.authenticate,
-        clearPlaylist: undefined,
-        createFavorite: ssController.createFavorite,
-        createPlaylist: undefined,
-        deleteFavorite: ssController.removeFavorite,
-        deletePlaylist: undefined,
-        getAlbumArtistDetail: undefined,
-        getAlbumArtistList: undefined,
-        getAlbumDetail: undefined,
-        getAlbumList: undefined,
-        getArtistDetail: undefined,
-        getArtistInfo: undefined,
-        getArtistList: undefined,
-        getDownloadUrl: ssController.getDownloadUrl,
-        getFavoritesList: undefined,
-        getFolderItemList: undefined,
-        getFolderList: undefined,
-        getFolderSongs: undefined,
-        getGenreList: undefined,
-        getLyrics: undefined,
-        getMusicFolderList: ssController.getMusicFolderList,
-        getPlaylistDetail: undefined,
-        getPlaylistList: undefined,
-        getServerInfo: ssController.getServerInfo,
-        getSimilarSongs: ssController.getSimilarSongs,
-        getSongDetail: undefined,
-        getSongList: undefined,
-        getStructuredLyrics: ssController.getStructuredLyrics,
-        getTopSongs: ssController.getTopSongList,
-        getTranscodingUrl: ssController.getTranscodingUrl,
-        getUserList: undefined,
-        scrobble: ssController.scrobble,
-        search: ssController.search3,
-        setRating: undefined,
-        shareItem: undefined,
-        updatePlaylist: undefined,
-    },
+    jellyfin: JellyfinController,
+    navidrome: NavidromeController,
+    subsonic: SubsonicController as ControllerEndpoint,
 };
 
 const apiController = (endpoint: keyof ControllerEndpoint, type?: ServerType) => {

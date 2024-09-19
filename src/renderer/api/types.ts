@@ -1228,3 +1228,44 @@ export type TranscodingQuery = {
 export type TranscodingArgs = {
     query: TranscodingQuery;
 } & BaseEndpointArgs;
+
+export type ControllerEndpoint = {
+    addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
+    authenticate: (
+        url: string,
+        body: { legacy?: boolean; password: string; username: string },
+    ) => Promise<AuthenticationResponse>;
+    createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
+    createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse>;
+    deleteFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
+    deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
+    getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
+    getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
+    getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse>;
+    getAlbumList: (args: AlbumListArgs) => Promise<AlbumListResponse>;
+    getArtistInfo?: (args: any) => void;
+    getArtistList?: (args: ArtistListArgs) => Promise<ArtistListResponse>;
+    getDownloadUrl: (args: DownloadArgs) => string;
+    getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
+    getLyrics?: (args: LyricsArgs) => Promise<LyricsResponse>;
+    getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
+    getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
+    getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
+    getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
+    getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
+    getServerInfo: (args: ServerInfoArgs) => Promise<ServerInfo>;
+    getSimilarSongs: (args: SimilarSongsArgs) => Promise<Song[]>;
+    getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
+    getSongList: (args: SongListArgs) => Promise<SongListResponse>;
+    getStructuredLyrics?: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
+    getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
+    getTranscodingUrl: (args: TranscodingArgs) => string;
+    getUserList?: (args: UserListArgs) => Promise<UserListResponse>;
+    movePlaylistItem: (args: MoveItemArgs) => Promise<void>;
+    removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
+    scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
+    search: (args: SearchArgs) => Promise<SearchResponse>;
+    setRating?: (args: SetRatingArgs) => Promise<RatingResponse>;
+    shareItem?: (args: ShareItemArgs) => Promise<ShareItemResponse>;
+    updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
+};
