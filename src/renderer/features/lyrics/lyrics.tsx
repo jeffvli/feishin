@@ -7,7 +7,6 @@ import styled from 'styled-components';
 import Kuroshiro from '@sglkc/kuroshiro';
 import KuromojiAnalyzer from '@sglkc/kuroshiro-analyzer-kuromoji';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
 import { SynchronizedLyrics, SynchronizedLyricsProps } from './synchronized-lyrics';
 import { Spinner, TextTitle } from '/@/renderer/components';
@@ -172,24 +171,16 @@ export const Lyrics = () => {
             : lyrics.lyrics;
         const { apiKey, targetLanguage } = lyricsSettings;
         const response = await axios({
-            baseURL: 'https://api.cognitive.microsofttranslator.com',
             data: [
                 {
                     text: originalLyrics,
                 },
             ],
             headers: {
-                'Content-type': 'application/json',
                 'Ocp-Apim-Subscription-Key': apiKey as string,
-                'X-ClientTraceId': uuidv4().toString(),
             },
             method: 'post',
-            params: {
-                'api-version': '3.0',
-                to: targetLanguage,
-            },
-            responseType: 'json',
-            url: '/translate',
+            url: `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${targetLanguage}`,
         });
         const TranslatedText = response.data[0].translations[0].text;
         setTranslatedLyrics(TranslatedText);
