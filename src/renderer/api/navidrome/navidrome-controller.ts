@@ -50,6 +50,7 @@ import {
     SimilarSongsArgs,
     Song,
     MoveItemArgs,
+    SongListSort,
 } from '../types';
 import { VersionInfo, getFeatures, hasFeature } from '/@/renderer/api/utils';
 import { ServerFeature, ServerFeatures } from '/@/renderer/api/features-types';
@@ -283,6 +284,34 @@ const getSongList = async (args: SongListArgs): Promise<SongListResponse> => {
 
     if (res.status !== 200) {
         throw new Error('Failed to get song list');
+    }
+
+    if (
+        (query.sortBy === SongListSort.ALBUM || query.sortBy === SongListSort.ALBUM_ARTIST) &&
+        !query.limit
+    ) {
+        const isAlbumArtist = query.sortBy === SongListSort.ALBUM_ARTIST;
+
+        res.body.data.sort((a, b) => {
+            if (isAlbumArtist) {
+                const albumDiff = a.album.localeCompare(b.album);
+                if (albumDiff !== 0) {
+                    return albumDiff;
+                }
+            }
+
+            const discDiff = a.discNumber - b.discNumber;
+            if (discDiff !== 0) {
+                return discDiff;
+            }
+
+            const trackDiff = a.trackNumber - b.trackNumber;
+            if (trackDiff !== 0) {
+                return trackDiff;
+            }
+
+            return a.title.localeCompare(b.title);
+        });
     }
 
     return {
