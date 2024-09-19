@@ -224,7 +224,7 @@ const getAlbumDetail = async (args: AlbumDetailArgs): Promise<AlbumDetailRespons
         query: {
             _end: 0,
             _order: 'ASC',
-            _sort: 'album',
+            _sort: NDSongListSort.ALBUM,
             _start: 0,
             album_id: [query.id],
         },
