@@ -145,7 +145,7 @@ export const ShuffleAllModal = ({
                 max={500}
                 min={1}
                 value={limit}
-                onChange={(e) => setStore({ limit: e ? Number(e) : 0 })}
+                onChange={(e) => setStore({ limit: e ? Number(e) : 500 })}
             />
             <Group grow>
                 <NumberInput
@@ -208,6 +208,7 @@ export const ShuffleAllModal = ({
             <Divider />
             <Group grow>
                 <Button
+                    disabled={!limit}
                     leftIcon={<RiAddBoxFill size="1rem" />}
                     type="submit"
                     variant="default"
@@ -216,6 +217,7 @@ export const ShuffleAllModal = ({
                     Add
                 </Button>
                 <Button
+                    disabled={!limit}
                     leftIcon={<RiAddCircleFill size="1rem" />}
                     type="submit"
                     variant="default"
@@ -225,6 +227,7 @@ export const ShuffleAllModal = ({
                 </Button>
             </Group>
             <Button
+                disabled={!limit}
                 leftIcon={<RiPlayFill size="1rem" />}
                 type="submit"
                 variant="filled"

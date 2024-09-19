@@ -229,15 +229,15 @@ export type NDAlbumListParams = {
     NDOrder;
 
 export enum NDSongListSort {
-    ALBUM = 'album, order_album_artist_name, disc_number, track_number, title',
-    ALBUM_ARTIST = 'order_album_artist_name, album, disc_number, track_number, title',
-    ALBUM_SONGS = 'album, discNumber, trackNumber',
+    ALBUM = 'album',
+    ALBUM_ARTIST = 'order_album_artist_name',
+    ALBUM_SONGS = 'album',
     ARTIST = 'artist',
     BPM = 'bpm',
     CHANNELS = 'channels',
     COMMENT = 'comment',
     DURATION = 'duration',
-    FAVORITED = 'starred ASC, starredAt ASC',
+    FAVORITED = 'starred',
     GENRE = 'genre',
     ID = 'id',
     PLAY_COUNT = 'playCount',
@@ -247,7 +247,7 @@ export enum NDSongListSort {
     RECENTLY_ADDED = 'createdAt',
     TITLE = 'title',
     TRACK = 'track',
-    YEAR = 'year, album, discNumber, trackNumber',
+    YEAR = 'year',
 }
 
 export type NDSongListParams = {
@@ -261,7 +261,7 @@ export type NDSongListParams = {
 
 export enum NDAlbumArtistListSort {
     ALBUM_COUNT = 'albumCount',
-    FAVORITED = 'starred ASC, starredAt ASC',
+    FAVORITED = 'starred',
     NAME = 'name',
     PLAY_COUNT = 'playCount',
     RATING = 'rating',
