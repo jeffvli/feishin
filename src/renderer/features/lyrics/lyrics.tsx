@@ -181,7 +181,6 @@ export const Lyrics = () => {
             headers: {
                 'Content-type': 'application/json',
                 'Ocp-Apim-Subscription-Key': apiKey as string,
-                'Ocp-Apim-Subscription-Region': 'global',
                 'X-ClientTraceId': uuidv4().toString(),
             },
             method: 'post',

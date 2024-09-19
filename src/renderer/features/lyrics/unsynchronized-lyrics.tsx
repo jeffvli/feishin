@@ -97,7 +97,7 @@ export const UnsynchronizedLyrics = ({
                         <LyricLine
                             alignment={settings.alignment}
                             className="lyric-line unsynchronized romaji"
-                            fontSize={settings.fontSizeUnsync}
+                            fontSize={settings.fontSizeUnsync * 0.8}
                             text={romanizedLines[idx]}
                         />
                     )}
@@ -105,7 +105,7 @@ export const UnsynchronizedLyrics = ({
                         <LyricLine
                             alignment={settings.alignment}
                             className="lyric-line unsynchronized translation"
-                            fontSize={settings.fontSizeUnsync}
+                            fontSize={settings.fontSizeUnsync * 0.8}
                             text={translatedLines[idx]}
                         />
                     )}

@@ -381,16 +381,18 @@ export const SynchronizedLyrics = ({
                         <LyricLine
                             alignment={settings.alignment}
                             className="lyric-line synchronized romaji"
-                            fontSize={settings.fontSize}
+                            fontSize={settings.fontSize * 0.8}
                             text={romanizedLyrics.split('\n')[idx]}
+                            onClick={() => handleSeek(time / 1000)}
                         />
                     )}
                     {translatedLyrics && (
                         <LyricLine
                             alignment={settings.alignment}
                             className="lyric-line synchronized translation"
-                            fontSize={settings.fontSize}
+                            fontSize={settings.fontSize * 0.8}
                             text={translatedLyrics.split('\n')[idx]}
+                            onClick={() => handleSeek(time / 1000)}
                         />
                     )}
                 </div>

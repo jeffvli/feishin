@@ -357,7 +357,8 @@
             },
             "lyrics": "lyrics",
             "related": "related",
-            "upNext": "up next"
+            "upNext": "up next",
+            "visualizer": "visualizer"
         },
         "genreList": {
             "showAlbums": "show $t(entity.genre_one) $t(entity.album_other)",
@@ -458,6 +459,8 @@
         "albumBackground_description": "adds a background image for album pages containing the album art",
         "albumBackgroundBlur": "album background image blur size",
         "albumBackgroundBlur_description": "adjusts the amount of blur applied to the album background image",
+        "apiProvider": "api provider",
+        "apiKey": "api key",
         "applicationHotkeys": "application hotkeys",
         "applicationHotkeys_description": "configure application hotkeys. toggle the checkbox to set as a global hotkey (desktop only)",
         "artistConfiguration": "album artist page configuration",
@@ -642,6 +645,7 @@
         "skipPlaylistPage_description": "when navigating to a playlist, go to the playlist song list page instead of the default page",
         "startMinimized": "start minimized",
         "startMinimized_description": "start the application in system tray",
+        "targetLanguage": "target language",
         "theme": "theme",
         "theme_description": "sets the theme to use for the application",
         "themeDark": "theme (dark)",

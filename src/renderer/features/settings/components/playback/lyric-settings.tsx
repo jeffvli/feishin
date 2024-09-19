@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import { LyricSource } from '/@/renderer/api/types';
 import { useTranslation } from 'react-i18next';
 import { TextInput, Select } from '@mantine/core';
+import { languages } from '/@/i18n/i18n';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -120,7 +121,7 @@ export const LyricSettings = () => {
         {
             control: (
                 <Select
-                    data={['en', 'zh']}
+                    data={languages}
                     value={settings.targetLanguage}
                     onChange={(value) => {
                         setSettings({ lyrics: { ...settings, targetLanguage: value } });
@@ -128,7 +129,7 @@ export const LyricSettings = () => {
                 />
             ),
             description: t('Target language for translation'),
-            title: t('Target Language'),
+            title: t('setting.targetLanguage', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -141,7 +142,7 @@ export const LyricSettings = () => {
                 />
             ),
             description: t('API provider for translation'),
-            title: t('API Provider'),
+            title: t('setting.apiProvider', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -153,7 +154,7 @@ export const LyricSettings = () => {
                 />
             ),
             description: t('API Key for translation'),
-            title: t('API Key'),
+            title: t('setting.apiKey', { postProcess: 'sentenceCase' }),
         },
     ];
 
