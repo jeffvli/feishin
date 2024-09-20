@@ -48,7 +48,7 @@ export default class MenuBuilder {
             label: 'Electron',
             submenu: [
                 {
-                    label: 'About ElectronReact',
+                    label: 'About Feishin',
                     selector: 'orderFrontStandardAboutPanel:',
                 },
                 { type: 'separator' },
@@ -56,7 +56,7 @@ export default class MenuBuilder {
                 { type: 'separator' },
                 {
                     accelerator: 'Command+H',
-                    label: 'Hide ElectronReact',
+                    label: 'Hide Feishin',
                     selector: 'hide:',
                 },
                 {
