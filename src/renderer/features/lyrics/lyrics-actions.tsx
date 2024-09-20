@@ -18,7 +18,6 @@ interface LyricsActionsProps {
 
     onRemoveLyric: () => void;
     onResetLyric: () => void;
-    onRomanizeLyric: () => void;
     onSearchOverride: (params: LyricsOverride) => void;
     onTranslateLyric: () => void;
     setIndex: (idx: number) => void;
@@ -29,7 +28,6 @@ export const LyricsActions = ({
     languages,
     onRemoveLyric,
     onResetLyric,
-    onRomanizeLyric,
     onSearchOverride,
     onTranslateLyric,
     setIndex,
@@ -142,19 +140,6 @@ export const LyricsActions = ({
                         onClick={onTranslateLyric}
                     >
                         {t('common.translation', { postProcess: 'sentenceCase' })}
-                    </Button>
-                ) : null}
-            </Box>
-
-            <Box style={{ position: 'absolute', right: 0, top: -100 }}>
-                {isDesktop && sources.length ? (
-                    <Button
-                        uppercase
-                        disabled={isActionsDisabled}
-                        variant="subtle"
-                        onClick={onRomanizeLyric}
-                    >
-                        {t('common.romaji', { postProcess: 'sentenceCase' })}
                     </Button>
                 ) : null}
             </Box>

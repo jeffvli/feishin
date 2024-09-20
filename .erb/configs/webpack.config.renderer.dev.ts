@@ -163,7 +163,6 @@ const configuration: webpack.Configuration = {
             publicPath: '/',
         },
         historyApiFallback: {
-            disableDotRule: true,
             verbose: true,
         },
         setupMiddlewares(middlewares) {

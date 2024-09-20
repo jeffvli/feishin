@@ -4,8 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
-import Kuroshiro from '@sglkc/kuroshiro';
-import KuromojiAnalyzer from '@sglkc/kuroshiro-analyzer-kuromoji';
 import axios from 'axios';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
 import { SynchronizedLyrics, SynchronizedLyricsProps } from './synchronized-lyrics';
@@ -89,8 +87,6 @@ export const Lyrics = () => {
     const currentSong = useCurrentSong();
     const lyricsSettings = useLyricsSettings();
     const [index, setIndex] = useState(0);
-    const [romanizedLyrics, setRomanizedLyrics] = useState<string | null>(null);
-    const [showRomaji, setShowRomaji] = useState<boolean>(false);
     const [translatedLyrics, setTranslatedLyrics] = useState<string | null>(null);
     const [showTranslation, setShowTranslation] = useState<boolean>(false);
 
@@ -143,22 +139,6 @@ export const Lyrics = () => {
             },
         );
     }, [currentSong?.id, currentSong?.serverId]);
-
-    const handleOnRomanizeLyric = useCallback(async () => {
-        if (romanizedLyrics) {
-            setShowRomaji(!showRomaji);
-            return;
-        }
-        if (!lyrics) return;
-        const originalLyrics = Array.isArray(lyrics.lyrics)
-            ? lyrics.lyrics.map(([, line]) => line).join('\n')
-            : lyrics.lyrics;
-        const kuroshiro = new Kuroshiro();
-        await kuroshiro.init(new KuromojiAnalyzer());
-        const romanizedText = await kuroshiro.convert(originalLyrics, { to: 'romaji' });
-        setRomanizedLyrics(romanizedText);
-        setShowRomaji(true);
-    }, [lyrics, romanizedLyrics, showRomaji]);
 
     const handleOnTranslateLyric = useCallback(async () => {
         if (translatedLyrics) {
@@ -273,13 +253,11 @@ export const Lyrics = () => {
                                 {synced ? (
                                     <SynchronizedLyrics
                                         {...(lyrics as SynchronizedLyricsProps)}
-                                        romanizedLyrics={showRomaji ? romanizedLyrics : null}
                                         translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />
                                 ) : (
                                     <UnsynchronizedLyrics
                                         {...(lyrics as UnsynchronizedLyricsProps)}
-                                        romanizedLyrics={showRomaji ? romanizedLyrics : null}
                                         translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />
                                 )}
@@ -294,7 +272,6 @@ export const Lyrics = () => {
                         setIndex={setIndex}
                         onRemoveLyric={handleOnRemoveLyric}
                         onResetLyric={handleOnResetLyric}
-                        onRomanizeLyric={handleOnRomanizeLyric}
                         onSearchOverride={handleOnSearchOverride}
                         onTranslateLyric={handleOnTranslateLyric}
                     />

@@ -304,8 +304,6 @@
         "@mantine/modals": "^6.0.17",
         "@mantine/notifications": "^6.0.17",
         "@mantine/utils": "^6.0.17",
-        "@sglkc/kuroshiro": "^1.0.1",
-        "@sglkc/kuroshiro-analyzer-kuromoji": "^1.0.1",
         "@tanstack/react-query": "^4.32.1",
         "@tanstack/react-query-devtools": "^4.32.1",
         "@tanstack/react-query-persist-client": "^4.32.1",
