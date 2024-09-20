@@ -134,14 +134,14 @@ export const LyricSettings = () => {
         {
             control: (
                 <Select
-                    data={['Azure']}
+                    data={['Microsoft Azure', 'Google Cloud']}
                     value={settings.apiProvider}
                     onChange={(value) => {
                         setSettings({ lyrics: { ...settings, apiProvider: value } });
                     }}
                 />
             ),
-            description: t('API provider for translation'),
+            description: t('Api provider for translation'),
             title: t('setting.apiProvider', { postProcess: 'sentenceCase' }),
         },
         {
@@ -153,7 +153,7 @@ export const LyricSettings = () => {
                     }}
                 />
             ),
-            description: t('API Key for translation'),
+            description: t('Api key for translation'),
             title: t('setting.apiKey', { postProcess: 'sentenceCase' }),
         },
     ];

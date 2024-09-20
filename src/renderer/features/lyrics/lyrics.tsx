@@ -169,20 +169,37 @@ export const Lyrics = () => {
         const originalLyrics = Array.isArray(lyrics.lyrics)
             ? lyrics.lyrics.map(([, line]) => line).join('\n')
             : lyrics.lyrics;
-        const { apiKey, targetLanguage } = lyricsSettings;
-        const response = await axios({
-            data: [
-                {
-                    text: originalLyrics,
+        const { apiKey, apiProvider, targetLanguage } = lyricsSettings;
+        let TranslatedText = '';
+        if (apiProvider === 'Microsoft Azure') {
+            const response = await axios({
+                data: [
+                    {
+                        Text: originalLyrics,
+                    },
+                ],
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Ocp-Apim-Subscription-Key': apiKey,
                 },
-            ],
-            headers: {
-                'Ocp-Apim-Subscription-Key': apiKey as string,
-            },
-            method: 'post',
-            url: `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${targetLanguage}`,
-        });
-        const TranslatedText = response.data[0].translations[0].text;
+                method: 'post',
+                url: `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${targetLanguage as string}`,
+            });
+            TranslatedText = response.data[0].translations[0].text;
+        } else if (apiProvider === 'Google Cloud') {
+            const response = await axios({
+                data: {
+                    format: 'text',
+                    q: originalLyrics,
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                method: 'post',
+                url: `https://translation.googleapis.com/language/translate/v2?target=${targetLanguage as string}&key=${apiKey}`,
+            });
+            TranslatedText = response.data.data.translations[0].translatedText;
+        }
         setTranslatedLyrics(TranslatedText);
         setShowTranslation(true);
     }, [lyrics, lyricsSettings, translatedLyrics, showTranslation]);
