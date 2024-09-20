@@ -219,7 +219,6 @@
         "@types/react-window-infinite-loader": "^1.0.6",
         "@types/styled-components": "^5.1.26",
         "@types/terser-webpack-plugin": "^5.0.4",
-        "@types/uuid": "^10.0.0",
         "@types/webpack-bundle-analyzer": "^4.4.1",
         "@types/webpack-env": "^1.16.3",
         "@typescript-eslint/eslint-plugin": "^5.47.0",
