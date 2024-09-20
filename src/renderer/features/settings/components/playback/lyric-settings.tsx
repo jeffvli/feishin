@@ -3,12 +3,18 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useLyricsSettings, useSettingsStoreActions } from '/@/renderer/store';
-import { MultiSelect, MultiSelectProps, NumberInput, Switch } from '/@/renderer/components';
+import {
+    Select,
+    MultiSelect,
+    MultiSelectProps,
+    TextInput,
+    NumberInput,
+    Switch,
+} from '/@/renderer/components';
 import isElectron from 'is-electron';
 import styled from 'styled-components';
 import { LyricSource } from '/@/renderer/api/types';
 import { useTranslation } from 'react-i18next';
-import { TextInput, Select } from '@mantine/core';
 import { languages } from '/@/i18n/i18n';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
