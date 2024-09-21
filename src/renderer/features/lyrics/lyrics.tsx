@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
-import axios from 'axios';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
 import { SynchronizedLyrics, SynchronizedLyricsProps } from './synchronized-lyrics';
 import { Spinner, TextTitle } from '/@/renderer/components';
@@ -18,6 +17,7 @@ import { FullLyricsMetadata, LyricSource, LyricsOverride } from '/@/renderer/api
 import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { queryClient } from '/@/renderer/lib/react-query';
+import { translateLyrics } from '/@/main/features/core/lyrics/translate';
 
 const ActionsContainer = styled.div`
     position: absolute;
@@ -88,7 +88,7 @@ export const Lyrics = () => {
     const lyricsSettings = useLyricsSettings();
     const [index, setIndex] = useState(0);
     const [translatedLyrics, setTranslatedLyrics] = useState<string | null>(null);
-    const [showTranslation, setShowTranslation] = useState<boolean>(false);
+    const [showTranslation, setShowTranslation] = useState(false);
 
     const { data, isInitialLoading } = useSongLyricsBySong(
         {
@@ -150,36 +150,12 @@ export const Lyrics = () => {
             ? lyrics.lyrics.map(([, line]) => line).join('\n')
             : lyrics.lyrics;
         const { apiKey, apiProvider, targetLanguage } = lyricsSettings;
-        let TranslatedText = '';
-        if (apiProvider === 'Microsoft Azure') {
-            const response = await axios({
-                data: [
-                    {
-                        Text: originalLyrics,
-                    },
-                ],
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Ocp-Apim-Subscription-Key': apiKey,
-                },
-                method: 'post',
-                url: `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${targetLanguage as string}`,
-            });
-            TranslatedText = response.data[0].translations[0].text;
-        } else if (apiProvider === 'Google Cloud') {
-            const response = await axios({
-                data: {
-                    format: 'text',
-                    q: originalLyrics,
-                },
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                method: 'post',
-                url: `https://translation.googleapis.com/language/translate/v2?target=${targetLanguage as string}&key=${apiKey}`,
-            });
-            TranslatedText = response.data.data.translations[0].translatedText;
-        }
+        const TranslatedText: string | null = await translateLyrics(
+            originalLyrics,
+            apiKey,
+            apiProvider,
+            targetLanguage,
+        );
         setTranslatedLyrics(TranslatedText);
         setShowTranslation(true);
     }, [lyrics, lyricsSettings, translatedLyrics, showTranslation]);

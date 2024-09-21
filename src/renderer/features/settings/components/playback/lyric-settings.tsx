@@ -135,6 +135,7 @@ export const LyricSettings = () => {
                 />
             ),
             description: t('Target language for translation'),
+            isHidden: !isElectron(),
             title: t('setting.targetLanguage', { postProcess: 'sentenceCase' }),
         },
         {
@@ -148,6 +149,7 @@ export const LyricSettings = () => {
                 />
             ),
             description: t('Api provider for translation'),
+            isHidden: !isElectron(),
             title: t('setting.apiProvider', { postProcess: 'sentenceCase' }),
         },
         {
@@ -160,6 +162,7 @@ export const LyricSettings = () => {
                 />
             ),
             description: t('Api key for translation'),
+            isHidden: !isElectron(),
             title: t('setting.apiKey', { postProcess: 'sentenceCase' }),
         },
     ];
