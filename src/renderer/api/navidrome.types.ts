@@ -353,7 +353,7 @@ export type NDPlaylistListResponse = NDPlaylist[];
 export enum NDPlaylistListSort {
     DURATION = 'duration',
     NAME = 'name',
-    OWNER = 'ownerName',
+    OWNER = 'owner_name',
     PUBLIC = 'public',
     SONG_COUNT = 'songCount',
     UPDATED_AT = 'updatedAt',
