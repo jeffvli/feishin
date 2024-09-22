@@ -11,7 +11,6 @@ import {
     AlbumArtistListQuery,
     AlbumArtistListResponse,
     AlbumArtistListSort,
-    ArtistListQuery,
     LibraryItem,
 } from '/@/renderer/api/types';
 import { ALBUMARTIST_CARD_ROWS } from '/@/renderer/components';
@@ -34,7 +33,7 @@ export const AlbumArtistListGridView = ({ itemCount, gridRef }: AlbumArtistListG
     const handlePlayQueueAdd = usePlayQueueAdd();
 
     const { pageKey } = useListContext();
-    const { grid, display, filter } = useListStoreByKey({ key: pageKey });
+    const { grid, display, filter } = useListStoreByKey<AlbumArtistListQuery>({ key: pageKey });
     const { setGrid } = useListStoreActions();
     const handleFavorite = useHandleFavorite({ gridRef, server });
 
@@ -73,7 +72,7 @@ export const AlbumArtistListGridView = ({ itemCount, gridRef }: AlbumArtistListG
 
     const fetch = useCallback(
         async ({ skip: startIndex, take: limit }: { skip: number; take: number }) => {
-            const query: ArtistListQuery = {
+            const query: AlbumArtistListQuery = {
                 ...filter,
                 limit,
                 startIndex,
@@ -91,7 +90,6 @@ export const AlbumArtistListGridView = ({ itemCount, gridRef }: AlbumArtistListG
                         },
                         query: {
                             limit,
-                            startIndex,
                             ...filter,
                         },
                     }),

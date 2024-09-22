@@ -86,7 +86,7 @@ export const PlaylistListHeaderFilters = ({
     const server = useCurrentServer();
     const { setFilter, setTable, setTablePagination, setGrid, setDisplayType } =
         useListStoreActions();
-    const { display, filter, table, grid } = useListStoreByKey({ key: pageKey });
+    const { display, filter, table, grid } = useListStoreByKey<PlaylistListQuery>({ key: pageKey });
     const cq = useContainerQuery();
 
     const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;

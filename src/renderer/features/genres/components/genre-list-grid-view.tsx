@@ -22,7 +22,7 @@ export const GenreListGridView = ({ gridRef, itemCount }: any) => {
     const server = useCurrentServer();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const { pageKey, id } = useListContext();
-    const { grid, display, filter } = useListStoreByKey({ key: pageKey });
+    const { grid, display, filter } = useListStoreByKey<GenreListQuery>({ key: pageKey });
     const { setGrid } = useListStoreActions();
     const genrePath = useGenreRoute();
 

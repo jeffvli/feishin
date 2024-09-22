@@ -1,7 +1,7 @@
 import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { GenreListSort, LibraryItem, SongListQuery, SortOrder } from '/@/renderer/api/types';
 import { MultiSelect, NumberInput, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
@@ -22,7 +22,7 @@ export const JellyfinSongFilters = ({
 }: JellyfinSongFiltersProps) => {
     const { t } = useTranslation();
     const { setFilter } = useListStoreActions();
-    const filter = useListFilterByKey({ key: pageKey });
+    const filter = useListFilterByKey<SongListQuery>({ key: pageKey });
 
     const isGenrePage = customFilters?._custom?.jellyfin?.GenreIds !== undefined;
 
@@ -61,16 +61,16 @@ export const JellyfinSongFilters = ({
                             jellyfin: {
                                 ...filter?._custom?.jellyfin,
                                 IncludeItemTypes: 'Audio',
-                                IsFavorite: e.currentTarget.checked ? true : undefined,
                             },
                         },
+                        favorite: e.currentTarget.checked ? true : undefined,
                     },
                     itemType: LibraryItem.SONG,
                     key: pageKey,
                 }) as SongListFilter;
                 onFilterChange(updatedFilters);
             },
-            value: filter?._custom?.jellyfin?.IsFavorite,
+            value: filter.favorite,
         },
     ];
 
@@ -84,9 +84,9 @@ export const JellyfinSongFilters = ({
                     jellyfin: {
                         ...filter?._custom?.jellyfin,
                         IncludeItemTypes: 'Audio',
-                        minYear: e === '' ? undefined : (e as number),
                     },
                 },
+                minYear: e === '' ? undefined : (e as number),
             },
             itemType: LibraryItem.SONG,
             key: pageKey,
@@ -104,9 +104,9 @@ export const JellyfinSongFilters = ({
                     jellyfin: {
                         ...filter?._custom?.jellyfin,
                         IncludeItemTypes: 'Audio',
-                        maxYear: e === '' ? undefined : (e as number),
                     },
                 },
+                maxYear: e === '' ? undefined : (e as number),
             },
             itemType: LibraryItem.SONG,
             key: pageKey,
@@ -115,7 +115,6 @@ export const JellyfinSongFilters = ({
     }, 500);
 
     const handleGenresFilter = debounce((e: string[] | undefined) => {
-        const genreFilterString = e?.length ? e.join(',') : undefined;
         const updatedFilters = setFilter({
             customFilters,
             data: {
@@ -123,10 +122,10 @@ export const JellyfinSongFilters = ({
                     ...filter?._custom,
                     jellyfin: {
                         ...filter?._custom?.jellyfin,
-                        GenreIds: genreFilterString,
                         IncludeItemTypes: 'Audio',
                     },
                 },
+                genreIds: e,
             },
             itemType: LibraryItem.SONG,
             key: pageKey,
@@ -151,18 +150,19 @@ export const JellyfinSongFilters = ({
             <Divider my="0.5rem" />
             <Group grow>
                 <NumberInput
-                    required
-                    defaultValue={filter?._custom?.jellyfin?.minYear}
+                    defaultValue={filter?.minYear}
                     label={t('filter.fromYear', { postProcess: 'sentenceCase' })}
                     max={2300}
                     min={1700}
+                    required={!!filter?.minYear}
                     onChange={handleMinYearFilter}
                 />
                 <NumberInput
-                    defaultValue={filter?._custom?.jellyfin?.maxYear}
+                    defaultValue={filter?.maxYear}
                     label={t('filter.toYear', { postProcess: 'sentenceCase' })}
                     max={2300}
                     min={1700}
+                    required={!!filter?.minYear}
                     onChange={handleMaxYearFilter}
                 />
             </Group>

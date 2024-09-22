@@ -11,9 +11,9 @@ import {
     useGeneralSettings,
     useWindowSettings,
 } from '../../../store/settings.store';
-import { PlaylistListSort, ServerType, SortOrder } from '/@/renderer/api/types';
-import { Button, MotionStack, Spinner, Tooltip } from '/@/renderer/components';
-import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
+import { ServerType } from '/@/renderer/api/types';
+import { Button, MotionStack, Tooltip } from '/@/renderer/components';
+import { CreatePlaylistForm } from '/@/renderer/features/playlists';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
@@ -110,15 +110,6 @@ export const Sidebar = () => {
         });
     };
 
-    const playlistsQuery = usePlaylistList({
-        query: {
-            sortBy: PlaylistListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId: server?.id,
-    });
-
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
     const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
     const expandFullScreenPlayer = () => {
@@ -198,7 +189,6 @@ export const Sidebar = () => {
                                     >
                                         {t('page.sidebar.playlists', { postProcess: 'titleCase' })}
                                     </Box>
-                                    {playlistsQuery.isLoading && <Spinner />}
                                 </Group>
                                 <Group spacing="sm">
                                     <Button
@@ -233,7 +223,7 @@ export const Sidebar = () => {
                                     </Button>
                                 </Group>
                             </Group>
-                            <SidebarPlaylistList data={playlistsQuery.data} />
+                            <SidebarPlaylistList />
                         </>
                     )}
                 </MotionStack>

@@ -5,12 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { AlbumListQuery, GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ListContext } from '/@/renderer/context/list-context';
 import { AlbumListContent } from '/@/renderer/features/albums/components/album-list-content';
 import { AlbumListHeader } from '/@/renderer/features/albums/components/album-list-header';
-import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { queryClient } from '/@/renderer/lib/react-query';
@@ -18,6 +17,7 @@ import { useCurrentServer, useListFilterByKey } from '/@/renderer/store';
 import { Play } from '/@/renderer/types';
 import { useGenreList } from '/@/renderer/features/genres';
 import { titleCase } from '/@/renderer/utils';
+import { useAlbumListCount } from '/@/renderer/features/albums/queries/album-list-count-query';
 
 const AlbumListRoute = () => {
     const { t } = useTranslation();
@@ -33,14 +33,7 @@ const AlbumListRoute = () => {
         const value = {
             ...(albumArtistId && { artistIds: [albumArtistId] }),
             ...(genreId && {
-                _custom: {
-                    jellyfin: {
-                        GenreIds: genreId,
-                    },
-                    navidrome: {
-                        genre_id: genreId,
-                    },
-                },
+                genres: [genreId],
             }),
         };
 
@@ -51,7 +44,7 @@ const AlbumListRoute = () => {
         return value;
     }, [albumArtistId, genreId]);
 
-    const albumListFilter = useListFilterByKey({
+    const albumListFilter = useListFilterByKey<AlbumListQuery>({
         filter: customFilters,
         key: pageKey,
     });
@@ -78,32 +71,27 @@ const AlbumListRoute = () => {
         return genre?.name;
     }, [genreId, genreList.data]);
 
-    const itemCountCheck = useAlbumList({
+    const itemCountCheck = useAlbumListCount({
         options: {
             cacheTime: 1000 * 60,
             staleTime: 1000 * 60,
         },
         query: {
-            limit: 1,
-            startIndex: 0,
             ...albumListFilter,
         },
         serverId: server?.id,
     });
 
-    const itemCount =
-        itemCountCheck.data?.totalRecordCount === null
-            ? undefined
-            : itemCountCheck.data?.totalRecordCount;
+    const itemCount = itemCountCheck.data === null ? undefined : itemCountCheck.data;
 
     const handlePlay = useCallback(
         async (args: { initialSongId?: string; playType: Play }) => {
             if (!itemCount || itemCount === 0) return;
             const { playType } = args;
             const query = {
-                startIndex: 0,
                 ...albumListFilter,
                 ...customFilters,
+                startIndex: 0,
             };
             const queryKey = queryKeys.albums.list(server?.id || '', query);
 

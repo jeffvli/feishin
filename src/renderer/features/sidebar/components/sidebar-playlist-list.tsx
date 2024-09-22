@@ -11,7 +11,7 @@ import {
 } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
-import { LibraryItem, Playlist } from '/@/renderer/api/types';
+import { LibraryItem, Playlist, PlaylistListSort, SortOrder } from '/@/renderer/api/types';
 import { Button, Text } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlaylistList } from '/@/renderer/features/playlists';
@@ -23,10 +23,6 @@ import { useHideScrollbar } from '/@/renderer/hooks';
 import { useCurrentServer, useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { PLAYLIST_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-
-interface SidebarPlaylistListProps {
-    data: ReturnType<typeof usePlaylistList>['data'];
-}
 
 const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
     const { t } = useTranslation();
@@ -66,11 +62,7 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
     }
 
     const path = data?.items[index].id
-        ? data.defaultFullPlaylist
-            ? generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data.items[index].id })
-            : generatePath(AppRoute.PLAYLISTS_DETAIL, {
-                  playlistId: data?.items[index].id,
-              })
+        ? generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data.items[index].id })
         : undefined;
 
     return (
@@ -181,12 +173,21 @@ const PlaylistRow = ({ index, data, style }: ListChildComponentProps) => {
     );
 };
 
-export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
+export const SidebarPlaylistList = () => {
     const { isScrollbarHidden, hideScrollbarElementProps } = useHideScrollbar(0);
     const handlePlayQueueAdd = usePlayQueueAdd();
-    const { defaultFullPlaylist, sidebarCollapseShared } = useGeneralSettings();
+    const { sidebarCollapseShared } = useGeneralSettings();
     const { toggleSidebarCollapseShare } = useSettingsStoreActions();
-    const { type, username } = useCurrentServer() || {};
+    const server = useCurrentServer();
+
+    const playlistsQuery = usePlaylistList({
+        query: {
+            sortBy: PlaylistListSort.NAME,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+        },
+        serverId: server?.id,
+    });
 
     const [rect, setRect] = useState({
         height: 0,
@@ -208,10 +209,12 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
         [handlePlayQueueAdd],
     );
 
-    const memoizedItemData = useMemo(() => {
-        const base = { defaultFullPlaylist, handlePlay: handlePlayPlaylist };
+    const data = playlistsQuery.data;
 
-        if (!type || !username || !data?.items) {
+    const memoizedItemData = useMemo(() => {
+        const base = { handlePlay: handlePlayPlaylist };
+
+        if (!server?.type || !server?.username || !data?.items) {
             return { ...base, items: data?.items };
         }
 
@@ -219,7 +222,7 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
         const shared: Playlist[] = [];
 
         for (const playlist of data.items) {
-            if (playlist.owner && playlist.owner !== username) {
+            if (playlist.owner && playlist.owner !== server.username) {
                 shared.push(playlist);
             } else {
                 owned.push(playlist);
@@ -234,12 +237,11 @@ export const SidebarPlaylistList = ({ data }: SidebarPlaylistListProps) => {
 
         return { ...base, items: final };
     }, [
-        sidebarCollapseShared,
         data?.items,
-        defaultFullPlaylist,
         handlePlayPlaylist,
-        type,
-        username,
+        server?.type,
+        server?.username,
+        sidebarCollapseShared,
         toggleSidebarCollapseShare,
     ]);
 

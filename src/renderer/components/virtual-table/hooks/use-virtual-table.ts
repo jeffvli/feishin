@@ -7,7 +7,6 @@ import {
     IDatasource,
     PaginationChangedEvent,
     RowDoubleClickedEvent,
-    RowModelType,
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { QueryKey, useQueryClient } from '@tanstack/react-query';
@@ -16,7 +15,12 @@ import orderBy from 'lodash/orderBy';
 import { generatePath, useNavigate } from 'react-router';
 import { api } from '/@/renderer/api';
 import { QueryPagination, queryKeys } from '/@/renderer/api/query-keys';
-import { BasePaginatedResponse, LibraryItem, ServerListItem } from '/@/renderer/api/types';
+import {
+    BasePaginatedResponse,
+    BaseQuery,
+    LibraryItem,
+    ServerListItem,
+} from '/@/renderer/api/types';
 import { getColumnDefs, VirtualTableProps } from '/@/renderer/components/virtual-table';
 import { SetContextMenuItems, useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -34,6 +38,7 @@ interface UseAgGridProps<TFilter> {
     columnType?: 'albumDetail' | 'generic';
     contextMenu: SetContextMenuItems;
     customFilters?: Partial<TFilter>;
+    isClientSide?: boolean;
     isClientSideSort?: boolean;
     isSearchParams?: boolean;
     itemCount?: number;
@@ -43,7 +48,9 @@ interface UseAgGridProps<TFilter> {
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const useVirtualTable = <TFilter>({
+const BLOCK_SIZE = 500;
+
+export const useVirtualTable = <TFilter extends BaseQuery<any>>({
     server,
     tableRef,
     pageKey,
@@ -52,13 +59,14 @@ export const useVirtualTable = <TFilter>({
     itemCount,
     customFilters,
     isSearchParams,
+    isClientSide,
     isClientSideSort,
     columnType,
 }: UseAgGridProps<TFilter>) => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const { setTable, setTablePagination } = useListStoreActions();
-    const properties = useListStoreByKey({ filter: customFilters, key: pageKey });
+    const properties = useListStoreByKey<TFilter>({ filter: customFilters, key: pageKey });
     const [searchParams, setSearchParams] = useSearchParams();
 
     const scrollOffset = searchParams.get('scrollOffset');
@@ -179,6 +187,19 @@ export const useVirtualTable = <TFilter>({
                         );
 
                         params.successCallback(sortedResults || [], results?.totalRecordCount || 0);
+                        return;
+                    }
+
+                    if (results.totalRecordCount === null) {
+                        const hasMoreRows = results?.items?.length === BLOCK_SIZE;
+                        const lastRowIndex = hasMoreRows
+                            ? undefined
+                            : (properties.filter.offset || 0) + results.items.length;
+
+                        params.successCallback(
+                            results?.items || [],
+                            hasMoreRows ? undefined : lastRowIndex,
+                        );
                         return;
                     }
 
@@ -335,10 +356,11 @@ export const useVirtualTable = <TFilter>({
                 : undefined,
             rowBuffer: 20,
             rowHeight: properties.table.rowHeight || 40,
-            rowModelType: 'infinite' as RowModelType,
+            rowModelType: isClientSide ? 'clientSide' : 'infinite',
             suppressRowDrag: true,
         };
     }, [
+        isClientSide,
         isPaginationEnabled,
         isSearchParams,
         itemCount,
@@ -370,7 +392,9 @@ export const useVirtualTable = <TFilter>({
                     );
                     break;
                 case LibraryItem.PLAYLIST:
-                    navigate(generatePath(AppRoute.PLAYLISTS_DETAIL, { playlistId: e.data.id }));
+                    navigate(
+                        generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: e.data.id }),
+                    );
                     break;
                 default:
                     break;

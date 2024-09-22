@@ -2,7 +2,7 @@ import { ChangeEvent, MutableRefObject } from 'react';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { LibraryItem } from '/@/renderer/api/types';
+import { GenreListQuery, LibraryItem } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { GenreListHeaderFilters } from '/@/renderer/features/genres/components/genre-list-header-filters';
@@ -22,7 +22,7 @@ export const GenreListHeader = ({ itemCount, gridRef, tableRef }: GenreListHeade
     const { t } = useTranslation();
     const cq = useContainerQuery();
     const server = useCurrentServer();
-    const { filter, refresh, search } = useDisplayRefresh({
+    const { filter, refresh, search } = useDisplayRefresh<GenreListQuery>({
         gridRef,
         itemType: LibraryItem.GENRE,
         server,
@@ -66,6 +66,7 @@ export const GenreListHeader = ({ itemCount, gridRef, tableRef }: GenreListHeade
             <FilterBar>
                 <GenreListHeaderFilters
                     gridRef={gridRef}
+                    itemCount={itemCount}
                     tableRef={tableRef}
                 />
             </FilterBar>

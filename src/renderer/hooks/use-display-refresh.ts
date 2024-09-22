@@ -11,21 +11,24 @@ import { useListStoreActions, useListStoreByKey } from '/@/renderer/store';
 
 export type UseDisplayRefreshProps = {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+    itemCount?: number;
     tableRef: MutableRefObject<AgGridReactType | null>;
 } & UseHandleListFilterChangeProps;
 
-export const useDisplayRefresh = ({
+export const useDisplayRefresh = <TFilter>({
     isClientSideSort,
+    itemCount,
     gridRef,
     itemType,
     server,
     tableRef,
 }: UseDisplayRefreshProps) => {
     const { customFilters, pageKey, handlePlay } = useListContext();
-    const { display, filter } = useListStoreByKey({ key: pageKey });
+    const { display, filter } = useListStoreByKey<TFilter>({ key: pageKey });
 
     const { handleRefreshGrid, handleRefreshTable } = useListFilterRefresh({
         isClientSideSort,
+        itemCount,
         itemType,
         server,
     });

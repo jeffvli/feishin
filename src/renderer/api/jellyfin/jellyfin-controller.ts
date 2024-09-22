@@ -229,6 +229,11 @@ export const JellyfinController: ControllerEndpoint = {
             totalRecordCount: res.body.TotalRecordCount,
         };
     },
+    getAlbumArtistListCount: async ({ apiClientProps, query }) =>
+        JellyfinController.getAlbumArtistList({
+            apiClientProps,
+            query: { ...query, limit: 1, startIndex: 0 },
+        }).then((result) => result!.totalRecordCount!),
     getAlbumDetail: async (args) => {
         const { query, apiClientProps } = args;
 
@@ -275,12 +280,8 @@ export const JellyfinController: ControllerEndpoint = {
         }
 
         const yearsGroup = [];
-        if (query._custom?.jellyfin?.minYear && query._custom?.jellyfin?.maxYear) {
-            for (
-                let i = Number(query._custom?.jellyfin?.minYear);
-                i <= Number(query._custom?.jellyfin?.maxYear);
-                i += 1
-            ) {
+        if (query.minYear && query.maxYear) {
+            for (let i = Number(query.minYear); i <= Number(query.maxYear); i += 1) {
                 yearsGroup.push(String(i));
             }
         }
@@ -295,7 +296,10 @@ export const JellyfinController: ControllerEndpoint = {
                 AlbumArtistIds: query.artistIds
                     ? formatCommaDelimitedString(query.artistIds)
                     : undefined,
+                ContributingArtistIds: query.compilation ? query.artistIds?.[0] : undefined,
+                GenreIds: query.genres ? query.genres.join(',') : undefined,
                 IncludeItemTypes: 'MusicAlbum',
+                IsFavorite: query.favorite,
                 Limit: query.limit,
                 ParentId: query.musicFolderId,
                 Recursive: true,
@@ -318,6 +322,11 @@ export const JellyfinController: ControllerEndpoint = {
             totalRecordCount: res.body.TotalRecordCount,
         };
     },
+    getAlbumListCount: async ({ apiClientProps, query }) =>
+        JellyfinController.getAlbumList({
+            apiClientProps,
+            query: { ...query, limit: 1, startIndex: 0 },
+        }).then((result) => result!.totalRecordCount!),
     getDownloadUrl: (args) => {
         const { apiClientProps, query } = args;
 
@@ -460,6 +469,11 @@ export const JellyfinController: ControllerEndpoint = {
             totalRecordCount: res.body.TotalRecordCount,
         };
     },
+    getPlaylistListCount: async ({ apiClientProps, query }) =>
+        JellyfinController.getPlaylistList({
+            apiClientProps,
+            query: { ...query, limit: 1, startIndex: 0 },
+        }).then((result) => result!.totalRecordCount!),
     getPlaylistSongList: async (args) => {
         const { query, apiClientProps } = args;
 
@@ -636,12 +650,8 @@ export const JellyfinController: ControllerEndpoint = {
         }
 
         const yearsGroup = [];
-        if (query._custom?.jellyfin?.minYear && query._custom?.jellyfin?.maxYear) {
-            for (
-                let i = Number(query._custom?.jellyfin?.minYear);
-                i <= Number(query._custom?.jellyfin?.maxYear);
-                i += 1
-            ) {
+        if (query.minYear && query.maxYear) {
+            for (let i = Number(query.minYear); i <= Number(query.maxYear); i += 1) {
                 yearsGroup.push(String(i));
             }
         }
@@ -662,7 +672,9 @@ export const JellyfinController: ControllerEndpoint = {
                 AlbumIds: albumIdsFilter,
                 ArtistIds: artistIdsFilter,
                 Fields: 'Genres, DateCreated, MediaSources, ParentId',
+                GenreIds: query.genreIds?.join(','),
                 IncludeItemTypes: 'Audio',
+                IsFavorite: query.favorite,
                 Limit: query.limit,
                 ParentId: query.musicFolderId,
                 Recursive: true,
@@ -705,6 +717,11 @@ export const JellyfinController: ControllerEndpoint = {
             totalRecordCount: res.body.TotalRecordCount,
         };
     },
+    getSongListCount: async ({ apiClientProps, query }) =>
+        JellyfinController.getSongList({
+            apiClientProps,
+            query: { ...query, limit: 1, startIndex: 0 },
+        }).then((result) => result!.totalRecordCount!),
     getTopSongs: async (args) => {
         const { apiClientProps, query } = args;
 

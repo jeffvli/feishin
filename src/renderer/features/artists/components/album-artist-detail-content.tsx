@@ -111,18 +111,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
             enabled: enabledItem.recentAlbums,
         },
         query: {
-            _custom: {
-                jellyfin: {
-                    ...(server?.type === ServerType.JELLYFIN
-                        ? { AlbumArtistIds: albumArtistId }
-                        : undefined),
-                },
-                navidrome: {
-                    ...(server?.type === ServerType.NAVIDROME
-                        ? { artist_id: albumArtistId, compilation: false }
-                        : undefined),
-                },
-            },
+            artistIds: [albumArtistId],
             limit: 15,
             sortBy: AlbumListSort.RELEASE_DATE,
             sortOrder: SortOrder.DESC,
@@ -136,18 +125,8 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
             enabled: enabledItem.compilations,
         },
         query: {
-            _custom: {
-                jellyfin: {
-                    ...(server?.type === ServerType.JELLYFIN
-                        ? { ContributingArtistIds: albumArtistId }
-                        : undefined),
-                },
-                navidrome: {
-                    ...(server?.type === ServerType.NAVIDROME
-                        ? { artist_id: albumArtistId, compilation: true }
-                        : undefined),
-                },
-            },
+            artistIds: [albumArtistId],
+            compilation: true,
             limit: 15,
             sortBy: AlbumListSort.RELEASE_DATE,
             sortOrder: SortOrder.DESC,

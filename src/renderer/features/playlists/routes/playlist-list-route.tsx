@@ -1,7 +1,7 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 import { useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
-import { PlaylistListSort, SortOrder } from '/@/renderer/api/types';
+import { PlaylistListSort, PlaylistSongListQuery, SortOrder } from '/@/renderer/api/types';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ListContext } from '/@/renderer/context/list-context';
 import { PlaylistListContent } from '/@/renderer/features/playlists/components/playlist-list-content';
@@ -16,7 +16,7 @@ const PlaylistListRoute = () => {
     const server = useCurrentServer();
     const { playlistId } = useParams();
     const pageKey = 'playlist';
-    const { filter } = useListStoreByKey({ key: pageKey });
+    const { filter } = useListStoreByKey<PlaylistSongListQuery>({ key: pageKey });
 
     const itemCountCheck = usePlaylistList({
         options: {

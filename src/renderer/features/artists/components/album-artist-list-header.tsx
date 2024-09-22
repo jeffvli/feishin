@@ -4,7 +4,7 @@ import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { FilterBar } from '../../shared/components/filter-bar';
-import { LibraryItem } from '/@/renderer/api/types';
+import { AlbumArtistListQuery, LibraryItem } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { AlbumArtistListHeaderFilters } from '/@/renderer/features/artists/components/album-artist-list-header-filters';
@@ -28,8 +28,9 @@ export const AlbumArtistListHeader = ({
     const server = useCurrentServer();
     const cq = useContainerQuery();
 
-    const { filter, refresh, search } = useDisplayRefresh({
+    const { filter, refresh, search } = useDisplayRefresh<AlbumArtistListQuery>({
         gridRef,
+        itemCount,
         itemType: LibraryItem.ALBUM_ARTIST,
         server,
         tableRef,

@@ -9,7 +9,13 @@ import { RiFolder2Line, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react
 import { useListContext } from '../../../context/list-context';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumArtistListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
+import {
+    AlbumArtistListQuery,
+    AlbumArtistListSort,
+    LibraryItem,
+    ServerType,
+    SortOrder,
+} from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
@@ -85,6 +91,28 @@ const FILTERS = {
             value: AlbumArtistListSort.SONG_COUNT,
         },
     ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.albumCount', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.ALBUM_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.isFavorited', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
+            value: AlbumArtistListSort.RATING,
+        },
+    ],
 };
 
 interface AlbumArtistListHeaderFiltersProps {
@@ -100,7 +128,9 @@ export const AlbumArtistListHeaderFilters = ({
     const queryClient = useQueryClient();
     const server = useCurrentServer();
     const { pageKey } = useListContext();
-    const { display, table, grid, filter } = useListStoreByKey({ key: pageKey });
+    const { display, table, grid, filter } = useListStoreByKey<AlbumArtistListQuery>({
+        key: pageKey,
+    });
     const { setFilter, setTable, setTablePagination, setDisplayType, setGrid } =
         useListStoreActions();
     const cq = useContainerQuery();

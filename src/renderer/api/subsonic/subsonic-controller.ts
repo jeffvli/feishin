@@ -11,16 +11,20 @@ export const SubsonicController: Omit<
     | 'addToPlaylist'
     | 'createPlaylist'
     | 'deletePlaylist'
+    | 'getAlbumArtistListCount'
     | 'getAlbumArtistDetail'
     | 'getAlbumArtistList'
     | 'getAlbumDetail'
     | 'getAlbumList'
+    | 'getAlbumListCount'
     | 'getGenreList'
     | 'getPlaylistDetail'
     | 'getPlaylistList'
+    | 'getPlaylistListCount'
     | 'getPlaylistSongList'
     | 'getSongDetail'
     | 'getSongList'
+    | 'getSongListCount'
     | 'movePlaylistItem'
     | 'removeFromPlaylist'
     | 'updatePlaylist'
@@ -102,22 +106,22 @@ export const SubsonicController: Omit<
 
         return null;
     },
-    getArtistInfo: async (args) => {
-        const { query, apiClientProps } = args;
+    // getArtistInfo: async (args) => {
+    //     const { query, apiClientProps } = args;
 
-        const res = await ssApiClient(apiClientProps).getArtistInfo({
-            query: {
-                count: query.limit,
-                id: query.artistId,
-            },
-        });
+    //     const res = await ssApiClient(apiClientProps).getArtistInfo({
+    //         query: {
+    //             count: query.limit,
+    //             id: query.artistId,
+    //         },
+    //     });
 
-        if (res.status !== 200) {
-            throw new Error('Failed to get artist info');
-        }
+    //     if (res.status !== 200) {
+    //         throw new Error('Failed to get artist info');
+    //     }
 
-        return res.body;
-    },
+    //     return res.body;
+    // },
     getDownloadUrl: (args) => {
         const { apiClientProps, query } = args;
 

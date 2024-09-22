@@ -5,7 +5,13 @@ import { AlbumListFilter, useListStoreActions, useListStoreByKey } from '/@/rend
 import debounce from 'lodash/debounce';
 import { useGenreList } from '/@/renderer/features/genres';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
-import { AlbumArtistListSort, GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import {
+    AlbumArtistListSort,
+    AlbumListQuery,
+    GenreListSort,
+    LibraryItem,
+    SortOrder,
+} from '/@/renderer/api/types';
 import { useTranslation } from 'react-i18next';
 
 interface NavidromeAlbumFiltersProps {
@@ -24,7 +30,7 @@ export const NavidromeAlbumFilters = ({
     serverId,
 }: NavidromeAlbumFiltersProps) => {
     const { t } = useTranslation();
-    const { filter } = useListStoreByKey({ key: pageKey });
+    const { filter } = useListStoreByKey<AlbumListQuery>({ key: pageKey });
     const { setFilter } = useListStoreActions();
 
     const genreListQuery = useGenreList({
@@ -48,13 +54,8 @@ export const NavidromeAlbumFilters = ({
         const updatedFilters = setFilter({
             customFilters,
             data: {
-                _custom: {
-                    ...filter._custom,
-                    navidrome: {
-                        ...filter._custom?.navidrome,
-                        genre_id: e || undefined,
-                    },
-                },
+                _custom: filter._custom,
+                genres: e ? [e] : undefined,
             },
             itemType: LibraryItem.ALBUM,
             key: pageKey,
@@ -90,20 +91,15 @@ export const NavidromeAlbumFilters = ({
                 const updatedFilters = setFilter({
                     customFilters,
                     data: {
-                        _custom: {
-                            ...filter._custom,
-                            navidrome: {
-                                ...filter._custom?.navidrome,
-                                starred: e.currentTarget.checked ? true : undefined,
-                            },
-                        },
+                        _custom: filter._custom,
+                        favorite: e.currentTarget.checked ? true : undefined,
                     },
                     itemType: LibraryItem.ALBUM,
                     key: pageKey,
                 }) as AlbumListFilter;
                 onFilterChange(updatedFilters);
             },
-            value: filter._custom?.navidrome?.starred,
+            value: filter.favorite,
         },
         {
             label: t('filter.isCompilation', { postProcess: 'sentenceCase' }),
@@ -111,20 +107,15 @@ export const NavidromeAlbumFilters = ({
                 const updatedFilters = setFilter({
                     customFilters,
                     data: {
-                        _custom: {
-                            ...filter._custom,
-                            navidrome: {
-                                ...filter._custom?.navidrome,
-                                compilation: e.currentTarget.checked ? true : undefined,
-                            },
-                        },
+                        _custom: filter._custom,
+                        compilation: e.currentTarget.checked ? true : undefined,
                     },
                     itemType: LibraryItem.ALBUM,
                     key: pageKey,
                 }) as AlbumListFilter;
                 onFilterChange(updatedFilters);
             },
-            value: filter._custom?.navidrome?.compilation,
+            value: filter.compilation,
         },
         {
             label: t('filter.isRecentlyPlayed', { postProcess: 'sentenceCase' }),

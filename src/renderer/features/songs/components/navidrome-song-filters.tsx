@@ -1,7 +1,7 @@
 import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { GenreListSort, LibraryItem, SongListQuery, SortOrder } from '/@/renderer/api/types';
 import { NumberInput, Select, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
@@ -22,9 +22,9 @@ export const NavidromeSongFilters = ({
 }: NavidromeSongFiltersProps) => {
     const { t } = useTranslation();
     const { setFilter } = useListStoreActions();
-    const filter = useListFilterByKey({ key: pageKey });
+    const filter = useListFilterByKey<SongListQuery>({ key: pageKey });
 
-    const isGenrePage = customFilters?._custom?.navidrome?.genre_id !== undefined;
+    const isGenrePage = customFilters?.genreIds !== undefined;
 
     const genreListQuery = useGenreList({
         query: {
@@ -47,12 +47,8 @@ export const NavidromeSongFilters = ({
         const updatedFilters = setFilter({
             customFilters,
             data: {
-                _custom: {
-                    ...filter._custom,
-                    navidrome: {
-                        genre_id: e || undefined,
-                    },
-                },
+                _custom: filter._custom,
+                genreIds: e ? [e] : undefined,
             },
             itemType: LibraryItem.SONG,
             key: pageKey,
@@ -68,12 +64,8 @@ export const NavidromeSongFilters = ({
                 const updatedFilters = setFilter({
                     customFilters,
                     data: {
-                        _custom: {
-                            ...filter._custom,
-                            navidrome: {
-                                starred: e.currentTarget.checked ? true : undefined,
-                            },
-                        },
+                        _custom: filter._custom,
+                        favorite: e.currentTarget.checked ? true : undefined,
                     },
                     itemType: LibraryItem.SONG,
                     key: pageKey,
@@ -81,7 +73,7 @@ export const NavidromeSongFilters = ({
 
                 onFilterChange(updatedFilters);
             },
-            value: filter._custom?.navidrome?.starred,
+            value: filter.favorite,
         },
     ];
 
@@ -133,7 +125,7 @@ export const NavidromeSongFilters = ({
                         clearable
                         searchable
                         data={genreList}
-                        defaultValue={filter._custom?.navidrome?.genre_id}
+                        defaultValue={filter.genreIds ? filter.genreIds[0] : undefined}
                         label={t('entity.genre', { count: 1, postProcess: 'titleCase' })}
                         width={150}
                         onChange={handleGenresFilter}

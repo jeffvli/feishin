@@ -184,6 +184,11 @@ export const NavidromeController: ControllerEndpoint = {
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },
+    getAlbumArtistListCount: async ({ apiClientProps, query }) =>
+        NavidromeController.getAlbumArtistList({
+            apiClientProps,
+            query: { ...query, limit: 1, startIndex: 0 },
+        }).then((result) => result!.totalRecordCount!),
     getAlbumDetail: async (args) => {
         const { query, apiClientProps } = args;
 
@@ -222,8 +227,11 @@ export const NavidromeController: ControllerEndpoint = {
                 _sort: albumListSortMap.navidrome[query.sortBy],
                 _start: query.startIndex,
                 artist_id: query.artistIds?.[0],
+                compilation: query.compilation,
+                genre_id: query.genres?.[0],
                 name: query.searchTerm,
                 ...query._custom?.navidrome,
+                starred: query.favorite,
             },
         });
 
@@ -237,6 +245,11 @@ export const NavidromeController: ControllerEndpoint = {
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },
+    getAlbumListCount: async ({ apiClientProps, query }) =>
+        NavidromeController.getAlbumList({
+            apiClientProps,
+            query: { ...query, limit: 1, startIndex: 0 },
+        }).then((result) => result!.totalRecordCount!),
     getDownloadUrl: SubsonicController.getDownloadUrl,
     getGenreList: async (args) => {
         const { query, apiClientProps } = args;
@@ -312,6 +325,11 @@ export const NavidromeController: ControllerEndpoint = {
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },
+    getPlaylistListCount: async ({ apiClientProps, query }) =>
+        NavidromeController.getPlaylistList({
+            apiClientProps,
+            query: { ...query, limit: 1, startIndex: 0 },
+        }).then((result) => result!.totalRecordCount!),
     getPlaylistSongList: async (args: PlaylistSongListArgs): Promise<PlaylistSongListResponse> => {
         const { query, apiClientProps } = args;
 
@@ -320,7 +338,6 @@ export const NavidromeController: ControllerEndpoint = {
                 id: query.id,
             },
             query: {
-                _end: query.startIndex + (query.limit || 0),
                 _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : 'ASC',
                 _sort: query.sortBy
                     ? songListSortMap.navidrome[query.sortBy]
@@ -458,6 +475,8 @@ export const NavidromeController: ControllerEndpoint = {
                 _start: query.startIndex,
                 album_artist_id: query.artistIds,
                 album_id: query.albumIds,
+                genre_id: query.genreIds,
+                starred: query.favorite,
                 title: query.searchTerm,
                 ...query._custom?.navidrome,
             },
@@ -503,6 +522,11 @@ export const NavidromeController: ControllerEndpoint = {
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },
+    getSongListCount: async ({ apiClientProps, query }) =>
+        NavidromeController.getSongList({
+            apiClientProps,
+            query: { ...query, limit: 1, startIndex: 0 },
+        }).then((result) => result!.totalRecordCount!),
     getTopSongs: SubsonicController.getTopSongs,
     getTranscodingUrl: SubsonicController.getTranscodingUrl,
     getUserList: async (args) => {
@@ -566,6 +590,7 @@ export const NavidromeController: ControllerEndpoint = {
     },
     scrobble: SubsonicController.scrobble,
     search: SubsonicController.search,
+    setRating: SubsonicController.setRating,
     shareItem: async (args) => {
         const { body, apiClientProps } = args;
 

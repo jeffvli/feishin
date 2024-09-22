@@ -13,7 +13,7 @@ export const useTopSongsList = (args: QueryHookArgs<TopSongListQuery>) => {
         enabled: !!server?.id,
         queryFn: ({ signal }) => {
             if (!server) throw new Error('Server not found');
-            return api.controller.getTopSongList({ apiClientProps: { server, signal }, query });
+            return api.controller.getTopSongs({ apiClientProps: { server, signal }, query });
         },
         queryKey: queryKeys.albumArtists.topSongs(server?.id || '', query),
         ...options,

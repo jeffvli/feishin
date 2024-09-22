@@ -29,7 +29,7 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
     const server = useCurrentServer();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const { pageKey, customFilters, id } = useListContext();
-    const { grid, display, filter } = useListStoreByKey({ key: pageKey });
+    const { grid, display, filter } = useListStoreByKey<AlbumListQuery>({ key: pageKey });
     const { setGrid } = useListStoreActions();
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -162,9 +162,9 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
 
             const query: AlbumListQuery = {
                 limit: take,
-                startIndex: skip,
                 ...filter,
                 ...customFilters,
+                startIndex: skip,
             };
 
             const queryKey = queryKeys.albums.list(server?.id || '', query, id);

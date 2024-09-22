@@ -128,7 +128,7 @@ export interface BasePaginatedResponse<T> {
     error?: string | any;
     items: T;
     startIndex: number;
-    totalRecordCount: number;
+    totalRecordCount: number | null;
 }
 
 export type AuthenticationResponse = {
@@ -309,6 +309,11 @@ type BaseEndpointArgs = {
     };
 };
 
+export interface BaseQuery<T> {
+    sortBy: T;
+    sortOrder: SortOrder;
+}
+
 // Genre List
 export type GenreListResponse = BasePaginatedResponse<Genre[]> | null | undefined;
 
@@ -318,7 +323,7 @@ export enum GenreListSort {
     NAME = 'name',
 }
 
-export type GenreListQuery = {
+export interface GenreListQuery extends BaseQuery<GenreListSort> {
     _custom?: {
         jellyfin?: null;
         navidrome?: null;
@@ -326,10 +331,8 @@ export type GenreListQuery = {
     limit?: number;
     musicFolderId?: string;
     searchTerm?: string;
-    sortBy: GenreListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 type GenreListSortMap = {
     jellyfin: Record<GenreListSort, JFGenreListSort | undefined>;
@@ -370,22 +373,22 @@ export enum AlbumListSort {
     YEAR = 'year',
 }
 
-export type AlbumListQuery = {
+export interface AlbumListQuery extends BaseQuery<AlbumListSort> {
     _custom?: {
-        jellyfin?: Partial<z.infer<typeof jfType._parameters.albumList>> & {
-            maxYear?: number;
-            minYear?: number;
-        };
+        jellyfin?: Partial<z.infer<typeof jfType._parameters.albumList>>;
         navidrome?: Partial<z.infer<typeof ndType._parameters.albumList>>;
     };
     artistIds?: string[];
+    compilation?: boolean;
+    favorite?: boolean;
+    genres?: string[];
     limit?: number;
+    maxYear?: number;
+    minYear?: number;
     musicFolderId?: string;
     searchTerm?: string;
-    sortBy: AlbumListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type AlbumListArgs = { query: AlbumListQuery } & BaseEndpointArgs;
 
@@ -481,24 +484,23 @@ export enum SongListSort {
     YEAR = 'year',
 }
 
-export type SongListQuery = {
+export interface SongListQuery extends BaseQuery<SongListSort> {
     _custom?: {
-        jellyfin?: Partial<z.infer<typeof jfType._parameters.songList>> & {
-            maxYear?: number;
-            minYear?: number;
-        };
+        jellyfin?: Partial<z.infer<typeof jfType._parameters.songList>>;
         navidrome?: Partial<z.infer<typeof ndType._parameters.songList>>;
     };
     albumIds?: string[];
     artistIds?: string[];
+    favorite?: boolean;
+    genreIds?: string[];
     imageSize?: number;
     limit?: number;
+    maxYear?: number;
+    minYear?: number;
     musicFolderId?: string;
     searchTerm?: string;
-    sortBy: SongListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type SongListArgs = { query: SongListQuery } & BaseEndpointArgs;
 
@@ -595,7 +597,7 @@ export enum AlbumArtistListSort {
     SONG_COUNT = 'songCount',
 }
 
-export type AlbumArtistListQuery = {
+export interface AlbumArtistListQuery extends BaseQuery<AlbumArtistListSort> {
     _custom?: {
         jellyfin?: Partial<z.infer<typeof jfType._parameters.albumArtistList>>;
         navidrome?: Partial<z.infer<typeof ndType._parameters.albumArtistList>>;
@@ -603,10 +605,8 @@ export type AlbumArtistListQuery = {
     limit?: number;
     musicFolderId?: string;
     searchTerm?: string;
-    sortBy: AlbumArtistListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type AlbumArtistListArgs = { query: AlbumArtistListQuery } & BaseEndpointArgs;
 
@@ -683,17 +683,15 @@ export enum ArtistListSort {
     SONG_COUNT = 'songCount',
 }
 
-export type ArtistListQuery = {
+export interface ArtistListQuery extends BaseQuery<ArtistListSort> {
     _custom?: {
         jellyfin?: Partial<z.infer<typeof jfType._parameters.albumArtistList>>;
         navidrome?: Partial<z.infer<typeof ndType._parameters.albumArtistList>>;
     };
     limit?: number;
     musicFolderId?: string;
-    sortBy: ArtistListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type ArtistListArgs = { query: ArtistListQuery } & BaseEndpointArgs;
 
@@ -879,17 +877,15 @@ export enum PlaylistListSort {
     UPDATED_AT = 'updatedAt',
 }
 
-export type PlaylistListQuery = {
+export interface PlaylistListQuery extends BaseQuery<PlaylistListSort> {
     _custom?: {
         jellyfin?: Partial<z.infer<typeof jfType._parameters.playlistList>>;
         navidrome?: Partial<z.infer<typeof ndType._parameters.playlistList>>;
     };
     limit?: number;
     searchTerm?: string;
-    sortBy: PlaylistListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type PlaylistListArgs = { query: PlaylistListQuery } & BaseEndpointArgs;
 
@@ -963,7 +959,7 @@ export enum UserListSort {
     NAME = 'name',
 }
 
-export type UserListQuery = {
+export interface UserListQuery extends BaseQuery<UserListSort> {
     _custom?: {
         navidrome?: {
             owner_id?: string;
@@ -971,10 +967,8 @@ export type UserListQuery = {
     };
     limit?: number;
     searchTerm?: string;
-    sortBy: UserListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type UserListArgs = { query: UserListQuery } & BaseEndpointArgs;
 
@@ -1241,22 +1235,26 @@ export type ControllerEndpoint = {
     deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
     getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
     getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
+    getAlbumArtistListCount: (args: AlbumArtistListArgs) => Promise<number>;
     getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse>;
     getAlbumList: (args: AlbumListArgs) => Promise<AlbumListResponse>;
-    getArtistInfo?: (args: any) => void;
-    getArtistList?: (args: ArtistListArgs) => Promise<ArtistListResponse>;
+    getAlbumListCount: (args: AlbumListArgs) => Promise<number>;
+    // getArtistInfo?: (args: any) => void;
+    // getArtistList?: (args: ArtistListArgs) => Promise<ArtistListResponse>;
     getDownloadUrl: (args: DownloadArgs) => string;
     getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
     getLyrics?: (args: LyricsArgs) => Promise<LyricsResponse>;
     getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
     getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
     getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
+    getPlaylistListCount: (args: PlaylistListArgs) => Promise<number>;
     getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
     getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
     getServerInfo: (args: ServerInfoArgs) => Promise<ServerInfo>;
     getSimilarSongs: (args: SimilarSongsArgs) => Promise<Song[]>;
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
+    getSongListCount: (args: SongListArgs) => Promise<number>;
     getStructuredLyrics?: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getTranscodingUrl: (args: TranscodingArgs) => string;

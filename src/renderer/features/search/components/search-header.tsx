@@ -5,7 +5,12 @@ import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router-dom';
 import { useCurrentServer } from '../../../store/auth.store';
-import { LibraryItem } from '/@/renderer/api/types';
+import {
+    AlbumArtistListQuery,
+    AlbumListQuery,
+    LibraryItem,
+    SongListQuery,
+} from '/@/renderer/api/types';
 import { Button, PageHeader, SearchInput } from '/@/renderer/components';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -24,7 +29,9 @@ export const SearchHeader = ({ tableRef, navigationId }: SearchHeaderProps) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const cq = useContainerQuery();
     const server = useCurrentServer();
-    const { filter } = useListStoreByKey({ key: itemType });
+    const { filter } = useListStoreByKey<AlbumListQuery | AlbumArtistListQuery | SongListQuery>({
+        key: itemType,
+    });
 
     const { handleRefreshTable } = useListFilterRefresh({
         itemType,

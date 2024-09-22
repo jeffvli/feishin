@@ -12,7 +12,13 @@ import {
     RiSettings3Fill,
 } from 'react-icons/ri';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { GenreListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
+import {
+    GenreListQuery,
+    GenreListSort,
+    LibraryItem,
+    ServerType,
+    SortOrder,
+} from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { GENRE_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
@@ -47,25 +53,38 @@ const FILTERS = {
             value: GenreListSort.NAME,
         },
     ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: GenreListSort.NAME,
+        },
+    ],
 };
 
 interface GenreListHeaderFiltersProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+    itemCount: number | undefined;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const GenreListHeaderFilters = ({ gridRef, tableRef }: GenreListHeaderFiltersProps) => {
+export const GenreListHeaderFilters = ({
+    gridRef,
+    itemCount,
+    tableRef,
+}: GenreListHeaderFiltersProps) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { pageKey, customFilters } = useListContext();
     const server = useCurrentServer();
     const { setFilter, setTable, setGrid, setDisplayType } = useListStoreActions();
-    const { display, filter, table, grid } = useListStoreByKey({ key: pageKey });
+    const { display, filter, table, grid } = useListStoreByKey<GenreListQuery>({ key: pageKey });
     const cq = useContainerQuery();
     const { genreTarget } = useGeneralSettings();
     const { setGenreBehavior } = useSettingsStoreActions();
 
     const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.GENRE,
         server,
     });
