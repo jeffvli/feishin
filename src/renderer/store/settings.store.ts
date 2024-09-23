@@ -265,8 +265,6 @@ export interface SettingsState {
     };
     lyrics: {
         alignment: 'left' | 'center' | 'right';
-        apiKey: string;
-        apiProvider: string | null;
         delayMs: number;
         fetch: boolean;
         follow: boolean;
@@ -277,7 +275,9 @@ export interface SettingsState {
         showMatch: boolean;
         showProvider: boolean;
         sources: LyricSource[];
-        targetLanguage: string | null;
+        translationApiKey: string;
+        translationApiProvider: string | null;
+        translationTargetLanguage: string | null;
     };
     playback: {
         audioDeviceId?: string | null;
@@ -442,8 +442,6 @@ const initialState: SettingsState = {
     },
     lyrics: {
         alignment: 'center',
-        apiKey: '',
-        apiProvider: '',
         delayMs: 0,
         fetch: false,
         follow: true,
@@ -454,7 +452,9 @@ const initialState: SettingsState = {
         showMatch: true,
         showProvider: true,
         sources: [],
-        targetLanguage: 'en',
+        translationApiKey: '',
+        translationApiProvider: '',
+        translationTargetLanguage: 'en',
     },
     playback: {
         audioDeviceId: undefined,

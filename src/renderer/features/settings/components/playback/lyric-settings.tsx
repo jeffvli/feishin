@@ -128,42 +128,53 @@ export const LyricSettings = () => {
             control: (
                 <Select
                     data={languages}
-                    value={settings.targetLanguage}
+                    value={settings.translationTargetLanguage}
                     onChange={(value) => {
-                        setSettings({ lyrics: { ...settings, targetLanguage: value } });
+                        setSettings({ lyrics: { ...settings, translationTargetLanguage: value } });
                     }}
                 />
             ),
-            description: t('Target language for translation'),
+            description: t('setting.translationTargetLanguage', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: t('setting.targetLanguage', { postProcess: 'sentenceCase' }),
+            title: t('setting.translationTargetLanguage', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <Select
                     data={['Microsoft Azure', 'Google Cloud']}
-                    value={settings.apiProvider}
+                    value={settings.translationApiProvider}
                     onChange={(value) => {
-                        setSettings({ lyrics: { ...settings, apiProvider: value } });
+                        setSettings({ lyrics: { ...settings, translationApiProvider: value } });
                     }}
                 />
             ),
-            description: t('Api provider for translation'),
+            description: t('setting.translationApiProvider', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: t('setting.apiProvider', { postProcess: 'sentenceCase' }),
+            title: t('setting.translationApiProvider', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
                 <TextInput
-                    value={settings.apiKey}
+                    value={settings.translationApiKey}
                     onChange={(e) => {
-                        setSettings({ lyrics: { ...settings, apiKey: e.currentTarget.value } });
+                        setSettings({
+                            lyrics: { ...settings, translationApiKey: e.currentTarget.value },
+                        });
                     }}
                 />
             ),
-            description: t('Api key for translation (Support global service endpoint only)'),
+            description: t('setting.translationApiKey', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
             isHidden: !isElectron(),
-            title: t('setting.apiKey', { postProcess: 'sentenceCase' }),
+            title: t('setting.translationApiKey', { postProcess: 'sentenceCase' }),
         },
     ];
 

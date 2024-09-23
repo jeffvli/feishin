@@ -2,12 +2,12 @@ import axios from 'axios';
 
 export const translateLyrics = async (
     originalLyrics: string,
-    apiKey: string,
-    apiProvider: string | null,
-    targetLanguage: string | null,
+    translationApiKey: string,
+    translationApiProvider: string | null,
+    translationTargetLanguage: string | null,
 ) => {
     let TranslatedText = '';
-    if (apiProvider === 'Microsoft Azure') {
+    if (translationApiProvider === 'Microsoft Azure') {
         try {
             const response = await axios({
                 data: [
@@ -17,17 +17,17 @@ export const translateLyrics = async (
                 ],
                 headers: {
                     'Content-Type': 'application/json',
-                    'Ocp-Apim-Subscription-Key': apiKey,
+                    'Ocp-Apim-Subscription-Key': translationApiKey,
                 },
                 method: 'post',
-                url: `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${targetLanguage as string}`,
+                url: `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${translationTargetLanguage as string}`,
             });
             TranslatedText = response.data[0].translations[0].text;
         } catch (e) {
             console.error('Microsoft Azure translate request got an error!', e);
             return null;
         }
-    } else if (apiProvider === 'Google Cloud') {
+    } else if (translationApiProvider === 'Google Cloud') {
         try {
             const response = await axios({
                 data: {
@@ -38,7 +38,7 @@ export const translateLyrics = async (
                     'Content-Type': 'application/json',
                 },
                 method: 'post',
-                url: `https://translation.googleapis.com/language/translate/v2?target=${targetLanguage as string}&key=${apiKey}`,
+                url: `https://translation.googleapis.com/language/translate/v2?target=${translationTargetLanguage as string}&key=${translationApiKey}`,
             });
             TranslatedText = response.data.data.translations[0].translatedText;
         } catch (e) {

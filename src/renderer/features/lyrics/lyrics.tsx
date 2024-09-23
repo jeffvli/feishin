@@ -149,12 +149,13 @@ export const Lyrics = () => {
         const originalLyrics = Array.isArray(lyrics.lyrics)
             ? lyrics.lyrics.map(([, line]) => line).join('\n')
             : lyrics.lyrics;
-        const { apiKey, apiProvider, targetLanguage } = lyricsSettings;
+        const { translationApiKey, translationApiProvider, translationTargetLanguage } =
+            lyricsSettings;
         const TranslatedText: string | null = await translateLyrics(
             originalLyrics,
-            apiKey,
-            apiProvider,
-            targetLanguage,
+            translationApiKey,
+            translationApiProvider,
+            translationTargetLanguage,
         );
         setTranslatedLyrics(TranslatedText);
         setShowTranslation(true);
