@@ -199,17 +199,17 @@ export type NDGenreListParams = {
     NDOrder;
 
 export enum NDAlbumListSort {
-    ALBUM_ARTIST = 'albumArtist',
+    ALBUM_ARTIST = 'album_artist',
     ARTIST = 'artist',
     DURATION = 'duration',
     NAME = 'name',
-    PLAY_COUNT = 'playCount',
+    PLAY_COUNT = 'play_count',
     PLAY_DATE = 'play_date',
     RANDOM = 'random',
     RATING = 'rating',
     RECENTLY_ADDED = 'recently_added',
     SONG_COUNT = 'songCount',
-    STARRED = 'starred',
+    STARRED = 'starred_at',
     YEAR = 'max_year',
 }
 
@@ -237,7 +237,7 @@ export enum NDSongListSort {
     CHANNELS = 'channels',
     COMMENT = 'comment',
     DURATION = 'duration',
-    FAVORITED = 'starred',
+    FAVORITED = 'starred_at',
     GENRE = 'genre',
     ID = 'id',
     PLAY_COUNT = 'playCount',
@@ -353,7 +353,7 @@ export type NDPlaylistListResponse = NDPlaylist[];
 export enum NDPlaylistListSort {
     DURATION = 'duration',
     NAME = 'name',
-    OWNER = 'ownerName',
+    OWNER = 'owner_name',
     PUBLIC = 'public',
     SONG_COUNT = 'songCount',
     UPDATED_AT = 'updatedAt',
