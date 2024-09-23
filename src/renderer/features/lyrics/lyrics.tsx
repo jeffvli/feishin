@@ -5,6 +5,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
+import { translateLyrics } from './queries/lyric-translate';
 import { SynchronizedLyrics, SynchronizedLyricsProps } from './synchronized-lyrics';
 import { Spinner, TextTitle } from '/@/renderer/components';
 import { ErrorFallback } from '/@/renderer/features/action-required';
@@ -17,7 +18,6 @@ import { FullLyricsMetadata, LyricSource, LyricsOverride } from '/@/renderer/api
 import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { queryClient } from '/@/renderer/lib/react-query';
-import { translateLyrics } from '/@/main/features/core/lyrics/translate';
 
 const ActionsContainer = styled.div`
     position: absolute;

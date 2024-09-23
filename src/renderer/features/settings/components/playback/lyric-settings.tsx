@@ -161,7 +161,7 @@ export const LyricSettings = () => {
                     }}
                 />
             ),
-            description: t('Api key for translation'),
+            description: t('Api key for translation (Support global service endpoint only)'),
             isHidden: !isElectron(),
             title: t('setting.apiKey', { postProcess: 'sentenceCase' }),
         },
