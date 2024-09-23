@@ -261,7 +261,7 @@ export type NDSongListParams = {
 
 export enum NDAlbumArtistListSort {
     ALBUM_COUNT = 'albumCount',
-    FAVORITED = 'starred',
+    FAVORITED = 'starred_at',
     NAME = 'name',
     PLAY_COUNT = 'playCount',
     RATING = 'rating',

@@ -545,7 +545,7 @@ const songListSort = {
     ARTIST: 'Artist,Album,SortName',
     COMMUNITY_RATING: 'CommunityRating,SortName',
     DURATION: 'Runtime,AlbumArtist,Album,SortName',
-    NAME: 'SortName,Name',
+    NAME: 'Name',
     PLAY_COUNT: 'PlayCount,SortName',
     RANDOM: 'Random,SortName',
     RECENTLY_ADDED: 'DateCreated,SortName',
