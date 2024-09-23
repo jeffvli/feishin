@@ -122,7 +122,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
 
     const compilationAlbumsQuery = useAlbumList({
         options: {
-            enabled: enabledItem.compilations,
+            enabled: enabledItem.compilations && server?.type !== ServerType.SUBSONIC,
         },
         query: {
             artistIds: [albumArtistId],
@@ -233,7 +233,10 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
             },
             {
                 data: compilationAlbumsQuery?.data?.items,
-                isHidden: !compilationAlbumsQuery?.data?.items?.length || !enabledItem.compilations,
+                isHidden:
+                    !compilationAlbumsQuery?.data?.items?.length ||
+                    !enabledItem.compilations ||
+                    server?.type === ServerType.SUBSONIC,
                 itemType: LibraryItem.ALBUM,
                 loading: compilationAlbumsQuery?.isLoading || compilationAlbumsQuery.isFetching,
                 order: itemOrder.compilations,
@@ -280,6 +283,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         recentAlbumsQuery?.data?.items,
         recentAlbumsQuery.isFetching,
         recentAlbumsQuery?.isLoading,
+        server?.type,
         t,
     ]);
 

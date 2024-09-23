@@ -44,7 +44,7 @@ import {
     useSetPlaylistDetailTablePagination,
 } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { ListDisplayType } from '/@/renderer/types';
+import { ListDisplayType, ServerType } from '/@/renderer/types';
 import { useAppFocus } from '/@/renderer/hooks';
 import { toast } from '/@/renderer/components';
 
@@ -270,6 +270,11 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
+    const canDrag =
+        filters.sortBy === SongListSort.ID &&
+        !detailQuery?.data?.rules &&
+        server?.type !== ServerType.SUBSONIC;
+
     return (
         <>
             <VirtualGridAutoSizerContainer>
@@ -294,9 +299,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                     paginationAutoPageSize={isPaginationEnabled}
                     paginationPageSize={pagination.itemsPerPage || 100}
                     rowClassRules={rowClassRules}
-                    rowDragEntireRow={
-                        filters.sortBy === SongListSort.ID && !detailQuery?.data?.rules
-                    }
+                    rowDragEntireRow={canDrag}
                     rowHeight={page.table.rowHeight || 40}
                     rowModelType="infinite"
                     onBodyScrollEnd={handleScroll}

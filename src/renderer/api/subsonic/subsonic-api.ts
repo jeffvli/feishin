@@ -27,6 +27,46 @@ export const contract = c.router({
             200: ssType._response.createFavorite,
         },
     },
+    createPlaylist: {
+        method: 'GET',
+        path: 'createPlaylist.view',
+        query: ssType._parameters.createPlaylist,
+        responses: {
+            200: ssType._response.createPlaylist,
+        },
+    },
+    deletePlaylist: {
+        method: 'GET',
+        path: 'deletePlaylist.view',
+        query: ssType._parameters.deletePlaylist,
+        responses: {
+            200: ssType._response.baseResponse,
+        },
+    },
+    getAlbum: {
+        method: 'GET',
+        path: 'getAlbum.view',
+        query: ssType._parameters.getAlbum,
+        responses: {
+            200: ssType._response.getAlbum,
+        },
+    },
+    getAlbumList2: {
+        method: 'GET',
+        path: 'getAlbumList2.view',
+        query: ssType._parameters.getAlbumList2,
+        responses: {
+            200: ssType._response.getAlbumList2,
+        },
+    },
+    getArtist: {
+        method: 'GET',
+        path: 'getArtist.view',
+        query: ssType._parameters.getArtist,
+        responses: {
+            200: ssType._response.getArtist,
+        },
+    },
     getArtistInfo: {
         method: 'GET',
         path: 'getArtistInfo.view',
@@ -35,11 +75,43 @@ export const contract = c.router({
             200: ssType._response.artistInfo,
         },
     },
+    getArtists: {
+        method: 'GET',
+        path: 'getArtists.view',
+        query: ssType._parameters.getArtists,
+        responses: {
+            200: ssType._response.getArtists,
+        },
+    },
+    getGenres: {
+        method: 'GET',
+        path: 'getGenres.view',
+        query: ssType._parameters.getGenres,
+        responses: {
+            200: ssType._response.getGenres,
+        },
+    },
     getMusicFolderList: {
         method: 'GET',
         path: 'getMusicFolders.view',
         responses: {
             200: ssType._response.musicFolderList,
+        },
+    },
+    getPlaylist: {
+        method: 'GET',
+        path: 'getPlaylist.view',
+        query: ssType._parameters.getPlaylist,
+        responses: {
+            200: ssType._response.getPlaylist,
+        },
+    },
+    getPlaylists: {
+        method: 'GET',
+        path: 'getPlaylists.view',
+        query: ssType._parameters.getPlaylists,
+        responses: {
+            200: ssType._response.getPlaylists,
         },
     },
     getRandomSongList: {
@@ -63,6 +135,30 @@ export const contract = c.router({
         query: ssType._parameters.similarSongs,
         responses: {
             200: ssType._response.similarSongs,
+        },
+    },
+    getSong: {
+        method: 'GET',
+        path: 'getSong.view',
+        query: ssType._parameters.getSong,
+        responses: {
+            200: ssType._response.getSong,
+        },
+    },
+    getSongsByGenre: {
+        method: 'GET',
+        path: 'getSongsByGenre.view',
+        query: ssType._parameters.getSongsByGenre,
+        responses: {
+            200: ssType._response.getSongsByGenre,
+        },
+    },
+    getStarred: {
+        method: 'GET',
+        path: 'getStarred.view',
+        query: ssType._parameters.getStarred,
+        responses: {
+            200: ssType._response.getStarred,
         },
     },
     getStructuredLyrics: {
@@ -118,6 +214,14 @@ export const contract = c.router({
         query: ssType._parameters.setRating,
         responses: {
             200: ssType._response.setRating,
+        },
+    },
+    updatePlaylist: {
+        method: 'GET',
+        path: 'updatePlaylist.view',
+        query: ssType._parameters.updatePlaylist,
+        responses: {
+            200: ssType._response.baseResponse,
         },
     },
 });
