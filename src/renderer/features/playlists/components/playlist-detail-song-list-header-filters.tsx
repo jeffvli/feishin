@@ -303,43 +303,55 @@ export const PlaylistDetailSongListHeaderFilters = ({
 
     const handleFilterChange = useCallback(
         async (filters: SongListFilter) => {
-            const dataSource: IDatasource = {
-                getRows: async (params) => {
-                    const limit = params.endRow - params.startRow;
-                    const startIndex = params.startRow;
+            if (server?.type !== ServerType.SUBSONIC) {
+                const dataSource: IDatasource = {
+                    getRows: async (params) => {
+                        const limit = params.endRow - params.startRow;
+                        const startIndex = params.startRow;
 
-                    const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, {
-                        id: playlistId,
-                        limit,
-                        startIndex,
-                        ...filters,
-                    });
+                        const queryKey = queryKeys.playlists.songList(
+                            server?.id || '',
+                            playlistId,
+                            {
+                                id: playlistId,
+                                limit,
+                                startIndex,
+                                ...filters,
+                            },
+                        );
 
-                    const songsRes = await queryClient.fetchQuery(
-                        queryKey,
-                        async ({ signal }) =>
-                            api.controller.getPlaylistSongList({
-                                apiClientProps: {
-                                    server,
-                                    signal,
-                                },
-                                query: {
-                                    id: playlistId,
-                                    limit,
-                                    startIndex,
-                                    ...filters,
-                                },
-                            }),
-                        { cacheTime: 1000 * 60 * 1 },
-                    );
+                        const songsRes = await queryClient.fetchQuery(
+                            queryKey,
+                            async ({ signal }) =>
+                                api.controller.getPlaylistSongList({
+                                    apiClientProps: {
+                                        server,
+                                        signal,
+                                    },
+                                    query: {
+                                        id: playlistId,
+                                        limit,
+                                        startIndex,
+                                        ...filters,
+                                    },
+                                }),
+                            { cacheTime: 1000 * 60 * 1 },
+                        );
 
-                    params.successCallback(songsRes?.items || [], songsRes?.totalRecordCount || 0);
-                },
-                rowCount: undefined,
-            };
-            tableRef.current?.api.setDatasource(dataSource);
-            tableRef.current?.api.purgeInfiniteCache();
-            tableRef.current?.api.ensureIndexVisible(0, 'top');
+                        params.successCallback(
+                            songsRes?.items || [],
+                            songsRes?.totalRecordCount || 0,
+                        );
+                    },
+                    rowCount: undefined,
+                };
+                tableRef.current?.api.setDatasource(dataSource);
+                tableRef.current?.api.purgeInfiniteCache();
+                tableRef.current?.api.ensureIndexVisible(0, 'top');
+            } else {
+                tableRef.current?.api.redrawRows();
+                tableRef.current?.api.ensureIndexVisible(0, 'top');
+            }
 
             if (page.display === ListDisplayType.TABLE_PAGINATED) {
                 setPagination({ data: { currentPage: 0 } });

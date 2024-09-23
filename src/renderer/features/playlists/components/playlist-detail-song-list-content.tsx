@@ -49,10 +49,11 @@ import { useAppFocus } from '/@/renderer/hooks';
 import { toast } from '/@/renderer/components';
 
 interface PlaylistDetailContentProps {
+    songs?: Song[];
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailContentProps) => {
+export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetailContentProps) => {
     const { playlistId } = useParams() as { playlistId: string };
     const queryClient = useQueryClient();
     const status = useCurrentStatus();
@@ -85,7 +86,12 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
 
     const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
 
+    const iSClientSide = server?.type === ServerType.SUBSONIC;
+
     const checkPlaylistList = usePlaylistSongList({
+        options: {
+            enabled: !iSClientSide,
+        },
         query: {
             id: playlistId,
             limit: 1,
@@ -101,44 +107,51 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
 
     const onGridReady = useCallback(
         (params: GridReadyEvent) => {
-            const dataSource: IDatasource = {
-                getRows: async (params) => {
-                    const limit = params.endRow - params.startRow;
-                    const startIndex = params.startRow;
+            if (!iSClientSide) {
+                const dataSource: IDatasource = {
+                    getRows: async (params) => {
+                        const limit = params.endRow - params.startRow;
+                        const startIndex = params.startRow;
 
-                    const query: PlaylistSongListQuery = {
-                        id: playlistId,
-                        limit,
-                        startIndex,
-                        ...filters,
-                    };
+                        const query: PlaylistSongListQuery = {
+                            id: playlistId,
+                            limit,
+                            startIndex,
+                            ...filters,
+                        };
 
-                    const queryKey = queryKeys.playlists.songList(
-                        server?.id || '',
-                        playlistId,
-                        query,
-                    );
-
-                    if (!server) return;
-
-                    const songsRes = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-                        api.controller.getPlaylistSongList({
-                            apiClientProps: {
-                                server,
-                                signal,
-                            },
+                        const queryKey = queryKeys.playlists.songList(
+                            server?.id || '',
+                            playlistId,
                             query,
-                        }),
-                    );
+                        );
 
-                    params.successCallback(songsRes?.items || [], songsRes?.totalRecordCount || 0);
-                },
-                rowCount: undefined,
-            };
-            params.api.setDatasource(dataSource);
+                        if (!server) return;
+
+                        const songsRes = await queryClient.fetchQuery(
+                            queryKey,
+                            async ({ signal }) =>
+                                api.controller.getPlaylistSongList({
+                                    apiClientProps: {
+                                        server,
+                                        signal,
+                                    },
+                                    query,
+                                }),
+                        );
+
+                        params.successCallback(
+                            songsRes?.items || [],
+                            songsRes?.totalRecordCount || 0,
+                        );
+                    },
+                    rowCount: undefined,
+                };
+                params.api.setDatasource(dataSource);
+            }
             params.api?.ensureIndexVisible(pagination.scrollOffset, 'top');
         },
-        [filters, pagination.scrollOffset, playlistId, queryClient, server],
+        [filters, iSClientSide, pagination.scrollOffset, playlistId, queryClient, server],
     );
 
     const handleDragEnd = useCallback(
@@ -271,9 +284,7 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
     const canDrag =
-        filters.sortBy === SongListSort.ID &&
-        !detailQuery?.data?.rules &&
-        server?.type !== ServerType.SUBSONIC;
+        filters.sortBy === SongListSort.ID && !detailQuery?.data?.rules && !iSClientSide;
 
     return (
         <>
@@ -294,14 +305,17 @@ export const PlaylistDetailSongListContent = ({ tableRef }: PlaylistDetailConten
                         status,
                     }}
                     getRowId={(data) => data.data.uniqueId}
-                    infiniteInitialRowCount={checkPlaylistList.data?.totalRecordCount || 100}
+                    infiniteInitialRowCount={
+                        iSClientSide ? undefined : checkPlaylistList.data?.totalRecordCount || 100
+                    }
                     pagination={isPaginationEnabled}
                     paginationAutoPageSize={isPaginationEnabled}
                     paginationPageSize={pagination.itemsPerPage || 100}
                     rowClassRules={rowClassRules}
+                    rowData={songs}
                     rowDragEntireRow={canDrag}
                     rowHeight={page.table.rowHeight || 40}
-                    rowModelType="infinite"
+                    rowModelType={iSClientSide ? 'clientSide' : 'infinite'}
                     onBodyScrollEnd={handleScroll}
                     onCellContextMenu={handleContextMenu}
                     onColumnMoved={handleColumnChange}

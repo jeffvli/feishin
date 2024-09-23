@@ -39,6 +39,7 @@ export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistLis
 
     const { filter, refresh, search } = useDisplayRefresh<PlaylistListQuery>({
         gridRef,
+        itemCount,
         itemType: LibraryItem.PLAYLIST,
         server,
         tableRef,
