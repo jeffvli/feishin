@@ -76,7 +76,7 @@ export const AppMenu = () => {
     const handleManageServersModal = () => {
         openModal({
             children: <ServerList />,
-            title: 'Manage Servers',
+            title: t('page.manageServers.title', { postProcess: 'titleCase' }),
         });
     };
 

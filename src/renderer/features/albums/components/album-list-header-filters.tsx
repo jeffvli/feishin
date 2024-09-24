@@ -436,7 +436,7 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                         },
                     }}
                     tooltip={{
-                        label: t('common.filter', { count: 2, postProcess: 'sentenceCase' }),
+                        label: t('common.filters', { count: 2, postProcess: 'sentenceCase' }),
                     }}
                     variant="subtle"
                     onClick={handleOpenFiltersModal}
@@ -514,7 +514,9 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        <DropdownMenu.Label>Display type</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.CARD}
                             value={ListDisplayType.CARD}

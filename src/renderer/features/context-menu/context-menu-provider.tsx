@@ -869,7 +869,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     },
                 ],
                 id: 'setRating',
-                label: 'Set rating',
+                label: t('action.setRating', { postProcess: 'sentenceCase' }),
                 leftIcon: <RiStarFill size="1.1rem" />,
                 onClick: () => {},
                 rightIcon: <RiArrowRightSFill size="1.2rem" />,

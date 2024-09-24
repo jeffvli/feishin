@@ -522,7 +522,9 @@ export const PlaylistDetailSongListHeaderFilters = ({
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        <DropdownMenu.Label>Display type</DropdownMenu.Label>
+                        <DropdownMenu.Label>
+                            {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Label>
                         <DropdownMenu.Item
                             $isActive={page.display === ListDisplayType.TABLE}
                             value={ListDisplayType.TABLE}

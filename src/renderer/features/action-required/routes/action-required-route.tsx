@@ -37,7 +37,7 @@ const ActionRequiredRoute = () => {
     const handleManageServersModal = () => {
         openModal({
             children: <ServerList />,
-            title: 'Manage Servers',
+            title: t('page.appMenu.manageServers', { postProcess: 'sentenceCase' }),
         });
     };
 

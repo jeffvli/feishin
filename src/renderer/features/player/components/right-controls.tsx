@@ -293,7 +293,10 @@ export const RightControls = () => {
                 {!isMinWidth ? (
                     <PlayerButton
                         icon={<HiOutlineQueueList size="1.1rem" />}
-                        tooltip={{ label: 'View queue', openDelay: 500 }}
+                        tooltip={{
+                            label: t('player.viewQueue', { postProcess: 'titleCase' }),
+                            openDelay: 500,
+                        }}
                         variant="secondary"
                         onClick={handleToggleQueue}
                     />

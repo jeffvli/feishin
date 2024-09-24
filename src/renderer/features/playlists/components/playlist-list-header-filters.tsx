@@ -368,7 +368,7 @@ export const PlaylistListHeaderFilters = ({
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Label>
-                            {t('table.config.general.displayType', { postProcess: 'titleCase' })}
+                            {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Label>
                         <DropdownMenu.Item
                             $isActive={display === ListDisplayType.CARD}

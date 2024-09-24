@@ -6,6 +6,7 @@ import { useSettingsStoreActions, useSettingsStore } from '/@/renderer/store/set
 import { TableColumn, TableType } from '/@/renderer/types';
 import { Option } from '/@/renderer/components/option';
 import i18n from '/@/i18n/i18n';
+import { useTranslation } from 'react-i18next';
 
 export const SONG_TABLE_COLUMNS = [
     {
@@ -285,6 +286,7 @@ interface TableConfigDropdownProps {
 }
 
 export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
+    const { t } = useTranslation();
     const { setSettings } = useSettingsStoreActions();
     const tableConfig = useSettingsStore((state) => state.tables);
 
@@ -374,7 +376,9 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
     return (
         <>
             <Option>
-                <Option.Label>Auto-fit Columns</Option.Label>
+                <Option.Label>
+                    {t('table.config.general.autoFitColumns', { postProcess: 'sentenceCase' })}
+                </Option.Label>
                 <Option.Control>
                     <Switch
                         defaultChecked={tableConfig[type]?.autoFit}
@@ -384,7 +388,11 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
             </Option>
             {type !== 'albumDetail' && (
                 <Option>
-                    <Option.Label>Follow current song</Option.Label>
+                    <Option.Label>
+                        {t('table.config.general.followCurrentSong', {
+                            postProcess: 'sentenceCase',
+                        })}
+                    </Option.Label>
                     <Option.Control>
                         <Switch
                             defaultChecked={tableConfig[type]?.followCurrentSong}
