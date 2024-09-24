@@ -84,7 +84,7 @@ const TrackListRoute = () => {
         async (args: { initialSongId?: string; playType: Play }) => {
             if (!itemCount || itemCount === 0) return;
             const { initialSongId, playType } = args;
-            const query: SongListQuery = { startIndex: 0, ...songListFilter };
+            const query: SongListQuery = { ...songListFilter, limit: itemCount, startIndex: 0 };
 
             if (albumArtistId) {
                 handlePlayQueueAdd?.({

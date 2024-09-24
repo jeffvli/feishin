@@ -192,14 +192,15 @@ export const getSongsByQuery = async (args: {
 
     const res = await queryClient.fetchQuery(
         queryKey,
-        async ({ signal }) =>
-            api.controller.getSongList({
+        async ({ signal }) => {
+            return api.controller.getSongList({
                 apiClientProps: {
                     server,
                     signal,
                 },
                 query: queryFilter,
-            }),
+            });
+        },
         {
             cacheTime: 1000 * 60,
             staleTime: 1000 * 60,

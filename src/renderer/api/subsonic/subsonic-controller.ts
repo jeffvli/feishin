@@ -697,20 +697,6 @@ export const SubsonicController: ControllerEndpoint = {
             totalRecordCount: res.body.randomSongs?.song?.length || 0,
         };
     },
-    removeFromPlaylist: async ({ query, apiClientProps }) => {
-        const res = await ssApiClient(apiClientProps).updatePlaylist({
-            query: {
-                playlistId: query.id,
-                songIndexToRemove: query.songId,
-            },
-        });
-
-        if (res.status !== 200) {
-            throw new Error('Failed to add to playlist');
-        }
-
-        return null;
-    },
     getServerInfo: async (args) => {
         const { apiClientProps } = args;
 
@@ -987,7 +973,7 @@ export const SubsonicController: ControllerEndpoint = {
                     throw new Error('Failed to get song list count');
                 }
 
-                const songCount = res.body.searchResult3.song?.length;
+                const songCount = res.body.searchResult3.song?.length || 0;
 
                 totalRecordCount += songCount;
                 startIndex += songCount;
@@ -1200,6 +1186,20 @@ export const SubsonicController: ControllerEndpoint = {
         }
 
         return url;
+    },
+    removeFromPlaylist: async ({ query, apiClientProps }) => {
+        const res = await ssApiClient(apiClientProps).updatePlaylist({
+            query: {
+                playlistId: query.id,
+                songIndexToRemove: query.songId,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to add to playlist');
+        }
+
+        return null;
     },
     scrobble: async (args) => {
         const { query, apiClientProps } = args;

@@ -1,7 +1,7 @@
 import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
-import { GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import { GenreListSort, LibraryItem, SongListQuery, SortOrder } from '/@/renderer/api/types';
 import { Select, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
@@ -22,9 +22,9 @@ export const SubsonicSongFilters = ({
 }: SubsonicSongFiltersProps) => {
     const { t } = useTranslation();
     const { setFilter } = useListStoreActions();
-    const filter = useListFilterByKey({ key: pageKey });
+    const filter = useListFilterByKey<SongListQuery>({ key: pageKey });
 
-    const isGenrePage = customFilters?._custom?.navidrome?.genre_id !== undefined;
+    const isGenrePage = customFilters?.genreIds !== undefined;
 
     const genreListQuery = useGenreList({
         query: {
@@ -58,6 +58,7 @@ export const SubsonicSongFilters = ({
 
     const toggleFilters = [
         {
+            disabled: filter.genreIds !== undefined || isGenrePage || !!filter.searchTerm,
             label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
@@ -71,7 +72,7 @@ export const SubsonicSongFilters = ({
 
                 onFilterChange(updatedFilters);
             },
-            value: filter.isFavorite,
+            value: filter.favorite,
         },
     ];
 
@@ -85,6 +86,7 @@ export const SubsonicSongFilters = ({
                     <Text>{filter.label}</Text>
                     <Switch
                         checked={filter?.value || false}
+                        disabled={filter.disabled}
                         size="xs"
                         onChange={filter.onChange}
                     />
@@ -97,7 +99,8 @@ export const SubsonicSongFilters = ({
                         clearable
                         searchable
                         data={genreList}
-                        defaultValue={filter.genre}
+                        defaultValue={filter.genreIds ? filter.genreIds[0] : undefined}
+                        disabled={!!filter.searchTerm}
                         label={t('entity.genre', { count: 1, postProcess: 'titleCase' })}
                         width={150}
                         onChange={handleGenresFilter}

@@ -194,7 +194,7 @@ export const useVirtualTable = <TFilter extends BaseQuery<any>>({
                         const hasMoreRows = results?.items?.length === BLOCK_SIZE;
                         const lastRowIndex = hasMoreRows
                             ? undefined
-                            : (properties.filter.offset || 0) + results.items.length;
+                            : params.startRow + results.items.length;
 
                         params.successCallback(
                             results?.items || [],
@@ -342,6 +342,7 @@ export const useVirtualTable = <TFilter extends BaseQuery<any>>({
             alwaysShowHorizontalScroll: true,
             autoFitColumns: properties.table.autoFit,
             blockLoadDebounceMillis: 200,
+            cacheBlockSize: BLOCK_SIZE,
             getRowId: (data: GetRowIdParams<any>) => data.data.id,
             infiniteInitialRowCount: itemCount || 100,
             pagination: isPaginationEnabled,
