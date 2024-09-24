@@ -5,6 +5,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
+import { translateLyrics } from './queries/lyric-translate';
 import { SynchronizedLyrics, SynchronizedLyricsProps } from './synchronized-lyrics';
 import { Spinner, TextTitle } from '/@/renderer/components';
 import { ErrorFallback } from '/@/renderer/features/action-required';
@@ -12,7 +13,7 @@ import {
     UnsynchronizedLyrics,
     UnsynchronizedLyricsProps,
 } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
-import { useCurrentSong, usePlayerStore } from '/@/renderer/store';
+import { useCurrentSong, usePlayerStore, useLyricsSettings } from '/@/renderer/store';
 import { FullLyricsMetadata, LyricSource, LyricsOverride } from '/@/renderer/api/types';
 import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -84,7 +85,10 @@ const ScrollContainer = styled(motion.div)`
 
 export const Lyrics = () => {
     const currentSong = useCurrentSong();
+    const lyricsSettings = useLyricsSettings();
     const [index, setIndex] = useState(0);
+    const [translatedLyrics, setTranslatedLyrics] = useState<string | null>(null);
+    const [showTranslation, setShowTranslation] = useState(false);
 
     const { data, isInitialLoading } = useSongLyricsBySong(
         {
@@ -95,6 +99,19 @@ export const Lyrics = () => {
     );
 
     const [override, setOverride] = useState<LyricsOverride | undefined>(undefined);
+
+    const [lyrics, synced] = useMemo(() => {
+        if (Array.isArray(data)) {
+            if (data.length > 0) {
+                const selectedLyric = data[Math.min(index, data.length)];
+                return [selectedLyric, selectedLyric.synced];
+            }
+        } else if (data?.lyrics) {
+            return [data, Array.isArray(data.lyrics)];
+        }
+
+        return [undefined, false];
+    }, [data, index]);
 
     const handleOnSearchOverride = useCallback((params: LyricsOverride) => {
         setOverride(params);
@@ -123,6 +140,27 @@ export const Lyrics = () => {
         );
     }, [currentSong?.id, currentSong?.serverId]);
 
+    const handleOnTranslateLyric = useCallback(async () => {
+        if (translatedLyrics) {
+            setShowTranslation(!showTranslation);
+            return;
+        }
+        if (!lyrics) return;
+        const originalLyrics = Array.isArray(lyrics.lyrics)
+            ? lyrics.lyrics.map(([, line]) => line).join('\n')
+            : lyrics.lyrics;
+        const { translationApiKey, translationApiProvider, translationTargetLanguage } =
+            lyricsSettings;
+        const TranslatedText: string | null = await translateLyrics(
+            originalLyrics,
+            translationApiKey,
+            translationApiProvider,
+            translationTargetLanguage,
+        );
+        setTranslatedLyrics(TranslatedText);
+        setShowTranslation(true);
+    }, [lyrics, lyricsSettings, translatedLyrics, showTranslation]);
+
     const { isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
         options: {
             enabled: !!override,
@@ -149,19 +187,6 @@ export const Lyrics = () => {
             unsubSongChange();
         };
     }, []);
-
-    const [lyrics, synced] = useMemo(() => {
-        if (Array.isArray(data)) {
-            if (data.length > 0) {
-                const selectedLyric = data[Math.min(index, data.length)];
-                return [selectedLyric, selectedLyric.synced];
-            }
-        } else if (data?.lyrics) {
-            return [data, Array.isArray(data.lyrics)];
-        }
-
-        return [undefined, false];
-    }, [data, index]);
 
     const languages = useMemo(() => {
         if (Array.isArray(data)) {
@@ -203,10 +228,14 @@ export const Lyrics = () => {
                                 transition={{ duration: 0.5 }}
                             >
                                 {synced ? (
-                                    <SynchronizedLyrics {...(lyrics as SynchronizedLyricsProps)} />
+                                    <SynchronizedLyrics
+                                        {...(lyrics as SynchronizedLyricsProps)}
+                                        translatedLyrics={showTranslation ? translatedLyrics : null}
+                                    />
                                 ) : (
                                     <UnsynchronizedLyrics
                                         {...(lyrics as UnsynchronizedLyricsProps)}
+                                        translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />
                                 )}
                             </ScrollContainer>
@@ -221,6 +250,7 @@ export const Lyrics = () => {
                         onRemoveLyric={handleOnRemoveLyric}
                         onResetLyric={handleOnResetLyric}
                         onSearchOverride={handleOnSearchOverride}
+                        onTranslateLyric={handleOnTranslateLyric}
                     />
                 </ActionsContainer>
             </LyricsContainer>

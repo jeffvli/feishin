@@ -3,11 +3,19 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useLyricsSettings, useSettingsStoreActions } from '/@/renderer/store';
-import { MultiSelect, MultiSelectProps, NumberInput, Switch } from '/@/renderer/components';
+import {
+    Select,
+    MultiSelect,
+    MultiSelectProps,
+    TextInput,
+    NumberInput,
+    Switch,
+} from '/@/renderer/components';
 import isElectron from 'is-electron';
 import styled from 'styled-components';
 import { LyricSource } from '/@/renderer/api/types';
 import { useTranslation } from 'react-i18next';
+import { languages } from '/@/i18n/i18n';
 
 const localSettings = isElectron() ? window.electron.localSettings : null;
 
@@ -115,6 +123,58 @@ export const LyricSettings = () => {
             }),
             isHidden: !isElectron(),
             title: t('setting.lyricOffset', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Select
+                    data={languages}
+                    value={settings.translationTargetLanguage}
+                    onChange={(value) => {
+                        setSettings({ lyrics: { ...settings, translationTargetLanguage: value } });
+                    }}
+                />
+            ),
+            description: t('setting.translationTargetLanguage', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.translationTargetLanguage', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Select
+                    data={['Microsoft Azure', 'Google Cloud']}
+                    value={settings.translationApiProvider}
+                    onChange={(value) => {
+                        setSettings({ lyrics: { ...settings, translationApiProvider: value } });
+                    }}
+                />
+            ),
+            description: t('setting.translationApiProvider', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.translationApiProvider', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <TextInput
+                    value={settings.translationApiKey}
+                    onChange={(e) => {
+                        setSettings({
+                            lyrics: { ...settings, translationApiKey: e.currentTarget.value },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.translationApiKey', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.translationApiKey', { postProcess: 'sentenceCase' }),
         },
     ];
 

@@ -275,6 +275,9 @@ export interface SettingsState {
         showMatch: boolean;
         showProvider: boolean;
         sources: LyricSource[];
+        translationApiKey: string;
+        translationApiProvider: string | null;
+        translationTargetLanguage: string | null;
     };
     playback: {
         audioDeviceId?: string | null;
@@ -449,6 +452,9 @@ const initialState: SettingsState = {
         showMatch: true,
         showProvider: true,
         sources: [],
+        translationApiKey: '',
+        translationApiProvider: '',
+        translationTargetLanguage: 'en',
     },
     playback: {
         audioDeviceId: undefined,

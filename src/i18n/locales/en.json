@@ -109,6 +109,7 @@
         "trackNumber": "track",
         "trackGain": "track gain",
         "trackPeak": "track peak",
+        "translation": "translation",
         "unknown": "unknown",
         "version": "version",
         "year": "year",
@@ -355,7 +356,8 @@
             },
             "lyrics": "lyrics",
             "related": "related",
-            "upNext": "up next"
+            "upNext": "up next",
+            "visualizer": "visualizer"
         },
         "genreList": {
             "showAlbums": "show $t(entity.genre_one) $t(entity.album_other)",
@@ -653,6 +655,12 @@
         "transcodeBitrate_description": "selects the bitrate to transcode. 0 means let the server pick",
         "transcodeFormat": "format to transcode",
         "transcodeFormat_description": "selects the format to transcode. leave empty to let the server decide",
+        "translationApiProvider": "translation api provider",
+        "translationApiProvider_description": "api provider for translation",
+        "translationApiKey": "translation api key",
+        "translationApiKey_description": "api key for translation (Support global service endpoint only)",
+        "translationTargetLanguage": "translation target language",
+        "translationTargetLanguage_description": "target language for translation",
         "trayEnabled": "show tray",
         "trayEnabled_description": "show/hide tray icon/menu. if disabled, also disables minimize/exit to tray",
         "useSystemTheme": "use system theme",
