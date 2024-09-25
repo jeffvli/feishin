@@ -569,7 +569,7 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                             icon={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
-                            Refresh
+                            {t('common.refresh', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>

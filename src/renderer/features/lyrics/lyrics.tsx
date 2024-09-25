@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Center, Group } from '@mantine/core';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from 'react-error-boundary';
+import { useTranslation } from 'react-i18next';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
 import { useSongLyricsByRemoteId, useSongLyricsBySong } from './queries/lyric-query';
@@ -86,6 +87,7 @@ const ScrollContainer = styled(motion.div)`
 export const Lyrics = () => {
     const currentSong = useCurrentSong();
     const lyricsSettings = useLyricsSettings();
+    const { t } = useTranslation();
     const [index, setIndex] = useState(0);
     const [translatedLyrics, setTranslatedLyrics] = useState<string | null>(null);
     const [showTranslation, setShowTranslation] = useState(false);
@@ -217,7 +219,9 @@ export const Lyrics = () => {
                                         order={3}
                                         weight={700}
                                     >
-                                        No lyrics found
+                                        {t('page.fullscreenPlayer.noLyrics', {
+                                            postProcess: 'sentenceCase',
+                                        })}
                                     </TextTitle>
                                 </Group>
                             </Center>

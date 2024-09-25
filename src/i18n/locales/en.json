@@ -354,6 +354,7 @@
                 "dynamicIsImage": "enable background image",
                 "followCurrentLyric": "follow current lyric",
                 "lyricAlignment": "lyric alignment",
+                "lyricOffset": "lyrics offset (ms)",
                 "lyricGap": "lyric gap",
                 "lyricSize": "lyric size",
                 "opacity": "opacity",
@@ -366,7 +367,8 @@
             "lyrics": "lyrics",
             "related": "related",
             "upNext": "up next",
-            "visualizer": "visualizer"
+            "visualizer": "visualizer",
+            "noLyrics": "no lyrics found"
         },
         "genreList": {
             "showAlbums": "show $t(entity.genre_one) $t(entity.album_other)",

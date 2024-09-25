@@ -382,7 +382,11 @@ const Controls = () => {
                         </Option.Control>
                     </Option>
                     <Option>
-                        <Option.Label>Lyrics offset (ms)</Option.Label>
+                        <Option.Label>
+                            {t('page.fullscreenPlayer.config.lyricOffset', {
+                                postProcess: 'sentenceCase',
+                            })}
+                        </Option.Label>
                         <Option.Control>
                             <NumberInput
                                 defaultValue={lyricConfig.delayMs}

@@ -98,7 +98,7 @@ export const FullScreenPlayerQueue = () => {
             items.push({
                 active: activeTab === 'visualizer',
                 icon: <RiFileTextLine size="1.5rem" />,
-                label: t('page.fullscreenPlayer.visualizer'),
+                label: t('page.fullscreenPlayer.visualizer', { postProcess: 'titleCase' }),
                 onClick: () => setStore({ activeTab: 'visualizer' }),
             });
         }
