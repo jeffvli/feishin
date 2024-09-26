@@ -15,7 +15,13 @@ import {
 } from 'react-icons/ri';
 import { useListStoreByKey } from '../../../store/list.store';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { LibraryItem, ServerType, SongListSort, SortOrder } from '/@/renderer/api/types';
+import {
+    LibraryItem,
+    ServerType,
+    SongListQuery,
+    SongListSort,
+    SortOrder,
+} from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
@@ -29,6 +35,7 @@ import { queryClient } from '/@/renderer/lib/react-query';
 import { SongListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
 import { ListDisplayType, Play, TableColumn } from '/@/renderer/types';
 import i18n from '/@/i18n/i18n';
+import { SubsonicSongFilters } from '/@/renderer/features/songs/components/subsonic-song-filter';
 
 const FILTERS = {
     jellyfin: [
@@ -165,25 +172,39 @@ const FILTERS = {
             value: SongListSort.YEAR,
         },
     ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: SongListSort.NAME,
+        },
+    ],
 };
 
 interface SongListHeaderFiltersProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+    itemCount?: number;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFiltersProps) => {
+export const SongListHeaderFilters = ({
+    gridRef,
+    itemCount,
+    tableRef,
+}: SongListHeaderFiltersProps) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
     const { pageKey, handlePlay, customFilters } = useListContext();
-    const { display, table, filter, grid } = useListStoreByKey({
+    const { display, table, filter, grid } = useListStoreByKey<SongListQuery>({
         filter: customFilters,
         key: pageKey,
     });
+
     const { setFilter, setGrid, setTable, setTablePagination, setDisplayType } =
         useListStoreActions();
 
     const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.SONG,
         server,
     });
@@ -392,25 +413,32 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
     };
 
     const handleOpenFiltersModal = () => {
+        let FilterComponent;
+
+        switch (server?.type) {
+            case ServerType.NAVIDROME:
+                FilterComponent = NavidromeSongFilters;
+                break;
+            case ServerType.JELLYFIN:
+                FilterComponent = JellyfinSongFilters;
+                break;
+            case ServerType.SUBSONIC:
+                FilterComponent = SubsonicSongFilters;
+                break;
+        }
+
+        if (!FilterComponent) {
+            return;
+        }
+
         openModal({
             children: (
-                <>
-                    {server?.type === ServerType.NAVIDROME ? (
-                        <NavidromeSongFilters
-                            customFilters={customFilters}
-                            pageKey={pageKey}
-                            serverId={server?.id}
-                            onFilterChange={onFilterChange}
-                        />
-                    ) : (
-                        <JellyfinSongFilters
-                            customFilters={customFilters}
-                            pageKey={pageKey}
-                            serverId={server?.id}
-                            onFilterChange={onFilterChange}
-                        />
-                    )}
-                </>
+                <FilterComponent
+                    customFilters={customFilters}
+                    pageKey={pageKey}
+                    serverId={server?.id}
+                    onFilterChange={onFilterChange}
+                />
             ),
             title: 'Song Filters',
         });
@@ -429,8 +457,16 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                 .filter((value) => value !== 'Audio') // Don't account for includeItemTypes: Audio
                 .some((value) => value !== undefined);
 
-        return isNavidromeFilterApplied || isJellyfinFilterApplied;
-    }, [filter?._custom?.jellyfin, filter?._custom?.navidrome, server?.type]);
+        const isGenericFilterApplied = filter?.favorite || filter?.genreIds?.length;
+
+        return isNavidromeFilterApplied || isJellyfinFilterApplied || isGenericFilterApplied;
+    }, [
+        filter._custom?.jellyfin,
+        filter._custom?.navidrome,
+        filter?.favorite,
+        filter?.genreIds?.length,
+        server?.type,
+    ]);
 
     const isFolderFilterApplied = useMemo(() => {
         return filter.musicFolderId !== undefined;
@@ -467,11 +503,15 @@ export const SongListHeaderFilters = ({ gridRef, tableRef }: SongListHeaderFilte
                         ))}
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
-                <Divider orientation="vertical" />
-                <OrderToggleButton
-                    sortOrder={filter.sortOrder}
-                    onToggle={handleToggleSortOrder}
-                />
+                {server?.type !== ServerType.SUBSONIC && (
+                    <>
+                        <Divider orientation="vertical" />
+                        <OrderToggleButton
+                            sortOrder={filter.sortOrder}
+                            onToggle={handleToggleSortOrder}
+                        />
+                    </>
+                )}
                 {server?.type === ServerType.JELLYFIN && (
                     <>
                         <Divider orientation="vertical" />

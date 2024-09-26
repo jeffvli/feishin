@@ -237,7 +237,7 @@ export enum NDSongListSort {
     CHANNELS = 'channels',
     COMMENT = 'comment',
     DURATION = 'duration',
-    FAVORITED = 'starred',
+    FAVORITED = 'starred_at',
     GENRE = 'genre',
     ID = 'id',
     PLAY_COUNT = 'playCount',

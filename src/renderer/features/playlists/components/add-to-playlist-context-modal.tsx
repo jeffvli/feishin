@@ -151,7 +151,12 @@ export const AddToPlaylistContextModal = ({
                             server,
                             signal,
                         },
-                        query: { id: playlistId, startIndex: 0 },
+                        query: {
+                            id: playlistId,
+                            sortBy: SongListSort.ID,
+                            sortOrder: SortOrder.ASC,
+                            startIndex: 0,
+                        },
                     });
                 });
 

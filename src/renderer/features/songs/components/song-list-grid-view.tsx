@@ -36,7 +36,7 @@ export const SongListGridView = ({ gridRef, itemCount }: SongListGridViewProps) 
     const server = useCurrentServer();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const { pageKey, customFilters, id } = useListContext();
-    const { grid, display, filter } = useListStoreByKey({ key: pageKey });
+    const { grid, display, filter } = useListStoreByKey<SongListQuery>({ key: pageKey });
     const { setGrid } = useListStoreActions();
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -174,9 +174,9 @@ export const SongListGridView = ({ gridRef, itemCount }: SongListGridViewProps) 
             const query: SongListQuery = {
                 imageSize: 250,
                 limit: take,
-                startIndex: skip,
                 ...filter,
                 ...customFilters,
+                startIndex: skip,
             };
 
             const queryKey = queryKeys.songs.list(server?.id || '', query, id);

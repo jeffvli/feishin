@@ -627,7 +627,10 @@ export const useListStore = create<ListSlice>()(
 
 export const useListStoreActions = () => useListStore((state) => state._actions);
 
-export const useListStoreByKey = <TFilter>(args: { filter?: Partial<TFilter>; key: string }) => {
+export const useListStoreByKey = <TFilter>(args: {
+    filter?: Partial<TFilter>;
+    key: string;
+}): ListItemProps<TFilter> => {
     const key = args.key as keyof ListState['item'];
     return useListStore(
         (state) => ({
@@ -644,7 +647,7 @@ export const useListStoreByKey = <TFilter>(args: { filter?: Partial<TFilter>; ke
 export const useListFilterByKey = <TFilter>(args: {
     filter?: Partial<TFilter> | any;
     key: string;
-}) => {
+}): TFilter => {
     const key = args.key as keyof ListState['item'];
     return useListStore(
         (state) => {

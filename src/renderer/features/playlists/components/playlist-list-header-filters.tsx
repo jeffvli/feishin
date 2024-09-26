@@ -69,6 +69,38 @@ const FILTERS = {
             value: PlaylistListSort.UPDATED_AT,
         },
     ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.owner', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.OWNER,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.isPublic', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.PUBLIC,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.SONG_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyUpdated', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.UPDATED_AT,
+        },
+    ],
 };
 
 interface PlaylistListHeaderFiltersProps {
@@ -86,7 +118,7 @@ export const PlaylistListHeaderFilters = ({
     const server = useCurrentServer();
     const { setFilter, setTable, setTablePagination, setGrid, setDisplayType } =
         useListStoreActions();
-    const { display, filter, table, grid } = useListStoreByKey({ key: pageKey });
+    const { display, filter, table, grid } = useListStoreByKey<PlaylistListQuery>({ key: pageKey });
     const cq = useContainerQuery();
 
     const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;

@@ -9,7 +9,6 @@ import {
     SongListSort,
     SortOrder,
     ServerListItem,
-    ServerType,
 } from '/@/renderer/api/types';
 
 export const getPlaylistSongsById = async (args: {
@@ -103,18 +102,7 @@ export const getGenreSongsById = async (args: {
     };
     for (const genreId of id) {
         const queryFilter: SongListQuery = {
-            _custom: {
-                ...(server?.type === ServerType.JELLYFIN && {
-                    jellyfin: {
-                        GenreIds: genreId,
-                    },
-                }),
-                ...(server?.type === ServerType.NAVIDROME && {
-                    navidrome: {
-                        genre_id: genreId,
-                    },
-                }),
-            },
+            genreIds: [genreId],
             sortBy: SongListSort.GENRE,
             sortOrder: SortOrder.ASC,
             startIndex: 0,
@@ -140,7 +128,9 @@ export const getGenreSongsById = async (args: {
         );
 
         data.items.push(...res!.items);
-        data.totalRecordCount += res!.totalRecordCount;
+        if (data.totalRecordCount) {
+            data.totalRecordCount += res!.totalRecordCount || 0;
+        }
     }
 
     return data;
@@ -202,14 +192,15 @@ export const getSongsByQuery = async (args: {
 
     const res = await queryClient.fetchQuery(
         queryKey,
-        async ({ signal }) =>
-            api.controller.getSongList({
+        async ({ signal }) => {
+            return api.controller.getSongList({
                 apiClientProps: {
                     server,
                     signal,
                 },
                 query: queryFilter,
-            }),
+            });
+        },
         {
             cacheTime: 1000 * 60,
             staleTime: 1000 * 60,

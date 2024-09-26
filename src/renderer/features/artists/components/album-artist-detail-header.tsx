@@ -26,16 +26,19 @@ export const AlbumArtistDetailHeader = forwardRef(
 
         const metadataItems = [
             {
+                enabled: detailQuery?.data?.albumCount,
                 id: 'albumCount',
                 secondary: false,
                 value: t('entity.albumWithCount', { count: detailQuery?.data?.albumCount || 0 }),
             },
             {
+                enabled: detailQuery?.data?.songCount,
                 id: 'songCount',
                 secondary: false,
                 value: t('entity.trackWithCount', { count: detailQuery?.data?.songCount || 0 }),
             },
             {
+                enabled: detailQuery.data?.duration,
                 id: 'duration',
                 secondary: true,
                 value:
@@ -70,7 +73,7 @@ export const AlbumArtistDetailHeader = forwardRef(
                 <Stack>
                     <Group>
                         {metadataItems
-                            .filter((i) => i.value)
+                            .filter((i) => i.enabled)
                             .map((item, index) => (
                                 <Fragment key={`item-${item.id}-${index}`}>
                                     {index > 0 && <Text $noSelect>•</Text>}

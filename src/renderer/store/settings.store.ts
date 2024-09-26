@@ -224,7 +224,6 @@ export interface SettingsState {
         albumBackgroundBlur: number;
         artistItems: SortableItem<ArtistItem>[];
         buttonSize: number;
-        defaultFullPlaylist: boolean;
         disabledContextMenu: { [k in ContextMenuItemType]?: boolean };
         doubleClickQueueAll: boolean;
         externalLinks: boolean;
@@ -370,7 +369,6 @@ const initialState: SettingsState = {
         albumBackgroundBlur: 6,
         artistItems,
         buttonSize: 20,
-        defaultFullPlaylist: true,
         disabledContextMenu: {},
         doubleClickQueueAll: true,
         externalLinks: true,

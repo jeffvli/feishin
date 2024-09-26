@@ -10,11 +10,11 @@ import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { SongListContent } from '/@/renderer/features/songs/components/song-list-content';
 import { SongListHeader } from '/@/renderer/features/songs/components/song-list-header';
-import { useSongList } from '/@/renderer/features/songs/queries/song-list-query';
 import { useCurrentServer, useListFilterByKey } from '/@/renderer/store';
 import { Play } from '/@/renderer/types';
 import { titleCase } from '/@/renderer/utils';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { useSongListCount } from '/@/renderer/features/songs/queries/song-list-count-query';
 
 const TrackListRoute = () => {
     const { t } = useTranslation();
@@ -30,14 +30,7 @@ const TrackListRoute = () => {
         const value = {
             ...(albumArtistId && { artistIds: [albumArtistId] }),
             ...(genreId && {
-                _custom: {
-                    jellyfin: {
-                        GenreIds: genreId,
-                    },
-                    navidrome: {
-                        genre_id: genreId,
-                    },
-                },
+                genreIds: [genreId],
             }),
         };
 
@@ -76,29 +69,22 @@ const TrackListRoute = () => {
         return genre?.name;
     }, [genreId, genreList.data]);
 
-    const itemCountCheck = useSongList({
+    const itemCountCheck = useSongListCount({
         options: {
             cacheTime: 1000 * 60,
             staleTime: 1000 * 60,
         },
-        query: {
-            limit: 1,
-            startIndex: 0,
-            ...songListFilter,
-        },
+        query: songListFilter,
         serverId: server?.id,
     });
 
-    const itemCount =
-        itemCountCheck.data?.totalRecordCount === null
-            ? undefined
-            : itemCountCheck.data?.totalRecordCount;
+    const itemCount = itemCountCheck.data === null ? undefined : itemCountCheck.data;
 
     const handlePlay = useCallback(
         async (args: { initialSongId?: string; playType: Play }) => {
             if (!itemCount || itemCount === 0) return;
             const { initialSongId, playType } = args;
-            const query: SongListQuery = { startIndex: 0, ...songListFilter };
+            const query: SongListQuery = { ...songListFilter, limit: itemCount, startIndex: 0 };
 
             if (albumArtistId) {
                 handlePlayQueueAdd?.({

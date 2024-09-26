@@ -1,3 +1,6 @@
+import orderBy from 'lodash/orderBy';
+import reverse from 'lodash/reverse';
+import shuffle from 'lodash/shuffle';
 import { z } from 'zod';
 import { ServerFeatures } from './features-types';
 import { jfType } from './jellyfin/jellyfin-types';
@@ -128,7 +131,7 @@ export interface BasePaginatedResponse<T> {
     error?: string | any;
     items: T;
     startIndex: number;
-    totalRecordCount: number;
+    totalRecordCount: number | null;
 }
 
 export type AuthenticationResponse = {
@@ -309,6 +312,11 @@ type BaseEndpointArgs = {
     };
 };
 
+export interface BaseQuery<T> {
+    sortBy: T;
+    sortOrder: SortOrder;
+}
+
 // Genre List
 export type GenreListResponse = BasePaginatedResponse<Genre[]> | null | undefined;
 
@@ -318,7 +326,7 @@ export enum GenreListSort {
     NAME = 'name',
 }
 
-export type GenreListQuery = {
+export interface GenreListQuery extends BaseQuery<GenreListSort> {
     _custom?: {
         jellyfin?: null;
         navidrome?: null;
@@ -326,10 +334,8 @@ export type GenreListQuery = {
     limit?: number;
     musicFolderId?: string;
     searchTerm?: string;
-    sortBy: GenreListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 type GenreListSortMap = {
     jellyfin: Record<GenreListSort, JFGenreListSort | undefined>;
@@ -370,22 +376,22 @@ export enum AlbumListSort {
     YEAR = 'year',
 }
 
-export type AlbumListQuery = {
+export interface AlbumListQuery extends BaseQuery<AlbumListSort> {
     _custom?: {
-        jellyfin?: Partial<z.infer<typeof jfType._parameters.albumList>> & {
-            maxYear?: number;
-            minYear?: number;
-        };
+        jellyfin?: Partial<z.infer<typeof jfType._parameters.albumList>>;
         navidrome?: Partial<z.infer<typeof ndType._parameters.albumList>>;
     };
     artistIds?: string[];
+    compilation?: boolean;
+    favorite?: boolean;
+    genres?: string[];
     limit?: number;
+    maxYear?: number;
+    minYear?: number;
     musicFolderId?: string;
     searchTerm?: string;
-    sortBy: AlbumListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type AlbumListArgs = { query: AlbumListQuery } & BaseEndpointArgs;
 
@@ -481,24 +487,23 @@ export enum SongListSort {
     YEAR = 'year',
 }
 
-export type SongListQuery = {
+export interface SongListQuery extends BaseQuery<SongListSort> {
     _custom?: {
-        jellyfin?: Partial<z.infer<typeof jfType._parameters.songList>> & {
-            maxYear?: number;
-            minYear?: number;
-        };
+        jellyfin?: Partial<z.infer<typeof jfType._parameters.songList>>;
         navidrome?: Partial<z.infer<typeof ndType._parameters.songList>>;
     };
     albumIds?: string[];
     artistIds?: string[];
+    favorite?: boolean;
+    genreIds?: string[];
     imageSize?: number;
     limit?: number;
+    maxYear?: number;
+    minYear?: number;
     musicFolderId?: string;
     searchTerm?: string;
-    sortBy: SongListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type SongListArgs = { query: SongListQuery } & BaseEndpointArgs;
 
@@ -595,7 +600,7 @@ export enum AlbumArtistListSort {
     SONG_COUNT = 'songCount',
 }
 
-export type AlbumArtistListQuery = {
+export interface AlbumArtistListQuery extends BaseQuery<AlbumArtistListSort> {
     _custom?: {
         jellyfin?: Partial<z.infer<typeof jfType._parameters.albumArtistList>>;
         navidrome?: Partial<z.infer<typeof ndType._parameters.albumArtistList>>;
@@ -603,10 +608,8 @@ export type AlbumArtistListQuery = {
     limit?: number;
     musicFolderId?: string;
     searchTerm?: string;
-    sortBy: AlbumArtistListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type AlbumArtistListArgs = { query: AlbumArtistListQuery } & BaseEndpointArgs;
 
@@ -683,17 +686,15 @@ export enum ArtistListSort {
     SONG_COUNT = 'songCount',
 }
 
-export type ArtistListQuery = {
+export interface ArtistListQuery extends BaseQuery<ArtistListSort> {
     _custom?: {
         jellyfin?: Partial<z.infer<typeof jfType._parameters.albumArtistList>>;
         navidrome?: Partial<z.infer<typeof ndType._parameters.albumArtistList>>;
     };
     limit?: number;
     musicFolderId?: string;
-    sortBy: ArtistListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type ArtistListArgs = { query: ArtistListQuery } & BaseEndpointArgs;
 
@@ -879,17 +880,15 @@ export enum PlaylistListSort {
     UPDATED_AT = 'updatedAt',
 }
 
-export type PlaylistListQuery = {
+export interface PlaylistListQuery extends BaseQuery<PlaylistListSort> {
     _custom?: {
         jellyfin?: Partial<z.infer<typeof jfType._parameters.playlistList>>;
         navidrome?: Partial<z.infer<typeof ndType._parameters.playlistList>>;
     };
     limit?: number;
     searchTerm?: string;
-    sortBy: PlaylistListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type PlaylistListArgs = { query: PlaylistListQuery } & BaseEndpointArgs;
 
@@ -963,7 +962,7 @@ export enum UserListSort {
     NAME = 'name',
 }
 
-export type UserListQuery = {
+export interface UserListQuery extends BaseQuery<UserListSort> {
     _custom?: {
         navidrome?: {
             owner_id?: string;
@@ -971,10 +970,8 @@ export type UserListQuery = {
     };
     limit?: number;
     searchTerm?: string;
-    sortBy: UserListSort;
-    sortOrder: SortOrder;
     startIndex: number;
-};
+}
 
 export type UserListArgs = { query: UserListQuery } & BaseEndpointArgs;
 
@@ -1228,3 +1225,223 @@ export type TranscodingQuery = {
 export type TranscodingArgs = {
     query: TranscodingQuery;
 } & BaseEndpointArgs;
+
+export type ControllerEndpoint = {
+    addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
+    authenticate: (
+        url: string,
+        body: { legacy?: boolean; password: string; username: string },
+    ) => Promise<AuthenticationResponse>;
+    createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
+    createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse>;
+    deleteFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
+    deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
+    getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
+    getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
+    getAlbumArtistListCount: (args: AlbumArtistListArgs) => Promise<number>;
+    getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse>;
+    getAlbumList: (args: AlbumListArgs) => Promise<AlbumListResponse>;
+    getAlbumListCount: (args: AlbumListArgs) => Promise<number>;
+    // getArtistInfo?: (args: any) => void;
+    // getArtistList?: (args: ArtistListArgs) => Promise<ArtistListResponse>;
+    getDownloadUrl: (args: DownloadArgs) => string;
+    getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
+    getLyrics?: (args: LyricsArgs) => Promise<LyricsResponse>;
+    getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
+    getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
+    getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
+    getPlaylistListCount: (args: PlaylistListArgs) => Promise<number>;
+    getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
+    getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
+    getServerInfo: (args: ServerInfoArgs) => Promise<ServerInfo>;
+    getSimilarSongs: (args: SimilarSongsArgs) => Promise<Song[]>;
+    getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
+    getSongList: (args: SongListArgs) => Promise<SongListResponse>;
+    getSongListCount: (args: SongListArgs) => Promise<number>;
+    getStructuredLyrics?: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
+    getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
+    getTranscodingUrl: (args: TranscodingArgs) => string;
+    getUserList?: (args: UserListArgs) => Promise<UserListResponse>;
+    movePlaylistItem?: (args: MoveItemArgs) => Promise<void>;
+    removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
+    scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
+    search: (args: SearchArgs) => Promise<SearchResponse>;
+    setRating?: (args: SetRatingArgs) => Promise<RatingResponse>;
+    shareItem?: (args: ShareItemArgs) => Promise<ShareItemResponse>;
+    updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
+};
+
+export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder: SortOrder) => {
+    let results = albums;
+
+    const order = sortOrder === SortOrder.ASC ? 'asc' : 'desc';
+
+    switch (sortBy) {
+        case AlbumListSort.ALBUM_ARTIST:
+            results = orderBy(
+                results,
+                ['albumArtist', (v) => v.name.toLowerCase()],
+                [order, 'asc'],
+            );
+            break;
+        case AlbumListSort.DURATION:
+            results = orderBy(results, ['duration'], [order]);
+            break;
+        case AlbumListSort.FAVORITED:
+            results = orderBy(results, ['starred'], [order]);
+            break;
+        case AlbumListSort.NAME:
+            results = orderBy(results, [(v) => v.name.toLowerCase()], [order]);
+            break;
+        case AlbumListSort.PLAY_COUNT:
+            results = orderBy(results, ['playCount'], [order]);
+            break;
+        case AlbumListSort.RANDOM:
+            results = shuffle(results);
+            break;
+        case AlbumListSort.RECENTLY_ADDED:
+            results = orderBy(results, ['createdAt'], [order]);
+            break;
+        case AlbumListSort.RECENTLY_PLAYED:
+            results = orderBy(results, ['lastPlayedAt'], [order]);
+            break;
+        case AlbumListSort.RATING:
+            results = orderBy(results, ['userRating'], [order]);
+            break;
+        case AlbumListSort.YEAR:
+            results = orderBy(results, ['releaseYear'], [order]);
+            break;
+        case AlbumListSort.SONG_COUNT:
+            results = orderBy(results, ['songCount'], [order]);
+            break;
+        default:
+            break;
+    }
+
+    return results;
+};
+
+export const sortSongList = (songs: QueueSong[], sortBy: SongListSort, sortOrder: SortOrder) => {
+    let results = songs;
+
+    const order = sortOrder === SortOrder.ASC ? 'asc' : 'desc';
+
+    switch (sortBy) {
+        case SongListSort.ALBUM:
+            results = orderBy(
+                results,
+                [(v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, 'asc', 'asc'],
+            );
+            break;
+
+        case SongListSort.ALBUM_ARTIST:
+            results = orderBy(
+                results,
+                ['albumArtist', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, order, 'asc', 'asc'],
+            );
+            break;
+
+        case SongListSort.ARTIST:
+            results = orderBy(
+                results,
+                ['artist', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, order, 'asc', 'asc'],
+            );
+            break;
+
+        case SongListSort.DURATION:
+            results = orderBy(results, ['duration'], [order]);
+            break;
+
+        case SongListSort.FAVORITED:
+            results = orderBy(results, ['userFavorite', (v) => v.name.toLowerCase()], [order]);
+            break;
+
+        case SongListSort.GENRE:
+            results = orderBy(
+                results,
+                [
+                    (v) => v.genres?.[0].name.toLowerCase(),
+                    (v) => v.album?.toLowerCase(),
+                    'discNumber',
+                    'trackNumber',
+                ],
+                [order, order, 'asc', 'asc'],
+            );
+            break;
+
+        case SongListSort.ID:
+            if (order === 'desc') {
+                results = reverse(results);
+            }
+            break;
+
+        case SongListSort.NAME:
+            results = orderBy(results, [(v) => v.name.toLowerCase()], [order]);
+            break;
+
+        case SongListSort.PLAY_COUNT:
+            results = orderBy(results, ['playCount'], [order]);
+            break;
+
+        case SongListSort.RANDOM:
+            results = shuffle(results);
+            break;
+
+        case SongListSort.RATING:
+            results = orderBy(results, ['userRating', (v) => v.name.toLowerCase()], [order]);
+            break;
+
+        case SongListSort.RECENTLY_ADDED:
+            results = orderBy(results, ['created'], [order]);
+            break;
+
+        case SongListSort.YEAR:
+            results = orderBy(
+                results,
+                ['year', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
+                [order, 'asc', 'asc', 'asc'],
+            );
+            break;
+
+        default:
+            break;
+    }
+
+    return results;
+};
+
+export const sortAlbumArtistList = (
+    artists: AlbumArtist[],
+    sortBy: AlbumArtistListSort,
+    sortOrder: SortOrder,
+) => {
+    const order = sortOrder === SortOrder.ASC ? 'asc' : 'desc';
+
+    let results = artists;
+
+    switch (sortBy) {
+        case AlbumArtistListSort.ALBUM_COUNT:
+            results = orderBy(artists, ['albumCount', (v) => v.name.toLowerCase()], [order, 'asc']);
+            break;
+
+        case AlbumArtistListSort.NAME:
+            results = orderBy(artists, [(v) => v.name.toLowerCase()], [order]);
+            break;
+
+        case AlbumArtistListSort.FAVORITED:
+            results = orderBy(artists, ['starred'], [order]);
+            break;
+
+        case AlbumArtistListSort.RATING:
+            results = orderBy(artists, ['userRating'], [order]);
+            break;
+
+        default:
+            break;
+    }
+
+    return results;
+};

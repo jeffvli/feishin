@@ -50,6 +50,19 @@ export const queryKeys: Record<
     Record<string, (...props: any) => QueryFunctionContext['queryKey']>
 > = {
     albumArtists: {
+        count: (serverId: string, query?: AlbumArtistListQuery) => {
+            const { pagination, filter } = splitPaginatedQuery(query);
+
+            if (query && pagination) {
+                return [serverId, 'albumArtists', 'count', filter, pagination] as const;
+            }
+
+            if (query) {
+                return [serverId, 'albumArtists', 'count', filter] as const;
+            }
+
+            return [serverId, 'albumArtists', 'count'] as const;
+        },
         detail: (serverId: string, query?: AlbumArtistDetailQuery) => {
             if (query) return [serverId, 'albumArtists', 'detail', query] as const;
             return [serverId, 'albumArtists', 'detail'] as const;
@@ -73,6 +86,27 @@ export const queryKeys: Record<
         },
     },
     albums: {
+        count: (serverId: string, query?: AlbumListQuery, artistId?: string) => {
+            const { pagination, filter } = splitPaginatedQuery(query);
+
+            if (query && pagination && artistId) {
+                return [serverId, 'albums', 'count', artistId, filter, pagination] as const;
+            }
+
+            if (query && pagination) {
+                return [serverId, 'albums', 'count', filter, pagination] as const;
+            }
+
+            if (query && artistId) {
+                return [serverId, 'albums', 'count', artistId, filter] as const;
+            }
+
+            if (query) {
+                return [serverId, 'albums', 'count', filter] as const;
+            }
+
+            return [serverId, 'albums', 'count'] as const;
+        },
         detail: (serverId: string, query?: AlbumDetailQuery) =>
             [serverId, 'albums', 'detail', query] as const,
         list: (serverId: string, query?: AlbumListQuery, artistId?: string) => {
@@ -208,6 +242,18 @@ export const queryKeys: Record<
         root: (serverId: string) => [serverId] as const,
     },
     songs: {
+        count: (serverId: string, query?: SongListQuery) => {
+            const { pagination, filter } = splitPaginatedQuery(query);
+            if (query && pagination) {
+                return [serverId, 'songs', 'count', filter, pagination] as const;
+            }
+
+            if (query) {
+                return [serverId, 'songs', 'count', filter] as const;
+            }
+
+            return [serverId, 'songs', 'count'] as const;
+        },
         detail: (serverId: string, query?: SongDetailQuery) => {
             if (query) return [serverId, 'songs', 'detail', query] as const;
             return [serverId, 'songs', 'detail'] as const;

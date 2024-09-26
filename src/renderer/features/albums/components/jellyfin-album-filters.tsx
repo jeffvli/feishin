@@ -3,7 +3,13 @@ import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { useListFilterByKey } from '../../../store/list.store';
-import { AlbumArtistListSort, GenreListSort, LibraryItem, SortOrder } from '/@/renderer/api/types';
+import {
+    AlbumArtistListSort,
+    AlbumListQuery,
+    GenreListSort,
+    LibraryItem,
+    SortOrder,
+} from '/@/renderer/api/types';
 import { MultiSelect, NumberInput, SpinnerIcon, Switch, Text } from '/@/renderer/components';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 import { useGenreList } from '/@/renderer/features/genres';
@@ -25,7 +31,7 @@ export const JellyfinAlbumFilters = ({
     serverId,
 }: JellyfinAlbumFiltersProps) => {
     const { t } = useTranslation();
-    const filter = useListFilterByKey({ key: pageKey });
+    const filter = useListFilterByKey<AlbumListQuery>({ key: pageKey });
     const { setFilter } = useListStoreActions();
 
     // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
@@ -47,10 +53,6 @@ export const JellyfinAlbumFilters = ({
         }));
     }, [genreListQuery.data]);
 
-    const selectedGenres = useMemo(() => {
-        return filter?._custom?.jellyfin?.GenreIds?.split(',');
-    }, [filter?._custom?.jellyfin?.GenreIds]);
-
     const toggleFilters = [
         {
             label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
@@ -58,20 +60,15 @@ export const JellyfinAlbumFilters = ({
                 const updatedFilters = setFilter({
                     customFilters,
                     data: {
-                        _custom: {
-                            ...filter?._custom,
-                            jellyfin: {
-                                ...filter?._custom?.jellyfin,
-                                IsFavorite: e.currentTarget.checked ? true : undefined,
-                            },
-                        },
+                        _custom: filter?._custom,
+                        favorite: e.currentTarget.checked ? true : undefined,
                     },
                     itemType: LibraryItem.ALBUM,
                     key: pageKey,
                 }) as AlbumListFilter;
                 onFilterChange(updatedFilters);
             },
-            value: filter?._custom?.jellyfin?.IsFavorite,
+            value: filter?.favorite,
         },
     ];
 
@@ -80,13 +77,8 @@ export const JellyfinAlbumFilters = ({
         const updatedFilters = setFilter({
             customFilters,
             data: {
-                _custom: {
-                    ...filter?._custom,
-                    jellyfin: {
-                        ...filter?._custom?.jellyfin,
-                        minYear: e === '' ? undefined : (e as number),
-                    },
-                },
+                _custom: filter?._custom,
+                minYear: e === '' ? undefined : (e as number),
             },
             itemType: LibraryItem.ALBUM,
             key: pageKey,
@@ -99,13 +91,8 @@ export const JellyfinAlbumFilters = ({
         const updatedFilters = setFilter({
             customFilters,
             data: {
-                _custom: {
-                    ...filter?._custom,
-                    jellyfin: {
-                        ...filter?._custom?.jellyfin,
-                        maxYear: e === '' ? undefined : (e as number),
-                    },
-                },
+                _custom: filter?._custom,
+                maxYear: e === '' ? undefined : (e as number),
             },
             itemType: LibraryItem.ALBUM,
             key: pageKey,
@@ -114,17 +101,11 @@ export const JellyfinAlbumFilters = ({
     }, 500);
 
     const handleGenresFilter = debounce((e: string[] | undefined) => {
-        const genreFilterString = e?.length ? e.join(',') : undefined;
         const updatedFilters = setFilter({
             customFilters,
             data: {
-                _custom: {
-                    ...filter?._custom,
-                    jellyfin: {
-                        ...filter?._custom?.jellyfin,
-                        GenreIds: genreFilterString,
-                    },
-                },
+                _custom: filter?._custom,
+                genres: e,
             },
             itemType: LibraryItem.ALBUM,
             key: pageKey,
@@ -157,17 +138,11 @@ export const JellyfinAlbumFilters = ({
     }, [albumArtistListQuery?.data?.items]);
 
     const handleAlbumArtistFilter = (e: string[] | null) => {
-        const albumArtistFilterString = e?.length ? e.join(',') : undefined;
         const updatedFilters = setFilter({
             customFilters,
             data: {
-                _custom: {
-                    ...filter?._custom,
-                    jellyfin: {
-                        ...filter?._custom?.jellyfin,
-                        AlbumArtistIds: albumArtistFilterString,
-                    },
-                },
+                _custom: filter?._custom,
+                artistIds: e || undefined,
             },
             itemType: LibraryItem.ALBUM,
             key: pageKey,
@@ -193,21 +168,21 @@ export const JellyfinAlbumFilters = ({
             <Divider my="0.5rem" />
             <Group grow>
                 <NumberInput
-                    defaultValue={filter?._custom?.jellyfin?.minYear}
+                    defaultValue={filter?.minYear}
                     hideControls={false}
                     label={t('filter.fromYear', { postProcess: 'sentenceCase' })}
                     max={2300}
                     min={1700}
-                    required={!!filter?._custom?.jellyfin?.maxYear}
+                    required={!!filter?.maxYear}
                     onChange={(e) => handleMinYearFilter(e)}
                 />
                 <NumberInput
-                    defaultValue={filter?._custom?.jellyfin?.maxYear}
+                    defaultValue={filter?.maxYear}
                     hideControls={false}
                     label={t('filter.toYear', { postProcess: 'sentenceCase' })}
                     max={2300}
                     min={1700}
-                    required={!!filter?._custom?.jellyfin?.minYear}
+                    required={!!filter?.minYear}
                     onChange={(e) => handleMaxYearFilter(e)}
                 />
             </Group>
@@ -216,7 +191,7 @@ export const JellyfinAlbumFilters = ({
                     clearable
                     searchable
                     data={genreList}
-                    defaultValue={selectedGenres}
+                    defaultValue={filter.genres}
                     label={t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
                     onChange={handleGenresFilter}
                 />

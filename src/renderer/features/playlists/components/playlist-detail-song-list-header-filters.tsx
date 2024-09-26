@@ -195,6 +195,68 @@ const FILTERS = {
             value: SongListSort.YEAR,
         },
     ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: SongListSort.ID,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.album', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+            value: SongListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.artist', { postProcess: 'titleCase' }),
+            value: SongListSort.ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: SongListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.isFavorited', { postProcess: 'titleCase' }),
+            value: SongListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.genre', { postProcess: 'titleCase' }),
+            value: SongListSort.GENRE,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: SongListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
+            value: SongListSort.RATING,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
+            value: SongListSort.RECENTLY_ADDED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
+            value: SongListSort.RECENTLY_PLAYED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
+            value: SongListSort.YEAR,
+        },
+    ],
 };
 
 interface PlaylistDetailSongListHeaderFiltersProps {
@@ -241,43 +303,55 @@ export const PlaylistDetailSongListHeaderFilters = ({
 
     const handleFilterChange = useCallback(
         async (filters: SongListFilter) => {
-            const dataSource: IDatasource = {
-                getRows: async (params) => {
-                    const limit = params.endRow - params.startRow;
-                    const startIndex = params.startRow;
+            if (server?.type !== ServerType.SUBSONIC) {
+                const dataSource: IDatasource = {
+                    getRows: async (params) => {
+                        const limit = params.endRow - params.startRow;
+                        const startIndex = params.startRow;
 
-                    const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, {
-                        id: playlistId,
-                        limit,
-                        startIndex,
-                        ...filters,
-                    });
+                        const queryKey = queryKeys.playlists.songList(
+                            server?.id || '',
+                            playlistId,
+                            {
+                                id: playlistId,
+                                limit,
+                                startIndex,
+                                ...filters,
+                            },
+                        );
 
-                    const songsRes = await queryClient.fetchQuery(
-                        queryKey,
-                        async ({ signal }) =>
-                            api.controller.getPlaylistSongList({
-                                apiClientProps: {
-                                    server,
-                                    signal,
-                                },
-                                query: {
-                                    id: playlistId,
-                                    limit,
-                                    startIndex,
-                                    ...filters,
-                                },
-                            }),
-                        { cacheTime: 1000 * 60 * 1 },
-                    );
+                        const songsRes = await queryClient.fetchQuery(
+                            queryKey,
+                            async ({ signal }) =>
+                                api.controller.getPlaylistSongList({
+                                    apiClientProps: {
+                                        server,
+                                        signal,
+                                    },
+                                    query: {
+                                        id: playlistId,
+                                        limit,
+                                        startIndex,
+                                        ...filters,
+                                    },
+                                }),
+                            { cacheTime: 1000 * 60 * 1 },
+                        );
 
-                    params.successCallback(songsRes?.items || [], songsRes?.totalRecordCount || 0);
-                },
-                rowCount: undefined,
-            };
-            tableRef.current?.api.setDatasource(dataSource);
-            tableRef.current?.api.purgeInfiniteCache();
-            tableRef.current?.api.ensureIndexVisible(0, 'top');
+                        params.successCallback(
+                            songsRes?.items || [],
+                            songsRes?.totalRecordCount || 0,
+                        );
+                    },
+                    rowCount: undefined,
+                };
+                tableRef.current?.api.setDatasource(dataSource);
+                tableRef.current?.api.purgeInfiniteCache();
+                tableRef.current?.api.ensureIndexVisible(0, 'top');
+            } else {
+                tableRef.current?.api.redrawRows();
+                tableRef.current?.api.ensureIndexVisible(0, 'top');
+            }
 
             if (page.display === ListDisplayType.TABLE_PAGINATED) {
                 setPagination({ data: { currentPage: 0 } });

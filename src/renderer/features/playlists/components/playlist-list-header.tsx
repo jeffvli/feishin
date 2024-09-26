@@ -12,7 +12,7 @@ import { PlaylistListFilter, useCurrentServer } from '/@/renderer/store';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 import { RiFileAddFill } from 'react-icons/ri';
-import { LibraryItem, ServerType } from '/@/renderer/api/types';
+import { LibraryItem, PlaylistListQuery, ServerType } from '/@/renderer/api/types';
 import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 
 interface PlaylistListHeaderProps {
@@ -37,8 +37,9 @@ export const PlaylistListHeader = ({ itemCount, tableRef, gridRef }: PlaylistLis
         });
     };
 
-    const { filter, refresh, search } = useDisplayRefresh({
+    const { filter, refresh, search } = useDisplayRefresh<PlaylistListQuery>({
         gridRef,
+        itemCount,
         itemType: LibraryItem.PLAYLIST,
         server,
         tableRef,

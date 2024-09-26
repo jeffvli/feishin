@@ -11,7 +11,13 @@ import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumListSort, LibraryItem, QueueSong, SortOrder } from '/@/renderer/api/types';
+import {
+    AlbumListQuery,
+    AlbumListSort,
+    LibraryItem,
+    QueueSong,
+    SortOrder,
+} from '/@/renderer/api/types';
 import { Button, Popover, Spoiler } from '/@/renderer/components';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
 import {
@@ -164,13 +170,12 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
         query: {
             _custom: {
                 jellyfin: {
-                    AlbumArtistIds: detailQuery?.data?.albumArtists[0]?.id,
                     ExcludeItemIds: detailQuery?.data?.id,
                 },
-                navidrome: {
-                    artist_id: detailQuery?.data?.albumArtists[0]?.id,
-                },
             },
+            artistIds: detailQuery?.data?.albumArtists.length
+                ? [detailQuery?.data?.albumArtists[0].id]
+                : undefined,
             limit: 15,
             sortBy: AlbumListSort.YEAR,
             sortOrder: SortOrder.DESC,
@@ -179,15 +184,8 @@ export const AlbumDetailContent = ({ tableRef, background }: AlbumDetailContentP
         serverId: server?.id,
     });
 
-    const relatedAlbumGenresRequest = {
-        _custom: {
-            jellyfin: {
-                GenreIds: detailQuery?.data?.genres?.[0]?.id,
-            },
-            navidrome: {
-                genre_id: detailQuery?.data?.genres?.[0]?.id,
-            },
-        },
+    const relatedAlbumGenresRequest: AlbumListQuery = {
+        genres: detailQuery.data?.genres.length ? [detailQuery.data.genres[0].id] : undefined,
         limit: 15,
         sortBy: AlbumListSort.RANDOM,
         sortOrder: SortOrder.ASC,

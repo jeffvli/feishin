@@ -3,7 +3,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
-import { LibraryItem } from '/@/renderer/api/types';
+import { AlbumListQuery, LibraryItem } from '/@/renderer/api/types';
 import { PageHeader, SearchInput } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { AlbumListHeaderFilters } from '/@/renderer/features/albums/components/album-list-header-filters';
@@ -33,8 +33,9 @@ export const AlbumListHeader = ({
     const cq = useContainerQuery();
     const playButtonBehavior = usePlayButtonBehavior();
     const genreRef = useRef<string>();
-    const { filter, handlePlay, refresh, search } = useDisplayRefresh({
+    const { filter, handlePlay, refresh, search } = useDisplayRefresh<AlbumListQuery>({
         gridRef,
+        itemCount,
         itemType: LibraryItem.ALBUM,
         server,
         tableRef,
@@ -90,6 +91,7 @@ export const AlbumListHeader = ({
             <FilterBar>
                 <AlbumListHeaderFilters
                     gridRef={gridRef}
+                    itemCount={itemCount}
                     tableRef={tableRef}
                 />
             </FilterBar>

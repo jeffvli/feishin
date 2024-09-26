@@ -21,7 +21,7 @@ import {
 } from '/@/renderer/components/virtual-grid';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useGeneralSettings, useListStoreByKey } from '/@/renderer/store';
+import { useCurrentServer, useListStoreByKey } from '/@/renderer/store';
 import { CardRow, ListDisplayType } from '/@/renderer/types';
 import { useHandleFavorite } from '/@/renderer/features/shared/hooks/use-handle-favorite';
 
@@ -35,15 +35,12 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
     const queryClient = useQueryClient();
     const server = useCurrentServer();
     const handlePlayQueueAdd = usePlayQueueAdd();
-    const { display, grid, filter } = useListStoreByKey({ key: pageKey });
+    const { display, grid, filter } = useListStoreByKey<PlaylistListQuery>({ key: pageKey });
     const { setGrid } = useListStoreActions();
-    const { defaultFullPlaylist } = useGeneralSettings();
     const handleFavorite = useHandleFavorite({ gridRef, server });
 
     const cardRows = useMemo(() => {
-        const rows: CardRow<Playlist>[] = defaultFullPlaylist
-            ? [PLAYLIST_CARD_ROWS.nameFull]
-            : [PLAYLIST_CARD_ROWS.name];
+        const rows: CardRow<Playlist>[] = [PLAYLIST_CARD_ROWS.nameFull];
 
         switch (filter.sortBy) {
             case PlaylistListSort.DURATION:
@@ -66,7 +63,7 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
         }
 
         return rows;
-    }, [defaultFullPlaylist, filter.sortBy]);
+    }, [filter.sortBy]);
 
     const handleGridScroll = useCallback(
         (e: ListOnScrollProps) => {
@@ -116,9 +113,9 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
 
             const query: PlaylistListQuery = {
                 limit: take,
-                startIndex: skip,
                 ...filter,
                 _custom: {},
+                startIndex: skip,
             };
 
             const queryKey = queryKeys.playlists.list(server?.id || '', query);
@@ -160,9 +157,7 @@ export const PlaylistListGridView = ({ gridRef, itemCount }: PlaylistListGridVie
                         loading={itemCount === undefined || itemCount === null}
                         minimumBatchSize={40}
                         route={{
-                            route: defaultFullPlaylist
-                                ? AppRoute.PLAYLISTS_DETAIL_SONGS
-                                : AppRoute.PLAYLISTS_DETAIL,
+                            route: AppRoute.PLAYLISTS_DETAIL_SONGS,
                             slugs: [{ idProperty: 'id', slugProperty: 'playlistId' }],
                         }}
                         width={width}

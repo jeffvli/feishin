@@ -2,24 +2,24 @@ import { ChangeEvent, useMemo } from 'react';
 import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { GenreListSort, LibraryItem, SongListQuery, SortOrder } from '/@/renderer/api/types';
-import { NumberInput, Select, Switch, Text } from '/@/renderer/components';
+import { Select, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
 import { useTranslation } from 'react-i18next';
 
-interface NavidromeSongFiltersProps {
+interface SubsonicSongFiltersProps {
     customFilters?: Partial<SongListFilter>;
     onFilterChange: (filters: SongListFilter) => void;
     pageKey: string;
     serverId?: string;
 }
 
-export const NavidromeSongFilters = ({
+export const SubsonicSongFilters = ({
     customFilters,
     onFilterChange,
     pageKey,
     serverId,
-}: NavidromeSongFiltersProps) => {
+}: SubsonicSongFiltersProps) => {
     const { t } = useTranslation();
     const { setFilter } = useListStoreActions();
     const filter = useListFilterByKey<SongListQuery>({ key: pageKey });
@@ -47,7 +47,6 @@ export const NavidromeSongFilters = ({
         const updatedFilters = setFilter({
             customFilters,
             data: {
-                _custom: filter._custom,
                 genreIds: e ? [e] : undefined,
             },
             itemType: LibraryItem.SONG,
@@ -59,13 +58,13 @@ export const NavidromeSongFilters = ({
 
     const toggleFilters = [
         {
+            disabled: filter.genreIds !== undefined || isGenrePage || !!filter.searchTerm,
             label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
                     customFilters,
                     data: {
-                        _custom: filter._custom,
-                        favorite: e.currentTarget.checked ? true : undefined,
+                        favorite: e.target.checked,
                     },
                     itemType: LibraryItem.SONG,
                     key: pageKey,
@@ -77,34 +76,17 @@ export const NavidromeSongFilters = ({
         },
     ];
 
-    const handleYearFilter = debounce((e: number | string) => {
-        const updatedFilters = setFilter({
-            customFilters,
-            data: {
-                _custom: {
-                    ...filter._custom,
-                    navidrome: {
-                        year: e === '' ? undefined : (e as number),
-                    },
-                },
-            },
-            itemType: LibraryItem.SONG,
-            key: pageKey,
-        }) as SongListFilter;
-
-        onFilterChange(updatedFilters);
-    }, 500);
-
     return (
         <Stack p="0.8rem">
             {toggleFilters.map((filter) => (
                 <Group
-                    key={`nd-filter-${filter.label}`}
+                    key={`ss-filter-${filter.label}`}
                     position="apart"
                 >
                     <Text>{filter.label}</Text>
                     <Switch
                         checked={filter?.value || false}
+                        disabled={filter.disabled}
                         size="xs"
                         onChange={filter.onChange}
                     />
@@ -112,20 +94,13 @@ export const NavidromeSongFilters = ({
             ))}
             <Divider my="0.5rem" />
             <Group grow>
-                <NumberInput
-                    label={t('common.year', { postProcess: 'titleCase' })}
-                    max={5000}
-                    min={0}
-                    value={filter._custom?.navidrome?.year}
-                    width={50}
-                    onChange={(e) => handleYearFilter(e)}
-                />
                 {!isGenrePage && (
                     <Select
                         clearable
                         searchable
                         data={genreList}
                         defaultValue={filter.genreIds ? filter.genreIds[0] : undefined}
+                        disabled={!!filter.searchTerm}
                         label={t('entity.genre', { count: 1, postProcess: 'titleCase' })}
                         width={150}
                         onChange={handleGenresFilter}

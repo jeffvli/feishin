@@ -10,12 +10,16 @@ import orderBy from 'lodash/orderBy';
 
 export interface UseHandleListFilterChangeProps {
     isClientSideSort?: boolean;
+    itemCount?: number;
     itemType: LibraryItem;
     server: ServerListItem | null;
 }
 
+const BLOCK_SIZE = 500;
+
 export const useListFilterRefresh = ({
     server,
+    itemCount,
     itemType,
     isClientSideSort,
 }: UseHandleListFilterChangeProps) => {
@@ -78,7 +82,7 @@ export const useListFilterRefresh = ({
 
                     const queryKey = queryKeyFn(server?.id || '', query);
 
-                    const res = await queryClient.fetchQuery({
+                    const results = await queryClient.fetchQuery({
                         queryFn: async ({ signal }) => {
                             return queryFn({
                                 apiClientProps: {
@@ -91,18 +95,34 @@ export const useListFilterRefresh = ({
                         queryKey,
                     });
 
-                    if (isClientSideSort && res?.items) {
+                    if (isClientSideSort && results?.items) {
                         const sortedResults = orderBy(
-                            res.items,
+                            results.items,
                             [(item) => String(item[filter.sortBy]).toLowerCase()],
                             filter.sortOrder === 'DESC' ? ['desc'] : ['asc'],
                         );
 
-                        params.successCallback(sortedResults || [], res?.totalRecordCount || 0);
+                        params.successCallback(
+                            sortedResults || [],
+                            results?.totalRecordCount || itemCount,
+                        );
                         return;
                     }
 
-                    params.successCallback(res?.items || [], res?.totalRecordCount || 0);
+                    if (results?.totalRecordCount === null) {
+                        const hasMoreRows = results?.items?.length === BLOCK_SIZE;
+                        const lastRowIndex = hasMoreRows
+                            ? undefined
+                            : (filter.offset || 0) + results.items.length;
+
+                        params.successCallback(
+                            results?.items || [],
+                            hasMoreRows ? undefined : lastRowIndex,
+                        );
+                        return;
+                    }
+
+                    params.successCallback(results?.items || [], results?.totalRecordCount || 0);
                 },
 
                 rowCount: undefined,
@@ -112,7 +132,7 @@ export const useListFilterRefresh = ({
             tableRef.current?.api.purgeInfiniteCache();
             tableRef.current?.api.ensureIndexVisible(0, 'top');
         },
-        [isClientSideSort, queryClient, queryFn, queryKeyFn, server],
+        [isClientSideSort, itemCount, queryClient, queryFn, queryKeyFn, server],
     );
 
     const handleRefreshGrid = useCallback(

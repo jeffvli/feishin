@@ -15,13 +15,20 @@ import {
     RiSettings3Fill,
 } from 'react-icons/ri';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/renderer/api/types';
+import {
+    AlbumListQuery,
+    AlbumListSort,
+    LibraryItem,
+    ServerType,
+    SortOrder,
+} from '/@/renderer/api/types';
 import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUM_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
 import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
 import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
+import { SubsonicAlbumFilters } from '/@/renderer/features/albums/components/subsonic-album-filters';
 import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
@@ -139,26 +146,74 @@ const FILTERS = {
             value: AlbumListSort.YEAR,
         },
     ],
+    subsonic: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+            value: AlbumListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.mostPlayed', { postProcess: 'titleCase' }),
+            value: AlbumListSort.PLAY_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: AlbumListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+            value: AlbumListSort.RANDOM,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
+            value: AlbumListSort.RECENTLY_ADDED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
+            value: AlbumListSort.RECENTLY_PLAYED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.favorited', { postProcess: 'titleCase' }),
+            value: AlbumListSort.FAVORITED,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
+            value: AlbumListSort.YEAR,
+        },
+    ],
 };
 
 interface AlbumListHeaderFiltersProps {
     gridRef: MutableRefObject<VirtualInfiniteGridRef | null>;
+    itemCount: number | undefined;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFiltersProps) => {
+export const AlbumListHeaderFilters = ({
+    gridRef,
+    itemCount,
+    tableRef,
+}: AlbumListHeaderFiltersProps) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { pageKey, customFilters, handlePlay } = useListContext();
     const server = useCurrentServer();
     const { setFilter, setTable, setGrid, setDisplayType } = useListStoreActions();
-    const { display, filter, table, grid } = useListStoreByKey({
+    const { display, filter, table, grid } = useListStoreByKey<AlbumListQuery>({
         filter: customFilters,
         key: pageKey,
     });
     const cq = useContainerQuery();
 
     const { handleRefreshTable, handleRefreshGrid } = useListFilterRefresh({
+        itemCount,
         itemType: LibraryItem.ALBUM,
         server,
     });
@@ -191,27 +246,35 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
     );
 
     const handleOpenFiltersModal = () => {
+        let FilterComponent;
+
+        switch (server?.type) {
+            case ServerType.NAVIDROME:
+                FilterComponent = NavidromeAlbumFilters;
+                break;
+            case ServerType.JELLYFIN:
+                FilterComponent = JellyfinAlbumFilters;
+                break;
+            case ServerType.SUBSONIC:
+                FilterComponent = SubsonicAlbumFilters;
+                break;
+            default:
+                break;
+        }
+
+        if (!FilterComponent) {
+            return;
+        }
+
         openModal({
             children: (
-                <>
-                    {server?.type === ServerType.NAVIDROME ? (
-                        <NavidromeAlbumFilters
-                            customFilters={customFilters}
-                            disableArtistFilter={!!customFilters}
-                            pageKey={pageKey}
-                            serverId={server?.id}
-                            onFilterChange={onFilterChange}
-                        />
-                    ) : (
-                        <JellyfinAlbumFilters
-                            customFilters={customFilters}
-                            disableArtistFilter={!!customFilters}
-                            pageKey={pageKey}
-                            serverId={server?.id}
-                            onFilterChange={onFilterChange}
-                        />
-                    )}
-                </>
+                <FilterComponent
+                    customFilters={customFilters}
+                    disableArtistFilter={!!customFilters}
+                    pageKey={pageKey}
+                    serverId={server?.id}
+                    onFilterChange={onFilterChange}
+                />
             ),
             title: 'Album Filters',
         });
@@ -347,8 +410,20 @@ export const AlbumListHeaderFilters = ({ gridRef, tableRef }: AlbumListHeaderFil
             filter?._custom?.jellyfin &&
             Object.values(filter?._custom?.jellyfin).some((value) => value !== undefined);
 
-        return isNavidromeFilterApplied || isJellyfinFilterApplied;
-    }, [filter?._custom?.jellyfin, filter?._custom?.navidrome, server?.type]);
+        const isSubsonicFilterApplied =
+            server?.type === ServerType.SUBSONIC &&
+            (filter.maxYear || filter.minYear || filter.genres?.length || filter.favorite);
+
+        return isNavidromeFilterApplied || isJellyfinFilterApplied || isSubsonicFilterApplied;
+    }, [
+        filter?._custom?.jellyfin,
+        filter?._custom?.navidrome,
+        filter.favorite,
+        filter.genres?.length,
+        filter.maxYear,
+        filter.minYear,
+        server?.type,
+    ]);
 
     const isFolderFilterApplied = useMemo(() => {
         return filter.musicFolderId !== undefined;

@@ -2,13 +2,13 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { useMemo, useRef } from 'react';
 import { useCurrentServer } from '../../../store/auth.store';
 import { useListFilterByKey } from '../../../store/list.store';
-import { LibraryItem } from '/@/renderer/api/types';
+import { AlbumArtistListQuery, LibraryItem } from '/@/renderer/api/types';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ListContext } from '/@/renderer/context/list-context';
 import { AlbumArtistListContent } from '/@/renderer/features/artists/components/album-artist-list-content';
 import { AlbumArtistListHeader } from '/@/renderer/features/artists/components/album-artist-list-header';
-import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 import { AnimatedPage } from '/@/renderer/features/shared';
+import { useAlbumArtistListCount } from '/@/renderer/features/artists/queries/album-artist-list-count-query';
 
 const AlbumArtistListRoute = () => {
     const gridRef = useRef<VirtualInfiniteGridRef | null>(null);
@@ -16,25 +16,18 @@ const AlbumArtistListRoute = () => {
     const pageKey = LibraryItem.ALBUM_ARTIST;
     const server = useCurrentServer();
 
-    const albumArtistListFilter = useListFilterByKey({ key: pageKey });
+    const albumArtistListFilter = useListFilterByKey<AlbumArtistListQuery>({ key: pageKey });
 
-    const itemCountCheck = useAlbumArtistList({
+    const itemCountCheck = useAlbumArtistListCount({
         options: {
             cacheTime: 1000 * 60,
             staleTime: 1000 * 60,
         },
-        query: {
-            limit: 1,
-            startIndex: 0,
-            ...albumArtistListFilter,
-        },
+        query: albumArtistListFilter,
         serverId: server?.id,
     });
 
-    const itemCount =
-        itemCountCheck.data?.totalRecordCount === null
-            ? undefined
-            : itemCountCheck.data?.totalRecordCount;
+    const itemCount = itemCountCheck.data === null ? undefined : itemCountCheck.data;
 
     const providerValue = useMemo(() => {
         return {

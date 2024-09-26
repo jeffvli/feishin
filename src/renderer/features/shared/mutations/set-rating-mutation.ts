@@ -35,7 +35,7 @@ export const useSetRating = (args: MutationHookArgs) => {
         mutationFn: (args) => {
             const server = getServerById(args.serverId);
             if (!server) throw new Error('Server not found');
-            return api.controller.updateRating({ ...args, apiClientProps: { server } });
+            return api.controller.setRating({ ...args, apiClientProps: { server } });
         },
         onError: (_error, _variables, context) => {
             for (const item of context?.previous?.items || []) {
