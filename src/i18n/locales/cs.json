@@ -224,11 +224,11 @@
         "discordListening_description": "zobrazit stav jako „Poslouchá“ namísto „Hraje“. tato funkce v současné době není kompatibilní s lištou s časem",
         "contextMenu": "nastavení kontextové nabídky (kliknutí pravým)",
         "contextMenu_description": "umožňuje skrýt položky, které se zobrazí v nabídce po kliknutí pravým tlačítkem myši na položku. položky, které nejsou zaškrtnuté, se skryjí",
-        "customCssEnable": "povolit vlastní css",
-        "customCssEnable_description": "povolti psaní vlastního css.",
+        "customCssEnable": "povolit vlastní CSS",
+        "customCssEnable_description": "povolit vlastní CSS.",
         "customCssNotice": "Varování: i když provádíme určitou sanitizaci (zakázáním url() a content:), může používání CSS stále představovat riziko změnami rozhraní.",
-        "customCss_description": "vlastní css obsah. Upozornění: vlastnosti content a vzdálené url jsou zakázané. Níže je zobrazen náhled vašeho obsahu. Další pole, která jste nenastavili, jsou přítomna z důvodu sanitizace.",
-        "customCss": "vlastní css",
+        "customCss_description": "vlastní CSS obsah. Upozornění: vlastnosti content a vzdálené url jsou zakázané. Níže je zobrazen náhled vašeho obsahu. Další pole, která jste nenastavili, jsou přítomna z důvodu sanitizace.",
+        "customCss": "vlastní CSS",
         "webAudio": "použít webový zvuk",
         "webAudio_description": "použít webový zvuk. tím povolíte pokročilé funkce jako replaygain. zakažte, pokud se objeví problémy",
         "transcodeNote": "projeví se po 1 (web) - 2 (mpv) skladbách",
@@ -248,7 +248,13 @@
         "artistConfiguration_description": "nastavit, které položky na stránce umělce alba budou zobrazeny a v jakém pořadí",
         "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
         "trayEnabled": "zobrazit v oznamovací oblasti",
-        "trayEnabled_description": "zobrazit/skrýt ikonu/nabídku v oznamovací oblasti. pokud je zakázáno, vypne také minimalizaci/ukončení do oznamovací oblasti"
+        "trayEnabled_description": "zobrazit/skrýt ikonu/nabídku v oznamovací oblasti. pokud je zakázáno, vypne také minimalizaci/ukončení do oznamovací oblasti",
+        "translationApiProvider": "poskytovatel api překladů",
+        "translationApiProvider_description": "poskytovatel api pro překlady",
+        "translationApiKey": "klíč api překladů",
+        "translationApiKey_description": "klíč api pro překlady (podporuje pouze koncový bod globální služby)",
+        "translationTargetLanguage": "cílový jazyk překladu",
+        "translationTargetLanguage_description": "cílový jazyk pro překlad"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -364,7 +370,8 @@
         "share": "sdílet",
         "codec": "kodek",
         "trackPeak": "vrchol skladby",
-        "preview": "náhled"
+        "preview": "náhled",
+        "translation": "překlad"
     },
     "table": {
         "config": {
@@ -541,7 +548,8 @@
             },
             "upNext": "další",
             "lyrics": "texty",
-            "related": "související"
+            "related": "související",
+            "visualizer": "vizualizér"
         },
         "appMenu": {
             "selectServer": "vybrat server",
