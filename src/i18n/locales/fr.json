@@ -145,7 +145,8 @@
         "reload": "recharger",
         "trackGain": "gain de la piste",
         "trackPeak": "crête de la piste",
-        "codec": "codec"
+        "codec": "codec",
+        "translation": "traduction"
     },
     "error": {
         "remotePortWarning": "redémarrer le serveur pour appliquer le nouveau port",
@@ -248,7 +249,8 @@
             },
             "upNext": "à suivre",
             "lyrics": "paroles",
-            "related": "similaire"
+            "related": "similaire",
+            "visualizer": "visualisateur"
         },
         "appMenu": {
             "selectServer": "sélectionner le serveur",
@@ -346,6 +348,9 @@
             "copyPath": "copier le chemin dans le presse-papiers",
             "openFile": "afficher la piste dans le gestionnaire de fichiers",
             "copiedPath": "chemin copié avec succès"
+        },
+        "playlist": {
+            "reorder": "le tri n'est possible que lorsque l'on trie par identifiant"
         }
     },
     "setting": {
@@ -546,7 +551,15 @@
         "webAudio": "utiliser l'audio web",
         "transcodeBitrate": "débit binaire du transcodage",
         "transcodeFormat": "format de transcodage",
-        "webAudio_description": "utiliser l'audio web. cela permet d'utiliser des fonctions avancées comme le replaygain. désactivez si vous rencontrez d'autres problèmes"
+        "webAudio_description": "utiliser l'audio web. cela permet d'utiliser des fonctions avancées comme le replaygain. désactivez si vous rencontrez d'autres problèmes",
+        "artistConfiguration": "page de configuration de l'artiste de l'album",
+        "artistConfiguration_description": "configurer les éléments et l'ordre à afficher, sur la page de l'artiste de l'album",
+        "doubleClickBehavior": "mettre en file d'attente toutes les pistes recherchées lors d'un double clic",
+        "contextMenu": "configuration du menu contexte (clic droit)",
+        "contextMenu_description": "permet de masquer les éléments qui s'affichent dans le menu lorsque vous cliquez avec le bouton droit de la souris sur un élément. les éléments qui ne sont pas cochés seront masqués",
+        "albumBackground": "image d'arrière-plan de l'album",
+        "albumBackground_description": "ajoute une image d'arrière-plan pour les pages de l'album contenant les illustrations de l'album",
+        "albumBackgroundBlur_description": "ajuste le niveau de flou appliqué à l'image d'arrière-plan de l'album"
     },
     "form": {
         "deletePlaylist": {
