@@ -190,9 +190,11 @@ const topSongsListParameters = z.object({
 });
 
 const topSongsList = z.object({
-    topSongs: z.object({
-        song: z.array(song),
-    }),
+    topSongs: z
+        .object({
+            song: z.array(song),
+        })
+        .optional(),
 });
 
 const scrobbleParameters = z.object({
@@ -204,11 +206,13 @@ const scrobbleParameters = z.object({
 const scrobble = z.null();
 
 const search3 = z.object({
-    searchResult3: z.object({
-        album: z.array(album),
-        artist: z.array(albumArtist),
-        song: z.array(song),
-    }),
+    searchResult3: z
+        .object({
+            album: z.array(album).optional(),
+            artist: z.array(albumArtist).optional(),
+            song: z.array(song).optional(),
+        })
+        .optional(),
 });
 
 const search3Parameters = z.object({
@@ -231,9 +235,11 @@ const randomSongListParameters = z.object({
 });
 
 const randomSongList = z.object({
-    randomSongs: z.object({
-        song: z.array(song),
-    }),
+    randomSongs: z
+        .object({
+            song: z.array(song),
+        })
+        .optional(),
 });
 
 const ping = z.object({
@@ -310,11 +316,13 @@ const getStarredParameters = z.object({
 });
 
 const getStarred = z.object({
-    starred: z.object({
-        album: z.array(albumListEntry),
-        artist: z.array(artistListEntry),
-        song: z.array(song),
-    }),
+    starred: z
+        .object({
+            album: z.array(albumListEntry),
+            artist: z.array(artistListEntry),
+            song: z.array(song),
+        })
+        .optional(),
 });
 
 const getSongsByGenreParameters = z.object({
@@ -325,9 +333,11 @@ const getSongsByGenreParameters = z.object({
 });
 
 const getSongsByGenre = z.object({
-    songsByGenre: z.object({
-        song: z.array(song),
-    }),
+    songsByGenre: z
+        .object({
+            song: z.array(song),
+        })
+        .optional(),
 });
 
 const getAlbumParameters = z.object({
@@ -408,9 +418,11 @@ const playlistListEntry = playlist.omit({
 });
 
 const getPlaylists = z.object({
-    playlists: z.object({
-        playlist: z.array(playlistListEntry),
-    }),
+    playlists: z
+        .object({
+            playlist: z.array(playlistListEntry),
+        })
+        .optional(),
 });
 
 const getPlaylistParameters = z.object({
@@ -430,9 +442,11 @@ const genre = z.object({
 const getGenresParameters = z.object({});
 
 const getGenres = z.object({
-    genres: z.object({
-        genre: z.array(genre),
-    }),
+    genres: z
+        .object({
+            genre: z.array(genre),
+        })
+        .optional(),
 });
 
 export enum AlbumListSortType {

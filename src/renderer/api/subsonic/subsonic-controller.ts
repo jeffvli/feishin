@@ -270,7 +270,7 @@ export const SubsonicController: ControllerEndpoint = {
             }
 
             const results =
-                res.body.searchResult3.album?.map((album) =>
+                res.body.searchResult3?.album?.map((album) =>
                     ssNormalize.album(album, apiClientProps.server),
                 ) || [];
 
@@ -325,14 +325,14 @@ export const SubsonicController: ControllerEndpoint = {
             }
 
             const results =
-                res.body.starred.album?.map((album) =>
+                res.body.starred?.album?.map((album) =>
                     ssNormalize.album(album, apiClientProps.server),
                 ) || [];
 
             return {
                 items: sortAlbumList(results, query.sortBy, query.sortOrder),
                 startIndex: 0,
-                totalRecordCount: res.body.starred.album?.length || 0,
+                totalRecordCount: res.body.starred?.album?.length || 0,
             };
         }
 
@@ -410,7 +410,7 @@ export const SubsonicController: ControllerEndpoint = {
                     throw new Error('Failed to get album list count');
                 }
 
-                const albumCount = res.body.searchResult3.album?.length;
+                const albumCount = (res.body.searchResult3?.album || [])?.length;
 
                 totalRecordCount += albumCount;
                 startIndex += albumCount;
@@ -433,7 +433,7 @@ export const SubsonicController: ControllerEndpoint = {
                 throw new Error('Failed to get album list');
             }
 
-            return res.body.starred.album?.length || 0;
+            return (res.body.starred?.album || []).length || 0;
         }
 
         let type = ALBUM_LIST_SORT_MAPPING[query.sortBy] ?? AlbumListSortType.ALPHABETICAL_BY_NAME;
@@ -523,7 +523,7 @@ export const SubsonicController: ControllerEndpoint = {
             throw new Error('Failed to get genre list');
         }
 
-        let results = res.body.genres.genre;
+        let results = res.body.genres?.genre || [];
 
         if (query.searchTerm) {
             const searchResults = filter(results, (genre) =>
@@ -588,7 +588,7 @@ export const SubsonicController: ControllerEndpoint = {
             throw new Error('Failed to get playlist list');
         }
 
-        let results = res.body.playlists.playlist;
+        let results = res.body.playlists?.playlist || [];
 
         if (query.searchTerm) {
             const searchResults = filter(results, (playlist) => {
@@ -634,7 +634,7 @@ export const SubsonicController: ControllerEndpoint = {
             throw new Error('Failed to get playlist list');
         }
 
-        let results = res.body.playlists.playlist;
+        let results = res.body.playlists?.playlist || [];
 
         if (query.searchTerm) {
             const searchResults = filter(results, (playlist) => {
@@ -689,10 +689,10 @@ export const SubsonicController: ControllerEndpoint = {
             throw new Error('Failed to get random songs');
         }
 
+        const results = res.body.randomSongs?.song || [];
+
         return {
-            items: res.body.randomSongs?.song?.map((song) =>
-                ssNormalize.song(song, apiClientProps.server, ''),
-            ),
+            items: results.map((song) => ssNormalize.song(song, apiClientProps.server, '')),
             startIndex: 0,
             totalRecordCount: res.body.randomSongs?.song?.length || 0,
         };
@@ -818,11 +818,11 @@ export const SubsonicController: ControllerEndpoint = {
                 throw new Error('Failed to get song list');
             }
 
+            const results = res.body.songsByGenre?.song || [];
+
             return {
                 items:
-                    res.body.songsByGenre.song?.map((song) =>
-                        ssNormalize.song(song, apiClientProps.server, ''),
-                    ) || [],
+                    results.map((song) => ssNormalize.song(song, apiClientProps.server, '')) || [],
                 startIndex: 0,
                 totalRecordCount: null,
             };
@@ -840,14 +840,14 @@ export const SubsonicController: ControllerEndpoint = {
             }
 
             const results =
-                res.body.starred.song?.map((song) =>
+                (res.body.starred?.song || []).map((song) =>
                     ssNormalize.song(song, apiClientProps.server, ''),
                 ) || [];
 
             return {
                 items: sortSongList(results, query.sortBy, query.sortOrder),
                 startIndex: 0,
-                totalRecordCount: res.body.starred.song?.length || 0,
+                totalRecordCount: (res.body.starred?.song || []).length || 0,
             };
         }
 
@@ -973,7 +973,7 @@ export const SubsonicController: ControllerEndpoint = {
                     throw new Error('Failed to get song list count');
                 }
 
-                const songCount = res.body.searchResult3.song?.length || 0;
+                const songCount = (res.body.searchResult3?.song || []).length || 0;
 
                 totalRecordCount += songCount;
                 startIndex += songCount;
@@ -1001,7 +1001,7 @@ export const SubsonicController: ControllerEndpoint = {
                     throw new Error('Failed to get song list count');
                 }
 
-                const numberOfResults = res.body.songsByGenre.song?.length || 0;
+                const numberOfResults = (res.body.songsByGenre?.song || []).length || 0;
 
                 if (numberOfResults !== 1) {
                     fetchNextSection = false;
@@ -1026,7 +1026,7 @@ export const SubsonicController: ControllerEndpoint = {
                     throw new Error('Failed to get song list count');
                 }
 
-                const numberOfResults = res.body.songsByGenre.song?.length || 0;
+                const numberOfResults = (res.body.songsByGenre?.song || []).length || 0;
 
                 totalRecordCount = startIndex + numberOfResults;
                 startIndex += numberOfResults;
@@ -1048,7 +1048,7 @@ export const SubsonicController: ControllerEndpoint = {
                 throw new Error('Failed to get song list');
             }
 
-            return res.body.starred.song?.length || 0;
+            return (res.body.starred?.song || []).length || 0;
         }
 
         let totalRecordCount = 0;
@@ -1070,7 +1070,7 @@ export const SubsonicController: ControllerEndpoint = {
                 throw new Error('Failed to get song list count');
             }
 
-            const numberOfResults = res.body.searchResult3.song?.length || 0;
+            const numberOfResults = (res.body.searchResult3?.song || []).length || 0;
 
             // Check each batch of 5000 songs to check for data
             sectionIndex += 5000;
@@ -1099,7 +1099,7 @@ export const SubsonicController: ControllerEndpoint = {
                 throw new Error('Failed to get song list count');
             }
 
-            const numberOfResults = res.body.searchResult3.song?.length || 0;
+            const numberOfResults = (res.body.searchResult3?.song || []).length || 0;
 
             totalRecordCount = startIndex + numberOfResults;
             startIndex += numberOfResults;
@@ -1237,13 +1237,13 @@ export const SubsonicController: ControllerEndpoint = {
         }
 
         return {
-            albumArtists: res.body.searchResult3?.artist?.map((artist) =>
+            albumArtists: (res.body.searchResult3?.artist || [])?.map((artist) =>
                 ssNormalize.albumArtist(artist, apiClientProps.server),
             ),
-            albums: res.body.searchResult3?.album?.map((album) =>
+            albums: (res.body.searchResult3?.album || []).map((album) =>
                 ssNormalize.album(album, apiClientProps.server),
             ),
-            songs: res.body.searchResult3?.song?.map((song) =>
+            songs: (res.body.searchResult3?.song || []).map((song) =>
                 ssNormalize.song(song, apiClientProps.server, ''),
             ),
         };
