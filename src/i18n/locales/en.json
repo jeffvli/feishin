@@ -147,7 +147,8 @@
         "smartPlaylist": "smart $t(entity.playlist_one)",
         "track_one": "track",
         "track_other": "tracks",
-        "song_many": "{{ count }} songs",
+        "song_one": "",
+        "song_other": "",
         "trackWithCount_one": "{{count}} track",
         "trackWithCount_other": "{{count}} tracks"
     },
