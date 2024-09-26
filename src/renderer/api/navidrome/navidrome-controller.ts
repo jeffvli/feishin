@@ -499,6 +499,7 @@ export const NavidromeController: ControllerEndpoint = {
             apiClientProps,
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
+    getStructuredLyrics: SubsonicController.getStructuredLyrics,
     getTopSongs: SubsonicController.getTopSongs,
     getTranscodingUrl: SubsonicController.getTranscodingUrl,
     getUserList: async (args) => {
