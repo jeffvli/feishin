@@ -69,7 +69,7 @@ export const SubsonicAlbumFilters = ({
     ];
 
     const handleYearFilter = debounce((e: number | string, type: 'min' | 'max') => {
-        let data: AlbumListQuery = {};
+        let data: Partial<AlbumListQuery> = {};
 
         if (type === 'min') {
             data = {
@@ -131,7 +131,7 @@ export const SubsonicAlbumFilters = ({
                     searchable
                     data={genreList}
                     defaultValue={filter.genres?.length ? filter.genres[0] : undefined}
-                    disabled={filter.minYear || filter.maxYear}
+                    disabled={Boolean(filter.minYear || filter.maxYear)}
                     label={t('entity.genre', { count: 1, postProcess: 'titleCase' })}
                     onChange={handleGenresFilter}
                 />
