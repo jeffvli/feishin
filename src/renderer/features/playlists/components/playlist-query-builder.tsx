@@ -467,11 +467,11 @@ export const PlaylistQueryBuilder = forwardRef(
                         <Select
                             data={[
                                 {
-                                    label: t('common.ascending', { postProcess: 'titleCase' }),
+                                    label: t('common.ascending', { postProcess: 'sentenceCase' }),
                                     value: 'asc',
                                 },
                                 {
-                                    label: t('common.descending', { postProcess: 'titleCase' }),
+                                    label: t('common.descending', { postProcess: 'sentenceCase' }),
                                     value: 'desc',
                                 },
                             ]}

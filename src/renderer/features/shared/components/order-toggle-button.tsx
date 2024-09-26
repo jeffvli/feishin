@@ -16,8 +16,8 @@ export const OrderToggleButton = ({ sortOrder, onToggle, buttonProps }: OrderTog
         <Tooltip
             label={
                 sortOrder === SortOrder.ASC
-                    ? t('common.ascending', { postProcess: 'titleCase' })
-                    : t('common.descending', { postProcess: 'titleCase' })
+                    ? t('common.ascending', { postProcess: 'sentenceCase' })
+                    : t('common.descending', { postProcess: 'sentenceCase' })
             }
         >
             <Button

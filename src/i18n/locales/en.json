@@ -147,6 +147,7 @@
         "smartPlaylist": "smart $t(entity.playlist_one)",
         "track_one": "track",
         "track_other": "tracks",
+        "song_many": "{{ count }} songs",
         "trackWithCount_one": "{{count}} track",
         "trackWithCount_other": "{{count}} tracks"
     },
@@ -315,6 +316,14 @@
             "settings": "$t(common.setting_other)",
             "version": "version {{version}}"
         },
+        "manageServers": {
+            "title": "manage servers",
+            "serverDetails": "server details",
+            "url": "URL",
+            "username": "username",
+            "editServerDetailsTooltip": "edit server details",
+            "removeServer": "remove server"
+        },
         "contextMenu": {
             "addFavorite": "$t(action.addToFavorites)",
             "addLast": "$t(player.addLast)",
@@ -345,6 +354,7 @@
                 "dynamicIsImage": "enable background image",
                 "followCurrentLyric": "follow current lyric",
                 "lyricAlignment": "lyric alignment",
+                "lyricOffset": "lyrics offset (ms)",
                 "lyricGap": "lyric gap",
                 "lyricSize": "lyric size",
                 "opacity": "opacity",
@@ -357,7 +367,8 @@
             "lyrics": "lyrics",
             "related": "related",
             "upNext": "up next",
-            "visualizer": "visualizer"
+            "visualizer": "visualizer",
+            "noLyrics": "no lyrics found"
         },
         "genreList": {
             "showAlbums": "show $t(entity.genre_one) $t(entity.album_other)",
@@ -449,7 +460,8 @@
         "stop": "stop",
         "toggleFullscreenPlayer": "toggle fullscreen player",
         "unfavorite": "unfavorite",
-        "pause": "pause"
+        "pause": "pause",
+        "viewQueue": "view queue"
     },
     "setting": {
         "accentColor": "accent color",
@@ -706,6 +718,7 @@
         "config": {
             "general": {
                 "autoFitColumns": "auto fit columns",
+                "followCurrentSong": "follow current song",
                 "displayType": "display type",
                 "gap": "$t(common.gap)",
                 "itemGap": "item gap (px)",
