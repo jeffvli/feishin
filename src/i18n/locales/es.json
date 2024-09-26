@@ -248,7 +248,13 @@
         "artistConfiguration_description": "Configurar qué elementos se muestran y en qué orden en la página del artista del álbum",
         "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
         "trayEnabled": "Mostrar en el área de notificación",
-        "trayEnabled_description": "mostrar/ocultar el icono/menú del área de notificación. si está deshabilitado, también deshabilita minimizar/salir a la bandeja"
+        "trayEnabled_description": "mostrar/ocultar el icono/menú del área de notificación. si está deshabilitado, también deshabilita minimizar/salir a la bandeja",
+        "translationApiProvider": "Proveedor de API de traducción",
+        "translationApiProvider_description": "Proveedor de API para traducción",
+        "translationApiKey": "clave api de traducción",
+        "translationApiKey_description": "Clave API para la traducción (solo para el punto final del servicio global)",
+        "translationTargetLanguage": "idioma final de la traducción",
+        "translationTargetLanguage_description": "lengua de destino de la traducción"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -364,7 +370,8 @@
         "reload": "Recargar",
         "share": "Compartir",
         "trackGain": "Ganancia de pista",
-        "preview": "Vista previa"
+        "preview": "Vista previa",
+        "translation": "traducción"
     },
     "error": {
         "remotePortWarning": "reiniciar el servidor para aplicar el nuevo puerto",
@@ -509,7 +516,8 @@
                 "dynamicIsImage": "habilitar imagen de fondo"
             },
             "lyrics": "letras",
-            "related": "relacionado"
+            "related": "relacionado",
+            "visualizer": "visualizador"
         },
         "albumDetail": {
             "moreFromArtist": "más de este $t(entity.artist_one)",
