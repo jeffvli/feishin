@@ -107,7 +107,8 @@
         "albumGain": "专辑增益",
         "codec": "编解码器",
         "share": "分享",
-        "preview": "预览"
+        "preview": "预览",
+        "translation": "翻译"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -377,7 +378,13 @@
         "artistConfiguration": "专辑艺术家页面配置",
         "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
         "trayEnabled_description": "显示/隐藏托盘图标/菜单。如果禁用，也会禁用最小化/退出到托盘",
-        "trayEnabled": "显示托盘"
+        "trayEnabled": "显示托盘",
+        "translationApiProvider": "翻译api提供商",
+        "translationApiProvider_description": "翻译api提供商",
+        "translationApiKey": "翻译api密钥",
+        "translationApiKey_description": "翻译api密钥（仅支持全球服务节点）",
+        "translationTargetLanguage": "目标翻译语言",
+        "translationTargetLanguage_description": "目标翻译语言"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -480,7 +487,8 @@
             },
             "lyrics": "歌词",
             "related": "相关",
-            "upNext": "即将播放"
+            "upNext": "即将播放",
+            "visualizer": "可视化"
         },
         "appMenu": {
             "selectServer": "选择服务器",
