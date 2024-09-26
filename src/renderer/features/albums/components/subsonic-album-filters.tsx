@@ -39,8 +39,6 @@ export const SubsonicAlbumFilters = ({
         }));
     }, [genreListQuery.data]);
 
-    console.log(genreList);
-
     const handleGenresFilter = debounce((e: string | null) => {
         const updatedFilters = setFilter({
             data: {
