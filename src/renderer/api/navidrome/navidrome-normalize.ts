@@ -99,7 +99,7 @@ const normalizeSong = (
             item.rgAlbumGain || item.rgTrackGain
                 ? { album: item.rgAlbumGain, track: item.rgTrackGain }
                 : null,
-        genres: item.genres?.map((genre) => ({
+        genres: (item.genres || []).map((genre) => ({
             id: genre.id,
             imageUrl: null,
             itemType: LibraryItem.GENRE,
@@ -162,7 +162,7 @@ const normalizeAlbum = (
         comment: item.comment || null,
         createdAt: item.createdAt.split('T')[0],
         duration: item.duration * 1000 || null,
-        genres: item.genres?.map((genre) => ({
+        genres: (item.genres || []).map((genre) => ({
             id: genre.id,
             imageUrl: null,
             itemType: LibraryItem.GENRE,
@@ -221,7 +221,7 @@ const normalizeAlbumArtist = (
         backgroundImageUrl: null,
         biography: item.biography || null,
         duration: null,
-        genres: item.genres?.map((genre) => ({
+        genres: (item.genres || []).map((genre) => ({
             id: genre.id,
             imageUrl: null,
             itemType: LibraryItem.GENRE,
