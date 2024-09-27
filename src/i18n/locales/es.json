@@ -29,7 +29,8 @@
         "mute": "silencio",
         "skip_forward": "saltar hacia delante",
         "pause": "pausa",
-        "playSimilarSongs": "Reproducir canciones similares"
+        "playSimilarSongs": "Reproducir canciones similares",
+        "viewQueue": "ver cola"
     },
     "setting": {
         "crossfadeStyle_description": "selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -513,11 +514,13 @@
                 "showLyricMatch": "mostrar coincidencia de letras",
                 "lyricGap": "desfase de letra",
                 "dynamicImageBlur": "tamaño de desenfoque de imagen",
-                "dynamicIsImage": "habilitar imagen de fondo"
+                "dynamicIsImage": "habilitar imagen de fondo",
+                "lyricOffset": "compensación de letras (ms)"
             },
             "lyrics": "letras",
             "related": "relacionado",
-            "visualizer": "visualizador"
+            "visualizer": "visualizador",
+            "noLyrics": "sin letras"
         },
         "albumDetail": {
             "moreFromArtist": "más de este $t(entity.artist_one)",
@@ -578,6 +581,14 @@
         },
         "playlist": {
             "reorder": "la reordenación solo se activa al ordenar por id"
+        },
+        "manageServers": {
+            "removeServer": "eliminar servidor",
+            "title": "administrar servidores",
+            "serverDetails": "detalles del servidor",
+            "username": "nombre de usuario",
+            "editServerDetailsTooltip": "editar detalles del servidor",
+            "url": "URL"
         }
     },
     "form": {
@@ -705,7 +716,8 @@
                 "size": "$t(common.size)",
                 "displayType": "tipo de visualización",
                 "itemGap": "espacio entre elementos (px)",
-                "itemSize": "tamaño del elemento (px)"
+                "itemSize": "tamaño del elemento (px)",
+                "followCurrentSong": "seguir la canción actual"
             },
             "view": {
                 "card": "tarjeta",
