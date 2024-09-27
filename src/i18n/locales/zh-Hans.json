@@ -159,7 +159,8 @@
         "skip_forward": "向前跳过",
         "playbackSpeed": "播放速度",
         "pause": "暂停",
-        "playSimilarSongs": "播放类似的曲目"
+        "playSimilarSongs": "播放类似的曲目",
+        "viewQueue": "查看播放队列"
     },
     "setting": {
         "crossfadeStyle_description": "选择用于音频播放器的淡入淡出风格",
@@ -483,12 +484,14 @@
                 "lyricGap": "歌词间距",
                 "followCurrentLyric": "跟随当前歌词",
                 "dynamicImageBlur": "图像模糊大小",
-                "dynamicIsImage": "启用背景图像"
+                "dynamicIsImage": "启用背景图像",
+                "lyricOffset": "歌词延迟补偿（毫秒）"
             },
             "lyrics": "歌词",
             "related": "相关",
             "upNext": "即将播放",
-            "visualizer": "可视化"
+            "visualizer": "可视化",
+            "noLyrics": "未找到歌词"
         },
         "appMenu": {
             "selectServer": "选择服务器",
@@ -591,6 +594,14 @@
         },
         "playlist": {
             "reorder": "仅在按 ID 排序时启用重排序"
+        },
+        "manageServers": {
+            "url": "URL",
+            "title": "管理服务器",
+            "serverDetails": "服务器详细信息",
+            "username": "用户名",
+            "editServerDetailsTooltip": "编辑服务器详细信息",
+            "removeServer": "移除服务器"
         }
     },
     "form": {
@@ -662,7 +673,8 @@
                 "autoFitColumns": "列宽自适应",
                 "size": "$t(common.size)",
                 "itemGap": "项目间隙（px）",
-                "itemSize": "项目大小 (px)"
+                "itemSize": "项目大小 (px)",
+                "followCurrentSong": "关注当前播放的歌曲"
             },
             "view": {
                 "table": "表格",
