@@ -75,8 +75,6 @@ button {
 }
 
 .hide-scrollbar {
-    scrollbar-color: transparent transparent;
-
     &::-webkit-scrollbar-track {
         background: transparent;
     }
