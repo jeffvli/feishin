@@ -29,7 +29,8 @@
         "addLast": "přidat poslední",
         "mute": "ztlumit",
         "skip_forward": "přeskočit dopředu",
-        "playSimilarSongs": "přehrát podobné skladby"
+        "playSimilarSongs": "přehrát podobné skladby",
+        "viewQueue": "zobrazit frontu"
     },
     "setting": {
         "crossfadeStyle_description": "vyberte způsob prolnutí u přehrávače zvuku",
@@ -387,7 +388,8 @@
                 "autoFitColumns": "automaticky přizpůsobit sloupce",
                 "size": "$t(common.size)",
                 "itemGap": "mezera mezi položkami (px)",
-                "itemSize": "velikost položek (px)"
+                "itemSize": "velikost položek (px)",
+                "followCurrentSong": "následovat aktuální skladbu"
             },
             "label": {
                 "releaseDate": "datum vydání",
@@ -544,12 +546,14 @@
                 "useImageAspectRatio": "použít poměr stran obrázku",
                 "lyricGap": "mezera textů",
                 "dynamicImageBlur": "velikost rozostření obrázku",
-                "dynamicIsImage": "povolit obrázek na pozadí"
+                "dynamicIsImage": "povolit obrázek na pozadí",
+                "lyricOffset": "posunutí textů (ms)"
             },
             "upNext": "další",
             "lyrics": "texty",
             "related": "související",
-            "visualizer": "vizualizér"
+            "visualizer": "vizualizér",
+            "noLyrics": "nenalezeny žádné texty"
         },
         "appMenu": {
             "selectServer": "vybrat server",
@@ -652,6 +656,14 @@
         },
         "playlist": {
             "reorder": "změna pořadí povolena pouze při řazení podle id"
+        },
+        "manageServers": {
+            "url": "URL",
+            "username": "uživatelské jméno",
+            "editServerDetailsTooltip": "upravit podrobnosti o serveru",
+            "removeServer": "odstranit server",
+            "serverDetails": "podrobnosti o serveru",
+            "title": "správa serverů"
         }
     },
     "form": {
@@ -763,6 +775,9 @@
         "trackWithCount_other": "{{count}} skladeb",
         "play_one": "{{count}} přehrání",
         "play_few": "{{count}} přehrání",
-        "play_other": "{{count}} přehrání"
+        "play_other": "{{count}} přehrání",
+        "song_one": " ",
+        "song_few": " ",
+        "song_other": " "
     }
 }
