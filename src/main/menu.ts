@@ -147,27 +147,27 @@ export default class MenuBuilder {
             submenu: [
                 {
                     click() {
-                        shell.openExternal('https://electronjs.org');
+                        shell.openExternal('https://github.com/jeffvli/feishin');
                     },
                     label: 'Learn More',
                 },
                 {
                     click() {
                         shell.openExternal(
-                            'https://github.com/electron/electron/tree/main/docs#readme',
+                            'https://github.com/jeffvli/feishin?tab=readme-ov-file#getting-started',
                         );
                     },
                     label: 'Documentation',
                 },
                 {
                     click() {
-                        shell.openExternal('https://www.electronjs.org/community');
+                        shell.openExternal('https://github.com/jeffvli/feishin/discussions');
                     },
                     label: 'Community Discussions',
                 },
                 {
                     click() {
-                        shell.openExternal('https://github.com/electron/electron/issues');
+                        shell.openExternal('https://github.com/jeffvli/feishin/issues');
                     },
                     label: 'Search Issues',
                 },
@@ -246,27 +246,27 @@ export default class MenuBuilder {
                 submenu: [
                     {
                         click() {
-                            shell.openExternal('https://electronjs.org');
+                            shell.openExternal('https://github.com/jeffvli/feishin');
                         },
                         label: 'Learn More',
                     },
                     {
                         click() {
                             shell.openExternal(
-                                'https://github.com/electron/electron/tree/main/docs#readme',
+                                'https://github.com/jeffvli/feishin?tab=readme-ov-file#getting-started',
                             );
                         },
                         label: 'Documentation',
                     },
                     {
                         click() {
-                            shell.openExternal('https://www.electronjs.org/community');
+                            shell.openExternal('https://github.com/jeffvli/feishin/discussions');
                         },
                         label: 'Community Discussions',
                     },
                     {
                         click() {
-                            shell.openExternal('https://github.com/electron/electron/issues');
+                            shell.openExternal('https://github.com/jeffvli/feishin/issues');
                         },
                         label: 'Search Issues',
                     },
