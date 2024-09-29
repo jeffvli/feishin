@@ -337,7 +337,7 @@ export const NavidromeController: ControllerEndpoint = {
                 id: query.id,
             },
             query: {
-                _end: query.limit,
+                _end: query.startIndex + (query.limit || -1),
                 _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : 'ASC',
                 _sort: query.sortBy
                     ? songListSortMap.navidrome[query.sortBy]
