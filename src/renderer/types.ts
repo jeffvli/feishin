@@ -69,6 +69,8 @@ export const toServerType = (value?: string): ServerType | null => {
             return ServerType.JELLYFIN;
         case ServerType.NAVIDROME:
             return ServerType.NAVIDROME;
+        case ServerType.SUBSONIC:
+            return ServerType.SUBSONIC;
         default:
             return null;
     }
