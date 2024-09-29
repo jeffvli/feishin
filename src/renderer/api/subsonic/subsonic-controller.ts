@@ -15,6 +15,7 @@ import {
     GenreListSort,
     AlbumListSort,
     sortAlbumList,
+    SortOrder,
 } from '/@/renderer/api/types';
 import { randomString } from '/@/renderer/utils';
 import { ServerFeatures } from '/@/renderer/api/features-types';
@@ -25,14 +26,14 @@ const ALBUM_LIST_SORT_MAPPING: Record<AlbumListSort, AlbumListSortType | undefin
     [AlbumListSort.PLAY_COUNT]: AlbumListSortType.FREQUENT,
     [AlbumListSort.RECENTLY_ADDED]: AlbumListSortType.NEWEST,
     [AlbumListSort.FAVORITED]: AlbumListSortType.STARRED,
-    [AlbumListSort.YEAR]: AlbumListSortType.RECENT,
+    [AlbumListSort.YEAR]: AlbumListSortType.BY_YEAR,
     [AlbumListSort.NAME]: AlbumListSortType.ALPHABETICAL_BY_NAME,
     [AlbumListSort.COMMUNITY_RATING]: undefined,
     [AlbumListSort.DURATION]: undefined,
     [AlbumListSort.CRITIC_RATING]: undefined,
     [AlbumListSort.RATING]: undefined,
     [AlbumListSort.ARTIST]: undefined,
-    [AlbumListSort.RECENTLY_PLAYED]: undefined,
+    [AlbumListSort.RECENTLY_PLAYED]: AlbumListSortType.RECENT,
     [AlbumListSort.RELEASE_DATE]: undefined,
     [AlbumListSort.SONG_COUNT]: undefined,
 };
@@ -360,6 +361,16 @@ export const SubsonicController: ControllerEndpoint = {
             }
         }
 
+        if (type === AlbumListSortType.BY_YEAR && !fromYear && !toYear) {
+            if (query.sortOrder === SortOrder.ASC) {
+                fromYear = 0;
+                toYear = dayjs().year();
+            } else {
+                fromYear = dayjs().year();
+                toYear = 0;
+            }
+        }
+
         const res = await ssApiClient(apiClientProps).getAlbumList2({
             query: {
                 fromYear,
@@ -436,7 +447,7 @@ export const SubsonicController: ControllerEndpoint = {
             return (res.body.starred?.album || []).length || 0;
         }
 
-        let type = ALBUM_LIST_SORT_MAPPING[query.sortBy] ?? AlbumListSortType.ALPHABETICAL_BY_NAME;
+        let type = AlbumListSortType.ALPHABETICAL_BY_NAME;
 
         let fetchNextPage = true;
         let startIndex = 0;
