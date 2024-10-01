@@ -361,6 +361,7 @@ const tableColumns: { [key: string]: ColDef } = {
                 ? {
                       albumArtists: params.data?.albumArtists,
                       artists: params.data?.artists,
+                      id: params.data?.id,
                       imagePlaceholderUrl: params.data?.imagePlaceholderUrl,
                       imageUrl: params.data?.imageUrl,
                       name: params.data?.name,
