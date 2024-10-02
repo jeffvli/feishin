@@ -7,7 +7,7 @@ import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import { SimpleImg } from 'react-simple-img';
 import styled from 'styled-components';
-import { AlbumArtist, Artist, LibraryItem } from '/@/renderer/api/types';
+import { AlbumArtist, Artist } from '/@/renderer/api/types';
 import { Text } from '/@/renderer/components/text';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Skeleton } from '/@/renderer/components/skeleton';
@@ -59,7 +59,7 @@ const StyledImage = styled(SimpleImg)`
     }
 `;
 
-export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams) => {
+export const CombinedTitleCell = ({ value, rowIndex, node, context }: ICellRendererParams) => {
     const artists = useMemo(() => {
         if (!value) return null;
         return value.artists?.length ? value.artists : value.albumArtists;
@@ -115,7 +115,7 @@ export const CombinedTitleCell = ({ value, rowIndex, node }: ICellRendererParams
                 )}
                 <ListCoverControls
                     itemData={value}
-                    itemType={LibraryItem.SONG}
+                    itemType={context.itemType}
                 />
             </ImageWrapper>
             <MetadataWrapper>
