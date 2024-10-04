@@ -334,6 +334,7 @@ export const useVirtualTable = <TFilter extends BaseQuery<any>>({
     const onCellContextMenu = useHandleTableContextMenu(itemType, contextMenu);
 
     const context = {
+        itemType,
         onCellContextMenu,
     };
 
