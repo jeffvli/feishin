@@ -2,6 +2,7 @@ import { SetContextMenuItems } from '/@/renderer/features/context-menu/events';
 
 export const QUEUE_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { divider: true, id: 'removeFromQueue' },
+    { id: 'moveToNextOfQueue' },
     { id: 'moveToBottomOfQueue' },
     { divider: true, id: 'moveToTopOfQueue' },
     { divider: true, id: 'addToPlaylist' },

@@ -32,6 +32,7 @@ export type ContextMenuItemType =
     | 'shareItem'
     | 'deletePlaylist'
     | 'createPlaylist'
+    | 'moveToNextOfQueue'
     | 'moveToBottomOfQueue'
     | 'moveToTopOfQueue'
     | 'removeFromQueue'

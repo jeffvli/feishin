@@ -18,6 +18,7 @@ import {
     RiAddBoxFill,
     RiAddCircleFill,
     RiArrowDownLine,
+    RiArrowGoForwardLine,
     RiArrowRightSFill,
     RiArrowUpLine,
     RiDeleteBinFill,
@@ -609,7 +610,19 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     );
 
     const playbackType = usePlaybackType();
-    const { moveToBottomOfQueue, moveToTopOfQueue, removeFromQueue } = useQueueControls();
+    const { moveToNextOfQueue, moveToBottomOfQueue, moveToTopOfQueue, removeFromQueue } =
+        useQueueControls();
+
+    const handleMoveToNext = useCallback(() => {
+        const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
+        if (!uniqueIds?.length) return;
+
+        const playerData = moveToNextOfQueue(uniqueIds);
+
+        if (playbackType === PlaybackType.LOCAL) {
+            setQueueNext(playerData);
+        }
+    }, [ctx.dataNodes, moveToNextOfQueue, playbackType]);
 
     const handleMoveToBottom = useCallback(() => {
         const uniqueIds = ctx.dataNodes?.map((row) => row.data.uniqueId);
@@ -758,6 +771,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 leftIcon: <RiArrowDownLine size="1.1rem" />,
                 onClick: handleMoveToBottom,
             },
+            moveToNextOfQueue: {
+                id: 'moveToNext',
+                label: t('page.contextMenu.moveToNext', { postProcess: 'sentenceCase' }),
+                leftIcon: <RiArrowGoForwardLine size="1.1rem" />,
+                onClick: handleMoveToNext,
+            },
             moveToTopOfQueue: {
                 id: 'moveToTopOfQueue',
                 label: t('page.contextMenu.moveToTop', { postProcess: 'sentenceCase' }),
@@ -904,6 +923,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         handleDeselectAll,
         ctx.data,
         handleDownload,
+        handleMoveToNext,
         handleMoveToBottom,
         handleMoveToTop,
         handleSimilar,
