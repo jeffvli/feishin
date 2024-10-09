@@ -19,6 +19,8 @@ const authenticateParameters = z.object({
     v: z.string(),
 });
 
+const id = z.number().or(z.string());
+
 const createFavoriteParameters = z.object({
     albumId: z.array(z.string()).optional(),
     artistId: z.array(z.string()).optional(),
@@ -43,7 +45,7 @@ const setRatingParameters = z.object({
 const setRating = z.null();
 
 const musicFolder = z.object({
-    id: z.string(),
+    id,
     name: z.string(),
 });
 
@@ -66,9 +68,9 @@ const genreItem = z.object({
 
 const song = z.object({
     album: z.string().optional(),
-    albumId: z.string().optional(),
+    albumId: id.optional(),
     artist: z.string().optional(),
-    artistId: z.string().optional(),
+    artistId: id.optional(),
     averageRating: z.number().optional(),
     bitRate: z.number().optional(),
     bpm: z.number().optional(),
@@ -79,7 +81,7 @@ const song = z.object({
     duration: z.number().optional(),
     genre: z.string().optional(),
     genres: z.array(genreItem).optional(),
-    id: z.string(),
+    id,
     isDir: z.boolean(),
     isVideo: z.boolean(),
     musicBrainzId: z.string().optional(),
@@ -100,12 +102,12 @@ const song = z.object({
 const album = z.object({
     album: z.string(),
     artist: z.string(),
-    artistId: z.string(),
+    artistId: id,
     coverArt: z.string(),
     created: z.string(),
     duration: z.number(),
     genre: z.string().optional(),
-    id: z.string(),
+    id,
     isCompilation: z.boolean().optional(),
     isDir: z.boolean(),
     isVideo: z.boolean(),
@@ -140,7 +142,7 @@ const albumArtist = z.object({
     albumCount: z.string(),
     artistImageUrl: z.string().optional(),
     coverArt: z.string().optional(),
-    id: z.string(),
+    id,
     name: z.string(),
     starred: z.string().optional(),
 });
@@ -398,7 +400,7 @@ const playlist = z.object({
     created: z.string(),
     duration: z.number(),
     entry: z.array(song).optional(),
-    id: z.string(),
+    id,
     name: z.string(),
     owner: z.string(),
     public: z.boolean(),

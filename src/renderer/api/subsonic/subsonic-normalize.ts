@@ -54,16 +54,16 @@ const normalizeSong = (
         album: item.album || '',
         albumArtists: [
             {
-                id: item.artistId || '',
+                id: item.artistId?.toString() || '',
                 imageUrl: null,
                 name: item.artist || '',
             },
         ],
-        albumId: item.albumId || '',
+        albumId: item.albumId?.toString() || '',
         artistName: item.artist || '',
         artists: [
             {
-                id: item.artistId || '',
+                id: item.artistId?.toString() || '',
                 imageUrl: null,
                 name: item.artist || '',
             },
@@ -95,7 +95,7 @@ const normalizeSong = (
                   },
               ]
             : [],
-        id: item.id,
+        id: item.id.toString(),
         imagePlaceholderUrl: null,
         imageUrl,
         itemType: LibraryItem.SONG,
@@ -146,7 +146,7 @@ const normalizeAlbumArtist = (
         biography: null,
         duration: null,
         genres: [],
-        id: item.id,
+        id: item.id.toString(),
         imageUrl,
         itemType: LibraryItem.ALBUM_ARTIST,
         lastPlayedAt: null,
@@ -178,9 +178,11 @@ const normalizeAlbum = (
     return {
         albumArtist: item.artist,
         albumArtists: item.artistId
-            ? [{ id: item.artistId, imageUrl: null, name: item.artist }]
+            ? [{ id: item.artistId.toString(), imageUrl: null, name: item.artist }]
             : [],
-        artists: item.artistId ? [{ id: item.artistId, imageUrl: null, name: item.artist }] : [],
+        artists: item.artistId
+            ? [{ id: item.artistId.toString(), imageUrl: null, name: item.artist }]
+            : [],
         backdropImageUrl: null,
         comment: null,
         createdAt: item.created,
@@ -195,7 +197,7 @@ const normalizeAlbum = (
                   },
               ]
             : [],
-        id: item.id,
+        id: item.id.toString(),
         imagePlaceholderUrl: null,
         imageUrl,
         isCompilation: null,
@@ -232,7 +234,7 @@ const normalizePlaylist = (
         description: item.comment || null,
         duration: item.duration,
         genres: [],
-        id: item.id,
+        id: item.id.toString(),
         imagePlaceholderUrl: null,
         imageUrl: getCoverArtUrl({
             baseUrl: server?.url,

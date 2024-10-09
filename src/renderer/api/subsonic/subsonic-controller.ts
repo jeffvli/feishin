@@ -125,7 +125,7 @@ export const SubsonicController: ControllerEndpoint = {
         }
 
         return {
-            id: res.body.playlist.id,
+            id: res.body.playlist.id.toString(),
             name: res.body.playlist.name,
         };
     },
@@ -570,7 +570,10 @@ export const SubsonicController: ControllerEndpoint = {
         }
 
         return {
-            items: res.body.musicFolders.musicFolder,
+            items: res.body.musicFolders.musicFolder.map((folder) => ({
+                id: folder.id.toString(),
+                name: folder.name,
+            })),
             startIndex: 0,
             totalRecordCount: res.body.musicFolders.musicFolder.length,
         };
@@ -902,7 +905,7 @@ export const SubsonicController: ControllerEndpoint = {
                     fromAlbumPromises.push(
                         ssApiClient(apiClientProps).getAlbum({
                             query: {
-                                id: albumId,
+                                id: albumId.toString(),
                             },
                         }),
                     );
