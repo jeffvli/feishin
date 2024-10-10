@@ -257,6 +257,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
                     context={{
                         currentSong,
                         isFocused,
+                        itemType: LibraryItem.SONG,
                         onCellContextMenu,
                         status,
                     }}

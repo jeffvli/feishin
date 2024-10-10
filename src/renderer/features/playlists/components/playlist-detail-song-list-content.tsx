@@ -301,6 +301,7 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
                     context={{
                         currentSong,
                         isFocused,
+                        itemType: LibraryItem.SONG,
                         onCellContextMenu: handleContextMenu,
                         status,
                     }}

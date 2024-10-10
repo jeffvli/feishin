@@ -550,6 +550,9 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     suppressLoadingOverlay
                                     suppressRowDrag
                                     columnDefs={topSongsColumnDefs}
+                                    context={{
+                                        itemType: LibraryItem.SONG,
+                                    }}
                                     enableCellChangeFlash={false}
                                     getRowId={(data) => data.data.uniqueId}
                                     rowData={topSongs}

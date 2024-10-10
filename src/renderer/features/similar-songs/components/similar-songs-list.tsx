@@ -66,6 +66,7 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
                     columnDefs={columnDefs}
                     context={{
                         count,
+                        itemType: LibraryItem.SONG,
                         onCellContextMenu,
                         song,
                     }}
