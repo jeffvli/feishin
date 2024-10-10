@@ -59,7 +59,13 @@ const StyledImage = styled(SimpleImg)`
     }
 `;
 
-export const CombinedTitleCell = ({ value, rowIndex, node, context }: ICellRendererParams) => {
+export const CombinedTitleCell = ({
+    value,
+    rowIndex,
+    node,
+    context,
+    data,
+}: ICellRendererParams) => {
     const artists = useMemo(() => {
         if (!value) return null;
         return value.artists?.length ? value.artists : value.albumArtists;
@@ -114,8 +120,10 @@ export const CombinedTitleCell = ({ value, rowIndex, node, context }: ICellRende
                     </Center>
                 )}
                 <ListCoverControls
+                    context={context}
                     itemData={value}
                     itemType={context.itemType}
+                    uniqueId={data?.uniqueId}
                 />
             </ImageWrapper>
             <MetadataWrapper>

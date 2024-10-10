@@ -52,12 +52,17 @@ const ListConverControlsContainer = styled.div`
 export const ListCoverControls = ({
     itemData,
     itemType,
+    context,
+    uniqueId,
 }: {
+    context: Record<string, any>;
     itemData: any;
     itemType: LibraryItem;
+    uniqueId?: string;
 }) => {
     const playButtonBehavior = usePlayButtonBehavior();
     const handlePlayQueueAdd = usePlayQueueAdd();
+    const isQueue = Boolean(context?.isQueue);
 
     const handlePlay = async (e: MouseEvent<HTMLButtonElement>, playType?: Play) => {
         e.preventDefault();
@@ -72,10 +77,18 @@ export const ListCoverControls = ({
         });
     };
 
+    const handlePlayFromQueue = () => {
+        context.handleDoubleClick({
+            data: {
+                uniqueId,
+            },
+        });
+    };
+
     return (
         <>
             <ListConverControlsContainer className="card-controls">
-                <PlayButton onClick={handlePlay}>
+                <PlayButton onClick={isQueue ? handlePlayFromQueue : handlePlay}>
                     <RiPlayFill size={20} />
                 </PlayButton>
             </ListConverControlsContainer>

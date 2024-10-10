@@ -256,7 +256,9 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
                     columnDefs={columnDefs}
                     context={{
                         currentSong,
+                        handleDoubleClick,
                         isFocused,
+                        isQueue: true,
                         itemType: LibraryItem.SONG,
                         onCellContextMenu,
                         status,
