@@ -221,7 +221,7 @@
         "doubleClickBehavior_description": "si es true, se pondrán en cola todas las pistas que coincidan en una búsqueda de pistas. De lo contrario, solo se pondrá en cola la pista seleccionada",
         "volumeWidth": "Ancho del deslizador de volumen",
         "volumeWidth_description": "La anchura del deslizador de volumen",
-        "discordListening_description": "Muestra el estado como escuchando en lugar de reproduciendo. Ten en cuenta que esto actualmente rompe la barra de tiempo",
+        "discordListening_description": "mostrar el estado como escuchando en lugar de jugando",
         "discordListening": "Mostrar estado como escuchando",
         "contextMenu": "Configuración del menú de contexto (clic derecho)",
         "contextMenu_description": "Te permite esconder elementos que son mostrados en el menú cuando haces clic derecho en un elemento. Los elementos que no estén seleccionados serán escondidos",
@@ -775,6 +775,9 @@
         "trackWithCount_other": "{{count}} pistas",
         "play_one": "Reproducir {{count}}",
         "play_many": "Reproducir {{count}}",
-        "play_other": "Reproducir {{count}}"
+        "play_other": "Reproducir {{count}}",
+        "song_one": "canción",
+        "song_many": "canciones",
+        "song_other": "canciones"
     }
 }
