@@ -209,7 +209,11 @@
         "moveToBottom": "idi na dno",
         "setRating": "oceni",
         "toggleSmartPlaylistEditor": "pokreni $t(entity.smartPlaylist) editor",
-        "removeFromFavorites": "ukloni iz $t(entity.favorite_other)"
+        "removeFromFavorites": "ukloni iz $t(entity.favorite_other)",
+        "openIn": {
+            "lastfm": "Otvori u Last.fm",
+            "musicbrainz": "Otvori u MusicBrainz"
+        }
     },
     "common": {
         "backward": "nazad",
