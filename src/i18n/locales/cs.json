@@ -222,7 +222,7 @@
         "volumeWidth": "šířka posuvníku hlasitosti",
         "volumeWidth_description": "horizontální velikost posuvníku hlasitosti",
         "discordListening": "zobrazit stav jako „Poslouchá“",
-        "discordListening_description": "zobrazit stav jako „Poslouchá“ namísto „Hraje“. tato funkce v současné době není kompatibilní s lištou s časem",
+        "discordListening_description": "zobrazit stav jako „Poslouchá“ namísto „Hraje“",
         "contextMenu": "nastavení kontextové nabídky (kliknutí pravým)",
         "contextMenu_description": "umožňuje skrýt položky, které se zobrazí v nabídce po kliknutí pravým tlačítkem myši na položku. položky, které nejsou zaškrtnuté, se skryjí",
         "customCssEnable": "povolit vlastní CSS",
@@ -776,8 +776,8 @@
         "play_one": "{{count}} přehrání",
         "play_few": "{{count}} přehrání",
         "play_other": "{{count}} přehrání",
-        "song_one": " ",
-        "song_few": " ",
-        "song_other": " "
+        "song_one": "píseň",
+        "song_few": "písničky",
+        "song_other": "písní"
     }
 }
