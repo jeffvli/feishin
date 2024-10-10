@@ -127,7 +127,8 @@
         "smartPlaylist": "智能$t(entity.playlist_one)",
         "genreWithCount_other": "{{count}} 种流派",
         "trackWithCount_other": "{{count}} 首乐曲",
-        "play_other": "{{count}} 次播放"
+        "play_other": "{{count}} 次播放",
+        "song_other": "歌曲"
     },
     "player": {
         "repeat_all": "循环全部",
@@ -352,7 +353,7 @@
         "volumeWidth": "音量滑块宽度",
         "volumeWidth_description": "音量滑块的宽度",
         "discordListening": "显示状态为正在监听",
-        "discordListening_description": "将状态显示为 “正在监听”，而不是 “正在播放”。请注意，这当前会破坏计时器栏",
+        "discordListening_description": "将状态显示为正在监听，而不是正在播放",
         "contextMenu_description": "允许您隐藏右键单击项目时显示在菜单中的项目。未选中的项目将被隐藏",
         "customCssEnable_description": "允许编写自定义 css。",
         "customCss": "自定义css",
