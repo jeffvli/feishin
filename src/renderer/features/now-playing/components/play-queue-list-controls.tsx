@@ -6,6 +6,7 @@ import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import {
     RiArrowDownLine,
+    RiArrowGoForwardLine,
     RiArrowUpLine,
     RiShuffleLine,
     RiDeleteBinLine,
@@ -30,13 +31,31 @@ interface PlayQueueListOptionsProps {
 
 export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsProps) => {
     const { t } = useTranslation();
-    const { clearQueue, moveToBottomOfQueue, moveToTopOfQueue, shuffleQueue, removeFromQueue } =
-        useQueueControls();
+    const {
+        clearQueue,
+        moveToBottomOfQueue,
+        moveToNextOfQueue,
+        moveToTopOfQueue,
+        shuffleQueue,
+        removeFromQueue,
+    } = useQueueControls();
 
     const { pause } = usePlayerControls();
 
     const playbackType = usePlaybackType();
     const setCurrentTime = useSetCurrentTime();
+
+    const handleMoveToNext = () => {
+        const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
+        const uniqueIds = selectedRows?.map((row) => row.uniqueId);
+        if (!uniqueIds?.length) return;
+
+        const playerData = moveToNextOfQueue(uniqueIds);
+
+        if (playbackType === PlaybackType.LOCAL) {
+            setQueueNext(playerData);
+        }
+    };
 
     const handleMoveToBottom = () => {
         const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
@@ -123,6 +142,15 @@ export const PlayQueueListControls = ({ type, tableRef }: PlayQueueListOptionsPr
                     onClick={handleShuffleQueue}
                 >
                     <RiShuffleLine size="1.1rem" />
+                </Button>
+                <Button
+                    compact
+                    size="md"
+                    tooltip={{ label: t('action.moveToNext', { postProcess: 'sentenceCase' }) }}
+                    variant="default"
+                    onClick={handleMoveToNext}
+                >
+                    <RiArrowGoForwardLine size="1.1rem" />
                 </Button>
                 <Button
                     compact
