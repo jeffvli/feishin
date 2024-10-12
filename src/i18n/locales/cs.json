@@ -278,7 +278,8 @@
         "openIn": {
             "lastfm": "Otevřít v Last.fm",
             "musicbrainz": "Otevřít v MusicBrainz"
-        }
+        },
+        "moveToNext": "přesunout na další"
     },
     "common": {
         "backward": "zpátky",
@@ -588,7 +589,8 @@
             "shareItem": "sdílet položku",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
             "download": "stáhnout",
-            "playShuffled": "$t(player.shuffle)"
+            "playShuffled": "$t(player.shuffle)",
+            "moveToNext": "$t(action.moveToNext)"
         },
         "home": {
             "mostPlayed": "nejpřehrávanější",
