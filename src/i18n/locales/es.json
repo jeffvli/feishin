@@ -278,7 +278,8 @@
         "openIn": {
             "lastfm": "Abrir en Last.fm",
             "musicbrainz": "Abrir en MusicBrainz"
-        }
+        },
+        "moveToNext": "pasar al siguiente"
     },
     "common": {
         "backward": "hacia atrás",
@@ -490,7 +491,8 @@
             "showDetails": "Obtener información",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
             "download": "descargar",
-            "playShuffled": "$t(player.shuffle)"
+            "playShuffled": "$t(player.shuffle)",
+            "moveToNext": "$t(action.moveToNext)"
         },
         "home": {
             "mostPlayed": "más reproducidos",
