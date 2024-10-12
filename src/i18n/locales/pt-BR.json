@@ -86,7 +86,8 @@
         "codec": "codec",
         "preview": "pré-visualizar",
         "share": "compartilhar",
-        "close": "fechar"
+        "close": "fechar",
+        "translation": "tradução"
     },
     "action": {
         "goToPage": "vá para página",
@@ -108,7 +109,9 @@
         "openIn": {
             "lastfm": "Abrir em Last.fm",
             "musicbrainz": "Abrir em MusicBrainz"
-        }
+        },
+        "toggleSmartPlaylistEditor": "alternar editor $t(entity.smartPlaylist)",
+        "moveToNext": "mover para o próximo"
     },
     "form": {
         "deletePlaylist": {
