@@ -20,7 +20,8 @@
         "openIn": {
             "lastfm": "在 Last.fm 中打开",
             "musicbrainz": "在 MusicBrainz 中打开"
-        }
+        },
+        "moveToNext": "移至下一首"
     },
     "common": {
         "increase": "增高",
@@ -554,7 +555,8 @@
             "shareItem": "分享项目",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
             "download": "下载",
-            "playShuffled": "$t(player.shuffle)"
+            "playShuffled": "$t(player.shuffle)",
+            "moveToNext": "$t(action.moveToNext)"
         },
         "trackList": {
             "title": "$t(entity.track_other)",
