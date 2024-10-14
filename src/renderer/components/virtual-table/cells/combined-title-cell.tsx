@@ -38,6 +38,7 @@ const CellContainer = styled(motion.div)<{ height: number }>`
 `;
 
 const ImageWrapper = styled.div`
+    position: relative;
     display: flex;
     grid-area: image;
     align-items: center;
