@@ -450,7 +450,6 @@ export const JellyfinController: ControllerEndpoint = {
                 Fields: 'ChildCount, Genres, DateCreated, ParentId, Overview',
                 IncludeItemTypes: 'Playlist',
                 Limit: query.limit,
-                MediaTypes: 'Audio',
                 Recursive: true,
                 SearchTerm: query.searchTerm,
                 SortBy: playlistListSortMap.jellyfin[query.sortBy],
