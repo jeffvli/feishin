@@ -43,7 +43,7 @@ const normalizeSong = (
     const imageUrl =
         getCoverArtUrl({
             baseUrl: server?.url,
-            coverArtId: item.coverArt,
+            coverArtId: item.coverArt?.toString(),
             credential: server?.credential,
             size: size || 300,
         }) || null;
@@ -135,7 +135,7 @@ const normalizeAlbumArtist = (
     const imageUrl =
         getCoverArtUrl({
             baseUrl: server?.url,
-            coverArtId: item.coverArt,
+            coverArtId: item.coverArt?.toString(),
             credential: server?.credential,
             size: imageSize || 100,
         }) || null;
@@ -170,7 +170,7 @@ const normalizeAlbum = (
     const imageUrl =
         getCoverArtUrl({
             baseUrl: server?.url,
-            coverArtId: item.coverArt,
+            coverArtId: item.coverArt?.toString(),
             credential: server?.credential,
             size: imageSize || 300,
         }) || null;
@@ -238,7 +238,7 @@ const normalizePlaylist = (
         imagePlaceholderUrl: null,
         imageUrl: getCoverArtUrl({
             baseUrl: server?.url,
-            coverArtId: item.coverArt,
+            coverArtId: item.coverArt?.toString(),
             credential: server?.credential,
             size: 300,
         }),
