@@ -207,7 +207,7 @@ const normalizeAlbum = (
         name: item.name,
         originalDate: null,
         playCount: null,
-        releaseDate: item.year ? new Date(item.year, 0, 1).toISOString() : null,
+        releaseDate: item.year ? new Date(Date.UTC(item.year, 0, 1)).toISOString() : null,
         releaseYear: item.year ? Number(item.year) : null,
         serverId: server?.id || 'unknown',
         serverType: ServerType.SUBSONIC,

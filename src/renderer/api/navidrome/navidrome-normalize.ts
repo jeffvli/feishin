@@ -121,7 +121,7 @@ const normalizeSong = (
         playlistItemId,
         releaseDate: (item.releaseDate
             ? new Date(item.releaseDate)
-            : new Date(item.year, 0, 1)
+            : new Date(Date.UTC(item.year, 0, 1))
         ).toISOString(),
         releaseYear: String(item.year),
         serverId: server?.id || 'unknown',
