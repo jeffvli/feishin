@@ -119,8 +119,16 @@ Feishin supports any music server that implements a [Navidrome](https://www.navi
 
 -   [Navidrome](https://github.com/navidrome/navidrome)
 -   [Jellyfin](https://github.com/jellyfin/jellyfin)
--   [Funkwhale](https://funkwhale.audio/) - TBD
--   Subsonic-compatible servers - TBD
+-   Subsonic-compatible servers
+    -   [Airsonic-Advanced](https://github.com/airsonic-advanced/airsonic-advanced)
+    -   [Ampache](https://ampache.org)
+    -   [Astiga](https://asti.ga/)
+    -   [Funkwhale](https://www.funkwhale.audio/)
+    -   [Gonic](https://github.com/sentriz/gonic)
+    -   [LMS](https://github.com/epoupon/lms)
+    -   [Nextcloud Music](https://apps.nextcloud.com/apps/music)
+    -   [Supysonic](https://github.com/spl0k/supysonic)
+    -   More (?)
 
 ### I have the issue "The SUID sandbox helper binary was found, but is not configured correctly" on Linux
 
