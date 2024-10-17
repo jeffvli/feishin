@@ -360,8 +360,16 @@
         "styled-components": "^6"
     },
     "devEngines": {
-        "node": ">=18.x",
-        "npm": ">=7.x"
+        "runtime": {
+            "name": "node",
+            "version": ">=18.x",
+            "onFail": "error"
+        },
+        "packageManager": {
+            "name": "npm",
+            "version": ">=7.x",
+            "onFail": "error"
+        }
     },
     "browserslist": [],
     "electronmon": {
