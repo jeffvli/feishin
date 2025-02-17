@@ -25,13 +25,13 @@ import { ssNormalize } from '/@/renderer/api/subsonic/subsonic-normalize';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
 
 const VERSION_INFO: VersionInfo = [
-    ['0.55.0', { [ServerFeature.BRF]: [1] }],
+    ['0.55.0', { [ServerFeature.BFR]: [1] }],
     ['0.49.3', { [ServerFeature.SHARING_ALBUM_SONG]: [1] }],
     ['0.48.0', { [ServerFeature.PLAYLISTS_SMART]: [1] }],
 ];
 
 const excludeMissing = (server: ServerListItem | null) => {
-    if (hasFeature(server, ServerFeature.BRF)) {
+    if (hasFeature(server, ServerFeature.BFR)) {
         return { missing: false };
     }
 
@@ -169,7 +169,7 @@ export const NavidromeController: ControllerEndpoint = {
                 _start: query.startIndex,
                 name: query.searchTerm,
                 ...query._custom?.navidrome,
-                role: hasFeature(apiClientProps.server, ServerFeature.BRF) ? 'albumartist' : '',
+                role: hasFeature(apiClientProps.server, ServerFeature.BFR) ? 'albumartist' : '',
             },
         });
 
@@ -406,7 +406,7 @@ export const NavidromeController: ControllerEndpoint = {
         }
 
         const features: ServerFeatures = {
-            brf: !!navidromeFeatures[ServerFeature.BRF],
+            bfr: !!navidromeFeatures[ServerFeature.BFR],
             lyricsMultipleStructured: !!navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
             playlistsSmart: !!navidromeFeatures[ServerFeature.PLAYLISTS_SMART],
             publicPlaylist: true,
