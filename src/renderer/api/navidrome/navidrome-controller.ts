@@ -25,7 +25,7 @@ import { ssNormalize } from '/@/renderer/api/subsonic/subsonic-normalize';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
 
 const VERSION_INFO: VersionInfo = [
-    ['0.54.5', { [ServerFeature.BFR]: [1] }],
+    ['0.55.0', { [ServerFeature.BFR]: [1] }],
     ['0.49.3', { [ServerFeature.SHARING_ALBUM_SONG]: [1] }],
     ['0.48.0', { [ServerFeature.PLAYLISTS_SMART]: [1] }],
 ];
