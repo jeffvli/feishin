@@ -59,8 +59,9 @@ jobs:
 
             - name: Zip Windows Binaries
               if: ${{ matrix.os == 'windows-latest' }}
+              shell: pwsh
               run: |
-                  zip -r release/build/windows-binaries.zip release/build/*.exe
+                  Compress-Archive -Path "release/build/*.exe" -DestinationPath "release/build/windows-binaries.zip" -Force
 
             - name: Zip Linux Binaries
               if: ${{ matrix.os == 'ubuntu-latest' }}
