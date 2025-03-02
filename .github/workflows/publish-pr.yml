@@ -11,7 +11,7 @@ jobs:
 
         strategy:
             matrix:
-                os: [macos-latest]
+                os: [macos-latest, ubuntu-latest, windows-latest]
 
         steps:
             - name: Checkout git repo
@@ -27,37 +27,67 @@ jobs:
               run: |
                   npm install --legacy-peer-deps
 
-            - name: Build releases
+            - name: Build for Windows
+              if: ${{ matrix.os == 'windows-latest' }}
               uses: nick-invision/retry@v2.8.2
               with:
                   timeout_minutes: 30
                   max_attempts: 3
                   retry_on: error
                   command: |
-                      npm run postinstall
-                      npm run build
-                      npm run package:pr
-                  on_retry_command: npm cache clean --force
+                      npm run package:pr:windows
 
-            - name: Zip all files in release/build
+            - name: Build for Linux
+              if: ${{ matrix.os == 'ubuntu-latest' }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      npm run package:pr:linux
+
+            - name: Build for MacOS
+              if: ${{ matrix.os == 'macos-latest' }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      npm run package:pr:macos
+
+            - name: Zip Windows Binaries
+              if: ${{ matrix.os == 'windows-latest' }}
               run: |
                   zip -r release/build/windows-binaries.zip release/build/*.exe
+
+            - name: Zip Linux Binaries
+              if: ${{ matrix.os == 'ubuntu-latest' }}
+              run: |
                   zip -r release/build/linux-binaries.zip release/build/*.{AppImage,deb,rpm}
+
+            - name: Zip MacOS Binaries
+              if: ${{ matrix.os == 'macos-latest' }}
+              run: |
                   zip -r release/build/macos-binaries.zip release/build/*.dmg
 
             - name: Upload Windows Binaries
+              if: ${{ matrix.os == 'windows-latest' }}
               uses: actions/upload-artifact@v4
               with:
                   name: windows-binaries
                   path: release/build/windows-binaries.zip
 
             - name: Upload Linux Binaries
+              if: ${{ matrix.os == 'ubuntu-latest' }}
               uses: actions/upload-artifact@v4
               with:
                   name: linux-binaries
                   path: release/build/linux-binaries.zip
 
             - name: Upload MacOS Binaries
+              if: ${{ matrix.os == 'macos-latest' }}
               uses: actions/upload-artifact@v4
               with:
                   name: macos-binaries
