@@ -39,22 +39,20 @@ jobs:
                       npm run package:pr
                   on_retry_command: npm cache clean --force
 
-            - uses: actions/upload-artifact@v4
+            - name: Merge and upload Windows Binaries
+              uses: actions/upload-artifact/merge@v4
               with:
                   name: windows-binaries
-                  path: |
-                      release/build/*.exe
+                  pattern: release/build/*.exe
 
-            - uses: actions/upload-artifact@v4
+            - name: Merge and upload Linux Binaries
+              uses: actions/upload-artifact/merge@v4
               with:
                   name: linux-binaries
-                  path: |
-                      release/build/*.AppImage
-                      release/build/*.deb
-                      release/build/*.rpm
+                  pattern: release/build/*.{AppImage,deb,rpm}
 
-            - uses: actions/upload-artifact@v4
+            - name: Merge and upload MacOS Binaries
+              uses: actions/upload-artifact/merge@v4
               with:
                   name: macos-binaries
-                  path: |
-                      release/build/*.dmg
+                  path: release/build/*.dmg
