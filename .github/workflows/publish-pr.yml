@@ -39,29 +39,26 @@ jobs:
                       npm run package:pr
                   on_retry_command: npm cache clean --force
 
-            - name: Loop through all files in release/build
+            - name: Zip all files in release/build
               run: |
-                  for file in release/build/*; do
-                      echo "Uploading $file"
-                      uses: actions/upload-artifact@v4
-                      with:
-                          name: $file
-                          path: $file
+                  zip -r release/build/windows-binaries.zip release/build/*.exe
+                  zip -r release/build/linux-binaries.zip release/build/*.{AppImage,deb,rpm}
+                  zip -r release/build/macos-binaries.zip release/build/*.dmg
 
-            # - name: Merge and upload Windows Binaries
-            #   uses: actions/upload-artifact/merge@v4
-            #   with:
-            #       name: windows-binaries
-            #       pattern: release/build/*.exe
+            - name: Upload Windows Binaries
+              uses: actions/upload-artifact@v4
+              with:
+                  name: windows-binaries
+                  path: release/build/windows-binaries.zip
 
-            # - name: Merge and upload Linux Binaries
-            #   uses: actions/upload-artifact/merge@v4
-            #   with:
-            #       name: linux-binaries
-            #       pattern: release/build/*.{AppImage,deb,rpm}
+            - name: Upload Linux Binaries
+              uses: actions/upload-artifact@v4
+              with:
+                  name: linux-binaries
+                  path: release/build/linux-binaries.zip
 
-            # - name: Merge and upload MacOS Binaries
-            #   uses: actions/upload-artifact/merge@v4
-            #   with:
-            #       name: macos-binaries
-            #       path: release/build/*.dmg
+            - name: Upload MacOS Binaries
+              uses: actions/upload-artifact@v4
+              with:
+                  name: macos-binaries
+                  path: release/build/macos-binaries.zip
