@@ -1,0 +1,17 @@
+.queue-drawer-area {
+    position: absolute;
+    top: 50%;
+    right: 25px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    width: 20px;
+    height: 30px;
+    user-select: none;
+}
+
+.queue-drawer {
+    background: var(--theme-colors-background);
+    border: 3px solid var(--theme-generic-border-color);
+    border-radius: var(--theme-radius-lg);
+}

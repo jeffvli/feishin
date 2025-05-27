@@ -1,7 +1,6 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-community/core';
-import { Box, Group, Stack } from '@mantine/core';
 import { useSetState } from '@mantine/hooks';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,11 +9,11 @@ import { RiHeartFill, RiHeartLine, RiMoreFill, RiSettings2Fill } from 'react-ico
 import { SiMusicbrainz } from 'react-icons/si';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+
+import styles from './album-detail-content.module.css';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { Button, Popover, Spoiler } from '/@/renderer/components';
-import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
+import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel/grid-carousel';
 import {
     getColumnDefs,
     TableConfigDropdown,
@@ -47,6 +46,11 @@ import {
     useTableSettings,
 } from '/@/renderer/store/settings.store';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
+import { Button } from '/@/shared/components/button/button';
+import { Group } from '/@/shared/components/group/group';
+import { Popover } from '/@/shared/components/popover/popover';
+import { Spoiler } from '/@/shared/components/spoiler/spoiler';
+import { Stack } from '/@/shared/components/stack/stack';
 import {
     AlbumListQuery,
     AlbumListSort,
@@ -59,19 +63,6 @@ import { Play } from '/@/shared/types/types';
 const isFullWidthRow = (node: RowNode) => {
     return node.id?.startsWith('disc-');
 };
-
-const ContentContainer = styled.div`
-    position: relative;
-    z-index: 0;
-`;
-
-const DetailContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    padding: 1rem 2rem 5rem;
-    overflow: hidden;
-`;
 
 interface AlbumDetailContentProps {
     background?: string;
@@ -330,23 +321,26 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
     const mbzId = detailQuery?.data?.mbzId;
 
     return (
-        <ContentContainer>
-            <LibraryBackgroundOverlay $backgroundColor={background} />
-            <DetailContainer>
-                <Box component="section">
+        <div
+            className={styles.contentContainer}
+            ref={cq.ref}
+        >
+            <LibraryBackgroundOverlay backgroundColor={background} />
+            <div className={styles.detailContainer}>
+                <section>
                     <Group
-                        position="apart"
-                        spacing="sm"
+                        gap="sm"
+                        justify="space-between"
                     >
                         <Group>
                             <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
                             <Button
-                                compact
                                 loading={
                                     createFavoriteMutation.isLoading ||
                                     deleteFavoriteMutation.isLoading
                                 }
                                 onClick={handleFavorite}
+                                size="compact-md"
                                 variant="subtle"
                             >
                                 {detailQuery?.data?.userFavorite ? (
@@ -359,11 +353,11 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                                 )}
                             </Button>
                             <Button
-                                compact
                                 onClick={(e) => {
                                     if (!detailQuery?.data) return;
                                     handleGeneralContextMenu(e, [detailQuery.data!]);
                                 }}
+                                size="compact-md"
                                 variant="subtle"
                             >
                                 <RiMoreFill size={20} />
@@ -373,8 +367,7 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                         <Popover position="bottom-end">
                             <Popover.Target>
                                 <Button
-                                    compact
-                                    size="md"
+                                    size="compact-md"
                                     variant="subtle"
                                 >
                                     <RiSettings2Fill size={20} />
@@ -385,17 +378,16 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                             </Popover.Dropdown>
                         </Popover>
                     </Group>
-                </Box>
+                </section>
                 {showGenres && (
-                    <Box component="section">
-                        <Group spacing="sm">
+                    <section>
+                        <Group gap="sm">
                             {detailQuery?.data?.genres?.map((genre) => (
                                 <Button
-                                    compact
                                     component={Link}
                                     key={`genre-${genre.id}`}
-                                    radius={0}
-                                    size="md"
+                                    radius="md"
+                                    size="compact-md"
                                     to={generatePath(genreRoute, {
                                         genreId: genre.id,
                                     })}
@@ -405,38 +397,34 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                                 </Button>
                             ))}
                         </Group>
-                    </Box>
+                    </section>
                 )}
                 {externalLinks && (lastFM || musicBrainz) ? (
-                    <Box component="section">
-                        <Group spacing="sm">
-                            {lastFM && (
+                    <section>
+                        <Group gap="sm">
+                            <Button
+                                component="a"
+                                href={`https://www.last.fm/music/${encodeURIComponent(
+                                    detailQuery?.data?.albumArtist || '',
+                                )}/${encodeURIComponent(detailQuery.data?.name || '')}`}
+                                radius="md"
+                                rel="noopener noreferrer"
+                                size="compact-md"
+                                target="_blank"
+                                tooltip={{
+                                    label: t('action.openIn.lastfm'),
+                                }}
+                                variant="subtle"
+                            >
+                                <FaLastfmSquare size={25} />
+                            </Button>
+                            {mbzId ? (
                                 <Button
-                                    compact
-                                    component="a"
-                                    href={`https://www.last.fm/music/${encodeURIComponent(
-                                        detailQuery?.data?.albumArtist || '',
-                                    )}/${encodeURIComponent(detailQuery.data?.name || '')}`}
-                                    radius="md"
-                                    rel="noopener noreferrer"
-                                    size="md"
-                                    target="_blank"
-                                    tooltip={{
-                                        label: t('action.openIn.lastfm'),
-                                    }}
-                                    variant="subtle"
-                                >
-                                    <FaLastfmSquare size={25} />
-                                </Button>
-                            )}
-                            {musicBrainz && mbzId ? (
-                                <Button
-                                    compact
                                     component="a"
                                     href={`https://musicbrainz.org/release/${mbzId}`}
                                     radius="md"
                                     rel="noopener noreferrer"
-                                    size="md"
+                                    size="compact-md"
                                     target="_blank"
                                     tooltip={{
                                         label: t('action.openIn.musicbrainz'),
@@ -447,14 +435,14 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                                 </Button>
                             ) : null}
                         </Group>
-                    </Box>
+                    </section>
                 ) : null}
                 {comment && (
-                    <Box component="section">
+                    <section>
                         <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
-                    </Box>
+                    </section>
                 )}
-                <Box style={{ minHeight: '300px' }}>
+                <div style={{ minHeight: '300px' }}>
                     <VirtualTable
                         autoFitColumns={tableConfig.autoFit}
                         autoHeight
@@ -491,11 +479,11 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                         suppressLoadingOverlay
                         suppressRowDrag
                     />
-                </Box>
+                </div>
                 <Stack
+                    gap="lg"
                     mt="3rem"
                     ref={cq.ref}
-                    spacing="lg"
                 >
                     {cq.height || cq.width ? (
                         <>
@@ -547,7 +535,7 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                         </>
                     ) : null}
                 </Stack>
-            </DetailContainer>
-        </ContentContainer>
+            </div>
+        </div>
     );
 };

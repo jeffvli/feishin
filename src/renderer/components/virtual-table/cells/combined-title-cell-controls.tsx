@@ -1,62 +1,22 @@
-import type { UnstyledButtonProps } from '@mantine/core';
-
-import React, { MouseEvent } from 'react';
+import clsx from 'clsx';
 import { RiPlayFill } from 'react-icons/ri';
-import styled from 'styled-components';
+
+import styles from './combined-title-cell-controls.module.css';
 
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
-type PlayButtonType = React.ComponentPropsWithoutRef<'button'> & UnstyledButtonProps;
-
-const PlayButton = styled.button<PlayButtonType>`
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    background-color: rgb(255 255 255);
-    border: none;
-    border-radius: 50%;
-    opacity: 0.8;
-    transition: scale 0.1s ease-in-out;
-
-    &:hover {
-        opacity: 1;
-        scale: 1.1;
-    }
-
-    &:active {
-        opacity: 1;
-        scale: 1;
-    }
-
-    svg {
-        fill: rgb(0 0 0);
-        stroke: rgb(0 0 0);
-    }
-`;
-
-const ListConverControlsContainer = styled.div`
-    position: absolute;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-`;
-
 export const ListCoverControls = ({
+    className,
     context,
     itemData,
     itemType,
     uniqueId,
 }: {
+    className?: string;
     context: Record<string, any>;
     itemData: any;
     itemType: LibraryItem;
@@ -66,7 +26,7 @@ export const ListCoverControls = ({
     const handlePlayQueueAdd = usePlayQueueAdd();
     const isQueue = Boolean(context?.isQueue);
 
-    const handlePlay = async (e: MouseEvent<HTMLButtonElement>, playType?: Play) => {
+    const handlePlay = async (e: React.MouseEvent<HTMLButtonElement>, playType?: Play) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -88,12 +48,13 @@ export const ListCoverControls = ({
     };
 
     return (
-        <>
-            <ListConverControlsContainer className="card-controls">
-                <PlayButton onClick={isQueue ? handlePlayFromQueue : handlePlay}>
-                    <RiPlayFill size={20} />
-                </PlayButton>
-            </ListConverControlsContainer>
-        </>
+        <div className={clsx(styles.listControlsContainer, className)}>
+            <ActionIcon
+                classNames={{ root: styles.playButton }}
+                onClick={isQueue ? handlePlayFromQueue : handlePlay}
+            >
+                <RiPlayFill size="1rem" />
+            </ActionIcon>
+        </div>
     );
 };

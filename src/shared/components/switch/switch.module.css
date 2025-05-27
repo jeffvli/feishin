@@ -1,0 +1,16 @@
+.thumb {
+    background: var(--theme-colors-foreground);
+}
+
+.track {
+    background-color: var(--theme-colors-surface);
+    border: 1px solid var(--theme-colors-border);
+
+    input:checked + & {
+        background-color: var(--theme-colors-primary-filled);
+
+        & > .thumb {
+            background: var(--theme-colors-primary-contrast);
+        }
+    }
+}

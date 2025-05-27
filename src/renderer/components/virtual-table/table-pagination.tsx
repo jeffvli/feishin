@@ -1,20 +1,20 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
-import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiHashtag } from 'react-icons/ri';
 
-import { Button } from '/@/renderer/components/button';
-import { NumberInput } from '/@/renderer/components/input';
-import { MotionFlex } from '/@/renderer/components/motion';
-import { Pagination } from '/@/renderer/components/pagination';
-import { Popover } from '/@/renderer/components/popover';
-import { Text } from '/@/renderer/components/text';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { ListKey } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Pagination } from '/@/shared/components/pagination/pagination';
+import { Popover } from '/@/shared/components/popover/popover';
+import { Text } from '/@/shared/components/text/text';
 import { TablePagination as TablePaginationType } from '/@/shared/types/types';
 
 interface TablePaginationProps {
@@ -71,19 +71,15 @@ export const TablePagination = ({
         currentPageMaxIndex > pagination.totalItems ? pagination.totalItems : currentPageMaxIndex;
 
     return (
-        <MotionFlex
+        <Flex
             align="center"
-            animate={{ y: 0 }}
-            exit={{ y: 50 }}
-            initial={{ y: 50 }}
             justify="space-between"
-            layout
             p="1rem"
             ref={containerQuery.ref}
-            sx={{ borderTop: '1px solid var(--generic-border-color)' }}
+            style={{ borderTop: '1px solid var(--theme-generic-border-color)' }}
         >
             <Text
-                $secondary
+                isMuted
                 size="md"
             >
                 {containerQuery.isMd ? (
@@ -104,9 +100,9 @@ export const TablePagination = ({
                 )}
             </Text>
             <Group
-                noWrap
+                gap="sm"
                 ref={containerQuery.ref}
-                spacing="sm"
+                wrap="nowrap"
             >
                 <Popover
                     onClose={() => handlers.close()}
@@ -119,7 +115,7 @@ export const TablePagination = ({
                             onClick={() => handlers.toggle()}
                             radius="sm"
                             size="sm"
-                            sx={{ height: '26px', padding: '0', width: '26px' }}
+                            style={{ height: '26px', padding: '0', width: '26px' }}
                             tooltip={{
                                 label: t('action.goToPage', { postProcess: 'sentenceCase' }),
                             }}
@@ -149,9 +145,7 @@ export const TablePagination = ({
                     </Popover.Dropdown>
                 </Popover>
                 <Pagination
-                    $hideDividers={!containerQuery.isSm}
                     boundaries={1}
-                    noWrap
                     onChange={handlePagination}
                     radius="sm"
                     siblings={containerQuery.isMd ? 2 : containerQuery.isSm ? 1 : 0}
@@ -159,6 +153,6 @@ export const TablePagination = ({
                     value={pagination.currentPage + 1}
                 />
             </Group>
-        </MotionFlex>
+        </Flex>
     );
 };

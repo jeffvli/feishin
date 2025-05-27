@@ -1,11 +1,16 @@
-import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { NumberInput, Select, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
 import { AlbumListFilter, useListStoreActions, useListStoreByKey } from '/@/renderer/store';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Select } from '/@/shared/components/select/select';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
 import {
     AlbumListQuery,
     GenreListSort,
@@ -100,8 +105,8 @@ export const SubsonicAlbumFilters = ({
         <Stack p="0.8rem">
             {toggleFilters.map((filter) => (
                 <Group
+                    justify="space-between"
                     key={`nd-filter-${filter.label}`}
-                    position="apart"
                 >
                     <Text>{filter.label}</Text>
                     <Switch

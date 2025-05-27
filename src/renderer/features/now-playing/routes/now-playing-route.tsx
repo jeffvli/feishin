@@ -3,12 +3,12 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 
 import { useRef } from 'react';
 
-import { Paper } from '/@/renderer/components';
 import { VirtualGridContainer } from '/@/renderer/components/virtual-grid';
 import { NowPlayingHeader } from '/@/renderer/features/now-playing/components/now-playing-header';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
 import { AnimatedPage } from '/@/renderer/features/shared';
+import { Paper } from '/@/shared/components/paper/paper';
 
 const NowPlayingRoute = () => {
     const queueRef = useRef<null | { grid: AgGridReactType<Song> }>(null);
@@ -17,7 +17,7 @@ const NowPlayingRoute = () => {
         <AnimatedPage>
             <VirtualGridContainer>
                 <NowPlayingHeader />
-                <Paper sx={{ borderTop: '1px solid var(--generic-border-color)' }}>
+                <Paper style={{ borderTop: '1px solid var(--theme-generic-border-color)' }}>
                     <PlayQueueListControls
                         tableRef={queueRef}
                         type="nowPlaying"

@@ -1,4 +1,3 @@
-import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
@@ -6,11 +5,17 @@ import { useTranslation } from 'react-i18next';
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { Button, Select, Switch, TextInput, toast } from '/@/renderer/components';
 import { useUpdatePlaylist } from '/@/renderer/features/playlists/mutations/update-playlist-mutation';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
+import { Button } from '/@/shared/components/button/button';
+import { Group } from '/@/shared/components/group/group';
+import { Select } from '/@/shared/components/select/select';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { toast } from '/@/shared/components/toast/toast';
 import {
     PlaylistDetailResponse,
     ServerListItem,
@@ -134,7 +139,7 @@ export const UpdatePlaylistForm = ({ body, onCancel, query, users }: UpdatePlayl
                         />
                     </>
                 )}
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button
                         onClick={onCancel}
                         variant="subtle"

@@ -1,20 +1,19 @@
-import { ActionIcon, CopyButton, Group } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { RiCheckFill, RiClipboardFill, RiExternalLinkFill } from 'react-icons/ri';
-import styled from 'styled-components';
 
-import { toast, Tooltip } from '/@/renderer/components';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { CopyButton } from '/@/shared/components/copy-button/copy-button';
+import { Group } from '/@/shared/components/group/group';
+import { Text } from '/@/shared/components/text/text';
+import { toast } from '/@/shared/components/toast/toast';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 
 const util = isElectron() ? window.api.utils : null;
 
 export type SongPathProps = {
     path: null | string;
 };
-
-const PathText = styled.div`
-    user-select: all;
-`;
 
 export const SongPath = ({ path }: SongPathProps) => {
     const { t } = useTranslation();
@@ -37,7 +36,10 @@ export const SongPath = ({ path }: SongPathProps) => {
                         )}
                         withinPortal
                     >
-                        <ActionIcon onClick={copy}>
+                        <ActionIcon
+                            onClick={copy}
+                            variant="transparent"
+                        >
                             {copied ? <RiCheckFill /> : <RiClipboardFill />}
                         </ActionIcon>
                     </Tooltip>
@@ -48,7 +50,7 @@ export const SongPath = ({ path }: SongPathProps) => {
                     label={t('page.itemDetail.openFile', { postProcess: 'sentenceCase' })}
                     withinPortal
                 >
-                    <ActionIcon>
+                    <ActionIcon variant="transparent">
                         <RiExternalLinkFill
                             onClick={() => {
                                 util.openItem(path).catch((error) => {
@@ -64,7 +66,7 @@ export const SongPath = ({ path }: SongPathProps) => {
                     </ActionIcon>
                 </Tooltip>
             )}
-            <PathText>{path}</PathText>
+            <Text style={{ userSelect: 'all' }}>{path}</Text>
         </Group>
     );
 };

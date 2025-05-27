@@ -4,8 +4,8 @@ import formatDuration from 'format-duration';
 import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BsDice3 } from 'react-icons/bs';
 import { IoIosPause } from 'react-icons/io';
+import { RiPlayListAddLine } from 'react-icons/ri';
 import {
     RiPlayFill,
     RiRepeat2Line,
@@ -17,9 +17,9 @@ import {
     RiSpeedFill,
     RiStopFill,
 } from 'react-icons/ri';
-import styled from 'styled-components';
 
-import { Text } from '/@/renderer/components';
+import styles from './center-controls.module.css';
+
 import { PlayerButton } from '/@/renderer/features/player/components/player-button';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { openShuffleAllModal } from '/@/renderer/features/player/components/shuffle-all-modal';
@@ -39,59 +39,12 @@ import {
     usePlaybackType,
     useSettingsStore,
 } from '/@/renderer/store/settings.store';
+import { Text } from '/@/shared/components/text/text';
 import { PlaybackType, PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
 interface CenterControlsProps {
     playersRef: any;
 }
-
-const ButtonsContainer = styled.div`
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-`;
-
-const SliderContainer = styled.div`
-    display: flex;
-    width: 95%;
-    height: 20px;
-`;
-
-const SliderValueWrapper = styled.div<{ $position: 'left' | 'right' }>`
-    display: flex;
-    flex: 1;
-    align-self: center;
-    justify-content: center;
-    max-width: 50px;
-
-    @media (width <= 768px) {
-        display: none;
-    }
-`;
-
-const SliderWrapper = styled.div`
-    display: flex;
-    flex: 6;
-    align-items: center;
-    height: 100%;
-`;
-
-const ControlsContainer = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 35px;
-
-    @media (width <= 768px) {
-        ${ButtonsContainer} {
-            gap: 0;
-        }
-
-        ${SliderValueWrapper} {
-            display: none;
-        }
-    }
-`;
 
 export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const { t } = useTranslation();
@@ -171,8 +124,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
 
     return (
         <>
-            <ControlsContainer>
-                <ButtonsContainer>
+            <div className={styles.controlsContainer}>
+                <div className={styles.buttonsContainer}>
                     <PlayerButton
                         icon={<RiStopFill size={buttonSize} />}
                         onClick={handleStop}
@@ -182,8 +135,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         variant="tertiary"
                     />
                     <PlayerButton
-                        $isActive={shuffle !== PlayerShuffle.NONE}
                         icon={<RiShuffleFill size={buttonSize} />}
+                        isActive={shuffle !== PlayerShuffle.NONE}
                         onClick={handleToggleShuffle}
                         tooltip={{
                             label:
@@ -257,7 +210,6 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         variant="secondary"
                     />
                     <PlayerButton
-                        $isActive={repeat !== PlayerRepeat.NONE}
                         icon={
                             repeat === PlayerRepeat.ONE ? (
                                 <RiRepeatOneLine size={buttonSize} />
@@ -265,6 +217,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                                 <RiRepeat2Line size={buttonSize} />
                             )
                         }
+                        isActive={repeat !== PlayerRepeat.NONE}
                         onClick={handleToggleRepeat}
                         tooltip={{
                             label: `${
@@ -288,7 +241,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                     />
 
                     <PlayerButton
-                        icon={<BsDice3 size={buttonSize} />}
+                        icon={<RiPlayListAddLine size={buttonSize} />}
                         onClick={() =>
                             openShuffleAllModal({
                                 handlePlayQueueAdd,
@@ -300,20 +253,20 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         }}
                         variant="tertiary"
                     />
-                </ButtonsContainer>
-            </ControlsContainer>
-            <SliderContainer>
-                <SliderValueWrapper $position="left">
+                </div>
+            </div>
+            <div className={styles.sliderContainer}>
+                <div className={styles.sliderValueWrapper}>
                     <Text
-                        $noSelect
-                        $secondary
+                        fw={600}
+                        isMuted
+                        isNoSelect
                         size="xs"
-                        weight={600}
                     >
                         {formattedTime}
                     </Text>
-                </SliderValueWrapper>
-                <SliderWrapper>
+                </div>
+                <div className={styles.sliderWrapper}>
                     <PlayerbarSlider
                         label={(value) => formatDuration(value * 1000)}
                         max={songDuration}
@@ -335,18 +288,18 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         value={!isSeeking ? currentTime : seekValue}
                         w="100%"
                     />
-                </SliderWrapper>
-                <SliderValueWrapper $position="right">
+                </div>
+                <div className={styles.sliderValueWrapper}>
                     <Text
-                        $noSelect
-                        $secondary
+                        fw={600}
+                        isMuted
+                        isNoSelect
                         size="xs"
-                        weight={600}
                     >
                         {duration}
                     </Text>
-                </SliderValueWrapper>
-            </SliderContainer>
+                </div>
+            </div>
         </>
     );
 };

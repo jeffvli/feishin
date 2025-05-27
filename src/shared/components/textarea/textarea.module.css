@@ -1,0 +1,22 @@
+.root {
+    transition: width 0.3s ease-in-out;
+
+    &[data-disabled='true'] {
+        opacity: 0.6;
+    }
+}
+
+.input {
+    color: var(--theme-colors-surface-foreground);
+    background: var(--theme-colors-surface);
+    border: 1px solid transparent;
+}
+
+.input:focus,
+.input:focus-visible {
+    border-color: lighten(var(--theme-colors-border), 10%);
+}
+
+.label {
+    margin-bottom: var(--theme-spacing-sm);
+}

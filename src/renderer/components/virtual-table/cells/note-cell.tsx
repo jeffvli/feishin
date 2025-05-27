@@ -2,10 +2,10 @@ import type { ICellRendererParams } from '@ag-grid-community/core';
 
 import { useMemo } from 'react';
 
-import { Skeleton } from '/@/renderer/components/skeleton';
-import { Text } from '/@/renderer/components/text';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
+import { Skeleton } from '/@/shared/components/skeleton/skeleton';
+import { Text } from '/@/shared/components/text/text';
 
 export const NoteCell = ({ value }: ICellRendererParams) => {
     const formattedValue = useMemo(() => {
@@ -18,7 +18,7 @@ export const NoteCell = ({ value }: ICellRendererParams) => {
 
     if (value === undefined) {
         return (
-            <CellContainer $position="left">
+            <CellContainer position="left">
                 <Skeleton
                     height="1rem"
                     width="80%"
@@ -28,9 +28,9 @@ export const NoteCell = ({ value }: ICellRendererParams) => {
     }
 
     return (
-        <CellContainer $position="left">
+        <CellContainer position="left">
             <Text
-                $secondary
+                isMuted
                 overflow="hidden"
             >
                 {formattedValue}

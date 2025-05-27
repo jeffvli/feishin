@@ -1,4 +1,3 @@
-import { Notifications } from '@mantine/notifications';
 import {
     PersistedClient,
     Persister,
@@ -6,9 +5,6 @@ import {
 } from '@tanstack/react-query-persist-client';
 import { del, get, set } from 'idb-keyval';
 import { createRoot } from 'react-dom/client';
-import 'overlayscrollbars/overlayscrollbars.css';
-
-import './styles/overlayscrollbars.css';
 
 import { App } from '/@/renderer/app';
 import { queryClient } from '/@/renderer/lib/react-query';
@@ -57,11 +53,6 @@ createRoot(document.getElementById('root')!).render(
             persister: indexedDbPersister,
         }}
     >
-        <Notifications
-            containerWidth="300px"
-            position="bottom-center"
-            zIndex={5}
-        />
         <App />
     </PersistQueryClientProvider>,
 );

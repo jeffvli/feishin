@@ -1,0 +1,34 @@
+.item-grid {
+    display: grid;
+    grid-template-areas: 'image info';
+    grid-template-rows: 1fr;
+    grid-template-columns: var(--item-height) minmax(0, 1fr);
+    grid-auto-columns: 1fr;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    letter-spacing: 0.5px;
+}
+
+.image-wrapper {
+    display: flex;
+    grid-area: image;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.metadata-wrapper {
+    display: flex;
+    flex-direction: column;
+    grid-area: info;
+    justify-content: center;
+    width: 100%;
+}
+
+.image {
+    object-fit: var(--theme-image-fit);
+    background: alpha(var(--theme-colors-foreground-muted), 0.3);
+    border-radius: 4px;
+}

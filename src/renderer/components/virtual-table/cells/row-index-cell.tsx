@@ -1,9 +1,8 @@
 import type { ICellRendererParams } from '@ag-grid-community/core';
 
-import { RiPlayFill } from 'react-icons/ri';
-
-import { Text } from '/@/renderer/components/text';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
+import { Icon } from '/@/shared/components/icon/icon';
+import { Text } from '/@/shared/components/text/text';
 
 // const AnimatedSvg = () => {
 //     return (
@@ -14,7 +13,7 @@ import { CellContainer } from '/@/renderer/components/virtual-table/cells/generi
 //             >
 //                 <g>
 //                     <rect
-//                         fill="var(--primary-color)"
+//                         fill="var(--theme-colors-primary-filled)"
 //                         height="80"
 //                         id="bar-1"
 //                         width="12"
@@ -33,7 +32,7 @@ import { CellContainer } from '/@/renderer/components/virtual-table/cells/generi
 //                         />
 //                     </rect>
 //                     <rect
-//                         fill="var(--primary-color)"
+//                         fill="var(--theme-colors-primary-filled)"
 //                         height="80"
 //                         id="bar-2"
 //                         width="12"
@@ -52,7 +51,7 @@ import { CellContainer } from '/@/renderer/components/virtual-table/cells/generi
 //                         />
 //                     </rect>
 //                     <rect
-//                         fill="var(--primary-color)"
+//                         fill="var(--theme-colors-primary-filled)"
 //                         height="80"
 //                         id="bar-3"
 //                         width="12"
@@ -71,7 +70,7 @@ import { CellContainer } from '/@/renderer/components/virtual-table/cells/generi
 //                         />
 //                     </rect>
 //                     <rect
-//                         fill="var(--primary-color)"
+//                         fill="var(--theme-colors-primary-filled)"
 //                         height="80"
 //                         id="bar-4"
 //                         width="12"
@@ -143,23 +142,28 @@ export const RowIndexCell = ({ eGridCell, value }: ICellRendererParams) => {
         classList.contains('current-song-cell') || classList.contains('current-playlist-song-cell');
 
     return (
-        <CellContainer $position="right">
-            {isPlaying &&
-                (isCurrentSong ? (
-                    <RiPlayFill
-                        color="var(--primary-color)"
-                        size="1.2rem"
-                    />
-                ) : null)}
-            <Text
-                $secondary
-                align="right"
-                className="current-song-child current-song-index"
-                overflow="hidden"
-                size="md"
-            >
-                {value}
-            </Text>
+        <CellContainer position="right">
+            {isPlaying && isCurrentSong ? (
+                <Icon
+                    fill="primary"
+                    icon="mediaPlay"
+                />
+            ) : isCurrentSong ? (
+                <Icon
+                    fill="primary"
+                    icon="mediaPause"
+                />
+            ) : (
+                <Text
+                    className="current-song-child current-song-index"
+                    isMuted
+                    overflow="hidden"
+                    size="md"
+                    style={{ textAlign: 'right' }}
+                >
+                    {value}
+                </Text>
+            )}
         </CellContainer>
     );
 };

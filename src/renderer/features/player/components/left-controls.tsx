@@ -1,14 +1,13 @@
-import { Center, Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
-import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
+import clsx from 'clsx';
+import { AnimatePresence, LayoutGroup, motion } from 'motion/react';
 import React, { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiArrowUpSLine, RiDiscLine, RiMore2Fill } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
-import styled from 'styled-components';
 
-import { Button, Text, Tooltip } from '/@/renderer/components';
-import { Separator } from '/@/renderer/components/separator';
+import styles from './left-controls.module.css';
+
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -20,79 +19,13 @@ import {
     useSetFullScreenPlayerStore,
     useSidebarStore,
 } from '/@/renderer/store';
-import { fadeIn } from '/@/renderer/styles';
+import { Button } from '/@/shared/components/button/button';
+import { Center } from '/@/shared/components/center/center';
+import { Group } from '/@/shared/components/group/group';
+import { Separator } from '/@/shared/components/separator/separator';
+import { Text } from '/@/shared/components/text/text';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { LibraryItem } from '/@/shared/types/domain-types';
-
-const ImageWrapper = styled.div`
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem 1rem 1rem 0;
-`;
-
-const MetadataStack = styled(motion.div)`
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    justify-content: center;
-    width: 100%;
-    overflow: hidden;
-`;
-
-const Image = styled(motion.div)`
-    position: relative;
-    width: 60px;
-    height: 60px;
-    cursor: pointer;
-    background-color: var(--placeholder-bg);
-    filter: drop-shadow(0 5px 6px rgb(0 0 0 / 50%));
-
-    ${fadeIn};
-    animation: fadein 0.2s ease-in-out;
-
-    button {
-        display: none;
-    }
-
-    &:hover button {
-        display: block;
-    }
-`;
-
-const PlayerbarImage = styled.img`
-    width: 100%;
-    height: 100%;
-    object-fit: var(--image-fit);
-`;
-
-const LineItem = styled.div<{ $secondary?: boolean }>`
-    display: inline-block;
-    width: fit-content;
-    max-width: 20vw;
-    overflow: hidden;
-    line-height: 1.3;
-    color: ${(props) => props.$secondary && 'var(--main-fg-secondary)'};
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    a {
-        color: ${(props) => props.$secondary && 'var(--text-secondary)'};
-    }
-`;
-
-const LeftControlsContainer = styled.div`
-    display: flex;
-    width: 100%;
-    height: 100%;
-    padding-left: 1rem;
-
-    @media (width <= 640px) {
-        ${ImageWrapper} {
-            display: none;
-        }
-    }
-`;
 
 export const LeftControls = () => {
     const { t } = useTranslation();
@@ -135,16 +68,17 @@ export const LeftControls = () => {
     ]);
 
     return (
-        <LeftControlsContainer>
+        <div className={styles.leftControlsContainer}>
             <LayoutGroup>
                 <AnimatePresence
                     initial={false}
                     mode="wait"
                 >
                     {!hideImage && (
-                        <ImageWrapper>
-                            <Image
+                        <div className={styles.imageWrapper}>
+                            <motion.div
                                 animate={{ opacity: 1, scale: 1, x: 0 }}
+                                className={styles.image}
                                 exit={{ opacity: 0, x: -50 }}
                                 initial={{ opacity: 0, x: -50 }}
                                 key="playerbar-image"
@@ -159,19 +93,20 @@ export const LeftControls = () => {
                                     openDelay={500}
                                 >
                                     {currentSong?.imageUrl ? (
-                                        <PlayerbarImage
+                                        <img
+                                            className={styles.playerbarImage}
                                             loading="eager"
                                             src={currentSong?.imageUrl}
                                         />
                                     ) : (
                                         <Center
-                                            sx={{
-                                                background: 'var(--placeholder-bg)',
+                                            style={{
+                                                background: 'var(--theme-colors-surface)',
                                                 height: '100%',
                                             }}
                                         >
                                             <RiDiscLine
-                                                color="var(--placeholder-fg)"
+                                                color="var(--theme-colors-foreground-muted)"
                                                 size={50}
                                             />
                                         </Center>
@@ -180,12 +115,11 @@ export const LeftControls = () => {
 
                                 {!collapsed && (
                                     <Button
-                                        compact
                                         onClick={handleToggleSidebarImage}
                                         opacity={0.8}
                                         radius={50}
-                                        size="md"
-                                        sx={{
+                                        size="compact-md"
+                                        style={{
                                             cursor: 'default',
                                             position: 'absolute',
                                             right: 2,
@@ -197,7 +131,6 @@ export const LeftControls = () => {
                                             }),
                                             openDelay: 500,
                                         }}
-                                        variant="default"
                                     >
                                         <RiArrowUpSLine
                                             color="white"
@@ -205,48 +138,55 @@ export const LeftControls = () => {
                                         />
                                     </Button>
                                 )}
-                            </Image>
-                        </ImageWrapper>
+                            </motion.div>
+                        </div>
                     )}
                 </AnimatePresence>
-                <MetadataStack layout="position">
-                    <LineItem onClick={stopPropagation}>
+                <motion.div
+                    className={styles.metadataStack}
+                    layout="position"
+                >
+                    <div
+                        className={styles.lineItem}
+                        onClick={stopPropagation}
+                    >
                         <Group
-                            align="flex-start"
-                            noWrap
-                            spacing="xs"
+                            align="center"
+                            gap="xs"
+                            wrap="nowrap"
                         >
                             <Text
-                                $link
                                 component={Link}
+                                fw={500}
+                                isLink
                                 overflow="hidden"
                                 size="md"
                                 to={AppRoute.NOW_PLAYING}
-                                weight={500}
                             >
                                 {title || '—'}
                             </Text>
                             {isSongDefined && (
                                 <Button
-                                    compact
                                     onClick={(e) => handleGeneralContextMenu(e, [currentSong!])}
+                                    size="compact-xs"
                                     variant="subtle"
                                 >
-                                    <RiMore2Fill size="1.2rem" />
+                                    <RiMore2Fill />
                                 </Button>
                             )}
                         </Group>
-                    </LineItem>
-                    <LineItem
-                        $secondary
+                    </div>
+                    <div
+                        className={clsx(styles.lineItem, styles.secondary)}
                         onClick={stopPropagation}
                     >
                         {artists?.map((artist, index) => (
                             <React.Fragment key={`bar-${artist.id}`}>
                                 {index > 0 && <Separator />}
                                 <Text
-                                    $link={artist.id !== ''}
                                     component={artist.id ? Link : undefined}
+                                    fw={500}
+                                    isLink={artist.id !== ''}
                                     overflow="hidden"
                                     size="md"
                                     to={
@@ -256,20 +196,20 @@ export const LeftControls = () => {
                                               })
                                             : undefined
                                     }
-                                    weight={500}
                                 >
                                     {artist.name || '—'}
                                 </Text>
                             </React.Fragment>
                         ))}
-                    </LineItem>
-                    <LineItem
-                        $secondary
+                    </div>
+                    <div
+                        className={clsx(styles.lineItem, styles.secondary)}
                         onClick={stopPropagation}
                     >
                         <Text
-                            $link
                             component={Link}
+                            fw={500}
+                            isLink
                             overflow="hidden"
                             size="md"
                             to={
@@ -279,13 +219,12 @@ export const LeftControls = () => {
                                       })
                                     : ''
                             }
-                            weight={500}
                         >
                             {currentSong?.album || '—'}
                         </Text>
-                    </LineItem>
-                </MetadataStack>
+                    </div>
+                </motion.div>
             </LayoutGroup>
-        </LeftControlsContainer>
+        </div>
     );
 };

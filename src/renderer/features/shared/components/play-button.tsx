@@ -1,49 +1,22 @@
-import { UnstyledButton } from '@mantine/core';
+import clsx from 'clsx';
 import { RiPlayFill } from 'react-icons/ri';
-import styled from 'styled-components';
 
-const MotionButton = styled(UnstyledButton)`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--btn-filled-bg);
-    border: none;
-    border-radius: 50%;
-    opacity: 0.8;
+import styles from './play-button.module.css';
 
-    svg {
-        fill: var(--btn-filled-fg);
-    }
+import { ActionIcon, ActionIconProps } from '/@/shared/components/action-icon/action-icon';
 
-    &:hover:not([disabled]) {
-        background: var(--btn-filled-bg);
-        transform: scale(1.1);
+export interface PlayButtonProps extends ActionIconProps {
+    size?: number | string;
+}
 
-        svg {
-            fill: var(--btn-filled-fg-hover);
-        }
-    }
-
-    &:active {
-        transform: scale(0.95);
-    }
-
-    &:disabled {
-        opacity: 0.6;
-    }
-
-    transition: background-color 0.2s ease-in-out;
-    transition: transform 0.2s ease-in-out;
-`;
-
-export const PlayButton = ({ ...props }: any) => {
+export const PlayButton = ({ className, size = '1.5rem', ...props }: PlayButtonProps) => {
     return (
-        <MotionButton
+        <ActionIcon
+            className={clsx(styles.button, className)}
+            variant="filled"
             {...props}
-            h="45px"
-            w="45px"
         >
-            <RiPlayFill size={20} />
-        </MotionButton>
+            <RiPlayFill size={size} />
+        </ActionIcon>
     );
 };

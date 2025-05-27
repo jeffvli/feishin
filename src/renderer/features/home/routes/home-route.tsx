@@ -1,12 +1,12 @@
-import { ActionIcon, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiRefreshLine } from 'react-icons/ri';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { FeatureCarousel, NativeScrollArea, Spinner, TextTitle } from '/@/renderer/components';
-import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel';
+import { FeatureCarousel } from '/@/renderer/components/feature-carousel/feature-carousel';
+import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel/grid-carousel';
+import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
 import { useAlbumList } from '/@/renderer/features/albums';
 import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-played-query';
 import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
@@ -18,6 +18,11 @@ import {
     useGeneralSettings,
     useWindowSettings,
 } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Group } from '/@/shared/components/group/group';
+import { Spinner } from '/@/shared/components/spinner/spinner';
+import { Stack } from '/@/shared/components/stack/stack';
+import { TextTitle } from '/@/shared/components/text-title/text-title';
 import {
     AlbumListSort,
     LibraryItem,
@@ -233,7 +238,6 @@ const HomeRoute = () => {
         <AnimatedPage>
             <NativeScrollArea
                 pageHeaderProps={{
-                    backgroundColor: 'var(--titlebar-bg)',
                     children: (
                         <LibraryHeaderBar>
                             <LibraryHeaderBar.Title>
@@ -246,10 +250,10 @@ const HomeRoute = () => {
                 ref={scrollAreaRef}
             >
                 <Stack
+                    gap="lg"
                     mb="5rem"
                     pt={windowBarStyle === Platform.WEB ? '5rem' : '3rem'}
                     px="2rem"
-                    spacing="lg"
                 >
                     {homeFeature && <FeatureCarousel data={featureItemsWithImage} />}
                     {sortedCarousel.map((carousel) => (
@@ -305,14 +309,16 @@ const HomeRoute = () => {
                                 label: (
                                     <Group>
                                         <TextTitle
+                                            fw={700}
                                             order={2}
-                                            weight={700}
                                         >
                                             {carousel.title}
                                         </TextTitle>
 
                                         <ActionIcon
                                             onClick={() => invalidateCarouselQuery(carousel)}
+                                            size="compact-sm"
+                                            variant="transparent"
                                         >
                                             <RiRefreshLine />
                                         </ActionIcon>

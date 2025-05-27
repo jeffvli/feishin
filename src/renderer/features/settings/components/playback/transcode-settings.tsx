@@ -1,11 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
-import { NumberInput, Switch, TextInput } from '/@/renderer/components';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Switch } from '/@/shared/components/switch/switch';
+import { TextInput } from '/@/shared/components/text-input/text-input';
 
 export const TranscodeSettings = () => {
     const { t } = useTranslation();

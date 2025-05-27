@@ -1,0 +1,31 @@
+.control {
+    color: var(--theme-btn-default-fg);
+    background-color: var(--theme-btn-default-bg);
+    border: none;
+    transition:
+        background 0.2s ease-in-out,
+        color 0.2s ease-in-out;
+
+    &[data-active] {
+        color: var(--theme-btn-primary-fg);
+        background-color: var(--theme-btn-primary-bg);
+    }
+
+    &[data-dots] {
+        background-color: transparent;
+    }
+
+    &:hover {
+        color: var(--theme-btn-default-fg-hover);
+        background-color: var(--theme-btn-default-bg-hover);
+
+        &[data-active] {
+            color: var(--theme-btn-primary-fg-hover);
+            background-color: var(--theme-btn-primary-bg-hover);
+        }
+
+        &[data-dots] {
+            background-color: transparent;
+        }
+    }
+}

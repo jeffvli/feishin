@@ -1,0 +1,15 @@
+.row {
+    width: 100%;
+    max-width: 100%;
+    height: 22px;
+    padding: 0 0.2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--theme-colors-foreground);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.row.secondary {
+    color: var(--theme-colors-foreground-muted);
+}

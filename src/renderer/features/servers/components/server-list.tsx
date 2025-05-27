@@ -1,4 +1,3 @@
-import { Divider, Group, Stack } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { openContextModal } from '@mantine/modals';
 import isElectron from 'is-electron';
@@ -6,11 +5,18 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiServerFill } from 'react-icons/ri';
 
-import { Accordion, Button, ContextModalVars, Switch, Text } from '/@/renderer/components';
 import { AddServerForm } from '/@/renderer/features/servers/components/add-server-form';
 import { ServerListItem } from '/@/renderer/features/servers/components/server-list-item';
 import { useCurrentServer, useServerList } from '/@/renderer/store';
 import { titleCase } from '/@/renderer/utils';
+import { Accordion } from '/@/shared/components/accordion/accordion';
+import { Button } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { ContextModalVars } from '/@/shared/components/modal/modal';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -59,27 +65,6 @@ export const ServerList = () => {
 
     return (
         <>
-            <Group
-                mb={10}
-                position="right"
-                sx={{
-                    position: 'absolute',
-                    right: 55,
-                    transform: 'translateY(-3.5rem)',
-                    zIndex: 2000,
-                }}
-            >
-                <Button
-                    autoFocus
-                    compact
-                    leftIcon={<RiAddFill size={15} />}
-                    onClick={handleAddServerModal}
-                    size="sm"
-                    variant="filled"
-                >
-                    {t('form.addServer.title', { postProcess: 'titleCase' })}
-                </Button>
-            </Group>
             <Stack>
                 <Accordion variant="separated">
                     {Object.keys(serverListQuery)?.map((serverId) => {
@@ -89,9 +74,10 @@ export const ServerList = () => {
                                 key={server.id}
                                 value={server.name}
                             >
-                                <Accordion.Control icon={<RiServerFill size={15} />}>
-                                    <Group position="apart">
-                                        <Text weight={server.id === currentServer?.id ? 800 : 400}>
+                                <Accordion.Control>
+                                    <Group>
+                                        <RiServerFill size={15} />
+                                        <Text fw={server.id === currentServer?.id ? 800 : 400}>
                                             {titleCase(server?.type)} - {server?.name}
                                         </Text>
                                     </Group>
@@ -102,6 +88,20 @@ export const ServerList = () => {
                             </Accordion.Item>
                         );
                     })}
+                    <Group
+                        grow
+                        pt="md"
+                    >
+                        <Button
+                            autoFocus
+                            leftSection={<RiAddFill size={15} />}
+                            onClick={handleAddServerModal}
+                            size="compact-sm"
+                            variant="default"
+                        >
+                            {t('form.addServer.title', { postProcess: 'titleCase' })}
+                        </Button>
+                    </Group>
                 </Accordion>
                 {isElectron() && (
                     <>

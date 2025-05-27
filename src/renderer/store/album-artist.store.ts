@@ -1,6 +1,6 @@
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 import { DataTableProps } from '/@/renderer/store/settings.store';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
@@ -37,7 +37,7 @@ type TableProps = DataTableProps & {
     scrollOffset: number;
 };
 
-export const useAlbumArtistStore = create<AlbumArtistSlice>()(
+export const useAlbumArtistStore = createWithEqualityFn<AlbumArtistSlice>()(
     persist(
         devtools(
             immer((set, get) => ({

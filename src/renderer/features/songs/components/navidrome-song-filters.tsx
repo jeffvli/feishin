@@ -1,13 +1,17 @@
-import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { NumberInput, Switch, Text } from '/@/renderer/components';
 import { SelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
 import { useGenreList } from '/@/renderer/features/genres';
 import { useTagList } from '/@/renderer/features/tag/queries/use-tag-list';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
 import { GenreListSort, LibraryItem, SongListQuery, SortOrder } from '/@/shared/types/domain-types';
 
 interface NavidromeSongFiltersProps {
@@ -129,8 +133,8 @@ export const NavidromeSongFilters = ({
         <Stack p="0.8rem">
             {toggleFilters.map((filter) => (
                 <Group
+                    justify="space-between"
                     key={`nd-filter-${filter.label}`}
-                    position="apart"
                 >
                     <Text>{filter.label}</Text>
                     <Switch

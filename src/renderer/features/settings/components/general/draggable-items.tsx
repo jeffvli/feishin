@@ -1,14 +1,14 @@
-import { Divider } from '@mantine/core';
-import { Reorder } from 'framer-motion';
 import isEqual from 'lodash/isEqual';
+import { Reorder } from 'motion/react';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '/@/renderer/components';
 import { DraggableItem } from '/@/renderer/features/settings/components/general/draggable-item';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 import { useSettingSearchContext } from '/@/renderer/features/settings/context/search-context';
 import { SortableItem } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
 
 export type DraggableItemsProps<K, T> = {
     description: string;
@@ -85,18 +85,18 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
                     <>
                         {open && (
                             <Button
-                                compact
                                 disabled={isSaveButtonDisabled}
                                 onClick={handleSave}
+                                size="compact-md"
                                 variant="filled"
                             >
                                 {t('common.save', { postProcess: 'titleCase' })}
                             </Button>
                         )}
                         <Button
-                            compact
                             onClick={() => setOpen(!open)}
-                            variant="filled"
+                            size="compact-md"
+                            variant={open ? 'subtle' : 'filled'}
                         >
                             {t(open ? 'common.close' : 'common.edit', { postProcess: 'titleCase' })}
                         </Button>

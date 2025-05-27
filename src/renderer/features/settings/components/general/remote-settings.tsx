@@ -2,9 +2,13 @@ import isElectron from 'is-electron';
 import debounce from 'lodash/debounce';
 import { useTranslation } from 'react-i18next';
 
-import { NumberInput, Switch, Text, TextInput, toast } from '/@/renderer/components';
 import { SettingsSection } from '/@/renderer/features/settings/components/settings-section';
 import { useRemoteSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Switch } from '/@/shared/components/switch/switch';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Text } from '/@/shared/components/text/text';
+import { toast } from '/@/shared/components/toast/toast';
 
 const remote = isElectron() ? window.api.remote : null;
 
@@ -70,8 +74,8 @@ export const RemoteSettings = () => {
             ),
             description: (
                 <Text
-                    $noSelect
-                    $secondary
+                    isMuted
+                    isNoSelect
                     size="sm"
                 >
                     {t('setting.enableRemote', {

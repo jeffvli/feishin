@@ -1,0 +1,14 @@
+.right-sidebar-container {
+    position: relative;
+    grid-area: right-sidebar;
+    height: 100%;
+
+    .current-song-cell:not(.current-playlist-song-cell) svg {
+        display: none;
+    }
+}
+
+.queue-drawer {
+    background: var(--theme-colors-background);
+    border-radius: var(--theme-radius-lg);
+}

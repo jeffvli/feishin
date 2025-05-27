@@ -1,12 +1,16 @@
-import { Box, Group, Stack, TextInput } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { closeModal, ContextModalProps } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Switch, toast } from '/@/renderer/components';
 import { useShareItem } from '/@/renderer/features/sharing/mutations/share-item-mutation';
 import { useCurrentServer } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { toast } from '/@/shared/components/toast/toast';
 
 // Bugged prop types in mantine v6
 const WrappedDateTimePicker = ({ ...props }: any) => {
@@ -98,7 +102,7 @@ export const ShareItemContextModal = ({
     });
 
     return (
-        <Box p="1rem">
+        <div style={{ padding: '1rem' }}>
             <form onSubmit={handleSubmit}>
                 <Stack>
                     <TextInput
@@ -125,7 +129,7 @@ export const ShareItemContextModal = ({
                         valueFormat="MM/DD/YYYY HH:mm"
                         {...form.getInputProps('expires')}
                     />
-                    <Group position="right">
+                    <Group justify="flex-end">
                         <Group>
                             <Button
                                 onClick={() => closeModal(id)}
@@ -145,6 +149,6 @@ export const ShareItemContextModal = ({
                     </Group>
                 </Stack>
             </form>
-        </Box>
+        </div>
     );
 };

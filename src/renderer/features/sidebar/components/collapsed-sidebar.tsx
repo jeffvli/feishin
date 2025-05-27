@@ -1,29 +1,22 @@
-import { Group, UnstyledButton } from '@mantine/core';
-import { motion } from 'framer-motion';
+import clsx from 'clsx';
+import { motion } from 'motion/react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiMenuFill } from 'react-icons/ri';
 import { NavLink, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 
-import { DropdownMenu, ScrollArea } from '/@/renderer/components';
+import styles from './collapsed-sidebar.module.css';
+
 import { CollapsedSidebarButton } from '/@/renderer/features/sidebar/components/collapsed-sidebar-button';
 import { CollapsedSidebarItem } from '/@/renderer/features/sidebar/components/collapsed-sidebar-item';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 import { SidebarItemType, useGeneralSettings, useWindowSettings } from '/@/renderer/store';
+import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
+import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Platform } from '/@/shared/types/types';
-
-const SidebarContainer = styled(motion.div)<{ $windowBarStyle: Platform }>`
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    max-height: ${(props) =>
-        props.$windowBarStyle === Platform.WEB || props.$windowBarStyle === Platform.LINUX
-            ? 'calc(100vh - 149px)'
-            : 'calc(100vh - 119px)'};
-    user-select: none;
-`;
 
 export const CollapsedSidebar = () => {
     const { t } = useTranslation();
@@ -67,29 +60,26 @@ export const CollapsedSidebar = () => {
     }, [sidebarItems, translatedSidebarItemMap]);
 
     return (
-        <SidebarContainer $windowBarStyle={windowBarStyle}>
+        <motion.div
+            className={clsx({
+                [styles.linux]: windowBarStyle === Platform.LINUX,
+                [styles.sidebarContainer]: true,
+                [styles.web]: windowBarStyle === Platform.WEB,
+            })}
+        >
             <ScrollArea
                 scrollbarSize={8}
                 scrollHideDelay={0}
             >
                 {sidebarCollapsedNavigation && (
                     <Group
+                        gap={0}
                         grow
-                        spacing={0}
-                        style={{
-                            borderRight: 'var(--sidebar-border)',
-                        }}
                     >
-                        <CollapsedSidebarButton
-                            component={UnstyledButton}
-                            onClick={() => navigate(-1)}
-                        >
+                        <CollapsedSidebarButton onClick={() => navigate(-1)}>
                             <RiArrowLeftSLine size="22" />
                         </CollapsedSidebarButton>
-                        <CollapsedSidebarButton
-                            component={UnstyledButton}
-                            onClick={() => navigate(1)}
-                        >
+                        <CollapsedSidebarButton onClick={() => navigate(1)}>
                             <RiArrowRightSLine size="22" />
                         </CollapsedSidebarButton>
                     </Group>
@@ -98,9 +88,13 @@ export const CollapsedSidebar = () => {
                     <DropdownMenu.Target>
                         <CollapsedSidebarItem
                             activeIcon={<RiMenuFill size="25" />}
-                            component={UnstyledButton}
+                            component={Flex}
                             icon={<RiMenuFill size="25" />}
                             label={t('common.menu', { postProcess: 'titleCase' })}
+                            style={{
+                                cursor: 'pointer',
+                                padding: 'var(--theme-spacing-md) 0',
+                            }}
                         />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
@@ -130,6 +124,6 @@ export const CollapsedSidebar = () => {
                     />
                 ))}
             </ScrollArea>
-        </SidebarContainer>
+        </motion.div>
     );
 };

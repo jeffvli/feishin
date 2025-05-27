@@ -1,0 +1,41 @@
+.menu-label {
+    padding: var(--theme-spacing-sm);
+}
+
+.menu-item {
+    position: relative;
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+    cursor: default;
+}
+
+.menu-item:disabled {
+    opacity: 0.6;
+}
+
+.menu-item-label {
+    margin-right: var(--theme-spacing-md);
+    margin-left: var(--theme-spacing-md);
+    color: var(--theme-colors-surface-foreground);
+}
+
+.menu-item-label-danger {
+    color: var(--theme-colors-state-error);
+}
+
+.menu-item-right-section {
+    display: flex;
+}
+
+.menu-dropdown {
+    padding: var(--theme-spacing-xs);
+    color: var(--theme-colors-surface-foreground);
+    background: var(--theme-colors-surface);
+    border: 1px solid var(--theme-colors-border);
+    filter: drop-shadow(0 0 5px rgb(0 0 0 / 50%));
+}
+
+.menu-divider {
+    padding: 0;
+    margin: 0;
+    border-color: var(--theme-colors-border);
+}

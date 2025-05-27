@@ -1,10 +1,15 @@
-import { Box, Center, Divider, Group, Stack } from '@mantine/core';
 import { RiArrowLeftSLine, RiErrorWarningLine, RiHome4Line, RiMenuFill } from 'react-icons/ri';
 import { useNavigate, useRouteError } from 'react-router';
 
-import { Button, DropdownMenu, Text } from '/@/renderer/components';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 import { AppRoute } from '/@/renderer/router/routes';
+import { Button } from '/@/shared/components/button/button';
+import { Center } from '/@/shared/components/center/center';
+import { Divider } from '/@/shared/components/divider/divider';
+import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
 
 const RouteErrorBoundary = () => {
     const navigate = useNavigate();
@@ -24,9 +29,9 @@ const RouteErrorBoundary = () => {
     };
 
     return (
-        <Box bg="var(--main-bg)">
-            <Center sx={{ height: '100vh' }}>
-                <Stack sx={{ maxWidth: '50%' }}>
+        <div style={{ backgroundColor: 'var(--theme-colors-background)' }}>
+            <Center style={{ height: '100vh' }}>
+                <Stack style={{ maxWidth: '50%' }}>
                     <Group>
                         <Button
                             onClick={handleReturn}
@@ -36,7 +41,7 @@ const RouteErrorBoundary = () => {
                             <RiArrowLeftSLine size={20} />
                         </Button>
                         <RiErrorWarningLine
-                            color="var(--danger-color)"
+                            color="var(--theme-colors-state-error)"
                             size={30}
                         />
                         <Text size="lg">Something went wrong</Text>
@@ -44,14 +49,14 @@ const RouteErrorBoundary = () => {
                     <Divider my={5} />
                     <Text size="sm">{error?.message}</Text>
                     <Group
+                        gap="sm"
                         grow
-                        spacing="sm"
                     >
                         <Button
-                            leftIcon={<RiHome4Line />}
+                            leftSection={<RiHome4Line />}
                             onClick={handleHome}
                             size="md"
-                            sx={{ flex: 0.5 }}
+                            style={{ flex: 0.5 }}
                             variant="default"
                         >
                             Go home
@@ -59,9 +64,9 @@ const RouteErrorBoundary = () => {
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
                                 <Button
-                                    leftIcon={<RiMenuFill />}
+                                    leftSection={<RiMenuFill />}
                                     size="md"
-                                    sx={{ flex: 0.5 }}
+                                    style={{ flex: 0.5 }}
                                     variant="default"
                                 >
                                     Menu
@@ -83,7 +88,7 @@ const RouteErrorBoundary = () => {
                     </Group>
                 </Stack>
             </Center>
-        </Box>
+        </div>
     );
 };
 

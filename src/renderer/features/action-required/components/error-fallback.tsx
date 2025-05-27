@@ -1,26 +1,26 @@
 import type { FallbackProps } from 'react-error-boundary';
 
-import { Box, Center, Group, Stack } from '@mantine/core';
 import { RiErrorWarningLine } from 'react-icons/ri';
 import { useRouteError } from 'react-router';
-import styled from 'styled-components';
 
-import { Button, Text } from '/@/renderer/components';
+import styles from './error-fallback.module.css';
 
-const Container = styled(Box)`
-    background: var(--main-bg);
-`;
+import { Button } from '/@/shared/components/button/button';
+import { Center } from '/@/shared/components/center/center';
+import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
 
 export const ErrorFallback = ({ resetErrorBoundary }: FallbackProps) => {
     const error = useRouteError() as any;
 
     return (
-        <Container>
-            <Center sx={{ height: '100vh' }}>
-                <Stack sx={{ maxWidth: '50%' }}>
-                    <Group spacing="xs">
+        <div className={styles.container}>
+            <Center style={{ height: '100vh' }}>
+                <Stack style={{ maxWidth: '50%' }}>
+                    <Group gap="xs">
                         <RiErrorWarningLine
-                            color="var(--danger-color)"
+                            color="var(--theme-colors-state-error)"
                             size={30}
                         />
                         <Text size="lg">Something went wrong</Text>
@@ -34,6 +34,6 @@ export const ErrorFallback = ({ resetErrorBoundary }: FallbackProps) => {
                     </Button>
                 </Stack>
             </Center>
-        </Container>
+        </div>
     );
 };

@@ -1,11 +1,9 @@
-import { Group, Stack } from '@mantine/core';
 import { forwardRef, Fragment, Ref, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { Rating, Text } from '/@/renderer/components';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
 import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -14,6 +12,10 @@ import { queryClient } from '/@/renderer/lib/react-query';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { formatDateAbsoluteUTC, formatDurationString } from '/@/renderer/utils';
+import { Group } from '/@/shared/components/group/group';
+import { Rating } from '/@/shared/components/rating/rating';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
 import { AlbumDetailResponse, LibraryItem, ServerType } from '/@/shared/types/domain-types';
 
 interface AlbumDetailHeaderProps {
@@ -129,17 +131,17 @@ export const AlbumDetailHeader = forwardRef(
                     title={detailQuery?.data?.name || ''}
                     {...background}
                 >
-                    <Stack spacing="sm">
-                        <Group spacing="sm">
+                    <Stack gap="sm">
+                        <Group gap="sm">
                             {metadataItems.map((item, index) => (
                                 <Fragment key={`item-${item.id}-${index}`}>
-                                    {index > 0 && <Text $noSelect>•</Text>}
+                                    {index > 0 && <Text isNoSelect>•</Text>}
                                     <Text>{item.value}</Text>
                                 </Fragment>
                             ))}
                             {showRating && (
                                 <>
-                                    <Text $noSelect>•</Text>
+                                    <Text isNoSelect>•</Text>
                                     <Rating
                                         onChange={handleUpdateRating}
                                         readOnly={
@@ -152,9 +154,9 @@ export const AlbumDetailHeader = forwardRef(
                             )}
                         </Group>
                         <Group
+                            gap="md"
                             mah="4rem"
-                            spacing="md"
-                            sx={{
+                            style={{
                                 overflow: 'hidden',
                                 WebkitBoxOrient: 'vertical',
                                 WebkitLineClamp: 2,
@@ -162,9 +164,9 @@ export const AlbumDetailHeader = forwardRef(
                         >
                             {detailQuery?.data?.albumArtists.map((artist) => (
                                 <Text
-                                    $link
                                     component={Link}
                                     fw={600}
+                                    isLink
                                     key={`artist-${artist.id}`}
                                     to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                         albumArtistId: artist.id,

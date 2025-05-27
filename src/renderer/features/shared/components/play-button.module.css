@@ -1,0 +1,16 @@
+.button {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    opacity: 0.8;
+    transition: background-color 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out;
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+    }
+}

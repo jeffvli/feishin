@@ -1,0 +1,40 @@
+.handle {
+    position: absolute;
+    z-index: 90;
+    width: 4px;
+    height: 100%;
+    cursor: ew-resize;
+    background-color: var(--theme-colors-border);
+    opacity: 0;
+
+    &:hover {
+        opacity: 0.6;
+    }
+
+    &::before {
+        position: absolute;
+        width: 1px;
+        height: 100%;
+        content: '';
+    }
+}
+
+.handle-top {
+    top: 0;
+}
+
+.handle-right {
+    right: 0;
+}
+
+.handle-bottom {
+    bottom: 0;
+}
+
+.handle-left {
+    left: 0;
+}
+
+.handle.resizing {
+    opacity: 1;
+}

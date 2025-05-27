@@ -1,18 +1,21 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
-import { Flex, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, MutableRefObject, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { PageHeader, SearchInput } from '/@/renderer/components';
+import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
+import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { SongListHeaderFilters } from '/@/renderer/features/songs/components/song-list-header-filters';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 import { SongListFilter, useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
 import { LibraryItem, SongListQuery } from '/@/shared/types/domain-types';
 
 interface SongListHeaderProps {
@@ -68,10 +71,10 @@ export const SongListHeader = ({
 
     return (
         <Stack
+            gap={0}
             ref={cq.ref}
-            spacing={0}
         >
-            <PageHeader backgroundColor="var(--titlebar-bg)">
+            <PageHeader>
                 <Flex
                     justify="space-between"
                     w="100%"
@@ -93,7 +96,6 @@ export const SongListHeader = ({
                         <SearchInput
                             defaultValue={filter.searchTerm}
                             onChange={handleSearch}
-                            openedWidth={cq.isMd ? 250 : cq.isSm ? 200 : 150}
                         />
                     </Group>
                 </Flex>

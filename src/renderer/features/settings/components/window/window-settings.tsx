@@ -1,12 +1,14 @@
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 
-import { Select, Switch, toast } from '/@/renderer/components';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useSettingsStoreActions, useWindowSettings } from '/@/renderer/store';
+import { Select } from '/@/shared/components/select/select';
+import { Switch } from '/@/shared/components/switch/switch';
+import { toast } from '/@/shared/components/toast/toast';
 import { Platform } from '/@/shared/types/types';
 
 const WINDOW_BAR_OPTIONS = [

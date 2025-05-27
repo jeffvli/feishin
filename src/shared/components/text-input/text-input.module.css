@@ -1,0 +1,39 @@
+.root {
+    transition: width 0.3s ease-in-out;
+}
+
+.input {
+    width: 100%;
+    border: 1px solid transparent;
+
+    &[data-variant='default'] {
+        color: var(--theme-colors-surface-foreground);
+        background: var(--theme-colors-surface);
+    }
+
+    &[data-variant='filled'] {
+        color: var(--theme-colors-foreground);
+        background: var(--theme-colors-background);
+    }
+}
+
+.input:focus,
+.input:focus-visible {
+    border-color: lighten(var(--theme-colors-border), 10%);
+}
+
+.label {
+    margin-bottom: var(--theme-spacing-sm);
+}
+
+.section {
+    color: var(--theme-colors-foreground-muted);
+}
+
+.required {
+    color: var(--theme-colors-state-error);
+}
+
+.disabled {
+    opacity: 0.6;
+}

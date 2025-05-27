@@ -1,13 +1,13 @@
-import { Box, Center, Divider, Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
-import { AnimatePresence, motion } from 'framer-motion';
-import { MouseEvent, useMemo } from 'react';
+import clsx from 'clsx';
+import { AnimatePresence, motion } from 'motion/react';
+import { CSSProperties, MouseEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiArrowDownSLine, RiDiscLine, RiListUnordered } from 'react-icons/ri';
 import { Link, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
 
-import { Button, MotionStack, Tooltip } from '/@/renderer/components';
+import styles from './sidebar.module.css';
+
 import { CreatePlaylistForm } from '/@/renderer/features/playlists';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
@@ -28,46 +28,15 @@ import {
     useGeneralSettings,
     useWindowSettings,
 } from '/@/renderer/store/settings.store';
-import { fadeIn } from '/@/renderer/styles';
+import { Button } from '/@/shared/components/button/button';
+import { Center } from '/@/shared/components/center/center';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { ServerType } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
-
-const SidebarContainer = styled.div<{ $windowBarStyle: Platform }>`
-    height: 100%;
-    max-height: ${
-        (props) =>
-            props.$windowBarStyle === Platform.WEB || props.$windowBarStyle === Platform.LINUX
-                ? 'calc(100vh - 160px)' // Playerbar (90px) & ActionBar (70px)
-                : 'calc(100vh - 190px)' // plus windowbar (30px) if the windowBarStyle is Windows/Mac
-        // We use the height of the SidebarContainer to keep the Stack below the ActionBar at the correct height
-        // ActionBar uses height: 100%; so it has the full height of its parent
-    };
-    user-select: none;
-`;
-
-const ImageContainer = styled(motion.div)<{ height: string }>`
-    position: relative;
-    height: ${(props) => props.height};
-    cursor: pointer;
-
-    ${fadeIn};
-    animation: fadein 0.2s ease-in-out;
-
-    button {
-        display: none;
-    }
-
-    &:hover button {
-        display: block;
-    }
-`;
-
-const SidebarImage = styled.img`
-    width: 100%;
-    height: 100%;
-    object-fit: var(--image-fit);
-    background: var(--placeholder-bg);
-`;
 
 export const Sidebar = () => {
     const { t } = useTranslation();
@@ -137,34 +106,37 @@ export const Sidebar = () => {
     }, [sidebarItems, translatedSidebarItemMap]);
 
     return (
-        <SidebarContainer
-            $windowBarStyle={windowBarStyle}
+        <div
+            className={clsx({
+                [styles.linux]: windowBarStyle === Platform.LINUX,
+                [styles.sidebarContainer]: true,
+                [styles.web]: windowBarStyle === Platform.WEB,
+            })}
             ref={cq.ref}
         >
             <ActionBar />
             <Stack
+                className={styles.sidebarContent}
+                gap={0}
                 h="100%"
                 justify="space-between"
-                spacing={0}
             >
-                <MotionStack
+                <Stack
+                    gap={0}
                     h="100%"
-                    layout="position"
-                    spacing={0}
-                    sx={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
+                    style={{ maxHeight: showImage ? `calc(100% - ${sidebar.leftWidth})` : '100%' }}
                 >
-                    <Stack spacing={0}>
+                    <Stack gap={0}>
                         {sidebarItemsWithRoute.map((item) => {
                             return (
                                 <SidebarItem
                                     key={`sidebar-${item.route}`}
                                     to={item.route}
                                 >
-                                    <Group spacing="sm">
+                                    <Group gap="sm">
                                         <SidebarIcon
                                             active={location.pathname === item.route}
                                             route={item.route}
-                                            size="1.1em"
                                         />
                                         {item.label}
                                     </Group>
@@ -179,38 +151,35 @@ export const Sidebar = () => {
                     {sidebarPlaylistList && (
                         <>
                             <Group
-                                position="apart"
+                                justify="space-between"
                                 pt="1rem"
                                 px="1.5rem"
                             >
                                 <Group>
-                                    <Box
+                                    <Text
                                         fw="600"
-                                        sx={{ fontSize: '1.2rem' }}
+                                        size="lg"
                                     >
                                         {t('page.sidebar.playlists', { postProcess: 'titleCase' })}
-                                    </Box>
+                                    </Text>
                                 </Group>
-                                <Group spacing="sm">
+                                <Group gap="sm">
                                     <Button
-                                        compact
                                         onClick={handleCreatePlaylistModal}
-                                        size="md"
+                                        size="compact-md"
                                         tooltip={{
                                             label: t('action.createPlaylist', {
                                                 postProcess: 'sentenceCase',
                                             }),
                                             openDelay: 500,
                                         }}
-                                        variant="default"
                                     >
                                         <RiAddFill size="1em" />
                                     </Button>
                                     <Button
-                                        compact
                                         component={Link}
                                         onClick={(e) => e.stopPropagation()}
-                                        size="md"
+                                        size="compact-md"
                                         to={AppRoute.PLAYLISTS}
                                         tooltip={{
                                             label: t('action.viewPlaylists', {
@@ -218,7 +187,6 @@ export const Sidebar = () => {
                                             }),
                                             openDelay: 500,
                                         }}
-                                        variant="default"
                                     >
                                         <RiListUnordered size="1em" />
                                     </Button>
@@ -227,20 +195,26 @@ export const Sidebar = () => {
                             <SidebarPlaylistList />
                         </>
                     )}
-                </MotionStack>
+                </Stack>
                 <AnimatePresence
                     initial={false}
                     mode="popLayout"
                 >
                     {showImage && (
-                        <ImageContainer
+                        <motion.div
                             animate={{ opacity: 1, y: 0 }}
+                            className={styles.imageContainer}
                             exit={{ opacity: 0, y: 200 }}
-                            height={sidebar.leftWidth}
                             initial={{ opacity: 0, y: 200 }}
                             key="sidebar-image"
                             onClick={expandFullScreenPlayer}
                             role="button"
+                            style={
+                                {
+                                    '--sidebar-image-height': sidebar.leftWidth,
+                                    bottom: '70px',
+                                } as CSSProperties
+                            }
                             transition={{ duration: 0.3, ease: 'easeInOut' }}
                         >
                             <Tooltip
@@ -250,46 +224,53 @@ export const Sidebar = () => {
                                 openDelay={500}
                             >
                                 {upsizedImageUrl ? (
-                                    <SidebarImage
+                                    <img
+                                        className={styles.sidebarImage}
                                         loading="eager"
                                         src={upsizedImageUrl}
                                     />
                                 ) : (
                                     <Center
-                                        sx={{ background: 'var(--placeholder-bg)', height: '100%' }}
+                                        style={{
+                                            background: 'var(--theme-colors-foreground-muted)',
+                                            height: '100%',
+                                        }}
                                     >
                                         <RiDiscLine
-                                            color="var(--placeholder-fg)"
+                                            color="var(--theme-colors-foreground-muted)"
                                             size={50}
                                         />
                                     </Center>
                                 )}
                             </Tooltip>
                             <Button
-                                compact
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setSideBar({ image: false });
                                 }}
                                 opacity={0.8}
                                 radius={100}
-                                size="md"
-                                sx={{ cursor: 'default', position: 'absolute', right: 5, top: 5 }}
+                                size="compact-md"
+                                style={{
+                                    cursor: 'default',
+                                    position: 'absolute',
+                                    right: 5,
+                                    top: 5,
+                                }}
                                 tooltip={{
                                     label: t('common.collapse', { postProcess: 'titleCase' }),
                                     openDelay: 500,
                                 }}
-                                variant="default"
                             >
                                 <RiArrowDownSLine
                                     color="white"
                                     size={20}
                                 />
                             </Button>
-                        </ImageContainer>
+                        </motion.div>
                     )}
                 </AnimatePresence>
             </Stack>
-        </SidebarContainer>
+        </div>
     );
 };

@@ -1,7 +1,7 @@
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 import { DataTableProps, PersistedTableColumn } from '/@/renderer/store/settings.store';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
@@ -107,7 +107,7 @@ type FilterType =
     | PlaylistListFilter
     | SongListFilter;
 
-export const useListStore = create<ListSlice>()(
+export const useListStore = createWithEqualityFn<ListSlice>()(
     persist(
         devtools(
             immer((set, get) => ({

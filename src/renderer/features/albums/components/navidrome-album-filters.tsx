@@ -1,14 +1,19 @@
-import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { NumberInput, SpinnerIcon, Switch, Text } from '/@/renderer/components';
 import { SelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 import { useGenreList } from '/@/renderer/features/genres';
 import { useTagList } from '/@/renderer/features/tag/queries/use-tag-list';
 import { AlbumListFilter, useListStoreActions, useListStoreByKey } from '/@/renderer/store';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
 import {
     AlbumArtistListSort,
     AlbumListQuery,
@@ -233,8 +238,8 @@ export const NavidromeAlbumFilters = ({
         <Stack p="0.8rem">
             {toggleFilters.map((filter) => (
                 <Group
+                    justify="space-between"
                     key={`nd-filter-${filter.label}`}
-                    position="apart"
                 >
                     <Text>{filter.label}</Text>
                     <Switch

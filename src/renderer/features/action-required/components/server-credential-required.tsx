@@ -1,5 +1,5 @@
-import { Text } from '/@/renderer/components';
 import { useCurrentServer } from '/@/renderer/store';
+import { Text } from '/@/shared/components/text/text';
 
 export const ServerCredentialRequired = () => {
     const currentServer = useCurrentServer();

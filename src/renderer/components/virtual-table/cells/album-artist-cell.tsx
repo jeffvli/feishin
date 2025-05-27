@@ -5,16 +5,16 @@ import React from 'react';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import { Separator } from '/@/renderer/components/separator';
-import { Skeleton } from '/@/renderer/components/skeleton';
-import { Text } from '/@/renderer/components/text';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 import { AppRoute } from '/@/renderer/router/routes';
+import { Separator } from '/@/shared/components/separator/separator';
+import { Skeleton } from '/@/shared/components/skeleton/skeleton';
+import { Text } from '/@/shared/components/text/text';
 
 export const AlbumArtistCell = ({ data, value }: ICellRendererParams) => {
     if (value === undefined) {
         return (
-            <CellContainer $position="left">
+            <CellContainer position="left">
                 <Skeleton
                     height="1rem"
                     width="80%"
@@ -24,9 +24,9 @@ export const AlbumArtistCell = ({ data, value }: ICellRendererParams) => {
     }
 
     return (
-        <CellContainer $position="left">
+        <CellContainer position="left">
             <Text
-                $secondary
+                isMuted
                 overflow="hidden"
                 size="md"
             >
@@ -35,9 +35,9 @@ export const AlbumArtistCell = ({ data, value }: ICellRendererParams) => {
                         {index > 0 && <Separator />}
                         {item.id ? (
                             <Text
-                                $link
-                                $secondary
                                 component={Link}
+                                isLink
+                                isMuted
                                 overflow="hidden"
                                 size="md"
                                 to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
@@ -48,7 +48,7 @@ export const AlbumArtistCell = ({ data, value }: ICellRendererParams) => {
                             </Text>
                         ) : (
                             <Text
-                                $secondary
+                                isMuted
                                 overflow="hidden"
                                 size="md"
                             >

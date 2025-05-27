@@ -2,8 +2,11 @@ import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Checkbox, FileInput, Text } from '/@/renderer/components';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Checkbox } from '/@/shared/components/checkbox/checkbox';
+import { FileInput } from '/@/shared/components/file-input/file-input';
+import { Text } from '/@/shared/components/text/text';
 import { PlaybackType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
@@ -15,7 +18,8 @@ export const MpvRequired = () => {
     const [disabled, setDisabled] = useState(false);
     const { t } = useTranslation();
 
-    const handleSetMpvPath = (e: File) => {
+    const handleSetMpvPath = (e: File | null) => {
+        if (!e) return;
         localSettings?.set('mpv_path', e.path);
     };
 

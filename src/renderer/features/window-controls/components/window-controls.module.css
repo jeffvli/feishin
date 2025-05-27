@@ -1,0 +1,29 @@
+.windows-button-group {
+    display: flex;
+    width: 130px;
+    height: 100%;
+    -webkit-app-region: no-drag;
+}
+
+.windows-button {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    -webkit-app-region: no-drag;
+    width: 50px;
+    height: 65px;
+
+    img {
+        width: 35%;
+        height: 50%;
+    }
+
+    &:hover {
+        background: rgb(125 125 125 / 30%);
+    }
+}
+
+.windows-button.exit-button {
+    background: var(--theme-colors-state-error);
+}

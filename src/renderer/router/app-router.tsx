@@ -1,16 +1,15 @@
-import { ModalsProvider } from '@mantine/modals';
 import { lazy, Suspense } from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 
 import { AppRoute } from './routes';
 
-import { BaseContextModal } from '/@/renderer/components';
 import ArtistListRoute from '/@/renderer/features/artists/routes/artist-list-route';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
 import { ShareItemContextModal } from '/@/renderer/features/sharing';
-import { DefaultLayout } from '/@/renderer/layouts';
+import { DefaultLayout } from '/@/renderer/layouts/default-layout';
 import { AppOutlet } from '/@/renderer/router/app-outlet';
 import { TitlebarOutlet } from '/@/renderer/router/titlebar-outlet';
+import { BaseContextModal, ModalsProvider } from '/@/shared/components/modal/modal';
 
 const NowPlayingRoute = lazy(
     () => import('/@/renderer/features/now-playing/routes/now-playing-route'),
@@ -72,18 +71,6 @@ export const AppRouter = () => {
     const router = (
         <HashRouter future={{ v7_startTransition: true }}>
             <ModalsProvider
-                modalProps={{
-                    centered: true,
-                    styles: {
-                        body: { position: 'relative' },
-                        content: { overflow: 'auto' },
-                    },
-                    transitionProps: {
-                        duration: 300,
-                        exitDuration: 300,
-                        transition: 'fade',
-                    },
-                }}
                 modals={{
                     addToPlaylist: AddToPlaylistContextModal,
                     base: BaseContextModal,

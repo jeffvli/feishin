@@ -1,14 +1,17 @@
-import { Divider, Group, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import isElectron from 'is-electron';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiDeleteBin2Line, RiEdit2Fill } from 'react-icons/ri';
 
-import { Button, Text, TimeoutButton } from '/@/renderer/components';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { ServerSection } from '/@/renderer/features/servers/components/server-section';
 import { useAuthStoreActions } from '/@/renderer/store';
+import { Button, TimeoutButton } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
 import { ServerListItem as ServerItem } from '/@/shared/types/domain-types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
@@ -56,7 +59,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
         <Stack>
             <ServerSection
                 title={
-                    <Group position="apart">
+                    <Group justify="space-between">
                         <Text>
                             {t('page.manageServers.serverDetails', {
                                 postProcess: 'sentenceCase',
@@ -73,7 +76,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                     />
                 ) : (
                     <Stack>
-                        <Group noWrap>
+                        <Group wrap="nowrap">
                             <Stack>
                                 <Text>
                                     {t('page.manageServers.url', {
@@ -93,7 +96,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                         </Group>
                         <Group grow>
                             <Button
-                                leftIcon={<RiEdit2Fill />}
+                                leftSection={<RiEdit2Fill />}
                                 onClick={() => handleEdit()}
                                 tooltip={{
                                     label: t('page.manageServers.editServerDetailsTooltip', {
@@ -110,7 +113,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
             </ServerSection>
             <Divider my="sm" />
             <TimeoutButton
-                leftIcon={<RiDeleteBin2Line />}
+                leftSection={<RiDeleteBin2Line />}
                 timeoutProps={{ callback: handleDeleteServer, duration: 1000 }}
                 variant="subtle"
             >

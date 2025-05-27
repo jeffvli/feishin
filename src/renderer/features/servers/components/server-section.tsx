@@ -1,25 +1,17 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { Fragment } from 'react';
 
-import { Text } from '/@/renderer/components';
+import { Text } from '/@/shared/components/text/text';
 
 interface ServerSectionProps {
     children: React.ReactNode;
     title: React.ReactNode | string;
 }
 
-const Container = styled.div``;
-
-const Section = styled.div`
-    padding: 1rem;
-    border: 1px dashed var(--generic-border-color);
-`;
-
 export const ServerSection = ({ children, title }: ServerSectionProps) => {
     return (
-        <Container>
+        <Fragment>
             {React.isValidElement(title) ? title : <Text>{title}</Text>}
-            <Section>{children}</Section>
-        </Container>
+            <div style={{ padding: '1rem' }}>{children}</div>
+        </Fragment>
     );
 };

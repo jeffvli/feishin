@@ -1,16 +1,19 @@
-import { Group } from '@mantine/core';
 import isElectron from 'is-electron';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, KeyboardEvent, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiDeleteBinLine, RiEditLine, RiKeyboardBoxLine } from 'react-icons/ri';
-import styled from 'styled-components';
+
+import styles from './hotkeys-manager-settings.module.css';
 
 import i18n from '/@/i18n/i18n';
-import { Button, Checkbox, TextInput } from '/@/renderer/components';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 import { useSettingSearchContext } from '/@/renderer/features/settings/context/search-context';
 import { BindingActions, useHotkeySettings, useSettingsStoreActions } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Checkbox } from '/@/shared/components/checkbox/checkbox';
+import { Group } from '/@/shared/components/group/group';
+import { TextInput } from '/@/shared/components/text-input/text-input';
 
 const ipc = isElectron() ? window.api.ipc : null;
 
@@ -91,18 +94,6 @@ const BINDINGS_MAP: Record<BindingActions, string> = {
     zoomIn: i18n.t('setting.hotkey', { context: 'zoomIn', postProcess: 'sentenceCase' }),
     zoomOut: i18n.t('setting.hotkey', { context: 'zoomOut', postProcess: 'sentenceCase' }),
 };
-
-const HotkeysContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    justify-content: center;
-    width: 100%;
-
-    button {
-        padding: 0 1rem;
-    }
-`;
 
 export const HotkeyManagerSettings = () => {
     const { t } = useTranslation();
@@ -247,11 +238,11 @@ export const HotkeyManagerSettings = () => {
                 })}
                 title={t('setting.applicationHotkeys', { postProcess: 'sentenceCase' })}
             />
-            <HotkeysContainer>
+            <div className={styles.container}>
                 {filteredBindings.map((binding) => (
                     <Group
                         key={`hotkey-${binding}`}
-                        noWrap
+                        wrap="nowrap"
                     >
                         <TextInput
                             readOnly
@@ -259,8 +250,8 @@ export const HotkeyManagerSettings = () => {
                             value={BINDINGS_MAP[binding as keyof typeof BINDINGS_MAP]}
                         />
                         <TextInput
-                            icon={<RiKeyboardBoxLine />}
                             id={`hotkey-${binding}`}
+                            leftSection={<RiKeyboardBoxLine />}
                             onBlur={() => setSelected(null)}
                             onChange={() => {}}
                             onKeyDownCapture={(e) => {
@@ -287,7 +278,7 @@ export const HotkeyManagerSettings = () => {
                                 onChange={(e) =>
                                     handleSetGlobalHotkey(binding as BindingActions, e)
                                 }
-                                size="xl"
+                                size="md"
                                 style={{
                                     opacity: bindings[binding as keyof typeof BINDINGS_MAP]
                                         .allowGlobal
@@ -296,25 +287,24 @@ export const HotkeyManagerSettings = () => {
                                 }}
                             />
                         )}
-                        <Button
+                        <ActionIcon
                             onClick={() => {
                                 setSelected(binding as BindingActions);
                                 document.getElementById(`hotkey-${binding}`)?.focus();
                             }}
                             variant="default"
-                            w={100}
                         >
                             <RiEditLine />
-                        </Button>
-                        <Button
+                        </ActionIcon>
+                        <ActionIcon
                             onClick={() => handleClearHotkey(binding as BindingActions)}
                             variant="default"
                         >
                             <RiDeleteBinLine />
-                        </Button>
+                        </ActionIcon>
                     </Group>
                 ))}
-            </HotkeysContainer>
+            </div>
         </>
     );
 };

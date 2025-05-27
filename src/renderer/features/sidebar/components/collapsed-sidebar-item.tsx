@@ -1,67 +1,12 @@
-import { createPolymorphicComponent, Flex } from '@mantine/core';
-import { motion } from 'framer-motion';
+import clsx from 'clsx';
 import { forwardRef, ReactNode } from 'react';
 import { useMatch } from 'react-router';
-import styled from 'styled-components';
 
-import { Text } from '/@/renderer/components';
+import styles from './collapsed-sidebar-item.module.css';
 
-const Container = styled(Flex)<{ $active?: boolean; $disabled?: boolean }>`
-    position: relative;
-    width: 100%;
-    padding: 0.9rem 0.3rem;
-    pointer-events: ${(props) => (props.$disabled ? 'none' : 'all')};
-    cursor: ${(props) => (props.$disabled ? 'default' : 'pointer')};
-    user-select: ${(props) => (props.$disabled ? 'none' : 'initial')};
-    border-right: var(--sidebar-border);
-    opacity: ${(props) => props.$disabled && 0.6};
-
-    svg {
-        fill: ${(props) => (props.$active ? 'var(--primary-color)' : 'var(--sidebar-fg)')};
-    }
-
-    &:focus-visible {
-        background-color: var(--sidebar-bg-hover);
-        outline: none;
-    }
-
-    ${(props) =>
-        !props.$disabled &&
-        `
-      &:hover {
-          background-color: var(--sidebar-bg-hover);
-
-          div {
-            color: var(--main-fg) !important;
-          }
-
-          svg {
-            fill: var(--primary-color);
-          }
-        }
-    `}
-`;
-
-const TextWrapper = styled.div`
-    width: 100%;
-    overflow: hidden;
-    text-align: center;
-    text-overflow: ellipsis;
-    white-space: pre-line;
-`;
-
-const ActiveTabIndicator = styled(motion.div)`
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 3px;
-    width: 2px;
-    height: 80%;
-    margin-top: auto;
-    margin-bottom: auto;
-    background: var(--primary-color);
-`;
+import { Flex } from '/@/shared/components/flex/flex';
+import { Text } from '/@/shared/components/text/text';
+import { createPolymorphicComponent } from '/@/shared/utils/create-polymorphic-component';
 
 interface CollapsedSidebarItemProps {
     activeIcon: ReactNode;
@@ -77,26 +22,32 @@ const _CollapsedSidebarItem = forwardRef<HTMLDivElement, CollapsedSidebarItemPro
         const isMatch = Boolean(match);
 
         return (
-            <Container
-                $active={Boolean(match)}
-                $disabled={disabled}
+            <Flex
                 align="center"
+                className={clsx({
+                    [styles.active]: isMatch,
+                    [styles.container]: true,
+                    [styles.disabled]: disabled,
+                })}
                 direction="column"
                 ref={ref}
+                tabIndex={0}
                 {...props}
             >
-                {isMatch ? <ActiveTabIndicator /> : null}
+                {isMatch ? <div className={styles.activeTabIndicator} /> : null}
                 {isMatch ? activeIcon : icon}
-                <TextWrapper>
-                    <Text
-                        $secondary={!isMatch}
-                        fw="600"
-                        size="xs"
-                    >
-                        {label}
-                    </Text>
-                </TextWrapper>
-            </Container>
+                <Text
+                    className={clsx({
+                        [styles.active]: isMatch,
+                        [styles.textWrapper]: true,
+                    })}
+                    fw="600"
+                    isMuted={!isMatch}
+                    size="xs"
+                >
+                    {label}
+                </Text>
+            </Flex>
         );
     },
 );

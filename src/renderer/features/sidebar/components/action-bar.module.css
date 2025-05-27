@@ -1,0 +1,10 @@
+.container {
+    display: flex;
+    align-items: center;
+    height: 70px;
+    -webkit-app-region: drag;
+
+    input {
+        -webkit-app-region: no-drag;
+    }
+}

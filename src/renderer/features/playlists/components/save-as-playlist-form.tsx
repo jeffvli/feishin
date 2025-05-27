@@ -1,11 +1,15 @@
-import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Switch, TextInput, toast } from '/@/renderer/components';
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { useCurrentServer } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
+import { Button } from '/@/shared/components/button/button';
+import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { toast } from '/@/shared/components/toast/toast';
 import {
     CreatePlaylistBody,
     CreatePlaylistResponse,
@@ -98,7 +102,7 @@ export const SaveAsPlaylistForm = ({
                         {...form.getInputProps('public', { type: 'checkbox' })}
                     />
                 )}
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button
                         onClick={onCancel}
                         variant="subtle"

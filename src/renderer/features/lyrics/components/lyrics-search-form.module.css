@@ -1,0 +1,13 @@
+.search-item {
+    all: unset;
+    box-sizing: border-box !important;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 5px;
+
+    &:hover,
+    &:focus-visible {
+        color: var(--theme-btn-default-fg-hover);
+        background: var(--theme-btn-default-bg-hover);
+    }
+}

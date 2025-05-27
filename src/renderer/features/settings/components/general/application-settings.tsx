@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n, { languages } from '/@/i18n/i18n';
-import { FileInput, NumberInput, Select, toast } from '/@/renderer/components';
 import {
     SettingOption,
     SettingsSection,
@@ -15,6 +14,10 @@ import {
     useGeneralSettings,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
+import { FileInput } from '/@/shared/components/file-input/file-input';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Select } from '/@/shared/components/select/select';
+import { toast } from '/@/shared/components/toast/toast';
 import { FontType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
@@ -148,7 +151,8 @@ export const ApplicationSettings = () => {
         getFonts();
     }, [fontSettings, localFonts, setSettings, t]);
 
-    const handleChangeLanguage = (e: string) => {
+    const handleChangeLanguage = (e: null | string) => {
+        if (!e) return;
         setSettings({
             general: {
                 ...settings,

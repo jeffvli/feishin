@@ -1,7 +1,6 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { IDatasource } from '@ag-grid-community/core';
-import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
@@ -21,16 +20,6 @@ import { useNavigate, useParams } from 'react-router';
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import {
-    Button,
-    ConfirmModal,
-    DropdownMenu,
-    MultiSelect,
-    Slider,
-    Switch,
-    Text,
-    toast,
-} from '/@/renderer/components';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { openUpdatePlaylistModal } from '/@/renderer/features/playlists/components/update-playlist-form';
@@ -40,6 +29,7 @@ import { OrderToggleButton } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
+    PersistedTableColumn,
     SongListFilter,
     useCurrentServer,
     usePlaylistDetailStore,
@@ -48,6 +38,18 @@ import {
     useSetPlaylistStore,
     useSetPlaylistTablePagination,
 } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
+import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
+import { ConfirmModal } from '/@/shared/components/modal/modal';
+import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
+import { Slider } from '/@/shared/components/slider/slider';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
+import { toast } from '/@/shared/components/toast/toast';
 import {
     LibraryItem,
     PlaylistSongListQuery,
@@ -55,7 +57,7 @@ import {
     SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { ListDisplayType, Play, TableColumn } from '/@/shared/types/types';
+import { ListDisplayType, Play } from '/@/shared/types/types';
 
 const FILTERS = {
     jellyfin: [
@@ -399,7 +401,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
         [page, setPage],
     );
 
-    const handleTableColumns = (values: TableColumn[]) => {
+    const handleTableColumns = (values: string[]) => {
         const existingColumns = page.table.columns;
 
         if (values.length === 0) {
@@ -410,7 +412,10 @@ export const PlaylistDetailSongListHeaderFilters = ({
 
         // If adding a column
         if (values.length > existingColumns.length) {
-            const newColumn = { column: values[values.length - 1], width: 100 };
+            const newColumn = {
+                column: values[values.length - 1],
+                width: 100,
+            } as PersistedTableColumn;
 
             setTable({ columns: [...existingColumns, newColumn] });
         } else {
@@ -474,16 +479,15 @@ export const PlaylistDetailSongListHeaderFilters = ({
     return (
         <Flex justify="space-between">
             <Group
+                gap="sm"
                 ref={cq.ref}
-                spacing="sm"
                 w="100%"
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             tooltip={{
                                 label: t('page.playlist.reorder', { postProcess: 'sentenceCase' }),
                             }}
@@ -495,7 +499,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                     <DropdownMenu.Dropdown>
                         {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
                             <DropdownMenu.Item
-                                $isActive={filter.value === filters.sortBy}
+                                isActive={filter.value === filters.sortBy}
                                 key={`filter-${filter.name}`}
                                 onClick={handleSetSortBy}
                                 value={filter.value}
@@ -515,36 +519,35 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
-                            <RiMoreFill size="1.3rem" />
+                            <RiMoreFill />
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiPlayFill />}
+                            leftSection={<RiPlayFill />}
                             onClick={() => handlePlay(Play.NOW)}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddBoxFill />}
+                            leftSection={<RiAddBoxFill />}
                             onClick={() => handlePlay(Play.LAST)}
                         >
                             {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddCircleFill />}
+                            leftSection={<RiAddCircleFill />}
                             onClick={() => handlePlay(Play.NEXT)}
                         >
                             {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            icon={<RiEditFill />}
+                            leftSection={<RiEditFill />}
                             onClick={() =>
                                 openUpdatePlaylistModal({
                                     playlist: detailQuery.data!,
@@ -555,14 +558,14 @@ export const PlaylistDetailSongListHeaderFilters = ({
                             {t('action.editPlaylist', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiDeleteBinFill />}
+                            leftSection={<RiDeleteBinFill />}
                             onClick={openDeletePlaylistModal}
                         >
                             {t('action.deletePlaylist', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            icon={<RiRefreshLine />}
+                            leftSection={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
                             {t('action.refresh', { postProcess: 'sentenceCase' })}
@@ -571,7 +574,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                             <>
                                 <DropdownMenu.Divider />
                                 <DropdownMenu.Item
-                                    $danger
+                                    isDanger
                                     onClick={handleToggleShowQueryBuilder}
                                 >
                                     {t('action.toggleSmartPlaylistEditor', {
@@ -590,11 +593,10 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 >
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
-                            <RiSettings3Fill size="1.3rem" />
+                            <RiSettings3Fill />
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
@@ -602,19 +604,12 @@ export const PlaylistDetailSongListHeaderFilters = ({
                             {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Label>
                         <DropdownMenu.Item
-                            $isActive={page.display === ListDisplayType.TABLE}
+                            isActive={page.display === ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                             value={ListDisplayType.TABLE}
                         >
                             Table
                         </DropdownMenu.Item>
-                        {/* <DropdownMenu.Item
-                            $isActive={page.display === ListDisplayType.TABLE_PAGINATED}
-                            value={ListDisplayType.TABLE_PAGINATED}
-                            onClick={handleSetViewType}
-                        >
-                            Table (paginated)
-                        </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
                         <DropdownMenu.Label>
                             {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
@@ -635,7 +630,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
                                     <Stack>
                                         <MultiSelect
@@ -647,7 +642,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                                             onChange={handleTableColumns}
                                             width={300}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>Auto Fit Columns</Text>
                                             <Switch
                                                 defaultChecked={page.table.autoFit}

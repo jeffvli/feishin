@@ -1,21 +1,12 @@
-import { Divider, Group } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
-import { motion, Variants } from 'framer-motion';
-import { useLayoutEffect, useRef } from 'react';
+import { motion, Variants } from 'motion/react';
+import { CSSProperties, useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiArrowDownSLine, RiSettings3Line } from 'react-icons/ri';
 import { useLocation } from 'react-router';
-import styled from 'styled-components';
 
-import {
-    Button,
-    NumberInput,
-    Option,
-    Popover,
-    Select,
-    Slider,
-    Switch,
-} from '/@/renderer/components';
+import styles from './full-screen-player.module.css';
+
 import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 import { FullScreenPlayerImage } from '/@/renderer/features/player/components/full-screen-player-image';
 import { FullScreenPlayerQueue } from '/@/renderer/features/player/components/full-screen-player-queue';
@@ -29,54 +20,18 @@ import {
     useSettingsStoreActions,
     useWindowSettings,
 } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Option } from '/@/shared/components/option/option';
+import { Popover } from '/@/shared/components/popover/popover';
+import { Select } from '/@/shared/components/select/select';
+import { Slider } from '/@/shared/components/slider/slider';
+import { Switch } from '/@/shared/components/switch/switch';
 import { Platform } from '/@/shared/types/types';
 
-const Container = styled(motion.div)`
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 200;
-    display: flex;
-    justify-content: center;
-    padding: 2rem;
-
-    @media screen and (orientation: portrait) {
-        padding: 2rem 2rem 1rem;
-    }
-`;
-
-const ResponsiveContainer = styled.div`
-    display: grid;
-    grid-template-rows: minmax(0, 1fr);
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 2rem 2rem;
-    width: 100%;
-    max-width: 2560px;
-    margin-top: 5rem;
-
-    @media screen and (orientation: portrait) {
-        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
-        grid-template-columns: minmax(0, 1fr);
-        margin-top: 0;
-    }
-`;
-
-interface BackgroundImageOverlayProps {
-    $blur: number;
-}
-
-const BackgroundImageOverlay = styled.div<BackgroundImageOverlayProps>`
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    width: 100%;
-    height: 100%;
-    background: var(--bg-header-overlay);
-    backdrop-filter: blur(${({ $blur }) => $blur}rem);
-`;
-
-const mainBackground = 'var(--main-bg)';
+const mainBackground = 'var(--theme-colors-background)';
 
 const Controls = () => {
     const { t } = useTranslation();
@@ -109,19 +64,18 @@ const Controls = () => {
 
     return (
         <Group
+            gap="sm"
             p="1rem"
             pos="absolute"
-            spacing="sm"
-            sx={{
-                background: `rgb(var(--main-bg-transparent), ${opacity}%)`,
+            style={{
+                background: `rgb(var(--theme-colors-background-transparent), ${opacity}%)`,
                 left: 0,
                 top: 0,
             }}
         >
             <Button
-                compact
                 onClick={handleToggleFullScreenPlayer}
-                size="sm"
+                size="compact-sm"
                 tooltip={{ label: t('common.minimize', { postProcess: 'titleCase' }) }}
                 variant="subtle"
             >
@@ -130,8 +84,7 @@ const Controls = () => {
             <Popover position="bottom-start">
                 <Popover.Target>
                     <Button
-                        compact
-                        size="sm"
+                        size="compact-sm"
                         tooltip={{ label: t('common.configure', { postProcess: 'titleCase' }) }}
                         variant="subtle"
                     >
@@ -285,8 +238,8 @@ const Controls = () => {
                         </Option.Label>
                         <Option.Control>
                             <Group
-                                noWrap
                                 w="100%"
+                                wrap="nowrap"
                             >
                                 <Slider
                                     defaultValue={lyricConfig.fontSize}
@@ -325,8 +278,8 @@ const Controls = () => {
                         </Option.Label>
                         <Option.Control>
                             <Group
-                                noWrap
                                 w="100%"
+                                wrap="nowrap"
                             >
                                 <Slider
                                     defaultValue={lyricConfig.gap}
@@ -485,8 +438,9 @@ export const FullScreenPlayer = () => {
             : mainBackground;
 
     return (
-        <Container
+        <motion.div
             animate="open"
+            className={styles.container}
             custom={{ background, backgroundImage, dynamicBackground, windowBarStyle }}
             exit="closed"
             initial="closed"
@@ -494,11 +448,20 @@ export const FullScreenPlayer = () => {
             variants={containerVariants}
         >
             <Controls />
-            {dynamicBackground && <BackgroundImageOverlay $blur={dynamicImageBlur} />}
-            <ResponsiveContainer>
+            {dynamicBackground && (
+                <div
+                    className={styles.backgroundImageOverlay}
+                    style={
+                        {
+                            '--image-blur': `${dynamicImageBlur}`,
+                        } as CSSProperties
+                    }
+                />
+            )}
+            <div className={styles.responsiveContainer}>
                 <FullScreenPlayerImage />
                 <FullScreenPlayerQueue />
-            </ResponsiveContainer>
-        </Container>
+            </div>
+        </motion.div>
     );
 };

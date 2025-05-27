@@ -1,0 +1,7 @@
+.dropdown {
+    padding: var(--theme-spacing-xs);
+    color: var(--theme-colors-surface-foreground);
+    background: var(--theme-colors-surface);
+    border: 1px solid var(--theme-colors-border);
+    filter: drop-shadow(0 0 5px rgb(0 0 0 / 50%));
+}

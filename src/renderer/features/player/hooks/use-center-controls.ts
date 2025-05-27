@@ -3,7 +3,6 @@ import debounce from 'lodash/debounce';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { toast } from '/@/renderer/components';
 import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
 import {
@@ -18,6 +17,7 @@ import {
 } from '/@/renderer/store';
 import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { setAutoNext, setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
+import { toast } from '/@/shared/components/toast/toast';
 import { PlaybackType, PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;

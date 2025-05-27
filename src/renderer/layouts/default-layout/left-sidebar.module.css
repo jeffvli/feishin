@@ -1,0 +1,4 @@
+.container {
+    position: relative;
+    grid-area: sidebar;
+}

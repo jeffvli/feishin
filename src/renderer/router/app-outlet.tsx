@@ -1,12 +1,13 @@
-import { Center } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useEffect, useMemo } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
-import { Spinner, toast } from '/@/renderer/components';
 import { useServerAuthenticated } from '/@/renderer/hooks/use-server-authenticated';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useSetPlayerFallback } from '/@/renderer/store';
+import { Center } from '/@/shared/components/center/center';
+import { Spinner } from '/@/shared/components/spinner/spinner';
+import { toast } from '/@/shared/components/toast/toast';
 import { AuthState } from '/@/shared/types/types';
 
 const ipc = isElectron() ? window.api.ipc : null;

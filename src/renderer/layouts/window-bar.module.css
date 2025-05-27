@@ -1,0 +1,91 @@
+.windows-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100vw;
+    -webkit-app-region: drag;
+}
+
+.windows-button-group {
+    display: flex;
+    width: 130px;
+    height: 100%;
+    -webkit-app-region: no-drag;
+}
+
+.windows-button {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    -webkit-app-region: no-drag;
+    width: 50px;
+    height: 30px;
+
+    img {
+        width: 35%;
+        height: 50%;
+    }
+
+    &:hover {
+        background: rgb(125 125 125 / 30%);
+    }
+}
+
+.windows-button.exit {
+    &:hover {
+        background: var(--theme-colors-state-error);
+    }
+}
+
+.player-status-container {
+    display: flex;
+    gap: 0.5rem;
+    max-width: 45vw;
+    padding-left: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.macos-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    -webkit-app-region: drag;
+}
+
+.macos-button-group {
+    position: absolute;
+    top: 5px;
+    left: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 20px);
+    height: 100%;
+    -webkit-app-region: no-drag;
+}
+
+.macos-button {
+    grid-row: 1 / span 1;
+    grid-column: 1;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+
+    img {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.macos-button.min-button {
+    grid-column: 2;
+}
+
+.macos-button.max-button,
+.macos-button.restore-button {
+    grid-column: 3;
+}

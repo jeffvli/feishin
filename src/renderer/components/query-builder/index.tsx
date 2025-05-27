@@ -1,12 +1,13 @@
-import { Group, Stack } from '@mantine/core';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { RiAddFill, RiAddLine, RiDeleteBinFill, RiMore2Line, RiRestartLine } from 'react-icons/ri';
 
 import i18n from '/@/i18n/i18n';
-import { Button } from '/@/renderer/components/button';
-import { DropdownMenu } from '/@/renderer/components/dropdown-menu';
 import { QueryBuilderOption } from '/@/renderer/components/query-builder/query-builder-option';
-import { Select } from '/@/renderer/components/select';
+import { Button } from '/@/shared/components/button/button';
+import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { Group } from '/@/shared/components/group/group';
+import { Select } from '/@/shared/components/select/select';
+import { Stack } from '/@/shared/components/stack/stack';
 import { QueryBuilderGroup, QueryBuilderRule } from '/@/shared/types/types';
 
 const FILTER_GROUP_OPTIONS_DATA = [
@@ -99,10 +100,10 @@ export const QueryBuilder = ({
 
     return (
         <Stack
+            gap="sm"
             ml={`${level * 10}px`}
-            spacing="sm"
         >
-            <Group spacing="sm">
+            <Group gap="sm">
                 <Select
                     data={FILTER_GROUP_OPTIONS_DATA}
                     maxWidth={175}
@@ -132,7 +133,7 @@ export const QueryBuilder = ({
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiAddFill />}
+                            leftSection={<RiAddFill />}
                             onClick={handleAddRuleGroup}
                         >
                             Add rule group
@@ -140,7 +141,7 @@ export const QueryBuilder = ({
 
                         {level > 0 && (
                             <DropdownMenu.Item
-                                icon={<RiDeleteBinFill />}
+                                leftSection={<RiDeleteBinFill />}
                                 onClick={handleDeleteRuleGroup}
                             >
                                 Remove rule group
@@ -150,15 +151,19 @@ export const QueryBuilder = ({
                             <>
                                 <DropdownMenu.Divider />
                                 <DropdownMenu.Item
-                                    $danger
-                                    icon={<RiRestartLine color="var(--danger-color)" />}
+                                    isDanger
+                                    leftSection={
+                                        <RiRestartLine color="var(--theme-colors-state-error)" />
+                                    }
                                     onClick={onResetFilters}
                                 >
                                     Reset to default
                                 </DropdownMenu.Item>
                                 <DropdownMenu.Item
-                                    $danger
-                                    icon={<RiDeleteBinFill color="var(--danger-color)" />}
+                                    isDanger
+                                    leftSection={
+                                        <RiDeleteBinFill color="var(--theme-colors-state-error)" />
+                                    }
                                     onClick={onClearFilters}
                                 >
                                     Clear filters

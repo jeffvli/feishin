@@ -15,11 +15,13 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 
 import { AgGridReact } from '@ag-grid-community/react';
 import { useClickOutside, useMergedRef } from '@mantine/hooks';
+import clsx from 'clsx';
 import formatDuration from 'format-duration';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import { forwardRef, Ref, useCallback, useEffect, useMemo, useRef } from 'react';
 import { generatePath } from 'react-router';
-import styled from 'styled-components';
+
+import styles from './virtual-table.module.css';
 
 import i18n from '/@/i18n/i18n';
 import { ActionsCell } from '/@/renderer/components/virtual-table/cells/actions-cell';
@@ -57,18 +59,18 @@ export * from './table-config-dropdown';
 export * from './table-pagination';
 export * from './utils';
 
-const TableWrapper = styled.div`
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-`;
+// const TableWrapper = styled.div`
+//     position: relative;
+//     display: flex;
+//     flex-direction: column;
+//     width: 100%;
+//     height: 100%;
+// `;
 
-const DummyHeader = styled.div<{ height?: number }>`
-    position: absolute;
-    height: ${({ height }) => height || 36}px;
-`;
+// const DummyHeader = styled.div<{ height?: number }>`
+//     position: absolute;
+//     height: ${({ height }) => height || 36}px;
+// `;
 
 const tableColumns: { [key: string]: ColDef } = {
     actions: {
@@ -593,15 +595,20 @@ export const VirtualTable = forwardRef(
         const mergedWrapperRef = useMergedRef(deselectRef, tableContainerRef);
 
         return (
-            <TableWrapper
-                className={
+            <div
+                className={clsx(
+                    styles.tableWrapper,
                     transparentHeader
                         ? 'ag-theme-alpine-dark ag-header-transparent'
-                        : 'ag-theme-alpine-dark'
-                }
+                        : 'ag-theme-alpine-dark',
+                )}
                 ref={mergedWrapperRef}
             >
-                <DummyHeader ref={tableHeaderRef} />
+                <div
+                    className={styles.dummyHeader}
+                    ref={tableHeaderRef}
+                    style={{ height: rest.headerHeight ?? 36 }}
+                />
                 <AgGridReact
                     animateRows
                     blockLoadDebounceMillis={200}
@@ -639,7 +646,7 @@ export const VirtualTable = forwardRef(
                         />
                     </AnimatePresence>
                 )}
-            </TableWrapper>
+            </div>
         );
     },
 );

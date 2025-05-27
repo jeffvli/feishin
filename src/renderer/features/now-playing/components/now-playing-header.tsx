@@ -1,4 +1,4 @@
-import { PageHeader } from '/@/renderer/components';
+import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 
 export const NowPlayingHeader = () => {
@@ -6,7 +6,7 @@ export const NowPlayingHeader = () => {
     // const theme = useTheme();
 
     return (
-        <PageHeader backgroundColor="var(--titlebar-bg)">
+        <PageHeader>
             <LibraryHeaderBar>
                 <LibraryHeaderBar.Title>Queue</LibraryHeaderBar.Title>
             </LibraryHeaderBar>

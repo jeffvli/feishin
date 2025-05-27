@@ -1,5 +1,4 @@
 import { RowNode } from '@ag-grid-community/core';
-import { Divider, Group, Portal, Stack } from '@mantine/core';
 import {
     useClickOutside,
     useMergedRef,
@@ -8,8 +7,8 @@ import {
     useViewportSize,
 } from '@mantine/hooks';
 import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
-import { AnimatePresence } from 'framer-motion';
 import isElectron from 'is-electron';
+import { AnimatePresence } from 'motion/react';
 import { createContext, Fragment, ReactNode, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -35,15 +34,7 @@ import {
 
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
-import {
-    ConfirmModal,
-    ContextMenu,
-    ContextMenuButton,
-    HoverCard,
-    Rating,
-    Text,
-    toast,
-} from '/@/renderer/components';
+import { ContextMenu, ContextMenuButton } from '/@/renderer/components/context-menu/context-menu';
 import {
     ContextMenuItemType,
     OpenContextMenuProps,
@@ -66,6 +57,15 @@ import {
 import { usePlaybackType } from '/@/renderer/store/settings.store';
 import { setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
 import { hasFeature } from '/@/shared/api/utils';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { HoverCard } from '/@/shared/components/hover-card/hover-card';
+import { ConfirmModal } from '/@/shared/components/modal/modal';
+import { Portal } from '/@/shared/components/portal/portal';
+import { Rating } from '/@/shared/components/rating/rating';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
+import { toast } from '/@/shared/components/toast/toast';
 import {
     AnyLibraryItem,
     AnyLibraryItems,
@@ -292,7 +292,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             {ctx.data.map((item) => (
                                 <li key={item.id}>
                                     <Group>
-                                        —<Text $secondary>{item.name}</Text>
+                                        —<Text isMuted>{item.name}</Text>
                                     </Group>
                                 </li>
                             ))}
@@ -946,10 +946,10 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                             xPos={ctx.xPos}
                             yPos={ctx.yPos}
                         >
-                            <Stack spacing={0}>
+                            <Stack gap={0}>
                                 <Stack
+                                    gap={0}
                                     onClick={closeContextMenu}
-                                    spacing={0}
                                 >
                                     {ctx.menuItems?.map((item) => {
                                         return (
@@ -957,7 +957,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                 <Fragment key={`context-menu-${item.id}`}>
                                                     {item.children ? (
                                                         <HoverCard
-                                                            offset={5}
+                                                            offset={0}
                                                             position="right"
                                                         >
                                                             <HoverCard.Target>
@@ -982,7 +982,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                                 </ContextMenuButton>
                                                             </HoverCard.Target>
                                                             <HoverCard.Dropdown>
-                                                                <Stack spacing={0}>
+                                                                <Stack gap={0}>
                                                                     {contextMenuItems[
                                                                         item.id
                                                                     ].children?.map((child) => (
@@ -1020,9 +1020,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
                                                     {item.divider && (
                                                         <Divider
-                                                            color="rgb(62, 62, 62)"
                                                             key={`context-menu-divider-${item.id}`}
-                                                            size="sm"
                                                         />
                                                     )}
                                                 </Fragment>
@@ -1030,10 +1028,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                         );
                                     })}
                                 </Stack>
-                                <Divider
-                                    color="rgb(62, 62, 62)"
-                                    size="sm"
-                                />
                                 <ContextMenuButton disabled>
                                     {t('page.contextMenu.numberSelected', {
                                         count: ctx.data?.length || 0,

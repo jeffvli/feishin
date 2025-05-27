@@ -1,6 +1,6 @@
-import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 export interface AlbumArtistListDataSlice extends AlbumArtistListDataState {
     actions: {
@@ -12,7 +12,7 @@ export interface AlbumArtistListDataState {
     itemData: any[];
 }
 
-export const useAlbumArtistListDataStore = create<AlbumArtistListDataSlice>()(
+export const useAlbumArtistListDataStore = createWithEqualityFn<AlbumArtistListDataSlice>()(
     devtools(
         immer((set) => ({
             actions: {

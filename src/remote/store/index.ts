@@ -1,11 +1,9 @@
-import type { NotificationProps as MantineNotificationProps } from '@mantine/notifications';
-
-import { hideNotification, showNotification } from '@mantine/notifications';
 import merge from 'lodash/merge';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { createWithEqualityFn } from 'zustand/traditional';
 
+import { toast } from '/@/shared/components/toast/toast';
 import { ClientEvent, ServerEvent, SongUpdateSocket } from '/@/shared/types/remote-types';
 
 export interface SettingsSlice extends SettingsState {
@@ -36,55 +34,7 @@ const initialState: SettingsState = {
     showImage: true,
 };
 
-interface NotificationProps extends MantineNotificationProps {
-    type?: 'error' | 'warning';
-}
-
-const showToast = ({ type, ...props }: NotificationProps) => {
-    const color = type === 'warning' ? 'var(--warning-color)' : 'var(--danger-color)';
-
-    const defaultTitle = type === 'warning' ? 'Warning' : 'Error';
-
-    const defaultDuration = type === 'error' ? 2000 : 1000;
-
-    return showNotification({
-        autoClose: defaultDuration,
-        styles: () => ({
-            closeButton: {
-                '&:hover': {
-                    background: 'transparent',
-                },
-            },
-            description: {
-                color: 'var(--toast-description-fg)',
-                fontSize: '1rem',
-            },
-            loader: {
-                margin: '1rem',
-            },
-            root: {
-                '&::before': { backgroundColor: color },
-                background: 'var(--toast-bg)',
-                border: '2px solid var(--generic-border-color)',
-                bottom: '90px',
-            },
-            title: {
-                color: 'var(--toast-title-fg)',
-                fontSize: '1.3rem',
-            },
-        }),
-        title: defaultTitle,
-        ...props,
-    });
-};
-
-const toast = {
-    error: (props: NotificationProps) => showToast({ type: 'error', ...props }),
-    hide: hideNotification,
-    warn: (props: NotificationProps) => showToast({ type: 'warning', ...props }),
-};
-
-export const useRemoteStore = create<SettingsSlice>()(
+export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
     persist(
         devtools(
             immer((set, get) => ({

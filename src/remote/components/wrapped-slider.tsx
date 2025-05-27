@@ -1,40 +1,16 @@
 import { rem, Slider, SliderProps } from '@mantine/core';
 import { ReactNode, useState } from 'react';
-import styled from 'styled-components';
 
-const SliderContainer = styled.div`
-    display: flex;
-    width: 95%;
-    height: 20px;
-    margin: 10px 0;
-`;
-
-const SliderValueWrapper = styled.div<{ $position: 'left' | 'right' }>`
-    display: flex;
-    flex: 1;
-    align-self: flex-end;
-    justify-content: center;
-    max-width: 50px;
-`;
-
-const SliderWrapper = styled.div`
-    display: flex;
-    flex: 6;
-    align-items: center;
-    height: 100%;
-`;
+import styles from './wrapped-slider.module.css';
 
 const PlayerbarSlider = ({ ...props }: SliderProps) => {
     return (
         <Slider
             styles={{
                 bar: {
-                    backgroundColor: 'var(--playerbar-slider-track-progress-bg)',
                     transition: 'background-color 0.2s ease',
                 },
                 label: {
-                    backgroundColor: 'var(--tooltip-bg)',
-                    color: 'var(--tooltip-fg)',
                     fontSize: '1.1rem',
                     fontWeight: 600,
                     padding: '0 1rem',
@@ -59,7 +35,6 @@ const PlayerbarSlider = ({ ...props }: SliderProps) => {
                 },
                 track: {
                     '&::before': {
-                        backgroundColor: 'var(--playerbar-slider-track-bg)',
                         right: 'calc(0.1rem * -1)',
                     },
                 },
@@ -84,9 +59,9 @@ export const WrapperSlider = ({ leftLabel, rightLabel, value, ...props }: Wrappe
     const [seek, setSeek] = useState(0);
 
     return (
-        <SliderContainer>
-            {leftLabel && <SliderValueWrapper $position="left">{leftLabel}</SliderValueWrapper>}
-            <SliderWrapper>
+        <div className={styles.container}>
+            {leftLabel && <div className={styles.valueWrapper}>{leftLabel}</div>}
+            <div className={styles.wrapper}>
                 <PlayerbarSlider
                     {...props}
                     min={0}
@@ -102,8 +77,8 @@ export const WrapperSlider = ({ leftLabel, rightLabel, value, ...props }: Wrappe
                     value={!isSeeking ? (value ?? 0) : seek}
                     w="100%"
                 />
-            </SliderWrapper>
-            {rightLabel && <SliderValueWrapper $position="right">{rightLabel}</SliderValueWrapper>}
-        </SliderContainer>
+            </div>
+            {rightLabel && <div className={styles.valueWrapper}>{rightLabel}</div>}
+        </div>
     );
 };

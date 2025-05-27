@@ -2,9 +2,9 @@ import type { ICellRendererParams } from '@ag-grid-community/core';
 
 import { RiHeartFill, RiHeartLine } from 'react-icons/ri';
 
-import { Button } from '/@/renderer/components/button';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { Button } from '/@/shared/components/button/button';
 
 export const FavoriteCell = ({ data, node, value }: ICellRendererParams) => {
     const createMutation = useCreateFavorite({});
@@ -47,20 +47,20 @@ export const FavoriteCell = ({ data, node, value }: ICellRendererParams) => {
     };
 
     return (
-        <CellContainer $position="center">
+        <CellContainer position="center">
             <Button
-                compact
                 onClick={handleToggleFavorite}
-                sx={{
+                size="compact-md"
+                style={{
                     svg: {
                         fill: !value
-                            ? 'var(--main-fg-secondary) !important'
-                            : 'var(--primary-color) !important',
+                            ? 'var(--theme-colors-foreground-muted) !important'
+                            : 'var(--theme-colors-primary-filled) !important',
                     },
                 }}
                 variant="subtle"
             >
-                {!value ? <RiHeartLine size="1.3em" /> : <RiHeartFill size="1.3em" />}
+                {!value ? <RiHeartLine /> : <RiHeartFill />}
             </Button>
         </CellContainer>
     );

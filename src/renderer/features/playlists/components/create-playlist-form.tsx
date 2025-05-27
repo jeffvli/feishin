@@ -1,9 +1,7 @@
-import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Switch, Text, TextInput, toast } from '/@/renderer/components';
 import {
     PlaylistQueryBuilder,
     PlaylistQueryBuilderRef,
@@ -12,6 +10,13 @@ import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/crea
 import { convertQueryGroupToNDQuery } from '/@/renderer/features/playlists/utils';
 import { useCurrentServer } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
+import { Button } from '/@/shared/components/button/button';
+import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Text } from '/@/shared/components/text/text';
+import { toast } from '/@/shared/components/toast/toast';
 import { CreatePlaylistBody, ServerType, SongListSort } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 
@@ -146,7 +151,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                     </Stack>
                 )}
 
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button
                         onClick={onCancel}
                         variant="subtle"

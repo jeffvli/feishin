@@ -5,8 +5,8 @@ import qs from 'qs';
 import { z } from 'zod';
 
 import i18n from '/@/i18n/i18n';
-import { toast } from '/@/renderer/components/toast/index';
 import { ssType } from '/@/shared/api/subsonic/subsonic-types';
+import { toast } from '/@/shared/components/toast/toast';
 import { ServerListItem } from '/@/shared/types/domain-types';
 
 const c = initContract();

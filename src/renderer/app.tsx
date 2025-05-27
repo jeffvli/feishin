@@ -2,17 +2,19 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { ModuleRegistry } from '@ag-grid-community/core';
 import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import { MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 import isElectron from 'is-electron';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { initSimpleImg } from 'react-simple-img';
+import '@mantine/core/styles.css';
 
-import './styles/global.scss';
+import './styles/global.css';
 
 import '@ag-grid-community/styles/ag-grid.css';
 import 'overlayscrollbars/overlayscrollbars.css';
 
+import './styles/overlayscrollbars.css';
+
 import i18n from '/@/i18n/i18n';
-import { toast } from '/@/renderer/components';
 import { ContextMenuProvider } from '/@/renderer/features/context-menu';
 import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
 import { PlayQueueHandlerContext } from '/@/renderer/features/player';
@@ -20,7 +22,6 @@ import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-co
 import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
-import { useTheme } from '/@/renderer/hooks';
 import { useServerVersion } from '/@/renderer/hooks/use-server-version';
 import { IsUpdatedDialog } from '/@/renderer/is-updated-dialog';
 import { AppRouter } from '/@/renderer/router/app-router';
@@ -34,13 +35,13 @@ import {
     useRemoteSettings,
     useSettingsStore,
 } from '/@/renderer/store';
+import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { setQueue } from '/@/renderer/utils/set-transcoded-queue-data';
-import { FontType, PlaybackType, PlayerStatus, WebAudio } from '/@/shared/types/types';
+import { toast } from '/@/shared/components/toast/toast';
+import { PlaybackType, PlayerStatus, WebAudio } from '/@/shared/types/types';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
-
-initSimpleImg({ threshold: 0.05 }, true);
 
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 const ipc = isElectron() ? window.api.ipc : null;
@@ -48,56 +49,18 @@ const remote = isElectron() ? window.api.remote : null;
 const utils = isElectron() ? window.api.utils : null;
 
 export const App = () => {
-    const theme = useTheme();
-    const accent = useSettingsStore((store) => store.general.accent);
+    const { mode, theme } = useAppTheme();
     const language = useSettingsStore((store) => store.general.language);
-    const nativeImageAspect = useSettingsStore((store) => store.general.nativeAspectRatio);
-    const { builtIn, custom, system, type } = useSettingsStore((state) => state.font);
+
     const { content, enabled } = useCssSettings();
     const { type: playbackType } = usePlaybackSettings();
     const { bindings } = useHotkeySettings();
     const handlePlayQueueAdd = useHandlePlayQueueAdd();
     const { clearQueue, restoreQueue } = useQueueControls();
     const remoteSettings = useRemoteSettings();
-    const textStyleRef = useRef<HTMLStyleElement | null>(null);
     const cssRef = useRef<HTMLStyleElement | null>(null);
     useDiscordRpc();
     useServerVersion();
-
-    useEffect(() => {
-        if (type === FontType.SYSTEM && system) {
-            const root = document.documentElement;
-            root.style.setProperty('--content-font-family', 'dynamic-font');
-
-            if (!textStyleRef.current) {
-                textStyleRef.current = document.createElement('style');
-                document.body.appendChild(textStyleRef.current);
-            }
-
-            textStyleRef.current.textContent = `
-            @font-face {
-                font-family: "dynamic-font";
-                src: local("${system}");
-            }`;
-        } else if (type === FontType.CUSTOM && custom) {
-            const root = document.documentElement;
-            root.style.setProperty('--content-font-family', 'dynamic-font');
-
-            if (!textStyleRef.current) {
-                textStyleRef.current = document.createElement('style');
-                document.body.appendChild(textStyleRef.current);
-            }
-
-            textStyleRef.current.textContent = `
-            @font-face {
-                font-family: "dynamic-font";
-                src: url("feishin://${custom}");
-            }`;
-        } else {
-            const root = document.documentElement;
-            root.style.setProperty('--content-font-family', builtIn);
-        }
-    }, [builtIn, custom, system, type]);
 
     const [webAudio, setWebAudio] = useState<WebAudio>();
 
@@ -120,16 +83,6 @@ export const App = () => {
 
         return () => {};
     }, [content, enabled]);
-
-    useEffect(() => {
-        const root = document.documentElement;
-        root.style.setProperty('--primary-color', accent);
-    }, [accent]);
-
-    useEffect(() => {
-        const root = document.documentElement;
-        root.style.setProperty('--image-fit', nativeImageAspect ? 'contain' : 'cover');
-    }, [nativeImageAspect]);
 
     const providerValue = useMemo(() => {
         return { handlePlayQueueAdd };
@@ -237,59 +190,14 @@ export const App = () => {
 
     return (
         <MantineProvider
-            theme={{
-                colorScheme: theme as 'dark' | 'light',
-                components: {
-                    Modal: {
-                        styles: {
-                            body: { background: 'var(--modal-bg)', padding: '1rem !important' },
-                            close: { marginRight: '0.5rem' },
-                            content: { borderRadius: '5px' },
-                            header: {
-                                background: 'var(--modal-header-bg)',
-                                paddingBottom: '1rem',
-                            },
-                            title: { fontSize: 'medium', fontWeight: 500 },
-                        },
-                    },
-                },
-                defaultRadius: 'xs',
-                dir: 'ltr',
-                focusRing: 'auto',
-                focusRingStyles: {
-                    inputStyles: () => ({
-                        border: '1px solid var(--primary-color)',
-                    }),
-                    resetStyles: () => ({ outline: 'none' }),
-                    styles: () => ({
-                        outline: '1px solid var(--primary-color)',
-                        outlineOffset: '-1px',
-                    }),
-                },
-                fontFamily: 'var(--content-font-family)',
-                fontSizes: {
-                    lg: '1.1rem',
-                    md: '1rem',
-                    sm: '0.9rem',
-                    xl: '1.5rem',
-                    xs: '0.8rem',
-                },
-                headings: {
-                    fontFamily: 'var(--content-font-family)',
-                    fontWeight: 700,
-                },
-                other: {},
-                spacing: {
-                    lg: '2rem',
-                    md: '1rem',
-                    sm: '0.5rem',
-                    xl: '4rem',
-                    xs: '0rem',
-                },
-            }}
-            withGlobalStyles
-            withNormalizeCSS
+            defaultColorScheme={mode as 'dark' | 'light'}
+            theme={theme}
         >
+            <Notifications
+                containerWidth="300px"
+                position="bottom-center"
+                zIndex={5}
+            />
             <PlayQueueHandlerContext.Provider value={providerValue}>
                 <ContextMenuProvider>
                     <WebAudioContext.Provider value={webAudioProvider}>

@@ -1,0 +1,27 @@
+.skeleton {
+    @mixin dark {
+        --base-color: lighten(var(--theme-colors-surface), 10%) !important;
+        --highlight-color: lighten(var(--theme-colors-surface), 15%) !important;
+    }
+
+    @mixin light {
+        --base-color: var(--theme-colors-foreground-muted) !important;
+        --highlight-color: darken(var(--theme-colors-foreground-muted), 40%) !important;
+    }
+
+    --animation-duration: 1.5s !important;
+
+    width: 100%;
+    height: 100%;
+}
+
+.skeleton-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.centered {
+    justify-content: center;
+}

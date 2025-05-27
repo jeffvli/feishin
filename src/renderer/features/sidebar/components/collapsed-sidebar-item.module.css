@@ -1,0 +1,68 @@
+.container {
+    position: relative;
+    width: 100%;
+    padding: 0.9rem 0.3rem;
+    color: var(--theme-colors-foreground-muted);
+    cursor: pointer;
+
+    &:focus-visible {
+        outline: none;
+    }
+
+    svg {
+        fill: var(--theme-colors-foreground-muted);
+    }
+
+    &:hover {
+        color: var(--theme-colors-foreground);
+
+        svg {
+            fill: var(--theme-colors-foreground);
+        }
+    }
+}
+
+.container.active {
+    svg {
+        fill: var(--theme-colors-primary-filled);
+    }
+}
+
+.container.disabled {
+    pointer-events: none;
+    cursor: default;
+    user-select: none;
+    opacity: 0.6;
+
+    &:hover {
+        div {
+            color: var(--theme-colors-foreground) !important;
+        }
+
+        svg {
+            fill: var(--theme-colors-primary-filled);
+        }
+    }
+}
+
+.text-wrapper {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    white-space: pre-line;
+}
+
+.text-wrapper.active {
+    color: var(--theme-colors-foreground);
+}
+
+.active-tab-indicator {
+    position: absolute;
+    inset: 0 0 0 3px;
+    width: 2px;
+    height: 80%;
+    margin-top: auto;
+    margin-bottom: auto;
+    background: var(--theme-colors-primary-filled);
+}

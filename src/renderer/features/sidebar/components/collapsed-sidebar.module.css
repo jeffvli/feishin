@@ -1,0 +1,13 @@
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: calc(100vh - 119px);
+    user-select: none;
+    background: var(--theme-colors-background-alternate);
+}
+
+.sidebar-container.web,
+.sidebar-container.linux {
+    max-height: calc(100vh - 149px);
+}

@@ -1,0 +1,44 @@
+input[cmdk-input] {
+    width: 100%;
+    font-size: var(--theme-font-size-md);
+    border: none;
+    border-radius: var(--theme-radius-sm);
+}
+
+[cmdk-group-heading] {
+    margin: var(--theme-spacing-md) 0;
+    font-size: var(--theme-font-size-sm);
+    opacity: 0.8;
+}
+
+[cmdk-group-items] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-xs);
+}
+
+[cmdk-item] {
+    display: flex;
+    gap: var(--theme-spacing-sm);
+    align-items: center;
+    padding: var(--theme-spacing-sm);
+    font-size: var(--theme-font-size-md);
+    color: var(--theme-colors-foreground);
+    cursor: pointer;
+    border-radius: var(--theme-radius-sm);
+
+    svg {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+
+    &[data-selected] {
+        background: var(--theme-colors-surface);
+    }
+}
+
+[cmdk-separator] {
+    height: 1px;
+    margin: 0 0 var(--theme-spacing-sm);
+    background: var(--theme-colors-border);
+}

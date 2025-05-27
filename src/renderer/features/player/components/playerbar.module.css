@@ -1,0 +1,40 @@
+.container {
+    width: 100vw;
+    height: 100%;
+    border-top: var(--theme-colors-border);
+}
+
+.controls-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1rem;
+    height: 100%;
+
+    @media (width < 768px) {
+        grid-template-columns: minmax(0, 0.5fr) minmax(0, 1fr) minmax(0, 0.5fr);
+    }
+}
+
+.right-grid-item {
+    align-self: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.left-grid-item {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.center-grid-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}

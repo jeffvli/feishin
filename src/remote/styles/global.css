@@ -1,0 +1,112 @@
+@import url('../../renderer/styles/ag-grid.css');
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+body,
+html {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--theme-content-font-family);
+    font-size: var(--theme-root-font-size);
+    color: var(--theme-content-text-color);
+    user-select: none;
+    background: var(--theme-content-bg);
+}
+
+@media only screen and (width < 640px) {
+    body,
+    html {
+        overflow-x: auto;
+    }
+}
+
+#app {
+    height: inherit;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    text-rendering: optimizelegibility;
+    -webkit-tap-highlight-color: rgb(0 0 0 / 0%);
+    text-size-adjust: none;
+    outline: none;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+/* ::-webkit-scrollbar-corner {
+    background: var(--theme-scrollbar-track-background);
+}
+
+::-webkit-scrollbar-track {
+    background: var(--theme-scrollbar-track-background);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--theme-scrollbar-handle-background);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-scrollbar-handle-hover-background);
+} */
+
+a {
+    text-decoration: none;
+}
+
+button {
+    -webkit-app-region: no-drag;
+}
+
+.overlay-scrollbar {
+    overflow: auto !important;
+}
+
+.hide-scrollbar {
+    scrollbar-color: transparent transparent;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+        width: 1px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: transparent;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}

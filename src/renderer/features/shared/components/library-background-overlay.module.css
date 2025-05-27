@@ -1,0 +1,11 @@
+.root {
+    position: absolute;
+    z-index: -1;
+    width: 100%;
+    height: 20vh;
+    min-height: 200px;
+    pointer-events: none;
+    user-select: none;
+    background-image: var(--theme-overlay-subheader);
+    opacity: 0.3;
+}

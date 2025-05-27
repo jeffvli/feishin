@@ -2,8 +2,8 @@ import { debounce } from 'lodash';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { api } from '/@/renderer/api';
-import { toast } from '/@/renderer/components';
 import { useCurrentServer } from '/@/renderer/store';
+import { toast } from '/@/shared/components/toast/toast';
 import { SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { AuthState, ServerListItem, ServerType } from '/@/shared/types/types';
 

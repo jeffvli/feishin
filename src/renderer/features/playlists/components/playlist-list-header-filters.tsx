@@ -1,7 +1,6 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { IDatasource } from '@ag-grid-community/core';
-import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,21 +9,35 @@ import { RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { PLAYLIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
 import { OrderToggleButton } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { PlaylistListFilter, useCurrentServer, useListStoreActions } from '/@/renderer/store';
+import {
+    PersistedTableColumn,
+    PlaylistListFilter,
+    useCurrentServer,
+    useListStoreActions,
+} from '/@/renderer/store';
 import { useListStoreByKey } from '/@/renderer/store/list.store';
+import { Button } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
+import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
+import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
+import { Slider } from '/@/shared/components/slider/slider';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
 import {
     LibraryItem,
     PlaylistListQuery,
     PlaylistListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { ListDisplayType, TableColumn } from '/@/shared/types/types';
+import { ListDisplayType } from '/@/shared/types/types';
 
 const FILTERS = {
     jellyfin: [
@@ -274,7 +287,7 @@ export const PlaylistListHeaderFilters = ({
         [pageKey, setDisplayType],
     );
 
-    const handleTableColumns = (values: TableColumn[]) => {
+    const handleTableColumns = (values: string[]) => {
         const existingColumns = table.columns;
 
         if (values.length === 0) {
@@ -286,7 +299,10 @@ export const PlaylistListHeaderFilters = ({
 
         // If adding a column
         if (values.length > existingColumns.length) {
-            const newColumn = { column: values[values.length - 1], width: 100 };
+            const newColumn = {
+                column: values[values.length - 1],
+                width: 100,
+            } as PersistedTableColumn;
 
             return setTable({ data: { columns: [...existingColumns, newColumn] }, key: pageKey });
         }
@@ -326,16 +342,15 @@ export const PlaylistListHeaderFilters = ({
     return (
         <Flex justify="space-between">
             <Group
+                gap="sm"
                 ref={cq.ref}
-                spacing="sm"
                 w="100%"
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             {sortByLabel}
@@ -344,7 +359,7 @@ export const PlaylistListHeaderFilters = ({
                     <DropdownMenu.Dropdown>
                         {FILTERS[server?.type as keyof typeof FILTERS].map((f) => (
                             <DropdownMenu.Item
-                                $isActive={f.value === filter.sortBy}
+                                isActive={f.value === filter.sortBy}
                                 key={`filter-${f.name}`}
                                 onClick={handleSetSortBy}
                                 value={f.value}
@@ -361,29 +376,27 @@ export const PlaylistListHeaderFilters = ({
                 />
                 <Divider orientation="vertical" />
                 <Button
-                    compact
                     onClick={handleRefresh}
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                 >
-                    <RiRefreshLine size="1.3rem" />
+                    <RiRefreshLine />
                 </Button>
                 <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
-                            <RiMoreFill size="1.3rem" />
+                            <RiMoreFill />
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiRefreshLine />}
+                            leftSection={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
                             {t('common.refresh', { postProcess: 'titleCase' })}
@@ -398,11 +411,10 @@ export const PlaylistListHeaderFilters = ({
                 >
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
-                            <RiSettings3Fill size="1.3rem" />
+                            <RiSettings3Fill />
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
@@ -410,33 +422,26 @@ export const PlaylistListHeaderFilters = ({
                             {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Label>
                         <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.CARD}
+                            isActive={display === ListDisplayType.CARD}
                             onClick={handleSetViewType}
                             value={ListDisplayType.CARD}
                         >
                             {t('table.config.view.card', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.POSTER}
+                            isActive={display === ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                             value={ListDisplayType.POSTER}
                         >
                             {t('table.config.view.poster', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.TABLE}
+                            isActive={display === ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                             value={ListDisplayType.TABLE}
                         >
                             {t('table.config.view.table', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
-                        {/* <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.TABLE_PAGINATED}
-                            value={ListDisplayType.TABLE_PAGINATED}
-                            onClick={handleSetViewType}
-                        >
-                            Table (paginated)
-                        </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
                         <DropdownMenu.Label>
                             {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
@@ -476,7 +481,7 @@ export const PlaylistListHeaderFilters = ({
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
                                     <Stack>
                                         <MultiSelect
@@ -488,7 +493,7 @@ export const PlaylistListHeaderFilters = ({
                                             onChange={handleTableColumns}
                                             width={300}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>
                                                 {t('table.config.general.autoFitColumns', {
                                                     postProcess: 'titleCase',

@@ -1,4 +1,3 @@
-import { Stack } from '@mantine/core';
 import isElectron from 'is-electron';
 import { lazy, Suspense, useMemo } from 'react';
 
@@ -7,6 +6,7 @@ import { LyricSettings } from '/@/renderer/features/settings/components/playback
 import { ScrobbleSettings } from '/@/renderer/features/settings/components/playback/scrobble-settings';
 import { TranscodeSettings } from '/@/renderer/features/settings/components/playback/transcode-settings';
 import { useSettingsStore } from '/@/renderer/store';
+import { Stack } from '/@/shared/components/stack/stack';
 import { PlaybackType } from '/@/shared/types/types';
 
 const MpvSettings = lazy(() =>
@@ -27,7 +27,7 @@ export const PlaybackTab = () => {
     }, [audioType, useWebAudio]);
 
     return (
-        <Stack spacing="md">
+        <Stack gap="md">
             <AudioSettings hasFancyAudio={hasFancyAudio} />
             <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
             <TranscodeSettings />

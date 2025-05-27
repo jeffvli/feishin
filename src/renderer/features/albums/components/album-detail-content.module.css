@@ -1,0 +1,12 @@
+.content-container {
+    position: relative;
+    z-index: 0;
+}
+
+.detail-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1rem 2rem 5rem;
+    overflow: hidden;
+}

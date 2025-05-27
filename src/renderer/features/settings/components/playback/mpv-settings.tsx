@@ -1,18 +1,8 @@
-import { Group, Stack } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiCloseLine, RiRestartLine } from 'react-icons/ri';
 
-import {
-    Button,
-    NumberInput,
-    Select,
-    Switch,
-    Text,
-    Textarea,
-    TextInput,
-} from '/@/renderer/components';
 import {
     SettingOption,
     SettingsSection,
@@ -24,6 +14,15 @@ import {
     useSettingsStore,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
+import { Button } from '/@/shared/components/button/button';
+import { Group } from '/@/shared/components/group/group';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Select } from '/@/shared/components/select/select';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Text } from '/@/shared/components/text/text';
+import { Textarea } from '/@/shared/components/textarea/textarea';
 import { PlaybackType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
@@ -157,7 +156,7 @@ export const MpvSettings = () => {
     const options: SettingOption[] = [
         {
             control: (
-                <Group spacing="sm">
+                <Group gap="sm">
                     <Button
                         onClick={handleReloadMpv}
                         tooltip={{
@@ -173,8 +172,8 @@ export const MpvSettings = () => {
                         rightSection={
                             mpvPath && (
                                 <Button
-                                    compact
                                     onClick={() => handleSetMpvPath(true)}
+                                    size="compact-md"
                                     tooltip={{
                                         label: t('common.clear', { postProcess: 'titleCase' }),
                                         openDelay: 0,
@@ -201,7 +200,7 @@ export const MpvSettings = () => {
         },
         {
             control: (
-                <Stack spacing="xs">
+                <Stack gap="xs">
                     <Textarea
                         autosize
                         defaultValue={settings.mpvExtraParameters.join('\n')}
@@ -218,10 +217,10 @@ export const MpvSettings = () => {
                 </Stack>
             ),
             description: (
-                <Stack spacing={0}>
+                <Stack gap={0}>
                     <Text
-                        $noSelect
-                        $secondary
+                        isMuted
+                        isNoSelect
                         size="sm"
                     >
                         {t('setting.mpvExtraParameters', {
@@ -288,7 +287,7 @@ export const MpvSettings = () => {
                         handleSetMpvProperty('audioSampleRateHz', value >= 8000 ? value : value);
                     }}
                     placeholder="48000"
-                    rightSection="Hz"
+                    rightSection={<Text size="xs">Hz</Text>}
                     width={100}
                 />
             ),

@@ -1,4 +1,3 @@
-import { Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
@@ -10,9 +9,16 @@ import { RiInformationLine } from 'react-icons/ri';
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { Button, Checkbox, PasswordInput, TextInput, toast, Tooltip } from '/@/renderer/components';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useAuthStoreActions } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Checkbox } from '/@/shared/components/checkbox/checkbox';
+import { Group } from '/@/shared/components/group/group';
+import { PasswordInput } from '/@/shared/components/password-input/password-input';
+import { Stack } from '/@/shared/components/stack/stack';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { toast } from '/@/shared/components/toast/toast';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { AuthenticationResponse, ServerListItem, ServerType } from '/@/shared/types/domain-types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
@@ -185,7 +191,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                         })}
                     />
                 )}
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button
                         onClick={onCancel}
                         variant="subtle"

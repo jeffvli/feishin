@@ -1,0 +1,5 @@
+.root {
+    color: var(--theme-colors-surface-foreground);
+    background: var(--theme-colors-surface);
+    box-shadow: 2px 2px 10px 2px rgb(0 0 0 / 40%);
+}

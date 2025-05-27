@@ -19,10 +19,10 @@ import {
     crossfadeHandler,
     gaplessHandler,
 } from '/@/renderer/components/audio-player/utils/list-handlers';
-import { toast } from '/@/renderer/components/toast';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import { getServerById, TranscodingConfig, usePlaybackSettings, useSpeed } from '/@/renderer/store';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import { toast } from '/@/shared/components/toast/toast';
 import { PlaybackStyle, PlayerStatus } from '/@/shared/types/types';
 
 export type AudioPlayerProgress = {

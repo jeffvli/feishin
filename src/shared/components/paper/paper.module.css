@@ -1,0 +1,4 @@
+.root {
+    color: var(--theme-colors-surface-foreground);
+    background: var(--theme-colors-surface);
+}

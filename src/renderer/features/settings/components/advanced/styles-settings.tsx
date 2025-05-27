@@ -1,12 +1,16 @@
-import { Code } from '@mantine/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Button, ConfirmModal, Switch, Text, Textarea } from '/@/renderer/components';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 import { useCssSettings, useSettingsStoreActions } from '/@/renderer/store';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
+import { Button } from '/@/shared/components/button/button';
+import { Code } from '/@/shared/components/code/code';
+import { ConfirmModal } from '/@/shared/components/modal/modal';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
+import { Textarea } from '/@/shared/components/textarea/textarea';
 
 export const StylesSettings = () => {
     const [open, setOpen] = useState(false);
@@ -82,8 +86,8 @@ export const StylesSettings = () => {
                             <>
                                 {open && (
                                     <Button
-                                        compact
                                         onClick={handleSave}
+                                        size="compact-md"
                                         // disabled={isSaveButtonDisabled}
                                         variant="filled"
                                     >
@@ -91,8 +95,8 @@ export const StylesSettings = () => {
                                     </Button>
                                 )}
                                 <Button
-                                    compact
                                     onClick={() => setOpen(!open)}
+                                    size="compact-md"
                                     variant="filled"
                                 >
                                     {t(open ? 'common.close' : 'common.edit', {

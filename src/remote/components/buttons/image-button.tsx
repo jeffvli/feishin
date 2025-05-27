@@ -12,7 +12,9 @@ export const ImageButton = () => {
             mr={5}
             onClick={() => toggleImage()}
             size="xl"
-            tooltip={showImage ? 'Hide Image' : 'Show Image'}
+            tooltip={{
+                label: showImage ? 'Hide Image' : 'Show Image',
+            }}
             variant="default"
         >
             {showImage ? <CiImageOff size={30} /> : <CiImageOn size={30} />}

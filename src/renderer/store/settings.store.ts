@@ -3,17 +3,17 @@ import type { ContextMenuItemType } from '/@/renderer/features/context-menu';
 import { ColDef } from '@ag-grid-community/core';
 import isElectron from 'is-electron';
 import { generatePath } from 'react-router';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 import i18n from '/@/i18n/i18n';
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayerStore } from '/@/renderer/store/player.store';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
 import { randomString } from '/@/renderer/utils';
-import { AppTheme } from '/@/shared/types/domain-types';
+import { AppTheme } from '/@/shared/themes/app-theme-types';
 import { LibraryItem, LyricSource } from '/@/shared/types/domain-types';
 import {
     CrossfadeStyle,
@@ -659,7 +659,7 @@ const initialState: SettingsState = {
     },
 };
 
-export const useSettingsStore = create<SettingsSlice>()(
+export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
     persist(
         devtools(
             immer((set, get) => ({

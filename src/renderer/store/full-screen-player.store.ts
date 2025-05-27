@@ -1,7 +1,7 @@
 import merge from 'lodash/merge';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 export interface FullScreenPlayerSlice extends FullScreenPlayerState {
     actions: {
@@ -19,7 +19,7 @@ interface FullScreenPlayerState {
     useImageAspectRatio: boolean;
 }
 
-export const useFullScreenPlayerStore = create<FullScreenPlayerSlice>()(
+export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSlice>()(
     persist(
         devtools(
             immer((set, get) => ({

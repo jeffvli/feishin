@@ -1,12 +1,9 @@
-import { ActionIcon, Group, Kbd, ScrollArea } from '@mantine/core';
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import { Fragment, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiCloseFill, RiSearchLine } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router';
-import styled from 'styled-components';
 
-import { Button, Modal, Paper, Spinner, TextInput } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { GoToCommands } from '/@/renderer/features/search/components/go-to-commands';
@@ -16,17 +13,19 @@ import { ServerCommands } from '/@/renderer/features/search/components/server-co
 import { useSearch } from '/@/renderer/features/search/queries/search-query';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Button } from '/@/shared/components/button/button';
+import { Group } from '/@/shared/components/group/group';
+import { Kbd } from '/@/shared/components/kbd/kbd';
+import { Modal } from '/@/shared/components/modal/modal';
+import { Paper } from '/@/shared/components/paper/paper';
+import { Spinner } from '/@/shared/components/spinner/spinner';
+import { TextInput } from '/@/shared/components/text-input/text-input';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface CommandPaletteProps {
     modalProps: (typeof useDisclosure)['arguments'];
 }
-
-const CustomModal = styled(Modal)`
-    & .mantine-Modal-header {
-        display: none;
-    }
-`;
 
 export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
     const navigate = useNavigate();
@@ -69,7 +68,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
     const handlePlayQueueAdd = usePlayQueueAdd();
 
     return (
-        <CustomModal
+        <Modal
             {...modalProps}
             centered
             handlers={{
@@ -91,19 +90,21 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                     }
                 },
             }}
-            scrollAreaComponent={ScrollArea.Autosize}
             size="lg"
+            styles={{
+                header: { display: 'none' },
+            }}
         >
             <Group
+                gap="sm"
                 mb="1rem"
-                spacing="sm"
             >
                 {pages.map((page, index) => (
                     <Fragment key={page}>
                         {index > 0 && ' > '}
                         <Button
-                            compact
                             disabled
+                            size="compact-md"
                             variant="default"
                         >
                             {page?.toLocaleUpperCase()}
@@ -123,20 +124,23 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
             >
                 <TextInput
                     data-autofocus
-                    icon={<RiSearchLine />}
+                    leftSection={<RiSearchLine />}
                     onChange={(e) => setQuery(e.currentTarget.value)}
                     ref={searchInputRef}
                     rightSection={
-                        <ActionIcon
-                            onClick={() => {
-                                setQuery('');
-                                searchInputRef.current?.focus();
-                            }}
-                        >
-                            <RiCloseFill />
-                        </ActionIcon>
+                        query && (
+                            <ActionIcon
+                                onClick={() => {
+                                    setQuery('');
+                                    searchInputRef.current?.focus();
+                                }}
+                                variant="transparent"
+                            >
+                                <RiCloseFill />
+                            </ActionIcon>
+                        )
                     }
-                    size="lg"
+                    size="sm"
                     value={query}
                 />
                 <Command.Separator />
@@ -267,11 +271,11 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                 mt="0.5rem"
                 p="0.5rem"
             >
-                <Group position="apart">
+                <Group justify="space-between">
                     <Command.Loading>
                         {isHome && isLoading && query !== '' && <Spinner />}
                     </Command.Loading>
-                    <Group spacing="sm">
+                    <Group gap="sm">
                         <Kbd size="md">ESC</Kbd>
                         <Kbd size="md">↑</Kbd>
                         <Kbd size="md">↓</Kbd>
@@ -279,6 +283,6 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                     </Group>
                 </Group>
             </Paper>
-        </CustomModal>
+        </Modal>
     );
 };

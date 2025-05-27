@@ -47,7 +47,7 @@ const config: UserConfig = {
     renderer: {
         css: {
             modules: {
-                generateScopedName: '[name]__[local]__[hash:base64:5]',
+                generateScopedName: 'fs-[name]-[local]',
                 localsConvention: 'camelCase',
             },
         },

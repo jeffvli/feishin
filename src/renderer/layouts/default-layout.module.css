@@ -1,0 +1,20 @@
+.layout {
+    display: grid;
+    grid-template-areas:
+        'window-bar'
+        'main-content'
+        'player';
+    grid-template-rows: 0 calc(100vh - 90px) 90px;
+    grid-template-columns: 1fr;
+    gap: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.windows {
+    grid-template-rows: 30px calc(100vh - 120px) 90px;
+}
+
+.macos {
+    grid-template-rows: 30px calc(100vh - 120px) 90px;
+}

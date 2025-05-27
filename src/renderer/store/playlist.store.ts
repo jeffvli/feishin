@@ -1,6 +1,6 @@
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 import { PlaylistListFilter, SongListFilter } from '/@/renderer/store/list.store';
 import { DataTableProps } from '/@/renderer/store/settings.store';
@@ -58,7 +58,7 @@ type TableProps = DataTableProps & {
     scrollOffset: number;
 };
 
-export const usePlaylistStore = create<PlaylistSlice>()(
+export const usePlaylistStore = createWithEqualityFn<PlaylistSlice>()(
     persist(
         devtools(
             immer((set, get) => ({

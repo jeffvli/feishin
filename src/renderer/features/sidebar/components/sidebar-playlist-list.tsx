@@ -1,4 +1,3 @@
-import { Box, Flex, Group } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +14,6 @@ import { Link } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 
-import { Button, Text } from '/@/renderer/components';
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { PLAYLIST_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
@@ -23,6 +21,10 @@ import { usePlaylistList } from '/@/renderer/features/playlists';
 import { useHideScrollbar } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
+import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, Playlist, PlaylistListSort, SortOrder } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
@@ -34,15 +36,12 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
 
         return (
             <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
-                <Box
-                    fw="600"
-                    sx={{ fontSize: '1.2rem' }}
-                >
+                <div style={{ fontSize: '1.2rem', fontWeight: '600' }}>
                     <Group>
                         <Text>{t('page.sidebar.shared', { postProcess: 'titleCase' })}</Text>
                         <Button
-                            compact
                             onClick={() => setCollapse()}
+                            size="compact-md"
                             tooltip={{
                                 label: t(collapse ? 'common.expand' : 'common.collapse', {
                                     postProcess: 'titleCase',
@@ -58,7 +57,7 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
                             )}
                         </Button>
                     </Group>
-                </Box>
+                </div>
             </div>
         );
     }
@@ -88,27 +87,27 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
         >
             <Group
                 className="sidebar-playlist-item"
-                noWrap
+                justify="space-between"
                 pos="relative"
-                position="apart"
-                sx={{
+                style={{
                     '&:hover': {
                         '.sidebar-playlist-controls': {
                             display: 'flex',
                         },
                         '.sidebar-playlist-name': {
-                            color: 'var(--sidebar-fg-hover) !important',
+                            color: 'var(--theme-colors-foreground) !important',
                         },
                     },
                 }}
+                wrap="nowrap"
             >
                 <Text
-                    className="sidebar-playlist-name"
+                    // className="sidebar-playlist-name"
                     component={Link}
                     overflow="hidden"
                     size="md"
-                    sx={{
-                        color: 'var(--sidebar-fg) !important',
+                    style={{
+                        color: 'white',
                         cursor: 'default',
                         width: '100%',
                     }}
@@ -119,18 +118,17 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
                 <Group
                     className="sidebar-playlist-controls"
                     display="none"
-                    noWrap
+                    gap="sm"
                     pos="absolute"
                     right="0"
-                    spacing="sm"
+                    wrap="nowrap"
                 >
                     <Button
-                        compact
                         onClick={() => {
                             if (!data?.items?.[index].id) return;
                             data.handlePlay(data?.items[index].id, Play.NOW);
                         }}
-                        size="md"
+                        size="compact-md"
                         tooltip={{
                             label: t('player.play', { postProcess: 'sentenceCase' }),
                             openDelay: 500,
@@ -140,7 +138,6 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
                         <RiPlayFill />
                     </Button>
                     <Button
-                        compact
                         onClick={() => {
                             if (!data?.items?.[index].id) return;
                             data.handlePlay(data?.items[index].id, Play.SHUFFLE);
@@ -155,12 +152,11 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
                         <RiShuffleFill />
                     </Button>
                     <Button
-                        compact
                         onClick={() => {
                             if (!data?.items?.[index].id) return;
                             data.handlePlay(data?.items[index].id, Play.LAST);
                         }}
-                        size="md"
+                        size="compact-md"
                         tooltip={{
                             label: t('player.addLast', { postProcess: 'sentenceCase' }),
                             openDelay: 500,
@@ -170,12 +166,11 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
                         <RiAddBoxFill />
                     </Button>
                     <Button
-                        compact
                         onClick={() => {
                             if (!data?.items?.[index].id) return;
                             data.handlePlay(data?.items[index].id, Play.NEXT);
                         }}
-                        size="md"
+                        size="compact-md"
                         tooltip={{
                             label: t('player.addNext', { postProcess: 'sentenceCase' }),
                             openDelay: 500,

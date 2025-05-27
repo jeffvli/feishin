@@ -1,9 +1,12 @@
-import { Center, Group, Stack } from '@mantine/core';
 import { RiQuestionLine } from 'react-icons/ri';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Button, Text } from '/@/renderer/components';
 import { AnimatedPage } from '/@/renderer/features/shared';
+import { Button } from '/@/shared/components/button/button';
+import { Center } from '/@/shared/components/center/center';
+import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
 
 const InvalidRoute = () => {
     const navigate = useNavigate();
@@ -11,14 +14,14 @@ const InvalidRoute = () => {
 
     return (
         <AnimatedPage>
-            <Center sx={{ height: '100%', width: '100%' }}>
+            <Center style={{ height: '100%', width: '100%' }}>
                 <Stack>
                     <Group
-                        noWrap
-                        position="center"
+                        justify="center"
+                        wrap="nowrap"
                     >
                         <RiQuestionLine
-                            color="var(--warning-color)"
+                            color="var(--theme-colors-state-warning)"
                             size={30}
                         />
                         <Text size="xl">Page not found</Text>

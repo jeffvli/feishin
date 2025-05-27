@@ -1,5 +1,5 @@
-import { toast } from '/@/renderer/components';
 import { useAuthStore } from '/@/renderer/store';
+import { toast } from '/@/shared/components/toast/toast';
 import { ServerListItem } from '/@/shared/types/types';
 
 export const authenticationFailure = (currentServer: null | ServerListItem) => {

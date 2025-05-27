@@ -7,7 +7,7 @@ import type {
 
 import { QueryCache, QueryClient } from '@tanstack/react-query';
 
-import { toast } from '/@/renderer/components/toast/index';
+import { toast } from '/@/shared/components/toast/toast';
 
 const queryCache = new QueryCache({
     onError: (error: any, query) => {

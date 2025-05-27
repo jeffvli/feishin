@@ -5,7 +5,6 @@ import { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { toast } from '/@/renderer/components/toast/index';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
 import {
@@ -20,6 +19,7 @@ import {
 import { useCurrentServer, usePlayerControls, usePlayerStore } from '/@/renderer/store';
 import { useGeneralSettings, usePlaybackType } from '/@/renderer/store/settings.store';
 import { setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
+import { toast } from '/@/shared/components/toast/toast';
 import {
     instanceOfCancellationError,
     LibraryItem,

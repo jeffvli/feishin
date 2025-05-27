@@ -1,0 +1,43 @@
+.sidebar-container {
+    height: 100%;
+    max-height: calc(100vh - 90px);
+    user-select: none;
+    background: var(--theme-colors-background-alternate);
+}
+
+.sidebar-container.web,
+.sidebar-container.linux {
+    max-height: calc(100vh - 160px);
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.image-container {
+    position: relative;
+    height: var(--sidebar-image-height);
+    cursor: pointer;
+    animation: fadein 0.2s ease-in-out;
+
+    button {
+        display: none;
+    }
+
+    &:hover button {
+        display: block;
+    }
+}
+
+.sidebar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--theme-image-fit);
+    background: var(--theme-colors-foreground-muted);
+}

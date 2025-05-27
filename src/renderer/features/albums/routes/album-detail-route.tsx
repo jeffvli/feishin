@@ -3,7 +3,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { useRef } from 'react';
 import { useParams } from 'react-router';
 
-import { NativeScrollArea } from '/@/renderer/components';
+import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
 import { AlbumDetailContent } from '/@/renderer/features/albums/components/album-detail-content';
 import { AlbumDetailHeader } from '/@/renderer/features/albums/components/album-detail-header';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';

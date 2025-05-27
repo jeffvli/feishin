@@ -430,7 +430,7 @@ export const NDSongQueryFields = [
     { label: 'Movement', type: 'string', value: 'movement' },
     { label: 'Movement Name', type: 'string', value: 'movementname' },
     { label: 'Movement Total', type: 'number', value: 'movementtotal' },
-    { label: 'MusicBrainz Artist Id', type: 'string', value: 'musicbrainz_albumartistid' },
+    { label: 'MusicBrainz Artist Id', type: 'string', value: 'musicbrainz_artistid' },
     { label: 'MusicBrainz Album Artist Id', type: 'string', value: 'musicbrainz_albumartistid' },
     { label: 'MusicBrainz Album Id', type: 'string', value: 'musicbrainz_albumid' },
     { label: 'MusicBrainz Disc Id', type: 'string', value: 'musicbrainz_discid' },

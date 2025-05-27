@@ -1,0 +1,17 @@
+.track {
+    height: 0.5rem;
+}
+
+.thumb {
+    background: var(--theme-colors-foreground);
+}
+
+.label {
+    max-width: 200px;
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+    font-size: var(--theme-font-size-md);
+    font-weight: 550;
+    color: var(--theme-colors-surface-foreground);
+    background: var(--theme-colors-surface);
+    box-shadow: 4px 4px 10px 0 rgb(0 0 0 / 20%);
+}

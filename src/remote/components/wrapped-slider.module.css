@@ -1,0 +1,21 @@
+.container {
+    display: flex;
+    width: 95%;
+    height: 20px;
+    margin: 10px 0;
+}
+
+.wrapper {
+    display: flex;
+    flex: 6;
+    align-items: center;
+    height: 100%;
+}
+
+.value-wrapper {
+    display: flex;
+    flex: 1;
+    align-self: flex-end;
+    justify-content: center;
+    max-width: 50px;
+}

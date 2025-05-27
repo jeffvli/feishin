@@ -1,53 +1,29 @@
-import { Button, type ButtonProps as MantineButtonProps, Tooltip } from '@mantine/core';
-import { forwardRef, MouseEvent, ReactNode, Ref } from 'react';
-import styled from 'styled-components';
+import clsx from 'clsx';
+import { forwardRef, ReactNode, Ref } from 'react';
 
-export interface ButtonProps extends StyledButtonProps {
-    tooltip: string;
-}
+import styles from './remote-button.module.css';
 
-interface StyledButtonProps extends MantineButtonProps {
-    $active?: boolean;
+import { Button, ButtonProps } from '/@/shared/components/button/button';
+
+interface RemoteButtonProps extends ButtonProps {
     children: ReactNode;
-    onClick?: (e: MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-    onMouseDown?: (e: MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+    isActive?: boolean;
     ref: Ref<HTMLButtonElement>;
 }
 
-const StyledButton = styled(Button)<StyledButtonProps>`
-    svg {
-        display: flex;
-        fill: ${({ $active: active }) =>
-            active ? 'var(--primary-color)' : 'var(--playerbar-btn-fg)'};
-        stroke: var(--playerbar-btn-fg);
-    }
-
-    &:hover {
-        background: var(--playerbar-btn-bg-hover);
-
-        svg {
-            fill: ${({ $active: active }) =>
-                active
-                    ? 'var(--primary-color) !important'
-                    : 'var(--playerbar-btn-fg-hover) !important'};
-        }
-    }
-`;
-
-export const RemoteButton = forwardRef<HTMLButtonElement, any>(
-    ({ children, tooltip, ...props }: any, ref) => {
+export const RemoteButton = forwardRef<HTMLButtonElement, RemoteButtonProps>(
+    ({ children, isActive, tooltip, ...props }, ref) => {
         return (
-            <Tooltip
-                label={tooltip}
-                withinPortal
+            <Button
+                className={clsx(styles.button, {
+                    [styles.active]: isActive,
+                })}
+                tooltip={tooltip}
+                {...props}
+                ref={ref}
             >
-                <StyledButton
-                    {...props}
-                    ref={ref}
-                >
-                    {children}
-                </StyledButton>
-            </Tooltip>
+                {children}
+            </Button>
         );
     },
 );

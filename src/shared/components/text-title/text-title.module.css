@@ -1,0 +1,27 @@
+.root {
+    color: var(--theme-colors-foreground);
+    transition: color 0.2s ease-in-out;
+}
+
+.muted {
+    color: var(--theme-colors-foreground-muted);
+}
+
+.link {
+    cursor: pointer;
+}
+
+.link:hover {
+    color: var(--theme-colors-foreground);
+    text-decoration: underline;
+}
+
+.no-select {
+    user-select: none;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

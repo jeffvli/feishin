@@ -5,7 +5,7 @@ import { ListOnScrollProps } from 'react-window';
 
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { PLAYLIST_CARD_ROWS } from '/@/renderer/components';
+import { PLAYLIST_CARD_ROWS } from '/@/renderer/components/card/card-rows';
 import {
     VirtualGridAutoSizerContainer,
     VirtualInfiniteGrid,

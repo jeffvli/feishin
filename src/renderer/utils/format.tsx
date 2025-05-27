@@ -5,7 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import utc from 'dayjs/plugin/utc';
 import formatDuration from 'format-duration';
 
-import { Rating } from '/@/renderer/components/rating';
+import { Rating } from '/@/shared/components/rating/rating';
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);

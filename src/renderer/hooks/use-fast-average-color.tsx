@@ -36,7 +36,7 @@ export const useFastAverageColor = (args: {
                 });
         } else if (srcLoaded) {
             idRef.current = id;
-            return setBackground('var(--placeholder-bg)');
+            return setBackground('var(--theme-colors-foreground-muted)');
         }
 
         return () => {

@@ -2,8 +2,8 @@ import i18n from '/@/i18n/i18n';
 import { JellyfinController } from '/@/renderer/api/jellyfin/jellyfin-controller';
 import { NavidromeController } from '/@/renderer/api/navidrome/navidrome-controller';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
-import { toast } from '/@/renderer/components/toast/index';
 import { useAuthStore } from '/@/renderer/store';
+import { toast } from '/@/shared/components/toast/toast';
 import {
     AuthenticationResponse,
     ControllerEndpoint,

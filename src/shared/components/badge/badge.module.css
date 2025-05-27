@@ -1,0 +1,11 @@
+.root[data-variant='filled'] {
+    background-color: var(--theme-colors-primary-filled);
+}
+
+.root[data-variant='outline'] {
+    background-color: transparent;
+}
+
+.root {
+    font-weight: 500;
+}

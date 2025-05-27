@@ -1,0 +1,9 @@
+.virtual-grid-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.virtual-grid-auto-sizer-container {
+    flex: 1;
+}

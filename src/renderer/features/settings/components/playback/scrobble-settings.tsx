@@ -1,11 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
-import { NumberInput, Slider, Switch } from '/@/renderer/components';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Slider } from '/@/shared/components/slider/slider';
+import { Switch } from '/@/shared/components/switch/switch';
 
 export const ScrobbleSettings = () => {
     const { t } = useTranslation();
@@ -79,7 +81,7 @@ export const ScrobbleSettings = () => {
                                 ...settings,
                                 scrobble: {
                                     ...settings.scrobble,
-                                    scrobbleAtDuration: e,
+                                    scrobbleAtDuration: Number(e),
                                 },
                             },
                         });

@@ -10,7 +10,8 @@ import type { FixedSizeListProps } from 'react-window';
 import debounce from 'lodash/debounce';
 import memoize from 'memoize-one';
 import { FixedSizeList } from 'react-window';
-import styled from 'styled-components';
+
+import styles from './virtual-grid-wrapper.module.css';
 
 import { GridCard } from '/@/renderer/components/virtual-grid/grid-card';
 import { Album, AlbumArtist, Artist, LibraryItem } from '/@/shared/types/domain-types';
@@ -128,12 +129,14 @@ export const VirtualGridWrapper = ({
     );
 };
 
-export const VirtualGridContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-`;
+interface VirtualGridContainerProps {
+    children: React.ReactNode;
+}
 
-export const VirtualGridAutoSizerContainer = styled.div`
-    flex: 1;
-`;
+export const VirtualGridContainer = ({ children }: VirtualGridContainerProps) => {
+    return <div className={styles.virtualGridContainer}>{children}</div>;
+};
+
+export const VirtualGridAutoSizerContainer = ({ children }: VirtualGridContainerProps) => {
+    return <div className={styles.virtualGridAutoSizerContainer}>{children}</div>;
+};

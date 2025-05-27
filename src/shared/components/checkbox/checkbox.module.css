@@ -1,0 +1,9 @@
+.input {
+    background: var(--theme-colors-surface);
+    border: 1px solid transparent;
+}
+
+.input:disabled {
+    border: 1px solid var(--theme-colors-border);
+    opacity: 0.6;
+}

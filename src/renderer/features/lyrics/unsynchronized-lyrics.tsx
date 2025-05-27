@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import styled from 'styled-components';
+
+import styles from './unsynchronized-lyrics.module.css';
 
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import { useLyricsSettings } from '/@/renderer/store';
@@ -9,37 +10,6 @@ export interface UnsynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyr
     lyrics: string;
     translatedLyrics?: null | string;
 }
-
-const UnsynchronizedLyricsContainer = styled.div<{ $gap: number }>`
-    display: flex;
-    flex-direction: column;
-    gap: ${(props) => props.$gap || 5}px;
-    width: 100%;
-    height: 100%;
-    padding: 10vh 0 6vh;
-    overflow: scroll;
-
-    -webkit-mask-image: linear-gradient(
-        180deg,
-        transparent 5%,
-        rgb(0 0 0 / 100%) 20%,
-        rgb(0 0 0 / 100%) 85%,
-        transparent 95%
-    );
-
-    mask-image: linear-gradient(
-        180deg,
-        transparent 5%,
-        rgb(0 0 0 / 100%) 20%,
-        rgb(0 0 0 / 100%) 85%,
-        transparent 95%
-    );
-    transform: translateY(-2rem);
-
-    @media screen and (orientation: portrait) {
-        padding: 5vh 0;
-    }
-`;
 
 export const UnsynchronizedLyrics = ({
     artist,
@@ -59,9 +29,9 @@ export const UnsynchronizedLyrics = ({
     }, [translatedLyrics]);
 
     return (
-        <UnsynchronizedLyricsContainer
-            $gap={settings.gapUnsync}
-            className="unsynchronized-lyrics"
+        <div
+            className={styles.container}
+            style={{ gap: `${settings.gapUnsync}px` }}
         >
             {settings.showProvider && source && (
                 <LyricLine
@@ -98,6 +68,6 @@ export const UnsynchronizedLyrics = ({
                     )}
                 </div>
             ))}
-        </UnsynchronizedLyricsContainer>
+        </div>
     );
 };

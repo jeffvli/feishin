@@ -1,10 +1,13 @@
-import { Flex, Group, Stack } from '@mantine/core';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
-export const MotionFlex = motion(Flex);
+import { Flex, FlexProps } from '/@/shared/components/flex/flex';
+import { Group, GroupProps } from '/@/shared/components/group/group';
+import { Stack, StackProps } from '/@/shared/components/stack/stack';
 
-export const MotionGroup = motion(Group);
+export const MotionFlex = motion.create<FlexProps>(Flex, { forwardMotionProps: true });
 
-export const MotionStack = motion(Stack);
+export const MotionGroup = motion.create<GroupProps>(Group, { forwardMotionProps: true });
+
+export const MotionStack = motion.create<StackProps>(Stack, { forwardMotionProps: true });
 
 export const MotionDiv = motion.div;

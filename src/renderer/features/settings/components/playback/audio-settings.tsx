@@ -1,9 +1,7 @@
-import { SelectItem } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Select, Slider, Switch, toast } from '/@/renderer/components';
 import {
     SettingOption,
     SettingsSection,
@@ -11,6 +9,10 @@ import {
 import { useCurrentStatus, usePlayerStore } from '/@/renderer/store';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { setQueue } from '/@/renderer/utils/set-transcoded-queue-data';
+import { Select } from '/@/shared/components/select/select';
+import { Slider } from '/@/shared/components/slider/slider';
+import { Switch } from '/@/shared/components/switch/switch';
+import { toast } from '/@/shared/components/toast/toast';
 import { CrossfadeStyle, PlaybackStyle, PlaybackType, PlayerStatus } from '/@/shared/types/types';
 
 const getAudioDevice = async () => {
@@ -24,7 +26,7 @@ export const AudioSettings = ({ hasFancyAudio }: { hasFancyAudio: boolean }) => 
     const { setSettings } = useSettingsStoreActions();
     const status = useCurrentStatus();
 
-    const [audioDevices, setAudioDevices] = useState<SelectItem[]>([]);
+    const [audioDevices, setAudioDevices] = useState<{ label: string; value: string }[]>([]);
 
     useEffect(() => {
         const getAudioDevices = () => {

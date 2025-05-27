@@ -1,4 +1,4 @@
-import { useInView } from 'framer-motion';
+import { useInView } from 'motion/react';
 import { useEffect, useRef } from 'react';
 
 import { useWindowSettings } from '/@/renderer/store/settings.store';

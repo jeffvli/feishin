@@ -1,4 +1,3 @@
-import { Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { openModal } from '@mantine/modals';
 import clone from 'lodash/clone';
@@ -9,15 +8,7 @@ import { forwardRef, Ref, useImperativeHandle, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiMore2Fill, RiSaveLine } from 'react-icons/ri';
 
-import {
-    Button,
-    DropdownMenu,
-    MotionFlex,
-    NumberInput,
-    QueryBuilder,
-    ScrollArea,
-    Select,
-} from '/@/renderer/components';
+import { QueryBuilder } from '/@/renderer/components/query-builder';
 import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
 import {
     convertNDQueryToQueryGroup,
@@ -33,6 +24,13 @@ import {
     NDSongQueryPlaylistOperators,
     NDSongQueryStringOperators,
 } from '/@/shared/api/navidrome.types';
+import { Button } from '/@/shared/components/button/button';
+import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
+import { Select } from '/@/shared/components/select/select';
 import { PlaylistListSort, SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { QueryBuilderGroup, QueryBuilderRule } from '/@/shared/types/types';
 
@@ -411,14 +409,14 @@ export const PlaylistQueryBuilder = forwardRef(
         ];
 
         return (
-            <MotionFlex
+            <Flex
                 direction="column"
                 h="calc(100% - 3.5rem)"
                 justify="space-between"
             >
                 <ScrollArea
                     h="100%"
-                    p="1rem"
+                    p="md"
                 >
                     <QueryBuilder
                         data={filters}
@@ -448,20 +446,21 @@ export const PlaylistQueryBuilder = forwardRef(
                 </ScrollArea>
                 <Group
                     align="flex-end"
+                    justify="space-between"
                     m="1rem"
-                    noWrap
-                    position="apart"
+                    wrap="nowrap"
                 >
                     <Group
-                        noWrap
-                        spacing="sm"
+                        gap="sm"
                         w="100%"
+                        wrap="nowrap"
                     >
                         <Select
                             data={sortOptions}
                             label="Sort"
                             maxWidth="20%"
                             searchable
+                            variant="filled"
                             width={150}
                             {...extraFiltersForm.getInputProps('sortBy')}
                         />
@@ -478,20 +477,22 @@ export const PlaylistQueryBuilder = forwardRef(
                             ]}
                             label={t('common.sortOrder', { postProcess: 'titleCase' })}
                             maxWidth="20%"
+                            variant="filled"
                             width={125}
                             {...extraFiltersForm.getInputProps('sortOrder')}
                         />
                         <NumberInput
                             label={t('common.limit', { postProcess: 'titleCase' })}
                             maxWidth="20%"
+                            variant="filled"
                             width={75}
                             {...extraFiltersForm.getInputProps('limit')}
                         />
                     </Group>
                     {onSave && onSaveAs && (
                         <Group
-                            noWrap
-                            spacing="sm"
+                            gap="sm"
+                            wrap="nowrap"
                         >
                             <Button
                                 loading={isSaving}
@@ -502,8 +503,7 @@ export const PlaylistQueryBuilder = forwardRef(
                             </Button>
                             <Button
                                 onClick={openPreviewModal}
-                                p="0.5em"
-                                variant="default"
+                                variant="subtle"
                             >
                                 {t('common.preview', { postProcess: 'titleCase' })}
                             </Button>
@@ -511,16 +511,18 @@ export const PlaylistQueryBuilder = forwardRef(
                                 <DropdownMenu.Target>
                                     <Button
                                         disabled={isSaving}
-                                        p="0.5em"
-                                        variant="default"
+                                        p="sm"
+                                        variant="subtle"
                                     >
                                         <RiMore2Fill size={15} />
                                     </Button>
                                 </DropdownMenu.Target>
                                 <DropdownMenu.Dropdown>
                                     <DropdownMenu.Item
-                                        $danger
-                                        icon={<RiSaveLine color="var(--danger-color)" />}
+                                        isDanger
+                                        leftSection={
+                                            <RiSaveLine color="var(--theme-colors-state-error)" />
+                                        }
                                         onClick={handleSave}
                                     >
                                         {t('common.saveAndReplace', { postProcess: 'titleCase' })}
@@ -530,7 +532,7 @@ export const PlaylistQueryBuilder = forwardRef(
                         </Group>
                     )}
                 </Group>
-            </MotionFlex>
+            </Flex>
         );
     },
 );

@@ -1,4 +1,3 @@
-import { Flex, Group } from '@mantine/core';
 import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import isElectron from 'is-electron';
 import { useEffect } from 'react';
@@ -12,8 +11,6 @@ import {
     RiVolumeUpFill,
 } from 'react-icons/ri';
 
-import { DropdownMenu, Rating } from '/@/renderer/components';
-import { Slider } from '/@/renderer/components/slider';
 import { PlayerButton } from '/@/renderer/features/player/components/player-button';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { useRightControls } from '/@/renderer/features/player/hooks/use-right-controls';
@@ -30,6 +27,11 @@ import {
     useSpeed,
     useVolume,
 } from '/@/renderer/store';
+import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
+import { Rating } from '/@/shared/components/rating/rating';
+import { Slider } from '/@/shared/components/slider/slider';
 import { LibraryItem, QueueSong, ServerType, Song } from '/@/shared/types/domain-types';
 
 const ipc = isElectron() ? window.api.ipc : null;
@@ -217,8 +219,8 @@ export const RightControls = () => {
             </Group>
             <Group
                 align="center"
-                noWrap
-                spacing="xs"
+                gap="xs"
+                wrap="nowrap"
             >
                 <DropdownMenu
                     arrowOffset={12}
@@ -268,7 +270,7 @@ export const RightControls = () => {
                     icon={
                         currentSong?.userFavorite ? (
                             <RiHeartFill
-                                color="var(--primary-color)"
+                                color="var(--theme-colors-primary-filled)"
                                 size="1.1rem"
                             />
                         ) : (
@@ -276,11 +278,11 @@ export const RightControls = () => {
                         )
                     }
                     onClick={() => handleToggleFavorite(currentSong)}
-                    sx={{
+                    style={{
                         svg: {
                             fill: !currentSong?.userFavorite
                                 ? undefined
-                                : 'var(--primary-color) !important',
+                                : 'var(--theme-colors-primary-filled) !important',
                         },
                     }}
                     tooltip={{
@@ -303,8 +305,8 @@ export const RightControls = () => {
                     />
                 ) : null}
                 <Group
-                    noWrap
-                    spacing="xs"
+                    gap="xs"
+                    wrap="nowrap"
                 >
                     <PlayerButton
                         icon={

@@ -1,0 +1,5 @@
+.filter-bar {
+    z-index: 1;
+    padding: var(--theme-spacing-md) var(--theme-spacing-sm);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 65%);
+}

@@ -1,0 +1,63 @@
+.motion-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.motion-wrapper.main {
+    display: flex;
+    margin: 0 0.5rem;
+}
+
+.player-button {
+    all: unset;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem;
+    overflow: visible;
+    cursor: default;
+
+    button {
+        display: flex;
+    }
+
+    &:focus-visible {
+        outline: 1px var(--theme-colors-primary-filled) solid;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+    }
+
+    svg {
+        display: flex;
+    }
+}
+
+.player-button.active {
+    svg {
+        fill: var(--theme-colors-primary-filled);
+    }
+}
+
+.main {
+    padding: 0.5rem;
+    border-radius: 50%;
+
+    svg {
+        display: flex;
+    }
+}
+
+.secondary {
+    padding: 0.5rem;
+}
+
+.tertiary {
+    padding: 0.5rem;
+
+    svg {
+        display: flex;
+    }
+}

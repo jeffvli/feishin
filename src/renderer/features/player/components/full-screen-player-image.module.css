@@ -1,0 +1,47 @@
+.image {
+    position: absolute;
+    max-width: 100%;
+    height: 100%;
+    object-fit: var(--theme-image-fit);
+    object-position: 50% 100%;
+    border-radius: 5px;
+    filter: drop-shadow(0 0 5px rgb(0 0 0 / 40%)) drop-shadow(0 0 5px rgb(0 0 0 / 40%));
+}
+
+.image-container {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    max-width: 100%;
+    height: 65%;
+    aspect-ratio: 1/1;
+    margin-bottom: 1rem;
+}
+
+.metadata-container {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 5px;
+
+    h1 {
+        font-size: 3.5vh;
+    }
+}
+
+.player-container {
+    @media screen and (height < 640px) {
+        .full-screen-player-image-metadata {
+            display: none;
+            height: 100%;
+            margin-bottom: 0;
+        }
+
+        .image-container {
+            height: 100%;
+            margin-bottom: 0;
+        }
+    }
+}

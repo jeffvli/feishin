@@ -1,4 +1,3 @@
-import { Checkbox, Group, Stack } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
@@ -8,8 +7,15 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
-import { Button, PasswordInput, SegmentedControl, TextInput, toast } from '/@/renderer/components';
 import { useAuthStoreActions } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Checkbox } from '/@/shared/components/checkbox/checkbox';
+import { Group } from '/@/shared/components/group/group';
+import { PasswordInput } from '/@/shared/components/password-input/password-input';
+import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
+import { Stack } from '/@/shared/components/stack/stack';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { toast } from '/@/shared/components/toast/toast';
 import { AuthenticationResponse } from '/@/shared/types/domain-types';
 import { ServerType, toServerType } from '/@/shared/types/types';
 
@@ -186,7 +192,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                         {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
                     />
                 )}
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button
                         onClick={onCancel}
                         variant="subtle"

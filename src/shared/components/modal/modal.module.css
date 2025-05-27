@@ -1,0 +1,18 @@
+.title {
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+    font-size: var(--theme-font-size-lg);
+    font-weight: 700;
+}
+
+.body {
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+}
+
+.header {
+    background: var(--theme-colors-background);
+    border-bottom: 1px solid var(--theme-colors-border);
+}
+
+.content {
+    background: var(--theme-colors-background);
+}

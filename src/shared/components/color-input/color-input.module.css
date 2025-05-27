@@ -1,0 +1,37 @@
+.root {
+    & [data-disabled='true'] {
+        opacity: 0.6;
+    }
+}
+
+.input {
+    width: 100%;
+    border: 1px solid transparent;
+
+    &[data-variant='default'] {
+        color: var(--theme-colors-surface-foreground);
+        background: var(--theme-colors-surface);
+    }
+
+    &[data-variant='filled'] {
+        color: var(--theme-colors-foreground);
+        background: var(--theme-colors-background);
+    }
+}
+
+.input:focus,
+.input:focus-visible {
+    border-color: lighten(var(--theme-colors-border), 10%);
+}
+
+.label {
+    margin-bottom: var(--theme-spacing-sm);
+}
+
+.dropdown {
+    color: var(--theme-colors-surface-foreground);
+    background: var(--theme-colors-surface);
+    border: 1px solid transparent;
+    border-radius: var(--theme-radius-md);
+    box-shadow: 2px 2px 10px 2px rgb(0 0 0 / 40%);
+}

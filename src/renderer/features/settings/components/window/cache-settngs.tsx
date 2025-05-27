@@ -4,11 +4,13 @@ import isElectron from 'is-electron';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Button, ConfirmModal, toast } from '/@/renderer/components';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
+import { Button } from '/@/shared/components/button/button';
+import { ConfirmModal } from '/@/shared/components/modal/modal';
+import { toast } from '/@/shared/components/toast/toast';
 
 const browser = isElectron() ? window.api.browser : null;
 
@@ -58,9 +60,9 @@ export const CacheSettings = () => {
         {
             control: (
                 <Button
-                    compact
                     disabled={isClearing}
                     onClick={() => openResetConfirmModal(false)}
+                    size="compact-md"
                     variant="filled"
                 >
                     {t('common.clear', { postProcess: 'sentenceCase' })}
@@ -75,9 +77,9 @@ export const CacheSettings = () => {
         {
             control: (
                 <Button
-                    compact
                     disabled={isClearing}
                     onClick={() => openResetConfirmModal(true)}
+                    size="compact-md"
                     variant="filled"
                 >
                     {t('common.clear', { postProcess: 'sentenceCase' })}

@@ -1,0 +1,38 @@
+.root {
+    bottom: 90px;
+    border: 2px solid var(--theme-colors-border);
+}
+
+.root.error {
+    background-color: var(--theme-colors-state-error);
+}
+
+.root.info {
+    background-color: var(--theme-colors-state-info);
+}
+
+.root.success {
+    background-color: var(--theme-colors-state-success);
+}
+
+.root.warning {
+    background-color: var(--theme-colors-state-warning);
+}
+
+.title {
+    font-size: var(--theme-font-size-md);
+}
+
+.loader {
+    margin: var(--theme-spacing-md);
+}
+
+.description {
+    font-size: var(--theme-font-size-md);
+}
+
+.close-button {
+    &:hover {
+        background: transparent;
+    }
+}

@@ -1,0 +1,115 @@
+.root {
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition:
+        background-color 0.2s ease-in-out,
+        border-color 0.2s ease-in-out;
+
+    &[data-disabled='true'] {
+        opacity: 0.6;
+    }
+
+    &[data-variant='default'] {
+        color: var(--theme-colors-foreground);
+        background-color: var(--theme-colors-surface);
+
+        &:hover {
+            background: lighten(var(--theme-colors-surface), 5%);
+        }
+
+        &:focus-visible {
+            background: lighten(var(--theme-colors-surface), 10%);
+        }
+    }
+
+    &[data-variant='outline'] {
+        --button-border: var(--theme-colors-border);
+
+        color: var(--theme-colors-foreground);
+        border: 1px solid var(--theme-colors-border);
+
+        &:hover {
+            border: 1px solid lighten(var(--theme-colors-border), 10%);
+        }
+
+        &:focus-visible {
+            border: 1px solid lighten(var(--theme-colors-border), 10%);
+        }
+    }
+
+    &[data-variant='filled'] {
+        color: var(--theme-colors-primary-contrast);
+        background: var(--theme-colors-primary-filled);
+        border: 1px solid transparent;
+        transition: background-color 0.2s ease-in-out;
+
+        &:hover,
+        &:focus-visible {
+            background: darken(var(--theme-colors-primary-filled), 10%);
+        }
+    }
+
+    &[data-variant='subtle'] {
+        color: var(--theme-colors-foreground);
+        background: transparent;
+
+        &:hover,
+        &:active,
+        &:focus-visible {
+            background-color: lighten(var(--button-bg), 10%);
+        }
+    }
+
+    &[data-variant='secondary'] {
+        border: 1px solid transparent;
+
+        &:hover {
+            background-color: darken(var(--button-bg), 5%);
+        }
+
+        &:focus-visible {
+            background-color: darken(var(--button-bg), 10%);
+        }
+    }
+
+    &[data-variant='transparent'] {
+        color: var(--theme-colors-foreground);
+        border: 1px solid transparent;
+
+        &:hover {
+            background-color: transparent;
+        }
+
+        &:focus-visible {
+            border: 1px solid lighten(var(--theme-colors-border), 10%);
+        }
+    }
+}
+
+.loader {
+    display: none;
+}
+
+.section {
+    display: flex;
+    margin-inline-end: var(--theme-spacing-sm);
+}
+
+.button-inner {
+    display: flex;
+}
+
+.button-inner.loading {
+    color: transparent;
+}
+
+.spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+}
+
+.button-inner.uppercase {
+    text-transform: uppercase;
+}

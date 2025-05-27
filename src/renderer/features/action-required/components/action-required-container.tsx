@@ -1,8 +1,9 @@
-import { Group, Stack } from '@mantine/core';
 import { ReactNode } from 'react';
 import { RiAlertFill } from 'react-icons/ri';
 
-import { Text } from '/@/renderer/components';
+import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
 
 interface ActionRequiredContainerProps {
     children: ReactNode;
@@ -10,15 +11,15 @@ interface ActionRequiredContainerProps {
 }
 
 export const ActionRequiredContainer = ({ children, title }: ActionRequiredContainerProps) => (
-    <Stack sx={{ cursor: 'default', maxWidth: '700px' }}>
+    <Stack style={{ cursor: 'default', maxWidth: '700px' }}>
         <Group>
             <RiAlertFill
-                color="var(--warning-color)"
+                color="var(--theme-colors-state-warning)"
                 size={30}
             />
             <Text
                 size="xl"
-                sx={{ textTransform: 'uppercase' }}
+                style={{ textTransform: 'uppercase' }}
             >
                 {title}
             </Text>

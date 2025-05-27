@@ -1,0 +1,81 @@
+.size-xs {
+    font-size: var(--theme-font-size-xs);
+}
+
+.size-sm {
+    font-size: var(--theme-font-size-sm);
+}
+
+.size-md {
+    font-size: var(--theme-font-size-md);
+}
+
+.size-lg {
+    font-size: var(--theme-font-size-lg);
+}
+
+.size-xl {
+    font-size: var(--theme-font-size-xl);
+}
+
+.fill {
+    fill: transparent;
+}
+
+.fill-inherit {
+    fill: inherit;
+}
+
+.fill-primary {
+    color: var(--theme-colors-primary-filled);
+    fill: var(--theme-colors-primary-filled);
+}
+
+.fill-secondary {
+    color: var(--theme-colors-foreground-muted);
+    fill: var(--theme-colors-foreground-muted);
+}
+
+.fill-success {
+    color: var(--theme-colors-state-success);
+    fill: var(--theme-colors-state-success);
+}
+
+.fill-error {
+    color: var(--theme-colors-state-error);
+    fill: var(--theme-colors-state-error);
+}
+
+.fill-info {
+    color: var(--theme-colors-state-info);
+    fill: var(--theme-colors-state-info);
+}
+
+.fill-warn {
+    color: var(--theme-colors-state-warn);
+    fill: var(--theme-colors-state-warn);
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+.pulse {
+    animation: pulse 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+    }
+}

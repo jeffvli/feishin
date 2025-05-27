@@ -1,8 +1,10 @@
 import { HotkeyItem, useHotkeys } from '@mantine/hooks';
+import clsx from 'clsx';
 import isElectron from 'is-electron';
 import { lazy } from 'react';
 import { useNavigate } from 'react-router';
-import styled from 'styled-components';
+
+import styles from './default-layout.module.css';
 
 import { CommandPalette } from '/@/renderer/features/search/components/command-palette';
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
@@ -25,22 +27,6 @@ if (!isElectron()) {
         },
     });
 }
-
-const Layout = styled.div<{ $windowBarStyle: Platform }>`
-    display: grid;
-    grid-template-areas:
-        'window-bar'
-        'main-content'
-        'player';
-    grid-template-rows: ${(props) =>
-        props.$windowBarStyle === Platform.WINDOWS || props.$windowBarStyle === Platform.MACOS
-            ? '30px calc(100vh - 120px) 90px'
-            : '0px calc(100vh - 90px) 90px'};
-    grid-template-columns: 1fr;
-    gap: 0;
-    height: 100%;
-    overflow: hidden;
-`;
 
 const WindowBar = lazy(() =>
     import('/@/renderer/layouts/window-bar').then((module) => ({
@@ -88,14 +74,17 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
 
     return (
         <>
-            <Layout
-                $windowBarStyle={windowBarStyle}
+            <div
+                className={clsx(styles.layout, {
+                    [styles.macos]: windowBarStyle === Platform.MACOS,
+                    [styles.windows]: windowBarStyle === Platform.WINDOWS,
+                })}
                 id="default-layout"
             >
                 {windowBarStyle !== Platform.WEB && <WindowBar />}
                 <MainContent shell={shell} />
                 <PlayerBar />
-            </Layout>
+            </div>
             <CommandPalette modalProps={{ handlers, opened }} />
         </>
     );

@@ -1,32 +1,15 @@
 import { useDisclosure, useTimeout } from '@mantine/hooks';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { AnimatePresence, motion, Variants } from 'motion/react';
 import { useCallback } from 'react';
 import { TbArrowBarLeft } from 'react-icons/tb';
 import { useLocation } from 'react-router';
-import styled from 'styled-components';
+
+import styles from './side-drawer-queue.module.css';
 
 import { DrawerPlayQueue } from '/@/renderer/features/now-playing';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAppStore, useSidebarStore } from '/@/renderer/store';
 import { Platform } from '/@/shared/types/types';
-
-const QueueDrawerArea = styled(motion.div)`
-    position: absolute;
-    top: 50%;
-    right: 25px;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    width: 20px;
-    height: 30px;
-    user-select: none;
-`;
-
-const QueueDrawer = styled(motion.div)`
-    background: var(--main-bg);
-    border: 3px solid var(--generic-border-color);
-    border-radius: 10px;
-`;
 
 const queueDrawerVariants: Variants = {
     closed: (windowBarStyle) => ({
@@ -98,45 +81,45 @@ export const SideDrawerQueue = () => {
         !rightExpanded && !drawer && location.pathname !== AppRoute.NOW_PLAYING;
 
     return (
-        <>
-            <AnimatePresence
-                initial={false}
-                mode="wait"
-            >
-                {isQueueDrawerButtonVisible && (
-                    <QueueDrawerArea
-                        animate="visible"
-                        exit="hidden"
-                        initial="hidden"
-                        key="queue-drawer-button"
-                        onMouseEnter={handleEnterDrawerButton}
-                        onMouseLeave={handleLeaveDrawerButton}
-                        variants={queueDrawerButtonVariants}
-                        whileHover={{ opacity: 1, scale: 2, transition: { duration: 0.5 } }}
-                    >
-                        <TbArrowBarLeft size={12} />
-                    </QueueDrawerArea>
-                )}
+        <AnimatePresence
+            initial={false}
+            mode="wait"
+        >
+            {isQueueDrawerButtonVisible && (
+                <motion.div
+                    animate="visible"
+                    className={styles.queueDrawerArea}
+                    exit="hidden"
+                    initial="hidden"
+                    key="queue-drawer-button"
+                    onMouseEnter={handleEnterDrawerButton}
+                    onMouseLeave={handleLeaveDrawerButton}
+                    variants={queueDrawerButtonVariants}
+                    whileHover={{ opacity: 1, scale: 2, transition: { duration: 0.5 } }}
+                >
+                    <TbArrowBarLeft size={12} />
+                </motion.div>
+            )}
 
-                {drawer && (
-                    <QueueDrawer
-                        animate="open"
-                        exit="closed"
-                        initial="closed"
-                        key="queue-drawer"
-                        onMouseLeave={() => {
-                            // The drawer will close due to the delay when setting isReorderingQueue
-                            setTimeout(() => {
-                                if (useAppStore.getState().isReorderingQueue) return;
-                                drawerHandler.close();
-                            }, 50);
-                        }}
-                        variants={queueDrawerVariants}
-                    >
-                        <DrawerPlayQueue />
-                    </QueueDrawer>
-                )}
-            </AnimatePresence>
-        </>
+            {drawer && (
+                <motion.div
+                    animate="open"
+                    className={styles.queueDrawer}
+                    exit="closed"
+                    initial="closed"
+                    key="queue-drawer"
+                    onMouseLeave={() => {
+                        // The drawer will close due to the delay when setting isReorderingQueue
+                        setTimeout(() => {
+                            if (useAppStore.getState().isReorderingQueue) return;
+                            drawerHandler.close();
+                        }, 50);
+                    }}
+                    variants={queueDrawerVariants}
+                >
+                    <DrawerPlayQueue />
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 };

@@ -1,0 +1,29 @@
+.item {
+    width: 100%;
+    font-family: var(--theme-content-font-family);
+    font-size: var(--theme-font-size-md);
+    font-weight: 600;
+
+    &:focus-visible {
+        border: 1px solid var(--theme-colors-primary-filled);
+    }
+}
+
+.link {
+    display: flex;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: var(--theme-font-size-md);
+    color: var(--theme-colors-foreground);
+    border: 1px transparent solid;
+    transition: color 0.2s ease-in-out;
+
+    &:focus-visible {
+        border: 1px solid var(--theme-colors-primary-filled);
+    }
+}
+
+.link.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}

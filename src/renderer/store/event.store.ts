@@ -1,6 +1,6 @@
-import { create } from 'zustand';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 export interface EventSlice extends EventState {
     actions: {
@@ -32,7 +32,7 @@ export type RatingEvent = {
 
 export type UserEvent = FavoriteEvent | PlayEvent | RatingEvent;
 
-export const useEventStore = create<EventSlice>()(
+export const useEventStore = createWithEqualityFn<EventSlice>()(
     subscribeWithSelector(
         devtools(
             immer((set) => ({

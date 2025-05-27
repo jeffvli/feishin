@@ -1,0 +1,75 @@
+.container {
+    position: relative;
+    z-index: 190;
+    width: 100%;
+    height: 65px;
+}
+
+.header {
+    position: relative;
+    z-index: 15;
+    width: 100%;
+    height: 100%;
+    margin-right: 1rem;
+    pointer-events: auto;
+    user-select: auto;
+    -webkit-app-region: drag;
+
+    button {
+        -webkit-app-region: no-drag;
+    }
+
+    input {
+        -webkit-app-region: no-drag;
+    }
+}
+
+.header.pad-right {
+    margin-right: 140px;
+}
+
+.header.hidden {
+    pointer-events: none;
+    user-select: none;
+}
+
+.header.is-draggable {
+    -webkit-app-region: drag;
+}
+
+.background-image {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background: var(--theme-colors-background);
+}
+
+.background-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+}
+
+.background-image-overlay.light {
+    background: linear-gradient(rgb(255 255 255 / 25%), rgb(255 255 255 / 25%));
+}
+
+.background-image-overlay.dark {
+    background: linear-gradient(rgb(0 0 0 / 50%), rgb(0 0 0 / 50%));
+}
+
+.title-wrapper {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.title-wrapper.hidden {
+    display: none;
+}

@@ -1,0 +1,21 @@
+.lyric-line {
+    padding: 0 1rem;
+    font-weight: 600;
+    color: var(--theme-colors-foreground);
+    opacity: 0.5;
+    transition:
+        opacity 0.3s ease-in-out,
+        transform 0.3s ease-in-out;
+
+    &.active {
+        opacity: 1;
+    }
+
+    &.unsynchronized {
+        opacity: 1;
+    }
+
+    &.synchronized {
+        cursor: pointer;
+    }
+}

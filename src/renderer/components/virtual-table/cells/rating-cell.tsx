@@ -1,8 +1,8 @@
 import type { ICellRendererParams } from '@ag-grid-community/core';
 
-import { Rating } from '/@/renderer/components/rating';
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 import { useSetRating } from '/@/renderer/features/shared';
+import { Rating } from '/@/shared/components/rating/rating';
 
 export const RatingCell = ({ node, value }: ICellRendererParams) => {
     const updateRatingMutation = useSetRating({});
@@ -25,7 +25,7 @@ export const RatingCell = ({ node, value }: ICellRendererParams) => {
     };
 
     return (
-        <CellContainer $position="center">
+        <CellContainer position="center">
             <Rating
                 onChange={handleUpdateRating}
                 size="xs"

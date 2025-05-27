@@ -1,19 +1,10 @@
 import AudioMotionAnalyzer from 'audiomotion-analyzer';
 import { createRef, useCallback, useEffect, useState } from 'react';
-import styled from 'styled-components';
+
+import styles from './visualizer.module.css';
 
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import { useSettingsStore } from '/@/renderer/store';
-
-const StyledContainer = styled.div`
-    max-width: 100%;
-    margin: auto;
-
-    canvas {
-        width: 100%;
-        margin: auto;
-    }
-`;
 
 export const Visualizer = () => {
     const { webAudio } = useWebAudio();
@@ -67,7 +58,8 @@ export const Visualizer = () => {
     }, [resize]);
 
     return (
-        <StyledContainer
+        <div
+            className={styles.container}
             ref={canvasRef}
             style={{ height: length, width: length }}
         />

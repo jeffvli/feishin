@@ -1,8 +1,8 @@
-import { ButtonProps } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { RiSortAsc, RiSortDesc } from 'react-icons/ri';
 
-import { Button, Tooltip } from '/@/renderer/components';
+import { Button, ButtonProps } from '/@/shared/components/button/button';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { SortOrder } from '/@/shared/types/domain-types';
 
 interface OrderToggleButtonProps {
@@ -22,20 +22,13 @@ export const OrderToggleButton = ({ buttonProps, onToggle, sortOrder }: OrderTog
             }
         >
             <Button
-                compact
                 fw="600"
                 onClick={onToggle}
-                size="md"
+                size="compact-md"
                 variant="subtle"
                 {...buttonProps}
             >
-                <>
-                    {sortOrder === SortOrder.ASC ? (
-                        <RiSortAsc size="1.3rem" />
-                    ) : (
-                        <RiSortDesc size="1.3rem" />
-                    )}
-                </>
+                <>{sortOrder === SortOrder.ASC ? <RiSortAsc /> : <RiSortDesc />}</>
             </Button>
         </Tooltip>
     );

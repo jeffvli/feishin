@@ -1,6 +1,5 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
-import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
@@ -18,7 +17,6 @@ import {
 
 import i18n from '/@/i18n/i18n';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { Button, DropdownMenu, MultiSelect, Slider, Switch, Text } from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUM_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
@@ -34,6 +32,16 @@ import {
     useListStoreActions,
     useListStoreByKey,
 } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
+import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
+import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
+import { Slider } from '/@/shared/components/slider/slider';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
 import {
     AlbumListQuery,
     AlbumListSort,
@@ -367,7 +375,7 @@ export const AlbumListHeaderFilters = ({
         [pageKey, setDisplayType],
     );
 
-    const handleTableColumns = (values: TableColumn[]) => {
+    const handleTableColumns = (values: string[]) => {
         const existingColumns = table.columns;
 
         if (values.length === 0) {
@@ -379,7 +387,7 @@ export const AlbumListHeaderFilters = ({
 
         // If adding a column
         if (values.length > existingColumns.length) {
-            const newColumn = { column: values[values.length - 1], width: 100 };
+            const newColumn = { column: values[values.length - 1] as TableColumn, width: 100 };
 
             setTable({ data: { columns: [...existingColumns, newColumn] }, key: pageKey });
         } else {
@@ -439,16 +447,15 @@ export const AlbumListHeaderFilters = ({
     return (
         <Flex justify="space-between">
             <Group
+                gap="sm"
                 ref={cq.ref}
-                spacing="sm"
                 w="100%"
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw={600}
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             {sortByLabel}
@@ -457,7 +464,7 @@ export const AlbumListHeaderFilters = ({
                     <DropdownMenu.Dropdown>
                         {FILTERS[server?.type as keyof typeof FILTERS].map((f) => (
                             <DropdownMenu.Item
-                                $isActive={f.value === filter.sortBy}
+                                isActive={f.value === filter.sortBy}
                                 key={`filter-${f.name}`}
                                 onClick={handleSetSortBy}
                                 value={f.value}
@@ -478,25 +485,24 @@ export const AlbumListHeaderFilters = ({
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
                                 <Button
-                                    compact
                                     fw={600}
-                                    size="md"
-                                    sx={{
+                                    size="compact-md"
+                                    style={{
                                         svg: {
                                             fill: isFolderFilterApplied
-                                                ? 'var(--primary-color) !important'
+                                                ? 'var(--theme-colors-primary-filled) !important'
                                                 : undefined,
                                         },
                                     }}
                                     variant="subtle"
                                 >
-                                    <RiFolder2Fill size="1.3rem" />
+                                    <RiFolder2Fill />
                                 </Button>
                             </DropdownMenu.Target>
                             <DropdownMenu.Dropdown>
                                 {musicFoldersQuery.data?.items.map((folder) => (
                                     <DropdownMenu.Item
-                                        $isActive={filter.musicFolderId === folder.id}
+                                        isActive={filter.musicFolderId === folder.id}
                                         key={`musicFolder-${folder.id}`}
                                         onClick={handleSetMusicFolder}
                                         value={folder.id}
@@ -510,12 +516,13 @@ export const AlbumListHeaderFilters = ({
                 )}
                 <Divider orientation="vertical" />
                 <Button
-                    compact
                     onClick={handleOpenFiltersModal}
-                    size="md"
-                    sx={{
+                    size="compact-md"
+                    style={{
                         svg: {
-                            fill: isFilterApplied ? 'var(--primary-color) !important' : undefined,
+                            fill: isFilterApplied
+                                ? 'var(--theme-colors-primary-filled) !important'
+                                : undefined,
                         },
                     }}
                     tooltip={{
@@ -523,24 +530,22 @@ export const AlbumListHeaderFilters = ({
                     }}
                     variant="subtle"
                 >
-                    <RiFilterFill size="1.3rem" />
+                    <RiFilterFill />
                 </Button>
                 <Divider orientation="vertical" />
                 <Button
-                    compact
                     onClick={handleRefresh}
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('common.refresh', { postProcess: 'sentenceCase' }) }}
                     variant="subtle"
                 >
-                    <RiRefreshLine size="1.3rem" />
+                    <RiRefreshLine />
                 </Button>
                 <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiMoreFill size={15} />
@@ -548,26 +553,26 @@ export const AlbumListHeaderFilters = ({
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiPlayFill />}
+                            leftSection={<RiPlayFill />}
                             onClick={() => handlePlay?.({ playType: Play.NOW })}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddBoxFill />}
+                            leftSection={<RiAddBoxFill />}
                             onClick={() => handlePlay?.({ playType: Play.LAST })}
                         >
                             {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            icon={<RiAddCircleFill />}
+                            leftSection={<RiAddCircleFill />}
                             onClick={() => handlePlay?.({ playType: Play.NEXT })}
                         >
                             {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            icon={<RiRefreshLine />}
+                            leftSection={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
                             {t('common.refresh', { postProcess: 'sentenceCase' })}
@@ -576,8 +581,8 @@ export const AlbumListHeaderFilters = ({
                 </DropdownMenu>
             </Group>
             <Group
-                noWrap
-                spacing="sm"
+                gap="sm"
+                wrap="nowrap"
             >
                 <DropdownMenu
                     position="bottom-end"
@@ -585,14 +590,13 @@ export const AlbumListHeaderFilters = ({
                 >
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             tooltip={{
                                 label: t('common.configure', { postProcess: 'sentenceCase' }),
                             }}
                             variant="subtle"
                         >
-                            <RiSettings3Fill size="1.3rem" />
+                            <RiSettings3Fill />
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
@@ -600,33 +604,26 @@ export const AlbumListHeaderFilters = ({
                             {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Label>
                         <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.CARD}
+                            isActive={display === ListDisplayType.CARD}
                             onClick={handleSetViewType}
                             value={ListDisplayType.CARD}
                         >
                             {t('table.config.view.card', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.POSTER}
+                            isActive={display === ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                             value={ListDisplayType.POSTER}
                         >
                             {t('table.config.view.poster', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.TABLE}
+                            isActive={display === ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                             value={ListDisplayType.TABLE}
                         >
                             {t('table.config.view.table', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
-                        {/* <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.TABLE_PAGINATED}
-                            value={ListDisplayType.TABLE_PAGINATED}
-                            onClick={handleSetViewType}
-                        >
-                            Table (paginated)
-                        </DropdownMenu.Item> */}
                         <DropdownMenu.Divider />
                         <DropdownMenu.Label>
                             {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
@@ -659,13 +656,17 @@ export const AlbumListHeaderFilters = ({
                         {(display === ListDisplayType.TABLE ||
                             display === ListDisplayType.TABLE_PAGINATED) && (
                             <>
-                                <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
+                                <DropdownMenu.Label>
+                                    {t('table.config.general.tableColumns', {
+                                        postProcess: 'titleCase',
+                                    })}
+                                </DropdownMenu.Label>
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
-                                    <Stack>
+                                    <Stack gap="lg">
                                         <MultiSelect
                                             clearable
                                             data={ALBUM_TABLE_COLUMNS}
@@ -673,9 +674,10 @@ export const AlbumListHeaderFilters = ({
                                                 (column) => column.column,
                                             )}
                                             onChange={handleTableColumns}
+                                            variant="filled"
                                             width={300}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>Auto Fit Columns</Text>
                                             <Switch
                                                 defaultChecked={table.autoFit}

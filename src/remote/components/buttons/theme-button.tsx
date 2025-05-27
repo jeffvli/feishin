@@ -3,7 +3,7 @@ import { RiMoonLine, RiSunLine } from 'react-icons/ri';
 
 import { RemoteButton } from '/@/remote/components/buttons/remote-button';
 import { useIsDark, useToggleDark } from '/@/remote/store';
-import { AppTheme } from '/@/shared/types/domain-types';
+import { AppTheme } from '/@/shared/themes/app-theme-types';
 
 export const ThemeButton = () => {
     const isDark = useIsDark();
@@ -19,7 +19,9 @@ export const ThemeButton = () => {
             mr={5}
             onClick={() => toggleDark()}
             size="xl"
-            tooltip="Toggle Theme"
+            tooltip={{
+                label: 'Toggle Theme',
+            }}
             variant="default"
         >
             {isDark ? <RiSunLine size={30} /> : <RiMoonLine size={30} />}

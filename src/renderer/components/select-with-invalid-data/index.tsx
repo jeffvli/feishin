@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { MultiSelect, MultiSelectProps, Select, SelectProps } from '/@/renderer/components/select';
+import { MultiSelect, MultiSelectProps } from '/@/shared/components/multi-select/multi-select';
+import { Select, SelectProps } from '/@/shared/components/select/select';
 
 export const SelectWithInvalidData = ({ data, defaultValue, ...props }: SelectProps) => {
     const { t } = useTranslation();
@@ -9,12 +10,14 @@ export const SelectWithInvalidData = ({ data, defaultValue, ...props }: SelectPr
     const [fullData, hasError] = useMemo(() => {
         if (typeof defaultValue === 'string') {
             const missingField =
-                data.find((item) =>
-                    typeof item === 'string' ? item === defaultValue : item.value === defaultValue,
+                data?.find((item) =>
+                    typeof item === 'string'
+                        ? item === defaultValue
+                        : (item as any).value === defaultValue,
                 ) === undefined;
 
             if (missingField) {
-                return [data.concat(defaultValue), true];
+                return [data?.concat(defaultValue), true];
             }
         }
 
@@ -40,11 +43,11 @@ export const MultiSelectWithInvalidData = ({ data, defaultValue, ...props }: Mul
     const [fullData, missing] = useMemo(() => {
         if (defaultValue?.length) {
             const validValues = new Set<string>();
-            for (const item of data) {
+            for (const item of data || []) {
                 if (typeof item === 'string') {
                     validValues.add(item);
                 } else {
-                    validValues.add(item.value);
+                    validValues.add((item as any).value);
                 }
             }
 
@@ -57,7 +60,7 @@ export const MultiSelectWithInvalidData = ({ data, defaultValue, ...props }: Mul
             }
 
             if (missingFields.length > 0) {
-                return [data.concat(missingFields), missingFields];
+                return [data?.concat(missingFields), missingFields];
             }
         }
 

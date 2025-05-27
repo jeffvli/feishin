@@ -1,9 +1,9 @@
 import type { ReactNode, Ref } from 'react';
 
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { forwardRef } from 'react';
 
-import styles from './animated-page.module.scss';
+import styles from './animated-page.module.css';
 
 interface AnimatedPageProps {
     children: ReactNode;

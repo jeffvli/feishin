@@ -1,0 +1,5 @@
+.symbol-body {
+    svg {
+        stroke: var(--theme-colors-foreground-muted);
+    }
+}

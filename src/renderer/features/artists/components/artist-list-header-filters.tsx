@@ -1,7 +1,6 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { IDatasource } from '@ag-grid-community/core';
-import { Divider, Flex, Group, Stack } from '@mantine/core';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
@@ -11,15 +10,6 @@ import { RiFolder2Line, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import {
-    Button,
-    DropdownMenu,
-    MultiSelect,
-    Select,
-    Slider,
-    Switch,
-    Text,
-} from '/@/renderer/components';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
@@ -28,10 +18,22 @@ import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared'
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
     ArtistListFilter,
+    PersistedTableColumn,
     useCurrentServer,
     useListStoreActions,
     useListStoreByKey,
 } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
+import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
+import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
+import { Select } from '/@/shared/components/select/select';
+import { Slider } from '/@/shared/components/slider/slider';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
 import {
     ArtistListQuery,
     ArtistListSort,
@@ -39,7 +41,7 @@ import {
     ServerType,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { ListDisplayType, TableColumn } from '/@/shared/types/types';
+import { ListDisplayType } from '/@/shared/types/types';
 
 const FILTERS = {
     jellyfin: [
@@ -329,7 +331,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
         [pageKey, setDisplayType],
     );
 
-    const handleTableColumns = (values: TableColumn[]) => {
+    const handleTableColumns = (values: string[]) => {
         const existingColumns = table.columns;
 
         if (values.length === 0) {
@@ -343,7 +345,10 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
 
         // If adding a column
         if (values.length > existingColumns.length) {
-            const newColumn = { column: values[values.length - 1], width: 100 };
+            const newColumn = {
+                column: values[values.length - 1],
+                width: 100,
+            } as PersistedTableColumn;
 
             setTable({ data: { columns: [...existingColumns, newColumn] }, key: pageKey });
         } else {
@@ -387,16 +392,15 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
     return (
         <Flex justify="space-between">
             <Group
+                gap="sm"
                 ref={cq.ref}
-                spacing="sm"
                 w="100%"
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
                             fw="600"
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             {sortByLabel}
@@ -405,7 +409,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                     <DropdownMenu.Dropdown>
                         {FILTERS[server?.type as keyof typeof FILTERS].map((f) => (
                             <DropdownMenu.Item
-                                $isActive={f.value === filter.sortBy}
+                                isActive={f.value === filter.sortBy}
                                 key={`filter-${f.name}`}
                                 onClick={handleSetSortBy}
                                 value={f.value}
@@ -426,9 +430,8 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
                                 <Button
-                                    compact
                                     fw="600"
-                                    size="md"
+                                    size="compact-md"
                                     variant="subtle"
                                 >
                                     {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}
@@ -437,7 +440,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                             <DropdownMenu.Dropdown>
                                 {musicFoldersQuery.data?.items.map((folder) => (
                                     <DropdownMenu.Item
-                                        $isActive={filter.musicFolderId === folder.id}
+                                        isActive={filter.musicFolderId === folder.id}
                                         key={`musicFolder-${folder.id}`}
                                         onClick={handleSetMusicFolder}
                                         value={folder.id}
@@ -461,20 +464,18 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                 )}
                 <Divider orientation="vertical" />
                 <Button
-                    compact
                     onClick={handleRefresh}
-                    size="md"
+                    size="compact-md"
                     tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
                 >
-                    <RiRefreshLine size="1.3rem" />
+                    <RiRefreshLine />
                 </Button>
                 <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
                             <RiMoreFill size={15} />
@@ -482,7 +483,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            icon={<RiRefreshLine />}
+                            leftSection={<RiRefreshLine />}
                             onClick={handleRefresh}
                         >
                             {t('common.refresh', {
@@ -499,11 +500,10 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                 >
                     <DropdownMenu.Target>
                         <Button
-                            compact
-                            size="md"
+                            size="compact-md"
                             variant="subtle"
                         >
-                            <RiSettings3Fill size="1.3rem" />
+                            <RiSettings3Fill />
                         </Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
@@ -511,7 +511,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                             {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Label>
                         <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.CARD}
+                            isActive={display === ListDisplayType.CARD}
                             onClick={handleSetViewType}
                             value={ListDisplayType.CARD}
                         >
@@ -520,7 +520,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                             })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.POSTER}
+                            isActive={display === ListDisplayType.POSTER}
                             onClick={handleSetViewType}
                             value={ListDisplayType.POSTER}
                         >
@@ -529,7 +529,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                             })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            $isActive={display === ListDisplayType.TABLE}
+                            isActive={display === ListDisplayType.TABLE}
                             onClick={handleSetViewType}
                             value={ListDisplayType.TABLE}
                         >
@@ -586,7 +586,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                                 <DropdownMenu.Item
                                     closeMenuOnClick={false}
                                     component="div"
-                                    sx={{ cursor: 'default' }}
+                                    style={{ cursor: 'default' }}
                                 >
                                     <Stack>
                                         <MultiSelect
@@ -598,7 +598,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                                             onChange={handleTableColumns}
                                             width={300}
                                         />
-                                        <Group position="apart">
+                                        <Group justify="space-between">
                                             <Text>
                                                 {t('table.config.general.autoFitColumns', {
                                                     postProcess: 'sentenceCase',

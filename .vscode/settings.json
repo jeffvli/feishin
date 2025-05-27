@@ -26,10 +26,6 @@
         "source.formatDocument": "explicit"
     },
     "css.validate": true,
-    "less.validate": false,
-    "scss.validate": true,
-    "scss.lint.unknownAtRules": "warning",
-    "scss.lint.unknownProperties": "warning",
     "javascript.validate.enable": false,
     "javascript.format.enable": false,
     "typescript.format.enable": false,
@@ -49,8 +45,10 @@
     "i18n-ally.localesPaths": ["src/i18n", "src/i18n/locales"],
     "typescript.tsdk": "node_modules\\typescript\\lib",
     "typescript.preferences.importModuleSpecifier": "non-relative",
-    "stylelint.validate": ["css", "scss", "typescript", "typescriptreact"],
+    "stylelint.config": null,
+    "stylelint.validate": ["css", "postcss"],
     "typescript.updateImportsOnFileMove.enabled": "always",
+    "typescript.preferences.autoImportFileExcludePatterns": ["@mantine/core", "@mantine/modals"],
     "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
     "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
     "folderTemplates.structures": [
@@ -63,14 +61,14 @@
                     "template": "Functional Component with CSS Modules"
                 },
                 {
-                    "fileName": "<FTName | kebabcase>.module.scss"
+                    "fileName": "<FTName | kebabcase>.module.css"
                 }
             ]
         }
     ],
     "folderTemplates.fileTemplates": {
         "Functional Component with CSS Modules": [
-            "import styles from './<FTName | kebabcase>.module.scss';",
+            "import styles from './<FTName | kebabcase>.module.css';",
             "",
             "interface <FTName | pascalcase>Props {}",
             "",

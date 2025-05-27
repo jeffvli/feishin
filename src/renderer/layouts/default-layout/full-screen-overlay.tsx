@@ -1,4 +1,4 @@
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 
 import { FullScreenPlayer } from '/@/renderer/features/player/components/full-screen-player';
 import { useFullScreenPlayerStore } from '/@/renderer/store';

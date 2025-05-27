@@ -1,24 +1,12 @@
 import type { ICellRendererParams } from '@ag-grid-community/core';
 
+import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
 
-import { Skeleton } from '/@/renderer/components/skeleton';
-import { Text } from '/@/renderer/components/text';
+import styles from './generic-cell.module.css';
 
-export const CellContainer = styled.div<{ $position?: 'center' | 'left' | 'right' }>`
-    display: flex;
-    align-items: center;
-    justify-content: ${(props) =>
-        props.$position === 'right'
-            ? 'flex-end'
-            : props.$position === 'center'
-              ? 'center'
-              : 'flex-start'};
-    width: 100%;
-    height: 100%;
-    letter-spacing: 0.5px;
-`;
+import { Skeleton } from '/@/shared/components/skeleton/skeleton';
+import { Text } from '/@/shared/components/text/text';
 
 type Options = {
     array?: boolean;
@@ -36,7 +24,7 @@ export const GenericCell = (
 
     if (value === undefined) {
         return (
-            <CellContainer $position={position || 'left'}>
+            <CellContainer position={position || 'left'}>
                 <Skeleton
                     height="1rem"
                     width="80%"
@@ -46,12 +34,12 @@ export const GenericCell = (
     }
 
     return (
-        <CellContainer $position={position || 'left'}>
+        <CellContainer position={position || 'left'}>
             {isLink ? (
                 <Text
-                    $link={isLink}
-                    $secondary={!primary}
                     component={Link}
+                    isLink={isLink}
+                    isMuted={!primary}
                     overflow="hidden"
                     size="md"
                     to={displayedValue.link}
@@ -60,8 +48,8 @@ export const GenericCell = (
                 </Text>
             ) : (
                 <Text
-                    $noSelect={false}
-                    $secondary={!primary}
+                    isMuted={!primary}
+                    isNoSelect={false}
                     overflow="hidden"
                     size="md"
                 >
@@ -69,5 +57,26 @@ export const GenericCell = (
                 </Text>
             )}
         </CellContainer>
+    );
+};
+
+export const CellContainer = ({
+    children,
+    position,
+}: {
+    children: React.ReactNode;
+    position: 'center' | 'left' | 'right';
+}) => {
+    return (
+        <div
+            className={clsx({
+                [styles.cellContainer]: true,
+                [styles.center]: position === 'center',
+                [styles.left]: position === 'left' || !position,
+                [styles.right]: position === 'right',
+            })}
+        >
+            {children}
+        </div>
     );
 };

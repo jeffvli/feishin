@@ -1,0 +1,30 @@
+.thumb {
+    background: var(--theme-scrollbar-handle-background);
+    border-radius: var(--theme-scrollbar-handle-border-radius);
+
+    &:hover {
+        background: var(--theme-scrollbar-handle-hover-background);
+    }
+
+    &[data-state='visible'] {
+        animation: fade-in 0.3s forwards;
+    }
+
+    &[data-state='hidden'] {
+        animation: fade-out 0.2s forwards;
+    }
+}
+
+.scrollbar {
+    padding: 0;
+    background: var(--theme-scrollbar-track-background);
+    border-radius: var(--theme-scrollbar-track-border-radius);
+
+    &:hover {
+        background: var(--theme-scrollbar-track-hover-background);
+    }
+}
+
+.viewport > div {
+    display: block !important;
+}

@@ -1,19 +1,12 @@
 import { ICellRendererParams } from '@ag-grid-community/core';
-import { Group } from '@mantine/core';
 import { useState } from 'react';
 import { RiCheckboxBlankLine, RiCheckboxLine } from 'react-icons/ri';
-import styled from 'styled-components';
 
-import { Button } from '/@/renderer/components/button';
-import { Paper } from '/@/renderer/components/paper';
+import styles from './full-width-disc-cell.module.css';
+
 import { getNodesByDiscNumber, setNodeSelection } from '/@/renderer/components/virtual-table/utils';
-
-const Container = styled(Paper)`
-    display: flex;
-    height: 100%;
-    padding: 0.5rem 1rem;
-    border: 1px solid transparent;
-`;
+import { Button } from '/@/shared/components/button/button';
+import { Group } from '/@/shared/components/group/group';
 
 export const FullWidthDiscCell = ({ api, data, node }: ICellRendererParams) => {
     const [isSelected, setIsSelected] = useState(false);
@@ -31,21 +24,20 @@ export const FullWidthDiscCell = ({ api, data, node }: ICellRendererParams) => {
     };
 
     return (
-        <Container>
+        <div className={styles.container}>
             <Group
-                position="apart"
+                justify="space-between"
                 w="100%"
             >
                 <Button
-                    compact
-                    leftIcon={isSelected ? <RiCheckboxLine /> : <RiCheckboxBlankLine />}
+                    leftSection={isSelected ? <RiCheckboxLine /> : <RiCheckboxBlankLine />}
                     onClick={handleToggleDiscNodes}
-                    size="md"
+                    size="compact-md"
                     variant="subtle"
                 >
                     {data.name}
                 </Button>
             </Group>
-        </Container>
+        </div>
     );
 };

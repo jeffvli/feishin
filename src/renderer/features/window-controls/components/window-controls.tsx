@@ -1,39 +1,15 @@
+import clsx from 'clsx';
 import isElectron from 'is-electron';
 import { useState } from 'react';
 import { RiCheckboxBlankLine, RiCloseLine, RiSubtractLine } from 'react-icons/ri';
-import styled from 'styled-components';
+
+import styles from './window-controls.module.css';
 
 const browser = isElectron() ? window.api.browser : null;
 
 interface WindowControlsProps {
     style?: 'linux' | 'macos' | 'windows';
 }
-
-const WindowsButtonGroup = styled.div`
-    display: flex;
-    width: 130px;
-    height: 100%;
-    -webkit-app-region: no-drag;
-`;
-
-export const WindowsButton = styled.div<{ $exit?: boolean }>`
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-    -webkit-app-region: no-drag;
-    width: 50px;
-    height: 65px;
-
-    img {
-        width: 35%;
-        height: 50%;
-    }
-
-    &:hover {
-        background: ${({ $exit }) => ($exit ? 'var(--danger-color)' : 'rgba(125, 125, 125, 30%)')};
-    }
-`;
 
 const close = () => browser?.exit();
 
@@ -64,27 +40,27 @@ export const WindowControls = ({ style }: WindowControlsProps) => {
             {isElectron() && (
                 <>
                     {style === 'windows' && (
-                        <WindowsButtonGroup>
-                            <WindowsButton
+                        <div className={styles.windowsButtonGroup}>
+                            <div
                                 onClick={handleMinimize}
                                 role="button"
                             >
                                 <RiSubtractLine size={19} />
-                            </WindowsButton>
-                            <WindowsButton
+                            </div>
+                            <div
                                 onClick={handleMaximize}
                                 role="button"
                             >
                                 <RiCheckboxBlankLine size={13} />
-                            </WindowsButton>
-                            <WindowsButton
-                                $exit
+                            </div>
+                            <div
+                                className={clsx(styles.windowsButton, styles.exitButton)}
                                 onClick={handleClose}
                                 role="button"
                             >
                                 <RiCloseLine size={19} />
-                            </WindowsButton>
-                        </WindowsButtonGroup>
+                            </div>
+                        </div>
                     )}
                 </>
             )}

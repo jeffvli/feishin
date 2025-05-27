@@ -1,0 +1,24 @@
+.button {
+    svg {
+        display: flex;
+        fill: var(--theme-colors-foreground);
+    }
+
+    &:hover {
+        svg {
+            fill: var(--theme-colors-foreground);
+        }
+    }
+}
+
+.button.active {
+    svg {
+        fill: var(--primary-color);
+    }
+
+    &:hover {
+        svg {
+            fill: var(--primary-color) !important;
+        }
+    }
+}

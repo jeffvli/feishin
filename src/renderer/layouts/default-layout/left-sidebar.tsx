@@ -1,17 +1,11 @@
 import { useRef } from 'react';
-import styled from 'styled-components';
+
+import styles from './left-sidebar.module.css';
 
 import { ResizeHandle } from '/@/renderer/features/shared';
 import { CollapsedSidebar } from '/@/renderer/features/sidebar/components/collapsed-sidebar';
 import { Sidebar } from '/@/renderer/features/sidebar/components/sidebar';
 import { useSidebarStore } from '/@/renderer/store';
-
-const SidebarContainer = styled.aside`
-    position: relative;
-    grid-area: sidebar;
-    background: var(--sidebar-bg);
-    border-right: var(--sidebar-border);
-`;
 
 interface LeftSidebarProps {
     isResizing: boolean;
@@ -23,17 +17,20 @@ export const LeftSidebar = ({ isResizing, startResizing }: LeftSidebarProps) => 
     const { collapsed } = useSidebarStore();
 
     return (
-        <SidebarContainer id="sidebar">
+        <aside
+            className={styles.container}
+            id="sidebar"
+        >
             <ResizeHandle
-                $isResizing={isResizing}
-                $placement="right"
+                isResizing={isResizing}
                 onMouseDown={(e) => {
                     e.preventDefault();
                     startResizing('left');
                 }}
+                placement="right"
                 ref={sidebarRef}
             />
             {collapsed ? <CollapsedSidebar /> : <Sidebar />}
-        </SidebarContainer>
+        </aside>
     );
 };

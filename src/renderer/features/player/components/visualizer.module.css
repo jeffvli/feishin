@@ -1,0 +1,9 @@
+.container {
+    max-width: 100%;
+    margin: auto;
+
+    canvas {
+        width: 100%;
+        margin: auto;
+    }
+}

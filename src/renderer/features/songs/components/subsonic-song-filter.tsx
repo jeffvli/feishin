@@ -1,11 +1,15 @@
-import { Divider, Group, Stack } from '@mantine/core';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Select, Switch, Text } from '/@/renderer/components';
 import { useGenreList } from '/@/renderer/features/genres';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { Select } from '/@/shared/components/select/select';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
 import { GenreListSort, LibraryItem, SongListQuery, SortOrder } from '/@/shared/types/domain-types';
 
 interface SubsonicSongFiltersProps {
@@ -81,8 +85,8 @@ export const SubsonicSongFilters = ({
         <Stack p="0.8rem">
             {toggleFilters.map((filter) => (
                 <Group
+                    justify="space-between"
                     key={`ss-filter-${filter.label}`}
-                    position="apart"
                 >
                     <Text>{filter.label}</Text>
                     <Switch

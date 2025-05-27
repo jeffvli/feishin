@@ -10,14 +10,13 @@ import type {
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { AnimatePresence } from 'framer-motion';
 import debounce from 'lodash/debounce';
+import { AnimatePresence } from 'motion/react';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { toast } from '/@/renderer/components';
 import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
 import { getColumnDefs, TablePagination, VirtualTable } from '/@/renderer/components/virtual-table';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
@@ -40,6 +39,7 @@ import {
     useSetPlaylistDetailTablePagination,
 } from '/@/renderer/store';
 import { PersistedTableColumn, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { toast } from '/@/shared/components/toast/toast';
 import {
     LibraryItem,
     PlaylistSongListQuery,

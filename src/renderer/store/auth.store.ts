@@ -1,8 +1,8 @@
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid/non-secure';
-import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 import { useAlbumArtistListDataStore } from '/@/renderer/store/album-artist-list-data.store';
 import { useAlbumListDataStore } from '/@/renderer/store/album-list-data.store';
@@ -25,7 +25,7 @@ export interface AuthState {
     serverList: Record<string, ServerListItem>;
 }
 
-export const useAuthStore = create<AuthSlice>()(
+export const useAuthStore = createWithEqualityFn<AuthSlice>()(
     persist(
         devtools(
             immer((set, get) => ({

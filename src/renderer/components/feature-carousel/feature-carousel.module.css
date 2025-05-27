@@ -1,0 +1,74 @@
+.carousel {
+    position: relative;
+    height: 35vh;
+    min-height: 250px;
+    padding: 2rem;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--theme-colors-background), rgb(25 26 28 / 60%));
+    border-radius: 1rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-areas: 'image info';
+    grid-template-rows: 1fr;
+    grid-template-columns: 200px minmax(0, 1fr);
+    grid-auto-columns: 1fr;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+}
+
+.image-column {
+    z-index: 15;
+    display: flex;
+    grid-area: image;
+    align-items: flex-end;
+}
+
+.info-column {
+    z-index: 15;
+    display: flex;
+    grid-area: info;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 100%;
+    padding-left: 1rem;
+}
+
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 150%;
+    height: 150%;
+    user-select: none;
+    object-fit: var(--theme-image-fit);
+    object-position: 0 30%;
+    filter: blur(24px);
+}
+
+.background-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgb(25 26 28 / 30%), var(--theme-colors-background));
+}
+
+.wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.title-wrapper {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}

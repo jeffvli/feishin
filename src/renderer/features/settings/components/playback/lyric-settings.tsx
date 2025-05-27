@@ -1,30 +1,20 @@
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 import { languages } from '/@/i18n/i18n';
-import {
-    MultiSelect,
-    MultiSelectProps,
-    NumberInput,
-    Select,
-    Switch,
-    TextInput,
-} from '/@/renderer/components';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useLyricsSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Select } from '/@/shared/components/select/select';
+import { Switch } from '/@/shared/components/switch/switch';
+import { TextInput } from '/@/shared/components/text-input/text-input';
 import { LyricSource } from '/@/shared/types/domain-types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
-
-const WorkingButtonSelect = styled(MultiSelect)<MultiSelectProps>`
-    & button {
-        padding: 0;
-    }
-`;
 
 export const LyricSettings = () => {
     const { t } = useTranslation();
@@ -77,17 +67,17 @@ export const LyricSettings = () => {
         },
         {
             control: (
-                <WorkingButtonSelect
+                <MultiSelect
                     aria-label="Lyric providers"
                     clearable
                     data={Object.values(LyricSource)}
                     defaultValue={settings.sources}
-                    onChange={(e: LyricSource[]) => {
+                    onChange={(e: string[]) => {
                         localSettings?.set('lyrics', e);
                         setSettings({
                             lyrics: {
                                 ...settings,
-                                sources: e,
+                                sources: e.map((source) => source as LyricSource),
                             },
                         });
                     }}

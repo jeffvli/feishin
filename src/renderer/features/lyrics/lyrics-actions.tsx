@@ -1,9 +1,7 @@
-import { Box, Center, Group, Select, SelectItem } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
 
-import { Button, NumberInput, Tooltip } from '/@/renderer/components';
 import { openLyricSearchModal } from '/@/renderer/features/lyrics/components/lyrics-search-form';
 import {
     useCurrentSong,
@@ -11,11 +9,17 @@ import {
     useSettingsStore,
     useSettingsStoreActions,
 } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
+import { Center } from '/@/shared/components/center/center';
+import { Group } from '/@/shared/components/group/group';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Select } from '/@/shared/components/select/select';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { LyricsOverride } from '/@/shared/types/domain-types';
 
 interface LyricsActionsProps {
     index: number;
-    languages: SelectItem[];
+    languages: { label: string; value: string }[];
 
     onRemoveLyric: () => void;
     onResetLyric: () => void;
@@ -38,7 +42,7 @@ export const LyricsActions = ({
     const { setSettings } = useSettingsStoreActions();
     const { delayMs, sources } = useLyricsSettings();
 
-    const handleLyricOffset = (e: number) => {
+    const handleLyricOffset = (e: number | string) => {
         setSettings({
             lyrics: {
                 ...useSettingsStore.getState().lyrics,
@@ -51,7 +55,7 @@ export const LyricsActions = ({
     const isDesktop = isElectron();
 
     return (
-        <Box style={{ position: 'relative', width: '100%' }}>
+        <div style={{ position: 'relative', width: '100%' }}>
             {languages.length > 1 && (
                 <Center>
                     <Select
@@ -64,7 +68,7 @@ export const LyricsActions = ({
                 </Center>
             )}
 
-            <Group position="center">
+            <Group justify="center">
                 {isDesktop && sources.length ? (
                     <Button
                         disabled={isActionsDisabled}
@@ -119,7 +123,7 @@ export const LyricsActions = ({
                 ) : null}
             </Group>
 
-            <Box style={{ position: 'absolute', right: 0, top: 0 }}>
+            <div style={{ position: 'absolute', right: 0, top: 0 }}>
                 {isDesktop && sources.length ? (
                     <Button
                         disabled={isActionsDisabled}
@@ -130,9 +134,9 @@ export const LyricsActions = ({
                         {t('common.clear', { postProcess: 'sentenceCase' })}
                     </Button>
                 ) : null}
-            </Box>
+            </div>
 
-            <Box style={{ position: 'absolute', right: 0, top: -50 }}>
+            <div style={{ position: 'absolute', right: 0, top: -50 }}>
                 {isDesktop && sources.length ? (
                     <Button
                         disabled={isActionsDisabled}
@@ -143,7 +147,7 @@ export const LyricsActions = ({
                         {t('common.translation', { postProcess: 'sentenceCase' })}
                     </Button>
                 ) : null}
-            </Box>
-        </Box>
+            </div>
+        </div>
     );
 };

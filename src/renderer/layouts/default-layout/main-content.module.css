@@ -1,0 +1,28 @@
+.main-content-container {
+    position: relative;
+    display: grid;
+    grid-area: main-content;
+    grid-template-areas: 'sidebar . right-sidebar';
+    grid-template-rows: 1fr;
+    gap: 0;
+}
+
+.main-content-container.shell {
+    display: flex;
+}
+
+.main-content-container.sidebar-collapsed {
+    grid-template-columns: 80px 1fr;
+}
+
+.main-content-container.sidebar-expanded {
+    grid-template-columns: var(--sidebar-width) 1fr;
+}
+
+.main-content-container.right-expanded {
+    grid-template-columns: var(--sidebar-width) 1fr var(--right-sidebar-width);
+}
+
+.main-content-container.sidebar-collapsed.right-expanded {
+    grid-template-columns: 80px 1fr var(--right-sidebar-width);
+}

@@ -1,167 +1,73 @@
-import type { TooltipProps, UnstyledButtonProps } from '@mantine/core';
+import clsx from 'clsx';
+import { motion } from 'motion/react';
+import { forwardRef, ReactNode } from 'react';
 
-import { UnstyledButton } from '@mantine/core';
-import { motion } from 'framer-motion';
-/* stylelint-disable no-descending-specificity */
-import { ComponentPropsWithoutRef, forwardRef, ReactNode } from 'react';
-import styled, { css } from 'styled-components';
+import styles from './player-button.module.css';
 
-import { Tooltip } from '/@/renderer/components';
+import { Button, ButtonProps } from '/@/shared/components/button/button';
+import { Tooltip, TooltipProps } from '/@/shared/components/tooltip/tooltip';
 
-type MantineButtonProps = ComponentPropsWithoutRef<'button'> & UnstyledButtonProps;
-interface PlayerButtonProps extends MantineButtonProps {
-    $isActive?: boolean;
+interface PlayerButtonProps extends ButtonProps {
     icon: ReactNode;
+    isActive?: boolean;
     tooltip?: Omit<TooltipProps, 'children'>;
     variant: 'main' | 'secondary' | 'tertiary';
 }
 
-const WrapperMainVariant = css`
-    margin: 0 0.5rem;
-`;
-
-type MotionWrapperProps = { variant: PlayerButtonProps['variant'] };
-
-const MotionWrapper = styled(motion.div)<MotionWrapperProps>`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    ${({ variant }) => variant === 'main' && WrapperMainVariant};
-`;
-
-const ButtonMainVariant = css`
-    padding: 0.5rem;
-    background: var(--playerbar-btn-main-bg);
-    border-radius: 50%;
-
-    svg {
-        display: flex;
-        fill: var(--playerbar-btn-main-fg);
-    }
-
-    &:focus-visible {
-        background: var(--playerbar-btn-main-bg-hover);
-    }
-
-    &:hover {
-        background: var(--playerbar-btn-main-bg-hover);
-
-        svg {
-            fill: var(--playerbar-btn-main-fg-hover);
-        }
-    }
-`;
-
-const ButtonSecondaryVariant = css`
-    padding: 0.5rem;
-`;
-
-const ButtonTertiaryVariant = css`
-    padding: 0.5rem;
-
-    svg {
-        display: flex;
-    }
-
-    &:focus-visible {
-        svg {
-            fill: var(--playerbar-btn-fg-hover);
-            stroke: var(--playerbar-btn-fg-hover);
-        }
-    }
-`;
-
-type StyledPlayerButtonProps = Omit<PlayerButtonProps, 'icon'>;
-
-const StyledPlayerButton = styled(UnstyledButton)<StyledPlayerButtonProps>`
-    all: unset;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 0.5rem;
-    overflow: visible;
-    cursor: default;
-    background: var(--playerbar-btn-bg-hover);
-
-    button {
-        display: flex;
-    }
-
-    &:focus-visible {
-        background: var(--playerbar-btn-bg-hover);
-        outline: 1px var(--primary-color) solid;
-    }
-
-    &:disabled {
-        opacity: 0.5;
-    }
-
-    svg {
-        display: flex;
-        fill: ${({ $isActive }) =>
-            $isActive ? 'var(--primary-color)' : 'var(--playerbar-btn-fg)'};
-        stroke: var(--playerbar-btn-fg);
-    }
-
-    &:hover {
-        color: var(--playerbar-btn-fg-hover);
-        background: var(--playerbar-btn-bg-hover);
-
-        svg {
-            fill: ${({ $isActive }) =>
-                $isActive ? 'var(--primary-color)' : 'var(--playerbar-btn-fg-hover)'};
-        }
-    }
-
-    ${({ variant }) =>
-        variant === 'main'
-            ? ButtonMainVariant
-            : variant === 'secondary'
-              ? ButtonSecondaryVariant
-              : ButtonTertiaryVariant};
-`;
-
 export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
-    ({ icon, tooltip, variant, ...rest }: PlayerButtonProps, ref) => {
+    ({ icon, isActive, tooltip, variant, ...rest }: PlayerButtonProps, ref) => {
         if (tooltip) {
             return (
                 <Tooltip {...tooltip}>
-                    <MotionWrapper
+                    <motion.div
+                        className={clsx({
+                            [styles.main]: variant === 'main',
+                            [styles.motionWrapper]: true,
+                        })}
                         ref={ref}
-                        variant={variant}
                     >
-                        <StyledPlayerButton
-                            variant={variant}
+                        <Button
+                            className={clsx(styles.playerButton, styles[variant], {
+                                [styles.active]: isActive,
+                            })}
                             {...rest}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 rest.onClick?.(e);
                             }}
+                            size="compact-md"
+                            variant="transparent"
                         >
                             {icon}
-                        </StyledPlayerButton>
-                    </MotionWrapper>
+                        </Button>
+                    </motion.div>
                 </Tooltip>
             );
         }
 
         return (
-            <MotionWrapper
+            <motion.div
+                className={clsx({
+                    [styles.main]: variant === 'main',
+                    [styles.motionWrapper]: true,
+                })}
                 ref={ref}
-                variant={variant}
             >
-                <StyledPlayerButton
-                    variant={variant}
+                <Button
+                    className={clsx(styles.playerButton, styles[variant], {
+                        [styles.active]: isActive,
+                    })}
                     {...rest}
                     onClick={(e) => {
                         e.stopPropagation();
                         rest.onClick?.(e);
                     }}
+                    size="compact-md"
+                    variant="transparent"
                 >
                     {icon}
-                </StyledPlayerButton>
-            </MotionWrapper>
+                </Button>
+            </motion.div>
         );
     },
 );
