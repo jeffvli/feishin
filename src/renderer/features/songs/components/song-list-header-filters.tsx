@@ -13,6 +13,7 @@ import {
     RiPlayFill,
     RiRefreshLine,
     RiSettings3Fill,
+    RiShuffleFill,
 } from 'react-icons/ri';
 
 import i18n from '/@/i18n/i18n';
@@ -593,6 +594,12 @@ export const SongListHeaderFilters = ({
                             onClick={() => handlePlay?.({ playType: Play.NOW })}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                            icon={<RiShuffleFill />}
+                            onClick={() => handlePlay?.({ playType: Play.SHUFFLE })}
+                        >
+                            {t('player.shuffle', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddBoxFill />}

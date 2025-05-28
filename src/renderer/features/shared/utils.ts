@@ -7,6 +7,10 @@ export const PLAY_TYPES = [
         play: Play.NOW,
     },
     {
+        label: i18n.t('player.shuffle', { postProcess: 'sentenceCase' }),
+        play: Play.SHUFFLE,
+    },
+    {
         label: i18n.t('player.addLast', { postProcess: 'sentenceCase' }),
         play: Play.LAST,
     },

@@ -1,5 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { RiAddBoxFill, RiAddCircleFill, RiMoreFill, RiPlayFill } from 'react-icons/ri';
+import {
+    RiAddBoxFill,
+    RiAddCircleFill,
+    RiMoreFill,
+    RiPlayFill,
+    RiShuffleFill,
+} from 'react-icons/ri';
 
 import { Button, DropdownMenu, PageHeader, Paper, SpinnerIcon } from '/@/renderer/components';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
@@ -61,6 +67,12 @@ export const AlbumArtistDetailTopSongsListHeader = ({
                             onClick={() => handlePlay(Play.NOW)}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
+                        </DropdownMenu.Item>
+                        <DropdownMenu.Item
+                            icon={<RiShuffleFill />}
+                            onClick={() => handlePlay(Play.SHUFFLE)}
+                        >
+                            {t('player.shuffle', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                             icon={<RiAddBoxFill />}
