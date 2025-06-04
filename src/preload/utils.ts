@@ -21,7 +21,9 @@ const onSaveQueue = (cb: (event: IpcRendererEvent) => void) => {
 const onRestoreQueue = (cb: (event: IpcRendererEvent, data: Partial<any>) => void) => {
     ipcRenderer.on('renderer-restore-queue', cb);
 };
-
+const onRestoreQueueFail = (cb: (event: IpcRendererEvent, data: any) => void) => {
+    ipcRenderer.on('renderer-restore-queue-fail', cb);
+};
 const playerErrorListener = (cb: (event: IpcRendererEvent, data: { code: number }) => void) => {
     ipcRenderer.on('player-error-listener', cb);
 };
@@ -59,6 +61,7 @@ export const utils = {
     logger,
     mainMessageListener,
     onRestoreQueue,
+    onRestoreQueueFail,
     onSaveQueue,
     openItem,
     playerErrorListener,
