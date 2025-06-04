@@ -8,6 +8,7 @@ import {
     RiArrowDownSLine,
     RiArrowUpSLine,
     RiPlayFill,
+    RiShuffleFill,
 } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -137,6 +138,21 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
                         variant="default"
                     >
                         <RiPlayFill />
+                    </Button>
+                    <Button
+                        compact
+                        onClick={() => {
+                            if (!data?.items?.[index].id) return;
+                            data.handlePlay(data?.items[index].id, Play.SHUFFLE);
+                        }}
+                        size="md"
+                        tooltip={{
+                            label: t('player.shuffle', { postProcess: 'sentenceCase' }),
+                            openDelay: 500,
+                        }}
+                        variant="default"
+                    >
+                        <RiShuffleFill />
                     </Button>
                     <Button
                         compact
