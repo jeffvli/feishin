@@ -32,9 +32,9 @@ export const Visualizer = () => {
                 connectSpeakers: false,
                 gradient: 'prism',
                 mode: 4,
-                showPeaks: false,
-                showBGColor: false,
                 overlay: true,
+                showBGColor: false,
+                showPeaks: false,
                 smoothing: 0.8,
             });
             setMotion(audioMotion);
