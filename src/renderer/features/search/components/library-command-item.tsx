@@ -169,19 +169,21 @@ export const LibraryCommandItem = ({
                 >
                     <RiPlayFill />
                 </Button>
-                <Button
-                    compact
-                    disabled={disabled}
-                    onClick={(e) => handlePlay(e, id, Play.SHUFFLE)}
-                    size="md"
-                    tooltip={{
-                        label: t('player.play', { postProcess: 'sentenceCase' }),
-                        openDelay: 500,
-                    }}
-                    variant="default"
-                >
-                    <RiShuffleFill />
-                </Button>
+                {itemType !== LibraryItem.SONG && (
+                    <Button
+                        compact
+                        disabled={disabled}
+                        onClick={(e) => handlePlay(e, id, Play.SHUFFLE)}
+                        size="md"
+                        tooltip={{
+                            label: t('player.shuffle', { postProcess: 'sentenceCase' }),
+                            openDelay: 500,
+                        }}
+                        variant="default"
+                    >
+                        <RiShuffleFill />
+                    </Button>
+                )}
                 <Button
                     compact
                     disabled={disabled}
