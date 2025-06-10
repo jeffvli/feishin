@@ -68,6 +68,65 @@ interface NetEaseResponse {
     result: Result;
 }
 
+/**
+ * A helper function to intersperse translated lyric lines into an original LRC string.
+ * It finds lines with matching timestamps and inserts the translated line directly
+ * after the original, preserving the full LRC format for both lines.
+ * @param original The original LRC lyric string.
+ * @param translated The translated LRC lyric string.
+ * @returns A new LRC string with translated lines injected, or the original string if no translation is available.
+ */
+function mergeLyrics(original: string | undefined, translated: string | undefined): string | null {
+    if (!original) {
+        return null;
+    }
+    if (!translated) {
+        return original;
+    }
+
+    const lrcLineRegex = /\[(\d{2}:\d{2}\.\d{2,3})\](.*)/;
+    const translatedMap = new Map<string, string>();
+
+    // Parse the translated LRC and store it in a Map for efficient timestamp-based lookups.
+    translated.split('\n').forEach(line => {
+        const match = line.match(lrcLineRegex);
+        if (match) {
+            const timestamp = match[1];
+            const text = match[2].trim();
+            if (text) {
+                translatedMap.set(timestamp, text);
+            }
+        }
+    });
+
+    if (translatedMap.size === 0) {
+        return original;
+    }
+
+    // Iterate through each line of the original LRC. If a translation exists for
+    // the same timestamp, insert it as a new, fully-formatted LRC line.
+    const finalLines = original.split('\n').flatMap(line => {
+        const match = line.match(lrcLineRegex);
+
+        if (match) {
+            const timestamp = match[1];
+            const translatedText = translatedMap.get(timestamp);
+
+            if (translatedText) {
+                // Return an array containing both the original line and the new translated line.
+                // flatMap will flatten this into the final array of lines.
+                const translatedLine = `[${timestamp}]${translatedText}`;
+                return [line, translatedLine];
+            }
+        }
+
+        // If no match or no translation is found, return only the original line.
+        return [line];
+    });
+
+    return finalLines.join('\n');
+}
+
 export async function getLyricsBySongId(songId: string): Promise<null | string> {
     let result: AxiosResponse<any, any>;
     try {
@@ -76,14 +135,17 @@ export async function getLyricsBySongId(songId: string): Promise<null | string> 
                 id: songId,
                 kv: '-1',
                 lv: '-1',
+                tv: '-1',
             },
         });
     } catch (e) {
         console.error('NetEase lyrics request got an error!', e);
         return null;
     }
-
-    return result.data.klyric?.lyric || result.data.lrc?.lyric;
+    const originalLrc = result.data.lrc?.lyric;
+    const translatedLrc = result.data.tlyric?.lyric;
+        // Attempt to merge the original lyrics with available translations.
+    return mergeLyrics(originalLrc, translatedLrc);
 }
 
 export async function getSearchResults(
