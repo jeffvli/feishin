@@ -180,6 +180,8 @@
         "followLyric_description": "滚动歌词到当前播放位置",
         "audioExclusiveMode": "音频独占模式",
         "font": "字体",
+        "neteaseTranslation": "启用网易云歌词翻译",
+        "neteaseTranslation_description": "启用后，在获取歌词时将包含并显示网易云音乐提供的翻译（如果存在）。",
         "crossfadeDuration_description": "设置淡入淡出持续时间",
         "audioDevice": "音频设备",
         "enableRemote": "启用远程控制服务器",
