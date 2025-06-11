@@ -103,6 +103,30 @@ export const LyricSettings = () => {
         },
         {
             control: (
+                <Switch
+                    aria-label="Enable NetEase translations"
+                    defaultChecked={settings.enableNeteaseTranslation}
+                    onChange={(e) => {
+                        const isChecked = e.currentTarget.checked;
+                        setSettings({
+                            lyrics: {
+                                ...settings,
+                                enableNeteaseTranslation: e.currentTarget.checked,
+                            },
+                        });
+                        localSettings?.set('enableNeteaseTranslation', isChecked);
+                    }}
+                />
+            ),
+            description: t('setting.neteaseTranslation', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.neteaseTranslation', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
                 <NumberInput
                     defaultValue={settings.delayMs}
                     onBlur={(e) => {

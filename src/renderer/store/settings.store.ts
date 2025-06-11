@@ -263,6 +263,7 @@ export interface SettingsState {
     lyrics: {
         alignment: 'center' | 'left' | 'right';
         delayMs: number;
+        enableNeteaseTranslation: boolean;
         fetch: boolean;
         follow: boolean;
         fontSize: number;
@@ -445,6 +446,7 @@ const initialState: SettingsState = {
     lyrics: {
         alignment: 'center',
         delayMs: 0,
+        enableNeteaseTranslation: false,
         fetch: false,
         follow: true,
         fontSize: 46,

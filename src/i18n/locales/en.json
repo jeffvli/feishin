@@ -609,6 +609,8 @@
         "mpvExtraParameters_help": "one per line",
         "musicbrainz": "show musicbrainz links",
         "musicbrainz_description": "show links to musicbrainz on artist/album pages, where mbid exists",
+        "neteaseTranslation": "Enable NetEase translations",
+        "neteaseTranslation_description": "When enabled, fetches and displays translated lyrics from NetEase if available.",
         "passwordStore": "passwords/secret store",
         "passwordStore_description": "what password/secret store to use. change this if you are having issues storing passwords.",
         "playbackStyle": "playback style",
