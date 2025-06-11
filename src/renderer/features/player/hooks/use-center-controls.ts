@@ -119,9 +119,7 @@ export const useCenterControls = (args: { playersRef: any }) => {
 
     const handleStop = useCallback(() => {
         if (isMpvPlayer) {
-            // mpvPlayer!.pause();
-            mpvPlayer!.stop(); 
-            // mpvPlayer!.seekTo(0);
+            mpvPlayer!.stop();
         } else {
             stopPlayback();
         }
