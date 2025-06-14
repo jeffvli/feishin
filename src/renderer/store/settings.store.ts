@@ -201,10 +201,8 @@ export interface SettingsState {
     discord: {
         clientId: string;
         enabled: boolean;
-        enableIdle: boolean;
         showAsListening: boolean;
         showServerImage: boolean;
-        updateInterval: number;
     };
     font: {
         builtIn: string;
@@ -352,10 +350,8 @@ const initialState: SettingsState = {
     discord: {
         clientId: '1165957668758900787',
         enabled: false,
-        enableIdle: false,
         showAsListening: false,
         showServerImage: false,
-        updateInterval: 15,
     },
     font: {
         builtIn: 'Inter',
