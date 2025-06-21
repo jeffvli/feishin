@@ -116,11 +116,11 @@ First thing to do is check that your MPV binary path is correct. Navigate to the
 
 ### What music servers does Feishin support?
 
-Feishin supports any music server that implements a [Navidrome](https://www.navidrome.org/), [Jellyfin](https://jellyfin.org/), or [Subsonic](https://www.subsonic.org/pages/index.jsp) API.
+Feishin supports any music server that implements a [Navidrome](https://www.navidrome.org/), [Jellyfin](https://jellyfin.org/), or [OpenSubsonic compatible](https://opensubsonic.netlify.app/) API.
 
 - [Navidrome](https://github.com/navidrome/navidrome)
 - [Jellyfin](https://github.com/jellyfin/jellyfin)
-- [Subsonic](https://www.subsonic.org/pages/index.jsp) and compatible servers, such as...
+- [OpenSubsonic](https://opensubsonic.netlify.app/) compatible servers, such as...
     - [Airsonic-Advanced](https://github.com/airsonic-advanced/airsonic-advanced)
     - [Ampache](https://ampache.org)
     - [Astiga](https://asti.ga/)
