@@ -5,7 +5,7 @@
     padding: 2rem;
     overflow: hidden;
     background: linear-gradient(180deg, var(--theme-colors-background), rgb(25 26 28 / 60%));
-    border-radius: 1rem;
+    border-radius: var(--theme-radius-md);
 }
 
 .grid {

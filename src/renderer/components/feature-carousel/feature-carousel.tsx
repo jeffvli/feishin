@@ -4,20 +4,22 @@ import type { MouseEvent } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
 
 import styles from './feature-carousel.module.css';
 
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { PlayButton } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayButtonBehavior } from '/@/renderer/store';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Image } from '/@/shared/components/image/image';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
+import { Text } from '/@/shared/components/text/text';
 import { Album, LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
@@ -106,45 +108,36 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                     <div className={styles.titleWrapper}>
                                         <TextTitle
                                             fw={900}
-                                            lh="3.5rem"
+                                            lineClamp={2}
                                             order={1}
                                             overflow="hidden"
-                                            style={{ fontSize: '3.5rem' }}
                                         >
                                             {currentItem?.name}
                                         </TextTitle>
                                     </div>
                                     <div className={styles.titleWrapper}>
                                         {currentItem?.albumArtists.slice(0, 1).map((artist) => (
-                                            <TextTitle
+                                            <Text
                                                 fw={600}
                                                 key={`carousel-artist-${artist.id}`}
-                                                order={2}
                                             >
                                                 {artist.name}
-                                            </TextTitle>
+                                            </Text>
                                         ))}
                                     </div>
                                     <Group>
-                                        {currentItem?.genres
-                                            ?.slice(0, 1)
-                                            .map((genre) => (
-                                                <Badge key={`carousel-genre-${genre.id}`}>
-                                                    {genre.name}
-                                                </Badge>
-                                            ))}
-                                        <Badge>{currentItem?.releaseYear}</Badge>
-                                        {currentItem?.songCount !== null &&
-                                            currentItem?.songCount !== undefined && (
-                                                <Badge variant="default">
-                                                    {t('entity.trackWithCount', {
-                                                        count: currentItem?.songCount || 0,
-                                                    })}
-                                                </Badge>
-                                            )}
+                                        {currentItem?.genres?.slice(0, 1).map((genre) => (
+                                            <Badge
+                                                key={`carousel-genre-${genre.id}`}
+                                                variant="default"
+                                            >
+                                                {genre.name}
+                                            </Badge>
+                                        ))}
+                                        <Badge variant="default">{currentItem?.releaseYear}</Badge>
                                     </Group>
                                     <Group justify="space-between">
-                                        <Button
+                                        <PlayButton
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 e.stopPropagation();
@@ -158,7 +151,6 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                                     playType,
                                                 });
                                             }}
-                                            style={{ borderRadius: '5rem' }}
                                             variant="outline"
                                         >
                                             {t(
@@ -169,21 +161,21 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                                       : 'player.addLast',
                                                 { postProcess: 'titleCase' },
                                             )}
-                                        </Button>
+                                        </PlayButton>
                                         <Group gap="sm">
                                             <Button
                                                 onClick={handlePrevious}
                                                 radius="lg"
-                                                variant="outline"
+                                                variant="subtle"
                                             >
-                                                <RiArrowLeftSLine size="2rem" />
+                                                <Icon icon="arrowLeftS" />
                                             </Button>
                                             <Button
                                                 onClick={handleNext}
                                                 radius="lg"
-                                                variant="outline"
+                                                variant="subtle"
                                             >
-                                                <RiArrowRightSLine size="2rem" />
+                                                <Icon icon="arrowRightS" />
                                             </Button>
                                         </Group>
                                     </Group>
