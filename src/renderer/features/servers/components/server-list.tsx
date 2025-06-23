@@ -3,20 +3,23 @@ import { openContextModal } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiAddFill, RiServerFill } from 'react-icons/ri';
 
+import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
+import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
+import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { AddServerForm } from '/@/renderer/features/servers/components/add-server-form';
 import { ServerListItem } from '/@/renderer/features/servers/components/server-list-item';
 import { useCurrentServer, useServerList } from '/@/renderer/store';
-import { titleCase } from '/@/renderer/utils';
 import { Accordion } from '/@/shared/components/accordion/accordion';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { ContextModalVars } from '/@/shared/components/modal/modal';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
 import { Text } from '/@/shared/components/text/text';
+import { ServerType } from '/@/shared/types/domain-types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -76,9 +79,21 @@ export const ServerList = () => {
                             >
                                 <Accordion.Control>
                                     <Group>
-                                        <RiServerFill size={15} />
-                                        <Text fw={server.id === currentServer?.id ? 800 : 400}>
-                                            {titleCase(server?.type)} - {server?.name}
+                                        <img
+                                            src={
+                                                server.type === ServerType.NAVIDROME
+                                                    ? NavidromeLogo
+                                                    : server.type === ServerType.JELLYFIN
+                                                      ? JellyfinLogo
+                                                      : OpenSubsonicLogo
+                                            }
+                                            style={{
+                                                height: 'var(--theme-font-size-lg)',
+                                                width: 'var(--theme-font-size-lg)',
+                                            }}
+                                        />
+                                        <Text fw={server.id === currentServer?.id ? 600 : 400}>
+                                            {server?.name}
                                         </Text>
                                     </Group>
                                 </Accordion.Control>
@@ -94,10 +109,8 @@ export const ServerList = () => {
                     >
                         <Button
                             autoFocus
-                            leftSection={<RiAddFill size={15} />}
+                            leftSection={<Icon icon="add" />}
                             onClick={handleAddServerModal}
-                            size="compact-sm"
-                            variant="default"
                         >
                             {t('form.addServer.title', { postProcess: 'titleCase' })}
                         </Button>

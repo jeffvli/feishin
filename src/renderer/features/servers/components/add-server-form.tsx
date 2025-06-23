@@ -28,7 +28,7 @@ const SERVER_TYPES = [
 ];
 
 interface AddServerFormProps {
-    onCancel: () => void;
+    onCancel: (() => void) | null;
 }
 
 export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
@@ -46,7 +46,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             type:
                 (localSettings
                     ? localSettings.env.SERVER_TYPE
-                    : toServerType(window.SERVER_TYPE)) ?? ServerType.JELLYFIN,
+                    : toServerType(window.SERVER_TYPE)) ?? ServerType.NAVIDROME,
             url: (localSettings ? localSettings.env.SERVER_URL : window.SERVER_URL) ?? 'https://',
             username: '',
         },
@@ -192,13 +192,18 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                         {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
                     />
                 )}
-                <Group justify="flex-end">
-                    <Button
-                        onClick={onCancel}
-                        variant="subtle"
-                    >
-                        {t('common.cancel', { postProcess: 'titleCase' })}
-                    </Button>
+                <Group
+                    grow
+                    justify="flex-end"
+                >
+                    {onCancel && (
+                        <Button
+                            onClick={onCancel}
+                            variant="subtle"
+                        >
+                            {t('common.cancel', { postProcess: 'titleCase' })}
+                        </Button>
+                    )}
                     <Button
                         disabled={isSubmitDisabled}
                         loading={isLoading}
