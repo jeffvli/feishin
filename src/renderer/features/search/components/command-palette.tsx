@@ -1,7 +1,6 @@
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import { Fragment, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiCloseFill, RiSearchLine } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router';
 
 import { usePlayQueueAdd } from '/@/renderer/features/player';
@@ -16,6 +15,7 @@ import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Kbd } from '/@/shared/components/kbd/kbd';
 import { Modal } from '/@/shared/components/modal/modal';
 import { Paper } from '/@/shared/components/paper/paper';
@@ -124,7 +124,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
             >
                 <TextInput
                     data-autofocus
-                    leftSection={<RiSearchLine />}
+                    leftSection={<Icon icon="search" />}
                     onChange={(e) => setQuery(e.currentTarget.value)}
                     ref={searchInputRef}
                     rightSection={
@@ -136,7 +136,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                                 }}
                                 variant="transparent"
                             >
-                                <RiCloseFill />
+                                <Icon icon="x" />
                             </ActionIcon>
                         )
                     }

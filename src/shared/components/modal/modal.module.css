@@ -1,5 +1,4 @@
 .title {
-    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
     font-size: var(--theme-font-size-lg);
     font-weight: 700;
 }

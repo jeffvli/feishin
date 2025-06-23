@@ -32,7 +32,7 @@ export const PlaylistListContent = ({ gridRef, itemCount, tableRef }: PlaylistLi
 
     return (
         <Suspense fallback={<Spinner container />}>
-            {display === ListDisplayType.CARD || display === ListDisplayType.POSTER ? (
+            {display === ListDisplayType.CARD || display === ListDisplayType.GRID ? (
                 <PlaylistListGridView
                     gridRef={gridRef}
                     itemCount={itemCount}

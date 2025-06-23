@@ -2,7 +2,6 @@ import isElectron from 'is-electron';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, KeyboardEvent, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiDeleteBinLine, RiEditLine, RiKeyboardBoxLine } from 'react-icons/ri';
 
 import styles from './hotkeys-manager-settings.module.css';
 
@@ -13,6 +12,7 @@ import { BindingActions, useHotkeySettings, useSettingsStoreActions } from '/@/r
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 
 const ipc = isElectron() ? window.api.ipc : null;
@@ -251,7 +251,7 @@ export const HotkeyManagerSettings = () => {
                         />
                         <TextInput
                             id={`hotkey-${binding}`}
-                            leftSection={<RiKeyboardBoxLine />}
+                            leftSection={<Icon icon="keyboard" />}
                             onBlur={() => setSelected(null)}
                             onChange={() => {}}
                             onKeyDownCapture={(e) => {
@@ -259,6 +259,16 @@ export const HotkeyManagerSettings = () => {
                                 handleSetHotkey(binding as BindingActions, e);
                             }}
                             readOnly
+                            rightSection={
+                                <ActionIcon
+                                    icon="edit"
+                                    onClick={() => {
+                                        setSelected(binding as BindingActions);
+                                        document.getElementById(`hotkey-${binding}`)?.focus();
+                                    }}
+                                    variant="transparent"
+                                />
+                            }
                             style={{
                                 opacity: selected === (binding as BindingActions) ? 0.8 : 1,
                                 outline: duplicateHotkeyMap.includes(
@@ -287,21 +297,16 @@ export const HotkeyManagerSettings = () => {
                                 }}
                             />
                         )}
-                        <ActionIcon
-                            onClick={() => {
-                                setSelected(binding as BindingActions);
-                                document.getElementById(`hotkey-${binding}`)?.focus();
-                            }}
-                            variant="default"
-                        >
-                            <RiEditLine />
-                        </ActionIcon>
-                        <ActionIcon
-                            onClick={() => handleClearHotkey(binding as BindingActions)}
-                            variant="default"
-                        >
-                            <RiDeleteBinLine />
-                        </ActionIcon>
+                        {bindings[binding as keyof typeof BINDINGS_MAP].hotkey && (
+                            <ActionIcon
+                                icon="x"
+                                iconProps={{
+                                    color: 'error',
+                                }}
+                                onClick={() => handleClearHotkey(binding as BindingActions)}
+                                variant="transparent"
+                            />
+                        )}
                     </Group>
                 ))}
             </div>

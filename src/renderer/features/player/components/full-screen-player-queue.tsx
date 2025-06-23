@@ -2,8 +2,6 @@ import clsx from 'clsx';
 import { motion } from 'motion/react';
 import { CSSProperties, lazy, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HiOutlineQueueList } from 'react-icons/hi2';
-import { RiFileMusicLine, RiFileTextLine } from 'react-icons/ri';
 
 import styles from './full-screen-player-queue.module.css';
 
@@ -35,19 +33,16 @@ export const FullScreenPlayerQueue = () => {
         const items = [
             {
                 active: activeTab === 'queue',
-                icon: <RiFileMusicLine size="1.5rem" />,
                 label: t('page.fullscreenPlayer.upNext'),
                 onClick: () => setStore({ activeTab: 'queue' }),
             },
             {
                 active: activeTab === 'related',
-                icon: <HiOutlineQueueList size="1.5rem" />,
                 label: t('page.fullscreenPlayer.related'),
                 onClick: () => setStore({ activeTab: 'related' }),
             },
             {
                 active: activeTab === 'lyrics',
-                icon: <RiFileTextLine size="1.5rem" />,
                 label: t('page.fullscreenPlayer.lyrics'),
                 onClick: () => setStore({ activeTab: 'lyrics' }),
             },
@@ -56,7 +51,6 @@ export const FullScreenPlayerQueue = () => {
         if (type === PlaybackType.WEB && webAudio) {
             items.push({
                 active: activeTab === 'visualizer',
-                icon: <RiFileTextLine size="1.5rem" />,
                 label: t('page.fullscreenPlayer.visualizer', { postProcess: 'titleCase' }),
                 onClick: () => setStore({ activeTab: 'visualizer' }),
             });
@@ -77,6 +71,7 @@ export const FullScreenPlayerQueue = () => {
             <Group
                 align="center"
                 className="full-screen-player-queue-header"
+                gap={0}
                 grow
                 justify="center"
             >
@@ -86,18 +81,11 @@ export const FullScreenPlayerQueue = () => {
                         key={`tab-${item.label}`}
                     >
                         <Button
-                            fullWidth
+                            flex={1}
                             fw="600"
                             onClick={item.onClick}
                             pos="relative"
                             size="lg"
-                            style={{
-                                alignItems: 'center',
-                                color: item.active
-                                    ? 'var(--theme-colors-foreground) !important'
-                                    : 'var(--theme-colors-foreground-muted) !important',
-                                letterSpacing: '1px',
-                            }}
                             uppercase
                             variant="subtle"
                         >

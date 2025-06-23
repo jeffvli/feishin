@@ -1,17 +1,19 @@
 import { useLocalStorage } from '@mantine/hooks';
 import { useCallback } from 'react';
-import { RiExternalLinkLine } from 'react-icons/ri';
+import { useTranslation } from 'react-i18next';
 
 import packageJson from '../../package.json';
 
 import { Button } from '/@/shared/components/button/button';
 import { Dialog } from '/@/shared/components/dialog/dialog';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 
 export function IsUpdatedDialog() {
     const { version } = packageJson;
+    const { t } = useTranslation();
 
     const [value, setValue] = useLocalStorage({ key: 'version' });
 
@@ -31,23 +33,23 @@ export function IsUpdatedDialog() {
             }}
         >
             <Stack>
-                <Text>A new version of Feishin has been installed ({version})</Text>
+                <Text>{t('common.newVersion', { postProcess: 'sentenceCase', version })}</Text>
                 <Group wrap="nowrap">
                     <Button
                         component="a"
                         href={`https://github.com/jeffvli/feishin/releases/tag/v${version}`}
                         onClick={handleDismiss}
-                        rightSection={<RiExternalLinkLine />}
+                        rightSection={<Icon icon="externalLink" />}
                         target="_blank"
                         variant="filled"
                     >
-                        View release notes
+                        {t('common.viewReleaseNotes', { postProcess: 'sentenceCase' })}
                     </Button>
                     <Button
                         onClick={handleDismiss}
                         variant="default"
                     >
-                        Dismiss
+                        {t('common.dismiss', { postProcess: 'titleCase' })}
                     </Button>
                 </Group>
             </Stack>

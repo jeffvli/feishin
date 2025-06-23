@@ -3,18 +3,9 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { IDatasource } from '@ag-grid-community/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
+import debounce from 'lodash/debounce';
+import { MouseEvent, MutableRefObject, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    RiAddBoxFill,
-    RiAddCircleFill,
-    RiDeleteBinFill,
-    RiEditFill,
-    RiMoreFill,
-    RiPlayFill,
-    RiRefreshLine,
-    RiSettings3Fill,
-} from 'react-icons/ri';
 import { useNavigate, useParams } from 'react-router';
 
 import i18n from '/@/i18n/i18n';
@@ -26,6 +17,8 @@ import { openUpdatePlaylistModal } from '/@/renderer/features/playlists/componen
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { OrderToggleButton } from '/@/renderer/features/shared';
+import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
+import { MoreButton } from '/@/renderer/features/shared/components/more-button';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
@@ -43,11 +36,8 @@ import { Divider } from '/@/shared/components/divider/divider';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { ConfirmModal } from '/@/shared/components/modal/modal';
-import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
-import { Slider } from '/@/shared/components/slider/slider';
-import { Stack } from '/@/shared/components/stack/stack';
-import { Switch } from '/@/shared/components/switch/switch';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import {
@@ -305,6 +295,8 @@ export const PlaylistDetailSongListHeaderFilters = ({
         setTable({ rowHeight: e });
     };
 
+    const debouncedHandleItemSize = debounce(handleItemSize, 20);
+
     const handleFilterChange = useCallback(
         async (filters: SongListFilter) => {
             if (server?.type !== ServerType.SUBSONIC) {
@@ -394,9 +386,8 @@ export const PlaylistDetailSongListHeaderFilters = ({
     }, [filters.sortOrder, handleFilterChange, playlistId, setFilter]);
 
     const handleSetViewType = useCallback(
-        (e: MouseEvent<HTMLButtonElement>) => {
-            if (!e.currentTarget?.value) return;
-            setPage({ detail: { ...page, display: e.currentTarget.value as ListDisplayType } });
+        (displayType: ListDisplayType) => {
+            setPage({ detail: { ...page, display: displayType } });
         },
         [page, setPage],
     );
@@ -429,10 +420,10 @@ export const PlaylistDetailSongListHeaderFilters = ({
         return tableRef.current?.api.sizeColumnsToFit();
     };
 
-    const handleAutoFitColumns = (e: ChangeEvent<HTMLInputElement>) => {
-        setTable({ autoFit: e.currentTarget.checked });
+    const handleAutoFitColumns = (autoFitColumns: boolean) => {
+        setTable({ autoFit: autoFitColumns });
 
-        if (e.currentTarget.checked) {
+        if (autoFitColumns) {
             tableRef.current?.api.sizeColumnsToFit();
         }
     };
@@ -486,8 +477,6 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            fw="600"
-                            size="compact-md"
                             tooltip={{
                                 label: t('page.playlist.reorder', { postProcess: 'sentenceCase' }),
                             }}
@@ -499,7 +488,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                     <DropdownMenu.Dropdown>
                         {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
                             <DropdownMenu.Item
-                                isActive={filter.value === filters.sortBy}
+                                isSelected={filter.value === filters.sortBy}
                                 key={`filter-${filter.name}`}
                                 onClick={handleSetSortBy}
                                 value={filter.value}
@@ -515,39 +504,32 @@ export const PlaylistDetailSongListHeaderFilters = ({
                     onToggle={handleToggleSortOrder}
                     sortOrder={filters.sortOrder || SortOrder.ASC}
                 />
-                <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
-                        <Button
-                            fw="600"
-                            size="compact-md"
-                            variant="subtle"
-                        >
-                            <RiMoreFill />
-                        </Button>
+                        <MoreButton />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            leftSection={<RiPlayFill />}
+                            leftSection={<Icon icon="mediaPlay" />}
                             onClick={() => handlePlay(Play.NOW)}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            leftSection={<RiAddBoxFill />}
+                            leftSection={<Icon icon="mediaPlayLast" />}
                             onClick={() => handlePlay(Play.LAST)}
                         >
                             {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            leftSection={<RiAddCircleFill />}
+                            leftSection={<Icon icon="mediaPlayNext" />}
                             onClick={() => handlePlay(Play.NEXT)}
                         >
                             {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            leftSection={<RiEditFill />}
+                            leftSection={<Icon icon="edit" />}
                             onClick={() =>
                                 openUpdatePlaylistModal({
                                     playlist: detailQuery.data!,
@@ -558,14 +540,14 @@ export const PlaylistDetailSongListHeaderFilters = ({
                             {t('action.editPlaylist', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            leftSection={<RiDeleteBinFill />}
+                            leftSection={<Icon icon="delete" />}
                             onClick={openDeletePlaylistModal}
                         >
                             {t('action.deletePlaylist', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            leftSection={<RiRefreshLine />}
+                            leftSection={<Icon icon="refresh" />}
                             onClick={handleRefresh}
                         >
                             {t('action.refresh', { postProcess: 'sentenceCase' })}
@@ -587,74 +569,18 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 </DropdownMenu>
             </Group>
             <Group>
-                <DropdownMenu
-                    position="bottom-end"
-                    width={425}
-                >
-                    <DropdownMenu.Target>
-                        <Button
-                            size="compact-md"
-                            variant="subtle"
-                        >
-                            <RiSettings3Fill />
-                        </Button>
-                    </DropdownMenu.Target>
-                    <DropdownMenu.Dropdown>
-                        <DropdownMenu.Label>
-                            {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
-                        </DropdownMenu.Label>
-                        <DropdownMenu.Item
-                            isActive={page.display === ListDisplayType.TABLE}
-                            onClick={handleSetViewType}
-                            value={ListDisplayType.TABLE}
-                        >
-                            Table
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Divider />
-                        <DropdownMenu.Label>
-                            {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
-                        </DropdownMenu.Label>
-                        <DropdownMenu.Item closeMenuOnClick={false}>
-                            <Slider
-                                defaultValue={page.table.rowHeight}
-                                label={null}
-                                max={100}
-                                min={25}
-                                onChangeEnd={handleItemSize}
-                            />
-                        </DropdownMenu.Item>
-                        {(page.display === ListDisplayType.TABLE ||
-                            page.display === ListDisplayType.TABLE_PAGINATED) && (
-                            <>
-                                <DropdownMenu.Label>Table Columns</DropdownMenu.Label>
-                                <DropdownMenu.Item
-                                    closeMenuOnClick={false}
-                                    component="div"
-                                    style={{ cursor: 'default' }}
-                                >
-                                    <Stack>
-                                        <MultiSelect
-                                            clearable
-                                            data={SONG_TABLE_COLUMNS}
-                                            defaultValue={page.table?.columns.map(
-                                                (column) => column.column,
-                                            )}
-                                            onChange={handleTableColumns}
-                                            width={300}
-                                        />
-                                        <Group justify="space-between">
-                                            <Text>Auto Fit Columns</Text>
-                                            <Switch
-                                                defaultChecked={page.table.autoFit}
-                                                onChange={handleAutoFitColumns}
-                                            />
-                                        </Group>
-                                    </Stack>
-                                </DropdownMenu.Item>
-                            </>
-                        )}
-                    </DropdownMenu.Dropdown>
-                </DropdownMenu>
+                <ListConfigMenu
+                    autoFitColumns={page.table.autoFit}
+                    disabledViewTypes={[ListDisplayType.GRID, ListDisplayType.LIST]}
+                    displayType={page.display}
+                    itemSize={page.table.rowHeight}
+                    onChangeAutoFitColumns={handleAutoFitColumns}
+                    onChangeDisplayType={handleSetViewType}
+                    onChangeItemSize={debouncedHandleItemSize}
+                    onChangeTableColumns={handleTableColumns}
+                    tableColumns={page.table.columns.map((column) => column.column)}
+                    tableColumnsData={SONG_TABLE_COLUMNS}
+                />
             </Group>
         </Flex>
     );

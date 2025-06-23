@@ -1,7 +1,7 @@
 import React from 'react';
-import { RiInformationLine } from 'react-icons/ri';
 
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
@@ -41,9 +41,7 @@ export const SettingsOptions = ({ control, description, note, title }: SettingsO
                                 label={note}
                                 openDelay={0}
                             >
-                                <Group>
-                                    <RiInformationLine size={15} />
-                                </Group>
+                                <Icon icon="info" />
                             </Tooltip>
                         )}
                     </Group>

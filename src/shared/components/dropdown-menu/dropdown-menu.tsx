@@ -9,7 +9,6 @@ import type {
 import { Menu as MantineMenu } from '@mantine/core';
 import clsx from 'clsx';
 import { ReactNode } from 'react';
-import { RiArrowLeftSFill } from 'react-icons/ri';
 
 import styles from './dropdown-menu.module.css';
 
@@ -19,8 +18,8 @@ type MenuDividerProps = MantineMenuDividerProps;
 type MenuDropdownProps = MantineMenuDropdownProps;
 interface MenuItemProps extends MantineMenuItemProps {
     children: ReactNode;
-    isActive?: boolean;
     isDanger?: boolean;
+    isSelected?: boolean;
 }
 type MenuLabelProps = MantineMenuLabelProps;
 type MenuProps = MantineMenuProps;
@@ -54,11 +53,12 @@ const MenuLabel = ({ children, ...props }: MenuLabelProps) => {
     );
 };
 
-const pMenuItem = ({ children, isActive, isDanger, ...props }: MenuItemProps) => {
+const pMenuItem = ({ children, isDanger, isSelected, ...props }: MenuItemProps) => {
     return (
         <MantineMenu.Item
-            className={styles['menu-item']}
-            rightSection={isActive && <RiArrowLeftSFill size={15} />}
+            className={clsx(styles['menu-item'], {
+                [styles.selected]: isSelected,
+            })}
             {...props}
         >
             <span

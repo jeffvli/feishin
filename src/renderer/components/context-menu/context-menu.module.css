@@ -12,7 +12,7 @@
     display: flex;
     padding: var(--theme-spacing-sm);
     font-family: var(--theme-content-font-family);
-    font-size: var(--theme-font-size-md);
+    font-size: var(--theme-font-size-sm);
     font-weight: 500;
     color: var(--theme-colors-surface-foreground);
     text-align: left;

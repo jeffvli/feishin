@@ -11,6 +11,7 @@ import styles from './modal.module.css';
 import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 
 export interface ModalProps extends Omit<MantineModalProps, 'onClose'> {
@@ -125,6 +126,9 @@ export const ModalsProvider = ({ children, ...rest }: ModalsProviderProps) => {
                     header: styles.header,
                     root: styles.root,
                     title: styles.title,
+                },
+                closeButtonProps: {
+                    icon: <Icon icon="x" />,
                 },
                 radius: 'lg',
                 transitionProps: {

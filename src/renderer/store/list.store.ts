@@ -346,7 +346,7 @@ export const useListStore = createWithEqualityFn<ListSlice>()(
                 detail: {},
                 item: {
                     album: {
-                        display: ListDisplayType.POSTER,
+                        display: ListDisplayType.GRID,
                         filter: {
                             sortBy: AlbumListSort.RECENTLY_ADDED,
                             sortOrder: SortOrder.DESC,
@@ -387,7 +387,7 @@ export const useListStore = createWithEqualityFn<ListSlice>()(
                         },
                     },
                     albumArtist: {
-                        display: ListDisplayType.POSTER,
+                        display: ListDisplayType.GRID,
                         filter: {
                             sortBy: AlbumArtistListSort.NAME,
                             sortOrder: SortOrder.DESC,
@@ -416,7 +416,7 @@ export const useListStore = createWithEqualityFn<ListSlice>()(
                         },
                     },
                     albumArtistAlbum: {
-                        display: ListDisplayType.POSTER,
+                        display: ListDisplayType.GRID,
                         filter: {
                             sortBy: AlbumListSort.RECENTLY_ADDED,
                             sortOrder: SortOrder.DESC,
@@ -514,7 +514,7 @@ export const useListStore = createWithEqualityFn<ListSlice>()(
                         },
                     },
                     artist: {
-                        display: ListDisplayType.POSTER,
+                        display: ListDisplayType.GRID,
                         filter: {
                             role: '',
                             sortBy: AlbumArtistListSort.NAME,
@@ -573,7 +573,7 @@ export const useListStore = createWithEqualityFn<ListSlice>()(
                         },
                     },
                     playlist: {
-                        display: ListDisplayType.POSTER,
+                        display: ListDisplayType.GRID,
                         filter: {
                             sortBy: PlaylistListSort.NAME,
                             sortOrder: SortOrder.DESC,

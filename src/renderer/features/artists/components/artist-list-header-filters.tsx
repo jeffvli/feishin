@@ -3,7 +3,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { IDatasource } from '@ag-grid-community/core';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
+import { MouseEvent, MutableRefObject, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
@@ -14,6 +14,9 @@ import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table'
 import { useListContext } from '/@/renderer/context/list-context';
 import { useRoles } from '/@/renderer/features/artists/queries/roles-query';
 import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
+import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
+import { MoreButton } from '/@/renderer/features/shared/components/more-button';
+import { RefreshButton } from '/@/renderer/features/shared/components/refresh-button';
 import { useContainerQuery } from '/@/renderer/hooks';
 import {
     ArtistListFilter,
@@ -29,12 +32,7 @@ import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
-import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
 import { Select } from '/@/shared/components/select/select';
-import { Slider } from '/@/shared/components/slider/slider';
-import { Stack } from '/@/shared/components/stack/stack';
-import { Switch } from '/@/shared/components/switch/switch';
-import { Text } from '/@/shared/components/text/text';
 import {
     ArtistListQuery,
     ArtistListSort,
@@ -153,7 +151,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
         serverId: server?.id,
     });
 
-    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
+    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.GRID;
     const musicFoldersQuery = useMusicFolders({ query: null, serverId: server?.id });
 
     const sortByLabel =
@@ -324,10 +322,8 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
     }, [filter.sortOrder, handleFilterChange, pageKey, setFilter]);
 
     const handleSetViewType = useCallback(
-        (e: MouseEvent<HTMLButtonElement>) => {
-            if (!e.currentTarget?.value) return;
-
-            setDisplayType({ data: e.currentTarget.value as ListDisplayType, key: pageKey });
+        (displayType: ListDisplayType) => {
+            setDisplayType({ data: displayType, key: pageKey });
         },
         [pageKey, setDisplayType],
     );
@@ -363,10 +359,10 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
         return tableRef.current?.api.sizeColumnsToFit();
     };
 
-    const handleAutoFitColumns = (e: ChangeEvent<HTMLInputElement>) => {
-        setTable({ data: { autoFit: e.currentTarget.checked }, key: pageKey });
+    const handleAutoFitColumns = (autoFitColumns: boolean) => {
+        setTable({ data: { autoFit: autoFitColumns }, key: pageKey });
 
-        if (e.currentTarget.checked) {
+        if (autoFitColumns) {
             tableRef.current?.api.sizeColumnsToFit();
         }
     };
@@ -399,18 +395,12 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
-                        <Button
-                            fw="600"
-                            size="compact-md"
-                            variant="subtle"
-                        >
-                            {sortByLabel}
-                        </Button>
+                        <Button variant="subtle">{sortByLabel}</Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         {FILTERS[server?.type as keyof typeof FILTERS].map((f) => (
                             <DropdownMenu.Item
-                                isActive={f.value === filter.sortBy}
+                                isSelected={f.value === filter.sortBy}
                                 key={`filter-${f.name}`}
                                 onClick={handleSetSortBy}
                                 value={f.value}
@@ -438,7 +428,7 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                             <DropdownMenu.Dropdown>
                                 {musicFoldersQuery.data?.items.map((folder) => (
                                     <DropdownMenu.Item
-                                        isActive={filter.musicFolderId === folder.id}
+                                        isSelected={filter.musicFolderId === folder.id}
                                         key={`musicFolder-${folder.id}`}
                                         onClick={handleSetMusicFolder}
                                         value={folder.id}
@@ -452,7 +442,6 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                 )}
                 {roles.data?.length && (
                     <>
-                        <Divider orientation="vertical" />
                         <Select
                             data={roles.data}
                             onChange={handleSetRole}
@@ -460,20 +449,10 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                         />
                     </>
                 )}
-                <Divider orientation="vertical" />
-                <ActionIcon
-                    onClick={handleRefresh}
-                    tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
-                    variant="subtle"
-					icon="refresh"
-                />
-                <Divider orientation="vertical" />
+                <RefreshButton onClick={handleRefresh} />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
-                        <ActionIcon
-                            icon="ellipsisHorizontal"
-                            variant="subtle"
-                        />
+                        <MoreButton />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
@@ -487,126 +466,23 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
             </Group>
-            <Group>
-                <DropdownMenu
-                    position="bottom-end"
-                    width={425}
-                >
-                    <DropdownMenu.Target>
-                        <ActionIcon
-                            icon="settings"
-                            variant="subtle"
-                        ></ActionIcon>
-                    </DropdownMenu.Target>
-                    <DropdownMenu.Dropdown>
-                        <DropdownMenu.Label>
-                            {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
-                        </DropdownMenu.Label>
-                        <DropdownMenu.Item
-                            isActive={display === ListDisplayType.CARD}
-                            onClick={handleSetViewType}
-                            value={ListDisplayType.CARD}
-                        >
-                            {t('table.config.view.card', {
-                                postProcess: 'sentenceCase',
-                            })}
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item
-                            isActive={display === ListDisplayType.POSTER}
-                            onClick={handleSetViewType}
-                            value={ListDisplayType.POSTER}
-                        >
-                            {t('table.config.view.poster', {
-                                postProcess: 'sentenceCase',
-                            })}
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item
-                            isActive={display === ListDisplayType.TABLE}
-                            onClick={handleSetViewType}
-                            value={ListDisplayType.TABLE}
-                        >
-                            {t('table.config.view.table', {
-                                postProcess: 'sentenceCase',
-                            })}
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Divider />
-                        <DropdownMenu.Label>
-                            {t('table.config.general.itemSize', { postProcess: 'sentenceCase' })}
-                        </DropdownMenu.Label>
-                        <DropdownMenu.Item closeMenuOnClick={false}>
-                            {display === ListDisplayType.CARD ||
-                            display === ListDisplayType.POSTER ? (
-                                <Slider
-                                    defaultValue={grid?.itemSize}
-                                    max={300}
-                                    min={150}
-                                    onChange={debouncedHandleItemSize}
-                                />
-                            ) : (
-                                <Slider
-                                    defaultValue={table.rowHeight}
-                                    max={100}
-                                    min={30}
-                                    onChange={debouncedHandleItemSize}
-                                />
-                            )}
-                        </DropdownMenu.Item>
-                        {isGrid && (
-                            <>
-                                <DropdownMenu.Label>
-                                    {t('table.config.general.itemGap', {
-                                        postProcess: 'sentenceCase',
-                                    })}
-                                </DropdownMenu.Label>
-                                <DropdownMenu.Item closeMenuOnClick={false}>
-                                    <Slider
-                                        defaultValue={grid?.itemGap || 0}
-                                        max={30}
-                                        min={0}
-                                        onChangeEnd={handleItemGap}
-                                    />
-                                </DropdownMenu.Item>
-                            </>
-                        )}
-                        {!isGrid && (
-                            <>
-                                <DropdownMenu.Label>
-                                    {t('table.config.general.tableColumns', {
-                                        postProcess: 'sentenceCase',
-                                    })}
-                                </DropdownMenu.Label>
-                                <DropdownMenu.Item
-                                    closeMenuOnClick={false}
-                                    component="div"
-                                    style={{ cursor: 'default' }}
-                                >
-                                    <Stack>
-                                        <MultiSelect
-                                            clearable
-                                            data={ALBUMARTIST_TABLE_COLUMNS}
-                                            defaultValue={table?.columns.map(
-                                                (column) => column.column,
-                                            )}
-                                            onChange={handleTableColumns}
-                                            width={300}
-                                        />
-                                        <Group justify="space-between">
-                                            <Text>
-                                                {t('table.config.general.autoFitColumns', {
-                                                    postProcess: 'sentenceCase',
-                                                })}
-                                            </Text>
-                                            <Switch
-                                                defaultChecked={table.autoFit}
-                                                onChange={handleAutoFitColumns}
-                                            />
-                                        </Group>
-                                    </Stack>
-                                </DropdownMenu.Item>
-                            </>
-                        )}
-                    </DropdownMenu.Dropdown>
-                </DropdownMenu>
+            <Group
+                gap="xs"
+                wrap="nowrap"
+            >
+                <ListConfigMenu
+                    autoFitColumns={table.autoFit}
+                    displayType={display}
+                    itemGap={grid?.itemGap || 0}
+                    itemSize={isGrid ? grid?.itemSize || 0 : table.rowHeight}
+                    onChangeAutoFitColumns={handleAutoFitColumns}
+                    onChangeDisplayType={handleSetViewType}
+                    onChangeItemGap={handleItemGap}
+                    onChangeItemSize={debouncedHandleItemSize}
+                    onChangeTableColumns={handleTableColumns}
+                    tableColumns={table?.columns.map((column) => column.column)}
+                    tableColumnsData={ALBUMARTIST_TABLE_COLUMNS}
+                />
             </Group>
         </Flex>
     );

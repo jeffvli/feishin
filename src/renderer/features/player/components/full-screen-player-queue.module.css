@@ -37,6 +37,8 @@
 .header-item-wrapper {
     position: relative;
     z-index: 2;
+    display: flex;
+    gap: 0;
 }
 
 .grid-container {

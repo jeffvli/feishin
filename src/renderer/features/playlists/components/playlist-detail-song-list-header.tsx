@@ -8,7 +8,7 @@ import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { PlaylistDetailSongListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header-filters';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
-import { LibraryHeaderBar } from '/@/renderer/features/shared';
+import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Badge } from '/@/shared/components/badge/badge';
@@ -68,12 +68,12 @@ export const PlaylistDetailSongListHeader = ({
                     {isSmartPlaylist && <Badge size="lg">{t('entity.smartPlaylist')}</Badge>}
                 </LibraryHeaderBar>
             </PageHeader>
-            <Paper p="1rem">
+            <FilterBar>
                 <PlaylistDetailSongListHeaderFilters
                     handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
                     tableRef={tableRef}
                 />
-            </Paper>
+            </FilterBar>
         </Stack>
     );
 };

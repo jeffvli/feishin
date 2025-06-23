@@ -2,7 +2,6 @@ import { useHotkeys } from '@mantine/hooks';
 import { motion, Variants } from 'motion/react';
 import { CSSProperties, useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiArrowDownSLine, RiSettings3Line } from 'react-icons/ri';
 import { useLocation } from 'react-router';
 
 import styles from './full-screen-player.module.css';
@@ -20,7 +19,7 @@ import {
     useSettingsStoreActions,
     useWindowSettings,
 } from '/@/renderer/store';
-import { Button } from '/@/shared/components/button/button';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
@@ -73,23 +72,21 @@ const Controls = () => {
                 top: 0,
             }}
         >
-            <Button
+            <ActionIcon
+                icon="arrowDownS"
+                iconProps={{ size: 'lg' }}
                 onClick={handleToggleFullScreenPlayer}
-                size="compact-sm"
                 tooltip={{ label: t('common.minimize', { postProcess: 'titleCase' }) }}
                 variant="subtle"
-            >
-                <RiArrowDownSLine size="2rem" />
-            </Button>
+            />
             <Popover position="bottom-start">
                 <Popover.Target>
-                    <Button
-                        size="compact-sm"
+                    <ActionIcon
+                        icon="settings"
+                        iconProps={{ size: 'lg' }}
                         tooltip={{ label: t('common.configure', { postProcess: 'titleCase' }) }}
                         variant="subtle"
-                    >
-                        <RiSettings3Line size="1.5rem" />
-                    </Button>
+                    />
                 </Popover.Target>
                 <Popover.Dropdown>
                     <Option>

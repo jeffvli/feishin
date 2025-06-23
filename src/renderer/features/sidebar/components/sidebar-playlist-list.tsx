@@ -1,11 +1,12 @@
 import { useDebouncedValue } from '@mantine/hooks';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiAddBoxFill, RiAddCircleFill, RiPlayFill, RiShuffleFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
+
+import styles from './sidebar-playlist-list.module.css';
 
 import { openContextMenu } from '/@/renderer/features/context-menu';
 import { PLAYLIST_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
@@ -14,6 +15,7 @@ import { usePlaylistList } from '/@/renderer/features/playlists';
 import { useHideScrollbar } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
@@ -24,6 +26,8 @@ import { Play } from '/@/shared/types/types';
 
 const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
     const { t } = useTranslation();
+
+    const [isHovered, setIsHovered] = useState(false);
 
     if (Array.isArray(data?.items[index])) {
         const [collapse, setCollapse] = data.items[index];
@@ -57,7 +61,9 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
         : undefined;
 
     return (
-        <div
+        <Button
+            className={styles.row}
+            component={Link}
             onContextMenu={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -73,105 +79,97 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
                     yPos: e.clientY + 5,
                 });
             }}
-            style={{ margin: '0.5rem 0', padding: '0 1rem', ...style }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            style={{ ...style }}
+            to={path || '/'}
+            variant="subtle"
         >
-            <Group
-                className="sidebar-playlist-item"
-                justify="space-between"
-                pos="relative"
-                style={{
-                    '&:hover': {
-                        '.sidebar-playlist-controls': {
-                            display: 'flex',
-                        },
-                        '.sidebar-playlist-name': {
-                            color: 'var(--theme-colors-foreground) !important',
-                        },
-                    },
+            {data?.items[index].name}
+            {isHovered && (
+                <RowControls
+                    data={data}
+                    index={index}
+                />
+            )}
+        </Button>
+    );
+};
+
+const RowControls = ({ data, index }: { data: any; index: number }) => {
+    const { t } = useTranslation();
+
+    return (
+        <Group
+            className={styles.controls}
+            gap="xs"
+            wrap="nowrap"
+        >
+            <ActionIcon
+                icon="mediaPlay"
+                iconProps={{
+                    size: 'md',
                 }}
-                wrap="nowrap"
-            >
-                <Text
-                    // className="sidebar-playlist-name"
-                    component={Link}
-                    overflow="hidden"
-                    size="md"
-                    style={{
-                        color: 'white',
-                        cursor: 'default',
-                        width: '100%',
-                    }}
-                    to={path}
-                >
-                    {data?.items[index].name}
-                </Text>
-                <Group
-                    className="sidebar-playlist-controls"
-                    display="none"
-                    gap="sm"
-                    pos="absolute"
-                    right="0"
-                    wrap="nowrap"
-                >
-                    <Button
-                        onClick={() => {
-                            if (!data?.items?.[index].id) return;
-                            data.handlePlay(data?.items[index].id, Play.NOW);
-                        }}
-                        size="compact-md"
-                        tooltip={{
-                            label: t('player.play', { postProcess: 'sentenceCase' }),
-                            openDelay: 500,
-                        }}
-                        variant="default"
-                    >
-                        <RiPlayFill />
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            if (!data?.items?.[index].id) return;
-                            data.handlePlay(data?.items[index].id, Play.SHUFFLE);
-                        }}
-                        size="md"
-                        tooltip={{
-                            label: t('player.shuffle', { postProcess: 'sentenceCase' }),
-                            openDelay: 500,
-                        }}
-                        variant="default"
-                    >
-                        <RiShuffleFill />
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            if (!data?.items?.[index].id) return;
-                            data.handlePlay(data?.items[index].id, Play.LAST);
-                        }}
-                        size="compact-md"
-                        tooltip={{
-                            label: t('player.addLast', { postProcess: 'sentenceCase' }),
-                            openDelay: 500,
-                        }}
-                        variant="default"
-                    >
-                        <RiAddBoxFill />
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            if (!data?.items?.[index].id) return;
-                            data.handlePlay(data?.items[index].id, Play.NEXT);
-                        }}
-                        size="compact-md"
-                        tooltip={{
-                            label: t('player.addNext', { postProcess: 'sentenceCase' }),
-                            openDelay: 500,
-                        }}
-                        variant="default"
-                    >
-                        <RiAddCircleFill />
-                    </Button>
-                </Group>
-            </Group>
-        </div>
+                onClick={() => {
+                    if (!data?.items?.[index].id) return;
+                    data.handlePlay(data?.items[index].id, Play.NOW);
+                }}
+                size="xs"
+                tooltip={{
+                    label: t('player.play', { postProcess: 'sentenceCase' }),
+                    openDelay: 500,
+                }}
+                variant="subtle"
+            />
+            <ActionIcon
+                icon="mediaShuffle"
+                iconProps={{
+                    size: 'md',
+                }}
+                onClick={() => {
+                    if (!data?.items?.[index].id) return;
+                    data.handlePlay(data?.items[index].id, Play.SHUFFLE);
+                }}
+                size="xs"
+                tooltip={{
+                    label: t('player.shuffle', { postProcess: 'sentenceCase' }),
+                    openDelay: 500,
+                }}
+                variant="subtle"
+            />
+            <ActionIcon
+                icon="mediaPlayLast"
+                iconProps={{
+                    size: 'md',
+                }}
+                onClick={() => {
+                    if (!data?.items?.[index].id) return;
+                    data.handlePlay(data?.items[index].id, Play.LAST);
+                }}
+                size="xs"
+                tooltip={{
+                    label: t('player.addLast', { postProcess: 'sentenceCase' }),
+                    openDelay: 500,
+                }}
+                variant="subtle"
+            />
+            <ActionIcon
+                icon="mediaPlayNext"
+                iconProps={{
+                    size: 'md',
+                }}
+                onClick={() => {
+                    if (!data?.items?.[index].id) return;
+                    data.handlePlay(data?.items[index].id, Play.NEXT);
+                }}
+                size="xs"
+                tooltip={{
+                    label: t('player.addNext', { postProcess: 'sentenceCase' }),
+                    openDelay: 500,
+                }}
+                variant="subtle"
+            />
+        </Group>
     );
 };
 
@@ -249,6 +247,7 @@ export const SidebarPlaylistList = () => {
 
     return (
         <Flex
+            className={styles.list}
             h="100%"
             {...hideScrollbarElementProps}
         >
@@ -263,7 +262,7 @@ export const SidebarPlaylistList = () => {
                         height={debounced.height}
                         itemCount={memoizedItemData?.items?.length || 0}
                         itemData={memoizedItemData}
-                        itemSize={25}
+                        itemSize={32}
                         overscanCount={20}
                         width={debounced.width}
                     >

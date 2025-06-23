@@ -28,6 +28,8 @@
         "action_other": "actions",
         "add": "add",
         "additionalParticipants": "additional participants",
+        "newVersion": "a new version has been installed ({{version}})",
+        "viewReleaseNotes": "view release notes",
         "albumGain": "album gain",
         "albumPeak": "album peak",
         "areYouSure": "are you sure?",
@@ -775,6 +777,8 @@
             },
             "view": {
                 "card": "card",
+                "grid": "grid",
+                "list": "list",
                 "poster": "poster",
                 "table": "table"
             }

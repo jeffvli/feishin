@@ -2,16 +2,7 @@ import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import isElectron from 'is-electron';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HiOutlineQueueList } from 'react-icons/hi2';
-import {
-    RiHeartFill,
-    RiHeartLine,
-    RiVolumeDownFill,
-    RiVolumeMuteFill,
-    RiVolumeUpFill,
-} from 'react-icons/ri';
 
-import { PlayerButton } from '/@/renderer/features/player/components/player-button';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { useRightControls } from '/@/renderer/features/player/hooks/use-right-controls';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
@@ -27,6 +18,7 @@ import {
     useSpeed,
     useVolume,
 } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
@@ -212,7 +204,7 @@ export const RightControls = () => {
                 {showRating && (
                     <Rating
                         onChange={handleUpdateRating}
-                        size="sm"
+                        size="xs"
                         value={currentSong?.userRating || 0}
                     />
                 )}
@@ -230,13 +222,17 @@ export const RightControls = () => {
                     withArrow
                 >
                     <DropdownMenu.Target>
-                        <PlayerButton
-                            icon={<>{speed} x</>}
+                        <ActionIcon
+                            icon="mediaSpeed"
+                            iconProps={{
+                                size: 'lg',
+                            }}
+                            size="sm"
                             tooltip={{
                                 label: t('player.playbackSpeed', { postProcess: 'sentenceCase' }),
-                                openDelay: 500,
+                                openDelay: 0,
                             }}
-                            variant="secondary"
+                            variant="transparent"
                         />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
@@ -266,78 +262,61 @@ export const RightControls = () => {
                         />
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
-                <PlayerButton
-                    icon={
-                        currentSong?.userFavorite ? (
-                            <RiHeartFill
-                                color="var(--theme-colors-primary-filled)"
-                                size="1.1rem"
-                            />
-                        ) : (
-                            <RiHeartLine size="1.1rem" />
-                        )
-                    }
-                    onClick={() => handleToggleFavorite(currentSong)}
-                    style={{
-                        svg: {
-                            fill: !currentSong?.userFavorite
-                                ? undefined
-                                : 'var(--theme-colors-primary-filled) !important',
-                        },
+                <ActionIcon
+                    icon="favorite"
+                    iconProps={{
+                        fill: currentSong?.userFavorite ? 'primary' : undefined,
+                        size: 'lg',
                     }}
+                    onClick={() => handleToggleFavorite(currentSong)}
+                    size="sm"
                     tooltip={{
                         label: currentSong?.userFavorite
                             ? t('player.unfavorite', { postProcess: 'titleCase' })
                             : t('player.favorite', { postProcess: 'titleCase' }),
-                        openDelay: 500,
+                        openDelay: 0,
                     }}
-                    variant="secondary"
+                    variant="transparent"
+                />
+                <ActionIcon
+                    icon={isQueueExpanded ? 'panelRightClose' : 'panelRightOpen'}
+                    iconProps={{
+                        size: 'lg',
+                    }}
+                    onClick={handleToggleQueue}
+                    size="sm"
+                    tooltip={{
+                        label: t('player.viewQueue', { postProcess: 'titleCase' }),
+                        openDelay: 0,
+                    }}
+                    variant="transparent"
+                />
+                <ActionIcon
+                    icon={muted ? 'volumeMute' : volume > 50 ? 'volumeMax' : 'volumeNormal'}
+                    iconProps={{
+                        color: muted ? 'muted' : undefined,
+                        size: 'xl',
+                    }}
+                    onClick={handleMute}
+                    onWheel={handleVolumeWheel}
+                    size="sm"
+                    tooltip={{
+                        label: muted ? t('player.muted', { postProcess: 'titleCase' }) : volume,
+                        openDelay: 0,
+                    }}
+                    variant="transparent"
                 />
                 {!isMinWidth ? (
-                    <PlayerButton
-                        icon={<HiOutlineQueueList size="1.1rem" />}
-                        onClick={handleToggleQueue}
-                        tooltip={{
-                            label: t('player.viewQueue', { postProcess: 'titleCase' }),
-                            openDelay: 500,
-                        }}
-                        variant="secondary"
+                    <PlayerbarSlider
+                        max={100}
+                        min={0}
+                        onChange={handleVolumeSlider}
+                        onWheel={handleVolumeWheel}
+                        size={6}
+                        value={volume}
+                        w={volumeWidth}
                     />
                 ) : null}
-                <Group
-                    gap="xs"
-                    wrap="nowrap"
-                >
-                    <PlayerButton
-                        icon={
-                            muted ? (
-                                <RiVolumeMuteFill size="1.2rem" />
-                            ) : volume > 50 ? (
-                                <RiVolumeUpFill size="1.2rem" />
-                            ) : (
-                                <RiVolumeDownFill size="1.2rem" />
-                            )
-                        }
-                        onClick={handleMute}
-                        onWheel={handleVolumeWheel}
-                        tooltip={{
-                            label: muted ? t('player.muted', { postProcess: 'titleCase' }) : volume,
-                            openDelay: 500,
-                        }}
-                        variant="secondary"
-                    />
-                    {!isMinWidth ? (
-                        <PlayerbarSlider
-                            max={100}
-                            min={0}
-                            onChange={handleVolumeSlider}
-                            onWheel={handleVolumeWheel}
-                            size={6}
-                            value={volume}
-                            w={volumeWidth}
-                        />
-                    ) : null}
-                </Group>
             </Group>
             <Group h="calc(100% / 3)" />
         </Flex>

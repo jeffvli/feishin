@@ -29,6 +29,7 @@ export const MultiSelect = ({
             }}
             style={{ maxWidth, width }}
             variant={variant}
+            withCheckIcon={false}
             {...props}
         />
     );

@@ -1,0 +1,11 @@
+.feishin-os-scrollbar {
+    --os-size: var(--theme-scrollbar-size);
+    --os-track-bg: var(--theme-scrollbar-track-background);
+    --os-track-bg-hover: var(--theme-scrollbar-track-hover-background);
+    --os-track-border-radius: var(--theme-scrollbar-track-border-radius);
+    --os-handle-bg: var(--theme-scrollbar-handle-background);
+    --os-handle-bg-hover: var(--theme-scrollbar-handle-hover-background);
+    --os-handle-bg-active: var(--theme-scrollbar-handle-active-background);
+    --os-handle-border-radius: var(--theme-scrollbar-handle-border-radius);
+    --os-handle-max-size: 200px;
+}

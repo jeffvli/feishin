@@ -1,0 +1,29 @@
+.list {
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+}
+
+.row {
+    position: relative;
+    display: flex;
+    width: 100%;
+    padding: var(--theme-spacing-sm) var(--theme-spacing-xs);
+    border-radius: var(--theme-radius-md);
+}
+
+.controls {
+    position: absolute;
+    top: 50%;
+    right: var(--theme-spacing-xs);
+    transform: translateY(-50%);
+    animation: fade-in 0.3s ease-in-out;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

@@ -2,7 +2,7 @@ import { closeAllModals, openModal } from '@mantine/modals';
 import { QueryClient } from '@tanstack/react-query';
 import merge from 'lodash/merge';
 import { useMemo } from 'react';
-import { RiAddBoxFill, RiAddCircleFill, RiPlayFill } from 'react-icons/ri';
+import { useTranslation } from 'react-i18next';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { createWithEqualityFn } from 'zustand/traditional';
@@ -15,6 +15,7 @@ import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Select } from '/@/shared/components/select/select';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -86,6 +87,7 @@ export const ShuffleAllModal = ({
     queryClient,
     server,
 }: ShuffleAllModalProps) => {
+    const { t } = useTranslation();
     const { enableMaxYear, enableMinYear, genre, limit, maxYear, minYear, musicFolderId, played } =
         useShuffleAllStore();
     const { setStore } = useShuffleAllStoreActions();
@@ -215,31 +217,31 @@ export const ShuffleAllModal = ({
             <Group grow>
                 <Button
                     disabled={!limit}
-                    leftSection={<RiAddBoxFill size="1rem" />}
+                    leftSection={<Icon icon="mediaPlayLast" />}
                     onClick={() => handlePlay(Play.LAST)}
                     type="submit"
                     variant="default"
                 >
-                    Add
+                    {t('player.addLast', { postProcess: 'sentenceCase' })}
                 </Button>
                 <Button
                     disabled={!limit}
-                    leftSection={<RiAddCircleFill size="1rem" />}
+                    leftSection={<Icon icon="mediaPlayNext" />}
                     onClick={() => handlePlay(Play.NEXT)}
                     type="submit"
                     variant="default"
                 >
-                    Add next
+                    {t('player.addNext', { postProcess: 'sentenceCase' })}
                 </Button>
             </Group>
             <Button
                 disabled={!limit}
-                leftSection={<RiPlayFill size="1rem" />}
+                leftSection={<Icon icon="mediaPlay" />}
                 onClick={() => handlePlay(Play.NOW)}
                 type="submit"
                 variant="filled"
             >
-                Play
+                {t('player.play', { postProcess: 'sentenceCase' })}
             </Button>
         </Stack>
     );

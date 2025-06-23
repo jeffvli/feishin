@@ -30,7 +30,7 @@ export const SongListContent = ({ gridRef, itemCount, tableRef }: SongListConten
     const { pageKey } = useListContext();
     const { display } = useListStoreByKey({ key: pageKey });
 
-    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
+    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.GRID;
 
     return (
         <Suspense fallback={<Spinner container />}>

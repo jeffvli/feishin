@@ -1,6 +1,7 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { closeAllModals, openModal } from '@mantine/modals';
+import { motion } from 'motion/react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router';
@@ -173,17 +174,21 @@ const PlaylistDetailSongListRoute = () => {
             />
 
             {(isSmartPlaylist || showQueryBuilder) && (
-                <div>
+                <motion.div>
                     <Box
                         h="100%"
                         mah="35vh"
+                        p="md"
                         w="100%"
                     >
-                        <Group p="md">
+                        <Group pb="md">
                             <ActionIcon
                                 icon={isQueryBuilderExpanded ? 'arrowUpS' : 'arrowDownS'}
+                                iconProps={{
+                                    size: 'md',
+                                }}
                                 onClick={handleToggleExpand}
-                                size="sm"
+                                size="xs"
                             />
                             <Text>{t('form.queryEditor.title', { postProcess: 'titleCase' })}</Text>
                         </Group>
@@ -201,7 +206,7 @@ const PlaylistDetailSongListRoute = () => {
                             />
                         )}
                     </Box>
-                </div>
+                </motion.div>
             )}
             <PlaylistDetailSongListContent
                 songs={

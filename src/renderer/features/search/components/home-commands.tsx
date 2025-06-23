@@ -35,7 +35,7 @@ export const HomeCommands = ({
 
         openModal({
             children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
-            size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
+            size: server?.type === ServerType?.NAVIDROME ? 'lg' : 'sm',
             title: t('form.createPlaylist.title', { postProcess: 'sentenceCase' }),
         });
     }, [handleClose, server?.type, t]);

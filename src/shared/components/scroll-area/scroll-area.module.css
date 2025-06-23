@@ -1,4 +1,4 @@
-.thumb {
+/* .thumb {
     background: var(--theme-scrollbar-handle-background);
     border-radius: var(--theme-scrollbar-handle-border-radius);
 
@@ -27,4 +27,9 @@
 
 .viewport > div {
     display: block !important;
+} */
+
+.scroll-area {
+    width: 100%;
+    height: 100%;
 }

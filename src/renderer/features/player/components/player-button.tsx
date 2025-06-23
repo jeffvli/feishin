@@ -4,10 +4,10 @@ import { forwardRef, ReactNode } from 'react';
 
 import styles from './player-button.module.css';
 
-import { Button, ButtonProps } from '/@/shared/components/button/button';
+import { ActionIcon, ActionIconProps } from '/@/shared/components/action-icon/action-icon';
 import { Tooltip, TooltipProps } from '/@/shared/components/tooltip/tooltip';
 
-interface PlayerButtonProps extends ButtonProps {
+interface PlayerButtonProps extends Omit<ActionIconProps, 'icon' | 'variant'> {
     icon: ReactNode;
     isActive?: boolean;
     tooltip?: Omit<TooltipProps, 'children'>;
@@ -26,7 +26,7 @@ export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
                         })}
                         ref={ref}
                     >
-                        <Button
+                        <ActionIcon
                             className={clsx(styles.playerButton, styles[variant], {
                                 [styles.active]: isActive,
                             })}
@@ -35,11 +35,10 @@ export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
                                 e.stopPropagation();
                                 rest.onClick?.(e);
                             }}
-                            size="compact-md"
                             variant="transparent"
                         >
                             {icon}
-                        </Button>
+                        </ActionIcon>
                     </motion.div>
                 </Tooltip>
             );
@@ -53,7 +52,7 @@ export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
                 })}
                 ref={ref}
             >
-                <Button
+                <ActionIcon
                     className={clsx(styles.playerButton, styles[variant], {
                         [styles.active]: isActive,
                     })}
@@ -66,7 +65,7 @@ export const PlayerButton = forwardRef<HTMLDivElement, PlayerButtonProps>(
                     variant="transparent"
                 >
                     {icon}
-                </Button>
+                </ActionIcon>
             </motion.div>
         );
     },

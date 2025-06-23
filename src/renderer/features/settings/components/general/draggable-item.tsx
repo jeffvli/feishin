@@ -1,16 +1,21 @@
 import { DragControls, Reorder, useDragControls } from 'motion/react';
-import { MdDragIndicator } from 'react-icons/md';
 
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
 import { Text } from '/@/shared/components/text/text';
 
 const DragHandle = ({ dragControls }: { dragControls: DragControls }) => {
     return (
-        <MdDragIndicator
-            color="white"
+        <ActionIcon
+            icon="dragVertical"
+            iconProps={{
+                size: 'md',
+            }}
             onPointerDown={(event) => dragControls.start(event)}
+            size="xs"
             style={{ cursor: 'grab' }}
+            variant="transparent"
         />
     );
 };

@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { RiPlayFill } from 'react-icons/ri';
 
 import styles from './play-button.module.css';
 
@@ -9,14 +8,17 @@ export interface PlayButtonProps extends ActionIconProps {
     size?: number | string;
 }
 
-export const PlayButton = ({ className, size = '1.5rem', ...props }: PlayButtonProps) => {
+export const PlayButton = ({ className, ...props }: PlayButtonProps) => {
     return (
         <ActionIcon
             className={clsx(styles.button, className)}
+            icon="mediaPlay"
+            iconProps={{
+                fill: 'default',
+                size: 'lg',
+            }}
             variant="filled"
             {...props}
-        >
-            <RiPlayFill size={size} />
-        </ActionIcon>
+        />
     );
 };

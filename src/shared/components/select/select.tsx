@@ -29,6 +29,7 @@ export const Select = ({
             }}
             style={{ maxWidth, width }}
             variant={variant}
+            withCheckIcon={false}
             {...props}
         />
     );

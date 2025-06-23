@@ -238,7 +238,7 @@ export const QueryBuilderOption = ({
                 px={5}
                 size="sm"
                 variant="subtle"
-            ></ActionIcon>
+            />
         </Group>
     );
 };

@@ -51,11 +51,11 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     <MantineButton
                         autoContrast
                         classNames={{
-                            label: styles.label,
-                            loader: styles.loader,
-                            root: clsx(styles.root, {
+                            label: clsx(styles.label, {
                                 [styles.uppercase]: uppercase,
                             }),
+                            loader: styles.loader,
+                            root: styles.root,
                             section: styles.section,
                             ...classNames,
                         }}
@@ -79,10 +79,11 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
         return (
             <MantineButton
                 classNames={{
-                    loader: styles.loader,
-                    root: clsx(styles.root, {
+                    label: clsx(styles.label, {
                         [styles.uppercase]: uppercase,
                     }),
+                    loader: styles.loader,
+                    root: styles.root,
                     section: styles.section,
                     ...classNames,
                 }}

@@ -13,8 +13,22 @@
 .menu-item-label {
     margin-right: var(--theme-spacing-md);
     margin-left: var(--theme-spacing-md);
-    font-size: var(--theme-font-size-md);
+    font-size: var(--theme-font-size-sm);
     color: var(--theme-colors-surface-foreground);
+}
+
+.selected {
+    &::before {
+        position: absolute;
+        top: 50%;
+        left: 2px;
+        width: 4px;
+        height: 50%;
+        content: '';
+        background-color: var(--theme-colors-primary-filled);
+        border-radius: var(--theme-border-radius-xl);
+        transform: translateY(-50%);
+    }
 }
 
 .menu-item-label-danger {
@@ -40,5 +54,5 @@
 }
 
 .menu-item-section svg {
-    font-size: var(--theme-font-size-md);
+    font-size: var(--theme-font-size-sm);
 }

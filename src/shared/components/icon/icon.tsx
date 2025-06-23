@@ -1,7 +1,7 @@
-import type { ComponentType } from 'react';
-
 import clsx from 'clsx';
 import { motion } from 'motion/react';
+import { type ComponentType, forwardRef } from 'react';
+import { IconBaseProps } from 'react-icons';
 import { FaLastfmSquare } from 'react-icons/fa';
 import {
     LuAppWindow,
@@ -37,6 +37,7 @@ import {
     LuExternalLink,
     LuFlag,
     LuFolderOpen,
+    LuGauge,
     LuGithub,
     LuGripHorizontal,
     LuGripVertical,
@@ -48,6 +49,7 @@ import {
     LuImageOff,
     LuInfinity,
     LuInfo,
+    LuKeyboard,
     LuLayoutGrid,
     LuLibrary,
     LuList,
@@ -71,6 +73,7 @@ import {
     LuPlus,
     LuRadio,
     LuRotateCw,
+    LuSave,
     LuSearch,
     LuSettings2,
     LuShare2,
@@ -149,7 +152,9 @@ export const AppIcon = {
     info: LuInfo,
     itemAlbum: LuDisc3,
     itemSong: LuMusic,
+    keyboard: LuKeyboard,
     layoutGrid: LuLayoutGrid,
+    layoutList: LuList,
     layoutTable: LuTable,
     library: LuLibrary,
     list: LuList,
@@ -167,6 +172,7 @@ export const AppIcon = {
     mediaRepeatOne: RiRepeatOneLine,
     mediaSettings: LuSlidersHorizontal,
     mediaShuffle: LuShuffle,
+    mediaSpeed: LuGauge,
     mediaStepBackward: LuStepBack,
     mediaStepForward: LuStepForward,
     mediaStop: LuSquare,
@@ -183,6 +189,7 @@ export const AppIcon = {
     radio: LuRadio,
     refresh: LuRotateCw,
     remove: LuMinus,
+    save: LuSave,
     search: LuSearch,
     server: LuHardDrive,
     settings: LuSettings2,
@@ -211,19 +218,18 @@ export const AppIcon = {
     xCircle: LuCircleX,
 } as const;
 
-export interface IconProps {
+export interface IconProps extends Omit<IconBaseProps, 'color' | 'fill' | 'size'> {
     animate?: 'pulse' | 'spin';
-    className?: string;
     color?: 'default' | 'error' | 'info' | 'inherit' | 'muted' | 'primary' | 'success' | 'warn';
     fill?: 'default' | 'error' | 'info' | 'inherit' | 'muted' | 'primary' | 'success' | 'warn';
     icon: keyof typeof AppIcon;
     size?: '2xl' | '3xl' | '4xl' | '5xl' | 'lg' | 'md' | 'sm' | 'xl' | 'xs' | number | string;
 }
 
-export function Icon(props: IconProps) {
+export const Icon = forwardRef<HTMLDivElement, IconProps>((props, ref) => {
     const { animate, className, color, fill, icon, size = 'md' } = props;
 
-    const IconComponent = AppIcon[icon];
+    const IconComponent: ComponentType<any> = AppIcon[icon];
 
     const classNames = clsx(className, {
         [styles.fill]: true,
@@ -238,10 +244,26 @@ export function Icon(props: IconProps) {
         <IconComponent
             className={classNames}
             fill={fill}
+            ref={ref}
+            size={isPredefinedSize(size) ? undefined : size}
         />
     );
-}
+});
 
 Icon.displayName = 'Icon';
 
 export const MotionIcon: ComponentType = motion.create(Icon);
+
+function isPredefinedSize(size: IconProps['size']) {
+    return (
+        size === '2xl' ||
+        size === '3xl' ||
+        size === '4xl' ||
+        size === '5xl' ||
+        size === 'lg' ||
+        size === 'md' ||
+        size === 'sm' ||
+        size === 'xl' ||
+        size === 'xs'
+    );
+}

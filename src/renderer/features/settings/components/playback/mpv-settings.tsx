@@ -1,7 +1,6 @@
 import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiCloseLine, RiRestartLine } from 'react-icons/ri';
 
 import {
     SettingOption,
@@ -14,7 +13,7 @@ import {
     useSettingsStore,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
-import { Button } from '/@/shared/components/button/button';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Select } from '/@/shared/components/select/select';
@@ -78,7 +77,9 @@ export const MpvSettings = () => {
     const { pause } = usePlayerControls();
     const { clearQueue } = useQueueControls();
 
-    const [mpvPath, setMpvPath] = useState('');
+    const [mpvPath, setMpvPath] = useState(
+        (localSettings?.get('mpv_path') as string | undefined) || '',
+    );
 
     const handleSetMpvPath = async (clear?: boolean) => {
         if (clear) {
@@ -157,34 +158,30 @@ export const MpvSettings = () => {
         {
             control: (
                 <Group gap="sm">
-                    <Button
+                    <ActionIcon
+                        icon="refresh"
                         onClick={handleReloadMpv}
                         tooltip={{
                             label: t('common.reload', { postProcess: 'titleCase' }),
                             openDelay: 0,
                         }}
                         variant="subtle"
-                    >
-                        <RiRestartLine />
-                    </Button>
+                    />
                     <TextInput
+                        onChange={(e) => {
+                            setMpvPath(e.currentTarget.value);
+                            localSettings?.set('mpv_path', e.currentTarget.value);
+                        }}
                         onClick={() => handleSetMpvPath()}
                         rightSection={
                             mpvPath && (
-                                <Button
+                                <ActionIcon
+                                    icon="x"
                                     onClick={() => handleSetMpvPath(true)}
-                                    size="compact-md"
-                                    tooltip={{
-                                        label: t('common.clear', { postProcess: 'titleCase' }),
-                                        openDelay: 0,
-                                    }}
-                                    variant="subtle"
-                                >
-                                    <RiCloseLine />
-                                </Button>
+                                    variant="transparent"
+                                />
                             )
                         }
-                        type="button"
                         value={mpvPath}
                         width={200}
                     />

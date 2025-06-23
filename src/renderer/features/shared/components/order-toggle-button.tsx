@@ -15,6 +15,9 @@ export const OrderToggleButton = ({ buttonProps, onToggle, sortOrder }: OrderTog
     return (
         <ActionIcon
             icon={sortOrder === SortOrder.ASC ? 'sortAsc' : 'sortDesc'}
+            iconProps={{
+                size: 'lg',
+            }}
             onClick={onToggle}
             tooltip={{
                 label:

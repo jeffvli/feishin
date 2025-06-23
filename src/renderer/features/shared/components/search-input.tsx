@@ -1,10 +1,10 @@
 import { useHotkeys } from '@mantine/hooks';
 import { ChangeEvent, KeyboardEvent, useRef } from 'react';
-import { RiCloseFill, RiSearchLine } from 'react-icons/ri';
 import { shallow } from 'zustand/shallow';
 
 import { useSettingsStore } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Icon } from '/@/shared/components/icon/icon';
 import { TextInput, TextInputProps } from '/@/shared/components/text-input/text-input';
 
 interface SearchInputProps extends TextInputProps {
@@ -37,7 +37,7 @@ export const SearchInput = ({ onChange, ...props }: SearchInputProps) => {
 
     return (
         <TextInput
-            leftSection={<RiSearchLine />}
+            leftSection={<Icon icon="search" />}
             onChange={onChange}
             onKeyDown={handleEscape}
             ref={ref}
@@ -47,11 +47,10 @@ export const SearchInput = ({ onChange, ...props }: SearchInputProps) => {
             rightSection={
                 ref.current?.value ? (
                     <ActionIcon
+                        icon="x"
                         onClick={handleClear}
                         variant="transparent"
-                    >
-                        <RiCloseFill />
-                    </ActionIcon>
+                    />
                 ) : null
             }
         />

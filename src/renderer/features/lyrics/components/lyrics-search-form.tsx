@@ -136,11 +136,10 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
                 <Spinner container />
             ) : (
                 <ScrollArea
-                    h={400}
-                    offsetScrollbars
-                    pr="1rem"
-                    type="auto"
-                    w="100%"
+                    style={{
+                        height: '400px',
+                        paddingRight: '1rem',
+                    }}
                 >
                     <Stack gap="md">
                         {searchResults.map((result) => (

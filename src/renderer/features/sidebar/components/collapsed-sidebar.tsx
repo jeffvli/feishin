@@ -67,10 +67,7 @@ export const CollapsedSidebar = () => {
                 [styles.web]: windowBarStyle === Platform.WEB,
             })}
         >
-            <ScrollArea
-                scrollbarSize={8}
-                scrollHideDelay={0}
-            >
+            <ScrollArea>
                 {sidebarCollapsedNavigation && (
                     <Group
                         gap={0}

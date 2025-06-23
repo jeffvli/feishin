@@ -1,19 +1,9 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { openModal } from '@mantine/modals';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
+import debounce from 'lodash/debounce';
+import { MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    RiAddBoxFill,
-    RiAddCircleFill,
-    RiFilterFill,
-    RiFolder2Fill,
-    RiMoreFill,
-    RiPlayFill,
-    RiRefreshLine,
-    RiSettings3Fill,
-    RiShuffleFill,
-} from 'react-icons/ri';
 
 import i18n from '/@/i18n/i18n';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -21,6 +11,11 @@ import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
 import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
+import { FilterButton } from '/@/renderer/features/shared/components/filter-button';
+import { FolderButton } from '/@/renderer/features/shared/components/folder-button';
+import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
+import { MoreButton } from '/@/renderer/features/shared/components/more-button';
+import { RefreshButton } from '/@/renderer/features/shared/components/refresh-button';
 import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jellyfin-song-filters';
 import { NavidromeSongFilters } from '/@/renderer/features/songs/components/navidrome-song-filters';
 import { SubsonicSongFilters } from '/@/renderer/features/songs/components/subsonic-song-filter';
@@ -39,11 +34,7 @@ import { Divider } from '/@/shared/components/divider/divider';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
-import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
-import { Slider } from '/@/shared/components/slider/slider';
-import { Stack } from '/@/shared/components/stack/stack';
-import { Switch } from '/@/shared/components/switch/switch';
-import { Text } from '/@/shared/components/text/text';
+import { Icon } from '/@/shared/components/icon/icon';
 import {
     LibraryItem,
     ServerType,
@@ -236,7 +227,7 @@ export const SongListHeaderFilters = ({
             ).find((f) => f.value === filter.sortBy)?.name) ||
         'Unknown';
 
-    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
+    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.GRID;
 
     const handleSetSortBy = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
@@ -341,11 +332,9 @@ export const SongListHeaderFilters = ({
     ]);
 
     const handleSetViewType = useCallback(
-        (e: MouseEvent<HTMLButtonElement>) => {
-            if (!e.currentTarget?.value) return;
-            const display = e.currentTarget.value as ListDisplayType;
+        (displayType: ListDisplayType) => {
             setDisplayType({
-                data: e.currentTarget.value as ListDisplayType,
+                data: displayType,
                 key: pageKey,
             });
 
@@ -358,7 +347,7 @@ export const SongListHeaderFilters = ({
                 setTablePagination({ data: { currentPage: 0 }, key: pageKey });
             }
         },
-        [pageKey, setDisplayType, setTablePagination, tableRef],
+        [display, pageKey, setDisplayType, setTablePagination, tableRef],
     );
 
     const handleTableColumns = (values: string[]) => {
@@ -390,10 +379,10 @@ export const SongListHeaderFilters = ({
         return setTable({ data: { columns: newColumns }, key: pageKey });
     };
 
-    const handleAutoFitColumns = (e: ChangeEvent<HTMLInputElement>) => {
-        setTable({ data: { autoFit: e.currentTarget.checked }, key: pageKey });
+    const handleAutoFitColumns = (autoFitColumns: boolean) => {
+        setTable({ data: { autoFit: autoFitColumns }, key: pageKey });
 
-        if (e.currentTarget.checked) {
+        if (autoFitColumns) {
             tableRef.current?.api.sizeColumnsToFit();
         }
     };
@@ -405,6 +394,8 @@ export const SongListHeaderFilters = ({
             setTable({ data: { rowHeight: e }, key: pageKey });
         }
     };
+
+    const debouncedHandleItemSize = debounce(handleItemSize, 20);
 
     const handleItemGap = (e: number) => {
         setGrid({ data: { itemGap: e }, key: pageKey });
@@ -500,18 +491,12 @@ export const SongListHeaderFilters = ({
             >
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
-                        <Button
-                            fw="600"
-                            size="compact-md"
-                            variant="subtle"
-                        >
-                            {sortByLabel}
-                        </Button>
+                        <Button variant="subtle">{sortByLabel}</Button>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         {FILTERS[server?.type as keyof typeof FILTERS].map((f) => (
                             <DropdownMenu.Item
-                                isActive={f.value === filter.sortBy}
+                                isSelected={f.value === filter.sortBy}
                                 key={`filter-${f.name}`}
                                 onClick={handleSetSortBy}
                                 value={f.value}
@@ -521,39 +506,23 @@ export const SongListHeaderFilters = ({
                         ))}
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
+                <Divider orientation="vertical" />
                 {server?.type !== ServerType.SUBSONIC && (
-                    <>
-                        <Divider orientation="vertical" />
-                        <OrderToggleButton
-                            onToggle={handleToggleSortOrder}
-                            sortOrder={filter.sortOrder}
-                        />
-                    </>
+                    <OrderToggleButton
+                        onToggle={handleToggleSortOrder}
+                        sortOrder={filter.sortOrder}
+                    />
                 )}
                 {server?.type === ServerType.JELLYFIN && (
                     <>
-                        <Divider orientation="vertical" />
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
-                                <Button
-                                    fw="600"
-                                    size="compact-md"
-                                    style={{
-                                        svg: {
-                                            fill: isFolderFilterApplied
-                                                ? 'var(--theme-colors-primary-filled) !important'
-                                                : undefined,
-                                        },
-                                    }}
-                                    variant="subtle"
-                                >
-                                    <RiFolder2Fill />
-                                </Button>
+                                <FolderButton isActive={!!isFolderFilterApplied} />
                             </DropdownMenu.Target>
                             <DropdownMenu.Dropdown>
                                 {musicFoldersQuery.data?.items.map((folder) => (
                                     <DropdownMenu.Item
-                                        isActive={filter.musicFolderId === folder.id}
+                                        isSelected={filter.musicFolderId === folder.id}
                                         key={`musicFolder-${folder.id}`}
                                         onClick={handleSetMusicFolder}
                                         value={folder.id}
@@ -565,70 +534,43 @@ export const SongListHeaderFilters = ({
                         </DropdownMenu>
                     </>
                 )}
-                <Divider orientation="vertical" />
-                <Button
+                <FilterButton
+                    isActive={!!isFilterApplied}
                     onClick={handleOpenFiltersModal}
-                    size="compact-md"
-                    style={{
-                        svg: {
-                            fill: isFilterApplied
-                                ? 'var(--theme-colors-primary-filled) !important'
-                                : undefined,
-                        },
-                    }}
-                    tooltip={{ label: t('common.filters', { postProcess: 'titleCase' }) }}
-                    variant="subtle"
-                >
-                    <RiFilterFill />
-                </Button>
-                <Divider orientation="vertical" />
-                <Button
-                    onClick={handleRefresh}
-                    size="compact-md"
-                    tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
-                    variant="subtle"
-                >
-                    <RiRefreshLine />
-                </Button>
-                <Divider orientation="vertical" />
+                />
+                <RefreshButton onClick={handleRefresh} />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
-                        <Button
-                            fw="600"
-                            size="compact-md"
-                            variant="subtle"
-                        >
-                            <RiMoreFill />
-                        </Button>
+                        <MoreButton />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            leftSection={<RiPlayFill />}
+                            leftSection={<Icon icon="mediaPlay" />}
                             onClick={() => handlePlay?.({ playType: Play.NOW })}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            leftSection={<RiShuffleFill />}
+                            leftSection={<Icon icon="mediaShuffle" />}
                             onClick={() => handlePlay?.({ playType: Play.SHUFFLE })}
                         >
                             {t('player.shuffle', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            leftSection={<RiAddBoxFill />}
+                            leftSection={<Icon icon="mediaPlayLast" />}
                             onClick={() => handlePlay?.({ playType: Play.LAST })}
                         >
                             {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            leftSection={<RiAddCircleFill />}
+                            leftSection={<Icon icon="mediaPlayNext" />}
                             onClick={() => handlePlay?.({ playType: Play.NEXT })}
                         >
                             {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            leftSection={<RiRefreshLine />}
+                            leftSection={<Icon icon="refresh" />}
                             onClick={handleRefresh}
                         >
                             {t('common.refresh', { postProcess: 'titleCase' })}
@@ -640,105 +582,19 @@ export const SongListHeaderFilters = ({
                 gap="sm"
                 wrap="nowrap"
             >
-                <DropdownMenu
-                    position="bottom-end"
-                    width={425}
-                >
-                    <DropdownMenu.Target>
-                        <Button
-                            size="compact-md"
-                            variant="subtle"
-                        >
-                            <RiSettings3Fill />
-                        </Button>
-                    </DropdownMenu.Target>
-                    <DropdownMenu.Dropdown>
-                        <DropdownMenu.Label>
-                            {t('table.config.general.displayType', { postProcess: 'sentenceCase' })}
-                        </DropdownMenu.Label>
-                        <DropdownMenu.Item
-                            isActive={display === ListDisplayType.CARD}
-                            onClick={handleSetViewType}
-                            value={ListDisplayType.CARD}
-                        >
-                            {t('table.config.view.card', { postProcess: 'sentenceCase' })}
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item
-                            isActive={display === ListDisplayType.POSTER}
-                            onClick={handleSetViewType}
-                            value={ListDisplayType.POSTER}
-                        >
-                            {t('table.config.view.poster', { postProcess: 'sentenceCase' })}
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item
-                            isActive={display === ListDisplayType.TABLE}
-                            onClick={handleSetViewType}
-                            value={ListDisplayType.TABLE}
-                        >
-                            {t('table.config.view.table', { postProcess: 'sentenceCase' })}
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Divider />
-                        <DropdownMenu.Label>
-                            {t('table.config.general.size', { postProcess: 'sentenceCase' })}
-                        </DropdownMenu.Label>
-                        <DropdownMenu.Item closeMenuOnClick={false}>
-                            <Slider
-                                defaultValue={isGrid ? grid?.itemSize || 0 : table.rowHeight}
-                                max={isGrid ? 300 : 100}
-                                min={isGrid ? 100 : 25}
-                                onChangeEnd={handleItemSize}
-                            />
-                        </DropdownMenu.Item>
-                        {isGrid && (
-                            <>
-                                <DropdownMenu.Label>
-                                    {t('table.config.general.gap', {
-                                        postProcess: 'sentenceCase',
-                                    })}
-                                </DropdownMenu.Label>
-                                <DropdownMenu.Item closeMenuOnClick={false}>
-                                    <Slider
-                                        defaultValue={grid?.itemGap || 0}
-                                        max={30}
-                                        min={0}
-                                        onChangeEnd={handleItemGap}
-                                    />
-                                </DropdownMenu.Item>
-                            </>
-                        )}
-                        <DropdownMenu.Label>
-                            {t('table.config.general.tableColumns', {
-                                postProcess: 'sentenceCase',
-                            })}
-                        </DropdownMenu.Label>
-                        <DropdownMenu.Item
-                            closeMenuOnClick={false}
-                            component="div"
-                            style={{ cursor: 'default' }}
-                        >
-                            <Stack>
-                                <MultiSelect
-                                    clearable
-                                    data={SONG_TABLE_COLUMNS}
-                                    defaultValue={table?.columns.map((column) => column.column)}
-                                    onChange={handleTableColumns}
-                                    width={300}
-                                />
-                                <Group justify="space-between">
-                                    <Text>
-                                        {t('table.config.general.autoFitColumns', {
-                                            postProcess: 'sentenceCase',
-                                        })}
-                                    </Text>
-                                    <Switch
-                                        defaultChecked={table.autoFit}
-                                        onChange={handleAutoFitColumns}
-                                    />
-                                </Group>
-                            </Stack>
-                        </DropdownMenu.Item>
-                    </DropdownMenu.Dropdown>
-                </DropdownMenu>
+                <ListConfigMenu
+                    autoFitColumns={table.autoFit}
+                    displayType={display}
+                    itemGap={grid?.itemGap || 0}
+                    itemSize={isGrid ? grid?.itemSize || 0 : table.rowHeight}
+                    onChangeAutoFitColumns={handleAutoFitColumns}
+                    onChangeDisplayType={handleSetViewType}
+                    onChangeItemGap={handleItemGap}
+                    onChangeItemSize={debouncedHandleItemSize}
+                    onChangeTableColumns={handleTableColumns}
+                    tableColumns={table?.columns.map((column) => column.column)}
+                    tableColumnsData={SONG_TABLE_COLUMNS}
+                />
             </Group>
         </Flex>
     );

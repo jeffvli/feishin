@@ -6,7 +6,6 @@ import setWith from 'lodash/setWith';
 import { nanoid } from 'nanoid';
 import { forwardRef, Ref, useImperativeHandle, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiMore2Fill, RiSaveLine } from 'react-icons/ri';
 
 import { QueryBuilder } from '/@/renderer/components/query-builder';
 import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
@@ -24,10 +23,12 @@ import {
     NDSongQueryPlaylistOperators,
     NDSongQueryStringOperators,
 } from '/@/shared/api/navidrome.types';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Select } from '/@/shared/components/select/select';
@@ -411,13 +412,10 @@ export const PlaylistQueryBuilder = forwardRef(
         return (
             <Flex
                 direction="column"
-                h="calc(100% - 3.5rem)"
+                h="calc(100% - 2rem)"
                 justify="space-between"
             >
-                <ScrollArea
-                    h="100%"
-                    p="md"
-                >
+                <ScrollArea>
                     <QueryBuilder
                         data={filters}
                         filters={NDSongQueryFields}
@@ -505,19 +503,20 @@ export const PlaylistQueryBuilder = forwardRef(
                             </Button>
                             <DropdownMenu position="bottom-end">
                                 <DropdownMenu.Target>
-                                    <Button
+                                    <ActionIcon
                                         disabled={isSaving}
-                                        p="sm"
+                                        icon="ellipsisHorizontal"
                                         variant="subtle"
-                                    >
-                                        <RiMore2Fill size={15} />
-                                    </Button>
+                                    />
                                 </DropdownMenu.Target>
                                 <DropdownMenu.Dropdown>
                                     <DropdownMenu.Item
                                         isDanger
                                         leftSection={
-                                            <RiSaveLine color="var(--theme-colors-state-error)" />
+                                            <Icon
+                                                color="error"
+                                                icon="save"
+                                            />
                                         }
                                         onClick={handleSave}
                                     >

@@ -1,27 +1,23 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
-import { closeAllModals, openModal } from '@mantine/modals';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiFileAddFill } from 'react-icons/ri';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
-import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { PlaylistListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-list-header-filters';
-import { LibraryHeaderBar } from '/@/renderer/features/shared';
+import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 import { PlaylistListFilter, useCurrentServer } from '/@/renderer/store';
-import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Paper } from '/@/shared/components/paper/paper';
 import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
-import { LibraryItem, PlaylistListQuery, ServerType } from '/@/shared/types/domain-types';
+import { LibraryItem, PlaylistListQuery } from '/@/shared/types/domain-types';
 
 interface PlaylistListHeaderProps {
     gridRef: MutableRefObject<null | VirtualInfiniteGridRef>;
@@ -33,17 +29,6 @@ export const PlaylistListHeader = ({ gridRef, itemCount, tableRef }: PlaylistLis
     const { t } = useTranslation();
     const cq = useContainerQuery();
     const server = useCurrentServer();
-
-    const handleCreatePlaylistModal = () => {
-        openModal({
-            children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
-            onClose: () => {
-                tableRef?.current?.api?.purgeInfiniteCache();
-            },
-            size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
-            title: t('form.createPlaylist.title', { postProcess: 'sentenceCase' }),
-        });
-    };
 
     const { filter, refresh, search } = useDisplayRefresh<PlaylistListQuery>({
         gridRef,
@@ -85,16 +70,6 @@ export const PlaylistListHeader = ({ gridRef, itemCount, tableRef }: PlaylistLis
                                 itemCount
                             )}
                         </Paper>
-                        <Button
-                            onClick={handleCreatePlaylistModal}
-                            tooltip={{
-                                label: t('action.createPlaylist', { postProcess: 'sentenceCase' }),
-                                openDelay: 500,
-                            }}
-                            variant="filled"
-                        >
-                            <RiFileAddFill />
-                        </Button>
                     </LibraryHeaderBar>
                     <Group>
                         <SearchInput
@@ -104,12 +79,12 @@ export const PlaylistListHeader = ({ gridRef, itemCount, tableRef }: PlaylistLis
                     </Group>
                 </Flex>
             </PageHeader>
-            <Paper p="1rem">
+            <FilterBar>
                 <PlaylistListHeaderFilters
                     gridRef={gridRef}
                     tableRef={tableRef}
                 />
-            </Paper>
+            </FilterBar>
         </Stack>
     );
 };

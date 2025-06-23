@@ -36,7 +36,22 @@
 }
 
 .option {
+    position: relative;
     padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+
+    &[data-checked='true'] {
+        &::before {
+            position: absolute;
+            top: 50%;
+            left: 2px;
+            width: 4px;
+            height: 50%;
+            content: '';
+            background-color: var(--theme-colors-primary-filled);
+            border-radius: var(--theme-border-radius-xl);
+            transform: translateY(-50%);
+        }
+    }
 }
 
 .option:hover {

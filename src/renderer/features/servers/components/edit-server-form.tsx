@@ -4,7 +4,6 @@ import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiInformationLine } from 'react-icons/ri';
 
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
@@ -14,6 +13,7 @@ import { useAuthStoreActions } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { PasswordInput } from '/@/shared/components/password-input/password-input';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
@@ -33,9 +33,10 @@ interface EditServerFormProps {
 const ModifiedFieldIndicator = () => {
     return (
         <Tooltip label={i18n.t('common.modified', { postProcess: 'titleCase' }) as string}>
-            <span>
-                <RiInformationLine color="red" />
-            </span>
+            <Icon
+                color="warn"
+                icon="info"
+            />
         </Tooltip>
     );
 };

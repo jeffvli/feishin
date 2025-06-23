@@ -29,7 +29,7 @@ interface ArtistListContentProps {
 export const ArtistListContent = ({ gridRef, itemCount, tableRef }: ArtistListContentProps) => {
     const { pageKey } = useListContext();
     const { display } = useListStoreByKey({ key: pageKey });
-    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.POSTER;
+    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.GRID;
 
     return (
         <Suspense fallback={<Spinner container />}>
