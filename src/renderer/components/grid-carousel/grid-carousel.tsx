@@ -10,7 +10,6 @@ import {
     useRef,
     useState,
 } from 'react';
-import { RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
 import { SwiperOptions, Virtual } from 'swiper';
 import 'swiper/css';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -22,6 +21,7 @@ import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/share
 import { usePlayButtonBehavior } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 import {
@@ -61,7 +61,7 @@ const Title = ({ handleNext, handlePrev, label, pagination }: TitleProps) => {
                 label
             ) : (
                 <TextTitle
-                    order={2}
+                    order={3}
                     weight={700}
                 >
                     {label}
@@ -72,18 +72,18 @@ const Title = ({ handleNext, handlePrev, label, pagination }: TitleProps) => {
                 <Button
                     disabled={!pagination.hasPreviousPage}
                     onClick={handlePrev}
-                    size="compact-lg"
-                    variant="default"
+                    size="compact-md"
+                    variant="subtle"
                 >
-                    <RiArrowLeftSLine />
+                    <Icon icon="arrowLeftS" />
                 </Button>
                 <Button
                     disabled={!pagination.hasNextPage}
                     onClick={handleNext}
-                    size="compact-lg"
-                    variant="default"
+                    size="compact-md"
+                    variant="subtle"
                 >
-                    <RiArrowRightSLine />
+                    <Icon icon="arrowRightS" />
                 </Button>
             </Group>
         </Group>

@@ -1,7 +1,6 @@
 import { openModal } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
-import { RiCheckFill, RiEdit2Line, RiHome4Line } from 'react-icons/ri';
-import { Link } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
@@ -14,8 +13,8 @@ import { useCurrentServer } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
-import { Text } from '/@/shared/components/text/text';
 
 const ActionRequiredRoute = () => {
     const { t } = useTranslation();
@@ -62,29 +61,7 @@ const ActionRequiredRoute = () => {
                         )}
                     </Group>
                     <Stack mt="2rem">
-                        {canReturnHome && (
-                            <>
-                                <Group
-                                    justify="center"
-                                    wrap="nowrap"
-                                >
-                                    <RiCheckFill
-                                        color="var(--theme-colors-state-success)"
-                                        size={30}
-                                    />
-                                    <Text size="xl">No issues found</Text>
-                                </Group>
-                                <Button
-                                    component={Link}
-                                    disabled={!canReturnHome}
-                                    leftSection={<RiHome4Line />}
-                                    to={AppRoute.HOME}
-                                    variant="filled"
-                                >
-                                    Go back
-                                </Button>
-                            </>
-                        )}
+                        {canReturnHome && <Navigate to={AppRoute.HOME} />}
                         {!displayedCheck && (
                             <Group
                                 justify="center"
@@ -92,7 +69,7 @@ const ActionRequiredRoute = () => {
                             >
                                 <Button
                                     fullWidth
-                                    leftSection={<RiEdit2Line />}
+                                    leftSection={<Icon icon="edit" />}
                                     onClick={handleManageServersModal}
                                     variant="filled"
                                 >

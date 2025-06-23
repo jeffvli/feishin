@@ -3,11 +3,10 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { MutableRefObject } from 'react';
-import { useTranslation } from 'react-i18next';
-import { RiHashtag } from 'react-icons/ri';
 
 import { useContainerQuery } from '/@/renderer/hooks';
 import { ListKey } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
@@ -32,7 +31,6 @@ export const TablePagination = ({
     setPagination,
     tableRef,
 }: TablePaginationProps) => {
-    const { t } = useTranslation();
     const [isGoToPageOpen, handlers] = useDisclosure(false);
     const containerQuery = useContainerQuery();
 
@@ -111,18 +109,13 @@ export const TablePagination = ({
                     trapFocus
                 >
                     <Popover.Target>
-                        <Button
+                        <ActionIcon
+                            icon="hash"
                             onClick={() => handlers.toggle()}
                             radius="sm"
                             size="sm"
                             style={{ height: '26px', padding: '0', width: '26px' }}
-                            tooltip={{
-                                label: t('action.goToPage', { postProcess: 'sentenceCase' }),
-                            }}
-                            variant="default"
-                        >
-                            <RiHashtag size={15} />
-                        </Button>
+                        />
                     </Popover.Target>
                     <Popover.Dropdown>
                         <form onSubmit={handleGoSubmit}>

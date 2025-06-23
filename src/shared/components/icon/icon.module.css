@@ -18,8 +18,56 @@
     font-size: var(--theme-font-size-xl);
 }
 
+.size-2xl {
+    font-size: var(--theme-font-size-2xl);
+}
+
+.size-3xl {
+    font-size: var(--theme-font-size-3xl);
+}
+
+.size-4xl {
+    font-size: var(--theme-font-size-4xl);
+}
+
+.size-5xl {
+    font-size: var(--theme-font-size-5xl);
+}
+
+.color-default {
+    color: var(--theme-colors-foreground);
+}
+
+.color-primary {
+    color: var(--theme-colors-primary-filled);
+}
+
+.color-muted {
+    color: var(--theme-colors-foreground-muted);
+}
+
+.color-success {
+    color: var(--theme-colors-state-success);
+}
+
+.color-error {
+    color: var(--theme-colors-state-error);
+}
+
+.color-info {
+    color: var(--theme-colors-state-info);
+}
+
+.color-warn {
+    color: var(--theme-colors-state-warn);
+}
+
 .fill {
     fill: transparent;
+}
+
+.fill-default {
+    fill: var(--theme-colors-foreground);
 }
 
 .fill-inherit {
@@ -27,32 +75,26 @@
 }
 
 .fill-primary {
-    color: var(--theme-colors-primary-filled);
     fill: var(--theme-colors-primary-filled);
 }
 
-.fill-secondary {
-    color: var(--theme-colors-foreground-muted);
+.fill-muted {
     fill: var(--theme-colors-foreground-muted);
 }
 
 .fill-success {
-    color: var(--theme-colors-state-success);
     fill: var(--theme-colors-state-success);
 }
 
 .fill-error {
-    color: var(--theme-colors-state-error);
     fill: var(--theme-colors-state-error);
 }
 
 .fill-info {
-    color: var(--theme-colors-state-info);
     fill: var(--theme-colors-state-info);
 }
 
 .fill-warn {
-    color: var(--theme-colors-state-warn);
     fill: var(--theme-colors-state-warn);
 }
 

@@ -3,6 +3,7 @@ import { HTMLAttributes, ReactNode, useRef, useState } from 'react';
 
 import styles from './spoiler.module.css';
 
+import { Text } from '/@/shared/components/text/text';
 import { useIsOverflow } from '/@/shared/hooks/use-is-overflow';
 
 interface SpoilerProps extends HTMLAttributes<HTMLDivElement> {
@@ -26,7 +27,7 @@ export const Spoiler = ({ children, defaultOpened, maxHeight, ...props }: Spoile
     };
 
     return (
-        <div
+        <Text
             className={spoilerClassNames}
             onClick={handleToggleExpand}
             ref={ref}
@@ -36,6 +37,6 @@ export const Spoiler = ({ children, defaultOpened, maxHeight, ...props }: Spoile
             {...props}
         >
             {children}
-        </div>
+        </Text>
     );
 };

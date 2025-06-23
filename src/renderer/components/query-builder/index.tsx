@@ -1,11 +1,11 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { RiAddFill, RiAddLine, RiDeleteBinFill, RiMore2Line, RiRestartLine } from 'react-icons/ri';
 
 import i18n from '/@/i18n/i18n';
 import { QueryBuilderOption } from '/@/renderer/components/query-builder/query-builder-option';
-import { Button } from '/@/shared/components/button/button';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Select } from '/@/shared/components/select/select';
 import { Stack } from '/@/shared/components/stack/stack';
 import { QueryBuilderGroup, QueryBuilderRule } from '/@/shared/types/types';
@@ -112,28 +112,26 @@ export const QueryBuilder = ({
                     value={data.type}
                     width="20%"
                 />
-                <Button
+                <ActionIcon
+                    icon="add"
                     onClick={handleAddRule}
-                    px={5}
                     size="sm"
-                    tooltip={{ label: 'Add rule' }}
-                    variant="default"
-                >
-                    <RiAddLine size={20} />
-                </Button>
+                    variant="subtle"
+                />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
-                        <Button
-                            p={0}
+                        <ActionIcon
+                            icon="ellipsisVertical"
                             size="sm"
+                            style={{
+                                padding: 0,
+                            }}
                             variant="subtle"
-                        >
-                            <RiMore2Line size={20} />
-                        </Button>
+                        />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            leftSection={<RiAddFill />}
+                            leftSection={<Icon icon="add" />}
                             onClick={handleAddRuleGroup}
                         >
                             Add rule group
@@ -141,7 +139,7 @@ export const QueryBuilder = ({
 
                         {level > 0 && (
                             <DropdownMenu.Item
-                                leftSection={<RiDeleteBinFill />}
+                                leftSection={<Icon icon="delete" />}
                                 onClick={handleDeleteRuleGroup}
                             >
                                 Remove rule group
@@ -153,7 +151,10 @@ export const QueryBuilder = ({
                                 <DropdownMenu.Item
                                     isDanger
                                     leftSection={
-                                        <RiRestartLine color="var(--theme-colors-state-error)" />
+                                        <Icon
+                                            color="error"
+                                            icon="refresh"
+                                        />
                                     }
                                     onClick={onResetFilters}
                                 >
@@ -162,7 +163,10 @@ export const QueryBuilder = ({
                                 <DropdownMenu.Item
                                     isDanger
                                     leftSection={
-                                        <RiDeleteBinFill color="var(--theme-colors-state-error)" />
+                                        <Icon
+                                            color="error"
+                                            icon="delete"
+                                        />
                                     }
                                     onClick={onClearFilters}
                                 >

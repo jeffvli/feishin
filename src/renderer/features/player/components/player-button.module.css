@@ -42,11 +42,13 @@
 }
 
 .main {
-    padding: 0.5rem;
+    background: var(--theme-colors-foreground);
     border-radius: 50%;
 
     svg {
         display: flex;
+        color: var(--theme-colors-background);
+        fill: var(--theme-colors-background);
     }
 }
 

@@ -2,7 +2,6 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
-import { RiInformationFill } from 'react-icons/ri';
 
 import styles from './lyrics.module.css';
 
@@ -26,8 +25,9 @@ import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentSong, useLyricsSettings, usePlayerStore } from '/@/renderer/store';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Spinner } from '/@/shared/components/spinner/spinner';
-import { TextTitle } from '/@/shared/components/text-title/text-title';
+import { Text } from '/@/shared/components/text/text';
 import { FullLyricsMetadata, LyricSource, LyricsOverride } from '/@/shared/types/domain-types';
 
 export const Lyrics = () => {
@@ -160,15 +160,12 @@ export const Lyrics = () => {
                         {hasNoLyrics ? (
                             <Center w="100%">
                                 <Group>
-                                    <RiInformationFill size="2rem" />
-                                    <TextTitle
-                                        fw={700}
-                                        order={3}
-                                    >
+                                    <Icon icon="info" />
+                                    <Text>
                                         {t('page.fullscreenPlayer.noLyrics', {
                                             postProcess: 'sentenceCase',
                                         })}
-                                    </TextTitle>
+                                    </Text>
                                 </Group>
                             </Center>
                         ) : (

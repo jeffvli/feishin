@@ -1,6 +1,5 @@
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
-import { RiAddFill, RiSubtractFill } from 'react-icons/ri';
 
 import { openLyricSearchModal } from '/@/renderer/features/lyrics/components/lyrics-search-form';
 import {
@@ -9,6 +8,7 @@ import {
     useSettingsStore,
     useSettingsStoreActions,
 } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
@@ -85,13 +85,12 @@ export const LyricsActions = ({
                         {t('common.search', { postProcess: 'titleCase' })}
                     </Button>
                 ) : null}
-                <Button
+                <ActionIcon
                     aria-label="Decrease lyric offset"
+                    icon="minus"
                     onClick={() => handleLyricOffset(delayMs - 50)}
                     variant="subtle"
-                >
-                    <RiSubtractFill />
-                </Button>
+                />
                 <Tooltip
                     label={t('setting.lyricOffset', { postProcess: 'sentenceCase' })}
                     openDelay={500}
@@ -104,13 +103,12 @@ export const LyricsActions = ({
                         width={55}
                     />
                 </Tooltip>
-                <Button
+                <ActionIcon
                     aria-label="Increase lyric offset"
+                    icon="plus"
                     onClick={() => handleLyricOffset(delayMs + 50)}
                     variant="subtle"
-                >
-                    <RiAddFill />
-                </Button>
+                />
                 {isDesktop && sources.length ? (
                     <Button
                         disabled={isActionsDisabled}

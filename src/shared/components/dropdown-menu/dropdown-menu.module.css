@@ -1,9 +1,7 @@
-.menu-label {
-    padding: var(--theme-spacing-sm);
-}
-
 .menu-item {
     position: relative;
+    display: flex;
+    align-items: center;
     padding: var(--theme-spacing-sm) var(--theme-spacing-md);
     cursor: default;
 }
@@ -15,6 +13,7 @@
 .menu-item-label {
     margin-right: var(--theme-spacing-md);
     margin-left: var(--theme-spacing-md);
+    font-size: var(--theme-font-size-md);
     color: var(--theme-colors-surface-foreground);
 }
 
@@ -38,4 +37,8 @@
     padding: 0;
     margin: 0;
     border-color: var(--theme-colors-border);
+}
+
+.menu-item-section svg {
+    font-size: var(--theme-font-size-md);
 }

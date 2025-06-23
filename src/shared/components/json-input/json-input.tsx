@@ -12,7 +12,19 @@ export interface JsonInputProps extends MantineJsonInputProps {
 }
 
 export const JsonInput = forwardRef<HTMLTextAreaElement, JsonInputProps>(
-    ({ children, classNames, maxWidth, style, variant = 'default', width, ...props }, ref) => {
+    (
+        {
+            children,
+            classNames,
+            maxWidth,
+            size = 'sm',
+            style,
+            variant = 'default',
+            width,
+            ...props
+        },
+        ref,
+    ) => {
         return (
             <MantineJsonInput
                 classNames={{
@@ -25,6 +37,7 @@ export const JsonInput = forwardRef<HTMLTextAreaElement, JsonInputProps>(
                     ...classNames,
                 }}
                 ref={ref}
+                size={size}
                 style={{ maxWidth, width, ...style }}
                 variant={variant}
                 {...props}

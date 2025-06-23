@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react';
 import React, { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiArrowUpSLine, RiDiscLine, RiMore2Fill } from 'react-icons/ri';
 import { generatePath, Link } from 'react-router-dom';
 
 import styles from './left-controls.module.css';
@@ -19,9 +18,9 @@ import {
     useSetFullScreenPlayerStore,
     useSidebarStore,
 } from '/@/renderer/store';
-import { Button } from '/@/shared/components/button/button';
-import { Center } from '/@/shared/components/center/center';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
+import { Image } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
@@ -92,33 +91,20 @@ export const LeftControls = () => {
                                     })}
                                     openDelay={500}
                                 >
-                                    {currentSong?.imageUrl ? (
-                                        <img
-                                            className={styles.playerbarImage}
-                                            loading="eager"
-                                            src={currentSong?.imageUrl}
-                                        />
-                                    ) : (
-                                        <Center
-                                            style={{
-                                                background: 'var(--theme-colors-surface)',
-                                                height: '100%',
-                                            }}
-                                        >
-                                            <RiDiscLine
-                                                color="var(--theme-colors-foreground-muted)"
-                                                size={50}
-                                            />
-                                        </Center>
-                                    )}
+                                    <Image
+                                        className={styles.playerbarImage}
+                                        loading="eager"
+                                        src={currentSong?.imageUrl ?? ''}
+                                    />
                                 </Tooltip>
-
                                 {!collapsed && (
-                                    <Button
+                                    <ActionIcon
+                                        icon="arrowUpS"
+                                        iconProps={{ size: 'xl' }}
                                         onClick={handleToggleSidebarImage}
                                         opacity={0.8}
-                                        radius={50}
-                                        size="compact-md"
+                                        radius="md"
+                                        size="xs"
                                         style={{
                                             cursor: 'default',
                                             position: 'absolute',
@@ -131,12 +117,7 @@ export const LeftControls = () => {
                                             }),
                                             openDelay: 500,
                                         }}
-                                    >
-                                        <RiArrowUpSLine
-                                            color="white"
-                                            size={20}
-                                        />
-                                    </Button>
+                                    />
                                 )}
                             </motion.div>
                         </div>
@@ -160,19 +141,22 @@ export const LeftControls = () => {
                                 fw={500}
                                 isLink
                                 overflow="hidden"
-                                size="md"
                                 to={AppRoute.NOW_PLAYING}
                             >
                                 {title || '—'}
                             </Text>
                             {isSongDefined && (
-                                <Button
+                                <ActionIcon
+                                    icon="ellipsisVertical"
                                     onClick={(e) => handleGeneralContextMenu(e, [currentSong!])}
-                                    size="compact-xs"
+                                    size="xs"
+                                    styles={{
+                                        root: {
+                                            '--ai-size-xs': '1.15rem',
+                                        },
+                                    }}
                                     variant="subtle"
-                                >
-                                    <RiMore2Fill />
-                                </Button>
+                                />
                             )}
                         </Group>
                     </div>

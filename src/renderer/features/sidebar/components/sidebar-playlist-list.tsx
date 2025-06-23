@@ -1,14 +1,7 @@
 import { useDebouncedValue } from '@mantine/hooks';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    RiAddBoxFill,
-    RiAddCircleFill,
-    RiArrowDownSLine,
-    RiArrowUpSLine,
-    RiPlayFill,
-    RiShuffleFill,
-} from 'react-icons/ri';
+import { RiAddBoxFill, RiAddCircleFill, RiPlayFill, RiShuffleFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -24,6 +17,7 @@ import { useCurrentServer, useGeneralSettings, useSettingsStoreActions } from '/
 import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, Playlist, PlaylistListSort, SortOrder } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -35,7 +29,7 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
         const [collapse, setCollapse] = data.items[index];
 
         return (
-            <div style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}>
+            <div style={{ margin: '0.5rem 0', padding: '0 1rem', ...style }}>
                 <div style={{ fontSize: '1.2rem', fontWeight: '600' }}>
                     <Group>
                         <Text>{t('page.sidebar.shared', { postProcess: 'titleCase' })}</Text>
@@ -50,11 +44,7 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
                             }}
                             variant="default"
                         >
-                            {collapse ? (
-                                <RiArrowUpSLine size={20} />
-                            ) : (
-                                <RiArrowDownSLine size={20} />
-                            )}
+                            {collapse ? <Icon icon="arrowUpS" /> : <Icon icon="arrowDownS" />}
                         </Button>
                     </Group>
                 </div>
@@ -83,7 +73,7 @@ const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
                     yPos: e.clientY + 5,
                 });
             }}
-            style={{ margin: '0.5rem 0', padding: '0 1.5rem', ...style }}
+            style={{ margin: '0.5rem 0', padding: '0 1rem', ...style }}
         >
             <Group
                 className="sidebar-playlist-item"

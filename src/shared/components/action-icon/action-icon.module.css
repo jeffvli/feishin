@@ -1,4 +1,10 @@
 .root {
+    --ai-size-xs: calc(1.875rem * var(--mantine-scale));
+    --ai-size-sm: calc(2.25rem * var(--mantine-scale));
+    --ai-size-md: calc(2.625rem * var(--mantine-scale));
+    --ai-size-lg: calc(3.125rem * var(--mantine-scale));
+    --ai-size-xl: calc(3.75rem * var(--mantine-scale));
+
     font-weight: 500;
     transition:
         background-color 0.2s ease-in-out,

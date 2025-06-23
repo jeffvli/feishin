@@ -2,7 +2,6 @@ import { useSetState } from '@mantine/hooks';
 import clsx from 'clsx';
 import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'motion/react';
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { RiAlbumFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -16,6 +15,7 @@ import { Badge } from '/@/shared/components/badge/badge';
 import { Center } from '/@/shared/components/center/center';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Image } from '/@/shared/components/image/image';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
@@ -65,8 +65,9 @@ const ImageWithPlaceholder = ({ ...props }: HTMLMotionProps<'img'> & { placehold
                     width: '100%',
                 }}
             >
-                <RiAlbumFill
-                    color="var(--theme-colors-foreground-muted)"
+                <Icon
+                    color="muted"
+                    icon="itemAlbum"
                     size="25%"
                 />
             </Center>

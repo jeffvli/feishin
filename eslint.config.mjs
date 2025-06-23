@@ -46,6 +46,7 @@ export default tseslint.config(
             'react-refresh/only-export-components': 'off',
             'react/display-name': 'off',
             semi: ['error', 'always'],
+            'single-attribute-per-line': 'off',
         },
     },
     eslintConfigPrettier,

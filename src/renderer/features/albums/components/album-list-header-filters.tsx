@@ -4,16 +4,6 @@ import { openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    RiAddBoxFill,
-    RiAddCircleFill,
-    RiFilterFill,
-    RiFolder2Fill,
-    RiMoreFill,
-    RiPlayFill,
-    RiRefreshLine,
-    RiSettings3Fill,
-} from 'react-icons/ri';
 
 import i18n from '/@/i18n/i18n';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -32,11 +22,13 @@ import {
     useListStoreActions,
     useListStoreByKey,
 } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -454,8 +446,7 @@ export const AlbumListHeaderFilters = ({
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button
-                            fw={600}
-                            size="compact-md"
+                            size="sm"
                             variant="subtle"
                         >
                             {sortByLabel}
@@ -484,20 +475,13 @@ export const AlbumListHeaderFilters = ({
                         <Divider orientation="vertical" />
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
-                                <Button
-                                    fw={600}
-                                    size="compact-md"
-                                    style={{
-                                        svg: {
-                                            fill: isFolderFilterApplied
-                                                ? 'var(--theme-colors-primary-filled) !important'
-                                                : undefined,
-                                        },
+                                <ActionIcon
+                                    icon="folder"
+                                    iconProps={{
+                                        fill: isFolderFilterApplied ? 'primary' : undefined,
                                     }}
                                     variant="subtle"
-                                >
-                                    <RiFolder2Fill />
-                                </Button>
+                                />
                             </DropdownMenu.Target>
                             <DropdownMenu.Dropdown>
                                 {musicFoldersQuery.data?.items.map((folder) => (
@@ -514,65 +498,53 @@ export const AlbumListHeaderFilters = ({
                         </DropdownMenu>
                     </>
                 )}
-                <Divider orientation="vertical" />
-                <Button
-                    onClick={handleOpenFiltersModal}
-                    size="compact-md"
-                    style={{
-                        svg: {
-                            fill: isFilterApplied
-                                ? 'var(--theme-colors-primary-filled) !important'
-                                : undefined,
-                        },
+                <ActionIcon
+                    icon="filter"
+                    iconProps={{
+                        fill: isFilterApplied ? 'primary' : undefined,
                     }}
+                    onClick={handleOpenFiltersModal}
+                    size="sm"
                     tooltip={{
                         label: t('common.filters', { count: 2, postProcess: 'sentenceCase' }),
                     }}
                     variant="subtle"
-                >
-                    <RiFilterFill />
-                </Button>
-                <Divider orientation="vertical" />
-                <Button
+                />
+                <ActionIcon
+                    icon="refresh"
                     onClick={handleRefresh}
-                    size="compact-md"
                     tooltip={{ label: t('common.refresh', { postProcess: 'sentenceCase' }) }}
                     variant="subtle"
-                >
-                    <RiRefreshLine />
-                </Button>
-                <Divider orientation="vertical" />
+                />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
-                        <Button
-                            size="compact-md"
+                        <ActionIcon
+                            icon="ellipsisHorizontal"
                             variant="subtle"
-                        >
-                            <RiMoreFill size={15} />
-                        </Button>
+                        />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            leftSection={<RiPlayFill />}
+                            leftSection={<Icon icon="mediaPlay" />}
                             onClick={() => handlePlay?.({ playType: Play.NOW })}
                         >
                             {t('player.play', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            leftSection={<RiAddBoxFill />}
+                            leftSection={<Icon icon="mediaPlayLast" />}
                             onClick={() => handlePlay?.({ playType: Play.LAST })}
                         >
                             {t('player.addLast', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
-                            leftSection={<RiAddCircleFill />}
+                            leftSection={<Icon icon="mediaPlayNext" />}
                             onClick={() => handlePlay?.({ playType: Play.NEXT })}
                         >
                             {t('player.addNext', { postProcess: 'sentenceCase' })}
                         </DropdownMenu.Item>
                         <DropdownMenu.Divider />
                         <DropdownMenu.Item
-                            leftSection={<RiRefreshLine />}
+                            leftSection={<Icon icon="refresh" />}
                             onClick={handleRefresh}
                         >
                             {t('common.refresh', { postProcess: 'sentenceCase' })}
@@ -589,15 +561,13 @@ export const AlbumListHeaderFilters = ({
                     width={425}
                 >
                     <DropdownMenu.Target>
-                        <Button
-                            size="compact-md"
+                        <ActionIcon
+                            icon="settings"
                             tooltip={{
                                 label: t('common.configure', { postProcess: 'sentenceCase' }),
                             }}
                             variant="subtle"
-                        >
-                            <RiSettings3Fill />
-                        </Button>
+                        />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Label>

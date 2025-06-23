@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { useState } from 'react';
-import { RiAlbumFill, RiPlayListFill, RiUserVoiceFill } from 'react-icons/ri';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { ListChildComponentProps } from 'react-window';
 
@@ -8,7 +7,6 @@ import styles from './poster-card.module.css';
 
 import { CardRows } from '/@/renderer/components/card/card-rows';
 import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
-import { Center } from '/@/shared/components/center/center';
 import { Image } from '/@/shared/components/image/image';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -65,26 +63,6 @@ export const PosterCard = ({
             }, {}),
         );
 
-        let Placeholder = RiAlbumFill;
-
-        switch (controls.itemType) {
-            case LibraryItem.ALBUM:
-                Placeholder = RiAlbumFill;
-                break;
-            case LibraryItem.ALBUM_ARTIST:
-                Placeholder = RiUserVoiceFill;
-                break;
-            case LibraryItem.ARTIST:
-                Placeholder = RiUserVoiceFill;
-                break;
-            case LibraryItem.PLAYLIST:
-                Placeholder = RiPlayListFill;
-                break;
-            default:
-                Placeholder = RiAlbumFill;
-                break;
-        }
-
         return (
             <div
                 className={styles.container}
@@ -102,19 +80,10 @@ export const PosterCard = ({
                     <div
                         className={`${styles.imageContainer} ${data?.userFavorite ? styles.isFavorite : ''}`}
                     >
-                        {data?.imageUrl ? (
-                            <Image
-                                className={styles.image}
-                                src={data?.imageUrl}
-                            />
-                        ) : (
-                            <Center className={styles.placeholderWrapper}>
-                                <Placeholder
-                                    color="var(--theme-colors-foreground-muted)"
-                                    size={35}
-                                />
-                            </Center>
-                        )}
+                        <Image
+                            className={styles.image}
+                            src={data?.imageUrl}
+                        />
                         <GridCardControls
                             handleFavorite={controls.handleFavorite}
                             handlePlayQueueAdd={controls.handlePlayQueueAdd}

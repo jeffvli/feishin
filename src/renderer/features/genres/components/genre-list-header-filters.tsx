@@ -3,14 +3,6 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { useQueryClient } from '@tanstack/react-query';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    RiAlbumLine,
-    RiFolder2Fill,
-    RiMoreFill,
-    RiMusic2Line,
-    RiRefreshLine,
-    RiSettings3Fill,
-} from 'react-icons/ri';
 
 import i18n from '/@/i18n/i18n';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -30,11 +22,13 @@ import {
     useListStoreByKey,
     useSettingsStoreActions,
 } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -298,20 +292,13 @@ export const GenreListHeaderFilters = ({
                         <Divider orientation="vertical" />
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
-                                <Button
-                                    fw={600}
-                                    size="compact-md"
-                                    style={{
-                                        svg: {
-                                            fill: isFolderFilterApplied
-                                                ? 'var(--theme-colors-primary-filled) !important'
-                                                : undefined,
-                                        },
+                                <ActionIcon
+                                    icon="folder"
+                                    iconProps={{
+                                        fill: isFolderFilterApplied ? 'primary' : undefined,
                                     }}
                                     variant="subtle"
-                                >
-                                    <RiFolder2Fill />
-                                </Button>
+                                />
                             </DropdownMenu.Target>
                             <DropdownMenu.Dropdown>
                                 {musicFoldersQuery.data?.items.map((folder) => (
@@ -328,48 +315,45 @@ export const GenreListHeaderFilters = ({
                         </DropdownMenu>
                     </>
                 )}
-                <Divider orientation="vertical" />
-                <Button
+                <ActionIcon
+                    icon="refresh"
                     onClick={handleRefresh}
-                    size="compact-md"
                     tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
-                >
-                    <RiRefreshLine />
-                </Button>
-                <Divider orientation="vertical" />
+                />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
-                        <Button
-                            size="compact-md"
+                        <ActionIcon
+                            icon="ellipsisHorizontal"
                             variant="subtle"
-                        >
-                            <RiMoreFill size={15} />
-                        </Button>
+                        />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            leftSection={<RiRefreshLine />}
+                            leftSection={<Icon icon="refresh" />}
                             onClick={handleRefresh}
                         >
                             {t('common.refresh', { postProcess: 'titleCase' })}
                         </DropdownMenu.Item>
                     </DropdownMenu.Dropdown>
-                    <Divider orientation="vertical" />
                     <Button
                         onClick={handleGenreToggle}
                         size="compact-md"
                         tooltip={{
                             label: t(
                                 genreTarget === GenreTarget.ALBUM
-                                    ? 'page.genreList.showAlbums'
-                                    : 'page.genreList.showTracks',
+                                    ? 'page.genreList.showTracks'
+                                    : 'page.genreList.showAlbums',
                                 { postProcess: 'sentenceCase' },
                             ),
                         }}
                         variant="subtle"
                     >
-                        {genreTarget === GenreTarget.ALBUM ? <RiAlbumLine /> : <RiMusic2Line />}
+                        {genreTarget === GenreTarget.ALBUM ? (
+                            <Icon icon="itemAlbum" />
+                        ) : (
+                            <Icon icon="itemSong" />
+                        )}
                     </Button>
                 </DropdownMenu>
             </Group>
@@ -382,15 +366,13 @@ export const GenreListHeaderFilters = ({
                     width={425}
                 >
                     <DropdownMenu.Target>
-                        <Button
-                            size="compact-md"
+                        <ActionIcon
+                            icon="settings"
                             tooltip={{
                                 label: t('common.configure', { postProcess: 'titleCase' }),
                             }}
                             variant="subtle"
-                        >
-                            <RiSettings3Fill />
-                        </Button>
+                        />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Label>
@@ -459,7 +441,7 @@ export const GenreListHeaderFilters = ({
                                     component="div"
                                     style={{ cursor: 'default' }}
                                 >
-                                    <Stack>
+                                    <Stack gap="xl">
                                         <MultiSelect
                                             clearable
                                             data={GENRE_TABLE_COLUMNS}
@@ -467,6 +449,7 @@ export const GenreListHeaderFilters = ({
                                                 (column) => column.column,
                                             )}
                                             onChange={handleTableColumns}
+                                            variant="filled"
                                             width={300}
                                         />
                                         <Group justify="space-between">

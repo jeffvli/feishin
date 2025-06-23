@@ -460,7 +460,6 @@ export const PlaylistQueryBuilder = forwardRef(
                             label="Sort"
                             maxWidth="20%"
                             searchable
-                            variant="filled"
                             width={150}
                             {...extraFiltersForm.getInputProps('sortBy')}
                         />
@@ -477,14 +476,12 @@ export const PlaylistQueryBuilder = forwardRef(
                             ]}
                             label={t('common.sortOrder', { postProcess: 'titleCase' })}
                             maxWidth="20%"
-                            variant="filled"
                             width={125}
                             {...extraFiltersForm.getInputProps('sortOrder')}
                         />
                         <NumberInput
                             label={t('common.limit', { postProcess: 'titleCase' })}
                             maxWidth="20%"
-                            variant="filled"
                             width={75}
                             {...extraFiltersForm.getInputProps('limit')}
                         />
@@ -497,7 +494,6 @@ export const PlaylistQueryBuilder = forwardRef(
                             <Button
                                 loading={isSaving}
                                 onClick={handleSaveAs}
-                                variant="filled"
                             >
                                 {t('common.saveAs', { postProcess: 'titleCase' })}
                             </Button>

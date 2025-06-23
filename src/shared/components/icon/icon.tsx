@@ -2,7 +2,9 @@ import type { ComponentType } from 'react';
 
 import clsx from 'clsx';
 import { motion } from 'motion/react';
+import { FaLastfmSquare } from 'react-icons/fa';
 import {
+    LuAppWindow,
     LuArrowDown,
     LuArrowDownToLine,
     LuArrowDownWideNarrow,
@@ -23,8 +25,11 @@ import {
     LuChevronUp,
     LuCircleCheck,
     LuCircleX,
+    LuClipboardCopy,
     LuClock3,
     LuCloudDownload,
+    LuCornerUpRight,
+    LuDelete,
     LuDisc3,
     LuDownload,
     LuEllipsis,
@@ -32,8 +37,10 @@ import {
     LuExternalLink,
     LuFlag,
     LuFolderOpen,
+    LuGithub,
     LuGripHorizontal,
     LuGripVertical,
+    LuHardDrive,
     LuHash,
     LuHeart,
     LuHeartCrack,
@@ -44,6 +51,8 @@ import {
     LuLayoutGrid,
     LuLibrary,
     LuList,
+    LuListFilter,
+    LuListMinus,
     LuListMusic,
     LuListPlus,
     LuLoader,
@@ -52,6 +61,7 @@ import {
     LuLogOut,
     LuMenu,
     LuMinus,
+    LuMusic,
     LuMusic2,
     LuPanelRightClose,
     LuPanelRightOpen,
@@ -59,8 +69,7 @@ import {
     LuPencilLine,
     LuPlay,
     LuPlus,
-    LuRepeat,
-    LuRepeat1,
+    LuRadio,
     LuRotateCw,
     LuSearch,
     LuSettings2,
@@ -71,12 +80,12 @@ import {
     LuSkipForward,
     LuSlidersHorizontal,
     LuSquare,
+    LuSquareCheck,
     LuSquareMenu,
     LuStar,
     LuStepBack,
     LuStepForward,
     LuTable,
-    LuTrash,
     LuTriangleAlert,
     LuUser,
     LuUserPen,
@@ -87,6 +96,8 @@ import {
     LuX,
 } from 'react-icons/lu';
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from 'react-icons/md';
+import { RiPlayListAddLine, RiRepeat2Line, RiRepeatOneLine } from 'react-icons/ri';
+import { SiMusicbrainz } from 'react-icons/si';
 
 import styles from './icon.module.css';
 
@@ -95,6 +106,7 @@ export type AppIconSelection = keyof typeof AppIcon;
 export const AppIcon = {
     add: LuPlus,
     album: LuDisc3,
+    appWindow: LuAppWindow,
     arrowDown: LuArrowDown,
     arrowDownS: LuChevronDown,
     arrowDownToLine: LuArrowDownToLine,
@@ -109,9 +121,13 @@ export const AppIcon = {
     arrowUpS: LuChevronUp,
     arrowUpToLine: LuArrowUpToLine,
     artist: LuUserPen,
+    brandGitHub: LuGithub,
+    brandLastfm: FaLastfmSquare,
+    brandMusicBrainz: SiMusicbrainz,
     cache: LuCloudDownload,
     check: LuCheck,
-    delete: LuTrash,
+    clipboardCopy: LuClipboardCopy,
+    delete: LuDelete,
     download: LuDownload,
     dragHorizontal: LuGripHorizontal,
     dragVertical: LuGripVertical,
@@ -124,38 +140,51 @@ export const AppIcon = {
     error: LuShieldAlert,
     externalLink: LuExternalLink,
     favorite: LuHeart,
+    filter: LuListFilter,
     folder: LuFolderOpen,
     genre: LuFlag,
     hash: LuHash,
     home: LuSquareMenu,
     image: LuImage,
     info: LuInfo,
+    itemAlbum: LuDisc3,
+    itemSong: LuMusic,
     layoutGrid: LuLayoutGrid,
     layoutTable: LuTable,
     library: LuLibrary,
+    list: LuList,
     listInfinite: LuInfinity,
     listPaginated: LuArrowRightToLine,
     lock: LuLock,
     mediaNext: LuSkipForward,
     mediaPause: LuPause,
     mediaPlay: LuPlay,
+    mediaPlayLast: LuChevronLast,
+    mediaPlayNext: LuCornerUpRight,
     mediaPrevious: LuSkipBack,
-    mediaRepeat: LuRepeat,
-    mediaRepeatOne: LuRepeat1,
+    mediaRandom: RiPlayListAddLine,
+    mediaRepeat: RiRepeat2Line,
+    mediaRepeatOne: RiRepeatOneLine,
     mediaSettings: LuSlidersHorizontal,
     mediaShuffle: LuShuffle,
     mediaStepBackward: LuStepBack,
     mediaStepForward: LuStepForward,
+    mediaStop: LuSquare,
     menu: LuMenu,
     metadata: LuBookOpen,
+    minus: LuMinus,
     panelRightClose: LuPanelRightClose,
     panelRightOpen: LuPanelRightOpen,
     playlist: LuListMusic,
     playlistAdd: LuListPlus,
+    playlistDelete: LuListMinus,
+    plus: LuPlus,
     queue: LuList,
+    radio: LuRadio,
     refresh: LuRotateCw,
     remove: LuMinus,
     search: LuSearch,
+    server: LuHardDrive,
     settings: LuSettings2,
     share: LuShare2,
     signIn: LuLogIn,
@@ -165,6 +194,7 @@ export const AppIcon = {
     sortDesc: LuArrowDownWideNarrow,
     spinner: LuLoader,
     square: LuSquare,
+    squareCheck: LuSquareCheck,
     star: LuStar,
     success: LuCircleCheck,
     track: LuMusic2,
@@ -184,27 +214,23 @@ export const AppIcon = {
 export interface IconProps {
     animate?: 'pulse' | 'spin';
     className?: string;
-    fill?: 'error' | 'info' | 'inherit' | 'primary' | 'secondary' | 'success' | 'warn';
+    color?: 'default' | 'error' | 'info' | 'inherit' | 'muted' | 'primary' | 'success' | 'warn';
+    fill?: 'default' | 'error' | 'info' | 'inherit' | 'muted' | 'primary' | 'success' | 'warn';
     icon: keyof typeof AppIcon;
-    size?: 'lg' | 'md' | 'sm' | 'xl' | 'xs' | number | string;
+    size?: '2xl' | '3xl' | '4xl' | '5xl' | 'lg' | 'md' | 'sm' | 'xl' | 'xs' | number | string;
 }
 
 export function Icon(props: IconProps) {
-    const { animate, className, fill, icon, size = 'md' } = props;
+    const { animate, className, color, fill, icon, size = 'md' } = props;
 
     const IconComponent = AppIcon[icon];
 
     const classNames = clsx(className, {
         [styles.fill]: true,
-        [styles.fillError]: fill === 'error',
-        [styles.fillInfo]: fill === 'info',
-        [styles.fillInherit]: fill === 'inherit',
-        [styles.fillPrimary]: fill === 'primary',
-        [styles.fillSecondary]: fill === 'secondary',
-        [styles.fillSuccess]: fill === 'success',
-        [styles.fillWarn]: fill === 'warn',
         [styles.pulse]: animate === 'pulse',
         [styles.spin]: animate === 'spin',
+        [styles[`color-${color || fill}`]]: color || fill,
+        [styles[`fill-${fill}`]]: fill,
         [styles[`size-${size}`]]: true,
     });
 

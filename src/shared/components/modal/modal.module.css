@@ -10,7 +10,7 @@
 
 .header {
     background: var(--theme-colors-background);
-    border-bottom: 1px solid var(--theme-colors-border);
+    border-bottom: none;
 }
 
 .content {

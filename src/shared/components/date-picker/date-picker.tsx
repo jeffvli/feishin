@@ -9,7 +9,14 @@ interface DateInputProps extends MantineDateInputProps {
     width?: number | string;
 }
 
-export const DateInput = ({ classNames, maxWidth, style, width, ...props }: DateInputProps) => {
+export const DateInput = ({
+    classNames,
+    maxWidth,
+    size = 'sm',
+    style,
+    width,
+    ...props
+}: DateInputProps) => {
     return (
         <MantineDateInput
             classNames={{
@@ -20,6 +27,7 @@ export const DateInput = ({ classNames, maxWidth, style, width, ...props }: Date
                 section: styles.section,
                 ...classNames,
             }}
+            size={size}
             style={{ maxWidth, width, ...style }}
             {...props}
         />

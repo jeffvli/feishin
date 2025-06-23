@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
-import { RiCheckFill, RiCloseFill } from 'react-icons/ri';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -13,6 +12,7 @@ import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Table } from '/@/shared/components/table/table';
@@ -119,8 +119,7 @@ const FormatGenre = (item: Album | AlbumArtist | Playlist | Song) => {
     ));
 };
 
-const BoolField = (key: boolean) =>
-    key ? <RiCheckFill size="1.1rem" /> : <RiCloseFill size="1.1rem" />;
+const BoolField = (key: boolean) => (key ? <Icon icon="check" /> : <Icon icon="x" />);
 
 const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
     { key: 'name', label: 'common.title' },

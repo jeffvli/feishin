@@ -12,7 +12,19 @@ export interface FileInputProps extends MantineFileInputProps {
 }
 
 export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
-    ({ children, classNames, maxWidth, style, variant = 'default', width, ...props }, ref) => {
+    (
+        {
+            children,
+            classNames,
+            maxWidth,
+            size = 'sm',
+            style,
+            variant = 'default',
+            width,
+            ...props
+        },
+        ref,
+    ) => {
         return (
             <MantineFileInput
                 classNames={{
@@ -25,6 +37,7 @@ export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
                     ...classNames,
                 }}
                 ref={ref}
+                size={size}
                 style={{ maxWidth, width, ...style }}
                 variant={variant}
                 {...props}

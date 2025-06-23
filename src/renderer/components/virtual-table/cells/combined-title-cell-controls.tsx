@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { RiPlayFill } from 'react-icons/ri';
 
 import styles from './combined-title-cell-controls.module.css';
 
@@ -51,10 +50,9 @@ export const ListCoverControls = ({
         <div className={clsx(styles.listControlsContainer, className)}>
             <ActionIcon
                 classNames={{ root: styles.playButton }}
+                icon="mediaPlay"
                 onClick={isQueue ? handlePlayFromQueue : handlePlay}
-            >
-                <RiPlayFill size="1rem" />
-            </ActionIcon>
+            />
         </div>
     );
 };

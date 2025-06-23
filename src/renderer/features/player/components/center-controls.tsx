@@ -4,19 +4,6 @@ import formatDuration from 'format-duration';
 import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IoIosPause } from 'react-icons/io';
-import { RiPlayListAddLine } from 'react-icons/ri';
-import {
-    RiPlayFill,
-    RiRepeat2Line,
-    RiRepeatOneLine,
-    RiRewindFill,
-    RiShuffleFill,
-    RiSkipBackFill,
-    RiSkipForwardFill,
-    RiSpeedFill,
-    RiStopFill,
-} from 'react-icons/ri';
 
 import styles from './center-controls.module.css';
 
@@ -39,6 +26,7 @@ import {
     usePlaybackType,
     useSettingsStore,
 } from '/@/renderer/store/settings.store';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { PlaybackType, PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
@@ -127,7 +115,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             <div className={styles.controlsContainer}>
                 <div className={styles.buttonsContainer}>
                     <PlayerButton
-                        icon={<RiStopFill size={buttonSize} />}
+                        icon={
+                            <Icon
+                                fill="default"
+                                icon="mediaStop"
+                                size={buttonSize}
+                            />
+                        }
                         onClick={handleStop}
                         tooltip={{
                             label: t('player.stop', { postProcess: 'sentenceCase' }),
@@ -135,7 +129,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         variant="tertiary"
                     />
                     <PlayerButton
-                        icon={<RiShuffleFill size={buttonSize} />}
+                        icon={
+                            <Icon
+                                fill={shuffle === PlayerShuffle.NONE ? 'default' : 'primary'}
+                                icon="mediaShuffle"
+                                size={buttonSize}
+                            />
+                        }
                         isActive={shuffle !== PlayerShuffle.NONE}
                         onClick={handleToggleShuffle}
                         tooltip={{
@@ -150,7 +150,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         variant="tertiary"
                     />
                     <PlayerButton
-                        icon={<RiSkipBackFill size={buttonSize} />}
+                        icon={
+                            <Icon
+                                fill="default"
+                                icon="mediaPrevious"
+                                size={buttonSize}
+                            />
+                        }
                         onClick={handlePrevTrack}
                         tooltip={{
                             label: t('player.previous', { postProcess: 'sentenceCase' }),
@@ -159,7 +165,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                     />
                     {skip?.enabled && (
                         <PlayerButton
-                            icon={<RiRewindFill size={buttonSize} />}
+                            icon={
+                                <Icon
+                                    fill="default"
+                                    icon="mediaStepBackward"
+                                    size={buttonSize}
+                                />
+                            }
                             onClick={() => handleSkipBackward(skip?.skipBackwardSeconds)}
                             tooltip={{
                                 label: t('player.skip', {
@@ -174,9 +186,15 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         disabled={currentSong?.id === undefined}
                         icon={
                             status === PlayerStatus.PAUSED ? (
-                                <RiPlayFill size={buttonSize} />
+                                <Icon
+                                    icon="mediaPlay"
+                                    size={buttonSize}
+                                />
                             ) : (
-                                <IoIosPause size={buttonSize} />
+                                <Icon
+                                    icon="mediaPause"
+                                    size={buttonSize}
+                                />
                             )
                         }
                         onClick={handlePlayPause}
@@ -190,7 +208,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                     />
                     {skip?.enabled && (
                         <PlayerButton
-                            icon={<RiSpeedFill size={buttonSize} />}
+                            icon={
+                                <Icon
+                                    fill="default"
+                                    icon="mediaStepForward"
+                                    size={buttonSize}
+                                />
+                            }
                             onClick={() => handleSkipForward(skip?.skipForwardSeconds)}
                             tooltip={{
                                 label: t('player.skip', {
@@ -202,7 +226,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         />
                     )}
                     <PlayerButton
-                        icon={<RiSkipForwardFill size={buttonSize} />}
+                        icon={
+                            <Icon
+                                fill="default"
+                                icon="mediaNext"
+                                size={buttonSize}
+                            />
+                        }
                         onClick={handleNextTrack}
                         tooltip={{
                             label: t('player.next', { postProcess: 'sentenceCase' }),
@@ -212,9 +242,17 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                     <PlayerButton
                         icon={
                             repeat === PlayerRepeat.ONE ? (
-                                <RiRepeatOneLine size={buttonSize} />
+                                <Icon
+                                    fill="primary"
+                                    icon="mediaRepeatOne"
+                                    size={buttonSize}
+                                />
                             ) : (
-                                <RiRepeat2Line size={buttonSize} />
+                                <Icon
+                                    fill={repeat === PlayerRepeat.NONE ? 'default' : 'primary'}
+                                    icon="mediaRepeat"
+                                    size={buttonSize}
+                                />
                             )
                         }
                         isActive={repeat !== PlayerRepeat.NONE}
@@ -241,7 +279,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                     />
 
                     <PlayerButton
-                        icon={<RiPlayListAddLine size={buttonSize} />}
+                        icon={
+                            <Icon
+                                fill="default"
+                                icon="mediaRandom"
+                                size={buttonSize}
+                            />
+                        }
                         onClick={() =>
                             openShuffleAllModal({
                                 handlePlayQueueAdd,

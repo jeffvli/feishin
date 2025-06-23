@@ -1,0 +1,7 @@
+.td {
+    padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
+}
+
+.th {
+    padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
+}

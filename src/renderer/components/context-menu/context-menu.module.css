@@ -1,6 +1,7 @@
 .container {
     position: absolute;
     z-index: 1000;
+    padding: var(--theme-spacing-xs);
     background: var(--theme-colors-surface);
     border: 1px solid var(--theme-colors-border);
     border-radius: var(--theme-radius-md);
@@ -11,7 +12,7 @@
     display: flex;
     padding: var(--theme-spacing-sm);
     font-family: var(--theme-content-font-family);
-    font-size: var(--theme-font-size-sm);
+    font-size: var(--theme-font-size-md);
     font-weight: 500;
     color: var(--theme-colors-surface-foreground);
     text-align: left;

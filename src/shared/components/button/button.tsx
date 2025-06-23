@@ -1,4 +1,4 @@
-import type { ButtonProps as MantineButtonProps } from '@mantine/core';
+import type { ButtonVariant, ButtonProps as MantineButtonProps } from '@mantine/core';
 
 import { ElementProps, Button as MantineButton } from '@mantine/core';
 import { useTimeout } from '@mantine/hooks';
@@ -15,10 +15,17 @@ export interface ButtonProps
     extends ElementProps<'button', keyof MantineButtonProps>,
         MantineButtonProps,
         MantineButtonProps {
-    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     tooltip?: Omit<TooltipProps, 'children'>;
     uppercase?: boolean;
+    variant?: ExtendedButtonVariant;
 }
+
+type ExtendedButtonVariant =
+    | 'state-error'
+    | 'state-info'
+    | 'state-success'
+    | 'state-warning'
+    | ButtonVariant;
 
 export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
     (
@@ -26,6 +33,7 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
             children,
             classNames,
             loading,
+            size = 'sm',
             style,
             tooltip,
             uppercase,
@@ -52,18 +60,12 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
                             ...classNames,
                         }}
                         ref={ref}
+                        size={size}
                         style={style}
                         variant={variant}
                         {...props}
                     >
-                        <span
-                            className={clsx(styles.buttonInner, {
-                                [styles.loading]: loading,
-                                [styles.uppercase]: uppercase,
-                            })}
-                        >
-                            {children}
-                        </span>
+                        {children}
                         {loading && (
                             <div className={styles.spinner}>
                                 <Spinner />
@@ -78,23 +80,19 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
             <MantineButton
                 classNames={{
                     loader: styles.loader,
-                    root: styles.root,
+                    root: clsx(styles.root, {
+                        [styles.uppercase]: uppercase,
+                    }),
                     section: styles.section,
                     ...classNames,
                 }}
                 ref={ref}
+                size={size}
                 style={style}
                 variant={variant}
                 {...props}
             >
-                <span
-                    className={clsx(styles.buttonInner, {
-                        [styles.loading]: loading,
-                        [styles.uppercase]: uppercase,
-                    })}
-                >
-                    {children}
-                </span>
+                {children}
                 {loading && (
                     <div className={styles.spinner}>
                         <Spinner />
@@ -148,7 +146,6 @@ export const TimeoutButton = ({ timeoutProps, ...props }: TimeoutButtonProps) =>
     return (
         <Button
             onClick={startTimeout}
-            style={{ color: 'var(--theme-colors-state-error)' }}
             {...props}
         >
             {isRunning ? 'Cancel' : props.children}

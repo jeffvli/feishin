@@ -5,7 +5,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiFolder2Line, RiMoreFill, RiRefreshLine, RiSettings3Fill } from 'react-icons/ri';
 
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
@@ -23,11 +22,13 @@ import {
     useListStoreActions,
     useListStoreByKey,
 } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
 import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
@@ -429,13 +430,10 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                         <Divider orientation="vertical" />
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
-                                <Button
-                                    fw="600"
-                                    size="compact-md"
+                                <ActionIcon
+                                    icon="folder"
                                     variant="subtle"
-                                >
-                                    {cq.isMd ? 'Folder' : <RiFolder2Line size={15} />}
-                                </Button>
+                                />
                             </DropdownMenu.Target>
                             <DropdownMenu.Dropdown>
                                 {musicFoldersQuery.data?.items.map((folder) => (
@@ -463,27 +461,23 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                     </>
                 )}
                 <Divider orientation="vertical" />
-                <Button
+                <ActionIcon
                     onClick={handleRefresh}
-                    size="compact-md"
                     tooltip={{ label: t('common.refresh', { postProcess: 'titleCase' }) }}
                     variant="subtle"
-                >
-                    <RiRefreshLine />
-                </Button>
+					icon="refresh"
+                />
                 <Divider orientation="vertical" />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
-                        <Button
-                            size="compact-md"
+                        <ActionIcon
+                            icon="ellipsisHorizontal"
                             variant="subtle"
-                        >
-                            <RiMoreFill size={15} />
-                        </Button>
+                        />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Item
-                            leftSection={<RiRefreshLine />}
+                            leftSection={<Icon icon="refresh" />}
                             onClick={handleRefresh}
                         >
                             {t('common.refresh', {
@@ -499,12 +493,10 @@ export const ArtistListHeaderFilters = ({ gridRef, tableRef }: ArtistListHeaderF
                     width={425}
                 >
                     <DropdownMenu.Target>
-                        <Button
-                            size="compact-md"
+                        <ActionIcon
+                            icon="settings"
                             variant="subtle"
-                        >
-                            <RiSettings3Fill />
-                        </Button>
+                        ></ActionIcon>
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
                         <DropdownMenu.Label>

@@ -8,7 +8,7 @@ import styles from './segmented-control.module.css';
 type SegmentedControlProps = MantineSegmentedControlProps;
 
 export const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps>(
-    ({ classNames, ...props }: SegmentedControlProps, ref) => {
+    ({ classNames, size = 'sm', ...props }: SegmentedControlProps, ref) => {
         return (
             <MantineSegmentedControl
                 classNames={{
@@ -19,6 +19,7 @@ export const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps
                     ...classNames,
                 }}
                 ref={ref}
+                size={size}
                 transitionDuration={250}
                 transitionTimingFunction="linear"
                 {...props}

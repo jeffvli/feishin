@@ -3,13 +3,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem 1rem 1rem 0;
+    padding: var(--theme-spacing-md) var(--theme-spacing-md) var(--theme-spacing-md) 0;
 }
 
 .metadata-stack {
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: var(--theme-spacing-xs);
     justify-content: center;
     width: 100%;
     overflow: hidden;
@@ -30,8 +30,6 @@
     width: 60px;
     height: 60px;
     cursor: pointer;
-    background-color: var(--theme-colors-foreground-muted);
-    filter: drop-shadow(0 5px 6px rgb(0 0 0 / 50%));
     animation: fadein 0.2s ease-in-out;
 
     button {

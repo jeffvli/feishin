@@ -2,11 +2,10 @@ import type { IHeaderParams } from '@ag-grid-community/core';
 import type { ReactNode } from 'react';
 
 import clsx from 'clsx';
-import { AiOutlineNumber } from 'react-icons/ai';
-import { FiClock } from 'react-icons/fi';
-import { RiHeartLine, RiMoreFill, RiStarLine } from 'react-icons/ri';
 
 import styles from './generic-table-header.module.css';
+
+import { Icon } from '/@/shared/components/icon/icon';
 
 type Options = {
     children?: ReactNode;
@@ -18,33 +17,33 @@ type Presets = 'actions' | 'duration' | 'rowIndex' | 'userFavorite' | 'userRatin
 
 const headerPresets = {
     actions: (
-        <RiMoreFill
-            color="var(--theme-ag-header-foreground-color)"
-            size="1em"
+        <Icon
+            icon="ellipsisHorizontal"
+            size="sm"
         />
     ),
     duration: (
-        <FiClock
-            color="var(--theme-ag-header-foreground-color)"
-            size="1em"
+        <Icon
+            icon="duration"
+            size="sm"
         />
     ),
     rowIndex: (
-        <AiOutlineNumber
-            color="var(--theme-ag-header-foreground-color)"
-            size="1em"
+        <Icon
+            icon="hash"
+            size="sm"
         />
     ),
     userFavorite: (
-        <RiHeartLine
-            color="var(--theme-ag-header-foreground-color)"
-            size="1em"
+        <Icon
+            icon="favorite"
+            size="sm"
         />
     ),
     userRating: (
-        <RiStarLine
-            color="var(--theme-ag-header-foreground-color)"
-            size="1em"
+        <Icon
+            icon="star"
+            size="sm"
         />
     ),
 };

@@ -1,12 +1,12 @@
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { useState } from 'react';
-import { RiCheckboxBlankLine, RiCheckboxLine } from 'react-icons/ri';
 
 import styles from './full-width-disc-cell.module.css';
 
 import { getNodesByDiscNumber, setNodeSelection } from '/@/renderer/components/virtual-table/utils';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 
 export const FullWidthDiscCell = ({ api, data, node }: ICellRendererParams) => {
     const [isSelected, setIsSelected] = useState(false);
@@ -30,7 +30,7 @@ export const FullWidthDiscCell = ({ api, data, node }: ICellRendererParams) => {
                 w="100%"
             >
                 <Button
-                    leftSection={isSelected ? <RiCheckboxLine /> : <RiCheckboxBlankLine />}
+                    leftSection={isSelected ? <Icon icon="squareCheck" /> : <Icon icon="square" />}
                     onClick={handleToggleDiscNodes}
                     size="compact-md"
                     variant="subtle"

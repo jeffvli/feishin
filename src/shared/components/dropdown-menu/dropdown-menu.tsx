@@ -30,6 +30,7 @@ export const DropdownMenu = ({ children, ...props }: MenuProps) => {
         <MantineMenu
             classNames={{
                 dropdown: styles['menu-dropdown'],
+                itemSection: styles['menu-item-section'],
             }}
             transitionProps={{
                 transition: 'fade',

@@ -17,6 +17,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             children,
             classNames,
             maxWidth,
+            size = 'sm',
             style,
             variant = 'default',
             width,
@@ -36,6 +37,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
                     ...classNames,
                 }}
                 ref={ref}
+                size={size}
                 spellCheck={false}
                 style={{ maxWidth, width, ...style }}
                 variant={variant}

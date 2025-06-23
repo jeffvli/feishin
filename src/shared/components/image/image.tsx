@@ -19,7 +19,9 @@ interface ImageLoaderProps {
 
 interface ImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> {
     containerClassName?: string;
-    src: string | string[];
+    includeLoader?: boolean;
+    includeUnloader?: boolean;
+    src: string | string[] | undefined;
     thumbHash?: string;
 }
 
@@ -27,7 +29,13 @@ interface ImageUnloaderProps {
     className?: string;
 }
 
-export function Image({ className, containerClassName, src }: ImageProps) {
+export function Image({
+    className,
+    containerClassName,
+    includeLoader = true,
+    includeUnloader = true,
+    src,
+}: ImageProps) {
     if (src) {
         return (
             <Img
@@ -36,16 +44,20 @@ export function Image({ className, containerClassName, src }: ImageProps) {
                     <ImageContainer className={containerClassName}>{children}</ImageContainer>
                 )}
                 loader={
-                    <ImageContainer className={containerClassName}>
-                        <ImageLoader className={className} />
-                    </ImageContainer>
+                    includeLoader ? (
+                        <ImageContainer className={containerClassName}>
+                            <ImageLoader className={className} />
+                        </ImageContainer>
+                    ) : null
                 }
                 loading="eager"
                 src={src}
                 unloader={
-                    <ImageContainer className={containerClassName}>
-                        <ImageUnloader className={className} />
-                    </ImageContainer>
+                    includeUnloader ? (
+                        <ImageContainer className={containerClassName}>
+                            <ImageUnloader className={className} />
+                        </ImageContainer>
+                    ) : null
                 }
             />
         );

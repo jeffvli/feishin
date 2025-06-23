@@ -1,8 +1,6 @@
 import type { PlayQueueAddOptions } from '/@/shared/types/types';
 import type { MouseEvent } from 'react';
 
-import { RiHeartFill, RiHeartLine, RiMore2Fill, RiPlayFill } from 'react-icons/ri';
-
 import styles from './card-controls.module.css';
 
 import {
@@ -11,8 +9,10 @@ import {
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
@@ -51,7 +51,7 @@ export const CardControls = ({
                     className={styles.playButton}
                     onClick={handlePlay}
                 >
-                    <RiPlayFill size={25} />
+                    <Icon icon="mediaPlay" />
                 </button>
                 <Group gap="xs">
                     <Button
@@ -63,16 +63,13 @@ export const CardControls = ({
                     >
                         <div className={itemData?.isFavorite ? styles.favoriteWrapper : ''}>
                             {itemData?.isFavorite ? (
-                                <RiHeartFill size={20} />
+                                <Icon icon="favorite" />
                             ) : (
-                                <RiHeartLine
-                                    color="white"
-                                    size={20}
-                                />
+                                <Icon icon="favorite" />
                             )}
                         </div>
                     </Button>
-                    <Button
+                    <ActionIcon
                         className={styles.secondaryButton}
                         onClick={(e: any) => {
                             e.preventDefault();
@@ -83,11 +80,8 @@ export const CardControls = ({
                         style={{ svg: { fill: 'white !important' } }}
                         variant="subtle"
                     >
-                        <RiMore2Fill
-                            color="white"
-                            size={20}
-                        />
-                    </Button>
+                        <Icon icon="ellipsisHorizontal" />
+                    </ActionIcon>
                 </Group>
             </div>
         </div>

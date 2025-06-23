@@ -8,7 +8,7 @@ import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { VirtualGridContainer } from '/@/renderer/components/virtual-grid';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
-import { Paper } from '/@/shared/components/paper/paper';
+import { Box } from '/@/shared/components/box/box';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Song } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
@@ -25,7 +25,7 @@ export const SidebarPlayQueue = () => {
                     <PageHeader />
                 </Stack>
             )}
-            <Paper
+            <Box
                 display={!isWeb ? 'flex' : undefined}
                 h={!isWeb ? '65px' : undefined}
             >
@@ -33,7 +33,7 @@ export const SidebarPlayQueue = () => {
                     tableRef={queueRef}
                     type="sideQueue"
                 />
-            </Paper>
+            </Box>
             <PlayQueue
                 ref={queueRef}
                 type="sideQueue"

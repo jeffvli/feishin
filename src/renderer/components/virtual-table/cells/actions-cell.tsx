@@ -1,24 +1,21 @@
 import type { ICellRendererParams } from '@ag-grid-community/core';
 
-import { RiMoreFill } from 'react-icons/ri';
-
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
-import { Button } from '/@/shared/components/button/button';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 
 export const ActionsCell = ({ api, context }: ICellRendererParams) => {
     return (
         <CellContainer position="center">
-            <Button
+            <ActionIcon
+                icon="ellipsisHorizontal"
                 onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
                     context.onCellContextMenu(undefined, api, e);
                 }}
-                size="compact-md"
+                size="sm"
                 variant="subtle"
-            >
-                <RiMoreFill />
-            </Button>
+            />
         </CellContainer>
     );
 };

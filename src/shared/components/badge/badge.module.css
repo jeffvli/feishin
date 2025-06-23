@@ -1,11 +1,13 @@
 .root[data-variant='filled'] {
-    background-color: var(--theme-colors-primary-filled);
+    background: var(--theme-colors-primary-filled);
 }
 
 .root[data-variant='outline'] {
-    background-color: transparent;
+    background: transparent;
 }
 
 .root {
+    padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
     font-weight: 500;
+    background: var(--theme-colors-surface);
 }

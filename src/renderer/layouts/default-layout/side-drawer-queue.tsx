@@ -1,7 +1,6 @@
 import { useDisclosure, useTimeout } from '@mantine/hooks';
 import { AnimatePresence, motion, Variants } from 'motion/react';
 import { useCallback } from 'react';
-import { TbArrowBarLeft } from 'react-icons/tb';
 import { useLocation } from 'react-router';
 
 import styles from './side-drawer-queue.module.css';
@@ -9,6 +8,7 @@ import styles from './side-drawer-queue.module.css';
 import { DrawerPlayQueue } from '/@/renderer/features/now-playing';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAppStore, useSidebarStore } from '/@/renderer/store';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Platform } from '/@/shared/types/types';
 
 const queueDrawerVariants: Variants = {
@@ -97,7 +97,10 @@ export const SideDrawerQueue = () => {
                     variants={queueDrawerButtonVariants}
                     whileHover={{ opacity: 1, scale: 2, transition: { duration: 0.5 } }}
                 >
-                    <TbArrowBarLeft size={12} />
+                    <Icon
+                        icon="arrowLeftToLine"
+                        size="lg"
+                    />
                 </motion.div>
             )}
 

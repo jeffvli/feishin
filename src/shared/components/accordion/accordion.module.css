@@ -1,0 +1,7 @@
+.panel {
+    background: var(--theme-colors-background);
+}
+
+.control {
+    background: var(--theme-colors-background);
+}

@@ -1,14 +1,16 @@
-import { RiQuestionLine } from 'react-icons/ri';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { AnimatedPage } from '/@/renderer/features/shared';
-import { Button } from '/@/shared/components/button/button';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 
 const InvalidRoute = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -20,19 +22,20 @@ const InvalidRoute = () => {
                         justify="center"
                         wrap="nowrap"
                     >
-                        <RiQuestionLine
-                            color="var(--theme-colors-state-warning)"
-                            size={30}
+                        <Icon
+                            color="warn"
+                            icon="error"
                         />
-                        <Text size="xl">Page not found</Text>
+                        <Text size="xl">
+                            {t('error.apiRouteError', { postProcess: 'sentenceCase' })}
+                        </Text>
                     </Group>
                     <Text>{location.pathname}</Text>
-                    <Button
+                    <ActionIcon
+                        icon="arrowLeftS"
                         onClick={() => navigate(-1)}
                         variant="filled"
-                    >
-                        Go back
-                    </Button>
+                    />
                 </Stack>
             </Center>
         </AnimatedPage>

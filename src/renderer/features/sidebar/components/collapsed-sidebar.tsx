@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { motion } from 'motion/react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiArrowLeftSLine, RiArrowRightSLine, RiMenuFill } from 'react-icons/ri';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 import styles from './collapsed-sidebar.module.css';
@@ -15,6 +14,7 @@ import { SidebarItemType, useGeneralSettings, useWindowSettings } from '/@/rende
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Platform } from '/@/shared/types/types';
 
@@ -77,19 +77,31 @@ export const CollapsedSidebar = () => {
                         grow
                     >
                         <CollapsedSidebarButton onClick={() => navigate(-1)}>
-                            <RiArrowLeftSLine size="22" />
+                            <Icon
+                                icon="arrowLeftS"
+                                size="xl"
+                            />
                         </CollapsedSidebarButton>
                         <CollapsedSidebarButton onClick={() => navigate(1)}>
-                            <RiArrowRightSLine size="22" />
+                            <Icon
+                                icon="arrowRightS"
+                                size="xl"
+                            />
                         </CollapsedSidebarButton>
                     </Group>
                 )}
                 <DropdownMenu position="right-start">
                     <DropdownMenu.Target>
                         <CollapsedSidebarItem
-                            activeIcon={<RiMenuFill size="25" />}
+                            activeIcon={null}
                             component={Flex}
-                            icon={<RiMenuFill size="25" />}
+                            icon={
+                                <Icon
+                                    fill="muted"
+                                    icon="menu"
+                                    size="3xl"
+                                />
+                            }
                             label={t('common.menu', { postProcess: 'titleCase' })}
                             style={{
                                 cursor: 'pointer',

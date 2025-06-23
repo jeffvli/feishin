@@ -1,20 +1,6 @@
 import { closeAllModals, openModal } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
-import {
-    RiArrowLeftSLine,
-    RiArrowRightSLine,
-    RiCloseCircleLine,
-    RiEdit2Line,
-    RiExternalLinkLine,
-    RiGithubLine,
-    RiLayoutLeftLine,
-    RiLayoutRightLine,
-    RiLockLine,
-    RiServerLine,
-    RiSettings3Line,
-    RiWindowFill,
-} from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -31,6 +17,7 @@ import {
     useSidebarStore,
 } from '/@/renderer/store';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { Icon } from '/@/shared/components/icon/icon';
 import { ServerListItem, ServerType } from '/@/shared/types/domain-types';
 
 const browser = isElectron() ? window.api.browser : null;
@@ -100,27 +87,27 @@ export const AppMenu = () => {
     return (
         <>
             <DropdownMenu.Item
-                leftSection={<RiArrowLeftSLine />}
+                leftSection={<Icon icon="arrowLeftS" />}
                 onClick={() => navigate(-1)}
             >
                 {t('page.appMenu.goBack', { postProcess: 'sentenceCase' })}
             </DropdownMenu.Item>
             <DropdownMenu.Item
-                leftSection={<RiArrowRightSLine />}
+                leftSection={<Icon icon="arrowRightS" />}
                 onClick={() => navigate(1)}
             >
                 {t('page.appMenu.goForward', { postProcess: 'sentenceCase' })}
             </DropdownMenu.Item>
             {collapsed ? (
                 <DropdownMenu.Item
-                    leftSection={<RiLayoutRightLine />}
+                    leftSection={<Icon icon="panelRightOpen" />}
                     onClick={handleExpandSidebar}
                 >
                     {t('page.appMenu.expandSidebar', { postProcess: 'sentenceCase' })}
                 </DropdownMenu.Item>
             ) : (
                 <DropdownMenu.Item
-                    leftSection={<RiLayoutLeftLine />}
+                    leftSection={<Icon icon="panelRightClose" />}
                     onClick={handleCollapseSidebar}
                 >
                     {t('page.appMenu.collapseSidebar', { postProcess: 'sentenceCase' })}
@@ -129,13 +116,13 @@ export const AppMenu = () => {
             <DropdownMenu.Divider />
             <DropdownMenu.Item
                 component={Link}
-                leftSection={<RiSettings3Line />}
+                leftSection={<Icon icon="settings" />}
                 to={AppRoute.SETTINGS}
             >
                 {t('page.appMenu.settings', { postProcess: 'sentenceCase' })}
             </DropdownMenu.Item>
             <DropdownMenu.Item
-                leftSection={<RiEdit2Line />}
+                leftSection={<Icon icon="edit" />}
                 onClick={handleManageServersModal}
             >
                 {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}
@@ -154,13 +141,18 @@ export const AppMenu = () => {
 
                 return (
                     <DropdownMenu.Item
-                        isActive={server.id === currentServer?.id}
                         key={`server-${server.id}`}
                         leftSection={
                             isSessionExpired ? (
-                                <RiLockLine color="var(--theme-colors-state-error)" />
+                                <Icon
+                                    fill="error"
+                                    icon="lock"
+                                />
                             ) : (
-                                <RiServerLine />
+                                <Icon
+                                    color={server.id === currentServer?.id ? 'primary' : undefined}
+                                    icon="server"
+                                />
                             )
                         }
                         onClick={() => {
@@ -176,8 +168,8 @@ export const AppMenu = () => {
             <DropdownMenu.Item
                 component="a"
                 href="https://github.com/jeffvli/feishin/releases"
-                leftSection={<RiGithubLine />}
-                rightSection={<RiExternalLinkLine />}
+                leftSection={<Icon icon="brandGitHub" />}
+                rightSection={<Icon icon="externalLink" />}
                 target="_blank"
             >
                 {t('page.appMenu.version', {
@@ -189,13 +181,13 @@ export const AppMenu = () => {
                 <>
                     <DropdownMenu.Divider />
                     <DropdownMenu.Item
-                        leftSection={<RiWindowFill />}
+                        leftSection={<Icon icon="appWindow" />}
                         onClick={handleBrowserDevTools}
                     >
                         {t('page.appMenu.openBrowserDevtools', { postProcess: 'sentenceCase' })}
                     </DropdownMenu.Item>
                     <DropdownMenu.Item
-                        leftSection={<RiCloseCircleLine />}
+                        leftSection={<Icon icon="x" />}
                         onClick={handleQuit}
                     >
                         {t('page.appMenu.quit', { postProcess: 'sentenceCase' })}

@@ -7,7 +7,12 @@ import styles from './color-input.module.css';
 
 export interface ColorInputProps extends MantineColorInputProps {}
 
-export const ColorInput = ({ classNames, variant = 'default', ...props }: ColorInputProps) => {
+export const ColorInput = ({
+    classNames,
+    size = 'sm',
+    variant = 'default',
+    ...props
+}: ColorInputProps) => {
     return (
         <MantineColorInput
             classNames={{
@@ -17,6 +22,7 @@ export const ColorInput = ({ classNames, variant = 'default', ...props }: ColorI
                 root: styles.root,
                 ...classNames,
             }}
+            size={size}
             variant={variant}
             {...props}
         />

@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiRefreshLine } from 'react-icons/ri';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { FeatureCarousel } from '/@/renderer/components/feature-carousel/feature-carousel';
@@ -20,6 +19,7 @@ import {
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
@@ -308,19 +308,12 @@ const HomeRoute = () => {
                             title={{
                                 label: (
                                     <Group>
-                                        <TextTitle
-                                            fw={700}
-                                            order={2}
-                                        >
-                                            {carousel.title}
-                                        </TextTitle>
-
+                                        <TextTitle order={3}>{carousel.title}</TextTitle>
                                         <ActionIcon
                                             onClick={() => invalidateCarouselQuery(carousel)}
-                                            size="compact-sm"
                                             variant="transparent"
                                         >
-                                            <RiRefreshLine />
+                                            <Icon icon="refresh" />
                                         </ActionIcon>
                                     </Group>
                                 ),

@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { MouseEvent, useState } from 'react';
-import { RiHeartFill, RiHeartLine, RiMoreFill, RiPlayFill } from 'react-icons/ri';
 
 import styles from './grid-card-controls.module.css';
 
@@ -13,6 +12,7 @@ import { useHandleGridContextMenu } from '/@/renderer/features/context-menu/hook
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
+import { Icon } from '/@/shared/components/icon/icon';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { Play, PlayQueueAddOptions } from '/@/shared/types/types';
 
@@ -86,45 +86,35 @@ export const GridCardControls = ({
                         onClick={handlePlay}
                         variant="filled"
                     >
-                        <RiPlayFill size={25} />
+                        <Icon
+                            icon="mediaPlay"
+                            size="xl"
+                        />
                     </Button>
                     <div className={styles.bottomControls}>
                         {itemType !== LibraryItem.PLAYLIST && (
                             <ActionIcon
                                 classNames={{ root: styles.secondaryButton }}
+                                icon={isFavorite ? 'favorite' : 'favorite'}
+                                iconProps={{
+                                    fill: isFavorite ? 'primary' : undefined,
+                                }}
                                 onClick={(e) => handleFavorites(e, itemData?.serverId)}
-                                size="xs"
-                                variant="subtle"
-                            >
-                                <span
-                                    className={itemData?.isFavorite ? styles.favoriteWrapper : ''}
-                                >
-                                    {isFavorite ? (
-                                        <RiHeartFill size={20} />
-                                    ) : (
-                                        <RiHeartLine
-                                            color="white"
-                                            size={20}
-                                        />
-                                    )}
-                                </span>
-                            </ActionIcon>
+                                size="sm"
+                                variant="transparent"
+                            />
                         )}
                         <ActionIcon
                             classNames={{ root: styles.secondaryButton }}
+                            icon="ellipsisHorizontal"
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 handleContextMenu(e, [itemData]);
                             }}
-                            size="xs"
-                            variant="subtle"
-                        >
-                            <RiMoreFill
-                                color="white"
-                                size={20}
-                            />
-                        </ActionIcon>
+                            size="sm"
+                            variant="transparent"
+                        />
                     </div>
                 </div>
             )}

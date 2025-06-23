@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiErrorWarningLine, RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -26,9 +25,11 @@ import { useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString } from '/@/renderer/utils';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
@@ -179,34 +180,26 @@ const DummyAlbumDetailRoute = () => {
                     >
                         <Group>
                             <PlayButton onClick={() => handlePlay()} />
-                            <Button
+                            <ActionIcon
+                                icon="favorite"
+                                iconProps={{
+                                    fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
+                                }}
                                 loading={
                                     createFavoriteMutation.isLoading ||
                                     deleteFavoriteMutation.isLoading
                                 }
                                 onClick={handleFavorite}
-                                size="compact-md"
                                 variant="subtle"
-                            >
-                                {detailQuery?.data?.userFavorite ? (
-                                    <RiHeartFill
-                                        color="red"
-                                        size={20}
-                                    />
-                                ) : (
-                                    <RiHeartLine size={20} />
-                                )}
-                            </Button>
-                            <Button
+                            />
+                            <ActionIcon
+                                icon="ellipsisHorizontal"
                                 onClick={(e) => {
                                     if (!detailQuery?.data) return;
                                     handleGeneralContextMenu(e, [detailQuery.data!]);
                                 }}
-                                size="compact-md"
                                 variant="subtle"
-                            >
-                                <RiMoreFill size={20} />
-                            </Button>
+                            />
                         </Group>
                     </Group>
                 </section>
@@ -238,8 +231,9 @@ const DummyAlbumDetailRoute = () => {
                 <section>
                     <Center>
                         <Group mr={5}>
-                            <RiErrorWarningLine
-                                color="var(--theme-colors-state-error)"
+                            <Icon
+                                fill="error"
+                                icon="error"
                                 size={30}
                             />
                         </Group>

@@ -3,7 +3,6 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri';
 import { generatePath, useNavigate, useParams } from 'react-router';
 
 import { PlaylistDetailSongListContent } from '/@/renderer/features/playlists/components/playlist-detail-song-list-content';
@@ -17,9 +16,9 @@ import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/play
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, usePlaylistDetailStore } from '/@/renderer/store';
-import { Button } from '/@/shared/components/button/button';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Box } from '/@/shared/components/box/box';
 import { Group } from '/@/shared/components/group/group';
-import { Paper } from '/@/shared/components/paper/paper';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import {
@@ -175,24 +174,18 @@ const PlaylistDetailSongListRoute = () => {
 
             {(isSmartPlaylist || showQueryBuilder) && (
                 <div>
-                    <Paper
+                    <Box
                         h="100%"
                         mah="35vh"
                         w="100%"
                     >
                         <Group p="md">
-                            <Button
+                            <ActionIcon
+                                icon={isQueryBuilderExpanded ? 'arrowUpS' : 'arrowDownS'}
                                 onClick={handleToggleExpand}
-                                size="compact-md"
-                                variant="default"
-                            >
-                                {isQueryBuilderExpanded ? (
-                                    <RiArrowUpSLine size={20} />
-                                ) : (
-                                    <RiArrowDownSLine size={20} />
-                                )}
-                            </Button>
-                            <Text>Query Editor</Text>
+                                size="sm"
+                            />
+                            <Text>{t('form.queryEditor.title', { postProcess: 'titleCase' })}</Text>
                         </Group>
                         {isQueryBuilderExpanded && (
                             <PlaylistQueryBuilder
@@ -207,7 +200,7 @@ const PlaylistDetailSongListRoute = () => {
                                 sortOrder={detailQuery?.data?.rules?.order || 'asc'}
                             />
                         )}
-                    </Paper>
+                    </Box>
                 </div>
             )}
             <PlaylistDetailSongListContent

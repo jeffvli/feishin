@@ -12,7 +12,7 @@
 
 .tab {
     padding: var(--theme-spacing-md);
-    font-weight: 600;
+    font-weight: 500;
     color: var(--theme-btn-subtle-fg);
     transition: color 0.2s ease-in-out;
 

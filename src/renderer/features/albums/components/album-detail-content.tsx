@@ -4,9 +4,6 @@ import { RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-commun
 import { useSetState } from '@mantine/hooks';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaLastfmSquare } from 'react-icons/fa';
-import { RiHeartFill, RiHeartLine, RiMoreFill, RiSettings2Fill } from 'react-icons/ri';
-import { SiMusicbrainz } from 'react-icons/si';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -46,6 +43,7 @@ import {
     useTableSettings,
 } from '/@/renderer/store/settings.store';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Popover } from '/@/shared/components/popover/popover';
@@ -334,44 +332,44 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                     >
                         <Group>
                             <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-                            <Button
-                                loading={
-                                    createFavoriteMutation.isLoading ||
-                                    deleteFavoriteMutation.isLoading
-                                }
-                                onClick={handleFavorite}
-                                size="compact-md"
-                                variant="subtle"
-                            >
-                                {detailQuery?.data?.userFavorite ? (
-                                    <RiHeartFill
-                                        color="red"
-                                        size={20}
-                                    />
-                                ) : (
-                                    <RiHeartLine size={20} />
-                                )}
-                            </Button>
-                            <Button
-                                onClick={(e) => {
-                                    if (!detailQuery?.data) return;
-                                    handleGeneralContextMenu(e, [detailQuery.data!]);
-                                }}
-                                size="compact-md"
-                                variant="subtle"
-                            >
-                                <RiMoreFill size={20} />
-                            </Button>
+                            <Group gap="xs">
+                                <ActionIcon
+                                    icon="favorite"
+                                    iconProps={{
+                                        fill: detailQuery?.data?.userFavorite
+                                            ? 'primary'
+                                            : undefined,
+                                    }}
+                                    loading={
+                                        createFavoriteMutation.isLoading ||
+                                        deleteFavoriteMutation.isLoading
+                                    }
+                                    onClick={handleFavorite}
+                                    size="lg"
+                                    variant="transparent"
+                                />
+                                <ActionIcon
+                                    icon="ellipsisHorizontal"
+                                    onClick={(e) => {
+                                        if (!detailQuery?.data) return;
+                                        handleGeneralContextMenu(e, [detailQuery.data!]);
+                                    }}
+                                    size="lg"
+                                    variant="transparent"
+                                />
+                            </Group>
                         </Group>
-
                         <Popover position="bottom-end">
                             <Popover.Target>
-                                <Button
-                                    size="compact-md"
-                                    variant="subtle"
-                                >
-                                    <RiSettings2Fill size={20} />
-                                </Button>
+                                <ActionIcon
+                                    icon="settings"
+                                    onClick={(e) => {
+                                        if (!detailQuery?.data) return;
+                                        handleGeneralContextMenu(e, [detailQuery.data!]);
+                                    }}
+                                    size="lg"
+                                    variant="transparent"
+                                />
                             </Popover.Target>
                             <Popover.Dropdown>
                                 <TableConfigDropdown type="albumDetail" />
@@ -402,37 +400,42 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                 {externalLinks && (lastFM || musicBrainz) ? (
                     <section>
                         <Group gap="sm">
-                            <Button
+                            <ActionIcon
                                 component="a"
                                 href={`https://www.last.fm/music/${encodeURIComponent(
                                     detailQuery?.data?.albumArtist || '',
                                 )}/${encodeURIComponent(detailQuery.data?.name || '')}`}
+                                icon="brandLastfm"
+                                iconProps={{
+                                    fill: 'default',
+                                    size: 'xl',
+                                }}
                                 radius="md"
                                 rel="noopener noreferrer"
-                                size="compact-md"
                                 target="_blank"
                                 tooltip={{
                                     label: t('action.openIn.lastfm'),
                                 }}
                                 variant="subtle"
-                            >
-                                <FaLastfmSquare size={25} />
-                            </Button>
+                            />
                             {mbzId ? (
-                                <Button
+                                <ActionIcon
                                     component="a"
                                     href={`https://musicbrainz.org/release/${mbzId}`}
+                                    icon="brandMusicBrainz"
+                                    iconProps={{
+                                        fill: 'default',
+                                        size: 'xl',
+                                    }}
                                     radius="md"
                                     rel="noopener noreferrer"
-                                    size="compact-md"
+                                    size="md"
                                     target="_blank"
                                     tooltip={{
                                         label: t('action.openIn.musicbrainz'),
                                     }}
                                     variant="subtle"
-                                >
-                                    <SiMusicbrainz size={25} />
-                                </Button>
+                                />
                             ) : null}
                         </Group>
                     </section>

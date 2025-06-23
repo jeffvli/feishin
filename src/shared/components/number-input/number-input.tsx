@@ -17,6 +17,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             children,
             classNames,
             maxWidth,
+            size = 'sm',
             style,
             variant = 'default',
             width,
@@ -38,6 +39,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                 }}
                 hideControls
                 ref={ref}
+                size={size}
                 style={{ maxWidth, width, ...style }}
                 variant={variant}
                 {...props}

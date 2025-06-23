@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import { AnimatePresence, motion } from 'motion/react';
 import { CSSProperties, MouseEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiAddFill, RiArrowDownSLine, RiDiscLine, RiListUnordered } from 'react-icons/ri';
 import { Link, useLocation } from 'react-router-dom';
 
 import styles from './sidebar.module.css';
@@ -28,10 +27,10 @@ import {
     useGeneralSettings,
     useWindowSettings,
 } from '/@/renderer/store/settings.store';
-import { Button } from '/@/shared/components/button/button';
-import { Center } from '/@/shared/components/center/center';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
+import { Image } from '/@/shared/components/image/image';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
@@ -152,8 +151,7 @@ export const Sidebar = () => {
                         <>
                             <Group
                                 justify="space-between"
-                                pt="1rem"
-                                px="1.5rem"
+                                px="1rem"
                             >
                                 <Group>
                                     <Text
@@ -163,23 +161,29 @@ export const Sidebar = () => {
                                         {t('page.sidebar.playlists', { postProcess: 'titleCase' })}
                                     </Text>
                                 </Group>
-                                <Group gap="sm">
-                                    <Button
+                                <Group gap="xs">
+                                    <ActionIcon
+                                        icon="add"
+                                        iconProps={{
+                                            size: 'lg',
+                                        }}
                                         onClick={handleCreatePlaylistModal}
-                                        size="compact-md"
+                                        size="xs"
                                         tooltip={{
                                             label: t('action.createPlaylist', {
                                                 postProcess: 'sentenceCase',
                                             }),
                                             openDelay: 500,
                                         }}
-                                    >
-                                        <RiAddFill size="1em" />
-                                    </Button>
-                                    <Button
+                                    />
+                                    <ActionIcon
                                         component={Link}
+                                        icon="list"
+                                        iconProps={{
+                                            size: 'lg',
+                                        }}
                                         onClick={(e) => e.stopPropagation()}
-                                        size="compact-md"
+                                        size="xs"
                                         to={AppRoute.PLAYLISTS}
                                         tooltip={{
                                             label: t('action.viewPlaylists', {
@@ -187,9 +191,7 @@ export const Sidebar = () => {
                                             }),
                                             openDelay: 500,
                                         }}
-                                    >
-                                        <RiListUnordered size="1em" />
-                                    </Button>
+                                    />
                                 </Group>
                             </Group>
                             <SidebarPlaylistList />
@@ -223,34 +225,25 @@ export const Sidebar = () => {
                                 })}
                                 openDelay={500}
                             >
-                                {upsizedImageUrl ? (
-                                    <img
-                                        className={styles.sidebarImage}
-                                        loading="eager"
-                                        src={upsizedImageUrl}
-                                    />
-                                ) : (
-                                    <Center
-                                        style={{
-                                            background: 'var(--theme-colors-foreground-muted)',
-                                            height: '100%',
-                                        }}
-                                    >
-                                        <RiDiscLine
-                                            color="var(--theme-colors-foreground-muted)"
-                                            size={50}
-                                        />
-                                    </Center>
-                                )}
+                                <Image
+                                    className={styles.sidebarImage}
+                                    includeLoader={false}
+                                    includeUnloader={false}
+                                    loading="eager"
+                                    src={upsizedImageUrl || ''}
+                                />
                             </Tooltip>
-                            <Button
+                            <ActionIcon
+                                icon="arrowDownS"
+                                iconProps={{
+                                    size: 'lg',
+                                }}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setSideBar({ image: false });
                                 }}
                                 opacity={0.8}
-                                radius={100}
-                                size="compact-md"
+                                radius="md"
                                 style={{
                                     cursor: 'default',
                                     position: 'absolute',
@@ -261,12 +254,7 @@ export const Sidebar = () => {
                                     label: t('common.collapse', { postProcess: 'titleCase' }),
                                     openDelay: 500,
                                 }}
-                            >
-                                <RiArrowDownSLine
-                                    color="white"
-                                    size={20}
-                                />
-                            </Button>
+                            />
                         </motion.div>
                     )}
                 </AnimatePresence>

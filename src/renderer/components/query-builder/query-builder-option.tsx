@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { RiSubtractLine } from 'react-icons/ri';
 
-import { Button } from '/@/shared/components/button/button';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Select } from '/@/shared/components/select/select';
@@ -45,7 +44,6 @@ const QueryValueInput = ({ data, onChange, type, ...props }: any) => {
                         { label: 'false', value: 'false' },
                     ]}
                     onChange={onChange}
-                    variant="filled"
                     {...props}
                 />
             );
@@ -54,7 +52,6 @@ const QueryValueInput = ({ data, onChange, type, ...props }: any) => {
                 <TextInput
                     onChange={onChange}
                     size="sm"
-                    variant="filled"
                     {...props}
                 />
             );
@@ -70,7 +67,6 @@ const QueryValueInput = ({ data, onChange, type, ...props }: any) => {
                             setNumberRange(newRange);
                             onChange(newRange);
                         }}
-                        variant="filled"
                         width="10%"
                     />
                     <NumberInput
@@ -82,7 +78,6 @@ const QueryValueInput = ({ data, onChange, type, ...props }: any) => {
                             setNumberRange(newRange);
                             onChange(newRange);
                         }}
-                        variant="filled"
                         width="10%"
                     />
                 </>
@@ -92,7 +87,6 @@ const QueryValueInput = ({ data, onChange, type, ...props }: any) => {
                 <NumberInput
                     onChange={onChange}
                     size="sm"
-                    variant="filled"
                     {...props}
                     defaultValue={props.defaultValue && Number(props.defaultValue)}
                 />
@@ -102,7 +96,6 @@ const QueryValueInput = ({ data, onChange, type, ...props }: any) => {
                 <Select
                     data={data}
                     onChange={onChange}
-                    variant="filled"
                     {...props}
                 />
             );
@@ -111,7 +104,6 @@ const QueryValueInput = ({ data, onChange, type, ...props }: any) => {
                 <TextInput
                     onChange={onChange}
                     size="sm"
-                    variant="filled"
                     {...props}
                 />
             );
@@ -207,7 +199,6 @@ export const QueryBuilderOption = ({
                 searchable
                 size="sm"
                 value={field}
-                variant="filled"
                 width="25%"
             />
             <Select
@@ -218,7 +209,6 @@ export const QueryBuilderOption = ({
                 searchable
                 size="sm"
                 value={operator}
-                variant="filled"
                 width="25%"
             />
             {field ? (
@@ -229,7 +219,6 @@ export const QueryBuilderOption = ({
                     onChange={handleChangeValue}
                     size="sm"
                     type={operator === 'inTheRange' ? 'dateRange' : fieldType}
-                    variant="filled"
                     width="25%"
                 />
             ) : (
@@ -239,20 +228,17 @@ export const QueryBuilderOption = ({
                     maxWidth={170}
                     onChange={handleChangeValue}
                     size="sm"
-                    variant="filled"
                     width="25%"
                 />
             )}
-            <Button
+            <ActionIcon
                 disabled={noRemove}
+                icon="remove"
                 onClick={handleDeleteRule}
                 px={5}
                 size="sm"
-                tooltip={{ label: 'Remove rule' }}
                 variant="subtle"
-            >
-                <RiSubtractLine size={20} />
-            </Button>
+            ></ActionIcon>
         </Group>
     );
 };

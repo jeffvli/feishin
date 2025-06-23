@@ -1,9 +1,6 @@
 import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaLastfmSquare } from 'react-icons/fa';
-import { RiHeartFill, RiHeartLine, RiMoreFill } from 'react-icons/ri';
-import { SiMusicbrainz } from 'react-icons/si';
 import { generatePath, useParams } from 'react-router';
 import { createSearchParams, Link } from 'react-router-dom';
 
@@ -31,6 +28,7 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { ArtistItem, useCurrentServer } from '/@/renderer/store';
 import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { sanitize } from '/@/renderer/utils/sanitize';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Grid } from '/@/shared/components/grid/grid';
 import { Group } from '/@/shared/components/group/group';
@@ -377,33 +375,27 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         onClick={() => handlePlay(playButtonBehavior)}
                     />
                     <Group gap="xs">
-                        <Button
+                        <ActionIcon
+                            icon="favorite"
+                            iconProps={{
+                                fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
+                            }}
                             loading={
                                 createFavoriteMutation.isLoading || deleteFavoriteMutation.isLoading
                             }
                             onClick={handleFavorite}
-                            size="compact-md"
-                            variant="subtle"
-                        >
-                            {detailQuery?.data?.userFavorite ? (
-                                <RiHeartFill
-                                    color="red"
-                                    size={20}
-                                />
-                            ) : (
-                                <RiHeartLine size={20} />
-                            )}
-                        </Button>
-                        <Button
+                            size="lg"
+                            variant="transparent"
+                        />
+                        <ActionIcon
+                            icon="ellipsisHorizontal"
                             onClick={(e) => {
                                 if (!detailQuery?.data) return;
                                 handleGeneralContextMenu(e, [detailQuery.data!]);
                             }}
-                            size="compact-md"
-                            variant="subtle"
-                        >
-                            <RiMoreFill size={20} />
-                        </Button>
+                            size="lg"
+                            variant="transparent"
+                        />
                     </Group>
                 </Group>
                 <Group gap="md">
@@ -447,42 +439,44 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 {externalLinks && (lastFM || musicBrainz) ? (
                     <section>
                         <Group gap="sm">
-                            <Button
+                            <ActionIcon
                                 component="a"
                                 href={`https://www.last.fm/music/${encodeURIComponent(
                                     detailQuery?.data?.name || '',
                                 )}`}
-                                radius="md"
+                                icon="brandLastfm"
+                                iconProps={{
+                                    fill: 'default',
+                                    size: 'xl',
+                                }}
                                 rel="noopener noreferrer"
-                                size="compact-md"
                                 target="_blank"
                                 tooltip={{
                                     label: t('action.openIn.lastfm'),
                                 }}
                                 variant="subtle"
-                            >
-                                <FaLastfmSquare size={25} />
-                            </Button>
+                            />
                             {mbzId ? (
-                                <Button
+                                <ActionIcon
                                     component="a"
                                     href={`https://musicbrainz.org/artist/${mbzId}`}
-                                    radius="md"
+                                    icon="brandMusicBrainz"
+                                    iconProps={{
+                                        fill: 'default',
+                                        size: 'xl',
+                                    }}
                                     rel="noopener noreferrer"
-                                    size="compact-md"
                                     target="_blank"
                                     tooltip={{
                                         label: t('action.openIn.musicbrainz'),
                                     }}
                                     variant="subtle"
-                                >
-                                    <SiMusicbrainz size={25} />
-                                </Button>
+                                />
                             ) : null}
                         </Group>
                     </section>
                 ) : null}
-                <Grid>
+                <Grid gutter="xl">
                     {biography ? (
                         <Grid.Col
                             order={itemOrder.biography}
