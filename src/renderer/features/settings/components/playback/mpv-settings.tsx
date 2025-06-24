@@ -170,7 +170,10 @@ export const MpvSettings = () => {
                     <TextInput
                         onChange={(e) => {
                             setMpvPath(e.currentTarget.value);
-                            localSettings?.set('mpv_path', e.currentTarget.value);
+
+                            // Transform backslashes to forward slashes
+                            const transformedValue = e.currentTarget.value.replace(/\\/g, '/');
+                            localSettings?.set('mpv_path', transformedValue);
                         }}
                         onClick={() => handleSetMpvPath()}
                         rightSection={
