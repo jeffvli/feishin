@@ -199,7 +199,11 @@ export const SidebarPlaylistList = () => {
 
     return (
         <Accordion.Item value="playlists">
-            <Accordion.Control>
+            <Accordion.Control
+                component="div"
+                role="button"
+                style={{ userSelect: 'none' }}
+            >
                 <Group
                     justify="space-between"
                     pr="var(--theme-spacing-md)"
