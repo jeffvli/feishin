@@ -7,6 +7,7 @@ import isElectron from 'is-electron';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+import '@mantine/dates/styles.css';
 
 import './styles/global.css';
 

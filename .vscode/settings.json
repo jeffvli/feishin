@@ -48,7 +48,11 @@
     "stylelint.config": null,
     "stylelint.validate": ["css", "postcss"],
     "typescript.updateImportsOnFileMove.enabled": "always",
-    "typescript.preferences.autoImportFileExcludePatterns": ["@mantine/core", "@mantine/modals"],
+    "typescript.preferences.autoImportFileExcludePatterns": [
+        "@mantine/core",
+        "@mantine/modals",
+        "@mantine/dates"
+    ],
     "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
     "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
     "folderTemplates.structures": [

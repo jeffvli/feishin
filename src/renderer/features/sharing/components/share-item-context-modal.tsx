@@ -1,4 +1,3 @@
-import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { closeModal, ContextModalProps } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
@@ -6,16 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { useShareItem } from '/@/renderer/features/sharing/mutations/share-item-mutation';
 import { useCurrentServer } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
+import { DateTimePicker } from '/@/shared/components/date-time-picker/date-time-picker';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
-import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Textarea } from '/@/shared/components/textarea/textarea';
 import { toast } from '/@/shared/components/toast/toast';
-
-// Bugged prop types in mantine v6
-const WrappedDateTimePicker = ({ ...props }: any) => {
-    return <DateTimePicker {...props} />;
-};
 
 export const ShareItemContextModal = ({
     id,
@@ -102,53 +97,54 @@ export const ShareItemContextModal = ({
     });
 
     return (
-        <div style={{ padding: '1rem' }}>
-            <form onSubmit={handleSubmit}>
-                <Stack>
-                    <TextInput
-                        label={t('form.shareItem.description', {
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('description')}
-                    />
-                    <Switch
-                        defaultChecked={false}
-                        label={t('form.shareItem.allowDownloading', {
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('allowDownloading')}
-                    />
-                    <WrappedDateTimePicker
-                        clearable
-                        label={t('form.shareItem.setExpiration', {
-                            postProcess: 'titleCase',
-                        })}
-                        minDate={new Date()}
-                        placeholder={defaultDate.toLocaleDateString()}
-                        popoverProps={{ withinPortal: true }}
-                        valueFormat="MM/DD/YYYY HH:mm"
-                        {...form.getInputProps('expires')}
-                    />
-                    <Group justify="flex-end">
-                        <Group>
-                            <Button
-                                onClick={() => closeModal(id)}
-                                size="md"
-                                variant="subtle"
-                            >
-                                {t('common.cancel', { postProcess: 'titleCase' })}
-                            </Button>
-                            <Button
-                                size="md"
-                                type="submit"
-                                variant="filled"
-                            >
-                                {t('common.share', { postProcess: 'titleCase' })}
-                            </Button>
-                        </Group>
+        <form onSubmit={handleSubmit}>
+            <Stack>
+                <DateTimePicker
+                    clearable
+                    label={t('form.shareItem.setExpiration', {
+                        postProcess: 'titleCase',
+                    })}
+                    minDate={new Date()}
+                    placeholder={defaultDate.toLocaleDateString()}
+                    popoverProps={{ withinPortal: true }}
+                    valueFormat="MM/DD/YYYY HH:mm"
+                    {...form.getInputProps('expires')}
+                />
+                <Textarea
+                    autosize
+                    label={t('form.shareItem.description', {
+                        postProcess: 'titleCase',
+                    })}
+                    minRows={5}
+                    {...form.getInputProps('description')}
+                />
+                <Switch
+                    defaultChecked={false}
+                    label={t('form.shareItem.allowDownloading', {
+                        postProcess: 'titleCase',
+                    })}
+                    {...form.getInputProps('allowDownloading')}
+                />
+
+                <Group justify="flex-end">
+                    <Group>
+                        <Button
+                            onClick={() => closeModal(id)}
+                            size="md"
+                            variant="subtle"
+                        >
+                            {t('common.cancel', { postProcess: 'titleCase' })}
+                        </Button>
+                        <Button
+                            size="md"
+                            type="submit"
+                            variant="filled"
+                        >
+                            {t('common.share', { postProcess: 'titleCase' })}
+                        </Button>
                     </Group>
-                </Stack>
-            </form>
-        </div>
+                </Group>
+            </Stack>
+        </form>
     );
 };

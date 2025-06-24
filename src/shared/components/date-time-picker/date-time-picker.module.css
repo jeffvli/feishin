@@ -1,0 +1,19 @@
+.root {
+    & [data-disabled='true'] {
+        opacity: 0.6;
+    }
+}
+
+.input {
+    color: var(--theme-colors-surface-foreground);
+    background: var(--theme-colors-surface);
+    border: 1px solid transparent;
+}
+
+.section {
+    color: var(--theme-colors-foreground-muted);
+}
+
+.required {
+    color: var(--theme-colors-state-error);
+}
