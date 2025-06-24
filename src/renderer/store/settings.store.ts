@@ -26,8 +26,6 @@ import {
     TableType,
 } from '/@/shared/types/types';
 
-const utils = isElectron() ? window.api.utils : null;
-
 export type SidebarItemType = {
     disabled: boolean;
     id: string;
@@ -338,7 +336,8 @@ type MpvSettings = {
 
 // Determines the default/initial windowBarStyle value based on the current platform.
 const getPlatformDefaultWindowBarStyle = (): Platform => {
-    return utils ? (utils.isMacOS() ? Platform.MACOS : Platform.WINDOWS) : Platform.WEB;
+    // Prefer native window bar
+    return Platform.LINUX;
 };
 
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
@@ -355,7 +354,7 @@ const initialState: SettingsState = {
         showServerImage: false,
     },
     font: {
-        builtIn: 'Inter',
+        builtIn: 'Poppins',
         custom: null,
         system: null,
         type: FontType.BUILT_IN,
@@ -366,7 +365,7 @@ const initialState: SettingsState = {
         albumBackground: false,
         albumBackgroundBlur: 6,
         artistItems,
-        buttonSize: 20,
+        buttonSize: 15,
         disabledContextMenu: {},
         doubleClickQueueAll: true,
         externalLinks: true,
@@ -382,7 +381,7 @@ const initialState: SettingsState = {
         passwordStore: undefined,
         playButtonBehavior: Play.NOW,
         playerbarOpenDrawer: false,
-        resume: false,
+        resume: true,
         showQueueDrawerButton: false,
         sidebarCollapsedNavigation: true,
         sidebarCollapseShared: false,
@@ -398,7 +397,7 @@ const initialState: SettingsState = {
         themeDark: AppTheme.DEFAULT_DARK,
         themeLight: AppTheme.DEFAULT_LIGHT,
         volumeWheelStep: 5,
-        volumeWidth: 60,
+        volumeWidth: 70,
         zoomFactor: 100,
     },
     hotkeys: {
@@ -437,7 +436,7 @@ const initialState: SettingsState = {
             zoomIn: { allowGlobal: true, hotkey: '', isGlobal: false },
             zoomOut: { allowGlobal: true, hotkey: '', isGlobal: false },
         },
-        globalMediaHotkeys: true,
+        globalMediaHotkeys: false,
     },
     lyrics: {
         alignment: 'center',
@@ -445,13 +444,13 @@ const initialState: SettingsState = {
         enableNeteaseTranslation: false,
         fetch: false,
         follow: true,
-        fontSize: 46,
-        fontSizeUnsync: 20,
-        gap: 5,
-        gapUnsync: 0,
+        fontSize: 24,
+        fontSizeUnsync: 24,
+        gap: 24,
+        gapUnsync: 24,
         showMatch: true,
         showProvider: true,
-        sources: [],
+        sources: [LyricSource.NETEASE, LyricSource.LRCLIB],
         translationApiKey: '',
         translationApiProvider: '',
         translationTargetLanguage: 'en',
@@ -506,10 +505,6 @@ const initialState: SettingsState = {
                 {
                     column: TableColumn.DURATION,
                     width: 100,
-                },
-                {
-                    column: TableColumn.BIT_RATE,
-                    width: 300,
                 },
                 {
                     column: TableColumn.PLAY_COUNT,
