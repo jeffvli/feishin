@@ -424,6 +424,7 @@
             "folders": "$t(entity.folder_other)",
             "genres": "$t(entity.genre_other)",
             "home": "$t(common.home)",
+            "myLibrary": "my library",
             "nowPlaying": "now playing",
             "playlists": "$t(entity.playlist_other)",
             "search": "$t(common.search)",

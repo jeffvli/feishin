@@ -12,7 +12,6 @@
 .link {
     display: flex;
     width: 100%;
-    padding: 0.5rem 1rem;
     font-size: var(--theme-font-size-md);
     color: var(--theme-colors-foreground);
     border: 1px transparent solid;

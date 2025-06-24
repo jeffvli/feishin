@@ -1,7 +1,6 @@
 .root {
     font-family: var(--font-family);
     color: var(--theme-colors-foreground);
-    cursor: auto;
     user-select: auto;
 }
 

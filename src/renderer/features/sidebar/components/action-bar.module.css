@@ -1,7 +1,7 @@
 .container {
     display: flex;
     align-items: center;
-    height: 70px;
+    height: 65px;
     -webkit-app-region: drag;
 
     input {

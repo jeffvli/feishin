@@ -1,102 +1,71 @@
-import { useDebouncedValue } from '@mantine/hooks';
-import { useCallback, useMemo, useState } from 'react';
+import { closeAllModals, openModal } from '@mantine/modals';
+import { MouseEvent, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList, ListChildComponentProps } from 'react-window';
 
 import styles from './sidebar-playlist-list.module.css';
 
-import { openContextMenu } from '/@/renderer/features/context-menu';
-import { PLAYLIST_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { usePlaylistList } from '/@/renderer/features/playlists';
-import { useHideScrollbar } from '/@/renderer/hooks';
+import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
+import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { useCurrentServer } from '/@/renderer/store';
+import { Accordion } from '/@/shared/components/accordion/accordion';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
-import { Button } from '/@/shared/components/button/button';
-import { Flex } from '/@/shared/components/flex/flex';
+import { ButtonProps } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
-import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
-import { LibraryItem, Playlist, PlaylistListSort, SortOrder } from '/@/shared/types/domain-types';
+import {
+    LibraryItem,
+    Playlist,
+    PlaylistListSort,
+    ServerType,
+    SortOrder,
+} from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
-const PlaylistRow = ({ data, index, style }: ListChildComponentProps) => {
-    const { t } = useTranslation();
+interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onPlay'> {
+    name: string;
+    onPlay: (id: string, playType: Play.LAST | Play.NEXT | Play.NOW | Play.SHUFFLE) => void;
+    to: string;
+}
+
+const PlaylistRowButton = ({ name, onPlay, to, ...props }: PlaylistRowButtonProps) => {
+    const url = generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: to });
 
     const [isHovered, setIsHovered] = useState(false);
 
-    if (Array.isArray(data?.items[index])) {
-        const [collapse, setCollapse] = data.items[index];
-
-        return (
-            <div style={{ margin: '0.5rem 0', padding: '0 1rem', ...style }}>
-                <div style={{ fontSize: '1.2rem', fontWeight: '600' }}>
-                    <Group>
-                        <Text>{t('page.sidebar.shared', { postProcess: 'titleCase' })}</Text>
-                        <Button
-                            onClick={() => setCollapse()}
-                            size="compact-md"
-                            tooltip={{
-                                label: t(collapse ? 'common.expand' : 'common.collapse', {
-                                    postProcess: 'titleCase',
-                                }),
-                                openDelay: 500,
-                            }}
-                            variant="default"
-                        >
-                            {collapse ? <Icon icon="arrowUpS" /> : <Icon icon="arrowDownS" />}
-                        </Button>
-                    </Group>
-                </div>
-            </div>
-        );
-    }
-
-    const path = data?.items[index].id
-        ? generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: data.items[index].id })
-        : undefined;
-
     return (
-        <Button
+        <div
             className={styles.row}
-            component={Link}
-            onContextMenu={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                if (!data?.items?.[index].id) return;
-
-                openContextMenu({
-                    data: [data?.items?.[index]],
-                    dataNodes: undefined,
-                    menuItems: PLAYLIST_CONTEXT_MENU_ITEMS,
-                    type: LibraryItem.PLAYLIST,
-                    xPos: e.clientX + 15,
-                    yPos: e.clientY + 5,
-                });
-            }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            style={{ ...style }}
-            to={path || '/'}
-            variant="subtle"
         >
-            {data?.items[index].name}
+            <SidebarItem
+                to={url}
+                variant="subtle"
+                {...props}
+            >
+                {name}
+            </SidebarItem>
             {isHovered && (
                 <RowControls
-                    data={data}
-                    index={index}
+                    id={to}
+                    onPlay={onPlay}
                 />
             )}
-        </Button>
+        </div>
     );
 };
 
-const RowControls = ({ data, index }: { data: any; index: number }) => {
+const RowControls = ({
+    id,
+    onPlay,
+}: {
+    id: string;
+    onPlay: (id: string, playType: Play) => void;
+}) => {
     const { t } = useTranslation();
 
     return (
@@ -111,8 +80,8 @@ const RowControls = ({ data, index }: { data: any; index: number }) => {
                     size: 'md',
                 }}
                 onClick={() => {
-                    if (!data?.items?.[index].id) return;
-                    data.handlePlay(data?.items[index].id, Play.NOW);
+                    if (!id) return;
+                    onPlay(id, Play.NOW);
                 }}
                 size="xs"
                 tooltip={{
@@ -127,8 +96,8 @@ const RowControls = ({ data, index }: { data: any; index: number }) => {
                     size: 'md',
                 }}
                 onClick={() => {
-                    if (!data?.items?.[index].id) return;
-                    data.handlePlay(data?.items[index].id, Play.SHUFFLE);
+                    if (!id) return;
+                    onPlay(id, Play.SHUFFLE);
                 }}
                 size="xs"
                 tooltip={{
@@ -143,8 +112,8 @@ const RowControls = ({ data, index }: { data: any; index: number }) => {
                     size: 'md',
                 }}
                 onClick={() => {
-                    if (!data?.items?.[index].id) return;
-                    data.handlePlay(data?.items[index].id, Play.LAST);
+                    if (!id) return;
+                    onPlay(id, Play.LAST);
                 }}
                 size="xs"
                 tooltip={{
@@ -159,8 +128,8 @@ const RowControls = ({ data, index }: { data: any; index: number }) => {
                     size: 'md',
                 }}
                 onClick={() => {
-                    if (!data?.items?.[index].id) return;
-                    data.handlePlay(data?.items[index].id, Play.NEXT);
+                    if (!id) return;
+                    onPlay(id, Play.NEXT);
                 }}
                 size="xs"
                 tooltip={{
@@ -174,10 +143,8 @@ const RowControls = ({ data, index }: { data: any; index: number }) => {
 };
 
 export const SidebarPlaylistList = () => {
-    const { hideScrollbarElementProps, isScrollbarHidden } = useHideScrollbar(0);
     const handlePlayQueueAdd = usePlayQueueAdd();
-    const { sidebarCollapseShared } = useGeneralSettings();
-    const { toggleSidebarCollapseShare } = useSettingsStoreActions();
+    const { t } = useTranslation();
     const server = useCurrentServer();
 
     const playlistsQuery = usePlaylistList({
@@ -188,13 +155,6 @@ export const SidebarPlaylistList = () => {
         },
         serverId: server?.id,
     });
-
-    const [rect, setRect] = useState({
-        height: 0,
-        width: 0,
-    });
-
-    const [debounced] = useDebouncedValue(rect, 25);
 
     const handlePlayPlaylist = useCallback(
         (id: string, playType: Play) => {
@@ -219,57 +179,160 @@ export const SidebarPlaylistList = () => {
         }
 
         const owned: Array<[boolean, () => void] | Playlist> = [];
+
+        for (const playlist of data.items) {
+            owned.push(playlist);
+        }
+
+        return { ...base, items: owned };
+    }, [data?.items, handlePlayPlaylist, server?.type, server?.username]);
+
+    const handleCreatePlaylistModal = (e: MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+
+        openModal({
+            children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
+            size: server?.type === ServerType?.NAVIDROME ? 'lg' : 'sm',
+            title: t('form.createPlaylist.title', { postProcess: 'titleCase' }),
+        });
+    };
+
+    return (
+        <Accordion.Item value="playlists">
+            <Accordion.Control>
+                <Group
+                    justify="space-between"
+                    pr="var(--theme-spacing-md)"
+                >
+                    <Text fw={600}>
+                        {t('page.sidebar.playlists', {
+                            postProcess: 'titleCase',
+                        })}
+                    </Text>
+                    <Group gap="xs">
+                        <ActionIcon
+                            icon="add"
+                            iconProps={{
+                                size: 'lg',
+                            }}
+                            onClick={handleCreatePlaylistModal}
+                            size="xs"
+                            tooltip={{
+                                label: t('action.createPlaylist', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                                openDelay: 500,
+                            }}
+                            variant="subtle"
+                        />
+                        <ActionIcon
+                            component={Link}
+                            icon="list"
+                            iconProps={{
+                                size: 'lg',
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            size="xs"
+                            to={AppRoute.PLAYLISTS}
+                            tooltip={{
+                                label: t('action.viewPlaylists', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                                openDelay: 500,
+                            }}
+                            variant="subtle"
+                        />
+                    </Group>
+                </Group>
+            </Accordion.Control>
+            <Accordion.Panel>
+                {memoizedItemData?.items?.map((item, index) => (
+                    <PlaylistRowButton
+                        key={index}
+                        name={item.name}
+                        onPlay={handlePlayPlaylist}
+                        to={item.id}
+                    />
+                ))}
+            </Accordion.Panel>
+        </Accordion.Item>
+    );
+};
+
+export const SidebarSharedPlaylistList = () => {
+    const handlePlayQueueAdd = usePlayQueueAdd();
+    const { t } = useTranslation();
+    const server = useCurrentServer();
+
+    const playlistsQuery = usePlaylistList({
+        query: {
+            sortBy: PlaylistListSort.NAME,
+            sortOrder: SortOrder.ASC,
+            startIndex: 0,
+        },
+        serverId: server?.id,
+    });
+
+    const handlePlayPlaylist = useCallback(
+        (id: string, playType: Play) => {
+            handlePlayQueueAdd?.({
+                byItemType: {
+                    id: [id],
+                    type: LibraryItem.PLAYLIST,
+                },
+                playType,
+            });
+        },
+        [handlePlayQueueAdd],
+    );
+
+    const data = playlistsQuery.data;
+
+    const memoizedItemData = useMemo(() => {
+        const base = { handlePlay: handlePlayPlaylist };
+
+        if (!server?.type || !server?.username || !data?.items) {
+            return { ...base, items: data?.items };
+        }
+
         const shared: Playlist[] = [];
 
         for (const playlist of data.items) {
             if (playlist.owner && playlist.owner !== server.username) {
+                console.log(playlist.owner, server.username);
                 shared.push(playlist);
-            } else {
-                owned.push(playlist);
             }
         }
 
-        if (shared.length > 0) {
-            owned.push([sidebarCollapseShared, toggleSidebarCollapseShare]);
-        }
+        return { ...base, items: shared };
+    }, [data?.items, handlePlayPlaylist, server?.type, server?.username]);
 
-        const final = sidebarCollapseShared ? owned : owned.concat(shared);
-
-        return { ...base, items: final };
-    }, [
-        data?.items,
-        handlePlayPlaylist,
-        server?.type,
-        server?.username,
-        sidebarCollapseShared,
-        toggleSidebarCollapseShare,
-    ]);
+    if (memoizedItemData?.items?.length === 0) {
+        return null;
+    }
 
     return (
-        <Flex
-            className={styles.list}
-            h="100%"
-            {...hideScrollbarElementProps}
-        >
-            <AutoSizer onResize={(e) => setRect(e as { height: number; width: number })}>
-                {() => (
-                    <FixedSizeList
-                        className={
-                            isScrollbarHidden
-                                ? 'hide-scrollbar overlay-scrollbar'
-                                : 'overlay-scrollbar'
-                        }
-                        height={debounced.height}
-                        itemCount={memoizedItemData?.items?.length || 0}
-                        itemData={memoizedItemData}
-                        itemSize={32}
-                        overscanCount={20}
-                        width={debounced.width}
-                    >
-                        {PlaylistRow}
-                    </FixedSizeList>
-                )}
-            </AutoSizer>
-        </Flex>
+        <Accordion.Item value="shared-playlists">
+            <Accordion.Control>
+                <Text
+                    fw={600}
+                    variant="secondary"
+                >
+                    {t('page.sidebar.shared', {
+                        postProcess: 'titleCase',
+                    })}
+                </Text>
+            </Accordion.Control>
+            <Accordion.Panel>
+                {memoizedItemData?.items?.map((item, index) => (
+                    <PlaylistRowButton
+                        key={index}
+                        name={item.name}
+                        onPlay={handlePlayPlaylist}
+                        to={item.id}
+                    />
+                ))}
+            </Accordion.Panel>
+        </Accordion.Item>
     );
 };

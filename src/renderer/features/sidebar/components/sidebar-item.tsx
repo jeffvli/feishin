@@ -1,46 +1,30 @@
-import type { ReactNode } from 'react';
-
 import clsx from 'clsx';
-import { Link } from 'react-router-dom';
+import { memo } from 'react';
+import { Link, LinkProps } from 'react-router-dom';
 
 import styles from './sidebar-item.module.css';
 
-import { Flex, FlexProps } from '/@/shared/components/flex/flex';
-import { createPolymorphicComponent } from '/@/shared/utils/create-polymorphic-component';
+import { Button, ButtonProps } from '/@/shared/components/button/button';
 
-interface ListItemProps extends FlexProps {
-    children: ReactNode;
-    disabled?: boolean;
-    to?: string;
+interface SidebarItemProps extends ButtonProps {
+    to: LinkProps['to'];
 }
 
-const ItemLink = createPolymorphicComponent<'a', ListItemProps>(Flex);
-
-export const SidebarItem = ({ children, to, ...props }: ListItemProps) => {
-    if (to) {
-        return (
-            <ItemLink
-                className={clsx({
-                    [styles.disabled]: props.disabled,
-                    [styles.link]: true,
-                })}
-                component={Link}
-                to={to}
-                {...props}
-            >
-                {children}
-            </ItemLink>
-        );
-    }
+export const SidebarItem = ({ children, to, ...props }: SidebarItemProps) => {
     return (
-        <Flex
-            className={styles.item}
-            tabIndex={0}
+        <Button
+            className={clsx({
+                [styles.disabled]: props.disabled,
+                [styles.link]: true,
+            })}
+            component={Link}
+            to={to}
+            variant="subtle"
             {...props}
         >
             {children}
-        </Flex>
+        </Button>
     );
 };
 
-SidebarItem.Link = ItemLink;
+export const MemoizedSidebarItem = memo(SidebarItem);
