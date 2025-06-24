@@ -20,6 +20,7 @@ interface TextTitleProps extends MantineTextTitleDivProps {
 
 const _TextTitle = ({
     children,
+    className,
     isLink,
     isMuted,
     isNoSelect,
@@ -28,12 +29,16 @@ const _TextTitle = ({
 }: TextTitleProps) => {
     return (
         <MantineHeader
-            className={clsx(styles.root, {
-                [styles.link]: isLink,
-                [styles.muted]: isMuted,
-                [styles.noSelect]: isNoSelect,
-                [styles.overflowHidden]: overflow === 'hidden' && !rest.lineClamp,
-            })}
+            className={clsx(
+                styles.root,
+                {
+                    [styles.link]: isLink,
+                    [styles.muted]: isMuted,
+                    [styles.noSelect]: isNoSelect,
+                    [styles.overflowHidden]: overflow === 'hidden' && !rest.lineClamp,
+                },
+                className,
+            )}
             {...rest}
         >
             {children}
