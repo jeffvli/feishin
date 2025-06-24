@@ -11,7 +11,6 @@ import { formatDateRelative, formatRating } from '/@/renderer/utils/format';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
-import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
@@ -52,9 +51,9 @@ const handleRow = <T extends AnyLibraryItem>(t: TFunction, item: T, rule: ItemDe
 
     return (
         <Table.Tr key={rule.label}>
-            <Table.Td>
+            <Table.Th>
                 {t(rule.label, { postProcess: rule.postprocess || 'sentenceCase' })}
-            </Table.Td>
+            </Table.Th>
             <Table.Td>{value}</Table.Td>
         </Table.Tr>
     );
@@ -119,7 +118,18 @@ const FormatGenre = (item: Album | AlbumArtist | Playlist | Song) => {
     ));
 };
 
-const BoolField = (key: boolean) => (key ? <Icon icon="check" /> : <Icon icon="x" />);
+const BoolField = (key: boolean) =>
+    key ? (
+        <Icon
+            color="success"
+            icon="check"
+        />
+    ) : (
+        <Icon
+            color="error"
+            icon="x"
+        />
+    );
 
 const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
     { key: 'name', label: 'common.title' },
@@ -318,10 +328,10 @@ const handleTags = (item: Album | Song, t: TFunction) => {
         const tags = Object.entries(item.tags).map(([tag, fields]) => {
             return (
                 <Table.Tr key={tag}>
-                    <Table.Td>
+                    <Table.Th>
                         {tag.slice(0, 1).toLocaleUpperCase()}
                         {tag.slice(1)}
-                    </Table.Td>
+                    </Table.Th>
                     <Table.Td>
                         {fields.length === 0 ? BoolField(true) : fields.join(SEPARATOR_STRING)}
                     </Table.Td>
@@ -332,7 +342,7 @@ const handleTags = (item: Album | Song, t: TFunction) => {
         if (tags.length) {
             return [
                 <Table.Tr key="tags">
-                    <Table.Td>{t('common.tags', { postProcess: 'sentenceCase' })}</Table.Td>
+                    <Table.Th>{t('common.tags', { postProcess: 'sentenceCase' })}</Table.Th>
                     <Table.Td>{tags.length}</Table.Td>
                 </Table.Tr>,
             ].concat(tags);
@@ -347,10 +357,10 @@ const handleParticipants = (item: Album | Song, t: TFunction) => {
         const participants = Object.entries(item.participants).map(([role, participants]) => {
             return (
                 <Table.Tr key={role}>
-                    <Table.Td>
+                    <Table.Th>
                         {role.slice(0, 1).toLocaleUpperCase()}
                         {role.slice(1)}
-                    </Table.Td>
+                    </Table.Th>
                     <Table.Td>{formatArtists(participants)}</Table.Td>
                 </Table.Tr>
             );
@@ -359,11 +369,11 @@ const handleParticipants = (item: Album | Song, t: TFunction) => {
         if (participants.length) {
             return [
                 <Table.Tr key="participants">
-                    <Table.Td>
+                    <Table.Th>
                         {t('common.additionalParticipants', {
                             postProcess: 'sentenceCase',
                         })}
-                    </Table.Td>
+                    </Table.Th>
                     <Table.Td>{participants.length}</Table.Td>
                 </Table.Tr>,
             ].concat(participants);
@@ -399,13 +409,13 @@ export const ItemDetailsModal = ({ item }: ItemDetailsModalProps) => {
     }
 
     return (
-        <Group>
-            <Table
-                highlightOnHover
-                withRowBorders={false}
-            >
-                <Table.Tbody>{body}</Table.Tbody>
-            </Table>
-        </Group>
+        <Table
+            highlightOnHover
+            variant="vertical"
+            withRowBorders={false}
+            withTableBorder
+        >
+            <Table.Tbody>{body}</Table.Tbody>
+        </Table>
     );
 };
