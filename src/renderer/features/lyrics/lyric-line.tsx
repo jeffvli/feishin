@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { ComponentPropsWithoutRef } from 'react';
 
 import styles from './lyric-line.module.css';
@@ -10,10 +11,10 @@ interface LyricLineProps extends ComponentPropsWithoutRef<'div'> {
     text: string;
 }
 
-export const LyricLine = ({ alignment, fontSize, text, ...props }: LyricLineProps) => {
+export const LyricLine = ({ alignment, className, fontSize, text, ...props }: LyricLineProps) => {
     return (
         <TextTitle
-            className={styles.lyricLine}
+            className={clsx(styles.lyricLine, className)}
             style={{
                 fontSize,
                 textAlign: alignment,

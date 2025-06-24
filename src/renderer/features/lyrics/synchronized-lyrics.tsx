@@ -3,6 +3,7 @@ import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef } from 'react';
 
 import styles from './synchronized-lyrics.module.css';
+import './synchronized-lyrics.css';
 
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
