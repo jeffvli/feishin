@@ -4,7 +4,7 @@ import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { LibraryHeaderBar } from '/@/renderer/features/shared';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { Paper } from '/@/shared/components/paper/paper';
+import { Badge } from '/@/shared/components/badge/badge';
 import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
 import { QueueSong } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -41,14 +41,9 @@ export const AlbumArtistDetailTopSongsListHeader = ({
                         title,
                     })}
                 </LibraryHeaderBar.Title>
-                <Paper
-                    fw="600"
-                    px="1rem"
-                    py="0.3rem"
-                    radius="sm"
-                >
+                <Badge>
                     {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}
-                </Paper>
+                </Badge>
             </LibraryHeaderBar>
         </PageHeader>
     );

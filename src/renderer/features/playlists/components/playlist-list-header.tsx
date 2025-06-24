@@ -12,9 +12,9 @@ import { SearchInput } from '/@/renderer/features/shared/components/search-input
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';
 import { PlaylistListFilter, useCurrentServer } from '/@/renderer/store';
+import { Badge } from '/@/shared/components/badge/badge';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
-import { Paper } from '/@/shared/components/paper/paper';
 import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import { LibraryItem, PlaylistListQuery } from '/@/shared/types/domain-types';
@@ -58,18 +58,13 @@ export const PlaylistListHeader = ({ gridRef, itemCount, tableRef }: PlaylistLis
                         <LibraryHeaderBar.Title>
                             {t('page.playlistList.title', { postProcess: 'titleCase' })}
                         </LibraryHeaderBar.Title>
-                        <Paper
-                            fw="600"
-                            px="1rem"
-                            py="0.3rem"
-                            radius="sm"
-                        >
+                        <Badge>
                             {itemCount === null || itemCount === undefined ? (
                                 <SpinnerIcon />
                             ) : (
                                 itemCount
                             )}
-                        </Paper>
+                        </Badge>
                     </LibraryHeaderBar>
                     <Group>
                         <SearchInput

@@ -13,12 +13,12 @@ import { useSearch } from '/@/renderer/features/search/queries/search-query';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Box } from '/@/shared/components/box/box';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Kbd } from '/@/shared/components/kbd/kbd';
 import { Modal } from '/@/shared/components/modal/modal';
-import { Paper } from '/@/shared/components/paper/paper';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { LibraryItem } from '/@/shared/types/domain-types';
@@ -267,7 +267,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                     )}
                 </Command.List>
             </Command>
-            <Paper
+            <Box
                 mt="0.5rem"
                 p="0.5rem"
             >
@@ -282,7 +282,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                         <Kbd size="md">⏎</Kbd>
                     </Group>
                 </Group>
-            </Paper>
+            </Box>
         </Modal>
     );
 };

@@ -12,7 +12,6 @@ import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Badge } from '/@/shared/components/badge/badge';
-import { Paper } from '/@/shared/components/paper/paper';
 import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import { LibraryItem } from '/@/shared/types/domain-types';
@@ -53,18 +52,13 @@ export const PlaylistDetailSongListHeader = ({
                 <LibraryHeaderBar>
                     <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
                     <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
-                    <Paper
-                        fw="600"
-                        px="1rem"
-                        py="0.3rem"
-                        radius="sm"
-                    >
+                    <Badge>
                         {itemCount === null || itemCount === undefined ? (
                             <SpinnerIcon />
                         ) : (
                             itemCount
                         )}
-                    </Paper>
+                    </Badge>
                     {isSmartPlaylist && <Badge size="lg">{t('entity.smartPlaylist')}</Badge>}
                 </LibraryHeaderBar>
             </PageHeader>

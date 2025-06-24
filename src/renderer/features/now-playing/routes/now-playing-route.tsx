@@ -8,7 +8,6 @@ import { NowPlayingHeader } from '/@/renderer/features/now-playing/components/no
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
 import { AnimatedPage } from '/@/renderer/features/shared';
-import { Paper } from '/@/shared/components/paper/paper';
 
 const NowPlayingRoute = () => {
     const queueRef = useRef<null | { grid: AgGridReactType<Song> }>(null);
@@ -17,12 +16,10 @@ const NowPlayingRoute = () => {
         <AnimatedPage>
             <VirtualGridContainer>
                 <NowPlayingHeader />
-                <Paper style={{ borderTop: '1px solid var(--theme-generic-border-color)' }}>
-                    <PlayQueueListControls
-                        tableRef={queueRef}
-                        type="nowPlaying"
-                    />
-                </Paper>
+                <PlayQueueListControls
+                    tableRef={queueRef}
+                    type="nowPlaying"
+                />
                 <PlayQueue
                     ref={queueRef}
                     type="nowPlaying"
