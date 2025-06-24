@@ -1,26 +1,30 @@
 .root {
     bottom: 90px;
-    border: 2px solid var(--theme-colors-border);
+    background-color: var(--theme-colors-surface);
 }
 
 .root.error {
-    background-color: var(--theme-colors-state-error);
+    --notification-color: var(--theme-colors-state-error);
 }
 
 .root.info {
-    background-color: var(--theme-colors-state-info);
+    --notification-color: var(--theme-colors-state-info);
 }
 
 .root.success {
-    background-color: var(--theme-colors-state-success);
+    --notification-color: var(--theme-colors-state-success);
 }
 
 .root.warning {
-    background-color: var(--theme-colors-state-warning);
+    --notification-color: var(--theme-colors-state-warning);
 }
 
 .title {
     font-size: var(--theme-font-size-md);
+}
+
+.body {
+    padding: var(--theme-spacing-md);
 }
 
 .loader {
@@ -32,7 +36,5 @@
 }
 
 .close-button {
-    &:hover {
-        background: transparent;
-    }
+    background-color: var(--theme-colors-surface);
 }

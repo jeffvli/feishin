@@ -28,6 +28,7 @@ const showToast = ({ message, onClose, type, ...props }: NotificationProps) => {
     return notifications.show({
         autoClose: props.autoClose,
         classNames: {
+            body: styles.body,
             closeButton: styles.closeButton,
             description: styles.description,
             loader: styles.loader,
@@ -42,6 +43,8 @@ const showToast = ({ message, onClose, type, ...props }: NotificationProps) => {
         message: message ?? '',
         onClose,
         title: getTitle(type),
+        withBorder: true,
+        withCloseButton: true,
     });
 };
 

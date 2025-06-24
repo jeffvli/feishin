@@ -6,6 +6,7 @@ import { Notifications } from '@mantine/notifications';
 import isElectron from 'is-electron';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
 
 import './styles/global.css';
 
