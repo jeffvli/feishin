@@ -2,6 +2,7 @@
     position: relative;
     grid-area: right-sidebar;
     height: 100%;
+    border-left: 1px solid alpha(var(--theme-colors-border), 0.3);
 
     .current-song-cell:not(.current-playlist-song-cell) svg {
         display: none;
