@@ -50,23 +50,14 @@ export const UnsynchronizedLyrics = ({
                 />
             )}
             {lines.map((text, idx) => (
-                <div key={idx}>
-                    <LyricLine
-                        alignment={settings.alignment}
-                        className="lyric-line unsynchronized"
-                        fontSize={settings.fontSizeUnsync}
-                        id={`lyric-${idx}`}
-                        text={text}
-                    />
-                    {translatedLines[idx] && (
-                        <LyricLine
-                            alignment={settings.alignment}
-                            className="lyric-line unsynchronized translation"
-                            fontSize={settings.fontSizeUnsync * 0.8}
-                            text={translatedLines[idx]}
-                        />
-                    )}
-                </div>
+                <LyricLine
+                    alignment={settings.alignment}
+                    className="lyric-line unsynchronized"
+                    fontSize={settings.fontSizeUnsync}
+                    id={`lyric-${idx}`}
+                    key={idx}
+                    text={text + (translatedLines[idx] ? `_BREAK_${translatedLines[idx]}` : '')}
+                />
             ))}
         </div>
     );

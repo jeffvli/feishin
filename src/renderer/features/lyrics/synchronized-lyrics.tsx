@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import isElectron from 'is-electron';
-import { Fragment, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import styles from './synchronized-lyrics.module.css';
 
@@ -338,25 +338,18 @@ export const SynchronizedLyrics = ({
                 />
             )}
             {lyrics.map(([time, text], idx) => (
-                <Fragment key={idx}>
-                    <LyricLine
-                        alignment={settings.alignment}
-                        className="lyric-line synchronized"
-                        fontSize={settings.fontSize}
-                        id={`lyric-${idx}`}
-                        onClick={() => handleSeek(time / 1000)}
-                        text={text}
-                    />
-                    {translatedLyrics && (
-                        <LyricLine
-                            alignment={settings.alignment}
-                            className="lyric-line synchronized translation"
-                            fontSize={settings.fontSize * 0.8}
-                            onClick={() => handleSeek(time / 1000)}
-                            text={translatedLyrics.split('\n')[idx]}
-                        />
-                    )}
-                </Fragment>
+                <LyricLine
+                    alignment={settings.alignment}
+                    className="lyric-line synchronized"
+                    fontSize={settings.fontSize}
+                    id={`lyric-${idx}`}
+                    key={idx}
+                    onClick={() => handleSeek(time / 1000)}
+                    text={
+                        text +
+                        (translatedLyrics ? `_BREAK_${translatedLyrics.split('\n')[idx]}` : '')
+                    }
+                />
             ))}
         </div>
     );
