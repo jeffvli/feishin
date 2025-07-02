@@ -964,7 +964,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                                 </ContextMenuButton>
                                                             </HoverCard.Target>
                                                             <HoverCard.Dropdown>
-                                                                <Stack gap={0}>
+                                                                <Stack
+                                                                    gap={0}
+                                                                    // Pass in this ref to the stack component as well
+                                                                    // so that it is treated as "inside" for clickOutsideRef
+                                                                    ref={mergedRef}
+                                                                >
                                                                     {contextMenuItems[
                                                                         item.id
                                                                     ].children?.map((child) => (
