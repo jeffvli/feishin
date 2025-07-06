@@ -236,7 +236,7 @@ const tableColumns: { [key: string]: ColDef } = {
         width: 130,
     },
     path: {
-        cellRenderer: GenericCell,
+        cellRenderer: (params: ICellRendererParams) => GenericCell(params, { position: 'left' }),
         colId: TableColumn.PATH,
         headerName: i18n.t('table.column.path'),
         valueGetter: (params: ValueGetterParams) => (params.data ? params.data.path : undefined),

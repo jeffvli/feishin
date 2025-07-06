@@ -16,10 +16,8 @@ type Options = {
     primary?: boolean;
 };
 
-export const GenericCell = (
-    { value, valueFormatted }: ICellRendererParams,
-    { isLink, position, primary }: Options,
-) => {
+export const GenericCell = ({ value, valueFormatted }: ICellRendererParams, options?: Options) => {
+    const { isLink, position, primary } = options || {};
     const displayedValue = valueFormatted || value;
 
     if (value === undefined) {
