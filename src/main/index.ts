@@ -421,9 +421,6 @@ async function createWindow(first = true): Promise<void> {
         store.set('fullscreen', mainWindow?.isFullScreen());
 
         if (!exitFromTray && store.get('window_exit_to_tray')) {
-            if (isMacOS() && !forceQuit) {
-                exitFromTray = true;
-            }
             event.preventDefault();
             mainWindow?.hide();
         }
@@ -431,8 +428,6 @@ async function createWindow(first = true): Promise<void> {
         if (!saved && store.get('resume')) {
             event.preventDefault();
             saved = true;
-
-            getMainWindow()?.webContents.send('renderer-save-queue');
 
             ipcMain.once('player-save-queue', async (_event, data: Record<string, any>) => {
                 const queueLocation = join(app.getPath('userData'), 'queue');
@@ -457,12 +452,19 @@ async function createWindow(first = true): Promise<void> {
                 } catch (error) {
                     console.error('error saving queue state: ', error);
                 } finally {
-                    mainWindow?.close();
+                    if (!isMacOS()) {
+                        mainWindow?.close();
+                    }
                     if (forceQuit) {
                         app.exit();
                     }
                 }
             });
+            getMainWindow()?.webContents.send('renderer-save-queue');
+        } else {
+            if (forceQuit) {
+                app.exit();
+            }
         }
     });
 
