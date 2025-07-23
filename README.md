@@ -57,6 +57,24 @@ If you're using a device running macOS 12 (Monterey) or higher, [check here](htt
 
 For media keys to work, you will be prompted to allow Feishin to be a Trusted Accessibility Client. After allowing, you will need to restart Feishin for the privacy settings to take effect.
 
+#### Linux Notes
+
+If you're using a Linux device, a `.desktop` file is recommended for easy launching of Feishin.
+
+The below file can be saved as `~/.local/share/applications/feishin.desktop` and assumes Feishin is downloaded to the `~/.applications/` folder.
+
+```yaml
+[Desktop Entry]
+Name=Feishin
+Comment=An Electron-based music streaming app
+Exec=/home/username/.applications/Feishin-linux-x86_64.AppImage
+Icon=/home/username/.applications/Feishin-linux-x86_64.png
+Terminal=false
+Type=Application
+Categories=AudioVideo;Music;Player;
+StartupNotify=true
+```
+
 ### Web and Docker
 
 Visit [https://feishin.vercel.app](https://feishin.vercel.app) to use the hosted web version of Feishin. The web client only supports the web player backend.
