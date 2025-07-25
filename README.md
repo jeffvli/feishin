@@ -61,19 +61,13 @@ For media keys to work, you will be prompted to allow Feishin to be a Trusted Ac
 
 If you're using a Linux device, a `.desktop` file is recommended for easy launching of Feishin.
 
-The below file can be saved as `~/.local/share/applications/feishin.desktop` and assumes Feishin is downloaded to the `~/.applications/` folder.
+Download the [latest release (AppImage)](https://github.com/jeffvli/feishin/releases) and [application icon](https://github.com/jeffvli/feishin/blob/development/resources/icon.png?raw=true) to your `~/applications/` folder. This folder may need to be created if it does not already exist.
 
-```yaml
-[Desktop Entry]
-Name=Feishin
-Comment=An Electron-based music streaming app
-Exec=/home/username/.applications/Feishin-linux-x86_64.AppImage
-Icon=/home/username/.applications/Feishin-linux-x86_64.png
-Terminal=false
-Type=Application
-Categories=AudioVideo;Music;Player;
-StartupNotify=true
-```
+Rename the AppImage to `Feishin-linux-x86_64.AppImage` and the icon to `Feishin-linux-x86_64.png`.
+
+Save the [example desktop file](https://raw.githubusercontent.com/jeffvli/feishin/refs/heads/development/feishin.desktop) as `~/.local/share/applications/feishin.desktop`.
+
+You will now see Feishin show up in your menu.
 
 ### Web and Docker
 
