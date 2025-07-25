@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Feishin
 Comment=An Electron-based music streaming app
-Exec=/home/username/.applications/Feishin-linux-x86_64.AppImage --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto
+Exec="/home/username/.applications/Feishin-linux-x86_64.AppImage" --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto
 Icon=/home/username/.applications/Feishin-linux-x86_64.png
 Terminal=false
 Type=Application
