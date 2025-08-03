@@ -516,7 +516,7 @@ async function createWindow(first = true): Promise<void> {
 }
 
 if (process.platform !== 'win32') {
-  app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
+  app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling');
 }
 
 // https://github.com/electron/electron/issues/46538#issuecomment-2808806722
