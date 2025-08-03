@@ -515,7 +515,9 @@ async function createWindow(first = true): Promise<void> {
     }
 }
 
-// app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling');
+if (process.platform !== 'win32') {
+  app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
+}
 
 // https://github.com/electron/electron/issues/46538#issuecomment-2808806722
 app.commandLine.appendSwitch('gtk-version', '3');
