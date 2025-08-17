@@ -37,12 +37,11 @@ import {
     useSettingsStore,
 } from '/@/renderer/store';
 import { useAppTheme } from '/@/renderer/themes/use-app-theme';
-import { bandsToAudioFilter, Octave, octaveEnumToFloat } from '/@/renderer/utils';
+import { bandsToAudioFilter } from '/@/renderer/utils';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { setQueue } from '/@/renderer/utils/set-transcoded-queue-data';
 import { toast } from '/@/shared/components/toast/toast';
 import { PlaybackType, PlayerStatus, WebAudio } from '/@/shared/types/types';
-import { config } from 'process';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 

@@ -7,7 +7,7 @@ import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { FileInput } from '/@/shared/components/file-input/file-input';
 import { Text } from '/@/shared/components/text/text';
 import { PlaybackType } from '/@/shared/types/types';
-import isElectron = require('is-electron');
+import isElectron from 'is-electron';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
