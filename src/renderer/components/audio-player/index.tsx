@@ -32,6 +32,11 @@ export type AudioPlayerProgress = {
     playedSeconds: number;
 };
 
+export interface AudioPlayerRef {
+    player1: null | ReactPlayer;
+    player2: null | ReactPlayer;
+}
+
 interface AudioPlayerProps extends ReactPlayerProps {
     autoNext: () => void;
     crossfadeDuration: number;
@@ -94,11 +99,6 @@ const useSongUrl = (transcode: TranscodingConfig, current: boolean, song?: Song)
         return null;
     }, [current, song?.uniqueId, song?.serverId, song?.streamUrl, transcode]);
 };
-
-export interface AudioPlayerRef {
-    player1: null | ReactPlayer;
-    player2: null | ReactPlayer;
-}
 
 export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, ref) => {
     const {
@@ -208,8 +208,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
         }
         return () => {};
         // Intentionally ignore the sample rate dependency, as it makes things really messy
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [shouldUseWebAudio, playback.audioSampleRateHz, resetSampleRate, setWebAudio]);
 
     useImperativeHandle(ref, () => ({
         get player1() {

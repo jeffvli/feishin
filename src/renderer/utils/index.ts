@@ -1,3 +1,5 @@
+export * from './audio-info';
+export * from './bands-to-audio-filter';
 export * from './constrain-sidebar-width';
 export * from './format';
 export * from './get-header-color';

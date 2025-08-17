@@ -35,6 +35,14 @@ const AdvancedTab = lazy(() =>
     })),
 );
 
+const AdvancedAudioTab = lazy(() =>
+    import('/@/renderer/features/settings/components/advanced-audio/advanced-audio-tab').then(
+        (module) => ({
+            default: module.AdvancedAudioTab,
+        }),
+    ),
+);
+
 export const SettingsContent = () => {
     const { t } = useTranslation();
     const currentTab = useSettingsStore((state) => state.tab);
@@ -67,6 +75,9 @@ export const SettingsContent = () => {
                     <Tabs.Tab value="advanced">
                         {t('page.setting.advanced', { postProcess: 'sentenceCase' })}
                     </Tabs.Tab>
+                    {(isElectron() || 'AudioContext' in window) && (
+                        <Tabs.Tab value="advanced-audio">Advanced Audio settings</Tabs.Tab>
+                    )}
                 </Tabs.List>
                 <Tabs.Panel value="general">
                     <GeneralTab />
@@ -85,6 +96,11 @@ export const SettingsContent = () => {
                 <Tabs.Panel value="advanced">
                     <AdvancedTab />
                 </Tabs.Panel>
+                {(isElectron() || 'AudioContext' in window) && (
+                    <Tabs.Panel value="advanced-audio">
+                        <AdvancedAudioTab />
+                    </Tabs.Panel>
+                )}
             </Tabs>
         </div>
     );

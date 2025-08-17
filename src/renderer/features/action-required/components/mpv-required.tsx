@@ -1,4 +1,3 @@
-import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,6 +7,7 @@ import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { FileInput } from '/@/shared/components/file-input/file-input';
 import { Text } from '/@/shared/components/text/text';
 import { PlaybackType } from '/@/shared/types/types';
+import isElectron = require('is-electron');
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 

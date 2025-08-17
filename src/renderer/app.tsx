@@ -37,10 +37,12 @@ import {
     useSettingsStore,
 } from '/@/renderer/store';
 import { useAppTheme } from '/@/renderer/themes/use-app-theme';
+import { bandsToAudioFilter, Octave, octaveEnumToFloat } from '/@/renderer/utils';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { setQueue } from '/@/renderer/utils/set-transcoded-queue-data';
 import { toast } from '/@/shared/components/toast/toast';
 import { PlaybackType, PlayerStatus, WebAudio } from '/@/shared/types/types';
+import { config } from 'process';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
@@ -52,7 +54,7 @@ const utils = isElectron() ? window.api.utils : null;
 export const App = () => {
     const { mode, theme } = useAppTheme();
     const language = useSettingsStore((store) => store.general.language);
-
+    const audioBands = useSettingsStore((state) => state.audio.bands);
     const { content, enabled } = useCssSettings();
     const { type: playbackType } = usePlaybackSettings();
     const { bindings } = useHotkeySettings();
@@ -67,7 +69,7 @@ export const App = () => {
 
     useEffect(() => {
         if (enabled && content) {
-            // Yes, CSS is sanitized here as well. Prevent a suer from changing the
+            // Yes, CSS is sanitized here as well. Prevent a user from changing the
             // localStorage to bypass sanitizing.
             const sanitized = sanitizeCss(content);
             if (!cssRef.current) {
@@ -108,12 +110,15 @@ export const App = () => {
                         ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
                     };
 
+                    const volume = properties.volume;
+                    properties.af = bandsToAudioFilter(audioBands, useSettingsStore.getState().audio.octave);
+
                     await mpvPlayer?.initialize({
                         extraParameters,
                         properties,
                     });
 
-                    mpvPlayer?.volume(properties.volume);
+                    mpvPlayer?.volume(volume);
                 }
             }
 
@@ -129,6 +134,8 @@ export const App = () => {
             mpvPlayer?.stop();
             mpvPlayer?.cleanup();
         };
+        // audioBands should NOT cause a cleanup of this function
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [clearQueue, playbackType]);
 
     useEffect(() => {
@@ -196,7 +203,7 @@ export const App = () => {
                 <ContextMenuProvider>
                     <WebAudioContext.Provider value={webAudioProvider}>
                         <AppRouter />
-                    </WebAudioContext.Provider>{' '}
+                    </WebAudioContext.Provider>
                 </ContextMenuProvider>
             </PlayQueueHandlerContext.Provider>
             <IsUpdatedDialog />

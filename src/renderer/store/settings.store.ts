@@ -12,7 +12,7 @@ import i18n from '/@/i18n/i18n';
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayerStore } from '/@/renderer/store/player.store';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
-import { randomString } from '/@/renderer/utils';
+import { AudioBand, AudioFrequencies, Octave, randomString } from '/@/renderer/utils';
 import { AppTheme } from '/@/shared/themes/app-theme-types';
 import { LibraryItem, LyricSource } from '/@/shared/types/domain-types';
 import {
@@ -192,6 +192,10 @@ export interface SettingsSlice extends SettingsState {
 }
 
 export interface SettingsState {
+    audio: {
+        bands: AudioBand[];
+        octave: Octave;
+    };
     css: {
         content: string;
         enabled: boolean;
@@ -201,7 +205,6 @@ export interface SettingsState {
         enabled: boolean;
         showAsListening: boolean;
         showPaused: boolean;
-        showServerImage: boolean;
     };
     font: {
         builtIn: string;
@@ -347,6 +350,13 @@ const getPlatformDefaultWindowBarStyle = (): Platform => {
 const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle();
 
 const initialState: SettingsState = {
+    audio: {
+        bands: AudioFrequencies.map((frequency) => ({
+            frequency,
+            gain: 0,
+        })),
+        octave: Octave.Third,
+    },
     css: {
         content: '',
         enabled: false,
@@ -356,7 +366,6 @@ const initialState: SettingsState = {
         enabled: false,
         showAsListening: false,
         showPaused: true,
-        showServerImage: false,
     },
     font: {
         builtIn: 'Poppins',
@@ -789,12 +798,14 @@ export const useHotkeySettings = () => useSettingsStore((state) => state.hotkeys
 export const useMpvSettings = () =>
     useSettingsStore((state) => state.playback.mpvProperties, shallow);
 
+export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
+
 export const useLyricsSettings = () => useSettingsStore((state) => state.lyrics, shallow);
 
 export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);
 
-export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
-
 export const useDiscordSetttings = () => useSettingsStore((state) => state.discord, shallow);
 
 export const useCssSettings = () => useSettingsStore((state) => state.css, shallow);
+
+export const useAudioSettings = () => useSettingsStore((state) => state.audio, shallow);
