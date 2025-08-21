@@ -49,6 +49,12 @@ export const sidebarItems: SidebarItemType[] = [
     { disabled: false, id: 'Home', label: i18n.t('page.sidebar.home'), route: AppRoute.HOME },
     {
         disabled: false,
+        id: 'Favorites',
+        label: i18n.t('page.sidebar.favorites'),
+        route: AppRoute.LIBRARY_FAVORITES,
+    },
+    {
+        disabled: false,
         id: 'Albums',
         label: i18n.t('page.sidebar.albums'),
         route: AppRoute.LIBRARY_ALBUMS,

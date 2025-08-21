@@ -63,7 +63,7 @@ export const SubsonicSongFilters = ({
 
     const toggleFilters = [
         {
-            disabled: filter.genreIds !== undefined || isGenrePage || !!filter.searchTerm,
+            disabled: filter.genreIds !== undefined || isGenrePage || !!filter.searchTerm || pageKey === 'favorites',
             label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
@@ -83,7 +83,9 @@ export const SubsonicSongFilters = ({
 
     return (
         <Stack p="0.8rem">
-            {toggleFilters.map((filter) => (
+            {toggleFilters
+                .filter(filter => !filter.disabled)
+                .map((filter) => (
                 <Group justify="space-between" key={`ss-filter-${filter.label}`}>
                     <Text>{filter.label}</Text>
                     <Switch

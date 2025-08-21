@@ -359,6 +359,9 @@
             "shareItem": "share item",
             "showDetails": "get info"
         },
+        "favoriteList": {
+            "title": "$t(entity.favorite_other)"
+        },
         "fullscreenPlayer": {
             "config": {
                 "dynamicBackground": "dynamic background",
@@ -426,6 +429,7 @@
             "artists": "$t(entity.artist_other)",
             "folders": "$t(entity.folder_other)",
             "genres": "$t(entity.genre_other)",
+            "favorites": "$t(entity.favorite_other)",
             "home": "$t(common.home)",
             "myLibrary": "my library",
             "nowPlaying": "now playing",

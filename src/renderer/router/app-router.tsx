@@ -18,6 +18,7 @@ const NowPlayingRoute = lazy(
 const AlbumListRoute = lazy(() => import('/@/renderer/features/albums/routes/album-list-route'));
 
 const SongListRoute = lazy(() => import('/@/renderer/features/songs/routes/song-list-route'));
+const SongFavoriteListRoute = lazy(() => import('/@/renderer/features/songs/routes/song-favorite-list-route'));
 
 const PlaylistDetailSongListRoute = lazy(
     () => import('/@/renderer/features/playlists/routes/playlist-detail-song-list-route'),
@@ -155,6 +156,11 @@ export const AppRouter = () => {
                                     element={<DummyAlbumDetailRoute />}
                                     errorElement={<RouteErrorBoundary />}
                                     path={AppRoute.FAKE_LIBRARY_ALBUM_DETAILS}
+                                />
+                                <Route
+                                    element={<SongFavoriteListRoute />}
+                                    errorElement={<RouteErrorBoundary />}
+                                    path={AppRoute.LIBRARY_FAVORITES}
                                 />
                                 <Route
                                     element={<SongListRoute />}

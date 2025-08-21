@@ -605,6 +605,43 @@ export const useListStore = createWithEqualityFn<ListSlice>()(
                             scrollOffset: 0,
                         },
                     },
+                    favorite: {
+                        display: ListDisplayType.TABLE,
+                        filter: {
+                            sortBy: SongListSort.RECENTLY_ADDED,
+                            sortOrder: SortOrder.DESC,
+                        },
+                        grid: { itemGap: 10, itemSize: 200, scrollOffset: 0 },
+                        table: {
+                            autoFit: true,
+                            columns: [
+                                {
+                                    column: TableColumn.ROW_INDEX,
+                                    width: 50,
+                                },
+                                {
+                                    column: TableColumn.TITLE_COMBINED,
+                                    width: 500,
+                                },
+                                {
+                                    column: TableColumn.ALBUM,
+                                    width: 300,
+                                },
+                                {
+                                    column: TableColumn.DURATION,
+                                    width: 100,
+                                },
+                            ],
+                            pagination: {
+                                currentPage: 1,
+                                itemsPerPage: 100,
+                                totalItems: 1,
+                                totalPages: 1,
+                            },
+                            rowHeight: 60,
+                            scrollOffset: 0,
+                        },
+                    },
                     song: {
                         display: ListDisplayType.TABLE,
                         filter: {

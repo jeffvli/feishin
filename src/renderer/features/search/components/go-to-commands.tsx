@@ -39,6 +39,9 @@ export const GoToCommands = ({ handleClose, setPages, setQuery }: GoToCommandsPr
                 </Command.Item>
             </Command.Group>
             <Command.Group heading="Library">
+                <Command.Item onSelect={() => goTo(AppRoute.LIBRARY_FAVORITES)}>
+                    {t('page.sidebar.favorites', { postProcess: 'titleCase' })}
+                </Command.Item>
                 <Command.Item onSelect={() => goTo(AppRoute.LIBRARY_ALBUMS)}>
                     {t('page.sidebar.albums', { postProcess: 'titleCase' })}
                 </Command.Item>
