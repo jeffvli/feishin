@@ -91,7 +91,7 @@ export const JellyfinSongFilters = ({
                 onFilterChange(updatedFilters);
             },
             value: filter.favorite,
-            disabled: pageKey === 'favorites',
+            disabled: pageKey === 'favorite',
         },
     ];
 

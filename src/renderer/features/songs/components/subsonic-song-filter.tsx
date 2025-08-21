@@ -63,7 +63,7 @@ export const SubsonicSongFilters = ({
 
     const toggleFilters = [
         {
-            disabled: filter.genreIds !== undefined || isGenrePage || !!filter.searchTerm || pageKey === 'favorites',
+            disabled: filter.genreIds !== undefined || isGenrePage || !!filter.searchTerm || pageKey === 'favorite',
             label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const updatedFilters = setFilter({
