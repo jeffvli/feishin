@@ -989,6 +989,7 @@ export type PlaylistSongListArgs = BaseEndpointArgs & { query: PlaylistSongListQ
 export type PlaylistSongListQuery = {
     id: string;
     limit?: number;
+    searchTerm?: string;
     sortBy?: SongListSort;
     sortOrder?: SortOrder;
     startIndex: number;

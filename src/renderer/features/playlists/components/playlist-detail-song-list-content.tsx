@@ -141,11 +141,9 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
                                     query,
                                 }),
                         );
-
-                        params.successCallback(
-                            songsRes?.items || [],
-                            songsRes?.totalRecordCount || 0,
-                        );
+                        const filteredSongs = songsRes?.items || [];
+                        const filteredCount = filteredSongs.length || 0;
+                        params.successCallback(filteredSongs, filteredCount);
                     },
                     rowCount: undefined,
                 };

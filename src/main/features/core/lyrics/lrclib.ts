@@ -10,7 +10,7 @@ import {
 import { orderSearchResults } from './shared';
 
 const FETCH_URL = 'https://lrclib.net/api/get';
-const SEEARCH_URL = 'https://lrclib.net/api/search';
+const SEARCH_URL = 'https://lrclib.net/api/search';
 
 const TIMEOUT_MS = 5000;
 
@@ -59,7 +59,7 @@ export async function getSearchResults(
     }
 
     try {
-        result = await axios.get<LrcLibSearchResponse[]>(SEEARCH_URL, {
+        result = await axios.get<LrcLibSearchResponse[]>(SEARCH_URL, {
             params: {
                 q: params.name,
             },

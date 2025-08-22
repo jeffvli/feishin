@@ -4,7 +4,7 @@ import { IDatasource } from '@ag-grid-community/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { MouseEvent, MutableRefObject, useCallback } from 'react';
+import { MouseEvent, MutableRefObject, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
@@ -44,10 +44,17 @@ import {
     LibraryItem,
     PlaylistSongListQuery,
     ServerType,
+    Song,
     SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
 import { ListDisplayType, Play } from '/@/shared/types/types';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { useDeferrer } from '/@/renderer/hooks/use-deferrer';
+import { isAnyFieldsContainsString } from '/@/shared/utils/is-any-fields-contains-string';
+
+const SEARCH_FIELDS: (keyof Song)[] = ['name', 'album', 'artistName'];
 
 const FILTERS = {
     jellyfin: [
@@ -273,7 +280,9 @@ export const PlaylistDetailSongListHeaderFilters = ({
     const filters: Partial<PlaylistSongListQuery> = {
         sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
         sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
+        searchTerm: page?.table.id[playlistId]?.filter?.searchTerm || '',
     };
+    const [searchTermInput, setSearchTermInput] = useState('');
 
     const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
     const isSmartPlaylist = detailQuery.data?.rules;
@@ -304,6 +313,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                     getRows: async (params) => {
                         const limit = params.endRow - params.startRow;
                         const startIndex = params.startRow;
+                        const { searchTerm, ...restFilters } = filters;
 
                         const queryKey = queryKeys.playlists.songList(
                             server?.id || '',
@@ -312,7 +322,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                                 id: playlistId,
                                 limit,
                                 startIndex,
-                                ...filters,
+                                ...restFilters,
                             },
                         );
 
@@ -328,16 +338,26 @@ export const PlaylistDetailSongListHeaderFilters = ({
                                         id: playlistId,
                                         limit,
                                         startIndex,
-                                        ...filters,
+                                        ...restFilters,
                                     },
                                 }),
                             { cacheTime: 1000 * 60 * 1 },
                         );
+                        const lowerCaseSearchTerm = searchTerm?.toLowerCase() || '';
+                        const filteredItems =
+                            songsRes?.items.filter((record) =>
+                                isAnyFieldsContainsString(
+                                    record,
+                                    SEARCH_FIELDS,
+                                    lowerCaseSearchTerm,
+                                ),
+                            ) || [];
+                        // HY: not optimal if the data is paginated. if anyone knows how to do server side filtering, then please let me know
+                        const filteredRecordCount = lowerCaseSearchTerm
+                            ? filteredItems.length
+                            : songsRes?.totalRecordCount || 0;
 
-                        params.successCallback(
-                            songsRes?.items || [],
-                            songsRes?.totalRecordCount || 0,
-                        );
+                        params.successCallback(filteredItems, filteredRecordCount);
                     },
                     rowCount: undefined,
                 };
@@ -353,7 +373,15 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 setPagination({ data: { currentPage: 0 } });
             }
         },
-        [tableRef, page.display, server, playlistId, queryClient, setPagination],
+        [
+            tableRef,
+            page.display,
+            server,
+            playlistId,
+            queryClient,
+            setPagination,
+            filters.searchTerm,
+        ],
     );
 
     const handleRefresh = () => {
@@ -372,18 +400,38 @@ export const PlaylistDetailSongListHeaderFilters = ({
             const updatedFilters = setFilter(playlistId, {
                 sortBy: e.currentTarget.value as SongListSort,
                 sortOrder: sortOrder || SortOrder.ASC,
+                searchTerm: filters.searchTerm,
             });
 
             handleFilterChange(updatedFilters);
         },
-        [handleFilterChange, playlistId, server?.type, setFilter],
+        [handleFilterChange, playlistId, server?.type, setFilter, filters.searchTerm],
     );
 
     const handleToggleSortOrder = useCallback(() => {
         const newSortOrder = filters.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
-        const updatedFilters = setFilter(playlistId, { sortOrder: newSortOrder });
+        const updatedFilters = setFilter(playlistId, {
+            sortOrder: newSortOrder,
+            searchTerm: filters.searchTerm,
+        });
         handleFilterChange(updatedFilters);
-    }, [filters.sortOrder, handleFilterChange, playlistId, setFilter]);
+    }, [filters.sortOrder, handleFilterChange, playlistId, setFilter, filters.searchTerm]);
+
+    const handeSearchTermChange = useCallback(
+        (searchTerm: string) => {
+            const updatedFilters = setFilter(playlistId, {
+                sortOrder: filters.sortOrder,
+                sortBy: filters.sortBy,
+                searchTerm,
+            });
+            handleFilterChange(updatedFilters);
+        },
+        [filters.sortOrder, filters.sortBy],
+    );
+
+    const deferredHandleSearchTermChange = useDeferrer((value: string) => {
+        handeSearchTermChange(value);
+    }, 100);
 
     const handleSetViewType = useCallback(
         (displayType: ListDisplayType) => {
@@ -560,6 +608,30 @@ export const PlaylistDetailSongListHeaderFilters = ({
                         )}
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
+
+                <TextInput
+                    leftSection={<Icon icon="search" />}
+                    value={searchTermInput}
+                    onChange={(e) => {
+                        const searchTerm = e.target.value;
+                        setSearchTermInput(searchTerm);
+                        deferredHandleSearchTermChange(searchTerm);
+                    }}
+                    rightSection={
+                        searchTermInput && (
+                            <ActionIcon
+                                onClick={() => {
+                                    setSearchTermInput('');
+                                    handeSearchTermChange('');
+                                }}
+                                variant="transparent"
+                            >
+                                <Icon icon="x" />
+                            </ActionIcon>
+                        )
+                    }
+                    size="sm"
+                />
             </Group>
             <Group>
                 <ListConfigMenu
