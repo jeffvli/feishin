@@ -4,7 +4,7 @@ import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import isElectron from 'is-electron';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
@@ -27,7 +27,6 @@ import { useServerVersion } from '/@/renderer/hooks/use-server-version';
 import { IsUpdatedDialog } from '/@/renderer/is-updated-dialog';
 import { AppRouter } from '/@/renderer/router/app-router';
 import {
-    PlayerState,
     useCssSettings,
     useHotkeySettings,
     usePlaybackSettings,
@@ -60,6 +59,44 @@ export const App = () => {
     const { clearQueue, restoreQueue } = useQueueControls();
     const remoteSettings = useRemoteSettings();
     const cssRef = useRef<HTMLStyleElement | null>(null);
+    const reloadStateHandled = useRef(false);
+    const playerQueue = usePlayerStore((state) => state.queue);
+    const playerCurrent = usePlayerStore((state) => state.current);
+    const generalSettingShouldResume = useSettingsStore((state) => state.general.resume);
+    const { index, nextIndex, shuffledIndex, song } = playerCurrent;
+
+    const savePlayerQueueState = useCallback(() => {
+        const data = {
+            current: {
+                index,
+                nextIndex,
+                shuffledIndex,
+                song,
+                status: PlayerStatus.PAUSED,
+                time: 0,
+            },
+            queue: playerQueue,
+        };
+        utils?.saveQueue(data);
+    }, [index, nextIndex, shuffledIndex, song, playerQueue]);
+
+    useEffect(() => {
+        if (!reloadStateHandled.current) {
+            return;
+        }
+        if (!generalSettingShouldResume) {
+            return;
+        }
+        savePlayerQueueState();
+    }, [generalSettingShouldResume, savePlayerQueueState]);
+
+    useEffect(() => {
+        if (reloadStateHandled.current === false && generalSettingShouldResume) {
+            utils?.restoreQueue();
+        } else {
+            reloadStateHandled.current = !generalSettingShouldResume;
+        }
+    }, [generalSettingShouldResume]);
     useDiscordRpc();
     useServerVersion();
 
@@ -116,8 +153,6 @@ export const App = () => {
                     mpvPlayer?.volume(properties.volume);
                 }
             }
-
-            utils?.restoreQueue();
         };
 
         if (isElectron()) {
@@ -139,29 +174,22 @@ export const App = () => {
 
     useEffect(() => {
         if (utils) {
-            utils.onSaveQueue(() => {
-                const { current, queue } = usePlayerStore.getState();
-                const stateToSave: Partial<Pick<PlayerState, 'current' | 'queue'>> = {
-                    current: {
-                        ...current,
-                        status: PlayerStatus.PAUSED,
-                    },
-                    queue,
-                };
-                utils.saveQueue(stateToSave);
-            });
-
             utils.onRestoreQueue((_event: any, data) => {
                 const playerData = restoreQueue(data);
                 if (playbackType === PlaybackType.LOCAL) {
                     setQueue(playerData, true);
                 }
                 updateSong(playerData.current.song);
+                reloadStateHandled.current = true;
+            });
+            utils.onRestoreQueueFail(() => {
+                reloadStateHandled.current = true;
             });
         }
 
         return () => {
             ipc?.removeAllListeners('renderer-restore-queue');
+            ipc?.removeAllListeners('renderer-restore-queue-fail');
             ipc?.removeAllListeners('renderer-save-queue');
         };
     }, [playbackType, restoreQueue]);
