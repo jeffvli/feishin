@@ -63,7 +63,7 @@ If you're using a Linux device, a `.desktop` file is recommended for easy launch
 
 Download the [latest release (AppImage)](https://github.com/jeffvli/feishin/releases) and [application icon](https://github.com/jeffvli/feishin/blob/development/resources/icon.png?raw=true) to your `~/applications/` folder. This folder may need to be created if it does not already exist.
 
-Rename the AppImage to `Feishin-linux-x86_64.AppImage` and the icon to `Feishin-linux-x86_64.png`.
+Rename the icon to `Feishin-linux-x86_64.png`.
 
 Save the [example desktop file](https://raw.githubusercontent.com/jeffvli/feishin/refs/heads/development/feishin.desktop) as `~/.local/share/applications/feishin.desktop`.
 
