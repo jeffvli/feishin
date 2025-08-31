@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useSendScrobble } from '/@/renderer/features/player/mutations/scrobble-mutation';
-import { usePlayerStore } from '/@/renderer/store';
-import { usePlaybackSettings } from '/@/renderer/store/settings.store';
+import { useAppStore, usePlaybackSettings, usePlayerStore } from '/@/renderer/store';
 import { QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
@@ -59,13 +58,14 @@ const checkScrobbleConditions = (args: {
 export const useScrobble = () => {
     const scrobbleSettings = usePlaybackSettings().scrobble;
     const isScrobbleEnabled = scrobbleSettings?.enabled;
+    const isPrivateModeEnabled = useAppStore().privateMode;
     const sendScrobble = useSendScrobble();
 
     const [isCurrentSongScrobbled, setIsCurrentSongScrobbled] = useState(false);
 
     const handleScrobbleFromSeek = useCallback(
         (currentTime: number) => {
-            if (!isScrobbleEnabled) return;
+            if (!isScrobbleEnabled || isPrivateModeEnabled) return;
 
             const currentSong = usePlayerStore.getState().current.song;
 
@@ -84,7 +84,7 @@ export const useScrobble = () => {
                 serverId: currentSong?.serverId,
             });
         },
-        [isScrobbleEnabled, sendScrobble],
+        [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble],
     );
 
     const progressIntervalId = useRef<null | ReturnType<typeof setInterval>>(null);
@@ -119,7 +119,7 @@ export const useScrobble = () => {
                 }, 1000);
             }
 
-            if (!isScrobbleEnabled) return;
+            if (!isScrobbleEnabled || isPrivateModeEnabled) return;
 
             if (progressIntervalId.current) {
                 clearInterval(progressIntervalId.current);
@@ -201,6 +201,7 @@ export const useScrobble = () => {
             scrobbleSettings?.scrobbleAtDuration,
             scrobbleSettings?.scrobbleAtPercentage,
             isScrobbleEnabled,
+            isPrivateModeEnabled,
             isCurrentSongScrobbled,
             sendScrobble,
             handleScrobbleFromSeek,
@@ -209,7 +210,7 @@ export const useScrobble = () => {
 
     const handleScrobbleFromStatusChange = useCallback(
         (current: PlayerEvent, previous: PlayerEvent) => {
-            if (!isScrobbleEnabled) return;
+            if (!isScrobbleEnabled || isPrivateModeEnabled) return;
 
             const currentSong = usePlayerStore.getState().current.song;
 
@@ -293,6 +294,7 @@ export const useScrobble = () => {
         },
         [
             isScrobbleEnabled,
+            isPrivateModeEnabled,
             sendScrobble,
             handleScrobbleFromSeek,
             scrobbleSettings?.scrobbleAtDuration,
@@ -306,7 +308,7 @@ export const useScrobble = () => {
     // need to perform another check to see if the scrobble conditions are met
     const handleScrobbleFromSongRestart = useCallback(
         (currentTime: number) => {
-            if (!isScrobbleEnabled) return;
+            if (!isScrobbleEnabled || isPrivateModeEnabled) return;
 
             const currentSong = usePlayerStore.getState().current.song;
 
@@ -349,6 +351,7 @@ export const useScrobble = () => {
         },
         [
             isScrobbleEnabled,
+            isPrivateModeEnabled,
             scrobbleSettings?.scrobbleAtDuration,
             scrobbleSettings?.scrobbleAtPercentage,
             isCurrentSongScrobbled,

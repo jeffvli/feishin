@@ -288,6 +288,11 @@
         "updateServer": {
             "success": "server updated successfully",
             "title": "update server"
+        },
+        "privateMode": {
+            "enabled": "private mode enabled, playback status is now hidden from external integrations",
+            "disabled": "private mode disabled, playback status is now visible to enabled external integrations",
+            "title": "private mode"
         }
     },
     "page": {
@@ -321,6 +326,8 @@
             "goBack": "go back",
             "goForward": "go forward",
             "manageServers": "manage servers",
+            "privateModeOff": "turn off private mode",
+            "privateModeOn": "turn on private mode",
             "openBrowserDevtools": "open browser devtools",
             "quit": "$t(common.quit)",
             "selectServer": "select server",
@@ -533,6 +540,10 @@
         "discordServeImage_description": "share cover art for {{discord}} rich presence from server itself, only available for jellyfin and navidrome",
         "discordUpdateInterval": "{{discord}} rich presence update interval",
         "discordUpdateInterval_description": "the time in seconds between each update (minimum 15 seconds)",
+        "discordDisplayType": "{{discord}} presence display type",
+        "discordDisplayType_description": "changes what you are listening to in your status",
+        "discordDisplayType_songname": "song name",
+        "discordDisplayType_artistname": "artist name(s)",
         "doubleClickBehavior": "queue all searched tracks when double clicking",
         "doubleClickBehavior_description": "if true, all matching tracks in a track search will be queued. otherwise, only the clicked one will be queued",
         "enableRemote": "enable remote control server",

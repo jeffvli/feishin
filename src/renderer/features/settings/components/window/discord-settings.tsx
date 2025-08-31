@@ -6,10 +6,12 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import {
+    DiscordDisplayType,
     useDiscordSetttings,
     useGeneralSettings,
     useSettingsStoreActions,
 } from '/@/renderer/store';
+import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 
@@ -117,6 +119,50 @@ export const DiscordSettings = () => {
             }),
             isHidden: !isElectron(),
             title: t('setting.discordListening', {
+                postProcess: 'sentenceCase',
+            }),
+        },
+        {
+            control: (
+                <Select
+                    aria-label={t('setting.discordDisplayType')}
+                    clearable={false}
+                    data={[
+                        { label: 'Feishin', value: DiscordDisplayType.FEISHIN },
+                        {
+                            label: t('setting.discordDisplayType', {
+                                context: 'songname',
+                                postProcess: 'sentenceCase',
+                            }),
+                            value: DiscordDisplayType.SONG_NAME,
+                        },
+                        {
+                            label: t('setting.discordDisplayType_artistname', {
+                                context: 'artistname',
+                                postProcess: 'sentenceCase',
+                            }),
+                            value: DiscordDisplayType.ARTIST_NAME,
+                        },
+                    ]}
+                    defaultValue={settings.displayType}
+                    onChange={(e) => {
+                        if (!e) return;
+                        setSettings({
+                            discord: {
+                                ...settings,
+                                displayType: e as DiscordDisplayType,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.discordDisplayType', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.discordDisplayType', {
+                discord: 'Discord',
                 postProcess: 'sentenceCase',
             }),
         },
