@@ -139,6 +139,7 @@ export enum BindingActions {
     GLOBAL_SEARCH = 'globalSearch',
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
+    NAVIGATE_HOME = 'navigateHome',
     NEXT = 'next',
     PAUSE = 'pause',
     PLAY = 'play',
@@ -326,6 +327,7 @@ export interface SettingsState {
         disableAutoUpdate: boolean;
         exitToTray: boolean;
         minimizeToTray: boolean;
+        preventSleepOnPlayback: boolean;
         startMinimized: boolean;
         tray: boolean;
         windowBarStyle: Platform;
@@ -431,6 +433,7 @@ const initialState: SettingsState = {
             favoritePreviousToggle: { allowGlobal: true, hotkey: '', isGlobal: false },
             globalSearch: { allowGlobal: false, hotkey: 'mod+k', isGlobal: false },
             localSearch: { allowGlobal: false, hotkey: 'mod+f', isGlobal: false },
+            navigateHome: { allowGlobal: false, hotkey: '', isGlobal: false },
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
             pause: { allowGlobal: true, hotkey: '', isGlobal: false },
             play: { allowGlobal: true, hotkey: '', isGlobal: false },
@@ -670,6 +673,7 @@ const initialState: SettingsState = {
         disableAutoUpdate: false,
         exitToTray: false,
         minimizeToTray: false,
+        preventSleepOnPlayback: false,
         startMinimized: false,
         tray: true,
         windowBarStyle: platformDefaultWindowBarStyle,
@@ -809,6 +813,6 @@ export const useRemoteSettings = () => useSettingsStore((state) => state.remote,
 
 export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
 
-export const useDiscordSetttings = () => useSettingsStore((state) => state.discord, shallow);
+export const useDiscordSettings = () => useSettingsStore((state) => state.discord, shallow);
 
 export const useCssSettings = () => useSettingsStore((state) => state.css, shallow);

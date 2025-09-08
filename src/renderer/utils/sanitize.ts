@@ -7,7 +7,7 @@ const SANITIZE_OPTIONS: Config = {
     ALLOWED_URI_REGEXP: /^(http(s?):)?\/\/.+/i,
 };
 
-const regex = /(url\("?)(?!data:)/gim;
+const regex = /(url\(["'](?!data:))/gim;
 
 const addStyles = (output: string[], styles: CSSStyleDeclaration) => {
     for (let prop = styles.length - 1; prop >= 0; prop -= 1) {

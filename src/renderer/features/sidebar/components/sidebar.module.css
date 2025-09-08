@@ -27,7 +27,8 @@
 }
 
 .image-container {
-    position: relative;
+    position: absolute;
+    bottom: 0;
     width: var(--sidebar-image-height);
     height: var(--sidebar-image-height);
     cursor: pointer;
@@ -61,6 +62,10 @@
 .accordion-control {
     height: 2.5rem;
     border-radius: var(--theme-radius-md);
+
+    &:hover {
+        background: var(--theme-colors-background);
+    }
 }
 
 .accordion-content {

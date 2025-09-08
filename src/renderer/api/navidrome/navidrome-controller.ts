@@ -187,6 +187,7 @@ export const NavidromeController: ControllerEndpoint = {
                 name: query.searchTerm,
                 ...query._custom?.navidrome,
                 role: hasFeature(apiClientProps.server, ServerFeature.BFR) ? 'albumartist' : '',
+                ...excludeMissing(apiClientProps.server),
             },
         });
 
@@ -232,6 +233,7 @@ export const NavidromeController: ControllerEndpoint = {
                 _sort: NDSongListSort.ALBUM,
                 _start: 0,
                 album_id: [query.id],
+                ...excludeMissing(apiClientProps.server),
             },
         });
 
@@ -310,6 +312,7 @@ export const NavidromeController: ControllerEndpoint = {
                 name: query.searchTerm,
                 ...query._custom?.navidrome,
                 role: query.role || undefined,
+                ...excludeMissing(apiClientProps.server),
             },
         });
 
@@ -433,6 +436,7 @@ export const NavidromeController: ControllerEndpoint = {
                     ? songListSortMap.navidrome[query.sortBy]
                     : ndType._enum.songList.ID,
                 _start: query.startIndex,
+                ...excludeMissing(apiClientProps.server),
             },
         });
 
@@ -532,6 +536,7 @@ export const NavidromeController: ControllerEndpoint = {
                 _sort: NDSongListSort.RANDOM,
                 _start: 0,
                 album_artist_id: query.albumArtistIds,
+                ...excludeMissing(apiClientProps.server),
             },
         });
 

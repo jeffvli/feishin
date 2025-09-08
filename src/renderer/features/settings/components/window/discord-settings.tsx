@@ -7,7 +7,7 @@ import {
 } from '/@/renderer/features/settings/components/settings-section';
 import {
     DiscordDisplayType,
-    useDiscordSetttings,
+    useDiscordSettings,
     useGeneralSettings,
     useSettingsStoreActions,
 } from '/@/renderer/store';
@@ -17,7 +17,7 @@ import { TextInput } from '/@/shared/components/text-input/text-input';
 
 export const DiscordSettings = () => {
     const { t } = useTranslation();
-    const settings = useDiscordSetttings();
+    const settings = useDiscordSettings();
     const generalSettings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
 

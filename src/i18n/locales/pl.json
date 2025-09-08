@@ -115,7 +115,13 @@
         "codec": "kodek",
         "preview": "podgląd",
         "close": "zamknij",
-        "translation": "tłumaczenie"
+        "translation": "tłumaczenie",
+        "additionalParticipants": "dodatkowi uczestnicy",
+        "newVersion": "nowa wersja została zaintalowana ({{version}})",
+        "viewReleaseNotes": "zobacz notatki dotyczące wydania",
+        "bitDepth": "głębia bitowa",
+        "sampleRate": "częstotliwość próbkowania",
+        "tags": "tagi"
     },
     "entity": {
         "genre_one": "gatunek",
@@ -193,7 +199,8 @@
         "loginRateError": "zbyt dużo prób logowania, poczekaj chwilę i spróbuj ponownie",
         "badAlbum": "ta strona jest wyświetlana, ponieważ ten utwór nie jest częścią albumu. najprawdopodobniej ten problem występuje, jeśli utwór znajduje się w nadrzędnym folderze plików z muzyką. jellyfin grupuje utwory tylko wtedy, gdy znajdują się one w folderze.",
         "networkError": "wystąpił błąd sieciowy",
-        "openError": "nie można otworzyć pliku"
+        "openError": "nie można otworzyć pliku",
+        "badValue": "niewłaściwa opcja \"{{value}}\". ta wartość już nie istnieje"
     },
     "filter": {
         "mostPlayed": "najczęściej odtwarzane",
@@ -278,7 +285,8 @@
         },
         "queryEditor": {
             "input_optionMatchAll": "dopasuj wszystkie",
-            "input_optionMatchAny": "dopasuj dowolne"
+            "input_optionMatchAny": "dopasuj dowolne",
+            "title": "edytor zapytań"
         },
         "lyricSearch": {
             "input_name": "$t(common.name)",
@@ -389,7 +397,8 @@
             "home": "$t(common.home)",
             "artists": "$t(entity.artist_other)",
             "albumArtists": "$t(entity.albumArtist_other)",
-            "shared": "udostępnione $t(entity.playlist_other)"
+            "shared": "udostępnione $t(entity.playlist_other)",
+            "myLibrary": "Moja biblioteka"
         },
         "home": {
             "mostPlayed": "najczęściej odtwarzane",
@@ -707,7 +716,15 @@
         "doubleClickBehavior_description": "jeżeli włączone, wszystkie pasujące utwory w wyszukiwaniu zostaną zakolejkowane. w przeciwnym wypadku, tylko kliknięty będzie zakolejkowany",
         "lastfmApiKey": "klucz API {{lastfm}}",
         "lastfmApiKey_description": "klucz API dla {{lastfm}}. wymagany dla okładek",
-        "translationTargetLanguage": "docelowy język tłumaczenia"
+        "translationTargetLanguage": "docelowy język tłumaczenia",
+        "discordPausedStatus_description": "jeżeli włączone, status będzie pokazywany kiedy odtwarzanie jest wstrzymane",
+        "preferLocalLyrics": "preferuj lokalne teksty",
+        "preferLocalLyrics_description": "jeśli to możliwe, preferuj lokalne teksty zamiast tekstów zdalnych",
+        "lastfm": "pokazuj linki do last.fm",
+        "lastfm_description": "pokazuj linki do last.fm na stronach artystów/albumów",
+        "notify": "włącz powiadomienia o piosenkach",
+        "musicbrainz": "pokazuj linki do musicbrainz",
+        "musicbrainz_description": "pokazuj linki do musicbrainz na stronach artystów/albumów, gdzie istnieje mbid"
     },
     "table": {
         "config": {

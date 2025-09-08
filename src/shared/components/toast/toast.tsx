@@ -1,4 +1,4 @@
-import type { NotificationsProps as MantineNotificationProps } from '@mantine/notifications';
+import type { NotificationData } from '@mantine/notifications';
 
 import {
     cleanNotifications,
@@ -11,7 +11,7 @@ import clsx from 'clsx';
 
 import styles from './toast.module.css';
 
-interface NotificationProps extends MantineNotificationProps {
+interface NotificationProps extends Omit<NotificationData, 'message'> {
     message?: string;
     onClose?: () => void;
     type?: 'error' | 'info' | 'success' | 'warning';
@@ -26,7 +26,7 @@ const getTitle = (type: NotificationProps['type']) => {
 
 const showToast = ({ message, onClose, type, ...props }: NotificationProps) => {
     return notifications.show({
-        autoClose: props.autoClose,
+        ...props,
         classNames: {
             body: styles.body,
             closeButton: styles.closeButton,

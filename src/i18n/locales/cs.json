@@ -4,7 +4,7 @@
         "stop": "zastavit",
         "repeat": "opakovat",
         "queue_remove": "odebrat vybrané",
-        "playRandom": "přehrát náhodné",
+        "playRandom": "přehrát náhodně",
         "skip": "přeskočit",
         "previous": "předchozí",
         "toggleFullscreenPlayer": "přepnout celoobrazovkový přehrávač",
@@ -273,7 +273,11 @@
         "preservePitch": "zachovat výšku",
         "preservePitch_description": "zachová výšku při úpravě rychlosti přehrávání",
         "notify": "povolit oznámení o skladbách",
-        "notify_description": "zobrazit oznámení při změně aktuální skladby"
+        "notify_description": "zobrazit oznámení při změně aktuální skladby",
+        "discordDisplayType": "typ zobrazení stavu {{discord}}",
+        "discordDisplayType_description": "změní, co posloucháte, ve vašem stavu",
+        "discordDisplayType_songname": "název skladby",
+        "discordDisplayType_artistname": "jména umělců"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -595,7 +599,9 @@
             "openBrowserDevtools": "otevřít vývojářské nástroje",
             "quit": "$t(common.quit)",
             "goBack": "přejít zpět",
-            "goForward": "přejít vpřed"
+            "goForward": "přejít vpřed",
+            "privateModeOff": "vypnout soukromý režim",
+            "privateModeOn": "zapnout soukromý režim"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -756,6 +762,11 @@
             "expireInvalid": "čas vypršení musí být v budoucnosti",
             "setExpiration": "nastavit vypršení",
             "createFailed": "nepodařilo se vytvořit sdílení (je sdílení povoleno?)"
+        },
+        "privateMode": {
+            "enabled": "soukromý režim povolen, stav přehrávání je nyní skryt před externími integracemi",
+            "disabled": "soukromý režim povolen, stav přehrávání je nyní viditelný pro externími integrace",
+            "title": "soukromý režim"
         }
     },
     "entity": {

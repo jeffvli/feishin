@@ -7,7 +7,7 @@ import {
     DiscordDisplayType,
     getServerById,
     useAppStore,
-    useDiscordSetttings,
+    useDiscordSettings,
     useGeneralSettings,
     usePlayerStore,
 } from '/@/renderer/store';
@@ -17,7 +17,7 @@ import { PlayerStatus } from '/@/shared/types/types';
 const discordRpc = isElectron() ? window.api.discordRpc : null;
 
 export const useDiscordRpc = () => {
-    const discordSettings = useDiscordSetttings();
+    const discordSettings = useDiscordSettings();
     const generalSettings = useGeneralSettings();
     const { privateMode } = useAppStore();
     const [lastUniqueId, setlastUniqueId] = useState('');

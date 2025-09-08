@@ -32,7 +32,8 @@ import { FullLyricsMetadata, LyricSource, LyricsOverride } from '/@/shared/types
 
 export const Lyrics = () => {
     const currentSong = useCurrentSong();
-    const lyricsSettings = useLyricsSettings();
+    const { translationApiKey, translationApiProvider, translationTargetLanguage } =
+        useLyricsSettings();
     const { t } = useTranslation();
     const [index, setIndex] = useState(0);
     const [translatedLyrics, setTranslatedLyrics] = useState<null | string>(null);
@@ -97,8 +98,6 @@ export const Lyrics = () => {
         const originalLyrics = Array.isArray(lyrics.lyrics)
             ? lyrics.lyrics.map(([, line]) => line).join('\n')
             : lyrics.lyrics;
-        const { translationApiKey, translationApiProvider, translationTargetLanguage } =
-            lyricsSettings;
         const TranslatedText: null | string = await translateLyrics(
             originalLyrics,
             translationApiKey,
@@ -107,7 +106,14 @@ export const Lyrics = () => {
         );
         setTranslatedLyrics(TranslatedText);
         setShowTranslation(true);
-    }, [lyrics, lyricsSettings, translatedLyrics, showTranslation]);
+    }, [
+        translatedLyrics,
+        lyrics,
+        translationApiKey,
+        translationApiProvider,
+        translationTargetLanguage,
+        showTranslation,
+    ]);
 
     const { isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
         options: {
@@ -194,7 +200,11 @@ export const Lyrics = () => {
                         onRemoveLyric={handleOnRemoveLyric}
                         onResetLyric={handleOnResetLyric}
                         onSearchOverride={handleOnSearchOverride}
-                        onTranslateLyric={handleOnTranslateLyric}
+                        onTranslateLyric={
+                            translationApiProvider && translationApiKey
+                                ? handleOnTranslateLyric
+                                : undefined
+                        }
                         setIndex={setIndex}
                     />
                 </div>

@@ -364,6 +364,8 @@
             "setRating": "$t(action.setRating)",
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "share item",
+            "goToAlbum": "go to $t(entity.album_one)",
+            "goToAlbumArtist": "go to $t(entity.albumArtist_one)",
             "showDetails": "get info"
         },
         "favoriteList": {
@@ -582,6 +584,7 @@
         "hotkey_favoritePreviousSong": "favorite $t(common.previousSong)",
         "hotkey_globalSearch": "global search",
         "hotkey_localSearch": "in-page search",
+        "hotkey_navigateHome": "navigate to home",
         "hotkey_playbackNext": "next track",
         "hotkey_playbackPause": "pause",
         "hotkey_playbackPlay": "play",
@@ -698,6 +701,8 @@
         "skipPlaylistPage_description": "when navigating to a playlist, go to the playlist song list page instead of the default page",
         "startMinimized": "start minimized",
         "startMinimized_description": "start the application in system tray",
+        "preventSleepOnPlayback": "prevent sleep on playback",
+        "preventSleepOnPlayback_description": "prevent the display from sleeping while music is playing",
         "theme": "theme",
         "theme_description": "sets the theme to use for the application",
         "themeDark": "theme (dark)",

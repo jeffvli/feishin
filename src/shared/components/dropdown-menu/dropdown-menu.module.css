@@ -4,6 +4,10 @@
     align-items: center;
     padding: var(--theme-spacing-sm) var(--theme-spacing-md);
     cursor: default;
+
+    &:hover {
+        background: var(--theme-colors-background);
+    }
 }
 
 .menu-item:disabled {
