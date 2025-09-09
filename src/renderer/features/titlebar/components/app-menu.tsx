@@ -10,6 +10,7 @@ import { ServerList } from '/@/renderer/features/servers';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
+    useAppStore,
     useAppStoreActions,
     useAuthStoreActions,
     useCurrentServer,
@@ -18,6 +19,7 @@ import {
 } from '/@/renderer/store';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Icon } from '/@/shared/components/icon/icon';
+import { toast } from '/@/shared/components/toast/toast';
 import { ServerListItem, ServerType } from '/@/shared/types/domain-types';
 
 const browser = isElectron() ? window.api.browser : null;
@@ -30,7 +32,8 @@ export const AppMenu = () => {
     const serverList = useServerList();
     const { setCurrentServer } = useAuthStoreActions();
     const { collapsed } = useSidebarStore();
-    const { setSideBar } = useAppStoreActions();
+    const { privateMode } = useAppStore();
+    const { setPrivateMode, setSideBar } = useAppStoreActions();
 
     const handleSetCurrentServer = (server: ServerListItem) => {
         navigate(AppRoute.HOME);
@@ -80,6 +83,22 @@ export const AppMenu = () => {
         setSideBar({ collapsed: false });
     };
 
+    const handlePrivateModeOff = () => {
+        setPrivateMode(false);
+        toast.info({
+            message: t('form.privateMode.disabled', { postProcess: 'sentenceCase' }),
+            title: t('form.privateMode.title', { postProcess: 'sentenceCase' }),
+        });
+    };
+
+    const handlePrivateModeOn = () => {
+        setPrivateMode(true);
+        toast.info({
+            message: t('form.privateMode.enabled', { postProcess: 'sentenceCase' }),
+            title: t('form.privateMode.title', { postProcess: 'sentenceCase' }),
+        });
+    };
+
     const handleQuit = () => {
         browser?.quit();
     };
@@ -127,7 +146,21 @@ export const AppMenu = () => {
             >
                 {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}
             </DropdownMenu.Item>
-
+            {privateMode ? (
+                <DropdownMenu.Item
+                    leftSection={<Icon color="error" icon="lock" />}
+                    onClick={handlePrivateModeOff}
+                >
+                    {t('page.appMenu.privateModeOff', { postProcess: 'sentenceCase' })}
+                </DropdownMenu.Item>
+            ) : (
+                <DropdownMenu.Item
+                    leftSection={<Icon icon="lockOpen" />}
+                    onClick={handlePrivateModeOn}
+                >
+                    {t('page.appMenu.privateModeOn', { postProcess: 'sentenceCase' })}
+                </DropdownMenu.Item>
+            )}
             <DropdownMenu.Divider />
             <DropdownMenu.Label>
                 {t('page.appMenu.selectServer', { postProcess: 'sentenceCase' })}

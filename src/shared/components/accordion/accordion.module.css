@@ -4,6 +4,10 @@
 
 .control {
     background: var(--theme-colors-background);
+
+    &:hover {
+        background: var(--theme-colors-background);
+    }
 }
 
 .chevron {

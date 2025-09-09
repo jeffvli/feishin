@@ -2,6 +2,7 @@ import { PostProcessorModule, StringMap, TOptions } from 'i18next';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import ca from './locales/ca.json';
 import cs from './locales/cs.json';
 import de from './locales/de.json';
 import en from './locales/en.json';
@@ -18,15 +19,18 @@ import nbNO from './locales/nb-NO.json';
 import nl from './locales/nl.json';
 import pl from './locales/pl.json';
 import ptBr from './locales/pt-BR.json';
+import pt from './locales/pt.json';
 import ru from './locales/ru.json';
 import sl from './locales/sl.json';
 import sr from './locales/sr.json';
 import sv from './locales/sv.json';
 import ta from './locales/ta.json';
+import tr from './locales/tr.json';
 import zhHans from './locales/zh-Hans.json';
 import zhHant from './locales/zh-Hant.json';
 
 const resources = {
+    ca: { translation: ca },
     cs: { translation: cs },
     de: { translation: de },
     en: { translation: en },
@@ -42,12 +46,14 @@ const resources = {
     'nb-NO': { translation: nbNO },
     nl: { translation: nl },
     pl: { translation: pl },
+    pt: { translation: pt },
     'pt-BR': { translation: ptBr },
     ru: { translation: ru },
     sl: { translation: sl },
     sr: { translation: sr },
     sv: { translation: sv },
     ta: { translation: ta },
+    tr: { translation: tr },
     'zh-Hans': { translation: zhHans },
     'zh-Hant': { translation: zhHant },
 };
@@ -56,6 +62,10 @@ export const languages = [
     {
         label: 'English',
         value: 'en',
+    },
+    {
+        label: 'Català',
+        value: 'ca',
     },
     {
         label: 'Čeština',
@@ -110,6 +120,10 @@ export const languages = [
         value: 'fa',
     },
     {
+        label: 'Português',
+        value: 'pt',
+    },
+    {
         label: 'Português (Brasil)',
         value: 'pt-BR',
     },
@@ -136,6 +150,10 @@ export const languages = [
     {
         label: 'Tamil',
         value: 'ta',
+    },
+    {
+        label: 'Türkçe',
+        value: 'tr',
     },
     {
         label: '简体中文',

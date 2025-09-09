@@ -203,6 +203,34 @@ export const WindowSettings = () => {
             isHidden: !isElectron() || !settings.tray,
             title: t('setting.startMinimized', { postProcess: 'sentenceCase' }),
         },
+        {
+            control: (
+                <Switch
+                    aria-label="Toggle prevent sleep on playback"
+                    defaultChecked={settings.preventSleepOnPlayback}
+                    disabled={!isElectron()}
+                    onChange={(e) => {
+                        if (!e) return;
+                        localSettings?.set(
+                            'window_prevent_sleep_on_playback',
+                            e.currentTarget.checked,
+                        );
+                        setSettings({
+                            window: {
+                                ...settings,
+                                preventSleepOnPlayback: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.preventSleepOnPlayback', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.preventSleepOnPlayback', { postProcess: 'sentenceCase' }),
+        },
     ];
 
     return <SettingsSection options={windowOptions} />;

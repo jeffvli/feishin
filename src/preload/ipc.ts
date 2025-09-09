@@ -8,7 +8,12 @@ const send = (channel: string, ...args: any[]) => {
     ipcRenderer.send(channel, ...args);
 };
 
+const invoke = (channel: string, ...args: any[]) => {
+    return ipcRenderer.invoke(channel, ...args);
+};
+
 export const ipc = {
+    invoke,
     removeAllListeners,
     send,
 };

@@ -15,6 +15,8 @@ export type ContextMenuItemType =
     | 'deletePlaylist'
     | 'deselectAll'
     | 'download'
+    | 'goToAlbum'
+    | 'goToAlbumArtist'
     | 'moveToBottomOfQueue'
     | 'moveToNextOfQueue'
     | 'moveToTopOfQueue'
@@ -57,6 +59,8 @@ export const CONFIGURABLE_CONTEXT_MENU_ITEMS: ContextMenuItemType[] = [
     'setRating',
     'download',
     'shareItem',
+    'goToAlbum',
+    'goToAlbumArtist',
     'showDetails',
 ];
 

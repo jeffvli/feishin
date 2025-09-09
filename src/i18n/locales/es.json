@@ -273,7 +273,14 @@
         "preservePitch": "Mantener el tono",
         "preservePitch_description": "Mantiene el tono cuando se modifica la velocidad de reproducción",
         "notify": "Activar notificaciones de canciones",
-        "notify_description": "Muestra notificaciones cuando se cambia la canción actual"
+        "notify_description": "Muestra notificaciones cuando se cambia la canción actual",
+        "discordDisplayType_songname": "Nombre de la canción",
+        "discordDisplayType_artistname": "Nombre(s) del artista(s)",
+        "discordDisplayType_description": "Cambia qué estás escuchando en tu estado",
+        "discordDisplayType": "Tipo de pantalla de actividad de {{discord}}",
+        "hotkey_navigateHome": "Navegar a inicio",
+        "preventSleepOnPlayback": "Evitar entrar en reposo durante la reproducción",
+        "preventSleepOnPlayback_description": "Evita que la pantalla entre en reposo mientras se está reproduciendo música"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -495,7 +502,9 @@
             "openBrowserDevtools": "abrir herramientas de desarrollador del navegador",
             "quit": "$t(common.quit)",
             "goBack": "retroceder",
-            "goForward": "avanzar"
+            "goForward": "avanzar",
+            "privateModeOff": "Apagar modo privado",
+            "privateModeOn": "Encender modo privado"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -519,7 +528,9 @@
             "playSimilarSongs": "$t(player.playSimilarSongs)",
             "download": "descargar",
             "playShuffled": "$t(player.shuffle)",
-            "moveToNext": "$t(action.moveToNext)"
+            "moveToNext": "$t(action.moveToNext)",
+            "goToAlbum": "Ir a $t(entity.album_one)",
+            "goToAlbumArtist": "Ir a $t(entity.albumArtist_one)"
         },
         "home": {
             "mostPlayed": "más reproducidos",
@@ -679,6 +690,11 @@
             "setExpiration": "Establecer expiración",
             "success": "Enlace de compartición copiado al portapapeles (o pulsa aquí para abrir)",
             "expireInvalid": "La expiración debe ser en el futuro"
+        },
+        "privateMode": {
+            "enabled": "Modo privado activado, el estado de reproducción ahora está oculto de integraciones externas",
+            "disabled": "Modo privado desactivado, el estado de reproducción ahora es visible a las integraciones externas habilitadas",
+            "title": "Modo privado"
         }
     },
     "table": {

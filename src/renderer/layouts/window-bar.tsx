@@ -12,8 +12,12 @@ import macMinHover from './assets/min-mac-hover.png';
 import macMin from './assets/min-mac.png';
 import styles from './window-bar.module.css';
 
-import { useCurrentStatus, useQueueStatus } from '/@/renderer/store';
-import { useWindowSettings } from '/@/renderer/store/settings.store';
+import {
+    useAppStore,
+    useCurrentStatus,
+    useQueueStatus,
+    useWindowSettings,
+} from '/@/renderer/store';
 import { Text } from '/@/shared/components/text/text';
 import { Platform, PlayerStatus } from '/@/shared/types/types';
 
@@ -126,14 +130,16 @@ export const WindowBar = () => {
     const playerStatus = useCurrentStatus();
     const { currentSong, index, length } = useQueueStatus();
     const { windowBarStyle } = useWindowSettings();
+    const { privateMode } = useAppStore();
 
     const statusString = playerStatus === PlayerStatus.PAUSED ? '(Paused) ' : '';
     const queueString = length ? `(${index + 1} / ${length}) ` : '';
-    const title = length
-        ? currentSong?.artistName
-            ? `${statusString}${queueString}${currentSong?.name} — ${currentSong?.artistName}`
-            : `${statusString}${queueString}${currentSong?.name}`
-        : 'Feishin';
+    const privateModeString = privateMode ? '(Private mode)' : '';
+    const title = `${
+        length
+            ? `${statusString}${queueString}${currentSong?.name}${currentSong?.artistName ? ` — ${currentSong?.artistName}` : ''}`
+            : 'Feishin'
+    }${privateMode ? ` ${privateModeString}` : ''}`;
     document.title = title;
 
     const [max, setMax] = useState(localSettings?.env.START_MAXIMIZED || false);

@@ -111,7 +111,14 @@
         "maximize": "maksimer",
         "right": "høyre",
         "sortOrder": "rekkefølge",
-        "tags": "tagger"
+        "tags": "tagger",
+        "newVersion": "en ny versjon har blitt installert ({{version}})",
+        "viewReleaseNotes": "se utgivelsesnotater",
+        "additionalParticipants": "ytterligere deltakere",
+        "albumGain": "gjennomsnittlig lydnivå for album",
+        "albumPeak": "høyeste lydnivå for album",
+        "bitDepth": "bitdybde",
+        "sampleRate": "samplingsfrekvens"
     },
     "entity": {
         "smartPlaylist": "smart $t(entity.playlist_one)",
@@ -154,7 +161,7 @@
         "apiRouteError": "kan ikke behandle forespørselen",
         "mpvRequired": "MPV er påkrevd",
         "authenticationFailed": "autentisering feilet",
-        "badAlbum": "du ser denne siden fordi sangen ikke er med i et album. Mest sannsynlig opplever du dette problemet fordi du har en sang helt øverst i musikkmappen. jellyfin gruperer kun spor som ligger i en mappe.",
+        "badAlbum": "du ser denne siden fordi sangen ikke er med i et album. Mest sannsynlig opplever du dette problemet fordi du har en sang helt øverst i musikkmappen. Jellyfin grupperer kun spor som ligger i en mappe.",
         "endpointNotImplementedError": "endepunkt {{endpoint}} er ikke implementert for {{serverType}}",
         "credentialsRequired": "innloggingsdetaljer er påkrevd",
         "genericError": "en feil har oppstått",
@@ -172,7 +179,9 @@
         "sessionExpiredError": "sesjonen din har utløpt",
         "remotePortWarning": "ta omstart av serveren for å aktivere ny port",
         "remoteDisableError": "en problem oppstod ved å $t(common.disable) serveren",
-        "remoteEnableError": "et problem oppstod ved å $t(common.enable) serveren"
+        "remoteEnableError": "et problem oppstod ved å $t(common.enable) serveren",
+        "notificationDenied": "tillatelser for varsler ble avvist. Denne innstillingen har ingen effekt",
+        "badValue": "ugyldig alternativ \"{{value}}\". Denne verdien eksisterer ikke lenger"
     },
     "filter": {
         "bpm": "bpm",
@@ -215,7 +224,8 @@
         "recentlyAdded": "nylig lagt til",
         "channels": "$t(common.channel_other)",
         "genre": "$t(entity.genre_one)",
-        "trackNumber": "spor"
+        "trackNumber": "spor",
+        "albumCount": "$t(entity.album_other) opptelling"
     },
     "form": {
         "createPlaylist": {
@@ -273,7 +283,8 @@
         },
         "queryEditor": {
             "input_optionMatchAll": "match alle",
-            "input_optionMatchAny": "matche hvilken som helst"
+            "input_optionMatchAny": "matche hvilken som helst",
+            "title": "redigeringsverktøy for spørringer"
         }
     },
     "page": {

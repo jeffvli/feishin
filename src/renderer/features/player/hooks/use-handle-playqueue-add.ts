@@ -78,6 +78,7 @@ export const useHandlePlayQueueAdd = () => {
             // Allow this to be undefined for "play shuffled". If undefined, default to 0,
             // otherwise, choose the selected item in the queue
             let initialSongIndex: number | undefined;
+            let toastId: null | string = null;
 
             if (byItemType) {
                 let songList: SongListResponse | undefined;
@@ -87,9 +88,8 @@ export const useHandlePlayQueueAdd = () => {
                 timeoutIds.current = {
                     ...timeoutIds.current,
                     [fetchId]: setTimeout(() => {
-                        toast.info({
+                        toastId = toast.info({
                             autoClose: false,
-                            id: fetchId,
                             message: t('player.playbackFetchCancel', {
                                 postProcess: 'sentenceCase',
                             }),
@@ -148,7 +148,9 @@ export const useHandlePlayQueueAdd = () => {
 
                     clearTimeout(timeoutIds.current[fetchId] as ReturnType<typeof setTimeout>);
                     delete timeoutIds.current[fetchId];
-                    toast.hide(fetchId);
+                    if (toastId) {
+                        toast.hide(toastId);
+                    }
                 } catch (err: any) {
                     if (instanceOfCancellationError(err)) {
                         return null;
