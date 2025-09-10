@@ -114,7 +114,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const clickOutsideRef = useClickOutside(
         () => setOpened(false),
         ['mousedown', 'touchstart'],
-        [contextMenuRef, ratingsRef],
     );
 
     const viewport = useViewportSize();
