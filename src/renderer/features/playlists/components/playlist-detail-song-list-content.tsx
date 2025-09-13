@@ -117,11 +117,9 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
                         },
                     });
 
-                    setTimeout(() => {
-                        queryClient.invalidateQueries({
-                            queryKey: queryKeys.playlists.songList(server?.id || '', playlistId),
-                        });
-                    }, 200);
+                    queryClient.invalidateQueries({
+                        queryKey: queryKeys.playlists.songList(server?.id || '', playlistId),
+                    });
                 } catch (error) {
                     toast.error({
                         message: (error as Error).message,

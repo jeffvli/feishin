@@ -541,7 +541,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                         });
                     },
                     onSuccess: () => {
-                        ctx.context?.tableRef?.current?.api?.refreshInfiniteCache();
                         closeAllModals();
                     },
                 },
