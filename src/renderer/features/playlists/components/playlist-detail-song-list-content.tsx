@@ -42,7 +42,9 @@ import {
     LibraryItem,
     PlaylistSongListQueryClientSide,
     QueueSong,
+    ServerType,
     Song,
+    SongListResponse,
     SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
@@ -117,9 +119,32 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
                         },
                     });
 
-                    queryClient.invalidateQueries({
-                        queryKey: queryKeys.playlists.songList(server?.id || '', playlistId),
-                    });
+                    queryClient.setQueryData<SongListResponse>(
+                        queryKeys.playlists.songList(server?.id || '', playlistId),
+                        (previous) => {
+                            if (previous?.items) {
+                                const from = e.node.rowIndex!;
+                                const to = e.overIndex;
+
+                                const item = previous.items[from];
+                                const remaining = previous.items.toSpliced(from, 1);
+                                remaining.splice(to, 0, item);
+
+                                return {
+                                    error: previous.error,
+                                    items: remaining,
+                                    startIndex: previous.startIndex,
+                                    totalRecordCount: previous.totalRecordCount,
+                                };
+                            }
+
+                            return previous;
+                        },
+                    );
+
+                    // Nodes have to be redrawn, otherwise the row indexes will be wrong
+                    // Maybe it's possible to only redraw necessary rows to not be as expensive?
+                    tableRef.current?.api.redrawRows();
                 } catch (error) {
                     toast.error({
                         message: (error as Error).message,
@@ -128,7 +153,7 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
                 }
             }
         },
-        [playlistId, queryClient, server],
+        [playlistId, queryClient, server, tableRef],
     );
 
     const handleGridSizeChange = () => {
@@ -224,7 +249,10 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
-    const canDrag = filters.sortBy === SongListSort.ID && !detailQuery?.data?.rules && false; //!iSClientSide;
+    const canDrag =
+        filters.sortBy === SongListSort.ID &&
+        !detailQuery?.data?.rules &&
+        server?.type !== ServerType.SUBSONIC;
 
     return (
         <>
