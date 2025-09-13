@@ -219,16 +219,7 @@ export const queryKeys: Record<
             return [serverId, 'playlists', 'list'] as const;
         },
         root: (serverId: string) => [serverId, 'playlists'] as const,
-        songList: (serverId: string, id?: string, query?: PlaylistSongListQuery) => {
-            const { filter, pagination } = splitPaginatedQuery(query);
-            if (query && id && pagination) {
-                return [serverId, 'playlists', id, 'songList', filter, pagination] as const;
-            }
-
-            if (query && id) {
-                return [serverId, 'playlists', id, 'songList', filter] as const;
-            }
-
+        songList: (serverId: string, id?: string) => {
             if (id) return [serverId, 'playlists', id, 'songList'] as const;
             return [serverId, 'playlists', 'songList'] as const;
         },

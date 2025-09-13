@@ -145,12 +145,7 @@ export const AddToPlaylistContextModal = ({
             const uniqueSongIds: string[] = [];
 
             if (values.skipDuplicates) {
-                const query = {
-                    id: playlistId,
-                    startIndex: 0,
-                };
-
-                const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, query);
+                const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId);
 
                 const playlistSongsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
                     if (!server)
@@ -164,9 +159,6 @@ export const AddToPlaylistContextModal = ({
                         },
                         query: {
                             id: playlistId,
-                            sortBy: SongListSort.ID,
-                            sortOrder: SortOrder.ASC,
-                            startIndex: 0,
                         },
                     });
                 });

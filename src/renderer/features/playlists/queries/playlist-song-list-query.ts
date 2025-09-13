@@ -20,7 +20,7 @@ export const usePlaylistSongList = (args: QueryHookArgs<PlaylistSongListQuery>) 
                 query,
             });
         },
-        queryKey: queryKeys.playlists.songList(server?.id || '', query.id, query),
+        queryKey: queryKeys.playlists.songList(server?.id || '', query.id),
         ...options,
     });
 };

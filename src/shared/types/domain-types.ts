@@ -988,10 +988,11 @@ export type PlaylistSongListArgs = BaseEndpointArgs & { query: PlaylistSongListQ
 
 export type PlaylistSongListQuery = {
     id: string;
-    limit?: number;
+};
+
+export type PlaylistSongListQueryClientSide = {
     sortBy?: SongListSort;
     sortOrder?: SortOrder;
-    startIndex: number;
 };
 
 // Playlist Songs
@@ -1400,7 +1401,7 @@ export const sortSongList = (songs: QueueSong[], sortBy: SongListSort, sortOrder
         case SongListSort.ALBUM_ARTIST:
             results = orderBy(
                 results,
-                ['albumArtist', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [(v) => v.albumArtists[0]?.name.toLowerCase(), 'discNumber', 'trackNumber'],
                 [order, order, 'asc', 'asc'],
             );
             break;
@@ -1408,9 +1409,21 @@ export const sortSongList = (songs: QueueSong[], sortBy: SongListSort, sortOrder
         case SongListSort.ARTIST:
             results = orderBy(
                 results,
-                ['artist', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [(v) => v.artistName?.toLowerCase(), 'discNumber', 'trackNumber'],
                 [order, order, 'asc', 'asc'],
             );
+            break;
+
+        case SongListSort.BPM:
+            results = orderBy(results, ['bpm'], [order]);
+            break;
+
+        case SongListSort.CHANNELS:
+            results = orderBy(results, ['channels'], [order]);
+            break;
+
+        case SongListSort.COMMENT:
+            results = orderBy(results, ['comment'], [order]);
             break;
 
         case SongListSort.DURATION:
@@ -1425,7 +1438,7 @@ export const sortSongList = (songs: QueueSong[], sortBy: SongListSort, sortOrder
             results = orderBy(
                 results,
                 [
-                    (v) => v.genres?.[0].name.toLowerCase(),
+                    (v) => v.genres?.[0]?.name.toLowerCase(),
                     (v) => v.album?.toLowerCase(),
                     'discNumber',
                     'trackNumber',
@@ -1457,13 +1470,21 @@ export const sortSongList = (songs: QueueSong[], sortBy: SongListSort, sortOrder
             break;
 
         case SongListSort.RECENTLY_ADDED:
-            results = orderBy(results, ['created'], [order]);
+            results = orderBy(results, ['createdAt'], [order]);
+            break;
+
+        case SongListSort.RECENTLY_PLAYED:
+            results = orderBy(results, ['lastPlayedAt'], [order]);
+            break;
+
+        case SongListSort.RELEASE_DATE:
+            results = orderBy(results, ['releaseDate'], [order]);
             break;
 
         case SongListSort.YEAR:
             results = orderBy(
                 results,
-                ['year', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
+                ['releaseYear', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
                 [order, 'asc', 'asc', 'asc'],
             );
             break;

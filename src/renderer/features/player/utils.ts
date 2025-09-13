@@ -18,17 +18,13 @@ export const getPlaylistSongsById = async (args: {
     queryClient: QueryClient;
     server: ServerListItem;
 }) => {
-    const { id, query, queryClient, server } = args;
+    const { id, queryClient, server } = args;
 
     const queryFilter: PlaylistSongListQuery = {
         id,
-        sortBy: SongListSort.ID,
-        sortOrder: SortOrder.ASC,
-        startIndex: 0,
-        ...query,
     };
 
-    const queryKey = queryKeys.playlists.songList(server?.id, id, queryFilter);
+    const queryKey = queryKeys.playlists.songList(server?.id, id);
 
     const res = await queryClient.fetchQuery(
         queryKey,

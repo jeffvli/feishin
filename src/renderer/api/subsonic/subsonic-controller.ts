@@ -759,18 +759,14 @@ export const SubsonicController: ControllerEndpoint = {
             throw new Error('Failed to get playlist song list');
         }
 
-        let results =
+        const items =
             res.body.playlist.entry?.map((song) => ssNormalize.song(song, apiClientProps.server)) ||
             [];
 
-        if (query.sortBy && query.sortOrder) {
-            results = sortSongList(results, query.sortBy, query.sortOrder);
-        }
-
         return {
-            items: results,
+            items,
             startIndex: 0,
-            totalRecordCount: results?.length || 0,
+            totalRecordCount: items.length,
         };
     },
     getRandomSongList: async (args) => {

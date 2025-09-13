@@ -3,7 +3,6 @@ import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
 import { NDSongListSort } from '/@/shared/api/navidrome.types';
 import { ndNormalize } from '/@/shared/api/navidrome/navidrome-normalize';
-import { ndType } from '/@/shared/api/navidrome/navidrome-types';
 import { ssNormalize } from '/@/shared/api/subsonic/subsonic-normalize';
 import { SubsonicExtensions } from '/@/shared/api/subsonic/subsonic-types';
 import { getFeatures, hasFeature, VersionInfo } from '/@/shared/api/utils';
@@ -430,12 +429,9 @@ export const NavidromeController: ControllerEndpoint = {
                 id: query.id,
             },
             query: {
-                _end: query.startIndex + (query.limit || -1),
-                _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : 'ASC',
-                _sort: query.sortBy
-                    ? songListSortMap.navidrome[query.sortBy]
-                    : ndType._enum.songList.ID,
-                _start: query.startIndex,
+                _end: -1,
+                _order: 'ASC',
+                _start: 0,
                 ...excludeMissing(apiClientProps.server),
             },
         });
@@ -446,7 +442,7 @@ export const NavidromeController: ControllerEndpoint = {
 
         return {
             items: res.body.data.map((item) => ndNormalize.song(item, apiClientProps.server)),
-            startIndex: query?.startIndex || 0,
+            startIndex: 0,
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },

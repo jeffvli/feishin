@@ -2,7 +2,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 
 import { closeAllModals, openModal } from '@mantine/modals';
 import { motion } from 'motion/react';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router';
 
@@ -22,12 +22,7 @@ import { Box } from '/@/shared/components/box/box';
 import { Group } from '/@/shared/components/group/group';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
-import {
-    PlaylistSongListQuery,
-    ServerType,
-    SongListSort,
-    SortOrder,
-} from '/@/shared/types/domain-types';
+import { ServerType, SongListSort, SortOrder, sortSongList } from '/@/shared/types/domain-types';
 
 const PlaylistDetailSongListRoute = () => {
     const { t } = useTranslation();
@@ -148,22 +143,25 @@ const PlaylistDetailSongListRoute = () => {
     };
 
     const page = usePlaylistDetailStore();
-    const filters: Partial<PlaylistSongListQuery> = {
-        sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
-        sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
-    };
 
-    const itemCountCheck = usePlaylistSongList({
+    const playlistSongs = usePlaylistSongList({
         query: {
             id: playlistId,
-            limit: 1,
-            startIndex: 0,
-            ...filters,
         },
         serverId: server?.id,
     });
 
-    const itemCount = itemCountCheck.data?.totalRecordCount || itemCountCheck.data?.items.length;
+    const itemCount = playlistSongs.data?.totalRecordCount ?? undefined;
+
+    const filterSortedSongs = useMemo(() => {
+        if (playlistSongs.data?.items) {
+            const sortBy = page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID;
+            const sortOrder = page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC;
+            return sortSongList(playlistSongs.data?.items, sortBy, sortOrder);
+        } else {
+            return [];
+        }
+    }, [playlistSongs.data?.items, page?.table.id, playlistId]);
 
     return (
         <AnimatedPage key={`playlist-detail-songList-${playlistId}`}>
@@ -203,12 +201,7 @@ const PlaylistDetailSongListRoute = () => {
                     </Box>
                 </motion.div>
             )}
-            <PlaylistDetailSongListContent
-                songs={
-                    server?.type === ServerType.SUBSONIC ? itemCountCheck.data?.items : undefined
-                }
-                tableRef={tableRef}
-            />
+            <PlaylistDetailSongListContent songs={filterSortedSongs} tableRef={tableRef} />
         </AnimatedPage>
     );
 };
