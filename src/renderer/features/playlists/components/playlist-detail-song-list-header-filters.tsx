@@ -374,6 +374,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
         handlePlayQueueAdd?.({
             byItemType: { id: [playlistId], type: LibraryItem.PLAYLIST },
             playType,
+            query: filters,
         });
     };
 

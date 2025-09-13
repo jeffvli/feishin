@@ -4,21 +4,23 @@ import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import {
     PlaylistSongListQuery,
+    PlaylistSongListQueryClientSide,
     ServerListItem,
     SongDetailQuery,
     SongListQuery,
     SongListResponse,
     SongListSort,
     SortOrder,
+    sortSongList,
 } from '/@/shared/types/domain-types';
 
 export const getPlaylistSongsById = async (args: {
     id: string;
-    query?: Partial<PlaylistSongListQuery>;
+    query?: Partial<PlaylistSongListQueryClientSide>;
     queryClient: QueryClient;
     server: ServerListItem;
 }) => {
-    const { id, queryClient, server } = args;
+    const { id, query, queryClient, server } = args;
 
     const queryFilter: PlaylistSongListQuery = {
         id,
@@ -41,6 +43,14 @@ export const getPlaylistSongsById = async (args: {
             staleTime: 1000 * 60,
         },
     );
+
+    if (res) {
+        res.items = sortSongList(
+            res.items,
+            query?.sortBy || SongListSort.ID,
+            query?.sortOrder || SortOrder.ASC,
+        );
+    }
 
     return res;
 };
