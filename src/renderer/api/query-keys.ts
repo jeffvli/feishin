@@ -9,7 +9,6 @@ import type {
     LyricsQuery,
     PlaylistDetailQuery,
     PlaylistListQuery,
-    PlaylistSongListQuery,
     RandomSongListQuery,
     SearchQuery,
     SimilarSongsQuery,
