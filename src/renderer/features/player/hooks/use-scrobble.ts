@@ -93,7 +93,7 @@ export const useScrobble = () => {
 
     const handleScrobbleFromSongChange = useCallback(
         (current: SongEvent, previous: SongEvent) => {
-            if (scrobbleSettings?.notify !== 'false' && current[0]?.id) {
+            if (scrobbleSettings?.notify && current[0]?.id) {
                 clearTimeout(notifyTimeoutId.current);
                 const currentSong = current[0];
 
@@ -114,7 +114,7 @@ export const useScrobble = () => {
                         new Notification(`${currentSong.name}`, {
                             body: `${artists}\n${currentSong.album}`,
                             icon: currentSong.imageUrl || undefined,
-                            silent: scrobbleSettings.notify === 'silent',
+                            silent: true,
                         });
                     }
                 }, 1000);

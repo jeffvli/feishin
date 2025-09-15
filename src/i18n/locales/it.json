@@ -403,8 +403,6 @@
         "hotkey_navigateHome": "vai alla schermata iniziale",
         "notify": "abilita notifiche delle tracce",
         "notify_description": "mostra una notifica quando cambia la traccia riprodotta",
-        "silentNotification": "Notifica silenziosa",
-        "silentNotification_description": "non riprodurre il suono della notifica",
         "preventSleepOnPlayback": "non sospendere in riproduzione",
         "preventSleepOnPlayback_description": "non sospendere il sistema quando la riproduzione è attiva",
         "discordDisplayType": "stile dello stato su {{discord}}"
