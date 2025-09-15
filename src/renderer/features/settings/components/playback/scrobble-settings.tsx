@@ -100,7 +100,7 @@ export const ScrobbleSettings = () => {
             control: (
                 <Switch
                     aria-label="Toggle notify"
-                    defaultChecked={settings.scrobble.notify}
+                    defaultChecked={settings.scrobble.notify !== 'false'}
                     onChange={async (e) => {
                         if (Notification.permission === 'denied') {
                             toast.error({
@@ -128,7 +128,7 @@ export const ScrobbleSettings = () => {
                                 ...settings,
                                 scrobble: {
                                     ...settings.scrobble,
-                                    notify: e.currentTarget.checked,
+                                    notify: e.currentTarget.checked ? 'true' : 'false',
                                 },
                             },
                         });
@@ -141,6 +141,33 @@ export const ScrobbleSettings = () => {
             }),
             isHidden: !('Notification' in window),
             title: t('setting.notify', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label="Silent notification"
+                    defaultChecked={settings.scrobble.notify === 'silent'}
+                    onChange={(e) => {
+                        if (!e) return;
+
+                        setSettings({
+                            playback: {
+                                ...settings,
+                                scrobble: {
+                                    ...settings.scrobble,
+                                    notify: e.currentTarget.checked ? 'silent' : 'true',
+                                },
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.silentNotification', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: settings.scrobble.notify === 'false',
+            title: t('setting.silentNotification', { postProcess: 'sentenceCase' }),
         },
     ];
 

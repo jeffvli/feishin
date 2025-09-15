@@ -624,6 +624,8 @@
         "lyricOffset_description": "offset the lyric by the specified amount of milliseconds",
         "notify": "enable song notifications",
         "notify_description": "show notifications when changing the current song",
+        "silentNotification": "silent notification",
+        "silentNotification_description": "do not play system audio when the notification appears",
         "minimizeToTray": "minimize to tray",
         "minimizeToTray_description": "minimize the application to the system tray",
         "minimumScrobblePercentage": "minimum scrobble duration (percentage)",
