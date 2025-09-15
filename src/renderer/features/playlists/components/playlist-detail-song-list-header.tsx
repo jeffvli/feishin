@@ -54,9 +54,7 @@ export const PlaylistDetailSongListHeader = ({
                     <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
                     <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
                     {showPlaylistDuration ? (
-                        <LibraryHeaderBar.PlaylistDuration>
-                            {detailQuery?.data?.duration}
-                        </LibraryHeaderBar.PlaylistDuration>
+                        <LibraryHeaderBar.PlaylistDuration time={detailQuery?.data?.duration} />
                     ) : (
                         <></>
                     )}
