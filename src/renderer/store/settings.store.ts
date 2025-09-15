@@ -240,7 +240,6 @@ export interface SettingsState {
         playButtonBehavior: Play;
         playerbarOpenDrawer: boolean;
         resume: boolean;
-        showPlaylistDuration: boolean;
         showQueueDrawerButton: boolean;
         sidebarCollapsedNavigation: boolean;
         sidebarCollapseShared: boolean;
@@ -398,7 +397,6 @@ const initialState: SettingsState = {
         playButtonBehavior: Play.NOW,
         playerbarOpenDrawer: false,
         resume: true,
-        showPlaylistDuration: false,
         showQueueDrawerButton: false,
         sidebarCollapsedNavigation: true,
         sidebarCollapseShared: false,
