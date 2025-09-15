@@ -377,8 +377,6 @@
         "transcode_description": "abilita la transcodifica in formati diversi",
         "playerbarOpenDrawer": "attiva/disattiva schermo intero",
         "playerbarOpenDrawer_description": "consente di cliccare sulla barra del lettore per aprire il lettore a schermo intero",
-        "showPlaylistDuration": "Mostra durata playlist",
-        "showPlaylistDuration_description": "Mostra la durata della playlist accanto al titolo",
         "replayGainClipping": "clipping di {{ReplayGain}}",
         "replayGainFallback": "metodo alternativo di {{ReplayGain}}",
         "transcodeBitrate": "bitrate per la transcodifica",
