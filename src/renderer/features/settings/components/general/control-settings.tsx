@@ -573,6 +573,29 @@ export const ControlSettings = () => {
             isHidden: false,
             title: t('setting.playerbarOpenDrawer', { postProcess: 'sentenceCase' }),
         },
+        {
+            control: (
+                <Switch
+                    aria-label=""
+                    defaultChecked={settings.showPlaylistDuration}
+                    onChange={(e) => {
+                        if (!e) return;
+                        setSettings({
+                            general: {
+                                ...settings,
+                                showPlaylistDuration: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.showPlaylistDuration', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.showPlaylistDuration', { postProcess: 'sentenceCase' }),
+        },
     ];
 
     return <SettingsSection options={controlOptions} />;

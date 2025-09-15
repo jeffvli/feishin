@@ -10,7 +10,7 @@ import { PlaylistDetailSongListHeaderFilters } from '/@/renderer/features/playli
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useCurrentServer } from '/@/renderer/store';
-import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Badge } from '/@/shared/components/badge/badge';
 import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -33,6 +33,7 @@ export const PlaylistDetailSongListHeader = ({
     const server = useCurrentServer();
     const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
     const handlePlayQueueAdd = usePlayQueueAdd();
+    const { showPlaylistDuration } = useGeneralSettings();
 
     const handlePlay = async (playType: Play) => {
         handlePlayQueueAdd?.({
@@ -52,6 +53,13 @@ export const PlaylistDetailSongListHeader = ({
                 <LibraryHeaderBar>
                     <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
                     <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
+                    {showPlaylistDuration ? (
+                        <LibraryHeaderBar.PlaylistDuration>
+                            {detailQuery?.data?.duration}
+                        </LibraryHeaderBar.PlaylistDuration>
+                    ) : (
+                        <></>
+                    )}
                     <Badge>
                         {itemCount === null || itemCount === undefined ? (
                             <SpinnerIcon />

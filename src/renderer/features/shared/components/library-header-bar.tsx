@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { ReactNode } from 'react';
 
 import styles from './library-header-bar.module.css';
@@ -43,6 +44,14 @@ const HeaderBadge = ({ children, isLoading, ...props }: HeaderBadgeProps) => {
     return <Badge {...props}>{isLoading ? <SpinnerIcon /> : children}</Badge>;
 };
 
+interface PlayListDurationBadgeProps extends BadgeProps {}
+
+const PlayListDurationBadge = ({ children }: PlayListDurationBadgeProps) => {
+    if (!children?.toString() || isNaN(Number(children!.toString()))) return <></>;
+    return <Badge>{dayjs(Number(children!.toString())).format('HH:mm:ss')}</Badge>;
+};
+
 LibraryHeaderBar.Title = Title;
 LibraryHeaderBar.PlayButton = HeaderPlayButton;
 LibraryHeaderBar.Badge = HeaderBadge;
+LibraryHeaderBar.PlaylistDuration = PlayListDurationBadge;

@@ -322,6 +322,7 @@
         "albumBackground_description": "aggiunge un'immagine di sfondo per le pagine degli album contenenti l'album art",
         "albumBackgroundBlur": "intensità sfocatura immagine di sfondo dell'album",
         "albumBackgroundBlur_description": "regola la quantità di sfocatura applicata all'immagine di sfondo dell'album",
+
         "artistConfiguration": "configurazione della pagina artista dell’album",
         "artistConfiguration_description": "configurare quali elementi vengono visualizzati, e in quale ordine, nella pagina dell'artista dell'album",
         "buttonSize": "dimensione del bottone nella barra di riproduzione",
@@ -376,6 +377,8 @@
         "transcode_description": "abilita la transcodifica in formati diversi",
         "playerbarOpenDrawer": "attiva/disattiva schermo intero",
         "playerbarOpenDrawer_description": "consente di cliccare sulla barra del lettore per aprire il lettore a schermo intero",
+        "showPlaylistDuration": "Mostra durata playlist",
+        "showPlaylistDuration_description": "Mostra la durata della playlist accanto al titolo",
         "replayGainClipping": "clipping di {{ReplayGain}}",
         "replayGainFallback": "metodo alternativo di {{ReplayGain}}",
         "transcodeBitrate": "bitrate per la transcodifica",
