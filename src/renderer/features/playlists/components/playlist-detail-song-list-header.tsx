@@ -52,7 +52,6 @@ export const PlaylistDetailSongListHeader = ({
                 <LibraryHeaderBar>
                     <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
                     <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
-                    <LibraryHeaderBar.PlaylistDuration time={detailQuery?.data?.duration} />
                     <Badge>
                         {itemCount === null || itemCount === undefined ? (
                             <SpinnerIcon />

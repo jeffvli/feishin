@@ -322,7 +322,6 @@
         "albumBackground_description": "aggiunge un'immagine di sfondo per le pagine degli album contenenti l'album art",
         "albumBackgroundBlur": "intensità sfocatura immagine di sfondo dell'album",
         "albumBackgroundBlur_description": "regola la quantità di sfocatura applicata all'immagine di sfondo dell'album",
-
         "artistConfiguration": "configurazione della pagina artista dell’album",
         "artistConfiguration_description": "configurare quali elementi vengono visualizzati, e in quale ordine, nella pagina dell'artista dell'album",
         "buttonSize": "dimensione del bottone nella barra di riproduzione",
