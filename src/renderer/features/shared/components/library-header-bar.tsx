@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 import { ReactNode } from 'react';
 
 import styles from './library-header-bar.module.css';
@@ -7,6 +8,8 @@ import { PlayButton, PlayButtonProps } from '/@/renderer/features/shared/compone
 import { Badge, BadgeProps } from '/@/shared/components/badge/badge';
 import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
+
+dayjs.extend(duration);
 
 interface LibraryHeaderBarProps {
     children: ReactNode;
@@ -50,7 +53,7 @@ interface PlayListDurationBadgeProps {
 
 const PlayListDurationBadge = ({ time }: PlayListDurationBadgeProps) => {
     if (time === null || time === undefined) return <SpinnerIcon />;
-    return <Badge>{dayjs(time).format('HH:mm:ss')}</Badge>;
+    return <Badge>{dayjs.duration(time).format('HH:mm:ss')}</Badge>;
 };
 
 LibraryHeaderBar.Title = Title;
