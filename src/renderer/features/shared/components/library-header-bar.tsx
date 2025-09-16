@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { ReactNode } from 'react';
 
 import styles from './library-header-bar.module.css';
