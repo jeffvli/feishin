@@ -172,6 +172,11 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         />
                     )}
                     <PlayButton
+                        className={
+                            status === PlayerStatus.PAUSED
+                                ? 'player-state-paused'
+                                : 'player-state-playing'
+                        }
                         disabled={currentSong?.id === undefined}
                         isPaused={status === PlayerStatus.PAUSED}
                         onClick={handlePlayPause}
@@ -253,7 +258,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             </div>
             <div className={styles.sliderContainer}>
                 <div className={styles.sliderValueWrapper}>
-                    <Text fw={600} isMuted isNoSelect size="xs">
+                    <Text className="elapsed-time" fw={600} isMuted isNoSelect size="xs">
                         {formattedTime}
                     </Text>
                 </div>
@@ -281,7 +286,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                     />
                 </div>
                 <div className={styles.sliderValueWrapper}>
-                    <Text fw={600} isMuted isNoSelect size="xs">
+                    <Text className="total-duration" fw={600} isMuted isNoSelect size="xs">
                         {duration}
                     </Text>
                 </div>

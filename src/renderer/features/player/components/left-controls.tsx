@@ -104,7 +104,7 @@ export const LeftControls = () => {
                                     openDelay={500}
                                 >
                                     <Image
-                                        className={styles.playerbarImage}
+                                        className={clsx(styles.playerbarImage, 'player-cover-art')}
                                         loading="eager"
                                         src={currentSong?.imageUrl ?? ''}
                                     />
@@ -139,6 +139,7 @@ export const LeftControls = () => {
                     <div className={styles.lineItem} onClick={stopPropagation}>
                         <Group align="center" gap="xs" wrap="nowrap">
                             <Text
+                                className="song-title"
                                 component={Link}
                                 fw={500}
                                 isLink
@@ -164,7 +165,7 @@ export const LeftControls = () => {
                         </Group>
                     </div>
                     <div
-                        className={clsx(styles.lineItem, styles.secondary)}
+                        className={clsx(styles.lineItem, styles.secondary, 'song-artist')}
                         onClick={stopPropagation}
                     >
                         {artists?.map((artist, index) => (
@@ -190,7 +191,7 @@ export const LeftControls = () => {
                         ))}
                     </div>
                     <div
-                        className={clsx(styles.lineItem, styles.secondary)}
+                        className={clsx(styles.lineItem, styles.secondary, 'song-album')}
                         onClick={stopPropagation}
                     >
                         <Text

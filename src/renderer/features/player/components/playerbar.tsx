@@ -56,7 +56,7 @@ export const Playerbar = () => {
 
     return (
         <div
-            className={styles.container}
+            className={`${styles.container} media-player`}
             onClick={playerbarOpenDrawer ? handleToggleFullScreenPlayer : undefined}
         >
             <div className={styles.controlsGrid}>
