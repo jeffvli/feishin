@@ -61,24 +61,32 @@ export const App = () => {
     const cssRef = useRef<HTMLStyleElement | null>(null);
     const reloadStateHandled = useRef(false);
     const playerQueue = usePlayerStore((state) => state.queue);
-    const playerCurrent = usePlayerStore((state) => state.current);
+    const playerCurrentIndex = usePlayerStore((state) => state.current.index);
+    const playerCurrentNextIndex = usePlayerStore((state) => state.current.nextIndex);
+    const playerCurrentShuffledIndex = usePlayerStore((state) => state.current.shuffledIndex);
+    const playerCurrentSong = usePlayerStore((state) => state.current.song);
     const generalSettingShouldResume = useSettingsStore((state) => state.general.resume);
-    const { index, nextIndex, shuffledIndex, song } = playerCurrent;
 
     const savePlayerQueueState = useCallback(() => {
         const data = {
             current: {
-                index,
-                nextIndex,
-                shuffledIndex,
-                song,
+                index: playerCurrentIndex,
+                nextIndex: playerCurrentNextIndex,
+                shuffledIndex: playerCurrentShuffledIndex,
+                song: playerCurrentSong,
                 status: PlayerStatus.PAUSED,
                 time: 0,
             },
             queue: playerQueue,
         };
         utils?.saveQueue(data);
-    }, [index, nextIndex, shuffledIndex, song, playerQueue]);
+    }, [
+        playerCurrentIndex,
+        playerCurrentNextIndex,
+        playerCurrentShuffledIndex,
+        playerCurrentSong,
+        playerQueue,
+    ]);
 
     useEffect(() => {
         if (!reloadStateHandled.current) {
