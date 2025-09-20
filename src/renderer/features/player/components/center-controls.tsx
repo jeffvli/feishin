@@ -5,6 +5,7 @@ import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { PlaybackSelectors } from '../../../../shared/constants/playback-selectors';
 import styles from './center-controls.module.css';
 
 import { PlayButton, PlayerButton } from '/@/renderer/features/player/components/player-button';
@@ -258,7 +259,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             </div>
             <div className={styles.sliderContainer}>
                 <div className={styles.sliderValueWrapper}>
-                    <Text className="elapsed-time" fw={600} isMuted isNoSelect size="xs">
+                    <Text
+                        className={PlaybackSelectors.elapsedTime}
+                        fw={600}
+                        isMuted
+                        isNoSelect
+                        size="xs"
+                    >
                         {formattedTime}
                     </Text>
                 </div>
@@ -286,7 +293,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                     />
                 </div>
                 <div className={styles.sliderValueWrapper}>
-                    <Text className="total-duration" fw={600} isMuted isNoSelect size="xs">
+                    <Text
+                        className={PlaybackSelectors.totalDuration}
+                        fw={600}
+                        isMuted
+                        isNoSelect
+                        size="xs"
+                    >
                         {duration}
                     </Text>
                 </div>
