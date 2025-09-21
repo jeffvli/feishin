@@ -1,6 +1,5 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
-import { IDatasource } from '@ag-grid-community/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
@@ -9,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
 import i18n from '/@/i18n/i18n';
-import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
@@ -23,7 +21,6 @@ import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     PersistedTableColumn,
-    SongListFilter,
     useCurrentServer,
     usePlaylistDetailStore,
     useSetPlaylistDetailFilters,
@@ -42,7 +39,7 @@ import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import {
     LibraryItem,
-    PlaylistSongListQuery,
+    PlaylistSongListQueryClientSide,
     ServerType,
     SongListSort,
     SortOrder,
@@ -155,7 +152,7 @@ const FILTERS = {
         },
         {
             defaultOrder: SortOrder.ASC,
-            name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+            name: i18n.t('filter.genre', { postProcess: 'titleCase' }),
             value: SongListSort.GENRE,
         },
         {
@@ -242,11 +239,6 @@ const FILTERS = {
         },
         {
             defaultOrder: SortOrder.DESC,
-            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
-            value: SongListSort.RECENTLY_PLAYED,
-        },
-        {
-            defaultOrder: SortOrder.DESC,
             name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
             value: SongListSort.YEAR,
         },
@@ -270,7 +262,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
     const setPage = useSetPlaylistStore();
     const setFilter = useSetPlaylistDetailFilters();
     const page = usePlaylistDetailStore();
-    const filters: Partial<PlaylistSongListQuery> = {
+    const filters: Partial<PlaylistSongListQueryClientSide> = {
         sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
         sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
     };
@@ -297,68 +289,18 @@ export const PlaylistDetailSongListHeaderFilters = ({
 
     const debouncedHandleItemSize = debounce(handleItemSize, 20);
 
-    const handleFilterChange = useCallback(
-        async (filters: SongListFilter) => {
-            if (server?.type !== ServerType.SUBSONIC) {
-                const dataSource: IDatasource = {
-                    getRows: async (params) => {
-                        const limit = params.endRow - params.startRow;
-                        const startIndex = params.startRow;
+    const handleFilterChange = useCallback(async () => {
+        tableRef.current?.api.redrawRows();
+        tableRef.current?.api.ensureIndexVisible(0, 'top');
 
-                        const queryKey = queryKeys.playlists.songList(
-                            server?.id || '',
-                            playlistId,
-                            {
-                                id: playlistId,
-                                limit,
-                                startIndex,
-                                ...filters,
-                            },
-                        );
-
-                        const songsRes = await queryClient.fetchQuery(
-                            queryKey,
-                            async ({ signal }) =>
-                                api.controller.getPlaylistSongList({
-                                    apiClientProps: {
-                                        server,
-                                        signal,
-                                    },
-                                    query: {
-                                        id: playlistId,
-                                        limit,
-                                        startIndex,
-                                        ...filters,
-                                    },
-                                }),
-                            { cacheTime: 1000 * 60 * 1 },
-                        );
-
-                        params.successCallback(
-                            songsRes?.items || [],
-                            songsRes?.totalRecordCount || 0,
-                        );
-                    },
-                    rowCount: undefined,
-                };
-                tableRef.current?.api.setDatasource(dataSource);
-                tableRef.current?.api.purgeInfiniteCache();
-                tableRef.current?.api.ensureIndexVisible(0, 'top');
-            } else {
-                tableRef.current?.api.redrawRows();
-                tableRef.current?.api.ensureIndexVisible(0, 'top');
-            }
-
-            if (page.display === ListDisplayType.TABLE_PAGINATED) {
-                setPagination({ data: { currentPage: 0 } });
-            }
-        },
-        [tableRef, page.display, server, playlistId, queryClient, setPagination],
-    );
+        if (page.display === ListDisplayType.TABLE_PAGINATED) {
+            setPagination({ data: { currentPage: 0 } });
+        }
+    }, [tableRef, page.display, setPagination]);
 
     const handleRefresh = () => {
-        queryClient.invalidateQueries(queryKeys.albums.list(server?.id || ''));
-        handleFilterChange({ ...page?.table.id[playlistId].filter, ...filters });
+        queryClient.invalidateQueries(queryKeys.playlists.songList(server?.id || '', playlistId));
+        handleFilterChange();
     };
 
     const handleSetSortBy = useCallback(
@@ -369,20 +311,20 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 (f) => f.value === e.currentTarget.value,
             )?.defaultOrder;
 
-            const updatedFilters = setFilter(playlistId, {
+            setFilter(playlistId, {
                 sortBy: e.currentTarget.value as SongListSort,
                 sortOrder: sortOrder || SortOrder.ASC,
             });
 
-            handleFilterChange(updatedFilters);
+            handleFilterChange();
         },
         [handleFilterChange, playlistId, server?.type, setFilter],
     );
 
     const handleToggleSortOrder = useCallback(() => {
         const newSortOrder = filters.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
-        const updatedFilters = setFilter(playlistId, { sortOrder: newSortOrder });
-        handleFilterChange(updatedFilters);
+        setFilter(playlistId, { sortOrder: newSortOrder });
+        handleFilterChange();
     }, [filters.sortOrder, handleFilterChange, playlistId, setFilter]);
 
     const handleSetViewType = useCallback(
@@ -432,6 +374,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
         handlePlayQueueAdd?.({
             byItemType: { id: [playlistId], type: LibraryItem.PLAYLIST },
             playType,
+            query: filters,
         });
     };
 

@@ -46,6 +46,11 @@ export const LeftControls = () => {
     );
 
     const handleToggleFullScreenPlayer = (e?: KeyboardEvent | MouseEvent<HTMLDivElement>) => {
+        // don't toggle if right click
+        if (e && 'button' in e && e.button === 2) {
+            return;
+        }
+
         e?.stopPropagation();
         setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
     };
@@ -53,6 +58,15 @@ export const LeftControls = () => {
     const handleToggleSidebarImage = (e?: MouseEvent<HTMLButtonElement>) => {
         e?.stopPropagation();
         setSideBar({ image: true });
+    };
+
+    const handleToggleContextMenu = (e: MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isSongDefined && !isFullScreenPlayerExpanded) {
+            handleGeneralContextMenu(e, [currentSong!]);
+        }
     };
 
     const stopPropagation = (e?: MouseEvent) => e?.stopPropagation();
@@ -79,6 +93,7 @@ export const LeftControls = () => {
                                 initial={{ opacity: 0, x: -50 }}
                                 key="playerbar-image"
                                 onClick={handleToggleFullScreenPlayer}
+                                onContextMenu={handleToggleContextMenu}
                                 role="button"
                                 transition={{ duration: 0.2, ease: 'easeIn' }}
                             >
@@ -127,6 +142,7 @@ export const LeftControls = () => {
                                 component={Link}
                                 fw={500}
                                 isLink
+                                onContextMenu={handleToggleContextMenu} // Ajout du clic droit
                                 overflow="hidden"
                                 to={AppRoute.NOW_PLAYING}
                             >

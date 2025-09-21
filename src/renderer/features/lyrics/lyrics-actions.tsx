@@ -24,7 +24,7 @@ interface LyricsActionsProps {
     onRemoveLyric: () => void;
     onResetLyric: () => void;
     onSearchOverride: (params: LyricsOverride) => void;
-    onTranslateLyric: () => void;
+    onTranslateLyric?: () => void;
     setIndex: (idx: number) => void;
 }
 
@@ -135,7 +135,7 @@ export const LyricsActions = ({
             </div>
 
             <div style={{ position: 'absolute', right: 0, top: -50 }}>
-                {isDesktop && sources.length ? (
+                {isDesktop && sources.length && onTranslateLyric ? (
                     <Button
                         disabled={isActionsDisabled}
                         onClick={onTranslateLyric}

@@ -181,6 +181,7 @@ export const LyricSettings = () => {
         {
             control: (
                 <Select
+                    clearable
                     data={['Microsoft Azure', 'Google Cloud']}
                     onChange={(value) => {
                         setSettings({ lyrics: { ...settings, translationApiProvider: value } });

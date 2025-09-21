@@ -92,7 +92,9 @@
         "additionalParticipants": "muut osallistujat",
         "tags": "tägit",
         "newVersion": "uusi versio on asennettu ({{version}})",
-        "viewReleaseNotes": "katsele julkaisutietoja"
+        "viewReleaseNotes": "katsele julkaisutietoja",
+        "bitDepth": "bittisyvyys",
+        "sampleRate": "näytteenottotaajuus"
     },
     "entity": {
         "album_one": "albumi",
@@ -178,7 +180,8 @@
         "playbackError": "mediaa toistaessa tapahtui virhe",
         "remotePortWarning": "käynnistä palvelin uudestaan ottaaksesi uuden portin käyttöön",
         "endpointNotImplementedError": "päätepiste {{endpoint}} ei ole toteutettu {{serverType}} varten",
-        "badValue": "kelpaamaton optio \"{{value}}\". tätä arvoa ei ole enää olemassa"
+        "badValue": "kelpaamaton optio \"{{value}}\". tätä arvoa ei ole enää olemassa",
+        "notificationDenied": "luvat ilmouilmoituksia varten evättiin. tällä asetuksella ei ole vaikutusta"
     },
     "filter": {
         "album": "$t(entity.album_one)",
@@ -524,7 +527,9 @@
         "discordPausedStatus": "näytä rich presence tauotettuna",
         "discordPausedStatus_description": "ollessak käytössä, status näyttää milloin soitin on tautotettuna",
         "preservePitch": "säilytä sävelkorkeus",
-        "preservePitch_description": "säilytä sävelkorkeus toistonopeutta muokatessa"
+        "preservePitch_description": "säilytä sävelkorkeus toistonopeutta muokatessa",
+        "notify": "käytä kappaleen ilmoituksia",
+        "notify_description": "näytä limoituksia, kun vaihdetaan nykyistä kappaletta"
     },
     "page": {
         "itemDetail": {

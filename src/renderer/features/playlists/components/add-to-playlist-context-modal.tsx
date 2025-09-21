@@ -36,6 +36,7 @@ export const AddToPlaylistContextModal = ({
     const { albumId, artistId, genreId, songId } = innerProps;
     const server = useCurrentServer();
     const [isLoading, setIsLoading] = useState(false);
+    const [isDropdownOpened, setIsDropdownOpened] = useState(true);
 
     const addToPlaylistMutation = useAddToPlaylist({});
 
@@ -144,12 +145,7 @@ export const AddToPlaylistContextModal = ({
             const uniqueSongIds: string[] = [];
 
             if (values.skipDuplicates) {
-                const query = {
-                    id: playlistId,
-                    startIndex: 0,
-                };
-
-                const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId, query);
+                const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId);
 
                 const playlistSongsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
                     if (!server)
@@ -163,9 +159,6 @@ export const AddToPlaylistContextModal = ({
                         },
                         query: {
                             id: playlistId,
-                            sortBy: SongListSort.ID,
-                            sortOrder: SortOrder.ASC,
-                            startIndex: 0,
                         },
                     });
                 });
@@ -229,6 +222,7 @@ export const AddToPlaylistContextModal = ({
                         clearable
                         data={playlistSelect}
                         disabled={playlistList.isLoading}
+                        dropdownOpened={isDropdownOpened}
                         label={t('form.addToPlaylist.input', {
                             context: 'playlists',
                             postProcess: 'titleCase',
@@ -236,6 +230,11 @@ export const AddToPlaylistContextModal = ({
                         searchable
                         size="md"
                         {...form.getInputProps('playlistId')}
+                        onChange={(e) => {
+                            setIsDropdownOpened(false);
+                            form.getInputProps('playlistId').onChange(e);
+                        }}
+                        onClick={() => setIsDropdownOpened(true)}
                     />
                     <Switch
                         label={t('form.addToPlaylist.input', {

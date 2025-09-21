@@ -20,7 +20,8 @@
         "openIn": {
             "lastfm": "In Last.fm öffnen",
             "musicbrainz": "In MusicBrainz öffnen"
-        }
+        },
+        "moveToNext": "nach unten verschieben"
     },
     "common": {
         "backward": "rückwärts",
@@ -115,7 +116,10 @@
         "albumPeak": "Album-Spitzenpegel",
         "albumGain": "Album-Pegelverstärkung",
         "tags": "tags",
-        "viewReleaseNotes": "Release Notes anzeigen"
+        "viewReleaseNotes": "Release Notes anzeigen",
+        "newVersion": "eine neue Version wurde installiert ({{version}})",
+        "bitDepth": "Bittiefe",
+        "sampleRate": "Abtastrate"
     },
     "error": {
         "remotePortWarning": "Starten Sie den Server neu, um den neuen Port anzuwenden",
@@ -139,7 +143,9 @@
         "loginRateError": "Zu viele Anmeldeversuche, bitte versuche es in einigen Sekunden erneut",
         "badAlbum": "Sie sehen diese Seite, weil dieses Lied nicht Teil eines Albums ist. Wahrscheinlich sehen Sie dieses Problem, wenn Sie einen Song in Ihrem Musikordner auf oberster Ebene haben. Jellyfin gruppiert nur Songs, wenn sie sich in einem Ordner befinden.",
         "networkError": "ein Netzwerkfehler ist aufgetreten",
-        "openError": "datei kann nicht geöffnet werden"
+        "openError": "datei kann nicht geöffnet werden",
+        "badValue": "ungültige option \"{{value}}\". Dieser Wert existiert nicht mehr",
+        "notificationDenied": "Berechtigungen über Benachrichtigungen wurden verweigert. Diese Einstellung hat keinen Effekt"
     },
     "filter": {
         "mostPlayed": "Meistgespielt",
@@ -360,12 +366,15 @@
                 "lyricAlignment": "Songtext-Ausrichtung",
                 "useImageAspectRatio": "Bildseitenverhältnis verwenden",
                 "lyricGap": "Songtext-Lücke",
-                "dynamicIsImage": "Hintergrundbild aktivieren"
+                "dynamicIsImage": "Hintergrundbild aktivieren",
+                "dynamicImageBlur": "Größe der Bildunschärfe",
+                "lyricOffset": "Zeitversetzung des Liedtexts (ms)"
             },
             "upNext": "als nächstes",
             "lyrics": "Songtexte",
             "related": "Ähnliche",
-            "noLyrics": "Keine Liedtexte gefunden"
+            "noLyrics": "Keine Liedtexte gefunden",
+            "visualizer": "visualizer"
         },
         "appMenu": {
             "selectServer": "Server auswählen",
@@ -418,7 +427,8 @@
             "removeFromQueue": "$t(action.removeFromQueue)",
             "playShuffled": "$t(player.shuffle)",
             "download": "Download",
-            "playSimilarSongs": "$t(player.playSimilarSongs)"
+            "playSimilarSongs": "$t(player.playSimilarSongs)",
+            "moveToNext": "$t(action.moveToNext)"
         },
         "sidebar": {
             "nowPlaying": "läuft gerade",
@@ -517,7 +527,8 @@
         "unfavorite": "Aus Favoriten entfernen",
         "skip_forward": "Vorspulen",
         "skip": "Überspringen",
-        "playSimilarSongs": "Ähnliche Lieder abspielen"
+        "playSimilarSongs": "Ähnliche Lieder abspielen",
+        "viewQueue": "Warteschlange anzeigen"
     },
     "setting": {
         "audioDevice_description": "Wählen Sie das Audiogerät aus, das für die Wiedergabe verwendet werden soll (nur Webplayer)",
@@ -691,6 +702,13 @@
         "lastfm": "zeige last.fm links",
         "lastfm_description": "zeige links zu last.fm auf dem Künstler/Album-Seiten",
         "musicbrainz": "Zeig musicbrainz links",
-        "customCssEnable": "aktiviere Benutzerdefinierte css"
+        "customCssEnable": "aktiviere Benutzerdefinierte css",
+        "albumBackground_description": "fügt ein Hintergrundbild für die Albumseiten hinzu, welche das Albumcover zeigen",
+        "albumBackgroundBlur": "Größe der Album-Bildunschärfe",
+        "albumBackgroundBlur_description": "passt die Stärke der Unschärfe an, welche auf das Hintergrundbild des Albums angewandt wird",
+        "clearCacheSuccess": "Cache erfolgreich geleert",
+        "contextMenu": "Kontextmenü-Einstellungen (Rechtsklick)",
+        "customCssEnable_description": "ermöglicht das Schreiben benutzerdefinierten CSS.",
+        "doubleClickBehavior": "bei Doppelklick alle gesuchten Tracks zur Warteschlange hinzufügen"
     }
 }

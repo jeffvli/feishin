@@ -9,8 +9,17 @@ import {
 import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { AnimatePresence } from 'motion/react';
-import { createContext, Fragment, ReactNode, useCallback, useMemo, useState } from 'react';
+import {
+    createContext,
+    Fragment,
+    ReactNode,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
+import { generatePath, useNavigate } from 'react-router-dom';
 
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
@@ -26,6 +35,7 @@ import { updateSong } from '/@/renderer/features/player/update-remote-song';
 import { useDeletePlaylist } from '/@/renderer/features/playlists';
 import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
 import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
+import { AppRoute } from '/@/renderer/router/routes';
 import {
     getServerById,
     useAuthStore,
@@ -88,24 +98,12 @@ export interface ContextMenuProviderProps {
     children: ReactNode;
 }
 
-function RatingIcon({ rating }: { rating: number }) {
-    return (
-        <Rating
-            readOnly
-            style={{
-                pointerEvents: 'none',
-                size: 'var(--theme-font-size-md)',
-            }}
-            value={rating}
-        />
-    );
-}
-
 export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const disabledItems = useSettingsStore((state) => state.general.disabledContextMenu);
     const { t } = useTranslation();
     const [opened, setOpened] = useState(false);
-    const clickOutsideRef = useClickOutside(() => setOpened(false));
+
+    const clickOutsideRef = useClickOutside(() => setOpened(false), ['mousedown', 'touchstart']);
 
     const viewport = useViewportSize();
     const server = useCurrentServer();
@@ -122,7 +120,26 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         yPos: 0,
     });
 
+    const [rating, setRating] = useState<number>(0);
+
+    useEffect(() => {
+        if (opened && ctx.data.length > 0) {
+            if (ctx.data.length === 1) {
+                setRating(ctx.data[0].userRating ?? 0);
+            } else {
+                const firstRating = ctx.data[0].userRating ?? 0;
+                const allSameRating = ctx.data.every(
+                    (item) => (item.userRating ?? 0) === firstRating,
+                );
+                setRating(allSameRating ? firstRating : 0);
+            }
+        } else {
+            setRating(0);
+        }
+    }, [ctx.data, opened]);
+
     const handlePlayQueueAdd = usePlayQueueAdd();
+    const navigate = useNavigate();
 
     const openContextMenu = useCallback(
         (args: OpenContextMenuProps) => {
@@ -524,7 +541,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                         });
                     },
                     onSuccess: () => {
-                        ctx.context?.tableRef?.current?.api?.refreshInfiniteCache();
                         closeAllModals();
                     },
                 },
@@ -552,7 +568,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const updateRatingMutation = useSetRating({});
 
     const handleUpdateRating = useCallback(
-        (rating: number) => {
+        (newRating: number) => {
             if (!ctx.dataNodes && !ctx.data) return;
 
             let uniqueServerIds: string[] = [];
@@ -574,6 +590,8 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 }, [] as string[]);
             }
 
+            const ratingToSet = newRating === rating ? 0 : newRating;
+
             for (const serverId of uniqueServerIds) {
                 if (ctx.dataNodes) {
                     items = ctx.dataNodes
@@ -587,7 +605,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                     {
                         query: {
                             item: items,
-                            rating,
+                            rating: ratingToSet,
                         },
                         serverId,
                     },
@@ -595,7 +613,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                         onSuccess: () => {
                             if (ctx.dataNodes) {
                                 for (const node of ctx.dataNodes) {
-                                    node.setData({ ...node.data, userRating: rating });
+                                    node.setData({ ...node.data, userRating: ratingToSet });
                                 }
                             }
                         },
@@ -603,7 +621,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 );
             }
         },
-        [ctx.data, ctx.dataNodes, updateRatingMutation],
+        [ctx.data, ctx.dataNodes, updateRatingMutation, rating],
     );
 
     const playbackType = usePlaybackType();
@@ -724,6 +742,24 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         }
     }, [ctx.data, server]);
 
+    const handleGoToAlbum = useCallback(() => {
+        const item = ctx.data[0];
+        if (item.albumId) {
+            navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: item.albumId }));
+        }
+    }, [ctx.data, navigate]);
+
+    const handleGoToAlbumArtist = useCallback(() => {
+        const item = ctx.data[0];
+        if (item.albumArtists && item.albumArtists.length > 0) {
+            navigate(
+                generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                    albumArtistId: item.albumArtists[0].id,
+                }),
+            );
+        }
+    }, [ctx.data, navigate]);
+
     const contextMenuItems: Record<ContextMenuItemType, ContextMenuItem> = useMemo(() => {
         return {
             addToFavorites: {
@@ -761,6 +797,23 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 label: t('page.contextMenu.download', { postProcess: 'sentenceCase' }),
                 leftIcon: <Icon icon="download" />,
                 onClick: handleDownload,
+            },
+            goToAlbum: {
+                disabled: ctx.data?.length !== 1 || !ctx.data[0]?.albumId,
+                id: 'goToAlbum',
+                label: t('page.contextMenu.goToAlbum', { postProcess: 'sentenceCase' }),
+                leftIcon: <Icon icon="album" />,
+                onClick: handleGoToAlbum,
+            },
+            goToAlbumArtist: {
+                disabled:
+                    ctx.data?.length !== 1 ||
+                    !ctx.data[0]?.albumArtists ||
+                    ctx.data[0]?.albumArtists?.length === 0,
+                id: 'goToAlbumArtist',
+                label: t('page.contextMenu.goToAlbumArtist', { postProcess: 'sentenceCase' }),
+                leftIcon: <Icon icon="artist" />,
+                onClick: handleGoToAlbumArtist,
             },
             moveToBottomOfQueue: {
                 id: 'moveToBottomOfQueue',
@@ -829,43 +882,22 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 onClick: handleRemoveSelected,
             },
             setRating: {
-                children: [
-                    {
-                        id: 'zeroStar',
-                        label: <RatingIcon rating={0} />,
-                        onClick: () => handleUpdateRating(0),
-                    },
-                    {
-                        id: 'oneStar',
-                        label: <RatingIcon rating={1} />,
-                        onClick: () => handleUpdateRating(1),
-                    },
-                    {
-                        id: 'twoStar',
-                        label: <RatingIcon rating={2} />,
-                        onClick: () => handleUpdateRating(2),
-                    },
-                    {
-                        id: 'threeStar',
-                        label: <RatingIcon rating={3} />,
-                        onClick: () => handleUpdateRating(3),
-                    },
-                    {
-                        id: 'fourStar',
-                        label: <RatingIcon rating={4} />,
-                        onClick: () => handleUpdateRating(4),
-                    },
-                    {
-                        id: 'fiveStar',
-                        label: <RatingIcon rating={5} />,
-                        onClick: () => handleUpdateRating(5),
-                    },
-                ],
                 id: 'setRating',
                 label: t('action.setRating', { postProcess: 'sentenceCase' }),
                 leftIcon: <Icon icon="star" />,
                 onClick: () => {},
-                rightIcon: <Icon icon="arrowRightS" />,
+                rightIcon: (
+                    <Group>
+                        <Rating
+                            onChange={(e) => {
+                                handleUpdateRating(e);
+                                setRating(e);
+                            }}
+                            size="xs"
+                            value={rating}
+                        />
+                    </Group>
+                ),
             },
             shareItem: {
                 disabled: !hasFeature(server, ServerFeature.SHARING_ALBUM_SONG),
@@ -899,9 +931,12 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         handleRemoveSelected,
         server,
         handleShareItem,
+        handleGoToAlbum,
+        handleGoToAlbumArtist,
         handleOpenItemDetails,
         handlePlay,
         handleUpdateRating,
+        rating,
     ]);
 
     const mergedRef = useMergedRef(ref, clickOutsideRef);
@@ -950,12 +985,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                                                                 </ContextMenuButton>
                                                             </HoverCard.Target>
                                                             <HoverCard.Dropdown>
-                                                                <Stack
-                                                                    gap={0}
-                                                                    // Pass in this ref to the stack component as well
-                                                                    // so that it is treated as "inside" for clickOutsideRef
-                                                                    ref={mergedRef}
-                                                                >
+                                                                <Stack gap={0}>
                                                                     {contextMenuItems[
                                                                         item.id
                                                                     ].children?.map((child) => (

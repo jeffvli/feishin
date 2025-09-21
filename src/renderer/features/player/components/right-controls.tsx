@@ -115,7 +115,9 @@ export const RightControls = () => {
     };
 
     const isSongDefined = Boolean(currentSong?.id);
-    const showRating = isSongDefined && server?.type === ServerType.NAVIDROME;
+    const showRating =
+        isSongDefined &&
+        (server?.type === ServerType.NAVIDROME || server?.type === ServerType.SUBSONIC);
 
     useHotkeys([
         [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDown],

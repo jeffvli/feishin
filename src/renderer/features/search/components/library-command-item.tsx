@@ -37,6 +37,7 @@ export const LibraryCommandItem = ({
     const handlePlay = useCallback(
         (e: SyntheticEvent, id: string, playType: Play) => {
             e.stopPropagation();
+            e.preventDefault();
             handlePlayQueueAdd?.({
                 byItemType: {
                     id: [id],

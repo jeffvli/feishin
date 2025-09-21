@@ -8,6 +8,7 @@ import { Platform } from '/@/shared/types/types';
 export interface AppSlice extends AppState {
     actions: {
         setAppStore: (data: Partial<AppSlice>) => void;
+        setPrivateMode: (enabled: boolean) => void;
         setSideBar: (options: Partial<SidebarProps>) => void;
         setTitleBar: (options: Partial<TitlebarProps>) => void;
     };
@@ -17,6 +18,7 @@ export interface AppState {
     commandPalette: CommandPaletteProps;
     isReorderingQueue: boolean;
     platform: Platform;
+    privateMode: boolean;
     sidebar: SidebarProps;
     titlebar: TitlebarProps;
 }
@@ -50,6 +52,11 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                     setAppStore: (data) => {
                         set({ ...get(), ...data });
                     },
+                    setPrivateMode: (privateMode) => {
+                        set((state) => {
+                            state.privateMode = privateMode;
+                        });
+                    },
                     setSideBar: (options) => {
                         set((state) => {
                             state.sidebar = { ...state.sidebar, ...options };
@@ -81,6 +88,7 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                 },
                 isReorderingQueue: false,
                 platform: Platform.WINDOWS,
+                privateMode: false,
                 sidebar: {
                     collapsed: false,
                     expanded: [],

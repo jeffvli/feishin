@@ -13,5 +13,6 @@
 .root {
     padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
     font-weight: 500;
+    color: var(--theme-colors-foreground);
     background: var(--theme-colors-surface);
 }

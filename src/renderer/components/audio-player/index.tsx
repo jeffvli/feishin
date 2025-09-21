@@ -225,6 +225,28 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
         setIsTransitioning(false);
     };
 
+    const handleOnError = (playerRef: React.RefObject<ReactPlayer>) => {
+        return ({ target }: ErrorEvent) => {
+            const { current: player } = playerRef;
+            if (!player || !(target instanceof Audio)) {
+                return;
+            }
+
+            const { error } = target;
+            if (error?.code !== MediaError.MEDIA_ERR_DECODE) {
+                return;
+            }
+
+            const duration = player.getDuration();
+            const currentTime = player.getCurrentTime();
+
+            // Decode error within last second, handle as track ended
+            if (duration && duration - currentTime < 1) {
+                handleOnEnded();
+            }
+        };
+    };
+
     useEffect(() => {
         if (status === PlayerStatus.PLAYING) {
             if (currentPlayer === 1) {
@@ -424,6 +446,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                 muted={muted}
                 // If there is no stream url, we do not need to handle when the audio finishes
                 onEnded={stream1 ? handleOnEnded : undefined}
+                onError={handleOnError(player1Ref)}
                 onProgress={
                     playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1
                 }
@@ -443,6 +466,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                 height={0}
                 muted={muted}
                 onEnded={stream2 ? handleOnEnded : undefined}
+                onError={handleOnError(player2Ref)}
                 onProgress={
                     playbackStyle === PlaybackStyle.GAPLESS ? handleGapless2 : handleCrossfade2
                 }

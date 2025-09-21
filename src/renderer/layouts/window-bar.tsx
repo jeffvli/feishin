@@ -12,10 +12,9 @@ import macMinHover from './assets/min-mac-hover.png';
 import macMin from './assets/min-mac.png';
 import styles from './window-bar.module.css';
 
-import { useCurrentStatus, useQueueStatus } from '/@/renderer/store';
-import { useWindowSettings } from '/@/renderer/store/settings.store';
+import { useWindowSettings } from '/@/renderer/store';
 import { Text } from '/@/shared/components/text/text';
-import { Platform, PlayerStatus } from '/@/shared/types/types';
+import { Platform } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -122,23 +121,15 @@ const MacOsControls = ({ controls, title }: WindowBarControlsProps) => {
     );
 };
 
-export const WindowBar = () => {
-    const playerStatus = useCurrentStatus();
-    const { currentSong, index, length } = useQueueStatus();
-    const { windowBarStyle } = useWindowSettings();
+interface WindowBarProps {
+    title: string;
+}
 
-    const statusString = playerStatus === PlayerStatus.PAUSED ? '(Paused) ' : '';
-    const queueString = length ? `(${index + 1} / ${length}) ` : '';
-    const title = length
-        ? currentSong?.artistName
-            ? `${statusString}${queueString}${currentSong?.name} — ${currentSong?.artistName}`
-            : `${statusString}${queueString}${currentSong?.name}`
-        : 'Feishin';
-    document.title = title;
+export const WindowBar = ({ title }: WindowBarProps) => {
+    const { windowBarStyle } = useWindowSettings();
+    const handleMinimize = () => minimize();
 
     const [max, setMax] = useState(localSettings?.env.START_MAXIMIZED || false);
-
-    const handleMinimize = () => minimize();
 
     const handleMaximize = useCallback(() => {
         if (max) {

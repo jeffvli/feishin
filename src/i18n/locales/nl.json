@@ -20,7 +20,8 @@
         "openIn": {
             "lastfm": "Open in Last.fm",
             "musicbrainz": "Open in MusicBrainz"
-        }
+        },
+        "moveToNext": "ga naar volgende"
     },
     "common": {
         "backward": "achteruit",
@@ -102,7 +103,12 @@
         "size": "grootte",
         "reload": "herlaad",
         "setting": "instelling",
-        "close": "sluiten"
+        "close": "sluiten",
+        "additionalParticipants": "andere deelnemers",
+        "newVersion": "een nieuwe versie is geinstalleerd ({{version}})",
+        "viewReleaseNotes": "zie release notes",
+        "albumGain": "album gain",
+        "translation": "vertaling"
     },
     "filter": {
         "rating": "rating",
@@ -252,7 +258,9 @@
         "genreWithCount_one": "{{count}} genre",
         "genreWithCount_other": "{{count}} genres",
         "trackWithCount_one": "{{count}} track",
-        "trackWithCount_other": "{{count}} tracks"
+        "trackWithCount_other": "{{count}} tracks",
+        "song_one": "lied",
+        "song_other": "liedjes"
     },
     "table": {
         "column": {
