@@ -25,6 +25,7 @@ import {
     usePlaybackType,
     useSettingsStore,
 } from '/@/renderer/store/settings.store';
+import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
 import { PlaybackType } from '/@/shared/types/types';
 
 export const Playerbar = () => {
@@ -56,7 +57,7 @@ export const Playerbar = () => {
 
     return (
         <div
-            className={`${styles.container} media-player`}
+            className={`${styles.container} ${PlaybackSelectors.mediaPlayer}`}
             onClick={playerbarOpenDrawer ? handleToggleFullScreenPlayer : undefined}
         >
             <div className={styles.controlsGrid}>

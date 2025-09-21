@@ -3,6 +3,7 @@
 
 export const PlaybackSelectors = {
     elapsedTime: 'elapsed-time',
+    mediaPlayer: 'media-player',
     playerCoverArt: 'player-cover-art',
     playerStatePaused: 'player-state-paused',
     playerStatePlaying: 'player-state-playing',
