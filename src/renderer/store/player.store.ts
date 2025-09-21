@@ -1171,6 +1171,12 @@ export const useSetQueueFavorite = () => usePlayerStore((state) => state.actions
 
 export const useSetQueueRating = () => usePlayerStore((state) => state.actions.setRating);
 
+export const useCurrentIndex = () => usePlayerStore((state) => state.current.index);
+
+export const useCurrentNextIndex = () => usePlayerStore((state) => state.current.nextIndex);
+
+export const useCurrentShufledIndex = () => usePlayerStore((state) => state.current.shuffledIndex);
+
 export const useIncrementQueuePlayCount = () =>
     usePlayerStore((state) => state.actions.incrementPlayCount);
 

@@ -27,6 +27,10 @@ import { IsUpdatedDialog } from '/@/renderer/is-updated-dialog';
 import { AppRouter } from '/@/renderer/router/app-router';
 import {
     useCssSettings,
+    useCurrentIndex,
+    useCurrentNextIndex,
+    useCurrentShufledIndex,
+    useCurrentSong,
     useHotkeySettings,
     usePlaybackSettings,
     usePlayerStore,
@@ -60,10 +64,10 @@ export const App = () => {
     const cssRef = useRef<HTMLStyleElement | null>(null);
     const reloadStateHandled = useRef(false);
     const playerQueue = usePlayerStore((state) => state.queue);
-    const playerCurrentIndex = usePlayerStore((state) => state.current.index);
-    const playerCurrentNextIndex = usePlayerStore((state) => state.current.nextIndex);
-    const playerCurrentShuffledIndex = usePlayerStore((state) => state.current.shuffledIndex);
-    const playerCurrentSong = usePlayerStore((state) => state.current.song);
+    const playerCurrentIndex = useCurrentIndex();
+    const playerCurrentNextIndex = useCurrentNextIndex();
+    const playerCurrentShuffledIndex = useCurrentShufledIndex();
+    const playerCurrentSong = useCurrentSong();
     const generalSettingShouldResume = useSettingsStore((state) => state.general.resume);
 
     const savePlayerQueueState = useCallback(() => {
