@@ -5,7 +5,6 @@ import React, { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router-dom';
 
-import { PlaybackSelectors } from '../../../../shared/constants/playback-selectors';
 import styles from './left-controls.module.css';
 
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
@@ -25,6 +24,7 @@ import { Image } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
+import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 export const LeftControls = () => {

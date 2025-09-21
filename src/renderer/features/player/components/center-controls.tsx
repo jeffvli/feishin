@@ -5,7 +5,6 @@ import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { PlaybackSelectors } from '../../../../shared/constants/playback-selectors';
 import styles from './center-controls.module.css';
 
 import { PlayButton, PlayerButton } from '/@/renderer/features/player/components/player-button';
@@ -29,6 +28,7 @@ import {
 } from '/@/renderer/store/settings.store';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
+import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
 import { PlaybackType, PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
 interface CenterControlsProps {
@@ -175,8 +175,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                     <PlayButton
                         className={
                             status === PlayerStatus.PAUSED
-                                ? 'player-state-paused'
-                                : 'player-state-playing'
+                                ? PlaybackSelectors.playerStatePaused
+                                : PlaybackSelectors.playerStatePlaying
                         }
                         disabled={currentSong?.id === undefined}
                         isPaused={status === PlayerStatus.PAUSED}
