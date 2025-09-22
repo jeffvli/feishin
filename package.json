@@ -125,6 +125,7 @@
         "react-router": "^6.16.0",
         "react-router-dom": "^6.16.0",
         "react-virtualized-auto-sizer": "^1.0.17",
+        "react-virtuoso": "^4.14.0",
         "react-window": "^1.8.9",
         "react-window-infinite-loader": "^1.0.9",
         "semver": "^7.5.4",

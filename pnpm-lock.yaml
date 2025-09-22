@@ -164,6 +164,9 @@ importers:
       overlayscrollbars-react:
         specifier: ^0.5.6
         version: 0.5.6(overlayscrollbars@2.11.3)(react@19.1.0)
+      postcss-simple-vars:
+        specifier: ^7.0.1
+        version: 7.0.1(postcss@8.5.3)
       qs:
         specifier: ^6.14.0
         version: 6.14.0
@@ -200,6 +203,9 @@ importers:
       react-virtualized-auto-sizer:
         specifier: ^1.0.17
         version: 1.0.26(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react-virtuoso:
+        specifier: ^4.14.0
+        version: 4.14.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react-window:
         specifier: ^1.8.9
         version: 1.8.11(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -10407,6 +10413,11 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
 
   react-virtualized-auto-sizer@1.0.26(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
+  react-virtuoso@4.14.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
