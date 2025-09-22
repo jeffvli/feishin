@@ -112,6 +112,7 @@
         "node-mpv": "github:jeffvli/Node-MPV#32b4d64395289ad710c41d481d2707a7acfc228f",
         "overlayscrollbars": "^2.11.1",
         "overlayscrollbars-react": "^0.5.6",
+        "postcss-simple-vars": "^7.0.1",
         "qs": "^6.14.0",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
