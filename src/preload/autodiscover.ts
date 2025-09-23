@@ -6,10 +6,7 @@ const discover = (onReply: (server: DiscoveredServerItem) => void): Promise<void
 
     ipcRenderer.postMessage('autodiscover-ping', {}, [remote]);
 
-    console.log("discover() called");
-
     local.onmessage = (ev) => {
-        console.log(ev);
         onReply(ev.data);
     }
 
