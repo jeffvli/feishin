@@ -46,6 +46,7 @@ export const PlaylistDetailSongListHeader = ({
 
     if (detailQuery.isLoading) return null;
     const isSmartPlaylist = detailQuery?.data?.rules;
+    const playlistDuration = detailQuery?.data?.duration;
 
     return (
         <Stack gap={0}>
@@ -53,9 +54,7 @@ export const PlaylistDetailSongListHeader = ({
                 <LibraryHeaderBar>
                     <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
                     <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
-                    {detailQuery?.data?.duration && (
-                        <Badge>{formatDurationString(detailQuery.data!.duration!)}</Badge>
-                    )}
+                    {!!playlistDuration && <Badge>{formatDurationString(playlistDuration)}</Badge>}
                     <Badge>
                         {itemCount === null || itemCount === undefined ? (
                             <SpinnerIcon />
