@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { MouseEvent, useCallback } from 'react';
 
 import styles from './playerbar.module.css';
@@ -57,7 +58,7 @@ export const Playerbar = () => {
 
     return (
         <div
-            className={`${styles.container} ${PlaybackSelectors.mediaPlayer}`}
+            className={clsx(styles.container, PlaybackSelectors.mediaPlayer)}
             onClick={playerbarOpenDrawer ? handleToggleFullScreenPlayer : undefined}
         >
             <div className={styles.controlsGrid}>

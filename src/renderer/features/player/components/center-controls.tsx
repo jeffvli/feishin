@@ -173,11 +173,6 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         />
                     )}
                     <PlayButton
-                        className={
-                            status === PlayerStatus.PAUSED
-                                ? PlaybackSelectors.playerStatePaused
-                                : PlaybackSelectors.playerStatePlaying
-                        }
                         disabled={currentSong?.id === undefined}
                         isPaused={status === PlayerStatus.PAUSED}
                         onClick={handlePlayPause}
