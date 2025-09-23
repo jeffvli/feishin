@@ -3,7 +3,7 @@ import { useFocusTrap } from '@mantine/hooks';
 import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { nanoid } from 'nanoid/non-secure';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
@@ -14,6 +14,7 @@ import { useAuthStoreActions } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
+import { Paper } from '/@/shared/components/paper/paper';
 import { PasswordInput } from '/@/shared/components/password-input/password-input';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -21,12 +22,35 @@ import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { AuthenticationResponse } from '/@/shared/types/domain-types';
-import { ServerType, toServerType } from '/@/shared/types/types';
+import { DiscoveredServerItem, ServerType, toServerType } from '/@/shared/types/types';
 
+const autodiscover = isElectron() ? window.api.autodiscover : null;
 const localSettings = isElectron() ? window.api.localSettings : null;
+
+function useAutodiscovery() {
+    const [isDone, setDone] = useState(false);
+    const [servers, setServers] = useState<DiscoveredServerItem[]>([]);
+
+    useEffect(() => {
+        setServers([]);
+
+        autodiscover?.discover(newServer => {
+            setServers(tail => [...tail, newServer]);
+        }).then(() => {
+            setDone(true);
+        });
+    }, []);
+
+    return { isDone, servers };
+}
 
 interface AddServerFormProps {
     onCancel: (() => void) | null;
+}
+
+interface ServerDetails {
+    name: string;
+    icon: string;
 }
 
 function ServerIconWithLabel({ icon, label }: { icon: string; label: string }) {
@@ -38,26 +62,35 @@ function ServerIconWithLabel({ icon, label }: { icon: string; label: string }) {
     );
 }
 
-const SERVER_TYPES = [
-    {
-        label: <ServerIconWithLabel icon={JellyfinIcon} label="Jellyfin" />,
-        value: ServerType.JELLYFIN,
+const SERVER_TYPES: Record<ServerType, ServerDetails> = {
+    [ServerType.JELLYFIN]: {
+        name: "Jellyfin",
+        icon: JellyfinIcon,
     },
-    {
-        label: <ServerIconWithLabel icon={NavidromeIcon} label="Navidrome" />,
-        value: ServerType.NAVIDROME,
+    [ServerType.NAVIDROME]: {
+        name: "Navidrome",
+        icon: NavidromeIcon,
     },
-    {
-        label: <ServerIconWithLabel icon={SubsonicIcon} label="OpenSubsonic" />,
-        value: ServerType.SUBSONIC,
+    [ServerType.SUBSONIC]: {
+        name: "OpenSubsonic",
+        icon: SubsonicIcon,
     },
-];
+};
+
+const ALL_SERVERS = Object.keys(SERVER_TYPES).map(serverType => {
+    const info = SERVER_TYPES[serverType];
+    return {
+        label: <ServerIconWithLabel icon={info.icon} label={info.name} />,
+        value: serverType,
+    };
+});
 
 export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const { t } = useTranslation();
     const focusTrapRef = useFocusTrap(true);
     const [isLoading, setIsLoading] = useState(false);
     const { addServer, setCurrentServer } = useAuthStoreActions();
+    const { servers: discovered } = useAutodiscovery();
 
     const form = useForm({
         initialValues: {
@@ -84,6 +117,10 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
               window.SERVER_URL) || false;
 
     const isSubmitDisabled = !form.values.name || !form.values.url || !form.values.username;
+
+    const fillServerDetails = (server: DiscoveredServerItem) => {
+        form.setValues({ ...server });
+    };
 
     const handleSubmit = form.onSubmit(async (values) => {
         const authFunction = api.controller.authenticate;
@@ -150,11 +187,24 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         return setIsLoading(false);
     });
 
-    return (
+    return (<>
+        <Stack>
+            {discovered.map(server =>
+                <Paper key={server.url} p="10px">
+                    <Group>
+                        <img height="32" width="32" src={SERVER_TYPES[server.type].icon} />
+                        <div style={{cursor: "pointer"}} onClick={() => fillServerDetails(server)}>
+                            <Text fw={700}>{server.name}</Text>
+                            <Text>{SERVER_TYPES[server.type].name} server at {server.url}</Text>
+                        </div>
+                    </Group>
+                </Paper>
+            )}
+        </Stack>
         <form onSubmit={handleSubmit}>
             <Stack m={5} ref={focusTrapRef}>
                 <SegmentedControl
-                    data={SERVER_TYPES}
+                    data={ALL_SERVERS}
                     disabled={Boolean(serverLock)}
                     p="md"
                     withItemsBorders={false}
@@ -230,5 +280,5 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 </Group>
             </Stack>
         </form>
-    );
+    </>);
 };

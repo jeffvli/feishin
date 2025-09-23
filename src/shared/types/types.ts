@@ -224,6 +224,12 @@ export type ServerListItem = {
     version?: string;
 };
 
+export type DiscoveredServerItem = {
+    type: ServerType;
+    name: string;
+    url: string;
+};
+
 export type SongState = {
     position?: number;
     repeat?: PlayerRepeat;
