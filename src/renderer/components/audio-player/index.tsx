@@ -233,17 +233,17 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
             }
 
             const { error } = target;
-            if (error?.code !== MediaError.MEDIA_ERR_DECODE) {
+
+            console.log('Playback error occurred:', error);
+
+            if (
+                error?.code !== MediaError.MEDIA_ERR_DECODE &&
+                error?.code !== MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED
+            ) {
                 return;
             }
 
-            const duration = player.getDuration();
-            const currentTime = player.getCurrentTime();
-
-            // Decode error within last second, handle as track ended
-            if (duration && duration - currentTime < 1) {
-                handleOnEnded();
-            }
+            handleOnEnded();
         };
     };
 
