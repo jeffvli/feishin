@@ -32,6 +32,8 @@ function discoverJellyfin(reply: (server: DiscoveredServerItem) => void) {
 
     sock.bind(() => {
         sock.setBroadcast(true);
+        // Send a broadcast packet to both loopback and default route, allowing discovery of same-machine instances
+        sock.send('who is JellyfinServer?', 7359, '127.255.255.255');
         sock.send('who is JellyfinServer?', 7359, '255.255.255.255');
     });
 
