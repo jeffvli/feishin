@@ -34,6 +34,8 @@ interface ItemCardProps {
     data: Album | AlbumArtist | Artist | Playlist | Song;
     isRound?: boolean;
     onClick?: () => void;
+    onItemExpand?: () => void;
+    onItemSelect?: () => void;
     type?: 'compact' | 'default' | 'poster';
     withControls?: boolean;
 }
@@ -42,6 +44,8 @@ export const ItemCard = ({
     data,
     isRound,
     onClick,
+    onItemExpand,
+    onItemSelect,
     type = 'poster',
     withControls,
 }: ItemCardProps) => {
@@ -58,6 +62,8 @@ export const ItemCard = ({
                     imageUrl={imageUrl}
                     isRound={isRound}
                     onClick={onClick}
+                    onItemExpand={onItemExpand}
+                    onItemSelect={onItemSelect}
                     rows={rows}
                     setShowControls={setShowControls}
                     showControls={showControls}
@@ -71,6 +77,8 @@ export const ItemCard = ({
                     imageUrl={imageUrl}
                     isRound={isRound}
                     onClick={onClick}
+                    onItemExpand={onItemExpand}
+                    onItemSelect={onItemSelect}
                     rows={rows}
                     setShowControls={setShowControls}
                     showControls={showControls}
@@ -85,6 +93,8 @@ export const ItemCard = ({
                     imageUrl={imageUrl}
                     isRound={isRound}
                     onClick={onClick}
+                    onItemExpand={onItemExpand}
+                    onItemSelect={onItemSelect}
                     rows={rows}
                     setShowControls={setShowControls}
                     showControls={showControls}
@@ -106,6 +116,8 @@ const CompactItemCard = ({
     imageUrl,
     isRound,
     onClick,
+    onItemExpand,
+    onItemSelect,
     rows,
     setShowControls,
     showControls,
@@ -141,6 +153,8 @@ const DefaultItemCard = ({
     imageUrl,
     isRound,
     onClick,
+    onItemExpand,
+    onItemSelect,
     rows,
     setShowControls,
     showControls,
@@ -151,6 +165,7 @@ const DefaultItemCard = ({
             <div
                 className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
                 onClick={onClick}
+                onDoubleClick={onItemExpand}
                 onMouseEnter={() => withControls && setShowControls(true)}
                 onMouseLeave={() => withControls && setShowControls(false)}
             >
@@ -178,6 +193,8 @@ const PosterItemCard = ({
     imageUrl,
     isRound,
     onClick,
+    onItemExpand,
+    onItemSelect,
     rows,
     setShowControls,
     showControls,

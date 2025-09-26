@@ -1,10 +1,16 @@
 .item-grid-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.grid-list-container {
     width: 100%;
     height: 100%;
     padding-right: var(--theme-spacing-md);
     container-name: grid-list;
     container-type: inline-size;
-    scrollbar-gutter: stable;
 }
 
 .grid-list-component {
