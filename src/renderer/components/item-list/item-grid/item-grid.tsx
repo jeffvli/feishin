@@ -202,7 +202,11 @@ const itemContent = (index: number, item: any, context: ItemContext) => {
 const InnerItem = memo(
     ({ context, index, item }: { context: ItemContext; index: number; item: ItemListItem }) => {
         const handleClick = () => {
-            context.actions.toggleExpanded({ id: item.id, itemType: item.itemType });
+            context.internalState.toggleExpanded({
+                id: item.id,
+                itemType: item.itemType,
+                serverId: item.serverId,
+            });
         };
 
         return (

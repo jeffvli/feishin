@@ -15,6 +15,7 @@ export type ItemListAction =
 export interface ItemListItem {
     id: string;
     itemType: LibraryItem;
+    serverId: string;
 }
 
 export interface ItemListState {
