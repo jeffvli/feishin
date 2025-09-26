@@ -24,6 +24,7 @@ import { ItemListItem, ItemListStateActions, useItemListState } from '../helpers
 import styles from './item-grid.module.css';
 
 import { ItemCard } from '/@/renderer/components/item-card/item-card';
+import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const gridComponents: GridComponents<any> = {
@@ -223,7 +224,7 @@ export const ItemGrid = ({
                         initial="hidden"
                         variants={expandedAnimationVariants}
                     >
-                        Hello World
+                        <ExpandedListItem internalState={internalState} itemType={itemType} />
                     </motion.div>
                 )}
             </AnimatePresence>

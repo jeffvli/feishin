@@ -1,0 +1,14 @@
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: var(--theme-colors-surface);
+    border-radius: var(--theme-radius-md);
+}
+
+.loading {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: var(--theme-spacing-sm);
+}
