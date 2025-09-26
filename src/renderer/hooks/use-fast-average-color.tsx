@@ -29,7 +29,15 @@ export const useFastAverageColor = (args: {
     const { algorithm, default: defaultColor, id, src, srcLoaded } = args;
     const idRef = useRef<string | undefined>(id);
 
-    const [background, setBackground] = useState<string | undefined>(defaultColor);
+    const [background, setBackground] = useState<{
+        background: string | undefined;
+        isDark: boolean;
+        isLight: boolean;
+    }>({
+        background: defaultColor,
+        isDark: true,
+        isLight: false,
+    });
 
     useEffect(() => {
         const fac = new FastAverageColor();
@@ -46,16 +54,28 @@ export const useFastAverageColor = (args: {
             })
                 .then((color) => {
                     idRef.current = id;
-                    return setBackground(color.rgb);
+                    return setBackground({
+                        background: color.rgb,
+                        isDark: color.isDark,
+                        isLight: color.isLight,
+                    });
                 })
                 .catch((e) => {
                     console.error('Error fetching average color', e);
                     idRef.current = id;
-                    return setBackground('rgba(0, 0, 0, 0)');
+                    return setBackground({
+                        background: 'rgba(0, 0, 0, 0)',
+                        isDark: true,
+                        isLight: false,
+                    });
                 });
         } else if (srcLoaded) {
             idRef.current = id;
-            return setBackground('var(--theme-colors-foreground-muted)');
+            return setBackground({
+                background: 'var(--theme-colors-foreground-muted)',
+                isDark: true,
+                isLight: false,
+            });
         }
 
         return () => {
@@ -63,5 +83,10 @@ export const useFastAverageColor = (args: {
         };
     }, [algorithm, srcLoaded, src, id]);
 
-    return { background, colorId: idRef.current };
+    return {
+        background: background.background,
+        colorId: idRef.current,
+        isDark: background.isDark,
+        isLight: background.isLight,
+    };
 };
