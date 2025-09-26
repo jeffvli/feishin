@@ -13,12 +13,18 @@ import {
     useRef,
     useState,
 } from 'react';
-import { GridComponents, VirtuosoGrid, VirtuosoGridHandle } from 'react-virtuoso';
+import {
+    GridComponents,
+    VirtuosoGrid,
+    VirtuosoGridHandle,
+    VirtuosoGridProps,
+} from 'react-virtuoso';
 
 import { ItemListItem, ItemListStateActions, useItemListState } from '../helpers/item-list-state';
 import styles from './item-grid.module.css';
 
 import { ItemCard } from '/@/renderer/components/item-card/item-card';
+import { LibraryItem } from '/@/shared/types/domain-types';
 
 const gridComponents: GridComponents<any> = {
     Item: forwardRef<
@@ -61,9 +67,10 @@ const gridComponents: GridComponents<any> = {
 };
 
 interface ItemContext {
-    actions: ItemListStateActions;
     enableExpansion?: boolean;
     enableSelection?: boolean;
+    internalState: ItemListStateActions;
+    itemType: LibraryItem;
     onItemClick?: (item: unknown, index: number) => void;
     onItemContextMenu?: (item: unknown, index: number) => void;
     onItemDoubleClick?: (item: unknown, index: number) => void;
@@ -73,9 +80,23 @@ interface ItemGridProps {
     data: unknown[];
     enableExpansion?: boolean;
     enableSelection?: boolean;
+    initialTopMostItemIndex?:
+        | number
+        | {
+              align: 'center' | 'end' | 'start';
+              behavior: 'auto' | 'smooth';
+              index: number;
+              offset?: number;
+          };
+    itemType: LibraryItem;
+    onEndReached?: (index: number) => void;
+    onIsScrolling?: VirtuosoGridProps<any, any>['isScrolling'];
     onItemClick?: (item: unknown, index: number) => void;
     onItemContextMenu?: (item: unknown, index: number) => void;
     onItemDoubleClick?: (item: unknown, index: number) => void;
+    onRangeChanged?: (range: { endIndex: number; startIndex: number }) => void;
+    onScroll?: VirtuosoGridProps<any, any>['onScroll'];
+    onStartReached?: (index: number) => void;
     ref: Ref<VirtuosoGridHandle>;
     totalItemCount?: number;
 }
@@ -99,9 +120,16 @@ export const ItemGrid = ({
     data,
     enableExpansion = false,
     enableSelection = false,
+    initialTopMostItemIndex = 0,
+    itemType,
+    onEndReached,
+    onIsScrolling,
     onItemClick,
     onItemContextMenu,
     onItemDoubleClick,
+    onRangeChanged,
+    onScroll,
+    onStartReached,
     ref,
     totalItemCount,
 }: ItemGridProps) => {
@@ -109,7 +137,7 @@ export const ItemGrid = ({
 
     const [scroller, setScroller] = useState<HTMLElement | null>(null);
 
-    const actions = useItemListState();
+    const internalState = useItemListState();
 
     const [initialize, osInstance] = useOverlayScrollbars({
         defer: true,
@@ -141,24 +169,26 @@ export const ItemGrid = ({
 
     const itemContext = useMemo(
         () => ({
-            actions,
             enableExpansion,
             enableSelection,
+            internalState,
+            itemType,
             onItemClick,
             onItemContextMenu,
             onItemDoubleClick,
         }),
         [
-            actions,
+            internalState,
             enableExpansion,
             enableSelection,
+            itemType,
             onItemClick,
             onItemDoubleClick,
             onItemContextMenu,
         ],
     );
 
-    const hasExpanded = actions.hasExpanded();
+    const hasExpanded = internalState.hasExpanded();
 
     return (
         <div className={styles.itemGridContainer}>
@@ -171,10 +201,16 @@ export const ItemGrid = ({
                     components={gridComponents}
                     context={itemContext}
                     data={data}
+                    endReached={onEndReached}
                     increaseViewportBy={200}
+                    initialTopMostItemIndex={initialTopMostItemIndex}
+                    isScrolling={onIsScrolling}
                     itemContent={itemContent}
+                    onScroll={onScroll}
+                    rangeChanged={onRangeChanged}
                     ref={ref}
                     scrollerRef={setScroller}
+                    startReached={onStartReached}
                     totalCount={totalItemCount || data.length}
                 />
             </div>
