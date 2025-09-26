@@ -8,6 +8,7 @@ import styles from './item-card.module.css';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Image } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
+import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
 import {
     Album,
@@ -31,8 +32,9 @@ type DataRow = {
 };
 
 interface ItemCardProps {
-    data: Album | AlbumArtist | Artist | Playlist | Song;
+    data: Album | AlbumArtist | Artist | Playlist | Song | undefined;
     isRound?: boolean;
+    itemType: LibraryItem;
     onClick?: () => void;
     onItemExpand?: () => void;
     onItemSelect?: () => void;
@@ -43,16 +45,17 @@ interface ItemCardProps {
 export const ItemCard = ({
     data,
     isRound,
+    itemType,
     onClick,
     onItemExpand,
     onItemSelect,
     type = 'poster',
     withControls,
 }: ItemCardProps) => {
-    const imageUrl = getImageUrl(data);
-    const rows = getDataRows(data);
-
     const [showControls, setShowControls] = useState(false);
+
+    const imageUrl = getImageUrl(data);
+    const rows = getDataRows(itemType);
 
     switch (type) {
         case 'compact':
@@ -61,6 +64,7 @@ export const ItemCard = ({
                     data={data}
                     imageUrl={imageUrl}
                     isRound={isRound}
+                    itemType={itemType}
                     onClick={onClick}
                     onItemExpand={onItemExpand}
                     onItemSelect={onItemSelect}
@@ -76,6 +80,7 @@ export const ItemCard = ({
                     data={data}
                     imageUrl={imageUrl}
                     isRound={isRound}
+                    itemType={itemType}
                     onClick={onClick}
                     onItemExpand={onItemExpand}
                     onItemSelect={onItemSelect}
@@ -92,6 +97,7 @@ export const ItemCard = ({
                     data={data}
                     imageUrl={imageUrl}
                     isRound={isRound}
+                    itemType={itemType}
                     onClick={onClick}
                     onItemExpand={onItemExpand}
                     onItemSelect={onItemSelect}
@@ -123,24 +129,41 @@ const CompactItemCard = ({
     showControls,
     withControls,
 }: ItemCardDerivativeProps) => {
+    if (data) {
+        return (
+            <div className={clsx(styles.container, styles.compact)}>
+                <div
+                    className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
+                    onClick={onClick}
+                    onMouseEnter={() => withControls && setShowControls(true)}
+                    onMouseLeave={() => withControls && setShowControls(false)}
+                >
+                    <Image
+                        className={clsx(styles.image, { [styles.isRound]: isRound })}
+                        src={imageUrl}
+                    />
+                    <AnimatePresence>
+                        {withControls && showControls && <ItemCardControls type="compact" />}
+                    </AnimatePresence>
+                    <div className={clsx(styles.detailContainer, styles.compact)}>
+                        {rows.map((row) => (
+                            <ItemCardRow data={data!} key={row.id} row={row} type="compact" />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={clsx(styles.container, styles.compact)}>
-            <div
-                className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                onClick={onClick}
-                onMouseEnter={() => withControls && setShowControls(true)}
-                onMouseLeave={() => withControls && setShowControls(false)}
-            >
-                <Image
-                    className={clsx(styles.image, { [styles.isRound]: isRound })}
-                    src={imageUrl}
-                />
-                <AnimatePresence>
-                    {withControls && showControls && <ItemCardControls type="compact" />}
-                </AnimatePresence>
+            <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
+                <Skeleton className={styles.image} enableAnimation={false} />
                 <div className={clsx(styles.detailContainer, styles.compact)}>
                     {rows.map((row) => (
-                        <ItemCardRow data={data} key={row.id} row={row} type="compact" />
+                        <div className={styles.row} key={row.id}>
+                            &nbsp;
+                        </div>
                     ))}
                 </div>
             </div>
@@ -160,28 +183,43 @@ const DefaultItemCard = ({
     showControls,
     withControls,
 }: ItemCardDerivativeProps) => {
+    if (data) {
+        return (
+            <div className={clsx(styles.container)}>
+                <div
+                    className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
+                    onClick={onClick}
+                    onDoubleClick={onItemExpand}
+                    onMouseEnter={() => withControls && setShowControls(true)}
+                    onMouseLeave={() => withControls && setShowControls(false)}
+                >
+                    <Image
+                        className={clsx(styles.image, { [styles.isRound]: isRound })}
+                        src={imageUrl}
+                    />
+                    <AnimatePresence>
+                        {withControls && showControls && <ItemCardControls type="default" />}
+                    </AnimatePresence>
+                </div>
+                <div className={styles.detailContainer}>
+                    {rows.map((row) => (
+                        <ItemCardRow data={data!} key={row.id} row={row} type="default" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={clsx(styles.container)}>
-            <div
-                className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                onClick={onClick}
-                onDoubleClick={onItemExpand}
-                onMouseEnter={() => withControls && setShowControls(true)}
-                onMouseLeave={() => withControls && setShowControls(false)}
-            >
-                <Image
-                    className={clsx(styles.image, { [styles.isRound]: isRound })}
-                    src={imageUrl}
-                />
-                <AnimatePresence>
-                    {withControls && showControls && <ItemCardControls type="default" />}
-                </AnimatePresence>
+            <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
+                <Skeleton className={styles.image} enableAnimation={false} />
             </div>
             <div className={styles.detailContainer}>
                 {rows.map((row) => (
-                    <Fragment key={row.id}>
-                        <ItemCardRow data={data} row={row} type="default" />
-                    </Fragment>
+                    <div className={styles.row} key={row.id}>
+                        &nbsp;
+                    </div>
                 ))}
             </div>
         </div>
@@ -200,35 +238,48 @@ const PosterItemCard = ({
     showControls,
     withControls,
 }: ItemCardDerivativeProps) => {
+    if (data) {
+        return (
+            <div className={clsx(styles.container, styles.poster)}>
+                <div
+                    className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
+                    onClick={onClick}
+                    onMouseEnter={() => withControls && setShowControls(true)}
+                    onMouseLeave={() => withControls && setShowControls(false)}
+                >
+                    <Image
+                        className={clsx(styles.image, { [styles.isRound]: isRound })}
+                        src={imageUrl}
+                    />
+                    <AnimatePresence>
+                        {withControls && showControls && <ItemCardControls type="poster" />}
+                    </AnimatePresence>
+                </div>
+                <div className={styles.detailContainer}>
+                    {rows.map((row) => (
+                        <ItemCardRow data={data!} key={row.id} row={row} type="poster" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={clsx(styles.container, styles.poster)}>
-            <div
-                className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                onClick={onClick}
-                onMouseEnter={() => withControls && setShowControls(true)}
-                onMouseLeave={() => withControls && setShowControls(false)}
-            >
-                <Image
-                    className={clsx(styles.image, { [styles.isRound]: isRound })}
-                    src={imageUrl}
-                />
-                <AnimatePresence>
-                    {withControls && showControls && <ItemCardControls type="poster" />}
-                </AnimatePresence>
+            <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
+                <Skeleton className={clsx(styles.image, { [styles.isRound]: isRound })} />
             </div>
             <div className={styles.detailContainer}>
                 {rows.map((row) => (
-                    <Fragment key={row.id}>
-                        <ItemCardRow data={data} row={row} type="poster" />
-                    </Fragment>
+                    <ItemCardRow data={undefined} key={row.id} row={row} type="poster" />
                 ))}
             </div>
         </div>
     );
 };
 
-const getDataRows = (data: Album | AlbumArtist | Artist | Playlist | Song): DataRow[] => {
-    switch (data.itemType) {
+const getDataRows = (itemType: LibraryItem): DataRow[] => {
+    switch (itemType) {
         case LibraryItem.ALBUM:
             return [
                 {
@@ -274,11 +325,13 @@ const getDataRows = (data: Album | AlbumArtist | Artist | Playlist | Song): Data
             return [{ format: (data) => (data as Playlist).name, id: 'name' }];
         case LibraryItem.SONG:
             return [{ format: (data) => (data as Song).name, id: 'name' }];
+        default:
+            return [];
     }
 };
 
-const getImageUrl = (data: Album | AlbumArtist | Artist | Playlist | Song) => {
-    if ('imageUrl' in data) {
+const getImageUrl = (data: Album | AlbumArtist | Artist | Playlist | Song | undefined) => {
+    if (data && 'imageUrl' in data) {
         return data.imageUrl || undefined;
     }
 
@@ -290,10 +343,25 @@ const ItemCardRow = ({
     row,
     type,
 }: {
-    data: Album | AlbumArtist | Artist | Playlist | Song;
+    data: Album | AlbumArtist | Artist | Playlist | Song | undefined;
     row: DataRow;
     type?: 'compact' | 'default' | 'poster';
 }) => {
+    if (!data) {
+        return (
+            <div
+                className={clsx(styles.row, {
+                    [styles.compact]: type === 'compact',
+                    [styles.default]: type === 'default',
+                    [styles.muted]: row.isMuted,
+                    [styles.poster]: type === 'poster',
+                })}
+            >
+                &nbsp;
+            </div>
+        );
+    }
+
     return (
         <Text
             className={clsx(styles.row, {
