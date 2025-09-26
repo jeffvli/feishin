@@ -27,30 +27,13 @@ import { DiscoveredServerItem, ServerType, toServerType } from '/@/shared/types/
 const autodiscover = isElectron() ? window.api.autodiscover : null;
 const localSettings = isElectron() ? window.api.localSettings : null;
 
-function useAutodiscovery() {
-    const [isDone, setDone] = useState(false);
-    const [servers, setServers] = useState<DiscoveredServerItem[]>([]);
-
-    useEffect(() => {
-        setServers([]);
-
-        autodiscover?.discover(newServer => {
-            setServers(tail => [...tail, newServer]);
-        }).then(() => {
-            setDone(true);
-        });
-    }, []);
-
-    return { isDone, servers };
-}
-
 interface AddServerFormProps {
     onCancel: (() => void) | null;
 }
 
 interface ServerDetails {
-    name: string;
     icon: string;
+    name: string;
 }
 
 function ServerIconWithLabel({ icon, label }: { icon: string; label: string }) {
@@ -62,22 +45,41 @@ function ServerIconWithLabel({ icon, label }: { icon: string; label: string }) {
     );
 }
 
+function useAutodiscovery() {
+    const [isDone, setDone] = useState(false);
+    const [servers, setServers] = useState<DiscoveredServerItem[]>([]);
+
+    useEffect(() => {
+        setServers([]);
+
+        autodiscover
+            ?.discover((newServer) => {
+                setServers((tail) => [...tail, newServer]);
+            })
+            .then(() => {
+                setDone(true);
+            });
+    }, []);
+
+    return { isDone, servers };
+}
+
 const SERVER_TYPES: Record<ServerType, ServerDetails> = {
     [ServerType.JELLYFIN]: {
-        name: "Jellyfin",
         icon: JellyfinIcon,
+        name: 'Jellyfin',
     },
     [ServerType.NAVIDROME]: {
-        name: "Navidrome",
         icon: NavidromeIcon,
+        name: 'Navidrome',
     },
     [ServerType.SUBSONIC]: {
-        name: "OpenSubsonic",
         icon: SubsonicIcon,
+        name: 'OpenSubsonic',
     },
 };
 
-const ALL_SERVERS = Object.keys(SERVER_TYPES).map(serverType => {
+const ALL_SERVERS = Object.keys(SERVER_TYPES).map((serverType) => {
     const info = SERVER_TYPES[serverType];
     return {
         label: <ServerIconWithLabel icon={info.icon} label={info.name} />,
@@ -187,98 +189,105 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         return setIsLoading(false);
     });
 
-    return (<>
-        <Stack>
-            {discovered.map(server =>
-                <Paper key={server.url} p="10px">
-                    <Group>
-                        <img height="32" width="32" src={SERVER_TYPES[server.type].icon} />
-                        <div style={{cursor: "pointer"}} onClick={() => fillServerDetails(server)}>
-                            <Text fw={700}>{server.name}</Text>
-                            <Text>{SERVER_TYPES[server.type].name} server at {server.url}</Text>
-                        </div>
-                    </Group>
-                </Paper>
-            )}
-        </Stack>
-        <form onSubmit={handleSubmit}>
-            <Stack m={5} ref={focusTrapRef}>
-                <SegmentedControl
-                    data={ALL_SERVERS}
-                    disabled={Boolean(serverLock)}
-                    p="md"
-                    withItemsBorders={false}
-                    {...form.getInputProps('type')}
-                />
-                <Group grow>
-                    <TextInput
-                        data-autofocus
-                        disabled={Boolean(serverLock)}
-                        label={t('form.addServer.input', {
-                            context: 'name',
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('name')}
-                    />
-                    <TextInput
-                        disabled={Boolean(serverLock)}
-                        label={t('form.addServer.input', {
-                            context: 'url',
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('url')}
-                    />
-                </Group>
-                <TextInput
-                    label={t('form.addServer.input', {
-                        context: 'username',
-                        postProcess: 'titleCase',
-                    })}
-                    {...form.getInputProps('username')}
-                />
-                <PasswordInput
-                    label={t('form.addServer.input', {
-                        context: 'password',
-                        postProcess: 'titleCase',
-                    })}
-                    {...form.getInputProps('password')}
-                />
-                {localSettings && form.values.type === ServerType.NAVIDROME && (
-                    <Checkbox
-                        label={t('form.addServer.input', {
-                            context: 'savePassword',
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('savePassword', {
-                            type: 'checkbox',
-                        })}
-                    />
-                )}
-                {form.values.type === ServerType.SUBSONIC && (
-                    <Checkbox
-                        label={t('form.addServer.input', {
-                            context: 'legacyAuthentication',
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
-                    />
-                )}
-                <Group grow justify="flex-end">
-                    {onCancel && (
-                        <Button onClick={onCancel} variant="subtle">
-                            {t('common.cancel', { postProcess: 'titleCase' })}
-                        </Button>
-                    )}
-                    <Button
-                        disabled={isSubmitDisabled}
-                        loading={isLoading}
-                        type="submit"
-                        variant="filled"
-                    >
-                        {t('common.add', { postProcess: 'titleCase' })}
-                    </Button>
-                </Group>
+    return (
+        <>
+            <Stack>
+                {discovered.map((server) => (
+                    <Paper key={server.url} p="10px">
+                        <Group>
+                            <img height="32" src={SERVER_TYPES[server.type].icon} width="32" />
+                            <div
+                                onClick={() => fillServerDetails(server)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <Text fw={700}>{server.name}</Text>
+                                <Text>
+                                    {SERVER_TYPES[server.type].name} server at {server.url}
+                                </Text>
+                            </div>
+                        </Group>
+                    </Paper>
+                ))}
             </Stack>
-        </form>
-    </>);
+            <form onSubmit={handleSubmit}>
+                <Stack m={5} ref={focusTrapRef}>
+                    <SegmentedControl
+                        data={ALL_SERVERS}
+                        disabled={Boolean(serverLock)}
+                        p="md"
+                        withItemsBorders={false}
+                        {...form.getInputProps('type')}
+                    />
+                    <Group grow>
+                        <TextInput
+                            data-autofocus
+                            disabled={Boolean(serverLock)}
+                            label={t('form.addServer.input', {
+                                context: 'name',
+                                postProcess: 'titleCase',
+                            })}
+                            {...form.getInputProps('name')}
+                        />
+                        <TextInput
+                            disabled={Boolean(serverLock)}
+                            label={t('form.addServer.input', {
+                                context: 'url',
+                                postProcess: 'titleCase',
+                            })}
+                            {...form.getInputProps('url')}
+                        />
+                    </Group>
+                    <TextInput
+                        label={t('form.addServer.input', {
+                            context: 'username',
+                            postProcess: 'titleCase',
+                        })}
+                        {...form.getInputProps('username')}
+                    />
+                    <PasswordInput
+                        label={t('form.addServer.input', {
+                            context: 'password',
+                            postProcess: 'titleCase',
+                        })}
+                        {...form.getInputProps('password')}
+                    />
+                    {localSettings && form.values.type === ServerType.NAVIDROME && (
+                        <Checkbox
+                            label={t('form.addServer.input', {
+                                context: 'savePassword',
+                                postProcess: 'titleCase',
+                            })}
+                            {...form.getInputProps('savePassword', {
+                                type: 'checkbox',
+                            })}
+                        />
+                    )}
+                    {form.values.type === ServerType.SUBSONIC && (
+                        <Checkbox
+                            label={t('form.addServer.input', {
+                                context: 'legacyAuthentication',
+                                postProcess: 'titleCase',
+                            })}
+                            {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
+                        />
+                    )}
+                    <Group grow justify="flex-end">
+                        {onCancel && (
+                            <Button onClick={onCancel} variant="subtle">
+                                {t('common.cancel', { postProcess: 'titleCase' })}
+                            </Button>
+                        )}
+                        <Button
+                            disabled={isSubmitDisabled}
+                            loading={isLoading}
+                            type="submit"
+                            variant="filled"
+                        >
+                            {t('common.add', { postProcess: 'titleCase' })}
+                        </Button>
+                    </Group>
+                </Stack>
+            </form>
+        </>
+    );
 };

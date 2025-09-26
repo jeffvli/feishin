@@ -166,6 +166,12 @@ export enum TableColumn {
     YEAR = 'releaseYear',
 }
 
+export type DiscoveredServerItem = {
+    name: string;
+    type: ServerType;
+    url: string;
+};
+
 export type GridCardData = {
     cardControls: any;
     cardRows: CardRow<Album | AlbumArtist | Artist | Playlist | Song>[];
@@ -222,12 +228,6 @@ export type ServerListItem = {
     userId: null | string;
     username: string;
     version?: string;
-};
-
-export type DiscoveredServerItem = {
-    type: ServerType;
-    name: string;
-    url: string;
 };
 
 export type SongState = {

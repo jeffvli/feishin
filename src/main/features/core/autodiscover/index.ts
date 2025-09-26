@@ -1,11 +1,16 @@
 import { createSocket } from 'dgram';
 import { ipcMain } from 'electron';
+
 import { DiscoveredServerItem, ServerType } from '/@/shared/types/types';
 
 type JellyfinResponse = {
     Address: string;
     Id: string;
     Name: string;
+};
+
+function discoverAll(reply: (server: DiscoveredServerItem) => void) {
+    return Promise.all([discoverJellyfin(reply)]);
 }
 
 function discoverJellyfin(reply: (server: DiscoveredServerItem) => void) {
@@ -15,8 +20,8 @@ function discoverJellyfin(reply: (server: DiscoveredServerItem) => void) {
             const response: JellyfinResponse = JSON.parse(msg.toString('utf-8'));
 
             reply({
-                type: ServerType.JELLYFIN,
                 name: response.Name,
+                type: ServerType.JELLYFIN,
                 url: response.Address,
             });
         } catch (e) {
@@ -38,17 +43,11 @@ function discoverJellyfin(reply: (server: DiscoveredServerItem) => void) {
     });
 }
 
-function discoverAll(reply: (server: DiscoveredServerItem) => void) {
-    return Promise.all([
-        discoverJellyfin(reply),
-    ]);
-}
-
 ipcMain.on('autodiscover-ping', (ev) => {
     if (ev.ports.length === 0) throw new Error('Expected a port to stream autodiscovery results');
     const port = ev.ports[0];
 
-    discoverAll(result => port.postMessage(result))
+    discoverAll((result) => port.postMessage(result))
         .then(() => port.close())
         .catch((err) => console.error(err));
 });
