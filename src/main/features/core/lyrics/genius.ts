@@ -109,8 +109,11 @@ export async function getLyricsBySongId(url: string): Promise<null | string> {
 
     if (lyricsDiv.length > 0) return lyricsDiv.text().trim();
 
-    const lyricSections = $('div[class^=Lyrics__Container]')
-        .map((_, e) => $(e).text())
+    const lyricSections = $('div[data-lyrics-container="true"]')
+        .map((_, e) => {
+            $(e).find('[data-exclude-from-selection="true"]').remove();
+            return $(e).text();
+        })
         .toArray()
         .join('\n');
     return lyricSections;
@@ -201,10 +204,16 @@ async function getSongId(
         return null;
     }
 
+    const artist_normalized = hit.artist_names.replace(/\u00A0/g, ' ').trim();
+    const full_title_normalized = hit.full_title
+        .replace(/\u00A0/g, ' ')
+        .replace(`by ${artist_normalized}`, '')
+        .trim();
+
     return {
-        artist: hit.artist_names,
+        artist: artist_normalized,
         id: hit.url,
-        name: hit.full_title,
+        name: full_title_normalized,
         source: LyricSource.GENIUS,
     };
 }
