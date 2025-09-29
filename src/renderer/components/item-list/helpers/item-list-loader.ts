@@ -1,16 +1,9 @@
-import {
-    useQueryClient,
-    UseQueryOptions,
-    useSuspenseQuery,
-    UseSuspenseQueryOptions,
-} from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery, UseSuspenseQueryOptions } from '@tanstack/react-query';
 import throttle from 'lodash/throttle';
 import { useMemo, useRef, useState } from 'react';
 
-import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { getServerById } from '/@/renderer/store';
-import { AlbumListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-types';
 
 export interface InfiniteListProps<TQuery> {
     query: Omit<TQuery, 'limit' | 'startIndex'>;
@@ -19,10 +12,9 @@ export interface InfiniteListProps<TQuery> {
 
 interface UseItemListInfiniteLoaderProps {
     itemsPerPage: number;
-    itemType: LibraryItem;
     listCountQuery: UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
-    listQuery: UseQueryOptions<any, Error, any, readonly unknown[]>;
-    params: Record<string, any>;
+    listQueryFn: (args: { apiClientProps: any; query: any }) => Promise<{ items: unknown[] }>;
+    query: Record<string, any>;
     serverId: string;
 }
 
@@ -31,25 +23,25 @@ function getInitialData(itemCount: number) {
 }
 
 export const useItemListInfiniteLoader = ({
-    itemsPerPage = 50, // Default items per page
-    itemType,
+    itemsPerPage = 100,
     listCountQuery,
-    listQuery,
-    params = {},
+    listQueryFn,
+    query = {},
     serverId,
 }: UseItemListInfiniteLoaderProps) => {
     const queryClient = useQueryClient();
 
-    // Scroll state management
     const scrollStateRef = useRef<ScrollState>({
         direction: 'unknown',
         lastRange: null,
         lastScrollTime: 0,
     });
 
-    const { data: totalItemCount } = useSuspenseQuery<any, any, any, any>(listCountQuery);
+    const { data: totalItemCount } = useSuspenseQuery<number, any, number, any>(listCountQuery);
 
-    const [data, setData] = useState<any>(getInitialData(totalItemCount));
+    const pagesLoaded = useRef<Record<string, boolean>>({});
+
+    const [data, setData] = useState<unknown[]>(getInitialData(totalItemCount));
 
     const onRangeChanged = useMemo(() => {
         return throttle(async (range: { endIndex: number; startIndex: number }) => {
@@ -57,41 +49,39 @@ export const useItemListInfiniteLoader = ({
             const startIndex = fetchRange.startIndex;
             const endIndex = fetchRange.startIndex + fetchRange.limit;
 
-            const query = {
+            const pageNumber = Math.floor(startIndex / itemsPerPage);
+
+            if (pagesLoaded.current[pageNumber]) {
+                return;
+            }
+
+            const queryParams = {
                 limit: fetchRange.limit,
-                sortBy: AlbumListSort.NAME,
-                sortOrder: SortOrder.ASC,
                 startIndex: fetchRange.startIndex,
+                ...query,
             };
 
-            // Check if data exists in cache and is fresh
-            const queryState = queryClient.getQueryState(queryKeys.albums.list(serverId, query));
+            const result = await queryClient.ensureQueryData({
+                gcTime: 1000 * 15,
+                queryFn: async ({ signal }) => {
+                    const result = await listQueryFn({
+                        apiClientProps: { server: getServerById(serverId), signal },
+                        query: queryParams,
+                    });
 
-            if (!queryState || queryState.isInvalidated) {
-                const result = await queryClient.fetchQuery({
-                    gcTime: 1000 * 30,
-                    queryFn: async ({ signal }) => {
-                        const result = await api.controller.getAlbumList({
-                            apiClientProps: {
-                                server: getServerById(serverId),
-                                signal,
-                            },
-                            query,
-                        });
+                    return result.items;
+                },
+                queryKey: queryKeys.albums.list(serverId, query),
+                staleTime: 1000 * 15,
+            });
 
-                        return result.items;
-                    },
-                    queryKey: queryKeys.albums.list(serverId, query),
-                    staleTime: 1000 * 30,
-                });
+            setData((oldData: any) => {
+                return [...oldData.slice(0, startIndex), ...result, ...oldData.slice(endIndex)];
+            });
 
-                // Only run setData if we actually fetched fresh data
-                setData((oldData: any) => {
-                    return [...oldData.slice(0, startIndex), ...result, ...oldData.slice(endIndex)];
-                });
-            }
+            pagesLoaded.current[pageNumber] = true;
         }, 50);
-    }, [itemsPerPage, queryClient, serverId]);
+    }, [itemsPerPage, queryClient, serverId, listQueryFn, query]);
 
     return { data, onRangeChanged };
 };
