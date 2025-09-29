@@ -233,8 +233,6 @@ export const ItemGrid = ({
             return [];
         }
 
-        console.log('data change');
-
         return data
             .map((d, i) => {
                 return {
@@ -261,7 +259,7 @@ export const ItemGrid = ({
                 height: '100%',
                 opacity: 1,
                 transition: {
-                    duration: 0.5,
+                    duration: 1,
                     ease: 'backInOut',
                 },
             }}
