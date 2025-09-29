@@ -110,7 +110,11 @@ export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZon
         >
             <Icon icon={icon} size="3xl" />
             <Text>Drop a file here</Text>
-            {hasErrored ? <Text c="red">{error}</Text> : null}
+            {hasErrored ? (
+                <Text c="red" ta="center">
+                    {error}
+                </Text>
+            ) : null}
             <input
                 onChange={onZoneInputChange}
                 ref={(self) => (zoneFileInput.current = self)}
