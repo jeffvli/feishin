@@ -16,6 +16,7 @@ import { ServerFeatures } from '/@/shared/types/features-types';
 export enum ListDisplayType {
     CARD = 'card',
     GRID = 'poster',
+    GRID_PAGINATED = 'posterPaginated',
     LIST = 'list',
     TABLE = 'table',
     TABLE_PAGINATED = 'paginatedTable',
