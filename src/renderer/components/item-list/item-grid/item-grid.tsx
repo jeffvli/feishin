@@ -1,83 +1,32 @@
-import clsx from 'clsx';
+import { useElementSize, useMergedRef } from '@mantine/hooks';
+import { throttle } from 'lodash';
 import { AnimatePresence, motion, Variants } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import {
     CSSProperties,
-    forwardRef,
-    memo,
-    ReactNode,
+    MouseEvent,
     Ref,
-    RefObject,
+    UIEvent,
+    useCallback,
     useEffect,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
-import {
-    GridComponents,
-    VirtuosoGrid,
-    VirtuosoGridHandle,
-    VirtuosoGridProps,
-} from 'react-virtuoso';
+import { List, ListImperativeAPI, RowComponentProps, useListRef } from 'react-window-v2';
 
-import { ItemListItem, ItemListStateActions, useItemListState } from '../helpers/item-list-state';
 import styles from './item-grid.module.css';
 
-import { ItemCard } from '/@/renderer/components/item-card/item-card';
+import { getDataRowsCount, ItemCard } from '/@/renderer/components/item-card/item-card';
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
+import {
+    ItemListStateActions,
+    useItemListState,
+} from '/@/renderer/components/item-list/helpers/item-list-state';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
-const gridComponents: GridComponents<any> = {
-    Item: forwardRef<
-        HTMLDivElement,
-        {
-            children?: ReactNode;
-            className?: string;
-            context?: ItemContext;
-            'data-index': number;
-            enableExpanded?: boolean;
-            style?: CSSProperties;
-            virtuosoRef?: RefObject<VirtuosoGridHandle>;
-        }
-    >((props, ref) => {
-        const { children, context, 'data-index': index } = props;
-
-        return (
-            <div className={clsx(styles.gridItemComponent)} ref={ref}>
-                {children}
-            </div>
-        );
-    }),
-    List: forwardRef<
-        HTMLDivElement,
-        { children?: ReactNode; className?: string; style?: CSSProperties }
-    >((props, ref) => {
-        const { children, className, style, ...rest } = props;
-
-        return (
-            <div
-                className={clsx(styles.gridListComponent, className)}
-                ref={ref}
-                style={{ ...style }}
-                {...rest}
-            >
-                {children}
-            </div>
-        );
-    }),
-};
-
-interface ItemContext {
-    enableExpansion?: boolean;
-    enableSelection?: boolean;
-    internalState: ItemListStateActions;
-    itemType: LibraryItem;
-    onItemClick?: (item: unknown, index: number) => void;
-    onItemContextMenu?: (item: unknown, index: number) => void;
-    onItemDoubleClick?: (item: unknown, index: number) => void;
-}
-
-interface ItemGridProps {
+export interface ItemGridProps {
     data: unknown[];
     enableExpansion?: boolean;
     enableSelection?: boolean;
@@ -91,25 +40,34 @@ interface ItemGridProps {
           };
     itemType: LibraryItem;
     onEndReached?: (index: number) => void;
-    onIsScrolling?: VirtuosoGridProps<any, any>['isScrolling'];
     onItemClick?: (item: unknown, index: number) => void;
     onItemContextMenu?: (item: unknown, index: number) => void;
     onItemDoubleClick?: (item: unknown, index: number) => void;
     onRangeChanged?: (range: { endIndex: number; startIndex: number }) => void;
-    onScroll?: VirtuosoGridProps<any, any>['onScroll'];
+    onScroll?: (e: UIEvent<HTMLDivElement>) => void;
+    onScrollEnd?: () => void;
     onStartReached?: (index: number) => void;
-    ref: Ref<VirtuosoGridHandle>;
+    ref: Ref<ListImperativeAPI>;
     totalItemCount?: number;
+}
+
+interface ItemContext {
+    enableExpansion?: boolean;
+    enableSelection?: boolean;
+    internalState: ItemListStateActions;
+    itemType: LibraryItem;
+    onItemClick?: (item: unknown, index: number) => void;
+    onItemContextMenu?: (item: unknown, index: number) => void;
+    onItemDoubleClick?: (item: unknown, index: number) => void;
 }
 
 const expandedAnimationVariants: Variants = {
     hidden: {
         height: 0,
-        maxHeight: 0,
+        minHeight: 0,
     },
     show: {
-        height: '40dvh',
-        maxHeight: '500px',
+        minHeight: '300px',
         transition: {
             duration: 0.3,
             ease: 'easeInOut',
@@ -124,24 +82,31 @@ export const ItemGrid = ({
     initialTopMostItemIndex = 0,
     itemType,
     onEndReached,
-    onIsScrolling,
     onItemClick,
     onItemContextMenu,
     onItemDoubleClick,
     onRangeChanged,
     onScroll,
+    onScrollEnd,
     onStartReached,
-    ref,
-    totalItemCount,
+    totalItemCount = 0,
 }: ItemGridProps) => {
-    const rootRef = useRef(null);
-
-    const [scroller, setScroller] = useState<HTMLElement | null>(null);
+    const itemGridRef = useListRef(null);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+    const { ref: containerRef, width: containerWidth } = useElementSize();
+    const mergedContainerRef = useMergedRef(containerRef, scrollContainerRef);
 
     const internalState = useItemListState();
 
-    const [initialize, osInstance] = useOverlayScrollbars({
+    const [initialize] = useOverlayScrollbars({
         defer: true,
+        events: {
+            initialized(osInstance) {
+                const { viewport } = osInstance.elements();
+                viewport.style.overflowX = `var(--os-viewport-overflow-x)`;
+                viewport.style.overflowY = `var(--os-viewport-overflow-y)`;
+            },
+        },
         options: {
             overflow: { x: 'hidden', y: 'scroll' },
             paddingAbsolute: true,
@@ -156,65 +121,169 @@ export const ItemGrid = ({
     });
 
     useEffect(() => {
-        const { current: root } = rootRef;
+        const { current: root } = scrollContainerRef;
 
-        if (scroller && root) {
+        if (root) {
             initialize({
-                elements: { viewport: scroller },
+                elements: { viewport: root.firstElementChild as HTMLElement },
                 target: root,
             });
         }
-
-        return () => osInstance()?.destroy();
-    }, [scroller, initialize, osInstance]);
-
-    const itemContext = useMemo(
-        () => ({
-            enableExpansion,
-            enableSelection,
-            internalState,
-            itemType,
-            onItemClick,
-            onItemContextMenu,
-            onItemDoubleClick,
-        }),
-        [
-            internalState,
-            enableExpansion,
-            enableSelection,
-            itemType,
-            onItemClick,
-            onItemDoubleClick,
-            onItemContextMenu,
-        ],
-    );
+    }, [itemGridRef, initialize]);
 
     const hasExpanded = internalState.hasExpanded();
 
+    const handleExpand = useCallback(
+        (_e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => {
+            if (item && typeof item === 'object' && 'id' in item && 'serverId' in item) {
+                internalState.toggleExpanded({
+                    id: item.id as string,
+                    itemType: itemType,
+                    serverId: item.serverId as string,
+                });
+            }
+        },
+        [internalState],
+    );
+
+    const handleScroll = useCallback(
+        (e: UIEvent<HTMLDivElement>) => {
+            onScroll?.(e);
+        },
+        [onScroll],
+    );
+
+    const [tableMeta, setTableMeta] = useState<null | {
+        columnCount: number;
+        itemHeight: number;
+        rowCount: number;
+    }>(null);
+
+    // Throttled function to update table meta
+    const throttledSetTableMeta = useMemo(() => {
+        return throttle((width: number, dataLength: number, type: LibraryItem) => {
+            const isSm = width >= 600;
+            const isMd = width >= 768;
+            const isLg = width >= 1200;
+            const isXl = width >= 1500;
+            const is2xl = width >= 1920;
+            const is3xl = width >= 2560;
+
+            let itemsPerRow = 2;
+
+            if (is3xl) {
+                itemsPerRow = 12;
+            } else if (is2xl) {
+                itemsPerRow = 10;
+            } else if (isXl) {
+                itemsPerRow = 8;
+            } else if (isLg) {
+                itemsPerRow = 6;
+            } else if (isMd) {
+                itemsPerRow = 4;
+            } else if (isSm) {
+                itemsPerRow = 3;
+            } else {
+                itemsPerRow = 2;
+            }
+            const widthPerItem = Number(width) / itemsPerRow;
+            const itemHeight = widthPerItem + getDataRowsCount(type) * 26;
+
+            if (widthPerItem === 0) {
+                return;
+            }
+
+            setTableMeta({
+                columnCount: itemsPerRow,
+                itemHeight,
+                rowCount: Math.ceil(dataLength / itemsPerRow),
+            });
+        }, 200);
+    }, []);
+
+    useLayoutEffect(() => {
+        throttledSetTableMeta(containerWidth, data.length, itemType);
+    }, [containerWidth, data.length, itemType, throttledSetTableMeta]);
+
+    const handleOnRowsRendered = useCallback(
+        (visibleRows: { startIndex: number; stopIndex: number }) => {
+            onRangeChanged?.({
+                endIndex: visibleRows.stopIndex * (tableMeta?.columnCount || 0),
+                startIndex: visibleRows.startIndex * (tableMeta?.columnCount || 0),
+            });
+
+            if (onStartReached || onEndReached) {
+                const totalRows = Math.ceil(totalItemCount / (tableMeta?.columnCount || 0));
+                const startRow = visibleRows.startIndex;
+                const endRow = visibleRows.stopIndex;
+
+                if (startRow === 0) {
+                    onStartReached?.(startRow);
+                }
+                if (endRow >= totalRows) {
+                    onEndReached?.(endRow);
+                }
+            }
+        },
+        [onEndReached, onRangeChanged, onStartReached, totalItemCount, tableMeta?.columnCount],
+    );
+
+    const elements = useMemo(() => {
+        if (!tableMeta) {
+            return [];
+        }
+
+        console.log('data change');
+
+        return data
+            .map((d, i) => {
+                return {
+                    data: d,
+                    index: i,
+                };
+            })
+            .reduce(
+                (acc, d) => {
+                    if (d.index % (tableMeta?.columnCount || 0) === 0) {
+                        acc.push([]);
+                    }
+                    const prev = acc[acc.length - 1];
+                    prev.push(d);
+                    return acc;
+                },
+                [] as { data: any; index: number }[][],
+            );
+    }, [tableMeta, data]);
+
     return (
-        <div className={styles.itemGridContainer}>
-            <div
-                className={styles.gridListContainer}
-                data-overlayscrollbars-initialize=""
-                ref={rootRef}
-            >
-                <VirtuosoGrid
-                    components={gridComponents}
-                    context={itemContext}
-                    data={data}
-                    endReached={onEndReached}
-                    increaseViewportBy={200}
-                    initialTopMostItemIndex={initialTopMostItemIndex}
-                    isScrolling={onIsScrolling}
-                    itemContent={itemContent}
-                    onScroll={onScroll}
-                    rangeChanged={onRangeChanged}
-                    ref={ref}
-                    scrollerRef={setScroller}
-                    startReached={onStartReached}
-                    totalCount={totalItemCount || data.length}
-                />
-            </div>
+        <motion.div
+            animate={{
+                height: '100%',
+                opacity: 1,
+                transition: {
+                    duration: 0.5,
+                    ease: 'backInOut',
+                },
+            }}
+            className={styles.itemGridContainer}
+            data-overlayscrollbars-initialize=""
+            initial={{ opacity: 0 }}
+            ref={mergedContainerRef}
+        >
+            <List
+                listRef={itemGridRef}
+                onRowsRendered={handleOnRowsRendered}
+                onScroll={handleScroll}
+                rowComponent={RowComponent}
+                rowCount={tableMeta?.rowCount || 0}
+                rowHeight={tableMeta?.itemHeight || 0}
+                rowProps={{
+                    columns: tableMeta?.columnCount || 0,
+                    data: elements,
+                    handleExpand,
+                    itemType,
+                }}
+            />
             <AnimatePresence>
                 {hasExpanded && (
                     <motion.div
@@ -222,37 +291,47 @@ export const ItemGrid = ({
                         className={styles.gridExpandedContainer}
                         exit="hidden"
                         initial="hidden"
+                        style={{ height: '500px' }}
                         variants={expandedAnimationVariants}
                     >
                         <ExpandedListItem internalState={internalState} itemType={itemType} />
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </motion.div>
     );
 };
 
-const itemContent = (index: number, item: any, context: ItemContext) => {
-    return <InnerItem context={context} index={index} item={item} />;
-};
-
-const InnerItem = memo(
-    ({ context, index, item }: { context: ItemContext; index: number; item: ItemListItem }) => {
-        const handleClick = () => {
-            context.internalState.toggleExpanded({
-                id: item.id,
-                itemType: item.itemType,
-                serverId: item.serverId,
-            });
-        };
-
-        return (
-            <ItemCard
-                data={item as any}
-                onClick={handleClick}
-                onItemExpand={() => context.onItemDoubleClick?.(item, index)}
-                withControls
-            />
-        );
-    },
-);
+function RowComponent({
+    columns,
+    data,
+    handleExpand,
+    index,
+    itemType,
+    style,
+}: RowComponentProps<{
+    columns: number;
+    data: any[];
+    handleExpand: (e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => void;
+    itemType: LibraryItem;
+}>) {
+    return (
+        <div className={styles.itemList} style={style}>
+            {data[index].map((d) => (
+                <div
+                    className={styles.itemRow}
+                    key={d.index}
+                    style={{ '--columns': columns } as CSSProperties}
+                >
+                    <ItemCard
+                        data={d.data}
+                        itemType={itemType}
+                        onClick={(e, item, itemType) => handleExpand(e, item, itemType)}
+                        type="poster"
+                        withControls
+                    />
+                </div>
+            ))}
+        </div>
+    );
+}

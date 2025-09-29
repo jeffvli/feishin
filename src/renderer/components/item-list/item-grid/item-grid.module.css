@@ -1,95 +1,38 @@
 .item-grid-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: column !important;
+    width: 100%;
+    height: 100%;
+    padding: 0 var(--theme-spacing-md);
+}
+
+.auto-sizer {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.list-container {
+    display: flex;
     width: 100%;
     height: 100%;
 }
 
 .grid-list-container {
     width: 100%;
+    padding: 0 var(--theme-spacing-md);
+}
+
+.item-list {
+    display: flex;
+}
+
+.item-row {
+    flex: 1 1 calc(100% / var(--columns));
+    width: 100%;
+    max-width: calc(100% / var(--columns));
     height: 100%;
-    padding-right: var(--theme-spacing-md);
-    container-name: grid-list;
-    container-type: inline-size;
-}
-
-.grid-list-component {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-flow: row dense;
-
-    @container (min-width: $breakpoint-xs) {
-        grid-template-columns: repeat(6, 1fr);
-    }
-
-    @container (min-width: $breakpoint-sm) {
-        grid-template-columns: repeat(8, 1fr);
-    }
-
-    @container (min-width: $breakpoint-md) {
-        grid-template-columns: repeat(10, 1fr);
-    }
-
-    @container (min-width: $breakpoint-lg) {
-        grid-template-columns: repeat(12, 1fr);
-    }
-
-    @container (min-width: $breakpoint-xl) {
-        grid-template-columns: repeat(14, 1fr);
-    }
-
-    @container (min-width: $breakpoint-2xl) {
-        grid-template-columns: repeat(16, 1fr);
-    }
-
-    @container (min-width: $breakpoint-3xl) {
-        grid-template-columns: repeat(18, 1fr);
-    }
-
-    /* display: flex; */
-
-    /* flex-wrap: wrap; */
-}
-
-.grid-item-component {
-    display: flex;
-    grid-column: span 2;
     padding: var(--theme-spacing-sm);
-
-    /* box-sizing: border-box;
-    display: flex;
-    flex: none;
-    align-content: stretch;
-    width: 50%;
-    padding: var(--theme-spacing-sm);
-
-    @container (min-width: $breakpoint-xs) {
-        width: 33.33%;
-    }
-
-    @container (min-width: $breakpoint-sm) {
-        width: 25%;
-    }
-
-    @container (min-width: $breakpoint-md) {
-        width: 20%;
-    }
-
-    @container (min-width: $breakpoint-lg) {
-        width: 14.28%;
-    }
-
-    @container (min-width: $breakpoint-xl) {
-        width: 12.5%;
-    }
-
-    @container (min-width: $breakpoint-2xl) {
-        width: 11.11%;
-    }
-
-    @container (min-width: $breakpoint-3xl) {
-        width: 10%;
-    } */
+    overflow: hidden;
 }
 
 .full-width-content {

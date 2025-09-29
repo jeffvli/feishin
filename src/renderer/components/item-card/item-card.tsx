@@ -1,6 +1,15 @@
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
-import { Dispatch, Fragment, lazy, ReactNode, SetStateAction, useState } from 'react';
+import {
+    Dispatch,
+    Fragment,
+    lazy,
+    memo,
+    MouseEvent,
+    ReactNode,
+    SetStateAction,
+    useState,
+} from 'react';
 import { generatePath, Link } from 'react-router-dom';
 
 import styles from './item-card.module.css';
@@ -35,7 +44,11 @@ interface ItemCardProps {
     data: Album | AlbumArtist | Artist | Playlist | Song | undefined;
     isRound?: boolean;
     itemType: LibraryItem;
-    onClick?: () => void;
+    onClick?: (
+        e: MouseEvent<HTMLDivElement>,
+        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        itemType: LibraryItem,
+    ) => void;
     onItemExpand?: () => void;
     onItemSelect?: () => void;
     type?: 'compact' | 'default' | 'poster';
@@ -121,6 +134,7 @@ const CompactItemCard = ({
     data,
     imageUrl,
     isRound,
+    itemType,
     onClick,
     onItemExpand,
     onItemSelect,
@@ -134,7 +148,7 @@ const CompactItemCard = ({
             <div className={clsx(styles.container, styles.compact)}>
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onClick={onClick}
+                    onClick={(e) => onClick?.(e, data, itemType)}
                     onMouseEnter={() => withControls && setShowControls(true)}
                     onMouseLeave={() => withControls && setShowControls(false)}
                 >
@@ -158,7 +172,7 @@ const CompactItemCard = ({
     return (
         <div className={clsx(styles.container, styles.compact)}>
             <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
-                <Skeleton className={styles.image} enableAnimation={false} />
+                <Skeleton className={styles.image} />
                 <div className={clsx(styles.detailContainer, styles.compact)}>
                     {rows.map((row) => (
                         <div className={styles.row} key={row.id}>
@@ -175,6 +189,7 @@ const DefaultItemCard = ({
     data,
     imageUrl,
     isRound,
+    itemType,
     onClick,
     onItemExpand,
     onItemSelect,
@@ -188,7 +203,7 @@ const DefaultItemCard = ({
             <div className={clsx(styles.container)}>
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onClick={onClick}
+                    onClick={(e) => onClick?.(e, data, itemType)}
                     onDoubleClick={onItemExpand}
                     onMouseEnter={() => withControls && setShowControls(true)}
                     onMouseLeave={() => withControls && setShowControls(false)}
@@ -213,7 +228,7 @@ const DefaultItemCard = ({
     return (
         <div className={clsx(styles.container)}>
             <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
-                <Skeleton className={styles.image} enableAnimation={false} />
+                <Skeleton className={styles.image} />
             </div>
             <div className={styles.detailContainer}>
                 {rows.map((row) => (
@@ -230,6 +245,7 @@ const PosterItemCard = ({
     data,
     imageUrl,
     isRound,
+    itemType,
     onClick,
     onItemExpand,
     onItemSelect,
@@ -243,7 +259,7 @@ const PosterItemCard = ({
             <div className={clsx(styles.container, styles.poster)}>
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onClick={onClick}
+                    onClick={(e) => onClick?.(e, data, itemType)}
                     onMouseEnter={() => withControls && setShowControls(true)}
                     onMouseLeave={() => withControls && setShowControls(false)}
                 >
@@ -330,6 +346,23 @@ const getDataRows = (itemType: LibraryItem): DataRow[] => {
     }
 };
 
+export const getDataRowsCount = (itemType: LibraryItem) => {
+    switch (itemType) {
+        case LibraryItem.ALBUM:
+            return 2;
+        case LibraryItem.ALBUM_ARTIST:
+            return 1;
+        case LibraryItem.ARTIST:
+            return 1;
+        case LibraryItem.PLAYLIST:
+            return 2;
+        case LibraryItem.SONG:
+            return 2;
+        default:
+            return 1;
+    }
+};
+
 const getImageUrl = (data: Album | AlbumArtist | Artist | Playlist | Song | undefined) => {
     if (data && 'imageUrl' in data) {
         return data.imageUrl || undefined;
@@ -375,3 +408,5 @@ const ItemCardRow = ({
         </Text>
     );
 };
+
+export const MemoizedItemCard = memo(ItemCard);
