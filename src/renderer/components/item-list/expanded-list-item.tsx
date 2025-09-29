@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import styles from './expanded-list-item.module.css';
 
 import {
@@ -5,6 +7,7 @@ import {
     ItemListStateActions,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ExpandedAlbumListItem } from '/@/renderer/features/albums/components/expanded-album-list-item';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface ExpandedListItemProps {
@@ -23,7 +26,9 @@ export const ExpandedListItem = ({ internalState, itemType }: ExpandedListItemPr
     return (
         <div className={styles.container}>
             <div className={styles.inner}>
-                <SelectedItem item={currentItem} itemType={itemType} />
+                <Suspense fallback={<Spinner container />}>
+                    <SelectedItem item={currentItem} itemType={itemType} />
+                </Suspense>
             </div>
         </div>
     );

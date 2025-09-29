@@ -1,7 +1,7 @@
 .container {
     width: 100%;
     height: 100%;
-    padding: var(--theme-spacing-lg);
+    padding: var(--theme-spacing-sm);
 }
 
 .inner {
