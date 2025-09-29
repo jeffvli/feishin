@@ -128,6 +128,8 @@
         "react-virtuoso": "^4.14.0",
         "react-window": "^1.8.9",
         "react-window-infinite-loader": "^1.0.9",
+        "react-window-infinite-loader-v2": "npm:react-window-infinite-loader@2.0.0",
+        "react-window-v2": "npm:react-window@^2.1.2",
         "semver": "^7.5.4",
         "swiper": "^9.3.1",
         "use-sync-external-store": "^1.5.0",
