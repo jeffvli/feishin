@@ -1,6 +1,8 @@
 import { useElementSize } from '@mantine/hooks';
 
 interface UseContainerQueryProps {
+    '2xl'?: number;
+    '3xl'?: number;
     lg?: number;
     md?: number;
     sm?: number;
@@ -8,7 +10,7 @@ interface UseContainerQueryProps {
 }
 
 export const useContainerQuery = (props?: UseContainerQueryProps) => {
-    const { lg, md, sm, xl } = props || {};
+    const { '2xl': xxl, '3xl': xxxl, lg, md, sm, xl } = props || {};
     const { height, ref, width } = useElementSize();
 
     const isXs = width >= 0;
@@ -16,6 +18,8 @@ export const useContainerQuery = (props?: UseContainerQueryProps) => {
     const isMd = width >= (md || 768);
     const isLg = width >= (lg || 1200);
     const isXl = width >= (xl || 1500);
+    const is2xl = width >= (xxl || 1920);
+    const is3xl = width >= (xxxl || 2560);
 
-    return { height, isLg, isMd, isSm, isXl, isXs, ref, width };
+    return { height, is2xl, is3xl, isLg, isMd, isSm, isXl, isXs, ref, width };
 };
