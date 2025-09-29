@@ -29,6 +29,8 @@ export const useFastAverageColor = (args: {
     const { algorithm, default: defaultColor, id, src, srcLoaded } = args;
     const idRef = useRef<string | undefined>(id);
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const [background, setBackground] = useState<{
         background: string | undefined;
         isDark: boolean;
@@ -43,6 +45,7 @@ export const useFastAverageColor = (args: {
         const fac = new FastAverageColor();
 
         if (src && srcLoaded) {
+            setIsLoading(true);
             fac.getColorAsync(src, {
                 algorithm: algorithm || 'dominant',
                 ignoredColor: [
@@ -68,6 +71,9 @@ export const useFastAverageColor = (args: {
                         isDark: true,
                         isLight: false,
                     });
+                })
+                .finally(() => {
+                    setIsLoading(false);
                 });
         } else if (srcLoaded) {
             idRef.current = id;
@@ -88,5 +94,6 @@ export const useFastAverageColor = (args: {
         colorId: idRef.current,
         isDark: background.isDark,
         isLight: background.isLight,
+        isLoading,
     };
 };
