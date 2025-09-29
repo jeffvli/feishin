@@ -131,6 +131,7 @@
         "react-window-infinite-loader-v2": "npm:react-window-infinite-loader@2.0.0",
         "react-window-v2": "npm:react-window@^2.1.2",
         "semver": "^7.5.4",
+        "string-to-color": "^2.2.2",
         "swiper": "^9.3.1",
         "use-sync-external-store": "^1.5.0",
         "ws": "^8.18.2",
