@@ -320,6 +320,7 @@ const normalizeAlbum = (
         size: item.size,
         songCount: item.songCount,
         songs: item.songs ? item.songs.map((song) => normalizeSong(song, server)) : undefined,
+        tags: item.tags || null,
         updatedAt: item.updatedAt,
         userFavorite: item.starred,
         userRating: item.rating || null,
