@@ -43,7 +43,7 @@
 }
 
 .item-title {
-    z-index: 100;
+    z-index: 10;
     display: -webkit-box;
     overflow: hidden;
     -webkit-line-clamp: 2;
@@ -54,6 +54,7 @@
 }
 
 .item-subtitle {
+    z-index: 10;
     color: black;
     white-space: nowrap;
 }
