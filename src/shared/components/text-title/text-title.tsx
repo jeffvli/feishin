@@ -25,6 +25,7 @@ const _TextTitle = ({
     isMuted,
     isNoSelect,
     overflow,
+    weight,
     ...rest
 }: TextTitleProps) => {
     return (
@@ -39,6 +40,7 @@ const _TextTitle = ({
                 },
                 className,
             )}
+            fw={weight}
             {...rest}
         >
             {children}

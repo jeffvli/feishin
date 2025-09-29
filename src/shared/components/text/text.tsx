@@ -28,6 +28,7 @@ export const _Text = ({
     isMuted,
     isNoSelect,
     overflow,
+    weight,
     ...rest
 }: TextProps) => {
     return (
@@ -39,6 +40,7 @@ export const _Text = ({
                 [styles.overflowHidden]: overflow === 'hidden',
             })}
             component="div"
+            fw={weight}
             style={
                 {
                     '--font-family': font,
