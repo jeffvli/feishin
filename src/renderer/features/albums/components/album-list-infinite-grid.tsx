@@ -5,7 +5,7 @@ import { api } from '/@/renderer/api';
 import {
     InfiniteListProps,
     useItemListInfiniteLoader,
-} from '/@/renderer/components/item-list/helpers/item-list-loader';
+} from '/@/renderer/components/item-list/helpers/item-list-infinite-loader';
 import { ItemGrid } from '/@/renderer/components/item-list/item-grid/item-grid';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import {
