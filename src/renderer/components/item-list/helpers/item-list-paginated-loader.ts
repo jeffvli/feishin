@@ -4,15 +4,17 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { getServerById } from '/@/renderer/store';
 
 export interface PaginatedListProps<TQuery> {
+    initialPage?: number;
+    itemsPerPage?: number;
     query: Omit<TQuery, 'limit' | 'startIndex'>;
     serverId: string;
 }
 
 interface UseItemListPaginatedLoaderProps {
+    currentPage: number;
     itemsPerPage: number;
     listCountQuery: UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
     listQueryFn: (args: { apiClientProps: any; query: any }) => Promise<{ items: unknown[] }>;
-    pageIndex: number;
     query: Record<string, any>;
     serverId: string;
 }
@@ -22,28 +24,30 @@ function getInitialData(itemCount: number) {
 }
 
 export const useItemListPaginatedLoader = ({
+    currentPage,
     itemsPerPage = 100,
     listCountQuery,
     listQueryFn,
-    pageIndex,
     query = {},
     serverId,
 }: UseItemListPaginatedLoaderProps) => {
     const { data: totalItemCount } = useSuspenseQuery<number, any, number, any>(listCountQuery);
 
+    const pageCount = Math.ceil(totalItemCount / itemsPerPage);
+
+    const fetchRange = getFetchRange(currentPage, itemsPerPage);
+    const startIndex = fetchRange.startIndex;
+
+    const queryParams = {
+        limit: itemsPerPage,
+        startIndex: startIndex,
+        ...query,
+    };
+
     const { data } = useQuery({
         gcTime: 1000 * 15,
-        initialData: getInitialData(totalItemCount),
+        placeholderData: getInitialData(itemsPerPage),
         queryFn: async ({ signal }) => {
-            const fetchRange = getFetchRange(pageIndex, itemsPerPage);
-            const startIndex = fetchRange.startIndex;
-
-            const queryParams = {
-                limit: itemsPerPage,
-                startIndex: startIndex,
-                ...query,
-            };
-
             const result = await listQueryFn({
                 apiClientProps: { server: getServerById(serverId), signal },
                 query: queryParams,
@@ -51,11 +55,11 @@ export const useItemListPaginatedLoader = ({
 
             return result.items;
         },
-        queryKey: queryKeys.albums.list(serverId, query),
+        queryKey: queryKeys.albums.list(serverId, queryParams),
         staleTime: 1000 * 15,
     });
 
-    return { data };
+    return { data, pageCount, totalItemCount };
 };
 
 const getFetchRange = (pageIndex: number, itemsPerPage: number) => {
