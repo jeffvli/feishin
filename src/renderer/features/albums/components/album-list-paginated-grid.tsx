@@ -6,7 +6,7 @@ import {
     PaginatedListProps,
     useItemListPaginatedLoader,
 } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
-import { ItemGrid } from '/@/renderer/components/item-list/item-grid/item-grid';
+import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/item-grid-list';
 import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
 import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
@@ -58,7 +58,7 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
                 pageCount={pageCount}
                 totalItemCount={totalItemCount}
             >
-                <ItemGrid data={data || []} itemType={LibraryItem.ALBUM} ref={ref} />
+                <ItemGridList data={data || []} itemType={LibraryItem.ALBUM} ref={ref} />
             </ItemListWithPagination>
         );
     },

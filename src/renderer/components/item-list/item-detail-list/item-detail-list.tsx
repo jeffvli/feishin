@@ -15,17 +15,14 @@ import {
 } from 'react';
 import { List, ListImperativeAPI, RowComponentProps, useListRef } from 'react-window-v2';
 
-import styles from './item-list-detail.module.css';
+import styles from './item-detail-list.module.css';
 
 import { ItemDetail } from '/@/renderer/components/item-detail/item-detail';
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
-import {
-    ItemListStateActions,
-    useItemListState,
-} from '/@/renderer/components/item-list/helpers/item-list-state';
+import { useItemListState } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
-export interface ItemGridProps {
+export interface ItemDetailListProps {
     data: unknown[];
     enableExpansion?: boolean;
     enableSelection?: boolean;
@@ -64,7 +61,7 @@ const expandedAnimationVariants: Variants = {
     },
 };
 
-export const ItemListDetail = ({
+export const ItemDetailList = ({
     data,
     enableExpansion = false,
     enableSelection = false,
@@ -79,7 +76,7 @@ export const ItemListDetail = ({
     onScrollEnd,
     onStartReached,
     totalItemCount = 0,
-}: ItemGridProps) => {
+}: ItemDetailListProps) => {
     const itemDetailRef = useListRef(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
     const { ref: containerRef, width: containerWidth } = useElementSize();

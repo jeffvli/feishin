@@ -6,7 +6,7 @@ import {
     InfiniteListProps,
     useItemListInfiniteLoader,
 } from '/@/renderer/components/item-list/helpers/item-list-infinite-loader';
-import { ItemGrid } from '/@/renderer/components/item-list/item-grid/item-grid';
+import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/item-grid-list';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import {
     AlbumListQuery,
@@ -44,7 +44,7 @@ export const AlbumListInfiniteGrid = forwardRef<any, AlbumListInfiniteGridProps>
         });
 
         return (
-            <ItemGrid
+            <ItemGridList
                 data={data || []}
                 itemType={LibraryItem.ALBUM}
                 onRangeChanged={onRangeChanged}
