@@ -83,8 +83,17 @@ export const useDiscordRpc = () => {
                         activity.endTimestamp = end;
                     }
 
-                    activity.smallImageKey = discordSettings.showPaused ? 'playing' : 'icon';
-                    activity.smallImageText = discordSettings.showPaused ? current[2] : 'Feishin';
+                    if (discordSettings.showPaused) {
+                        activity.smallImageKey = 'playing';
+                        activity.smallImageText = current[2];
+                    } else {
+                        activity.smallImageKey = discordSettings.usePlayIconWhenNotPaused
+                            ? 'playing'
+                            : 'icon';
+                        activity.smallImageText = discordSettings.usePlayIconWhenNotPaused
+                            ? current[2]
+                            : 'Feishin';
+                    }
                 } else if ((current[2] as PlayerStatus) === PlayerStatus.PAUSED) {
                     if (discordSettings.showPaused) {
                         activity.smallImageKey = 'paused';
