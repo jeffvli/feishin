@@ -286,7 +286,7 @@ export const ItemGrid = ({
                 {hasExpanded && (
                     <motion.div
                         animate="show"
-                        className={styles.gridExpandedContainer}
+                        className={styles.listExpandedContainer}
                         exit="hidden"
                         initial="hidden"
                         style={{ height: '500px' }}
