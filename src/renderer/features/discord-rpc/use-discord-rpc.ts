@@ -28,22 +28,16 @@ export const useDiscordRpc = () => {
             previous: (number | PlayerStatus | QueueSong | undefined)[],
         ) => {
             if (
-                !current[0] || // No track
-                current[1] === 0 || // Start of track
-                (current[2] === 'paused' && !discordSettings.showPaused) // Track paused with show paused setting disabled
-            )
+                !current[0] ||
+                current[1] === 0 ||
+                (current[2] === 'paused' && !discordSettings.showPaused)
+            ) {
                 return discordRpc?.clearActivity();
+            }
 
-            // Handle change detection
             const song = current[0] as QueueSong;
             const trackChanged = lastUniqueId !== song.uniqueId;
 
-            /*
-                1. If the song has just started, update status
-                2. If we jump more then 1.2 seconds from last state, update status to match
-                3. If the current song id is completely different, update status
-                4. If the player state changed, update status
-            */
             if (
                 previous[1] === 0 ||
                 Math.abs((current[1] as number) - (previous[1] as number)) > 1.2 ||
@@ -54,8 +48,7 @@ export const useDiscordRpc = () => {
 
                 const start = Math.round(Date.now() - (current[1] as number) * 1000);
                 const end = Math.round(start + song.duration);
-
-                const artists = song?.artists.map((artist) => artist.name).join(', ');
+                const artists = song?.artists.map((a) => a.name).join(', ');
 
                 const statusDisplayMap = {
                     [DiscordDisplayType.ARTIST_NAME]: StatusDisplayType.STATE,
@@ -72,11 +65,10 @@ export const useDiscordRpc = () => {
                     smallImageText: current[2] as string,
                     state: artists || 'Unknown artist',
                     statusDisplayType: statusDisplayMap[discordSettings.displayType],
-                    // I would love to use the actual type as opposed to hardcoding to 2,
-                    // but manually installing the discord-types package appears to break things
                     type: discordSettings.showAsListening ? 2 : 0,
                 };
 
+                // Decide small image icon
                 if ((current[2] as PlayerStatus) === PlayerStatus.PLAYING) {
                     if (start && end) {
                         activity.startTimestamp = start;
@@ -87,12 +79,12 @@ export const useDiscordRpc = () => {
                         activity.smallImageKey = 'playing';
                         activity.smallImageText = current[2];
                     } else {
-                        activity.smallImageKey = discordSettings.usePlayIconWhenNotPaused
-                            ? 'playing'
-                            : 'icon';
-                        activity.smallImageText = discordSettings.usePlayIconWhenNotPaused
-                            ? current[2]
-                            : 'Feishin';
+                        activity.smallImageKey = discordSettings.useAppIconWhenNotPaused
+                            ? 'icon'
+                            : 'playing';
+                        activity.smallImageText = discordSettings.useAppIconWhenNotPaused
+                            ? 'Feishin'
+                            : current[2];
                     }
                 } else if ((current[2] as PlayerStatus) === PlayerStatus.PAUSED) {
                     if (discordSettings.showPaused) {
@@ -100,52 +92,46 @@ export const useDiscordRpc = () => {
                     }
                 }
 
+                // Load large image from Jellyfin, Navidrome, or Last.fm
                 if (discordSettings.showServerImage && song) {
                     if (song.serverType === ServerType.JELLYFIN && song.imageUrl) {
                         activity.largeImageKey = song.imageUrl;
                     } else if (song.serverType === ServerType.NAVIDROME) {
                         const server = getServerById(song.serverId);
-
                         try {
                             const info = await controller.getAlbumInfo({
                                 apiClientProps: { server },
                                 query: { id: song.albumId },
                             });
-
-                            if (info.imageUrl) {
-                                activity.largeImageKey = info.imageUrl;
-                            }
-                        } catch {
-                            /* empty */
-                        }
+                            if (info.imageUrl) activity.largeImageKey = info.imageUrl;
+                        } catch {}
                     }
                 }
 
                 if (
-                    activity.largeImageKey === undefined &&
+                    !activity.largeImageKey &&
                     generalSettings.lastfmApiKey &&
-                    song?.album &&
-                    song?.albumArtists.length
+                    song.album &&
+                    song.albumArtists.length
                 ) {
-                    const albumInfo = await fetch(
-                        `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${generalSettings.lastfmApiKey}&artist=${encodeURIComponent(song.albumArtists[0].name)}&album=${encodeURIComponent(song.album)}&format=json`,
-                    );
-
-                    const albumInfoJson = await albumInfo.json();
-
-                    if (albumInfoJson.album?.image?.[3]['#text']) {
-                        activity.largeImageKey = albumInfoJson.album.image[3]['#text'];
-                    }
+                    try {
+                        const albumInfo = await fetch(
+                            `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${generalSettings.lastfmApiKey}&artist=${encodeURIComponent(song.albumArtists[0].name)}&album=${encodeURIComponent(song.album)}&format=json`,
+                        );
+                        const albumInfoJson = await albumInfo.json();
+                        const img = albumInfoJson.album?.image?.[3]?.['#text'];
+                        if (img) activity.largeImageKey = img;
+                    } catch {}
                 }
 
-                // Fall back to default icon if not set
                 if (!activity.largeImageKey) {
                     activity.largeImageKey = 'icon';
                 }
 
-                // Initialize if needed
                 const isConnected = await discordRpc?.isConnected();
-                if (!isConnected) await discordRpc?.initialize(discordSettings.clientId);
+                if (!isConnected) {
+                    await discordRpc?.initialize(discordSettings.clientId);
+                }
 
                 discordRpc?.setActivity(activity);
             }
@@ -154,6 +140,7 @@ export const useDiscordRpc = () => {
             discordSettings.showAsListening,
             discordSettings.showServerImage,
             discordSettings.showPaused,
+            discordSettings.useAppIconWhenNotPaused, // ✅ Include in deps
             generalSettings.lastfmApiKey,
             discordSettings.clientId,
             discordSettings.displayType,

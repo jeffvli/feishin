@@ -102,24 +102,24 @@ export const DiscordSettings = () => {
         {
             control: (
                 <Switch
-                    checked={settings.usePlayIconWhenNotPaused}
+                    checked={settings.useAppIconWhenNotPaused}
                     disabled={settings.showPaused}
                     onChange={(e) => {
                         setSettings({
                             discord: {
                                 ...settings,
-                                usePlayIconWhenNotPaused: e.currentTarget.checked,
+                                useAppIconWhenNotPaused: e.currentTarget.checked,
                             },
                         });
                     }}
                 />
             ),
-            description: t('setting.usePlayIconWhenNotPaused', {
+            description: t('setting.useAppIconWhenNotPaused', {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.usePlayIconWhenNotPaused', {
+            title: t('setting.useAppIconWhenNotPaused', {
                 postProcess: 'sentenceCase',
             }),
         },

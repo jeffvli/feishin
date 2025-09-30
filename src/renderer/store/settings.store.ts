@@ -210,7 +210,7 @@ export interface SettingsState {
         showAsListening: boolean;
         showPaused: boolean;
         showServerImage: boolean;
-        usePlayIconWhenNotPaused: boolean;
+        useAppIconWhenNotPaused: boolean;
     };
     font: {
         builtIn: string;
