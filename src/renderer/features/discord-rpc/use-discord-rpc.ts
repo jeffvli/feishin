@@ -77,14 +77,14 @@ export const useDiscordRpc = () => {
 
                     if (discordSettings.showPaused) {
                         activity.smallImageKey = 'playing';
-                        activity.smallImageText = current[2];
+                        activity.smallImageText = String(current[2] ?? '');
                     } else {
                         activity.smallImageKey = discordSettings.useAppIconWhenNotPaused
                             ? 'icon'
                             : 'playing';
                         activity.smallImageText = discordSettings.useAppIconWhenNotPaused
                             ? 'Feishin'
-                            : current[2];
+                            : String(current[2] ?? '');
                     }
                 } else if ((current[2] as PlayerStatus) === PlayerStatus.PAUSED) {
                     if (discordSettings.showPaused) {

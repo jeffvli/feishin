@@ -368,6 +368,7 @@ const initialState: SettingsState = {
         showAsListening: false,
         showPaused: true,
         showServerImage: false,
+        useAppIconWhenNotPaused: true,
     },
     font: {
         builtIn: 'Poppins',
