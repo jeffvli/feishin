@@ -81,7 +81,7 @@ export const useDiscordRpc = () => {
                     activity.stateUrl = 'https://www.last.fm/music/' + song.artists[0].name;
                     activity.detailsUrl =
                         'https://www.last.fm/music/' +
-                        song.artistName +
+                        song.albumArtists[0].name +
                         '/' +
                         (song.album || '_') +
                         '/' +
