@@ -78,9 +78,14 @@ export const useDiscordRpc = () => {
                 };
 
                 if (song?.artistName) {
-                    activity.stateUrl = 'https://www.last.fm/music/' + song.artistName;
+                    activity.stateUrl = 'https://www.last.fm/music/' + song.artists[0].name;
                     activity.detailsUrl =
-                        activity.stateUrl + '/' + (song.album || '_') + '/' + song.name;
+                        'https://www.last.fm/music/' +
+                        song.artistName +
+                        '/' +
+                        (song.album || '_') +
+                        '/' +
+                        song.name;
                 }
 
                 if ((current[2] as PlayerStatus) === PlayerStatus.PLAYING) {
