@@ -169,6 +169,33 @@ export const DiscordSettings = () => {
         {
             control: (
                 <Switch
+                    checked={settings.linkMusicbrainz}
+                    onChange={(e) => {
+                        setSettings({
+                            discord: {
+                                ...settings,
+                                linkMusicbrainz: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.discordLinkMusicbrainz_description', {
+                context: 'description',
+                discord: 'Discord',
+                musicbrainz: 'musicbrainz',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.discordLinkMusicbrainz', {
+                discord: 'Discord',
+                musicbrainz: 'musicbrainz',
+                postProcess: 'sentenceCase',
+            }),
+        },
+        {
+            control: (
+                <Switch
                     checked={settings.linkLastfm}
                     onChange={(e) => {
                         setSettings({
@@ -184,6 +211,7 @@ export const DiscordSettings = () => {
                 context: 'description',
                 discord: 'Discord',
                 lastfm: 'last.fm',
+                musicbrainz: 'musicbrainz',
                 postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),

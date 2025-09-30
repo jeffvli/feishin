@@ -261,6 +261,7 @@ const normalizeSong = (
         itemType: LibraryItem.SONG,
         lastPlayedAt: null,
         lyrics: null,
+        mbzId: item.ProviderIds?.MusicBrainzTrack || null,
         name: item.Name,
         participants: getPeople(item),
         path,

@@ -214,7 +214,7 @@ const song = z.object({
     mbzAlbumArtistId: z.string().optional(),
     mbzAlbumId: z.string().optional(),
     mbzArtistId: z.string().optional(),
-    mbzTrackId: z.string().optional(),
+    mbzReleaseTrackId: z.string().optional(),
     mediumImageUrl: z.string().optional(),
     orderAlbumArtistName: z.string(),
     orderAlbumName: z.string(),

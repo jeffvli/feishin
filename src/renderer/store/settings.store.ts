@@ -208,6 +208,7 @@ export interface SettingsState {
         displayType: DiscordDisplayType;
         enabled: boolean;
         linkLastfm: boolean;
+        linkMusicbrainz: boolean;
         showAsListening: boolean;
         showPaused: boolean;
         showServerImage: boolean;
@@ -366,6 +367,7 @@ const initialState: SettingsState = {
         displayType: DiscordDisplayType.FEISHIN,
         enabled: false,
         linkLastfm: false,
+        linkMusicbrainz: false,
         showAsListening: false,
         showPaused: true,
         showServerImage: false,

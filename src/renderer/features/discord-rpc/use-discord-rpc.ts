@@ -88,6 +88,12 @@ export const useDiscordRpc = () => {
                         song.name;
                 }
 
+                if (discordSettings.linkMusicbrainz && song?.mbzId) {
+                    if (song.serverType == 'subsonic')
+                        activity.detailsUrl = 'https://musicbrainz.org/recording/' + song.mbzId;
+                    else activity.detailsUrl = 'https://musicbrainz.org/track/' + song.mbzId;
+                }
+
                 if ((current[2] as PlayerStatus) === PlayerStatus.PLAYING) {
                     if (start && end) {
                         activity.startTimestamp = start;
