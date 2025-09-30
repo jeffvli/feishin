@@ -83,9 +83,12 @@ export const useDiscordRpc = () => {
                         activity.endTimestamp = end;
                     }
 
-                    activity.smallImageKey = 'playing';
-                } else {
-                    activity.smallImageKey = 'paused';
+                    activity.smallImageKey = discordSettings.showPaused ? 'playing' : 'icon';
+                    activity.smallImageText = discordSettings.showPaused ? current[2] : 'Feishin';
+                } else if ((current[2] as PlayerStatus) === PlayerStatus.PAUSED) {
+                    if (discordSettings.showPaused) {
+                        activity.smallImageKey = 'paused';
+                    }
                 }
 
                 if (discordSettings.showServerImage && song) {
