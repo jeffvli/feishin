@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { controller } from '/@/renderer/api/controller';
 import {
     DiscordDisplayType,
-    DiscordLinkType,
     getServerById,
     useAppStore,
     useDiscordSettings,
@@ -78,7 +77,7 @@ export const useDiscordRpc = () => {
                     type: discordSettings.showAsListening ? 2 : 0,
                 };
 
-                if (discordSettings.linkType == DiscordLinkType.LAST_FM && song?.artistName) {
+                if (discordSettings.linkLastfm && song?.artistName) {
                     activity.stateUrl = 'https://www.last.fm/music/' + song.artists[0].name;
                     activity.detailsUrl =
                         'https://www.last.fm/music/' +
@@ -157,7 +156,7 @@ export const useDiscordRpc = () => {
             generalSettings.lastfmApiKey,
             discordSettings.clientId,
             discordSettings.displayType,
-            discordSettings.linkType,
+            discordSettings.linkLastfm,
             lastUniqueId,
         ],
     );

@@ -7,7 +7,6 @@ import {
 } from '/@/renderer/features/settings/components/settings-section';
 import {
     DiscordDisplayType,
-    DiscordLinkType,
     useDiscordSettings,
     useGeneralSettings,
     useSettingsStoreActions,
@@ -169,38 +168,28 @@ export const DiscordSettings = () => {
         },
         {
             control: (
-                <Select
-                    aria-label={t('setting.discordLinkType')}
-                    clearable={false}
-                    data={[
-                        {
-                            label: t('setting.discordLinkType_none', {
-                                postProcess: 'sentenceCase',
-                            }),
-                            value: DiscordLinkType.NONE,
-                        },
-                        { label: 'last.fm', value: DiscordLinkType.LAST_FM },
-                    ]}
-                    defaultValue={settings.linkType}
+                <Switch
+                    checked={settings.linkLastfm}
                     onChange={(e) => {
-                        if (!e) return;
                         setSettings({
                             discord: {
                                 ...settings,
-                                linkType: e as DiscordLinkType,
+                                linkLastfm: e.currentTarget.checked,
                             },
                         });
                     }}
                 />
             ),
-            description: t('setting.discordLinkType', {
+            description: t('setting.discordLinkLastFM_description', {
                 context: 'description',
                 discord: 'Discord',
+                lastfm: 'last.fm',
                 postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.discordLinkType', {
+            title: t('setting.discordLinkLastFM', {
                 discord: 'Discord',
+                lastfm: 'last.fm',
                 postProcess: 'sentenceCase',
             }),
         },
