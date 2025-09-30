@@ -545,7 +545,7 @@
         "discordDisplayType_songname": "song name",
         "discordDisplayType_artistname": "artist name(s)",
         "discordLinkLastFM": "{{discord}} presence {{lastfm}} links",
-        "discordLinkLastFM_description": "adds external links to lastfm to the song and artist fields in {{discord}} rich presence. {{lastfm}} should always provide a link. makes no extra network requests",
+        "discordLinkLastFM_description": "adds external links to {{lastfm}} to the song and artist fields in {{discord}} rich presence. {{lastfm}} should always provide a link. makes no extra network requests",
         "doubleClickBehavior": "queue all searched tracks when double clicking",
         "doubleClickBehavior_description": "if true, all matching tracks in a track search will be queued. otherwise, only the clicked one will be queued",
         "enableRemote": "enable remote control server",
