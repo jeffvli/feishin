@@ -1,4 +1,5 @@
 import { openModal } from '@mantine/modals';
+import { t } from 'i18next';
 import { useCallback } from 'react';
 
 import { ExportImportSettingsModal } from '/@/renderer/components/export-import-settings-modal/export-import-settings-modal';
@@ -36,7 +37,7 @@ export const ExportImportSettings = () => {
         openModal({
             children: <ExportImportSettingsModal />,
             size: 'lg',
-            title: 'Import Feishin Settings',
+            title: t('setting.exportImportSettings_importModalTitle').toString(),
         });
     };
 
@@ -45,12 +46,16 @@ export const ExportImportSettings = () => {
             <SettingsOptions
                 control={
                     <>
-                        <Button onClick={onExportSettings}>Export Settings</Button>
-                        <Button onClick={openImportModal}>Import Settings</Button>
+                        <Button onClick={onExportSettings}>
+                            {t('setting.exportImportSettings_control_exportText').toString()}
+                        </Button>
+                        <Button onClick={openImportModal}>
+                            {t('setting.exportImportSettings_control_importText').toString()}
+                        </Button>
                     </>
                 }
-                description="Export and Import settings via JSON"
-                title="Import / Export Settings"
+                description={t('setting.exportImportSettings_control_description').toString()}
+                title={t('setting.exportImportSettings_control_title').toString()}
             />
         </>
     );

@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import { useCallback, useState } from 'react';
 
 import { DiffVisualiser } from '/@/renderer/components/settings-diff-visualiser/settings-diff-visualiser';
@@ -55,6 +56,7 @@ const removeUndefinedKeys = (obj: Omit<SettingsState, 'actions'>) => {
     }
 
     const cleanedObj: any = Array.isArray(obj) ? [] : {};
+
     for (const key in obj) {
         if (obj[key] !== undefined) {
             cleanedObj[key] = removeUndefinedKeys(obj[key]);
@@ -81,7 +83,7 @@ export const ExportImportSettingsModal = () => {
                 JSON.parse(itemContents);
             } catch (err) {
                 return {
-                    error: 'The file passed is not valid JSON',
+                    error: t('setting.exportImportSettings_notValidJSON'),
                     isValid: false,
                 };
             }
@@ -94,7 +96,9 @@ export const ExportImportSettingsModal = () => {
 
             if (!isValid) {
                 return {
-                    error: `The file passed does not match the expected structure. Offending key: "${offendingKey}"`,
+                    error: t('setting.exportImportSettings_offendingKeyError', {
+                        offendingKey,
+                    }),
                     isValid: false,
                 };
             }
@@ -131,17 +135,16 @@ export const ExportImportSettingsModal = () => {
                         originalSettings={otherSettings}
                     />
                     <Text size="sm" ta="center">
-                        Importing settings is destructive, please review the above before clicking
-                        &quot;Import&quot; below!
+                        {t('setting.exportImportSettings_destructiveWarning').toString()}
                     </Text>
                     <Button onClick={onImportClick} variant="state-info">
-                        Import Settings
+                        {t('setting.exportImportSettings_importBtn').toString()}
                     </Button>
                 </Stack>
             ) : null}
             {currentScreen === SCREENS.IMPORT_COMPLETE ? (
                 <Text py="md" ta="center">
-                    Settings have been imported successfully!
+                    {t('setting.exportImportSettings_importSuccess').toString()}
                 </Text>
             ) : null}
         </>

@@ -1,3 +1,4 @@
+import { t } from 'i18next';
 import { useCallback, useRef, useState } from 'react';
 
 import { Flex } from '/@/shared/components/flex/flex';
@@ -37,7 +38,7 @@ export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZon
             const items = event.dataTransfer.items;
 
             if (items.length > 1) {
-                setError('Please only select 1 file');
+                setError(t('dragDropZone.error_oneFileOnly'));
                 return;
             }
 
@@ -51,7 +52,11 @@ export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZon
                 .then((value) => processItem(value.toString()))
                 .catch((err) => {
                     const error = err as Error;
-                    setError(`There has been an issue reading the file: ${error.message}`);
+                    setError(
+                        t('dragDropZone.error_readingFile', {
+                            errorMessage: error.message,
+                        }),
+                    );
                 });
         },
         [processItem],
@@ -71,7 +76,7 @@ export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZon
             const { files } = event.target;
 
             if (!files || files.length > 1) {
-                setError('Please only select 1 file');
+                setError(t('dragDropZone.error_oneFileOnly'));
                 return;
             }
 
@@ -109,7 +114,7 @@ export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZon
             style={{ cursor: 'pointer' }}
         >
             <Icon icon={icon} size="3xl" />
-            <Text>Drop a file here</Text>
+            <Text>{t('dragDropZone.mainText').toString()}</Text>
             {hasErrored ? (
                 <Text c="red" ta="center">
                     {error}
