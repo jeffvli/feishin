@@ -77,6 +77,12 @@ export const useDiscordRpc = () => {
                     type: discordSettings.showAsListening ? 2 : 0,
                 };
 
+                if (song?.artistName) {
+                    activity.stateUrl = 'https://www.last.fm/music/' + song.artistName;
+                    activity.detailsUrl =
+                        activity.stateUrl + '/' + (song.album || '_') + '/' + song.name;
+                }
+
                 if ((current[2] as PlayerStatus) === PlayerStatus.PLAYING) {
                     if (start && end) {
                         activity.startTimestamp = start;
