@@ -1,5 +1,5 @@
 import { closeAllModals, openModal } from '@mantine/modals';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
@@ -39,6 +39,13 @@ export const StylesSettings = () => {
         });
         closeAllModals();
     };
+
+    useEffect(() => {
+        if (content !== css) {
+            setCss(content);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- Reason: This is to only fire if an external source updates the stores css.content
+    }, [content]);
 
     const openConfirmModal = () => {
         openModal({

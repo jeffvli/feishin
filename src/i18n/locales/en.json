@@ -559,7 +559,7 @@
         "exportImportSettings_importModalTitle": "Import Feishin Settings",
         "exportImportSettings_importSuccess": "Settings have been imported successfully!",
         "exportImportSettings_notValidJSON": "The file passed is not valid JSON",
-        "exportImportSettings_offendingKeyError": "The file passed does not match the expected structure. Offending key: \"{{offendingKey}}\"",
+        "exportImportSettings_offendingKeyError": "\"{{offendingKey}}\" is incorrect - {{reason}}",
         "externalLinks_description": "enables showing external links (Last.fm, MusicBrainz) on artist/album pages",
         "externalLinks": "show external links",
         "floatingQueueArea_description": "display a hover icon on the right side of the screen to view the play queue",

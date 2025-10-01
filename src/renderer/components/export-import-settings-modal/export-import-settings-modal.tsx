@@ -1,8 +1,16 @@
 import { t } from 'i18next';
 import { useCallback, useState } from 'react';
+import { ZodError } from 'zod';
 
 import { DiffVisualiser } from '/@/renderer/components/settings-diff-visualiser/settings-diff-visualiser';
-import { SettingsState, useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
+import {
+    migrateSettings,
+    type SettingsState,
+    SettingsStateSchema,
+    useSettingsForExport,
+    useSettingsStoreActions,
+    VersionedSettings,
+} from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { DragDropZone } from '/@/shared/components/drag-drop-zone/drag-drop-zone';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -14,66 +22,21 @@ enum SCREENS {
     IMPORT_COMPLETE,
 }
 
-const compareKeysRecursive = (
-    obj1: unknown,
-    obj2: unknown,
-    parentKey: string = '',
-): { isValid: boolean; offendingKey?: string } => {
-    if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
-        return { isValid: true };
-    }
-
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-
-    if (keys1.length !== keys2.length) {
-        return { isValid: false, offendingKey: parentKey };
-    }
-
-    for (const key of keys1) {
-        if (!keys2.includes(key)) {
-            const fullKey = parentKey ? `${parentKey}.${key}` : key;
-            return { isValid: false, offendingKey: fullKey };
-        }
-
-        const result = compareKeysRecursive(
-            obj1[key],
-            obj2[key],
-            parentKey ? `${parentKey}.${key}` : key,
-        );
-
-        if (!result.isValid) {
-            return result;
-        }
-    }
-
-    return { isValid: true };
-};
-
-const removeUndefinedKeys = (obj: Omit<SettingsState, 'actions'>) => {
-    if (typeof obj !== 'object' || obj === null) {
-        return obj;
-    }
-
-    const cleanedObj: any = Array.isArray(obj) ? [] : {};
-
-    for (const key in obj) {
-        if (obj[key] !== undefined) {
-            cleanedObj[key] = removeUndefinedKeys(obj[key]);
-        }
-    }
-    return cleanedObj;
-};
-
 export const ExportImportSettingsModal = () => {
-    const { actions, ...otherSettings } = useSettingsStore();
+    const { version, ...settings } = useSettingsForExport();
     const { setSettings } = useSettingsStoreActions();
 
     const [currentScreen, setCurrentScreen] = useState<SCREENS>(SCREENS.FILE_PICKER);
     const [selectedSettingsFile, setSettingsFile] = useState<SettingsState>();
 
     const onItemSelected = useCallback((itemContents: string) => {
-        setSettingsFile(JSON.parse(itemContents) as SettingsState);
+        const settingsFile = JSON.parse(itemContents) as VersionedSettings;
+        const { version, ...settings } = settingsFile;
+
+        const parsedResult = SettingsStateSchema.parse(settings);
+        const migratedSettings = migrateSettings(parsedResult, version);
+
+        setSettingsFile(migratedSettings);
         setCurrentScreen(SCREENS.DIFF_VISUALS);
     }, []);
 
@@ -88,16 +51,20 @@ export const ExportImportSettingsModal = () => {
                 };
             }
 
-            const parsedFile = JSON.parse(itemContents) as SettingsState;
-            const { isValid, offendingKey } = compareKeysRecursive(
-                removeUndefinedKeys(otherSettings),
-                parsedFile,
-            );
+            const content = JSON.parse(itemContents);
+            const validationRes = SettingsStateSchema.safeParse(content);
 
-            if (!isValid) {
+            if (!validationRes.success) {
+                const error = validationRes.error as ZodError;
+                const firstError = error.errors.pop();
+
+                const dotPath = firstError?.path.join('.');
+                const reason = firstError?.message;
+
                 return {
                     error: t('setting.exportImportSettings_offendingKeyError', {
-                        offendingKey,
+                        offendingKey: dotPath,
+                        reason,
                     }),
                     isValid: false,
                 };
@@ -107,7 +74,7 @@ export const ExportImportSettingsModal = () => {
                 isValid: true,
             };
         },
-        [otherSettings],
+        [],
     );
 
     const onImportClick = useCallback(() => {
@@ -132,7 +99,7 @@ export const ExportImportSettingsModal = () => {
                 <Stack>
                     <DiffVisualiser
                         newSettings={selectedSettingsFile!}
-                        originalSettings={otherSettings}
+                        originalSettings={settings}
                     />
                     <Text size="sm" ta="center">
                         {t('setting.exportImportSettings_destructiveWarning').toString()}
