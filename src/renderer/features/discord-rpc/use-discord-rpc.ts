@@ -163,6 +163,7 @@ export const useDiscordRpc = () => {
             discordSettings.clientId,
             discordSettings.displayType,
             discordSettings.linkLastfm,
+            discordSettings.linkMusicbrainz,
             lastUniqueId,
         ],
     );
