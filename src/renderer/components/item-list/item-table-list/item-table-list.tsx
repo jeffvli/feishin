@@ -21,10 +21,21 @@ import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list
 import { useItemListState } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
-interface ItemTableListProps<CellProps extends object> {
+export interface ItemTableListColumn {
+    id: string;
+    label: string;
+    width: number;
+}
+
+interface CellProps {
+    columns: ItemTableListColumn[];
+    data: unknown[];
+}
+
+interface ItemTableListProps {
     CellComponent: JSXElementConstructor<CellComponentProps<CellProps>>;
-    cellProps: GridProps<CellProps>['cellProps'];
     columnCount: number;
+    columns: ItemTableListColumn[];
     columnWidth: ((index: number, cellProps: CellProps) => number) | number;
     data: unknown[];
     enableExpansion?: boolean;
@@ -40,11 +51,11 @@ interface ItemTableListProps<CellProps extends object> {
     itemType: LibraryItem;
     onCellsRendered: GridProps<CellProps>['onCellsRendered'];
     onEndReached?: (index: number) => void;
-    onItemClick?: (item: unknown, index: number) => void;
-    onItemContextMenu?: (item: unknown, index: number) => void;
-    onItemDoubleClick?: (item: unknown, index: number) => void;
+    onItemClick?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
+    onItemContextMenu?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
+    onItemDoubleClick?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
     onRangeChanged?: (range: { endIndex: number; startIndex: number }) => void;
-    onScroll?: (e: UIEvent<HTMLDivElement>) => void;
+    onScroll?: (event: UIEvent<HTMLDivElement>) => void;
     onScrollEnd?: () => void;
     onStartReached?: (index: number) => void;
     ref?: Ref<GridImperativeAPI>;
@@ -68,11 +79,12 @@ const expandedAnimationVariants: Variants = {
     },
 };
 
-export const ItemTableList = <CellProps extends object>({
+export const ItemTableList = ({
     CellComponent,
-    cellProps,
     columnCount,
+    columns,
     columnWidth,
+    data,
     initialTopMostItemIndex,
     itemType,
     onCellsRendered,
@@ -89,7 +101,7 @@ export const ItemTableList = <CellProps extends object>({
     stickyColumnCount,
     stickyRowCount,
     totalItemCount,
-}: ItemTableListProps<CellProps>) => {
+}: ItemTableListProps) => {
     const totalRowCount = totalItemCount - (stickyRowCount ?? 0);
     const totalColumnCount = columnCount - (stickyColumnCount ?? 0);
     const stickyRowRef = useRef<HTMLDivElement>(null);
@@ -272,6 +284,11 @@ export const ItemTableList = <CellProps extends object>({
         return undefined;
     }, []);
 
+    const cellProps = {
+        columns,
+        data,
+    };
+
     const internalState = useItemListState();
 
     const hasExpanded = internalState.hasExpanded();
@@ -337,14 +354,14 @@ export const ItemTableList = <CellProps extends object>({
     );
 
     const RowCell = useCallback(
-        (cellProps: CellComponentProps & CellProps) => {
+        (cellProps: CellComponentProps<CellProps>) => {
             return (
                 <CellComponent
                     {...cellProps}
                     columnIndex={cellProps.columnIndex + (stickyColumnCount ?? 0)}
-                    onClick={() => {
-                        console.log('click', cellProps.rowIndex);
-                    }}
+                    // onClick={(e) => {
+                    //     onItemClick?.(cellProps.data[cellProps.rowIndex], cellProps.rowIndex, e);
+                    // }}
                     rowIndex={cellProps.rowIndex + (stickyRowCount ?? 0)}
                 />
             );
