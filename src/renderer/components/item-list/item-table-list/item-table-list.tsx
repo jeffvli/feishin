@@ -172,6 +172,9 @@ export const ItemTableList = ({
             const timeoutId = setTimeout(syncHeights, 0);
 
             const activeElement = { element: null } as { element: HTMLDivElement | null };
+            const scrollingElements = new Set<HTMLDivElement>();
+            const scrollTimeouts = new Map<HTMLDivElement, NodeJS.Timeout>();
+
             const setActiveElement = (e: HTMLElementEventMap['pointermove']) => {
                 activeElement.element = e.currentTarget as HTMLDivElement;
             };
@@ -179,8 +182,38 @@ export const ItemTableList = ({
                 activeElement.element = e.currentTarget as HTMLDivElement;
             };
 
+            // Track which elements are actively scrolling
+            const markElementAsScrolling = (element: HTMLDivElement) => {
+                scrollingElements.add(element);
+
+                // Clear existing timeout for this element
+                const existingTimeout = scrollTimeouts.get(element);
+                if (existingTimeout) {
+                    clearTimeout(existingTimeout);
+                }
+
+                // Set a timeout to remove the element from scrolling set
+                const timeout = setTimeout(() => {
+                    scrollingElements.delete(element);
+                    scrollTimeouts.delete(element);
+                }, 150);
+
+                scrollTimeouts.set(element, timeout);
+            };
+
             const syncScroll = (e: HTMLElementEventMap['scroll']) => {
-                if (e.currentTarget !== activeElement.element) {
+                const currentElement = e.currentTarget as HTMLDivElement;
+
+                markElementAsScrolling(currentElement);
+
+                // Allow sync if:
+                // 1. Current element is the active element (normal case)
+                // 2. Current element is actively scrolling (handles autoscroll and other continuous scrolling)
+                const shouldSync =
+                    currentElement === activeElement.element ||
+                    scrollingElements.has(currentElement);
+
+                if (!shouldSync) {
                     return;
                 }
 
@@ -264,6 +297,10 @@ export const ItemTableList = ({
 
             return () => {
                 clearTimeout(timeoutId);
+                scrollTimeouts.forEach((timeout) => clearTimeout(timeout));
+                scrollTimeouts.clear();
+                scrollingElements.clear();
+
                 if (header) {
                     header.removeEventListener('pointermove', setActiveElement);
                     header.removeEventListener('wheel', setActiveElementFromWheel);
