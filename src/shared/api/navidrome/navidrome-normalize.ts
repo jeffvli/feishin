@@ -180,7 +180,8 @@ const normalizeSong = (
         itemType: LibraryItem.SONG,
         lastPlayedAt: normalizePlayDate(item),
         lyrics: item.lyrics ? item.lyrics : null,
-        mbzId: item.mbzReleaseTrackId || null,
+        mbzRecordingId: item.mbzReleaseTrackId || null,
+        mbzTrackId: item.mbzReleaseTrackId || null,
         name: item.title,
         // Thankfully, Windows is merciful and allows a mix of separators. So, we can use the
         // POSIX separator here instead

@@ -89,10 +89,13 @@ export const useDiscordRpc = () => {
                         encodeURIComponent(song.name);
                 }
 
-                if (discordSettings.linkMusicbrainz && song?.mbzId) {
-                    if (song.serverType == 'subsonic')
-                        activity.detailsUrl = 'https://musicbrainz.org/recording/' + song.mbzId;
-                    else activity.detailsUrl = 'https://musicbrainz.org/track/' + song.mbzId;
+                if (discordSettings.linkMusicbrainz) {
+                    if (song?.mbzTrackId) {
+                        activity.detailsUrl = 'https://musicbrainz.org/track/' + song.mbzTrackId;
+                    } else if (song?.mbzRecordingId) {
+                        activity.detailsUrl =
+                            'https://musicbrainz.org/recording/' + song.mbzRecordingId;
+                    }
                 }
 
                 if ((current[2] as PlayerStatus) === PlayerStatus.PLAYING) {
