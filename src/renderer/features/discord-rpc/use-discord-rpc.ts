@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { controller } from '/@/renderer/api/controller';
 import {
     DiscordDisplayType,
+    DiscordLinkType,
     getServerById,
     useAppStore,
     useDiscordSettings,
@@ -77,7 +78,11 @@ export const useDiscordRpc = () => {
                     type: discordSettings.showAsListening ? 2 : 0,
                 };
 
-                if (discordSettings.linkLastfm && song?.artistName) {
+                if (
+                    (discordSettings.linkType == DiscordLinkType.LAST_FM ||
+                        discordSettings.linkType == DiscordLinkType.MBZ_LAST_FM) &&
+                    song?.artistName
+                ) {
                     activity.stateUrl =
                         'https://www.last.fm/music/' + encodeURIComponent(song.artists[0].name);
                     activity.detailsUrl =
@@ -89,7 +94,10 @@ export const useDiscordRpc = () => {
                         encodeURIComponent(song.name);
                 }
 
-                if (discordSettings.linkMusicbrainz) {
+                if (
+                    discordSettings.linkType == DiscordLinkType.MBZ ||
+                    discordSettings.linkType == DiscordLinkType.MBZ_LAST_FM
+                ) {
                     if (song?.mbzTrackId) {
                         activity.detailsUrl = 'https://musicbrainz.org/track/' + song.mbzTrackId;
                     } else if (song?.mbzRecordingId) {
@@ -166,8 +174,7 @@ export const useDiscordRpc = () => {
             generalSettings.lastfmApiKey,
             discordSettings.clientId,
             discordSettings.displayType,
-            discordSettings.linkLastfm,
-            discordSettings.linkMusicbrainz,
+            discordSettings.linkType,
             lastUniqueId,
         ],
     );

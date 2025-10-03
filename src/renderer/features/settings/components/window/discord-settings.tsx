@@ -7,6 +7,7 @@ import {
 } from '/@/renderer/features/settings/components/settings-section';
 import {
     DiscordDisplayType,
+    DiscordLinkType,
     useDiscordSettings,
     useGeneralSettings,
     useSettingsStoreActions,
@@ -163,51 +164,45 @@ export const DiscordSettings = () => {
             isHidden: !isElectron(),
             title: t('setting.discordDisplayType', {
                 discord: 'Discord',
-                postProcess: 'sentenceCase',
-            }),
-        },
-        {
-            control: (
-                <Switch
-                    checked={settings.linkMusicbrainz}
-                    onChange={(e) => {
-                        setSettings({
-                            discord: {
-                                ...settings,
-                                linkMusicbrainz: e.currentTarget.checked,
-                            },
-                        });
-                    }}
-                />
-            ),
-            description: t('setting.discordLinkMusicbrainz_description', {
-                context: 'description',
-                discord: 'Discord',
-                musicbrainz: 'musicbrainz',
-                postProcess: 'sentenceCase',
-            }),
-            isHidden: !isElectron(),
-            title: t('setting.discordLinkMusicbrainz', {
-                discord: 'Discord',
                 musicbrainz: 'musicbrainz',
                 postProcess: 'sentenceCase',
             }),
         },
         {
             control: (
-                <Switch
-                    checked={settings.linkLastfm}
+                <Select
+                    aria-label={t('setting.discordLinkType')}
+                    clearable={false}
+                    data={[
+                        {
+                            label: t('setting.discordLinkType_none', {
+                                postProcess: 'sentenceCase',
+                            }),
+                            value: DiscordLinkType.NONE,
+                        },
+                        { label: 'last.fm', value: DiscordLinkType.LAST_FM },
+                        { label: 'musicbrainz', value: DiscordLinkType.MBZ },
+                        {
+                            label: t('setting.discordLinkType_mbz_lastfm', {
+                                lastfm: 'last.fm',
+                                musicbrainz: 'musicbrainz',
+                            }),
+                            value: DiscordLinkType.MBZ_LAST_FM,
+                        },
+                    ]}
+                    defaultValue={settings.linkType}
                     onChange={(e) => {
+                        if (!e) return;
                         setSettings({
                             discord: {
                                 ...settings,
-                                linkLastfm: e.currentTarget.checked,
+                                linkType: e as DiscordLinkType,
                             },
                         });
                     }}
                 />
             ),
-            description: t('setting.discordLinkLastFM_description', {
+            description: t('setting.discordLinkType', {
                 context: 'description',
                 discord: 'Discord',
                 lastfm: 'last.fm',
@@ -215,9 +210,8 @@ export const DiscordSettings = () => {
                 postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.discordLinkLastFM', {
+            title: t('setting.discordLinkType', {
                 discord: 'Discord',
-                lastfm: 'last.fm',
                 postProcess: 'sentenceCase',
             }),
         },

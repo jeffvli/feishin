@@ -164,6 +164,13 @@ export enum DiscordDisplayType {
     SONG_NAME = 'song',
 }
 
+export enum DiscordLinkType {
+    LAST_FM = 'last_fm',
+    MBZ = 'musicbrainz',
+    MBZ_LAST_FM = 'musicbrainz_last_fm',
+    NONE = 'none',
+}
+
 export enum GenreTarget {
     ALBUM = 'album',
     TRACK = 'track',
@@ -207,8 +214,7 @@ export interface SettingsState {
         clientId: string;
         displayType: DiscordDisplayType;
         enabled: boolean;
-        linkLastfm: boolean;
-        linkMusicbrainz: boolean;
+        linkType: DiscordLinkType;
         showAsListening: boolean;
         showPaused: boolean;
         showServerImage: boolean;
@@ -366,8 +372,7 @@ const initialState: SettingsState = {
         clientId: '1165957668758900787',
         displayType: DiscordDisplayType.FEISHIN,
         enabled: false,
-        linkLastfm: false,
-        linkMusicbrainz: false,
+        linkType: DiscordLinkType.NONE,
         showAsListening: false,
         showPaused: true,
         showServerImage: false,
