@@ -71,7 +71,7 @@ export const useItemListInfiniteLoader = ({
 
                     return result.items;
                 },
-                queryKey: queryKeys.albums.list(serverId, query),
+                queryKey: queryKeys.albums.list(serverId, queryParams),
                 staleTime: 1000 * 15,
             });
 
@@ -80,7 +80,7 @@ export const useItemListInfiniteLoader = ({
             });
 
             pagesLoaded.current[pageNumber] = true;
-        }, 50);
+        }, 500);
     }, [itemsPerPage, queryClient, serverId, listQueryFn, query]);
 
     return { data, onRangeChanged };
