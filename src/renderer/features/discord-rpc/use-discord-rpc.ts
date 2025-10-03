@@ -78,14 +78,15 @@ export const useDiscordRpc = () => {
                 };
 
                 if (discordSettings.linkLastfm && song?.artistName) {
-                    activity.stateUrl = 'https://www.last.fm/music/' + song.artists[0].name;
+                    activity.stateUrl =
+                        'https://www.last.fm/music/' + encodeURIComponent(song.artists[0].name);
                     activity.detailsUrl =
                         'https://www.last.fm/music/' +
-                        song.albumArtists[0].name +
+                        encodeURIComponent(song.albumArtists[0].name) +
                         '/' +
-                        (song.album || '_') +
+                        encodeURIComponent(song.album || '_') +
                         '/' +
-                        song.name;
+                        encodeURIComponent(song.name);
                 }
 
                 if (discordSettings.linkMusicbrainz && song?.mbzId) {
