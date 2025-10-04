@@ -820,7 +820,8 @@
             "size": "$t(common.size)",
             "songCount": "$t(entity.track_other)",
             "title": "title",
-            "trackNumber": "track"
+            "trackNumber": "track",
+            "owner": "owner"
         },
         "config": {
             "general": {

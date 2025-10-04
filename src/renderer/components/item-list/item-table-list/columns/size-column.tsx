@@ -1,19 +1,18 @@
-import formatDuration from 'format-duration';
-
 import {
     ItemTableListInnerColumn,
     TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
+import { formatSizeString } from '/@/renderer/utils/format';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 
-export const DurationColumn = (props: ItemTableListInnerColumn) => {
+export const SizeColumn = (props: ItemTableListInnerColumn) => {
     const row: number | undefined = (props.data as (any | undefined)[])[props.rowIndex]?.[
         props.columns[props.columnIndex].id
     ];
 
     if (typeof row === 'number') {
         return (
-            <TableColumnTextContainer {...props}>{formatDuration(row)}</TableColumnTextContainer>
+            <TableColumnTextContainer {...props}>{formatSizeString(row)}</TableColumnTextContainer>
         );
     }
 

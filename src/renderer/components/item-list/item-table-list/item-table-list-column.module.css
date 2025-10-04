@@ -6,6 +6,19 @@
     padding: var(--theme-spacing-xs);
 }
 
+.container.center {
+    align-items: center;
+    text-align: center;
+}
+
+.container.left {
+    text-align: left;
+}
+
+.container.right {
+    text-align: right;
+}
+
 .content {
     display: -webkit-box;
     overflow: hidden;
@@ -18,4 +31,24 @@
 
 .container.compact {
     padding: var(--theme-spacing-xs);
+}
+
+.header-container {
+    background: none;
+}
+
+.header-content {
+    display: flex;
+}
+
+.header-content.center {
+    justify-content: center;
+}
+
+.header-content.left {
+    justify-content: flex-start;
+}
+
+.header-content.right {
+    justify-content: flex-end;
 }

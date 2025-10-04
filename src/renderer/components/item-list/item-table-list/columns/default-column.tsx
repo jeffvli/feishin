@@ -1,6 +1,6 @@
 import {
     ItemTableListInnerColumn,
-    TableColumnContainer,
+    TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 
@@ -10,16 +10,16 @@ export const DefaultColumn = (props: ItemTableListInnerColumn) => {
     ];
 
     if (typeof row === 'string') {
-        return <TableColumnContainer {...props}>{row}</TableColumnContainer>;
+        return <TableColumnTextContainer {...props}>{row}</TableColumnTextContainer>;
     }
 
     if (typeof row === 'undefined') {
         return (
-            <TableColumnContainer {...props}>
+            <TableColumnTextContainer {...props}>
                 <Skeleton />
-            </TableColumnContainer>
+            </TableColumnTextContainer>
         );
     }
 
-    return null;
+    return <TableColumnTextContainer {...props}>&nbsp;</TableColumnTextContainer>;
 };
