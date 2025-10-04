@@ -12,6 +12,7 @@ import {
     useCallback,
     useEffect,
     useRef,
+    useState,
 } from 'react';
 import { type CellComponentProps, Grid, GridImperativeAPI, type GridProps } from 'react-window-v2';
 
@@ -21,15 +22,18 @@ import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list
 import { useItemListState } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
+export interface CellProps {
+    columns: ItemTableListColumn[];
+    data: unknown[];
+    handleExpand: (e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => void;
+    itemType: LibraryItem;
+    size?: 'compact' | 'default';
+}
+
 export interface ItemTableListColumn {
     id: string;
     label: string;
     width: number;
-}
-
-interface CellProps {
-    columns: ItemTableListColumn[];
-    data: unknown[];
 }
 
 interface ItemTableListProps {
@@ -39,7 +43,9 @@ interface ItemTableListProps {
     columnWidth: ((index: number, cellProps: CellProps) => number) | number;
     data: unknown[];
     enableExpansion?: boolean;
+    enableHeader?: boolean;
     enableSelection?: boolean;
+    headerHeight?: number;
     initialTopMostItemIndex?:
         | number
         | {
@@ -60,8 +66,8 @@ interface ItemTableListProps {
     onStartReached?: (index: number) => void;
     ref?: Ref<GridImperativeAPI>;
     rowHeight: ((index: number, cellProps: CellProps) => number) | number;
+    size?: 'compact' | 'default';
     stickyColumnCount: number;
-    stickyRowCount: number;
     totalItemCount: number;
 }
 
@@ -85,6 +91,8 @@ export const ItemTableList = ({
     columns,
     columnWidth,
     data,
+    enableHeader = true,
+    headerHeight = 40,
     initialTopMostItemIndex,
     itemType,
     onCellsRendered,
@@ -98,10 +106,11 @@ export const ItemTableList = ({
     onStartReached,
     ref,
     rowHeight,
+    size = 'default',
     stickyColumnCount,
-    stickyRowCount,
     totalItemCount,
 }: ItemTableListProps) => {
+    const stickyRowCount = enableHeader ? 1 : 0;
     const totalRowCount = totalItemCount - (stickyRowCount ?? 0);
     const totalColumnCount = columnCount - (stickyColumnCount ?? 0);
     const stickyRowRef = useRef<HTMLDivElement>(null);
@@ -109,6 +118,7 @@ export const ItemTableList = ({
     const stickyColumnRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
     const mergedRowRef = useMergedRef(rowRef, scrollContainerRef);
+    const [showLeftShadow, setShowLeftShadow] = useState(false);
 
     const [initialize] = useOverlayScrollbars({
         defer: true,
@@ -321,10 +331,43 @@ export const ItemTableList = ({
         return undefined;
     }, []);
 
-    const cellProps = {
-        columns,
-        data,
-    };
+    // Handle left shadow visibility based on horizontal scroll
+    useEffect(() => {
+        const row = rowRef.current?.childNodes[0] as HTMLDivElement;
+
+        if (!row || !stickyColumnCount) {
+            setShowLeftShadow(false);
+            return;
+        }
+
+        const checkScrollPosition = () => {
+            const scrollLeft = row.scrollLeft;
+            setShowLeftShadow(scrollLeft > 0);
+        };
+
+        checkScrollPosition();
+
+        row.addEventListener('scroll', checkScrollPosition);
+
+        return () => {
+            row.removeEventListener('scroll', checkScrollPosition);
+        };
+    }, [stickyColumnCount]);
+
+    const getRowHeight = useCallback(
+        (index: number, cellProps: CellProps) => {
+            const baseHeight =
+                typeof rowHeight === 'number' ? rowHeight : rowHeight(index, cellProps);
+
+            // If enableHeader is true and this is the first sticky row, use fixed header height
+            if (enableHeader && index === 0 && stickyRowCount > 0) {
+                return headerHeight;
+            }
+
+            return baseHeight;
+        },
+        [enableHeader, headerHeight, rowHeight, stickyRowCount],
+    );
 
     const internalState = useItemListState();
 
@@ -342,6 +385,7 @@ export const ItemTableList = ({
         },
         [internalState],
     );
+
     const handleOnCellsRendered = useCallback(
         (cells: {
             columnStartIndex: number;
@@ -349,6 +393,11 @@ export const ItemTableList = ({
             rowStartIndex: number;
             rowStopIndex: number;
         }) => {
+            onRangeChanged?.({
+                endIndex: cells.rowStopIndex,
+                startIndex: cells.rowStartIndex,
+            });
+
             return onCellsRendered
                 ? ({ columnStartIndex, columnStopIndex, rowStartIndex, rowStopIndex }) => {
                       return onCellsRendered!(
@@ -363,7 +412,7 @@ export const ItemTableList = ({
                   }
                 : undefined;
         },
-        [onCellsRendered, stickyColumnCount, stickyRowCount],
+        [onCellsRendered, onRangeChanged, stickyColumnCount, stickyRowCount],
     );
 
     const StickyRowCell = useCallback(
@@ -406,6 +455,14 @@ export const ItemTableList = ({
         [stickyColumnCount, stickyRowCount, CellComponent],
     );
 
+    const cellProps = {
+        columns,
+        data,
+        handleExpand,
+        itemType,
+        size,
+    };
+
     return (
         <motion.div
             animate={{
@@ -416,128 +473,121 @@ export const ItemTableList = ({
                     ease: 'backInOut',
                 },
             }}
-            className={styles.itemTableContainer}
+            className={styles.itemTableListContainer}
             initial={{ opacity: 0 }}
         >
-            <div
-                className={styles.itemTableStickyColumnsGridContainer}
-                style={{
-                    minWidth: `${Array.from({ length: stickyColumnCount ?? 0 }, () => 0).reduce(
-                        (a, _, i) =>
-                            a +
-                            (typeof columnWidth === 'number'
-                                ? columnWidth
-                                : columnWidth(i, cellProps)),
-                        0,
-                    )}px`,
-                }}
-            >
-                {!!(stickyColumnCount || stickyRowCount) && (
-                    <div
-                        className={styles.itemTableStickyIntersectionGridContainer}
-                        style={{
-                            minHeight: `${Array.from(
-                                { length: stickyRowCount ?? 0 },
-                                () => 0,
-                            ).reduce(
-                                (a, _, i) =>
-                                    a +
-                                    (typeof rowHeight === 'number'
-                                        ? rowHeight
-                                        : rowHeight(i, cellProps)),
-                                0,
-                            )}px`,
-                        }}
-                    >
-                        <Grid
-                            cellComponent={CellComponent as any}
-                            cellProps={cellProps}
-                            className={styles.noScrollbar}
-                            columnCount={stickyColumnCount}
-                            columnWidth={columnWidth}
-                            rowCount={stickyRowCount}
-                            rowHeight={rowHeight}
-                        />
-                    </div>
-                )}
-                {!!stickyColumnCount && (
-                    <div className={styles.itemTableStickyColumnsContainer} ref={stickyColumnRef}>
-                        <Grid
-                            cellComponent={StickyColumnCell}
-                            cellProps={cellProps}
-                            className={clsx(styles.noScrollbar, styles.height100)}
-                            columnCount={stickyColumnCount}
-                            columnWidth={columnWidth}
-                            rowCount={totalRowCount}
-                            rowHeight={(index, cellProps) => {
-                                return typeof rowHeight === 'number'
-                                    ? rowHeight
-                                    : rowHeight(index + (stickyRowCount ?? 0), cellProps);
+            <div className={styles.itemTableContainer}>
+                <div
+                    className={styles.itemTableStickyColumnsGridContainer}
+                    style={{
+                        minWidth: `${Array.from({ length: stickyColumnCount ?? 0 }, () => 0).reduce(
+                            (a, _, i) =>
+                                a +
+                                (typeof columnWidth === 'number'
+                                    ? columnWidth
+                                    : columnWidth(i, cellProps)),
+                            0,
+                        )}px`,
+                    }}
+                >
+                    {!!(stickyColumnCount || stickyRowCount) && (
+                        <div
+                            className={styles.itemTableStickyIntersectionGridContainer}
+                            style={{
+                                minHeight: `${Array.from(
+                                    { length: stickyRowCount ?? 0 },
+                                    () => 0,
+                                ).reduce((a, _, i) => a + getRowHeight(i, cellProps), 0)}px`,
                             }}
-                        />
-                    </div>
-                )}
-            </div>
-            <div className={styles.itemTableStickyRowsContainer}>
-                {!!stickyRowCount && (
-                    <div
-                        className={styles.itemTableStickyRowsGridContainer}
-                        ref={stickyRowRef}
-                        style={{
-                            minHeight: `${Array.from(
-                                { length: stickyRowCount ?? 0 },
-                                () => 0,
-                            ).reduce(
-                                (a, _, i) =>
-                                    a +
-                                    (typeof rowHeight === 'number'
-                                        ? rowHeight
-                                        : rowHeight(i, cellProps)),
-                                0,
-                            )}px`,
-                        }}
-                    >
+                        >
+                            <Grid
+                                cellComponent={CellComponent as any}
+                                cellProps={cellProps}
+                                className={styles.noScrollbar}
+                                columnCount={stickyColumnCount}
+                                columnWidth={columnWidth}
+                                rowCount={stickyRowCount}
+                                rowHeight={getRowHeight}
+                            />
+                            {enableHeader && <div className={styles.itemTableStickyHeaderShadow} />}
+                        </div>
+                    )}
+                    {!!stickyColumnCount && (
+                        <div
+                            className={styles.itemTableStickyColumnsContainer}
+                            ref={stickyColumnRef}
+                        >
+                            <Grid
+                                cellComponent={StickyColumnCell}
+                                cellProps={cellProps}
+                                className={clsx(styles.noScrollbar, styles.height100)}
+                                columnCount={stickyColumnCount}
+                                columnWidth={columnWidth}
+                                rowCount={totalRowCount}
+                                rowHeight={(index, cellProps) => {
+                                    return getRowHeight(index + (stickyRowCount ?? 0), cellProps);
+                                }}
+                            />
+                        </div>
+                    )}
+                </div>
+                <div className={styles.itemTableStickyRowsContainer}>
+                    {!!stickyRowCount && (
+                        <div
+                            className={styles.itemTableStickyRowsGridContainer}
+                            ref={stickyRowRef}
+                            style={
+                                {
+                                    '--header-height': `${headerHeight}px`,
+                                    minHeight: `${Array.from(
+                                        { length: stickyRowCount ?? 0 },
+                                        () => 0,
+                                    ).reduce((a, _, i) => a + getRowHeight(i, cellProps), 0)}px`,
+                                } as React.CSSProperties
+                            }
+                        >
+                            <Grid
+                                cellComponent={StickyRowCell}
+                                cellProps={cellProps}
+                                className={styles.noScrollbar}
+                                columnCount={totalColumnCount}
+                                columnWidth={(index, cellProps) => {
+                                    return typeof columnWidth === 'number'
+                                        ? columnWidth
+                                        : columnWidth(index + (stickyColumnCount ?? 0), cellProps);
+                                }}
+                                rowCount={
+                                    Array.from({ length: stickyRowCount ?? 0 }, () => 0).length
+                                }
+                                rowHeight={getRowHeight}
+                            />
+                            {enableHeader && <div className={styles.itemTableStickyHeaderShadow} />}
+                        </div>
+                    )}
+                    <div className={styles.itemTableGridContainer} ref={mergedRowRef}>
                         <Grid
-                            cellComponent={StickyRowCell}
+                            cellComponent={RowCell}
                             cellProps={cellProps}
-                            className={styles.noScrollbar}
+                            className={styles.height100}
                             columnCount={totalColumnCount}
                             columnWidth={(index, cellProps) => {
                                 return typeof columnWidth === 'number'
                                     ? columnWidth
                                     : columnWidth(index + (stickyColumnCount ?? 0), cellProps);
                             }}
-                            rowCount={Array.from({ length: stickyRowCount ?? 0 }, () => 0).length}
+                            onCellsRendered={handleOnCellsRendered}
+                            rowCount={totalRowCount}
                             rowHeight={(index, cellProps) => {
-                                return typeof rowHeight === 'number'
-                                    ? rowHeight
-                                    : rowHeight(index, cellProps);
+                                return getRowHeight(index + (stickyRowCount ?? 0), cellProps);
                             }}
                         />
+                        {stickyColumnCount > 0 && showLeftShadow && (
+                            <div className={styles.itemTableLeftScrollShadow} />
+                        )}
                     </div>
-                )}
-                <div className={styles.itemTableGridContainer} ref={mergedRowRef}>
-                    <Grid
-                        cellComponent={RowCell}
-                        cellProps={cellProps}
-                        className={styles.height100}
-                        columnCount={totalColumnCount}
-                        columnWidth={(index, cellProps) => {
-                            return typeof columnWidth === 'number'
-                                ? columnWidth
-                                : columnWidth(index + (stickyColumnCount ?? 0), cellProps);
-                        }}
-                        onCellsRendered={handleOnCellsRendered}
-                        rowCount={totalRowCount}
-                        rowHeight={(index, cellProps) => {
-                            return typeof rowHeight === 'number'
-                                ? rowHeight
-                                : rowHeight(index + (stickyRowCount ?? 0), cellProps);
-                        }}
-                    />
                 </div>
             </div>
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
                 {hasExpanded && (
                     <motion.div
                         animate="show"
