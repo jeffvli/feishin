@@ -21,26 +21,27 @@ import styles from './item-table-list.module.css';
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import { useItemListState } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { LibraryItem } from '/@/shared/types/domain-types';
+import { TableColumn } from '/@/shared/types/types';
 
 export interface CellProps {
-    columns: ItemTableListColumn[];
+    columns: ItemTableListColumnConfig[];
     data: unknown[];
+    enableHeader?: boolean;
     handleExpand: (e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => void;
     itemType: LibraryItem;
     size?: 'compact' | 'default';
 }
 
-export interface ItemTableListColumn {
-    id: string;
-    label: string;
+export interface ItemTableListColumnConfig {
+    align: 'center' | 'end' | 'start';
+    id: TableColumn;
+    pinned: 'left' | 'right' | null;
     width: number;
 }
 
 interface ItemTableListProps {
     CellComponent: JSXElementConstructor<CellComponentProps<CellProps>>;
-    columnCount: number;
-    columns: ItemTableListColumn[];
-    columnWidth: ((index: number, cellProps: CellProps) => number) | number;
+    columns: ItemTableListColumnConfig[];
     data: unknown[];
     enableExpansion?: boolean;
     enableHeader?: boolean;
@@ -64,8 +65,6 @@ interface ItemTableListProps {
     onScroll?: (event: UIEvent<HTMLDivElement>) => void;
     onScrollEnd?: () => void;
     onStartReached?: (index: number) => void;
-    pinnedLeftColumnCount: number;
-    pinnedRightColumnCount?: number;
     ref?: Ref<GridImperativeAPI>;
     rowHeight: ((index: number, cellProps: CellProps) => number) | number;
     size?: 'compact' | 'default';
@@ -88,9 +87,7 @@ const expandedAnimationVariants: Variants = {
 
 export const ItemTableList = ({
     CellComponent,
-    columnCount,
     columns,
-    columnWidth,
     data,
     enableHeader = true,
     headerHeight = 40,
@@ -105,17 +102,20 @@ export const ItemTableList = ({
     onScroll,
     onScrollEnd,
     onStartReached,
-    pinnedLeftColumnCount,
-    pinnedRightColumnCount = 0,
     ref,
     rowHeight,
     size = 'default',
     totalItemCount,
 }: ItemTableListProps) => {
+    const columnCount = columns.length;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const columnWidth = (index: number, _cellProps: CellProps) => columns[index].width;
+    const pinnedLeftColumnCount = columns.filter((col) => col.pinned === 'left').length;
+    const pinnedRightColumnCount = columns.filter((col) => col.pinned === 'right').length;
+
     const pinnedRowCount = enableHeader ? 1 : 0;
-    const totalRowCount = totalItemCount - (pinnedRowCount ?? 0);
-    const totalColumnCount =
-        columnCount - (pinnedLeftColumnCount ?? 0) - (pinnedRightColumnCount ?? 0);
+    const totalRowCount = totalItemCount - pinnedRowCount;
+    const totalColumnCount = columnCount - pinnedLeftColumnCount - pinnedRightColumnCount;
     const pinnedRowRef = useRef<HTMLDivElement>(null);
     const rowRef = useRef<HTMLDivElement>(null);
     const pinnedLeftColumnRef = useRef<HTMLDivElement>(null);
@@ -166,7 +166,6 @@ export const ItemTableList = ({
         const pinnedLeft = pinnedLeftColumnRef.current?.childNodes[0] as HTMLDivElement;
         const pinnedRight = pinnedRightColumnRef.current?.childNodes[0] as HTMLDivElement;
 
-        // At minimum, we need the main row element
         if (row) {
             // Ensure all containers have the same height
             const syncHeights = () => {
@@ -465,10 +464,10 @@ export const ItemTableList = ({
                 ? ({ columnStartIndex, columnStopIndex, rowStartIndex, rowStopIndex }) => {
                       return onCellsRendered!(
                           {
-                              columnStartIndex: columnStartIndex + (pinnedLeftColumnCount ?? 0),
-                              columnStopIndex: columnStopIndex + (pinnedLeftColumnCount ?? 0),
-                              rowStartIndex: rowStartIndex + (pinnedRowCount ?? 0),
-                              rowStopIndex: rowStopIndex + (pinnedRowCount ?? 0),
+                              columnStartIndex: columnStartIndex + pinnedLeftColumnCount,
+                              columnStopIndex: columnStopIndex + pinnedLeftColumnCount,
+                              rowStartIndex: rowStartIndex + pinnedRowCount,
+                              rowStopIndex: rowStopIndex + pinnedRowCount,
                           },
                           cells,
                       );
@@ -483,7 +482,7 @@ export const ItemTableList = ({
             return (
                 <CellComponent
                     {...cellProps}
-                    columnIndex={cellProps.columnIndex + (pinnedLeftColumnCount ?? 0)}
+                    columnIndex={cellProps.columnIndex + pinnedLeftColumnCount}
                 />
             );
         },
@@ -492,12 +491,7 @@ export const ItemTableList = ({
 
     const PinnedColumnCell = useCallback(
         (cellProps: CellComponentProps & CellProps) => {
-            return (
-                <CellComponent
-                    {...cellProps}
-                    rowIndex={cellProps.rowIndex + (pinnedRowCount ?? 0)}
-                />
-            );
+            return <CellComponent {...cellProps} rowIndex={cellProps.rowIndex + pinnedRowCount} />;
         },
         [pinnedRowCount, CellComponent],
     );
@@ -507,10 +501,8 @@ export const ItemTableList = ({
             return (
                 <CellComponent
                     {...cellProps}
-                    columnIndex={
-                        cellProps.columnIndex + (pinnedLeftColumnCount ?? 0) + totalColumnCount
-                    }
-                    rowIndex={cellProps.rowIndex + (pinnedRowCount ?? 0)}
+                    columnIndex={cellProps.columnIndex + pinnedLeftColumnCount + totalColumnCount}
+                    rowIndex={cellProps.rowIndex + pinnedRowCount}
                 />
             );
         },
@@ -522,9 +514,7 @@ export const ItemTableList = ({
             return (
                 <CellComponent
                     {...cellProps}
-                    columnIndex={
-                        cellProps.columnIndex + (pinnedLeftColumnCount ?? 0) + totalColumnCount
-                    }
+                    columnIndex={cellProps.columnIndex + pinnedLeftColumnCount + totalColumnCount}
                 />
             );
         },
@@ -536,11 +526,11 @@ export const ItemTableList = ({
             return (
                 <CellComponent
                     {...cellProps}
-                    columnIndex={cellProps.columnIndex + (pinnedLeftColumnCount ?? 0)}
+                    columnIndex={cellProps.columnIndex + pinnedLeftColumnCount}
                     // onClick={(e) => {
                     //     onItemClick?.(cellProps.data[cellProps.rowIndex], cellProps.rowIndex, e);
                     // }}
-                    rowIndex={cellProps.rowIndex + (pinnedRowCount ?? 0)}
+                    rowIndex={cellProps.rowIndex + pinnedRowCount}
                 />
             );
         },
@@ -550,6 +540,7 @@ export const ItemTableList = ({
     const cellProps = {
         columns,
         data,
+        enableHeader,
         handleExpand,
         itemType,
         size,
@@ -572,25 +563,20 @@ export const ItemTableList = ({
                 <div
                     className={styles.itemTablePinnedColumnsGridContainer}
                     style={{
-                        minWidth: `${Array.from(
-                            { length: pinnedLeftColumnCount ?? 0 },
-                            () => 0,
-                        ).reduce(
-                            (a, _, i) =>
-                                a +
-                                (typeof columnWidth === 'number'
-                                    ? columnWidth
-                                    : columnWidth(i, cellProps)),
+                        minWidth: `${Array.from({ length: pinnedLeftColumnCount }, () => 0).reduce(
+                            (a, _, i) => a + columnWidth(i, cellProps),
                             0,
                         )}px`,
                     }}
                 >
                     {!!(pinnedLeftColumnCount || pinnedRowCount) && (
                         <div
-                            className={styles.itemTablePinnedIntersectionGridContainer}
+                            className={clsx(styles.itemTablePinnedIntersectionGridContainer, {
+                                [styles.withHeader]: enableHeader,
+                            })}
                             style={{
                                 minHeight: `${Array.from(
-                                    { length: pinnedRowCount ?? 0 },
+                                    { length: pinnedRowCount },
                                     () => 0,
                                 ).reduce((a, _, i) => a + getRowHeight(i, cellProps), 0)}px`,
                             }}
@@ -620,7 +606,7 @@ export const ItemTableList = ({
                                 columnWidth={columnWidth}
                                 rowCount={totalRowCount}
                                 rowHeight={(index, cellProps) => {
-                                    return getRowHeight(index + (pinnedRowCount ?? 0), cellProps);
+                                    return getRowHeight(index + pinnedRowCount, cellProps);
                                 }}
                             />
                         </div>
@@ -629,13 +615,15 @@ export const ItemTableList = ({
                 <div className={styles.itemTablePinnedRowsContainer}>
                     {!!pinnedRowCount && (
                         <div
-                            className={styles.itemTablePinnedRowsGridContainer}
+                            className={clsx(styles.itemTablePinnedRowsGridContainer, {
+                                [styles.withHeader]: enableHeader,
+                            })}
                             ref={pinnedRowRef}
                             style={
                                 {
                                     '--header-height': `${headerHeight}px`,
                                     minHeight: `${Array.from(
-                                        { length: pinnedRowCount ?? 0 },
+                                        { length: pinnedRowCount },
                                         () => 0,
                                     ).reduce((a, _, i) => a + getRowHeight(i, cellProps), 0)}px`,
                                 } as React.CSSProperties
@@ -647,16 +635,9 @@ export const ItemTableList = ({
                                 className={styles.noScrollbar}
                                 columnCount={totalColumnCount}
                                 columnWidth={(index, cellProps) => {
-                                    return typeof columnWidth === 'number'
-                                        ? columnWidth
-                                        : columnWidth(
-                                              index + (pinnedLeftColumnCount ?? 0),
-                                              cellProps,
-                                          );
+                                    return columnWidth(index + pinnedLeftColumnCount, cellProps);
                                 }}
-                                rowCount={
-                                    Array.from({ length: pinnedRowCount ?? 0 }, () => 0).length
-                                }
+                                rowCount={Array.from({ length: pinnedRowCount }, () => 0).length}
                                 rowHeight={getRowHeight}
                             />
                             {enableHeader && <div className={styles.itemTablePinnedHeaderShadow} />}
@@ -669,14 +650,12 @@ export const ItemTableList = ({
                             className={styles.height100}
                             columnCount={totalColumnCount}
                             columnWidth={(index, cellProps) => {
-                                return typeof columnWidth === 'number'
-                                    ? columnWidth
-                                    : columnWidth(index + (pinnedLeftColumnCount ?? 0), cellProps);
+                                return columnWidth(index + pinnedLeftColumnCount, cellProps);
                             }}
                             onCellsRendered={handleOnCellsRendered}
                             rowCount={totalRowCount}
                             rowHeight={(index, cellProps) => {
-                                return getRowHeight(index + (pinnedRowCount ?? 0), cellProps);
+                                return getRowHeight(index + pinnedRowCount, cellProps);
                             }}
                         />
                         {pinnedLeftColumnCount > 0 && showLeftShadow && (
@@ -692,27 +671,27 @@ export const ItemTableList = ({
                         className={styles.itemTablePinnedColumnsGridContainer}
                         style={{
                             minWidth: `${Array.from(
-                                { length: pinnedRightColumnCount ?? 0 },
+                                { length: pinnedRightColumnCount },
                                 () => 0,
                             ).reduce(
                                 (a, _, i) =>
                                     a +
-                                    (typeof columnWidth === 'number'
-                                        ? columnWidth
-                                        : columnWidth(
-                                              i + pinnedLeftColumnCount + totalColumnCount,
-                                              cellProps,
-                                          )),
+                                    columnWidth(
+                                        i + pinnedLeftColumnCount + totalColumnCount,
+                                        cellProps,
+                                    ),
                                 0,
                             )}px`,
                         }}
                     >
                         {!!(pinnedRightColumnCount || pinnedRowCount) && (
                             <div
-                                className={styles.itemTablePinnedIntersectionGridContainer}
+                                className={clsx(styles.itemTablePinnedIntersectionGridContainer, {
+                                    [styles.withHeader]: enableHeader,
+                                })}
                                 style={{
                                     minHeight: `${Array.from(
-                                        { length: pinnedRowCount ?? 0 },
+                                        { length: pinnedRowCount },
                                         () => 0,
                                     ).reduce((a, _, i) => a + getRowHeight(i, cellProps), 0)}px`,
                                 }}
@@ -723,12 +702,10 @@ export const ItemTableList = ({
                                     className={styles.noScrollbar}
                                     columnCount={pinnedRightColumnCount}
                                     columnWidth={(index, cellProps) => {
-                                        return typeof columnWidth === 'number'
-                                            ? columnWidth
-                                            : columnWidth(
-                                                  index + pinnedLeftColumnCount + totalColumnCount,
-                                                  cellProps,
-                                              );
+                                        return columnWidth(
+                                            index + pinnedLeftColumnCount + totalColumnCount,
+                                            cellProps,
+                                        );
                                     }}
                                     rowCount={pinnedRowCount}
                                     rowHeight={getRowHeight}
@@ -748,16 +725,14 @@ export const ItemTableList = ({
                                 className={clsx(styles.noScrollbar, styles.height100)}
                                 columnCount={pinnedRightColumnCount}
                                 columnWidth={(index, cellProps) => {
-                                    return typeof columnWidth === 'number'
-                                        ? columnWidth
-                                        : columnWidth(
-                                              index + pinnedLeftColumnCount + totalColumnCount,
-                                              cellProps,
-                                          );
+                                    return columnWidth(
+                                        index + pinnedLeftColumnCount + totalColumnCount,
+                                        cellProps,
+                                    );
                                 }}
                                 rowCount={totalRowCount}
                                 rowHeight={(index, cellProps) => {
-                                    return getRowHeight(index + (pinnedRowCount ?? 0), cellProps);
+                                    return getRowHeight(index + pinnedRowCount, cellProps);
                                 }}
                             />
                         </div>

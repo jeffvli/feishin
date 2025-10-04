@@ -37,6 +37,10 @@
     min-width: 0;
 }
 
+.item-table-pinned-rows-grid-container.with-header {
+    background-color: var(--theme-colors-surface);
+}
+
 .item-table-pinned-columns-grid-container {
     display: flex;
     flex: 0 1 auto;
@@ -48,6 +52,10 @@
     position: relative;
     flex: 0 1 auto;
     min-width: 0;
+}
+
+.item-table-pinned-intersection-grid-container.with-header {
+    background-color: var(--theme-colors-surface);
 }
 
 .item-table-pinned-columns-container {
