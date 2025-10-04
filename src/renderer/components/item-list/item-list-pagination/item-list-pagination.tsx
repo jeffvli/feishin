@@ -24,13 +24,15 @@ export const ItemListWithPagination = ({
     return (
         <div className={styles.container}>
             <Fragment key={currentPage}>{children}</Fragment>
-            <Pagination
-                itemsPerPage={itemsPerPage}
-                onChange={onChange}
-                total={pageCount}
-                totalItemCount={totalItemCount}
-                value={currentPage}
-            />
+            <div className={styles.paginationContainer}>
+                <Pagination
+                    itemsPerPage={itemsPerPage}
+                    onChange={onChange}
+                    total={pageCount}
+                    totalItemCount={totalItemCount}
+                    value={currentPage}
+                />
+            </div>
         </div>
     );
 };
