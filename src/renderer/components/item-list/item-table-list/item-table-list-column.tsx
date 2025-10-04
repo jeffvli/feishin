@@ -121,6 +121,8 @@ export const TableColumnTextContainer = (
                 [styles.compact]: props.size === 'compact',
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
+                [styles.withRowBorder]:
+                    props.enableRowBorders && props.enableHeader && props.rowIndex > 0,
             })}
             onClick={(e) => props.handleExpand(e, props.data[props.rowIndex], props.itemType)}
             style={props.style}
@@ -151,6 +153,8 @@ export const TableColumnContainer = (
                 [styles.compact]: props.size === 'compact',
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
+                [styles.withRowBorder]:
+                    props.enableRowBorders && props.enableHeader && props.rowIndex > 0,
             })}
             onClick={(e) => props.handleExpand(e, props.data[props.rowIndex], props.itemType)}
             style={props.style}

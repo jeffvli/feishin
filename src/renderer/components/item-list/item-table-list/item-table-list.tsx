@@ -29,6 +29,7 @@ export interface CellProps {
     columns: ItemTableListColumnConfig[];
     data: unknown[];
     enableHeader?: boolean;
+    enableRowBorders?: boolean;
     handleExpand: (e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => void;
     itemType: LibraryItem;
     size?: 'compact' | 'default';
@@ -47,6 +48,7 @@ interface ItemTableListProps {
     data: unknown[];
     enableExpansion?: boolean;
     enableHeader?: boolean;
+    enableRowBorders?: boolean;
     enableSelection?: boolean;
     headerHeight?: number;
     initialTopMostItemIndex?:
@@ -92,6 +94,7 @@ export const ItemTableList = ({
     columns,
     data,
     enableHeader = true,
+    enableRowBorders = false,
     headerHeight = 40,
     initialTopMostItemIndex,
     itemType,
@@ -544,6 +547,7 @@ export const ItemTableList = ({
         columns: sortedColumns,
         data,
         enableHeader,
+        enableRowBorders,
         handleExpand,
         itemType,
         size,
