@@ -4,7 +4,7 @@
     user-select: auto;
 }
 
-.root.muted {
+.muted {
     color: var(--theme-colors-foreground-muted);
 }
 
@@ -23,6 +23,6 @@
     white-space: nowrap;
 }
 
-.root.no-select {
+.no-select {
     user-select: none;
 }

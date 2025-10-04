@@ -33,12 +33,14 @@ export const _Text = ({
 }: TextProps) => {
     return (
         <MantineText
-            className={clsx(styles.root, {
-                [styles.link]: isLink,
-                [styles.muted]: isMuted,
-                [styles.noSelect]: isNoSelect,
-                [styles.overflowHidden]: overflow === 'hidden',
-            })}
+            classNames={{
+                root: clsx(styles.root, {
+                    [styles.link]: isLink,
+                    [styles.muted]: isMuted,
+                    [styles.noSelect]: isNoSelect,
+                    [styles.overflowHidden]: overflow === 'hidden',
+                }),
+            }}
             component="div"
             fw={weight}
             style={
