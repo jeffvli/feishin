@@ -29,7 +29,7 @@ export function Skeleton({
     containerClassName,
     count,
     direction,
-    enableAnimation = true,
+    enableAnimation = false,
     height,
     inline,
     isCentered,
