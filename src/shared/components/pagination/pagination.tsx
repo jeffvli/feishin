@@ -8,6 +8,7 @@ import { useRef } from 'react';
 import styles from './pagination.module.css';
 
 import { Icon } from '/@/shared/components/icon/icon';
+import { Separator } from '/@/shared/components/separator/separator';
 import { Text } from '/@/shared/components/text/text';
 import { useContainerQuery } from '/@/shared/hooks/use-container-query';
 
@@ -64,7 +65,7 @@ export const Pagination = ({
             />
             {containerQuery.isSm && totalItemCount && (
                 <Text isNoSelect weight={500}>
-                    {currentPageStartIndex} - {currentPageEndIndex} of {totalItemCount}
+                    {currentPageStartIndex} - {currentPageEndIndex} <Separator /> {totalItemCount}
                 </Text>
             )}
         </div>
