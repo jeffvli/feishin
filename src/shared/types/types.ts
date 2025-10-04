@@ -144,7 +144,7 @@ export enum PlayerType {
 export enum TableColumn {
     ACTIONS = 'actions',
     ALBUM = 'album',
-    ALBUM_ARTIST = 'albumArtist',
+    ALBUM_ARTIST = 'albumArtists',
     ALBUM_COUNT = 'albumCount',
     ARTIST = 'artist',
     BIOGRAPHY = 'biography',
@@ -153,7 +153,7 @@ export enum TableColumn {
     CHANNELS = 'channels',
     CODEC = 'container',
     COMMENT = 'comment',
-    DATE_ADDED = 'dateAdded',
+    DATE_ADDED = 'createdAt',
     DISC_NUMBER = 'discNumber',
     DURATION = 'duration',
     GENRE = 'genres',

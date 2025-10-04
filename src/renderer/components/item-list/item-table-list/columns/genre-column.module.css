@@ -1,0 +1,8 @@
+.group {
+    gap: var(--theme-spacing-sm) var(--theme-spacing-xs);
+    overflow: hidden;
+}
+
+.group a {
+    cursor: pointer;
+}

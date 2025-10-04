@@ -1,35 +1,47 @@
+import { memo, useMemo } from 'react';
+import { generatePath, Link } from 'react-router-dom';
+
+import styles from './genre-column.module.css';
+
 import {
     ItemTableListInnerColumn,
     TableColumnContainer,
     TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
+import { AppRoute } from '/@/renderer/router/routes';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Group } from '/@/shared/components/group/group';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Genre } from '/@/shared/types/domain-types';
 import { stringToColor } from '/@/shared/utils/string-to-color';
 
-export const GenreColumn = (props: ItemTableListInnerColumn) => {
+const GenreColumn = (props: ItemTableListInnerColumn) => {
     const row: Genre[] | undefined = (props.data as (Genre[] | undefined)[])[props.rowIndex]?.[
         props.columns[props.columnIndex].id
     ];
 
-    const genres = (row || []).map((genre) => {
-        const { color, isLight } = stringToColor(genre.name);
-        return { ...genre, color, isLight };
-    });
+    const genres = useMemo(() => {
+        if (!row) return [];
+        return row.map((genre) => {
+            const { color, isLight } = stringToColor(genre.name);
+            const path = generatePath(AppRoute.LIBRARY_GENRES_ALBUMS, { genreId: genre.id });
+            return { ...genre, color, isLight, path };
+        });
+    }, [row]);
 
     if (Array.isArray(row)) {
         return (
             <TableColumnContainer {...props}>
-                <Group gap="xs" wrap="nowrap">
+                <Group className={styles.group} wrap="wrap">
                     {genres.map((genre) => (
                         <Badge
+                            component={Link}
                             key={genre.id}
                             style={{
                                 backgroundColor: genre.color,
                                 color: genre.isLight ? 'black' : 'white',
                             }}
+                            to={genre.path}
                         >
                             {genre.name}
                         </Badge>
@@ -45,3 +57,7 @@ export const GenreColumn = (props: ItemTableListInnerColumn) => {
         </TableColumnTextContainer>
     );
 };
+
+export const GenreColumnMemo = memo(GenreColumn);
+
+export { GenreColumnMemo as GenreColumn };

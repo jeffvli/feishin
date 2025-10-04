@@ -6,6 +6,7 @@ import styles from './item-table-list-column.module.css';
 
 import i18n from '/@/i18n/i18n';
 import { ActionsColumn } from '/@/renderer/components/item-list/item-table-list/columns/actions-column';
+import { AlbumArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-artists-column';
 import { CountColumn } from '/@/renderer/components/item-list/item-table-list/columns/count-column';
 import {
     DateColumn,
@@ -46,6 +47,9 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
         case TableColumn.ACTIONS:
         case TableColumn.SKIP:
             return <ActionsColumn {...props} type={type} />;
+
+        case TableColumn.ALBUM_ARTIST:
+            return <AlbumArtistsColumn {...props} type={type} />;
 
         case TableColumn.ALBUM_COUNT:
         case TableColumn.PLAY_COUNT:
@@ -184,61 +188,61 @@ export const TableColumnHeaderContainer = (
 
 const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.ACTIONS]: '',
-    [TableColumn.ALBUM]: i18n.t('table.column.album', { postProcess: 'titleCase' }) as string,
+    [TableColumn.ALBUM]: i18n.t('table.column.album', { postProcess: 'upperCase' }) as string,
     [TableColumn.ALBUM_ARTIST]: i18n.t('table.column.albumArtist', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
     [TableColumn.ALBUM_COUNT]: i18n.t('table.column.albumCount', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
-    [TableColumn.ARTIST]: i18n.t('table.column.artist', { postProcess: 'titleCase' }) as string,
+    [TableColumn.ARTIST]: i18n.t('table.column.artist', { postProcess: 'upperCase' }) as string,
     [TableColumn.BIOGRAPHY]: i18n.t('table.column.biography', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
-    [TableColumn.BIT_RATE]: i18n.t('table.column.bitrate', { postProcess: 'titleCase' }) as string,
-    [TableColumn.BPM]: i18n.t('table.column.bpm', { postProcess: 'titleCase' }) as string,
-    [TableColumn.CHANNELS]: i18n.t('table.column.channels', { postProcess: 'titleCase' }) as string,
-    [TableColumn.CODEC]: i18n.t('table.column.codec', { postProcess: 'titleCase' }) as string,
-    [TableColumn.COMMENT]: i18n.t('table.column.comment', { postProcess: 'titleCase' }) as string,
+    [TableColumn.BIT_RATE]: i18n.t('table.column.bitrate', { postProcess: 'upperCase' }) as string,
+    [TableColumn.BPM]: i18n.t('table.column.bpm', { postProcess: 'upperCase' }) as string,
+    [TableColumn.CHANNELS]: i18n.t('table.column.channels', { postProcess: 'upperCase' }) as string,
+    [TableColumn.CODEC]: i18n.t('table.column.codec', { postProcess: 'upperCase' }) as string,
+    [TableColumn.COMMENT]: i18n.t('table.column.comment', { postProcess: 'upperCase' }) as string,
     [TableColumn.DATE_ADDED]: i18n.t('table.column.dateAdded', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
     [TableColumn.DISC_NUMBER]: i18n.t('table.column.discNumber', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
     [TableColumn.DURATION]: <Icon icon="duration" size="md" />,
-    [TableColumn.GENRE]: i18n.t('table.column.genre', { postProcess: 'titleCase' }) as string,
+    [TableColumn.GENRE]: i18n.t('table.column.genre', { postProcess: 'upperCase' }) as string,
     [TableColumn.ID]: 'ID',
     [TableColumn.IMAGE]: '',
     [TableColumn.LAST_PLAYED]: i18n.t('table.column.lastPlayed', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
-    [TableColumn.OWNER]: i18n.t('table.column.owner', { postProcess: 'titleCase' }) as string,
-    [TableColumn.PATH]: i18n.t('table.column.path', { postProcess: 'titleCase' }) as string,
+    [TableColumn.OWNER]: i18n.t('table.column.owner', { postProcess: 'upperCase' }) as string,
+    [TableColumn.PATH]: i18n.t('table.column.path', { postProcess: 'upperCase' }) as string,
     [TableColumn.PLAY_COUNT]: i18n.t('table.column.playCount', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
     [TableColumn.RELEASE_DATE]: i18n.t('table.column.releaseDate', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
-    [TableColumn.ROW_INDEX]: '#',
-    [TableColumn.SIZE]: i18n.t('table.column.size', { postProcess: 'titleCase' }) as string,
+    [TableColumn.ROW_INDEX]: <Icon icon="hash" size="md" />,
+    [TableColumn.SIZE]: i18n.t('table.column.size', { postProcess: 'upperCase' }) as string,
     [TableColumn.SKIP]: '',
     [TableColumn.SONG_COUNT]: i18n.t('table.column.songCount', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
-    [TableColumn.TITLE]: i18n.t('table.column.title', { postProcess: 'titleCase' }) as string,
+    [TableColumn.TITLE]: i18n.t('table.column.title', { postProcess: 'upperCase' }) as string,
     [TableColumn.TITLE_COMBINED]: i18n.t('table.column.titleCombined', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
     [TableColumn.TRACK_NUMBER]: i18n.t('table.column.trackNumber', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
     [TableColumn.USER_FAVORITE]: i18n.t('table.column.favorite', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
     [TableColumn.USER_RATING]: i18n.t('table.column.rating', {
-        postProcess: 'titleCase',
+        postProcess: 'upperCase',
     }) as string,
-    [TableColumn.YEAR]: i18n.t('table.column.releaseYear', { postProcess: 'titleCase' }) as string,
+    [TableColumn.YEAR]: i18n.t('table.column.releaseYear', { postProcess: 'upperCase' }) as string,
 };
