@@ -11,6 +11,7 @@ import {
     UIEvent,
     useCallback,
     useEffect,
+    useMemo,
     useRef,
     useState,
 } from 'react';
@@ -20,6 +21,7 @@ import styles from './item-table-list.module.css';
 
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import { useItemListState } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { sortTableColumns } from '/@/renderer/components/item-list/helpers/sort-table-columns';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { TableColumn } from '/@/shared/types/types';
 
@@ -107,11 +109,12 @@ export const ItemTableList = ({
     size = 'default',
     totalItemCount,
 }: ItemTableListProps) => {
-    const columnCount = columns.length;
+    const sortedColumns = useMemo(() => sortTableColumns(columns), [columns]);
+    const columnCount = sortedColumns.length;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const columnWidth = (index: number, _cellProps: CellProps) => columns[index].width;
-    const pinnedLeftColumnCount = columns.filter((col) => col.pinned === 'left').length;
-    const pinnedRightColumnCount = columns.filter((col) => col.pinned === 'right').length;
+    const columnWidth = (index: number, _cellProps: CellProps) => sortedColumns[index].width;
+    const pinnedLeftColumnCount = sortedColumns.filter((col) => col.pinned === 'left').length;
+    const pinnedRightColumnCount = sortedColumns.filter((col) => col.pinned === 'right').length;
 
     const pinnedRowCount = enableHeader ? 1 : 0;
     const totalRowCount = totalItemCount - pinnedRowCount;
@@ -538,7 +541,7 @@ export const ItemTableList = ({
     );
 
     const cellProps = {
-        columns,
+        columns: sortedColumns,
         data,
         enableHeader,
         handleExpand,
