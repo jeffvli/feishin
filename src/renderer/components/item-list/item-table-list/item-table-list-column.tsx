@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { CellComponentProps } from 'react-window-v2';
 
 import styles from './item-table-list-column.module.css';
@@ -114,17 +114,51 @@ export const TableColumnTextContainer = (
         type: TableColumn;
     },
 ) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isDataRow = props.enableHeader && props.rowIndex > 0;
+
+    useEffect(() => {
+        if (!isDataRow || !containerRef.current || !props.enableRowHover) return;
+
+        const container = containerRef.current;
+        const rowIndex = props.rowIndex;
+
+        const handleMouseEnter = () => {
+            // Find all cells in the same row and add hover class
+            const allCells = document.querySelectorAll(`[data-row-index="${rowIndex}"]`);
+            allCells.forEach((cell) => cell.classList.add(styles.rowHovered));
+        };
+
+        const handleMouseLeave = () => {
+            // Remove hover class from all cells in the same row
+            const allCells = document.querySelectorAll(`[data-row-index="${rowIndex}"]`);
+            allCells.forEach((cell) => cell.classList.remove(styles.rowHovered));
+        };
+
+        container.addEventListener('mouseenter', handleMouseEnter);
+        container.addEventListener('mouseleave', handleMouseLeave);
+
+        return () => {
+            container.removeEventListener('mouseenter', handleMouseEnter);
+            container.removeEventListener('mouseleave', handleMouseLeave);
+        };
+    }, [isDataRow, props.rowIndex, props.enableRowHover]);
+
     return (
         <div
             className={clsx(styles.container, props.containerClassName, {
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
+                [styles.dataRow]: isDataRow,
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
+                [styles.rowHoverEnabled]: isDataRow && props.enableRowHover,
                 [styles.withRowBorder]:
                     props.enableRowBorders && props.enableHeader && props.rowIndex > 0,
             })}
+            data-row-index={isDataRow ? props.rowIndex : undefined}
             onClick={(e) => props.handleExpand(e, props.data[props.rowIndex], props.itemType)}
+            ref={containerRef}
             style={props.style}
         >
             <Text
@@ -146,17 +180,51 @@ export const TableColumnContainer = (
         type: TableColumn;
     },
 ) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isDataRow = props.enableHeader && props.rowIndex > 0;
+
+    useEffect(() => {
+        if (!isDataRow || !containerRef.current || !props.enableRowHover) return;
+
+        const container = containerRef.current;
+        const rowIndex = props.rowIndex;
+
+        const handleMouseEnter = () => {
+            // Find all cells in the same row and add hover class
+            const allCells = document.querySelectorAll(`[data-row-index="${rowIndex}"]`);
+            allCells.forEach((cell) => cell.classList.add(styles.rowHovered));
+        };
+
+        const handleMouseLeave = () => {
+            // Remove hover class from all cells in the same row
+            const allCells = document.querySelectorAll(`[data-row-index="${rowIndex}"]`);
+            allCells.forEach((cell) => cell.classList.remove(styles.rowHovered));
+        };
+
+        container.addEventListener('mouseenter', handleMouseEnter);
+        container.addEventListener('mouseleave', handleMouseLeave);
+
+        return () => {
+            container.removeEventListener('mouseenter', handleMouseEnter);
+            container.removeEventListener('mouseleave', handleMouseLeave);
+        };
+    }, [isDataRow, props.rowIndex, props.enableRowHover]);
+
     return (
         <div
             className={clsx(styles.container, props.containerClassName, {
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
+                [styles.dataRow]: isDataRow,
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
+                [styles.rowHoverEnabled]: isDataRow && props.enableRowHover,
                 [styles.withRowBorder]:
                     props.enableRowBorders && props.enableHeader && props.rowIndex > 0,
             })}
+            data-row-index={isDataRow ? props.rowIndex : undefined}
             onClick={(e) => props.handleExpand(e, props.data[props.rowIndex], props.itemType)}
+            ref={containerRef}
             style={props.style}
         >
             {props.children}

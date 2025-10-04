@@ -1,4 +1,5 @@
 .container {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -20,6 +21,8 @@
 }
 
 .content {
+    position: relative;
+    z-index: 2;
     display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -35,6 +38,25 @@
 
 .container.with-row-border {
     border-bottom: 1px solid var(--theme-colors-border);
+}
+
+.container.data-row.row-hover-enabled:hover::before,
+.container.data-row.row-hover-enabled.row-hovered::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+    content: '';
+    background-color: var(--theme-colors-surface);
+    opacity: 0.7;
+}
+
+.container.data-row > * {
+    position: relative;
+    z-index: 2;
 }
 
 .header-container {
