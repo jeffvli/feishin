@@ -38,6 +38,7 @@ const AlbumArtistsColumn = (props: ItemTableListInnerColumn) => {
                             component={Link}
                             isLink
                             isMuted
+                            isNoSelect
                             key={albumArtist.id}
                             to={albumArtist.path}
                         >
