@@ -27,6 +27,7 @@ import { CellProps } from '/@/renderer/components/item-list/item-table-list/item
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { TableColumn } from '/@/shared/types/types';
+import { createDoubleClickHandler } from '/@/shared/utils/double-click-handler';
 
 export interface ItemTableListColumn extends CellComponentProps<CellProps> {}
 
@@ -116,6 +117,7 @@ export const TableColumnTextContainer = (
 ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const isDataRow = props.enableHeader && props.rowIndex > 0;
+    const dataIndex = isDataRow ? props.rowIndex - 1 : props.rowIndex;
 
     useEffect(() => {
         if (!isDataRow || !containerRef.current || !props.enableRowHover) return;
@@ -157,7 +159,18 @@ export const TableColumnTextContainer = (
                     props.enableRowBorders && props.enableHeader && props.rowIndex > 0,
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
-            onClick={(e) => props.handleExpand(e, props.data[props.rowIndex], props.itemType)}
+            onClick={createDoubleClickHandler<HTMLDivElement>({
+                onDoubleClick: (e) => {
+                    props.onItemDoubleClick?.(props.data[props.rowIndex], dataIndex, e);
+                },
+                onSingleClick: (e) => {
+                    props.onItemClick?.(props.data[props.rowIndex], dataIndex, e);
+                    props.handleExpand(e, props.data[props.rowIndex], props.itemType);
+                },
+            })}
+            onContextMenu={(e) => {
+                props.onItemContextMenu?.(props.data[props.rowIndex], dataIndex, e);
+            }}
             ref={containerRef}
             style={props.style}
         >
@@ -182,6 +195,7 @@ export const TableColumnContainer = (
 ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const isDataRow = props.enableHeader && props.rowIndex > 0;
+    const dataIndex = isDataRow ? props.rowIndex - 1 : props.rowIndex;
 
     useEffect(() => {
         if (!isDataRow || !containerRef.current || !props.enableRowHover) return;
@@ -223,7 +237,18 @@ export const TableColumnContainer = (
                     props.enableRowBorders && props.enableHeader && props.rowIndex > 0,
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
-            onClick={(e) => props.handleExpand(e, props.data[props.rowIndex], props.itemType)}
+            onClick={createDoubleClickHandler<HTMLDivElement>({
+                onDoubleClick: (e) => {
+                    props.onItemDoubleClick?.(props.data[props.rowIndex], dataIndex, e);
+                },
+                onSingleClick: (e) => {
+                    props.onItemClick?.(props.data[props.rowIndex], dataIndex, e);
+                    props.handleExpand(e, props.data[props.rowIndex], props.itemType);
+                },
+            })}
+            onContextMenu={(e) => {
+                props.onItemContextMenu?.(props.data[props.rowIndex], dataIndex, e);
+            }}
             ref={containerRef}
             style={props.style}
         >

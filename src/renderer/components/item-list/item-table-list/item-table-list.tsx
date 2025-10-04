@@ -8,7 +8,6 @@ import {
     type JSXElementConstructor,
     MouseEvent,
     Ref,
-    UIEvent,
     useCallback,
     useEffect,
     useMemo,
@@ -33,6 +32,9 @@ export interface CellProps {
     enableRowHover?: boolean;
     handleExpand: (e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => void;
     itemType: LibraryItem;
+    onItemClick?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
+    onItemContextMenu?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
+    onItemDoubleClick?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
     size?: 'compact' | 'default';
 }
 
@@ -53,23 +55,19 @@ interface ItemTableListProps {
     enableRowHover?: boolean;
     enableSelection?: boolean;
     headerHeight?: number;
-    initialTopMostItemIndex?:
-        | number
-        | {
-              align: 'center' | 'end' | 'start';
-              behavior: 'auto' | 'smooth';
-              index: number;
-              offset?: number;
-          };
+    initialTop?: {
+        behavior?: 'auto' | 'smooth';
+        to: number;
+        type: 'index' | 'offset';
+    };
     itemType: LibraryItem;
-    onCellsRendered: GridProps<CellProps>['onCellsRendered'];
+    onCellsRendered?: GridProps<CellProps>['onCellsRendered'];
     onEndReached?: (index: number) => void;
     onItemClick?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
     onItemContextMenu?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
     onItemDoubleClick?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
     onRangeChanged?: (range: { endIndex: number; startIndex: number }) => void;
-    onScroll?: (event: UIEvent<HTMLDivElement>) => void;
-    onScrollEnd?: () => void;
+    onScrollEnd?: (offset: number) => void;
     onStartReached?: (index: number) => void;
     ref?: Ref<GridImperativeAPI>;
     rowHeight: ((index: number, cellProps: CellProps) => number) | number;
@@ -95,11 +93,12 @@ export const ItemTableList = ({
     CellComponent,
     columns,
     data,
+    enableExpansion = false,
     enableHeader = true,
     enableRowBorders = false,
     enableRowHover = false,
     headerHeight = 40,
-    initialTopMostItemIndex,
+    initialTop,
     itemType,
     onCellsRendered,
     onEndReached,
@@ -107,7 +106,6 @@ export const ItemTableList = ({
     onItemContextMenu,
     onItemDoubleClick,
     onRangeChanged,
-    onScroll,
     onScrollEnd,
     onStartReached,
     ref,
@@ -133,6 +131,8 @@ export const ItemTableList = ({
     const mergedRowRef = useMergedRef(rowRef, scrollContainerRef);
     const [showLeftShadow, setShowLeftShadow] = useState(false);
     const [showRightShadow, setShowRightShadow] = useState(false);
+
+    const onScrollEndRef = useRef<ItemTableListProps['onScrollEnd']>(onScrollEnd);
 
     const [initialize] = useOverlayScrollbars({
         defer: true,
@@ -230,6 +230,10 @@ export const ItemTableList = ({
                 const timeout = setTimeout(() => {
                     scrollingElements.delete(element);
                     scrollTimeouts.delete(element);
+
+                    if (element === row && onScrollEndRef.current) {
+                        onScrollEndRef.current(row.scrollTop);
+                    }
                 }, 150);
 
                 scrollTimeouts.set(element, timeout);
@@ -446,6 +450,10 @@ export const ItemTableList = ({
 
     const handleExpand = useCallback(
         (_e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => {
+            if (!enableExpansion) {
+                return;
+            }
+
             if (item && typeof item === 'object' && 'id' in item && 'serverId' in item) {
                 internalState.toggleExpanded({
                     id: item.id as string,
@@ -454,7 +462,7 @@ export const ItemTableList = ({
                 });
             }
         },
-        [internalState],
+        [enableExpansion, internalState],
     );
 
     const handleOnCellsRendered = useCallback(
@@ -469,21 +477,41 @@ export const ItemTableList = ({
                 startIndex: cells.rowStartIndex,
             });
 
-            return onCellsRendered
-                ? ({ columnStartIndex, columnStopIndex, rowStartIndex, rowStopIndex }) => {
-                      return onCellsRendered!(
-                          {
-                              columnStartIndex: columnStartIndex + pinnedLeftColumnCount,
-                              columnStopIndex: columnStopIndex + pinnedLeftColumnCount,
-                              rowStartIndex: rowStartIndex + pinnedRowCount,
-                              rowStopIndex: rowStopIndex + pinnedRowCount,
-                          },
-                          cells,
-                      );
-                  }
-                : undefined;
+            if (onStartReached || onEndReached) {
+                if (cells.rowStartIndex === 0) {
+                    onStartReached?.(0);
+                }
+
+                if (cells.rowStopIndex + 10 >= totalItemCount) {
+                    onEndReached?.(totalItemCount);
+                }
+            }
+
+            if (onCellsRendered) {
+                return ({ columnStartIndex, columnStopIndex, rowStartIndex, rowStopIndex }) => {
+                    return onCellsRendered!(
+                        {
+                            columnStartIndex: columnStartIndex + pinnedLeftColumnCount,
+                            columnStopIndex: columnStopIndex + pinnedLeftColumnCount,
+                            rowStartIndex: rowStartIndex + pinnedRowCount,
+                            rowStopIndex: rowStopIndex + pinnedRowCount,
+                        },
+                        cells,
+                    );
+                };
+            }
+
+            return undefined;
         },
-        [onCellsRendered, onRangeChanged, pinnedLeftColumnCount, pinnedRowCount],
+        [
+            onCellsRendered,
+            onEndReached,
+            onRangeChanged,
+            onStartReached,
+            pinnedLeftColumnCount,
+            pinnedRowCount,
+            totalItemCount,
+        ],
     );
 
     const PinnedRowCell = useCallback(
@@ -536,9 +564,6 @@ export const ItemTableList = ({
                 <CellComponent
                     {...cellProps}
                     columnIndex={cellProps.columnIndex + pinnedLeftColumnCount}
-                    // onClick={(e) => {
-                    //     onItemClick?.(cellProps.data[cellProps.rowIndex], cellProps.rowIndex, e);
-                    // }}
                     rowIndex={cellProps.rowIndex + pinnedRowCount}
                 />
             );
@@ -554,8 +579,102 @@ export const ItemTableList = ({
         enableRowHover,
         handleExpand,
         itemType,
+        onItemClick,
+        onItemContextMenu,
+        onItemDoubleClick,
         size,
     };
+
+    const isInitialScrollPositionSet = useRef<boolean>(false);
+
+    useEffect(() => {
+        if (!initialTop || isInitialScrollPositionSet.current) return;
+
+        const scrollToIndex = (index: number, behavior: 'auto' | 'smooth' = 'auto') => {
+            isInitialScrollPositionSet.current = true;
+            const adjustedIndex = enableHeader ? Math.max(0, index - 1) : index;
+
+            // Calculate scroll position based on row heights
+            const calculateScrollTop = (rowIndex: number) => {
+                let scrollTop = 0;
+                for (let i = 0; i < rowIndex; i++) {
+                    const height = rowHeight as number;
+                    scrollTop += height;
+                }
+                return scrollTop;
+            };
+
+            const scrollTop = calculateScrollTop(adjustedIndex);
+
+            // Get the scroll containers and scroll them directly
+            const mainContainer = rowRef.current?.childNodes[0] as HTMLDivElement;
+            const pinnedLeftContainer = pinnedLeftColumnRef.current
+                ?.childNodes[0] as HTMLDivElement;
+            const pinnedRightContainer = pinnedRightColumnRef.current
+                ?.childNodes[0] as HTMLDivElement;
+
+            if (initialTop.type === 'offset') {
+                if (mainContainer) {
+                    mainContainer.scrollTo({
+                        behavior,
+                        top: initialTop.to,
+                    });
+                }
+
+                if (pinnedLeftContainer) {
+                    pinnedLeftContainer.scrollTo({
+                        behavior,
+                        top: initialTop.to,
+                    });
+                }
+
+                if (pinnedRightContainer) {
+                    pinnedRightContainer.scrollTo({
+                        behavior,
+                        top: initialTop.to,
+                    });
+                }
+            } else {
+                if (mainContainer) {
+                    mainContainer.scrollTo({
+                        behavior,
+                        top: scrollTop,
+                    });
+                }
+
+                if (pinnedLeftContainer) {
+                    pinnedLeftContainer.scrollTo({
+                        behavior,
+                        top: scrollTop,
+                    });
+                }
+
+                if (pinnedRightContainer) {
+                    pinnedRightContainer.scrollTo({
+                        behavior,
+                        top: scrollTop,
+                    });
+                }
+            }
+        };
+
+        scrollToIndex(initialTop.to, initialTop.behavior);
+    }, [initialTop, enableHeader, pinnedLeftColumnCount, pinnedRightColumnCount, rowHeight]);
+
+    // Expose grid refs to parent component
+    useEffect(() => {
+        if (ref && typeof ref === 'object') {
+            // Create a simple API that exposes the main container
+            const combinedAPI: GridImperativeAPI = {
+                // We'll create a minimal API that can be extended later
+                // For now, we'll just expose the main container ref
+            } as GridImperativeAPI;
+
+            if ('current' in ref) {
+                (ref as React.MutableRefObject<GridImperativeAPI>).current = combinedAPI;
+            }
+        }
+    }, [ref]);
 
     return (
         <motion.div
