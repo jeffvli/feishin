@@ -322,7 +322,7 @@ const normalizeAlbum = (
         songs: item.songs ? item.songs.map((song) => normalizeSong(song, server)) : undefined,
         tags: item.tags || null,
         updatedAt: item.updatedAt,
-        userFavorite: item.starred,
+        userFavorite: item.starred || false,
         userRating: item.rating || null,
     };
 };
@@ -389,8 +389,8 @@ const normalizeAlbumArtist = (
                 name: artist.name,
             })) || null,
         songCount,
-        userFavorite: item.starred,
-        userRating: item.rating,
+        userFavorite: item.starred || false,
+        userRating: item.rating || null,
     };
 };
 
