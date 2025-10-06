@@ -5,31 +5,27 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { PlaylistDetailSongListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header-filters';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
-import { useCurrentServer, usePlaylistDetailStore } from '/@/renderer/store';
+import { useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString } from '/@/renderer/utils';
 import { Badge } from '/@/shared/components/badge/badge';
 import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
-import {
-    LibraryItem,
-    PlaylistSongListQueryClientSide,
-    SongListSort,
-    SortOrder,
-} from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface PlaylistDetailHeaderProps {
+    handlePlay: (playType: Play) => void;
+
     handleToggleShowQueryBuilder: () => void;
     itemCount?: number;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const PlaylistDetailSongListHeader = ({
+    handlePlay,
     handleToggleShowQueryBuilder,
     itemCount,
     tableRef,
@@ -38,20 +34,6 @@ export const PlaylistDetailSongListHeader = ({
     const { playlistId } = useParams() as { playlistId: string };
     const server = useCurrentServer();
     const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
-    const handlePlayQueueAdd = usePlayQueueAdd();
-    const page = usePlaylistDetailStore();
-    const filters: Partial<PlaylistSongListQueryClientSide> = {
-        sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
-        sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
-    };
-
-    const handlePlay = async (playType: Play) => {
-        handlePlayQueueAdd?.({
-            byItemType: { id: [playlistId], type: LibraryItem.PLAYLIST },
-            playType,
-            query: filters,
-        });
-    };
 
     const playButtonBehavior = usePlayButtonBehavior();
 
@@ -78,6 +60,7 @@ export const PlaylistDetailSongListHeader = ({
             </PageHeader>
             <FilterBar>
                 <PlaylistDetailSongListHeaderFilters
+                    handlePlay={handlePlay}
                     handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
                     tableRef={tableRef}
                 />

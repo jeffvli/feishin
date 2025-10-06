@@ -77,6 +77,8 @@ const BindingActionsSchema = z.enum([
 
 const DiscordDisplayTypeSchema = z.enum(['artist', 'feishin', 'song']);
 
+const DiscordLinkTypeSchema = z.enum(['last_fm', 'musicbrainz', 'musicbrainz_last_fm', 'none']);
+
 const GenreTargetSchema = z.enum(['album', 'track']);
 
 const SideQueueTypeSchema = z.enum(['sideDrawerQueue', 'sideQueue']);
@@ -133,6 +135,7 @@ const DiscordSettingsSchema = z.object({
     clientId: z.string(),
     displayType: DiscordDisplayTypeSchema,
     enabled: z.boolean(),
+    linkType: DiscordLinkTypeSchema,
     showAsListening: z.boolean(),
     showPaused: z.boolean(),
     showServerImage: z.boolean(),
@@ -345,6 +348,13 @@ export enum DiscordDisplayType {
     SONG_NAME = 'song',
 }
 
+export enum DiscordLinkType {
+    LAST_FM = 'last_fm',
+    MBZ = 'musicbrainz',
+    MBZ_LAST_FM = 'musicbrainz_last_fm',
+    NONE = 'none',
+}
+
 export enum GenreTarget {
     ALBUM = 'album',
     TRACK = 'track',
@@ -477,6 +487,7 @@ const initialState: SettingsState = {
         clientId: '1165957668758900787',
         displayType: DiscordDisplayType.FEISHIN,
         enabled: false,
+        linkType: DiscordLinkType.NONE,
         showAsListening: false,
         showPaused: true,
         showServerImage: false,

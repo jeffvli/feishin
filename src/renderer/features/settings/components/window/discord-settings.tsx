@@ -7,6 +7,7 @@ import {
 } from '/@/renderer/features/settings/components/settings-section';
 import {
     DiscordDisplayType,
+    DiscordLinkType,
     useDiscordSettings,
     useGeneralSettings,
     useSettingsStoreActions,
@@ -162,6 +163,54 @@ export const DiscordSettings = () => {
             }),
             isHidden: !isElectron(),
             title: t('setting.discordDisplayType', {
+                discord: 'Discord',
+                musicbrainz: 'musicbrainz',
+                postProcess: 'sentenceCase',
+            }),
+        },
+        {
+            control: (
+                <Select
+                    aria-label={t('setting.discordLinkType')}
+                    clearable={false}
+                    data={[
+                        {
+                            label: t('setting.discordLinkType_none', {
+                                postProcess: 'sentenceCase',
+                            }),
+                            value: DiscordLinkType.NONE,
+                        },
+                        { label: 'last.fm', value: DiscordLinkType.LAST_FM },
+                        { label: 'musicbrainz', value: DiscordLinkType.MBZ },
+                        {
+                            label: t('setting.discordLinkType_mbz_lastfm', {
+                                lastfm: 'last.fm',
+                                musicbrainz: 'musicbrainz',
+                            }),
+                            value: DiscordLinkType.MBZ_LAST_FM,
+                        },
+                    ]}
+                    defaultValue={settings.linkType}
+                    onChange={(e) => {
+                        if (!e) return;
+                        setSettings({
+                            discord: {
+                                ...settings,
+                                linkType: e as DiscordLinkType,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.discordLinkType', {
+                context: 'description',
+                discord: 'Discord',
+                lastfm: 'last.fm',
+                musicbrainz: 'musicbrainz',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.discordLinkType', {
                 discord: 'Discord',
                 postProcess: 'sentenceCase',
             }),

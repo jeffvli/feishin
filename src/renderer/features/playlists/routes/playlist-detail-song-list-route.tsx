@@ -1,11 +1,13 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { closeAllModals, openModal } from '@mantine/modals';
+import Fuse from 'fuse.js';
 import { motion } from 'motion/react';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router';
 
+import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { PlaylistDetailSongListContent } from '/@/renderer/features/playlists/components/playlist-detail-song-list-content';
 import { PlaylistDetailSongListHeader } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header';
 import { PlaylistQueryBuilder } from '/@/renderer/features/playlists/components/playlist-query-builder';
@@ -23,6 +25,7 @@ import { Group } from '/@/shared/components/group/group';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerType, SongListSort, SortOrder, sortSongList } from '/@/shared/types/domain-types';
+import { Play } from '/@/shared/types/types';
 
 const PlaylistDetailSongListRoute = () => {
     const { t } = useTranslation();
@@ -30,6 +33,7 @@ const PlaylistDetailSongListRoute = () => {
     const tableRef = useRef<AgGridReactType | null>(null);
     const { playlistId } = useParams() as { playlistId: string };
     const server = useCurrentServer();
+    const handlePlayQueueAdd = useHandlePlayQueueAdd();
 
     const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
     const createPlaylistMutation = useCreatePlaylist({});
@@ -151,21 +155,50 @@ const PlaylistDetailSongListRoute = () => {
         serverId: server?.id,
     });
 
-    const itemCount = playlistSongs.data?.totalRecordCount ?? undefined;
-
     const filterSortedSongs = useMemo(() => {
-        if (playlistSongs.data?.items) {
+        let items = playlistSongs.data?.items;
+
+        if (items) {
+            const searchTerm = page?.table.id[playlistId]?.filter?.searchTerm;
+
+            if (searchTerm) {
+                const fuse = new Fuse(items, {
+                    fieldNormWeight: 1,
+                    ignoreLocation: true,
+                    keys: [
+                        'name',
+                        'album',
+                        {
+                            getFn: (song) => song.artists.map((artist) => artist.name),
+                            name: 'artist',
+                        },
+                    ],
+                    threshold: 0,
+                });
+                items = fuse.search(searchTerm).map((item) => item.item);
+            }
+
             const sortBy = page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID;
             const sortOrder = page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC;
-            return sortSongList(playlistSongs.data?.items, sortBy, sortOrder);
+            return sortSongList(items, sortBy, sortOrder);
         } else {
             return [];
         }
     }, [playlistSongs.data?.items, page?.table.id, playlistId]);
 
+    const itemCount = playlistSongs.data?.totalRecordCount ? filterSortedSongs.length : undefined;
+
+    const handlePlay = (play: Play) => {
+        handlePlayQueueAdd?.({
+            byData: filterSortedSongs,
+            playType: play,
+        });
+    };
+
     return (
         <AnimatedPage key={`playlist-detail-songList-${playlistId}`}>
             <PlaylistDetailSongListHeader
+                handlePlay={handlePlay}
                 handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
                 itemCount={itemCount}
                 tableRef={tableRef}

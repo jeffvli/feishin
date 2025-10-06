@@ -5,6 +5,7 @@ const HOME_ITEMS: Array<[string, string]> = [
     [HomeItem.RANDOM, 'page.home.explore'],
     [HomeItem.RECENTLY_PLAYED, 'page.home.recentlyPlayed'],
     [HomeItem.RECENTLY_ADDED, 'page.home.newlyAdded'],
+    [HomeItem.RECENTLY_RELEASED, 'page.home.recentlyReleased'],
     [HomeItem.MOST_PLAYED, 'page.home.mostPlayed'],
 ];
 

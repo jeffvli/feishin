@@ -340,6 +340,8 @@ export type Song = {
     itemType: LibraryItem.SONG;
     lastPlayedAt: null | string;
     lyrics: null | string;
+    mbzRecordingId: null | string;
+    mbzTrackId: null | string;
     name: string;
     participants: null | Record<string, RelatedArtist[]>;
     path: null | string;

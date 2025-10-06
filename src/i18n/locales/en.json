@@ -411,6 +411,7 @@
             "mostPlayed": "most played",
             "newlyAdded": "newly added releases",
             "recentlyPlayed": "recently played",
+            "recentlyReleased": "recently released",
             "title": "$t(common.home)"
         },
         "itemDetail": {
@@ -534,6 +535,10 @@
         "discordDisplayType": "{{discord}} presence display type",
         "discordIdleStatus_description": "when enabled, update status while player is idle",
         "discordIdleStatus": "show rich presence idle status",
+        "discordLinkType_description": "adds external links to {{lastfm}} or {{musicbrainz}} to the song and artist fields in {{discord}} rich presence. {{musicbrainz}} is the most accurate but requires tags and doesn't provide artist links while {{lastfm}} should always provide a link. makes no extra network requests",
+        "discordLinkType_mbz_lastfm": "{{musicbrainz}} with {{lastfm}} fallback",
+        "discordLinkType_none": "$t(common.none)",
+        "discordLinkType": "{{discord}} presence links",
         "discordListening_description": "show status as listening instead of playing",
         "discordListening": "show status as listening",
         "discordPausedStatus_description": "when enabled, status will show when player is paused",
