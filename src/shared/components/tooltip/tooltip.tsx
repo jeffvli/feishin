@@ -16,12 +16,14 @@ export const Tooltip = ({
 }: TooltipProps) => {
     return (
         <MantineTooltip
+            arrowSize={10}
             classNames={{
                 tooltip: styles.tooltip,
             }}
             multiline
             openDelay={openDelay}
             transitionProps={transitionProps}
+            withArrow
             withinPortal={withinPortal}
             {...props}
         >
