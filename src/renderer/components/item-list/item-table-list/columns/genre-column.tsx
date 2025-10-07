@@ -15,6 +15,8 @@ import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Genre } from '/@/shared/types/domain-types';
 import { stringToColor } from '/@/shared/utils/string-to-color';
 
+const MAX_GENRES = 4;
+
 const GenreColumn = (props: ItemTableListInnerColumn) => {
     const row: Genre[] | undefined = (props.data as (Genre[] | undefined)[])[props.rowIndex]?.[
         props.columns[props.columnIndex].id
@@ -33,7 +35,7 @@ const GenreColumn = (props: ItemTableListInnerColumn) => {
         return (
             <TableColumnContainer {...props}>
                 <Group className={styles.group} wrap="wrap">
-                    {genres.map((genre) => (
+                    {genres.slice(0, MAX_GENRES).map((genre) => (
                         <Badge
                             component={Link}
                             key={genre.id}
